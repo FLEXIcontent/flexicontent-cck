@@ -146,6 +146,7 @@ class ParentClassItem extends JModelAdmin
 		// Set a new item id and wipe data
 		if ($this->_id != $id) {
 			$this->_item = null;
+			$this->_version = null;
 		}
 		$this->_id = (int) $id;
 		
@@ -203,7 +204,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function set( $property, $value=null )
 	{
-		if ( $this->_loadItem() ) {
+		if ($this->_item || $this->_loadItem()) {
 			$this->_item->$property = $value;
 			return true;
 		} else {
@@ -219,11 +220,10 @@ class ParentClassItem extends JModelAdmin
 	 * @return	array
 	 * @since	1.0
 	 */
-	function &getItem($pk=null, $check_view_access=true, $no_cache=false, $force_version=false)
+	function &getItem($pk=null, $check_view_access=true, $no_cache=false, $force_version=0)
 	{
 		$app     = JFactory::getApplication();
 		$cparams = $this->_cparams;
-		$preview = JRequest::getVar('preview');
 		
 		// View access done is meant only for FRONTEND !!! ... force it to false
 		if ( $app->isAdmin() ) $check_view_access = false;
@@ -239,7 +239,7 @@ class ParentClassItem extends JModelAdmin
 			$this->setId($pk);
 		}
 		
-		// --. Try to load existing item
+		// --. Try to load existing item ... ZERO $force_version means unversioned data or maintain currently loaded version
 		if ( $pk && $this->_loadItem($no_cache, $force_version) )
 		{
 			// Successfully loaded existing item, do some extra manipulation of the loaded item ...
@@ -248,7 +248,7 @@ class ParentClassItem extends JModelAdmin
 				// Load item parameters with heritage
 				$this->_loadItemParams();
 				// Check item viewing access
-				if ( $check_view_access ) $this->_check_viewing_access();
+				if ( $check_view_access ) $this->_check_viewing_access($force_version);
 			}
 		}
 		
@@ -284,21 +284,28 @@ class ParentClassItem extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function _loadItem( $no_cache=false, $force_version=false )
+	function _loadItem( $no_cache=false, $force_version=0 )
 	{
 		if(!$this->_id) return false;  // Only try to load existing item
 		
-		// Cache items retrieved, we can retrieve multiple items, for this purpose 
-		// (a) temporarily set JRequest variable -version- to specify loaded version (set to zero to use latest )
-		// (b1) use member function function setId($id, $currcatid=0) to change primary key and then call getItem()
-		// (b2) or call getItem($pk, $check_view_access=true) passing the item id and maybe also disabling read access checkings, to avoid unwanted messages/errors
+		//echo 'force_version: '.$force_version ."  -- call_count: $call_count<br/>";
+		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+		
+		// -- To load a different item:
+		// a. use member function function setId($id, $currcatid=0) to change primary key and then call getItem()
+		// b. call getItem($pk, $check_view_access=true) passing the item id and maybe also disabling read access checkings, to avoid unwanted messages/errors
+		
+		// This is ITEM cache. NOTE: only unversioned items are cached
 		static $items = array();
+		
+		// Clear item to make sure it is reloaded
 		if ( $no_cache ) {
-			// Clear item to make sure it is reloaded
 			$this->_item = null;
 		}
-		else if ( isset($items[$this->_id]) ) {
-			$this->_item = & $items[$this->_id];
+		
+		// Only retrieve item if not already, ZERO $force_version means unversioned data or maintain currently loaded version
+		else if ( isset($this->_item) && (!$force_version || $force_version==$this->_version) ) {
+			//echo "********************************<br/>\n RETURNING ALREADY loaded item: {$this->_id}<br/> ********************************<br/><br/><br/>";
 			return (boolean) $this->_item;
 		}
 		
@@ -313,534 +320,542 @@ class ParentClassItem extends JModelAdmin
 		$view    = JRequest::getVar('view', false);
 		$option  = JRequest::getVar('option', false);
 		$use_versioning = $cparams->get('use_versioning', 1);
-		$allow_current_version = true;
 		$editjf_translations = $cparams->get('editjf_translations', 0);
 		
-		// *********************************************************************************************************
-		// Retrieve item if not already retrieved, null indicates cleared item data, e.g. because of changed item id
-		// *********************************************************************************************************
-		if ( $this->_item === null ) {
-			
-			//*****************************************************
-			// DECIDE VERSION and GENERATE VERSION RELATED MESSAGES
-			//*****************************************************
-			
-			// Variables controlling the version loading logic
-			$loadcurrent = JRequest::getVar('loadcurrent', false, 'request', 'boolean');  // loadcurrent request flag, ignored if version specified
-			$preview = JRequest::getVar('preview', false, 'request', 'boolean');   // preview request flag for viewing latest (and possibly unapproved) version in frontend
-			$version = JRequest::getVar('version', 0, 'request', 'int' );          // the item version to load
+		// ***********************************************************************
+		// Check if loading specific VERSION and generate version related messages
+		// ***********************************************************************
 		
-			// -- Decide the version to load: (a) the one specified by request or (b) the current one or (c) the latest one
-			$current_version = FLEXIUtilities::getCurrentVersions($this->_id, true, $force=true); // Get current item version
-			$last_version    = FLEXIUtilities::getLastVersions($this->_id, true, $force=true);    // Get last version (=latest one saved, highest version id),
+		$current_version = FLEXIUtilities::getCurrentVersions($this->_id, true, $force=true); // Get current item version
+		$last_version    = FLEXIUtilities::getLastVersions($this->_id, true, $force=true);    // Get last version (=latest one saved, highest version id)
 		
-			// NOTE: Setting version to zero indicates to load the current version from the normal tables and not the versioning table
-			if ( !$use_versioning ) {
-				// Force version to zero (load current version), when not using versioning mode
-				$version = 0;
-			} else if ($force_version !== false) {
-				$version = $force_version==-1 ? $last_version : $force_version;
-			} else if ($version == 0) {
-				// version request variable was NOT SET ... We need to decide to load current (version zero) or latest
-				
-				if ( $app->isAdmin() || ($task=='edit' && $option=='com_flexicontent') ) {
-					// Catch cases (a) when we enable versioning mode after an item has been saved in unversioning mode, (b) loadcurrent flag is set
-					// in these case we will load CURRENT version instead of the default for the item edit form which is the LATEST (for backend/fontend)
-					$version = ($current_version >= $last_version || $loadcurrent) ? 0 : $last_version;
-				} else {
-					// In frontend item display the current version must be shown unless preview flag is set
-					$version = !$preview ? 0 : $last_version;
-				}
-			} else if ($version == $current_version) {
-				// Current version number given, the data from the versioning table should be the same as the data from normal tables
-				// we do not force $version to ZERO to allow testing the field data of current version from the versioning table
-				if (!$allow_current_version) $version = 0;   // Force zero to retrieve unversioned data
+		// -- Decide the version to load: (a) the one specified or (b) UNversioned data (these should be same as current version data) or (c) the latest one
+		if ( !$use_versioning ) {
+			// Force version to zero (load current version), when not using versioning mode
+			$version = 0;
+		} else if ($force_version) {
+			$version = (int)$force_version;
+			if ($version == -1) {
+				// Load latest, but catch cases when we enable versioning mode after an item has been saved in unversioning mode
+				// in these case we will load CURRENT version instead of the default for the item edit form which is the LATEST (for backend/fontend)
+				//echo "LOADING LATEST: current_version >= last_version : $current_version >= $last_version <br/>";
+				$version = ($current_version >= $last_version) ? 0 : $last_version;
 			}
-			
-			// Check if not loading the current version while we are in edit form, and raise a notice to inform the user
-			if ($version && $version != $current_version  && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
-				$unapproved_version_notice = 1;
-				if (!$app->isAdmin()) {
-					JError::raiseNotice(10, JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') );
-				} else {
-					JError::raiseNotice(10,
-						JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') . ' :: ' .
-						JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE', $version, $current_version)
-					);
-				}
+		} else {
+			$version = 0; // Load unversioned data
+		}
+		
+		// Check if item is alredy loaded and is of correct version
+		if ( $this->_version == $version && isset($this->_item) ) {
+			return (boolean) $this->_item;
+		}
+		$this->_version = $version; // Set number of loaded version
+		//echo 'version: '.$version ."<br/>";
+		
+		// Current version number given, the data from the versioning table should be the same as the data from normal tables
+		// we do not force $version to ZERO to allow testing the field data of current version from the versioning table
+		//if ($version == $current_version) $version = 0;   // Force zero to retrieve unversioned data
+		
+		// Check if not loading the current version while we are in edit form, and raise a notice to inform the user
+		if ($version && $version != $current_version  && $task=='edit' && $option=='com_flexicontent' && !$unapproved_version_notice) {
+			$unapproved_version_notice = 1;
+			if (!$app->isAdmin()) {
+				JError::raiseNotice(10, JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') );
+			} else {
+				JError::raiseNotice(10,
+					JText::_('FLEXI_LOADING_UNAPPROVED_VERSION_NOTICE') . ' :: ' .
+					JText::sprintf('FLEXI_LOADED_VERSION_INFO_NOTICE', $version, $current_version)
+				);
 			}
-			
-			try
+		}
+		
+		
+		// Only unversioned items are cached, use cache if no specific version was requested
+		if ( !$version && isset($items[$this->_id]) ) {
+			//echo "********************************<br/>\n RETURNING CAHCED item: {$this->_id}<br/> ********************************<br/><br/><br/>";
+			$this->_item = & $items[$this->_id];
+			return (boolean) $this->_item;
+		}
+		
+		//echo "**************************<br/>\n LOADING item id: {$this->_id}<br/> **************************<br/><br/><br/>";
+		
+		// *********************
+		// TRY TO LOAD ITEM DATA
+		// *********************
+		try
+		{
+			if ( $app->isAdmin() )
 			{
-				if ( $app->isAdmin() )
+				// **********************
+				// Item Retrieval BACKEND
+				// **********************
+				$item   = $this->getTable('flexicontent_items', '');
+				$result = $item->load($this->_id);  // try loading existing item data
+				if ($result===false) {
+					$this->_item = false;
+					if (!$version) $items[$this->_id] = & $this->_item;
+					return false; // item not found, return
+				}
+			}
+			else
+			{
+				// ***********************
+				// Item Retrieval FRONTEND
+				// ***********************
+				
+				// Tables needed to be joined for calculating access
+				$joinaccess = '';
+				// Extra access columns for main category and content type (item access will be added as 'access')
+				$select_access = 'mc.access as category_access, ty.access as type_access';
+				
+				// Access Flags for: content type, main category, item
+				if (FLEXI_J16GE) {
+					$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+					$aid_list = implode(",", $aid_arr);
+					$select_access .= ', CASE WHEN ty.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_type_access';
+					$select_access .= ', CASE WHEN mc.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_mcat_access';
+					$select_access .= ', CASE WHEN  i.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_item_access';
+				} else {
+					$aid = (int) $user->get('aid');
+					if (FLEXI_ACCESS) {
+						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
+						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+						$select_access .= ', CASE WHEN (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_type_access';
+						$select_access .= ', CASE WHEN (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_mcat_access';
+						$select_access .= ', CASE WHEN (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_item_access';
+					} else {
+						$select_access .= ', CASE WHEN (ty.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_type_access';
+						$select_access .= ', CASE WHEN (mc.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_mcat_access';
+						$select_access .= ', CASE WHEN ( i.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_item_access';
+					}
+					$select_access .= ', ';
+				}
+				
+				// SQL date strings, current date and null date
+				$nowDate = $db->Quote( FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL() );
+				$nullDate	= $db->Quote($db->getNullDate());
+				
+				// Decide to limit to CURRENT CATEGORY
+				$limit_to_cid = $this->_cid ? ' AND rel.catid = '. (int) $this->_cid : ' AND rel.catid = i.catid';
+				
+				if (FLEXI_J16GE)
 				{
-					// **********************
-					// Item Retrieval BACKEND
-					// **********************
-					$item   = $this->getTable('flexicontent_items', '');
-					$result = $item->load($this->_id);  // try loading existing item data
-					if ($result===false) return false;
+					// Initialize query
+					$query = $db->getQuery(true);
+					
+					$query->select('i.*, ie.*');                              // Item basic and extended data
+					$query->select($select_access);                              // Access Columns and Access Flags for: content type, main category, item
+					if ($version) $query->select('ver.version_id');           // Versioned item viewing
+					$query->select('c.id AS catid, i.catid as maincatid');    // Current category id and Main category id
+					$query->select(
+						'c.title AS category_title, c.alias AS category_alias, c.lft,c.rgt');   // Current category data
+					$query->select('ty.name AS typename, ty.alias as typealias');             // Content Type data, and author data
+					$query->select('u.name AS author');                                       // Author data
+					
+					// Rating count, Rating & Score
+					$query->select('v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score');
+					
+					// Item and Current Category slugs (for URL)
+					$query->select('CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug');
+					$query->select('CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug');
+					
+					// Publication Scheduled / Expired Flags
+					$query->select('CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled');
+					$query->select('CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired' );
+					
+					// From content table, and extended item table, content type table, user table, rating table, categories relation table
+					$query->from('#__content AS i');
+					$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id');
+					$query->join('LEFT', '#__flexicontent_types AS ty ON ie.type_id = ty.id');
+					$query->join('LEFT', '#__users AS u on u.id = i.created_by');
+					$query->join('LEFT', '#__content_rating AS v ON i.id = v.content_id');
+					$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid);
+					
+					// Join twice on category table, once for current category and once for item's main category
+					$query->join('LEFT', '#__categories AS c on c.id = rel.catid');   // All item's categories
+					$query->join('LEFT', '#__categories AS mc on mc.id = i.catid');   // Item's main category
+					
+					// HANDLE J1.6+ ancestor category being unpublished, when badcats.id is not null,
+					// then the item is inside in an unpublished ancestor category, thus inaccessible
+					/*$query->select('CASE WHEN badcats.id is null THEN 1 ELSE 0 END AS ancestor_cats_published');
+					$subquery = ' (SELECT cat.id as id FROM #__categories AS cat JOIN #__categories AS parent ';
+					$subquery .= 'ON cat.lft BETWEEN parent.lft AND parent.rgt ';
+					$subquery .= 'WHERE parent.extension = ' . $db->Quote('com_content');
+					$subquery .= ' AND parent.published <= 0 GROUP BY cat.id)';
+					$query->join('LEFT', $subquery . ' AS badcats ON badcats.id = c.id');*/
+					
+					if ($version) {
+						// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists
+						$query->join('LEFT', '#__flexicontent_versions AS ver ON ver.item_id = i.id AND ver.version_id = '. $db->Quote($version) );
+					}
+					
+					// Join on contact table, to get contact data of author
+					//$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'contact_details"';
+					//$db->setQuery($query);
+					//$contact_details_tbl_exists = (boolean) count($db->loadObjectList());
+					//if ( $contact_details_tbl_exists) {
+					//	$query->select('contact.id as contactid' ) ;
+					//	$query->join('LEFT','#__contact_details AS contact on contact.user_id = i.created_by');
+					//}
+					
+					// Join over the categories to get parent category titles
+					//$query->select('parent.title as parent_title, parent.id as parent_id, parent.path as parent_route, parent.alias as parent_alias');
+					//$query->join('LEFT', '#__categories as parent ON parent.id = c.parent_id');
+					
+					$query->where('i.id = ' . (int) $this->_id);
+					//echo $db->replacePrefix($query);
 				}
 				else
 				{
-					// ***********************
-					// Item Retrieval FRONTEND
-					// ***********************
+					// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists
+					$version_join =  $version ? ' LEFT JOIN #__flexicontent_versions AS ver ON ver.item_id = i.id AND ver.version_id = '. $db->Quote($version) : '';
+					$where	= $this->_buildItemWhere();
 					
-					// Tables needed to be joined for calculating access
-					$joinaccess = '';
-					// Extra access columns for main category and content type (item access will be added as 'access')
-					$select_access = 'mc.access as category_access, ty.access as type_access';
+					$query = 'SELECT i.*, ie.*, '                                   // Item basic and extended data
+					. $select_access                                                // Access Columns and Access Flags for: content type, main category, item
+					. ($version ? 'ver.version_id,'  : '')                          // Versioned item viewing
+					. ' c.id AS catid, i.catid as maincatid,'                       // Current category id and Main category id
+					. ' c.published AS catpublished,'                               // Current category published (in J1.6+ this includes all ancestor categories)
+					. ' c.title AS category_title, c.alias AS category_alias,'      // Current category data
+					. ' ty.name as typename, ty.alias as typealias,'                // Content Type data
+					. ' u.name AS author, u.usertype,'                              // Author data
 					
-					// Access Flags for: content type, main category, item
-					if (FLEXI_J16GE) {
-						$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-						$aid_list = implode(",", $aid_arr);
-						$select_access .= ', CASE WHEN ty.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_type_access';
-						$select_access .= ', CASE WHEN mc.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_mcat_access';
-						$select_access .= ', CASE WHEN  i.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_item_access';
-					} else {
-						$aid = (int) $user->get('aid');
-						if (FLEXI_ACCESS) {
-							$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-							$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-							$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-							$select_access .= ', CASE WHEN (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_type_access';
-							$select_access .= ', CASE WHEN (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_mcat_access';
-							$select_access .= ', CASE WHEN (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_item_access';
-						} else {
-							$select_access .= ', CASE WHEN (ty.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_type_access';
-							$select_access .= ', CASE WHEN (mc.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_mcat_access';
-							$select_access .= ', CASE WHEN ( i.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_item_access';
-						}
-						$select_access .= ', ';
-					}
+					// Rating count, Rating & Score
+					. ' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score,'
 					
-					// SQL date strings, current date and null date
-					$nowDate = $db->Quote( FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL() );
-					$nullDate	= $db->Quote($db->getNullDate());
+					// Item and Current Category slugs (for URL)
+					. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
 					
-					// Decide to limit to CURRENT CATEGORY
-					$limit_to_cid = $this->_cid ? ' AND rel.catid = '. (int) $this->_cid : ' AND rel.catid = i.catid';
+					// Publication Scheduled / Expired Flags
+					. ' CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled,'
+					. ' CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired'
 					
-					if (FLEXI_J16GE)
-					{
-						// Initialize query
-						$query = $db->getQuery(true);
-						
-						$query->select('i.*, ie.*');                              // Item basic and extended data
-						$query->select($select_access);                              // Access Columns and Access Flags for: content type, main category, item
-						if ($version) $query->select('ver.version_id');           // Versioned item viewing
-						$query->select('c.id AS catid, i.catid as maincatid');    // Current category id and Main category id
-						$query->select(
-							'c.title AS category_title, c.alias AS category_alias, c.lft,c.rgt');   // Current category data
-						$query->select('ty.name AS typename, ty.alias as typealias');             // Content Type data, and author data
-						$query->select('u.name AS author');                                       // Author data
-						
-						// Rating count, Rating & Score
-						$query->select('v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score');
-						
-						// Item and Current Category slugs (for URL)
-						$query->select('CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug');
-						$query->select('CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug');
-						
-						// Publication Scheduled / Expired Flags
-						$query->select('CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled');
-						$query->select('CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired' );
-						
-						// From content table, and extended item table, content type table, user table, rating table, categories relation table
-						$query->from('#__content AS i');
-						$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id');
-						$query->join('LEFT', '#__flexicontent_types AS ty ON ie.type_id = ty.id');
-						$query->join('LEFT', '#__users AS u on u.id = i.created_by');
-						$query->join('LEFT', '#__content_rating AS v ON i.id = v.content_id');
-						$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid);
-						
-						// Join twice on category table, once for current category and once for item's main category
-						$query->join('LEFT', '#__categories AS c on c.id = rel.catid');   // All item's categories
-						$query->join('LEFT', '#__categories AS mc on mc.id = i.catid');   // Item's main category
-						
-						// HANDLE J1.6+ ancestor category being unpublished, when badcats.id is not null,
-						// then the item is inside in an unpublished ancestor category, thus inaccessible
-						/*$query->select('CASE WHEN badcats.id is null THEN 1 ELSE 0 END AS ancestor_cats_published');
-						$subquery = ' (SELECT cat.id as id FROM #__categories AS cat JOIN #__categories AS parent ';
-						$subquery .= 'ON cat.lft BETWEEN parent.lft AND parent.rgt ';
-						$subquery .= 'WHERE parent.extension = ' . $db->Quote('com_content');
-						$subquery .= ' AND parent.published <= 0 GROUP BY cat.id)';
-						$query->join('LEFT', $subquery . ' AS badcats ON badcats.id = c.id');*/
-						
-						if ($version) {
-							// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists
-							$query->join('LEFT', '#__flexicontent_versions AS ver ON ver.item_id = i.id AND ver.version_id = '. $db->Quote($version) );
-						}
-						
-						// Join on contact table, to get contact data of author
-						//$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'contact_details"';
-						//$db->setQuery($query);
-						//$contact_details_tbl_exists = (boolean) count($db->loadObjectList());
-						//if ( $contact_details_tbl_exists) {
-						//	$query->select('contact.id as contactid' ) ;
-						//	$query->join('LEFT','#__contact_details AS contact on contact.user_id = i.created_by');
-						//}
-						
-						// Join over the categories to get parent category titles
-						//$query->select('parent.title as parent_title, parent.id as parent_id, parent.path as parent_route, parent.alias as parent_alias');
-						//$query->join('LEFT', '#__categories as parent ON parent.id = c.parent_id');
-
-						$query->where('i.id = ' . (int) $this->_id);
-						//echo $db->replacePrefix($query);
-					}
-					else
-					{
-						// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists
-						$version_join =  $version ? ' LEFT JOIN #__flexicontent_versions AS ver ON ver.item_id = i.id AND ver.version_id = '. $db->Quote($version) : '';
-						$where	= $this->_buildItemWhere();
-						
-						$query = 'SELECT i.*, ie.*, '                                   // Item basic and extended data
-						. $select_access                                                // Access Columns and Access Flags for: content type, main category, item
-						. ($version ? 'ver.version_id,'  : '')                          // Versioned item viewing
-						. ' c.id AS catid, i.catid as maincatid,'                       // Current category id and Main category id
-						. ' c.published AS catpublished,'                               // Current category published (in J1.6+ this includes all ancestor categories)
-						. ' c.title AS category_title, c.alias AS category_alias,'      // Current category data
-						. ' ty.name as typename, ty.alias as typealias,'                // Content Type data
-						. ' u.name AS author, u.usertype,'                              // Author data
-						
-						// Rating count, Rating & Score
-						. ' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score,'
-						
-						// Item and Current Category slugs (for URL)
-						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
-						
-						// Publication Scheduled / Expired Flags
-						. ' CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled,'
-						. ' CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired'
-						
-						. ' FROM #__content AS i'
-						. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-						. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-						. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid
-						. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-						. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
-						. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-						. ' LEFT JOIN #__content_rating AS v ON i.id = v.content_id'
-						. $joinaccess
-						. $version_join 
-						. $where
-						;
-					}
-					
-					$db->setQuery($query);
-					
-					// Try to execute query directly and load the data as an object
-					if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $app->getCfg('dbtype') , array('mysqli','mysql') ) ) {
-						$data = flexicontent_db::directQuery($query);
-						$data = @ $data[0];
-						//$data = $db->loadObject(null, false);   // do not, translate, this is the JoomFish overridden method of Database extended Class
-					} else {
-						$data = $db->loadObject();
-					}
-					
-					// Check for SQL error
-					if ( $db->getErrorNum() ) {
-						if (FLEXI_J16GE) throw new Exception($db->getErrorMsg(), 500); else JError::raiseError(500, $db->getErrorMsg());
-					}
-					//print_r($data); exit;
-					
-					if(!$data) return false; // item not found, return				
-					
-					if ($version && !$data->version_id) {
-						JError::raiseNotice(10, JText::sprintf('NOTICE: Requested item version %d was not found', $version) );
-					}
-					
-					$item = & $data;
+					. ' FROM #__content AS i'
+					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+					. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid
+					. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+					. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
+					. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+					. ' LEFT JOIN #__content_rating AS v ON i.id = v.content_id'
+					. $joinaccess
+					. $version_join 
+					. $where
+					;
 				}
 				
-				// -- Create the description field called 'text' by appending introtext + readmore + fulltext
-				$item->text = $item->introtext;
-				$item->text .= JString::strlen( trim($item->fulltext) ) ? '<hr id="system-readmore" />' . $item->fulltext : "";
+				$db->setQuery($query);
 				
-				//echo "<br/>Current version (Frontend Active): " . $item->version;
-				//echo "<br/>Version to load: ".$version;
-				//echo "<br/><b> *** db title:</b> ".$item->title;
-				//echo "<br/><b> *** db text:</b> ".$item->text;
-				//echo "<pre>*** item data: "; print_r($item); echo "</pre>"; exit;
-				
-				// Set number of loaded version, IMPORTANT: zero means load unversioned data
-				JRequest::setVar( 'version', $version );
-				
-				
-				// *************************************************************************************************
-				// -- Retrieve all active site languages, and create empty item translation objects for each of them
-				// *************************************************************************************************
-				$nn_content_tbl = FLEXI_J16GE ? 'falang_content' : 'jf_content';
-				
-				if ( FLEXI_FISH )
-				{
-					$site_languages = FLEXIUtilities::getlanguageslist();
-					$item_translations = new stdClass();
-					foreach($site_languages as $lang_id => $lang_data)
-					{
-						if ( !$lang_id && $item->language!='*' ) continue;
-						$lang_data->fields = new stdClass();
-						$item_translations->{$lang_id} = $lang_data; 
-					}
+				// Try to execute query directly and load the data as an object
+				if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $app->getCfg('dbtype') , array('mysqli','mysql') ) ) {
+					$data = flexicontent_db::directQuery($query);
+					$data = @ $data[0];
+					//$data = $db->loadObject(null, false);   // do not, translate, this is the JoomFish overridden method of Database extended Class
+				} else {
+					$data = $db->loadObject();
 				}
 				
-				// **********************************
-				// Retrieve and prepare JoomFish data
-				// **********************************
-				if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' )
+				// Check for SQL error
+				if ( $db->getErrorNum() ) {
+					if (FLEXI_J16GE) throw new Exception($db->getErrorMsg(), 500); else JError::raiseError(500, $db->getErrorMsg());
+				}
+				//print_r($data); exit;
+				
+				if (!$data) {
+					$this->_item = false;
+					if (!$version) $items[$this->_id] = & $this->_item;
+					return false; // item not found, return
+				}
+				
+				if ($version && !$data->version_id) {
+					JError::raiseNotice(10, JText::sprintf('NOTICE: Requested item version %d was not found, loaded currently active version', $version));
+				}
+				
+				$item = & $data;
+			}
+			
+			// -- Create the description field called 'text' by appending introtext + readmore + fulltext
+			$item->text = $item->introtext;
+			$item->text .= JString::strlen( trim($item->fulltext) ) ? '<hr id="system-readmore" />' . $item->fulltext : "";
+			
+			//echo "<br/>Current version (Frontend Active): " . $item->version;
+			//echo "<br/>Version to load: ".$version;
+			//echo "<br/><b> *** db title:</b> ".$item->title;
+			//echo "<br/><b> *** db text:</b> ".$item->text;
+			//echo "<pre>*** item data: "; print_r($item); echo "</pre>"; exit;
+			
+			
+			// *************************************************************************************************
+			// -- Retrieve all active site languages, and create empty item translation objects for each of them
+			// *************************************************************************************************
+			$nn_content_tbl = FLEXI_J16GE ? 'falang_content' : 'jf_content';
+			
+			if ( FLEXI_FISH )
+			{
+				$site_languages = FLEXIUtilities::getlanguageslist();
+				$item_translations = new stdClass();
+				foreach($site_languages as $lang_id => $lang_data)
 				{
-					// -- Try to retrieve all joomfish data for the current item
-					$query = "SELECT jfc.language_id, jfc.reference_field, jfc.value, jfc.published "
-							." FROM #__".$nn_content_tbl." as jfc "
-							." WHERE jfc.reference_table='content' AND jfc.reference_id = {$this->_id} ";
-					$db->setQuery($query);
-					$translated_fields = $db->loadObjectList();
+					if ( !$lang_id && $item->language!='*' ) continue;
+					$lang_data->fields = new stdClass();
+					$item_translations->{$lang_id} = $lang_data; 
+				}
+			}
+			
+			// **********************************
+			// Retrieve and prepare JoomFish data
+			// **********************************
+			if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' )
+			{
+				// -- Try to retrieve all joomfish data for the current item
+				$query = "SELECT jfc.language_id, jfc.reference_field, jfc.value, jfc.published "
+						." FROM #__".$nn_content_tbl." as jfc "
+						." WHERE jfc.reference_table='content' AND jfc.reference_id = {$this->_id} ";
+				$db->setQuery($query);
+				$translated_fields = $db->loadObjectList();
+				
+				if ( $editjf_translations == 0 && $translated_fields ) {  // 1:disable without warning about found translations
+					$app->enqueueMessage( "3rd party Joom!Fish/Falang translations detected for current item."
+						." You can either enable editing them or disable this message in FLEXIcontent component configuration", 'message' );
+				} else if ( $editjf_translations == 2 ) {
+					if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 					
-					if ( $editjf_translations == 0 && $translated_fields ) {  // 1:disable without warning about found translations
-						$app->enqueueMessage( "3rd party Joom!Fish/Falang translations detected for current item."
-							." You can either enable editing them or disable this message in FLEXIcontent component configuration", 'message' );
-					} else if ( $editjf_translations == 2 ) {
-						if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-						
-						// -- Parse translation data according to their language
-						if ( $translated_fields )
+					// -- Parse translation data according to their language
+					if ( $translated_fields )
+					{
+						// Add retrieved translated item properties
+						foreach ($translated_fields as $field_data)
 						{
-							// Add retrieved translated item properties
-							foreach ($translated_fields as $field_data)
-							{
-								$item_translations ->{$field_data->language_id} ->fields ->{$field_data->reference_field} = new stdClass();
-								$item_translations ->{$field_data->language_id} ->fields ->{$field_data->reference_field}->value = $field_data->value;
-								$found_languages[$field_data->language_id] = $item_translations->{$field_data->language_id}->name;
-							}
-							//echo "<br/>Joom!Fish translations found for: " . implode(",", $found_languages);
+							$item_translations ->{$field_data->language_id} ->fields ->{$field_data->reference_field} = new stdClass();
+							$item_translations ->{$field_data->language_id} ->fields ->{$field_data->reference_field}->value = $field_data->value;
+							$found_languages[$field_data->language_id] = $item_translations->{$field_data->language_id}->name;
 						}
-						
-						foreach ($item_translations as $lang_id => $translation_data)
-						{
-							// Default title can be somewhat long, trim it to first word, so that it is more suitable for tabs
-							list($translation_data->name) = explode(' ', trim($translation_data->name));
-						
-							// Create text field value for all languages
-							$translation_data->fields->text = new stdClass();
-							$translation_data->fields->text->value = @ $translation_data->fields->introtext->value;
-							if ( JString::strlen( trim(@$translation_data->fields->fulltext->value) ) ) {
-								$translation_data->fields->text->value .=  '<hr id="system-readmore" />' . @ $translation_data->fields->fulltext->value;
-							}
-						}
-						
-						$item->item_translations = & $item_translations;
+						//echo "<br/>Joom!Fish translations found for: " . implode(",", $found_languages);
 					}
+					
+					foreach ($item_translations as $lang_id => $translation_data)
+					{
+						// Default title can be somewhat long, trim it to first word, so that it is more suitable for tabs
+						list($translation_data->name) = explode(' ', trim($translation_data->name));
+					
+						// Create text field value for all languages
+						$translation_data->fields->text = new stdClass();
+						$translation_data->fields->text->value = @ $translation_data->fields->introtext->value;
+						if ( JString::strlen( trim(@$translation_data->fields->fulltext->value) ) ) {
+							$translation_data->fields->text->value .=  '<hr id="system-readmore" />' . @ $translation_data->fields->fulltext->value;
+						}
+					}
+					
+					$item->item_translations = & $item_translations;
 				}
-				//echo "<pre>"; print_r($item->item_translations); exit;
+			}
+			//echo "<pre>"; print_r($item->item_translations); exit;
+			
+			// *****************************************************
+			// Overwrite item fields with the requested VERSION data
+			// *****************************************************
+			$item->current_version = $current_version; 
+			$item->last_version = $last_version; 
+			if ($use_versioning && $version) 
+			{
+				// Overcome possible group concat limitation
+				$query="SET SESSION group_concat_max_len = 9999999";
+				$db->setQuery($query);
+				$db->query();
 				
-				// *****************************************************
-				// Overwrite item fields with the requested VERSION data
-				// *****************************************************
-				$item->current_version = $current_version; 
-				$item->last_version = $last_version; 
-				if ($use_versioning && $version) 
-				{
-					// Overcome possible group concat limitation
-					$query="SET SESSION group_concat_max_len = 9999999";
-					$db->setQuery($query);
-					$db->query();
+				$query = "SELECT f.id, f.name, f.field_type, GROUP_CONCAT(iv.value SEPARATOR ',') as value, count(f.id) as valuecount, iv.field_id"
+					." FROM #__flexicontent_items_versions as iv "
+					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id"
+					." WHERE iv.version='".$version."' AND (f.iscore=1 OR iv.field_id=-1 OR iv.field_id=-2) AND iv.item_id='".$this->_id."'"
+					." GROUP BY f.id";
+				$db->setQuery($query);
+				$fields = $db->loadObjectList();
+				$fields = $fields ? $fields : array();
+				
+				//echo "<br/>Overwritting fields with version: $version";
+				foreach($fields as $f) {
+					//echo "<br/><b>{$f->field_id} : ". $f->name."</b> : "; print_r($f->value);
 					
-					$query = "SELECT f.id, f.name, f.field_type, GROUP_CONCAT(iv.value SEPARATOR ',') as value, count(f.id) as valuecount, iv.field_id"
-						." FROM #__flexicontent_items_versions as iv "
-						." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id"
-						." WHERE iv.version='".$version."' AND (f.iscore=1 OR iv.field_id=-1 OR iv.field_id=-2) AND iv.item_id='".$this->_id."'"
-						." GROUP BY f.id";
-					$db->setQuery($query);
-					$fields = $db->loadObjectList();
-					$fields = $fields ? $fields : array();
-					
-					//echo "<br/>Overwritting fields with version: $version";
-					foreach($fields as $f) {
-						//echo "<br/><b>{$f->field_id} : ". $f->name."</b> : "; print_r($f->value);
-						
-						// Use versioned data, by overwriting the item data 
-						$fieldname = $f->name;
-						if ($f->field_type=='hits' || $f->field_type=='state' || $f->field_type=='voting') {
-							// skip fields that should not have been versioned: hits, state, voting
-							continue;
-						} else if ($f->field_type=='version') {
-							// set version variable to indicate the loaded version
-							$item->version = $version;
-						} else if( $fieldname=='categories'|| $fieldname=='tags' ) {
-							// categories and tags must have been serialized but some earlier versions did not do it,
-							// we will check before unserializing them, otherwise they were concatenated to a single string and use explode ...
-							$item->$fieldname = ($array = @unserialize($f->value)) ? $array : explode(",", $f->value);
-						} else if ($f->field_id==-1) {
-							if ( FLEXI_FISH ) {
-								$jfdata = unserialize($f->value);
-								$item_lang = substr($item->language ,0,2);
-								foreach ($item_translations as $lang_id => $translation_data) {
-									//echo "<br/>Adding values for: ".$translation_data->shortcode;
-									if ( empty($jfdata[$translation_data->shortcode]) ) continue;
-									foreach ($jfdata[$translation_data->shortcode] as $fieldname => $fieldvalue)
-									{
-										//echo "<br/>".$translation_data->shortcode.": $fieldname => $fieldvalue";
-										if ($translation_data->shortcode != $item_lang) {
-											$translation_data->fields->$fieldname = new stdClass();
-											$translation_data->fields->$fieldname->value = $fieldvalue;
-										} else {
-											$item->$fieldname = $fieldvalue;
-										}
+					// Use versioned data, by overwriting the item data 
+					$fieldname = $f->name;
+					if ($f->field_type=='hits' || $f->field_type=='state' || $f->field_type=='voting') {
+						// skip fields that should not have been versioned: hits, state, voting
+						continue;
+					} else if ($f->field_type=='version') {
+						// set version variable to indicate the loaded version
+						$item->version = $version;
+					} else if( $fieldname=='categories'|| $fieldname=='tags' ) {
+						// categories and tags must have been serialized but some earlier versions did not do it,
+						// we will check before unserializing them, otherwise they were concatenated to a single string and use explode ...
+						$item->$fieldname = ($array = @unserialize($f->value)) ? $array : explode(",", $f->value);
+					} else if ($f->field_id==-1) {
+						if ( FLEXI_FISH ) {
+							$jfdata = unserialize($f->value);
+							$item_lang = substr($item->language ,0,2);
+							foreach ($item_translations as $lang_id => $translation_data) {
+								//echo "<br/>Adding values for: ".$translation_data->shortcode;
+								if ( empty($jfdata[$translation_data->shortcode]) ) continue;
+								foreach ($jfdata[$translation_data->shortcode] as $fieldname => $fieldvalue)
+								{
+									//echo "<br/>".$translation_data->shortcode.": $fieldname => $fieldvalue";
+									if ($translation_data->shortcode != $item_lang) {
+										$translation_data->fields->$fieldname = new stdClass();
+										$translation_data->fields->$fieldname->value = $fieldvalue;
+									} else {
+										$item->$fieldname = $fieldvalue;
 									}
 								}
 							}
-						} else if ($f->field_id==-2) {
-							// Other item properties that were versioned, such as alias, catid, meta params, attribs
-							$item_data = unserialize($f->value);
-							//$item->bind($item_data);
-							foreach ($item_data as $k => $v) $item->$k = $v;
-						} else if ($fieldname) {
-							// Other fields (maybe serialized or not but we do not unserialized them, this is responsibility of the field itself)
-							$item->$fieldname = $f->value;
 						}
-					}
-					// The text field is stored in the db as to seperate fields: introtext & fulltext
-					// So we search for the {readmore} tag and split up the text field accordingly.
-					$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
-					$tagPos	= preg_match($pattern, $item->text);
-					if ($tagPos == 0)	{
-						$item->introtext = $item->text;
-						$item->fulltext  = '';
-					} else 	{
-						list($item->introtext, $item->fulltext) = preg_split($pattern, $item->text, 2);
-						$item->fulltext = JString::strlen( trim($item->fulltext) ) ? $item->fulltext : '';
+					} else if ($f->field_id==-2) {
+						// Other item properties that were versioned, such as alias, catid, meta params, attribs
+						$item_data = unserialize($f->value);
+						//$item->bind($item_data);
+						foreach ($item_data as $k => $v) $item->$k = $v;
+					} else if ($fieldname) {
+						// Other fields (maybe serialized or not but we do not unserialized them, this is responsibility of the field itself)
+						$item->$fieldname = $f->value;
 					}
 				}
-				
-				// -- Retrieve tags field value (if not using versioning)
-				if ( $use_versioning && $version ) {
-					// Check version value was found
-					if ( !isset($item->tags) || !is_array($item->tags) )
-						$item->tags = array();
-				} else {
-					// Retrieve unversioned value
-					$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
-					$db->setQuery($query);
-					$item->tags = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-				}
-				
-				// -- Retrieve categories field value (if not using versioning)
-				if ( $use_versioning && $version ) {
-					// Check version value was found, and is valid (above code should have produced an array)
-					if ( !isset($item->categories) || !is_array($item->categories) )
-						$item->categories = array();
-				} else {
-					$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
-					$db->setQuery($query);
-					$item->categories = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-				}
-				
-				// Make sure catid is in categories array
-				if ( !in_array($item->catid, $item->categories) ) $item->categories[] = $item->catid;
-				
-				// 'cats' is an alias of categories
-				$item->cats = & $item->categories;
-				
-				
-				// *********************************************************
-				// Retrieve item properties not defined in the model's CLASS
-				// *********************************************************
-				
-				if (FLEXI_J16GE) {
-					$query = 'SELECT title FROM #__viewlevels WHERE id = '. (int) $item->access;
-				} else {
-					$query = 'SELECT name FROM #__groups WHERE id = '. (int) $item->access;
-				}
-				$db->setQuery($query);
-				$item->access_level = $db->loadResult();
-				
-				// Category access is retrieved here for J1.6+, for J1.5 we use FLEXIaccess
-				if (FLEXI_J16GE) {
-					// Get category access for the item's main category, used later to determine viewing of the item
-					$query = 'SELECT access FROM #__categories WHERE id = '. (int) $item->catid;
-					$db->setQuery($query);
-					$item->category_access = $db->loadResult();
-				}
-				
-				// Typecast some properties in case LEFT JOIN returned nulls
-				if ( !isset($item->type_access) ) {
-					$public_acclevel = !FLEXI_J16GE ? 0 : 1;
-					$item->type_access = $public_acclevel;
-				}
-				if ( !isset($item->rating_count) ) {
-					// Get category access for the item's main category, used later to determine viewing of the item
-					$query = 'SELECT '
-						.' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score'
-						.' FROM #__content_rating AS v WHERE v.content_id = '. (int) $item->id
-						;
-					$db->setQuery($query);
-					$rating_data = $db->loadObject();
-					$item->rating_count = !$rating_data ? 0 : $rating_data->rating_count;
-					$item->rating       = !$rating_data ? 0 : $rating_data->rating_count;
-					$item->score        = !$rating_data ? 0 : $rating_data->score;
-				}
-				$item->typename     = (string) @ $item->typename;
-				$item->typealias    = (string) @ $item->typealias;
-				
-				// Retrieve Creator NAME and email (used to display the gravatar)
-				$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->created_by;
-				$db->setQuery($query);
-				$creator_data = $db->loadObject();
-				$item->creator = $creator_data ? $creator_data->name : '';
-				$item->creatoremail = $creator_data ? $creator_data->email : '';
-				
-				// Retrieve Modifier NAME
-				if ($item->created_by == $item->modified_by) {
-					$item->modifier = $item->creator;
-				} else {
-					$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->modified_by;
-					$db->setQuery($query);
-					$modifier_data = $db->loadObject();
-					$item->modifier = $modifier_data ? $modifier_data->name : '';
-					$item->modifieremail = $modifier_data ? $modifier_data->email : '';
-				}
-				
-				// Clear modified Date, if it is an invalid "null" date
-				if ($item->modified == $db->getNulldate()) {
-					$item->modified = null;
-				}
-				
-				// ********************************************************
-				// Assign to the item data member variable and cache it too
-				// ********************************************************
-				$this->_item = & $item;
-				$items[$this->_id] = & $this->_item;
-				
-				// ******************************************************************************************************
-				// Detect if current version doesnot exist in version table and add it !!! e.g. after enabling versioning 
-				// ******************************************************************************************************
-				if ( $use_versioning && $current_version > $last_version ) {
-					require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'flexicontent.php');
-					$fleximodel = new FlexicontentModelFlexicontent();
-					$fleximodel->addCurrentVersionData($item->id);
-				}
-				
-				// return true if item was loaded successfully
-				return (boolean) $this->_item;
-			}
-			catch (JException $e)
-			{
-				
-				if ($e->getCode() == 404) {
-					// Need to go thru the error handler to allow Redirect to work.
-					$msg = $e->getMessage();
-					if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
-				}
-				else {
-					$this->setError($e);
-					$this->_item = false;
+				// The text field is stored in the db as to seperate fields: introtext & fulltext
+				// So we search for the {readmore} tag and split up the text field accordingly.
+				$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
+				$tagPos	= preg_match($pattern, $item->text);
+				if ($tagPos == 0)	{
+					$item->introtext = $item->text;
+					$item->fulltext  = '';
+				} else 	{
+					list($item->introtext, $item->fulltext) = preg_split($pattern, $item->text, 2);
+					$item->fulltext = JString::strlen( trim($item->fulltext) ) ? $item->fulltext : '';
 				}
 			}
-		} else {
-			$items[$this->_id] = & $this->_item;
+			
+			// -- Retrieve tags field value (if not using versioning)
+			if ( $use_versioning && $version ) {
+				// Check version value was found
+				if ( !isset($item->tags) || !is_array($item->tags) )
+					$item->tags = array();
+			} else {
+				// Retrieve unversioned value
+				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
+				$db->setQuery($query);
+				$item->tags = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			}
+			
+			// -- Retrieve categories field value (if not using versioning)
+			if ( $use_versioning && $version ) {
+				// Check version value was found, and is valid (above code should have produced an array)
+				if ( !isset($item->categories) || !is_array($item->categories) )
+					$item->categories = array();
+			} else {
+				$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
+				$db->setQuery($query);
+				$item->categories = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			}
+			
+			// Make sure catid is in categories array
+			if ( !in_array($item->catid, $item->categories) ) $item->categories[] = $item->catid;
+			
+			// 'cats' is an alias of categories
+			$item->cats = & $item->categories;
+			
+			
+			// *********************************************************
+			// Retrieve item properties not defined in the model's CLASS
+			// *********************************************************
+			
+			if (FLEXI_J16GE) {
+				$query = 'SELECT title FROM #__viewlevels WHERE id = '. (int) $item->access;
+			} else {
+				$query = 'SELECT name FROM #__groups WHERE id = '. (int) $item->access;
+			}
+			$db->setQuery($query);
+			$item->access_level = $db->loadResult();
+			
+			// Category access is retrieved here for J1.6+, for J1.5 we use FLEXIaccess
+			if (FLEXI_J16GE) {
+				// Get category access for the item's main category, used later to determine viewing of the item
+				$query = 'SELECT access FROM #__categories WHERE id = '. (int) $item->catid;
+				$db->setQuery($query);
+				$item->category_access = $db->loadResult();
+			}
+			
+			// Typecast some properties in case LEFT JOIN produced nulls
+			if ( !isset($item->type_access) ) {
+				$public_acclevel = !FLEXI_J16GE ? 0 : 1;
+				$item->type_access = $public_acclevel;
+			}
+			if ( !isset($item->rating_count) ) {
+				// Get category access for the item's main category, used later to determine viewing of the item
+				$query = 'SELECT '
+					.' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score'
+					.' FROM #__content_rating AS v WHERE v.content_id = '. (int) $item->id
+					;
+				$db->setQuery($query);
+				$rating_data = $db->loadObject();
+				$item->rating_count = !$rating_data ? 0 : $rating_data->rating_count;
+				$item->rating       = !$rating_data ? 0 : $rating_data->rating_count;
+				$item->score        = !$rating_data ? 0 : $rating_data->score;
+			}
+			$item->typename     = (string) @ $item->typename;
+			$item->typealias    = (string) @ $item->typealias;
+			
+			// Retrieve Creator NAME and email (used to display the gravatar)
+			$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->created_by;
+			$db->setQuery($query);
+			$creator_data = $db->loadObject();
+			$item->creator = $creator_data ? $creator_data->name : '';
+			$item->creatoremail = $creator_data ? $creator_data->email : '';
+			
+			// Retrieve Modifier NAME
+			if ($item->created_by == $item->modified_by) {
+				$item->modifier = $item->creator;
+			} else {
+				$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->modified_by;
+				$db->setQuery($query);
+				$modifier_data = $db->loadObject();
+				$item->modifier = $modifier_data ? $modifier_data->name : '';
+				$item->modifieremail = $modifier_data ? $modifier_data->email : '';
+			}
+			
+			// Clear modified Date, if it is an invalid "null" date
+			if ($item->modified == $db->getNulldate()) {
+				$item->modified = null;
+			}
+			
+			// ***************************************************************************************
+			// Assign to the item data member variable and cache it if loaded an unversioned item data
+			// ***************************************************************************************
+			$this->_item = & $item;
+			if (!$version) $items[$this->_id] = & $this->_item;
+			
+			// ******************************************************************************************************
+			// Detect if current version doesnot exist in version table and add it !!! e.g. after enabling versioning 
+			// ******************************************************************************************************
+			if ( $use_versioning && $current_version > $last_version ) {
+				require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'flexicontent.php');
+				$fleximodel = new FlexicontentModelFlexicontent();
+				$fleximodel->addCurrentVersionData($item->id);
+			}
+		}
+		
+		// ***********************************************
+		// CATCH EXCEPTION THROWN DURING LOADING ITEM DATA
+		// ***********************************************
+		catch (JException $e)
+		{
+			$this->_item = false;
+			if ($e->getCode() == 404) {
+				// Need to go thru the error handler to allow Redirect to work.
+				$msg = $e->getMessage();
+				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+			}
+			else {
+				$this->setError($e);
+				$this->_item = false;
+			}
 		}
 		
 		/*$session = JFactory::getSession();
@@ -849,14 +864,18 @@ class ParentClassItem extends JModelAdmin
 			$session->set('item_edit_postdata', null, 'flexicontent');
 			// ...
 		}*/
-
-		return true;
+		
+		// Add to cache if it is non-version data
+		if (!$version) $items[$this->_id] = & $this->_item;
+		
+		// return true if item was loaded successfully
+		return (boolean) $this->_item;
 	}
 
 	
-//*************
+// ************
 // BOF of J1.6+
-//*************
+// ************
 
 	/**
 	 * Returns a Table object, always creating it
@@ -882,7 +901,11 @@ class ParentClassItem extends JModelAdmin
 	public function getForm($data = array(), $loadData = true)
 	{
 		$app = JFactory::getApplication();
-		$this->getItem();
+		
+		// Retrieve item if not already done, (loading item should been done by the view !), but:
+		// 1) allow maintaining existing value:   $no_cache=false
+		// 2) load by default the last saved version:   $force_version=-1   means latest (last saved) version)
+		$this->getItem(null, $check_view_access=false, $no_cache=false, $force_version=-1);
 		
 		// *********************************************************
 		// Prepare item data for being loaded into the form:
@@ -1191,13 +1214,13 @@ class ParentClassItem extends JModelAdmin
 		return $allow;
 	}
 
-//*************
+// ************
 // EOF of J1.6+
-//*************
+// ************
 
-//*************
+// ************
 // BOF of J1.5
-//*************
+// ************
 
 	/**
 	 * Method (for J1.5) to check if the user can add an item anywhere
@@ -1233,7 +1256,7 @@ class ParentClassItem extends JModelAdmin
 	{
 		$user	= JFactory::getUser();
 		
-		if (!$this->_loadItem() || $user->gid >= 25) {
+		if ( (!$this->_item && !$this->_loadItem()) || $user->gid >= 25 ) {
 			return true;
 		} else if (FLEXI_ACCESS) {
 			// This should not be used, as it bypasses individual item rights
@@ -1254,9 +1277,9 @@ class ParentClassItem extends JModelAdmin
 	}
 	
 	
-//*************
+// ************
 // EOF of J1.5
-//*************
+// ************
 	
 	
 	/**
@@ -1472,8 +1495,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function isCheckedOut( $uid=0 )
 	{
-		if ( $this->_loadItem() )
-		{
+		if ($this->_item || $this->_loadItem()) {
 			if ($uid) {
 				return ($this->_item->checked_out && $this->_item->checked_out != $uid);
 			} else {
@@ -2273,9 +2295,9 @@ class ParentClassItem extends JModelAdmin
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		
 		
-		//*********************************
+		// ********************************
 		// Checks for untranslatable fields
-		//*********************************
+		// ********************************
 		
 		// CASE 1. Check if saving an item that translates an original content in site's default language
 		// ... Decide whether to retrieve field values of untranslatable fields from the original content item
@@ -3369,7 +3391,6 @@ class ParentClassItem extends JModelAdmin
 			$typeid = $typeid ? $typeid : JRequest::getVar('typeid', 0, '', 'int');
 			$type_join = ' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id='.$typeid;
 			
-			$version = JRequest::getVar( 'version', 0, 'request', 'int' );
 			$query = 'SELECT  fi.*'
 					.' FROM #__flexicontent_fields AS fi'
 					.($typeid ? $type_join : '')            // Require field belonging to item type
@@ -3381,21 +3402,21 @@ class ParentClassItem extends JModelAdmin
 			$fields = $this->_db->loadObjectList('name');
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
-			$custom_vals[$this->_id] = $this->getCustomFieldsValues($this->_id, $version);
-			if ( $lang_parent_id && !$version) {  // Language parent item is used only when loading non-versioned item
+			$custom_vals[$this->_id] = $this->getCustomFieldsValues($this->_id, $this->_version);
+			if ( $lang_parent_id && !$this->_version) {  // Language parent item is used only when loading non-versioned item
 				$custom_vals[$lang_parent_id] = $this->getCustomFieldsValues($lang_parent_id, 0);
 			}
 			foreach ($fields as $field)
 			{
 				$field->item_id		= (int)$this->_id;
-				// $version should be ZERO when versioning disabled, or when wanting to load the current version !!!
-				if ( (!$version || !$use_versioning) && $field->iscore) {
+				// version number should be ZERO when versioning disabled, or when wanting to load the current version !!!
+				if ( (!$this->_version || !$use_versioning) && $field->iscore) {
 					// Load CURRENT (non-versioned) core field from properties of item object
-					$field->value = $this->getCoreFieldValue($field, $version);
+					$field->value = $this->getCoreFieldValue($field, $this->_version);
 				} else {
 					// Load non core field (versioned or non-versioned) OR core field (versioned only)
 					// while checking if current field is using untranslatable value from original content item
-					$item_id = ($lang_parent_id && @$field->untranslatable && !$version) ? $lang_parent_id : $this->_id;
+					$item_id = ($lang_parent_id && @$field->untranslatable && !$this->_version) ? $lang_parent_id : $this->_id;
 					$field->value = isset( $custom_vals[$item_id][$field->id] ) ? $custom_vals[$item_id][$field->id] : array();
 					if( ( $field->name=='categories') || $field->name=='tags' ) {
 						// categories and tags must have been serialized but some early versions did not do it, we will check before unserializing them
@@ -3403,7 +3424,7 @@ class ParentClassItem extends JModelAdmin
 					}
 				}
 				
-				//echo "Got ver($version) id {$field->id}: ". $field->name .": ";  print_r($field->value); 	echo "<br/>";
+				//echo "Got ver($this->_version) id {$field->id}: ". $field->name .": ";  print_r($field->value); 	echo "<br/>";
 				$field->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
 			}
 		}

@@ -48,7 +48,7 @@ class FlexicontentModelItemcompare extends JModelLegacy
 
 		$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
 		JArrayHelper::toInteger($cid, array(0));
-		$version = JRequest::getVar('version', 0, '', 'int');
+		$version = JRequest::getVar( 'version', 0, '', 'int' );
 		$this->setId($cid[0],$version);
 	}
 

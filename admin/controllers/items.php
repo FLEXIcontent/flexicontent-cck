@@ -135,8 +135,12 @@ class FlexicontentControllerItems extends FlexicontentController
 		if ( $featured_cats_parent && !$enable_featured_cid_selector )
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
+			$disabled_cats = $params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
+			
 			$featured_cid = array();
-			foreach($model->get('cats') as $item_cat) if (isset($featured_tree[$item_cat])) $featured_cid[] = $item_cat;
+			foreach($model->get('cats') as $item_cat) {
+				if (isset($featured_tree[$item_cat]) && !isset($disabled_cats[$item_cat])) $featured_cid[] = $item_cat;
+			}
 			$data['featured_cid'] = $featured_cid;
 		}
 		
@@ -1379,9 +1383,23 @@ class FlexicontentControllerItems extends FlexicontentController
 		JRequest::setVar( 'view', 'item' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 
-		$user  = JFactory::getUser();
-		$session = JFactory::getSession();
+		$user     = JFactory::getUser();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
+		
+		// Get/Create the view
+		$viewType   = $document->getType();
+		$viewName   = FLEXI_J30GE ? $this->input->get('view', $this->default_view) : JRequest::getVar('view');
+		$viewLayout = FLEXI_J30GE ? $this->input->get('layout', 'default', 'string') : JRequest::getVar('layout', 'default', 'string');
+		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
+		
+		// Get/Create the model
 		$model = $this->getModel('item');
+		
+		// Load versioned data otherwise load latest (last saved)
+		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
+		
 		$isnew  = !$model->getId();
 		
 		$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $model->getItemAccess()->get('access-create');
@@ -1463,7 +1481,13 @@ class FlexicontentControllerItems extends FlexicontentController
 			return;
 		}
 		
-		parent::display();
+		// Push the model into the view (as default) and call the view
+		// this way we avoid creating 2nd model when calling the parent's display task
+		$view->setModel($model, true);
+		$view->document = $document;
+		$view->display();
+		
+		//parent::display();
 	}
 
 	/**

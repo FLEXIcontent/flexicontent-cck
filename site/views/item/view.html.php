@@ -77,15 +77,14 @@ class FlexicontentViewItem  extends JViewLegacy
 		$model  = $this->getModel();
 		$cid    = $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id
 		
-		// we are in display() task, so we will load the current item version by default
-		// 'preview' request variable will force last, and finally 'version' request variable will force specific
-		// NOTE: preview and version variables cannot be used by users that cannot edit the item
-		JRequest::setVar('loadcurrent', true);
-		
 		// Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
 		// indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
 		$start_microtime = microtime(true);
-		$item = $model->getItem(null, $check_view_access=2);
+
+		$version = JRequest::getVar('version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+		$preview = JRequest::getVar('preview', 0, 'request', 'int' );   // Preview versioned data FLAG ... if previewing and version is not set then ... we load version -1 (=latest version)
+		$version = $preview && !$version ? -1 : $version;
+		$item = $model->getItem(null, $check_view_access=2, $no_cache=($version||$preview), $force_version=($version||$preview ? $version : 0));  // ZERO means unversioned data
 		$_run_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Set item parameters as VIEW's parameters (item parameters are merged with component/page/type/current category/access parameters already)
@@ -592,7 +591,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			$canCreateType = true;
 		}
 		
-		$item = $this->get('Item');
+		$item = $model->getItem();
 		if (FLEXI_J16GE) {
 			$form = $this->get('Form');
 		}
@@ -1360,8 +1359,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		if ( $featured_cats_parent )
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
+			$disabled_cats = $params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
+			
 			$featured_sel = array();
-			foreach($selectedcats as $featured_cat) if (isset($featured_tree[$featured_cat])) $featured_sel[] = $featured_cat;
+			foreach($selectedcats as $item_cat) if (isset($featured_tree[$item_cat])) $featured_sel[] = $item_cat;
 			
 			$class  = "use_select2_lib select2_list_selected";
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
@@ -1369,7 +1370,9 @@ class FlexicontentViewItem  extends JViewLegacy
 			
 			$fieldname = FLEXI_J16GE ? 'jform[featured_cid][]' : 'featured_cid[]';
 			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed);
+				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed,
+					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
+				);
 		}
 		else{
 			// Do not display, if not configured or not allowed to the user
@@ -1384,8 +1387,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		{
 			if ($tparams->get('cid_allowed_parent')) {
 				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('cid_allowed_parent'), $depth_limit=0);
+				$disabled_cats = $tparams->get('cid_allowed_parent_disable', 1) ? array($tparams->get('cid_allowed_parent')) : array();
 			} else {
 				$cid_tree = & $categories;
+				$disabled_cats = array();
 			}
 			
 			// Get author's maximum allowed categories per item and set js limitation
@@ -1405,8 +1410,9 @@ class FlexicontentViewItem  extends JViewLegacy
 			$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
 			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
 			$lists['cid'] = ($enable_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $selectedcats, false, $attribs, true, true,
-				$actions_allowed, $require_all=true, $skip_subtrees, $disable_subtrees=array());
+				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $selectedcats, false, $attribs, true, true, $actions_allowed,
+					$require_all=true, $skip_subtrees, $disable_subtrees=array(), $custom_options=array(), $disabled_cats
+				);
 		}
 		else {
 			if ( count($selectedcats)>1 ) {
@@ -1434,8 +1440,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		if ($tparams->get('catid_allowed_parent')) {
 			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('catid_allowed_parent'), $depth_limit=0);
+			$disabled_cats = $tparams->get('catid_allowed_parent_disable', 1) ? array($tparams->get('catid_allowed_parent')) : array();
 		} else {
 			$catid_tree = & $categories;
+			$disabled_cats = array();
 		}
 		
 		$lists['catid'] = false;
@@ -1443,7 +1451,9 @@ class FlexicontentViewItem  extends JViewLegacy
 			$disabled = $enable_catid_selector ? '' : ' disabled="disabled"';
 			$attribs .= $disabled;
 			$lists['catid'] = ($enable_catid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed);
+				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed,
+					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
+				);
 		} else if ( !$isnew && $item->catid ) {
 			$lists['catid'] = $globalcats[$item->catid]->title;
 		}

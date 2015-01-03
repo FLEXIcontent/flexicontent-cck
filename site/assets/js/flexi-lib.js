@@ -22,11 +22,18 @@
 	}
 	
 	// Load given URL in an open dialog
-	function fc_showDialog(url, tagid, no_iframe)
+	function fc_showDialog(url, tagid, no_iframe, winwidth, winheight)
 	{
 		// Initialize popup container
-		var winwidth = jQuery( window ).width() - 80;
-		var winheight= jQuery( window ).height() - 100;
+		var winwidth  = typeof winwidth !== 'undefined' ? winwidth  : jQuery( window ).width() - 80;
+		var winheight = typeof winheight!== 'undefined' ? winheight : jQuery( window ).height() - 100;
+		winwidth  = winwidth  > (jQuery( window ).width() - 80)   ? (jQuery( window ).width() - 80)   : winwidth;
+		winheight = winheight > (jQuery( window ).height() - 100) ? (jQuery( window ).height() - 100) : winheight;
+		//window.console.log ('winwidth  : ' + winwidth  + ', winheight : ' + winheight );
+
+		var winleft = (jQuery( window ).width() - winwidth) / 2;
+		var wintop  = (jQuery( window ).height() - winheight) / 2 - 5;
+		//window.console.log ('winleft : ' + winleft + ', wintop : ' + wintop);
 		
 		// Get container creating it if it does not exist
 		var container = jQuery('#'+tagid);
@@ -59,7 +66,7 @@
 			width: winwidth,
 			height: winheight,
 			modal: true,
-			position: [40, 45],
+			position: [winleft, wintop],
 			// Load contents (url) when dialog opens
 			open: function(ev, ui){
 				no_iframe ?

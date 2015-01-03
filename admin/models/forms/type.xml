@@ -29,6 +29,10 @@
 			<field name="catid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
 				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be used for selecting main category" />
+			<field name="catid_allowed_parent_disable" type="radio" default="1" label="Disable subtree parent" description="Usually you would want to disable selecting the root category of the category subtree" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="catid_default" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
 				default="" label="Default category" description="Select the category subtree that will be allowed to be used as main category" />
@@ -37,6 +41,10 @@
 			<field name="cid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
 				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be allowed to be used for selecting secondary categories" />
+			<field name="cid_allowed_parent_disable" type="radio" default="1" label="Disable subtree parent" description="Usually you would want to disable selecting the root category of the category subtree" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="cid_default" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="true"
 				default="" label="Default categories" description="Select the default secondary categories" />

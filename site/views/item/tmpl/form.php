@@ -279,7 +279,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			$submit_msg = $approval_msg = '';
 			// A message about submitting new Content via configuration parameter
 			if ( $isnew && $this->params->get('submit_message') ) {
-				$submit_msg = sprintf( $alert_box, '', 'note', 'fc-nobgimage', JText::_($this->params->get('submit_message')) );
+				$submit_msg = sprintf( $alert_box, 'id="fc_submit_msg"', 'note', 'fc-nobgimage', JText::_($this->params->get('submit_message')) );
 			}
 			
 			// Autopublishing new item regardless of publish privilege, use a menu item specific
@@ -288,20 +288,20 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				$approval_msg = $this->params->get('autopublished_message') ? $this->params->get('autopublished_message') :  JText::_( 'FLEXI_CONTENT_WILL_BE_AUTOPUBLISHED' ) ;
 				$approval_msg = str_replace('_PUBLISH_UP_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
 				$approval_msg = str_replace('_PUBLISH_DOWN_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
-				$approval_msg = sprintf( $alert_box, '', 'info', $approval_msg );
+				$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'info', $approval_msg );
 			}
 			else {
 				// Current user does not have general publish privilege, aka new/existing items will surely go through approval/reviewal process
 				if ( !$this->perms['canpublish'] ) {
 					if ($isnew) {
 						$approval_msg = JText::_( 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' ) ;
-						$approval_msg = sprintf( $alert_box, '', 'note', 'fc-nobgimage', $approval_msg );
+						$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'note', 'fc-nobgimage', $approval_msg );
 					} else if ( $this->params->get('use_versioning', 1) ) {
 						$approval_msg = JText::_( 'FLEXI_REQUIRES_VERSION_REVIEWAL' ) ;
-						$approval_msg = sprintf( $alert_box, '', 'note', 'fc-nobgimage', $approval_msg );
+						$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'note', 'fc-nobgimage', $approval_msg );
 					} else {
 						$approval_msg = JText::_( 'FLEXI_CHANGES_APPLIED_IMMEDIATELY' ) ;
-						$approval_msg = sprintf( $alert_box, '', 'info', 'fc-nobgimage', $approval_msg );
+						$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'info', 'fc-nobgimage', $approval_msg );
 					}
 				}
 				
@@ -309,13 +309,13 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				else {
 					if ($isnew) {
 						$approval_msg = JText::_( 'FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL' ) ;
-						$approval_msg = sprintf( $alert_box, '', 'note', 'fc-nobgimage', $approval_msg );
+						$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'note', 'fc-nobgimage', $approval_msg );
 					} else if ( $this->params->get('use_versioning', 1) ) {
 						$approval_msg = JText::_( 'FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL' ) ;
-						$approval_msg = sprintf( $alert_box, '', 'note', 'fc-nobgimage', $approval_msg );
+						$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'note', 'fc-nobgimage', $approval_msg );
 					} else {
 						$approval_msg = JText::_( 'FLEXI_CHANGES_APPLIED_IMMEDIATELY' ) ;
-						$approval_msg = sprintf( $alert_box, '', 'info', 'fc-nobgimage', $approval_msg );
+						$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'info', 'fc-nobgimage', $approval_msg );
 					}
 				}
 			}

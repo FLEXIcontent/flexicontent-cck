@@ -510,6 +510,15 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$cnt = $this->_db->loadResult();
 		if ($cnt) return $return = true;
 		
+		$query = "SELECT COUNT(*)"
+			." FROM #__content as i"
+			." JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
+			." WHERE i.language<>ie.language"
+			." LIMIT 1";
+		$this->_db->setQuery($query);
+		$cnt = $this->_db->loadResult();
+		if ($cnt) return $return = true;
+		
 		return $return;
 	}
 	

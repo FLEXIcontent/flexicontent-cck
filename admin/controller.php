@@ -643,6 +643,44 @@ VALUES
 	
 	
 	/**
+	 * Method to sync language between Joomla and FLEXIcontent tables
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function syncItemsLang()
+	{
+		$db = JFactory::getDBO();
+		
+		// Set default language for items that do not have their language set
+		$query 	= 'UPDATE #__content AS i'
+					.' LEFT JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id'
+				. ' SET i.language = ie.language'
+				. ' WHERE ie.language<>"" AND ('
+				. '  i.language="" OR '
+				. '  (i.language="*" AND i.language<>ie.language)'
+				. ' )'
+				;
+		$db->setQuery($query);
+		$result1 = $db->query();
+		
+		// Set default language for items that do not have their language set
+		$query 	= 'UPDATE #__flexicontent_items_ext AS ie'
+					.' LEFT JOIN #__content as i ON i.id=ie.item_id'
+				. ' SET ie.language = i.language'
+				. ' WHERE i.language<>"" AND ('
+				. '  ie.language="" OR '
+				. '  (ie.language="*" AND i.language<>ie.language)'
+				. ' )'
+				;
+		$db->setQuery($query);
+		$result1 = $db->query();
+	}
+	
+	
+	
+	/**
 	 * Method to set the default site language the items with no language
 	 * 
 	 * @access	public
@@ -687,6 +725,7 @@ VALUES
 		
 		return $result1 && $result1a && $result2 && $result3;
 	}
+		
 	
 	/**
 	 * Method to set the default site language the items with no language
@@ -780,7 +819,10 @@ VALUES
 		// Add default language for items that do not have one, and add translation group to items that do not have one set
 		$model = $this->getModel('flexicontent');
 		if ($model->getItemsNoLang()) {
-			// Add site default language to the language field if empty
+			// 1. copy language from __flexicontent_items_ext table into __content
+			$this->syncItemsLang();
+			
+			// 2. then for those that are still empty, add site default language to the language field if empty
 			$lang = flexicontent_html::getSiteDefaultLang();
 			$result_items_default_lang = $this->setItemsDefaultLang($lang);
 			if (!$result_items_default_lang) echo "Cannot set default language or set default translation group<br>";

@@ -818,10 +818,14 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 
 
 /* FIELD-GROUP: list of value containers */
+#flexicontent ul.fcfield-sortables.fcfield-group {
+	width: 100%;
+}
 /* FIELD-GROUP: value container (contains grouped fields) */
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox {
 	border: 1px dashed gray;
 	border-radius: 8px !important;
+	width: 100%;
 }
 /* FIELD-GROUP: label of grouped field */
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label {

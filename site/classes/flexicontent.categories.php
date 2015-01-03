@@ -273,7 +273,8 @@ class flexicontent_cats
 		$attribs = 'class="inputbox"', $check_published = false, $check_perms = true,
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'),   // For item edit this should be array('core.create')
 		$require_all=true,   // Require (or not) all privileges present to accept a category
-		$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array()
+		$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(),
+		$disable_specific_cats = array()
 	) {
 		
 		// ***************************
@@ -334,6 +335,13 @@ class flexicontent_cats
 				if ( $subtree_rootid && isset($globalcats[$subtree_rootid]->descendantsarray) ) {
 					foreach($globalcats[$subtree_rootid]->descendantsarray as $_excluded)  $disable_cats_arr[$_excluded] = 1;
 				}
+			}
+		}
+		
+		// Disable specific categories
+		if ( !empty($disable_specific_cats) ) {
+			foreach ($disable_specific_cats as $_excluded) {
+				$disable_cats_arr[$_excluded] = 1;
 			}
 		}
 		

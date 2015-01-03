@@ -180,7 +180,7 @@ class flexicontent_html
 
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-
+		
 		$itemmodel = FLEXI_J16GE ? new FlexicontentModelItem() : new FlexicontentModelItems();
 		$item = $itemmodel->getItem($item_id, $check_view_access=false);
 
@@ -226,7 +226,7 @@ class flexicontent_html
 		$item_html = ob_get_contents();
 		ob_end_clean();
 		$this->params = $this->params_saved;
-
+		
 		return $item_html;
 	}
 
@@ -3308,6 +3308,7 @@ class flexicontent_html
 		
 		// a. Get Featured categories and language filter their titles
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
+		$disabled_cats = $params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
 		$featured_cats = array();
 		if ( $add_featured_cats && $featured_cats_parent )
 		{
@@ -3315,6 +3316,7 @@ class flexicontent_html
 				'id IN (' . $globalcats[$featured_cats_parent]->descendants . ')' :
 				'parent_id = '. $featured_cats_parent
 				;
+			if (!empty($disabled_cats)) $where[] = 'id NOT IN (' . implode(", ", $disabled_cats) . ')';  // optionally exclude category root of featured subtree
 			$query = 'SELECT c.id'
 				. ' FROM #__categories AS c'
 				. (count($where) ? ' WHERE ' . implode( ' AND ', $where ) : '')

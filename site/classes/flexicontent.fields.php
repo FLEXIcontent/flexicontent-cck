@@ -149,15 +149,15 @@ class FlexicontentFields
 		
 		// @TODO : move to the constructor
 		// This is optimized regarding the use of SINGLE QUERY to retrieve the core item data
-		$vars['tags']       = FlexicontentFields::_getTags($items);
-		$vars['cats']       = FlexicontentFields::_getCategories($items);
-		$vars['favourites'] = FlexicontentFields::_getFavourites($items);
-		$vars['favoured']   = FlexicontentFields::_getFavoured($items);
-		$vars['authors']    = FlexicontentFields::_getAuthors($items);
-		$vars['modifiers']  = FlexicontentFields::_getModifiers($items);
-		$vars['typenames']  = FlexicontentFields::_getTypenames($items);
-		$vars['votes']      = FlexicontentFields::_getVotes($items);
-		$vars['custom']     = FlexicontentFields::_getCustomValues($items);
+		$vars['tags']       = FlexicontentFields::_getTags($items, $view);
+		$vars['cats']       = FlexicontentFields::_getCategories($items, $view);
+		$vars['favourites'] = FlexicontentFields::_getFavourites($items, $view);
+		$vars['favoured']   = FlexicontentFields::_getFavoured($items, $view);
+		$vars['authors']    = FlexicontentFields::_getAuthors($items, $view);
+		$vars['modifiers']  = FlexicontentFields::_getModifiers($items, $view);
+		$vars['typenames']  = FlexicontentFields::_getTypenames($items, $view);
+		$vars['votes']      = FlexicontentFields::_getVotes($items, $view);
+		$vars['custom']     = FlexicontentFields::_getCustomValues($items, $view);
 		
 		FlexicontentFields::getItemFields($items, $vars, $view, $aid);
 		
@@ -420,6 +420,9 @@ class FlexicontentFields
 		static $_created = array();
 		$flexiview = JRequest::getVar('view');
 		
+		// field's source code, can use this JRequest variable, to detect who rendered the fields (e.g. they can detect rendering from 'module')
+		JRequest::setVar("flexi_callview", $view);
+		
 		static $cparams = null;
 		if ($cparams === null) $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
@@ -580,7 +583,7 @@ class FlexicontentFields
 		}
 		if ( !isset($_trigger_plgs_ft[$field_name]) ) {
 			$_t = $field->parameters->get('trigger_onprepare_content', 0);
-			if ($flexiview=='category') $_t = $_t && $field->parameters->get('trigger_plgs_incatview', 1);
+			if ($flexiview=='category' && $view=='category') $_t = $_t && $field->parameters->get('trigger_plgs_incatview', 1);
 			$_trigger_plgs_ft[$field_name] = $_t;
 		}
 		
@@ -887,7 +890,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function _getCustomValues($items)
+	static function _getCustomValues(&$items, $view = FLEXI_ITEMVIEW)
 	{
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->created_by);
 		$version = $versioned_item ? $items[0]->version_id : 0;
@@ -921,16 +924,24 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	static function _getTags($items)
+	static function _getTags(&$items, $view = FLEXI_ITEMVIEW)
 	{
-		// This is fix for versioned field of creator in items view when previewing
+		// This is fix for versioned fields in items view when previewing
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->tags);
 		
 		$db = JFactory::getDBO();
-
+		
+		/*echo "_getTags <br/> \n";
+		echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+		$cids = array();
+		foreach ($items as $item) { array_push($cids, $item->id); }
+		print_r($cids);
+		echo "<br/>";*/
+		
 		if ($versioned_item) {
 			if (!count($items[0]->tags)) return array();
 			$tids = $items[0]->tags;
+			//echo "<pre>"; print_r($tids); echo "</pre>";
 			$query 	= 'SELECT DISTINCT t.id, t.name, ' . $items[0]->id .' as itemid, '
 				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 				. ' FROM #__flexicontent_tags AS t'
@@ -968,9 +979,9 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	static function _getCategories($items)
+	static function _getCategories(&$items, $view = FLEXI_ITEMVIEW)
 	{
-		// This is fix for versioned field of creator in items view when previewing
+		// This is fix for versioned fields in items view when previewing
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->categories);
 		
 		$db = JFactory::getDBO();
@@ -1010,7 +1021,7 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	static function _getFavourites($items)
+	static function _getFavourites(&$items, $view = FLEXI_ITEMVIEW)
 	{
 		$db = JFactory::getDBO();
 		$cids = array();
@@ -1033,7 +1044,7 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	static function _getFavoured($items)
+	static function _getFavoured(&$items, $view = FLEXI_ITEMVIEW)
 	{
 		$db = JFactory::getDBO();
 		$cids = array();
@@ -1059,7 +1070,7 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	static function _getModifiers($items)
+	static function _getModifiers(&$items, $view = FLEXI_ITEMVIEW)
 	{
 		// This is fix for versioned field of modifier in items view when previewing
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->modified_by);
@@ -1085,9 +1096,9 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	static function _getAuthors($items)
+	static function _getAuthors(&$items, $view = FLEXI_ITEMVIEW)
 	{
-		// This is fix for versioned field of creator in items view when previewing
+		// This is fix for versioned fields in items view when previewing
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->created_by);
 		
 		$db = JFactory::getDBO();
@@ -1111,7 +1122,7 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	static function _getTypenames($items)
+	static function _getTypenames(&$items, $view = FLEXI_ITEMVIEW)
 	{
 		$db = JFactory::getDBO();
 
@@ -1141,7 +1152,7 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	static function _getVotes($items)
+	static function _getVotes(&$items, $view = FLEXI_ITEMVIEW)
 	{
 		$db = JFactory::getDBO();
 		$cids = array();

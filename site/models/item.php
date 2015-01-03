@@ -51,7 +51,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @return	array
 	 * @since	1.5
 	 */
-	function _check_viewing_access()
+	function _check_viewing_access($version=false)
 	{
 		global $globalcats;
 		$app  = JFactory::getApplication();
@@ -158,11 +158,9 @@ class FlexicontentModelItem extends ParentClassItem
 			}
 			
 			// Calculate if item is active ... and viewable is also it's (current or All) categories are published
-			$preview = JRequest::getVar('preview', 0, 'request', 'int' );            // Get if trying to preview the item
-			$version = JRequest::getVar('version', 0, 'request', 'int' );            // Get item version to load
 			$item_active          = $item_is_published && !$item_is_scheduled && !$item_is_expired;
 			$item_n_cat_active    = $item_active && $cats_are_published;
-			$previewing_and_unlogged = (($preview || $version) && $user->guest); // this is a flag indicates to redirect to login instead of 404 error
+			$previewing_and_unlogged = ($version && $user->guest); // this is a flag indicates to redirect to login instead of 404 error
 			$ignore_publication   = $canedititem || $caneditstate || $isOwner || $previewing_and_unlogged;
 			$inactive_notice_set = false;
 			$item_state_pending   = $this->_item->state == -3;

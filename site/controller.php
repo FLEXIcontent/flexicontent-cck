@@ -332,9 +332,6 @@ class FlexicontentController extends JControllerLegacy
 			$CanChangeCat     = 1;
 		}
 		
-		$featured_cats_parent = $params->get('featured_cats_parent', 0);
-		$featured_cats = array();
-		
 		$enable_featured_cid_selector = $perms->MultiCat && $CanChangeFeatCat;
 		$enable_cid_selector   = $perms->MultiCat && $CanChangeSecCat;
 		$enable_catid_selector = ($isnew && !$tparams->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
@@ -345,9 +342,13 @@ class FlexicontentController extends JControllerLegacy
 		if ( $featured_cats_parent && !$enable_featured_cid_selector )
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
+			$disabled_cats = $params->get('featured_cats_parent_disable', 1) ? array($featured_cats_parent) : array();
+			
 			$featured_cid = array();
 			if (!$isnew) {
-				foreach($model->get('categories') as $item_cat) if (isset($featured_tree[$item_cat])) $featured_cid[] = $item_cat;
+				foreach($model->get('categories') as $item_cat) {
+					if (isset($featured_tree[$item_cat]) && !isset($disabled_cats[$item_cat])) $featured_cid[] = $item_cat;
+				}
 			}
 			$data['featured_cid'] = $featured_cid;
 		}
@@ -1012,15 +1013,22 @@ class FlexicontentController extends JControllerLegacy
 	function edit()
 	{
 		//JError::raiseNotice(500, 'IN edit()');   // Debuging message
+		$document = JFactory::getDocument();
 		
-		$view  = $this->getView(FLEXI_ITEMVIEW, 'html');   // Get/Create the view
-		$model = $this->getModel(FLEXI_ITEMVIEW);   // Get/Create the model
+		// Get/Create the view
+		$viewType   = $document->getType();
+		$viewName   = FLEXI_J30GE ? $this->input->get('view', $this->default_view) : JRequest::getVar('view');
+		$viewLayout = FLEXI_J30GE ? $this->input->get('layout', 'form', 'string') : JRequest::getVar('layout', 'form', 'string');
+		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
+		
+		// Get/Create the model
+		$model = $this->getModel($viewName);
 		
 		// Push the model into the view (as default)
 		$view->setModel($model, true);
 
 		// Set the layout
-		$view->setLayout( JRequest::getVar('layout','form') );
+		//$view->setLayout($viewLayout);
 
 		// Display the view
 		$view->display();
