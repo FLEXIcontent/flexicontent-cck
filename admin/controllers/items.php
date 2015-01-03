@@ -1481,7 +1481,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			return;
 		}
 		
-		// Push the model into the view (as default) and call the view
+		// Push the model into the view (as default) and then display the view
 		// this way we avoid creating 2nd model when calling the parent's display task
 		$view->setModel($model, true);
 		$view->document = $document;
