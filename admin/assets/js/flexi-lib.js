@@ -135,23 +135,26 @@ function toggle_column(container_div_id, data_tbl_id, col_no, firstrun) {
   // 1. Get column-status array for the table with id: data_tbl_id
   var show_col = eval('show_col_'+data_tbl_id);
   
-  // 2. Decide show or hide action and update the displayed number of the hidden columns (if any must be in the: $(data_tbl_id+'_hidecolnum_box') element)
+  // 2. Decide show or hide action and update the displayed number of the hidden columns (if any must be in the element with id: data_tbl_id+'_hidecolnum_box')
   if ( !js_isset(show_col[col_no]) || show_col[col_no] ) {
     var action_func = 'hide';
     show_col[col_no] = 0;
-    if ( js_isset($(data_tbl_id+'_hidecolnum_box')) ) {
-      $(data_tbl_id+'_hidecolnum_box').innerHTML = parseInt($(data_tbl_id+'_hidecolnum_box').innerHTML) + 1;
+    var hidecol_box = document.getElementById(data_tbl_id+'_hidecolnum_box');
+    if ( js_isset(hidecol_box) ) {
+      hidecol_box.innerHTML = parseInt(hidecol_box.innerHTML) + 1;
     }
   } else {
     var action_func = 'show';
     show_col[col_no] = 1;
-    if ( js_isset($(data_tbl_id+'_hidecolnum_box')) ) {
-      $(data_tbl_id+'_hidecolnum_box').innerHTML = parseInt($(data_tbl_id+'_hidecolnum_box').innerHTML) - 1;
+    var hidecol_box = document.getElementById(data_tbl_id+'_hidecolnum_box');
+    if ( js_isset(hidecol_box) ) {
+      hidecol_box.innerHTML = parseInt(hidecol_box.innerHTML) - 1;
     }
   }
   
   //var ffieldname_label = 'columnchoose_' + data_tbl_id + '_' + col_no + '_label';
-  //if ( js_isset($(ffieldname_label)) ) if (action_func == 'show') $(ffieldname_label).style.color='black';  else $(ffieldname_label).style.color='#00aa00';
+  //var ffieldname_label = document.getElementById(ffieldname_label);
+  //if ( js_isset(ffieldname_label) ) if (action_func == 'show')  ffieldname_label.style.color='black';  else ffieldname_label.style.color='#00aa00';
   
   // 3. Get table and all its rows
   var tbl  = document.getElementById(data_tbl_id);
@@ -267,7 +270,7 @@ function create_column_choosers(container_div_id, data_tbl_id, firstload, lbltex
   
   // 8. Fill in 'column choose box'
   str = '<input type="hidden" name="columnchoose_'+data_tbl_id+'" value="true">'+str;
-  $(container_div_id).innerHTML=str;
+  document.getElementById(container_div_id).innerHTML=str;
 }
 
 
@@ -284,4 +287,15 @@ function fclib_setCookie(cookieName, cookieValue, nDays) {
 		document.cookie = cookieName+"="+escape(cookieValue) + ";path=" + path;
 	}
 	//alert(cookieName+"="+escape(cookieValue) + ";path=" + path);
+}
+
+
+function fc_toggle_box_via_btn(theBox, btn, btnClass)	{
+	if (jQuery('#'+theBox).is(':hidden')) {
+		jQuery(btn).addClass(btnClass);
+	}
+	else {
+		jQuery(btn).removeClass(btnClass);
+	}
+	jQuery('#'+theBox).slideToggle(400);
 }

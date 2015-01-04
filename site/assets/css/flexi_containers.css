@@ -41,7 +41,7 @@
 .fc-mssg-inline.fc-nobgimage,
 .fc-mssg.fc-nobgimage {
 	background-image: none !important;
-	padding: 8px !important;
+	padding: 2px 8px !important;
 }
 
 .fc-mssg-inline.fc-note,
@@ -251,7 +251,7 @@ ul.statetoggler > li.topLevel > a.opener img {
 .fc_nice_box {
 	border-radius: 6px;
 	margin: 0px 0px 8px 0px;
-	padding: 2px 1%;
+	padding: 2px 8px;
 	float: none;
 	clear: both !important;
 	border: 1px solid lightgray;

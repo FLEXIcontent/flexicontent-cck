@@ -5414,8 +5414,8 @@ function FLEXISubmenu($cando)
 	if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>'))
 	{
 		call_user_func($addEntry, JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items');
-		if ($perms->CanTypes)			call_user_func($addEntry, JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
 		if ($perms->CanCats) 			call_user_func($addEntry, JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
+		if ($perms->CanTypes)			call_user_func($addEntry, JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
 		if ($perms->CanFields) 		call_user_func($addEntry, JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
 		if ($perms->CanTags) 			call_user_func($addEntry, JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
 		if ($perms->CanTemplates)	call_user_func($addEntry, JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');

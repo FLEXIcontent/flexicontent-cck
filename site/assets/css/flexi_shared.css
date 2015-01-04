@@ -1233,9 +1233,10 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
   padding: 6px 3% 6px 1% !important;
   width: 14%;
   max-width:126px;
-	background-image: url(../images/lightbulb.png);
-	background-position: 98% 5px;
+	background-image: url(../images/information.png);
+	background-position: 98% 7px;
 	background-repeat: no-repeat;
+	vertical-align: top;
 }
 
 #flexicontent .flexi_label.invalid {
@@ -1331,8 +1332,12 @@ div.flexi_box_right {
 	border: 1px solid lightgray;
 	border-radius: 6px;
 	width: auto;
-	padding: 2px 2%;
+	padding: 2px 8px;
 	margin: 2px 8px;
+	float: none;
+}
+.fc_mini_note_box.floated {
+	float: left;
 }
 
 .fieldgrprow_cell {
@@ -1429,7 +1434,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 .customfields_set .fc_mini_note_box {margin: 0px 0px 6px 0px !important;}
 .container_fcfield.fcdualline { width:auto !important; }
 .container_fcfield_name_language { margin-top:8px !important; }
-.container_fcfield .editlinktip img { margin:4px 0px -4px 0px !important; padding:0px !important; }
+.container_fcfield .editlinktip img { margin:4px 4px -4px 0px !important; padding:0px !important; vertical-align:baseline; }
 
 
 #flexicontent .fcclear.fcseparator {

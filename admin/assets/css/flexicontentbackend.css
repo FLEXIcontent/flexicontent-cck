@@ -119,29 +119,43 @@ div.current dd .pane-sliders .panel {
 	border: 0px !important;
 }
 
-#filterline .fc-mssg-inline {
-	margin-bottom: 12px !important;
+
+/******************************************/
+/* Manager filters and filters containers */
+/******************************************/
+
+.flexicontent #filterline .fc-mssg-inline {
+	margin: 6px !important;
 }
-#filterline .controls {
+.flexicontent #filterline  .nowrap_box, .flexicontent .nowrap_box {
+	vertical-align: baseline !important;
+}
+.flexicontent #filterline .fc-mssg-inline > * {
+	vertical-align: middle !important;
+}
+.flexicontent #filterline .fc-mssg-inline.fc-btn_box {
+	border:none!important;
+}
+
+.flexicontent #filterline .controls {
 	display: inline-block;
 	margin: 3px 0 7px;
 }
-#filterline input[type="text"] {
+.flexicontent #filterline input[type="text"] {
 	padding: 2px 2px 3px !important;
 }
-#filterline .input-append, #filterline .input-prepend {
+.flexicontent #filterline .input-append, #filterline .input-prepend {
 	margin:0px;
 }
-#filterline .input-prepend input,
-#filterline .input-append input {
+.flexicontent #filterline .input-prepend input,
+.flexicontent #filterline .input-append input {
     margin: 0 !important;
     padding: 4px !important;
 }
-#stateGroupsBox input:checked + label {
+.flexicontent #stateGroupsBox input:checked + label {
 	color: #8B0000;
 	font-weight: bold;
 }
-
 
 /* Highlighting selected choices */
 .fc_filter_html .select2-search-choice div,

@@ -25,6 +25,10 @@ $header_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  
 ;
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCitems', $header_text);
 
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
+$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/icon-16-hint.png', JText::_( 'FLEXI_NOTES' ) );
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+
 global $globalcats;
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $limit = $this->pagination->limit;
@@ -93,6 +97,13 @@ if (FLEXI_J16GE) {
 } else {
 	$tz_offset = $site_zone;
 }
+$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
+if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
+$date_note_msg = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
+$label_tooltip = 'class="'.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'"';
+$date_zone_tip = '<span '.$label_tooltip.'>'.$hintmage.'</span>';
+
+$edit_item_title = JText::_('FLEXI_EDIT_ITEM');
 ?>
 <script type="text/javascript">
 
@@ -157,76 +168,25 @@ function submitform(pressbutton)
 // delete active filter
 function delFilter(name)
 {
-	var myForm = $('adminForm');
-	if ($(name).type=='checkbox')
-		$(name).checked = '';
+	//window.console.log('Clearing filter:'+name);
+	var myForm = jQuery('#adminForm');
+	var filter = jQuery('#'+name);
+	if (filter.attr('type')=='checkbox')
+		filter.checked = '';
 	else
-		$(name).setProperty('value', '');
+		filter.val('');
 }
 
 function delAllFilters() {
 	delFilter('search'); delFilter('filter_type'); delFilter('filter_state');
 	delFilter('filter_cats'); delFilter('filter_authors'); delFilter('filter_id');
-	delFilter('startdate'); delFilter('enddate');
-	<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>
+	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');
 }
 
 <?php if ($this->ordering) : ?>
 var move_within_ordering_groups_limits = <?php echo '"'.JText::_('FLEXI_MOVE_WITHIN_ORDERING_GROUPS_LIMITS',true).'"'; ?>
 <?php endif; ?>
 
-window.addEvent('domready', function(){
-
-	var startdate	= $('startdate');
-	var enddate 	= $('enddate');
-	if(MooTools.version>="1.2.4") {
-		var sdate = startdate.value;
-		var edate = enddate.value;
-	}else{
-		var sdate = startdate.getValue();
-		var edate = enddate.getValue();
-	}
-	if (sdate == '') {
-		startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM',true ); ?>');
-	}
-	if (edate == '') {
-		enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO',true ); ?>');
-	}
-	$('startdate').addEvent('focus', function() {
-		if (sdate == '<?php echo JText::_( 'FLEXI_FROM',true ); ?>') {
-			startdate.setProperty('value', '');
-		}
-	});
-	$('enddate').addEvent('focus', function() {
-		if (edate == '<?php echo JText::_( 'FLEXI_TO',true ); ?>') {
-			enddate.setProperty('value', '');
-		}
-	});
-	$('startdate').addEvent('blur', function() {
-		if (sdate == '') {
-			startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM',true ); ?>');
-		}
-	});
-	$('enddate').addEvent('blur', function() {
-		if (edate == '') {
-			enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO',true ); ?>');
-		}
-	});
-
-<?php /*
-	$('show_filters').setStyle('display', 'none');
-	$('hide_filters').addEvent('click', function() {
-		$('filterline').setStyle('display', 'none');
-		$('show_filters').setStyle('display', '');
-		$('hide_filters').setStyle('display', 'none');
-	});
-	$('show_filters').addEvent('click', function() {
-		$('filterline').setStyle('display', '');
-		$('show_filters').setStyle('display', 'none');
-		$('hide_filters').setStyle('display', '');
-	});
-*/ ?>
-});
 </script>
 
 <script type="text/javascript">
@@ -378,52 +338,40 @@ window.addEvent('domready', function() {
 	<div id="j-main-container">
 <?php endif;?>
 
-	<table style="white-space:nowrap">
+	<table>
 		<tr class="filterbuttons_head">
 			<td>
-				<div style="float:left; margin:2px 48px 0px 0px;">
+				<div style="margin:2px 38px 0px 0px; display:inline-block; float:left">
 					<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
 					<span class="radio"><?php echo $this->lists['scope']; ?></span>
 					<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 				</div>
 				
 				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button'; ?>
-				<div class="btn-group" style="margin: 2px 0 6px -3px;">
-				<input type="button" class="<?php echo $_class; ?>" onclick="jQuery('#mainChooseColBox').slideToggle();" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-				<input type="button" class="<?php echo $_class; ?>" onclick="jQuery('#stateGroupsBox').slideToggle();" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
-				<input type="button" class="<?php echo $_class; ?>" onclick="jQuery('#filterline').slideToggle('slow');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
-				</div>
-				<!--
-				<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
-				<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
-				-->
-				
-				<div class="clear"></div>
-				
-				<div class="limit" style="display: inline-block;">
-					<label class="label">
-						<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
-					</label>
-					<?php
-					$pagination_footer = $this->pagination->getListFooter();
-					if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
-					?>
+				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
+				<input type="button" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+				<input type="button" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('stateGroupsBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
+				<input type="button" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 				</div>
 				
-				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
-					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
-				</span>
-				
-				<span class="fc_pages_counter" style="display:inline-block; white-space:nowrap;">
-					<?php echo $this->pagination->getPagesCounter(); ?>
-				</span>
-				
-				<div class='fc_mini_note_box' style='display: inline-block;'>
-					<?php
-					$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
-					if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
-					echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
-					?>
+				<div style="display:inline-block; float:left;">
+					<div class="limit nowrap_box" style="display: inline-block;">
+						<label class="label">
+							<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
+						</label>
+						<?php
+						$pagination_footer = $this->pagination->getListFooter();
+						if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
+						?>
+					</div>
+					
+					<span class="fc_item_total_data nowrap_box badge badge-info">
+						<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+					</span>
+					
+					<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
+						<?php echo $this->pagination->getPagesCounter(); ?>
+					</span>
 				</div>
 				
 				<?php if (@$this->lists['filter_fileid']): ?>
@@ -437,60 +385,48 @@ window.addEvent('domready', function() {
 	
 	
 	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> >
-	
-		<div class="fc-mssg-inline fc-nobgimage fc-success">
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
 			<?php echo $this->lists['filter_authors']; ?>
-			
-			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
-				<?php echo $this->lists['filter_lang']; ?>
-			<?php endif; ?>
-			
+			<?php echo $this->lists['filter_lang']; ?>
 			<?php echo $this->lists['filter_type']; ?>
 			<?php echo $this->lists['filter_state']; ?>
 		</div>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success">
-			<div style="display:inline-block; white-space:nowrap; padding:1px 0px 5px 0px;">
-				<?php echo $ordering_type_tip; ?>
-				<label class="label"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
-				<?php echo $this->lists['filter_order_type']; ?>
-			</div>
+		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+			<?php echo $ordering_type_tip; ?>
+			<label class="label"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
+			<?php echo $this->lists['filter_order_type']; ?>
 		</div>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success">
-			<div style="display:inline-block; white-space:nowrap;">
-				<?php echo $this->lists['filter_cats']; ?>
-				<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
-				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
-			</div>
+		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+			<?php echo $this->lists['filter_cats']; ?>
+			<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
+			<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
 		</div>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success">
-			<div style="display:inline-block; white-space:nowrap; padding:1px 0px 5px 0px;">
-				<span class="radio"><?php echo $this->lists['date']; ?></span>
-				<?php echo $this->lists['startdate']; ?>
-				<?php echo $this->lists['enddate']; ?>
-			</div>
+		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+			<?php echo $date_zone_tip; ?>
+			<span class="radio"><?php echo $this->lists['date']; ?></span>
+			<?php echo $this->lists['startdate']; ?>
+			<?php echo $this->lists['enddate']; ?>
 		</div>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success">
-			<div style="display:inline-block; white-space:nowrap; padding:2px 0px 5px 0px;">
-				<label class="label"><?php echo JText::_('FLEXI_ID'); ?></label>
-				<input type="text" name="filter_id" id="filter_id" size="4" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
-			</div>
+		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+			<label class="label"><?php echo JText::_('FLEXI_ID'); ?></label>
+			<input type="text" name="filter_id" id="filter_id" size="6" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" style="width:auto;" />
 		</div>
 		
-		<div style="display:inline-block; white-space:nowrap; margin:0px 0px 12px 12px;">
-			<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+		<div class="fc-mssg-inline fc-nobgimage nowrap_box fc-btn_box">
+			<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_GO'/*'FLEXI_APPLY_FILTERS'*/ ); ?>" />
+			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET'/*'FLEXI_RESET_FILTERS'*/ ); ?>" />
 		</div>
 		
 	</div>
 	
-	
-	<div id="mainChooseColBox" class="fc_nice_box" style="margin-top:6px; display:none;"></div>
+	<div id="mainChooseColBox" class="fc_mini_note_box floated" style="margin-top:6px; display:none;"></div>
 
-	<div id="stateGroupsBox" class="fc_nice_box" <?php if (!$this->filter_stategrp && $this->filter_catsinstate==1) echo 'style="display:none;"'; ?> >
+	<div id="stateGroupsBox" class="fc_mini_note_box floated" <?php if (!$this->filter_stategrp && $this->filter_catsinstate==1) echo 'style="display:none;"'; ?> >
 		
 		<div style="float:left; margin-right:12px;">
 		<?php
@@ -877,17 +813,10 @@ window.addEvent('domready', function() {
 
 				// Display title with edit link ... (row editable and not checked out)
 				} else {
-				?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM', true );?>::<?php echo $row->title; ?>">
-					<?php
-					if ( $enable_translation_groups ) :
+					if ( $enable_translation_groups ) {
 						if ($this->lists['order']=='i.lang_parent_id'&& $row->id!=$row->lang_parent_id) echo "<sup>|</sup>--";
-					endif;
-					?>
-					<a href="<?php echo $link; ?>">
-					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-					</a></span>
-				<?php
+					}
+					echo '<a href="'.$link.'" title="'.$edit_item_title.'">'.htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8').'</a>';
 				}
 				?>
 
@@ -938,7 +867,6 @@ window.addEvent('domready', function() {
 						}
 					}
 
-					echo "<br/>";
 					foreach($this->lang_assocs[$row->lang_parent_id] as $assoc_item) {
 						if ($assoc_item->id==$row->id) continue;
 

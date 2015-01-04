@@ -1,6 +1,6 @@
-/************************
- * Input / select styling
- ************************/
+/*******************************
+ * Input / select / form styling
+ *******************************/
 
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"] {
 	font-size:11px !important;
@@ -15,11 +15,15 @@
 	display: inline-block;  /* important causes problem hidden elements */
 	/*float: none;*/ /* problem with ... */
 	margin: 1px 2px 1px 3px !important;
-	padding: 4px 2px !important;
+	padding: 2px 2px !important;
 	border-radius: 4px !important;
+	height: auto !important;
 }
 
-
+.flexicontent form {
+	margin: 0px;
+	padding: 0px;
+}
 
 /********************************
  * Label and property field boxes
@@ -38,6 +42,9 @@
 }
 #flexicontent .nowrap_box .label, .flexicontent .nowrap_box .label {
 	vertical-align: top !important;
+}
+#flexicontent .filterbuttons_head .nowrap_box .label, .flexicontent .filterbuttons_head .nowrap_box .label {
+	vertical-align: middle !important;
 }
 
 

@@ -33,38 +33,48 @@ class FlexicontentViewCategories extends JViewLegacy
 	{
 		//initialise variables
 		global $globalcats;
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
-		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
-		$document	= JFactory::getDocument();
-		
+		$app     = JFactory::getApplication();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		$option   = JRequest::getCmd('option');
+		$view     = JRequest::getVar('view');
+		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
-		JHTML::_('behavior.tooltip');
+		flexicontent_html::loadFramework('select2');
+		//JHTML::_('behavior.tooltip');
+
+		// Get filters
+		$count_filters = 0;
 		
 		//get vars
 		$order_property = !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     $order_property, 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', '', 'word' );
+		
 		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',     'filter_state',     '', 'string' );
 		$filter_cats      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',      'filter_cats',			 '', 'int' );
 		$filter_level     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_level',     'filter_level',     '', 'string' );
 		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
-		if (FLEXI_J16GE) {
-			$filter_language	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_language',  'filter_language',  '', 'string' );
-		}
-		$search  = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
-		$search  = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
-
-		// Prepare the document: add css files, etc
+		if ($filter_state) $count_filters++; if ($filter_cats) $count_filters++;
+		if ($filter_level) $count_filters++; if ($filter_access) $count_filters++;
+		
+		$filter_language	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_language',  'filter_language',  '', 'string' );
+		if ($filter_language) $count_filters++;
+		
+		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
+		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		if ($search) $count_filters++;
+		
+		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
+		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/flexi-lib.js' );
 		
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
@@ -220,15 +230,17 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		// filter by a category (it's subtree will be displayed)
 		$categories = $globalcats;
-		$lists['cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="this.form.submit();"', $check_published=true, $check_perms=false);
+		$lists['cats'] = ($filter_cats ? '<label class="label">'.JText::_('FLEXI_CATEGORY').'</label>' : '').
+			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="use_select2_lib" onchange="this.form.submit();"', $check_published=true, $check_perms=false);
 		
 		// filter depth level
 		$options	= array();
 		$options[]	= JHtml::_('select.option', '', JText::_( 'FLEXI_SELECT_MAX_DEPTH' ));
 		for($i=1; $i<=10; $i++) $options[]	= JHtml::_('select.option', $i, $i);
 		$fieldname =  $elementid = 'filter_level';
-		$attribs = ' size="1" class="inputbox" onchange="this.form.submit();" ';
-		$lists['level']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid, $translate=true );
+		$attribs = 'class="use_select2_lib" onchange="this.form.submit();"';
+		$lists['level']	= ($filter_level ? '<label class="label">'.JText::_('FLEXI_MAX_DEPTH').'</label>' : '').
+			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid, $translate=true );
 		
 		// filter publication state
 		if (FLEXI_J16GE)
@@ -236,8 +248,9 @@ class FlexicontentViewCategories extends JViewLegacy
 			$options = JHtml::_('jgrid.publishedOptions');
 			array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_SELECT_PUBLISHED')) );
 			$fieldname =  $elementid = 'filter_state';
-			$attribs = ' size="1" class="inputbox" onchange="Joomla.submitform()" ';
-			$lists['state']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
+			$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
+			$lists['state']	= ($filter_state ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
+				JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
 		} else {
 			$lists['state']	= JHTML::_('grid.state', $filter_state );
 		}
@@ -248,11 +261,13 @@ class FlexicontentViewCategories extends JViewLegacy
 			$options = JHtml::_('access.assetgroups');
 			array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_SELECT_ACCESS')) );
 			$fieldname =  $elementid = 'filter_access';
-			$attribs = ' size="1" class="inputbox" onchange="Joomla.submitform()" ';
-			$lists['access']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
+			$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
+			$lists['access'] = ($filter_access ? '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>' : '').
+				JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
 			
 			// filter language
-			$lists['language'] = flexicontent_html::buildlanguageslist('filter_language', 'size="1" class="inputbox" onchange="submitform();"', $filter_language, 2);
+			$lists['language'] = ($filter_language ? '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>' : '').
+				flexicontent_html::buildlanguageslist('filter_language', 'class="use_select2_lib" onchange="submitform();"', $filter_language, 2);
 		} else {
 			// filter access level
 			$options = array();
@@ -261,8 +276,8 @@ class FlexicontentViewCategories extends JViewLegacy
 			$options[] = JHtml::_('select.option', '1', JText::_('Registered'));
 			$options[] = JHtml::_('select.option', '2', JText::_('SPECIAL'));
 			$fieldname =  $elementid = 'filter_access';
-			$attribs = ' size="1" class="inputbox" onchange="this.form.submit()" ';
-			$lists['access']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
+			$attribs = 'class="use_select2_lib" onchange="this.form.submit()"';
+			$lists['access'] = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
 		}
 		
 		// filter search word
@@ -275,6 +290,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$ordering = ($lists['order'] == $order_property) ? $order_property : '';
 
 		//assign data to template
+		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('lists'	, $lists);
 		$this->assignRef('rows'		, $rows);
 		$this->assignRef('perms'	, $perms);
