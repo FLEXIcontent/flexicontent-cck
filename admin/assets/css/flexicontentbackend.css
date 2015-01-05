@@ -173,3 +173,6 @@ div.current dd .pane-sliders .panel {
 	font-style: italic !important;
 }
 
+.flexicontent .icon-publish, .icon-cancel {
+	font-size: 14px;
+}

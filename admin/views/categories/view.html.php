@@ -33,7 +33,7 @@ class FlexicontentViewCategories extends JViewLegacy
 	{
 		//initialise variables
 		global $globalcats;
-		$app     = JFactory::getApplication();
+		$app      = JFactory::getApplication();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
@@ -67,7 +67,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
 		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
-		if ($search) $count_filters++;
+		if (strlen($search)) $count_filters++;
 		
 		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -83,15 +83,16 @@ class FlexicontentViewCategories extends JViewLegacy
 		FLEXISubmenu('CanCats');
 		
 		
+		// ******************
+		// Create the toolbar
+		// ******************
+		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_CATEGORIES' );
 		$site_title = $document->getTitle();
 		JToolBarHelper::title( $doc_title, 'fc_categories' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
-		// ******************
-		// Create the toolbar
-		// ******************
 		$js = "window.addEvent('domready', function(){";
 		
 		$contrl = FLEXI_J16GE ? "categories." : "";
@@ -186,7 +187,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$document->addScriptDeclaration($js);
 		
 		
-		//Get data from the model
+		// Get data from the model
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		if (FLEXI_J16GE) {
 			$rows = $this->get( 'Items');
@@ -230,55 +231,43 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		// filter by a category (it's subtree will be displayed)
 		$categories = $globalcats;
-		$lists['cats'] = ($filter_cats ? '<label class="label">'.JText::_('FLEXI_CATEGORY').'</label>' : '').
-			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="use_select2_lib" onchange="this.form.submit();"', $check_published=true, $check_perms=false);
+		$lists['cats'] = ($filter_cats || 1 ? '<label class="label">'.JText::_('FLEXI_CATEGORY').'</label>' : '').
+			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-', 'class="use_select2_lib" onchange="this.form.submit();"', $check_published=true, $check_perms=false);
 		
 		// filter depth level
 		$options	= array();
-		$options[]	= JHtml::_('select.option', '', JText::_( 'FLEXI_SELECT_MAX_DEPTH' ));
+		$options[]	= JHtml::_('select.option', '', '-'/*JText::_('FLEXI_SELECT_MAX_DEPTH')*/);
 		for($i=1; $i<=10; $i++) $options[]	= JHtml::_('select.option', $i, $i);
 		$fieldname =  $elementid = 'filter_level';
 		$attribs = 'class="use_select2_lib" onchange="this.form.submit();"';
-		$lists['level']	= ($filter_level ? '<label class="label">'.JText::_('FLEXI_MAX_DEPTH').'</label>' : '').
+		$lists['level']	= ($filter_level || 1 ? '<label class="label">'.JText::_('FLEXI_MAX_DEPTH').'</label>' : '').
 			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid, $translate=true );
 		
 		// filter publication state
 		if (FLEXI_J16GE)
 		{
 			$options = JHtml::_('jgrid.publishedOptions');
-			array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_SELECT_PUBLISHED')) );
+			array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_PUBLISHED')*/) );
 			$fieldname =  $elementid = 'filter_state';
 			$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
-			$lists['state']	= ($filter_state ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
+			$lists['state']	= ($filter_state || 1 ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
 				JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
 		} else {
-			$lists['state']	= JHTML::_('grid.state', $filter_state );
+			$lists['state']	= ($filter_state ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
+				JHTML::_('grid.state', $filter_state );
 		}
 		
-		if (FLEXI_J16GE)
-		{
-			// filter access level
-			$options = JHtml::_('access.assetgroups');
-			array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_SELECT_ACCESS')) );
-			$fieldname =  $elementid = 'filter_access';
-			$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
-			$lists['access'] = ($filter_access ? '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>' : '').
-				JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
-			
-			// filter language
-			$lists['language'] = ($filter_language ? '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>' : '').
-				flexicontent_html::buildlanguageslist('filter_language', 'class="use_select2_lib" onchange="submitform();"', $filter_language, 2);
-		} else {
-			// filter access level
-			$options = array();
-			$options[] = JHtml::_('select.option', '', JText::_('FLEXI_SELECT_ACCESS_LEVEL'));
-			$options[] = JHtml::_('select.option', '0', JText::_('Public'));
-			$options[] = JHtml::_('select.option', '1', JText::_('Registered'));
-			$options[] = JHtml::_('select.option', '2', JText::_('SPECIAL'));
-			$fieldname =  $elementid = 'filter_access';
-			$attribs = 'class="use_select2_lib" onchange="this.form.submit()"';
-			$lists['access'] = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
-		}
+		// filter access level
+		$options = JHtml::_('access.assetgroups');
+		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
+		$fieldname =  $elementid = 'filter_access';
+		$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
+		$lists['access'] = ($filter_access || 1 ? '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>' : '').
+			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
+		
+		// filter language
+		$lists['language'] = ($filter_language || 1 ? '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>' : '').
+			flexicontent_html::buildlanguageslist('filter_language', 'class="use_select2_lib" onchange="submitform();"', $filter_language, '-'/*2*/);
 		
 		// filter search word
 		$lists['search']= $search;

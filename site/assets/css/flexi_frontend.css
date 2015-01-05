@@ -37,16 +37,6 @@
 #flexicontent .fceven { background-color:#e7e7e7; }
 #flexicontent .fcodd { background-color:#f2f2f2; }
 
-.fc_mini_note_box {
-	font-size: 11px;
-	background-color: lightyellow;
-	border: 1px solid lightgray;
-	border-radius: 6px;
-	width: auto;
-	padding: 2px 2%;
-	margin: 2px 8px;
-}
-
 
 /**********************************************************************
  * FLEXIcontent buttons for links: print, pdf, email, rss, approval etc

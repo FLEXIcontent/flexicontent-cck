@@ -352,13 +352,17 @@ class flexicontent_cats
 		
 		$catlist 	= array();
 		// A tree to select: e.g. a parent category
-		if ($top == 1) {
+		if (!is_numeric($top) && strlen($top)) {
+			$catlist[] 	= JHTML::_( 'select.option', '', $top );
+		}
+		
+		else if ($top == 1) {
 			$catlist[] 	= JHTML::_( 'select.option', FLEXI_J16GE ? 1 : 0, JText::_( 'FLEXI_TOPLEVEL' ));
 		}
 		
 		// A tree to select a category
-		else if($top == 2) {
-			$catlist[] 	= JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_CAT' ));
+		else if($top == 2 || $top == -1) {
+			$catlist[] 	= JHTML::_( 'select.option', '', JText::_( $top==-1 ? '' : 'FLEXI_SELECT_CAT' ));
 		}
 		
 		// A sub-tree where root category of the sub-tree should be excluded, in place of it a disabled prompt is added ... NOTE that:

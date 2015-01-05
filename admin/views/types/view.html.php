@@ -29,45 +29,54 @@ jimport('joomla.application.component.view');
  */
 class FlexicontentViewTypes extends JViewLegacy
 {
-	/**
-	 * Creates the Entrypage
-	 *
-	 * @since 1.0
-	 */
 	function display( $tpl = null )
 	{
 		//initialise variables
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$user = JFactory::getUser();
-		$db   = JFactory::getDBO();
-		$document	= JFactory::getDocument();
-		
+		$app      = JFactory::getApplication();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		$option   = JRequest::getCmd('option');
+		$view     = JRequest::getVar('view');
+		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
+		flexicontent_html::loadFramework('select2');
 		JHTML::_('behavior.tooltip');
+
+		// Get filters
+		$count_filters = 0;
 		
 		//get vars
-		$filter_order		  = $app->getUserStateFromRequest( $option.'.types.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.types.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $app->getUserStateFromRequest( $option.'.types.filter_state', 		'filter_state', 	'*', 'word' );
-		$search 			= $app->getUserStateFromRequest( $option.'.types.search', 			'search', 			'', 'string' );
-		$search 			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
-
-		//add css and submenu to document
+		$filter_order		  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order', 	't.name', 'cmd' );
+		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_state 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 		'filter_state', 	'', 'word' );
+		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
+		if ($filter_state) $count_filters++; if ($filter_access) $count_filters++;
+		
+		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
+		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		if (strlen($search)) $count_filters++;
+		
+		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
+		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/flexi-lib.js' );
 		
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
 		
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanTypes');
-
+		
+		
+		// ******************
+		// Create the toolbar
+		// ******************
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_TYPES' );
@@ -75,7 +84,6 @@ class FlexicontentViewTypes extends JViewLegacy
 		JToolBarHelper::title( $doc_title, 'types' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
-		// Create the toolbar
 		$contrl = FLEXI_J16GE ? "types." : "";
 		JToolBarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
 		JToolBarHelper::divider(); JToolBarHelper::spacer();
@@ -123,19 +131,36 @@ class FlexicontentViewTypes extends JViewLegacy
 
 		$lists = array();
 		
-		//publish unpublished filter
-		$lists['state']	= JHTML::_('grid.state', $filter_state );
+		// filter publication state
+		$states 	= array();
+		$states[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$states[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+		$states[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+		//$states[] = JHTML::_('select.option',  '-2', JText::_( 'FLEXI_TRASHED' ) );
 		
-		// search filter
+		$lists['state'] = ($filter_state || 1 ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
+			JHTML::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
+			//JHTML::_('grid.state', $filter_state );
+		
+		// filter access level
+		$options = JHtml::_('access.assetgroups');
+		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
+		$fieldname =  $elementid = 'filter_access';
+		$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
+		$lists['access'] = ($filter_access || 1 ? '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>' : '').
+			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
+			
+		// filter search word
 		$lists['search']= $search;
-
+		
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 
 		//assign data to template
-		$this->assignRef('lists'      , $lists);
-		$this->assignRef('rows'      	, $rows);
+		$this->assignRef('count_filters', $count_filters);
+		$this->assignRef('lists'	, $lists);
+		$this->assignRef('rows'		, $rows);
 		$this->assignRef('pagination'	, $pagination);
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;

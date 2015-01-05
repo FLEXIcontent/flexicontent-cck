@@ -62,7 +62,7 @@ class flexicontent_html
 
 
 	// *** Output the javascript to dynamically hide/show columns of a table
-	static function jscode_to_showhide_table($container_div_id,$data_tbl_id, $lbltext) {
+	static function jscode_to_showhide_table($container_div_id, $data_tbl_id, $start_html='', $end_html='') {
 		$document = JFactory::getDocument();
 		$js = "
 		var show_col_${data_tbl_id} = Array();
@@ -83,7 +83,7 @@ class flexicontent_html
 		}
 	  
 	  $firstload = isset($_POST["columnchoose_${data_tbl_id}"]) || isset($_COOKIE["columnchoose_${data_tbl_id}"]) ? "false" : "true";
-	  $js .= "create_column_choosers('$container_div_id', '$data_tbl_id', $firstload,'".$lbltext."'); \n";
+	  $js .= "create_column_choosers('$container_div_id', '$data_tbl_id', $firstload, '".$start_html."', '".$end_html."'); \n";
 	  
 		$js .= "
 		});
@@ -2459,7 +2459,8 @@ class flexicontent_html
 		$user = JFactory::getUser();
 		
 		$typelist = array();
-		if($top)  $typelist[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_TYPE' ) );
+		if (!is_numeric($top) && is_string($top)) $typelist[] = JHTML::_( 'select.option', '', $top );
+		else if ($top) $typelist[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_TYPE' ) );
 		
 		foreach ($types as $type)
 		{
@@ -2496,10 +2497,9 @@ class flexicontent_html
 	{
 		$typelist 	= array();
 
-		if($top) {
-			$typelist[] 	= JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_AUTHOR' ) );
-		}
-
+		if (!is_numeric($top) && is_string($top)) $typelist[] = JHTML::_( 'select.option', '', $top );
+		else if ($top) $typelist[] 	= JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_AUTHOR' ) );
+		
 		foreach ($list as $item) {
 			$typelist[] = JHTML::_( 'select.option', $item->id, $item->name);
 		}
@@ -2654,14 +2654,16 @@ class flexicontent_html
 		$langs = array();
 		switch ($type)
 		{
-			case 1:  // Drop-down SELECT of ALL languages , WITHOUT empty prompt to select language
-				foreach ($user_langs as $lang) {
-					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
+			case 1: case 2: default:
+				if ($type==1) {
+					// Drop-down SELECT of ALL languages , WITHOUT empty prompt to select language
+				} else if ($type==2) {
+				  // Drop-down SELECT of ALL languages , WITH empty prompt to select language, e.g. used in items/category manager
+					$langs[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_LANGUAGE' ));
+				} else if (!is_numeric($type)) {
+				  // Drop-down SELECT of ALL languages , WITH custom prompt to select language
+					$langs[] = JHTML::_('select.option',  '', $type);
 				}
-				$list = JHTML::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected );
-				break;
-			case 2:  // Drop-down SELECT of ALL languages , WITH empty prompt to select language, e.g. used in items/category manager
-				$langs[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_LANGUAGE' ));
 				foreach ($user_langs as $lang) {
 					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
 				}

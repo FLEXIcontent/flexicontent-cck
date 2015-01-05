@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1901 2014-05-07 02:37:25Z ggppdk $
+ * @version 1.5 stable $Id$
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,8 +18,12 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$header_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
-flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCcats', $header_text);
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
+
+$start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
+$end_text = '<div class="icon-cancel" title="'.JText::_('FLEXI_HIDE').'"style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
+flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCcats', $start_text, $end_text);
 
 $listOrder  = $this->lists['order'];
 $listDirn   = $this->lists['order_Dir'];
@@ -85,8 +89,8 @@ function delAllFilters() {
 				
 				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button'; ?>
 				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
-				<input type="button" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-				<input type="button" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+				<input type="button" id="fc_filterline_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 				</div>
 				
 				<div style="display:inline-block; float:left;">
@@ -104,9 +108,11 @@ function delAllFilters() {
 						<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
 					</span>
 					
+					<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
 					<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
-						<?php echo $this->pagination->getPagesCounter(); ?>
+						<?php echo $getPagesCounter; ?>
 					</span>
+					<?php endif; ?>
 				</div>
 			</td>
 		</tr>
@@ -114,6 +120,7 @@ function delAllFilters() {
 	
 	
 	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> >
+		<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>
 		
 		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
 			<?php echo $this->lists['cats']; ?>
@@ -126,15 +133,15 @@ function delAllFilters() {
 		  <?php echo $this->lists['language']; ?>
 		</div>
 		
-		
 		<div class="fc-mssg-inline fc-nobgimage nowrap_box fc-btn_box">
 			<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_GO'/*'FLEXI_APPLY_FILTERS'*/ ); ?>" />
 			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET'/*'FLEXI_RESET_FILTERS'*/ ); ?>" />
 		</div>
 		
+		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('filterline', document.getElementById('fc_filterline_btn'), 'btn-primary');"></div>
 	</div>
 	
-	<div id="mainChooseColBox" class="fc_mini_note_box floated" style="margin:8px 0px 12px; display:none;"></div>
+	<div id="mainChooseColBox" class="fc_mini_note_box" style="margin:8px 0px 12px; display:none;"></div>
 	
 	<table id="adminListTableFCcats" class="adminlist" cellspacing="1" style="margin-top:12px;">
 	<thead>

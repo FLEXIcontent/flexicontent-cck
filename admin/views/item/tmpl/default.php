@@ -1169,7 +1169,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		?>
 		<tr>
 			<td>
-				<strong><?php echo JText::_( 'FLEXI_ITEM_ID' ); ?>:</strong>
+				<span class="label"><?php echo JText::_( 'FLEXI_ITEM_ID' ); ?></span>
 			</td>
 			<td>
 				<?php echo $this->row->id; ?>
@@ -1188,7 +1188,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 						$label_tooltip = 'class="label"';
 					}
 				?>
-				<strong <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_STATE' ); ?></strong>
+				<span <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_STATE' ); ?></span>
 			</td>
 			<td>
 				<?php echo $this->published;?>
@@ -1204,7 +1204,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 						$label_tooltip = 'class="label"';
 					}
 				?>
-				<strong <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_HITS' ); ?></strong>
+				<span <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_HITS' ); ?></span>
 			</td>
 			<td>
 				<div id="hits" style="float:left;"></div> &nbsp;
@@ -1223,7 +1223,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 						$label_tooltip = 'class="label"';
 					}
 				?>
-				<strong <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_SCORE' ); ?></strong>
+				<span <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_SCORE' ); ?></span>
 			</td>
 			<td>
 				<div id="votes" style="float:left;"></div> &nbsp;
@@ -1242,7 +1242,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 						$label_tooltip = 'class="label"';
 					}
 				?>
-				<strong <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_REVISED' ); ?></strong>
+				<span <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_REVISED' ); ?></span>
 			</td>
 			<td>
 				<?php echo $this->row->last_version;?> <?php echo JText::_( 'FLEXI_TIMES' ); ?>
@@ -1250,7 +1250,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		</tr>
 		<tr>
 			<td>
-				<strong><?php echo JText::_( 'FLEXI_FRONTEND_ACTIVE_VERSION' ); ?></strong>
+				<strong class="label"><?php echo JText::_( 'FLEXI_FRONTEND_ACTIVE_VERSION' ); ?></strong>
 			</td>
 			<td>
 				#<?php echo $this->row->current_version;?>
@@ -1258,7 +1258,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		</tr>
 		<tr>
 			<td>
-				<strong><?php echo JText::_( 'FLEXI_FORM_LOADED_VERSION' ); ?></strong>
+				<strong class="label"><?php echo JText::_( 'FLEXI_FORM_LOADED_VERSION' ); ?></strong>
 			</td>
 			<td>
 				#<?php echo $this->row->version;?>
@@ -1274,7 +1274,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 						$label_tooltip = 'class="label"';
 					}
 				?>
-				<strong <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_CREATED' ); ?></strong>
+				<span <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_CREATED' ); ?></span>
 			</td>
 			<td>
 				<?php
@@ -1296,7 +1296,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 						$label_tooltip = 'class="label"';
 					}
 				?>
-				<strong <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_MODIFIED' ); ?></strong>
+				<span <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_MODIFIED' ); ?></span>
 			</td>
 			<td>
 				<?php
@@ -1313,7 +1313,9 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	<?php if ($this->params->get('use_versioning', 1)) : ?>
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 			<tr>
-				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></th>
+				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4">
+					<span class="badge"><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></span>
+				</th>
 			</tr>
 			<tr>
 				<td><textarea name="jform[versioncomment]" id="versioncomment" style="width: 300px; height: 30px; line-height:100%" rows="5" cols="32"></textarea></td>
@@ -1324,7 +1326,9 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		<div id="result" >
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 5px;" cellpadding="0" cellspacing="0">
 			<tr>
-				<th style="border-bottom: 1px dotted silver; padding: 2px 0 6px 0;" colspan="4"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></th>
+				<th style="border-bottom: 1px dotted silver; padding: 2px 0 6px 0;" colspan="4">
+					<span class="badge"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></span>
+				</th>
 			</tr>
 			<?php if ($this->row->id == 0) : ?>
 			<tr>

@@ -227,7 +227,7 @@ function toggle_column(container_div_id, data_tbl_id, col_no, firstrun) {
 }
 
 // *** Create column choosers row for a table. NOTE must have <th> cells at row 0
-function create_column_choosers(container_div_id, data_tbl_id, firstload, lbltext) {
+function create_column_choosers(container_div_id, data_tbl_id, firstload, start_text, end_text) {
   // 1. Get column-status array for the table with id: data_tbl_id
   var show_col = eval('show_col_'+data_tbl_id);
   
@@ -236,13 +236,14 @@ function create_column_choosers(container_div_id, data_tbl_id, firstload, lbltex
   var thcells = firstrow.find('th');
   
   // 3. Iterate through the 'th' cells and create column hiders for those having the class 'hideOnDemandClass'
-  var str = (typeof lbltext != "undefined") ? lbltext : '';
+  var str = (typeof start_text != "undefined") ? start_text : '';
   for (var col=0; col<thcells.length;col++) {
     // 4. Skip if not having 'hideOnDemandClass' class
     if (!jQuery(thcells[col]).hasClass('hideOnDemandClass')) continue;
     
     // 5. Get column name
-		var col_display_name = jQuery(thcells[col]).text();
+    var column_toggle_lbl = jQuery(thcells[col]).find('.column_toggle_lbl');
+    var col_display_name = column_toggle_lbl.length ? column_toggle_lbl.html(): jQuery(thcells[col]).text();
     
     // 6. Show / Hide current column
     if ( ( !firstload && !js_isset(show_col[col]) ) || ( jQuery(thcells[col]).hasClass('initiallyHidden') && !js_isset(show_col[col]) ) ) {
@@ -269,7 +270,7 @@ function create_column_choosers(container_div_id, data_tbl_id, firstload, lbltex
   }
   
   // 8. Fill in 'column choose box'
-  str = '<input type="hidden" name="columnchoose_'+data_tbl_id+'" value="true">'+str;
+  str = '<input type="hidden" name="columnchoose_'+data_tbl_id+'" value="true">' + str + end_text;
   document.getElementById(container_div_id).innerHTML=str;
 }
 

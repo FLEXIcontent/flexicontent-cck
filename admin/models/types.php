@@ -87,19 +87,21 @@ class FlexicontentModelTypes extends JModelList
 	 */
 	function getListQuery()
 	{
-		// Get the WHERE, HAVING and ORDER BY clauses for the query
-		$app    = JFactory::getApplication();
+		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
+		$app  = JFactory::getApplication();
+		$db   = JFactory::getDBO();
 		$option = JRequest::getVar('option');
-		$db = JFactory::getDBO();
-		$query = $db->getQuery(true);
-
-		$filter_state = $app->getUserStateFromRequest( $option.'.types.filter_state', 'filter_state', '', 'word' );
-		$search = $app->getUserStateFromRequest( $option.'.types.search', 'search', '', 'string' );
-		$search = trim( JString::strtolower( $search ) );
+		$view   = JRequest::getVar('view');
 		
-		$filter_order     = $app->getUserStateFromRequest( $option.'.types.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.types.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
-
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     't.name', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', 'ASC', 'word' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',     'filter_state',     '', 'string' );
+		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
+		$search  = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
+		$search  = trim( JString::strtolower( $search ) );
+		
+		// Create a new query object.
+		$query = $db->getQuery(true);
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
@@ -124,8 +126,14 @@ class FlexicontentModelTypes extends JModelList
 				$query->where('t.published = 0');
 			}
 		}
-
-		if ($search) {
+		
+		// Filter by access level
+		if ( $filter_access ) {
+			$query->where('t.access = '.(int) $filter_access);
+		}
+		
+		// Filter by search word (can be also be  id:NN  OR author:AAAAA)
+		if (strlen($search)) {
 			$query->where('LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false ));
 		}
 		$query->order($filter_order.' '.$filter_order_Dir);

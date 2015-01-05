@@ -1335,6 +1335,7 @@ div.flexi_box_right {
 	padding: 2px 8px;
 	margin: 2px 8px;
 	float: none;
+	display: inline-block;
 }
 .fc_mini_note_box.floated {
 	float: left;

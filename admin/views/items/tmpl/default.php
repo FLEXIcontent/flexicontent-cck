@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- *
+ * 
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -18,16 +18,17 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$header_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &nbsp; '
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
+$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/icon-16-hint.png', JText::_( 'FLEXI_NOTES' ) );
+
+$start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &nbsp; '
 .'<a onclick="alert(this.title);" title="'.str_replace("<br/>","\\n", JText::_('FLEXI_CAN_ADD_CUSTOM_FIELD_COLUMNS_COMPONENT_AND_PER_TYPE', true)).'" style="vertical-align:middle; font-size:12px; cursor:pointer;" href="javascript:;" >'
 .'<img src="components/com_flexicontent/assets/images/plus-button.png" /><sup>[5]</sup>'
 .'</a> &nbsp; '
 ;
-flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCitems', $header_text);
-
-$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
-$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/icon-16-hint.png', JText::_( 'FLEXI_NOTES' ) );
-$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$end_text = '<div class="icon-cancel" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
+flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCitems', $start_text, $end_text);
 
 global $globalcats;
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
@@ -349,9 +350,9 @@ window.addEvent('domready', function() {
 				
 				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button'; ?>
 				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
-				<input type="button" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-				<input type="button" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('stateGroupsBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
-				<input type="button" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+				<input type="button" id="fc_stateGroupsBox_btn" class="<?php echo $_class.($this->filter_stategrp || $this->filter_catsinstate!=1 ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('stateGroupsBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
+				<input type="button" id="fc_filterline_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 				</div>
 				
 				<div style="display:inline-block; float:left;">
@@ -369,23 +370,25 @@ window.addEvent('domready', function() {
 						<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
 					</span>
 					
+					<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
 					<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
-						<?php echo $this->pagination->getPagesCounter(); ?>
+						<?php echo $getPagesCounter; ?>
 					</span>
+					<?php endif; ?>
 				</div>
 				
 				<?php if (@$this->lists['filter_fileid']): ?>
 					<div class="fcclear"></div>
 					<?php echo '<label class="label">'.JText::_('List items using file') . '</label> ' . $this->lists['filter_fileid']; ?>
 				<?php endif; ?>
-				
 			</td>
 		</tr>
 	</table>
 	
 	
 	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> >
-		
+		<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>
+				
 		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
 			<?php echo $this->lists['filter_authors']; ?>
 			<?php echo $this->lists['filter_lang']; ?>
@@ -422,9 +425,10 @@ window.addEvent('domready', function() {
 			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET'/*'FLEXI_RESET_FILTERS'*/ ); ?>" />
 		</div>
 		
+		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('filterline', document.getElementById('fc_filterline_btn'), 'btn-primary');"></div>
 	</div>
 	
-	<div id="mainChooseColBox" class="fc_mini_note_box floated" style="margin-top:6px; display:none;"></div>
+	<div id="mainChooseColBox" class="fc_mini_note_box" style="margin-top:6px; display:none;"></div>
 
 	<div id="stateGroupsBox" class="fc_mini_note_box floated" <?php if (!$this->filter_stategrp && $this->filter_catsinstate==1) echo 'style="display:none;"'; ?> >
 		
@@ -447,6 +451,8 @@ window.addEvent('domready', function() {
 		<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" alt="<?php echo $_img_title_desc; ?>" title="::<?php echo $_img_title_desc; ?>" style="vertical-align:middle;" />
 		<span class="radio"><?php echo $this->lists['filter_catsinstate']; ?></span>
 		</div>
+		
+		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('stateGroupsBox', document.getElementById('fc_stateGroupsBox_btn'), 'btn-primary');"></div>
 	</div>
 	
 

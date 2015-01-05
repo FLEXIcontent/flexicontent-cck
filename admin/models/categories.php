@@ -98,12 +98,13 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	function getListQuery()
 	{
+		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
+		global $globalcats;
 		$app  = JFactory::getApplication();
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
 		$option = JRequest::getVar('option');
 		$view   = JRequest::getVar('view');
-		global $globalcats;
 		
 		$order_property = !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     $order_property, 'cmd' );
@@ -112,12 +113,10 @@ class FlexicontentModelCategories extends JModelList
 		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',     'filter_state',     '', 'string' );
 		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
 		$filter_level     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_level',     'filter_level',     '', 'string' );
-		if (FLEXI_J16GE) {
-			$filter_language  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_language',  'filter_language',  '', 'string' );
-		}
-		$search           = $app->getUserStateFromRequest( $option.'.'.$view.'.search',           'search',           '', 'string' );
-		$search           = trim( JString::strtolower( $search ) );
-
+		$filter_language  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_language',  'filter_language',  '', 'string' );
+		$search  = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
+		$search  = trim( JString::strtolower( $search ) );
+		
 		// Create a new query object.
 		$query = $db->getQuery(true);
 		// Select the required fields from the table.
@@ -181,7 +180,7 @@ class FlexicontentModelCategories extends JModelList
 		}
 		
 		// Filter by search word (can be also be  id:NN  OR author:AAAAA)
-		if (!empty($search)) {
+		if (strlen($search)) {
 			if (stripos($search, 'id:') === 0) {
 				$query->where('c.id = '.(int) substr($search, 3));
 			}
