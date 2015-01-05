@@ -1396,7 +1396,11 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Get/Create the model
 		$model = $this->getModel('item');
 		
-		// Load versioned data otherwise load latest (last saved)
+		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
+		$view->setModel($model, true);
+		$view->document = $document;
+		
+		// FORCE model to load versioned data (URL specified version or latest version (last saved))
 		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
 		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
 		
@@ -1481,12 +1485,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			return;
 		}
 		
-		// Push the model into the view (as default) and then display the view
-		// this way we avoid creating 2nd model when calling the parent's display task
-		$view->setModel($model, true);
-		$view->document = $document;
+		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->display();
-		
 		//parent::display();
 	}
 

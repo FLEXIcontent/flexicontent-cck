@@ -288,7 +288,7 @@ class ParentClassItem extends JModelAdmin
 	{
 		if(!$this->_id) return false;  // Only try to load existing item
 		
-		//echo 'force_version: '.$force_version ."  -- call_count: $call_count<br/>";
+		//echo 'force_version: '.$force_version ."<br/>";
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
 		
 		// -- To load a different item:
@@ -377,7 +377,7 @@ class ParentClassItem extends JModelAdmin
 			return (boolean) $this->_item;
 		}
 		
-		//echo "**************************<br/>\n LOADING item id: {$this->_id}<br/> **************************<br/><br/><br/>";
+		//echo "**************************<br/>\n LOADING item id: {$this->_id}  version:{$this->_version}<br/> **************************<br/><br/><br/>";
 		
 		// *********************
 		// TRY TO LOAD ITEM DATA

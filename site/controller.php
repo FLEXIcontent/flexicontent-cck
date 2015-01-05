@@ -966,12 +966,12 @@ class FlexicontentController extends JControllerLegacy
 			// J1.6+
 			else {
 				// Exception 1: Do not cache logged users
-				if (JFactory::getUser()->get('id')) {
+				/*if (JFactory::getUser()->get('id')) {
 					$cachable = false;
 				}
 				
 				// Exception 2: SEARCH view or OTHER view with TEXT search active
-				else if ( JRequest::getVar('view')=='search' || JRequest::getVar('filter') ) {
+				else*/ if ( JRequest::getVar('view')=='search' || JRequest::getVar('filter') ) {
 					$cachable = false;
 				}
 				
@@ -997,7 +997,7 @@ class FlexicontentController extends JControllerLegacy
 				} else {
 					$safeurlparams = & $urlparams;
 				}
-				//echo (int)$cachable." - "; print_r($safeurlparams);
+				//echo "cacheable: ".(int)$cachable." - " . print_r($safeurlparams, true) ."<br/>";
 				
 				parent::display($cachable, $safeurlparams);
 			}
@@ -1024,12 +1024,12 @@ class FlexicontentController extends JControllerLegacy
 		// Get/Create the model
 		$model = $this->getModel($viewName);
 		
-		// Push the model into the view (as default) and then display the view
-		// this way we avoid creating 2nd model when calling the parent's display task
+		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);
 		$view->document = $document;
-		$view->display();
 		
+		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
+		$view->display();
 		//parent::display();
 	}
 	
@@ -1043,18 +1043,24 @@ class FlexicontentController extends JControllerLegacy
 	function add()
 	{
 		//JError::raiseNotice(500, 'IN ADD()');   // Debuging message
+		$document = JFactory::getDocument();
 		
-		$view  =  $this->getView(FLEXI_ITEMVIEW, 'html');   // Get/Create the view
-		$model = $this->getModel(FLEXI_ITEMVIEW);    // Get/Create the model
+		// Get/Create the view
+		$viewType   = $document->getType();
+		$viewName   = FLEXI_J30GE ? $this->input->get('view', $this->default_view) : JRequest::getVar('view');
+		$viewLayout = FLEXI_J30GE ? $this->input->get('layout', 'form', 'string') : JRequest::getVar('layout', 'form', 'string');
+		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 		
-		// Push the model into the view (as default)
+		// Get/Create the model
+		$model = $this->getModel($viewName);
+		
+		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->setModel($model, true);
+		$view->document = $document;
 		
-		// Set the layout
-		$view->setLayout( JRequest::getVar('layout','form') );
-		
-		// Display the view
+		// Call display method of the view, instead of calling parent's display task, because it will create a 2nd model instance !!
 		$view->display();
+		//parent::display();
 	}
 
 

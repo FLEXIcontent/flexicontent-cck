@@ -81,8 +81,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		// indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
 		$start_microtime = microtime(true);
 
-		$version = JRequest::getVar('version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
-		$preview = JRequest::getVar('preview', 0, 'request', 'int' );   // Preview versioned data FLAG ... if previewing and version is not set then ... we load version -1 (=latest version)
+		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+		$preview = JRequest::getVar( 'preview', 0, 'request', 'int' );   // Preview versioned data FLAG ... if previewing and version is not set then ... we load version -1 (=latest version)
 		$version = $preview && !$version ? -1 : $version;
 		$item = $model->getItem(null, $check_view_access=2, $no_cache=($version||$preview), $force_version=($version||$preview ? $version : 0));  // ZERO means unversioned data
 		$_run_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -591,10 +591,10 @@ class FlexicontentViewItem  extends JViewLegacy
 			$canCreateType = true;
 		}
 		
-		$item = $model->getItem();
-		if (FLEXI_J16GE) {
-			$form = $this->get('Form');
-		}
+		// FORCE model to load versioned data (URL specified version or latest version (last saved))
+		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
+		$form = $this->get('Form');
 		
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
