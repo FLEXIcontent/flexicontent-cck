@@ -1361,7 +1361,7 @@ div#cpanel span, div.cpanel span { display: block; text-align: center; }
 div#cpanel img, div.cpanel img { margin: 0 auto; padding: 10px 0; }
 div#cpanel div.icon  a {
 	border: 1px solid lightgray;
-	border-radius: 8px;
+	border-radius: 2px;
 	display: block;
 	width: 108px;
 	height: 97px;

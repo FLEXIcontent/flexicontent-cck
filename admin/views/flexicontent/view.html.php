@@ -347,11 +347,11 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 					JHTML::_('behavior.modal');
 					$rel = $modaliframe?" rel=\"{handler: 'iframe', size: {x: 900, y: 500}}\"":'';
 				?>
-					<a href="<?php echo $link; ?>" style="cursor:pointer" class="modal"<?php echo $rel;?>>
+					<a href="<?php echo $link; ?>" style="cursor:pointer" class="well well-small modal"<?php echo $rel;?>>
 				<?php
 				} else {
 				?>
-					<a href="<?php echo $link; ?>">
+					<a href="<?php echo $link; ?>" class="well well-small">
 				<?php
 				}
 
