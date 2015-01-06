@@ -52,6 +52,44 @@
 
 	<administration>
 		<menu img="components/com_flexicontent/assets/images/flexicontent.png">FLEXIcontent</menu>
+		<submenu>
+			<menu link="index.php?option=com_flexicontent">
+				FLEXI_DASHBOARD
+			</menu>
+			<menu link="index.php?option=com_flexicontent&amp;view=items">
+				FLEXI_ITEMS
+			</menu>
+			<menu link="index.php?option=com_flexicontent&amp;view=categories">
+				FLEXI_CATEGORIES
+			</menu>
+			<menu link="index.php?option=com_flexicontent&amp;view=types">
+				FLEXI_TYPES
+			</menu>
+			<menu link="index.php?option=com_flexicontent&amp;view=fields">
+				FLEXI_FIELDS
+			</menu>
+			<menu link="index.php?option=com_flexicontent&amp;view=tags">
+				FLEXI_TAGS
+			</menu>
+			<menu link="index.php?option=com_flexicontent&amp;view=templates">
+				FLEXI_TEMPLATES
+			</menu>
+			<menu link="index.php?option=com_flexicontent&amp;view=users">
+				FLEXI_USER
+			</menu>
+			<menu link="index.php?option=com_flexicontent&amp;view=filemanager">
+				FLEXI_FILEMANAGER
+			</menu>
+			<menu link="index.php?option=com_flexicontent&amp;view=import">
+				FLEXI_IMPORT
+			</menu>
+			<menu link="index.php?option=com_flexicontent&amp;view=stats">
+				FLEXI_STATISTICS
+			</menu>
+			<menu link="index.php?option=com_config&amp;view=component&amp;component=com_flexicontent">
+				FLEXI_CONFIG
+			</menu>
+		</submenu>
 		<files folder="admin">
 			<filename>index.html</filename>
 			<filename>admin.flexicontent.php</filename>
