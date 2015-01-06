@@ -130,19 +130,19 @@ function delAllFilters() {
 	</table>
 	
 	
-	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> >
+	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="well well-small" >
 		<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>
 				
-		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['filter_type']; ?>
 			<?php echo $this->lists['assigned']; ?>
 		</div>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['fftype']; ?>
 		</div>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['state']; ?>
 			<?php echo $this->lists['access']; ?>
 		</div>
@@ -155,7 +155,7 @@ function delAllFilters() {
 		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('filterline', document.getElementById('fc_filterline_btn'), 'btn-primary');"></div>
 	</div>
 	
-	<div id="mainChooseColBox" class="fc_mini_note_box" style="margin:8px 0px 12px; display:none;"></div>
+	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="margin:8px 0px 12px; display:none;"></div>
 	
 	<span style="display:none; color:darkred;" class="fc_nice_box" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
 	

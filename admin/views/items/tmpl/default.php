@@ -386,36 +386,36 @@ window.addEvent('domready', function() {
 	</table>
 	
 	
-	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> >
+	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="well well-small">
 		<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>
 				
-		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['filter_authors']; ?>
 			<?php echo $this->lists['filter_lang']; ?>
 			<?php echo $this->lists['filter_type']; ?>
 			<?php echo $this->lists['filter_state']; ?>
 		</div>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $ordering_type_tip; ?>
 			<label class="label"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
 			<?php echo $this->lists['filter_order_type']; ?>
 		</div>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['filter_cats']; ?>
 			<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
 			<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
 		</div>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $date_zone_tip; ?>
 			<span class="radio"><?php echo $this->lists['date']; ?></span>
 			<?php echo $this->lists['startdate']; ?>
 			<?php echo $this->lists['enddate']; ?>
 		</div>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<label class="label"><?php echo JText::_('FLEXI_ID'); ?></label>
 			<input type="text" name="filter_id" id="filter_id" size="6" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" style="width:auto;" />
 		</div>
@@ -428,9 +428,9 @@ window.addEvent('domready', function() {
 		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('filterline', document.getElementById('fc_filterline_btn'), 'btn-primary');"></div>
 	</div>
 	
-	<div id="mainChooseColBox" class="fc_mini_note_box" style="margin-top:6px; display:none;"></div>
+	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="margin-top:6px; display:none;"></div>
 
-	<div id="stateGroupsBox" class="fc_mini_note_box floated" <?php if (!$this->filter_stategrp && $this->filter_catsinstate==1) echo 'style="display:none;"'; ?> >
+	<div id="stateGroupsBox" class="fc_mini_note_box floated well well-small" <?php if (!$this->filter_stategrp && $this->filter_catsinstate==1) echo 'style="display:none;"'; ?> >
 		
 		<div style="float:left; margin-right:12px;">
 		<?php

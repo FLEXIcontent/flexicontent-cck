@@ -74,6 +74,9 @@
 	color: #3A87AD !important;
 	border-color: #BCE8F1 !important;
 }
+.fc-filter {
+	border :0px !important;
+}
 
 .alert.fc-error {
 	background: #F2DEDE url(../images/error.png) no-repeat 10px 50%;
