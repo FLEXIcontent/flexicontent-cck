@@ -1280,7 +1280,7 @@ fieldset.flexiaccess legend, fieldset.adminform legend { font-weight:bold; font-
 	border: 1px solid #dddddd;
 	cursor: pointer;
 	margin: 0;
-	padding: 0.1em 0.4em 0.1em 0.2em;
+	/*padding: 0.1em 0.4em 0.1em 0.2em;*/
 }
 
 #flexicontent form textarea.invalid,
