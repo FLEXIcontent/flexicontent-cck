@@ -256,7 +256,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		// Create attributes for JS inputmask validation
 		if ($custommask && $inputmask=="__custom__") {
-			$validate_mask = " data-inputmask=\" ".$custommask." \" ";
+			$validate_mask = " data-inputmask=\"'mask': '".$custommask."'\" ";
 		} else {
 			$validate_mask = $inputmask ? " data-inputmask=\" 'alias': '".$inputmask."' \" " : "";
 		}

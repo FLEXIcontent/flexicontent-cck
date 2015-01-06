@@ -625,6 +625,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html input.fc_text_filter:focus,
 .fc_filter_html input.fc_field_filter:focus {
 	height: 14px !important;
+	line-height: 14px !important;
 	padding: 6px 26px 7px 4px !important;
 	margin: 3px 4px 4px 8px !important;
 	position: relative;
@@ -1616,7 +1617,7 @@ div.fancybox-wrap a { background: none!important;}
 	
 	width: auto;
 	white-space: normal;
-	color: #ffft;
+	color: #fff;
 	font-size: 12;
 	font-weight: bold;
 	line-height: 14px;

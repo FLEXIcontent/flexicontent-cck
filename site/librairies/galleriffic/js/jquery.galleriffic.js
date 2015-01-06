@@ -640,10 +640,10 @@
 					.find('span.current').css('opacity', '0');
 
 				if (this.enableFancybox && imageData.fancy.attr('href')) {
-					newSlide.append('<a class="fancy-link" href="' + imageData.fancy.attr('href') + '" title="' + imageData.title + '">&nbsp;</a>');
+					newSlide.append('<a class="fancy-link" href="' + imageData.fancy.attr('href') + '" title="' + imageData.title + '"> </a>');
 					newSlide.find('a').fancybox(this.fancyOptions);
 				} else {
-					newSlide.append('<a class="advance-link" rel="history" href="#'+this.data[nextIndex].hash+'" title="'+imageData.title+'">&nbsp;</a>');
+					newSlide.append('<a class="advance-link" rel="history" href="#'+this.data[nextIndex].hash+'" title="'+imageData.title+'"> </a>');
 					newSlide.find('a').click(function(e) {
 						gallery.clickHandler(e, this);
 					});

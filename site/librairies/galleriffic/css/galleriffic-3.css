@@ -3,6 +3,7 @@ div#gf_container div.content {
 	display: none;
 	float: right;
 	width: 550px; 
+	min-height: 450px!important;
 }
 div#gf_container div.content a, div#gf_container div.navigation a {
 	text-decoration: none;
@@ -27,7 +28,7 @@ div#gf_container div.nav-controls {
 div#gf_container div.slideshow-container {
 	position: relative;
 	clear: both;
-	height: 502px; /* This should be set to be at least the height of the largest image in the slideshow */
+	height: 400px; /* This should be set to be at least the height of the largest image in the slideshow */
 }
 div#gf_container div.loader {
 	position: absolute;
@@ -51,8 +52,8 @@ div#gf_container div.slideshow span.image-wrapper {
 div#gf_container div.slideshow a.advance-link {
 	display: block;
 	width: 550px;
-	height: 502px; /* This should be set to be at least the height of the largest image in the slideshow */
-	line-height: 502px; /* This should be set to be at least the height of the largest image in the slideshow */
+	height: 100%; /* This should be set to be at least the height of the largest image in the slideshow */
+	line-height: 100%; /* This should be set to be at least the height of the largest image in the slideshow */
 	text-align: center;
 }
 div#gf_container div.slideshow a.advance-link:hover, div#gf_container div.slideshow a.advance-link:active, div#gf_container div.slideshow a.advance-link:visited {
@@ -109,7 +110,7 @@ div#gf_container a.thumb {
 	border: 0px solid;
 	display: block;
 }
-ul.thumbs li.selected a.thumb {
+div#gf_container ul.thumbs li.selected a.thumb {
 	background: #000;
 }
 div#gf_container a.thumb:focus {
@@ -121,6 +122,7 @@ div#gf_container ul.thumbs img {
 }
 div#gf_container div.pagination {
 	clear: both;
+	margin:0px;
 }
 div#gf_container div.navigation div.top {
 	margin-bottom: 12px;
@@ -130,6 +132,7 @@ div#gf_container div.navigation div.bottom {
 	margin-top: 12px;
 }
 div#gf_container div.pagination a, div#gf_container div.pagination span.current, div#gf_container div.pagination span.ellipsis {
+	line-height: 100%;
 	display: block;
 	float: left;
 	margin-right: 2px;

@@ -838,6 +838,13 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	display:inline-block;
 	border-width: 0px !important;
 }
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label.fc_tooltip_icon_fe {
+	padding-right: 3% !important;
+	width: 14% !important;
+	background-image: url(../images/icon-16-hint.png);
+	background-position: 99% 5px;
+	background-repeat: no-repeat;
+}
 /* FIELD-GROUP: value of grouped field */
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
 	/* important to allow only specific overrides, (remember to do value label too!) */
@@ -1265,7 +1272,7 @@ fieldset.flexiaccess, fieldset.adminform { margin-bottom: 1em !important; }
 fieldset.flexiaccess { margin-top: 8px; }
 fieldset.flexiaccess legend, fieldset.adminform legend { font-weight:bold; font-size: 14px; }
 
-#flexicontent form input,
+#flexicontent form :not(.input-prepend):not(.input-append) >input,
 #flexicontent form button:not(.btn),
 #flexicontent form select,
 #flexicontent form textarea {
