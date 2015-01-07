@@ -23,6 +23,43 @@ $option    = JRequest::getVar('option');
 $user      = JFactory::getUser();
 $template  = $app->getTemplate();
 
+//params button for dashboard
+$display_content_fieldset        = $this->params->get('display_content_fieldset', 1);
+$display_content_items            = $this->params->get('display_content_items', 1);
+$display_content_additems         = $this->params->get('display_content_additems', 1);
+$display_content_category         = $this->params->get('display_content_category', 1);
+$display_content_addcategory      = $this->params->get('display_content_addcategory', 1);
+$display_types_fieldset           = $this->params->get('display_content_fieldset', 1);
+$display_types_types              = $this->params->get('display_types_fieldset', 1);
+$display_types_addtypes           = $this->params->get('display_types_types', 1);
+$display_types_fields             = $this->params->get('display_types_fields', 1);
+$display_types_addfields          = $this->params->get('display_types_addfields', 1);
+$display_types_tags               = $this->params->get('display_types_tags', 1);
+$display_types_addtags            = $this->params->get('isplay_types_addtags', 1);
+$display_types_files              = $this->params->get('display_types_files', 1);
+$display_contentviewing_fieldset  = $this->params->get('display_contentviewing_fieldset', 1);
+$display_contentviewing_templates = $this->params->get('display_contentviewing_templates', 1);
+$display_contentviewing_stats     = $this->params->get('display_contentviewing_stats', 1);
+$display_users_fieldset           = $this->params->get('display_users_fieldset', 1);
+$display_users_users              = $this->params->get('display_users_users', 1);
+$display_users_addusers           = $this->params->get('display_users_addusers', 1);
+$display_users_groups             = $this->params->get('display_users_groups', 1);
+$display_users_addgroups          = $this->params->get('display_users_addgroups', 1);
+$display_expert_fieldset          = $this->params->get('display_expert_fieldset', 1);
+$display_expert_import            = $this->params->get('display_expert_import', 1);
+$display_expert_index             = $this->params->get('display_expert_index', 1);
+$display_expert_plugin            = $this->params->get('display_expert_plugin ', 1);
+
+//params slider for dashboard
+$display_slider_pending           = $this->params->get('display_slider_pending', 1);
+$display_slider_revised           = $this->params->get('display_slider_revised', 1);
+$display_slider_inprogress        = $this->params->get('display_slider_inprogress', 1);
+$display_slider_draft             = $this->params->get('display_slider_draft', 1);
+$display_slider_version           = $this->params->get('display_slider_version', 1);
+
+
+
+
 // ensures the PHP version is correct
 if (version_compare(PHP_VERSION, '5.0.0', '<'))
 {
@@ -88,7 +125,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				}
 
 				if ($this->dopostinstall) {
-					?><fieldset class="fc-board-set"><legend class="fc-board-header-content-editing"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></legend><div class="fc-board-set-inner"><?php
+					?><?php if($display_content_fieldset): ?><fieldset class="fc-board-set"><legend class="fc-board-header-content-editing"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></legend><div class="fc-board-set-inner"><?php
 					$link = 'index.php?option='.$option.'&amp;view=items';
 					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-items.png', JText::_( 'FLEXI_ITEMS' ) );
 					if ($this->perms->CanAdd)
@@ -113,7 +150,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-category-add.png', JText::_( 'FLEXI_NEW_CATEGORY' ) );
 						}
 					}
-					?><div></fieldset><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' );?></legend><div class="fc-board-set-inner"><?php
+					?><div></fieldset><?php endif; ?><?php if($display_types_fieldset): ?><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' );?></legend><div class="fc-board-set-inner"><?php
 					if ($this->perms->CanTypes)
 					{
 						$link = 'index.php?option='.$option.'&amp;view=types';
@@ -140,7 +177,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						$link = 'index.php?option='.$option.'&amp;view=filemanager';
 						FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-files.png', JText::_( 'FLEXI_FILEMANAGER' ) );
 					}
-					?><div></fieldset><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' );?></legend><div class="fc-board-set-inner"><?php
+					?><div></fieldset><?php endif; ?><?php if($display_contentviewing_fieldset): ?><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' );?></legend><div class="fc-board-set-inner"><?php
 					if ($this->perms->CanTemplates)
 					{
 						$link = 'index.php?option='.$option.'&amp;view=templates';
@@ -151,7 +188,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						$link = 'index.php?option='.$option.'&amp;view=stats';
 						FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-statistics.png', JText::_( 'FLEXI_STATISTICS' ) );
 					}
-					?><div></fieldset><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' );?></legend><div class="fc-board-set-inner"><?php
+					?><div></fieldset><?php endif; ?><?php if($display_users_fieldset): ?><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' );?></legend><div class="fc-board-set-inner"><?php
 					if ($this->perms->CanAuthors)
 					{
 						$link = 'index.php?option='.$option.'&amp;view=users';
@@ -166,7 +203,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						$link = 'index.php?option='.$option.'&amp;'.(FLEXI_J16GE ? 'task=groups.add' : 'controller=groups&amp;task=add');
 						FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-groups-add.png', JText::_( 'FLEXI_ADD_GROUP' ) );
 					}
-					?><div></fieldset><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' );?></legend><div class="fc-board-set-inner"><?php
+					?><div></fieldset><?php endif; ?><?php if($display_expert_fieldset): ?><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' );?></legend><div class="fc-board-set-inner"><?php
 					if ($this->perms->CanImport)
 					{
 						$link = 'index.php?option='.$option.'&amp;view=import';
@@ -205,7 +242,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						$link = $this->params->get('support_url');
 						FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-help.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
 					}
-					?><div></fieldset><?php
+					?><div></fieldset><?php endif; ?><?php
 				}
 				?>
 				</div>
@@ -226,7 +263,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				}
 				?>
 				
-				
+				<?php if($display_slider_pending): ?>
 				<?php
 				$title = JText::_( 'FLEXI_PENDING_SLIDER' )." (".count($this->pending)."/".$this->totalrows['pending'].")";
 				echo FLEXI_J16GE ? JHtml::_('sliders.panel', $title, 'pending' ) : $this->pane->startPanel( $title, 'pending' );
@@ -282,7 +319,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					</table>
 					<?php echo  FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 					
-					
+					<?php endif; ?>
+					<?php if($display_slider_revised): ?>
 					<?php
 					$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' )." (".count($this->revised)."/".$this->totalrows['revised'].")";
 					echo FLEXI_J16GE ? JHtml::_('sliders.panel', $title, 'revised' ) : $this->pane->startPanel( $title, 'revised' );
@@ -338,6 +376,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					</table>
 					<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 					
+					<?php endif; ?>
+					<?php if($display_slider_inprogress): ?>
 					
 					<?php
 					$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' )." (".count($this->inprogress)."/".$this->totalrows['inprogress'].")";
@@ -396,7 +436,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					</table>
 					<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 					
-					
+					<?php endif; ?>
+					<?php if($display_slider_draft): ?>
 					<?php
 					$title = JText::_( 'FLEXI_DRAFT_SLIDER' )." (".count($this->draft)."/".$this->totalrows['draft'].")";
 					echo FLEXI_J16GE ?
@@ -453,7 +494,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						<?php $k = 1 - $k; } ?>
 					</table>
 					<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
-					
+					<?php endif; ?>
+					<?php if($display_slider_version): ?>
 					
 				<?php
 				if($this->params->get('show_updatecheck', 1) == 1) {	 
@@ -490,6 +532,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				}
 				?>
 				<?php echo FLEXI_J16GE ? JHtml::_('sliders.end') : $this->pane->endPane();?>
+				<?php endif; ?>
 				</div>
 		
 				<div id="fc-dash-credits">
