@@ -58,6 +58,9 @@
 .icon-32-advindexdirty	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png); }
 .icon-32-advindexpurge	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-purge.png); }
 
+/* preview icon */
+.icon-32-test, .icon-32-preview	{ background: none; }
+.icon-32-test:before, .icon-32-preview:before	{ content: "\3c"; }
 
 /**************
  * Small labels
