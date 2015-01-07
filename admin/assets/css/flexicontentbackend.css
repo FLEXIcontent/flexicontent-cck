@@ -256,20 +256,20 @@ fieldset.fc-board-set {
 	margin:0 24px 12px 0;
 	padding:0;
 }
-fieldset.fc-board-set div.fc-board-set-inner { border:1px solid #ccc; position:relative; top:0; float:left; border-radius:4px; padding: 8px 2%; width: 96%; }
+fieldset.fc-board-set div.fc-board-set-inner { box-shadow: 0 0 4px #cccccc; position:relative; top:0; float:left; border-radius:2px; padding: 8px 2%; width: 96%; background: none repeat scroll 0 0 #f5f5f5;}
 /*legend.*/[class^="fc-board-header"] {
-	border:1px solid #b7b7b7; -webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;font-size:12px;font-family:arial, helvetica, sans-serif; text-decoration:none; display:inline-block;text-shadow: -1px -1px 0 rgba(0,0,0,0.3);font-weight:bold; color: #FFFFFF;
-	background-color: #d3d3d3; background-image: -webkit-gradient(linear, left top, left bottom, from(#d3d3d3), to(#707070));
-	background-image: -webkit-linear-gradient(top, #d3d3d3, #707070);
-	background-image: -moz-linear-gradient(top, #d3d3d3, #707070);
-	background-image: -ms-linear-gradient(top, #d3d3d3, #707070);
-	background-image: -o-linear-gradient(top, #d3d3d3, #707070);
-	background-image: linear-gradient(to bottom, #d3d3d3, #707070);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#d3d3d3, endColorstr=#707070);
+	-webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;font-size:12px;font-family:arial, helvetica, sans-serif; text-decoration:none; display:inline-block;text-shadow: -1px -1px 0 rgba(0,0,0,0.3);font-weight:bold;
+	background-color: #f5f5f5; background-image: -webkit-gradient(linear, left top, left bottom, from(#f5f5f5), to(#cccccc));
+	background-image: -webkit-linear-gradient(top, #f5f5f5, #cccccc);
+	background-image: -moz-linear-gradient(top, #f5f5f5, #cccccc);
+	background-image: -ms-linear-gradient(top, #f5f5f5, #cccccc);
+	background-image: -o-linear-gradient(top,#f5f5f5 , #cccccc);
+	background-image: linear-gradient(to bottom, #f5f5f5,#dcccccc );filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f5f5f5, endColorstr=#cccccc);
 
 	width:auto;
 	font-size:12px;
 	line-height:2em;
-	margin:0px 0 0px 0px;
+	margin:1px 0 0px -1px;
 	padding:0px 24px 0 20px;
 }
 .fc-board-header-content-editing {}
@@ -280,20 +280,27 @@ fieldset.fc-board-set div.fc-board-set-inner { border:1px solid #ccc; position:r
 
 div#fc-dash-boardbtns .fc-board-button {
 	margin: 4px 12px 4px 0px;
-	border: 1px solid #e7e7e7;
-	border-radius: 4px;
-	padding: 0px;
-	background: #e7e7e7;
-	box-shadow: 2px 2px 2px #888888;
+	padding: 5px;
+	background: #ffffff;
 	font-weight: bold;
 	width: 80px;
 	height: 80px;
 	text-align: center;
+	border-bottom: 1px solid #e2e2e2;
+    border-left: 1px solid #efefef;
+    border-radius: 2px;
+    display: block;
+    border-right: 1px solid #efefef;
+    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.04);
+    border-top: none;
+    -webkit-transition-duration: 0.15s;
+    transition-duration: 0.15s;
+    -webkit-transition-property: all;
+    transition-property: all; 
 }
 div#fc-dash-boardbtns .fc-board-button:hover {
-	background: #d7d7d7;
-	border: 1px solid #d7d7d7;
-	box-shadow: 5px 5px 2px #888888;
+	background: #C4C2C4;
+	box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.32); 
 }
 
 div#fc-dash-boardbtns .fc-board-button .fc-board-btn-img {
