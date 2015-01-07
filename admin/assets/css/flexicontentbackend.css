@@ -258,18 +258,14 @@ fieldset.fc-board-set {
 }
 fieldset.fc-board-set div.fc-board-set-inner { box-shadow: 0 0 4px #cccccc; position:relative; top:0; float:left; border-radius:2px; padding: 8px 2%; width: 96%; background: none repeat scroll 0 0 #f5f5f5;}
 /*legend.*/[class^="fc-board-header"] {
-	-webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;font-size:12px;font-family:arial, helvetica, sans-serif; text-decoration:none; display:inline-block;text-shadow: -1px -1px 0 rgba(0,0,0,0.3);font-weight:bold;
-	background-color: #f5f5f5; background-image: -webkit-gradient(linear, left top, left bottom, from(#f5f5f5), to(#cccccc));
-	background-image: -webkit-linear-gradient(top, #f5f5f5, #cccccc);
-	background-image: -moz-linear-gradient(top, #f5f5f5, #cccccc);
-	background-image: -ms-linear-gradient(top, #f5f5f5, #cccccc);
-	background-image: -o-linear-gradient(top,#f5f5f5 , #cccccc);
-	background-image: linear-gradient(to bottom, #f5f5f5,#dcccccc );filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f5f5f5, endColorstr=#cccccc);
+	-webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;font-size:12px;font-family:arial, helvetica, sans-serif; text-decoration:none; display:inline-block;text-shadow: 2px 2px 1px rgba(0,0,0,0.6);font-weight:bold;
+	background-color: #9C9D9E;
+	color:#ffffff;
 
 	width:auto;
 	font-size:12px;
 	line-height:2em;
-	margin:1px 0 0px -1px;
+	margin:1px 0 -3px -1px;
 	padding:0px 24px 0 20px;
 }
 .fc-board-header-content-editing {}
@@ -279,28 +275,40 @@ fieldset.fc-board-set div.fc-board-set-inner { box-shadow: 0 0 4px #cccccc; posi
 .fc-board-header-expert {}
 
 div#fc-dash-boardbtns .fc-board-button {
-	margin: 4px 12px 4px 0px;
-	padding: 5px;
-	background: #ffffff;
-	font-weight: bold;
-	width: 80px;
-	height: 80px;
-	text-align: center;
-	border-bottom: 1px solid #e2e2e2;
-    border-left: 1px solid #efefef;
-    border-radius: 2px;
-    display: block;
-    border-right: 1px solid #efefef;
-    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.04);
-    border-top: none;
-    -webkit-transition-duration: 0.15s;
-    transition-duration: 0.15s;
-    -webkit-transition-property: all;
-    transition-property: all; 
+	margin: 4px 12px 4px 0;
+    padding: 5px;
+    font-weight: bold;
+    width: 80px;
+    height: 80px;
+    text-align: center;
+    background-color: #e1e1e1;
+    background-image: -moz-linear-gradient(#ededed, #e1e1e1);
+    background-image: -o-linear-gradient(#ededed, #e1e1e1);
+    background-image: -webkit-linear-gradient(#ededed, #e1e1e1);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ededed), color-stop(1, #e1e1e1));
+    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr=#ededed, EndColorStr=#e1e1e1)";
+    background-image: linear-gradient(#ededed, #e1e1e1);
+    border: 1px solid #d0d0d0;
+    color: #444;
+    text-shadow: 1px 1px 1px #fff;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -moz-box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.32);
+    -webkit-box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.32);
+    box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.32)
 }
 div#fc-dash-boardbtns .fc-board-button:hover {
-	background: #C4C2C4;
-	box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.32); 
+    background-color: #FffFfF;
+    background-image: -moz-linear-gradient(#ededed, #fff);
+    background-image: -o-linear-gradient(#ededed, #fff);
+    background-image: -webkit-linear-gradient(#ededed, #fff);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ededed), color-stop(1, #fff));
+    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr=#ededed, EndColorStr=#fff)";
+    background-image: linear-gradient(#ededed, #fff);
+    -moz-box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6);
+    -webkit-box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6);
+    box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6)
 }
 
 div#fc-dash-boardbtns .fc-board-button .fc-board-btn-img {
