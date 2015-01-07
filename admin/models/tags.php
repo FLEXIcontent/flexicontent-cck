@@ -184,18 +184,25 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function _buildQuery()
 	{
+		$app = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
-
+		
+		$filter_order    = $app->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
+		$filter_assigned = $app->getUserStateFromRequest( $option.'.tags.filter_assigned', 'filter_assigned', '', 'word' );
+		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor'
 			// because of multi-multi tag-item relations it is faster to calculate this with a single seperate query
 			// if it was single mapping e.g. like it is 'item' TO 'content type' or 'item' TO 'creator' we could use a subquery
-			// the more categories are listed (query LIMIT) the bigger the performance difference ...
-			//. ', (SELECT COUNT(rel.tid) FROM #__flexicontent_tags_item_relations AS rel WHERE rel.tid=t.id GROUP BY t.id) AS nrassigned'
+			// the more tags are listed (query LIMIT) the bigger the performance difference ...
+			. ($filter_order=='nrassigned' ? ', (SELECT COUNT(rel.tid) FROM #__flexicontent_tags_item_relations AS rel WHERE rel.tid=t.id GROUP BY t.id) AS nrassigned' : '')
 			. ' FROM #__flexicontent_tags AS t'
 			. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
+			. ($filter_assigned || $filter_order=='nrassigned' ? ' LEFT JOIN #__flexicontent_tags_item_relations AS rel ON rel.tid=t.id' : '')
 			. $where
 			. ' GROUP BY t.id'
 			. $having

@@ -194,14 +194,16 @@ class FlexicontentModelFields extends JModelList
 			$option = JRequest::getVar('option');
 			$app = JFactory::getApplication();
 	
-			$filter_state     = $app->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
-			$filter_type      = $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 			$filter_fieldtype = $app->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 'filter_fieldtype', '', 'word' );
+			$filter_type      = $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+			$filter_state     = $app->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
+			$filter_access    = $app->getUserStateFromRequest( $option.'.fields.filter_access', 'filter_access', '', 'string' );
 			$search = $app->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
 			$search = trim( JString::strtolower( $search ) );
 	
 			$where = array();
 	
+			// Filter by item-type (assigned-to)
 			if ( $filter_fieldtype ) {
 				if ( $filter_fieldtype == 'C' ) {
 					$where[] = 't.iscore = 1';
@@ -213,7 +215,13 @@ class FlexicontentModelFields extends JModelList
 					$where[] = 't.field_type = "'.$filter_fieldtype.'"';
 				}
 			}
-	
+			
+			// Filter by field-type
+			if ( $filter_type ) {
+				$where[] = 'rel.type_id = ' . $filter_type;
+			}
+			
+			// Filter by state
 			if ( $filter_state ) {
 				if ( $filter_state == 'P' ) {
 					$where[] = 't.published = 1';
@@ -221,11 +229,13 @@ class FlexicontentModelFields extends JModelList
 					$where[] = 't.published = 0';
 				}
 			}
-	
-			if ( $filter_type ) {
-				$where[] = 'rel.type_id = ' . $filter_type;
-				}
-	
+			
+			// Filter by access level
+			if ( $filter_access ) {
+				$where[] = 't.access = '.(int) $filter_access;
+			}
+			
+			// Filter by search word
 			if ($search) {
 				$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
 				$where[] = ' (LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false )

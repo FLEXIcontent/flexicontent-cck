@@ -45,8 +45,6 @@ class FlexicontentViewItems extends JViewLegacy
 		$bind_limit = JRequest::getInt('bind_limit', 1000);
 		
 		$session = JFactory::getSession();
-		$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
-		$filter_fileid = JRequest::getInt('filter_fileid', 0);
 		
 		// Some flags
 		$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
@@ -63,6 +61,10 @@ class FlexicontentViewItems extends JViewLegacy
 
 		// Get filters
 		$count_filters = 0;
+		
+		$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
+		$filter_fileid = JRequest::getInt('filter_fileid', 0);
+		if ($filter_fileid) $count_filters++;
 		
 		$filter_cats       = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',				'filter_cats',			'',		'int' );
 		$filter_subcats    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_subcats',		'filter_subcats',		1,		'int' );
@@ -545,7 +547,7 @@ class FlexicontentViewItems extends JViewLegacy
 				$file_options[] = JHTML::_('select.option', $_file->id, $_file->altname );
 			}
 			flexicontent_html::loadFramework('select2');
-			$lists['filter_fileid'] = ($filter_fileid ? '<label class="label">'.JText::_('FLEXI_FILE').'</label>' : '').
+			$lists['filter_fileid'] = ($filter_fileid || 1 ? '<label class="label">'.JText::_('FLEXI_ITEMS_USING').' '.JText::_('FLEXI_FILE').'</label>' : '').
 				JHTML::_('select.genericlist', $file_options, 'filter_fileid', 'size="1" class="use_select2_lib" onchange="submitform();"', 'value', 'text', $filter_fileid );
 		}
 		

@@ -22,7 +22,7 @@ $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
-$end_text = '<div class="icon-cancel" title="'.JText::_('FLEXI_HIDE').'"style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
+$end_text = '<div class="icon-cancel" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCcats', $start_text, $end_text);
 
 $listOrder  = $this->lists['order'];
@@ -89,8 +89,8 @@ function delAllFilters() {
 				
 				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button'; ?>
 				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
-				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
 				<input type="button" id="fc_filterline_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
 				</div>
 				
 				<div style="display:inline-block; float:left;">
@@ -119,17 +119,26 @@ function delAllFilters() {
 	</table>
 	
 	
-	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> >
+	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="fc_mini_note_box well well-small">
 		<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['cats']; ?>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['level']; ?>
 		</div>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-success nowrap_box">
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['state']; ?>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['access']; ?>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 		  <?php echo $this->lists['language']; ?>
 		</div>
 		
@@ -141,7 +150,7 @@ function delAllFilters() {
 		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('filterline', document.getElementById('fc_filterline_btn'), 'btn-primary');"></div>
 	</div>
 	
-	<div id="mainChooseColBox" class="fc_mini_note_box" style="margin:8px 0px 12px; display:none;"></div>
+	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>
 	
 	<table id="adminListTableFCcats" class="adminlist" cellspacing="1" style="margin-top:12px;">
 	<thead>

@@ -22,7 +22,7 @@ $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
-$end_text = '<div class="icon-cancel" title="'.JText::_('FLEXI_HIDE').'"style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
+$end_text = '<div class="icon-cancel" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCfields', $start_text, $end_text);
 
 $user      = JFactory::getUser();
@@ -100,8 +100,8 @@ function delAllFilters() {
 				
 				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button'; ?>
 				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
-				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
 				<input type="button" id="fc_filterline_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
 				</div>
 				
 				<div style="display:inline-block; float:left;">
@@ -130,11 +130,14 @@ function delAllFilters() {
 	</table>
 	
 	
-	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="well well-small" >
+	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="fc_mini_note_box well well-small">
 		<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>
 				
 		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['filter_type']; ?>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['assigned']; ?>
 		</div>
 		
@@ -144,6 +147,9 @@ function delAllFilters() {
 		
 		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['state']; ?>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['access']; ?>
 		</div>
 		
@@ -155,9 +161,9 @@ function delAllFilters() {
 		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('filterline', document.getElementById('fc_filterline_btn'), 'btn-primary');"></div>
 	</div>
 	
-	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="margin:8px 0px 12px; display:none;"></div>
+	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>
 	
-	<span style="display:none; color:darkred;" class="fc_nice_box" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
+	<span style="display:none; color:darkred;" class="fc_mini_note_box" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
 	
 	<table id="adminListTableFCfields" class="adminlist" cellspacing="1" style="margin-top:12px;">
 	<thead>
@@ -436,15 +442,15 @@ function delAllFilters() {
 				} else {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_FIELD' );?>::<?php echo $escaped_label; ?>">
-					<a href="<?php echo $link; ?>">
-					<?php echo $translated_label; ?>
-					</a></span>
+						<a href="<?php echo $link; ?>">
+						<?php echo $translated_label; ?>
+						</a>
+					</span>
 					<?php echo $original_label_text;?>
 				<?php
 				}
 				?>
 			</td>
-
 			<td align="left">
 				<?php echo $row->name; ?>
 			</td>
@@ -501,7 +507,6 @@ function delAllFilters() {
 			<td align="center">
 				<?php echo $published; ?>
 			</td>
-
 			<td align="center"><?php echo $row->id; ?></td>
 		</tr>
 		<?php $k = 1 - $k; } ?>

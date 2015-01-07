@@ -350,9 +350,9 @@ window.addEvent('domready', function() {
 				
 				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button'; ?>
 				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
-				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-				<input type="button" id="fc_stateGroupsBox_btn" class="<?php echo $_class.($this->filter_stategrp || $this->filter_catsinstate!=1 ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('stateGroupsBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
 				<input type="button" id="fc_filterline_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+				<input type="button" id="fc_stateGroupsBox_btn" class="<?php echo $_class.($this->filter_stategrp || $this->filter_catsinstate!=1 ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('stateGroupsBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
+				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
 				</div>
 				
 				<div style="display:inline-block; float:left;">
@@ -376,23 +376,33 @@ window.addEvent('domready', function() {
 					</span>
 					<?php endif; ?>
 				</div>
-				
-				<?php if (@$this->lists['filter_fileid']): ?>
-					<div class="fcclear"></div>
-					<?php echo '<label class="label">'.JText::_('List items using file') . '</label> ' . $this->lists['filter_fileid']; ?>
-				<?php endif; ?>
 			</td>
 		</tr>
 	</table>
 	
 	
-	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="well well-small">
+	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="fc_mini_note_box well well-small">
 		<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>
-				
+		
+		<?php if (@$this->lists['filter_fileid']): ?>
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+			<?php echo $this->lists['filter_fileid']; ?>
+		</div>
+		<?php endif; ?>
+		
 		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['filter_authors']; ?>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['filter_lang']; ?>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['filter_type']; ?>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['filter_state']; ?>
 		</div>
 		
@@ -428,8 +438,6 @@ window.addEvent('domready', function() {
 		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('filterline', document.getElementById('fc_filterline_btn'), 'btn-primary');"></div>
 	</div>
 	
-	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="margin-top:6px; display:none;"></div>
-
 	<div id="stateGroupsBox" class="fc_mini_note_box floated well well-small" <?php if (!$this->filter_stategrp && $this->filter_catsinstate==1) echo 'style="display:none;"'; ?> >
 		
 		<div style="float:left; margin-right:12px;">
@@ -455,6 +463,7 @@ window.addEvent('domready', function() {
 		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('stateGroupsBox', document.getElementById('fc_stateGroupsBox_btn'), 'btn-primary');"></div>
 	</div>
 	
+	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>
 
 	<div class="clear"></div>
 	<span style="display:none; margin-bottom:0px!important;" class="fc-mssg-inline fc-note" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>

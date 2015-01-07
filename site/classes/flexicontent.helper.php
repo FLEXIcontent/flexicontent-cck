@@ -5412,22 +5412,31 @@ function FLEXISubmenu($cando)
 	// Create Submenu, Dashboard (HOME is always added, other will appear only if post-installation tasks are done)
 	$addEntry = array(FLEXI_J30GE ? 'JHtmlSidebar' : 'JSubMenuHelper', 'addEntry');
 	
-	call_user_func($addEntry, JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
+	if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-content-editing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' ).'</h2>', '', '');
+	call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-flexicontent"></span>' : '').JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
 	if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>'))
 	{
-		call_user_func($addEntry, JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items');
-		if ($perms->CanCats) 			call_user_func($addEntry, JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
-		if ($perms->CanTypes)			call_user_func($addEntry, JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
-		if ($perms->CanFields) 		call_user_func($addEntry, JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
-		if ($perms->CanTags) 			call_user_func($addEntry, JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
-		if ($perms->CanTemplates)	call_user_func($addEntry, JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
-		if ($perms->CanAuthors)		call_user_func($addEntry, JText::_( 'FLEXI_AUTHORS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
-		if ($perms->CanGroups)		call_user_func($addEntry, JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups');
-	//if ($perms->CanArchives)	call_user_func($addEntry, JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
-		if ($perms->CanFiles) 		call_user_func($addEntry, JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
-		if ($perms->CanIndex)			call_user_func($addEntry, JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
-		if ($perms->CanImport)		call_user_func($addEntry, JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
-		if ($perms->CanStats)			call_user_func($addEntry, JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
+		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-items"></span>' : '').JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items');
+		if ($perms->CanCats) 			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-fc_categories"></span>' : '').JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
+		
+		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-type-fields">'.JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' ).'</h2>', '', '');
+		if ($perms->CanTypes)			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-types"></span>' : '').JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
+		if ($perms->CanFields) 		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-fields"></span>' : '').JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
+		if ($perms->CanTags) 			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-tags"></span>' : '').JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
+		if ($perms->CanFiles) 		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-filemanager"></span>' : '').JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
+		
+		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-content-viewing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' ).'</h2>', '', '');
+		if ($perms->CanTemplates)	call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-templates"></span>' : '').JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
+		if ($perms->CanStats)			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-stats"></span>' : '').JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
+		
+		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-users">'.JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' ).'</h2>', '', '');
+		if ($perms->CanAuthors)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-users"></span>' : '').JText::_( 'FLEXI_AUTHORS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
+		if ($perms->CanGroups)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-groups"></span>' : '').JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups');
+	//if ($perms->CanArchives)	call_user_func($addEntry, '<span class="fcsb-icon-archive"></span>'.JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
+	
+		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
+		if ($perms->CanImport)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-import"></span>' : '').JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
+		if ($perms->CanIndex)			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-search"></span>' : '').JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
 	}
 }
 

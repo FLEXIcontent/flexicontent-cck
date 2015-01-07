@@ -50,9 +50,9 @@ class FlexicontentViewTypes extends JViewLegacy
 		$count_filters = 0;
 		
 		//get vars
-		$filter_order		  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 		'filter_state', 	'', 'word' );
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     't.name', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', '', 'word' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 		'filter_state',     '', 'word' );
 		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
 		if ($filter_state) $count_filters++; if ($filter_access) $count_filters++;
 		
@@ -112,6 +112,7 @@ class FlexicontentViewTypes extends JViewLegacy
 			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
+		
 		// Get data from the model
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		if (FLEXI_J16GE) {
@@ -131,7 +132,7 @@ class FlexicontentViewTypes extends JViewLegacy
 
 		$lists = array();
 		
-		// filter publication state
+		// build publication state filter
 		$states 	= array();
 		$states[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
 		$states[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
@@ -142,21 +143,25 @@ class FlexicontentViewTypes extends JViewLegacy
 			JHTML::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
 			//JHTML::_('grid.state', $filter_state );
 		
-		// filter access level
+		
+		// build access level filter
 		$options = JHtml::_('access.assetgroups');
 		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
 		$fieldname =  $elementid = 'filter_access';
 		$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
 		$lists['access'] = ($filter_access || 1 ? '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>' : '').
 			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
-			
-		// filter search word
+		
+		
+		// text search filter
 		$lists['search']= $search;
+		
 		
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
-
+		
+		
 		//assign data to template
 		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('lists'	, $lists);

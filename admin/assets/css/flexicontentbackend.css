@@ -4,51 +4,92 @@
 /***********
 HEADER ICONS
 ************/
+[class^="fcsb-icon-"], [class*=" fcsb-icon-"] {
+    display: inline-block;
+    height: 14px;
+    line-height: 14px;
+    width: 20px;
+}
+[class^="fcsb-icon-"]:before, [class*=" fcsb-icon-"]:before {
+    font-family: "IcoMoon";
+    font-style: normal;
+}
+.disabled[class^="fcsb-icon-"], .disabled[class*=" fcsb-icon-"] {
+    font-weight: normal;
+}
+
+.fcsb-icon-flexicontent:before,
 .icon-flexicontent:before {
 	content: "\e250";
 }
+.fcsb-icon-items:before,
 .icon-items:before {
 	content: "\e242";
 }
 .icon-itemedit:before, .icon-itemadd:before {
 	content: "\2c";
 }
+.fcsb-icon-types:before,
 .icon-types:before, icon-typeadd:before, .icon-typeedit:before {
 	content: "\e020";
 }
+.fcsb-icon-fc_categories:before,
 .icon-fc_categories:before, .icon-fc_categoryadd:before, .icon-fc_categoryedit:before {
 	content: "\2d";
 }
+.fcsb-icon-fields:before,
 .icon-fields:before, .icon-fieldadd:before, .icon-fieldedit:before {
 	content: "\e230";
 }
+.fcsb-icon-tags:before,
 .icon-tags:before {
 	content: "\e264";
 }
 .icon-tagadd:before, .icon-tagedit:before {
 	content: "\e262";
 }
+.fcsb-icon-templates:before,
 .icon-templates:before {
 	content: "\3c";
 }
+.fcsb-icon-authors:before,
 .icon-authors:before {
 	content: "\e01f";
 }
+.fcsb-icon-users:before,
 .icon-authoredit:before, .icon-authoradd:before {
 	content: "\22";
 }
+.fcsb-icon-groups:before,
 .icon-groups:before, .icon-groupedit:before, .icon-groups-add:before {
 	content: "\e01f";
 }
+.fcsb-icon-filemanager:before,
 .icon-files:before {
 	content: "\30";
 }
+.fcsb-icon-search:before,
 .icon-searchtext:before {
 	content: "\53";
 }
+.fcsb-icon-stats:before,
 .icon-stats:before {
 	content: "\75";
 }
+
+.icon-test:before { content: "l";  color: #51a351; font-weight:bold; }
+.icon-savenew:before    { content: "\5d";   color: #51a351; }
+.icon-32-delete:before,
+.icon-32-trash:before   { content: "\4c"; }
+.icon-copy_wvalues:before,
+.icon-params:before     { content: "\e018"; color: #51a351; }
+.icon-32-archive:before { content: "\50"; }
+.fcsb-icon-import:before{ content: "\e022"; }
+.icon-import:before     { content: "\e022"; color: darkorange; }
+.icon-32-restore:before { content: "\6c"; }
+.icon-translate:before  {	content: "\25";}
+
+
 /*********************/
 .flexicontent #adminForm a.saveorder {
 	float: none !important;
@@ -124,8 +165,11 @@ div.current dd .pane-sliders .panel {
 /* Manager filters and filters containers */
 /******************************************/
 
-.flexicontent #filterline .fc-mssg-inline {
-	margin: 6px !important;
+.flexicontent #filterline .fc-mssg-inline.fc-filter,
+.flexicontent #filterline .fc-mssg.fc-filter {
+	border:0px !important;
+	margin:0px 8px !important;
+	padding:0px 8px !important;
 }
 .flexicontent #filterline  .nowrap_box, .flexicontent .nowrap_box {
 	vertical-align: baseline !important;
@@ -152,6 +196,15 @@ div.current dd .pane-sliders .panel {
     margin: 0 !important;
     padding: 4px !important;
 }
+.flexicontent #filterline,
+.flexicontent #mainChooseColBox,
+.flexicontent #stateGroupsBox,
+.flexicontent #itemusage-filters {
+	padding: 4px 8px 4px 4px;
+	margin: 4px 0px;
+	vertical-align: top;
+	min-height: 34px;
+}
 .flexicontent #stateGroupsBox input:checked + label {
 	color: #8B0000;
 	font-weight: bold;
@@ -173,6 +226,89 @@ div.current dd .pane-sliders .panel {
 	font-style: italic !important;
 }
 
+/* a little larger icons */
 .flexicontent .icon-publish, .icon-cancel {
 	font-size: 14px;
 }
+
+
+/* FLEXIcontent Dashboard */
+
+div#fc-dash-boardbtns, /* backend dashboard buttons */
+div#fc-dash-recentitems, /* backend dashboard recent item changes */
+div#fc-dash-credits {  /* backend dashboard credits */
+	float:left;
+}
+div#fc-dash-boardbtns {
+	padding: 0px 0px; 
+	clear:both;
+	margin-bottom: 12px;
+}
+div#fc-dash-credits {
+	margin-left:24px;
+}
+
+fieldset.fc-board-set {
+	float:left;
+  width: auto;
+	margin-left: 10px;
+	border:0;
+	margin:0 24px 12px 0;
+	padding:0;
+}
+fieldset.fc-board-set div.fc-board-set-inner { border:1px solid #ccc; position:relative; top:0; float:left; border-radius:4px; padding: 8px 2%; width: 96%; }
+/*legend.*/[class^="fc-board-header"] {
+	border:1px solid #b7b7b7; -webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;font-size:12px;font-family:arial, helvetica, sans-serif; text-decoration:none; display:inline-block;text-shadow: -1px -1px 0 rgba(0,0,0,0.3);font-weight:bold; color: #FFFFFF;
+	background-color: #d3d3d3; background-image: -webkit-gradient(linear, left top, left bottom, from(#d3d3d3), to(#707070));
+	background-image: -webkit-linear-gradient(top, #d3d3d3, #707070);
+	background-image: -moz-linear-gradient(top, #d3d3d3, #707070);
+	background-image: -ms-linear-gradient(top, #d3d3d3, #707070);
+	background-image: -o-linear-gradient(top, #d3d3d3, #707070);
+	background-image: linear-gradient(to bottom, #d3d3d3, #707070);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#d3d3d3, endColorstr=#707070);
+
+	width:auto;
+	font-size:12px;
+	line-height:2em;
+	margin:0px 0 0px 0px;
+	padding:0px 24px 0 20px;
+}
+.fc-board-header-content-editing {}
+.fc-board-header-type-fields {}
+.fcsfc-boardbnav-content-viewing {}
+.fc-board-header-users { }
+.fc-board-header-expert {}
+
+div#fc-dash-boardbtns .fc-board-button {
+	margin: 4px 12px 4px 0px;
+	border: 1px solid #e7e7e7;
+	border-radius: 4px;
+	padding: 0px;
+	background: #e7e7e7;
+	box-shadow: 2px 2px 2px #888888;
+	font-weight: bold;
+	width: 80px;
+	height: 80px;
+	text-align: center;
+}
+div#fc-dash-boardbtns .fc-board-button:hover {
+	background: #d7d7d7;
+	border: 1px solid #d7d7d7;
+	box-shadow: 5px 5px 2px #888888;
+}
+
+div#fc-dash-boardbtns .fc-board-button .fc-board-btn-img {
+	width: 32px;
+	margin: 0 auto;
+}
+div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text {
+	display: inline-block;
+	width: 96%;
+	padding: 2%;
+	margin: 0px 0 0 0;
+	min-height:48px;
+	vertical-align:middle;
+	font-size: 12px;
+}
+
+div#fc-dash-boardbtns .fc-board-button a { text-decoration:none; }
+div#fc-dash-boardbtns .fc-board-button:hover a {}

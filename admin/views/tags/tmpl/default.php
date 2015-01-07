@@ -18,6 +18,13 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
+
+$start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
+$end_text = '<div class="icon-cancel" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
+flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCtags', $start_text, $end_text);
+
 $user      = JFactory::getUser();
 $cparams   = JComponentHelper::getParams( 'com_flexicontent' );
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
@@ -28,6 +35,25 @@ $image_preview = FLEXI_J16GE ?
 	JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview) :
 	JHTML::_('image.site', 'monitor_go.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_('FLEXI_PREVIEW'), $attribs_preview) ;
 ?>
+<script type="text/javascript">
+
+// delete active filter
+function delFilter(name)
+{
+	//window.console.log('Clearing filter:'+name);
+	var myForm = jQuery('#adminForm');
+	var filter = jQuery('#'+name);
+	if (filter.attr('type')=='checkbox')
+		filter.checked = '';
+	else
+		filter.val('');
+}
+
+function delAllFilters() {
+	delFilter('search'); delFilter('filter_assigned');  delFilter('filter_state');
+}
+
+</script>
 
 <div class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
@@ -41,53 +67,73 @@ $image_preview = FLEXI_J16GE ?
 	<div id="j-main-container">
 <?php endif;?>
 
-	<table class="adminform">
-		<tr>
-			<td align="left">
-				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
-				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onchange="document.adminForm.submit();" />
-				<div id="fc-filter-buttons">
-					<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-					<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
-				</div>
-			</td>
-			<td nowrap="nowrap">
-				<div class="limit" style="display: inline-block;">
-					<?php
-					echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM');
-					$pagination_footer = $this->pagination->getListFooter();
-					if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
-					?>
+	<table>
+		<tr class="filterbuttons_head">
+			<td>
+				<div style="margin:2px 38px 0px 0px; display:inline-block; float:left">
+					<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
+					<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 				</div>
 				
-				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
-					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
-				</span>
+				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button'; ?>
+				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
+				<input type="button" id="fc_filterline_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+				</div>
 				
-				<span class="fc_pages_counter">
-					<?php echo $this->pagination->getPagesCounter(); ?>
-				</span>
-			</td>
-			<td style="text-align:right;">
-				<div class="filter-select fltrt">
-					<?php echo $this->lists['assigned']; ?>
-					<?php echo $this->lists['state']; ?>
+				<div style="display:inline-block; float:left;">
+					<div class="limit nowrap_box" style="display: inline-block;">
+						<label class="label">
+							<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
+						</label>
+						<?php
+						$pagination_footer = $this->pagination->getListFooter();
+						if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
+						?>
+					</div>
+					
+					<span class="fc_item_total_data nowrap_box badge badge-info">
+						<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+					</span>
+					
+					<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
+					<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
+						<?php echo $getPagesCounter; ?>
+					</span>
+					<?php endif; ?>
 				</div>
 			</td>
 		</tr>
 	</table>
-
-	<table class="adminlist" cellspacing="1">
+	
+	
+	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="fc_mini_note_box well well-small">
+		<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+			<?php echo $this->lists['assigned']; ?>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+			<?php echo $this->lists['state']; ?>
+		</div>
+		
+		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('filterline', document.getElementById('fc_filterline_btn'), 'btn-primary');"></div>
+	</div>
+	
+	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>
+	
+	<table id="adminListTableFCtags" class="adminlist" cellspacing="1" style="margin-top:12px;">
 	<thead>
 		<tr>
-			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="5"><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
-			<th width="1%" nowrap="nowrap">&nbsp;</th>
-			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TAG_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="30%"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="20"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TO', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+			<th nowrap="nowrap"></th>
+			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TAG_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TO', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
@@ -119,14 +165,14 @@ $image_preview = FLEXI_J16GE ?
 			if (FLEXI_J16GE)	$published	= JHTML::_('jgrid.published', $row->published, $i, 'tags.' );
 			else							$published	= JHTML::_('grid.published', $row, $i );
 			
-			$checked	= @ JHTML::_('grid.checkedout', $row, $i );
+			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
 			$canEdit    = 1;
 			$canEditOwn = 1;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
-			<td width="7"><?php echo $checked; ?></td>
-			<td width="1%" >
+			<td><?php echo $checked; ?></td>
+			<td>
 				<?php
 				$tag_link    = str_replace('&', '&amp;', FlexicontentHelperRoute::getTagRoute($row->id));
 				$tag_link    = JRoute::_(JURI::root().$tag_link, $xhtml=false);  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
@@ -171,7 +217,6 @@ $image_preview = FLEXI_J16GE ?
 				}
 				?>
 			</td>
-			
 			<td>
 				<?php
 				if (JString::strlen($row->alias) > 25) {
@@ -181,7 +226,7 @@ $image_preview = FLEXI_J16GE ?
 				}
 				?>
 			</td>
-			<td align="center"><?php echo $row->nrassigned?></td>
+			<td align="center"><span class="badge badge-info"><?php echo $row->nrassigned ? $row->nrassigned : 0; ?></span></td>
 			<td align="center">
 				<?php echo $published; ?>
 			</td>

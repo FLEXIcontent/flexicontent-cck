@@ -70,8 +70,8 @@ function delAllFilters() {
 				
 				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button'; ?>
 				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
-				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
 				<input type="button" id="fc_filterline_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
 				</div>
 				
 				<div style="display:inline-block; float:left;">
@@ -100,7 +100,7 @@ function delAllFilters() {
 	</table>
 	
 	
-	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?>  class="well well-small">
+	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="fc_mini_note_box well well-small">
 		<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>
 		
 		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
@@ -116,7 +116,7 @@ function delAllFilters() {
 		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('filterline', document.getElementById('fc_filterline_btn'), 'btn-primary');"></div>
 	</div>
 	
-	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="margin:8px 0px 12px; display:none;"></div>
+	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>
 	
 	<table id="adminListTableFCtypes" class="adminlist" cellspacing="1" style="margin-top:12px;">
 	<thead>

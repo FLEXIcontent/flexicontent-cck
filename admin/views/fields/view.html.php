@@ -50,11 +50,11 @@ class FlexicontentViewFields extends JViewLegacy
 		$count_filters = 0;
 		
 		//get vars
-		$filter_assigned  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_assigned', 	'filter_assigned', 	'', 'word' );
 		$filter_fieldtype = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
+		$filter_assigned  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_assigned', 	'filter_assigned', 	'', 'word' );
+		$filter_type      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type', 		'filter_type', 		'', 'int' );
 		$filter_state 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 		'filter_state', 	'', 'word' );
 		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
-		$filter_type      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type', 		'filter_type', 		'', 'int' );
 		if ($filter_assigned) $count_filters++; if ($filter_fieldtype) $count_filters++;
 		if ($filter_state) $count_filters++; if ($filter_access) $count_filters++;
 		if ($filter_type) $count_filters++;
@@ -179,7 +179,23 @@ class FlexicontentViewFields extends JViewLegacy
 
 		$lists = array();
 		
-		//build backend visible filter
+		
+		// build item-type filter
+		$lists['filter_type'] = ($filter_type|| 1 ? '<label class="label">'.JText::_('FLEXI_TYPE').'</label>' : '').
+			flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="submitform( );"', 'filter_type');
+		
+		
+		// build orphaned/assigned filter
+		$assigned 	= array();
+		$assigned[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS' )*/ );
+		$assigned[] = JHTML::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
+		$assigned[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
+
+		$lists['assigned'] = ($filter_assigned || 1 ? '<label class="label">'.JText::_('FLEXI_ASSIGNED').'</label>' : '').
+			JHTML::_('select.genericlist', $assigned, 'filter_assigned', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_assigned );
+		
+		
+		// build field-type filter
 		$ALL = mb_strtoupper(JText::_( 'FLEXI_ALL' ), 'UTF-8') . ' : ';
 		$fftype 	= array();
 		$fftype[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
@@ -200,20 +216,8 @@ class FlexicontentViewFields extends JViewLegacy
 			JHTML::_('select.genericlist', $fftype, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
 		if (!FLEXI_J16GE) $lists['fftype'] = str_replace('<optgroup label="">', '</optgroup>', $lists['fftype']);
 		
-		//build orphaned/assigned filter
-		$assigned 	= array();
-		$assigned[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS' )*/ );
-		$assigned[] = JHTML::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
-		$assigned[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
-
-		$lists['assigned'] = ($filter_assigned || 1 ? '<label class="label">'.JText::_('FLEXI_ASSIGNED').'</label>' : '').
-			JHTML::_('select.genericlist', $assigned, 'filter_assigned', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_assigned );
-
-		//build type select list
-		$lists['filter_type'] = ($filter_type|| 1 ? '<label class="label">'.JText::_('FLEXI_TYPE').'</label>' : '').
-			flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="submitform( );"', 'filter_type');
 		
-		// filter publication state
+		// build publication state filter
 		$states 	= array();
 		$states[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
 		$states[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
@@ -224,28 +228,30 @@ class FlexicontentViewFields extends JViewLegacy
 			JHTML::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
 			//JHTML::_('grid.state', $filter_state );
 		
-		// filter access level
+		
+		// build access level filter
 		$options = JHtml::_('access.assetgroups');
-		array_unshift($options, JHtml::_('select.option', '',  '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
+		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
 		$fieldname =  $elementid = 'filter_access';
 		$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
 		$lists['access'] = ($filter_access || 1 ? '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>' : '').
 			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
-			
-		// filter search word
+		
+		
+		// text search filter
 		$lists['search']= $search;
+		
 		
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
-
-		// filter ordering
 		if ($filter_type == '' || $filter_type == 0)
 		{
 			$ordering = ($lists['order'] == 't.ordering');
 		} else {
 			$ordering = ($lists['order'] == 'typeordering');
 		}
+		
 		
 		//assign data to template
 		$this->assignRef('count_filters', $count_filters);

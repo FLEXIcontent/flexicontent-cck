@@ -29,41 +29,54 @@ jimport('joomla.application.component.view');
  */
 class FlexicontentViewTags extends JViewLegacy
 {
-	function display($tpl = null)
+	function display( $tpl = null )
 	{
 		//initialise variables
 		$app      = JFactory::getApplication();
-		$option   = JRequest::getVar('option');
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
+		$option   = JRequest::getCmd('option');
+		$view     = JRequest::getVar('view');
 		
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
+		flexicontent_html::loadFramework('select2');
 		JHTML::_('behavior.tooltip');
 
+		// Get filters
+		$count_filters = 0;
+		
 		//get vars
-		$filter_order     = $app->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.tags.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state     = $app->getUserStateFromRequest( $option.'.tags.filter_state', 		'filter_state', 	'*', 'word' );
-		$filter_assigned = $app->getUserStateFromRequest( $option.'.tags.filter_assigned', 	'filter_assigned', '*', 'word' );
-		$search 			= $app->getUserStateFromRequest( $option.'.tags.search', 				'search', 			'', 'string' );
-		$search 			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
-
-		//add css and submenu to document
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     't.name', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', '', 'word' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 		'filter_state',     '', 'word' );
+		$filter_assigned  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_assigned', 	'filter_assigned','', 'word' );
+		if ($filter_state) $count_filters++; if ($filter_assigned) $count_filters++;
+		
+		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
+		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		if (strlen($search)) $count_filters++;
+		
+		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
-
+		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/flexi-lib.js' );
+		
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
-
+		
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanTags');
 		
+		
+		// ******************
+		// Create the toolbar
+		// ******************
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_TAGS' );
@@ -123,47 +136,66 @@ class FlexicontentViewTags extends JViewLegacy
 		$document->addScriptDeclaration($js);
 		
 		
-		//Get data from the model
+		// Get data from the model
 		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$model =  $this->getModel();
 		$rows = $this->get( 'Data');
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
-		// Get assigned items
-		$model =  $this->getModel();
-		$rowids = array();
-		foreach ($rows as $row) $rowids[] = $row->id;
-		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$rowtotals = $model->getAssignedItems($rowids);
-		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		foreach ($rows as $row) {
-			$row->nrassigned = isset($rowtotals[$row->id]) ? $rowtotals[$row->id]->nrassigned : 0;
+		
+		
+		// Get assigned items (via separate query),  (if not already retrieved)
+		// ... when we order by assigned then this is already done via main DB query
+		if ( $filter_order!='nrassigned' )
+		{
+			$rowids = array();
+			foreach ($rows as $row) $rowids[] = $row->id;
+			if ( $print_logging_info )  $start_microtime = microtime(true);
+			$rowtotals = $model->getAssignedItems($rowids);
+			if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			foreach ($rows as $row) {
+				$row->nrassigned = isset($rowtotals[$row->id]) ? $rowtotals[$row->id]->nrassigned : 0;
+			}
 		}
 		
+		// Create pagination object
 		$pagination = $this->get( 'Pagination' );
 
 		$lists = array();
 		
-		//build arphaned/assigned filter
+		// build orphaned/assigned filter
 		$assigned 	= array();
-		$assigned[] = JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_TAGS' ) .' -' );
+		$assigned[] = JHTML::_('select.option',  '', '-'/*JText::_('FLEXI_ALL_TAGS')*/);
 		$assigned[] = JHTML::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
 		$assigned[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
 
-		$lists['assigned'] = JHTML::_('select.genericlist', $assigned, 'filter_assigned', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_assigned );
+		$lists['assigned'] = ($filter_assigned || 1 ? '<label class="label">'.JText::_('FLEXI_ASSIGNED').'</label>' : '').
+			JHTML::_('select.genericlist', $assigned, 'filter_assigned', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_assigned );
 		
-		//publish unpublished filter
-		$lists['state']	= JHTML::_('grid.state', $filter_state );
+		// build publication state filter
+		$states 	= array();
+		$states[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$states[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+		$states[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+		//$states[] = JHTML::_('select.option',  '-2', JText::_( 'FLEXI_TRASHED' ) );
 		
-		// search filter
+		$lists['state'] = ($filter_state || 1 ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
+			JHTML::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
+			//JHTML::_('grid.state', $filter_state );
+		
+		
+		// text search filter
 		$lists['search']= $search;
-
+		
+		
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
-
+		
+		
 		//assign data to template
-		$this->assignRef('lists'      , $lists);
-		$this->assignRef('rows'      	, $rows);
+		$this->assignRef('count_filters', $count_filters);
+		$this->assignRef('lists'	, $lists);
+		$this->assignRef('rows'		, $rows);
 		$this->assignRef('pagination'	, $pagination);
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;

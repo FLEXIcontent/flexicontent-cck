@@ -1356,17 +1356,6 @@ div.flexi_box_right {
 	padding-right: 0px;
 }
 
-div#cpanel div.icon { margin: 7px; text-align: center; }
-div#cpanel span, div.cpanel span { display: block; text-align: center; }
-div#cpanel img, div.cpanel img { margin: 0 auto; padding: 10px 0; }
-div#cpanel div.icon  a {
-	border: 1px solid lightgray;
-	border-radius: 2px;
-	display: block;
-	width: 108px;
-	height: 97px;
-}
-
 .fc_drag_handle_none, .fc_drag_handle {
 	display: block !important;
 	width: 16px;

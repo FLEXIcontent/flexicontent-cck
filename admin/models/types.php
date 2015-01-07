@@ -119,6 +119,7 @@ class FlexicontentModelTypes extends JModelList
 		$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
 		$query->group('t.id');
 		
+		// Filter by state
 		if ( $filter_state ) {
 			if ( $filter_state == 'P' ) {
 				$query->where('t.published = 1');
@@ -132,7 +133,7 @@ class FlexicontentModelTypes extends JModelList
 			$query->where('t.access = '.(int) $filter_access);
 		}
 		
-		// Filter by search word (can be also be  id:NN  OR author:AAAAA)
+		// Filter by search word
 		if (strlen($search)) {
 			$query->where('LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false ));
 		}
