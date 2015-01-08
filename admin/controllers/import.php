@@ -847,7 +847,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					$field_values = trim($field_data);
 				} else {
 					// Split multi-value field
-					$vals = $field_data ? preg_split("/[\s]*%%[\s]*/", $field_data) : array();
+					$vals = strlen($field_data) ? preg_split("/[\s]*%%[\s]*/", $field_data) : array();
 					$vals = flexicontent_html::arrayTrim($vals);
 					
 					// Handle each value of the field
