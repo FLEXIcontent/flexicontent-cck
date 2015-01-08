@@ -22,7 +22,7 @@
 
 
 .fc-mssg-inline, .fc-mssg {
-	border: 1px solid !important;
+	border: 1px solid;
 	display: block;
 	margin: 0 0 5px 0 !important;
 	padding: 8px 10px 12px 36px !important;
@@ -73,6 +73,12 @@
 	background: #D9EDF7 url(../images/information.png) no-repeat 10px 50%;
 	color: #3A87AD !important;
 	border-color: #BCE8F1 !important;
+}
+.fc-mssg-inline-box {
+	display: inline-block;
+	border-width: 0;
+	padding: 2px;
+	margin: 0 6px 2px 0;
 }
 
 .alert.fc-error {

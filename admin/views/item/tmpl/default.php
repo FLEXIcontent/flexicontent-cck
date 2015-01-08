@@ -1183,7 +1183,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<?php
 					$field = isset($this->fields['state']) ? $this->fields['state'] : false;
 					if ($field) {
-						$label_tooltip = 'class="'.$tip_class.' '.$lbl_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
+						$label_tooltip = 'class="'.$tip_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
 					} else {
 						$label_tooltip = 'class="label"';
 					}
@@ -1199,7 +1199,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<?php
 					$field = isset($this->fields['hits']) ? $this->fields['hits'] : false;
 					if ($field) {
-						$label_tooltip = 'class="'.$tip_class.' '.$lbl_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
+						$label_tooltip = 'class="'.$tip_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
 					} else {
 						$label_tooltip = 'class="label"';
 					}
@@ -1218,7 +1218,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<?php
 					$field = isset($this->fields['voting']) ? $this->fields['voting'] : false;
 					if ($field) {
-						$label_tooltip = 'class="'.$tip_class.' '.$lbl_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
+						$label_tooltip = 'class="'.$tip_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
 					} else {
 						$label_tooltip = 'class="label"';
 					}
@@ -1237,7 +1237,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<?php
 					$field = isset($this->fields['modified']) ? $this->fields['modified'] : false;
 					if ($field) {
-						$label_tooltip = 'class="'.$tip_class.' '.$lbl_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
+						$label_tooltip = 'class="'.$tip_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
 					} else {
 						$label_tooltip = 'class="label"';
 					}
@@ -1269,7 +1269,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<?php
 					$field = isset($this->fields['created']) ? $this->fields['created'] : false;
 					if ($field) {
-						$label_tooltip = 'class="'.$tip_class.' '.$lbl_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
+						$label_tooltip = 'class="'.$tip_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
 					} else {
 						$label_tooltip = 'class="label"';
 					}
@@ -1291,7 +1291,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<?php
 					$field = isset($this->fields['modified']) ? $this->fields['modified'] : false;
 					if ($field) {
-						$label_tooltip = 'class="'.$tip_class.' '.$lbl_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
+						$label_tooltip = 'class="'.$tip_class.' label" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
 					} else {
 						$label_tooltip = 'class="label"';
 					}

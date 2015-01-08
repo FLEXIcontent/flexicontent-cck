@@ -179,6 +179,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
+		$document->addScript( JURI::root().'components/com_flexicontent/assets/js/flexi-lib.js' );
 		
 		$css =	'.install-ok { background: url(components/com_flexicontent/assets/images/accept.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; }
 				 .install-notok { background: url(components/com_flexicontent/assets/images/delete.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; float:left;}';		
@@ -327,34 +328,24 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	 * @param string $text image description
 	 * @param boolean $modal 1 for loading in modal
 	 */
-	function quickiconButton( $link, $image, $text, $modal = 0, $modaliframe = 1 )
+	function quickiconButton( $link, $image, $text, $modal = 0, $modal_create_iframe = 1, $modal_width=0, $modal_height=0)
 	{
 		//initialise variables
 		$lang = JFactory::getLanguage();
 		$img_attribs = ' class="fc-board-btn-img"';
-  		?>
-
+		$no_iframe = (int)(!$modal_create_iframe);
+		$link_attrs = $modal ? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.$no_iframe.', '.$modal_width.', '.$modal_height.'); return false;"' : '';
+  	?>
 		<span class="fc-board-button" style="float:<?php echo ($lang->isRTL()) ? 'right' : 'left'; ?>;">
 			<span class="fc-board-button-inner">
-				<?php
-				if ($modal == 1) {
-					JHTML::_('behavior.modal');
-					$rel = $modaliframe?" rel=\"{handler: 'iframe', size: {x: 900, y: 500}}\"":'';
-				?>
-					<a href="<?php echo $link; ?>" style="cursor:pointer" class="modal"<?php echo $rel;?>>
-				<?php
-				} else {
-				?>
-					<a href="<?php echo $link; ?>" class="">
-				<?php
-				}
-
-					echo FLEXI_J16GE ?
+				
+				<a href="<?php echo $link; ?>" class="fc-board-button-link" <?php echo $link_attrs; ?>>
+					<?php echo FLEXI_J16GE ?
 						JHTML::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs) :
-						JHTML::_('image.site', $image, '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, $text, $attribs);
-				?>
+						JHTML::_('image.site', $image, '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, $text, $attribs); ?>
 					<span class="fc-board-btn-text"><?php echo $text; ?></span>
 				</a>
+				
 			</span>
 		</span>
 		<?php

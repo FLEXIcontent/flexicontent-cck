@@ -235,9 +235,10 @@ div.current dd .pane-sliders .panel {
 /* FLEXIcontent Dashboard */
 
 div#fc-dash-boardbtns, /* backend dashboard buttons */
-div#fc-dash-recentitems, /* backend dashboard recent item changes */
+div#fc-dash-sliders, /* backend dashboard sliders (recent items, etc) */
 div#fc-dash-credits {  /* backend dashboard credits */
 	float:left;
+	clear:both;
 }
 div#fc-dash-boardbtns {
 	padding: 0px 0px; 
@@ -245,38 +246,71 @@ div#fc-dash-boardbtns {
 	margin-bottom: 12px;
 }
 div#fc-dash-credits {
-	margin-left:24px;
+	margin: 0px 24px 12px 0px;
+}
+div#fc-dash-sliders {
+	padding: 0px 0px; 
+	width: 100%;
+	clear:both;
+	margin-bottom: 12px;
+}
+div#fc-dash-sliders table.adminlist tr > td {
+	border: 1px solid gray !important;
+	padding: 4px 12px !important;
 }
 
+/* Dashboard button SET (a fieldset) */
 fieldset.fc-board-set {
 	float:left;
-  width: auto;
+	width: auto;
 	margin-left: 10px;
 	border:0;
 	margin:0 24px 12px 0;
 	padding:0;
 }
-fieldset.fc-board-set div.fc-board-set-inner { box-shadow: 0 0 4px #cccccc; position:relative; top:0; float:left; border-radius:2px; padding: 8px 2%; width: 96%; background: none repeat scroll 0 0 #f5f5f5;}
-/*legend.*/[class^="fc-board-header"] {
-	-webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;font-size:12px;font-family:arial, helvetica, sans-serif; text-decoration:none; display:inline-block;text-shadow: 2px 2px 1px rgba(0,0,0,0.6);font-weight:bold;
+fieldset.fc-board-set div.fc-board-set-inner {
+	box-shadow: 0 0 4px #cccccc;
+	position:relative;
+	top:0;
+	float:left;
+	border-radius:2px;
+	margin:0px;
+	padding: 12px 0px 0px 12px;
+	width: auto;
+	background: none repeat scroll 0 0 #f5f5f5;
+}
+
+/* Dashboard button SET title (a fieldset lengend)*/
+legend[class^="fc-board-header"] {
+	-webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;
+	font-size:12px;
+	font-family:arial, helvetica, sans-serif;
+	font-weight:bold;
+	text-decoration:none;
+	display:inline-block;
+	text-shadow: 1px 1px 1px rgba(0,0,0,0.6);
 	background-color: #9C9D9E;
 	color:#ffffff;
-
 	width:auto;
 	font-size:12px;
 	line-height:2em;
-	margin:1px 0 -3px -1px;
+	margin:1px 0 0px -1px;
 	padding:0px 24px 0 20px;
 }
+
+/* Individual titles of dashboard button SETs */
 .fc-board-header-content-editing {}
 .fc-board-header-type-fields {}
 .fcsfc-boardbnav-content-viewing {}
 .fc-board-header-users { }
 .fc-board-header-expert {}
 
+
+
+/* Dashboard button */
 div#fc-dash-boardbtns .fc-board-button {
-	margin: 4px 12px 4px 0;
-    padding: 5px;
+    margin: 0px 12px 12px 0;
+    padding: 0px;
     font-weight: bold;
     width: 80px;
     height: 80px;
@@ -310,20 +344,37 @@ div#fc-dash-boardbtns .fc-board-button:hover {
     -webkit-box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6);
     box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6)
 }
+.fc-board-button-inner {  /* inner container of dashboard button (of extra styling choices) */
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	padding:0;
+	margin:0;
+}
 
+/* Dashboard button (inner) LINK, (contains the button image and the button text */
+div#fc-dash-boardbtns .fc-board-button a {
+	text-decoration:none;
+	display: inline-block;
+	width: 96%;
+	height: 100%;
+	padding: 5px 2%;
+	margin:0;
+}
+div#fc-dash-boardbtns .fc-board-button:hover a {}
+
+/* Dashboard button image and text */
 div#fc-dash-boardbtns .fc-board-button .fc-board-btn-img {
 	width: 32px;
 	margin: 0 auto;
 }
 div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text {
 	display: inline-block;
-	width: 96%;
-	padding: 2%;
+	width: 100%;
+	padding: 2px 0%;
 	margin: 0px 0 0 0;
 	min-height:48px;
 	vertical-align:middle;
 	font-size: 12px;
+	line-height: 140%; /* or less will allow 3 lines of text to fit inside the button height */
 }
-
-div#fc-dash-boardbtns .fc-board-button a { text-decoration:none; }
-div#fc-dash-boardbtns .fc-board-button:hover a {}

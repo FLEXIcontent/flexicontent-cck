@@ -25,8 +25,8 @@
 	function fc_showDialog(url, tagid, no_iframe, winwidth, winheight)
 	{
 		// Initialize popup container
-		var winwidth  = typeof winwidth !== 'undefined' ? winwidth  : jQuery( window ).width() - 80;
-		var winheight = typeof winheight!== 'undefined' ? winheight : jQuery( window ).height() - 100;
+		var winwidth  = typeof winwidth !== 'undefined' && winwidth ? winwidth : jQuery( window ).width() - 80;
+		var winheight = typeof winheight!== 'undefined' && winheight ? winheight : jQuery( window ).height() - 100;
 		winwidth  = winwidth  > (jQuery( window ).width() - 80)   ? (jQuery( window ).width() - 80)   : winwidth;
 		winheight = winheight > (jQuery( window ).height() - 100) ? (jQuery( window ).height() - 100) : winheight;
 		//window.console.log ('winwidth  : ' + winwidth  + ', winheight : ' + winheight );
@@ -42,16 +42,16 @@
 		}
 		
 		// Add loading animation
-		var loading = jQuery('<div id="'+tagid+'_loading" class="fc_loading_msg">loading...</div>');
+		var loading = jQuery('<div id="'+tagid+'_loading" class="fc_loading_msg" style="position:absolute; background-color:transparent;">loading...</div>');
 		container.prepend(loading);
 		
 		// Add the iframe
 		var iframe;
 		if (!no_iframe) {
-			iframe = jQuery('<iframe id="'+tagid+'_frame" style="display:none; width:100%; height:100%; border:0; margin:0; padding:0;" src=""></iframe>');
-			container.prepend(iframe);
+			iframe = jQuery('<iframe id="'+tagid+'_frame" style="visibility:hidden; width:100%; height:100%; border:0; margin:0; padding:0;" src=""></iframe>');
+			container.append(iframe);
 			iframe.load(function() {
-				iframe.show();
+				iframe.show().css('visibility', 'visible');
 				loading.hide();
 			});
 		}

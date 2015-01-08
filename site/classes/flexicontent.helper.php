@@ -5430,7 +5430,7 @@ function FLEXISubmenu($cando)
 		if ($perms->CanStats)			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-stats"></span>' : '').JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
 		
 		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-users">'.JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' ).'</h2>', '', '');
-		if ($perms->CanAuthors)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-users"></span>' : '').JText::_( 'FLEXI_AUTHORS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
+		if ($perms->CanAuthors)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-users"></span>' : '').JText::_( 'FLEXI_USERS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
 		if ($perms->CanGroups)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-groups"></span>' : '').JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups');
 	//if ($perms->CanArchives)	call_user_func($addEntry, '<span class="fcsb-icon-archive"></span>'.JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
 	

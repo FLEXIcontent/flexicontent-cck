@@ -23,19 +23,19 @@ if($this->check['connect'] == 0) {
 ?>
 	<table class="adminlist">
 		<thead>
-				<tr>
-					<th colspan="2">
-					<?php echo JText::_( 'FLEXI_VERSION' ); ?>
-					</th>
-				</tr>
+			<tr>
+				<th colspan="2">
+					<span class="label label-info"><?php echo JText::_( 'FLEXI_VERSION' ); ?></span>
+				</th>
+			</tr>
 		</thead>
 		<tbody>
 			<tr>
-			<td colspan="2">
+				<td colspan="2">
 				<?php
 					echo '<b><font color="red">'.JText::_( 'FLEXI_CONNECTION_FAILED' ).'</font></b>';
 				?>
-			</td>
+				</td>
 			</tr>
 		</tbody>
 	</table>
@@ -53,7 +53,7 @@ if($this->check['connect'] == 0) {
 	</thead>
 	<tbody>
 	<tr>
-	<td width="33%">
+	<td>
 	<?php
 		if ($this->check['current'] == 0 ) {		  				
 			echo FLEXI_J16GE ?
@@ -83,7 +83,7 @@ if($this->check['connect'] == 0) {
 	</td>
 	</tr>
 	<tr>
-	<td width="33%">
+	<td>
 		<?php echo JText::_( 'FLEXI_LATEST_VERSION' ).':'; ?>
 	</td>
 	<td>
@@ -91,7 +91,7 @@ if($this->check['connect'] == 0) {
 	</td>
 	</tr>
 	<tr>
-	<td width="33%">
+	<td>
 		<?php echo JText::_( 'FLEXI_INSTALLED_VERSION' ).':'; ?>
 	</td>
 	<td>
@@ -99,7 +99,7 @@ if($this->check['connect'] == 0) {
 	</td>
 	</tr>
 	<tr>
-	<td width="33%">
+	<td>
 		<?php echo JText::_( 'FLEXI_RELEASED_DATE' ).':'; ?>
 	</td>
 	<td>

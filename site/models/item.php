@@ -104,7 +104,7 @@ class FlexicontentModelItem extends ParentClassItem
 				// Item not editable, check if item is editable till logoff
 				if ( $session->has('rendered_uneditable', 'flexicontent') ) {
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-					$canedititem = isset($rendered_uneditable[$model->get('id')]);
+					$canedititem = isset($rendered_uneditable[$this->_item->id]);
 				}
 			}
 			

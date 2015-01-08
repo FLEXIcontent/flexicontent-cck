@@ -1214,138 +1214,19 @@
 	</fieldset>
 	<fieldset name="backend_tabs_conf" label="FLEXI_BACKEND_TABS_CONF" description="" >
 	
-	<field name="" type="separator" default="FLEXI_DASHORD_MANAGER_CONF" label="" level="level0" menu="hide" />
+	<field name="" type="separator" default="FLEXI_DASH_BOARD" label="" level="level0" menu="hide" />
 			
-		<field name="" type="separator" default="FLEXI_CONTENT_PARAMETERS" label="" level="level1" menu="hide" />
-			
-			<field name="display_content_fieldset" type="radio" default="1" label="FLEXI_DISPLAY_CONTENT_FIELDSET" description="FLEXI_DISPLAY_CONTENT_FIELDSET_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_content_items" type="radio" default="1" label="FLEXI_DISPLAY_CONTENT_ITEMS" description="FLEXI_DISPLAY_CONTENT_ITEMS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_content_additems" type="radio" default="1" label="FLEXI_DISPLAY_CONTENT_ADDITEMS" description="FLEXI_DISPLAY_CONTENT_ADDITEMS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_content_category" type="radio" default="1" label="FLEXI_DISPLAY_CONTENT_CATEGORY" description="FLEXI_DISPLAY_CONTENT_CATEGORY_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_content_addcategory" type="radio" default="1" label="FLEXI_DISPLAY_CONTENT_ADDCATEGORY" description="FLEXI_DISPLAY_CONTENT_ADDCATEGORY_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-		<field name="" type="separator" default="FLEXI_TYPES_PARAMETERS" label="" level="level1" menu="hide" />
-			<field name="display_types_fieldset" type="radio" default="1" label="FLEXI_DISPLAY_TYPES_FIELDSET" description="FLEXI_DISPLAY_TYPES_FIELDSET_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_types_types" type="radio" default="1" label="FLEXI_DISPLAY_TYPES_TYPES" description="FLEXI_DISPLAY_TYPES_TYPES_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_types_addtypes" type="radio" default="1" label="FLEXI_DISPLAY_TYPES_ADDTYPES" description="FLEXI_DISPLAY_CONTENT_ADDTYPES_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_types_fields" type="radio" default="1" label="FLEXI_DISPLAY_TYPES_FIELDS" description="FLEXI_DISPLAY_TYPES_FIELDS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_types_addfields" type="radio" default="1" label="FLEXI_DISPLAY_TYPES_ADDFIELDS" description="FLEXI_DISPLAY_TYPES_ADDFIELDS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_types_tags" type="radio" default="1" label="FLEXI_DISPLAY_TYPES_TAGS" description="FLEXI_DISPLAY_CONTENT_TAGS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_types_addtags" type="radio" default="1" label="FLEXI_DISPLAY_TYPES_ADDTAGS" description="FLEXI_DISPLAY_CONTENT_ADDTAGS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_types_files" type="radio" default="1" label="FLEXI_DISPLAY_TYPES_FILES" description="FLEXI_DISPLAY_TYPES_FILES_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-		<field name="" type="separator" default="FLEXI_CONTENTVIEWING_PARAMETERS" label="" level="level1" menu="hide" />
-			<field name="display_contentviewing_fieldset" type="radio" default="1" label="FLEXI_DISPLAY_CONTENTVIEWING_FIELDSET" description="FLEXI_DISPLAY_CONTENTVIEWING_FIELDSET_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_contentviewing_templates" type="radio" default="1" label="FLEXI_DISPLAY_CONTENTVIEWING_TEMPLATES" description="FLEXI_DISPLAY_CONTENTVIEWING_TEMPLATES_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_contentviewing_stats" type="radio" default="1" label="FLEXI_DISPLAY_CONTENTVIEWING_STATS" description="FLEXI_DISPLAY_CONTENTVIEWING_STATES_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-		<field name="" type="separator" default="FLEXI_USERS_PARAMETERS" label="" level="level1" menu="hide" />
-			<field name="display_users_fieldset" type="radio" default="1" label="FLEXI_DISPLAY_USERS_FIELDSET" description="FLEXI_DISPLAY_USERS_FIELDSET_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_users_users" type="radio" default="1" label="FLEXI_DISPLAY_USERS_USERS" description="FLEXI_DISPLAY_USERS_FIELDSET_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_users_addusers" type="radio" default="1" label="FLEXI_DISPLAY_USERS_ADDUSERS" description="FLEXI_DISPLAY_ADDUSERS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_users_groups" type="radio" default="1" label="FLEXI_DISPLAY_USERS_GROUPS" description="FLEXI_DISPLAY_USERS_GROUPS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_users_addgroups" type="radio" default="1" label="FLEXI_DISPLAY_USERS_ADDGROUPS" description="FLEXI_DISPLAY_ADDGROUPS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="" type="separator" default="FLEXI_EXPERT_PARAMETERS" label="" level="level1" menu="hide" />
-			<field name="display_expert_fieldset" type="radio" default="1" label="FLEXI_DISPLAY_EXPERT_FIELDSET" description="FLEXI_DISPLAY_EXPERT_FIELDSET_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_expert_import" type="radio" default="1" label="FLEXI_DISPLAY_EXPERT_IMPORT" description="FLEXI_DISPLAY_EXPERT_IMPORT_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_expert_index" type="radio" default="1" label="FLEXI_DISPLAY_EXPERT_INDEX" description="FLEXI_DISPLAY_EXPERT_INDEX_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_expert_plugin" type="radio" default="1" label="FLEXI_DISPLAY_EXPERT_PLUGIN" description="FLEXI_DISPLAY_EXPERT_PLUGIN_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-		<field name="" type="separator" default="FLEXI_SLIDER_PARAMETERS" label="" level="level1" menu="hide" />
-			<field name="display_slider_pending" type="radio" default="1" label="FLEXI_DISPLAY_SLIDER_PENDING" description="FLEXI_DISPLAY_SLIDER_PENDING_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_slider_revised" type="radio" default="1" label="FLEXI_DISPLAY_SLIDER_REVISED" description="FLEXI_DISPLAY_SLIDER_REVISED_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_slider_inprogress" type="radio" default="1" label="FLEXI_DISPLAY_SLIDER_INPROGRESS" description="FLEXI_DISPLAY_SLIDER_INPROGRESS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_slider_draft" type="radio" default="1" label="FLEXI_DISPLAY_SLIDER_DRAFT" description="FLEXI_DISPLAY_SLIDER_DRAFT_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_slider_version" type="radio" default="1" label="FLEXI_DISPLAY_SLIDER_VERSION" description="FLEXI_DISPLAY_SLIDER_VERSION_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-	
+		<field name="dashboard_buttons_hide" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
+			checkoptions="FLEXI_ITEMS,FLEXI_NEW_ITEM,FLEXI_CATEGORIES,FLEXI_NEW_CATEGORY,FLEXI_TYPES,FLEXI_ADD_TYPE,FLEXI_FIELDS,FLEXI_ADD_FIELD,FLEXI_TAGS,FLEXI_NEW_TAG,FLEXI_FILES,FLEXI_TEMPLATES,FLEXI_STATISTICS,FLEXI_USERS,FLEXI_ADD_USER,FLEXI_GROUPS,FLEXI_ADD_GROUP,FLEXI_IMPORT,FLEXI_INDEX,FLEXI_PLUGINS,FLEXI_COMMENTS"
+			checkvals="items,additem,cats,addcat,types,addtype,fields,addfield,tags,addtag,files,templates,stats,users,adduser,groups,addgroup,import,index,plugins,comments"
+			defaultvals=""
+			label="FLEXI_DASH_HIDE_BTNS" description="FLEXI_DASH_HIDE_BTNS_DESC" />
+		
+		<field name="dashboard_sliders_disable" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
+			checkoptions="FLEXI_PENDING,FLEXI_REVISED,FLEXI_IN_PROGRESS,FLEXI_TO_WRITE,FLEXI_VERSION_CHECKING"
+			checkvals="pending,revised,inprogress,draft,version" defaultvals=""
+			label="FLEXI_DASH_DISABLE_SLIDERS" description="FLEXI_DASH_DISABLE_SLIDERS_DESC" />
+		
 		<field name="" type="separator" default="FLEXI_ITEMS_MANAGER_CONF" label="" level="level0" menu="hide" />
 			
 		<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR" label="" level="level1" menu="hide" />
