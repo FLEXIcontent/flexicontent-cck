@@ -1493,11 +1493,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$field->{$prop}[] =
 				'<span style="display: inline-block;">
 					<a href="'.$item_link.'" style="display: inline-block;">
-					'.$field->{$prop}[$i].'
+					'.$img_nolegend.'
 					</a>'
 					.($_method == 'display_single_total' ? '
 					<span class="fc_img_total_data badge badge-info" style="display: inline-block;" >
-						'.JText::_('FLEXI_IMAGES') .': '.count($values).'
+						'.count($values).' '.JText::_('FLEXI_IMAGES').'
 					</span>' : '').'
 				</span>';
 				break;
