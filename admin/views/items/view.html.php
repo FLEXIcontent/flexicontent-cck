@@ -477,17 +477,18 @@ class FlexicontentViewItems extends JViewLegacy
 		$scopes[1] = JText::_( 'FLEXI_TITLE' );
 		$scopes[2] = JText::_( 'FLEXI_INTROTEXT' );
 		$scopes[4] = JText::_( 'FLEXI_INDEXED_CONTENT' );
-		/*$_scopes = array();
+		$_scopes = array();
 		foreach ($scopes as $i => $v) {
 			$_scopes[] = JHTML::_('select.option', $i, $v);
 		}
-		$lists['scope'] = JHTML::_('select.radiolist', $_scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );*/
-		$lists['scope']  = '';
+		//$lists['scope'] = JHTML::_('select.radiolist', $_scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );
+		$lists['scope'] = JHTML::_('select.genericlist', $_scopes, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight"', 'value', 'text', $scope, 'scope' );
+		/*$lists['scope']  = '';
 		foreach ($scopes as $i => $v) {
 			$checked = $scope == $i ? ' checked="checked" ' : '';
 			$lists['scope'] .= '<input type="radio" onchange="submitform();" class="inputbox" '.$checked.' value="'.$i.'" id="scope'.$i.'" name="scope" />';
 			$lists['scope'] .= '<label class="" id="scope'.$i.'-lbl" for="scope'.$i.'">'.$v.'</label>';
-		}
+		}*/
 		
 		// build item dates option list
 		$dates[1] = JText::_( 'FLEXI_CREATED' );

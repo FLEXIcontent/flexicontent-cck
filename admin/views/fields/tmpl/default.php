@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
 $end_text = '<div class="icon-cancel" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
@@ -98,7 +98,7 @@ function delAllFilters() {
 					<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 				</div>
 				
-				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button'; ?>
+				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
 				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
 				<input type="button" id="fc_filterline_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
@@ -131,8 +131,8 @@ function delAllFilters() {
 	
 	
 	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="fc_mini_note_box well well-small">
-		<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>
-				
+		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
+		
 		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
 			<?php echo $this->lists['filter_type']; ?>
 		</div>

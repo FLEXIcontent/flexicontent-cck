@@ -168,8 +168,8 @@ div.current dd .pane-sliders .panel {
 .flexicontent #filterline .fc-mssg-inline.fc-filter,
 .flexicontent #filterline .fc-mssg.fc-filter {
 	border:0px !important;
-	margin:0px 8px !important;
-	padding:0px 8px !important;
+	margin: 4px 8px !important;
+	padding:0px !important;
 }
 .flexicontent #filterline  .nowrap_box, .flexicontent .nowrap_box {
 	vertical-align: baseline !important;

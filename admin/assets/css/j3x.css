@@ -59,6 +59,7 @@
 .icon-32-advindexpurge	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-purge.png); }
 
 
+
 /**************
  * Small labels
  **************/
@@ -110,6 +111,8 @@ fieldset legend {
 	margin: 0px;
 }
 
+
+/* Fix fitting issues e.g. with chosen enhanced selects */
 .form-horizontal .chzn-container {
 	width: 90% !important;
 	max-width: 500px !important;
@@ -117,7 +120,7 @@ fieldset legend {
 .form-horizontal .chzn-container .chzn-drop {
 	width: 100% !important;
 	max-width: 500px !important;
-/* 	border: 1px solid lightgray !important; */
+	/*border: 1px solid lightgray !important; */
 }
 .form-horizontal .controls {
 	margin:0px !important;
@@ -126,42 +129,12 @@ fieldset legend {
 	padding-top:0;
 	padding-bottom:0;
 }
-.form-horizontal .nav-tabs {
-}
-.form-horizontal .nav-tabs {
-/* 	padding-bottom: 2px; */
-}
-/*
-.form-horizontal .nav-tabs > li {
-	margin-bottom: 6px;
-}
-
-.form-horizontal .nav-tabs > li > a {
-	border:1px solid darkgray;
-	background-color: #eee;
-}
-.form-horizontal .nav-tabs > li.active > a {
-	border:1px solid black;
-	border-bottom: 1px solid white;
-	background-color: white;
-	color: black;
-}
-*/
 .form-horizontal .chzn-container-single .chzn-single {
 	width:auto;
 	float:left;
 }
-/*
-.form-horizontal .chzn-container-single .chzn-search {
-	border: 1px solid lightgray;
-}
 
-.form-horizontal .tabs-left > .nav-tabs .active > a,
-.form-horizontal .tabs-left > .nav-tabs .active > a:hover,
-.form-horizontal .tabs-left > .nav-tabs .active > a:focus {
-    border-color: #A9A9A9 rgba(0, 0, 0, 0) #A9A9A9 #A9A9A9;
-}
-*/
+
 
 /********************
  * Permissions slider
@@ -172,144 +145,105 @@ fieldset legend {
 /**************
  * Table styles
  **************/
- 
 
-table.adminlist thead th.left {
-	text-align: left;
-	border-bottom: none;
+/* ADMINLIST table, e.g. collapse, white background  */
+table.adminlist {
+	background-color: #fff;
+	border-spacing: 0px !important; /* forced, combines with table, row, cell borders */
+	border-collapse: collapse !important; /* forced */
+	color: #555;
+	width: 100%;
+	margin-bottom: 20px;
 }
-table.adminlist thead th.center {
+
+/* HEAD row, e.g. bottom border only */
+table.adminlist thead tr {
+	border-bottom: 1px solid #aaa !important; /* forced, combines with table, row, cell borders */
+}
+
+/* HEAD cell */
+table.adminlist thead th {
+	background: none repeat scroll 0 0 #fff !important; /* forced, combines with table, row, cell borders */
+	border: none;
+	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
+	color: #555;
 	text-align: center;
-	border-bottom: none;
+	padding: 10px 8px 5px 8px !important; // allow only specific overrides
 }
-table.adminlist thead td {
+
+table.adminlist thead th.center { text-align: center !important; }
+table.adminlist thead th.left { text-align: left !important; }
+table.adminlist thead a:hover { text-decoration: none; }
+table.adminlist thead th img { padding-left:3px; vertical-align:middle; }
+
+/*table.adminlist thead td {
 	background: #fff;
 	vertical-align: middle;
-	vertical-align: bottom;
   border-bottom: 1px solid #DADADA;
   border-left: 1px solid #DADADA;
   border-top: 1px solid #DADADA;
   padding: 10px 8px 5px 8px;
-}
-table.adminlist thead td.left #search,
-table.adminlist thead td.left #filter_id {
-	width: 92%;
-}
+}*/
 table.adminlist thead td.left .radio {
 	display: block;
 	margin-bottom: 5px;
 }
 table.adminlist thead th .filterdel img {
 	vertical-align: bottom;
-
-}
-table.adminlist thead td.filterbuttons {
-	background-color: #f8f8f8;
-	border-bottom: 1px solid #999;
-}
-table.adminlist thead td.filterbuttons input[type="text"] {
-	background-color: #fff;
-	border-radius: 2px;
-	font-weight: bold;
-	margin-left: 4px;
-}
-table.adminlist thead td.filterbuttons input {
-	background-color: transparent;
-}
-table.adminlist thead td.filterbuttons input:hover {
-	background-color: #d8d8d8;
 }
 
-table.adminlist td.yellow,
-table.adminlist tbody tr td.yellow,
-table.adminlist tbody tr.row1 td.yellow {
-	background-color: #FFFFDD;
-}
-
-table.adminlist thead #filter_lang,
-table.adminlist thead #filter_state,
-table.adminlist thead #filter_type { width: 50px !important; }
-table.adminlist thead #filter_authors { width: 120px !important; }
-table.adminlist thead #filter_cats { width: 120px !important; }
-table.adminlist thead #startdate,
-table.adminlist thead #enddate { width: 100px !important; }
-
-table.adminlist td.order {
-	width: auto !important;
-}
-
-table.adminlist td.order span {
-	width: 16px !important;
-}
-
-table.adminlist th {
-	padding: 10px 8px 5px !important;
-}
+/* Table cell */
 table.adminlist td {
-	padding: 7px 8px !important;
+	padding: 6px 8px !important; // allow only specific overrides
 }
-
-.novalue {
-	color: gray;
-	font-style: italic;
-}
-
 table.adminlist input[type="text"] {
-	width: auto !important;
+	width: auto !important;  /* enforce to avoid fitting problems */
 	padding-left: 0px !important;
 	padding-right: 0px !important;
 }
-table.adminlist {
-	background-color: #fff !important;
-	border-spacing: 0px !important;
+/* Highlighted columns, e.g. filtered */
+table.adminlist td.yellow,
+table.adminlist tbody tr td.yellow,
+table.adminlist tbody tr.row0 td.yellow,
+table.adminlist tbody tr.row1 td.yellow {
+	background-color: #FFFFbb !important;
+}
+table.adminlist tbody th { font-weight: bold; } /* header cell inside tbody */
 
-	color: #555 !important;
-	width: 100%;
-	margin-bottom: 20px;
-	box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.04);
-}
-table.adminlist td, table.adminlist th {
-	padding: 7px 8px;
-}
-
-table.adminlist thead th {
-	background: none repeat scroll 0 0 #fff !important;
-	border-bottom: 1px solid #dadada !important;
-	border-left: none !important;
-	color: #555 !important;
-	text-align: center !important;
-}
-table.adminlist thead th.left {
-	text-align: left !important;
-}
-table.adminlist thead a:hover {
-	text-decoration: none;
-}
-table.adminlist thead th img {
-	padding-left: 3px;
-	vertical-align: middle;
-}
-table.adminlist tbody th {
-	font-weight: bold;
-}
+/* TR, NO background default align left */
 table.adminlist tbody tr {
+	border-top: 1px solid #dadada !important; /* forced, combines with table, row, cell borders */
 	background-color: #FFFFFF;
 	text-align: left;
-	
 }
-table.adminlist tbody tr.row0:hover td, table.adminlist tbody tr.row1:hover td {
-	background-color: #f3f3f3;
+/* ORDER column no wrapping and proper alignment */
+table.adminlist td.order {
+	text-align: right;
+	white-space: nowrap;
 }
+
+/* TR.row0 TR.row1 differences */
 table.adminlist tbody tr td {
 	background: none repeat scroll 0 0 #FFFFFF;
 	border: none;
-	border-top: 1px solid #dadada;
-	
+	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
 }
 table.adminlist tbody tr.row1 td {
-	background: none repeat scroll 0 0 #f8f8f8;
-	border-top: 1px solid #dadada;
+	background: none repeat scroll 0 0 #f7f7f7;
 }
+
+/* Mouse over ROW */
+table.adminlist tbody tr.row0:hover td,
+table.adminlist tbody tr.row1:hover td {
+	text-shadow: 1px 1px 2px #aaa;
+	background-color: #ffffdd;
+}
+table.adminlist tbody tr:hover td input,
+table.adminlist tbody tr:hover td select {
+	box-shadow: 1px 1px 2px #aaa;
+}
+
+/* FOOTER of table */
 table.adminlist tfoot tr {
 	color: #333333;
 	text-align: center;
@@ -319,23 +253,21 @@ table.adminlist tfoot td, table.adminlist tfoot th {
 	border-top: 1px solid #dadada;
 	text-align: center;
 }
+
+/* ORDER column no wrapping and proper alignment */
 table.adminlist td.order {
-	text-align: center;
+	text-align: right;
 	white-space: nowrap;
-	width: 200px;
+	width: auto !important;
 }
-table.adminlist td.order span {
-	background-repeat: no-repeat;
-	float: left;
-	height: 13px;
-	text-align: center;
-	width: 20px;
-}
+
+/* IF PAGINATION is inside the table the force center alignment */
 table.adminlist .pagination {
 	display: inline-block;
-	margin: 0 auto;
+	margin: 4px auto 2px;
 	padding: 0;
 }
+
 
 
 /***********************
@@ -457,7 +389,6 @@ div fieldset label.btn {
 	margin: 0px 0px !important;
 	padding: 1px 12px !important;
 }
-
 
 div.fieldset_value,
 div.panel fieldset input:not(.input-small), div.panel fieldset textarea, div.panel fieldset select,

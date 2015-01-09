@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 $hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/icon-16-hint.png', JText::_( 'FLEXI_NOTES' ) );
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &nbsp; '
@@ -348,7 +348,7 @@ window.addEvent('domready', function() {
 					<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 				</div>
 				
-				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button'; ?>
+				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
 				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
 				<input type="button" id="fc_filterline_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 				<input type="button" id="fc_stateGroupsBox_btn" class="<?php echo $_class.($this->filter_stategrp || $this->filter_catsinstate!=1 ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('stateGroupsBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
@@ -382,7 +382,7 @@ window.addEvent('domready', function() {
 	
 	
 	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="fc_mini_note_box well well-small">
-		<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>
+		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
 		
 		<?php if (@$this->lists['filter_fileid']): ?>
 		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
@@ -483,7 +483,7 @@ window.addEvent('domready', function() {
 	?>
 	
 	<?php if ($order_msg): ?>
-	<span class="fc-mssg-inline fc-success" id="fcorder_notes_box">
+	<span class="fc-mssg-inline fc-success" id="fcorder_notes_box" style="margin-top:20px !important;">
 		<?php echo $order_msg;?>
 	</span>
 	<?php endif; ?>
@@ -504,7 +504,7 @@ window.addEvent('domready', function() {
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->search) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('search');document.adminForm.submit();" />
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('search');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -512,7 +512,7 @@ window.addEvent('domready', function() {
 				<?php echo JText::_( 'FLEXI_AUTHOR' ); ?>
 				<?php if ($this->filter_authors) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_authors');document.adminForm.submit();" />
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_authors');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>			
@@ -521,7 +521,7 @@ window.addEvent('domready', function() {
 				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'i.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_lang');document.adminForm.submit();" />
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_lang');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -530,7 +530,7 @@ window.addEvent('domready', function() {
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_type');document.adminForm.submit();" />
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_type');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -538,7 +538,7 @@ window.addEvent('domready', function() {
 				<?php echo JText::_( 'FLEXI_STATE', true ); ?>
 				<?php if ($this->filter_state) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_state');document.adminForm.submit();" />
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_state');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -581,7 +581,7 @@ window.addEvent('domready', function() {
 				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->filter_cats) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_cats');document.adminForm.submit();" />
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_cats');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -592,7 +592,7 @@ window.addEvent('domready', function() {
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
 				</span>
 				<?php
 					endif;
@@ -606,7 +606,7 @@ window.addEvent('domready', function() {
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
 				</span>
 				<?php
 					endif;
@@ -620,45 +620,12 @@ window.addEvent('domready', function() {
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_id) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_id');document.adminForm.submit();" />
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_id');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 
 			</th>
 		</tr>
-		
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>
-				<td></td>
-			<?php endif; ?>
-			<td></td>
-			<td></td>
-			<td></td>
-			<?php if ( $enable_translation_groups ) : ?>
-				<td></td>
-			<?php endif; ?>
-
-	  	<?php foreach($this->extra_fields as $field) :?>
-				<td></td>
-			<?php endforeach; ?>
-			
-			<td>
-			</td>
-			
-			<td></td>
-			<td>
-			</td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-
 	</thead>
 
 	<tfoot>
@@ -928,7 +895,7 @@ window.addEvent('domready', function() {
 		<?php endforeach; ?>
 
 		<?php if ($this->CanOrder) : ?>
-			<td class="order ">
+			<td class="order">
 				<?php
 					$row_stategrp_prev = @ $stategrps[@$this->rows[$i-1]->state];
 					$row_stategrp = @ $stategrps[$this->rows[$i]->state];

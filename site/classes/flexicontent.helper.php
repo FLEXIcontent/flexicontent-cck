@@ -569,7 +569,7 @@ class flexicontent_html
 							}
 							
 							"/* SINGLE-SELECT2: Highlight selects with an active value */."
-							if ( ! el_select.attr('multiple') ) {
+							if ( ! el_select.attr('multiple') && !el_select.hasClass('fc_skip_highlight') ) {
 								var el = el_container.find('.select2-choice');
 								var val = el_select.val();
 								if (val === null) {
@@ -616,7 +616,7 @@ class flexicontent_html
 						"/* SINGLE-SELECT2: Add events to handle highlighting selected value */."
 						('change', function() {
 							var el_select = jQuery(this);
-							if ( ! el_select.attr('multiple') ) {
+							if ( ! el_select.attr('multiple') && !el_select.hasClass('fc_skip_highlight') ) {
 								var el = jQuery(this).prev('div').find('.select2-choice');
 								var val = el_select.val();
 								if (val.length) {

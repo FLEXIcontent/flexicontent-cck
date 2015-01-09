@@ -582,7 +582,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							
 							<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
 								<span class="label <?php echo $tooltip_class;?>" title="Developer">Marvelic Engine</span><br/><br/>
-								<a class="<?php echo $btn_class.(FLEXI_J16GE ? ' btn-small ' : ' fcsmall').$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
+								<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
 									marvelic.co.th
 								</a>
 							</span>
@@ -593,7 +593,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							
 							<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
 								<span class="label <?php echo $tooltip_class;?>" title="Developer">Ruben Reyes</span><br/><br/>
-								<a class="<?php echo $btn_class.(FLEXI_J16GE ? ' btn-small ' : ' fcsmall').$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
+								<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
 									lyquix.com
 								</a>
 							</span>
