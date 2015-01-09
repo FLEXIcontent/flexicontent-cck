@@ -21,7 +21,7 @@ $app = JFactory::getApplication();
 $template	= $app->getTemplate();
 if($this->check['connect'] == 0) {
 ?>
-	<table class="adminlist">
+	<table class="fc-table-list">
 		<thead>
 			<tr>
 				<th colspan="2">
@@ -43,7 +43,7 @@ if($this->check['connect'] == 0) {
 } elseif ($this->check['enabled'] == 1) {
 ?>
 
-	<table class="adminlist">
+	<table class="fc-table-list">
 	<thead>
 	<tr>
 		<th colspan="2">
@@ -77,33 +77,33 @@ if($this->check['connect'] == 0) {
 		} elseif( $this->check['current'] == -1 ) {
 			echo '<b><font color="red">'.JText::_( 'FLEXI_OLD_VERSION_INSTALLED' ).'</font></b>';
 		} else {
-			echo '<b><font color="darkred">'.JText::_( 'You have installed a newer version than the latest officially stable version' /*'FLEXI_NEWS_VERSION_COMPONENT'*/ ).'</font></b>';
+			echo '<b><font color="gray">'.JText::_( 'You have installed a newer version than the latest officially stable version' /*'FLEXI_NEWS_VERSION_COMPONENT'*/ ).'</font></b>';
 		}
 	?>
 	</td>
 	</tr>
 	<tr>
 	<td>
-		<?php echo JText::_( 'FLEXI_LATEST_VERSION' ).':'; ?>
+		<span class="label"><?php echo JText::_( 'FLEXI_LATEST_VERSION' ).':'; ?></span>
 	</td>
 	<td>
-		<?php echo $this->check['version']; ?>
-	</td>
-	</tr>
-	<tr>
-	<td>
-		<?php echo JText::_( 'FLEXI_INSTALLED_VERSION' ).':'; ?>
-	</td>
-	<td>
-		<?php echo $this->check['current_version']; ?>
+		<span class="badge badge-success"><?php echo $this->check['version']; ?></span>
 	</td>
 	</tr>
 	<tr>
 	<td>
-		<?php echo JText::_( 'FLEXI_RELEASED_DATE' ).':'; ?>
+		<span class="label"><?php echo JText::_( 'FLEXI_INSTALLED_VERSION' ).':'; ?></span>
 	</td>
 	<td>
-		<?php echo $this->check['released']; ?>
+		<span class="badge <?php echo $this->check['current']==-1 ? 'badge-warning' : ($this->check['current']==0 ? 'badge-success' : ''); ?>"><?php echo $this->check['current_version']; ?></span>
+	</td>
+	</tr>
+	<tr>
+	<td>
+		<span class="label"><?php echo JText::_( 'FLEXI_RELEASED_DATE' ).':'; ?></span>
+	</td>
+	<td>
+		<span class="badge badge-info"><?php echo $this->check['released']; ?></span>
 	</td>
 	</tr>
 

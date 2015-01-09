@@ -64,7 +64,7 @@
  **************/
 
 .label, .badge, .flexicontent label.label {
-	margin: 0px 2px 2px 4px !important;
+	margin: 0px 2px 2px 4px;
 }
 .label.highlight, .badge.highlight {
 	color: darkred;
@@ -282,7 +282,7 @@ table.adminlist .pagination {
 	box-shadow: 0 0 4px #cccccc;
 	border-radius:2px;
 	padding: 12px 0px 0px 12px;
-	background: none repeat scroll 0 0 #f5f5f5;
+	background: none repeat scroll 0 0 white;
 }
 .pane-toggler-down a:hover, .pane-toggler-down a:focus,
 .pane-toggler a:hover, .pane-toggler a:focus {

@@ -747,7 +747,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				
 				foreach($filedata_arr as $lineno => $field_data) {
 					// Split multi-value field
-					$vals = $field_data ? preg_split("/[\s]*%%[\s]*/", $field_data) : array();
+					$vals = strlen($field_data) ? preg_split("/[\s]*%%[\s]*/", $field_data) : array();
 					$vals = flexicontent_html::arrayTrim($vals);
 					unset($field_values);
 					
@@ -756,7 +756,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					foreach ($vals as $i => $val)
 					{
 						// Split multiple property fields
-						$props = $val ? preg_split("/[\s]*!![\s]*/", $val) : array();
+						$props = strlen($val) ? preg_split("/[\s]*!![\s]*/", $val) : array();
 						$props = flexicontent_html::arrayTrim($props);
 						unset($prop_arr);
 						
@@ -855,7 +855,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					foreach ($vals as $i => $val)
 					{
 						// Split multiple property fields
-						$props = $val ? preg_split("/[\s]*!![\s]*/", $val) : array();
+						$props = strlen($val) ? preg_split("/[\s]*!![\s]*/", $val) : array();
 						$props = flexicontent_html::arrayTrim($props);
 						unset($prop_arr);
 						

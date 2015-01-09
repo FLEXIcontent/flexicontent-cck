@@ -25,6 +25,7 @@ $template  = $app->getTemplate();
 
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
 $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
+$edit_item_txt = JText::_( 'FLEXI_EDIT_ITEM' );
 
 // hide dashboard buttons
 $dashboard_buttons_hide = $this->params->get('dashboard_buttons_hide', array());
@@ -37,14 +38,19 @@ $skip_contentviewing_fieldset = isset($sbtns['templates']) && isset($sbtns['stat
 $skip_users_fieldset = isset($sbtns['users']) && isset($sbtns['adduser']) && isset($sbtns['groups']) && isset($sbtns['addgroup']);
 $skip_expert_fieldset = isset($sbtns['import']) && isset($sbtns['index']) && isset($sbtns['plugins']) && isset($sbtns['comments']);
 
-
 // disable dashboard sliders
 $dashboard_sliders_disable = $this->params->get('dashboard_sliders_disable', array());
 $dashboard_sliders_disable  = FLEXIUtilities::paramToArray($dashboard_sliders_disable);
 
+// Other options
+$modal_item_edit = $this->params->get('dashboard_modal_item_edit', 1);
+$onclick_modal_edit = $modal_item_edit ? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;"' : '';
+$disable_fc_logo = $this->params->get('dashboard_disable_fc_logo', 0);
+$hide_fc_license = $this->params->get('dashboard_hide_fc_license', 1); /* hide inside sliders */
+
 $ssliders = array_flip($dashboard_sliders_disable);
 $skip_sliders = isset($sbtns['pending']) && isset($sbtns['revised']) && isset($sbtns['inprogress']) && isset($sbtns['draft']) && isset($sbtns['version']);
-$skip_sliders = $skip_sliders && $this->dopostinstall && $this->allplgpublish;
+$skip_sliders = $skip_sliders && $this->dopostinstall && $this->allplgpublish && !$hide_fc_license;
 
 // ensures the PHP version is correct
 if (version_compare(PHP_VERSION, '5.0.0', '<'))
@@ -239,7 +245,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				<?php endif; ?>
 				
 				<?php if (!$skip_sliders) :
-					echo FLEXI_J16GE ? JHtml::_('sliders.start', 'fc-dash-sliders') : $this->pane->startPane( 'stat-pane' );
+					echo FLEXI_J16GE ? JHtml::_('sliders.start', 'fc-dash-sliders', array('useCookie'=>1, 'show'=>-1, 'display'=>-1, 'startOffset'=>-1)) : $this->pane->startPane( 'stat-pane' );
 					?>
 				
 					<?php if (!$this->dopostinstall || !$this->allplgpublish) : ?>
@@ -259,12 +265,14 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					echo FLEXI_J16GE ? JHtml::_('sliders.panel', $title, 'pending' ) : $this->pane->startPanel( $title, 'pending' );
 					$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE';
 					?>
-					<table class="adminlist">
-						<tr style="background-color:gray;">
-							<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
-							<td><?php echo JText::_('FLEXI_CREATED'); ?></td>
-							<td><?php echo JText::_('FLEXI_AUTHOR'); ?></td>
+					<table class="fc-table-list">
+						<thead>
+						<tr>
+							<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
+							<th><?php echo JText::_('FLEXI_CREATED'); ?></th>
+							<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 						</tr>
+						</thead>
 						<?php
 						$k = 0;
 						$n = count($this->pending);
@@ -284,6 +292,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							}
 						$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 				?>
+						<tbody>
 						<tr>
 							<td>
 							<?php
@@ -291,12 +300,10 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 								echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
 							} else {
 							?>
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
-									<?php echo ($i+1).". "; ?>
-									<a href="<?php echo $link; ?>">
-										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-									</a>
-								</span>
+								<?php echo ($i+1).". "; ?>
+								<a href="<?php echo $link; ?>" title="<?php echo $edit_item_txt; ?>" <?php echo $onclick_modal_edit; ?>>
+									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+								</a>
 							<?php
 							}
 							?>
@@ -305,8 +312,15 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							<td><?php echo $row->creator; ?></td>
 						</tr>
 						<?php $k = 1 - $k; } ?>
+						</tbody>
+						<tfoot>
+						</tr>
+							<td colspan="3">
+								<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >Show All</span><br/>'; ?>
+							</td>
+						</tr>
+						</tfoot>
 					</table>
-					<?php echo '<a class="'.$btn_class.' btn-primary"margin: 4px 12px 4px 4px;" href="'.$show_all_link.'" style="text-decoration:none;">Show All</a><br/>'; ?>
 					<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 					<?php endif; /* !isset($ssliders['pending']) */ ?>
 					
@@ -316,12 +330,14 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					echo FLEXI_J16GE ? JHtml::_('sliders.panel', $title, 'revised' ) : $this->pane->startPanel( $title, 'revised' );
 					$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=RV';
 					?>
-					<table class="adminlist">
-						<tr style="background-color:gray;">
-							<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
-							<td><?php echo JText::_('FLEXI_MODIFIED'); ?></td>
-							<td><?php echo JText::_('FLEXI_NF_MODIFIER'); ?></td>
+					<table class="fc-table-list">
+						<thead>
+						<tr>
+							<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
+							<th><?php echo JText::_('FLEXI_MODIFIED'); ?></th>
+							<th><?php echo JText::_('FLEXI_NF_MODIFIER'); ?></th>
 						</tr>
+						</thead>
 						<?php
 						$k = 0;
 						$n = count($this->revised);
@@ -341,6 +357,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							}
 							$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 					?>
+						<tbody>
 						<tr>
 							<td>
 							<?php
@@ -348,12 +365,10 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 								echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
 							} else {
 							?>
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
-									<?php echo ($i+1).". "; ?>
-									<a href="<?php echo $link; ?>">
-										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-									</a>
-								</span>
+								<?php echo ($i+1).". "; ?>
+								<a href="<?php echo $link; ?>" title="<?php echo $edit_item_txt; ?>" <?php echo $onclick_modal_edit; ?>>
+									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+								</a>
 							<?php
 							}
 							?>
@@ -362,8 +377,15 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							<td><?php echo $row->modifier; ?></td>
 						</tr>
 						<?php $k = 1 - $k; } ?>
+						</tbody>
+						<tfoot>
+						</tr>
+							<td colspan="3">
+								<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >Show All</span><br/>'; ?>
+							</td>
+						</tr>
+						</tfoot>
 					</table>
-					<?php echo '<a class="'.$btn_class.' btn-primary"margin: 4px 12px 4px 4px;" href="'.$show_all_link.'" style="text-decoration:none;">Show All</a><br/>'; ?>
 					<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 					<?php endif; /* !isset($ssliders['revised']) */ ?>
 					
@@ -375,12 +397,14 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						$this->pane->startPanel( $title, 'inprogress' );
 					$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP';
 					?>
-					<table class="adminlist">
-						<tr style="background-color:gray;">
-							<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
-							<td><?php echo JText::_('FLEXI_CREATED'); ?></td>
-							<td><?php echo JText::_('FLEXI_AUTHOR'); ?></td>
+					<table class="fc-table-list">
+						<thead>
+						<tr>
+							<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
+							<th><?php echo JText::_('FLEXI_CREATED'); ?></th>
+							<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 						</tr>
+						</thead>
 						<?php
 						$k = 0;
 						$n = count($this->inprogress);
@@ -400,6 +424,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							}
 							$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 					?>
+						<tbody>
 						<tr>
 							<td>
 							<?php
@@ -407,12 +432,10 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 								echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
 							} else {
 							?>
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
-									<?php echo ($i+1).". "; ?>
-									<a href="<?php echo $link; ?>">
-										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-									</a>
-								</span>
+								<?php echo ($i+1).". "; ?>
+								<a href="<?php echo $link; ?>" title="<?php echo $edit_item_txt; ?>" <?php echo $onclick_modal_edit; ?>>
+									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+								</a>
 							<?php
 							}
 							?>
@@ -421,8 +444,15 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							<td><?php echo $row->creator; ?></td>
 						</tr>
 						<?php $k = 1 - $k; } ?>
+						</tbody>
+						<tfoot>
+						</tr>
+							<td colspan="3">
+								<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >Show All</span><br/>'; ?>
+							</td>
+						</tr>
+						</tfoot>
 					</table>
-					<?php echo '<a class="'.$btn_class.' btn-primary"margin: 4px 12px 4px 4px;" href="'.$show_all_link.'" style="text-decoration:none;">Show All</a><br/>'; ?>
 					<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 					<?php endif; /* !isset($ssliders['inprogress']) */ ?>
 					
@@ -434,12 +464,14 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						$this->pane->startPanel( $title, 'draft' );
 					$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=OQ';
 					?>
-					<table class="adminlist">
-						<tr style="background-color:gray;">
-							<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
-							<td><?php echo JText::_('FLEXI_CREATED'); ?></td>
-							<td><?php echo JText::_('FLEXI_AUTHOR'); ?></td>
+					<table class="fc-table-list">
+						<thead>
+						<tr>
+							<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
+							<th><?php echo JText::_('FLEXI_CREATED'); ?></th>
+							<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 						</tr>
+						</thead>
 					<?php
 						$k = 0;
 						$n = count($this->draft);
@@ -459,6 +491,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							}
 						$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 					?>
+						<tbody>
 						<tr>
 							<td>
 							<?php
@@ -466,12 +499,10 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 								echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
 							} else {
 							?>
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
-									<?php echo ($i+1).". "; ?>
-									<a href="<?php echo $link; ?>">
-										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-									</a>
-								</span>
+								<?php echo ($i+1).". "; ?>
+								<a href="<?php echo $link; ?>" title="<?php echo $edit_item_txt; ?>" <?php echo $onclick_modal_edit; ?>>
+									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+								</a>
 							<?php
 							}
 							?>
@@ -480,8 +511,15 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							<td><?php echo $row->creator; ?></td>
 						</tr>
 						<?php $k = 1 - $k; } ?>
+						</tbody>
+						<tfoot>
+						</tr>
+							<td colspan="3">
+								<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >Show All</span><br/>'; ?>
+							</td>
+						</tr>
+						</tfoot>
 					</table>
-					<?php echo '<a class="'.$btn_class.' btn-primary"margin: 4px 12px 4px 4px;" href="'.$show_all_link.'" style="text-decoration:none;">Show All</a><br/>'; ?>
 					<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 					<?php endif; /* !isset($ssliders['draft']) */ ?>
 					
@@ -522,36 +560,65 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					?>
 					<?php endif; /* !isset($ssliders['version']) */ ?>
 				
+				<?php ob_start(); ?>
+				<div id="fc-dash-credits">
+				<?php echo !$hide_fc_license ? '<fieldset class="fc-board-set"><legend class="fc-board-header-content-editing">'.JText::_( 'About FLEXIcontent' ).'</legend>' : ''; ?>
+					<div class="fc-board-set-inner">
+					<?php
+						$logo_style = ';';
+						if (!$disable_fc_logo) echo (FLEXI_J16GE ?
+							JHTML::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ') :
+							JHTML::_('image.site', 'logo.png', '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, 'FLEXIcontent', ' id="fc-dash-logo" '));
+					?>
+						<span id="fc-dash-license" class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="">
+							FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2015
+						</span><br/><br/>
+						<span id="fc-dash-devs" class="nowrap_box">
+							<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box" style="text-align:center;" >
+								<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span>
+								<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span><br/><br/>
+								<a class="<?php echo $btn_class.(FLEXI_J16GE ? ' btn-primary ' : ' ').$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
+							</span>
+							
+							<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
+								<span class="label <?php echo $tooltip_class;?>" title="Developer">Marvelic Engine</span><br/><br/>
+								<a class="<?php echo $btn_class.(FLEXI_J16GE ? ' btn-small ' : ' fcsmall').$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
+									marvelic.co.th
+								</a>
+							</span>
+							
+							<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
+								<span class="label <?php echo $tooltip_class;?>" title="Developer">Suriya Kaewmungmuang</span>
+							</span>
+							
+							<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
+								<span class="label <?php echo $tooltip_class;?>" title="Developer">Ruben Reyes</span><br/><br/>
+								<a class="<?php echo $btn_class.(FLEXI_J16GE ? ' btn-small ' : ' fcsmall').$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
+									lyquix.com
+								</a>
+							</span>
+						</span>
+						
+					</div>
+				<?php echo !$hide_fc_license ? '</fieldset>' : ''; ?>
+				
+				</div>
+				<?php $fc_logo_license = ob_get_clean(); ?>
+				
+				<?php
+				if ($hide_fc_license) {
+					echo FLEXI_J16GE ?
+						JHtml::_('sliders.panel', "About FLEXIcontent", 'inprogress' ) :
+						$this->pane->startPanel( $title, 'inprogress' );
+					echo $fc_logo_license;
+					echo FLEXI_J16GE ? '' : $this->pane->endPanel();
+				}
+				?>
+				
 				<?php echo FLEXI_J16GE ? JHtml::_('sliders.end') : $this->pane->endPane();?>
 				<?php endif; /* !$skip_sliders */ ?>
 				
-				<div id="fc-dash-credits">
-					<?php
-						echo FLEXI_J16GE ?
-							JHTML::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' style="display:inline-block; float:left; margin-right:24px; padding:2px; border:1px solid #e0e0e0; border-radius:8px;"') :
-							JHTML::_('image.site', 'logo.png', '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, 'FLEXIcontent', ' style="display:inline-block; float:left; margin-right:24px; padding:2px; border:1px solid #e0e0e0; border-radius:8px;"') ;
-					?>
-					<p style="float:left; display:inline-block;">
-						<span class="badge"> FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?></span>
-						<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="color:rgb(0, 136, 204)!important;" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
-						<br/>
-						<span class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="margin:8px 8px 8px 0px !important;">GNU/GPL licence, Copyright &copy; 2009-2015</span>
-						<br/>
-						<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span>
-						<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span>
-						<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="color:rgb(0, 136, 204)!important;" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
-							Marvelic Engine
-						</a>
-						<span class="label <?php echo $tooltip_class;?>" title="Developer">Suriya Kaewmungmuang</span>
-						<span class="label <?php echo $tooltip_class;?>" title="Developer">Ruben Reyes</span>
-					</p>
-					<?php /*
-					<p>
-						Logo and icons : Greg Berthelot<br/>
-						<a class="hasTip" href="http://www.artefact-design.com" target="_blank" title="Artefact Design::Professional Joomla! Integration">www.artefact-design.com</a>
-					</p>
-					*/ ?>
-				</div>
+				<?php if (!$hide_fc_license) echo $fc_logo_license; ?>
 			</td>
 		</tr>
 	</table>
