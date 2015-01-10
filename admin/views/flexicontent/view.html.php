@@ -63,8 +63,8 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		JHTML::_('behavior.tooltip');
 
 		// handle jcomments integration
-		if (JPluginHelper::isEnabled('system', 'jcomments.system') || JPluginHelper::isEnabled('system', 'jcomments')) {
-			$CanComments 	= 1;
+		if (JPluginHelper::isEnabled('system', 'jcomments')) {
+			$JComments_Installed 	= 1;
 			$destpath		= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
 			$dest 			= $destpath.DS.'com_flexicontent.plugin.php';
 			$source 		= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
@@ -82,7 +82,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 				}
 			}
 		} else {
-			$CanComments 	= 0;
+			$JComments_Installed 	= 0;
 		}
 
 		// handle joomfish integration

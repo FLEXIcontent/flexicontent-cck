@@ -76,6 +76,12 @@ HEADER ICONS
 .icon-stats:before {
 	content: "\75";
 }
+.fcsb-icon-comments:before{
+	content: "$";
+}
+.fcsb-icon-plugins:before {
+	content: "2";
+}
 
 .icon-test:before { content: "l";  color: #51a351; font-weight:bold; }
 .icon-savenew:before    { content: "\5d";   color: #51a351; }
@@ -423,6 +429,14 @@ legend[class^="fc-board-header"] {
 
 
 /* Dashboard button */
+div#fc-dash-boardbtns .fc-board-button_sep {
+    margin: 0px 12px 12px 0;
+    padding: 0px;
+    font-weight: bold;
+    width: 0px;
+    height: 80px;
+    border-left: 1px dashed #d0d0d0;
+}
 div#fc-dash-boardbtns .fc-board-button {
     margin: 0px 12px 12px 0;
     padding: 0px;
@@ -445,7 +459,7 @@ div#fc-dash-boardbtns .fc-board-button {
     border-radius: 3px;
     -moz-box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.32);
     -webkit-box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.32);
-    box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.32)
+    box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.32);
 }
 div#fc-dash-boardbtns .fc-board-button:hover {
     background-color: #FffFfF;
@@ -457,7 +471,7 @@ div#fc-dash-boardbtns .fc-board-button:hover {
     background-image: linear-gradient(#ededed, #fff);
     -moz-box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6);
     -webkit-box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6);
-    box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6)
+    box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6);
 }
 .fc-board-button-inner {  /* inner container of dashboard button (of extra styling choices) */
 	display: inline-block;

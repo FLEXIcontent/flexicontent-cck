@@ -48,7 +48,7 @@ class FlexicontentHelperPerm
 	{
 		// handle jcomments integration
 		if (JPluginHelper::isEnabled('system', 'jcomments')) {
-			$Comments_Enabled 	= 1;
+			$JComments_Installed 	= 1;
 			$destpath		= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
 			$dest 			= $destpath.DS.'com_flexicontent.plugin.php';
 			$source 		= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
@@ -67,7 +67,7 @@ class FlexicontentHelperPerm
 				}
 			}
 		} else {
-			$Comments_Enabled 	= 0;
+			$JComments_Installed 	= 0;
 		}
 		
 		// Find permissions for given user id
@@ -202,7 +202,8 @@ class FlexicontentHelperPerm
 		// OTHER components permissions
 		$permission->CanPlugins	 	= $user->authorise('core.manage', 'com_plugins');
 		$permission->CanComments 	= $user->authorise('core.manage', 'com_jcomments');
-		$permission->CanComments	=	$permission->CanComments && $Comments_Enabled;
+		$permission->CanComments	=	$permission->CanComments && $JComments_Installed;
+		$permission->JComments_Installed = $JComments_Installed;
 		
 		// Global parameter to force always displaying of categories as tree
 		if (JComponentHelper::getParams('com_flexicontent')->get('cats_always_astree', 1)) {
