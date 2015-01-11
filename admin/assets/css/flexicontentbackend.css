@@ -5,17 +5,18 @@
 HEADER ICONS
 ************/
 [class^="fcsb-icon-"], [class*=" fcsb-icon-"] {
-    display: inline-block;
-    height: 14px;
-    line-height: 14px;
-    width: 20px;
+	display: inline-block;
+	height: 14px;
+	line-height: 14px;
+	width: 20px;
 }
 [class^="fcsb-icon-"]:before, [class*=" fcsb-icon-"]:before {
-    font-family: "IcoMoon";
-    font-style: normal;
+	font-family: "IcoMoon";
+	font-style: normal;
 }
 .disabled[class^="fcsb-icon-"], .disabled[class*=" fcsb-icon-"] {
-    font-weight: normal;
+	font-weight: normal;
+	color: #aaa;
 }
 
 .fcsb-icon-flexicontent:before,
@@ -506,4 +507,12 @@ div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text {
 	vertical-align:middle;
 	font-size: 12px;
 	line-height: 140%; /* or less will allow 3 lines of text to fit inside the button height */
+}
+.fc_sidebar_entry.disabled {
+	color: #aaa;
+	font-style: normal;
+}
+div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text.fcdisabled {
+	color: gray;
+	font-style: italic;
 }

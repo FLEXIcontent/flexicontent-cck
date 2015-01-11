@@ -143,11 +143,12 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 		// THE FOLLOWING WILL ONLY BE DISPLAYED IF $DOPOSTINSTALL IS INCOMPLETE
 		// SO WHY CALCULATE THEM, WE SKIP THEM, USER MUST LOG OUT ANYWAY TO SEE THEM ...
-		if(($postinst_integrity_ok===NULL) || ($postinst_integrity_ok===false) || $optional_tasks) {
+		
+		if(($postinst_integrity_ok===NULL) || ($postinst_integrity_ok===false)) {
 			$use_versioning = $params->get('use_versioning', 1);
 			
-			$existmenuitems	= $model->getExistMenuItems();
 			$existtype 			= $model->getExistType();
+			$existmenuitems	= $model->getExistMenuItems();
 			$existfields 		= $model->getExistFields();
 			
 			$existfplg 			= $model->getExistFieldsPlugins();
@@ -156,21 +157,28 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			
 			$existcats					= !$model->getItemsNoCat();
 			$existlang	 				= $model->getExistLanguageColumns() && !$model->getItemsNoLang();
-			$existdbindexes			= $model->getExistDBindexes($check_only=false);
-			$itemcountingdok    = $model->getItemCountingDataOK();
 			$existversions 			= $model->getExistVersionsTable();
 			$existversionsdata	= !$use_versioning || $model->getExistVersionsPopulated();
-			
 			$existauthors			= $model->getExistAuthorsTable();
-			$cachethumb				= $model->getCacheThumbChmod();
+
 			$oldbetafiles			= true; //$model->getOldBetaFiles();
 			$nooldfieldsdata	= $model->getNoOldFieldsData();
 			$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
+			$cachethumb				= $model->getCacheThumbChmod();
 			
-			$initialpermission = FLEXI_J16GE ? $model->checkInitialPermission() : true;
+			$existdbindexes    = ! (boolean) ($missingindexes = $model->getExistDBindexes($check_only=false));
+			$itemcountingdok   = $model->getItemCountingDataOK();
+			$initialpermission = $model->checkInitialPermission();
 			
 			// Check if old field positions were converted
 			$model->getFieldsPositions();
+		} else if ($optional_tasks) {  // IF optional tasks do not recheck instead just set the FLAGS to true
+			$existtype = $existmenuitems = $existfields = true;
+			$existfplg = $existseplg = $existsyplg = true;
+		  $existcats = $existlang = $existversions = $existversionsdata = $existauthors = true;
+		  $oldbetafiles = $nooldfieldsdata = $missingversion = $cachethumb = true;
+		  $existdbindexes = $itemcountingdok = $initialpermission = true;
+		  $missingindexes = array();
 		}
 		
 		
@@ -291,25 +299,29 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// install check
 		$this->assignRef('dopostinstall'	, $postinst_integrity_ok);
 		$this->assignRef('allplgpublish'	, $allplgpublish);
-		$this->assignRef('existmenuitems'	, $existmenuitems);
+		
 		$this->assignRef('existtype'			, $existtype);
+		$this->assignRef('existmenuitems'	, $existmenuitems);
 		$this->assignRef('existfields'		, $existfields);
+		
 		$this->assignRef('existfplg'			, $existfplg);
 		$this->assignRef('existseplg'			, $existseplg);
 		$this->assignRef('existsyplg'			, $existsyplg);
+		
 		$this->assignRef('existcats'			, $existcats);
 		$this->assignRef('existlang'			, $existlang);
-		$this->assignRef('existdbindexes'	, $existdbindexes);
-		$this->assignRef('itemcountingdok', $itemcountingdok);
 		$this->assignRef('existversions'		, $existversions);
 		$this->assignRef('existversionsdata', $existversionsdata);
 		$this->assignRef('existauthors'			, $existauthors);
-		$this->assignRef('cachethumb'				, $cachethumb);
+		
 		$this->assignRef('oldbetafiles'			, $oldbetafiles);
 		$this->assignRef('nooldfieldsdata'	, $nooldfieldsdata);
 		$this->assignRef('missingversion'		, $missingversion);
-		if (FLEXI_J16GE)
-			$this->assignRef('initialpermission', $initialpermission);
+		$this->assignRef('cachethumb'				, $cachethumb);
+
+		$this->assignRef('existdbindexes'	, $existdbindexes); $this->assignRef('missingindexes', $missingindexes);
+		$this->assignRef('itemcountingdok', $itemcountingdok);
+		$this->assignRef('initialpermission', $initialpermission);
 		
 		// assign Rights to the template
 		$this->assignRef('perms'		, $perms);
@@ -332,19 +344,18 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	{
 		//initialise variables
 		$lang = JFactory::getLanguage();
-		$img_attribs = ' class="fc-board-btn-img"';
-		$no_iframe = (int)(!$modal_create_iframe);
-		$link_attrs = $modal ? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.$no_iframe.', '.$modal_width.', '.$modal_height.'); return false;"' : '';
+		$link_attribs = $modal ? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.'); return false;"' : '';
+		$img_attribs  = ' class="fc-board-btn-img"';
   	?>
 		<span class="fc-board-button" style="float:<?php echo ($lang->isRTL()) ? 'right' : 'left'; ?>;">
 			<span class="fc-board-button-inner">
 				
-				<a href="<?php echo $link; ?>" class="fc-board-button-link" <?php echo $link_attrs; ?>>
+				<?php if ($link) : ?><a href="<?php echo $link; ?>" class="fc-board-button-link" <?php echo $link_attribs; ?>><?php endif; ?>
 					<?php echo FLEXI_J16GE ?
 						JHTML::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs) :
 						JHTML::_('image.site', $image, '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, $text, $attribs); ?>
-					<span class="fc-board-btn-text"><?php echo $text; ?></span>
-				</a>
+					<span class="fc-board-btn-text <?php echo $link ? '' : ' fcdisabled'; ?>"><?php echo $text; ?></span>
+				<?php if ($link) : ?></a><?php endif; ?>
 				
 			</span>
 		</span>

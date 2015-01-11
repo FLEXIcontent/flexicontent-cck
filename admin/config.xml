@@ -296,11 +296,13 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="comments" type="radio" default="0" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC"  menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_JCOMMENTS</option>
-				<option value="2">FLEXI_JOMCOMMENTS</option>
+			<field name="" type="separator" default="FLEXI_COMMENTS" label="" level="level2" menu="hide" />
+			<field name="comments" type="radio" default="0" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_DISABLE_OR_INTEGRATE_MANUALLY</option>
+				<option value="1">FLEXI_JCOMMENTS_INTEGRATION</option>
 			</field>
+			<field name="" type="separator" default="FLEXI_MANUAL_COMMENTS_INTEGRATION" label="" level="level3" menu="hide" />
+			<field name="comments_admin_link" type="text" default="" label="FLEXI_COMMENTS_BACKEND_ADMIN_LINK" description="FLEXI_COMMENTS_BACKEND_ADMIN_LINK_DESC" menu="hide" />
 			
 		<field name="" type="separator" default="FLEXI_DIRECTORY_VIEW_CONF" level="level1" menu="hide" />
 		
@@ -1233,7 +1235,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="dashboard_hide_fc_license" type="radio" default="1" label="FLEXI_DASH_HIDE_FC_LICENSE" description="FLEXI_DASH_HIDE_FC_LICENSE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="dashboard_hide_fc_license_credits" type="radio" default="1" label="FLEXI_DASH_HIDE_FC_LICENSE_AND_CREDITS" description="FLEXI_DASH_HIDE_FC_LICENSE_AND_CREDITS_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_IN_SLIDER</option>
 			</field>

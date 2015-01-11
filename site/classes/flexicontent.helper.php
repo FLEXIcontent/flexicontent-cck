@@ -5423,7 +5423,7 @@ function FLEXISubmenu($cando)
 			'<a href="index.php?option=com_jcomments&task=view&fog=com_flexicontent" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
 				(FLEXI_J30GE ? '<span class="fcsb-icon-comments"></span>' : '').JText::_( 'FLEXI_COMMENTS' ).
 			'</a>', '', false);
-		else if ($cparams->get('comments')==1 && !$perms->JComments_Installed) call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-comments" style="color:gray;"></span>' : '').'<s style="color:gray;">JComments not found</s>', '', false);
+		else if ($cparams->get('comments')==1 && !$perms->JComments_Installed) call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-comments disabled"></span>' : '').'<span class="fc_sidebar_entry disabled">'.JText::_( 'FLEXI_JCOMMENTS_MISSING' ).'</span>', '', false);
 		
 		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-type-fields">'.JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' ).'</h2>', '', '');
 		if ($perms->CanTypes)			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-types"></span>' : '').JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
