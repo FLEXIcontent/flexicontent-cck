@@ -26,7 +26,7 @@ defined('_JEXEC') or die('Restricted access');
 			  	<?php echo JText::_( 'FLEXI_SEARCH' ); ?>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
 				<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-				<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+				<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_CLEAR' ); ?></button>
 			</td>
 		</tr>
 		<tr>
