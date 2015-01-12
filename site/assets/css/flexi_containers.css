@@ -24,9 +24,9 @@
 .fc-mssg-inline, .fc-mssg {
 	border: 1px solid;
 	display: block;
-	margin: 0 0 5px 0 !important;
-	padding: 8px 10px 12px 36px !important;
-	border-radius: 6px !important;
+	margin: 0 0 5px 0;
+	padding: 8px 10px 12px 36px;
+	border-radius: 6px;
 	font-family: tahoma;
 	font-size:11px;
 	white-space: normal;
@@ -34,14 +34,14 @@
 }
 .fc-mssg-inline {
 	display: inline-block;
-	margin: 0 0 0 12px !important;
+	margin: 0 0 0 12px;
 	max-width: 62%;
 }
 
 .fc-mssg-inline.fc-nobgimage,
 .fc-mssg.fc-nobgimage {
 	background-image: none !important;
-	padding: 2px 8px !important;
+	padding: 2px 8px;
 }
 
 .fc-mssg-inline.fc-note,
@@ -124,6 +124,11 @@
 	white-space: normal;
 	line-height: 140%;
 
+}
+.fc-padded-image {
+	padding:4px 6px 4px 4px;
+	margin:-4px -6px -4px -4px;
+	display:inline-block;
 }
 
 

@@ -656,8 +656,28 @@ div label.lang_box .lang_lbl {
 	line-height: 1em !important;
 	font-size: 12px !important;
 }
-div label.lang_box img, .fc_assoc_translation img {	border: 1px solid lightgray !important; }
-.fc_assoc_translation img  { margin-right: 5px !important; }
+div label.lang_box img {
+	border: 1px solid lightgray;
+}
+
+/* language associations */
+.fc_assoc_translation img {
+	border: 1px solid lightgray;
+	padding: 0px !important;
+	margin: 0px !important;
+	float:left;
+}
+.fc_assoc_translation {
+	display:inline-block;
+	float:left;
+	text-decoration:none;
+	margin-right: 5px;
+	padding: 1px;
+	border: 1px dashed transparent;
+}
+.fc_assoc_translation.fc_assoc_outdated {
+	border-color: gray;
+}
 
 
 /* Import view */
@@ -1399,13 +1419,6 @@ div.flexi_box_right {
 
 .fc_small {
 	font-size: 11px;
-}
-
-.fc_assoc_translation {
-	display:inline-block;
-	float:left;
-	margin:1px 3px;
-	text-decoration:none;
 }
 
 

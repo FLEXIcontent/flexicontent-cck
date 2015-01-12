@@ -20,7 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/icon-16-hint.png', JText::_( 'FLEXI_NOTES' ) );
+$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), ' align="left" ' );
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &nbsp; '
 .'<a onclick="alert(this.title);" title="'.str_replace("<br/>","\\n", JText::_('FLEXI_CAN_ADD_CUSTOM_FIELD_COLUMNS_COMPONENT_AND_PER_TYPE', true)).'" style="vertical-align:middle; font-size:12px; cursor:pointer;" href="javascript:;" >'
@@ -55,35 +55,34 @@ $items_list_cols += count($this->extra_fields);
 
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
 $_img_title = JText::_('FLEXI_PREVIEW', true);
-$image_zoom = '<img src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.$_img_title.'" title="'.$_img_title.':: Click to display the frontend view of this item in a new browser window" />';
+$image_zoom = '<img src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="fc-padded-image '.$tip_class.'" alt="'.$_img_title.'" title="'.$_img_title.':: Click to display the frontend view of this item in a new browser window" />';
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
 	$_img_title = JText::_('FLEXI_REORDERING_ENABLED_TIP', true);
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" alt="'.$_img_title.'" title="'.$_img_title.'" />' .' ';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="fc-padded-image '.$tip_class.'" alt="'.$_img_title.'" title="'.$_img_title.'" />' .' ';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 } else {
 	$_img_title = JText::_('FLEXI_REORDERING_DISABLED_TIP', true);
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" alt="'.$_img_title.'" title="'.$_img_title.'" />' .' ';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="fc-padded-image '.$tip_class.'" alt="'.$_img_title.'" title="'.$_img_title.'" />' .' ';
 	$drag_handle_box = '<div class="fc_drag_handle %s" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
 	$image_saveorder    = '';
 }
 $_img_title = JText::_('MAIN category shown in bold', true);
-$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" alt="'.$_img_title.'" title="'.'::'.$_img_title.'" />';
+$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="fc-padded-image '.$tip_class.'" alt="'.$_img_title.'" title="'.'::'.$_img_title.'" />';
 
 if ( !$this->filter_order_type ) {
-	$_img_title = JText::_('FLEXI_ORDER_JOOMLA', true);
-	$_img_title_desc = JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA', true)).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP', true);
-	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" alt="'.$_img_title.'" title="'.$_img_title.'::'.$_img_title_desc.'" />';
+	$_img_title = JText::_('FLEXI_ORDER_JOOMLA');
+	$_img_title_desc = JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP');
 	$ord_catid = 'catid';
 	$ord_col = 'ordering';
 } else {
 	$_img_title = JText::_('FLEXI_ORDER_FLEXICONTENT', true);
-	$_img_title_desc = JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_FLEXICONTENT', true)).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP', true);
-	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" alt="'.$_img_title.'" title="'.$_img_title.'::'.$_img_title_desc.'" />';
+	$_img_title_desc = JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_FLEXICONTENT')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP');
 	$ord_catid = 'rel_catid';
 	$ord_col = 'catsordering';
 }
+$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" data-placement="bottom" class="'.$tip_class.'" alt="'.$_img_title.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" />';
 $ord_grp = 1;
 
 $stategrps = array(1=>'published', 0=>'unpublished', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
@@ -101,10 +100,14 @@ if (FLEXI_J16GE) {
 $tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
 if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
 $date_note_msg = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
-$label_tooltip = 'class="'.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'"';
-$date_zone_tip = '<span '.$label_tooltip.'>'.$hintmage.'</span>';
+$date_zone_tip = '<span class="fc-padded-image '.$tip_class.'" data-placement="bottom" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'">'.$hintmage.'</span>';
 
+// COMMON repeated texts
 $edit_item_title = JText::_('FLEXI_EDIT_ITEM');
+$rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER');
+$rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
+$scheduled_for_publication = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION', true );
+$publication_expired = JText::_( 'FLEXI_PUBLICATION_EXPIRED', true );
 ?>
 <script type="text/javascript">
 
@@ -272,7 +275,6 @@ window.addEvent('domready', function() {
 </script>
 <div class="flexicontent">
 
-
 <?php if ($this->unassociated && !$this->badcatitems) : ?>
 	<div class="fc-mssg fc-warning">
 	<table>
@@ -327,7 +329,6 @@ window.addEvent('domready', function() {
 <?php endif; ?>
 
 
-
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
@@ -339,114 +340,113 @@ window.addEvent('domready', function() {
 	<div id="j-main-container">
 <?php endif;?>
 
-	<table>
-		<tr class="filterbuttons_head">
-			<td>
-				<div style="margin:2px 38px 0px 0px; display:inline-block; float:left">
-					<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
-					<span class="radio"><?php echo $this->lists['scope']; ?></span>
-					<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
-				</div>
-				
-				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
-				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
-				<input type="button" id="fc_filterline_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
-				<input type="button" id="fc_stateGroupsBox_btn" class="<?php echo $_class.($this->filter_stategrp || $this->filter_catsinstate!=1 ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('stateGroupsBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
-				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-				</div>
-				
-				<div style="display:inline-block; float:left;">
-					<div class="limit nowrap_box" style="display: inline-block;">
-						<label class="label">
-							<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
-						</label>
-						<?php
-						$pagination_footer = $this->pagination->getListFooter();
-						if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
-						?>
-					</div>
-					
-					<span class="fc_item_total_data nowrap_box badge badge-info">
-						<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
-					</span>
-					
-					<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
-					<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
-						<?php echo $getPagesCounter; ?>
-					</span>
-					<?php endif; ?>
-				</div>
-			</td>
-		</tr>
-	</table>
+	<div id="fc-filters-header">
+		<span class="fc-filter nowrap_box">
+			<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
+			<span class="radio"><?php echo $this->lists['scope']; ?></span>
+		</span>
+		
+		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
+		<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
+		<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+		<input type="button" id="fc_stateGroupsBox_btn" class="<?php echo $_class.($this->filter_stategrp || $this->filter_catsinstate!=1 ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('stateGroupsBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
+		<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+		</div>
+		
+		<span class="fc-filter nowrap_box">
+			<div class="limit nowrap_box" style="display: inline-block;">
+				<label class="label">
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
+				</label>
+				<?php
+				$pagination_footer = $this->pagination->getListFooter();
+				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
+				?>
+			</div>
+			
+			<span class="fc_item_total_data nowrap_box badge badge-info">
+				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+			</span>
+			
+			<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
+			<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
+				<?php echo $getPagesCounter; ?>
+			</span>
+			<?php endif; ?>
+		</span>
+	</div>
 	
 	
-	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="fc_mini_note_box well well-small">
+	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
 		
 		<?php if (@$this->lists['filter_fileid']): ?>
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['filter_fileid']; ?>
-		</div>
+		</span>
 		<?php endif; ?>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['filter_authors']; ?>
-		</div>
+		</span>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['filter_lang']; ?>
-		</div>
+		</span>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['filter_type']; ?>
-		</div>
+		</span>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['filter_state']; ?>
-		</div>
+		</span>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+		<span class="fc-filter nowrap_box">
+			<?php echo $this->lists['filter_cats']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
+			<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_SUBCATEGORIES' ); ?></label>
+			<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
+			<?php echo $date_zone_tip; ?>
+			<?php echo $this->lists['date']; ?>
+			<?php echo $this->lists['startdate']; ?>
+			<?php echo $this->lists['enddate']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
+			<label class="label"><?php echo JText::_('FLEXI_ID'); ?></label>
+			<input type="text" name="filter_id" id="filter_id" size="6" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" style="width:auto;" />
+		</span>
+		
+		<span class="fc-filter nowrap_box">
 			<?php echo $ordering_type_tip; ?>
 			<label class="label"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
 			<?php echo $this->lists['filter_order_type']; ?>
-		</div>
+		</span>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
-			<?php echo $this->lists['filter_cats']; ?>
-			<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
-			<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
-		</div>
-		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
-			<?php echo $date_zone_tip; ?>
-			<span class="radio"><?php echo $this->lists['date']; ?></span>
-			<?php echo $this->lists['startdate']; ?>
-			<?php echo $this->lists['enddate']; ?>
-		</div>
-		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
-			<label class="label"><?php echo JText::_('FLEXI_ID'); ?></label>
-			<input type="text" name="filter_id" id="filter_id" size="6" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" style="width:auto;" />
-		</div>
-		
-		<div class="fc-mssg-inline fc-nobgimage nowrap_box fc-btn_box">
+		<span class="fc-filter nowrap_box">
 			<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_GO'/*'FLEXI_APPLY_FILTERS'*/ ); ?>" />
-			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET'/*'FLEXI_RESET_FILTERS'*/ ); ?>" />
-		</div>
+			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_CLEAR'/*'FLEXI_RESET_FILTERS'*/ ); ?>" />
+		</span>
 		
-		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('filterline', document.getElementById('fc_filterline_btn'), 'btn-primary');"></div>
+		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 	
 	<div id="stateGroupsBox" class="fc_mini_note_box floated well well-small" <?php if (!$this->filter_stategrp && $this->filter_catsinstate==1) echo 'style="display:none;"'; ?> >
 		
 		<div style="float:left; margin-right:12px;">
 		<?php
-		$_img_title = JText::_('FLEXI_LIST_ITEMS_WITH_STATE', true);
-		$_img_title_desc = JText::_('FLEXI_LIST_ITEMS_WITH_STATE_DESC', true);
+		$_img_title = JText::_('FLEXI_LIST_ITEMS_WITH_STATE');
+		$_img_title_desc = JText::_('FLEXI_LIST_ITEMS_WITH_STATE_DESC');
+		$_tooltip = ' class="fc-padded-image '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $_img_title_desc, 0, 1).'" ';
 		?>
 		<label class="label"><?php echo '&nbsp;'.$_img_title; ?></label>
-		<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" alt="<?php echo $_img_title_desc; ?>" title="::<?php echo $_img_title_desc; ?>" style="vertical-align:middle;" />
+		<img src="components/com_flexicontent/assets/images/information.png" alt="<?php echo $_img_title_desc; ?>" <?php echo $_tooltip; ?>/>
 		<?php echo $this->lists['filter_stategrp']; ?>
 		</div>
 		
@@ -454,9 +454,10 @@ window.addEvent('domready', function() {
 		<?php
 		$_img_title = JText::_('FLEXI_LIST_ITEMS_IN_CATS', true);
 		$_img_title_desc = JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true);
+		$_tooltip = ' class="fc-padded-image '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $_img_title_desc, 0, 1).'" ';
 		?>
 		<label class="label"><?php echo '&nbsp;'.$_img_title; ?></label>
-		<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" alt="<?php echo $_img_title_desc; ?>" title="::<?php echo $_img_title_desc; ?>" style="vertical-align:middle;" />
+		<img src="components/com_flexicontent/assets/images/information.png" alt="<?php echo $_img_title_desc; ?>" <?php echo $_tooltip; ?>/>
 		<span class="radio"><?php echo $this->lists['filter_catsinstate']; ?></span>
 		</div>
 		
@@ -503,16 +504,16 @@ window.addEvent('domready', function() {
 			<th class="left hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->search) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('search');document.adminForm.submit();" />
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('search');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
 			<th class="center hideOnDemandClass">
 				<?php echo JText::_( 'FLEXI_AUTHOR' ); ?>
 				<?php if ($this->filter_authors) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_authors');document.adminForm.submit();" />
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_authors');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>			
@@ -520,8 +521,8 @@ window.addEvent('domready', function() {
 			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'i.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_lang');document.adminForm.submit();" />
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_lang');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -529,16 +530,16 @@ window.addEvent('domready', function() {
 			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_type');document.adminForm.submit();" />
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_type');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
 			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JText::_( 'FLEXI_STATE', true ); ?>
 				<?php if ($this->filter_state) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_state');document.adminForm.submit();" />
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_state');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -580,8 +581,8 @@ window.addEvent('domready', function() {
 				<?php echo $categories_tip; ?>
 				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->filter_cats) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_cats');document.adminForm.submit();" />
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_cats');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -591,8 +592,8 @@ window.addEvent('domready', function() {
 				if ($this->date == '1') :
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
 				</span>
 				<?php
 					endif;
@@ -605,8 +606,8 @@ window.addEvent('domready', function() {
 				if ($this->date == '2') :
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
 				</span>
 				<?php
 					endif;
@@ -619,8 +620,8 @@ window.addEvent('domready', function() {
 			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_id) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_id');document.adminForm.submit();" />
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_id');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 
@@ -746,11 +747,11 @@ window.addEvent('domready', function() {
 
 			if ( $row->publication_scheduled && $is_published ) {
 				$extra_img = 'pushished_scheduled.png';
-				$extra_alt = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION', true );
+				$extra_alt = & $scheduled_for_publication;
 			}
 			if ( $row->publication_expired && $is_published ) {
 				$extra_img = 'pushished_expired.png';
-				$extra_alt = JText::_( 'FLEXI_PUBLICATION_EXPIRED', true );
+				$extra_alt = & $publication_expired;
 			}
 
 			// Set a row language, even if empty to avoid errors
@@ -808,7 +809,7 @@ window.addEvent('domready', function() {
 			</td>
 
 		<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>
-			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE', true ).'::'.($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
+			<td align="center" class="col_lang" title="<?php echo ($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
 
 				<?php if ( !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
 					<img src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
@@ -823,8 +824,10 @@ window.addEvent('domready', function() {
 				<?php echo $row->type_name; ?>
 			</td>
 			<td align="center" class="col_state">
-			<?php echo flexicontent_html::statebutton( $row, $row->params, $addToggler = ($limit <= $this->inline_ss_max) ); ?>
-			<?php if ($extra_img) : ?><img style='float:right;' src="components/com_flexicontent/assets/images/<?php echo $extra_img;?>" width="16" height="16" border="0" class="hasTip" alt="<?php echo $extra_alt; ?>" title="<?php echo $extra_alt; ?>" /><?php endif; ?>
+				<?php echo flexicontent_html::statebutton( $row, $row->params, $addToggler = ($limit <= $this->inline_ss_max) ); ?>
+				<?php if ($extra_img) : ?>
+					<img src="components/com_flexicontent/assets/images/<?php echo $extra_img;?>" width="16" height="16" border="0" class="<?php echo $tip_class; ?>" alt="<?php echo $extra_alt; ?>" title="<?php echo $extra_alt; ?>" />
+				<?php endif; ?>
 			</td>
 
 			<td align="center">
@@ -852,19 +855,25 @@ window.addEvent('domready', function() {
 					foreach($this->lang_assocs[$row->lang_parent_id] as $assoc_item) {
 						if ($assoc_item->id==$row->id) continue;
 
+						$assoc_modified = strtotime($assoc_item->modified);
+						if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
+						$_class = ( $assoc_modified < $row_modified ) ? ' fc_assoc_outdated' : '';
+						
 						$_link  = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $assoc_item->id;
-						$_title = JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION', true ).':: ['. $assoc_item->lang .'] '. $assoc_item->title;
-						echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
+						$_title = flexicontent_html::getToolTip(
+							JText::_( $assoc_modified < $row_modified ? 'FLEXI_OUTDATED' : 'FLEXI_UPTODATE'),
+							//JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION').
+							($assoc_item->lang=='*' ? JText::_("All") : $this->langs->{$assoc_item->lang}->name).' <br/><br/> '.
+							$assoc_item->title, 0, 1
+						);
+						
+						echo '<a class="fc_assoc_translation '.$tip_class.$_class.'" target="_blank" href="'.$_link.'" title="'.$_title.'" >';
 						//echo $assoc_item->id;
 						if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
 							echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
 						} else if( !empty($assoc_item->lang) ) {
 							echo $assoc_item->lang=='*' ? JText::_("FLEXI_ALL") : $assoc_item->lang;
 						}
-
-						$assoc_modified = strtotime($assoc_item->modified);
-						if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
-						if ( $assoc_modified < $row_modified ) echo "(!)";
 						echo "</a>";
 					}
 				}

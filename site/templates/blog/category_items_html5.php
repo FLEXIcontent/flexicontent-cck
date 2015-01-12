@@ -22,6 +22,11 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
 
+$lead_use_image = $this->params->get('lead_use_image', 1);
+$lead_link_image_to = $this->params->get('lead_link_image_to', 0);
+$intro_use_image = $this->params->get('intro_use_image', 1);
+$intro_link_image_to = $this->params->get('intro_link_image_to', 0);
+
 // ITEMS as MASONRY tiles
 if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_placement', 0)==1))
 {
@@ -115,7 +120,7 @@ if ($leadnum) :
 
 	<ul class="leadingblock <?php echo $classnum; ?> group row">
 		<?php
-		if ($this->params->get('lead_use_image', 1) && $this->params->get('lead_image')) {
+		if ($lead_use_image && $this->params->get('lead_image')) {
 			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', 'o'=>'original');
 			$img_field_size = $img_size_map[ $this->params->get('lead_image_size' , 'l') ];
 			$img_field_name = $this->params->get('lead_image');
@@ -138,6 +143,41 @@ if ($leadnum) :
 				}
 			}
 			$markup_tags .= '</span>';
+			
+			$custom_link = null;
+			if ($lead_use_image) :
+				if (!empty($img_field_name)) {
+					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
+					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
+					$img_field = & $item->fields[$img_field_name];
+					$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+					if ( $lead_link_image_to && isset($img_field->value[0]) ) {
+						$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
+					}
+				} else {
+					$src = flexicontent_html::extractimagesrc($item);
+				}
+				
+				$RESIZE_FLAG = !$this->params->get('lead_image') || !$this->params->get('lead_image_size');
+				if ( $src && $RESIZE_FLAG ) {
+					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
+					$w		= '&amp;w=' . $this->params->get('lead_width', 200);
+					$h		= '&amp;h=' . $this->params->get('lead_height', 200);
+					$aoe	= '&amp;aoe=1';
+					$q		= '&amp;q=95';
+					$zc		= $this->params->get('lead_method') ? '&amp;zc=' . $this->params->get('lead_method') : '';
+					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					
+					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
+					$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				} else {
+					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
+					$thumb = $src;
+				}
+			endif;
+			$link_url = $custom_link ? $custom_link : JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 		?>
 		
 		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
@@ -195,7 +235,7 @@ if ($leadnum) :
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<h2 class="contentheading"><span class="fc_item_title">
 					<?php if ($this->params->get('link_titles', 0)) : ?>
-					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>"><?php echo $item->title; ?></a>
+					<a href="<?php echo $link_url; ?>"><?php echo $item->title; ?></a>
 					<?php
 					else :
 					echo $item->title;
@@ -217,39 +257,7 @@ if ($leadnum) :
 			<?php if ( $header_shown ) : ?>
 			</header>
 			<?php endif; ?>
-
-			<?php 
-				if ($this->params->get('lead_use_image', 1)) :
-					if (!empty($img_field_name)) :
-						// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
-						/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
-						$img_field = & $item->fields[$img_field_name];
-						$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
-					else :
-						$src = flexicontent_html::extractimagesrc($item);
-					endif;
-						
-					$RESIZE_FLAG = !$this->params->get('lead_image') || !$this->params->get('lead_image_size');
-					if ( $src && $RESIZE_FLAG ) {
-						// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-						$w		= '&amp;w=' . $this->params->get('lead_width', 200);
-						$h		= '&amp;h=' . $this->params->get('lead_height', 200);
-						$aoe	= '&amp;aoe=1';
-						$q		= '&amp;q=95';
-						$zc		= $this->params->get('lead_method') ? '&amp;zc=' . $this->params->get('lead_method') : '';
-						$ext = pathinfo($src, PATHINFO_EXTENSION);
-						$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-						$conf	= $w . $h . $aoe . $q . $zc . $f;
-						
-						$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-						$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
-					} else {
-						// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
-						$thumb = $src;
-					}
-				endif;
-			?>
-				
+			
 			<!-- BOF above-description-line1 block -->
 			<?php if (isset($item->positions['above-description-line1'])) : ?>
 			<div class="lineinfo line1">
@@ -305,11 +313,11 @@ if ($leadnum) :
 			<!-- EOF above-description-nolabel-line2 block -->
 				
 			<div class="lineinfo image_descr">
-			<?php if ($this->params->get('lead_use_image', 1) && $src) : ?>
+			<?php if ($lead_use_image && $src) : ?>
 			<figure class="image<?php echo $this->params->get('lead_position') ? ' right' : ' left'; ?>">
 				<?php $title_encoded = htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>
 				<?php if ($this->params->get('lead_link_image', 1)) : ?>
-				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>">
+				<a href="<?php echo $link_url; ?>">
 					<img src="<?php echo $thumb; ?>" alt="<?php echo $title_encoded; ?>" class="<?php echo $tooltip_class;?>" title="<?php echo flexicontent_html::getToolTip($_read_more_about, $title_encoded, 0, 0); ?>"/>
 				</a>
 				<?php else : ?>
@@ -402,7 +410,7 @@ if ($leadnum) :
 				echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>';
 				*/
 				?>
-				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="readon">
+				<a href="<?php echo $link_url; ?>" class="readon">
 					<?php echo ' ' . ($item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title)); ?>
 				</a>
 				<?php //echo '<script>document.write(\'</a> <div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.$item->title.'</div>\')</script>'; ?>
@@ -446,7 +454,7 @@ if ($count > $leadnum) :
 
 	<ul class="introblock <?php echo $classnum; ?> group row">	
 		<?php
-		if ($this->params->get('intro_use_image', 1) && $this->params->get('intro_image')) {
+		if ($intro_use_image && $this->params->get('intro_image')) {
 			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', 'o'=>'original');
 			$img_field_size = $img_size_map[ $this->params->get('intro_image_size' , 'l') ];
 			$img_field_name = $this->params->get('intro_image');
@@ -471,6 +479,41 @@ if ($count > $leadnum) :
 				}
 			}
 			$markup_tags .= '</span>';
+			
+			$custom_link = null;
+			if ($intro_use_image) :
+				if (!empty($img_field_name)) {
+					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
+					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
+					$img_field = & $item->fields[$img_field_name];
+					$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+					if ( $intro_link_image_to && isset($img_field->value[0]) ) {
+						$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
+					}
+				} else {
+					$src = flexicontent_html::extractimagesrc($item);
+				}
+				
+				$RESIZE_FLAG = !$this->params->get('intro_image') || !$this->params->get('intro_image_size');
+				if ( $src && $RESIZE_FLAG ) {
+					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
+					$w		= '&amp;w=' . $this->params->get('intro_width', 200);
+					$h		= '&amp;h=' . $this->params->get('intro_height', 200);
+					$aoe	= '&amp;aoe=1';
+					$q		= '&amp;q=95';
+					$zc		= $this->params->get('intro_method') ? '&amp;zc=' . $this->params->get('intro_method') : '';
+					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					
+					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
+					$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				} else {
+					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
+					$thumb = $src;
+				}
+			endif;
+			$link_url = $custom_link ? $custom_link : JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 		?>
 		
 		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
@@ -528,7 +571,7 @@ if ($count > $leadnum) :
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<h2 class="contentheading"><span class="fc_item_title">
 					<?php if ($this->params->get('link_titles', 0)) : ?>
-					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>"><?php echo $item->title; ?></a>
+					<a href="<?php echo $link_url; ?>"><?php echo $item->title; ?></a>
 					<?php
 					else :
 					echo $item->title;
@@ -550,39 +593,6 @@ if ($count > $leadnum) :
 			<?php if ( $header_shown ) : ?>
 			</header>
 			<?php endif; ?>
-
-
-			<?php 
-			if ($this->params->get('intro_use_image', 1)) :
-				if (!empty($img_field_name)) :
-					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
-					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
-					$img_field = & $item->fields[$img_field_name];
-					$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
-				else :
-					$src = flexicontent_html::extractimagesrc($item);
-				endif;
-					
-				$RESIZE_FLAG = !$this->params->get('intro_image') || !$this->params->get('intro_image_size');
-				if ( $src && $RESIZE_FLAG ) {
-					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-					$w		= '&amp;w=' . $this->params->get('intro_width', 200);
-					$h		= '&amp;h=' . $this->params->get('intro_height', 200);
-					$aoe	= '&amp;aoe=1';
-					$q		= '&amp;q=95';
-					$zc		= $this->params->get('intro_method') ? '&amp;zc=' . $this->params->get('intro_method') : '';
-					$ext = pathinfo($src, PATHINFO_EXTENSION);
-					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $zc . $f;
-					
-					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-					$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
-				} else {
-					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
-					$thumb = $src;
-				}
-			endif;
-			?>
 				
 			<!-- BOF above-description-line1 block -->
 			<?php if (isset($item->positions['above-description-line1'])) : ?>
@@ -639,11 +649,11 @@ if ($count > $leadnum) :
 			<!-- EOF above-description-nolabel-line2 block -->
 
 			<div class="lineinfo image_descr">
-			<?php if ($this->params->get('intro_use_image', 1) && $src) : ?>
+			<?php if ($intro_use_image && $src) : ?>
 			<figure class="image<?php echo $this->params->get('intro_position') ? ' right' : ' left'; ?>">
 				<?php $title_encoded = htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>
 				<?php if ($this->params->get('intro_link_image', 1)) : ?>
-					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>">
+					<a href="<?php echo $link_url; ?>">
 						<img src="<?php echo $thumb; ?>" alt="<?php echo $title_encoded; ?>" class="<?php echo $tooltip_class;?>" title="<?php echo flexicontent_html::getToolTip($_read_more_about, $title_encoded, 0, 0); ?>"/>
 					</a>
 				<?php else : ?>
@@ -737,7 +747,7 @@ if ($count > $leadnum) :
 				echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>';
 				*/
 				?>
-				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="readon">
+				<a href="<?php echo $link_url; ?>" class="readon">
 				<?php
 				if ($item->params->get('readmore')) :
 					echo ' ' . $item->params->get('readmore');

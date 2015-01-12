@@ -29,8 +29,8 @@ $listOrder  = $this->lists['order'];
 $listDirn   = $this->lists['order_Dir'];
 $saveOrder  = ($listOrder == 'c.lft' && $listDirn == 'asc');
 
-$user      = JFactory::getUser();
-$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
+$user    = JFactory::getUser();
+$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
 $attribs_preview = ' style="float:right;" class="hasTip" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this category in a new browser window" ';
@@ -68,6 +68,7 @@ function delAllFilters() {
 </script>
 
 <div class="flexicontent">
+
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
@@ -79,75 +80,70 @@ function delAllFilters() {
 	<div id="j-main-container">
 <?php endif;?>
 
-	<table>
-		<tr class="filterbuttons_head">
-			<td>
-				<div style="margin:2px 38px 0px 0px; display:inline-block; float:left">
-					<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
-					<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
-				</div>
-				
-				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
-				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block; float:left;">
-				<input type="button" id="fc_filterline_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('filterline', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
-				<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-				</div>
-				
-				<div style="display:inline-block; float:left;">
-					<div class="limit nowrap_box" style="display: inline-block;">
-						<label class="label">
-							<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
-						</label>
-						<?php
-						$pagination_footer = $this->pagination->getListFooter();
-						if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
-						?>
-					</div>
-					
-					<span class="fc_item_total_data nowrap_box badge badge-info">
-						<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
-					</span>
-					
-					<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
-					<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
-						<?php echo $getPagesCounter; ?>
-					</span>
-					<?php endif; ?>
-				</div>
-			</td>
-		</tr>
-	</table>
+	<div id="fc-filters-header">
+		<span class="fc-filter nowrap_box">
+			<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
+		</span>
+		
+		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
+		<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
+		<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+		<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+		</div>
+		
+		<span class="fc-filter nowrap_box">
+			<div class="limit nowrap_box" style="display: inline-block;">
+				<label class="label">
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
+				</label>
+				<?php
+				$pagination_footer = $this->pagination->getListFooter();
+				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
+				?>
+			</div>
+			
+			<span class="fc_item_total_data nowrap_box badge badge-info">
+				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+			</span>
+			
+			<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
+			<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
+				<?php echo $getPagesCounter; ?>
+			</span>
+			<?php endif; ?>
+		</span>
+	</div>
 	
 	
-	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="fc_mini_note_box well well-small">
+	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['cats']; ?>
-		</div>
+		</span>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['level']; ?>
-		</div>
+		</span>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['state']; ?>
-		</div>
+		</span>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['access']; ?>
-		</div>
+		</span>
 		
-		<div class="fc-mssg-inline fc-nobgimage fc-filter nowrap_box">
+		<span class="fc-filter nowrap_box">
 		  <?php echo $this->lists['language']; ?>
-		</div>
+		</span>
 		
-		<div class="fc-mssg-inline fc-nobgimage nowrap_box fc-btn_box">
+		<span class="fc-filter nowrap_box">
 			<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_GO'/*'FLEXI_APPLY_FILTERS'*/ ); ?>" />
-			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET'/*'FLEXI_RESET_FILTERS'*/ ); ?>" />
-		</div>
+			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_CLEAR'/*'FLEXI_RESET_FILTERS'*/ ); ?>" />
+		</span>
 		
-		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('filterline', document.getElementById('fc_filterline_btn'), 'btn-primary');"></div>
+		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 	
 	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>

@@ -102,7 +102,7 @@ function delAllFilters() {
 			</tr>
 			
 			
-			<tr id="filterline">
+			<tr id="fc-filters-box">
 				<!--td class="left col_title" colspan="4">
 					<span class="radio"><?php echo $this->lists['scope']; ?></span>
 					<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />

@@ -597,19 +597,24 @@ $tabCnt[$tabSetCnt] = 0;
 					{
 						if ($assoc_item->id==$this->row->id) continue;
 						
+						$assoc_modified = strtotime($assoc_item->modified);
+						if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
+						$_class = ( $assoc_modified < $row_modified ) ? ' fc_assoc_outdated' : '';
+						
 						$_link  = 'index.php?option=com_flexicontent&'.$task_items.'edit&cid='. $assoc_item->id;
-						$_title = htmlspecialchars(JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
-						echo '<a class="fc_assoc_translation editlinktip hasTip" target="_blank" href="'.$_link.'" title="'.$_title.'" >';
-						//echo $assoc_item->id;
+						$_title = flexicontent_html::getToolTip(
+							JText::_( $assoc_modified < $row_modified ? 'FLEXI_OUTDATED' : 'FLEXI_UPTODATE'),
+							//JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION').
+							($assoc_item->lang=='*' ? JText::_("All") : $this->langs->{$assoc_item->lang}->name).' <br/><br/> '.
+							$assoc_item->title, 0, 1
+						);
+						
+						echo '<a class="fc_assoc_translation '.$tip_class.$_class.'" target="_blank" href="'.$_link.'" title="'.$_title.'" >';
 						if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
 							echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
 						} else if( !empty($assoc_item->lang) ) {
 							echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
 						}
-						
-						$assoc_modified = strtotime($assoc_item->modified);
-						if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
-						if ( $assoc_modified < $row_modified ) echo "(!)";
 						echo "</a>";
 					}
 				}

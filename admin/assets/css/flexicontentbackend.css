@@ -172,38 +172,9 @@ div.current dd .pane-sliders .panel {
 /* Manager filters and filters containers */
 /******************************************/
 
-.flexicontent #filterline .fc-mssg-inline.fc-filter,
-.flexicontent #filterline .fc-mssg.fc-filter {
-	border:0px !important;
-	margin: 4px 8px !important;
-	padding:0px !important;
-}
-.flexicontent #filterline  .nowrap_box, .flexicontent .nowrap_box {
-	vertical-align: baseline !important;
-}
-.flexicontent #filterline .fc-mssg-inline > * {
-	vertical-align: middle !important;
-}
-.flexicontent #filterline .fc-mssg-inline.fc-btn_box {
-	border:none!important;
-}
+/* containers of backend managers */
 
-.flexicontent #filterline .controls {
-	display: inline-block;
-	margin: 3px 0 7px;
-}
-.flexicontent #filterline input[type="text"] {
-	padding: 2px 2px 3px !important;
-}
-.flexicontent #filterline .input-append, #filterline .input-prepend {
-	margin:0px;
-}
-.flexicontent #filterline .input-prepend input,
-.flexicontent #filterline .input-append input {
-    margin: 0 !important;
-    padding: 4px !important;
-}
-.flexicontent #filterline,
+.flexicontent #fc-filters-box,
 .flexicontent #mainChooseColBox,
 .flexicontent #stateGroupsBox,
 .flexicontent #itemusage-filters {
@@ -212,10 +183,71 @@ div.current dd .pane-sliders .panel {
 	vertical-align: top;
 	min-height: 34px;
 }
+.flexicontent #fc-filters-box {
+	padding-left: 0px;
+}
+.tooltip {
+	max-width: 80%!important;
+}
+
+/* text search / pagination line */
+
+.flexicontent #fc-filters-header #search {
+	margin: 0px !important;
+	padding: 4px !important;
+	vertical-align: top !important;
+}
+.flexicontent #fc-filters-header #limit {
+	padding: 3px 6px !important;
+}
+.flexicontent #fc-filters-header .fc-filter {
+	vertical-align: top !important;
+	border:0px !important;
+	padding:0px !important;
+	margin: 2px 48px 6px 0px;
+}
+
+
+/* filters line */
+
+.flexicontent #fc-filters-box .fc-filter {
+	border:0px !important;
+	margin: 0px 12px 12px 0;
+	padding:0px !important;
+	vertical-align: baseline !important;
+}
+.flexicontent #fc-filters-box .fc-filter > * {
+	vertical-align: middle !important;
+}
+.flexicontent #fc-filters-header .fc-filter .label,
+.flexicontent #fc-filters-box .fc-filter .label{
+	font-size: 11px;
+	padding: 4px 4px;
+}
+
+
+/* form controls */
+
+.flexicontent #fc-filters-box .controls {
+	display: inline-block;
+	margin: 3px 0 7px;
+}
+.flexicontent #fc-filters-box input[type="text"] {
+	padding: 2px 2px 3px !important;
+}
+.flexicontent #fc-filters-box .input-append, #fc-filters-box .input-prepend {
+	margin:0px;
+}
+.flexicontent #fc-filters-box .input-prepend input,
+.flexicontent #fc-filters-box .input-append input {
+	margin: 0 !important;
+	padding: 4px !important;
+}
 .flexicontent #stateGroupsBox input:checked + label {
 	color: #8B0000;
 	font-weight: bold;
 }
+
 
 /* Highlighting selected choices */
 .fc_filter_html .select2-search-choice div,

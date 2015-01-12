@@ -868,7 +868,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 	width: auto !important;
 	min-width: 124px !important;
 	min-height: 20px !important;
-	padding: 2px !important;
+	padding: 1px 4px !important;
 	border: 1px solid lightgray !important;
 	/*background: url(../../assets/images/plus-button.png) no-repeat  50% 50% !important;*/
 
