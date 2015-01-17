@@ -108,6 +108,16 @@ if ($count) {
 $leadnum  = $this->params->get('lead_num', 1);
 $leadnum  = ($leadnum >= $count) ? $count : $leadnum;
 
+// Handle category block (start of category items)
+$doing_cat_order = $this->category->_order_arr[1]=='order';
+$lead_catblock  = $this->params->get('lead_catblock', 0);
+$intro_catblock = $this->params->get('intro_catblock', 0);
+$lead_catblock_title  = $this->params->get('lead_catblock_title', 1);
+$intro_catblock_title = $this->params->get('intro_catblock_title', 1);
+if ($lead_catblock || $intro_catblock) {
+	global $globalcats;
+}
+
 // ONLY FIRST PAGE has leading content items
 if ($this->limitstart != 0) $leadnum = 0;
 
@@ -128,6 +138,8 @@ if ($leadnum) :
 		for ($i=0; $i<$leadnum; $i++) :
 			$item = $items[$i];
 			$fc_item_classes = 'fc_bloglist_item';
+			if ($doing_cat_order)
+     		$fc_item_classes .= ($i==0 || ($items[$i-1]->rel_catid != $items[$i]->rel_catid) ? ' fc_cat_item_1st' : '');
 			$fc_item_classes .= $i%2 ? ' fceven' : ' fcodd';
 			$fc_item_classes .= ' fccol'.($i%$lead_cols + 1);
 			
@@ -179,6 +191,11 @@ if ($leadnum) :
 			endif;
 			$link_url = $custom_link ? $custom_link : JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 		?>
+		
+		<?php echo $lead_catblock ?
+			'<li class="lead_catblock">'
+				.($lead_catblock_title && @$globalcats[$item->rel_catid] ? $globalcats[$item->rel_catid]->title : '').
+			'</li>' : ''; ?>		
 		
 		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
 			
@@ -463,6 +480,8 @@ if ($count > $leadnum) :
 		for ($i=$leadnum; $i<$count; $i++) :
 			$item = $items[$i];
 			$fc_item_classes = 'fc_bloglist_item';
+			if ($doing_cat_order)
+     		$fc_item_classes .= ($i==0 || ($items[$i-1]->rel_catid != $items[$i]->rel_catid) ? ' fc_cat_item_1st' : '');
 			$fc_item_classes .= ' '.$classspan;
 			$fc_item_classes .= ($i-$leadnum)%2 ? ' fceven' : ' fcodd';
 			$fc_item_classes .= ' fccol'.($i%$intro_cols + 1);
@@ -515,6 +534,11 @@ if ($count > $leadnum) :
 			endif;
 			$link_url = $custom_link ? $custom_link : JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 		?>
+		
+		<?php echo $intro_catblock ?
+			'<li class="intro_catblock">'
+				.($intro_catblock_title && @$globalcats[$item->rel_catid] ? $globalcats[$item->rel_catid]->title : '').
+			'</li>' : ''; ?>
 		
 		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
 			

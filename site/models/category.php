@@ -412,6 +412,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$orderby = $this->_buildItemOrderBy($order);
 			$orderby_join = '';
 			
+			// Set order array (2-level) in case it is later needed
+			$this->_category->_order_arr = $order;
+			
 			// Create JOIN for ordering items by a custom field (Level 1)
 			if ( 'field' == $order[1] ) {
 				$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
@@ -455,7 +458,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id ';  // SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
 			$query .= @ $orderby_col;
 		} else {
-			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename,'
+			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, rel.catid as rel_catid,'
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 				. @ $feed_img_col      // optional
