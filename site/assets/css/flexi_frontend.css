@@ -1342,7 +1342,6 @@ table.admintable td {
 /* CONTAINER of message for item having default content template layout */
 #__content_type_default_layout__ {
 	margin: 12px 4px 4px 32px;
-	padding:0px;
 }
 
 

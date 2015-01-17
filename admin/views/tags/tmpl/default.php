@@ -35,6 +35,8 @@ $attribs_preview = ' style="float:right;" class="hasTip" title="'.JText::_('FLEX
 $image_preview = FLEXI_J16GE ?
 	JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview) :
 	JHTML::_('image.site', 'monitor_go.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_('FLEXI_PREVIEW'), $attribs_preview) ;
+
+$list_total_cols = 8;
 ?>
 <script type="text/javascript">
 
@@ -125,7 +127,9 @@ function delAllFilters() {
 	
 	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>
 	
-	<table id="adminListTableFCtags" class="adminlist" cellspacing="1" style="margin-top:12px;">
+	<div class="fcclear"></div>
+	
+	<table id="adminListTableFCtags" class="adminlist fcmanlist">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -141,7 +145,7 @@ function delAllFilters() {
 
 	<tfoot>
 		<tr>
-			<td colspan="8">
+			<td colspan="<?php echo $list_total_cols; ?>">
 				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>
@@ -159,6 +163,8 @@ function delAllFilters() {
 		$edit_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&amp;task=';
 		
 		$k = 0;
+		
+		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"><td></tr>';  // Collapsed row to allow border styling to apply		$k = 0;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
 			$row = & $this->rows[$i];

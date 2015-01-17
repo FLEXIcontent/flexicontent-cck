@@ -2446,8 +2446,34 @@ class flexicontent_html
 
 		return $output;
 	}
-
-
+	
+	
+	/**
+	 * Method to build a list of radio or checkbox buttons
+	 *
+	 * @return array
+	 * @since 1.5
+	 */
+	static function buildradiochecklist($options, $name, $selected, $buildtype=0, $attribs = '', $tagid='')
+	{
+		$selected = is_array($selected) ? $selected : array($selected);
+		$tagid = $tagid ? $tagid : $name;
+		$n = 0;
+		$html = $buildtype==1 || $buildtype==3 ? '<fieldset class="radio btn-group btn-group-yesno">' : '';
+		$attribs = $buildtype==1 || $buildtype==3  ? ' class="btn" '.$attribs : $attribs;
+		foreach ($options as $value => $text) {
+			$tagid_n = $tagid.$n;
+			$html .='
+			<input type="'.($buildtype > 1 ? 'checkbox' : 'radio').'" class="inputbox" '.(in_array($value, $selected) ? ' checked="checked" ' : '').' value="'.$value.'" id="'.$tagid_n.'" name="'.$name.'" />
+			<label id="'.$tagid_n.'-lbl" for="'.$tagid_n.'" '.$attribs.'>'.$text.'</label>
+			';
+			$n++;
+		}
+		$html .= $buildtype==1 ? '</fieldset>' : '';
+		return $html;
+	}
+	
+	
 	/**
 	 * Method to build the list for types when performing an edit action
 	 *
@@ -2550,7 +2576,7 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildfilesextlist($name, $class, $selected)
+	static function buildfilesextlist($name, $class, $selected, $type=1)
 	{
 		$db = JFactory::getDBO();
 
@@ -2560,9 +2586,13 @@ class flexicontent_html
 		;
 		$db->setQuery($query);
 		$exts = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-
-		$options[] = JHTML::_( 'select.option', '', '- '.JText::_( 'FLEXI_ALL_EXT' ).' -');
-
+		
+		if (!is_numeric($type)) {
+			$options[] = JHTML::_( 'select.option', '', $type);
+		} else {
+			$options[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_ALL_EXT' ));
+		}
+		
 		foreach ($exts as $ext) {
 			$options[] = JHTML::_( 'select.option', $ext, $ext);
 		}
@@ -2578,7 +2608,7 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function builduploaderlist($name, $class, $selected)
+	static function builduploaderlist($name, $class, $selected, $type=1)
 	{
 		$db = JFactory::getDBO();
 
@@ -2589,9 +2619,13 @@ class flexicontent_html
 		;
 		$db->setQuery($query);
 		$exts = $db->loadObjectList();
-
-		$options[] = JHTML::_( 'select.option', '', '- '.JText::_( 'FLEXI_ALL_UPLOADERS' ).' -');
-
+		
+		if (!is_numeric($type)) {
+			$options[] = JHTML::_( 'select.option', '', $type);
+		} else {
+			$options[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_ALL_UPLOADERS' ));
+		}
+		
 		foreach ($exts as $ext) {
 			$options[] = JHTML::_( 'select.option', $ext->uid, $ext->name);
 		}
@@ -3538,6 +3572,44 @@ class flexicontent_upload
 		//$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
 		return preg_replace($regex, '', $file);
 	}
+	
+	
+	static function parseByteLimit($limit)
+	{
+		if (is_numeric($limit)) return $limit;  // already in bytes
+	
+		$v = (int)$limit;
+		$type = substr($limit, -1);
+		
+		switch (strtoupper($type)) {
+			case 'P': $v *= 1024;
+			case 'T':	$v *= 1024;
+			case 'G':	$v *= 1024;
+			case 'M': $v *= 1024;
+			case 'K': $v *= 1024;
+			break;
+		}
+		return $v;
+	}
+	
+	
+	static function getPHPuploadLimit()
+	{
+		$post_max   = flexicontent_upload::parseByteLimit(ini_get('post_max_size'));
+		$upload_max = flexicontent_upload::parseByteLimit(ini_get('upload_max_filesize'));
+		if ($upload_max < $post_max) {
+			$limit = array('value'=>$upload_max, 'name'=>'upload_max_filesize');
+		}
+		else {
+			$limit = array('value'=>$post_max, 'name'=>'post_max_size');
+		}
+		// Sucosin limitation
+		if (extension_loaded('suhosin')) {
+			$post_max = parseByteLimit(ini_get('suhosin.post.max_value_length'));
+			if ($post_max < $limit['value']) $limit = array('value'=>$post_max, 'name'=>'suhosin.post.max_value_length');
+		}
+		return $limit;
+	}
 
 
 	/**
@@ -4202,7 +4274,8 @@ class FLEXIUtilities
 		// ******************
 		if (FLEXI_J16GE) {   // Use J1.6+ language info
 			$query = 'SELECT DISTINCT lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, lc.title_native, '
-				. ' CASE WHEN CHAR_LENGTH(lc.title_native) THEN CONCAT(lc.title, " (", lc.title_native, ")") ELSE lc.title END as name '
+				//. ' CASE WHEN CHAR_LENGTH(lc.title_native) THEN CONCAT(lc.title, " (", lc.title_native, ")") ELSE lc.title END as name '
+				. ' lc.title as name '
 				.' FROM #__languages as lc '
 				.' WHERE 1 '.($published_only ? ' AND lc.published=1' : '')
 				. ' ORDER BY lc.ordering ASC '

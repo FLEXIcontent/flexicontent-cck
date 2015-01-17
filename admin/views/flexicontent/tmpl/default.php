@@ -317,7 +317,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				
 					<?php if (!isset($ssliders['pending'])): ?>
 					<?php
-					$title = JText::_( 'FLEXI_PENDING_SLIDER' )." (".count($this->pending)."/".$this->totalrows['pending'].")";
+					$title = JText::_( 'FLEXI_PENDING_SLIDER' ).' - <div class="badge badge-warning">'.count($this->pending)." / ".$this->totalrows['pending'].'</div>';
 					echo FLEXI_J16GE ? JHtml::_('sliders.panel', $title, 'pending' ) : $this->pane->startPanel( $title, 'pending' );
 					$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE';
 					?>
@@ -382,7 +382,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					
 					<?php if (!isset($ssliders['revised'])): ?>
 					<?php
-					$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' )." (".count($this->revised)."/".$this->totalrows['revised'].")";
+					$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' ).' - <div class="badge badge-warning">'.count($this->revised)." / ".$this->totalrows['revised'].'</div>';
 					echo FLEXI_J16GE ? JHtml::_('sliders.panel', $title, 'revised' ) : $this->pane->startPanel( $title, 'revised' );
 					$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=RV';
 					?>
@@ -447,7 +447,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					
 					<?php if (!isset($ssliders['inprogress'])): ?>
 					<?php
-					$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' )." (".count($this->inprogress)."/".$this->totalrows['inprogress'].")";
+					$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' ).' - <div class="badge badge-info">'.count($this->inprogress)." / ".$this->totalrows['inprogress'].'</div>';
 					echo FLEXI_J16GE ?
 						JHtml::_('sliders.panel', $title, 'inprogress' ) :
 						$this->pane->startPanel( $title, 'inprogress' );
@@ -514,7 +514,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					
 					<?php if (!isset($ssliders['draft'])): ?>
 					<?php
-					$title = JText::_( 'FLEXI_DRAFT_SLIDER' )." (".count($this->draft)."/".$this->totalrows['draft'].")";
+					$title = JText::_( 'FLEXI_DRAFT_SLIDER' ).' - <div class="badge badge-info">'.count($this->draft)." / ".$this->totalrows['draft'].'</div>';
 					echo FLEXI_J16GE ?
 						JHtml::_('sliders.panel', $title, 'draft' ) : 
 						$this->pane->startPanel( $title, 'draft' );

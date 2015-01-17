@@ -45,17 +45,17 @@ $user 		= JFactory::getUser();
 $enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
-$items_list_cols = 15;
+$list_total_cols = 15;
 if ( FLEXI_J16GE || FLEXI_FISH ) {
-	$items_list_cols++;
-	if ( $enable_translation_groups ) $items_list_cols++;
+	$list_total_cols++;
+	if ( $enable_translation_groups ) $list_total_cols++;
 }
 
-$items_list_cols += count($this->extra_fields);
+$list_total_cols += count($this->extra_fields);
 
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
-$_img_title = JText::_('FLEXI_PREVIEW', true);
-$image_zoom = '<img src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="fc-padded-image '.$tip_class.'" alt="'.$_img_title.'" title="'.$_img_title.':: Click to display the frontend view of this item in a new browser window" />';
+$_img_title = JText::_('FLEXI_PREVIEW');
+$image_zoom = '<img src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="fc-padded-image '.$tip_class.'" alt="'.$_img_title.'" title="'.flexicontent_html::getToolTip($_img_title, 'Click to display the frontend view of this item in a new browser window', 0, 1).'" />';
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
@@ -69,7 +69,7 @@ if ($this->ordering) {
 	$image_saveorder    = '';
 }
 $_img_title = JText::_('MAIN category shown in bold', true);
-$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="fc-padded-image '.$tip_class.'" alt="'.$_img_title.'" title="'.'::'.$_img_title.'" />';
+$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="fc-padded-image '.$tip_class.'" alt="'.$_img_title.'" title="'.flexicontent_html::getToolTip(null, $_img_title, 0, 1).'" />';
 
 if ( !$this->filter_order_type ) {
 	$_img_title = JText::_('FLEXI_ORDER_JOOMLA');
@@ -104,6 +104,7 @@ $date_zone_tip = '<span class="fc-padded-image '.$tip_class.'" data-placement="b
 
 // COMMON repeated texts
 $edit_item_title = JText::_('FLEXI_EDIT_ITEM');
+$edit_cat_title = JText::_('FLEXI_EDIT_CATEGORY');
 $rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER');
 $rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
 $scheduled_for_publication = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION', true );
@@ -343,7 +344,7 @@ window.addEvent('domready', function() {
 	<div id="fc-filters-header">
 		<span class="fc-filter nowrap_box">
 			<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
-			<span class="radio"><?php echo $this->lists['scope']; ?></span>
+			<?php echo $this->lists['scope']; ?>
 		</span>
 		
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
@@ -491,16 +492,16 @@ window.addEvent('domready', function() {
 	
 	<div class="fcclear"></div>
 	
-	<table id="adminListTableFCitems" class="adminlist" cellspacing="1" style="margin-top:12px;">
+	<table id="adminListTableFCitems" class="adminlist fcmanlist">
 	<thead>
 		<tr>
-			<th class="center" style="width:24px;">
+			<th class="center">
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th>
-			<th class="center" style="width:24px;">
+			<th class="center">
 				<input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" />
 			</th>
-			<th class="center" style="width:24px;">&nbsp;</th>
+			<th class="center">&nbsp;</th>
 			<th class="left hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->search) : ?>
@@ -631,13 +632,13 @@ window.addEvent('domready', function() {
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo $items_list_cols; ?>">
+			<td colspan="<?php echo $list_total_cols; ?>">
 				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>
 		
 		<tr>
-			<td colspan="<?php echo $items_list_cols; ?>" style="margin: 0 auto !important; background-color: white;">
+			<td colspan="<?php echo $list_total_cols; ?>" style="margin: 0 auto !important; background-color: white;">
 				<table class="admintable" style="margin: 0 auto !important; background-color: white;">
 					<tr>
 						<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED', true ); ?>" /></td>
@@ -680,6 +681,7 @@ window.addEvent('domready', function() {
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS') ? "%d/%m/%y %H:%M" : $date_format;
 
 		$unpublishableFound = false;
+		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"><td></tr>';  // Collapsed row to allow border styling to apply
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
 			$row = & $this->rows[$i];
@@ -991,7 +993,7 @@ window.addEvent('domready', function() {
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 					if ($this->CanCats) :
 				?>
-					<span class="editlinktip hasTip<?php echo $typeofcats; ?>" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY', true );?>::<?php echo $title; ?>">
+					<span class="<?php echo $typeofcats; ?>" title="<?php echo $edit_cat_title; ?>">
 					<a href="<?php echo $catlink; ?>">
 						<?php
 						if (JString::strlen($title) > 40) {

@@ -28,6 +28,7 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableF
 $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
+$list_total_cols = 10;
 ?>
 <script type="text/javascript">
 
@@ -118,7 +119,9 @@ function delAllFilters() {
 	
 	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>
 	
-	<table id="adminListTableFCtypes" class="adminlist" cellspacing="1" style="margin-top:12px;">
+	<div class="fcclear"></div>
+	
+	<table id="adminListTableFCtypes" class="adminlist fcmanlist">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -137,7 +140,7 @@ function delAllFilters() {
 
 	<tfoot>
 		<tr>
-			<td colspan="10">
+			<td colspan="<?php echo $list_total_cols; ?>">
 				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>
@@ -154,6 +157,8 @@ function delAllFilters() {
 		}
 		
 		$k = 0;
+		
+		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"><td></tr>';  // Collapsed row to allow border styling to apply		$k = 0;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
 			$row = & $this->rows[$i];
@@ -225,13 +230,13 @@ function delAllFilters() {
 				?>
 			</td>
 			<td align="center">
-				<?php echo $row->fassigned; ?>
+				<span class="badge"><?php echo $row->fassigned; ?></span>
 				<a href="<?php echo $fields; ?>">
 				[<?php echo JText::_( 'FLEXI_VIEW_FIELDS' );?>]
 				</a>
 			</td>
 			<td align="center">
-				<?php echo $row->iassigned; ?>
+				<span class="badge badge-info"><?php echo $row->iassigned; ?></span>
 				<a href="<?php echo $items; ?>">
 				[<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>]
 				</a>

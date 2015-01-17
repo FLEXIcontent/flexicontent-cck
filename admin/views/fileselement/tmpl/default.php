@@ -101,7 +101,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 					<tr>
 						<td id="file-title-lbl-container" class="key">
 							<label id="file-title-lbl" for="file-title">
-							<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
+							<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 							</label>
 						</td>
 						<td id="file-title-container">
@@ -168,7 +168,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 					<tr>
 						<td class="key">
 							<label for="file-url-ext">
-							<?php echo JText::_( 'FLEXI_FILEEXT' ); ?>
+							<?php echo JText::_( 'FLEXI_FILEEXT_MIME' ); ?>
 							</label>
 						</td>
 						<td>
@@ -187,7 +187,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 					<tr>
 						<td class="key">
 							<label for="file-url-title">
-							<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
+							<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 							</label>
 						</td>
 						<td>
@@ -262,7 +262,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 			<th width="5"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class=""><?php echo JHTML::_('grid.sort', 'FLEXI_ORIGINAL_FILENAME', 'f.filename_original', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_FILE_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_FILE_DISPLAY_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width=""><?php echo JText::_( 'FLEXI_ACCESS' ); ?></th>
 			<th width=""><?php echo JText::_( 'FLEXI_LANGUAGE' ); ?></th>

@@ -16,6 +16,7 @@
  * GNU General Public License for more details.
  */
 
+// no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.view');
@@ -550,12 +551,12 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($fileid_to_itemids && count($fileid_to_itemids)) {
 			$files_data = $model->getFileData(array_keys($fileid_to_itemids));
 			$file_options = array();
-			$file_options[] = JHTML::_('select.option',  '', ' -- '.JText::_( 'FLEXI_SELECT' ).' '.JText::_( 'FLEXI_FILE' ).' -- ' );
+			$file_options[] = JHTML::_('select.option',  '', '-'/*.JText::_( 'FLEXI_SELECT' ).' '.JText::_( 'FLEXI_FILE' )*/ );
 			foreach($files_data as $_file) {
 				$file_options[] = JHTML::_('select.option', $_file->id, $_file->altname );
 			}
 			flexicontent_html::loadFramework('select2');
-			$lists['filter_fileid'] = ($filter_fileid || 1 ? '<label class="label">'.JText::_('FLEXI_ITEMS_USING').' '.JText::_('FLEXI_FILE').'</label>' : '').
+			$lists['filter_fileid'] = ($filter_fileid || 1 ? '<label class="label label-warning">'.JText::_('FLEXI_ITEMS_USING').' '.JText::_('FLEXI_FILE').'</label>' : '').
 				JHTML::_('select.genericlist', $file_options, 'filter_fileid', 'size="1" class="use_select2_lib" onchange="submitform();"', 'value', 'text', $filter_fileid );
 		}
 		

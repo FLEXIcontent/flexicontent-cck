@@ -204,7 +204,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					<tr>
 						<td class="key">
 							<label for="file-title">
-							<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
+							<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 							</label>
 						</td>
 						<td>
@@ -276,7 +276,7 @@ flexicontent_html::loadFramework('flexi-lib');
 <?php } ?>
 			<th width="5"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_FILE_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_FILE_DISPLAY_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="10%"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
 			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>

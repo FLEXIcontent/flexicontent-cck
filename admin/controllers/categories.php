@@ -54,6 +54,8 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		$this->registerTask( 'orderdown', 	'orderdown' );
 		$this->registerTask( 'orderup', 		'orderup' );
 		$this->registerTask( 'saveorder', 	'saveorder' );
+		$this->registerTask( 'publish', 		'publish' );
+		$this->registerTask( 'unpublish', 	'unpublish' );
 	}
 
 	/**
@@ -99,8 +101,8 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	 */
 	function publish()
 	{
-		if (FLEXI_J16GE)   parent::publish();
-		else               self::changestate(1);
+		//parent::publish();
+		self::changestate(1);  // Go through custom publish to clean FLEXIcontent category cache
 	}
 
 	/**
@@ -112,8 +114,8 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	 */
 	function unpublish()
 	{
-		if (FLEXI_J16GE)   parent::unpublish();
-		else               self::changestate(0);
+		//parent::unpublish();
+		self::changestate(0);  // Go through custom unpublish to clean FLEXIcontent category cache
 	}
 
 	/**
@@ -156,18 +158,18 @@ class FlexicontentControllerCategories extends JControllerAdmin
 			$model = $this->getModel('categories');
 			if( !$model->publish($cid, $state) ) {
 				JError::raiseWarning(500, $model->getError());
-				$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
-				return;
+				$msg = JText::_('Failed');
+			} else {		
+				// set message
+				$msg 	= $state ? JText::_( 'FLEXI_CATEGORY_PUBLISHED') : JText::_( 'FLEXI_CATEGORY_UNPUBLISHED' );
 			}
-			
-			// set message
-			$msg 	= $state ? JText::_( 'FLEXI_CATEGORY_PUBLISHED') : JText::_( 'FLEXI_CATEGORY_UNPUBLISHED' );
 			
 			// clean cache
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
+			//JFactory::getApplication()->enqueueMessage(JText::_( 'Cache cleaned' ), 'message');
 		}
 
 		// redirect to categories management tab
@@ -394,7 +396,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	 * @return void
 	 * @since 1.0
 	 */
-	function getModel()
+	function getModel($name = '', $prefix = '', $config = Array())
 	{
 		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'categories.php');
 		$model = new FlexicontentModelCategories();

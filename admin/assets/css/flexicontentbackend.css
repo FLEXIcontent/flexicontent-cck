@@ -168,12 +168,16 @@ div.current dd .pane-sliders .panel {
 }
 
 
-/******************************************/
-/* Manager filters and filters containers */
-/******************************************/
+/************************************
+ * FLEXIcontent backend manager views
+ ************************************/
 
-/* containers of backend managers */
+/* rows table */
+table.adminlist.fcmanlist {
+	margin-top: 12px;
+}
 
+/* various containers of backend managers */
 .flexicontent #fc-filters-box,
 .flexicontent #mainChooseColBox,
 .flexicontent #stateGroupsBox,
@@ -187,7 +191,6 @@ div.current dd .pane-sliders .panel {
 	padding-left: 0px;
 }
 .tooltip {
-	max-width: 80%!important;
 }
 
 /* text search / pagination line */
@@ -223,6 +226,7 @@ div.current dd .pane-sliders .panel {
 .flexicontent #fc-filters-box .fc-filter .label{
 	font-size: 11px;
 	padding: 4px 4px;
+	margin: 0px 4px;
 }
 
 
@@ -234,6 +238,7 @@ div.current dd .pane-sliders .panel {
 }
 .flexicontent #fc-filters-box input[type="text"] {
 	padding: 2px 2px 3px !important;
+	margin: 0px !important;
 }
 .flexicontent #fc-filters-box .input-append, #fc-filters-box .input-prepend {
 	margin:0px;
@@ -255,6 +260,7 @@ div.current dd .pane-sliders .panel {
 .fc_highlight {
 	color: darkorange !important;
 	font-weight: bold !important;
+	font-size: 11px;
 }
 
 .select2-container .select2-choice.fc_highlight_disabled span,
@@ -271,7 +277,10 @@ div.current dd .pane-sliders .panel {
 }
 
 
-/* FLEXIcontent Dashboard */
+
+/************************
+ * FLEXIcontent Dashboard
+ ************************/
 
 div#fc-dash-boardbtns, /* backend dashboard buttons */
 div#fc-dash-sliders, /* backend dashboard sliders (recent items, etc) */

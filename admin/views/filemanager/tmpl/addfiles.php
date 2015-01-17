@@ -57,7 +57,7 @@ $session = JFactory::getSession();
 				<fieldset>
 					<legend><?php echo JText::_( 'FLEXI_UPLOAD_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
 					<fieldset class="actions">
-						<?php echo JText::_( 'FLEXI_FILE_TITLE' ).': '; ?><input type="text" id="file-upload-name" name="altname" />
+						<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).': '; ?><input type="text" id="file-upload-name" name="altname" />
 						<br /><br />
 						<input type="file" id="file-upload" name="Filedata" />
 						<textarea name="file-desc" cols="23" rows="5" id="file-desc"></textarea>

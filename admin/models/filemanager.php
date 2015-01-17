@@ -238,7 +238,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		if ( $ids_only ) {
 			$columns[] = 'f.id';
 		} else {
-			$columns[] = 'SQL_CALC_FOUND_ROWS f.*, u.name AS uploader';
+			$columns[] = 'SQL_CALC_FOUND_ROWS f.*, u.name AS uploader,'
+				.' CASE WHEN f.filename_original<>"" THEN f.filename_original ELSE f.filename END AS filename_displayed ';
 			if ( $assigned_fields && count($assigned_fields) ) {
 				foreach ($assigned_fields as $field_type) {
 					// Field relation sub query for counting file assignment to this field type
@@ -301,7 +302,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 
 		$filter_order     = $app->getUserStateFromRequest( $option.'.filemanager.filter_order', 		'filter_order', 	'f.filename', 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.filemanager.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-
+		
+		if ($filter_order=='f.filename_displayed') $filter_order = ' CASE WHEN f.filename_original<>"" THEN f.filename_original ELSE f.filename END ';
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', f.filename';
 
 		return $orderby;
@@ -368,7 +370,9 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		
 		if ($search && $filter == 1) {
 			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
-			$where[] = ' LOWER(f.filename) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
+			$where[] = ' (LOWER(f.filename) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false ).
+				' OR LOWER(f.filename_original) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false ).')'
+				;
 		}
 
 		if ($search && $filter == 2) {

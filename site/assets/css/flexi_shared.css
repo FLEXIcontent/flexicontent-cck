@@ -445,26 +445,41 @@ fieldset.tmplprop legend.open {
 	background: url(../images/toggle_blue.png) no-repeat 98% 50%;
 }
 
-/* Backend Listings */
-table.adminlist thead th.left {
-	text-align: left;
-	border-bottom: none;
+
+/**************
+ * Table styles
+ **************/
+
+/* ADMINLIST table, e.g. collapse, white background  */
+table.adminlist {
+	background-color: #fff;
+	border-spacing: 0px !important; /* forced, combines with table, row, cell borders */
+	border-collapse: collapse !important; /* forced */
+	color: #555;
+	width: 100%;
+	margin-bottom: 20px;
 }
-table.adminlist thead th.center {
+
+/* HEAD row, e.g. bottom border only */
+table.adminlist thead tr {
+	border-bottom: 1px solid #aaa !important; /* forced, combines with table, row, cell borders */
+}
+
+/* HEAD cell */
+table.adminlist thead th {
+	background: none repeat scroll 0 0 #fff !important; /* forced, combines with table, row, cell borders */
+	border: none;
+	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
+	color: #555;
 	text-align: center;
-	border-bottom: none;
+	padding: 6px 8px !important; /* allow only specific overrides */
 }
-table.adminlist thead td {
-	background: #fff;
-	color: #666;
-/* 	border-bottom: 1px solid #999; */
-	border-left: 1px solid #fff;
-	vertical-align: middle;
-}
-table.adminlist thead td.left #search,
-table.adminlist thead td.left #filter_id {
-	width: 92%;
-}
+
+table.adminlist thead th.center { text-align: center !important; }
+table.adminlist thead th.left { text-align: left !important; }
+table.adminlist thead a:hover { text-decoration: none; }
+table.adminlist thead th img { padding-left:3px; vertical-align:middle; }
+
 table.adminlist thead td.left .radio {
 	display: block;
 	margin-bottom: 5px;
@@ -472,52 +487,95 @@ table.adminlist thead td.left .radio {
 table.adminlist thead th .filterdel img {
 	vertical-align: bottom;
 }
-table.adminlist thead td.filterbuttons {
-	background-color: #f0f0f0;
-	border-bottom: 1px solid #999;
-}
-table.adminlist thead td.filterbuttons input[type="text"] {
-	background-color: #fff;
-	border-radius: 2px;
-	font-weight: bold;
-	margin-left: 4px;
-}
-table.adminlist thead td.filterbuttons input {
-	background-color: transparent;
-}
-table.adminlist thead td.filterbuttons input:hover {
-	background-color: lightgray;
-}
 
+/* Table cell */
+table.adminlist td {
+	padding: 6px 8px; /* allow only specific overrides */
+}
+table.adminlist input[type="text"] {
+	width: auto !important;  /* enforce to avoid fitting problems */
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+}
+/* Highlighted columns, e.g. filtered */
 table.adminlist td.yellow,
 table.adminlist tbody tr td.yellow,
+table.adminlist tbody tr.row0 td.yellow,
 table.adminlist tbody tr.row1 td.yellow {
-	background-color: #FFFFDD;
+	background-color: #FFFFBB !important;
 }
+table.adminlist tbody th { font-weight: bold; } /* header cell inside tbody */
 
-table.adminlist thead #filter_lang,
-table.adminlist thead #filter_state,
-table.adminlist thead #filter_type { width: 50px !important; }
-table.adminlist thead #filter_authors { width: 120px !important; }
-table.adminlist thead #filter_cats { width: 120px !important; }
-table.adminlist thead #startdate,
-table.adminlist thead #enddate { width: 100px !important; }
-
+/* TR, NO background default align left */
+table.adminlist tbody tr:first-child {
+	border-top: 1px solid #aaa !important; /* forced, combines with table, row, cell borders */
+}
+table.adminlist tbody tr {
+	border-top: 1px solid #dadada !important; /* forced, combines with table, row, cell borders */
+	background-color: #FFFFFF;
+	text-align: left;
+}
+table.adminlist tbody tr.collapsed_row {
+	visibility: collapse;
+}
+/* ORDER column no wrapping and proper alignment */
 table.adminlist td.order {
-	width: 120px !important;
+	text-align: right;
+	white-space: nowrap;
 }
 
-table.adminlist td.order span {
-	width: 16px !important;
+/* TR.row0 TR.row1 differences */
+table.adminlist tbody tr td {
+	background: none repeat scroll 0 0 #FFFFFF;
+	border: none;
+	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
+}
+table.adminlist tbody tr.row1 td {
+	background: none repeat scroll 0 0 #f7f7f7;
 }
 
-table.adminlist th {
-	padding: 4px 4px !important;
+/* Mouse over ROW */
+table.adminlist tbody tr.row0:hover td,
+table.adminlist tbody tr.row1:hover td {
+	text-shadow: 1px 1px 2px #aaa;
+	background-color: #ffffdd;
 }
-table.adminlist td {
-	padding: 2px 4px !important;
+table.adminlist tbody tr:hover td input,
+table.adminlist tbody tr:hover td select {
+	box-shadow: 1px 1px 2px #aaa;
 }
 
+/* FOOTER of table */
+table.adminlist tfoot {
+	border-top: 1px solid #aaa !important; /* forced, combines with table, row, cell borders */
+}
+table.adminlist tfoot tr {
+	color: #333333;
+	text-align: center;
+}
+table.adminlist tfoot td, table.adminlist tfoot th {
+	background-color: #fff;
+	border: none;
+	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
+	text-align: center;
+}
+
+/* ORDER column no wrapping and proper alignment */
+table.adminlist td.order {
+	text-align: right;
+	white-space: nowrap;
+	width: auto !important;
+}
+
+/* IF PAGINATION is inside the table the force center alignment */
+table.adminlist .pagination {
+	display: inline-block;
+	margin: 4px auto 2px;
+	padding: 0;
+}
+
+
+/* various */
 .novalue {
 	color: gray;
 	font-style: italic;
@@ -870,8 +928,8 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	/* important to allow only specific overrides, (remember to do value label too!) */
 	/* padding, margin, border, width must be percentage and must be a total of 100% (including label) */
 	border-width: 0 !important;
-	width: 79% !important;
-	padding: 6px 1% !important;
+	width: 81% !important;
+	padding: 0px 0% 6px !important;
 	margin: 0% !important;
 	float: none !important;
 	
@@ -1093,7 +1151,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 #flexicontent div fieldset.panelform img,
 #flexicontent div fieldset.panelform button,
 div fieldset input, div fieldset textarea, div fieldset select, div fieldset img, div fieldset button {
-	margin: 2px 2px 2px 0px !important;
+	margin: 2px 2px 2px 0px;
 	font-size: 12px;
 }
 #flexicontent div fieldset.panelform input,
@@ -1108,7 +1166,7 @@ div fieldset td input, div fieldset td textarea {
 #flexicontent div fieldset.panelform select,
 div fieldset td input, div fieldset td textarea, div fieldset td select {
 	border-radius:4px;
-	padding:2px 4px;;
+	padding:2px 4px;
 }
 
 #flexicontent .fc_form_title,
@@ -1292,14 +1350,14 @@ fieldset.flexiaccess, fieldset.adminform { margin-bottom: 1em !important; }
 fieldset.flexiaccess { margin-top: 8px; }
 fieldset.flexiaccess legend, fieldset.adminform legend { font-weight:bold; font-size: 14px; }
 
-#flexicontent form :not(.input-prepend):not(.input-append) >input,
+#flexicontent form :not(.input-prepend):not(.input-append):not(.btn-group) >input,
 #flexicontent form button:not(.btn),
 #flexicontent form select,
 #flexicontent form textarea {
 	background-color: #ffffff;
 	border: 1px solid #dddddd;
 	cursor: pointer;
-	margin: 0;
+	margin: 0px 2px 0px 3px;
 	/*padding: 0.1em 0.4em 0.1em 0.2em;*/
 }
 
@@ -1535,3 +1593,38 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 /* Common field CSS for forms */
 #flexicontent .admintable .fcfield_textval { height:22px; line-height:100%; margin-top:0px !important; margin-bottom: 0px!important;  }
 #flexicontent .ui-sortable > li { background-color: white; }
+
+
+/* Table for forms with label styling */
+table.fc-form-tbl td {
+	vertical-align: top;
+	padding: 4px 24px 4px 0px;
+}
+table.fc-form-tbl td.key {
+	text-align: right;
+	padding: 4px 0px;
+	max-width:100px;
+}
+table.fc-form-tbl td.key label.label {
+	padding: 8px 4% !important;
+	width: 84% !important;
+	margin: 0px 4% !important;
+	white-space: normal !important;
+}
+
+legend.tab-inner-title {
+	-webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;
+	font-size:12px;
+	font-family:arial, helvetica, sans-serif;
+	font-weight:bold;
+	text-decoration:none;
+	display:inline-block;
+	text-shadow: 1px 1px 1px rgba(0,0,0,0.6);
+	background-color: #9C9D9E;
+	color:#ffffff;
+	width:auto;
+	font-size:12px;
+	line-height:2em;
+	margin:1px 0 0px -1px;
+	padding:0px 24px 0 20px;
+}

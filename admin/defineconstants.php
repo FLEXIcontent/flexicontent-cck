@@ -82,53 +82,6 @@ if ( !class_exists('JViewLegacy') )
 	class JViewLegacy extends JView {}
 }
 
-if( FLEXI_J30GE )
-{
-	class JParameter{
-		var $params = null;
-		
-		function __construct($string = ''){
-			if(is_array($string)){
-				$this->params = $string;
-			}else{
-				$this->setParams($string);
-			}
-		}
-		
-		function get($k, $v = null){
-			if(array_key_exists($k, $this->params)){
-				return $this->params[$k];
-			}else{
-				return $v;
-			}
-		}
-		
-		function set($k, $v){
-			$this->params[$k] = $v;
-		}
-		
-		function setParams($string = ''){
-			if(strlen(trim(($string))) > 0){
-				$data = json_decode($string, true);
-				$this->params = $data;
-			}
-			if (!$this->params) $this->params = array();
-		}
-		
-		function toString(){
-			return json_encode($this->params);
-		}
-		
-		function toArray(){
-			return $this->params;
-		}
-		
-		function toObject(){
-			return json_decode(json_encode($this->params));
-		}
-	}
-}
-
 // Set a default timezone if web server provider has not done so
 if ( ini_get('date.timezone')=='' && version_compare(PHP_VERSION, '5.1.0', '>'))
 	date_default_timezone_set('UTC');

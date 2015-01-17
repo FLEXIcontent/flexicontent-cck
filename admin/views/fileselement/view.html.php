@@ -278,7 +278,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		//search filter
 		$filters = array();
 		$filters[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_FILENAME' ) );
-		$filters[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_FILE_TITLE' ) );
+		$filters[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ) );
 		$lists['filter'] = JHTML::_('select.genericlist', $filters, 'filter', 'size="1" class="use_select2_lib"', 'value', 'text', $filter );
 
 		//build url/file filterlist

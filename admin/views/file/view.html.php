@@ -37,12 +37,14 @@ class FlexicontentViewFile extends JViewLegacy {
 		$user     = JFactory::getUser();
 		//$authorparams = flexicontent_db::getUserConfig($user->id);
 
-		//add css to document
+		//add css/js to document
+		flexicontent_html::loadFramework('select2');
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
-
+		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/flexi-lib.js' );
+		
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FILE' ), 'fileedit' );
 		

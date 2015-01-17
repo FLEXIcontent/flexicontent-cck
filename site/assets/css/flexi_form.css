@@ -6,7 +6,7 @@
 	font-size:11px !important;
 	display: inline-block !important;
 	/*float: none;*/ /* problem with ... */
-	margin: 2px 2px 1px 3px !important;
+	margin: 1px 2px 1px 3px !important;
 	padding: 4px 2px 5px !important;
 	border-radius: 4px !important;
 }
@@ -19,7 +19,9 @@
 	border-radius: 4px !important;
 	height: auto !important;
 }
-
+.flexicontent textarea, .flexicontent fieldset.radio {
+	margin: 1px 2px 1px 3px;
+}
 .flexicontent form {
 	margin: 0px;
 	padding: 0px;

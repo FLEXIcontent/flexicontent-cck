@@ -56,6 +56,7 @@ if ($this->filter_type == '' || $this->filter_type == 0) {
 	$ord_col = 'typeordering';
 }
 $ord_grp = 1;
+$list_total_cols = 15;
 ?>
 <script type="text/javascript">
 
@@ -161,7 +162,7 @@ function delAllFilters() {
 	
 	<span style="display:none; color:darkred;" class="fc_mini_note_box" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
 	
-	<table id="adminListTableFCfields" class="adminlist" cellspacing="1" style="margin-top:12px;">
+	<table id="adminListTableFCfields" class="adminlist fcmanlist">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -212,7 +213,7 @@ function delAllFilters() {
 
 	<tfoot>
 		<tr>
-			<td colspan="15">
+			<td colspan="<?php echo $list_total_cols; ?>">
 				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>
@@ -233,6 +234,7 @@ function delAllFilters() {
 		$i = 0;
 		$padcount = 0;
 		
+		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"><td></tr>';  // Collapsed row to allow border styling to apply		$k = 0;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
 			$row = & $this->rows[$i];
@@ -346,7 +348,7 @@ function delAllFilters() {
 			}
 			
 			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
-			$warning	= '<span class="hasTip" title="'. JText::_ ( 'FLEXI_WARNING' ) .'::'. JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/warning.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
+			$orphan_warning	= '<span class="'.$tip_class.'" title="'. flexicontent_html::getToolTip('FLEXI_WARNING', 'FLEXI_NO_TYPES_ASSIGNED', 1, 1) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/warning.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
    		?>
 		<tr class="<?php echo "row$k"; ?>" style="<?php echo $row_css; ?>">
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
@@ -496,7 +498,9 @@ function delAllFilters() {
 				-
 				<?php endif; ?>
 			</td>
-			<td align="center"><?php echo $row->nrassigned ? $row->nrassigned : $warning; ?></td>
+			<td align="center">
+				<?php echo $row->nrassigned ? '<span class="badge badge-info">'.$row->nrassigned.'</span' : $orphan_warning; ?></span>
+			</td>
 			<td align="center">
 				<?php echo $access; ?>
 			</td>

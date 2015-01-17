@@ -534,6 +534,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$count_vals = 0;  // Count non-empty sortable records added
 		$image_added = false;
 		$skipped_vals = array();
+		$uploadLimitsTxt = $this->getUploadLimitsTxt($field);
 		foreach ($field->value as $value)
 		{
 			$value = unserialize($value);
@@ -691,8 +692,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						<td class="key fckey_high">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
 						<td style="white-space: normal;">'.
 							'<input name="'.$field->name.'['.$n.']" id="'.$elementid_n.'_newfile"  class="newfile no_value_selected" '.$onchange.' type="file" /><br/>' .
-							'<b>'.JText::_( 'FLEXI_FIELD_MAXSIZE' ).'</b>: '.($field->parameters->get('upload_maxsize') / 1000000).' MBs &nbsp; - &nbsp; <br/>' .
-							'<b>'.JText::_( 'FLEXI_FIELD_ALLOWEDEXT' ).'</b>: '.str_replace(",", ", ", $field->parameters->get('upload_extensions')) .'
+							$uploadLimitsTxt.
+							'<br/><span class="label label-info">'.JText::_( 'FLEXI_FIELD_ALLOWEDEXT' ).'</span>'.
+							'<span style="margin-left:12px;">'.str_replace(",", ", ", $field->parameters->get('upload_extensions')) .'</span>
 						</td>
 					</tr>
 					<tr class="img_existingfile_row">
@@ -1465,7 +1467,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			// For galleries that are not inline/special, we can have inline text ??
 			$inline_info = '';
-			if ( !($usepopup == 5 || $usepopup == 7) )
+			if ( $linkto_url || ($prop=='display_large' || $prop=='display_original') || !$usepopup || ($popuptype != 5 && $popuptype != 7) )
 			{
 				// Add inline display of title/desc
 				if ( ($showtitle && $title ) || ($showdesc && $desc) )
@@ -1534,7 +1536,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				// CASE 2: // No gallery code ... just apply pretext/posttext
 				$field->{$prop}[] = $pretext.$img_legend.$inline_info.$posttext;
 				
-			} else if ($usepopup == 5 || $usepopup == 7) {
+			} else if ($popuptype == 5 || $popuptype == 7) {
 			
 				// CASE 3: Inline/special galleries OR --> GALLERIES THAT NEED SPECIAL ENCLOSERS
 				// !!! ... pretext/posttext/inline_info/etc not meaningful or not supported or not needed
@@ -2726,4 +2728,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		return $itemid_list;
 	}
 	
+	function getUploadLimitsTxt(&$field) {
+		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+		
+		$upload_maxsize = $field->parameters->get('upload_maxsize');
+		$phpUploadLimit = flexicontent_upload::getPHPuploadLimit();
+		$sys_limit_class = ($phpUploadLimit['value'] < $upload_maxsize) ? 'badge-warning' : '';
+		
+		return '<span class="label label-info">'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span>'
+			.'<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip('FLEXI_CONF_UPLOAD_MAX_LIMIT', 'FLEXI_CONF_UPLOAD_MAX_LIMIT_DESC', 1, 1).'">'.$hintmage.'</span>'
+			.'<span class="badge badge">'.round($upload_maxsize / (1024*1024), 2).' M </span>'
+			.'<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SERVER_UPLOAD_MAX_LIMIT'), JText::sprintf('FLEXI_SERVER_UPLOAD_MAX_LIMIT_DESC', $phpUploadLimit['name']), 0, 1).'">'.$hintmage.'</span>'
+			.'<span class="badge '.$sys_limit_class.'">'.round($phpUploadLimit['value'] / (1024*1024), 2).' M </span>'
+			;
+	}
 }
