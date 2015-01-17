@@ -33,13 +33,13 @@
 			</field>
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
-			<field name="carousel_content_layout_feat" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
+			<field name="carousel_content_layout_feat" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
 				<option value="2">Cleared (Above)</option>
 				<option value="3">Cleared (Below)</option>
 				<option value="4">Overlayed (Top)</option>
-				<option value="5">Overlayed (Bottom **)</option>
+				<option value="5">Overlayed (Bottom)</option>
 				<option value="6">Overlayed (Full)</option>
 			</field>
 			<field name="carousel_content_display_feat" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
@@ -68,13 +68,13 @@
 			
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
-			<field name="carousel_content_layout" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
+			<field name="carousel_content_layout" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
 				<option value="2">Cleared (Above)</option>
 				<option value="3">Cleared (Below)</option>
 				<option value="4">Overlayed (Top)</option>
-				<option value="5">Overlayed (Bottom **)</option>
+				<option value="5">Overlayed (Bottom)</option>
 				<option value="6">Overlayed (Full)</option>
 			</field>
 			<field name="carousel_content_display" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
