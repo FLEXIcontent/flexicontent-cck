@@ -51,13 +51,36 @@ class FlexicontentViewStats extends JViewLegacy
 		$votesstats	= $this->get( 'Votesstats' );
 		$creators   = $this->get( 'Creators' );
 		$editors    = $this->get( 'Editors' );
+
+		// ************************************************** New data*********************************************************************************************************************//
+		$itemsgraph  			   = $this->get('Itemsgraph');
+		$unpopular   			   = $this->get('Unpopular');
+		$totalitemspublish         = $this->get('Itemspublish');
+		$totalitemsunpublish       = $this->get('Itemsunpublish');
+		$totalitemswaiting         = $this->get('Itemswaiting');
+		$totalitemsprogress        = $this->get('Itemsprogress');
+		$metadescription           = $this->get('Itemsmetadescription');
+		$metakeywords              = $this->get('Itemsmetakeywords');
+		
+		// ************************************************** New data*********************************************************************************************************************//
 		
 		//add css and submenu to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
+
+
+
+
+		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
+		$document->addStyleSheet('//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
+		$document->addScript(JURI::base().'components/com_flexicontent/assets/js/esl.js');
+		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		
+
+
+
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
 		
@@ -93,13 +116,25 @@ class FlexicontentViewStats extends JViewLegacy
 		}
 		$this->assignRef('genstats'		, $genstats);
 		$this->assignRef('popular'		, $popular);
-		$this->assignRef('rating'			, $rating);
-		$this->assignRef('worstrating', $worstrating);
+		$this->assignRef('rating'		, $rating);
+		$this->assignRef('worstrating'  , $worstrating);
 		$this->assignRef('favoured'		, $favoured);
 		$this->assignRef('statestats'	, $statestats);
 		$this->assignRef('votesstats'	, $votesstats);
 		$this->assignRef('creators'		, $creators);
 		$this->assignRef('editors'		, $editors);
+
+		// ************************************************** New data*********************************************************************************************************************//
+		$this->assignRef('itemsgraph'		  , $itemsgraph);
+		$this->assignRef('unpopular'		  , $unpopular);
+		$this->assignRef('totalitemspublish'  , $totalitemspublish);
+		$this->assignRef('totalitemsunpublish', $totalitemsunpublish);
+		$this->assignRef('totalitemswaiting'  , $totalitemswaiting);
+		$this->assignRef('totalitemsprogress' , $totalitemsprogress);
+		$this->assignRef('metadescription'    , $metadescription);
+		$this->assignRef('metakeywords'    , $metakeywords);
+		
+		// ************************************************** New data*********************************************************************************************************************//
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
