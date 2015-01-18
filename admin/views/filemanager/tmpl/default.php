@@ -46,7 +46,25 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 
 $list_total_cols = 14;
 ?>
+<script type="text/javascript">
 
+// delete active filter
+function delFilter(name)
+{
+	//window.console.log('Clearing filter:'+name);
+	var myForm = jQuery('#adminForm');
+	var filter = jQuery('#'+name);
+	if (filter.attr('type')=='checkbox')
+		filter.checked = '';
+	else
+		filter.val('');
+}
+
+function delAllFilters() {
+	delFilter('search'); delFilter('filter_state');  delFilter('filter_access');
+}
+
+</script>
 <div id="flexicontent" class="flexicontent">
 
 <?php if (!empty( $this->sidebar)) : ?>
