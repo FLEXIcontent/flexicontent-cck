@@ -72,10 +72,9 @@ class FlexicontentViewStats extends JViewLegacy
 
 
 
-
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		$document->addStyleSheet('//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
-		$document->addScript(JURI::base().'components/com_flexicontent/assets/js/esl.js');
+		$document->addScript(JURI::root().'components/com_flexicontent/librairies/esl/esl.js');
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		
 
@@ -116,8 +115,8 @@ class FlexicontentViewStats extends JViewLegacy
 		}
 		$this->assignRef('genstats'		, $genstats);
 		$this->assignRef('popular'		, $popular);
-		$this->assignRef('rating'		, $rating);
-		$this->assignRef('worstrating'  , $worstrating);
+		$this->assignRef('rating'			, $rating);
+		$this->assignRef('worstrating', $worstrating);
 		$this->assignRef('favoured'		, $favoured);
 		$this->assignRef('statestats'	, $statestats);
 		$this->assignRef('votesstats'	, $votesstats);

@@ -209,6 +209,9 @@ table.adminlist.fcmanlist {
 	padding:0px !important;
 	margin: 2px 48px 6px 0px;
 }
+.flexicontent #fc-filters-header .use_select2_lib {
+	margin-top: 1px !important;
+}
 
 
 /* filters line */
@@ -272,8 +275,12 @@ table.adminlist.fcmanlist {
 }
 
 /* a little larger icons */
-.flexicontent .icon-publish, .icon-cancel {
-	font-size: 14px;
+.flexicontent [class^="icon-"] {
+	/*font-size: 14px;*/
+}
+.flexicontent #fc-filters-box [class^="icon-arrow-"] {
+	vertical-align: middle;
+	font-size: 18px;
 }
 
 

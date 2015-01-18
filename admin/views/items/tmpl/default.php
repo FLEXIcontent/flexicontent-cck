@@ -27,7 +27,7 @@ $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &
 .'<img src="components/com_flexicontent/assets/images/plus-button.png" /><sup>[5]</sup>'
 .'</a> &nbsp; '
 ;
-$end_text = '<div class="icon-cancel" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
+$end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCitems', $start_text, $end_text);
 
 global $globalcats;
@@ -330,7 +330,7 @@ window.addEvent('domready', function() {
 <?php endif; ?>
 
 
-<form action="index.php" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=<?php echo $this->option; ?>&view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
@@ -343,15 +343,19 @@ window.addEvent('domready', function() {
 
 	<div id="fc-filters-header">
 		<span class="fc-filter nowrap_box">
-			<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 			<?php echo $this->lists['scope']; ?>
+			<div class="btn-wrapper input-append" style="margin:0;">
+				<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
+				<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
+				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="delAllFilters();this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
+			</div>
 		</span>
 		
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
 		<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
-		<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
-		<input type="button" id="fc_stateGroupsBox_btn" class="<?php echo $_class.($this->filter_stategrp || $this->filter_catsinstate!=1 ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('stateGroupsBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
-		<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+			<input type="button" id="fc_stateGroupsBox_btn" class="<?php echo $_class.($this->filter_stategrp || $this->filter_catsinstate!=1 ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('stateGroupsBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
+			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
 		</div>
 		
 		<span class="fc-filter nowrap_box">
@@ -430,12 +434,7 @@ window.addEvent('domready', function() {
 			<?php echo $this->lists['filter_order_type']; ?>
 		</span>
 		
-		<span class="fc-filter nowrap_box">
-			<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_GO'/*'FLEXI_APPLY_FILTERS'*/ ); ?>" />
-			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_CLEAR'/*'FLEXI_RESET_FILTERS'*/ ); ?>" />
-		</span>
-		
-		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 	
 	<div id="stateGroupsBox" class="fc_mini_note_box floated well well-small" <?php if (!$this->filter_stategrp && $this->filter_catsinstate==1) echo 'style="display:none;"'; ?> >
@@ -462,7 +461,7 @@ window.addEvent('domready', function() {
 		<span class="radio"><?php echo $this->lists['filter_catsinstate']; ?></span>
 		</div>
 		
-		<div class="icon-cancel" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('stateGroupsBox', document.getElementById('fc_stateGroupsBox_btn'), 'btn-primary');"></div>
+		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('stateGroupsBox', document.getElementById('fc_stateGroupsBox_btn'), 'btn-primary');"></div>
 	</div>
 	
 	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>

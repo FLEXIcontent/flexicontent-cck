@@ -116,7 +116,14 @@ class FlexicontentModelStats extends JModelLegacy
 		
 		return $_items;
 	}
-
+	
+	
+	/**
+	* Method to get items counts per month
+	*
+	* @access public
+	* @return array
+	*/
 	function getItemsgraph(){
 		$_items = array();
 
@@ -498,14 +505,14 @@ class FlexicontentModelStats extends JModelLegacy
 	}
 
 	/**
-	 * Method to get published items
+	 * Method to get item count of published items
 	 *
 	 * @access public
 	 * @return array
 	 */
 	function getItemspublish()
 	{
-		$query = 'SELECT COUNT(i.state) AS itemspub '
+		$query = 'SELECT COUNT(*) AS itemspub '
 			. ' FROM #__content AS i'
 			. ' WHERE i.state = 1'
 			;
@@ -517,14 +524,14 @@ class FlexicontentModelStats extends JModelLegacy
 	}
 
 	/**
-	 * Method to get items unpublished
+	 * Method to get item count of unpublished items
 	 *
 	 * @access public
 	 * @return array
 	 */
 	function getItemsunpublish()
 	{
-		$query = 'SELECT COUNT(i.state) AS itemsunpub '
+		$query = 'SELECT COUNT(*) AS itemsunpub '
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid = c.id'
 			. ' WHERE i.state = 0'
@@ -536,14 +543,14 @@ class FlexicontentModelStats extends JModelLegacy
 		return $itemsunpub;
 	}
 	/**
-	 * Method to get item in waiting approval
+	 * Method to get item count of items waiting approval
 	 *
 	 * @access public
 	 * @return array
 	 */
 	function getItemswaiting()
 	{
-		$query = 'SELECT COUNT(i.state) AS itemswaiting '
+		$query = 'SELECT COUNT(*) AS itemswaiting '
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid = c.id'
 			. ' WHERE i.state = -3'
@@ -556,14 +563,14 @@ class FlexicontentModelStats extends JModelLegacy
 	}
 
 	/**
-	 * Method to get items in progress
+	 * Method to get item count of items in progress
 	 *
 	 * @access public
 	 * @return array
 	 */
 	function getItemsprogress()
 	{
-		$query = 'SELECT COUNT(i.state) AS itemsprogress '
+		$query = 'SELECT COUNT(*) AS itemsprogress '
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid = c.id'
 			. ' WHERE i.state = -5'
@@ -576,14 +583,14 @@ class FlexicontentModelStats extends JModelLegacy
 	}
 
 	/**
-	 * Method to get Meta description
+	 * Method to get item count of items without Meta-Description
 	 *
 	 * @access public
 	 * @return array
 	 */
 	function getItemsmetadescription()
 	{
-		$query = 'SELECT COUNT(i.state) AS itemsmetadesc '
+		$query = 'SELECT COUNT(*) AS itemsmetadesc '
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid = c.id'
 			. ' WHERE i.metadesc = ""'
@@ -596,7 +603,7 @@ class FlexicontentModelStats extends JModelLegacy
 	}
 
 	/**
-	 * Method to get Meta Keywords
+	 * Method to get without Meta Keywords
 	 *
 	 * @access public
 	 * @return array

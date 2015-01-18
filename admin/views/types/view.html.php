@@ -167,7 +167,10 @@ class FlexicontentViewTypes extends JViewLegacy
 		$this->assignRef('lists'	, $lists);
 		$this->assignRef('rows'		, $rows);
 		$this->assignRef('pagination'	, $pagination);
-
+		
+		$this->assignRef('option', $option);
+		$this->assignRef('view', $view);
+		
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}

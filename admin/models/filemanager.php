@@ -323,9 +323,9 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
 
-		$filter 	= $app->getUserStateFromRequest( $option.'.filemanager.filter', 'filter', 1, 'int' );
-		$search 	= $app->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
-		$search 	= trim( JString::strtolower( $search ) );
+		$scope 	= $app->getUserStateFromRequest( $option.'.filemanager.filter', 'scope', 1, 'int' );
+		$search	= $app->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
+		$search	= trim( JString::strtolower( $search ) );
 		
 		$filter_lang		= $app->getUserStateFromRequest( $option.'.filemanager.filter_lang', 		'filter_lang', 		'', 		'string' );
 		$filter_uploader= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader','filter_uploader',0,			'int' );
@@ -368,14 +368,14 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$where[] = ' ext = ' . $this->_db->Quote( $filter_ext );
 		}
 		
-		if ($search && $filter == 1) {
+		if ($search && $scope == 1) {
 			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
 			$where[] = ' (LOWER(f.filename) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false ).
 				' OR LOWER(f.filename_original) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false ).')'
 				;
 		}
 
-		if ($search && $filter == 2) {
+		if ($search && $scope == 2) {
 			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
 			$where[] = ' LOWER(f.altname) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
 		}

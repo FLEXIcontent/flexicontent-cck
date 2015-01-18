@@ -31,28 +31,31 @@ $ctrl_users = FLEXI_J16GE ? "task=users." : "controller=users&amp;task=";
 	<div id="j-main-container">
 <?php endif;?>
 
-<?php /*****************************************Load libraries********************************************************/ ?>
-    <script type="text/javascript">
-        require.config({
-            packages: [
-                {
-                    name: 'echarts',
-                    location: 'components/com_flexicontent/assets/echarts',
-                    main: 'echarts'
-                },
-                {
-                    name: 'zrender',
-                    location: 'http://ecomfe.github.io/zrender/src',
-                    //location: '../../../zrender/src', // I don't know why it does not work with this
-                    main: 'zrender'
-                }
-            ]
-        });
-
-
-    </script>
-    <?php /*****************************************Load libraries********************************************************/ ?>
-
+<?php
+// BOF: Load echart libraries
+if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_COMPONENT.DS.'assets'.DS.'zrender')) :
+?>
+<script type="text/javascript">
+    require.config({
+        packages: [
+            {
+                name: 'echarts',
+                location: 'components/com_flexicontent/assets/echarts',
+                main: 'echarts'
+            },
+            {
+                name: 'zrender',
+                location: 'http://ecomfe.github.io/zrender/src',
+                //location: '../../../zrender/src', // I don't know why it does not work with this
+                main: 'zrender'
+            }
+        ]
+    });
+</script>
+<?php 
+endif;
+// EOF: Load echart libraries
+?>
 
 <?php
 echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
@@ -409,6 +412,10 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_USER_STATS' ), 'users
 
 <?php
 echo FLEXI_J16GE ? '' : $this->pane->endPanel();
+
+// BOF: statistics that use ECHART
+if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_COMPONENT.DS.'assets'.DS.'zrender')) :
+
 echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_DASHBOARD' ), 'ratings' ) : $this->pane->startPanel( JText::_( 'FLEXI_DASHBOARD' ), 'ratings' ) ;
 ?>
 <div class="clear clearfix"></div>
@@ -1064,6 +1071,10 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_DASHBOARD' ), 'rating
 
 <?php
 echo FLEXI_J16GE ? '' : $this->pane->endPanel();
+
+endif;
+// EOF: statistics that use ECHART
+
 echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane();
 ?>
 

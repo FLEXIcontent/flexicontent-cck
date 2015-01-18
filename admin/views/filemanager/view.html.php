@@ -64,8 +64,8 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		if ($filter_url) $count_filters++; if ($filter_secure) $count_filters++;
 		if ($filter_ext) $count_filters++; if ($filter_item) $count_filters++;
 		
-		$filter = $app->getUserStateFromRequest( $option.'.'.$view.'.filter', 			'filter', 			1, 	'int' );
-		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
+		$scope  = $app->getUserStateFromRequest( $option.'.'.$view.'.scope', 			'scope', 			1, 	'int' );
+		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 		'search', 		'', 'string' );
 		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
 		if (strlen($search)) $count_filters++;
 		
@@ -162,7 +162,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$filters = array();
 		$filters[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_FILENAME' ) );
 		$filters[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ) );
-		$lists['filter'] = JHTML::_('select.genericlist', $filters, 'filter', 'size="1" class="use_select2_lib fc_skip_highlight"', 'value', 'text', $filter );
+		$lists['scope'] = JHTML::_('select.genericlist', $filters, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"', 'value', 'text', $scope );
 
 		//build url/file filterlist
 		$url 	= array();
@@ -229,6 +229,9 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$this->assignRef('assigned_fields_labels' , $assigned_fields_labels);
 		$this->assignRef('assigned_fields_icons'  , $assigned_fields_icons);
 		$this->assignRef('langs', $langs);
+		
+		$this->assignRef('option', $option);
+		$this->assignRef('view', $view);
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);

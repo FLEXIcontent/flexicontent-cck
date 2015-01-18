@@ -488,7 +488,7 @@ class FlexicontentViewItems extends JViewLegacy
 			$_scopes[] = JHTML::_('select.option', $i, $v);
 		}
 		//$lists['scope'] = JHTML::_('select.radiolist', $_scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );
-		$lists['scope'] = JHTML::_('select.genericlist', $_scopes, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight"', 'value', 'text', $scope, 'scope' );
+		$lists['scope'] = JHTML::_('select.genericlist', $_scopes, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"', 'value', 'text', $scope, 'scope' );
 		/*$lists['scope']  = '';
 		foreach ($scopes as $i => $v) {
 			$checked = $scope == $i ? ' checked="checked" ' : '';
@@ -598,6 +598,9 @@ class FlexicontentViewItems extends JViewLegacy
 		$this->assignRef('date'				, $date);
 		$this->assignRef('startdate'	, $startdate);
 		$this->assignRef('enddate'		, $enddate);
+		
+		$this->assignRef('option', $option);
+		$this->assignRef('view', $view);
 
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
