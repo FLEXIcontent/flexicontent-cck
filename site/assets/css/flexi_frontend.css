@@ -624,8 +624,8 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html input.fc_field_filter,
 .fc_filter_html input.fc_text_filter:focus,
 .fc_filter_html input.fc_field_filter:focus {
-	height: 14px !important;
-	line-height: 14px !important;
+	height: auto;
+	line-height: 150%;
 	padding: 6px 26px 7px 4px !important;
 	margin: 3px 4px 4px 8px !important;
 	position: relative;
@@ -636,7 +636,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	background: url(../images/magnifier-left.png) 96% 4px no-repeat white;
 	opacity: 0.5; filter:alpha(opacity=50);
 	min-width: 120px !important;
-	vertical-align: middle;
+	vertical-align: top;
 }
 .fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_field_filter,

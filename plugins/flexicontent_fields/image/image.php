@@ -1493,10 +1493,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 				$field->{$prop}[] =
-				'<span style="display: inline-block;">
+				'<span style="display: inline-block; text-align:center; ">
 					<a href="'.$item_link.'" style="display: inline-block;">
 					'.$img_nolegend.'
-					</a>'
+					</a><br/>'
 					.($_method == 'display_single_total' ? '
 					<span class="fc_img_total_data badge badge-info" style="display: inline-block;" >
 						'.count($values).' '.JText::_('FLEXI_IMAGES').'
