@@ -163,7 +163,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 
 			$oldbetafiles			= true; //$model->getOldBetaFiles();
 			$nooldfieldsdata	= $model->getNoOldFieldsData();
-			$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
+			$missingversion		= true; //!$use_versioning || !$model->checkCurrentVersionData();
 			$cachethumb				= $model->getCacheThumbChmod();
 			
 			$existdbindexes    = ! (boolean) ($missingindexes = $model->getExistDBindexes($check_only=false));

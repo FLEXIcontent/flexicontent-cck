@@ -326,8 +326,8 @@ class ParentClassItem extends JModelAdmin
 		// Check if loading specific VERSION and generate version related messages
 		// ***********************************************************************
 		
-		$current_version = FLEXIUtilities::getCurrentVersions($this->_id, true, $force=true); // Get current item version
-		$last_version    = FLEXIUtilities::getLastVersions($this->_id, true, $force=true);    // Get last version (=latest one saved, highest version id)
+		$current_version = (int) FLEXIUtilities::getCurrentVersions($this->_id, true, $force=true); // Get current item version
+		$last_version    = (int) FLEXIUtilities::getLastVersions($this->_id, true, $force=true);    // Get last version (=latest one saved, highest version id)
 		
 		// -- Decide the version to load: (a) the one specified or (b) UNversioned data (these should be same as current version data) or (c) the latest one
 		if ( !$use_versioning ) {
@@ -657,7 +657,7 @@ class ParentClassItem extends JModelAdmin
 			// Overwrite item fields with the requested VERSION data
 			// *****************************************************
 			$item->current_version = $current_version; 
-			$item->last_version = $last_version; 
+			$item->last_version    = $last_version; 
 			if ($use_versioning && $version) 
 			{
 				// Overcome possible group concat limitation
@@ -838,6 +838,7 @@ class ParentClassItem extends JModelAdmin
 				require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'flexicontent.php');
 				$fleximodel = new FlexicontentModelFlexicontent();
 				$fleximodel->addCurrentVersionData($item->id);
+				$item->last_version = $last_version = $current_version;
 			}
 		}
 		
@@ -2035,8 +2036,8 @@ class ParentClassItem extends JModelAdmin
 		// ****************************************************************************************************************
 		// Get version info, force version approval ON is versioning disabled, and decide new item's current version number
 		// ****************************************************************************************************************
-		$last_version = FLEXIUtilities::getLastVersions($item->id, true);
-		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
+		$current_version = (int) FLEXIUtilities::getCurrentVersions($item->id, true);
+		$last_version    = (int) FLEXIUtilities::getLastVersions($item->id, true);
 		
 		// (a) Force item approval when versioning disabled
 		$data['vstate'] = ( !$use_versioning ) ? 2 : $data['vstate'];
@@ -2288,7 +2289,7 @@ class ParentClassItem extends JModelAdmin
 		$cparams    = $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$print_logging_info = $cparams->get('print_logging_info');
-		$last_version = FLEXIUtilities::getLastVersions($item->id, true);
+		$last_version = (int) FLEXIUtilities::getLastVersions($item->id, true);
 		$mval_query = true;
 		
 		if ( $print_logging_info ) global $fc_run_times;
