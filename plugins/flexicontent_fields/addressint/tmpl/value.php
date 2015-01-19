@@ -17,7 +17,7 @@ $field_suffix 	= $this->getParam('field_suffix','');
 // get view
 $view = JRequest::getVar('view');
 // get value
-$values = $values[0] ;
+$address = & $values[0];
 // generate map
 $map = '';
 if(($view=='category' && ($show_map=='category' || $show_map=='both')) || ($view!='category' && ($show_map=='item' || $show_map=='both'))) {

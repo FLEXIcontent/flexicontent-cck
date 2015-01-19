@@ -1681,6 +1681,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			//$max_width = $field->parameters->get( 'w_l', 800 );
 			
 			// this should be size of previewer aka size of large image thumbnail
+			$uid = 'es_'.$field->name."_fcitem".$item->id;
 			$field->{$prop} = '
 			<div id="rg-gallery_'.$uid.'" class="rg-gallery" >
 				<div class="rg-thumbs">

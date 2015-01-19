@@ -112,15 +112,16 @@ class plgFlexicontent_fieldsAddressint extends FCField {
 		// Serialize multi-property data before storing them into the DB
 		$post = serialize($post);
 	}
-
+	
+	
 	/*function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// displays the field in the frontend
-		
-		$field->label = JText::_($field->label);
 		if ( !in_array($field->field_type, self::$field_types) ) return;
+		$field->label = JText::_($field->label);
+		
 		$this->setField($field);
 		$this->setItem($item);
-		$this->display();
+
+		$this->display($values, $prop);
 	}*/
 }

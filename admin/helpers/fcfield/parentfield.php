@@ -108,11 +108,11 @@ class FCField extends JPlugin{
 	public function onDisplayField(&$field, &$item) {
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
+		$field->label = JText::_($field->label);
+		
 		$this->setField($field);
 		$this->setItem($item);
 		
-		$field->label = JText::_($field->label);
-
 		$this->displayField();
 	}
 	
@@ -120,10 +120,12 @@ class FCField extends JPlugin{
 	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display') {
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
+		$field->label = JText::_($field->label);
+		
 		$this->setField($field);
 		$this->setItem($item);
 
-		$this->display();
+		$this->display($values, $prop);
 	}
 	
 	// Method to handle field's values before they are saved into the DB
@@ -194,7 +196,8 @@ class FCField extends JPlugin{
 	 *
 	 * @since   1.5
 	 */
-	public static function getLayoutPath($plg, $layout = 'field') {
+	public static function getLayoutPath($plg, $layout = 'field')
+	{
 		$template = JFactory::getApplication('site')->getTemplate();
 		$defaultLayout = $layout;
 
@@ -243,18 +246,8 @@ class FCField extends JPlugin{
 		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'closetag', '' ), 'closetag' );
 	}
 	
-	/**
-	 * Display FLEXIConetnet field
-	 *
-	 * @param   string  $field  The field object
-	 * @param   string  $item  The item object of this field
-	 * @param   string  $params  The parameters object of this field
-	 *
-	 * @return
-	 *
-	 * @since   3.3
-	 */
-	public function displayField($params=NULL) {
+	public function displayField()
+	{
 		$values = $this->parseValues($this->field->value);
 		$field = $this->getField();
 		$item = $this->getItem();
@@ -263,8 +256,10 @@ class FCField extends JPlugin{
 		$field->html = @ob_get_clean();
 	}
 	
-	public function display($prop='display', $params=NULL) {
-		$values = $this->parseValues($this->field->value);
+	public function display(&$values=null, $prop='display')
+	{
+		$values = $values ? $values : $this->field->value;
+		$this->parseValues($values);
 		$field = $this->getField();
 		$item = $this->getItem();
 		$this->field->{$prop} = array();
@@ -285,12 +280,15 @@ class FCField extends JPlugin{
 		}*/
 	}
 	
-	public function parseValues($values) {
-		if(empty($values)) return array();
-		$pvalues = array();
-		foreach($values as $k=>$v) {
-			$pvalues[$k] = unserialize($v);
+	public function parseValues(&$values)
+	{
+		if (empty($values)) {
+			$values = array();
+			return;
 		}
-		return $pvalues;
+		foreach($values as $k => &$v) {
+			$v = unserialize($v);
+		}
+		unset($v);
 	}
 }

@@ -905,7 +905,7 @@ class ParentClassItem extends JModelAdmin
 		// Retrieve item if not already done, (loading item should been done by the view !), but:
 		// 1) allow maintaining existing value:   $no_cache=false
 		// 2) load by default the last saved version:   $force_version=-1   means latest (last saved) version)
-		$this->getItem(null, $check_view_access=false, $no_cache=false, $force_version=-1);
+		$this->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);
 		
 		// *********************************************************
 		// Prepare item data for being loaded into the form:
@@ -1033,7 +1033,7 @@ class ParentClassItem extends JModelAdmin
 		JFactory::getApplication()->setUserState('com_flexicontent.edit.'.$this->getName().'.data', false);
 		
 		if (empty($data)) {
-			$data = $this->getItem();
+			$data = $this->_item ? $this->_item : $this->getItem();
 		} else {
 			//print_r($data);
 			// Split text to introtext & fulltext

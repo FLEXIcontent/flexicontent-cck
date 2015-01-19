@@ -516,26 +516,39 @@ class FlexicontentModelItems extends JModelLegacy
 		$this->_db->setQuery($query);
 		$this->_db->query();
 		
+		
+		$query = "SHOW VARIABLES LIKE '%max_allowed_packet%'";
+		$this->_db->setQuery($query);
+		$_dbvariable = $this->_db->loadObject();
+		$max_allowed_packet = flexicontent_upload::parseByteLimit(@ $_dbvariable->Value);
+		$max_allowed_packet = $max_allowed_packet ? $max_allowed_packet : 256*1024;
+		$query_lim = (int) (3 * $max_allowed_packet / 4);
+		
 		// Insert items_ext datas,
 		// NOTE: we will not use a single query for creating multiple records, instead we will create only e.g. 100 at once,
 		// because of the column search_index which can be quite long
 		$itemext = array();
 		$id_arr  = array();
 		$row_count = count($rows);
-		$n = 0;
-		foreach ($rows as $row) {
+		$n = 0; $i = 0;
+		$query_len = 0;
+		foreach ($rows as $row)
+		{
 			if (FLEXI_J16GE) $ilang = $row->language ? $row->language : $default_lang;
 			else $ilang = $default_lang;  // J1.5 has no language setting
-			$itemext[] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.$row->text_stripped).', '.(int)$row->id.')';
-			$id_arr[] = (int)$row->id;
-			$n++;
-			if ( ($n%101 == 0) || ($n==$row_count) ) {
+			$itemext[$i] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.$row->text_stripped).', '.(int)$row->id.')';
+			$id_arr[$i] = (int)$row->id;
+			$query_len += strlen($itemext[$i]) + 2;  // Sum of query length so far
+			$n++; $i++;
+			if ( ($n%101 == 0) || ($n==$row_count) || ($query_len > $query_lim ))
+			{
 				$itemext_list = implode(', ', $itemext);
 				$query = "INSERT INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`, `lang_parent_id`)"
 						." VALUES " . $itemext_list
 						." ON DUPLICATE KEY UPDATE type_id=VALUES(type_id), language=VALUES(language), search_index=VALUES(search_index)";
 				$this->_db->setQuery($query);
 				$this->_db->query();
+				// reset the item array
 				$itemext = array();
 				
 				$query = "UPDATE #__flexicontent_items_tmp"
@@ -543,6 +556,11 @@ class FlexicontentModelItems extends JModelLegacy
 					." WHERE id IN(".implode(',',$id_arr).")";
 				$this->_db->setQuery($query);
 				$this->_db->query();
+				// reset the item id array
+				$id_arr = array();
+				
+				$i = 0; // reset sub-counter, and query length
+				$query_len = 0;
 			}
 		}
 		// Update temporary item data
