@@ -26,6 +26,7 @@ class FCField extends JPlugin{
 	protected $fieldtypes = NULL;
 	protected $field = NULL;
 	protected $item = NULL;
+	protected $vars = NULL;
 	
 	// ***********
 	// CONSTRUCTOR
@@ -44,7 +45,7 @@ class FCField extends JPlugin{
 	}
 	
 	public function setField(&$field) {
-		$this->field = &$field;
+		$this->field = $field;
 	}
 	
 	public function &getField() {
@@ -52,14 +53,15 @@ class FCField extends JPlugin{
 	}
 	
 	public function setItem(&$item) {
-		$this->item = &$item;
+		$this->item = $item;
 	}
 	
 	public function &getItem() {
 		return $this->item;
 	}
 	
-	protected function getSeparatorF() {
+	protected function getSeparatorF($opentag, $closetag)
+	{
 		if(!$this->field) return;
 		$separatorf = $this->field->parameters->get( 'separatorf', 1 ) ;
 		switch($separatorf)
@@ -95,53 +97,57 @@ class FCField extends JPlugin{
 		return $separatorf;
 	}
 	
-	protected function getParam($key, $default=NULL) {
-		if(!$this->field) return;
-		return $this->field->parameters->get( $key, $default ) ;
-	}
 	
 	// *******************************************
 	// DISPLAY methods, item form & frontend views
 	// *******************************************
 	
 	// Method to create field's HTML display for item form
-	public function onDisplayField(&$field, &$item) {
-		// execute the code only if the field type match the plugin type
+	public function onDisplayField(&$field, &$item)
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		$field->label = JText::_($field->label);
 		
 		$this->setField($field);
 		$this->setItem($item);
+		$this->values = $this->parseValues($this->field->value);
 		
 		$this->displayField();
 	}
 	
+	
 	// Method to create field's HTML display for frontend views
-	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display') {
-		// execute the code only if the field type match the plugin type
+	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		$field->label = JText::_($field->label);
 		
 		$this->setField($field);
 		$this->setItem($item);
-
+		$this->values = $this->parseValues($this->field->value);
+		
 		$this->display($values, $prop);
 	}
 	
+	
 	// Method to handle field's values before they are saved into the DB
-	public function onBeforeSaveField( &$field, &$post, &$file, &$item ) {
-		// execute the code only if the field type match the plugin type
+	public function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !is_array($post) && !strlen($post) ) return;
 	}
+	
 	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	public function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
 	
+	
 	// Method called just before the item is deleted to remove custom item data related to the field
 	public function onBeforeDeleteField(&$field, &$item) {
 	}
+	
+	
 	
 	// *********************************
 	// CATEGORY/SEARCH FILTERING METHODS
@@ -248,47 +254,73 @@ class FCField extends JPlugin{
 	
 	public function displayField()
 	{
-		$values = $this->parseValues($this->field->value);
-		$field = $this->getField();
-		$item = $this->getItem();
-		@ob_start();
+		// Prepare variables
+		$use_ingroup = 0;
+		$multiple = 0;
+		$field  = $this->getField();
+		$item   = $this->getItem();
+		$values = & $this->values;
+		
+		$field->html = array();
+		
+		// Include template file: EDIT LAYOUT 
 		include(self::getLayoutPath($this->fieldtypes[0]));
-		$field->html = @ob_get_clean();
+		
+		if ($use_ingroup) { // do not convert the array to string if field is in a group
+		} else if ($multiple) { // handle multiple records
+			$field->html =
+				'<li class="'.$value_classes.'">'.
+					implode('</li><li class="'.$value_classes.'">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
+		} else {  // handle single values
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+		}
 	}
 	
 	public function display(&$values=null, $prop='display')
 	{
-		$values = $values ? $values : $this->field->value;
-		$this->parseValues($values);
-		$field = $this->getField();
-		$item = $this->getItem();
-		$this->field->{$prop} = array();
-		@ob_start();
-		include(self::getViewPath($this->fieldtypes[0]));
-		$html = @ob_get_clean();
+		// Prepare variables
+		$use_ingroup = 0;
+		$field  = $this->getField();
+		$item   = $this->getItem();
+		$values = & $this->values;
 		
-		//$separatorf	= $this->getSeparatorF();
 		$opentag	= $this->getOpenTag();
 		$closetag	= $this->getCloseTag();
-		// Apply seperator and open/close tags
-		$this->field->{$prop}  = $html ? $opentag . $html . $closetag : '';
-		/*if(count($this->field->{$prop})) {
-			//$this->field->{$prop}  = implode($separatorf, $this->field->{$prop});
-			$this->field->{$prop}  = $opentag . $html . $closetag;
-		} else {
-			$this->field->{$prop} = '';
-		}*/
+		$separatorf	= $this->getSeparatorF($opentag, $closetag);
+		
+		$this->field->{$prop} = array();
+		
+		// Execute template file: VALUE VIEWING
+		include(self::getViewPath($this->fieldtypes[0]));
+		
+		// Apply separator and open/close tags
+		if (!$use_ingroup)  // do not convert the array to string if field is in a group
+		{
+			// Apply separator and open/close tags
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+			if ( $field->{$prop}!=='' ) {
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			} else {
+				$field->{$prop} = '';
+			}
+		}
 	}
 	
-	public function parseValues(&$values)
+	
+	public function & parseValues(&$values)
 	{
-		if (empty($values)) {
-			$values = array();
-			return;
+		$vals = array();
+		if (!empty($values)) foreach($values as $value) {
+			$v = !empty($value) ? @unserialize($value) : false;
+			if ( $v !== false || $v === 'b:0;' ) {
+				$vals[] = $v;
+			} else {
+				$vals[] = $value;
+			}
 		}
-		foreach($values as $k => &$v) {
-			$v = unserialize($v);
-		}
-		unset($v);
+		return $vals;
 	}
 }

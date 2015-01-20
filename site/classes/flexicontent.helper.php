@@ -537,7 +537,8 @@ class flexicontent_html
 						
 						"/* Attach select2 to specific to select elements having specific CSS class, show selected values as both: unselectable and disabled */."
 						jQuery('select.use_select2_lib').select2({
-							/*hideSelectionFromResult: function(selectedObject) { selectedObject.removeClass('select2-result-selectable').addClass('select2-result-unselectable').addClass('select2-disabled'); return false; }*/
+							/*hideSelectionFromResult: function(selectedObject) { selectedObject.removeClass('select2-result-selectable').addClass('select2-result-unselectable').addClass('select2-disabled'); return false; },*/
+							minimumResultsForSearch: 10
 						});
 						
 						jQuery('div.use_select2_lib').each(function() {

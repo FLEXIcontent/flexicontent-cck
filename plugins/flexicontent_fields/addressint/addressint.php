@@ -8,42 +8,36 @@ JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent
 class plgFlexicontent_fieldsAddressint extends FCField {
 	static $field_types = array('addressint');
 
-	function onDisplayField(&$field, &$item) {
-		// displays the field when editing content item
-		$field->label = JText::_($field->label);
+	function onDisplayField(&$field, &$item)
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
+		$field->label = JText::_($field->label);
 		$this->setField($field);
 		$this->setItem($item);
-
-		//$editor 	= JFactory::getEditor();
 		
-		// some parameter shortcuts
-		$required 	= $this->getParam( 'required', 0 );
-		$required 	= $required ? ' class="required"' : '';
-		
-		// initialise property
-		$value = $this->parseValues($field->value);
-		$value = @$value[0];
-		if(empty($value)) {
-			$value['addr1'] = '';
-			$value['addr2'] = '';
-			$value['addr3'] = '';
-			$value['city'] = '';
-			$value['state'] = '';
-			$value['province'] = '';
-			$value['zip'] = '';
-			$value['country'] = '';
-			$value['lat'] = '';
-			$value['lon'] = '';
+		// Initialise value property
+		$values = $this->parseValues($field->value);
+		if (empty($values)) {
+			$values[0]['addr1'] = '';
+			$values[0]['addr2'] = '';
+			$values[0]['addr3'] = '';
+			$values[0]['city'] = '';
+			$values[0]['state'] = '';
+			$values[0]['province'] = '';
+			$values[0]['zip'] = '';
+			$values[0]['country'] = '';
+			$values[0]['lat'] = '';
+			$values[0]['lon'] = '';
 		}
-		$params = new stdClass;
-		$params->required = $required;
-		$params->value = $value;
+		$this->values = & $values;
 		
-		$this->displayField($params);
+		// Render form field
+		$this->displayField();
 		
-		static $js_added = false;
-		if (!$js_added) {
+		// Add needed JS/CSS
+		static $js_added = null;
+		if ($js_added === null) {
 			$js_added = true;
 			$document = JFactory::getDocument();
 			$document->addScript('//maps.google.com/maps/api/js?sensor=false');
@@ -74,8 +68,8 @@ class plgFlexicontent_fieldsAddressint extends FCField {
 		}
 	}
 	
-
-
+	
+	
 	// *************************
 	// SEARCH / INDEXING METHODS
 	// *************************

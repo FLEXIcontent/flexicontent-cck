@@ -1,26 +1,12 @@
 <?php
 //No direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
-$required = $params->required;
-$value = $params->value;
-?>
-<table class="admintable" border="0" cellspacing="0" cellpadding="5"><tr><td class="key" align="right"><?php echo JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS');?>:</td>
-<td><input type="text" class="fcfield_textval" name="custom[<?php echo $field->name;?>][addr1]" value="<?php echo $value['addr1'];?>" size="50" maxlength="100"<?php echo $required;?> /></td>
-</tr>
-<tr><td class="key" align="right">&nbsp;</td>
-<td><input type="text" class="fcfield_textval" name="custom[<?php echo $field->name;?>][addr2]" value="<?php echo $value['addr2'];?>" size="50" maxlength="100" /></td>
-</tr>
-<tr><td class="key" align="right">&nbsp;</td>
-<td><input type="text" class="fcfield_textval" name="custom[<?php echo $field->name;?>][addr3]" value="<?php echo $value['addr3'];?>" size="50" maxlength="100" /></td>
-</tr>
-<tr><td class="key" align="right"><?php echo JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY');?>:</td>
-<td><input type="text" class="fcfield_textval" name="custom[<?php echo $field->name;?>][city]" id="city" value="<?php echo $value['city'];?>" size="50" maxlength="100" /></td>
-</tr>
-<tr><td class="key" align="right"><?php echo JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE');?>:</td>
-<?php
-// generate state drop down list
-$listarrays = array(
+// Some parameter shortcuts
+$required = $field->parameters->get('required', 0);
+$required = $required ? ' class="required"' : '';
+
+// States drop down list
+$list_states = array(
 	'AL'=>'Alabama',
 	'AK'=>'Alaska',
 	'AS'=>'American Samoa',
@@ -78,25 +64,11 @@ $listarrays = array(
 	'WA'=>'Washington',
 	'WV'=>'West Virginia',
 	'WI'=>'Wisconsin',
-	'WY'=>'Wyoming');
+	'WY'=>'Wyoming'
+);
 
-$options = array(); 
-$options[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
-$display = "";
-$fval = @$field->value[0];
-if ( !empty($fval)  && isset($listarrays[$fval]) ) {
-	$display = $listarrays[$fval];
-}
-?>
-<td><?php echo JHTML::_('select.genericlist', $options, 'custom['.$field->name.'][state]', $required, 'value', 'text', $value['state']);?></td>
-</tr><tr><td class="key" align="right"><?php echo JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE');?>:</td>
-<td><input type="text" class="fcfield_textval" name="custom[<?php echo $field->name;?>][province]" value="<?php echo $value['province'];?>" size="50" maxlength="100" /></td>
-</tr><tr><td class="key" align="right"><?php echo JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE');?>:</td>
-<td><input type="text" class="fcfield_textval" name="custom[<?php echo $field->name;?>][zip]" value="<?php echo $value['zip'];?>" size="10" maxlength="10"<?php echo $required;?> /></td>
-</tr><tr><td class="key" align="right"><?php echo JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY');?>:</td>
-<?php
-// generate state drop down list
-$listarrays = array(
+// Country drop down list
+$list_countries = array(
 	'AF'=>'Afghanistan',
 	'AX'=>'&Aring;land Islands',
 	'AL'=>'Albania',
@@ -345,22 +317,64 @@ $listarrays = array(
 	'EH'=>'Western Sahara',
 	'YE'=>'Yemen',
 	'ZM'=>'Zambia',
-	'ZW'=>'Zimbabwe');
+	'ZW'=>'Zimbabwe'
+);
 
-$options = array(); 
-$options[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
-$display = "";
+$options_states = array();
+$options_states[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
 
-$fval = @ $field->value[0];
-if ( !empty($fval)  && isset($listarrays[$fval]) ) {
-	$display = $listarrays[$fval];
+$options_countries = array();
+$options_countries[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
+
+$n = 0;
+foreach ($values as $value)
+{
+	$_state = $value['state'];
+	if ( !empty($_state)  && isset($list_states[$_state]) ) {
+		$display_state = $list_states[$_state];
+	} else {
+		$display_state = "";
+	}
+	
+	$_country = $value['country'];
+	if ( !empty($_country)  && isset($list_countries[$_country]) ) {
+		$display_country = $list_countries[$_country];
+	} else {
+		$display_country = "";
+	}
+	
+	$field->html[$n] = '
+	<table class="admintable" border="0" cellspacing="0" cellpadding="5">
+		<tr>
+			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').':</td>
+			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][addr1]" value="'.$value['addr1'].'" size="50" maxlength="100"'.$required.' /></td>
+		</tr><tr>
+			<td class="key" align="right">&nbsp;</td>
+			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][addr2]" value="'.$value['addr2'].'" size="50" maxlength="100" /></td>
+		</tr><tr>
+			<td class="key" align="right">&nbsp;</td>
+			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][addr3]" value="'.$value['addr3'].'" size="50" maxlength="100" /></td>
+		</tr><tr>
+			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY').':</td>
+			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][city]" id="city" value="'.$value['city'].'" size="50" maxlength="100" /></td>
+		</tr><tr>
+			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').':</td>
+			<td>'.JHTML::_('select.genericlist', $options_states, 'custom['.$field->name.'][state]', $required, 'value', 'text', $value['state']).'</td>
+		</tr><tr>
+			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').':</td>
+			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][province]" value="'.$value['province'].'" size="50" maxlength="100" /></td>
+		</tr><tr>
+			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').':</td>
+			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][zip]" value="'.$value['zip'].'" size="10" maxlength="10"'.$required.' /></td>
+		</tr><tr>
+			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').':</td>
+			<td>'.JHTML::_('select.genericlist', $options_countries, 'custom['.$field->name.'][country]', $required, 'value', 'text', $value['country']).'</td>
+		</tr><tr>
+			<td></td><td><input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GEOLOCATE').'" onclick="geolocateAddr(\'custom['.$field->name.']\', \''.$field->name.'\');" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lat]" value="'.$value['lat'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lon]" value="'.$value['lon'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <div id="'.$field->name.'_map"><img src="http://maps.google.com/maps/api/staticmap?center='.$value['lat'].','.$value['lon'].'&zoom=12&size=250x150&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|'.$value['lat'].','.$value['lon'].'&sensor=false" alt="" /></div></td>
+		</tr>
+	</table>
+	';
+	
+	$n++;
+	break; // Only 1 value currently allowed
 }
-?>
-<td><?php echo JHTML::_('select.genericlist', $options, 'custom['.$field->name.'][country]', $required, 'value', 'text', $value['country']);?></td>
-</tr>
-<tr><td></td><td>
-<input class="fcfield-button" type="button" value="<?php echo JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GEOLOCATE');?>" onclick="geolocateAddr('custom[<?php echo $field->name;?>]', '<?php echo $field->name;?>');" />
-<input type="text" class="fcfield_textval" name="custom[<?php echo $field->name;?>][lat]" value="<?php echo $value['lat'];?>" size="5" maxlength="10"<?php echo $required;?> readonly="readonly" />
-<input type="text" class="fcfield_textval" name="custom[<?php echo $field->name;?>][lon]" value="<?php echo $value['lon'];?>" size="5" maxlength="10"<?php echo $required;?> readonly="readonly" />
-<div id="<?php echo $field->name;?>_map"><img src="http://maps.google.com/maps/api/staticmap?center=<?php echo $value['lat'].','.$value['lon'];?>&zoom=12&size=250x150&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|<?php $value['lat'].','.$value['lon'];?>&sensor=false" alt="" /></div></td>
-</tr></table>
