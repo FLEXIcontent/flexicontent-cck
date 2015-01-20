@@ -841,10 +841,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// support for basic CSV import / export
 			if ( $is_importcsv ) {
 				if ( !is_numeric($v) ) {
-					$filename = $v;
+					$filename = basename($v);
+					$sub_folder = dirname($v);
+					$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
+					
 					$fman = new FlexicontentControllerFilemanager();
 					JRequest::setVar( 'return-url', null, 'post' );
-					JRequest::setVar( 'file-dir-path', DS. $import_docs_folder, 'post' );
+					JRequest::setVar( 'file-dir-path', DS. $import_docs_folder . $sub_folder, 'post' );
 					JRequest::setVar( 'file-filter-re', preg_quote($filename), 'post' );
 					JRequest::setVar( 'secure', 1, 'post' );
 					JRequest::setVar( 'keep', 1, 'post' );

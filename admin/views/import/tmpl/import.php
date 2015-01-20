@@ -419,7 +419,7 @@ function submitbutton(task) {
 						</td>
 						<td class="fcimportdata">
 							<input type="text" name="import_media_folder" id="import_media_folder" value="<?php echo $params->get('import_media_folder','tmp/fcimport_media'); ?>" class="fcfield_textval" size="40"/>
-							<span class="fc-mssg-inline fc-info"><?php echo JText::_( 'FLEXI_IMPORT_FOLDER_DESC' ); ?></span>
+							<span class="fc-mssg-inline fc-info"><?php echo JText::_( 'FLEXI_IMPORT_FOLDER_DESC' ). '<br/><br/>-- '. JText::_( 'FLEXI_IMPORT_FILE_IN_SUBFOLDER_DESC' ); ?></span>
 						</td>
 					</tr>
 					<tr valign="top">
@@ -429,7 +429,7 @@ function submitbutton(task) {
 						</td>
 						<td class="fcimportdata">
 							<input type="text" name="import_docs_folder" id="import_docs_folder" value="<?php echo $params->get('import_docs_folder','tmp/fcimport_docs'); ?>" class="fcfield_textval" size="40"/>
-							<span class="fc-mssg-inline fc-info"><?php echo JText::_( 'FLEXI_IMPORT_FOLDER_DESC' ); ?></span>
+							<span class="fc-mssg-inline fc-info"><?php echo JText::_( 'FLEXI_IMPORT_FOLDER_DESC' ). '<br/><br/>-- '. JText::_( 'FLEXI_IMPORT_FILE_IN_SUBFOLDER_DESC' ); ?></span>
 						</td>
 					</tr>
 					<tr valign="top">

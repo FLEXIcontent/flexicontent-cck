@@ -1843,24 +1843,28 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			// Handle copying original files from a server folder during CSV import
 			else if ($is_importcsv && $import_media_folder ) {
-				$filename = $v['originalname'];
+				$filename = basename($v['originalname']);
+				$sub_folder = dirname($v['originalname']);
+				$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
+				
 				if ($image_source) {
-					$srcfilepath  = JPath::clean( $srcpath_original  . $filename );
+					$srcfilepath  = JPath::clean( $srcpath_original . $v['originalname'] );
 					$destfilepath = JPath::clean( $destpath_original . $filename );
 					if ( JFile::exists($srcfilepath) ) {
 						$result = JFile::copy( $srcfilepath,  $destfilepath );
 						if ( $result && JPath::canChmod($destfilepath) )  chmod($destfilepath, 0644);
 					}
+					$v['originalname'] = $filename; // make sure filename is without subfolder
 				} else {
 					$fman = new FlexicontentControllerFilemanager();
 					JRequest::setVar( 'return-url', null, 'post' );
-					JRequest::setVar( 'file-dir-path', DS. $import_media_folder, 'post' );
+					JRequest::setVar( 'file-dir-path', DS.$import_media_folder . $sub_folder, 'post' );
 					JRequest::setVar( 'file-filter-re', preg_quote($filename), 'post' );
 					JRequest::setVar( 'secure', 1, 'post' );
 					JRequest::setVar( 'keep', 1, 'post' );
 					$file_ids = $fman->addlocal();
 					reset($file_ids);  // Reset array to point to first element
-					$v['originalname'] = key($file_ids);    // The keys of file_ids array is the cleaned up filenames
+					$v['originalname'] = key($file_ids);  // The (first) key of file_ids array is the cleaned up filename
 				}
 			}
 			
