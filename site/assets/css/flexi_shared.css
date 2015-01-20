@@ -1628,3 +1628,7 @@ legend.tab-inner-title {
 	margin:1px 0 0px -1px;
 	padding:0px 24px 0 20px;
 }
+
+body.view-items .select2-drop .select2-results {
+	max-height: 400px !important;
+}

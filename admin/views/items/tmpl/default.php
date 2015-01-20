@@ -71,6 +71,11 @@ if ($this->ordering) {
 $_img_title = JText::_('MAIN category shown in bold', true);
 $categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="fc-padded-image '.$tip_class.'" alt="'.$_img_title.'" title="'.flexicontent_html::getToolTip(null, $_img_title, 0, 1).'" />';
 
+$_img_title = JText::_('FLEXI_LIST_ITEMS_IN_CATS', true);
+$_img_title_desc = JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true);
+$_tooltip = ' class="fc-padded-image '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $_img_title_desc, 0, 1).'" ';
+$catsinstate_tip = '<img src="components/com_flexicontent/assets/images/comment.png" alt="'.$_img_title_desc.'" '.$_tooltip.' />';
+
 if ( !$this->filter_order_type ) {
 	$_img_title = JText::_('FLEXI_ORDER_JOOMLA');
 	$_img_title_desc = JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP');
@@ -82,7 +87,7 @@ if ( !$this->filter_order_type ) {
 	$ord_catid = 'rel_catid';
 	$ord_col = 'catsordering';
 }
-$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" data-placement="bottom" class="'.$tip_class.'" alt="'.$_img_title.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" />';
+$ordering_type_tip  = '<img src="components/com_flexicontent/assets/images/comment.png" data-placement="bottom" class="fc-padded-image '.$tip_class.'" alt="'.$_img_title.'" title="'.flexicontent_html::getToolTip($_img_title, $_img_title_desc, 0, 1).'" />';
 $ord_grp = 1;
 
 $stategrps = array(1=>'published', 0=>'unpublished', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
@@ -354,7 +359,6 @@ window.addEvent('domready', function() {
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
 		<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
 			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
-			<input type="button" id="fc_stateGroupsBox_btn" class="<?php echo $_class.($this->filter_stategrp || $this->filter_catsinstate!=1 ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('stateGroupsBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
 			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
 		</div>
 		
@@ -408,6 +412,11 @@ window.addEvent('domready', function() {
 		</span>
 		
 		<span class="fc-filter nowrap_box">
+			<?php echo $catsinstate_tip; ?>
+			<?php echo $this->lists['filter_catsinstate']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['filter_cats']; ?>
 		</span>
 		
@@ -435,33 +444,6 @@ window.addEvent('domready', function() {
 		</span>
 		
 		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
-	</div>
-	
-	<div id="stateGroupsBox" class="fc_mini_note_box floated well well-small" <?php if (!$this->filter_stategrp && $this->filter_catsinstate==1) echo 'style="display:none;"'; ?> >
-		
-		<div style="float:left; margin-right:12px;">
-		<?php
-		$_img_title = JText::_('FLEXI_LIST_ITEMS_WITH_STATE');
-		$_img_title_desc = JText::_('FLEXI_LIST_ITEMS_WITH_STATE_DESC');
-		$_tooltip = ' class="fc-padded-image '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $_img_title_desc, 0, 1).'" ';
-		?>
-		<label class="label"><?php echo '&nbsp;'.$_img_title; ?></label>
-		<img src="components/com_flexicontent/assets/images/information.png" alt="<?php echo $_img_title_desc; ?>" <?php echo $_tooltip; ?>/>
-		<?php echo $this->lists['filter_stategrp']; ?>
-		</div>
-		
-		<div style="float:left;">
-		<?php
-		$_img_title = JText::_('FLEXI_LIST_ITEMS_IN_CATS', true);
-		$_img_title_desc = JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true);
-		$_tooltip = ' class="fc-padded-image '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $_img_title_desc, 0, 1).'" ';
-		?>
-		<label class="label"><?php echo '&nbsp;'.$_img_title; ?></label>
-		<img src="components/com_flexicontent/assets/images/information.png" alt="<?php echo $_img_title_desc; ?>" <?php echo $_tooltip; ?>/>
-		<span class="radio"><?php echo $this->lists['filter_catsinstate']; ?></span>
-		</div>
-		
-		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('stateGroupsBox', document.getElementById('fc_stateGroupsBox_btn'), 'btn-primary');"></div>
 	</div>
 	
 	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>

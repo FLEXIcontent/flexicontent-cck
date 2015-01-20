@@ -637,18 +637,25 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							</span>
 							
 							<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
-								<span class="label <?php echo $tooltip_class;?>" title="Developer">Marvelic Engine</span><br/><br/>
+								<span class="label label-info <?php echo $tooltip_class;?>" title="Core Developer">Marvelic Engine</span><br/><br/>
 								<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
 									marvelic.co.th
 								</a>
 							</span>
 							
 							<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
-								<span class="label <?php echo $tooltip_class;?>" title="Developer">Suriya Kaewmungmuang</span>
+								<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Suriya Kaewmungmuang</span>
 							</span>
 							
 							<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
-								<span class="label <?php echo $tooltip_class;?>" title="Developer">Ruben Reyes</span><br/><br/>
+								<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Yannick Berges</span><br/><br/>
+								<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://com3elles.com/" target="_blank" title="<?php echo flexicontent_html::getToolTip("Com'3Elles", "Com'3Elles, agence de communication, conseil et formations", 0, 1); ?>">
+									com3elles.com
+								</a>
+							</span>
+							
+							<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
+								<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">Ruben Reyes</span><br/><br/>
 								<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
 									lyquix.com
 								</a>

@@ -82,7 +82,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$filter_state 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',				'filter_state',			'',		'word' );
 		if ($filter_type) $count_filters++; if ($filter_authors) $count_filters++; if ($filter_state) $count_filters++;
 		
-		$filter_stategrp	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_stategrp',		'filter_stategrp',	'',		'word' );
+		//$filter_stategrp	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_stategrp',		'filter_stategrp',	'',		'word' );
 		
 		$filter_lang	 = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang', 		'filter_lang', 		'', 			'string' );
 		if ($filter_lang) $count_filters++;
@@ -184,14 +184,14 @@ class FlexicontentViewItems extends JViewLegacy
 		$toolbar = JToolBar::getInstance('toolbar');
 		
 		$add_divider = false;
-		if ( $filter_stategrp != '') {
+		/*if ( $filter_stategrp != '') {
 			$btn_task    = FLEXI_J16GE ? 'items.display' : 'display';
 			$extra_js    = "document.getElementById('filter_stategrp').checked=true;";
 			flexicontent_html::addToolBarButton(
 				'FLEXI_DISPLAY_NORMAL', 'preview', $full_js='', $msg_alert='', $msg_confirm='',
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false);
 			$add_divider = true;
-		}
+		}*/
 		
 		/*if ( ($CanDelete || $CanDeleteOwn) && $filter_stategrp != 'trashed' ) {
 			$btn_task    = FLEXI_J16GE ? 'items.display' : 'display';
@@ -233,7 +233,7 @@ class FlexicontentViewItems extends JViewLegacy
 			$add_divider = true;
 		}
 		if ($CanDelete || $CanDeleteOwn) {
-			if ( $filter_stategrp == 'trashed' ) {
+			if ( $filter_state == 'T' ) {
 				$btn_msg = 'FLEXI_ARE_YOU_SURE';
 				$btn_task = FLEXI_J16GE ? 'items.remove' : 'remove';
 				JToolBarHelper::deleteList($btn_msg, $btn_task);
@@ -248,7 +248,7 @@ class FlexicontentViewItems extends JViewLegacy
 			}
 			$add_divider = true;
 		}
-		if ($CanArchives && $filter_stategrp != 'archived') {
+		if ($CanArchives && $filter_state != 'A') {
 			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_ARCHIVE')  );
 			$msg_confirm = JText::_('FLEXI_ARCHIVE_CONFIRM');
 			$btn_task    = FLEXI_J16GE ? 'items.changestate' : 'changestate';
@@ -258,7 +258,7 @@ class FlexicontentViewItems extends JViewLegacy
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 			$add_divider = true;
 		}
-		if ( ($CanArchives && $filter_stategrp=='archived') || (($CanDelete || $CanDeleteOwn) && $filter_stategrp=='trashed') ) {
+		if ( ($CanArchives && $filter_state=='A') || (($CanDelete || $CanDeleteOwn) && $filter_state=='T') ) {
 			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_RESTORE') );
 			$msg_confirm = JText::_('FLEXI_RESTORE_CONFIRM');
 			$btn_task    = FLEXI_J16GE ? 'items.changestate' : 'changestate';
@@ -382,6 +382,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// filter publication state
 		$states 	= array();
+		$states[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_SINGLE_STATUS' ) );
 		$states[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
 		$states[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 		$states[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
@@ -389,6 +390,16 @@ class FlexicontentViewItems extends JViewLegacy
 		$states[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
 		$states[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
 		$states[] = JHTML::_('select.option',  'RV', JText::_( 'FLEXI_REVISED_VER' ) );
+		$states[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
+		$states[] = JHTML::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
+		$states[] = JHTML::_('select.optgroup', '' );
+		
+		$states[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_STATUS_GROUPS' ) );
+		$states[] = JHTML::_('select.option',  'ALL', JText::_( 'FLEXI_GRP_ALL' ).' '. JText::_( 'FLEXI_STATE_S' ) );
+		$states[] = JHTML::_('select.option',  'ALL_P', JText::_( 'FLEXI_GRP_PUBLISHED' ).' '. JText::_( 'FLEXI_STATE_S' ) );
+		$states[] = JHTML::_('select.option',  'ALL_U', JText::_( 'FLEXI_GRP_UNPUBLISHED' ).' '. JText::_( 'FLEXI_STATE_S' ) );
+		$states[] = JHTML::_('select.option',  'ORPHAN', JText::_( 'FLEXI_GRP_ORPHAN' ) );
+		$states[] = JHTML::_('select.optgroup', '' );
 
 		$lists['filter_state'] = ($filter_state || 1 ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
 			JHTML::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
@@ -397,15 +408,15 @@ class FlexicontentViewItems extends JViewLegacy
 		// build filter state group
 		if ($CanDelete || $CanDeleteOwn || $CanArchives)   // Create state group filter only if user can delete or archive
 		{
-			$stategroups[''] = JText::_( 'FLEXI_GRP_NORMAL' ) .' '. JText::_( 'FLEXI_STATE_S' );
-			$stategroups['published'] = JText::_( 'FLEXI_GRP_PUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
-			$stategroups['unpublished'] = JText::_( 'FLEXI_GRP_UNPUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
-			if ($CanDelete || $CanDeleteOwn)
-				$stategroups['trashed']  = JText::_( 'FLEXI_GRP_TRASHED' );
-			if ($CanArchives)
-				$stategroups['archived'] = JText::_( 'FLEXI_GRP_ARCHIVED' );
-			$stategroups['orphan']      = JText::_( 'FLEXI_GRP_ORPHAN' );
-			$stategroups['all']      = JText::_( 'FLEXI_GRP_ALL' );
+			//$stategroups[''] = JText::_( 'FLEXI_GRP_NORMAL' ) .' '. JText::_( 'FLEXI_STATE_S' );
+			//$stategroups['published'] = JText::_( 'FLEXI_GRP_PUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
+			//$stategroups['unpublished'] = JText::_( 'FLEXI_GRP_UNPUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
+			/*if ($CanDelete || $CanDeleteOwn)
+				$stategroups['trashed']  = JText::_( 'FLEXI_GRP_TRASHED' );*/
+			/*if ($CanArchives)
+				$stategroups['archived'] = JText::_( 'FLEXI_GRP_ARCHIVED' );*/
+			//$stategroups['orphan']      = JText::_( 'FLEXI_GRP_ORPHAN' );
+			//$stategroups['all']      = JText::_( 'FLEXI_GRP_ALL' );
 			
 			/*$_stategroups = array();
 			foreach ($stategroups as $i => $v) {
@@ -413,12 +424,12 @@ class FlexicontentViewItems extends JViewLegacy
 			}
 			$lists['filter_stategrp'] = JHTML::_('select.radiolist', $_stategroups, 'filter_stategrp', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_stategrp );*/
 			
-			$lists['filter_stategrp'] = '';
+			/*$lists['filter_stategrp'] = '';
 			foreach ($stategroups as $i => $v) {
 				$checked = $filter_stategrp == $i ? ' checked="checked" ' : '';
 				$lists['filter_stategrp'] .= '<input type="radio" onchange="submitform();" class="inputbox" '.$checked.' value="'.$i.'" id="filter_stategrp'.$i.'" name="filter_stategrp" />';
 				$lists['filter_stategrp'] .= '<label class="" id="filter_stategrp'.$i.'-lbl" for="filter_stategrp'.$i.'">'.$v.'</label>';
-			}
+			}*/
 		}
 		
 		// build the include subcats boolean list
@@ -445,17 +456,19 @@ class FlexicontentViewItems extends JViewLegacy
 			$catsinstate[2] = JText::_( 'FLEXI_ARCHIVED_STATE' );
 			$catsinstate[-2] = JText::_( 'FLEXI_TRASHED_STATE' );
 		}
-		/*$_catsinstate = array();
+		$_catsinstate = array();
 		foreach ($catsinstate as $i => $v) {
 			$_catsinstate[] = JHTML::_('select.option', $i, $v);
 		}
-		$lists['filter_catsinstate'] = JHTML::_('select.radiolist', $_catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_catsinstate );*/
-		$lists['filter_catsinstate']  = '';
+		$lists['filter_catsinstate'] = ($filter_state || 1 ? '<label class="label">'.JText::_('FLEXI_LIST_ITEMS_IN_CATS').'</label>' : '').
+			JHTML::_('select.genericlist', $_catsinstate, 'filter_catsinstate', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="submitform();"', 'value', 'text', $filter_catsinstate, 'filter_catsinstate' );
+		//$lists['filter_catsinstate'] = JHTML::_('select.radiolist', $_catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_catsinstate );
+		/*$lists['filter_catsinstate']  = '';
 		foreach ($catsinstate as $i => $v) {
 			$checked = $filter_catsinstate == $i ? ' checked="checked" ' : '';
 			$lists['filter_catsinstate'] .= '<input type="radio" onchange="submitform();" class="inputbox" '.$checked.' value="'.$i.'" id="filter_catsinstate'.$i.'" name="filter_catsinstate" />';
 			$lists['filter_catsinstate'] .= '<label class="" id="filter_catsinstate'.$i.'-lbl" for="filter_catsinstate'.$i.'">'.$v.'</label>';
-		}
+		}*/
 		
 		// build the order type boolean list
 		$order_types = array();
@@ -562,7 +575,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		//assign data to template
 		$this->assignRef('count_filters', $count_filters);
-		$this->assignRef('filter_stategrp', $filter_stategrp);
+		//$this->assignRef('filter_stategrp', $filter_stategrp);
 		$this->assignRef('filter_catsinstate', $filter_catsinstate);
 		$this->assignRef('db'				, $db);
 		$this->assignRef('lists'		, $lists);

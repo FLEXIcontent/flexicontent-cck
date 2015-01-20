@@ -564,3 +564,8 @@ div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text.fcdisabled {
 	color: gray;
 	font-style: italic;
 }
+
+/* items manager */
+body.view-items .select2-drop .select2-results {
+	max-height: 400px !important;
+}

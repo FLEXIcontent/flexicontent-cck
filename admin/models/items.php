@@ -673,7 +673,6 @@ class FlexicontentModelItems extends JModelLegacy
 		$filter_subcats   = $app->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
 		$filter_state     = $app->getUserStateFromRequest( $option.'.items.filter_state',			'filter_state',			'',		'word' );
 		$filter_order     = $app->getUserStateFromRequest( $option.'.items.filter_order',			'filter_order',			'',		'cmd' );
-		$filter_stategrp  = $app->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp',	'',		'word' );
 		
 		$nullDate = $this->_db->Quote($this->_db->getNullDate());
 		$nowDate = $this->_db->Quote( FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL() );
@@ -761,7 +760,6 @@ class FlexicontentModelItems extends JModelLegacy
 		$filter_order     = $app->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', '', 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 		
-		$filter_stategrp = $app->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp', '', 'word' );
 		$extra_order  = 'state_order, ';
 		if (
 			($filter_order_type && (FLEXI_FISH || FLEXI_J16GE)) ||   // FLEXIcontent order supports language in J1.5 too
@@ -837,7 +835,6 @@ class FlexicontentModelItems extends JModelLegacy
 		$filter_subcats	= $app->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
 		$filter_catsinstate = $app->getUserStateFromRequest( $option.'.items.filter_catsinstate',	'filter_catsinstate', 1, 'int' );
 		$filter_state 	= $app->getUserStateFromRequest( $option.'.items.filter_state', 	'filter_state', '', 'word' );
-		$filter_stategrp= $app->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp', '', 'word' );
 		$filter_id	 		= $app->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', '', 'int' );
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang 	= $app->getUserStateFromRequest( $option.'.items.filter_lang', 	'filter_lang', '', 'string' );
@@ -970,37 +967,33 @@ class FlexicontentModelItems extends JModelLegacy
 		// ************************************************************
 		// Limit using state or group of states (e.g. published states)
 		// ************************************************************
-		
-		if ( $filter_stategrp=='all' ) {
-			// no limitations
-		} else if ( $filter_stategrp=='published' ) {
-			$where[] = 'i.state IN (1,-5)';
-		} else if ( $filter_stategrp=='unpublished' ) {
-			$where[] = 'i.state IN (0,-3,-4)';
-		} else if ( $filter_stategrp=='trashed' ) {
-			$where[] = 'i.state = -2';
-		} else if ( $filter_stategrp=='archived' ) {
-			$where[] = 'i.state = '.(FLEXI_J16GE ? 2:-1);
-		} else if ( $filter_stategrp=='orphan' ) {
-			$where[] = 'i.state NOT IN ('.(FLEXI_J16GE ? 2:-1).',-2,1,0,-3,-4,-5)';
-		} else {
+		if ( !$filter_state ) {
 			$where[] = 'i.state <> -2';
 			$where[] = 'i.state <> '.(FLEXI_J16GE ? 2:-1);
-			if ( $filter_state ) {
-				if ( $filter_state == 'P' ) {
-					$where[] = 'i.state = 1';
-				} else if ($filter_state == 'U' ) {
-					$where[] = 'i.state = 0';
-				} else if ($filter_state == 'PE' ) {
-					$where[] = 'i.state = -3';
-				} else if ($filter_state == 'OQ' ) {
-					$where[] = 'i.state = -4';
-				} else if ($filter_state == 'IP' ) {
-					$where[] = 'i.state = -5';
-				} else if ($filter_state == 'RV' ) {
-					$where[] = 'i.state = 1 OR i.state = -5';
-				}
-			}
+		} else if ( $filter_state == 'ALL' ) {
+			// no limitations
+		} else if ( $filter_state == 'ORPHAN' ) {
+			$where[] = 'i.state NOT IN ('.(FLEXI_J16GE ? 2:-1).',-2,1,0,-3,-4,-5)';
+		} else if ( $filter_state == 'ALL_P' ) {
+			$where[] = 'i.state IN (1,-5)';
+		} else if ( $filter_state == 'ALL_U' ) {
+			$where[] = 'i.state IN (0,-3,-4)';
+		} else if ( $filter_state == 'P' ) {
+			$where[] = 'i.state = 1';
+		} else if ($filter_state == 'U' ) {
+			$where[] = 'i.state = 0';
+		} else if ($filter_state == 'PE' ) {
+			$where[] = 'i.state = -3';
+		} else if ($filter_state == 'OQ' ) {
+			$where[] = 'i.state = -4';
+		} else if ($filter_state == 'IP' ) {
+			$where[] = 'i.state = -5';
+		} else if ($filter_state == 'RV' ) {
+			$where[] = 'i.state = 1 OR i.state = -5';
+		} else if ($filter_state == 'A' ) {
+			$where[] = 'i.state = '.(FLEXI_J16GE ? 2:-1);
+		} else if ($filter_state == 'T' ) {
+			$where[] = 'i.state = -2';
 		}
 		
 		
@@ -1771,7 +1764,7 @@ class FlexicontentModelItems extends JModelLegacy
 				// NEXT or PREVIOUS item NOT found, raise a notice
 				JError::raiseNotice( 500, JText::sprintf('Previous/Next item in category and in STATE group (%s) was not found or has same ordering,
 					trying saving ordering to create incrementing ordering numbers for those items that have positive orderings
-					NOTE: negative are reserved as "sticky" and are not automatically reordered', $filter_stategrp) );
+					NOTE: negative are reserved as "sticky" and are not automatically reordered', $row_stategrp) );
 				return true;
 			}
 			//exit;
