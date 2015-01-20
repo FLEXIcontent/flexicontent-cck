@@ -4214,7 +4214,31 @@ class flexicontent_images
 
 class FLEXIUtilities
 {
-
+	static function funcIsDisabled($function)
+	{
+		static $disabledFuncs = null;
+		$func = strtolower($function);
+		if ($disabledFuncs !== null) return isset($disabledFuncs[$func]);
+		
+		$disabledFuncs = array();
+		$disable_local  = explode(',',     strtolower(@ini_get('disable_functions')));
+		$disable_global = explode(',', strtolower(@get_cfg_var('disable_functions')));
+		
+		foreach ($disable_local as $key => $value) {
+			$disabledFuncs[trim($value)] = 'local';
+		}
+		foreach ($disable_global as $key => $value) {
+			$disabledFuncs[trim($value)] = 'global';
+		}
+		if (@ini_get('safe_mode')) {
+			$disabledFuncs['shell_exec']     = 'local';
+			$disabledFuncs['set_time_limit'] = 'local';
+		}
+		
+		return isset($disabledFuncs[$func]);
+	}
+	
+	
 	/**
 	 * Load Template-Specific language file to override or add new language strings
 	 *

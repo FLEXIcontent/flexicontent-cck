@@ -2255,7 +2255,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		//readfile($dlfile->abspath);  // this will read an output the file but it will cause a memory exhausted error on large files
 		
-		set_time_limit(0);
+		if ( !FLEXIUtilities::funcIsDisabled('set_time_limit') ) @set_time_limit(0);
 		$handle = @fopen($dlfile->abspath,"rb");
 		while(!feof($handle))
 		{
