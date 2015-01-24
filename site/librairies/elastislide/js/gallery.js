@@ -66,7 +66,7 @@ jQuery(function() {
 			init			= function() {
 				
 				// (not necessary) preloading the images here...
-				$items.add('<img src="images/ajax-loader.gif"/><img src="images/black.png"/>').imagesLoaded( function() {
+				$items.add('<span class="rg-loading"></span>').imagesLoaded( function() {
 					// add options
 					_addViewModes();
 					
@@ -205,7 +205,7 @@ jQuery(function() {
 				
 				// shows the large image that is associated to the $item
 				
-				var $loader	= $rgGallery.find('div.rg-loading').show();
+				//var $loader	= $rgGallery.find('div.rg-loading').show();
 				
 				$items.removeClass('selected');
 				$item.addClass('selected');
@@ -216,12 +216,18 @@ jQuery(function() {
 				
 				jQuery('<img/>').load( function() {
 					
-					$rgGallery.find('div.rg-image').empty().append('<img src="' + largesrc + '"/>');
+					//$rgGallery.find('div.rg-image').empty().append('<img src="' + largesrc + '"/>');
+					$rgGallery.find('div.rg-image').stop(false, true).animate({ opacity: 0.1 }, 500, function() {
+						var $loader	= $rgGallery.find('div.rg-loading').show();
+						jQuery(this).empty().append('<img src="' + largesrc + '"/>');
+						$loader.hide();
+						jQuery(this).stop(false, true).animate({ opacity: 1 }, 2000);
+					});
 					
 					if( title )
 						$rgGallery.find('div.rg-caption').show().children('p').empty().text( title );
 					
-					$loader.hide();
+					//$loader.hide();
 					
 					if( mode === 'carousel' ) {
 						$esCarousel.elastislide( 'reload' );

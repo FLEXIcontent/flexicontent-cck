@@ -1603,7 +1603,8 @@ table.fc-form-tbl td {
 table.fc-form-tbl td.key {
 	text-align: right;
 	padding: 4px 0px;
-	max-width:100px;
+	max-width: 120px;
+	min-width: 90px;
 }
 table.fc-form-tbl td.key label.label {
 	padding: 8px 4% !important;
@@ -1627,8 +1628,4 @@ legend.tab-inner-title {
 	line-height:2em;
 	margin:1px 0 0px -1px;
 	padding:0px 24px 0 20px;
-}
-
-body.view-items .select2-drop .select2-results {
-	max-height: 400px !important;
 }

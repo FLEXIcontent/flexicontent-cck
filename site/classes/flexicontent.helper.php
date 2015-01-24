@@ -674,7 +674,8 @@ class flexicontent_html
 				// Attach inputmask to all input fields that have appropriate tag parameters
 				$js .= "
 					jQuery(document).ready(function(){
-					    jQuery(\":input\").inputmask();
+					    jQuery('input.has_inputmask').inputmask();
+					    jQuery('input.inputmask-regex').inputmask('Regex');
 					});
 				";
 				break;
@@ -2520,7 +2521,7 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildauthorsselect($list, $name, $selected, $top, $class = 'class="inputbox"')
+	static function buildauthorsselect($list, $name, $selected, $top, $attribs = 'class="inputbox"')
 	{
 		$typelist 	= array();
 
@@ -2530,7 +2531,7 @@ class flexicontent_html
 		foreach ($list as $item) {
 			$typelist[] = JHTML::_( 'select.option', $item->id, $item->name);
 		}
-		return JHTML::_('select.genericlist', $typelist, $name, $class, 'value', 'text', $selected );
+		return JHTML::_('select.genericlist', $typelist, $name, $attribs, 'value', 'text', $selected );
 	}
 
 
@@ -2540,7 +2541,7 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildfieldtypeslist($name, $class, $selected, $group=false)
+	static function buildfieldtypeslist($name, $class, $selected, $group=false, $attribs = 'class="inputbox"')
 	{
 		$field_types = flexicontent_db::getfieldtypes($group);
 		if (!$group) {
@@ -2565,7 +2566,7 @@ class flexicontent_html
 			
 			$fieldname = FLEXI_J16GE ? 'jform[field_type]' : 'field_type';
 			$elementid = FLEXI_J16GE ? 'jform_field_type'  : 'field_type';
-			$list = JHTML::_('select.genericlist', $fftype, $fieldname, 'class="inputbox" size="1"', 'value', 'text', $selected, $elementid );
+			$list = JHTML::_('select.genericlist', $fftype, $fieldname, $attribs, 'value', 'text', $selected, $elementid );
 			if (!FLEXI_J16GE) $list = str_replace('<optgroup label="">', '</optgroup>', $list);
 		}
 		return $list;

@@ -258,6 +258,10 @@ if ( ($item_placement_feat == 1 && $item_columns_feat > 1) || ($item_placement_s
 	flexicontent_html::loadFramework('imagesLoaded');
 }
 $document = JFactory::getDocument();
+if ($transition) {
+	$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
+	$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-explode.min.js');
+}
 ?>
 
 <div class="carousel mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_carousel<?php echo $module->id; ?>">

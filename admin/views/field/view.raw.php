@@ -68,7 +68,7 @@ class FlexicontentViewField extends JViewLegacy
 			}
 		}
 		
-		if ($field_type)
+		/*if ($field_type)
 		{
 			if (!FLEXI_J16GE) {
 				echo $form->render('params', 'group-' . $field_type );
@@ -79,7 +79,29 @@ class FlexicontentViewField extends JViewLegacy
 			}
 		} else {
 			echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
-		}
+		}*/
+		
+		?>
+		<div class="fctabber fields_tabset" id="field_specific_props_tabset">
+		<?php
+		$fieldSets = $form->getFieldsets('attribs');
+		foreach ($fieldSets as $name => $fieldSet) :
+			if ($fieldSet->label) $label = JText::_($fieldSet->label);
+			else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
+			?>
+			<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab">
+				<h3 class="tabberheading"> <?php echo $label; ?> </h3>
+				<?php
+				$i = 0;
+				foreach ($form->getFieldset($name) as $field) {
+					echo '<fieldset class="panelform '.($i ? '' : 'fc-nomargin').'">' . $field->label . $field->input . '</fieldset>' . "\n";
+				}
+				?>
+			</div>
+		<?php endforeach; ?>
+		</div>
+		
+		<?php
 		//parent::display($tpl);
 	}
 }

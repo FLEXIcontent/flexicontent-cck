@@ -72,6 +72,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		// Input field display size & max characters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced
+		$placeholder= $field->parameters->get( 'placeholder', '' ) ;
 		
 		// create extra HTML TAG parameters for the form field
 		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
@@ -84,6 +85,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		// **********************
 		$inputmask	= $field->parameters->get( 'inputmask', false ) ;
 		$custommask = $field->parameters->get( 'custommask', false ) ;
+		$regexmask  = $field->parameters->get( 'regexmask', false ) ;
+		
 		static $inputmask_added = false;
 	  if ($inputmask && !$inputmask_added) {
 			$inputmask_added = true;
@@ -254,13 +257,32 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 		
+		$classes  = 'fcfield_textval inputbox'.$required;
+		
 		// Create attributes for JS inputmask validation
-		if ($custommask && $inputmask=="__custom__") {
-			$validate_mask = " data-inputmask=\"'mask': '".$custommask."'\" ";
-		} else {
-			$validate_mask = $inputmask ? " data-inputmask=\" 'alias': '".$inputmask."' \" " : "";
+		$validate_mask = '';
+		switch ($inputmask) {
+		case '__regex__':
+			if ($regexmask) {
+				$validate_mask = " data-inputmask-regex=\"".$regexmask."\" ";
+				$classes .= ' inputmask-regex';
+			}
+			break;
+		case '__custom__':
+			if ($custommask) {
+				$validate_mask = " data-inputmask=\"".$custommask."\" ";
+				$classes .= ' has_inputmask';
+			}
+			break;
+		default:
+			if ($inputmask){
+				$validate_mask = " data-inputmask=\" 'alias': '".$inputmask."' "." \" ";
+				$classes .= ' has_inputmask';
+			}
 		}
-		$classes  = 'fcfield_textval inputbox'.$required.($inputmask ? ' has_inputmask' : '');
+		
+		// Add placeholder tag parameter if not using validation mask, (if using vaildation mask then placeholder should be added a validation mask property)
+		$attribs .= $placeholder ? ' placeholder="'.$placeholder.'" ' : '';
 		
 		
 		// *****************************************

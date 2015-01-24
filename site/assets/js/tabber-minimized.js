@@ -452,7 +452,7 @@ tabberObj.prototype.navClearActive = function(tabberIndex)
 /*==================================================*/
 
 
-function tabberAutomatic(tabberArgs)
+function tabberAutomatic(tabberArgs, container_id)
 {
   /* This function finds all DIV elements in the document where
      class=tabber.classMain, then converts them to use the tabber
@@ -473,13 +473,21 @@ function tabberAutomatic(tabberArgs)
   /* Find all DIV elements in the document that have class=tabber */
 
   /* First get an array of all DIV elements and loop through them */
-  divs = document.getElementsByTagName("div");
-  for (i=0; i < divs.length; i++) {
-    
+  var divs = new Array();
+  if (typeof container_id != 'undefined')	{
+	  var i = 0;
+  	jQuery('#'+container_id+' div').each(function() {
+  		divs[i] = jQuery(this).get(0);
+  		i++;
+  	});
+  } else {
+ 		divs = document.getElementsByTagName("div");
+	}
+  for (i=0; i < divs.length; i++)
+  {
     /* Is this DIV the correct class? */
-    if (divs[i].className &&
-	divs[i].className.match(tempObj.REclassMain)) {
-      
+    if (divs[i].className && divs[i].className.match(tempObj.REclassMain))
+    {
       /* Now tabify the DIV */
       tabberArgs.div = divs[i];
       divs[i].tabber = new tabberObj(tabberArgs);

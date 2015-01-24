@@ -17,49 +17,77 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:top; margin-top:6px;" ' );
+
+// Load JS tabber lib
+$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
+$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
+$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 ?>
 
+<div class="flexicontent" id="flexicontent">
 <form action="index.php" method="post" class="form-validate" name="adminForm" id="adminForm">
 
-<table cellspacing="0" cellpadding="0" border="0" width="100%">
-	<tr>
-		<td valign="top">
+<table cellspacing="0" cellpadding="0" border="0" width="100%"><tr>
+
+	<td valign="top" width="50%">
+	
+		<!--span class="badge"><h3><?php echo JText::_( /*'FLEXI_STANDARD_FIELDS_PROPERTIES'*/'Common configuration' ); ?></h3></span-->
 		
-			<fieldset>
-			<legend><?php echo JText::_( 'FLEXI_FIELD_PROPERTIES' ); ?></legend>
-				<table class="admintable">
-					<tr>
-						<td colspan="2">
-							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_BASIC' ); ?></span>
-						</td>
-					</tr>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('label').'*'; ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('label'); ?>
-						</td>
-					</tr>
-					<?php if ($this->form->getValue('iscore') == 0) : ?>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('name').'*'; ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('name'); ?>
-						</td>
-					</tr>
-					<?php else : ?>
-						<td class="key">
-							<?php echo $this->form->getLabel('name'); ?>
-						</td>
-						<td>
-							<?php echo $this->form->getValue("name"); ?>
-						</td>
-					<?php endif; ?>
-					
+		<table class="fc-form-tbl" style="margin-bottom:12px;">
+			<tr>
+				<td class="key">
+					<?php echo $this->form->getLabel('label'); ?>
+				</td>
+				<td>
+					<?php echo $this->form->getInput('label'); ?>
+				</td>
+			</tr>
+			<?php if ($this->form->getValue('iscore') == 0) : ?>
+			<tr>
+				<td class="key">
+					<?php echo $this->form->getLabel('name'); ?>
+				</td>
+				<td>
+					<?php echo $this->form->getInput('name'); ?>
+				</td>
+			</tr>
+			<?php else : ?>
+			<tr>
+				<td class="key">
+					<?php echo $this->form->getLabel('name'); ?>
+				</td>
+				<td>
+					<?php echo $this->form->getValue("name"); ?>
+				</td>
+			</tr>
+			<?php endif; ?>
+
+			
+			<?php if ($this->form->getValue("iscore") == 0) : ?>
+			<tr>
+				<td class="key">
+				<?php echo $this->form->getLabel('field_type'); ?>
+				</td>
+				<td>
+				<?php echo $this->lists['field_type']; ?>
+				&nbsp;&nbsp;&nbsp;
+				[ <span id="field_typename"><?php echo $this->form->getValue('field_type'); ?></span> ]
+				</td>
+			</tr>
+			<?php endif; ?>
+
+		</table>
+		
+		<div class="fctabber fields_tabset" id="field_specific_props_tabset">
+			
+			<div class="tabbertab" id="fcform_tabset_common_basic_tab">
+				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
+				
+				<table class="fc-form-tbl">
 					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('published'); ?>
@@ -82,18 +110,15 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						</td>
 					</tr>
 					
-					<?php if ($this->form->getValue("iscore") == 0) : ?>
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('field_type').'*'; ?>
+							<?php echo $this->form->getLabel('access'); ?>
 						</td>
 						<td>
-							<?php echo $this->lists['field_type']; ?>
-							&nbsp;&nbsp;&nbsp;
-							[ <span id="field_typename"><?php echo $this->form->getValue('field_type'); ?></span> ]
+							<?php echo $this->form->getInput('access'); ?>
 						</td>
 					</tr>
-					<?php endif; ?>
+					
 					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('ordering'); ?>
@@ -102,34 +127,38 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('ordering'); ?>
 						</td>
 					</tr>
-
+					
 					<tr>
-						<td colspan="2">
+						<td colspan="2" style="padding-top:24px;">
 							<?php $box_class = $this->row->iscore ? 'fc-info' : ($this->typesselected ? 'fc-success' : 'fc-warning'); ?>
 							<span class="<?php echo $box_class; ?> fc-mssg" style="width:90%; margin:6px 0px 0px 0px !important;">
 								<?php echo JText::_( $this->row->iscore ? 'FLEXI_SELECT_TYPES_CORE_NOTES' : 'FLEXI_SELECT_TYPES_CUSTOM_NOTES' ); ?>
 							</span>
 						</td>
 					</tr>
-					
 					<tr>
 						<td colspan="2">
-							<span class="flexi label hasTip" title="<?php echo JText::_('FLEXI_TYPES').'::'.JText::_('FLEXI_TYPES_NOTES');?>">
+							<span class="label label-warning" style="vertical-align:middle;">
 								<?php echo JText::_( 'FLEXI_TYPES' ); ?>
 							</span>
 							<?php echo /*FLEXI_J16GE ? $this->form->getInput('tid') :*/ $this->lists['tid']; ?>
 						</td>
 					</tr>
-
-					<?php if ($this->supportsearch || $this->supportfilter) : ?>
-					<tr>
-						<td colspan="2">
-							<span class="fcsep_level2" style="width:90%; margin-top:16px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX' ); ?></span>
-							<span class="fcsep_level3" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX_NOTES' ); ?></span>
-						</td>
-					</tr>
-					<?php endif; ?>
 					
+				</table>
+			</div>
+			
+			
+			<div class="tabbertab" id="fcform_tabset_common_basic_tab">
+				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELD_SEARCH_FILTERING' ); ?> </h3>
+				
+				<?php if ($this->supportsearch || $this->supportfilter) : ?>
+					<span class="fcsep_level1" style="width:90%; margin-top:16px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX' ); ?></span>
+					<span class="fcsep_level4" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX_NOTES' ); ?></span>
+					<div class="fcclear"></div>
+				<?php endif; ?>
+					
+				<table class="fc-form-tbl">
 					<?php if ($this->supportsearch) : ?>
 					<tr>
 						<td class="key">
@@ -154,17 +183,15 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						</td>
 					</tr>
 					<?php endif; ?>
-					
-
-					<?php if ($this->supportadvsearch || $this->supportadvfilter) : ?>
-					<tr>
-						<td colspan="2">
-							<span class="fcsep_level2" style="width:90%; margin-top:16px; "><?php echo JText::_( 'FLEXI_ADV_INDEX' ); ?></span>
-							<span class="fcsep_level3" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_ADV_INDEX_NOTES' ); ?></span>
-						</td>
-					</tr>
-					<?php endif; ?>
-					
+				</table>
+				
+				<?php if ($this->supportadvsearch || $this->supportadvfilter) : ?>
+					<span class="fcsep_level1" style="width:90%; margin-top:16px; "><?php echo JText::_( 'FLEXI_ADV_INDEX' ); ?></span>
+					<span class="fcsep_level4" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_ADV_INDEX_NOTES' ); ?></span>
+					<div class="fcclear"></div>
+				<?php endif; ?>
+				
+				<table class="fc-form-tbl">
 					<?php if ($this->supportadvsearch) : ?>
 					<tr>
 						<td class="key">
@@ -192,12 +219,15 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						</td>
 					</tr>
 					<?php endif; ?>
+				</table>
+				
+			</div>
+			
+			
+			<div class="tabbertab" id="fcform_tabset_common_basic_tab">
+				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?> </h3>
+				<table class="fc-form-tbl">
 					
-					<tr>
-						<td colspan="2">
-							<span class="fcsep_level2" style="width:90%; margin-top:16px; "><?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?></span>
-						</td>
-					</tr>
 					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>
 						<td class="key">
 							<?php echo $this->form->getLabel('untranslatable'); ?>
@@ -206,7 +236,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('untranslatable'); ?>
 						</td>
 					</tr>
-
+	
 					<tr<?php echo !$this->supportformhidden?' style="display:none;"':'';?>>
 						<td class="key">
 							<?php echo $this->form->getLabel('formhidden'); ?>
@@ -216,7 +246,6 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						</td>
 					</tr>
 					
-					<?php if (FLEXI_ACCESS || FLEXI_J16GE) : ?>
 					<tr<?php echo !$this->supportvalueseditable?' style="display:none;"':'';?>>
 						<td class="key">
 							<?php echo $this->form->getLabel('valueseditable'); ?>
@@ -225,7 +254,6 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('valueseditable'); ?>
 						</td>
 					</tr>
-					<?php endif; ?>
 					
 					<tr<?php echo !$this->supportedithelp?' style="display:none;"':'';?>>
 						<td class="key">
@@ -235,17 +263,6 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('edithelp'); ?>
 						</td>
 					</tr>
-					
-					<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('access'); ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('access'); ?>
-						</td>
-					</tr>
-					<?php endif; ?>
 					
 					<tr>
 						<td class="key">
@@ -257,11 +274,11 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					
 				</table>
-			</fieldset>
+			</div>
 			
-			<?php
-			if ($this->permission->CanConfig) :
-				$this->document->addScriptDeclaration("
+			
+			<?php if ($this->permission->CanConfig) :
+				/*$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
 						var slideaccess = new Fx.Slide('tabacces');
 						var slidenoaccess = new Fx.Slide('notabacces');
@@ -271,73 +288,61 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							slidenoaccess.toggle();
 						});
 					});
-				");
+				");*/
 			?>
-			<fieldset class="flexiaccess">
-				<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-				<table id="tabacces" class="admintable" width="100%">
-					<tr>
-						<td>
-							<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
-						</td>
-					</tr>
-				</table>
-				<div id="notabacces">
-					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-				</div>
-			</fieldset>
-		<?php endif; ?>
-		
-		</td>
-
-		<td valign="top" width="50%" style="padding: 7px 0 0 24px">
+			<div class="tabbertab" id="fcform_tabset_common_basic_tab">
+				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
+				<!--fieldset class="flexiaccess">
+					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend-->
+					<table id="tabacces" class="fc-form-tbl" width="100%">
+						<tr>
+							<td>
+								<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
+							</td>
+						</tr>
+					</table>
+					<div id="notabacces">
+						<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+					</div>
+				<!--/fieldset-->
+			</div>
+			<?php endif; ?>		
 			
-			<div class="pane-sliders" id="det-pane" style="margin-top:0px !important;">
-				
-				<div class="panel" style="margin-bottom:24px !important; padding:2px 0px !important;">
-					<h3 id="standard-page" class="title pane-toggler-down"><span><?php echo JText::_( 'FLEXI_STANDARD_FIELDS_PROPERTIES' ); ?></span></h3>
-					<div class="jpane-slider content" style="border-top: medium none; border-bottom: medium none; overflow: hidden; padding-top: 6px; padding-bottom: 6px;">
-						
-						<?php foreach($this->form->getFieldset('basic') as $field) : ?>
-							<fieldset class="panelform">
-							<?php echo $field->label; ?>
-							<?php echo $field->input; ?>
-							</fieldset>
-						<?php endforeach; ?>
-						
-						<?php foreach($this->form->getFieldset('standard') as $field) : ?>
-							<fieldset class="panelform">
-							<?php echo $field->label; ?>
-							<?php echo $field->input; ?>
-							</fieldset>
-						<?php endforeach; ?>
-						
-					</div>
-					
-				</div>
-				
-				<div class="panel" style="padding:2px 0px !important;">
-					<h3 id="group-page" class="title pane-toggler-down"><span><?php echo JText::_( 'FLEXI_THIS_FIELDTYPE_PROPERTIES' ); ?></span></h3>
-					<div id="fieldspecificproperties" class="jpane-slider content" style="border-top: medium none; border-bottom: medium none; overflow: hidden; padding-top: 6px; padding-bottom: 6px;">
-					<?php
-					$field_type = $this->form->getValue("field_type", NULL, "text");
-					if ($field_type) {
-						foreach($this->form->getFieldset('group-' . $field_type) as $field) :
-							//$input = str_replace("name=\"".$field->inputName."\"", "name=\"params[".$field->inputName."]\"", $field->input);
-							?>
-							<fieldset class="panelform">
-							<?php echo $field->label; ?>
-							<?php echo $field->input; ?>
-							</fieldset>
-							<?php
-						endforeach;
-					} else {
-						echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
-					}
+		</div>
+		
+		
+	</td>
+	<td valign="top" width="50%" style="padding: 0px 0 0 24px">
+			
+			<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; "><?php echo JText::_( /*'FLEXI_THIS_FIELDTYPE_PROPERTIES'*/'FIELD TYPE specific configuration' ); ?></span>
+			
+			<div id="fieldspecificproperties">
+				<div class="fctabber fields_tabset" id="field_specific_props_tabset">
+				<?php
+				$fieldSets = $this->form->getFieldsets('attribs');
+				$field_type = $this->form->getValue("field_type", NULL, "text");
+				$prefix_len = strlen('group-'.$field_type);
+				if ($field_type) foreach ($fieldSets as $name => $fieldSet)
+				{
+					if ($name!='basic' && $name!='standard' && substr($name, 0, $prefix_len)!='group-'.$field_type ) continue;
+					if ($fieldSet->label) $label = JText::_($fieldSet->label);
+					else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
 					?>
+					<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab">
+						<h3 class="tabberheading"> <?php echo $label; ?> </h3>
+						<?php $i = 0; ?>
+						<?php foreach ($this->form->getFieldset($name) as $field) { 
+							echo '<fieldset class="panelform '.($i ? '' : 'fc-nomargin').'">' . $field->label . $field->input . '</fieldset>' . "\n";
+						} ?>
 					</div>
+					<?php
+				} else {
+					echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
+				}
+				?>
 				</div>
 			</div>
+			
 		</td>
 	</tr>
 </table>
@@ -352,6 +357,8 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 <input type="hidden" name="view" value="field" />
 <input type="hidden" name="task" value="" />
 </form>
+</div>
+<div style="margin-bottom:24px;"></div>
 			
 <?php
 //keep session alive while editing

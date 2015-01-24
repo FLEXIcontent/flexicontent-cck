@@ -132,6 +132,7 @@ class FlexicontentViewField extends JViewLegacy
 								});
 								var ajax_JTooltips = new Tips($('fieldspecificproperties').getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
 								")."
+								tabberAutomatic(tabberOptions, 'fieldspecificproperties');
 								jQuery('#field_typename').html(jQuery('".$_field_id."').val());
 							}
 						});
@@ -141,7 +142,7 @@ class FlexicontentViewField extends JViewLegacy
 		}
 		
 		//build field select list
-		$lists['field_type'] = flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type, $group=true);
+		$lists['field_type'] = flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type, $group=true, ' class="use_select2_lib fc_skip_highlight" ');
 		
 		//build type select list
 		$attribs  = 'class="use_select2_lib" multiple="multiple" size="6"';
