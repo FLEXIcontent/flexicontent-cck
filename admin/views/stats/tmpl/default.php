@@ -142,7 +142,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_GENERAL_STATS' ), 'ge
 					?>
 					<tr>
 						<td width="65%">
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo $row->title; ?>">
+							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 								<a href="<?php echo $link; ?>">
 									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 								</a>
@@ -195,7 +195,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_GENERAL_STATS' ), 'ge
 				?>
 				<tr>
 					<td>
-						<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+						<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 							<a href="<?php echo $link; ?>">
 								<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 							</a>
@@ -261,7 +261,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_RATING_STATS' ), 'rat
 					?>
 					<tr>
 						<td>
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 								<a href="<?php echo $link; ?>">
 									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 								</a>
@@ -300,7 +300,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_RATING_STATS' ), 'rat
 					?>
 					<tr>
 						<td>
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 								<a href="<?php echo $link; ?>">
 									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 								</a>
@@ -352,7 +352,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_USER_STATS' ), 'users
 					?>
 					<tr>
 						<td>
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo $row->username; ?>">
+							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8'); ?>">
 								<a href="<?php echo $link; ?>">
 									<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
 								</a>
@@ -391,7 +391,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_USER_STATS' ), 'users
 					?>
 					<tr>
 						<td>
-							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo $row->username; ?>">
+							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8'); ?>">
 								<a href="<?php echo $link; ?>">
 									<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
 								</a>
@@ -641,7 +641,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_DASHBOARD' ), 'rating
 							?>
 							<tr>
 								<td width="65%">
-									<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo $row->title; ?>">
+									<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 										<a href="<?php echo $link; ?>">
 											<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 										</a>
@@ -683,7 +683,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_DASHBOARD' ), 'rating
 							?>
 							<tr>
 								<td width="65%">
-									<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo $row->title; ?>">
+									<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 										<a href="<?php echo $link; ?>">
 											<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 										</a>
@@ -726,7 +726,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_DASHBOARD' ), 'rating
 							?>
 							<tr>
 								<td>
-									<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+									<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 										<a href="<?php echo $link; ?>">
 											<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 										</a>
@@ -849,7 +849,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_DASHBOARD' ), 'rating
 										?>
 										<tr>
 											<td>
-												<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+												<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 													<a href="<?php echo $link; ?>">
 														<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 													</a>
@@ -886,7 +886,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_DASHBOARD' ), 'rating
 												?>
 												<tr>
 													<td>
-														<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+														<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 															<a href="<?php echo $link; ?>">
 																<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 															</a>
@@ -1010,7 +1010,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_DASHBOARD' ), 'rating
 									?>
 									<tr>
 										<td>
-											<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo $row->username; ?>">
+											<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8'); ?>">
 												<a href="<?php echo $link; ?>">
 													<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
 												</a>
@@ -1045,7 +1045,7 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_DASHBOARD' ), 'rating
 									?>
 									<tr>
 										<td>
-											<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo $row->username; ?>">
+											<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8'); ?>">
 												<a href="<?php echo $link; ?>">
 													<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
 												</a>
