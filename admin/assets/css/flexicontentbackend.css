@@ -414,17 +414,19 @@ div#fc-dash-sliders table.fc-table-list tr:last-of-type td:last-child {
 
 div#fc-dash-sliders table.fc-table-list thead tr:hover th {
 	color: white;
-	text-shadow: 2px 2px 3px #777 !important;
+	/*text-shadow: 2px 2px 3px #777 !important;*/
+	background-color: #ffffdd;
 }
 
 div#fc-dash-sliders table.fc-table-list tbody tr:hover td {
 	color: black;
-	text-shadow: 2px 2px 2px #888;
+	/*text-shadow: 2px 2px 2px #888;*/
+	background-color: #ffffdd;
 }
 
 div#fc-dash-sliders table.fc-table-list tbody tr:hover td a {
 	color: rgb(0, 136, 204);
-	text-shadow: 1px 1px 2px #888;
+	/*text-shadow: 1px 1px 2px #888;*/
 }
 
 

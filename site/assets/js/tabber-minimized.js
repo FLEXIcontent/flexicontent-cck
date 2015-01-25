@@ -209,6 +209,7 @@ tabberObj.prototype.init = function(e)
        Or use an automatically generated number.
      */
     t.headingText = t.div.title;
+    t.headingTitle = '';
 
     /* Remove the title attribute to prevent a tooltip from appearing */
     if (this.removeTitle) { t.div.title = ''; }
@@ -225,6 +226,7 @@ tabberObj.prototype.init = function(e)
         headingElement = t.div.getElementsByTagName(this.titleElements[i2])[0];
         if (headingElement) {
           t.headingText = headingElement.innerHTML;
+          t.headingTitle = headingElement.title;
           if (typeof jQuery != 'undefined') {
             tab_classes=jQuery(headingElement).attr('class');
           }
@@ -258,7 +260,7 @@ tabberObj.prototype.init = function(e)
     DOM_a = document.createElement("a");
     DOM_a.appendChild(document.createTextNode(t.headingText));
     DOM_a.href = "javascript:void(null);";
-    DOM_a.title = t.headingText;
+    DOM_a.title = t.headingTitle;
     DOM_a.onclick = this.navClick;
     if (typeof jQuery != 'undefined') {
     	jQuery(DOM_a).addClass(tab_classes);

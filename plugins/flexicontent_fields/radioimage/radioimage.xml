@@ -17,28 +17,14 @@
 	<config>
 	<fields name="attribs">
 		
-		<fieldset name="standard" repeat="1">
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
-			<field name="" type="separator" default="The following requires the groupfield and v2.3.0+, do not enable if you do not have this field" level="level2" />
-			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-		</fieldset>
+		<!--fieldset name="standard" repeat="1">
+		</fieldset-->
 		
-		<fieldset name="group-radioimage" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-radioimage-editing" repeat="1" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_ITEM_FORM" level="level0" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
-			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
 			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Yes, (avoid ! use checkboximage instead)</option>
@@ -55,7 +41,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
 			<field name="default_value" type="text" default="" size="50" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="default_value_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
@@ -70,14 +56,14 @@
 			<field name="imagedir" type="text" default="images/stories/" class="required" label="FLEXI_FIELD_IMAGEDIR" description="FLEXI_FIELD_IMAGEDIR_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
-			<field name="use_jslib" type="radio" default="2" label="FLEXI_USE_JS_FORM_FIELD" description="FLEXI_USE_JS_FORM_FIELD_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="2">prettyCheckable</option>
-			</field>
 			<field name="form_vals_display" type="radio" default="1" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC">
 				<option value="0">FLEXI_LABEL</option>
 				<option value="1">FLEXI_IMAGE</option>
 				<option value="2">FLEXI_BOTH</option>
+			</field>
+			<field name="use_jslib" type="radio" default="2" label="FLEXI_USE_JS_FORM_FIELD" description="FLEXI_USE_JS_FORM_FIELD_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="2">prettyCheckable</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_ALTERNATIVE_DISPLAY" description="" level="level2" />
@@ -91,7 +77,7 @@
 			</field>
 			<field name="firstoptiontext" type="text" default="FLEXI_SELECT" label="FLEXI_FIELD_FIRST_OPTION_TEXT" description="FLEXI_FIELD_FIRST_OPTION_TEXT_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level1" />
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
 			<field name="pretext_form" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext_form" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			<field name="separator" type="list" default="0" label="FLEXI_VALUE_SEPARATOR_ITEM_FORM" description="FLEXI_VALUE_SEPARATOR_ITEM_FORM_DESC">
@@ -105,8 +91,24 @@
 			<field name="opentag_form" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag_form" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_FRONTEND" level="level0" />
-			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
+		</fieldset>
+		
+		<fieldset name="group-radioimage-viewing" repeat="1" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
+			
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
 			<field name="lang_filter_values" type="radio" default="1" label="FLEXI_LANG_FILTER_LABELS" description="FLEXI_LANG_FILTER_LABELS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -128,7 +130,7 @@
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -150,10 +152,13 @@
 			<field name="ns_pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT_NONSELECTED" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_NONSELECTED_DESC" />
 			<field name="ns_posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT_NONSELECTED" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_NONSELECTED_DESC" />
 			
+		</fieldset>
+
+		<fieldset name="group-radioimage-filtering" repeat="1" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level0" />
-		
-			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_CONF" description="" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_CONF" description="" level="level2"/>
 			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_WARNING" description="" level="level3" menu="hide" />			
 			<field name="filter_customize_options" type="list" default="0" label="FLEXI_CUSTOM_FILTER_VALUES" description="FLEXI_CUSTOM_FILTER_VALUES_DESC">
 				<option value="0">FLEXI_USE_ALL_VALUES_DEFAULT</option>
@@ -184,6 +189,8 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level2" />
 			<field name="display_label_filter" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
@@ -258,6 +265,15 @@
 			</field>
 			
 		</fieldset>
+		
+		<fieldset name="group-radioimage-fieldgrouping" repeat="1" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="The following requires the groupfield and v2.3.0+, do not enable if you do not have this field" level="level2" />
+			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+		</fieldset>
+		
 	</fields>
 	</config>
 	

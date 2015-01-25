@@ -23,7 +23,9 @@
 		
 		<fieldset name="group-text-editing" repeat="1" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
 			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -40,7 +42,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
 			<field name="default_value" type="text" default="" size="50" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="default_value_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
@@ -64,6 +66,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
+			
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			<field name="placeholder" type="text" default="" size="50" label="FLEXI_FIELD_PLACEHOLDER" description="FLEXI_FIELD_PLACEHOLDER_DESC" />
@@ -102,6 +105,8 @@
 		</fieldset>
 		<fieldset name="group-text-viewing" repeat="1" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
+			
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -112,7 +117,7 @@
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
 			
-			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			<field name="lang_filter_values" type="radio" default="1" label="FLEXI_LANG_FILTER_VALUES" description="FLEXI_LANG_FILTER_VALUES_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -134,7 +139,7 @@
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -169,6 +174,8 @@
 		</fieldset>
 		<fieldset name="group-text-filtering" repeat="1" label="FLEXI_FILTERING_CONF" addfieldpath="/administrator/components/com_flexicontent/elements">
 
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
 			
 			<field name="filter_compare_type" type="list" default="0" label="FLEXI_FILTER_VALUE_COMPARISON" description="FLEXI_FILTER_VALUE_COMPARISON_DESC">
@@ -185,6 +192,8 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level2" />
 			<field name="display_label_filter" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
@@ -250,15 +259,14 @@
 			
 		</fieldset>
 
-		<fieldset name="group-text-editting" repeat="1" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-text-fieldgrouping" repeat="1" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="" type="separator" default="The following requires the groupfield and v2.3.0+, do not enable if you do not have this field" level="level2" />
 			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
-
-
+		
 	</fields>
 	</config>
 	

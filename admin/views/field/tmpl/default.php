@@ -327,12 +327,14 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					if ($name!='basic' && $name!='standard' && substr($name, 0, $prefix_len)!='group-'.$field_type ) continue;
 					if ($fieldSet->label) $label = JText::_($fieldSet->label);
 					else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
+					$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
 					?>
 					<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab">
-						<h3 class="tabberheading"> <?php echo $label; ?> </h3>
+						<h3 class="tabberheading" title="<?php echo $description; ?>"> <?php echo $label; ?> </h3>
 						<?php $i = 0; ?>
 						<?php foreach ($this->form->getFieldset($name) as $field) { 
 							echo '<fieldset class="panelform '.($i ? '' : 'fc-nomargin').'">' . $field->label . $field->input . '</fieldset>' . "\n";
+							$i++;
 						} ?>
 					</div>
 					<?php

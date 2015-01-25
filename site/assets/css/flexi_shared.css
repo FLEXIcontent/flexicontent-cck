@@ -537,12 +537,12 @@ table.adminlist tbody tr.row1 td {
 /* Mouse over ROW */
 table.adminlist tbody tr.row0:hover td,
 table.adminlist tbody tr.row1:hover td {
-	text-shadow: 1px 1px 2px #aaa;
+	/*text-shadow: 1px 1px 2px #aaa;*/
 	background-color: #ffffdd;
 }
 table.adminlist tbody tr:hover td input,
 table.adminlist tbody tr:hover td select {
-	box-shadow: 1px 1px 2px #aaa;
+	/*box-shadow: 1px 1px 2px #aaa;*/
 }
 
 /* FOOTER of table */

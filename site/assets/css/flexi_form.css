@@ -484,7 +484,7 @@ body.contentpane  {
 	background-color: #2096C9;
 	color: white;
 	padding: 0.8em 1%;
-	margin: 16px 0% 2px 0%;
+	margin: 20px 0% 2px 0%;
 	display: block;
 	position: relative;
 	border-radius: 5px;
@@ -492,6 +492,7 @@ body.contentpane  {
 	float:left;
 	width:98%;
 	font-size:12px;
+	font-weight:bold;
 }
 .fcsep_level2 {
 	background-color: #9fd1f2;
@@ -514,11 +515,15 @@ table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level0,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level1,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
-:first-child > .fcsep_level0,   :first-child > .fcsep_level1,   :first-child > .fcsep_level2,
-.fc-nomargin > .fcsep_level0, .noseppadding > .fcsep_level1,   .noseppadding > .fcsep_level2
+:first-child > .fcsep_level0,  :first-child > .fcsep_level1,  :first-child > .fcsep_level2,
+.fc-nomargin > .fcsep_level0,  .fc-nomargin > .fcsep_level1,  .fc-nomargin > .fcsep_level2
 {
 	margin-top:0px !important;
 }
+.fc-nomargin > .fcsep_level0,  .fc-nomargin > .fcsep_level1,  .fc-nomargin > .fcsep_level2 {
+	margin-top: 0.8em !important;
+}
+
 div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-of-type > div > .fcsep_level1, div.control-group:first-of-type > div > .fcsep_level2 {margin-top:0px;}
 
 .fcsep_level3 {

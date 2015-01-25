@@ -95,6 +95,7 @@ class FlexicontentViewField extends JViewLegacy
 				$i = 0;
 				foreach ($form->getFieldset($name) as $field) {
 					echo '<fieldset class="panelform '.($i ? '' : 'fc-nomargin').'">' . $field->label . $field->input . '</fieldset>' . "\n";
+					$i++;
 				}
 				?>
 			</div>

@@ -16,10 +16,26 @@
 	</files>
 	
 	<config>
-	
 	<fields name="attribs">
 		
-		<fieldset name="standard" repeat="1">
+		<!--fieldset name="standard" repeat="1">
+		</fieldset-->
+		
+		<fieldset name="group-addressint-editing" repeat="1" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		</fieldset>
+		<fieldset name="group-addressint-viewing" repeat="1" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
+			
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -29,22 +45,27 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
-		</fieldset>
-		
-		<fieldset name="group-addressint" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC"  menu="hide">
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="plugins" type="pluginlist" label="PLG_FLEXICONTENT_FIELDS_CHOOSE_SPECIFIC_PLUGINS" description="PLG_FLEXICONTENT_FIELDS_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			
+			
+			<field name="" type="separator" default="Map configuration" description="Google map configuration" level="level2" />
+			
 			<field name="show_map" type="list" default="none" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_MAP" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_MAP_DESC">
 				<option value="none">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NEVER</option>
 				<option value="category">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CATEGORY_VIEW</option>
 				<option value="item">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ITEM_VIEW</option>
 				<option value="both">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALWAYS</option>
 			</field>
-			<field name="map_width" type="text" default="200" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH" description="" />
-			<field name="map_height" type="text" default="150" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT" description="" />
+			<field name="map_width" type="text" default="200" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH" description="..." />
+			<field name="map_height" type="text" default="150" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT" description="..." />
 			<field name="map_type" type="list" default="roadmap" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE_DESC">
 				<option value="roadmap">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ROADMAP</option>
 				<option value="satellite">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SATELLITE</option>
@@ -99,9 +120,19 @@
 				<option value="small">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SMALL</option>
 				<option value="normal">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NORMAL</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="field_prefix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_PREFIX" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_PREFIX_DESC" />
 			<field name="field_suffix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_SUFFIX" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_SUFFIX_DESC" />
 		</fieldset>
+		
+		<!--fieldset name="group-addressint-fieldgrouping" repeat="1" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="The following requires the groupfield and v2.3.0+, do not enable if you do not have this field" level="level2" />
+			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+				<option value="0">FLEXI_NO</option>
+			</field>
+		</fieldset-->
+		
 	</fields>
 	</config>
 	

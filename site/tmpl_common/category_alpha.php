@@ -83,8 +83,7 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 	$groupcssclasses[$i] = 'letters';
 }
 
-if ($caching) $selected_letter = JRequest::getVar('letter', '', 'get');
-else $selected_letter = JRequest::getVar('letter', '', 'post');
+$selected_letter = JRequest::getVar('letter', '');
 ?>
 
 <div id="fc_alpha">
