@@ -84,7 +84,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		
 		<div class="fctabber fields_tabset" id="field_specific_props_tabset">
 			
-			<div class="tabbertab" id="fcform_tabset_common_basic_tab">
+			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-home-2" >
 				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
 				
 				<table class="fc-form-tbl">
@@ -149,82 +149,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 			</div>
 			
 			
-			<div class="tabbertab" id="fcform_tabset_common_basic_tab">
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELD_SEARCH_FILTERING' ); ?> </h3>
-				
-				<?php if ($this->supportsearch || $this->supportfilter) : ?>
-					<span class="fcsep_level1" style="width:90%; margin-top:16px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX' ); ?></span>
-					<span class="fcsep_level4" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX_NOTES' ); ?></span>
-					<div class="fcclear"></div>
-				<?php endif; ?>
-					
-				<table class="fc-form-tbl">
-					<?php if ($this->supportsearch) : ?>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('issearch'); ?>
-						</td>
-						<td>
-							<?php echo
-								in_array($this->form->getValue('issearch'),array(-1,2)) ?
-									JText::_($this->form->getValue('issearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_BASIC_INDEX_PROPERTY_DIRTY') :
-									$this->form->getInput('issearch'); ?>
-						</td>
-					</tr>
-					<?php endif; ?>
-					
-					<?php if ($this->supportfilter) : ?>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('isfilter'); ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('isfilter'); ?>
-						</td>
-					</tr>
-					<?php endif; ?>
-				</table>
-				
-				<?php if ($this->supportadvsearch || $this->supportadvfilter) : ?>
-					<span class="fcsep_level1" style="width:90%; margin-top:16px; "><?php echo JText::_( 'FLEXI_ADV_INDEX' ); ?></span>
-					<span class="fcsep_level4" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_ADV_INDEX_NOTES' ); ?></span>
-					<div class="fcclear"></div>
-				<?php endif; ?>
-				
-				<table class="fc-form-tbl">
-					<?php if ($this->supportadvsearch) : ?>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('isadvsearch'); ?>
-						</td>
-						<td>
-							<?php echo
-								in_array($this->form->getValue('isadvsearch'),array(-1,2)) ?
-									JText::_($this->form->getValue('isadvsearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
-									$this->form->getInput('isadvsearch'); ?>
-						</td>
-					</tr>
-					<?php endif; ?>
-					
-					<?php if ($this->supportadvfilter) : ?>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('isadvfilter'); ?>
-						</td>
-						<td>
-							<?php echo
-								in_array($this->form->getValue('isadvfilter'),array(-1,2)) ?
-									JText::_($this->form->getValue('isadvfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
-									$this->form->getInput('isadvfilter'); ?>
-						</td>
-					</tr>
-					<?php endif; ?>
-				</table>
-				
-			</div>
-			
-			
-			<div class="tabbertab" id="fcform_tabset_common_basic_tab">
+			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-pencil" >
 				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?> </h3>
 				<table class="fc-form-tbl">
 					
@@ -277,6 +202,84 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 			</div>
 			
 			
+			<?php if ($this->supportsearch || $this->supportfilter || $this->supportadvsearch || $this->supportadvfilter) : ?>
+			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-filter" >
+				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELD_SEARCH_FILTERING' ); ?> </h3>
+				
+				<?php if ($this->supportsearch || $this->supportfilter) : ?>
+					<span class="fcsep_level1" style="width:90%; margin-top:16px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX' ); ?></span>
+					<span class="fcsep_level4" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX_NOTES' ); ?></span>
+					<div class="fcclear"></div>
+				
+					<table class="fc-form-tbl">
+						<?php if ($this->supportsearch) : ?>
+						<tr>
+							<td class="key">
+								<?php echo $this->form->getLabel('issearch'); ?>
+							</td>
+							<td>
+								<?php echo
+									in_array($this->form->getValue('issearch'),array(-1,2)) ?
+										JText::_($this->form->getValue('issearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_BASIC_INDEX_PROPERTY_DIRTY') :
+										$this->form->getInput('issearch'); ?>
+							</td>
+						</tr>
+						<?php endif; ?>
+						
+						<?php if ($this->supportfilter) : ?>
+						<tr>
+							<td class="key">
+								<?php echo $this->form->getLabel('isfilter'); ?>
+							</td>
+							<td>
+								<?php echo $this->form->getInput('isfilter'); ?>
+							</td>
+						</tr>
+						<?php endif; ?>
+					</table>
+				<?php endif; ?>
+				
+				
+				<?php if ($this->supportadvsearch || $this->supportadvfilter) : ?>
+					<span class="fcsep_level1" style="width:90%; margin-top:16px; "><?php echo JText::_( 'FLEXI_ADV_INDEX' ); ?></span>
+					<span class="fcsep_level4" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_ADV_INDEX_NOTES' ); ?></span>
+					<div class="fcclear"></div>
+					
+					<table class="fc-form-tbl">
+						<?php if ($this->supportadvsearch) : ?>
+						<tr>
+							<td class="key">
+								<?php echo $this->form->getLabel('isadvsearch'); ?>
+							</td>
+							<td>
+								<?php echo
+									in_array($this->form->getValue('isadvsearch'),array(-1,2)) ?
+										JText::_($this->form->getValue('isadvsearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
+										$this->form->getInput('isadvsearch'); ?>
+							</td>
+						</tr>
+						<?php endif; ?>
+						
+						<?php if ($this->supportadvfilter) : ?>
+						<tr>
+							<td class="key">
+								<?php echo $this->form->getLabel('isadvfilter'); ?>
+							</td>
+							<td>
+								<?php echo
+									in_array($this->form->getValue('isadvfilter'),array(-1,2)) ?
+										JText::_($this->form->getValue('isadvfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
+										$this->form->getInput('isadvfilter'); ?>
+							</td>
+						</tr>
+						<?php endif; ?>
+					</table>
+				<?php endif; ?>
+				
+			</div>
+			<?php endif; ?>
+			
+			
 			<?php if ($this->permission->CanConfig) :
 				/*$this->document->addScriptDeclaration("
 					window.addEvent('domready', function() {
@@ -290,7 +293,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					});
 				");*/
 			?>
-			<div class="tabbertab" id="fcform_tabset_common_basic_tab">
+			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-power-cord" >
 				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
 				<!--fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend-->
@@ -317,7 +320,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 			<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; "><?php echo JText::_( /*'FLEXI_THIS_FIELDTYPE_PROPERTIES'*/'FIELD TYPE specific configuration' ); ?></span>
 			
 			<div id="fieldspecificproperties">
-				<div class="fctabber fields_tabset" id="field_specific_props_tabset">
+				<div class="fctabber fields_tabset" id="field_specific_props_tabset" >
 				<?php
 				$fieldSets = $this->form->getFieldsets('attribs');
 				$field_type = $this->form->getValue("field_type", NULL, "text");
@@ -327,10 +330,15 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					if ($name!='basic' && $name!='standard' && substr($name, 0, $prefix_len)!='group-'.$field_type ) continue;
 					if ($fieldSet->label) $label = JText::_($fieldSet->label);
 					else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
+					
+					if (@$fieldSet->label_prefix) $label = JText::_($fieldSet->label_prefix) .' - '. $label;
+					$icon = @$fieldSet->icon_class ? 'data-icon-class="'.$fieldSet->icon_class.'"' : '';
+					$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.JText::_($fieldSet->prepend_text).'"' : '';
+					
 					$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
 					?>
-					<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab">
-						<h3 class="tabberheading" title="<?php echo $description; ?>"> <?php echo $label; ?> </h3>
+					<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
+						<h3 class="tabberheading" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
 						<?php $i = 0; ?>
 						<?php foreach ($this->form->getFieldset($name) as $field) { 
 							echo '<fieldset class="panelform '.($i ? '' : 'fc-nomargin').'">' . $field->label . $field->input . '</fieldset>' . "\n";

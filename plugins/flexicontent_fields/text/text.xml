@@ -21,7 +21,7 @@
 		<!--fieldset name="standard" repeat="1">
 		</fieldset-->
 		
-		<fieldset name="group-text-editing" repeat="1" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-text-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
@@ -103,7 +103,7 @@
 			<field name="custommask" type="text" default="" size="50" label="FLEXI_VALUE_VALIDATION_CUSTOM_MASK" description="FLEXI_VALUE_VALIDATION_CUSTOM_MASK_DESC" />
 			
 		</fieldset>
-		<fieldset name="group-text-viewing" repeat="1" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-text-viewing" repeat="1" icon_class="icon-list-view" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
@@ -172,8 +172,8 @@
 			<field name="ogpmaxlen" type="text" default="300" label="FLEXI_SOCIAL_TXT_MAXLEN_LISTING" description="FLEXI_SOCIAL_TXT_MAXLEN_LISTING_DESC" />
 
 		</fieldset>
-		<fieldset name="group-text-filtering" repeat="1" label="FLEXI_FILTERING_CONF" addfieldpath="/administrator/components/com_flexicontent/elements">
-
+		<fieldset name="group-text-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
@@ -259,7 +259,7 @@
 			
 		</fieldset>
 
-		<fieldset name="group-text-fieldgrouping" repeat="1" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-text-fieldgrouping" repeat="1" icon_class="icon-menu-3" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="" type="separator" default="The following requires the groupfield and v2.3.0+, do not enable if you do not have this field" level="level2" />
 			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
 				<option value="0">FLEXI_NO</option>

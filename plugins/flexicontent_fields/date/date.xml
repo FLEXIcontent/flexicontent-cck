@@ -35,7 +35,7 @@
 			</field>
 		</fieldset>
 		
-		<fieldset name="group-date" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-date-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
 			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">

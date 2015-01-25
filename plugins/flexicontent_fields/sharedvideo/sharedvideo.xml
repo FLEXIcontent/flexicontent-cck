@@ -29,7 +29,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
 		</fieldset>
 		
-		<fieldset name="group-sharedvideo" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-sharedvideo-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
 			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
 			<field name="display_title" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TITLE" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TITLE_DESC">

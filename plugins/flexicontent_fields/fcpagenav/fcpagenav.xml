@@ -33,7 +33,7 @@
 			<field name="backend_hidden" type="hidden" default="1" />
 		</fieldset>
 		
-		<fieldset name="group-fcpagenav" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-fcpagenav-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_CSS" description="FLEXI_FIELD_PAGENAV_CSS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -45,9 +45,9 @@
 			</field>
 			
 			
-			<field name="item_sep" type="separator" hr="false" default="Previous / Next items" description="..." level="level2" menu="hide" />
+			<field name="item_sep" type="separator" hr="false" default="Previous / Next items" description="..." level="level2" />
 			
-			<field name="item_links_sep" type="separator" hr="false" default="Item links" description="..." level="level3" menu="hide" />
+			<field name="item_links_sep" type="separator" hr="false" default="Item links" description="..." level="level3" />
 			<field name="use_tooltip" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_USETIP" description="FLEXI_FIELD_PAGENAV_USETIP_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -61,7 +61,7 @@
 			<field name="prev_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_PREV" description="..." />
 			<field name="next_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_NEXT" description="..." />
 			
-			<field name="item_image_sep" type="separator" hr="false" default="Item images" description="..." level="level3" menu="hide" />
+			<field name="item_image_sep" type="separator" hr="false" default="Item images" description="..." level="level3" />
 			<field name="item_use_image" type="radio" default="0" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -75,13 +75,13 @@
 				<option value="o">FLEXI_ORIGINAL</option>
 			</field>
 			
-			<field name="cat_sep" type="separator" hr="false" default="FLEXI_CATEGORY" description="..." level="level2" menu="hide" />
+			<field name="cat_sep" type="separator" hr="false" default="FLEXI_CATEGORY" description="..." level="level2" />
 			<field name="use_category_link" type="radio" default="0" label="FLEXI_FIELD_PAGENAV_USECATEGORY" description="FLEXI_FIELD_PAGENAV_USECATEGORY_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="category_label" type="text" default="" label="FLEXI_FIELDS_PAGENAV_CATEGORY" description="..." />
-			<field name="cat_image_sep" type="separator" hr="false" default="Category image" description="..." level="level3" menu="hide" />
+			<field name="cat_image_sep" type="separator" hr="false" default="Category image" description="..." level="level3" />
 			<field name="cat_use_image" type="radio" default="0" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -93,7 +93,7 @@
 			</field>
 			
 			
-			<field name="image_thumbnail_sep" type="separator" hr="false" default="Thumbnailing parameters (enable above)" description="..." level="level1" menu="hide" />
+			<field name="image_thumbnail_sep" type="separator" hr="false" default="Thumbnailing parameters (enable above)" description="..." level="level1" />
 			<field name="nav_width" type="text" size="4" default="120" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="nav_height" type="text" size="4" default="60" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			<field name="nav_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="btn-group btn-group-yesno">

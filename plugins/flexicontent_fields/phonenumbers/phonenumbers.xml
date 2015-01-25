@@ -34,9 +34,9 @@
 			</field>
 		</fieldset>
 		
-		<fieldset name="group-phonenumbers" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-phonenumbers-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_ITEM_FORM" level="level0" />
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="level0" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level1" />
 			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
@@ -100,7 +100,7 @@
 			<field name="phone3_size" type="text" default="12" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			
 			
-			<field name="" type="separator" default="FLEXI_FRONTEND" level="level0" />
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="level0" />
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_OPTIONAL_PROPERTIES_EVERY_VALUE" level="level2" />

@@ -30,7 +30,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
 		</fieldset>
 		
-		<fieldset name="group-groupmarker" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-groupmarker-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="marker_type" type="groupedlist" default="fieldset_open" label="FLEXI_MARKER" description="FLEXI_MARKER_DESC">
 				<group label="FLEXI_TABS">
@@ -48,11 +48,11 @@
 				</group>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_TABS_FIELDSET" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_TABS_FIELDSET" level="level3" />
 			<field name="cont_label"    type="text" size="24" default="" label="FLEXI_TABS_FIELDSET_LABEL"     description="FLEXI_TABS_FIELDSET_LABEL_DESC" />
 			<field name="cont_cssclass" type="text" size="24" default="" label="FLEXI_CONTAINER_CSS" description="FLEXI_CONTAINER_CSS_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_CUSTOM_HTML_SEP" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_CUSTOM_HTML_SEP" level="level3" />
 			<field name="custom_html_sep" type="textarea" cols="21" rows="5" default="&lt;hr style='clear:both;' /&gt;" label="FLEXI_CUSTOM_HTML" description="FLEXI_CUSTOM_HTML_DESC" />
 			
 		</fieldset>

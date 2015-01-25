@@ -1154,9 +1154,11 @@ div fieldset input, div fieldset textarea, div fieldset select, div fieldset img
 	margin: 2px 2px 2px 0px;
 	font-size: 12px;
 }
+#flexicontent div fieldset.panelform fieldset.radio,
 #flexicontent div fieldset.panelform input,
 #flexicontent div fieldset.panelform textarea {
-	min-width: 70%;
+	min-width: 60%;
+	width: 60%;
 }
 div fieldset td input, div fieldset td textarea {
 	min-width: 80%;

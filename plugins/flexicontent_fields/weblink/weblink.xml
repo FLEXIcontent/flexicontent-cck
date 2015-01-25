@@ -15,13 +15,12 @@
 	</files>
 	
 	<config>
-	
 	<fields name="attribs">
 		
 		<!--fieldset name="standard" repeat="1">
 		</fieldset-->
 		
-		<fieldset name="group-weblink-editing" repeat="1" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-weblink-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
@@ -66,9 +65,9 @@
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level2" />
 			
-			<field name="" type="separator" default="Title (used as Link Text)" level="level3" menu="hide" />
+			<field name="" type="separator" default="Title (used as Link Text)" level="level3" />
 			<field name="use_title" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -80,14 +79,14 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_HITS" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_HITS" level="level3" />
 			<field name="use_hits" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 		</fieldset>
-		<fieldset name="group-weblink-viewing" repeat="1" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-weblink-viewing" repeat="1" icon_class="icon-list-view" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
@@ -134,9 +133,8 @@
 			<field name="opentag" type="text" default="" size="50" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" size="50" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
-
 		</fieldset>
-		<fieldset name="group-text-filtering" repeat="1" label="FLEXI_FILTERING_CONF" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-weblink-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
@@ -145,7 +143,7 @@
 			
 		</fieldset>
 
-		<fieldset name="group-weblink-fieldgrouping" repeat="1" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-weblink-fieldgrouping" repeat="1" icon_class="icon-menu-3" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="" type="separator" default="The following requires the groupfield and v2.3.0+, do not enable if you do not have this field" level="level2" />
 			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
 				<option value="0">FLEXI_NO</option>

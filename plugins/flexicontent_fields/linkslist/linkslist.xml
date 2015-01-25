@@ -30,9 +30,9 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
 		</fieldset>
 		
-		<fieldset name="group-linkslist" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-linkslist-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_ITEM_FORM" description="" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" description="" level="level1" />
 			
 			<field name="field_elements" type="textarea" default="Title1[id=&quot;tagid1&quot; class=&quot;cssclass1&quot; link=&quot;#link1&quot;] :: &#13; Title2[id=&quot;tagid2&quot; class=&quot;cssclass2&quot; link=&quot;#link2&quot;] :: &#13; Title3[id=&quot;tagid3&quot; class=&quot;cssclass3&quot; link=&quot;#link3&quot;]" class="required" rows="5" cols="40" label="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS_DESC" />
 			<field name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
@@ -55,7 +55,7 @@
 			<field name="opentag_form" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag_form" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_FRONTEND" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LINKSLIST_LIST_TAG_PARAMS" level="level3" />
 			<field name="list_type" type="list" default="ul" label="FLEXI_FIELD_LIST_TYPE" description="FLEXI_FIELD_LIST_TYPE_DESC">

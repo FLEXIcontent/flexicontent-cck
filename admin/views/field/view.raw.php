@@ -85,12 +85,20 @@ class FlexicontentViewField extends JViewLegacy
 		<div class="fctabber fields_tabset" id="field_specific_props_tabset">
 		<?php
 		$fieldSets = $form->getFieldsets('attribs');
+		$prefix_len = strlen('group-'.$field_type);
 		foreach ($fieldSets as $name => $fieldSet) :
+			if ($name!='basic' && $name!='standard' && substr($name, 0, $prefix_len)!='group-'.$field_type ) continue;
 			if ($fieldSet->label) $label = JText::_($fieldSet->label);
 			else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
+			
+			if (@$fieldSet->label_prefix) $label = JText::_($fieldSet->label_prefix) .' - '. $label;
+			$icon = @$fieldSet->icon_class ? 'data-icon-class="'.$fieldSet->icon_class.'"' : '';
+			$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.JText::_($fieldSet->prepend_text).'"' : '';
+			
+			$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
 			?>
-			<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab">
-				<h3 class="tabberheading"> <?php echo $label; ?> </h3>
+			<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
+				<h3 class="tabberheading" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
 				<?php
 				$i = 0;
 				foreach ($form->getFieldset($name) as $field) {

@@ -35,9 +35,9 @@
 			</field>
 		</fieldset>
 		
-		<fieldset name="group-image" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-image-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_ITEM_FORM" level="level0" />
+			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="level0" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level1" />
 			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC" class="btn-group btn-group-yesno">
@@ -69,7 +69,7 @@
 				<option value="1">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE_DESC" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_FOLDER_MODE_DESC" level="level2" />
 			<field name="autoassign" type="radio" default="0" label="FLEXI_FIELD_AUTO_ASSIGN_UPLOADED_IMAGE" description="FLEXI_FIELD_AUTO_ASSIGN_UPLOADED_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -83,7 +83,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE_DESC" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE_DESC" level="level2" />
 			<field name="autoupload" type="radio" default="0" label="FLEXI_FIELD_IMAGE_AUTOUPLOAD" description="FLEXI_FIELD_IMAGE_AUTOUPLOAD_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -92,7 +92,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="" type="separator" default="FLEXI_FIELD_EXISTING_IMAGE_LIST" description="FLEXI_FIELD_EXISTING_IMAGE_LIST_DESC" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_FIELD_EXISTING_IMAGE_LIST" description="FLEXI_FIELD_EXISTING_IMAGE_LIST_DESC" level="level3" />
 			<field name="imagepickerlimit" type="text" default="200" label="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION" description="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION_DESC" />
 			<field name="list_all_media_files" type="radio" default="0" label="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD" description="FLEXI_FIELD_INCLUDE_IMAGES_UPLOADED_FIELD_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_FIELD_THIS_FIELD</option>
@@ -108,9 +108,9 @@
 			</field>
 			
 
-			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" />
 			
-			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC" level="level3" />
 			<field name="linkto_url" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -121,7 +121,7 @@
 				<option value="multibox">FLEXI_FIELD_MODAL_POPUP_WIN</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_ALTERN_TEXT" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_ALTERN_TEXT" level="level3" />
 			<field name="use_alt" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -133,7 +133,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_TOOLTIP_TITLE" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_TOOLTIP_TITLE" level="level3" />
 			<field name="use_title" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -145,7 +145,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_TOOLTIP_DESCRIPTION" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_TOOLTIP_DESCRIPTION" level="level3" />
 			<field name="use_desc" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -157,7 +157,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
-			<field name="" type="separator" default="CUSTOM 1" description="Custom value. NOTE, that you need to add a language string for 'FLEXI_FIELD_IMG_CUSTOM...'" level="level3" menu="hide" />
+			<field name="" type="separator" default="CUSTOM 1" description="Custom value. NOTE, that you need to add a language string for 'FLEXI_FIELD_IMG_CUSTOM...'" level="level3" />
 			<field name="use_cust1" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -169,7 +169,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
-			<field name="" type="separator" default="CUSTOM 2" description="Custom value. NOTE, that you need to add a language string for 'FLEXI_FIELD_IMG_CUSTOM...'" level="level3" menu="hide" />
+			<field name="" type="separator" default="CUSTOM 2" description="Custom value. NOTE, that you need to add a language string for 'FLEXI_FIELD_IMG_CUSTOM...'" level="level3" />
 			<field name="use_cust2" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -182,7 +182,7 @@
 			</field>
 
 
-			<field name="" type="separator" default="FLEXI_FRONTEND" level="level0" />
+			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="level0" />
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
 			<field name="default_method_cat" type="list" default="display_single_total" label="Category view &lt;br/&gt; (item listings)" description="Default display method for the view" class="btn-group btn-group-yesno">

@@ -204,4 +204,15 @@ ul.tabbernav li.tabberactive a:hover
 	border-top: 1px solid #B0B0B0;
 	border-right: 1px solid #808080;
 	text-shadow: none;
+	position: relative;
+}
+
+#flexicontent ul.tabbernav li.tabberactive a:before {
+	content: "";
+	position: absolute;
+	height: 1px;
+	border-top: 5px solid #26759e;
+	top: 0;
+	left: 0px;
+	width: 100%;
 }

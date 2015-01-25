@@ -120,7 +120,7 @@ if ( JRequest::getWord('format')!='raw')
 	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 	
 	// Load jquery Framework
-	flexicontent_html::loadJQuery();
+	flexicontent_html::loadFramework('jQuery');
 	
 	if ($cparams->get('add_tooltips', 1))
 	{

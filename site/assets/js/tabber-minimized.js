@@ -210,7 +210,9 @@ tabberObj.prototype.init = function(e)
      */
     t.headingText = t.div.title;
     t.headingTitle = '';
-
+    t.headingIconClass = t.div.getAttribute('data-icon-class');
+    t.headingPrefixTxt = t.div.getAttribute('data-prefix-text');
+    
     /* Remove the title attribute to prevent a tooltip from appearing */
     if (this.removeTitle) { t.div.title = ''; }
 
@@ -258,6 +260,12 @@ tabberObj.prototype.init = function(e)
 
     /* Create a link to activate the tab */
     DOM_a = document.createElement("a");
+    if (t.headingIconClass) {
+    	var icon = document.createElement("i");
+    	icon.setAttribute('class', t.headingIconClass);
+    	DOM_a.appendChild(icon);
+    	DOM_a.appendChild(document.createTextNode(' '));
+    }
     DOM_a.appendChild(document.createTextNode(t.headingText));
     DOM_a.href = "javascript:void(null);";
     DOM_a.title = t.headingTitle;
@@ -286,6 +294,13 @@ tabberObj.prototype.init = function(e)
     }
 
     /* Add the link to the list element */
+    if (t.headingPrefixTxt) {
+    	var span = document.createElement("span");
+    	span.setAttribute('class', 'label');
+    	span.appendChild(document.createTextNode(t.headingPrefixTxt));
+    	DOM_li.appendChild(span);
+    	DOM_li.appendChild(document.createElement("br"));
+    }
     DOM_li.appendChild(DOM_a);
 
     /* Add the list element to the list */
