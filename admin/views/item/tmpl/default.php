@@ -1067,8 +1067,6 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	<?php endif;
 	?>
 	
-	
-	
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 		
@@ -1141,42 +1139,26 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		</fieldset>
 		
 	</div> <!-- end tab -->
+	
+	<!-- Versionning tab -->
+		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+		<h3 class="tabberheading">  <?php echo JText::_('FLEXI_VERSIONS_HISTORY'); ?> </h3>
+		
+		<div class="fc-board-set-inner">
 
-<?php
-// ***************
-// MAIN TABSET END
-// ***************
-?>
-</div> <!-- end of tab set -->
-				
-				
-			</td>
-			<td valign="top" width="380px" style="padding: 7px 0 0 5px">
-
-		<?php
-		// used to hide "Reset Hits" when hits = 0
-		if ( !$this->row->hits ) {
-			$visibility = 'style="display: none; visibility: hidden;"';
-		} else {
-			$visibility = '';
-		}
-
-		if ( !$this->row->score ) {
-			$visibility2 = 'style="display: none; visibility: hidden;"';
-		} else {
-			$visibility2 = '';
-		}
-
-		?>
-		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
+		<table width="100%" style="padding: 5px; margin-bottom: 10px;" class="table table-condensed table-striped">
+		<div class="container_fcfield">
+		<div class="fcsep_level2 hasTooltip" title="" style="" data-original-title="">Infos</div>
+		</div>
+		<div class="fcclear clear"> </div>
 		<?php
 		if ( $this->row->id ) {
 		?>
 		<tr>
-			<td>
+			<td width="10%">
 				<span class="label"><?php echo JText::_( 'FLEXI_ITEM_ID' ); ?></span>
 			</td>
-			<td>
+			<td width="90%">
 				<?php echo $this->row->id; ?>
 			</td>
 		</tr>
@@ -1214,7 +1196,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			<td>
 				<div id="hits" style="float:left;"></div> &nbsp;
 				<span <?php echo $visibility; ?>>
-					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resethits', '<?php echo $this->row->id; ?>', 'hits')" />
+					<input name="reset_hits" type="button" class="button btn-small btn-warning" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resethits', '<?php echo $this->row->id; ?>', 'hits')" />
 				</span>
 			</td>
 		</tr>
@@ -1233,7 +1215,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			<td>
 				<div id="votes" style="float:left;"></div> &nbsp;
 				<span <?php echo $visibility2; ?>>
-					<input name="reset_votes" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resetvotes', '<?php echo $this->row->id; ?>', 'votes')" />
+					<input name="reset_votes" type="button" class="button btn-small btn-warning" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resetvotes', '<?php echo $this->row->id; ?>', 'votes')" />
 				</span>
 			</td>
 		</tr>
@@ -1316,10 +1298,12 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		</table>
 
 	<?php if ($this->params->get('use_versioning', 1)) : ?>
-		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
+		<table width="100%" style="padding: 5px; margin-bottom: 10px;" class="table table-striped">
 			<tr>
-				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4">
-					<span class="badge"><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></span>
+				<th style="padding-bottom: 3px;" colspan="4">
+						<div class="container_fcfield">
+		<div class="fcsep_level2 hasTooltip" title="" style="" data-original-title=""><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></div>
+		</div>
 				</th>
 			</tr>
 			<tr>
@@ -1329,10 +1313,12 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		
 		<?php if ( $this->perms['canversion'] ) : ?>
 		<div id="result" >
-		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 5px;" cellpadding="0" cellspacing="0">
+		<table width="100%" style="padding: 5px; margin-bottom: 5px;" cellpadding="0" cellspacing="0" class="table table-condensed">
 			<tr>
 				<th style="border-bottom: 1px dotted silver; padding: 2px 0 6px 0;" colspan="4">
-					<span class="badge"><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></span>
+				<div class="container_fcfield">
+		<div class="fcsep_level2 hasTooltip" title="" style="" data-original-title=""><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></div>
+		</div>
 				</th>
 			</tr>
 			<?php if ($this->row->id == 0) : ?>
@@ -1343,7 +1329,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			else :
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
 			foreach ($this->versions as $version) :
-				$class = ($version->nr == $this->row->version) ? ' class="active-version"' : '';
+				$class = ($version->nr == $this->row->version) ? ' class="active-version success"' : '';
 				if ((int)$version->nr > 0) :
 			?>
 			<tr<?php echo $class; ?>>
@@ -1383,6 +1369,21 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		</td>
 	</tr>
 </table>
+</div>
+</div>
+	
+	
+
+<?php
+// ***************
+// MAIN TABSET END
+// ***************
+?>
+</div> <!-- end of tab set -->
+				
+				
+			</td>
+
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="jform[id]" value="<?php echo $this->row->id; ?>" />
