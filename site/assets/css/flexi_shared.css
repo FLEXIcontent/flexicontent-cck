@@ -538,7 +538,7 @@ table.adminlist tbody tr.row1 td {
 table.adminlist tbody tr.row0:hover td,
 table.adminlist tbody tr.row1:hover td {
 	/*text-shadow: 1px 1px 2px #aaa;*/
-	background-color: #ffffdd;
+	background-color: #DFF0D8;
 }
 table.adminlist tbody tr:hover td input,
 table.adminlist tbody tr:hover td select {

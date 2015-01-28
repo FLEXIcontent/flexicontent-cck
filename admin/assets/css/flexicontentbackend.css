@@ -313,7 +313,7 @@ div#fc-dash-credits {
 	margin: 24px 0px 12px 0px;
 }
 div#fc-dash-credits .fc-board-set-inner { text-align:left; }
-div#fc-dash-credits #fc-dash-logo { display:inline-block; padding:2px; border:1px solid #e0e0e0; border-radius:3px; float: left; margin:4px 16px 16px 0 !important;}
+div#fc-dash-credits #fc-dash-logo { display:inline-block; padding:2px; float: left; margin:4px 16px 16px 0 !important;}
 div#fc-dash-credits #fc-dash-license { margin:4px 16px 0 0 !important; padding: 22px 32px !important; max-width: inherit; }
 div#fc-dash-credits #fc-dash-devs { display:inline-flex; }
 div#fc-dash-credits #fc-dash-devs > .fc-mssg-inline  { vertical-align:top; margin:0 24px 12px 0 !important; padding:0 !important; }
