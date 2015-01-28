@@ -102,7 +102,9 @@ class FlexicontentViewField extends JViewLegacy
 				<?php
 				$i = 0;
 				foreach ($form->getFieldset($name) as $field) {
-					echo '<fieldset class="panelform '.($i ? '' : 'fc-nomargin').'">' . $field->label . $field->input . '</fieldset>' . "\n";
+					$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
+						$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+					echo '<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container" >' . $field->label . $field->input . '</fieldset>' . "\n";
 					$i++;
 				}
 				?>

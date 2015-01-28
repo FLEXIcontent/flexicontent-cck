@@ -19,7 +19,32 @@
 	
 	<fields name="attribs">
 		
-		<fieldset name="standard" repeat="1">
+		<!--fieldset name="standard" repeat="1">
+		</fieldset-->
+		
+		<fieldset name="group-file-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
+			<field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			
+		</fieldset>
+		<fieldset name="group-file-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
+			
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -29,23 +54,29 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
-		</fieldset>
+			
+			<field name="" type="separator" default="FLEXI_DISPLAY_INACCESSIBLE_FILES_PARAMS_LABEL" level="level2" />
+			<field name="noaccess_display" type="radio" default="1" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_FILE_YES_NO_DESCRIPTION</option>
+			</field>
+			<field name="noaccess_addvars" type="radio" default="0" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FILE_UNLOGGED_USERS" level="level3" />
+			<field name="noaccess_url_unlogged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_UNLOGGED_DESC" />
+			<field name="noaccess_msg_unlogged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_UNLOGGED_DESC" />
 		
-		<fieldset name="group-file-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="FLEXI_FILE_LOGGED_USERS" level="level3" />
+			<field name="noaccess_url_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_LOGGED_DESC" />
+			<field name="noaccess_msg_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_LOGGED_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="level1" />
-			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
-			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
-			<field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			
-			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMS_LABEL" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
 			<field name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -113,7 +144,10 @@
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_FIELD_FILE_OPTIONAL_BUTTONS" level="level2" />
+		</fieldset>
+		<fieldset name="group-file-downloading" repeat="1" icon_class="icon-download" label="FLEXI_FIELD_FILE_DOWNLOAD" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="Button configuration for actions such as: download, view, share, add-to-cart" level="level2" />
 			
 			<field name="usebutton" type="radio" default="1" label="FLEXI_FIELD_USE_BUTTONS" description="FLEXI_FIELD_USE_BUTTONS_DESC">
 				<option value="0">FLEXI_FIELD_LINKS</option>
@@ -131,7 +165,7 @@
 			</field>
 			<field name="actionseptxt" type="text" default="" label="FLEXI_FIELD_FILE_ACTION_SEP_CHARS" description="FLEXI_FIELD_FILE_ACTION_SEP_CHARS_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_DOWNLOADS" level="level3" />
+			<field name="" type="separator" default="FLEXI_DOWNLOADS" level="level1" />
 			<field name="allowdownloads" type="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD" description="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -139,7 +173,7 @@
 			</field>
 			<field name="downloadstext" type="text" size="40" default="FLEXI_DOWNLOAD" label="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
 			
-			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" level="level3" />
+			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" level="level1" />
 			<field name="allowview" type="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_VIEW" description="FLEXI_FIELD_FILE_ALLOW_VIEW_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -147,15 +181,10 @@
 			</field>
 			<field name="viewtext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT_DESC"/>
 			
-			<field name="" type="separator" default="FLEXI_SHARING" level="level3" />
-			<field name="allowshare" type="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_SHARE" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-				<option value="2">FLEXI_YES_CUSTOM_TEXT</option>
-			</field>
-			<field name="sharetext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT_DESC"/>
+		</fieldset>
+		<fieldset name="group-file-cart" repeat="1" icon_class="icon-cart" label="FLEXI_DOWNLOAD_CART_SHORT" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_DOWNLOADS_MANAGER" level="level3" />
+			<field name="" type="separator" default="FLEXI_DOWNLOAD_CART" level="level1" />
 			<field name="use_downloads_manager" type="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART" description="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -163,25 +192,16 @@
 			</field>
 			<field name="addtocarttext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_TEXT" description="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_TEXT_DESC"/>
 			
-
-			<field name="" type="separator" default="FLEXI_DISPLAY_INACCESSIBLE_FILES_PARAMS_LABEL" level="level1" />
-			<field name="noaccess_display" type="radio" default="1" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY_DESC">
+		</fieldset>
+		<fieldset name="group-file-share" repeat="1" icon_class="icon-users" label="FLEXI_SHARING" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_SHARING" level="level1" />
+			<field name="allowshare" type="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_SHARE" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-				<option value="2">FLEXI_FILE_YES_NO_DESCRIPTION</option>
+				<option value="2">FLEXI_YES_CUSTOM_TEXT</option>
 			</field>
-			<field name="noaccess_addvars" type="radio" default="0" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-
-			<field name="" type="separator" default="FLEXI_FILE_UNLOGGED_USERS" level="level3" />
-			<field name="noaccess_url_unlogged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_UNLOGGED_DESC" />
-			<field name="noaccess_msg_unlogged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_UNLOGGED_DESC" />
-		
-			<field name="" type="separator" default="FLEXI_FILE_LOGGED_USERS" level="level3" />
-			<field name="noaccess_url_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_LOGGED_DESC" />
-			<field name="noaccess_msg_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_LOGGED_DESC" />
+			<field name="sharetext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT_DESC"/>			
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_DOWNLOAD_COUPONS" level="level1" />
 			<field name="enable_coupons" type="radio" default="0" label="FLEXI_FIELD_FILE_ENABLE_COUPONS" description="FLEXI_FIELD_FILE_ENABLE_COUPONS_DESC">
@@ -191,16 +211,19 @@
 			<field name="coupon_hits_limit" type="text" size="5" default="3" label="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT" description="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT_DESC"/>
 			<field name="coupon_expiration_days" type="text" size="5" default="15" label="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS" description="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS_DESC"/>
 			
+		</fieldset>
+		<fieldset name="group-file-notifications" repeat="1" icon_class="icon-mail" label="Notifications" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_DOWNLOAD_NOTIFICATION" level="level1" />
 			<field name="send_notifications" type="radio" default="0" label="FLEXI_DOWNLOAD_HIT_NOTIFICATION" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES_EVERY_HIT</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="notifications_step" type="text" default="20" size="10" label="Every N hits" description="Send email every N hits" />
 			
-			<field name="notification_tmpl" type="textarea" cols="50" rows="10" default="%%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" size="50" label="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE" description="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE_DESC" />
+			<field name="notification_tmpl" type="textarea" cols="50" rows="10" default="%%FLEXI_HITS%% __FILE_HITS__ &#10; %%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" size="50" label="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE" description="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_SEND_TO" level="level3" />
+			<field name="" type="separator" default="FLEXI_SEND_TO" level="level2" />
 			<field name="send_all_to_email" type="text" default="" size="50" label="FLEXI_SPE_EMAIL" description="FLEXI_SPE_EMAIL_DESC" />
 			<field name="send_to_current_item_owner" type="radio" default="0" label="FLEXI_CONTENT_OWNER" description="FLEXI_CONTENT_OWNER_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -208,8 +231,8 @@
 			</field>
 			<field name="send_to_email_field" type="fields" field_type="email" label="FLEXI_EMAIL_FIELD" description="FLEXI_EMAIL_FIELD_DESC" />
 			
-			
-			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level1" />
+		</fieldset>
+		<fieldset name="group-file-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
@@ -217,6 +240,17 @@
 			</field>
 			
 		</fieldset>
+		<fieldset name="group-file-fieldgrp" repeat="1" icon_class="icon-menu-3" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_REQUIRES_FIELDGROUP_FIELD" level="level2" />
+			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+				<option value="0">FLEXI_NO</option>
+			</field>
+			<field name="" type="separator" default="(this is last built-in field missing fieldgroup support)" level="level4" />
+			
+		</fieldset>
+
+
 	</fields>
 	</config>
 	

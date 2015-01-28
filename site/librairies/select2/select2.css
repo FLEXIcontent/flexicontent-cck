@@ -829,12 +829,15 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
 	padding: 0 0 0 8px !important;
 	margin: 0 6px 0 0 !important;
 	font-weight: normal !important;
+	min-height: 26px;
+	height:auto !important;
 }
 html[dir="rtl"] .select2-container .select2-choice {
 	padding: 0 8px 0 0 !important;
 }
 .select2-container .select2-choice > .select2-chosen {
 	color: black !important;
+	white-space: pre-wrap !important;
 }
 
 

@@ -50,10 +50,10 @@
 .icon-32-test,
 .icon-32-preview			{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-preview.png); }
 
-.icon-32-basicindex		{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png); }
+/*.icon-32-basicindex		{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png); }
 .icon-32-basicfilter	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-refresh.png); }
 .icon-32-advindex			{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png); }
-.icon-32-advfilter		{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-refresh.png); }
+.icon-32-advfilter		{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-refresh.png); }*/
 
 .icon-32-advindexdirty	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png); }
 .icon-32-advindexpurge	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-purge.png); }

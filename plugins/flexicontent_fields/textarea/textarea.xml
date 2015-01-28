@@ -17,28 +17,11 @@
 	
 	<fields name="attribs">
 		
-		<fieldset name="standard" repeat="1">
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
-			<field name="" type="separator" default="The following requires the groupfield and v2.3.0+, do not enable if you do not have this field" level="level2" />
-			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-		</fieldset>
-		
-		<fieldset name="group-textarea-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-textarea-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="level0" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
-			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
 			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -55,7 +38,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
 			<field name="default_value" type="text" default="" size="50" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="default_value_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
@@ -69,6 +52,8 @@
 				<option value="STRING">FLEXI_FIELD_PLAIN_TEXT_DECODE_ENTITIES</option>
 				<option value="HTML">FLEXI_FIELD_PLAIN_TEXT_ALLOW_ENTITIES</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
 			
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="use_html" type="radio" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC">
@@ -89,46 +74,23 @@
 			</field>
 			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_BUTTONS_JCE_ONLY" description="FLEXI_SKIP_BUTTONS_JCE_ONLY_DESC" />
 			
+
+		</fieldset>
+		<fieldset name="group-textarea-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_TABBING_PARAMS" description="FLEXI_TABBING_PARAMS_DESC" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
-			<field name="editorarea_per_tab" type="radio" default="0" label="FLEXI_ONE_PER_TABS" description="FLEXI_ONE_PER_TABS_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
-			<field name="allow_tab_insertion" type="radio" default="0" label="FLEXI_ALLOW_INSER_TABS" description="FLEXI_ALLOW_INSER_TABS_DESC">
+			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
 			
-			<field name="allow_tabs_code_editing" type="radio" default="1" label="FLEXI_ALLOW_EDIT_TABS" description="FLEXI_ALLOW_EDIT_TABS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="force_beforetabs" type="radio" default="1" label="FLEXI_FORCE_BEFORE_TABS" description="FLEXI_FORCE_BEFORE_TABS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="force_aftertabs" type="radio" default="1" label="FLEXI_FORCE_AFTER_TABS" description="FLEXI_FORCE_AFTER_TABS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="start_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_START_TABS_PATERNS" description="FLEXI_START_TABS_PATERNS_DESC" />
-			<field name="start_of_tabs_default_text" type="textarea" default="" cols="31" rows="4" label="FLEXI_START_TABS_DEF_TEXT" description="FLEXI_START_TABS_DEF_TEXT_DESC" />
-			<field name="start_of_tab_pattern" type="text" default="" size="56" label="FLEXI_START_TAB_PATERNS" description="FLEXI_START_TAB_PATERNS_DESC" />
-			
-			<field name="title_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_TITLE_PATTERN" description="FLEXI_TAB_TITLE_PATTERN_DESC" />
-			<field name="default_tab_list" type="textarea" default="" cols="31" rows="4" label="FLEXI_DEFAULT_TAB_LIST" description="LEXI_DEFAULT_TAB_LIST_DESC" />
-			
-			<field name="end_of_tab_pattern" type="text" default="" size="56" label="FLEXI_END_TAB" description="FLEXI_END_TAB" />
-			<field name="end_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_END_TABS" description="FLEXI_END_TABS_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="level0" />
-			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			<field name="encode_output" type="radio" default="0" label="FLEXI_ENCODE_OUTPUT" description="FLEXI_ENCODE_OUTPUT_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -150,7 +112,7 @@
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -168,6 +130,9 @@
 			<field name="opentag" type="text" default="" size="50" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" size="50" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
+		</fieldset>
+		<fieldset name="group-textarea-social" repeat="1" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
 			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />
 			<field name="useogp" type="radio" default="0" label="FLEXI_SOCIAL_SUGGEST_FIELD" description="FLEXI_SOCIAL_SUGGEST_TXT_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -182,7 +147,8 @@
 			</field>
 			<field name="ogpmaxlen" type="text" default="300" label="FLEXI_SOCIAL_TXT_MAXLEN_LISTING" description="FLEXI_SOCIAL_TXT_MAXLEN_LISTING_DESC" />
 
-			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level0" />
+		</fieldset>
+		<fieldset name="group-textarea-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
@@ -190,6 +156,53 @@
 			</field>
 			
 		</fieldset>
+		<fieldset name="group-textarea-tabulate" repeat="1" icon_class="icon-puzzle" label="Tabs (RegEx)" description="Split textarea into TABs via regular expression" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_PARSE_JOOMLA_TABS_PLUGIN_CODE" description="FLEXI_PARSE_JOOMLA_TABS_PLUGIN_CODE_DESC" level="level1" />
+			
+			<field name="editorarea_per_tab" type="radio" default="0" label="FLEXI_ENABLE" description="Enable to try to identify TABs via regex patterns">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="Regular expression patterns" description="..." level="level2" />
+			
+			<field name="" type="separator" default="Tabset patterns" description="..." level="level3" />
+			<field name="start_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_TABSET_START_PATTERN" description="..." />
+			<field name="end_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_TABSET_END_PATTERN" description="..." />
+			
+			<field name="" type="separator" default="Tab patterns" description="..." level="level3" />
+			<field name="start_of_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_START_PATTERN" description="..." />
+			<field name="end_of_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_END_PATTERN" description="..." />
+			
+			<field name="" type="separator" default="Inside tab start text" description="..." level="level4" />
+			<field name="title_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_TITLE_PATTERN" description="This is inside the text match as TAB start" />
+			
+			<field name="" type="separator" default="Extra editor areas" description="Add extra editor areas for each case" level="level2" />
+			<field name="force_beforetabs" type="radio" default="1" label="Before tabset" description="Add extra editor area">
+				<option value="0">FLEXI_AUTO</option>
+				<option value="1">FLEXI_ALWAYS</option>
+			</field>
+			<field name="force_aftertabs" type="radio" default="1" label="After tabset" description="Add extra editor area">
+				<option value="0">FLEXI_AUTO</option>
+				<option value="1">FLEXI_ALWAYS</option>
+			</field>
+			<field name="allow_tabs_code_editing" type="radio" default="1" label="FLEXI_TABS_CODE_EDITABLE" description="FLEXI_TABS_CODE_EDITABLE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		</fieldset>
+		<fieldset name="group-textarea-fieldgrp" repeat="1" icon_class="icon-menu-3" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_REQUIRES_FIELDGROUP_FIELD" level="level2" />
+			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		</fieldset>
+		
 	</fields>
 	</config>
 	

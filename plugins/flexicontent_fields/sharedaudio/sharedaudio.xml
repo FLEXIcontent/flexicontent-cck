@@ -17,7 +17,12 @@
 	<config>
 	<fields name="attribs">
 	
-		<fieldset name="standard" repeat="1">
+		<!--fieldset name="standard" repeat="1">
+		</fieldset-->
+		
+		<fieldset name="group-sharedaudio-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -27,11 +32,13 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
-		</fieldset>
-		
-		<fieldset name="group-sharedaudio-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
 			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+			
+			<field name="" type="separator" default="Audio" level="level1" />
+			<field name="" type="separator" default="Audio Info" level="level2" />
 			<field name="display_title" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -56,6 +63,8 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			
+			<field name="" type="separator" default="Audio player" level="level2" />
 			<field name="width" type="text" default="480" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_WIDTH" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_WIDTH_DESC" />
 			<field name="height" type="text" default="170" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_HEIGHT" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_HEIGHT_DESC" />
 			<field name="autostart" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTOSTART" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTOSTART_DESC">
@@ -64,6 +73,15 @@
 			</field>
 			<field name="embedly_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEDLY_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEDLY_KEY_DESC" />
 		</fieldset>
+
+		<!--fieldset name="group-sharedaudio-fieldgrp" repeat="1" icon_class="icon-menu-3" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="FLEXI_REQUIRES_FIELDGROUP_FIELD" level="level2" />
+			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="0">FLEXI_YES</option>
+			</field>
+		</fieldset-->
+		
 	</fields>
 	</config>
 	

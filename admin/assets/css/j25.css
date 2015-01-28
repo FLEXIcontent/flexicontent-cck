@@ -184,6 +184,7 @@ div fieldset.panelform fieldset.radio label {
 div fieldset.panelform {
 	padding: 0px !important;
 	margin: 0px !important;
+	border-width: 0px !important;
 }
 
 #jform_tid-lbl, #jform_attribs_ilayout-lbl,

@@ -1614,6 +1614,11 @@ table.fc-form-tbl td.key label.label {
 	margin: 0px 4% !important;
 	white-space: normal !important;
 }
+table.fc-form-tbl fieldset {
+	margin:0px;
+	padding:0px;
+	border-width:0px;
+}
 
 legend.tab-inner-title {
 	-webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;

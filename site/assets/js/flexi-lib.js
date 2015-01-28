@@ -112,3 +112,16 @@
 			}
 		}
 	}
+
+	// Add toggling of dependent form elements
+	function fc_bind_form_togglers(container)
+	{
+		jQuery('#'+container+' .fcform_toggler_element').change(function() {
+			var show_list = jQuery('option:selected', this).attr('show_list').split(',');
+			var hide_list = jQuery('option:selected', this).attr('hide_list').split(',');
+			jQuery.each( show_list, function( i, val ) {  if (val) jQuery('.'+val).slideDown();  });
+			jQuery.each( hide_list, function( i, val ) {  if (val) jQuery('.'+val).slideUp();  });
+		});
+		jQuery('form .fcform_toggler_element').trigger('change');
+	}
+	

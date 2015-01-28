@@ -574,7 +574,7 @@ class flexicontent_html
 								var el = el_container.find('.select2-choice');
 								var val = el_select.val();
 								if (val === null) {
-									el.addClass('fc_highlight_disabled');
+									//el.addClass('fc_highlight_disabled');
 								} else if (val.length) {
 									el.addClass('fc_highlight');
 								} else {

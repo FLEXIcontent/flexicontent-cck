@@ -22,7 +22,7 @@
 		<!--fieldset name="standard" repeat="1">
 		</fieldset-->
 		
-		<fieldset name="group-toolbar-viewing" repeat="1" icon_class="icon-list-view" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-toolbar-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
@@ -80,7 +80,7 @@
 			<field name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
 			
 		</fieldset>
-		<fieldset name="group-toolbar-social" repeat="1" label_prefix="FLEXI_FIELD_VIEWING" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-toolbar-social" repeat="1" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS_DESC" level="level1" />
 			

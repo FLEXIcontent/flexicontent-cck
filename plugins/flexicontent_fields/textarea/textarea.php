@@ -638,9 +638,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$start_of_tabs_pattern = $field->parameters->get('start_of_tabs_pattern');
 		$end_of_tabs_pattern = $field->parameters->get('end_of_tabs_pattern');
 		
-		$start_of_tabs_default_text = $field->parameters->get('start_of_tabs_default_text');  // Currently unused
-		$default_tab_list = $field->parameters->get('default_tab_list');                      // Currently unused
-		
 		$title_tab_pattern = $field->parameters->get('title_tab_pattern');
 		$start_of_tab_pattern = $field->parameters->get('start_of_tab_pattern');
 		$end_of_tab_pattern = $field->parameters->get('end_of_tab_pattern');

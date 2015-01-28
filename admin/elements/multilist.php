@@ -58,10 +58,21 @@ class JFormFieldMultiList extends JFormField
 		$name = FLEXI_J16GE ? $attributes['name'] : $name;
 		$control_name = FLEXI_J16GE ? str_replace($name, '', $element_id) : $control_name;
 		
-		$attribs = ' style="float:left;" ';
+		//$attribs = ' style="float:left;" ';
+		$attribs = array(
+	    'id' => $element_id, // HTML id for select field
+	    'list.attr' => array( // additional HTML attributes for select field
+	    ),
+	    'list.translate'=>false, // true to translate
+	    'option.key'=>'value', // key name for value in data array
+	    'option.text'=>'text', // key name for text in data array
+	    'option.attr'=>'attr', // key name for attr in data array
+	    'list.select'=>$element_id, // value of the SELECTED field
+		);
+		
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
-			$attribs .= ' multiple="multiple" ';
-			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
+			$attribs['list.attr']['multiple'] = 'multiple';
+			$attribs['list.attr']['size'] = @$attributes['size'] ? $attributes['size'] : "6";
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
@@ -72,37 +83,58 @@ class JFormFieldMultiList extends JFormField
 		// HTML Tag parameters
 		if ($onchange = @$attributes['onchange']) {
 			$onchange = str_replace('{control_name}', $control_name, $onchange);
-			$attribs .= ' onchange="'.$onchange.'"';
-		}
-		if ($class = @$attributes['class']) {
-			$attribs .= ' class="'.$class.'"';
+			$attribs['list.attr']['onchange'] = $onchange;
 		}
 		
+		$attribs['list.attr']['class'] = array();
+		if ($class = @$attributes['class']) {
+			$attribs['list.attr']['class'][] = $class;
+		}
+		
+		if (@$attributes['toggle_related']) {
+			$attribs['list.attr']['class'][] = 'fcform_toggler_element';
+		}
+		$attribs['list.attr']['class'] = implode($attribs['list.attr']['class'], ' ');
 		
 		// Construct an array of the HTML OPTION statements.
 		$options = array ();
 		foreach ($node->children() as $option)
 		{
-			$val  = FLEXI_J16GE ? $option->attributes()->value : $option->attributes('value');
-			$text = $option->data();
-			$name = FLEXI_J16GE ? $option->name() : $option->_name;
+			$val  = $option->attributes()->value;
+			$text = FLEXI_J30GE ? $option->__toString() : $option->data();
+			$name = FLEXI_J30GE ? $option->getName() : $option->name();
 			//echo "<pre>"; print_r($option); echo "</pre>"; exit;
 			if ($name=="group") {
 				$group_label = FLEXI_J16GE ? $option->attributes()->label : $option->attributes('label');
 				$options[] = JHTML::_('select.optgroup', JText::_($group_label) );
 				foreach ($option->children() as $sub_option)
 				{
-					$val    = FLEXI_J16GE ? $sub_option->attributes()->value : $sub_option->attributes('value');
-					$text   = $sub_option->data();
-					$options[] = JHTML::_('select.option', $val, JText::_($text));
+					$val    = $sub_option->attributes()->value;
+					$text   = FLEXI_J30GE ? $sub_option->__toString() : $sub_option->data();
+					//$options[] = JHTML::_('select.option', $val, JText::_($text));
+					$options[] = array(
+						'value' => $val, 'text' => JText::_($text),
+						'attr' => array(
+							'show_list'=>$sub_option->attributes()->show_list,
+							'hide_list'=>$sub_option->attributes()->hide_list
+						)
+					);
 				}
 				$options[] = JHTML::_('select.optgroup', '' );
 			}
-			else
-				$options[] = JHTML::_('select.option', $val, JText::_($text));
+			else {
+				//$options[] = JHTML::_('select.option', $val, JText::_($text));
+				$options[] = array(
+					'value' => $val, 'text' => JText::_($text),
+					'attr' => array(
+						'show_list'=>$option->attributes()->show_list,
+						'hide_list'=>$option->attributes()->hide_list
+					)
+				);
+			}
 		}
 		
-		$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs);
 		if (!FLEXI_J16GE) $html = str_replace('<optgroup label="">', '</optgroup>', $html);
 		return $html.$maximize_link;
 	}

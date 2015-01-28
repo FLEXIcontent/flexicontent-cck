@@ -584,6 +584,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// Create field's displayed html
 			// *****************************
 			
+			$str = '';
+			
 			// [1]: either create the download link -or- use no authorized link ...
 			if ( !$authorized ) {
 				$dl_link = $noaccess_url;
@@ -592,7 +594,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				}
 			} else {
 				$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
-				$str = '';
 			}
 			
 			// SOME behavior FLAGS

@@ -21,11 +21,19 @@ defined('_JEXEC') or die('Restricted access');
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:top; margin-top:6px;" ' );
+unset($form);
+$form = & $this->form;
 
 // Load JS tabber lib
 $this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
 $this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+$js = "
+	jQuery(document).ready(function(){
+		fc_bind_form_togglers('flexicontent');
+	});
+";
+$this->document->addScriptDeclaration($js);
 ?>
 
 <div class="flexicontent" id="flexicontent">
@@ -40,42 +48,42 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		<table class="fc-form-tbl" style="margin-bottom:12px;">
 			<tr>
 				<td class="key">
-					<?php echo $this->form->getLabel('label'); ?>
+					<?php echo $form->getLabel('label'); ?>
 				</td>
 				<td>
-					<?php echo $this->form->getInput('label'); ?>
+					<?php echo $form->getInput('label'); ?>
 				</td>
 			</tr>
-			<?php if ($this->form->getValue('iscore') == 0) : ?>
+			<?php if ($form->getValue('iscore') == 0) : ?>
 			<tr>
 				<td class="key">
-					<?php echo $this->form->getLabel('name'); ?>
+					<?php echo $form->getLabel('name'); ?>
 				</td>
 				<td>
-					<?php echo $this->form->getInput('name'); ?>
+					<?php echo $form->getInput('name'); ?>
 				</td>
 			</tr>
 			<?php else : ?>
 			<tr>
 				<td class="key">
-					<?php echo $this->form->getLabel('name'); ?>
+					<?php echo $form->getLabel('name'); ?>
 				</td>
 				<td>
-					<?php echo $this->form->getValue("name"); ?>
+					<?php echo $form->getValue("name"); ?>
 				</td>
 			</tr>
 			<?php endif; ?>
 
 			
-			<?php if ($this->form->getValue("iscore") == 0) : ?>
+			<?php if ($form->getValue("iscore") == 0) : ?>
 			<tr>
 				<td class="key">
-				<?php echo $this->form->getLabel('field_type'); ?>
+				<?php echo $form->getLabel('field_type'); ?>
 				</td>
 				<td>
 				<?php echo $this->lists['field_type']; ?>
 				&nbsp;&nbsp;&nbsp;
-				[ <span id="field_typename"><?php echo $this->form->getValue('field_type'); ?></span> ]
+				[ <span id="field_typename"><?php echo $form->getValue('field_type'); ?></span> ]
 				</td>
 			</tr>
 			<?php endif; ?>
@@ -90,12 +98,12 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				<table class="fc-form-tbl">
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('published'); ?>
+							<?php echo $form->getLabel('published'); ?>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('published'); ?>
+							<?php echo $form->getInput('published'); ?>
 							<?php
-							$disabled = ($this->form->getValue("id") > 0 && $this->form->getValue("id") < 7);
+							$disabled = ($form->getValue("id") > 0 && $form->getValue("id") < 7);
 							if ($disabled) {
 								$this->document->addScriptDeclaration("
 									jQuery( document ).ready(function() {
@@ -112,19 +120,19 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('access'); ?>
+							<?php echo $form->getLabel('access'); ?>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('access'); ?>
+							<?php echo $form->getInput('access'); ?>
 						</td>
 					</tr>
 					
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('ordering'); ?>
+							<?php echo $form->getLabel('ordering'); ?>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('ordering'); ?>
+							<?php echo $form->getInput('ordering'); ?>
 						</td>
 					</tr>
 					
@@ -141,7 +149,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 							<span class="label label-warning" style="vertical-align:middle;">
 								<?php echo JText::_( 'FLEXI_TYPES' ); ?>
 							</span>
-							<?php echo /*FLEXI_J16GE ? $this->form->getInput('tid') :*/ $this->lists['tid']; ?>
+							<?php echo /*FLEXI_J16GE ? $form->getInput('tid') :*/ $this->lists['tid']; ?>
 						</td>
 					</tr>
 					
@@ -155,46 +163,46 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					
 					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>
 						<td class="key">
-							<?php echo $this->form->getLabel('untranslatable'); ?>
+							<?php echo $form->getLabel('untranslatable'); ?>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('untranslatable'); ?>
+							<?php echo $form->getInput('untranslatable'); ?>
 						</td>
 					</tr>
 	
 					<tr<?php echo !$this->supportformhidden?' style="display:none;"':'';?>>
 						<td class="key">
-							<?php echo $this->form->getLabel('formhidden'); ?>
+							<?php echo $form->getLabel('formhidden'); ?>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('formhidden'); ?>
+							<?php echo $form->getInput('formhidden'); ?>
 						</td>
 					</tr>
 					
 					<tr<?php echo !$this->supportvalueseditable?' style="display:none;"':'';?>>
 						<td class="key">
-							<?php echo $this->form->getLabel('valueseditable'); ?>
+							<?php echo $form->getLabel('valueseditable'); ?>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('valueseditable'); ?>
+							<?php echo $form->getInput('valueseditable'); ?>
 						</td>
 					</tr>
 					
 					<tr<?php echo !$this->supportedithelp?' style="display:none;"':'';?>>
 						<td class="key">
-							<?php echo $this->form->getLabel('edithelp'); ?>
+							<?php echo $form->getLabel('edithelp'); ?>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('edithelp'); ?>
+							<?php echo $form->getInput('edithelp'); ?>
 						</td>
 					</tr>
 					
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('description'); ?>
+							<?php echo $form->getLabel('description'); ?>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('description'); ?>
+							<?php echo $form->getInput('description'); ?>
 						</td>
 					</tr>
 					
@@ -203,7 +211,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 			
 			
 			<?php if ($this->supportsearch || $this->supportfilter || $this->supportadvsearch || $this->supportadvfilter) : ?>
-			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-filter" >
+			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-search" >
 				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELD_SEARCH_FILTERING' ); ?> </h3>
 				
 				<?php if ($this->supportsearch || $this->supportfilter) : ?>
@@ -215,13 +223,13 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 						<?php if ($this->supportsearch) : ?>
 						<tr>
 							<td class="key">
-								<?php echo $this->form->getLabel('issearch'); ?>
+								<?php echo $form->getLabel('issearch'); ?>
 							</td>
 							<td>
 								<?php echo
-									in_array($this->form->getValue('issearch'),array(-1,2)) ?
-										JText::_($this->form->getValue('issearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_BASIC_INDEX_PROPERTY_DIRTY') :
-										$this->form->getInput('issearch'); ?>
+									in_array($form->getValue('issearch'),array(-1,2)) ?
+										JText::_($form->getValue('issearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_BASIC_INDEX_PROPERTY_DIRTY') :
+										$form->getInput('issearch'); ?>
 							</td>
 						</tr>
 						<?php endif; ?>
@@ -229,10 +237,10 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 						<?php if ($this->supportfilter) : ?>
 						<tr>
 							<td class="key">
-								<?php echo $this->form->getLabel('isfilter'); ?>
+								<?php echo $form->getLabel('isfilter'); ?>
 							</td>
 							<td>
-								<?php echo $this->form->getInput('isfilter'); ?>
+								<?php echo $form->getInput('isfilter'); ?>
 							</td>
 						</tr>
 						<?php endif; ?>
@@ -249,13 +257,13 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 						<?php if ($this->supportadvsearch) : ?>
 						<tr>
 							<td class="key">
-								<?php echo $this->form->getLabel('isadvsearch'); ?>
+								<?php echo $form->getLabel('isadvsearch'); ?>
 							</td>
 							<td>
 								<?php echo
-									in_array($this->form->getValue('isadvsearch'),array(-1,2)) ?
-										JText::_($this->form->getValue('isadvsearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
-										$this->form->getInput('isadvsearch'); ?>
+									in_array($form->getValue('isadvsearch'),array(-1,2)) ?
+										JText::_($form->getValue('isadvsearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
+										$form->getInput('isadvsearch'); ?>
 							</td>
 						</tr>
 						<?php endif; ?>
@@ -263,13 +271,13 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 						<?php if ($this->supportadvfilter) : ?>
 						<tr>
 							<td class="key">
-								<?php echo $this->form->getLabel('isadvfilter'); ?>
+								<?php echo $form->getLabel('isadvfilter'); ?>
 							</td>
 							<td>
 								<?php echo
-									in_array($this->form->getValue('isadvfilter'),array(-1,2)) ?
-										JText::_($this->form->getValue('isadvfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
-										$this->form->getInput('isadvfilter'); ?>
+									in_array($form->getValue('isadvfilter'),array(-1,2)) ?
+										JText::_($form->getValue('isadvfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
+										$form->getInput('isadvfilter'); ?>
 							</td>
 						</tr>
 						<?php endif; ?>
@@ -300,7 +308,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					<table id="tabacces" class="fc-form-tbl" width="100%">
 						<tr>
 							<td>
-								<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
+								<div id="access"><?php echo $form->getInput('rules'); ?></div>
 							</td>
 						</tr>
 					</table>
@@ -322,8 +330,8 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 			<div id="fieldspecificproperties">
 				<div class="fctabber fields_tabset" id="field_specific_props_tabset" >
 				<?php
-				$fieldSets = $this->form->getFieldsets('attribs');
-				$field_type = $this->form->getValue("field_type", NULL, "text");
+				$fieldSets = $form->getFieldsets('attribs');
+				$field_type = $form->getValue("field_type", NULL, "text");
 				$prefix_len = strlen('group-'.$field_type);
 				if ($field_type) foreach ($fieldSets as $name => $fieldSet)
 				{
@@ -340,8 +348,10 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
 						<h3 class="tabberheading" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
 						<?php $i = 0; ?>
-						<?php foreach ($this->form->getFieldset($name) as $field) { 
-							echo '<fieldset class="panelform '.($i ? '' : 'fc-nomargin').'">' . $field->label . $field->input . '</fieldset>' . "\n";
+						<?php foreach ($form->getFieldset($name) as $field) {
+							$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
+								$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+							echo '<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container" >' . $field->label . $field->input . '</fieldset>' . "\n";
 							$i++;
 						} ?>
 					</div>
@@ -358,11 +368,11 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 </table>
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
-<?php if ($this->form->getValue('iscore') == 1) : ?>
-<input type="hidden" name="jform[iscore]" value="<?php echo $this->form->getValue("iscore"); ?>" />
-<input type="hidden" name="jform[name]" value="<?php echo $this->form->getValue("name"); ?>" />
+<?php if ($form->getValue('iscore') == 1) : ?>
+<input type="hidden" name="jform[iscore]" value="<?php echo $form->getValue("iscore"); ?>" />
+<input type="hidden" name="jform[name]" value="<?php echo $form->getValue("name"); ?>" />
 <?php endif; ?>
-<input type="hidden" name="jform[id]" value="<?php echo $this->form->getValue("id"); ?>" />
+<input type="hidden" name="jform[id]" value="<?php echo $form->getValue("id"); ?>" />
 <input type="hidden" name="controller" value="fields" />
 <input type="hidden" name="view" value="field" />
 <input type="hidden" name="task" value="" />
