@@ -587,6 +587,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$str = '';
 			
 			// [1]: either create the download link -or- use no authorized link ...
+			$str = '';
 			if ( !$authorized ) {
 				$dl_link = $noaccess_url;
 				if ($noaccess_msg) {
