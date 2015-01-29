@@ -535,15 +535,16 @@ table.adminlist tbody tr.row1 td {
 }
 
 /* Mouse over ROW */
-table.adminlist tbody tr.row0:hover td,
+/*table.adminlist tbody tr.row0:hover td,
 table.adminlist tbody tr.row1:hover td {
-	/*text-shadow: 1px 1px 2px #aaa;*/
 	background-color: #DFF0D8;
+}*/
+table.adminlist tbody tr.row0:hover,
+table.adminlist tbody tr.row1:hover {
+	background: repeating-linear-gradient( 135deg, #e7e7e7, #e7e7e7 10px, #e0e0e0 10px, #e0e0e0 20px );
 }
-table.adminlist tbody tr:hover td input,
-table.adminlist tbody tr:hover td select {
-	/*box-shadow: 1px 1px 2px #aaa;*/
-}
+table.adminlist tbody tr.row0:hover td,
+table.adminlist tbody tr.row1:hover td { background: transparent; }
 
 /* FOOTER of table */
 table.adminlist tfoot {

@@ -3252,7 +3252,7 @@ class flexicontent_html
 		return $output;
 	}
 
-	static function addToolBarButton($text='Button Text', $name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask', $extra_js='', $list=true, $menu=true, $confirm=true)
+	static function addToolBarButton($text='Button Text', $name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask', $extra_js='', $list=true, $menu=true, $confirm=true, $btn_class="")
 	{
 		$toolbar = JToolBar::getInstance('toolbar');
 		$text  = JText::_( $text );
@@ -3277,7 +3277,7 @@ class flexicontent_html
 		}
 		$full_js = "javascript: $full_js";
 
-		$button_html	= "<a href=\"#\" onclick=\"$full_js\" class=\"toolbar btn btn-small\">\n";
+		$button_html	= "<a href=\"#\" onclick=\"$full_js\" class=\"toolbar btn btn-small $btn_class\">\n";
 		$button_html .= "<span class=\"$class\" title=\"$text\">\n";
 		$button_html .= "</span>\n";
 		$button_html	.= "$text\n";

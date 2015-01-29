@@ -137,28 +137,28 @@ class FlexicontentViewFields extends JViewLegacy
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='issearch';";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_TEXT_SEARCHABLE', $toggle_icon, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
-			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
 		
 		$toggle_icon = 'basicfilter';
 		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isfilter';";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_FILTERABLE', $toggle_icon, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
-			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
 		
 		$toggle_icon = 'advindex';
 		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isadvsearch';";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_ADV_TEXT_SEARCHABLE', $toggle_icon, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
-			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
 		
 		$toggle_icon = 'advfilter';
 		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isadvfilter';";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_ADV_FILTERABLE', $toggle_icon, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
-			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
 		
 		if ($perms->CanConfig) {
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
