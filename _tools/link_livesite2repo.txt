@@ -2,6 +2,9 @@
 PURPOSE:
 This script will link a local Joomla installation (with flexicontent already installed) to your local flexicontent-cck repository
 
+USAGE:
+link_livesite2repo.bat  /J JOOMLA_SITE_PATH  /R FLEXI_REPOSITORY_PATH /NoBackup
+
 
 NOTE: flexicontent must be already installed in the Joomla live site
 NOTE: existing folders (or files) will get an _ at the end of their name  (for files extension is preserved)
