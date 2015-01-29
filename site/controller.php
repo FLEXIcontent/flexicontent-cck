@@ -2019,7 +2019,7 @@ class FlexicontentController extends JControllerLegacy
 				// Parse and identify language strings and then make language replacements
 				$notification_tmpl = $fields_conf[$field_id]->get('notification_tmpl');
 				if ( empty($notification_tmpl) ) {
-					$notification_tmpl = JText::('FLEXI_HITS') .": ".$file->hits;
+					$notification_tmpl = JText::_('FLEXI_HITS') .": ".$file->hits;
 					$notification_tmpl .= '%%FLEXI_FDN_FILE_NO%% __file_id__:  "__file_title__" '."\n";
 					$notification_tmpl .= '%%FLEXI_FDN_FILE_IN_ITEM%% "__item_title__":' ."\n";
 					$notification_tmpl .= '__item_url__';
@@ -2100,7 +2100,7 @@ class FlexicontentController extends JControllerLegacy
 					$_mssg_file = str_ireplace('__item_url__', $filedata->__item_url__, $_mssg_file);
 					$count = 0;
 					$_mssg_file = str_ireplace('__file_hits__', $filedata->hits, $_mssg_file, $count);
-					if ($count == 0) $_mssg_file = JText::('FLEXI_HITS') .": ".$file->hits ."\n". $_mssg_file;
+					if ($count == 0) $_mssg_file = JText::_('FLEXI_HITS') .": ".$file->hits ."\n". $_mssg_file;
 					$_message .= "\n\n" . $_mssg_file;
 				}
 				//echo "<pre>". $_message ."</pre>";
