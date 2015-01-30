@@ -2735,7 +2735,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	
 	function getUploadLimitsTxt(&$field) {
 		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-		$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+		$hintmage = JHTML::image ( 'components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 		
 		$upload_maxsize = $field->parameters->get('upload_maxsize');
 		$phpUploadLimit = flexicontent_upload::getPHPuploadLimit();
