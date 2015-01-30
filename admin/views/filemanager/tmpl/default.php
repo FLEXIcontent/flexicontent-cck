@@ -422,23 +422,24 @@ function delAllFilters() {
 	
 <div class="fcclear"></div>
 
-<div id="why_box" style="display:none;">
-	<!--<h3 class=""> <?php echo JText::_( 'Why a DB-based filemanager ?' ); ?> </h3>-->
-
-	<span class="fc-mssg fc-info" style="font-size:14px;">
-		Why a DB-based filemanager ? <br/><br/>
-	- To keep track of <b>file usage</b> inside content (<b>assigned</b> items column in this page) <br/>
-	- To <b>prevent direct access</b> to files, allowing only indirect access, thus also hiding file's real path (* <b>file / image-gallery fields</b>)<br/>
-	- To add <b>more control</b> over the download <sup>1</sup>(<b>file field</b>) <br/>
-	  &nbsp; &nbsp; a. gathering <b>hits</b> and other statistics <br/>
-	  &nbsp; &nbsp; b. adding <b>access</b> control to the files, and more (e.g. download coupons <sup>1</sup>) <br/>
-	- To better handle a <b>SET of re-usable</b> images <sup>2,3</sup>(<b>image-gallery field</b> in DB-mode)<br/><br/>
-	
-	<sup>1</sup> Each new version may add more statistics and/or more download control<br/>
-	<sup>2</sup> If images are <b>not reusable</b>, please do NOT use the DB-mode in image-gallery field, instead use <b>'folder mode'</b><br/>
-	<sup>3</sup> If user can not add extra images and/or you need filtering in item listings, then instead use <b>checkbox-image or radio-image fields</b><br/>
-	</span>
-
+<div id="why_box" style="display:none; margin:10px 10px 48px 0px;">
+<table class="fc-table-list" style="margin:0px;">
+	<tr>
+		<th>Why a DB-based filemanager ?</th>
+	</tr>
+	<tr><td>
+		- To keep track of <b>file usage</b> inside content (<b>assigned</b> items column in this page) <br/>
+		- To <b>prevent direct access</b> to files, allowing only indirect access, thus also hiding file's real path (* <b>file / image-gallery fields</b>)<br/>
+		- To add <b>more control</b> over the download <sup>1</sup>(<b>file field</b>) <br/>
+		  &nbsp; &nbsp; a. gathering <b>hits</b> and other statistics <br/>
+		  &nbsp; &nbsp; b. adding <b>access</b> control to the files, and more (e.g. download coupons <sup>1</sup>) <br/>
+		- To better handle a <b>SET of re-usable</b> images <sup>2,3</sup>(<b>image-gallery field</b> in DB-mode)<br/><br/>
+		
+		<sup>1</sup> Each new version may add more statistics and/or more download control<br/>
+		<sup>2</sup> If images are <b>not reusable</b>, please do NOT use the DB-mode in image-gallery field, instead use <b>'folder mode'</b><br/>
+		<sup>3</sup> If user can not add extra images and/or you need filtering in item listings, then instead use <b>checkbox-image or radio-image fields</b><br/>
+	</td></tr>
+</table>
 </div>
 
 <div class="fcclear"></div>

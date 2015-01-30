@@ -282,8 +282,8 @@ fieldset.fieldgroups legend span img {
 .versions img {
 	vertical-align: middle;
 }
-.active-version {
-	background: #FFFFDD;
+table .active-version {
+	background: #FFFFDD !important;
 }
 #pager {
 	clear:both;

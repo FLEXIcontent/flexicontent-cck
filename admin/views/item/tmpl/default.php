@@ -109,8 +109,8 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 		});
 		
 		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: 'index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1&format=raw&page='+pageclickednumber, context: jQuery('#result'), success: function(str){
-				jQuery(this).html(\"<table width='100%' class='versionlist' cellpadding='0' cellspacing='0'>\\
+			jQuery.ajax({ url: 'index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
+				jQuery(this).html(\"<table class='fc-table-list fc-tbl-short' style='margin:10px;'>\\
 				<tr>\\
 					<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY',true )."</th>\\
 				</tr>\\
@@ -1321,54 +1321,58 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		</table>
 		
 		<?php if ( $this->perms['canversion'] ) : ?>
-		<div id="result" >
-		<table class="fc-table-list fc-tbl-short" style="margin:10px;">
+		<table id="version_tbl" class="fc-table-list fc-tbl-short" style="margin:10px;">
 			<tr>
-				<th colspan="4">
+				<th>
 					<?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?>
 				</th>
 			</tr>
-			<?php if ($this->row->id == 0) : ?>
-			<tr>
-				<td class="versions-first" colspan="4"><?php echo JText::_( 'FLEXI_NEW_ARTICLE' ); ?></td>
-			</tr>
-			<?php
-			else :
-			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
-			foreach ($this->versions as $version) :
-				$class = ($version->nr == $this->row->version) ? ' class="active-version success"' : '';
-				if ((int)$version->nr > 0) :
-			?>
-			<tr<?php echo $class; ?>>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), $date_format ); ?></span></td>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
-				<td class="versions"><a href="javascript:;" class="hasTip" title="Comment::<?php echo htmlspecialchars($version->comment, ENT_COMPAT, 'UTF-8');?>"><?php echo $commentimage;?></a><?php
-				if((int)$version->nr==(int)$this->row->current_version) { ?>
-					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&<?php echo $task_items;?>edit&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
-				<?php }else{
+			<tr><td>
+				<table class="fc-table-list fc-tbl-short" style="margin:10px;">
+				<?php if ($this->row->id == 0) : ?>
+				<tr>
+					<td class="versions-first" colspan="4"><?php echo JText::_( 'FLEXI_NEW_ARTICLE' ); ?></td>
+				</tr>
+				<?php
+				else :
+				$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
+				foreach ($this->versions as $version) :
+					$class = ($version->nr == $this->row->version) ? ' class="active-version success"' : '';
+					if ((int)$version->nr > 0) :
 				?>
-					<a class="modal-versions"
-						href="index.php?option=com_flexicontent&view=itemcompare&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component"
-						title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
-					>
-						<?php echo $viewimage; ?>
-					</a>
-					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&task=items.edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1');"
-						href="javascript:;"
-						title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
-					>
-						<?php echo $revertimage; ?>
-					</a>
-				<?php }?></td>
-			</tr>
-			<?php
-				endif;
-			endforeach;
-			endif; ?>
+				<tr<?php echo $class; ?>>
+					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
+					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), $date_format ); ?></span></td>
+					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
+					<td class="versions"><a href="javascript:;" class="hasTip" title="Comment::<?php echo htmlspecialchars($version->comment, ENT_COMPAT, 'UTF-8');?>"><?php echo $commentimage;?></a><?php
+					if((int)$version->nr==(int)$this->row->current_version) { ?>
+						<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&<?php echo $task_items;?>edit&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+					<?php }else{
+					?>
+						<a class="modal-versions"
+							href="index.php?option=com_flexicontent&view=itemcompare&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component"
+							title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
+						>
+							<?php echo $viewimage; ?>
+						</a>
+						<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&task=items.edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1');"
+							href="javascript:;"
+							title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
+						>
+							<?php echo $revertimage; ?>
+						</a>
+					<?php }?></td>
+				</tr>
+				<?php
+					endif;
+				endforeach;
+				endif; ?>
+				</table>
+			</td></tr>
+			<tr style="background:unset;"><td style="background:unset;">
+				<div id="fc_pager"></div>
+			</td></tr>
 		</table>
-		</div>
-		<div id="fc_pager"></div>
 		<div class="clear"></div>
 		<?php endif; ?>
 	<?php endif; ?>
