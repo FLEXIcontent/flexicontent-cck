@@ -60,10 +60,10 @@ JFactory::getDocument()->addScriptDeclaration($js);
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="42"></th>
+			<th width="50"><?php echo JText::_( 'FLEXI_TEMPLATE_ITEM' ); ?></th>
+			<th width="50"><?php echo JText::_( 'FLEXI_TEMPLATE_CAT' ); ?></th>
+			<th width="50"><?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?></th>
 			<th class="title" align="left"><?php echo JText::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
-			<th width="100"><?php echo JText::_( 'FLEXI_TEMPLATE_ITEM' ); ?></th>
-			<th width="100"><?php echo JText::_( 'FLEXI_TEMPLATE_CAT' ); ?></th>
 		</tr>
 	</thead>
 
@@ -82,7 +82,9 @@ JFactory::getDocument()->addScriptDeclaration($js);
 			?>
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
 			<td><?php echo $i; ?></td>
-			<td align="right">
+			<td align="center"><?php echo @$row->items ? ((isset($row->items->positions)) ? '<a href="'.$itemlink.'">'.$editlayout.'</a>' : $noeditlayout) : ''; ?></td>
+			<td align="center"><?php echo @$row->category ? ((isset($row->category->positions)) ? '<a href="'.$catlink.'">'.$editlayout.'</a>' : $noeditlayout) : ''; ?></td>
+			<td align="center">
 				<?php if (!in_array($row->name, $basetemplates)) :?>
 					<a style="margin-right: 5px" id="<?php echo 'del-' . $row->name ?>" class="deletable-template" href="javascript:;">
 						<?php echo $deltmpl; ?>
@@ -90,9 +92,14 @@ JFactory::getDocument()->addScriptDeclaration($js);
 			 	<?php endif; ?>
 				<a class="modal" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>">  <?php echo $copytmpl; ?> </a>
 			</td>
-			<td align="left"><?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?></td>
-			<td align="center"><?php echo @$row->items ? ((isset($row->items->positions)) ? '<a href="'.$itemlink.'">'.$editlayout.'</a>' : $noeditlayout) : ''; ?></td>
-			<td align="center"><?php echo @$row->category ? ((isset($row->category->positions)) ? '<a href="'.$catlink.'">'.$editlayout.'</a>' : $noeditlayout) : ''; ?></td>
+			<td align="left">
+				<?php if (in_array($row->name, $basetemplates)) :?>
+					<span class="fc_item_total_data nowrap_box badge badge-info">CORE</span>
+				<?php else: ?>
+					<span class="fc_item_total_data nowrap_box badge badge-success">USER</span>
+				<?php endif; ?>
+				<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
+			</td>
 		</tr>
 		<?php
 		$k = 1 - $k;
