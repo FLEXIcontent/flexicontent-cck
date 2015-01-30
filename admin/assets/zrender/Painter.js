@@ -13,7 +13,7 @@
         var util = require('./tool/util');
         // var vec2 = require('./tool/vector');
         var log = require('./tool/log');
-        var matrix = require('./tool/matrix');
+        // var matrix = require('./tool/matrix');
         var BaseLoadingEffect = require('./loadingEffect/Base');
 
         var Layer = require('./Layer');
@@ -56,6 +56,11 @@
              * @type {HTMLElement}
              */
             this.root = root;
+            root.style['-webkit-tap-highlight-color'] = 'transparent';
+            root.style['-webkit-user-select'] = 'none';
+            root.style['user-select'] = 'none';
+            root.style['-webkit-touch-callout'] = 'none';
+
             /**
              * @type {module:zrender/Storage}
              */
@@ -184,7 +189,7 @@
 
             this.eachBuildinLayer(this._preProcessLayer);
 
-            var invTransform = [];
+            // var invTransform = [];
 
             for (var i = 0, l = list.length; i < l; i++) {
                 var shape = list[i];
@@ -294,7 +299,7 @@
             }
             // Check if is a valid layer
             if (!isLayerValid(layer)) {
-                log("Layer of zlevel " + zlevel + ' is not valid');
+                log('Layer of zlevel ' + zlevel + ' is not valid');
                 return;
             }
 

@@ -45,8 +45,7 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
             },
             {
                 name: 'zrender',
-                location: 'http://ecomfe.github.io/zrender/src',
-                //location: '../../../zrender/src', // I don't know why it does not work with this
+                location: 'components/com_flexicontent/assets/zrender',
                 main: 'zrender'
             }
         ]
@@ -57,17 +56,23 @@ endif;
 // EOF: Load echart libraries
 ?>
 
-<?php
 
+<?php
 // BOF: statistics that use ECHART
 if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_COMPONENT.DS.'assets'.DS.'zrender')) :
 ?>
-<div class="clear clearfix"></div>
-<div class="container-fluid">
-	<!-- Breadcrumbs -->
+
+	<table class="fc-table-list fc-tbl-short" style="margin:20px 0 20px 0; width:98%;">
+	<tr>
+		<th colspan="2" style="font-size:18px;">
+			<?php echo JText::_( 'FLEXI_TOTAL_NUM_OF' ); ?>
+		</th>
+	</tr>
+	</table>
+	
+	<!-- SITE TOTALS -->
 	<div class="row-fluid">
 		<div class="span12">
-			<?php echo JText::_( 'FLEXI_TOTAL_NUM_OF' ) ?>:
 			<a href="index.php?option=com_flexicontent&view=items"       class="btn btn-small"><?php echo $this->genstats[0]; ?> <?php echo JText::_( 'FLEXI_ITEMS' ) ?></a> 
 			<a href="index.php?option=com_flexicontent&view=categories"  class="btn btn-small"><?php echo $this->genstats[1]; ?> <?php echo JText::_( 'FLEXI_CATEGORIES' ) ?></a> 
 			<a href="index.php?option=com_flexicontent&view=tags"        class="btn btn-small"><?php echo $this->genstats[2]; ?> <?php echo JText::_( 'FLEXI_TAGS' ) ?></a> 
@@ -76,92 +81,102 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 			<a href="index.php?option=com_flexicontent&view=users"       class="btn btn-small"><?php echo $this->genstats[5]; ?> <?php echo JText::_( 'FLEXI_USERS' ) ?></a> 
 			<a href="index.php?option=com_flexicontent&view=templates"   class="btn btn-small"><?php echo $this->genstats[6]; ?> <?php echo JText::_( 'FLEXI_TEMPLATES' ) ?></a> 
 			<a href="index.php?option=com_flexicontent&view=fields"      class="btn btn-small"><?php echo $this->genstats[7]; ?> <?php echo JText::_( 'FLEXI_FIELDS' ) ?></a> 
-
-			
-
 		</div>
 	</div>
-	<!-- End of Breadcrumbs -->
-
-	<hr>
-	<div class="row-fluid">
-		<div class="span12"><h3><?php echo JText::_( 'FLEXI_ITEMS' ); ?> <a href="index.php?option=com_flexicontent&view=items"       class="btn btn-small"><?php echo JText::_( 'FLEXI_VIEW' ) ?></a> </h3></div>
-	</div>
-	<!-- Ballons -->
-		<div class="row-fluid">
-			<div class="span2">
-	  			<a href="index.php?option=com_flexicontent&view=items&filter_state=P" class="btn btn-block btn-large btn-success">
-	  			  	<div>
-	  			  		<i class="icon-asterisk "></i>
-		  			  	<span class="white">
-		  			  		<?php print_r($this->totalitemspublish[0]->itemspub);  ?>
-		  			  	</span>
-	  			  	</div>
-	  			  	<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_OF_PUBLISHED_ITEMS' ) ?></small>
-	  			</a>
-			</div>
-			<div class="span2">
-				<a href="index.php?option=com_flexicontent&view=items&filter_state=U" class="btn btn-block btn-large btn-warning">
+	<!-- End of SITE TOTALS -->
+	
+	
+	<!-- ITEM TOTALS -->
+	<hr />
+	<span class="label"><?php echo JText::_( 'FLEXI_ITEMS' ) ?></span>
+	<div class="span12">
+		
+		<div class="span2">
+			<a href="index.php?option=com_flexicontent&view=items&filter_state=P" class="btn btn-block btn-large btn-success">
+				<div>
+					<i class="icon-asterisk "></i>
+					<span class="white">
+						<?php print_r($this->totalitemspublish[0]->itemspub);  ?>
+					</span>
+				</div>
+				<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_OF_PUBLISHED_ITEMS' ) ?></small>
+			</a>
+		</div>
+		
+		<div class="span2">
+			<a href="index.php?option=com_flexicontent&view=items&filter_state=U" class="btn btn-block btn-large btn-warning">
 				<div class="white">
-		  			  		<i class="icon-file "></i>
-		  			  		<span class="">
-								<?php print_r($this->totalitemsunpublish[0]->itemsunpub);  ?>
-		  			  		</span>
-		  			  	</div>
-		  			  	<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_UNPUBLISHED_ITEMS' ) ?></small>
-
-				</a>
-		  			  	
-	  		</div>
-	  		<div class="span2">
-
-				<a href="index.php?option=com_flexicontent&view=items&filter_state=PE" class="btn btn-block btn-large btn-danger">
-	  			  	<div class="white">
-	  			  		<i class="icon-trash "></i>
-	  			  			<span class="">
-								<?php print_r($this->totalitemswaiting[0]->itemswaiting);  ?>
-	  			  			</span>
-	  			  	</div>
-	  			  	<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_OF_WAITING_ITEMS' ) ?></small>
-	  			</a>
-	  		</div>
-	  		<div class="span2">
-	  			<a href="index.php?option=com_flexicontent&view=items&filter_state=IP" class="btn btn-block btn-large btn-primary">
-	  			  	<div class="white">
-	  			  		<i class="icon-archive "></i>
-	  			  			<span class="">
-								<?php print_r($this->totalitemsprogress[0]->itemsprogress);  ?>
-	  			  			</span>
-	  			  	</div>
-	  			  	<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_OF_INPROGRESS_ITEMS' ) ?></small>
-	  			</a>
-	  		</div>
-	  		<div class="span2">
-
-				<a href="index.php?option=com_flexicontent&view=items&filter_state=PE" class="btn btn-block btn-large btn-info">
-	  			  	<div class="white">
-	  			  		<i class="icon-list"></i>
-	  			  			<span class="">
-								<?php print_r($this->metadescription[0]->itemsmetadesc);  ?>
-	  			  			</span>
-	  			  	</div>
-	  			  	<small><?php echo JText::_( 'FLEXI_SEODESC_ITEMS' ) ?></small>
-	  			</a>
-	  		</div>
-	  		<div class="span2">
-	  			<a href="index.php?option=com_flexicontent&view=items&filter_state=IP" class="btn btn-block btn-large btn-inverse">
-	  			  	<div class="white">
-	  			  		<i class="icon-tag "></i>
-	  			  			<span class="">
-								<?php print_r($this->metakeywords[0]->itemsmetakey);  ?>
-	  			  			</span>
-	  			  	</div>
-	  			  	<small><?php echo JText::_( 'FLEXI_SEOKEYWORDS_ITEMS' ) ?></small>
-	  			</a>
-	  		</div>
+					<i class="icon-file "></i>
+					<span class="">
+						<?php print_r($this->totalitemsunpublish[0]->itemsunpub);  ?>
+					</span>
+				</div>
+				<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_UNPUBLISHED_ITEMS' ) ?></small>
+			</a>
+		</div>
+	
+		<div class="span2">
+			<a href="index.php?option=com_flexicontent&view=items&filter_state=PE" class="btn btn-block btn-large btn-danger">
+				<div class="white">
+					<i class="icon-trash "></i>
+					<span class="">
+						<?php print_r($this->totalitemswaiting[0]->itemswaiting);  ?>
+					</span>
+				</div>
+				<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_OF_WAITING_ITEMS' ) ?></small>
+			</a>
+		</div>
+		
+		<div class="span2">
+			<a href="index.php?option=com_flexicontent&view=items&filter_state=IP" class="btn btn-block btn-large btn-primary">
+				<div class="white">
+					<i class="icon-archive "></i>
+					<span class="">
+						<?php print_r($this->totalitemsprogress[0]->itemsprogress);  ?>
+					</span>
+				</div>
+				<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_OF_INPROGRESS_ITEMS' ) ?></small>
+			</a>
+		</div>
+		
+		<div class="span2">
+			<a href="index.php?option=com_flexicontent&view=items&filter_state=PE" class="btn btn-block btn-large btn-info">
+				<div class="white">
+					<i class="icon-list"></i>
+					<span class="">
+						<?php print_r($this->metadescription[0]->itemsmetadesc);  ?>
+					</span>
+				</div>
+				<small><?php echo JText::_( 'FLEXI_SEODESC_ITEMS' ) ?></small>
+			</a>
+		</div>
+		
+		<div class="span2">
+			<a href="index.php?option=com_flexicontent&view=items&filter_state=IP" class="btn btn-block btn-large btn-inverse">
+				<div class="white">
+					<i class="icon-tag "></i>
+					<span class="">
+						<?php print_r($this->metakeywords[0]->itemsmetakey);  ?>
+					</span>
+				</div>
+				<small><?php echo JText::_( 'FLEXI_SEOKEYWORDS_ITEMS' ) ?></small>
+			</a>
+		</div>
+		
 	</div>
-	<br>
-	<!-- End of Ballons -->
+	<!-- End of ITEM TOTALS -->
+	
+	
+	<hr>
+	
+	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
+	<tr>
+		<th colspan="2" style="font-size:18px;">
+			<?php echo JText::_( 'FLEXI_ITEMS' ); ?> - <?php echo JText::_( 'FLEXI_CREATION_DATE' ); ?>
+		</th>
+	</tr>
+	</table>
+
 
 <?php 
 	$stasts          = $this->itemsgraph[0];
@@ -248,220 +263,234 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 
 	</script>
 
+	
 	<hr>
-	<div class="row-fluid">
-		<div class="span12"><h3><?php echo JText::_( 'FLEXI_GENERAL_STATS' ); ?></h3></div>
+	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
+	<tr>
+		<th colspan="2" style="font-size:18px;">
+			<?php echo JText::_( 'FLEXI_ITEM_STATES_CHART' ); ?>
+		</th>
+	</tr>
+	</table>
+
+	
+	<div class="span9">
+		
+		<div id="pie" style="height:525px; 1px solid #ccc; padding: 10px;"></div>
+
+		<?php 
+
+			$workflow          = $this->statestats;
+			$typeslabel        = explode('|',$workflow['labels']);
+			$typeslabellist    = json_encode($typeslabel);
+			$valuesitems       = explode(',',$workflow['values']);
+			$datalist          = '';
+
+			foreach ($typeslabel  as $key=>$label) {
+					$datalist.= '{value:'.$valuesitems[$key].', name:"'.$label.'"},';
+			}
+		 ?>
+
+	    <script type="text/javascript" language="javascript">
+	       
+			var optionpie = {
+			      tooltip : {
+			        trigger: 'item',
+			        formatter: "{a} <br/>{b} : {c} ({d}%)"
+			      },
+			      legend: {
+			        orient : 'vertical',
+			        x : 'left',
+			        data:<?php echo $typeslabellist; ?>
+			      },
+			      toolbox: {
+			        show : true,
+			        feature : {
+		          //mark : {show: true},
+		          //dataView : {show: true, readOnly: false},
+		          restore : {
+		          	show: true,
+		          	title: 'Refresh'
+		          },
+		          saveAsImage : {
+		          	show: true,
+		          	title: 'Export'
+		          }
+		        }
+			      },
+			      calculable : false,
+			      series : [
+			        {
+			          name:'Workflow',
+			          type:'pie',
+			          radius : '75%',
+			          center: ['50%', '60%'],
+			          data:[
+			               <?php echo $datalist; ?>
+			           ]
+			        }
+			      ]
+			    };
+		        require(
+		            [
+		                'echarts',
+		                'echarts/chart/pie'
+		            ],
+		            function (ec) {
+		                var myChart = ec.init(document.getElementById('pie'));
+		                myChart.setOption(optionpie);
+		            }
+		        )
+
+	        </script>
 	</div>
+
+	
+	
+	<hr>
+	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
+	<tr>
+		<th colspan="2" style="font-size:18px;">
+			<?php echo JText::_( 'FLEXI_GENERAL_STATS' ); ?>
+		</th>
+	</tr>
+	</table>
+	
 	<!-- Most and less Popular-->
-		<div class="row-fluid">
-			<div class="span5">
-					<!-- Most and less Popular-->
-		<div class="row-fluid">
-			
-			<div class="span12">
-				<div class="well">
-					<h3><?php echo JText::_( 'FLEXI_MOST_POPULAR' ); ?> <a href="index.php?option=com_flexicontent&view=items&filter_order=i.hits&filter_order_Dir=desc" class="btn btn-small"><?php echo JText::_( 'FLEXI_VIEW' ); ?></a></h3>
-					<hr>
-					<table class="adminlist  table table-hover table-striped">
-						<thead>
-							<tr>
-								<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-								<th><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
-								<th><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php
-							$k = 0;
-							for ($i=0, $n=count($this->popular); $i < $n; $i++) {
-							$row = $this->popular[$i];
-							$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
-							?>
-							<tr>
-								<td width="65%">
-									<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo $row->title; ?>">
-										<a href="<?php echo $link; ?>">
-											<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-										</a>
-									</span>
-								</td>
-								<td width="1%" align="center">
-									<strong><?php echo $row->hits; ?></strong>
-								</td>
-								<td width="34%">
-									<strong><?php echo flexicontent_html::ratingbar( $row ); ?></strong>
-								</td>
-							</tr>
-							<?php $k = 1 - $k; } ?>
-						</tbody>
-					</table>
-				</div>
-			</div>
+
+	<div class="span6">
+		<div class="well">
+			<h3><?php echo JText::_( 'FLEXI_MOST_POPULAR' ); ?> <a href="index.php?option=com_flexicontent&view=items&filter_order=i.hits&filter_order_Dir=desc" class="btn btn-small"><?php echo JText::_( 'FLEXI_VIEW' ); ?></a></h3>
+			<hr>
+			<table class="adminlist  table table-hover table-striped">
+				<thead>
+					<tr>
+						<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+						<th><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
+						<th><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					$k = 0;
+					for ($i=0, $n=count($this->popular); $i < $n; $i++) {
+					$row = $this->popular[$i];
+					$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
+					?>
+					<tr>
+						<td width="65%">
+							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo $row->title; ?>">
+								<a href="<?php echo $link; ?>">
+									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+								</a>
+							</span>
+						</td>
+						<td width="1%" align="center">
+							<strong><?php echo $row->hits; ?></strong>
+						</td>
+						<td width="34%">
+							<strong><?php echo flexicontent_html::ratingbar( $row ); ?></strong>
+						</td>
+					</tr>
+					<?php $k = 1 - $k; } ?>
+				</tbody>
+			</table>
 		</div>
-		<div class="row-fluid">
-			
-			<div class="span12">
-				<div class="well">
-					<h3><?php echo JText::_( 'FLEXI_LESS_POPULAR' ) ?> <a href="index.php?option=com_flexicontent&view=items&filter_order=i.hits&filter_order_Dir=asc" class="btn btn-small"><?php echo JText::_( 'FLEXI_VIEW' ); ?></a></h3>
-					<hr>
-					<table class="adminlist  table table-hover table-striped">
-						<thead>
-							<tr>
-								<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-								<th><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
-								<th><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php
-							$k = 0;
-							for ($i=0, $n=count($this->unpopular); $i < $n; $i++) {
-							$row = $this->unpopular[$i];
-							$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
-							?>
-							<tr>
-								<td width="65%">
-									<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo $row->title; ?>">
-										<a href="<?php echo $link; ?>">
-											<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-										</a>
-									</span>
-								</td>
-								<td width="1%" align="center">
-									<strong><?php echo $row->hits; ?></strong>
-								</td>
-								<td width="34%">
-									<strong><?php echo flexicontent_html::ratingbar( $row ); ?></strong>
-								</td>
-							</tr>
-							<?php $k = 1 - $k; } ?>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-
-
-		<div class="row-fluid">
-			
-			<div class="span12">
-				<div class="well">
-					<h3><?php echo JText::_( 'FLEXI_MOST_FAVOURED' ) ?> </h3>
-					<hr>
-							<table class="adminlist  table table-hover table-striped">
-						<thead>
-							<tr>
-								<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-								<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php
-							$k = 0;
-							for ($i=0, $n=count($this->favoured); $i < $n; $i++) {
-							$row = $this->favoured[$i];
-							$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
-							?>
-							<tr>
-								<td>
-									<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
-										<a href="<?php echo $link; ?>">
-											<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-										</a>
-									</span>
-								</td>
-								<td align="center">
-									<strong><?php echo $row->favnr; ?></strong>
-								</td>
-							</tr>
-							<?php $k = 1 - $k; } ?>
-						</tbody>
-					</table>
-				</div>
-			</div>
-			</div>
-			</div>
-			<div class="span7">
-				<div class="well">
-					<h3><?php echo JText::_( 'FLEXI_ITEM_STATES_CHART' ); ?></h3>
-
- 
-					    <div id="pie" style="height:742px; width:100%; 1px solid #ccc; padding: 10px;"></div>
-
-						<?php 
-
-							$workflow          = $this->statestats;
-							$typeslabel        = explode('|',$workflow['labels']);
-							$typeslabellist    = json_encode($typeslabel);
-							$valuesitems       = explode(',',$workflow['values']);
-							$datalist          = '';
-
-							foreach ($typeslabel  as $key=>$label) {
-									$datalist.= '{value:'.$valuesitems[$key].', name:"'.$label.'"},';
-							}
-						 ?>
-
-					    <script type="text/javascript" language="javascript">
-					       
-							var optionpie = {
-							      tooltip : {
-							        trigger: 'item',
-							        formatter: "{a} <br/>{b} : {c} ({d}%)"
-							      },
-							      legend: {
-							        orient : 'vertical',
-							        x : 'left',
-							        data:<?php echo $typeslabellist; ?>
-							      },
-							      toolbox: {
-							        show : true,
-							        feature : {
-						          //mark : {show: true},
-						          //dataView : {show: true, readOnly: false},
-						          restore : {
-						          	show: true,
-						          	title: 'Refresh'
-						          },
-						          saveAsImage : {
-						          	show: true,
-						          	title: 'Export'
-						          }
-						        }
-							      },
-							      calculable : false,
-							      series : [
-							        {
-							          name:'Workflow',
-							          type:'pie',
-							          radius : '50%',
-							          center: ['50%', '60%'],
-							          data:[
-							               <?php echo $datalist; ?>
-							           ]
-							        }
-							      ]
-							    };
-						        require(
-						            [
-						                'echarts',
-						                'echarts/chart/pie'
-						            ],
-						            function (ec) {
-						                var myChart = ec.init(document.getElementById('pie'));
-						                myChart.setOption(optionpie);
-						            }
-						        )
-
-					        </script>
-
-						</div>
-					</div>
-				</div>
-			<!-- End of Most and less Popular-->
-	<hr>
-	<div class="row-fluid">
-		<div class="span12"><h3><?php echo JText::_( 'FLEXI_RATING_STATS' ) ?></h3></div>
 	</div>
+	
+	
+	<div class="span6">
+		
+		<div class="well">
+			<h3><?php echo JText::_( 'FLEXI_LESS_POPULAR' ) ?> <a href="index.php?option=com_flexicontent&view=items&filter_order=i.hits&filter_order_Dir=asc" class="btn btn-small"><?php echo JText::_( 'FLEXI_VIEW' ); ?></a></h3>
+			<hr>
+			<table class="adminlist  table table-hover table-striped">
+				<thead>
+					<tr>
+						<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+						<th><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
+						<th><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					$k = 0;
+					for ($i=0, $n=count($this->unpopular); $i < $n; $i++) {
+					$row = $this->unpopular[$i];
+					$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
+					?>
+					<tr>
+						<td width="65%">
+							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo $row->title; ?>">
+								<a href="<?php echo $link; ?>">
+									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+								</a>
+							</span>
+						</td>
+						<td width="1%" align="center">
+							<strong><?php echo $row->hits; ?></strong>
+						</td>
+						<td width="34%">
+							<strong><?php echo flexicontent_html::ratingbar( $row ); ?></strong>
+						</td>
+					</tr>
+					<?php $k = 1 - $k; } ?>
+				</tbody>
+			</table>
+		</div>
+		
+	</div>
+	
+	
+	<div class="span6">
+		<div class="well">
+			<h3><?php echo JText::_( 'FLEXI_MOST_FAVOURED' ) ?> </h3>
+			<hr>
+					<table class="adminlist  table table-hover table-striped">
+				<thead>
+					<tr>
+						<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+						<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					$k = 0;
+					for ($i=0, $n=count($this->favoured); $i < $n; $i++) {
+					$row = $this->favoured[$i];
+					$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
+					?>
+					<tr>
+						<td>
+							<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+								<a href="<?php echo $link; ?>">
+									<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+								</a>
+							</span>
+						</td>
+						<td align="center">
+							<strong><?php echo $row->favnr; ?></strong>
+						</td>
+					</tr>
+					<?php $k = 1 - $k; } ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	
+	<!-- End of Most and less Popular-->
+
+	<div class="clear clearfix"></div>
+	
+	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
+	<tr>
+		<th colspan="2" style="font-size:18px;">
+			<?php echo JText::_( 'FLEXI_RATING_STATS' ); ?>
+		</th>
+	</tr>
+	</table>
+
+
 	<!-- Most and less Popular-->
 			<div class="row-fluid">
 
@@ -622,10 +651,17 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 			</div>
 		<!-- End of Most and less Popular-->
 
+
+	<div class="clear clearfix"></div>
 	<hr>
-	<div class="row-fluid">
-		<div class="span12"><h3><?php echo JText::_( 'FLEXI_USER_STATS' ) ?></h3></div>
-	</div>
+	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
+	<tr>
+		<th colspan="2" style="font-size:18px;">
+			<?php echo JText::_( 'FLEXI_USER_STATS' ); ?>
+		</th>
+	</tr>
+	</table>
+	
 	<!-- Most and less Popular-->
 			<div class="row-fluid">
 				<div class="span5">
@@ -663,6 +699,8 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 							</table>
 					</div>
 				</div>
+				
+				
 				<div class="span7">
 					<div class="well">
 						<h3><?php echo JText::_( 'FLEXI_TOP_CONTRIBUTORS' ) ?></h3>
@@ -695,18 +733,18 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 									</tr>
 									<?php $k = 1 - $k; } ?>
 								</tbody>
+							</table>
 					</div>
 				</div>
 				
 			</div>
 		<!-- End of Most and less Popular-->
 
-<?php 
+<?php
 endif;
 // EOF: Load echart 
 ?>
 
 
-</div>
 <div class="clear clearfix"></div>
-	</div>
+</div>

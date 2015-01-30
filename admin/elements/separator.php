@@ -147,8 +147,8 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
 			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
-			//if (!FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
-			if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
+			//if (!FLEXI_J30GE)  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+			if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		}
 	}
 	

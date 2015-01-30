@@ -43,10 +43,10 @@ class FlexicontentViewTag extends JViewLegacy
 		$cid 		= JRequest::getVar( 'cid' );
 
 		//add css to document
-		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
+		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
 		
 		// Add JS frameworks
 		//flexicontent_html::loadFramework('select2');

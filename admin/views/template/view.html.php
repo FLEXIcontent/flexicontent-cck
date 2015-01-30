@@ -43,7 +43,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		
 		if (!$use_jquery_sortable) {
 			// mootools sortable
-			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
+			$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/sortables.js' );
 		}
 		
 		$type 	= JRequest::getVar('type',  'items', '', 'word');
@@ -210,10 +210,10 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		JHTML::_('behavior.modal');
 
 		//add css and submenu to document
-		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
+		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
 		$permission = FlexicontentHelperPerm::getPerm();
 
 		if (!$permission->CanTemplates) {
