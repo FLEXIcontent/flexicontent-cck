@@ -359,15 +359,19 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	<div class="container_fcfield container_fcfield_id_1 container_fcfield_name_title" id="container_fcfield_1">
 	<?php	if ( isset($this->item->item_translations) ) :?>
 		
+		<?php
+		$tabSetCnt++;
+		$tabCnt[$tabSetCnt] = 0;
+		?>
 		<!-- tabber start -->
-		<div class="fctabber" style=''>
-			<div class="tabbertab" style="padding: 0px;" >
+		<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+			<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 				<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 				<?php echo $this->form->getInput('title');?>
 			</div>
 			<?php foreach ($this->item->item_translations as $t): ?>
 				<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
-					<div class="tabbertab" style="padding: 0px;" >
+					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 						<?php
 						$ff_id = 'jfdata_'.$t->shortcode.'_title';
@@ -401,15 +405,19 @@ if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 	<div class="container_fcfield container_fcfield_name_alias">
 	<?php	if ( isset($this->item->item_translations) ) :?>
 	
+		<?php
+		$tabSetCnt++;
+		$tabCnt[$tabSetCnt] = 0;
+		?>
 		<!-- tabber start -->
-		<div class="fctabber" style=''>
-			<div class="tabbertab" style="padding: 0px;" >
+		<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+			<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 				<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 				<?php echo $this->form->getInput('alias');?>
 			</div>
 			<?php foreach ($this->item->item_translations as $t): ?>
 				<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
-					<div class="tabbertab" style="padding: 0px;" >
+					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 						<?php
 						$ff_id = 'jfdata_'.$t->shortcode.'_alias';
@@ -865,15 +873,19 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 			<div class="container_fcfield">
 				<?php	if ( isset($this->item->item_translations) ) :?>
 					
+					<?php
+					$tabSetCnt++;
+					$tabCnt[$tabSetCnt] = 0;
+					?>
 					<!-- tabber start -->
-					<div class="fctabber" style='display:inline-block;'>
-						<div class="tabbertab" style="padding: 0px;" >
+					<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 							<?php echo $this->form->getInput('metadesc'); ?>
 						</div>
 						<?php foreach ($this->item->item_translations as $t): ?>
 							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
-								<div class="tabbertab" style="padding: 0px;" >
+								<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 									<?php
 									$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
@@ -897,15 +909,19 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 			<div class="container_fcfield">
 				<?php	if ( isset($this->item->item_translations) ) :?>
 					
+					<?php
+					$tabSetCnt++;
+					$tabCnt[$tabSetCnt] = 0;
+					?>
 					<!-- tabber start -->
-					<div class="fctabber" style='display:inline-block;'>
-						<div class="tabbertab" style="padding: 0px;" >
+					<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 							<?php echo $this->form->getInput('metakey'); ?>
 						</div>
 						<?php foreach ($this->item->item_translations as $t): ?>
 							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
-								<div class="tabbertab" style="padding: 0px;" >
+								<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 									<?php
 									$ff_id = 'jfdata_'.$t->shortcode.'_metakey';
@@ -1154,11 +1170,15 @@ if ($this->fields && $typeid) :
 				<?php echo ($field->description && $edithelp==3)  ?  sprintf( $alert_box, '', 'info', 'fc-nobgimage', $field->description )  :  ''; ?>
 				
 			<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing of joomfish (J1.5) or falang (J2.5+)
-				if ($field->field_type=='maintext' && isset($this->item->item_translations) ) : ?>
+			if ($field->field_type=='maintext' && isset($this->item->item_translations) ) : ?>
 				
+				<?php
+				$tabSetCnt++;
+				$tabCnt[$tabSetCnt] = 0;
+				?>
 				<!-- tabber start -->
-				<div class="fctabber" style=''>
-					<div class="tabbertab" style="padding: 0px;" >
+				<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo '- '.$this->itemlang->name.' -'; // $t->name; ?> </h3>
 						<?php
 							$field_tab_labels = & $field->tab_labels;
@@ -1168,7 +1188,7 @@ if ($this->fields && $typeid) :
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
 						<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
-							<div class="tabbertab" style="padding: 0px;" >
+							<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 								<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 								<?php
 								$field_tab_labels = & $t->fields->text->tab_labels;
@@ -1187,16 +1207,20 @@ if ($this->fields && $typeid) :
 				
 			<?php else : /* MULTI-TABBED FIELD e.g textarea, description */ ?>
 				
+				<?php
+				$tabSetCnt++;
+				$tabCnt[$tabSetCnt] = 0;
+				?>
 				<!-- tabber start -->
-				<div class="fctabber">
+				<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 				<?php foreach ($field->html as $i => $fldhtml): ?>
 					<?php
 						// Hide field when it has no label, and skip creating tab
 						$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
 						if (!isset($field->tab_labels[$i]))	continue;
 					?>
-							
-					<div class="tabbertab">
+					
+					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
 						<?php
 							echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
@@ -1302,9 +1326,7 @@ $tabCnt[$tabSetCnt] = 0;
 ?>
 
 <!-- tabber start -->
-<div class='fctabber fields_tabset' id='fcform_tabset_<?php echo $tabSetCnt; ?>' >
-	
-
+<div class="fctabber fields_tabset" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 
 
 <?php	
@@ -1314,7 +1336,7 @@ $tabCnt[$tabSetCnt] = 0;
 if ( count($tab_fields['tab01']) ) :
 	$tab_lbl = isset($tab_titles['tab01']) ? $tab_titles['tab01'] : JText::_( 'FLEXI_BASIC' );
 	?>
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-tree-2">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 		
 		<?php foreach($tab_fields['tab01'] as $fn => $i) : ?>
@@ -1332,7 +1354,7 @@ if ( count($tab_fields['tab01']) ) :
 if ( count($tab_fields['tab02']) ) :
 	$tab_lbl = isset($tab_titles['tab02']) ? $tab_titles['tab02'] : JText::_( 'FLEXI_DESCRIPTION' );
 	?>
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-file-2">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 		
 		<?php foreach($tab_fields['tab02'] as $fn => $i) : ?>
@@ -1351,7 +1373,7 @@ if ( count($tab_fields['tab02']) ) :
 if ( count($tab_fields['tab03']) ) :
 	$tab_lbl = isset($tab_titles['tab03']) ? $tab_titles['tab03'] : JText::_( 'FLEXI_FIELDS' );
 	?>
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-signup">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 		
 		<?php foreach($tab_fields['tab03'] as $fn => $i) : ?>
@@ -1375,7 +1397,7 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	$publication_priv = FLEXI_J16GE ? 'canpublish' : 'canedit';
 	if ( count($tab_fields['tab04']) ) : ?>
 		<?php $tab_lbl = isset($tab_titles['tab04']) ? $tab_titles['tab04'] : JText::_( 'FLEXI_PUBLISHING' ); ?>
-		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-calendar">
 			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 			
 			<fieldset class="flexi_params fc_edit_container_full">
@@ -1396,7 +1418,7 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	// **************
 	if ( count($tab_fields['tab05']) ) : ?>
 		<?php $tab_lbl = isset($tab_titles['tab05']) ? $tab_titles['tab05'] : JText::_( 'FLEXI_META_SEO' ); ?>
-		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-bookmark" >
 			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 	
 			<?php foreach($tab_fields['tab05'] as $fn => $i) : ?>
@@ -1415,7 +1437,7 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	// *************************
 	if ( count($tab_fields['tab06']) ) : ?>
 		<?php $tab_lbl = isset($tab_titles['tab06']) ? $tab_titles['tab06'] : JText::_( 'FLEXI_DISPLAYING' ); ?>
-		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-eye-open">
 			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 	
 			<?php foreach($tab_fields['tab06'] as $fn => $i) : ?>
@@ -1432,7 +1454,7 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	// JOOMLA IMAGE/URLS TAB
 	// *********************
 	if (JComponentHelper::getParams('com_content')->get('show_urls_images_frontend', 0) ) : ?>
-		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-joomla">
 			<h3 class="tabberheading"> <?php echo JText::_('Compatibility'); ?> </h3>
 			
 			<?php
@@ -1468,7 +1490,7 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	// ************
 	if ( count($tab_fields['tab07']) ) : ?>
 		<?php $tab_lbl = isset($tab_titles['tab07']) ? $tab_titles['tab07'] : JText::_( 'FLEXI_TEMPLATE' ); ?>
-		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-palette">
 			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 			
 			<fieldset class="flexi_params fc_edit_container_full">

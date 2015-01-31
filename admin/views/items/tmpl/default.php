@@ -349,11 +349,11 @@ window.addEvent('domready', function() {
 	<div id="fc-filters-header">
 		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['scope']; ?>
-			<div class="btn-wrapper input-append" style="margin:0;">
+			<span class="btn-wrapper input-append" style="margin:0;">
 				<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
 				<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
 				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="delAllFilters();this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
-			</div>
+			</span>
 		</span>
 		
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
@@ -363,7 +363,7 @@ window.addEvent('domready', function() {
 		</div>
 		
 		<span class="fc-filter nowrap_box">
-			<div class="limit nowrap_box" style="display: inline-block;">
+			<span class="limit nowrap_box" style="display: inline-block;">
 				<label class="label">
 					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
 				</label>
@@ -371,7 +371,7 @@ window.addEvent('domready', function() {
 				$pagination_footer = $this->pagination->getListFooter();
 				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 				?>
-			</div>
+			</span>
 			
 			<span class="fc_item_total_data nowrap_box badge badge-info">
 				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>

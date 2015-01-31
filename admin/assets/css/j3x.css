@@ -178,7 +178,7 @@ fieldset legend {
 .pane-toggler a:hover, .pane-toggler a:focus {
 	text-decoration: none !important;
 }
-.pane-toggler span {
+.pane-toggler > a > span {
 	background: url("../images/toggle_blue.png") no-repeat scroll 0px 0px transparent;
 	padding-left: 20px;
 	font-size: 14px;
@@ -186,7 +186,7 @@ fieldset legend {
 .pane-toggler-down {
 	border-bottom: 1px solid #CCCCCC;
 }
-.pane-toggler-down span {
+.pane-toggler-down > a > span {
 	background: url("../images/toggle_blue_up.png") no-repeat scroll 0px 0px transparent;
 	padding-left: 20px;
 	font-size: 14px;

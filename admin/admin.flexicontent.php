@@ -118,6 +118,10 @@ if ( JRequest::getWord('format')!='raw')
 	
 	// J3.0+ tooltips (bootstrap based)
 	if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
+	
+	// Add flexi-lib JS
+	JFactory::getDocument()->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js' );
+	JFactory::getDocument()->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js' );
 }
 
 

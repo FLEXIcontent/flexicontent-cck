@@ -68,13 +68,13 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 				</div>
 			</td>
 			<td nowrap="nowrap">
-				<div class="limit" style="display: inline-block;">
+				<span class="limit" style="display: inline-block;">
 					<?php
 					echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM');
 					$pagination_footer = $this->pagination->getListFooter();
 					if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 					?>
-				</div>
+				</span>
 				
 				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
 					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>

@@ -139,13 +139,13 @@ function delAllFilters() {
 					<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 					<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				
-					<div class="limit" style="display: inline-block; margin-left: 24px;">
+					<span class="limit" style="display: inline-block; margin-left: 24px;">
 						<?php
 						echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM');
 						$pagination_footer = $this->pagination->getListFooter();
 						if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 						?>
-					</div>
+					</span>
 					
 					<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
 						<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>

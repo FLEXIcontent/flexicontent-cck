@@ -109,7 +109,6 @@ class FlexicontentViewItems extends JViewLegacy
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
 		$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/stateselector.js' );
-		$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js' );
 
 		$js = "window.addEvent('domready', function(){";
 		if ($filter_cats) {

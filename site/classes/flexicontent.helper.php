@@ -1551,7 +1551,7 @@ class flexicontent_html
 					$output .='
 							<li>
 								<a href="javascript:void(0);" onclick="dostate(\''.$state_id.'\', \''.$item->id.'\')" class="closer '.$tooltip_class.'" title="'.$tooltip_title.'">
-									<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" border="0" alt="'.$state_names[$state_id].'" />
+									<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="'.$state_names[$state_id].'" />
 								</a>
 							</li>';
 				}
@@ -2846,7 +2846,7 @@ class flexicontent_html
 				$checked = $state_id==$selected ? ' checked="checked"' : '';
 				$list 	.= '<input id="state'.$state_id.'" type="radio" name="state" class="state" value="'.$state_id.'" '.$checked.'/>';
 				$list 	.= '<label class="state_box" for="state'.$state_id.'" title="'.$state_names[$state_id].'" >';
-				$list 	.= '<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" border="0" alt="'.$state_names[$state_id].'" />';
+				$list 	.= '<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="'.$state_names[$state_id].'" />';
 				$list 	.= '</label>';
 			}
 			$checked = $selected==='' ? ' checked="checked"' : '';

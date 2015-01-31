@@ -37,63 +37,65 @@ $document->addStyleDeclaration("
 
 // Add form validation JS to the doc header
 $document->addScriptDeclaration("
-".(FLEXI_J16GE ? 'Joomla.submitform = ' : '')."
 
-function submitbutton(task) {
-	if(task=='cancel') {
+jQuery(document).ready(function () {
+	".(FLEXI_J16GE ? 'Joomla.submitform = ' : '')."
+	function submitbutton(task) {
+		if(task=='cancel') {
+			submitform(task);
+			return;
+		}
+		if(!$('type_id').value) {
+			alert('Please select item type.');
+			$('type_id').focus();
+			return;
+		}
+	
+		radio_ischecked = 0;
+		for (i = 0; i < document.getElementsByName('language').length; i++) {
+			if (document.getElementsByName('language')[i].checked) {
+				radio_ischecked = 1;
+			}
+		}
+		if( !radio_ischecked ) {
+			alert('Please select item language.');
+			return;
+		}
+	
+		radio_ischecked = 0;
+		for (i = 0; i < document.getElementsByName('state').length; i++) {
+			if (document.getElementsByName('state')[i].checked) {
+				radio_ischecked = 1;
+			}
+		}
+		if( !radio_ischecked ) {
+			alert('Please select item state.');
+			return;
+		}
+	
+		if( $('maincat').value.length<=0 && !$('maincat_col').checked ) {
+			alert('Please select a primary category or select to use \'catid\' column');
+			$('maincat').focus();
+			return;
+		}
+		if($('field_separator').value=='') {
+			alert('Please select your FLEXIcontent field separator string e.g ~~');
+			$('csvfile').focus();
+			return;
+		}
+		if($('record_separator').value=='') {
+			alert('Please select your FLEXIcontent item separator string e.g \\n~~');
+			$('csvfile').focus();
+			return;
+		}
+		if($('csvfile').value=='') {
+			alert('Please select your csv file that you want to import.');
+			$('csvfile').focus();
+			return;
+		}
 		submitform(task);
-		return;
 	}
-	if(!$('type_id').value) {
-		alert('Please select item type.');
-		$('type_id').focus();
-		return;
-	}
-
-	radio_ischecked = 0;
-	for (i = 0; i < document.getElementsByName('language').length; i++) {
-		if (document.getElementsByName('language')[i].checked) {
-			radio_ischecked = 1;
-		}
-	}
-	if( !radio_ischecked ) {
-		alert('Please select item language.');
-		return;
-	}
-
-	radio_ischecked = 0;
-	for (i = 0; i < document.getElementsByName('state').length; i++) {
-		if (document.getElementsByName('state')[i].checked) {
-			radio_ischecked = 1;
-		}
-	}
-	if( !radio_ischecked ) {
-		alert('Please select item state.');
-		return;
-	}
-
-	if( $('maincat').value.length<=0 && !$('maincat_col').checked ) {
-		alert('Please select a primary category or select to use \'catid\' column');
-		$('maincat').focus();
-		return;
-	}
-	if($('field_separator').value=='') {
-		alert('Please select your FLEXIcontent field separator string e.g ~~');
-		$('csvfile').focus();
-		return;
-	}
-	if($('record_separator').value=='') {
-		alert('Please select your FLEXIcontent item separator string e.g \\n~~');
-		$('csvfile').focus();
-		return;
-	}
-	if($('csvfile').value=='') {
-		alert('Please select your csv file that you want to import.');
-		$('csvfile').focus();
-		return;
-	}
-	submitform(task);
-}
+});
 ");
 ?>
 
@@ -113,7 +115,7 @@ function submitbutton(task) {
 	<table cellspacing="10" cellpadding="0" border="0" width="100%">
 		
 		<tr>
-			<td valign="top" colspan="2">
+			<td valign="top">
 			<div style="width:95%; text-align:right; clear:both; float:right;">
 				<a href="#tools_3rd_party" ><?php echo JText::_( 'FLEXI_3RD_PARTY_DEV_IMPORT_EXPORT_TOOLS' ); ?></a>
 			</div>
@@ -303,7 +305,7 @@ function submitbutton(task) {
 		</tr>
 		
 		<tr>
-			<td valign="top" colspan="2">
+			<td valign="top">
 				<fieldset style="min-height:220px;">
 					<legend><?php echo JText::_( 'FLEXI_IMPORT_CATS_LEGEND' ); ?></legend>
 					<table class="fcimporttbl">
@@ -335,7 +337,7 @@ function submitbutton(task) {
 		</tr>
 		
 		<tr>
-			<td valign="top" colspan="2" >
+			<td valign="top">
 			<fieldset>
 				<legend><?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_FORMAT_LEGEND' ); ?></legend>
 				<table class="fcimporttbl">
@@ -386,7 +388,7 @@ function submitbutton(task) {
 		</tr>
 		
 		<tr>
-			<td valign="top" colspan="2" >
+			<td valign="top">
 			<fieldset>
 				<legend><?php echo JText::_( 'FLEXI_CSV_FILE_FILE_FOLDERS_LEGEND' ); ?></legend>
 				<table class="fcimporttbl">
@@ -453,7 +455,7 @@ function submitbutton(task) {
 		</tr>
 
 		<tr>
-			<td valign="top" colspan="2" style="font-family:tahoma; font-size:12px;">
+			<td valign="top" style="font-family:tahoma; font-size:12px;">
 			<fieldset>
 				<legend style='color: darkgreen;'><?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_FORMAT_EXPLANATION' ); ?></legend>
 <b>1. First line</b> of the CSV file: &nbsp; &nbsp; must contain the <b>field names</b> <u>(and not the field labels!)</u><br/><br/>

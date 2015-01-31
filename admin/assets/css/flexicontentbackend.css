@@ -403,6 +403,11 @@ div#fc-dash-sliders table.fc-table-list td {
 div table.fc-table-list.fc-tbl-short td,
 div#fc-dash-sliders table.fc-table-list.fc-tbl-short td {
 	padding: 0px 15px;
+	text-align: left;
+}
+div table.fc-table-list.fc-tbl-short td:first-child,
+div#fc-dash-sliders table.fc-table-list.fc-tbl-short td:first-child {
+	text-align: right;
 }
 
 div table.fc-table-list td a,
@@ -471,7 +476,7 @@ div#fc-dash-sliders table.fc-table-list tbody tr:hover td a {
 
 
 /* Dashboard button SET (a fieldset) */
-fieldset.fc-board-set {
+#flexicontent fieldset.fc-board-set {
 	float:left;
 	width: auto;
 	margin-left: 10px;
@@ -479,7 +484,7 @@ fieldset.fc-board-set {
 	margin:0 24px 12px 0;
 	padding:0;
 }
-fieldset.fc-board-set div.fc-board-set-inner {
+#flexicontent fieldset.fc-board-set div.fc-board-set-inner {
 	box-shadow: 0 0 4px #cccccc;
 	position:relative;
 	top:0;
@@ -492,7 +497,7 @@ fieldset.fc-board-set div.fc-board-set-inner {
 }
 
 /* Dashboard button SET title (a fieldset lengend)*/
-legend[class^="fc-board-header"] {
+#flexicontent legend[class^="fc-board-header"] {
 	-webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;
 	font-size:12px;
 	font-family:arial, helvetica, sans-serif;

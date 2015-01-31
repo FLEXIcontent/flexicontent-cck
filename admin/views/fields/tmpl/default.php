@@ -56,7 +56,7 @@ if ($this->filter_type == '' || $this->filter_type == 0) {
 	$ord_col = 'typeordering';
 }
 $ord_grp = 1;
-$list_total_cols = 15;
+$list_total_cols = 13;
 ?>
 <script type="text/javascript">
 
@@ -94,11 +94,11 @@ function delAllFilters() {
 
 	<div id="fc-filters-header">
 		<span class="fc-filter nowrap_box">
-			<div class="btn-wrapper input-append" style="margin:0;">
+			<span class="btn-wrapper input-append" style="margin:0;">
 				<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
 				<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
 				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="delAllFilters();this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
-			</div>
+			</span>
 		</span>
 		
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
@@ -108,7 +108,7 @@ function delAllFilters() {
 		</div>
 		
 		<span class="fc-filter nowrap_box">
-			<div class="limit nowrap_box" style="display: inline-block;">
+			<span class="limit nowrap_box" style="display: inline-block;">
 				<label class="label">
 					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
 				</label>
@@ -116,7 +116,7 @@ function delAllFilters() {
 				$pagination_footer = $this->pagination->getListFooter();
 				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 				?>
-			</div>
+			</span>
 			
 			<span class="fc_item_total_data nowrap_box badge badge-info">
 				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
@@ -468,14 +468,14 @@ function delAllFilters() {
 			<td align="center">
 				<?php if($supportsearch) :?>
 				<a title="Toggle property" onclick="document.adminForm.propname.value='issearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
-					<img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" border="0" title="<?php echo $issearch_tip;?>" alt="<?php echo $issearch_tip;?>" />
+					<img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" style="border-width:0;" title="<?php echo $issearch_tip;?>" alt="<?php echo $issearch_tip;?>" />
 				</a>
 				<?php else: ?>
 				-
 				<?php endif; ?> /
 				<?php if($supportfilter) :?>
 				<a title="Toggle property" onclick="document.adminForm.propname.value='isfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
-					<img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" border="0" title="<?php echo $isfilter_tip;?>" alt="<?php echo $isfilter_tip;?>" />
+					<img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" style="border-width:0;" title="<?php echo $isfilter_tip;?>" alt="<?php echo $isfilter_tip;?>" />
 				</a>
 				<?php else: ?>
 				-
@@ -484,21 +484,21 @@ function delAllFilters() {
 			<td align="center">
 				<?php if($supportadvsearch) :?>
 				<a title="Toggle property" onclick="document.adminForm.propname.value='isadvsearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
-					<img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" border="0" title="<?php echo $isadvsearch_tip;?>" alt="<?php echo $isadvsearch_tip;?>" />
+					<img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" style="border-width:0;" title="<?php echo $isadvsearch_tip;?>" alt="<?php echo $isadvsearch_tip;?>" />
 				</a>
 				<?php else: ?>
 				-
 				<?php endif; ?> /
 				<?php if($supportadvfilter) :?>
 				<a title="Toggle property" onclick="document.adminForm.propname.value='isadvfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
-					<img src="components/com_flexicontent/assets/images/<?php echo $isadvfilter;?>" width="16" height="16" border="0" title="<?php echo $isadvfilter_tip;?>" alt="<?php echo $isadvfilter_tip;?>" />
+					<img src="components/com_flexicontent/assets/images/<?php echo $isadvfilter;?>" width="16" height="16" style="border-width:0;" title="<?php echo $isadvfilter_tip;?>" alt="<?php echo $isadvfilter_tip;?>" />
 				</a>
 				<?php else: ?>
 				-
 				<?php endif; ?>
 			</td>
 			<td align="center">
-				<?php echo $row->nrassigned ? '<span class="badge badge-info">'.$row->nrassigned.'</span' : $orphan_warning; ?></span>
+				<?php echo $row->nrassigned ? '<span class="badge badge-info">'.$row->nrassigned.'</span>' : $orphan_warning; ?>
 			</td>
 			<td align="center">
 				<?php echo $access; ?>

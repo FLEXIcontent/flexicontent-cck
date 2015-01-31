@@ -226,9 +226,9 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 				</div>
 			</td>
 			<td nowrap="nowrap">
-				<div class="limit" style="display: inline-block;">
+				<span class="limit" style="display: inline-block;">
 					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
-				</div>
+				</span>
 				
 				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
 					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
