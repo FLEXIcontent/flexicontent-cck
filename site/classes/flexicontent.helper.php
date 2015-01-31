@@ -126,7 +126,7 @@ class flexicontent_html
 	
 	
 	static function escape($str) {
-		return addslashes(htmlspecialchars($str, ENT_COMPAT, 'UTF-8'));
+		return htmlspecialchars($str, ENT_COMPAT, 'UTF-8');
 	}
 	
 	
