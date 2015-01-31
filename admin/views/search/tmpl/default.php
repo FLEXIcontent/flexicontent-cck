@@ -105,7 +105,7 @@ function delAllFilters() {
 			<tr id="fc-filters-box">
 				<!--td class="left col_title" colspan="4">
 					<span class="radio"><?php echo $this->lists['scope']; ?></span>
-					<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
+					<input type="text" name="search" id="search" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
 				</td-->
 				<td class="left"></td>
 				<td class="left"></td>
@@ -129,7 +129,7 @@ function delAllFilters() {
 				<td class="left"></td>
 				<td class="left col_search_index">
 					<?php echo '<label class="label'.($this->f_active['search_index'] ? " highlight":"").'">'.JText::_('FLEXI_FILTER').'</label> '; ?><br/>
-					<input type="text" name="search_index" id="search_index" value="<?php echo $this->lists['search_index']; ?>" class="text_area" onchange="document.adminForm.submit();" />
+					<input type="text" name="search_index" id="search_index" value="<?php echo htmlspecialchars($this->lists['search_index'], ENT_QUOTES, 'UTF-8'); ?>" class="text_area" onchange="document.adminForm.submit();" />
 				</td>
 				<td class="left"></td>
 			</tr>

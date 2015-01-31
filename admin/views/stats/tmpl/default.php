@@ -385,7 +385,7 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 						?>
 						<tr>
 							<td width="65%">
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo $row->title; ?>">
+								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 									<a href="<?php echo $link; ?>">
 										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 									</a>
@@ -427,7 +427,7 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 						?>
 						<tr>
 							<td width="65%">
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo $row->title; ?>">
+								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 									<a href="<?php echo $link; ?>">
 										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 									</a>
@@ -471,7 +471,7 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 						?>
 						<tr>
 							<td>
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 									<a href="<?php echo $link; ?>">
 										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 									</a>
@@ -530,7 +530,7 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 								?>
 								<tr>
 									<td>
-										<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+										<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 											<a href="<?php echo $link; ?>">
 												<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 											</a>
@@ -568,7 +568,7 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 										?>
 										<tr>
 											<td>
-												<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+												<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 													<a href="<?php echo $link; ?>">
 														<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 													</a>
@@ -700,7 +700,7 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 									?>
 									<tr>
 										<td>
-											<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo $row->username; ?>">
+											<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8'); ?>">
 												<a href="<?php echo $link; ?>">
 													<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
 												</a>
@@ -737,7 +737,7 @@ if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_C
 									?>
 									<tr>
 										<td>
-											<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo $row->username; ?>">
+											<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8'); ?>">
 												<a href="<?php echo $link; ?>">
 													<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
 												</a>
