@@ -60,9 +60,9 @@
 
 
 
-/**************
- * Small labels
- **************/
+/*****************************
+ * Bootstrap-like CSS for j2.5
+ *****************************/
 
 .label, .badge, .flexicontent label.label {
 	background-color: #999999;
@@ -78,9 +78,15 @@
 	border-radius: 4px;
 	margin: 0px 2px 2px 4px;
 }
-.label.highlight, .badge.highlight {
+.flexicontent .label-info, .flexicontent .badge-info { background-color: #3a87ad; }
+.flexicontent .label-success, .flexicontent .badge-success { background-color: #468847; }
+.flexicontent .label-warning, .flexicontent .badge-warning { background-color: #f89406; }
+.flexicontent .label-important, .flexicontent .badge-important { background-color: #b94a48; }
+.flexicontent .label.highlight, .flexicontent .badge.highlight {
 	color: darkred;
 }
+.pull-left { float: left; }
+.pull-right { float: right; }
 
 
 /**************

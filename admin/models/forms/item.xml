@@ -3,8 +3,8 @@
 	<fieldset>
 		<field name="id"  type="hidden" class="readonly" label="JGLOBAL_FIELD_ID_LABEL" description ="JGLOBAL_FIELD_ID_DESC" size="10" default="0" readonly="true" />
 		<field name="asset_id" type="hidden" filter="unset" />
-		<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="fcfield_textval" maxlength="254" size="40" required="true" />
-		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="fcfield_textval" maxlength="254" size="40" />
+		<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="fc_form_title fcfield_textval" maxlength="254" size="40" required="true" />
+		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="fc_form_alias fcfield_textval" maxlength="254" size="40" />
 		<field name="type_id" type="fieldtypes" label="FLEXI_TYPE" description="FLEXI_TYPE_DESC" class="inputbox" />
 		<field name="text" type="editor" class="inputbox" label="COM_CONTENT_FIELD_ARTICLETEXT_LABEL" description="COM_CONTENT_FIELD_ARTICLETEXT_DESC" filter="JComponentHelper::filterText" buttons="true" />
 		<field name="state" type="list" label="FLEXI_STATE" description="FLEXI_STATE_DESC" class="inputbox use_select2_lib" filter="intval" size="1" default="-4">
@@ -29,15 +29,15 @@
 		<field name="featured_cid" type="categorytree" size="10" label="FLEXI_FEATURED_CATEGORIES" description="FLEXI_FEATURED_CATEGORIES_DESC" class="use_select2_lib" multiple="true" top="3" />
 		<field name="catid" type="categorytree" label="FLEXI_PRIMARY_CATEGORY" description="FLEXI_CATEGORIES_NOTES" class="scat use_select2_lib" required="true" top="2" />
 		<field name="buttonspacer" description="JGLOBAL_ACTION_PERMISSIONS_DESCRIPTION" type="spacer" />
-		<field name="created" type="calendar" label="COM_CONTENT_FIELD_CREATED_LABEL" description="COM_CONTENT_FIELD_CREATED_DESC" class="fcfield_textval" size="22" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
-		<field name="created_by" type="user" label="FLEXI_FIELD_CREATED_BY_LABEL" description="FLEXI_FIELD_CREATED_BY_DESC" class="fcfield_textval" />
+		<field name="created" type="calendar" label="COM_CONTENT_FIELD_CREATED_LABEL" description="COM_CONTENT_FIELD_CREATED_DESC" class="" size="22" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
+		<field name="created_by" type="user" label="FLEXI_FIELD_CREATED_BY_LABEL" description="FLEXI_FIELD_CREATED_BY_DESC" class="" />
 		<field name="created_by_alias" type="text" label="FLEXI_FIELD_CREATED_BY_ALIAS_LABEL" description="FLEXI_FIELD_CREATED_BY_ALIAS_DESC" class="fcfield_textval" size="20" />
 		<field name="modified" type="calendar" class="readonly" label="COM_CONTENT_FIELD_MODIFIED_LABEL" description="COM_CONTENT_FIELD_MODIFIED_DESC" size="22" readonly="true" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
 		<field name="modified_by" type="hidden" filter="unset" />
 		<field name="checked_out" type="hidden" filter="unset" />
 		<field name="checked_out_time" type="hidden" filter="unset" />
-		<field name="publish_up" type="calendar" label="COM_CONTENT_FIELD_PUBLISH_UP_LABEL" description="COM_CONTENT_FIELD_PUBLISH_UP_DESC" class="fcfield_textval" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" />
-		<field name="publish_down" type="calendar" label="COM_CONTENT_FIELD_PUBLISH_DOWN_LABEL" description="COM_CONTENT_FIELD_PUBLISH_DOWN_DESC" class="fcfield_textval" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" />
+		<field name="publish_up" type="calendar" label="COM_CONTENT_FIELD_PUBLISH_UP_LABEL" description="COM_CONTENT_FIELD_PUBLISH_UP_DESC" class="" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" />
+		<field name="publish_down" type="calendar" label="COM_CONTENT_FIELD_PUBLISH_DOWN_LABEL" description="COM_CONTENT_FIELD_PUBLISH_DOWN_DESC" class="" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" />
 		<field name="version" type="text" class="readonly" label="COM_CONTENT_FIELD_VERSION_LABEL" size="6" description="COM_CONTENT_FIELD_VERSION_DESC" readonly="true" filter="unset" />
 		<field name="versioncomment" type="textarea" label="FLEXI_VERSION_COMMENT" description="FLEXI_VERSION_COMMENT_DESC" class="inputbox" rows="3" cols="30" />
 		<field name="ordering" type="text" label="JFIELD_ORDERING_LABEL" description="JFIELD_ORDERING_DESC" class="inputbox" size="6" default="0" />
@@ -109,11 +109,11 @@
 	<fieldset name="params-advanced" label="FLEXI_PARAMETERS_ITEM_ADVANCED">
 		
 		<field name="" type="separator" default="FLEXI_ADVANCED" description="..." level="level2" />
-			<field name="comments" type="radio" default="" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_DISABLE_OR_INTEGRATE_MANUALLY</option>
-				<option value="1">FLEXI_JCOMMENTS_INTEGRATION</option>
-			</field>
+		<field name="comments" type="radio" default="" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<option value="">FLEXI_USE_GLOBAL</option>
+			<option value="0">FLEXI_DISABLE_OR_INTEGRATE_MANUALLY</option>
+			<option value="1">FLEXI_JCOMMENTS_INTEGRATION</option>
+		</field>
 		<field name="automatic_pathways" type="radio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>

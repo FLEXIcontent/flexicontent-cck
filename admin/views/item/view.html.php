@@ -214,19 +214,19 @@ class FlexicontentViewItem extends JViewLegacy
 
 			if ( !$params->get('use_versioning', 1) || ($item->version == $item->current_version && $item->version == $item->last_version) )
 			{
-				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
+				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small" onClick="window.open(\''.$previewlink.'\');" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</button>', 'preview' );
 			} else {
 				// Add a preview button for (currently) LOADED version of the item
 				$previewlink_loaded_ver = $previewlink .'&version='.$item->version;
-				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_loaded_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION').' ['.$item->version.']</a>', 'preview' );
+				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small" onClick="window.open(\''.$previewlink_loaded_ver.'\');" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION').' ['.$item->version.']</button>', 'preview' );
 
 				// Add a preview button for currently ACTIVE version of the item
 				$previewlink_active_ver = $previewlink .'&version='.$item->current_version;
-				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_active_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$item->current_version.']</a>', 'preview' );
+				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small" onClick="window.open(\''.$previewlink_active_ver.'\');" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$item->current_version.']</button>', 'preview' );
 
 				// Add a preview button for currently LATEST version of the item
 				$previewlink_last_ver = $previewlink; //'&version='.$item->last_version;
-				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_last_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$item->last_version.']</a>', 'preview' );
+				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small" onClick="window.open(\''.$previewlink_last_ver.'\');" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$item->last_version.']</button>', 'preview' );
 			}
 			JToolBarHelper::spacer();
 			JToolBarHelper::divider();
@@ -654,10 +654,7 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
-		$language_fieldname = FLEXI_J16GE ? 'jform[language]' : 'language';
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			$lists['languages'] = flexicontent_html::buildlanguageslist($language_fieldname, '', $item->language, 3, $allowed_langs);
-		}
+		$lists['languages'] = flexicontent_html::buildlanguageslist('jform[language]', 'class="use_select2_lib"', $item->language, 2, $allowed_langs);
 		
 		// Label for current item state: published, unpublished, archived etc
 		switch ($item->state) {

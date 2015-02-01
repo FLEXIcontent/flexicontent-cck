@@ -84,7 +84,7 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 			url = document.forms["adminForm"].elements[url].value;
 			var videoID = false;
 			var videoType = false;
-			console.log("Fetching "+url);
+			if(window.console) window.console.log("Fetching "+url);
 			// try youtube
 			var myregexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
 			if(url.match(myregexp) != null) {
@@ -107,8 +107,8 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 			updateVideoInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
 			updateVideoTypeId_'.$field->name.'(videoType,videoID);
 			if(videoID && videoType){
-				console.log("Video type: "+videoType);
-				console.log("Video ID: "+videoID);
+				if(window.console) window.console.log("Video type: "+videoType);
+				if(window.console) window.console.log("Video ID: "+videoID);
 				switch(videoType) {
 					case "youtube":
 						jsonurl = "//gdata.youtube.com/feeds/api/videos/"+videoID+"?v=2&alt=json-in-script&callback=youtubeCallback_'.$field->name.'";

@@ -88,7 +88,7 @@ function showUploader() {
 		uploader = jQuery("#flash_uploader").plupload();
 		
 		uploader.bind(\'complete\',function(){
-			console.log("All Files Uploaded");
+			if(window.console) window.console.log("All Files Uploaded");
 			window.location.reload();
 		});
 	} else {
@@ -126,7 +126,7 @@ function showUploader() {
 		uploader = jQuery("#flash_uploader").pluploadQueue();
 		
 		uploader.bind(\'UploadComplete\',function(){
-			console.log("All Files Uploaded");
+			if(window.console) window.console.log("All Files Uploaded");
 			window.location.reload();
 		});
 	}

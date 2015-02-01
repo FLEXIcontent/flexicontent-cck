@@ -99,11 +99,7 @@ div.toolbar-box {
 }
 
 fieldset legend {
-	display: inline;
-	width: auto;
-	border: 0px solid;
-	margin: 0px;
-	padding:4px;
+	/**/
 }
 
 /*input, */select {
@@ -148,6 +144,10 @@ fieldset legend {
 /***********************
  * pane TABS and sliders
  ***********************/
+
+.tab-pane.active table {
+	width: auto;
+}
 
 .pane-sliders .panel {
 	margin-bottom: 3px;

@@ -330,7 +330,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if ( originalname != '' || existingname != '' ) {
 					var valcounter = jQuery('#".$field->name."');
 					valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
-					//if ( window.console && window.console.log ) window.console.log ('valcounter.value: ' + valcounter.value);
+					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
 				}
 				
 				// Add empty container if last element, instantly removing the given field value container
@@ -448,7 +448,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					}
 				}
 				
-				//window.console.log(valcounter.value);
+				//if(window.console) window.console.log(valcounter.value);
 				
 				var existing_obj = jQuery('#' + elementid + '_existingname' );
 				var original_obj = jQuery('#' + elementid + '_originalname' );

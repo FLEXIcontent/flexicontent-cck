@@ -43,7 +43,7 @@ $list_total_cols = 8;
 // delete active filter
 function delFilter(name)
 {
-	//window.console.log('Clearing filter:'+name);
+	//if(window.console) window.console.log('Clearing filter:'+name);
 	var myForm = jQuery('#adminForm');
 	var filter = jQuery('#'+name);
 	if (filter.attr('type')=='checkbox')

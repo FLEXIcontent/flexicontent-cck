@@ -536,14 +536,14 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_line .fc_filter_label {
 	float: left !important;
 	display: inline-block !important;
-	color: white !important;
-	background-color: #555 !important;
-	border-width: 0px !important;
-	font-weight: normal !important;
-	font-size: 12px !important;
-	font-family: georgia,arial !important;
-	text-align: right !important;
-	border-radius: 6px !important;
+	color: white;
+	background-color: #909090;
+	border-width: 0px;
+	font-weight: normal;
+	font-size: 12px;
+	font-family: georgia,arial;
+	text-align: right;
+	border-radius: 3px;
 	text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
 }
 

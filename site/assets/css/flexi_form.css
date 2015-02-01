@@ -30,11 +30,10 @@
 /********************************
  * Label and property field boxes
  ********************************/
-#flexicontent label, .flexicontent label {
-	display: inline-block;  /* important causes problem hidden labels */
-	/*float: none;*/
+/*#flexicontent .label, .flexicontent .label {
+	display: inline-block;
 	margin-right: 12px;
-}
+}*/
 
 #flexicontent .nowrap_box, .flexicontent .nowrap_box {
 	white-space: nowrap !important;

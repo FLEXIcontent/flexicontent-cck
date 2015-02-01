@@ -621,11 +621,13 @@ ul#ultagbox li{
 }
 /** tag selection */
 div#tags {
-	margin: 4px 0px !important;
+	margin: 0px 48px 0 0 !important;
 	padding:0px !important;
+	float: left;
 }
 div#tags #input-tags {
-	margin: 4px !important;
+	margin: 0px !important;
+	width: auto;
 }
 div#tags #input_new_tag {
 	display:inline-block !important;
@@ -635,13 +637,14 @@ div#tags #input_new_tag {
 	height: 16px !important;
 	background: url(../images/tag_blue_add.png) #f9f9f9 no-repeat  100% 50% !important;
 }
-.qf_tagbox {
+#qf_tagbox {
 	display: block !important;
 	max-height: 170px !important;
 	overflow: auto !important;
 	border: 1px dashed silver !important;
 	background: #fff !important;
 	margin: 0px 4px 4px 0px !important;
+	float: left;
 }
 
 .qf_tagidbox {
@@ -1146,15 +1149,24 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	float: left;
 }
 
-#flexicontent div fieldset.panelform input,
+#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append):not(.btn-group) > input,
+#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append):not(.btn-group) > button,
 #flexicontent div fieldset.panelform textarea,
 #flexicontent div fieldset.panelform select,
 #flexicontent div fieldset.panelform img,
-#flexicontent div fieldset.panelform button,
-div fieldset input, div fieldset textarea, div fieldset select, div fieldset img, div fieldset button {
+div fieldset :not(.input-prepend):not(.input-append):not(.btn-group) > input,
+div fieldset :not(.input-prepend):not(.input-append):not(.btn-group) > button
+div fieldset textarea,
+div fieldset select,
+div fieldset img, {
 	margin: 2px 2px 2px 0px;
 	font-size: 12px;
 }
+#flexicontent div fieldset .input-append,
+#flexicontent div fieldset .input-prepend {
+	margin-bottom: 0px;
+}
+
 #flexicontent div fieldset.panelform fieldset.radio,
 #flexicontent div fieldset.panelform input,
 #flexicontent div fieldset.panelform textarea {
@@ -1170,19 +1182,6 @@ div fieldset td input, div fieldset td textarea {
 div fieldset td input, div fieldset td textarea, div fieldset td select {
 	border-radius:4px;
 	padding:2px 4px;
-}
-
-#flexicontent .fc_form_title,
-#flexicontent .fc_form_alias,
-#flexicontent #alias, #flexicontent #jform_alias,
-#flexicontent #title, #flexicontent #jform_title,
-#flexicontent #jform_lang_parent_id_name, #flexicontent #lang_parent_id_name
-{
-	font-size:11px!important;
-	font-family:tahoma!important;
-	font-weight:normal!important;
-	width:97%;
-	max-width:600px;
 }
 
 #flexicontent .current ul.tabbernav > li a {
@@ -1252,22 +1251,80 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 #flexicontent .params_set label.hasTip, #flexicontent .params_set label.hasTooltip,
 #flexicontent .flexi_params label.hasTip, #flexicontent .flexi_params label.hasTooltip,
 #flexicontent label.fckey, #flexicontent .flexi_label {
-	display: block;
-	float: left !important;
-	clear: left !important;
+	display: inline-block;
 	color: white;
-	background-color: #555;
-	border: 0px solid !important; /* non-zero causes wrapping */
+	background-color: #707070;
+	border-radius: 3px;
+	
 	font-size: 12px;
 	font-weight: bold;
-	text-align: right !important;
+	text-align: right;
+	
 	width: 16%;
 	max-width:150px;
+	
+	border: 0px solid !important; /* non-zero causes wrapping */
+	float: left !important;
+	clear: left !important;
 	min-width:auto !important;
 	margin: 2px 1% 3px 0% !important;
 	padding: 4px 1% 4px 1% !important;
-	border-radius: 8px;
+	white-space: wrap !important;
 }
+#flexicontent .label-fcouter {
+	display: inline-block;
+	width: 18%;
+	max-width: 150px;
+	float: left;
+	margin: 2px 1% 3px 0% !important;
+	padding: 0 !important;
+}
+#flexicontent .label-fcinner {
+	font-size: 12px;
+	text-align: right;
+	max-width: 80%;
+	width:  80%;
+	float: right;
+	
+	/* important for proper form placement, override ALL or NONE */
+	border: 0px solid !important; /* non-zero causes wrapping */
+	margin: 0 !important;
+	padding: 4px 10% !important;
+	white-space: unset !important;
+}
+#flexicontent .label-toplevel {
+	background-color: #707070;
+}
+#flexicontent .nowrap_box .label-fcouter {
+	float: none;
+	width: unset;
+	max-width: unset;
+}
+#flexicontent .nowrap_box .container_fcfield {
+	float: none !important;
+}
+@media (max-width: 979px) {
+	#flexicontent .full_width_980 {
+		width: 100% !important;
+		padding: 0% !important;
+		margin: 0% !important;
+	}
+}
+@media (max-width: 1200px) {
+	#flexicontent .span6 .label-fcouter {
+		width: 26% !important;
+	}
+	#flexicontent .span6 .container_fcfield {
+		width: 71% !important;
+	}
+}
+#flexicontent .input-fcmax.container_fcfield input {
+	width: 96%;
+	padding-left: 2%;
+	padding-right: 2%;
+	margin: 0;
+}
+
 
 #flexicontent .flexi_params .fcdualline_container { margin: 0px; padding: 0px; float: left; min-width: 430px; }
 #flexicontent .flexi_params .fcdualline_container label.flexi_label,
@@ -1498,13 +1555,12 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 
 .fckey_high { color:darkred !important; }
-.container_fcfield { float:left!important; padding:0px!important;  margin: 2px 0% 3px 0%!important; width: 81% !important; }
+.container_fcfield { float:left!important; padding:0px!important;  margin: 2px 0% 3px 0%!important; width: 81% !important; display:inline-block; vertical-align: top; }
 .container_fcfield.fcfield_row0 {}
 .container_fcfield.fcfield_row1 {}
 .container_fcfield .fc_mini_note_box,
 .customfields_set .fc_mini_note_box {margin: 0px 0px 6px 0px !important;}
 .container_fcfield.fcdualline { width:auto !important; }
-.container_fcfield_name_language { margin-top:8px !important; }
 .container_fcfield .editlinktip img { margin:4px 4px -4px 0px !important; padding:0px !important; vertical-align:baseline; }
 
 
@@ -1610,6 +1666,7 @@ table.fc-form-tbl td.key {
 	min-width: 90px;
 }
 table.fc-form-tbl td.key label.label {
+	display: inline-block;
 	padding: 8px 4% !important;
 	width: 84% !important;
 	margin: 0px 4% !important;

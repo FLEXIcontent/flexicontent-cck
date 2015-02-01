@@ -40,7 +40,9 @@ $publication_priv = FLEXI_J16GE ? 'canpublish' : 'canedit';
 
 // For tabsets/tabs ids (focusing, etc)
 $tabSetCnt = -1;
+$tabSetMax = -1;
 $tabCnt = array();
+$tabSetStack = array();
 
 $secondary_displayed =
   ($this->menuCats  && $this->menuCats->cid) ||   // New Content  -with-  Menu Override, check if secondary categories were enabled in menu
@@ -79,6 +81,7 @@ $via_core_prop    = $this->placementConf['via_core_prop'];
 $placeable_fields = $this->placementConf['placeable_fields'];
 $tab_fields       = $this->placementConf['tab_fields'];
 $tab_titles       = $this->placementConf['tab_titles'];
+$tab_icocss       = $this->placementConf['tab_icocss'];
 $all_tab_fields   = $this->placementConf['all_tab_fields'];
 $coreprop_missing = $this->placementConf['coreprop_missing'];
 
@@ -90,28 +93,27 @@ if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclarati
 if ($this->params->get('form_extra_js_fe'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_fe'));
 
 // Load JS tabber lib
-$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js' );
-$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css' );
+$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
+$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js');
 	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js');
-	// These are not used in frontend form (in order to keep it simpler, maybe we will add via parameter ...)
-	//$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js');     // e.g. pagination for item versions
-	//$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js');  // e.g. autogrow version comment textarea
-	
-	$this->document->addStyleSheet('components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css');
+	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js');     // e.g. pagination for item versions
+	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js');  // e.g. autogrow version comment textarea
+
+	$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery(\"#input-tags\").autocomplete(\"".JURI::base(true)."/index.php?option=com_flexicontent&view=item&task=viewtags&tmpl=component&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1\", {
+			jQuery('#input-tags').autocomplete('".JURI::base(true)."/index.php?option=com_flexicontent&view=item&task=viewtags&tmpl=component&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1', {
 				width: 260,
 				max: 100,
 				matchContains: false,
 				mustMatch: false,
 				selectFirst: false,
-				dataType: \"json\",
+				dataType: 'json',
 				parse: function(data) {
 					return jQuery.map(data, function(row) {
 						return {
@@ -125,12 +127,12 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 					return row.name;
 				}
 			}).result(function(e, row) {
-				jQuery(\"#input-tags\").attr('tagid',row.id);
-				jQuery(\"#input-tags\").attr('tagname',row.name);
+				jQuery('#input-tags').attr('tagid',row.id);
+				jQuery('#input-tags').attr('tagname',row.name);
 				addToList(row.id, row.name);
 			}).keydown(function(event) {
-				if((event.keyCode==13)&&(jQuery(\"#input-tags\").attr('tagid')=='0') ) {//press enter button
-					addtag(0, jQuery(\"#input-tags\").attr('value'));
+				if((event.keyCode==13)&&(jQuery('#input-tags').attr('tagid')=='0') ) {//press enter button
+					addtag(0, jQuery('#input-tags').attr('value'));
 					resetField();
 					return false;
 				}else if(event.keyCode==13) {
@@ -139,11 +141,11 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 				}
 			});
 			function resetField() {
-				jQuery(\"#input-tags\").attr('tagid',0);
-				jQuery(\"#input-tags\").attr('tagname','');
-				jQuery(\"#input-tags\").attr('value','');
+				jQuery('#input-tags').attr('tagid',0);
+				jQuery('#input-tags').attr('tagname','');
+				jQuery('#input-tags').attr('value','');
 			}
-			jQuery(\".deletetag\").click(function(e){
+			jQuery('.deletetag').click(function(e){
 				parent = jQuery(jQuery(this).parent());
 				parent.remove();
 				return false;
@@ -360,7 +362,8 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	<?php	if ( isset($this->item->item_translations) ) :?>
 		
 		<?php
-		$tabSetCnt++;
+		array_push($tabSetStack, $tabSetCnt);
+		$tabSetCnt = ++$tabSetMax;
 		$tabCnt[$tabSetCnt] = 0;
 		?>
 		<!-- tabber start -->
@@ -383,6 +386,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<?php endforeach; ?>
 		</div>
 		<!-- tabber end -->
+		<?php $tabSetCnt = array_pop($tabSetStack); ?>
 		
 	<?php else : ?>
 		<?php echo $this->form->getInput('title');?>
@@ -406,7 +410,8 @@ if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 	<?php	if ( isset($this->item->item_translations) ) :?>
 	
 		<?php
-		$tabSetCnt++;
+		array_push($tabSetStack, $tabSetCnt);
+		$tabSetCnt = ++$tabSetMax;
 		$tabCnt[$tabSetCnt] = 0;
 		?>
 		<!-- tabber start -->
@@ -429,6 +434,7 @@ if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 			<?php endforeach; ?>
 		</div>
 		<!-- tabber end -->
+		<?php $tabSetCnt = array_pop($tabSetStack); ?>
 		
 	<?php else : ?>
 		<?php echo $this->form->getInput('alias');?>
@@ -874,7 +880,8 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 				<?php	if ( isset($this->item->item_translations) ) :?>
 					
 					<?php
-					$tabSetCnt++;
+					array_push($tabSetStack, $tabSetCnt);
+					$tabSetCnt = ++$tabSetMax;
 					$tabCnt[$tabSetCnt] = 0;
 					?>
 					<!-- tabber start -->
@@ -897,6 +904,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 						<?php endforeach; ?>
 					</div>
 					<!-- tabber end -->
+					<?php $tabSetCnt = array_pop($tabSetStack); ?>
 					
 				<?php else : ?>
 					<?php echo $this->form->getInput('metadesc'); ?>
@@ -910,7 +918,8 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 				<?php	if ( isset($this->item->item_translations) ) :?>
 					
 					<?php
-					$tabSetCnt++;
+					array_push($tabSetStack, $tabSetCnt);
+					$tabSetCnt = ++$tabSetMax;
 					$tabCnt[$tabSetCnt] = 0;
 					?>
 					<!-- tabber start -->
@@ -933,6 +942,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 						<?php endforeach; ?>
 					</div>
 					<!-- tabber end -->
+					<?php $tabSetCnt = array_pop($tabSetStack); ?>
 					
 				<?php else : ?>
 					<?php echo $this->form->getInput('metakey'); ?>
@@ -1173,7 +1183,8 @@ if ($this->fields && $typeid) :
 			if ($field->field_type=='maintext' && isset($this->item->item_translations) ) : ?>
 				
 				<?php
-				$tabSetCnt++;
+				array_push($tabSetStack, $tabSetCnt);
+				$tabSetCnt = ++$tabSetMax;
 				$tabCnt[$tabSetCnt] = 0;
 				?>
 				<!-- tabber start -->
@@ -1200,6 +1211,7 @@ if ($this->fields && $typeid) :
 					<?php endforeach; ?>
 				</div>
 				<!-- tabber end -->
+				<?php $tabSetCnt = array_pop($tabSetStack); ?>
 				
 			<?php elseif ( !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
 				
@@ -1208,7 +1220,8 @@ if ($this->fields && $typeid) :
 			<?php else : /* MULTI-TABBED FIELD e.g textarea, description */ ?>
 				
 				<?php
-				$tabSetCnt++;
+				array_push($tabSetStack, $tabSetCnt);
+				$tabSetCnt = ++$tabSetMax;
 				$tabCnt[$tabSetCnt] = 0;
 				?>
 				<!-- tabber start -->
@@ -1232,6 +1245,7 @@ if ($this->fields && $typeid) :
 				<?php endforeach; ?>
 				</div>
 				<!-- tabber end -->
+				<?php $tabSetCnt = array_pop($tabSetStack); ?>
 				<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
 						
 			<?php endif; /* END MULTI-TABBED FIELD */ ?>
@@ -1321,7 +1335,8 @@ if ( count($tab_fields['above']) ) : ?>
 // *****************
 // MAIN TABSET START
 // *****************
-$tabSetCnt++;
+array_push($tabSetStack, $tabSetCnt);
+$tabSetCnt = ++$tabSetMax;
 $tabCnt[$tabSetCnt] = 0;
 ?>
 
@@ -1329,17 +1344,18 @@ $tabCnt[$tabSetCnt] = 0;
 <div class="fctabber fields_tabset" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 
 
-<?php	
-// *********
-// BASIC TAB
-// *********
+<?php
+// ***************
+// DESCRIPTION TAB
+// ***************
 if ( count($tab_fields['tab01']) ) :
-	$tab_lbl = isset($tab_titles['tab01']) ? $tab_titles['tab01'] : JText::_( 'FLEXI_BASIC' );
+	$tab_lbl = isset($tab_titles['tab01']) ? $tab_titles['tab01'] : JText::_( 'FLEXI_DESCRIPTION' );
+	$tab_ico = isset($tab_icocss['tab01']) ? $tab_icocss['tab01'] : 'icon-file-2';
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-tree-2">
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 		
-		<?php foreach($tab_fields['tab01'] as $fn => $i) : ?>
+		<?php foreach($tab_fields['tab02'] as $fn => $i) : ?>
 			<div class="fcclear"></div>
 			<?php echo $captured[$fn]; unset($captured[$fn]); ?>
 		<?php endforeach; ?>
@@ -1348,16 +1364,18 @@ if ( count($tab_fields['tab01']) ) :
 <?php endif;
 
 
-// ***************
-// DESCRIPTION TAB
-// ***************
+
+// *********
+// BASIC TAB
+// *********
 if ( count($tab_fields['tab02']) ) :
-	$tab_lbl = isset($tab_titles['tab02']) ? $tab_titles['tab02'] : JText::_( 'FLEXI_DESCRIPTION' );
+	$tab_lbl = isset($tab_titles['tab02']) ? $tab_titles['tab02'] : JText::_( 'FLEXI_BASIC' );
+	$tab_ico = isset($tab_icocss['tab02']) ? $tab_icocss['tab02'] : 'icon-tree-2';
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-file-2">
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 		
-		<?php foreach($tab_fields['tab02'] as $fn => $i) : ?>
+		<?php foreach($tab_fields['tab01'] as $fn => $i) : ?>
 			<div class="fcclear"></div>
 			<?php echo $captured[$fn]; unset($captured[$fn]); ?>
 		<?php endforeach; ?>
@@ -1372,8 +1390,9 @@ if ( count($tab_fields['tab02']) ) :
 // *****************
 if ( count($tab_fields['tab03']) ) :
 	$tab_lbl = isset($tab_titles['tab03']) ? $tab_titles['tab03'] : JText::_( 'FLEXI_FIELDS' );
+	$tab_ico = isset($tab_icocss['tab03']) ? $tab_icocss['tab03'] : 'icon-signup';
 	?>
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-signup">
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 		
 		<?php foreach($tab_fields['tab03'] as $fn => $i) : ?>
@@ -1396,8 +1415,11 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	// J2.5 requires Edit State privilege while J1.5 requires Edit privilege
 	$publication_priv = FLEXI_J16GE ? 'canpublish' : 'canedit';
 	if ( count($tab_fields['tab04']) ) : ?>
-		<?php $tab_lbl = isset($tab_titles['tab04']) ? $tab_titles['tab04'] : JText::_( 'FLEXI_PUBLISHING' ); ?>
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-calendar">
+		<?php
+		$tab_lbl = isset($tab_titles['tab04']) ? $tab_titles['tab04'] : JText::_( 'FLEXI_PUBLISHING' );
+		$tab_ico = isset($tab_icocss['tab04']) ? $tab_icocss['tab04'] : 'icon-calendar';
+		?>
+		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 			
 			<fieldset class="flexi_params fc_edit_container_full">
@@ -1417,8 +1439,11 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	// META / SEO TAB
 	// **************
 	if ( count($tab_fields['tab05']) ) : ?>
-		<?php $tab_lbl = isset($tab_titles['tab05']) ? $tab_titles['tab05'] : JText::_( 'FLEXI_META_SEO' ); ?>
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-bookmark" >
+		<?php
+		$tab_lbl = isset($tab_titles['tab05']) ? $tab_titles['tab05'] : JText::_( 'FLEXI_META_SEO' );
+		$tab_ico = isset($tab_icocss['tab05']) ? $tab_icocss['tab05'] : 'icon-bookmark';
+		?>
+		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>" >
 			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 	
 			<?php foreach($tab_fields['tab05'] as $fn => $i) : ?>
@@ -1436,8 +1461,11 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	// DISPLAYING PARAMETERS TAB
 	// *************************
 	if ( count($tab_fields['tab06']) ) : ?>
-		<?php $tab_lbl = isset($tab_titles['tab06']) ? $tab_titles['tab06'] : JText::_( 'FLEXI_DISPLAYING' ); ?>
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-eye-open">
+		<?php
+		$tab_lbl = isset($tab_titles['tab06']) ? $tab_titles['tab06'] : JText::_( 'FLEXI_DISPLAYING' );
+		$tab_ico = isset($tab_icocss['tab06']) ? $tab_icocss['tab06'] : 'icon-eye-open';
+		?>
+		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 	
 			<?php foreach($tab_fields['tab06'] as $fn => $i) : ?>
@@ -1489,8 +1517,11 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	// TEMPLATE TAB
 	// ************
 	if ( count($tab_fields['tab07']) ) : ?>
-		<?php $tab_lbl = isset($tab_titles['tab07']) ? $tab_titles['tab07'] : JText::_( 'FLEXI_TEMPLATE' ); ?>
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-palette">
+		<?php
+		$tab_lbl = isset($tab_titles['tab07']) ? $tab_titles['tab07'] : JText::_( 'FLEXI_TEMPLATE' );
+		$tab_ico = isset($tab_icocss['tab07']) ? $tab_icocss['tab07'] : 'icon-palette';
+		?>
+		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $tab_ico; ?>">
 			<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 			
 			<fieldset class="flexi_params fc_edit_container_full">
@@ -1515,7 +1546,8 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 // ***************
 ?>
 </div> <!-- end of tab set -->
-	
+<?php $tabSetCnt = array_pop($tabSetStack); ?>
+
 	
 <?php
 // ************

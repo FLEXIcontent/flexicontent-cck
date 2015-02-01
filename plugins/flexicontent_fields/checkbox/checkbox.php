@@ -189,7 +189,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 				
 				// Update the new checkboxes
 				var theSet = newField.find('input:checkbox');
-				//window.console.log('theSet.length: ' + theSet.length);
+				//if(window.console) window.console.log('theSet.length: ' + theSet.length);
 				var nr = 0;
 				theSet.each(function() {
 					var elem = jQuery(this);

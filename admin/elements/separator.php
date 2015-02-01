@@ -79,7 +79,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			min-width:10px!important; padding: 0px 10px 0px 0px!important; margin: 4px 0px 0px 1px!important;
 		}*/
 		
-		div fieldset input, div fieldset textarea, div fieldset img, div fieldset button { margin:5px 2px 2px 0px; }
+		/*div fieldset input, div fieldset textarea, div fieldset img, div fieldset button { margin:5px 2px 2px 0px; }*/
 		div fieldset select { margin:0px; }
 					
 		div.current ul.config-option-list li select { margin-bottom: 0px; font-size:12px;}

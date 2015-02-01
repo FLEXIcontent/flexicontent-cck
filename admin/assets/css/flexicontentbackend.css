@@ -485,10 +485,11 @@ div#fc-dash-sliders table.fc-table-list tbody tr:hover td a {
 	padding:0;
 }
 #flexicontent fieldset.fc-board-set div.fc-board-set-inner {
-	box-shadow: 0 0 4px #cccccc;
+	float:left;
+	clear: both;
 	position:relative;
 	top:0;
-	float:left;
+	box-shadow: 0 0 4px #cccccc;
 	border-radius:2px;
 	margin:0px;
 	padding: 12px 0px 0px 12px;
@@ -498,6 +499,7 @@ div#fc-dash-sliders table.fc-table-list tbody tr:hover td a {
 
 /* Dashboard button SET title (a fieldset lengend)*/
 #flexicontent legend[class^="fc-board-header"] {
+	float:left;
 	-webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;
 	font-size:12px;
 	font-family:arial, helvetica, sans-serif;

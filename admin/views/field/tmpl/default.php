@@ -303,19 +303,21 @@ $this->document->addScriptDeclaration($js);
 			?>
 			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-power-cord" >
 				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
-				<!--fieldset class="flexiaccess">
+				
+				<?php /*
+				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend-->
-					<table id="tabacces" class="fc-form-tbl" width="100%">
-						<tr>
-							<td>
-								<div id="access"><?php echo $form->getInput('rules'); ?></div>
-							</td>
-						</tr>
-					</table>
-					<div id="notabacces">
-						<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+					<div id="tabacces">
+				*/ ?>
+						<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
+				<?php /*
 					</div>
-				<!--/fieldset-->
+					<div id="notabacces">
+					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+					</div>
+				</fieldset>
+				*/ ?>
+				
 			</div>
 			<?php endif; ?>		
 			

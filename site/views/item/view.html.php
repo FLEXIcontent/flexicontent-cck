@@ -1790,29 +1790,41 @@ class FlexicontentViewItem  extends JViewLegacy
 			}
 		}
 		
-		// get TAB titles
-		$_tmp = $params->get('form_tab_titles', '1:FLEXI_BASIC, 2:FLEXI_DESCRIPTION, 3:__TYPE_NAME__, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
+		// get TAB titles and TAB icon classes
+		$_tmp = $params->get('form_tab_titles', '1:FLEXI_DESCRIPTION, 2:FLEXI_BASIC, 3:__TYPE_NAME__, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
+		$_ico = $params->get('form_tab_icons',  '1:icon-file-2, 2:icon-tree-2, 3:icon-signup, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette');
 		
 		// Create title of the custom fields default TAB (field manager TAB)
 		if ($item->type_id) {
+			$_str = JText::_('FLEXI_DETAILS');
+			$_str = mb_strtoupper(mb_substr($_str, 0, 1, 'UTF-8')) . mb_substr($_str, 1, NULL, 'UTF-8');
+			
 			$types_arr = flexicontent_html::getTypesList();
-			$typename = @ $types_arr[$item->type_id]['name'];
-			$typename = $typename ? JText::_($typename) : JText::_('FLEXI_CONTENT_TYPE');
-			$typename = $typename .' ('. JText::_('FLEXI_DETAILS') .')';
+			$type_lbl = @ $types_arr[$item->type_id]['name'];
+			$type_lbl = $type_lbl ? JText::_($type_lbl) : JText::_('FLEXI_CONTENT_TYPE');
+			$type_lbl = $type_lbl .' ('. $_str .')';
 		} else {
-			$typename = JText::_('FLEXI_TYPE_NOT_DEFINED');
+			$type_lbl = JText::_('FLEXI_TYPE_NOT_DEFINED');
 		}
 		
 		
-		// Split title of default tabs and language filter the titles
+		// Split titles of default tabs and language filter the titles
 		$_tmp = preg_split("/[\s]*,[\s]*/", $_tmp);
 		$tab_titles = array();
 		foreach($_tmp as $_data) {
 			list($tab_no, $tab_title) = preg_split("/[\s]*:[\s]*/", $_data);
 			if ($tab_title == '__TYPE_NAME__')
-				$tab_titles['tab0'.$tab_no] = $typename;
+				$tab_titles['tab0'.$tab_no] = $type_lbl;
 			else
 				$tab_titles['tab0'.$tab_no] = JText::_($tab_title);
+		}
+		
+		// Split icon classes of default tabs
+		$_ico = preg_split("/[\s]*,[\s]*/", $_ico);
+		$tab_icocss = array();
+		foreach($_ico as $_data) {
+			list($tab_no, $tab_icon_class) = preg_split("/[\s]*:[\s]*/", $_data);
+			$tab_icocss['tab0'.$tab_no] = $tab_icon_class;
 		}
 		
 		
@@ -1833,6 +1845,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$placementConf['placeable_fields'] = $placeable_fields;
 		$placementConf['tab_fields']       = $tab_fields;
 		$placementConf['tab_titles']       = $tab_titles;
+		$placementConf['tab_icocss']       = $tab_icocss;
 		$placementConf['all_tab_fields']   = $all_tab_fields;
 		$placementConf['coreprop_missing'] = $coreprop_missing;
 		

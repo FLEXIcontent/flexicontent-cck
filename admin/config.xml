@@ -1175,7 +1175,9 @@
 			<field name="" type="separator" default="FLEXI_NOT_PLACED_FIELDS_AND_DISABLING" label="" level="level3" menu="hide" />
 			
 			<field name="form_tab_titles" type="textarea" rows="3" cols="60" label="FLEXI_FORM_TAB_TITLES" description="FLEXI_FORM_TAB_TITLES_DESC" menu="hide"
-				default="1:FLEXI_BASIC, 2:FLEXI_DESCRIPTION, 3:__TYPE_NAME__, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE" />
+				default="1:FLEXI_DESCRIPTION, 2:FLEXI_ASSIGNMENT, 3:__TYPE_NAME__, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE" />
+			<field name="form_tab_icons" type="textarea" rows="3" cols="60" label="FLEXI_FORM_TAB_ICONS" description="FLEXI_FORM_TAB_ICONS_DESC" menu="hide"
+				default="1:icon-file-2, 2:icon-tree-2, 3:icon-signup, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette" />
 			
 			<field name="" type="separator" default="FLEXI_PLACEMENT_INSIDE_DEFAULT_TABS" label="" level="level3" menu="hide" />
 			

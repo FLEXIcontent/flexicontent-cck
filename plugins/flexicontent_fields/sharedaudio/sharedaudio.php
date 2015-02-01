@@ -70,7 +70,7 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 			url = document.forms["adminForm"].elements[url].value;
 			var audioID = false;
 			var audioType = false;
-			console.log("Fetching "+url);
+			if(window.console) window.console.log("Fetching "+url);
 			var jsonurl;
 			updateAudioInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
 			updateAudioTypeId_'.$field->name.'(audioType,audioID);

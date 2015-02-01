@@ -185,7 +185,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 				
 				// Update the new radios
 				var theSet = newField.find('input:radio');
-				//window.console.log('theSet.length: ' + theSet.length);
+				//if(window.console) window.console.log('theSet.length: ' + theSet.length);
 				var nr = 0;
 				theSet.each(function() {
 					var elem = jQuery(this);
