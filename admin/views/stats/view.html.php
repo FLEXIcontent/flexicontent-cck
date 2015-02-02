@@ -74,7 +74,7 @@ class FlexicontentViewStats extends JViewLegacy
 
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		$document->addStyleSheet('//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
-		$document->addScript(JURI::root().'components/com_flexicontent/librairies/esl/esl.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/esl/esl.js');
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		
 

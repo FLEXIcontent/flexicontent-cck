@@ -33,34 +33,28 @@ $ctrl_users = FLEXI_J16GE ? "task=users." : "controller=users&amp;task=";
 
 <?php
 // BOF: Load echart libraries
-if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_COMPONENT.DS.'assets'.DS.'zrender')) :
+if (!file_exists(JPATH_COMPONENT_SITE.DS.'librairies'.DS.'echarts')) :
+	echo "echarts library not installed in ".JPATH_COMPONENT_SITE.DS.'librairies'.DS.'echarts';
+elseif (!file_exists(JPATH_COMPONENT_SITE.DS.'librairies'.DS.'zrender')) :
+	echo "zrender library not installed in ".JPATH_COMPONENT_SITE.DS.'librairies'.DS.'zrender';
+else :
 ?>
 <script type="text/javascript">
     require.config({
         packages: [
             {
                 name: 'echarts',
-                location: 'components/com_flexicontent/assets/echarts',
+                location: '../components/com_flexicontent/librairies/echarts',
                 main: 'echarts'
             },
             {
                 name: 'zrender',
-                location: 'components/com_flexicontent/assets/zrender',
+                location: '../components/com_flexicontent/librairies/zrender',
                 main: 'zrender'
             }
         ]
     });
 </script>
-<?php 
-endif;
-// EOF: Load echart libraries
-?>
-
-
-<?php
-// BOF: statistics that use ECHART
-if (file_exists(JPATH_COMPONENT.DS.'assets'.DS.'echarts') && file_exists(JPATH_COMPONENT.DS.'assets'.DS.'zrender')) :
-?>
 
 	<table class="fc-table-list fc-tbl-short" style="margin:20px 0 20px 0; width:98%;">
 	<tr>
