@@ -104,7 +104,14 @@ class FlexicontentViewField extends JViewLegacy
 				foreach ($form->getFieldset($name) as $field) {
 					$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
 						$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
-					echo '<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container" >' . $field->label . $field->input . '</fieldset>' . "\n";
+					echo '
+								<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+								'.($field->label ? '
+									<span class="label-fcouter">'.str_replace((FLEXI_J30GE ? 'hasTooltip' : 'hasTip'), (FLEXI_J30GE ? 'hasTooltip label' : 'hasTip label'), $field->label).'</span>
+									<span class="container_fcfield">'.$field->input.'</span>
+								' : $field->input).'
+							</fieldset>
+							';
 					$i++;
 				}
 				?>

@@ -87,6 +87,16 @@
 }
 .pull-left { float: left; }
 .pull-right { float: right; }
+.span6 {
+	width: 50%!important;
+	box-sizing: border-box;
+	display: inline-block;
+	float: left;
+}
+@media (max-width: 979px) {
+	.span6 { width:100%!important; }
+}
+
 
 
 /**************
@@ -165,7 +175,7 @@ fieldset.panelform fieldset.radio,
 fieldset.adminform-legacy fieldset.radio {
 	border: 0 none !important;
 	float: left !important;
-	margin: 0 0 0 4px !important;
+	margin: 2px 0 0 4px !important;
 	padding: 2px 0px !important;
 }
 
@@ -194,7 +204,7 @@ div fieldset.panelform {
 }
 
 #jform_tid-lbl, #jform_attribs_ilayout-lbl,
-div fieldset.panelform label.hasTip, div fieldset.panelform label.hasTooltip,
+div fieldset.panelform :not(.label-fcouter) label.hasTip, div fieldset.panelform :not(.label-fcouter) label.hasTooltip,
 .fc_fieldset label.hasTip, .fc_fieldset label.hasTooltip
  {
 	clear: both;
@@ -217,10 +227,11 @@ div fieldset label:not(.btn) {
 }
 
 div.fieldset_value,
-div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
+div.panel fieldset input:not(.input-small), div.panel fieldset textarea, div.panel fieldset select,
 div.panel fieldset img, div.panel fieldset button,
-fieldset.panelform label,
-fieldset.panelform input, fieldset.panelform textarea, fieldset.panelform select,
+fieldset.panelform :not(.label-fcouter) label,
+fieldset.panelform input:not(.input-small),
+fieldset.panelform textarea, fieldset.panelform select,
 fieldset.panelform img, fieldset.panelform button {
 	float: left !important;
 	margin: 2px 8px 0px 6px!important;
@@ -295,7 +306,7 @@ fieldset.panelform select {
 	}
 }
 
-div fieldset.panelform label {
+div fieldset.panelform :not(.label-fcouter) label {
 	min-width:132px;
 	text-align: right;
 }

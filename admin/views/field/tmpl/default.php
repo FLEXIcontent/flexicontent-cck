@@ -39,9 +39,9 @@ $this->document->addScriptDeclaration($js);
 <div class="flexicontent" id="flexicontent">
 <form action="index.php" method="post" class="form-validate" name="adminForm" id="adminForm">
 
-<table cellspacing="0" cellpadding="0" border="0" width="100%"><tr>
+<div class="container-fluid">
 
-	<td valign="top" width="50%">
+	<div class="span6 full_width_980">
 	
 		<!--span class="badge"><h3><?php echo JText::_( /*'FLEXI_STANDARD_FIELDS_PROPERTIES'*/'Common configuration' ); ?></h3></span-->
 		
@@ -322,10 +322,9 @@ $this->document->addScriptDeclaration($js);
 			<?php endif; ?>		
 			
 		</div>
-		
-		
-	</td>
-	<td valign="top" width="50%" style="padding: 0px 0 0 24px">
+
+	</div>
+	<div class="span6 full_width_980 padded_wrap_box" style="padding: 0px 0 0 24px">
 			
 			<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; "><?php echo JText::_( /*'FLEXI_THIS_FIELDTYPE_PROPERTIES'*/'FIELD TYPE specific configuration' ); ?></span>
 			
@@ -353,7 +352,14 @@ $this->document->addScriptDeclaration($js);
 						<?php foreach ($form->getFieldset($name) as $field) {
 							$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
 								$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
-							echo '<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container" >' . $field->label . $field->input . '</fieldset>' . "\n";
+							echo '
+							<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+								'.($field->label ? '
+									<span class="label-fcouter">'.str_replace((FLEXI_J30GE ? 'hasTooltip' : 'hasTip'), (FLEXI_J30GE ? 'hasTooltip label' : 'hasTip label'), $field->label).'</span>
+									<span class="container_fcfield">'.$field->input.'</span>
+								' : $field->input).'
+							</fieldset>
+							';
 							$i++;
 						} ?>
 					</div>
@@ -364,10 +370,12 @@ $this->document->addScriptDeclaration($js);
 				?>
 				</div>
 			</div>
-			
-		</td>
-	</tr>
-</table>
+
+	</div>
+
+</div>
+
+
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <?php if ($form->getValue('iscore') == 1) : ?>

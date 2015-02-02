@@ -1167,7 +1167,7 @@ div fieldset img, {
 	margin-bottom: 0px;
 }
 
-#flexicontent div fieldset.panelform fieldset.radio,
+#flexicontent div fieldset.panelform :not(.container_fcfield) fieldset.radio,
 #flexicontent div fieldset.panelform input,
 #flexicontent div fieldset.panelform textarea {
 	min-width: 60%;
@@ -1267,8 +1267,8 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	float: left !important;
 	clear: left !important;
 	min-width:auto !important;
-	margin: 2px 1% 3px 0% !important;
-	padding: 4px 1% 4px 1% !important;
+	margin: 0px 1% 1px 0% !important;
+	padding: 8px 1% !important;
 	white-space: wrap !important;
 }
 #flexicontent .label-fcouter {
@@ -1279,9 +1279,11 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	margin: 2px 1% 3px 0% !important;
 	padding: 0 !important;
 }
+#flexicontent .label-fcouter > label,
 #flexicontent .label-fcinner {
 	font-size: 12px;
 	text-align: right;
+	min-width: 40px;
 	max-width: 80%;
 	width:  80%;
 	float: right;
@@ -1289,7 +1291,7 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	/* important for proper form placement, override ALL or NONE */
 	border: 0px solid !important; /* non-zero causes wrapping */
 	margin: 0 !important;
-	padding: 4px 10% !important;
+	padding: 8px 10% !important;
 	white-space: unset !important;
 }
 #flexicontent .label-toplevel {
@@ -1308,6 +1310,9 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 		width: 100% !important;
 		padding: 0% !important;
 		margin: 0% !important;
+	}
+	#flexicontent .padded_wrap_box {
+		margin-top: 48px !important;
 	}
 }
 @media (max-width: 1200px) {
