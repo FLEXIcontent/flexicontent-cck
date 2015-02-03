@@ -64,7 +64,8 @@
  * Bootstrap-like CSS for j2.5
  *****************************/
 
-.label, .badge, .flexicontent label.label {
+.label, .badge {
+	background-url: unset;
 	background-color: #999999;
 	color: #FFFFFF;
 	display: inline-block;
@@ -157,7 +158,7 @@ div.credits img {
 /***********************
  * pane TABS and sliders
  ***********************/
-
+.pane-toggler span > span { background-image:none; padding-left: 4px; }
 
 
 

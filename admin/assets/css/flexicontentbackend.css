@@ -593,6 +593,7 @@ div#fc-dash-boardbtns .fc-board-button:hover a {}
 div#fc-dash-boardbtns .fc-board-button .fc-board-btn-img {
 	width: 32px;
 	margin: 0 auto;
+	float: none;
 }
 div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text {
 	display: inline-block;

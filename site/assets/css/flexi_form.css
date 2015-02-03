@@ -526,16 +526,17 @@ table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
 div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-of-type > div > .fcsep_level1, div.control-group:first-of-type > div > .fcsep_level2 {margin-top:0px;}
 
 .fcsep_level3 {
-	background: #e7e7e7;
-	color: #333;
-	float:left;
-	border: 1px solid gray !important;
-	padding: 4px 24px 4px 24px !important;
+	background-color: #d0d0d0;
+	color: black;
+	padding: 0.4em 2em;
 	margin: 5px 5% 1px;
 	display: block;
+	position: relative;
 	border-radius: 5px;
 	clear: both;
-	max-width:60%;
+	float:left;
+	width: auto;
+	font-size:13px;
 }
 .fcsep_level4 {
 	background: #f7f7f7;

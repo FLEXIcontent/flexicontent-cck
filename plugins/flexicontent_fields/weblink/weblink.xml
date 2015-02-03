@@ -42,6 +42,8 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
+			
+			<field name="" type="separator" default="Link" level="level3" />
 			<field name="default_value_link" type="text" default="" size="50" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="link_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
@@ -49,29 +51,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
-			<field name="targetblank" type="radio" default="0" label="FLEXI_FIELD_FIELD_NEW_WINDOW" description="FLEXI_FIELD_FIELD_NEW_WINDOW_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="use_direct_link" type="list" default="0" label="FLEXI_FIELD_USE_DIRECT_LINKS" description="FLEXI_FIELD_USE_DIRECT_LINKS_DESC">
-				 <option value="0">FLEXI_NO</option>
-				 <option value="1">Yes, (disable hits counting)</option>
-			</field>
-			<field name="add_rel_nofollow" type="list" default="0" label="FLEXI_FIELD_ADD_REL_NOFOLLOW" description="FLEXI_FIELD_ADD_REL_NOFOLLOW_DESC">
-				 <option value="0">FLEXI_FIELD_NO_ALLOW_INDEXING</option>
-				 <option value="1">FLEXI_FIELD_YES_ALLOW_INDEXING</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
-			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level2" />
-			
-			<field name="" type="separator" default="Title (used as Link Text)" level="level3" />
-			<field name="use_title" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
+			<field name="" type="separator" default="Title &lt;small&gt; (Link Text) &lt;/small&gt;" level="level3" />
 			<field name="default_value_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
@@ -79,7 +59,20 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_HITS" level="level3" />
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
+			
+			<field name="" type="separator" default="Link" level="level2" />
+			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
+			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="extra_attributes" type="text" default="" size="50" label="FLEXI_FIELD_EXTRA_ATTRIBUTES" description="FLEXI_FIELD_EXTRA_ATTRIBUTES_DESC" />
+			
+			<field name="" type="separator" default="Title &lt;small&gt; (Link Text) &lt;/small&gt;" level="level2" />
+			<field name="use_title" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_HITS" level="level2" />
 			<field name="use_hits" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -101,6 +94,19 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			<field name="targetblank" type="radio" default="0" label="FLEXI_FIELD_FIELD_NEW_WINDOW" description="FLEXI_FIELD_FIELD_NEW_WINDOW_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="use_direct_link" type="list" default="0" label="FLEXI_FIELD_USE_DIRECT_LINKS" description="FLEXI_FIELD_USE_DIRECT_LINKS_DESC">
+				 <option value="0">FLEXI_NO</option>
+				 <option value="1">Yes, (disable hits counting)</option>
+			</field>
+			<field name="add_rel_nofollow" type="list" default="0" label="FLEXI_FIELD_ADD_REL_NOFOLLOW" description="FLEXI_FIELD_ADD_REL_NOFOLLOW_DESC">
+				 <option value="0">FLEXI_FIELD_NO_ALLOW_INDEXING</option>
+				 <option value="1">FLEXI_FIELD_YES_ALLOW_INDEXING</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_HITS" level="level3" />
 			<field name="display_hits" type="list" default="0" label="FLEXI_FIELD_SHOW_HITS" description="FLEXI_FIELD_SHOW_HITS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_AS_ICON</option>

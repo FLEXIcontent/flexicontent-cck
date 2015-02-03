@@ -89,6 +89,13 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		// Form fields display parameters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
+		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced
+		
+		// create extra HTML TAG parameters for the form field
+		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
+		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
+		$attribs .= ' size="'.$size.'" ';
+		
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
@@ -285,7 +292,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$link = '
 				<div class="nowrap_box">
 					<label class="label">'.JText::_( 'FLEXI_FIELD_URL' ).'</label>
-					<input class="urllink fcfield_textval '.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['link'].'" />
+					<input class="urllink fcfield_textval '.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'" type="text" '.$attribs.' value="'.$value['link'].'" />
 				</div>';
 			
 			$title = '';

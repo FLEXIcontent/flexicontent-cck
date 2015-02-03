@@ -18,28 +18,14 @@
 	<config>
 	<fields name="attribs">
 		
-		<fieldset name="standard" repeat="1">
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
-			<field name="" type="separator" default="FLEXI_REQUIRES_FIELDGROUP_FIELD" level="level2" />
-			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-		</fieldset>
+		<!--fieldset name="standard" repeat="1">
+		</fieldset-->
 		
-		<fieldset name="group-image-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-image-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="level0" />
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
-			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
 			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -56,13 +42,13 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_IMAGE_HANDLING_LABEL" description="" level="level1" />
 			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png,BMP,GIF,JPG,JPEG,PNG" size="60" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
 			<field name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
-
-
-			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
+			
+		</fieldset>
+		<fieldset name="group-image-source" repeat="1" icon_class="icon-wrench" label="Image Source" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
 			<field name="image_source" type="list" default="1" label="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" >
 				<!--option value="-1">Joomla article images: (intro + full)</option-->
 				<option value="0">FLEXI_FIELD_REUSABLE_DB_MODE</option>
@@ -107,8 +93,8 @@
 				<option value="1">FLEXI_FIELD_UNIQUE_THUMB_FOLDER</option>
 			</field>
 			
-
-			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" />
+		</fieldset>
+		<fieldset name="group-image-optional-props" repeat="1" icon_class="icon-checkmark" label="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC" level="level3" />
 			<field name="linkto_url" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
@@ -180,9 +166,20 @@
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-
-
-			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="level0" />
+			
+		</fieldset>
+		<fieldset name="group-image-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
 			<field name="default_method_cat" type="list" default="display_single_total" label="Category view &lt;br/&gt; (item listings)" description="Default display method for the view" class="btn-group btn-group-yesno">
@@ -264,6 +261,8 @@
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
 
+		</fieldset>
+		<fieldset name="group-images-thumbs" repeat="1" icon_class="icon-image" label="FLEXI_THUMBNAILS" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAIL_CREATION" description="FLEXI_IMGFIELD_THUMBNAIL_CREATION_DESC" level="level1" />
 			
@@ -353,8 +352,7 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_YES_REGARDLESS_SETTINGS</option>
 			</field>
-
-
+			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -374,6 +372,9 @@
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
+		</fieldset>
+		<fieldset name="group-image-social" repeat="1" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
 			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />
 			<field name="useogp" type="radio" default="0" label="FLEXI_SOCIAL_SUGGEST_FIELD" description="FLEXI_SOCIAL_SUGGEST_IMG_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -388,16 +389,24 @@
 				<option value="3">FLEXI_LARGE</option>
 				<option value="4">FLEXI_ORIGINAL</option>
 			</field>
-
-
-			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level0" />
 			
-			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
+		</fieldset>
+		<fieldset name="group-image-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level1" />
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
 				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
-			
+
 		</fieldset>
+		<fieldset name="group-image-fieldgrp" repeat="1" icon_class="icon-menu-3" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="FLEXI_REQUIRES_FIELDGROUP_FIELD" level="level2" />
+			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+		</fieldset>
+		
 	</fields>
 	</config>
 	

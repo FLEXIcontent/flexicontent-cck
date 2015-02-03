@@ -138,8 +138,6 @@ endif;
 	<tbody>
 
 	<?php foreach ($items as $i => $item) : ?>
-		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
-		
 		<?php
 		$fc_item_classes = 'sectiontableentry';
 		
@@ -157,6 +155,8 @@ endif;
 		$markup_tags .= '</span>';
 		?>
 
+		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
+		
 		<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
 			<td class="fc_title_col">
 			

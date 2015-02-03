@@ -246,7 +246,6 @@
 			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
 				<option value="0">FLEXI_NO</option>
 			</field>
-			<field name="" type="separator" default="(this is last built-in field missing fieldgroup support)" level="level4" />
 			
 		</fieldset>
 

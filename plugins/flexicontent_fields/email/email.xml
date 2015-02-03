@@ -41,15 +41,27 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
-			<field name="" type="separator" default="Email address" description="FLEXI_FORM_FIELD_CONF_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
+			
+			<field name="" type="separator" default="Email address" description="" level="level3" />
 			<field name="default_value" type="text" default="" size="50" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="default_value_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level3" />
+			
+			<field name="" type="separator" default="FLEXI_EMAIL_TITLE" level="level3" />
+			<field name="default_value_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
+			
+			<field name="" type="separator" default="Email address" description="FLEXI_FORM_FIELD_CONF_DESC" level="level2" />
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			<field name="extra_attributes" type="text" default="" size="50" label="FLEXI_FIELD_EXTRA_ATTRIBUTES" description="FLEXI_FIELD_EXTRA_ATTRIBUTES_DESC" />
@@ -58,12 +70,6 @@
 			<field name="use_title" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="default_value_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
-				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
-				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
-				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
 		</fieldset>
@@ -80,6 +86,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
 			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">

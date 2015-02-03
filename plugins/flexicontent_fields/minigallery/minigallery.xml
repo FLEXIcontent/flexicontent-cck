@@ -20,7 +20,32 @@
 	
 	<fields name="attribs">
 		
-		<fieldset name="standard" repeat="1">
+		<!--fieldset name="standard" repeat="1">
+		</fieldset-->
+		
+		<fieldset name="group-minigallery-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
+			
+			<field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		</fieldset>
+		<fieldset name="group-minigallery-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
+			
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -30,19 +55,6 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
-		</fieldset>
-		
-		<fieldset name="group-minigallery-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
-
-			<field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
-			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			
 			<field name="" type="separator" level="level1" default="FLEXI_FIELD_GALLERY_IMAGES" description="FLEXI_FIELD_GALLERY_IMAGES_DESC" />
 			<field name="thumbposition" type="list" default="3" label="FLEXI_FIELD_GALLERY_THUMBS_POSITION" description="FLEXI_FIELD_GALLERY_THUMBS_POSITION_DESC">
@@ -56,7 +68,9 @@
 			<field name="w_s" type="text" default="100" size="4" label="FLEXI_FIELD_GALLERY_WIDTH_MINI" description="FLEXI_FIELD_GALLERY_WIDTH_MINI_DESC" />
 			<field name="h_s" type="text" default="66" size="4" label="FLEXI_FIELD_GALLERY_HEIGHT_MINI" description="FLEXI_FIELD_GALLERY_HEIGHT_MINI_DESC" />
  			
-			<field name="" type="separator" level="level1" default="FLEXI_FIELD_GALLERY_SLIDESHOW" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" />
+		</fieldset>
+		<fieldset name="group-minigallery-viewing-slideshow" repeat="1" icon_class="icon-image" label_prefix="FLEXI_FIELD_VIEWING" label="Slideshow" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
 			<field name="controller" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_CONTROLS" description="FLEXI_FIELD_DISPLAY_CONTROLS_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>

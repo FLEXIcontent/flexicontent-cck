@@ -41,8 +41,9 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_TERMTITLE" description="Title, may be used in future vesions for e.g. click-to-open description, if you disable Term title, then you will need to enter it inside description if a title is needed" level="level1" />
-			<field name="title_label" type="text" default="FLEXI_FIELD_TERMTITLE" size="30" label="FLEXI_LABEL" description="Label, this is language filtered" />
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_TERMTITLE" description="Title, may be used in future vesions for e.g. click-to-open description, if you disable Term title, then you will need to enter it inside description if a title is needed" level="level3" />
 			<field name="default_value_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
@@ -50,13 +51,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level2" />
-			<field name="title_maxlength" type="text" default="0" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
-			<field name="title_size" type="text" default="80" size="3" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
-			
-			<field name="" type="separator" default="Term decription" level="level1" />
-			
-			<field name="value_label" type="text" default="FLEXI_FIELD_TERMTEXT" size="30" label="FLEXI_LABEL" description="Label, this is language filtered" />
+			<field name="" type="separator" default="Term decription" level="level3" />
 			<field name="default_value" type="text" default="" size="50" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="default_value_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
@@ -71,7 +66,16 @@
 				<option value="HTML">FLEXI_FIELD_PLAIN_TEXT_ALLOW_ENTITIES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level2" />
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_TERMTITLE" description="Title, may be used in future vesions for e.g. click-to-open description, if you disable Term title, then you will need to enter it inside description if a title is needed" level="level2" />
+			<field name="title_label" type="text" default="FLEXI_FIELD_TERMTITLE" size="30" label="FLEXI_LABEL" description="Label, this is language filtered" />
+			<field name="title_maxlength" type="text" default="0" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
+			<field name="title_size" type="text" default="80" size="3" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			
+			<field name="" type="separator" default="Term decription" level="level2" />
+			<field name="value_label" type="text" default="FLEXI_FIELD_TERMTEXT" size="30" label="FLEXI_LABEL" description="Label, this is language filtered" />
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="use_html" type="radio" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC">
 				<option value="1">FLEXI_HTML_EDITOR</option>
