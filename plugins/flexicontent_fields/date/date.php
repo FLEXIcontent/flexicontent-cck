@@ -282,11 +282,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
-			$calendar = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname, $elementid_n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
+			$calendar = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
 			if (!$calendar) {
 				$skipped_vals[] = $value;
 				if (!$use_ingroup) continue;
-				$calendar = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname, $elementid_n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
+				$calendar = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
 			}
 			
 			$field->html[] = '
