@@ -105,8 +105,8 @@ input[type="radio"].fc_checkradio,
 	opacity: 0 !important;
 	display: none !important;
 }
-div input[type="checkbox"][name^="cid"],
-div input[type="checkbox"]:only-child,
+[name="adminForm"] input[type="checkbox"][name^="cid"],
+[name="adminForm"] input[type="checkbox"]:only-child,
 label input[type="checkbox"].fc_checkradio,
 label input[type="radio"].fc_checkradio,
 [name="adminForm"] label input[type="checkbox"]:not(.skip_fccr),
