@@ -1149,6 +1149,40 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	float: left;
 }
 
+/* workaround yes-no forced styling */
+#flexicontent .btn {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+#flexicontent .group-fcinfo .btn,
+#flexicontent .group-fcprimary .btn,
+#flexicontent .group-fcinfo .btn {
+	color: #333 !important;
+  background-color: #e6e6e6 !important;
+	background-image: linear-gradient(to bottom, #fff, #e6e6e6) !important;
+	background-repeat: repeat-x !important;
+	border-color: #bbb #bbb #a2a2a2 !important;
+	border-image: none !important;
+}
+#flexicontent .group-fcinfo .btn.active,
+#flexicontent .group-fcprimary .btn.active,
+#flexicontent .group-fcsuccess .btn.active {
+	color: #fff !important;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
+	
+	background-image: none !important;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) inset, 0 1px 2px rgba(0, 0, 0, 0.15) !important;
+	outline: 0 none !important;
+}
+#flexicontent .group-fcinfo .btn.active { background-color: #2f96b4 !important; border-color: #2f96b4 #2f96b4 #1f6377 !important; }
+#flexicontent .group-fcprimary .btn.active { background-color: #15497c !important; border-color: #15497c #15497c #0a223b !important; }
+#flexicontent .group-fcsuccess .btn.active { background-color: #51a351 !important; border-color: #51a351 #51a351 #387038 !important; }
+
+
 #flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append):not(.btn-group) > input,
 #flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append):not(.btn-group) > button,
 #flexicontent div fieldset.panelform textarea,
@@ -1171,7 +1205,7 @@ div fieldset img, {
 #flexicontent div fieldset.panelform input,
 #flexicontent div fieldset.panelform textarea {
 	min-width: 60%;
-	width: 60%;
+	width: 72%;
 }
 div fieldset td input, div fieldset td textarea {
 	min-width: 80%;
@@ -1250,6 +1284,7 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 #flexicontent .pane-sliders label.hasTip, #flexicontent .pane-sliders label.hasTooltip,
 #flexicontent .params_set label.hasTip, #flexicontent .params_set label.hasTooltip,
 #flexicontent .flexi_params label.hasTip, #flexicontent .flexi_params label.hasTooltip,
+#flexicontent .panelform > label,
 #flexicontent label.fckey, #flexicontent .flexi_label {
 	display: inline-block;
 	color: white;

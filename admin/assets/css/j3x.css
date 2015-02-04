@@ -201,12 +201,12 @@ fieldset legend {
 .controls fieldset.radio,
 .controls fieldset.checkbox,
 fieldset.adminform fieldset.radio,
-fieldset.panelform fieldset.radio:not(.btn-group),
+fieldset.panelform fieldset.radio,
 fieldset.adminform-legacy fieldset.radio {
 	border: 0 none !important;
 	float: left !important;
-	margin: 0px 0 0 4px;
-	padding: 2px 0px;
+	margin: 2px 0 0 4px;
+	padding: 0px 0px;
 }
 
 div fieldset label.radiobtn {

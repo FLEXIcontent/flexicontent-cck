@@ -49,8 +49,7 @@ class JFormFieldMultiList extends JFormField
 		}
 		
 		$values			= FLEXI_J16GE ? $this->value : $value;
-		if ( empty($values) )							$values = array();
-		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
@@ -67,7 +66,7 @@ class JFormFieldMultiList extends JFormField
 	    'option.key'=>'value', // key name for value in data array
 	    'option.text'=>'text', // key name for text in data array
 	    'option.attr'=>'attr', // key name for attr in data array
-	    'list.select'=>$element_id, // value of the SELECTED field
+	    'list.select'=>$values, // value of the SELECTED field
 		);
 		
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
@@ -86,7 +85,13 @@ class JFormFieldMultiList extends JFormField
 			$attribs['list.attr']['onchange'] = $onchange;
 		}
 		
+		$subtype = @$attributes['subtype'];
+
 		$attribs['list.attr']['class'] = array();
+		if ($subtype=='radio') {
+			$attribs['list.attr']['class'][] = 'radio';
+		}
+
 		if ($class = @$attributes['class']) {
 			$attribs['list.attr']['class'][] = $class;
 		}
@@ -109,32 +114,63 @@ class JFormFieldMultiList extends JFormField
 				$options[] = JHTML::_('select.optgroup', JText::_($group_label) );
 				foreach ($option->children() as $sub_option)
 				{
+					$attr_arr = array();
+					if (isset($sub_option->attributes()->show_list))  $attr_arr['show_list'] = $sub_option->attributes()->show_list;
+					if (isset($sub_option->attributes()->hide_list))  $attr_arr['hide_list'] = $sub_option->attributes()->hide_list;
+					if (isset($sub_option->attributes()->class))  $attr_arr['class'] = $sub_option->attributes()->class;
+					
 					$val    = $sub_option->attributes()->value;
 					$text   = FLEXI_J30GE ? $sub_option->__toString() : $sub_option->data();
 					//$options[] = JHTML::_('select.option', $val, JText::_($text));
 					$options[] = array(
 						'value' => $val, 'text' => JText::_($text),
-						'attr' => array(
-							'show_list'=>$sub_option->attributes()->show_list,
-							'hide_list'=>$sub_option->attributes()->hide_list
-						)
+						'attr' => $attr_arr
 					);
 				}
 				$options[] = JHTML::_('select.optgroup', '' );
 			}
 			else {
+				$attr_arr = array();
+				if (isset($option->attributes()->show_list))  $attr_arr['show_list'] = $option->attributes()->show_list;
+				if (isset($option->attributes()->hide_list))  $attr_arr['hide_list'] = $option->attributes()->hide_list;
+				if (isset($option->attributes()->class))  $attr_arr['class'] = $option->attributes()->class;
+				
+				//print_r($attr_arr['hide_list']);
 				//$options[] = JHTML::_('select.option', $val, JText::_($text));
 				$options[] = array(
 					'value' => $val, 'text' => JText::_($text),
-					'attr' => array(
-						'show_list'=>$option->attributes()->show_list,
-						'hide_list'=>$option->attributes()->hide_list
-					)
+					'attr' => $attr_arr
 				);
 			}
 		}
 		
-		$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs);
+		if ($subtype=='radio') {
+			$_class = ' class ="'.$attribs['list.attr']['class'].'"';
+			$_id = ' id="'.$element_id.'"';
+			$html = '';
+			foreach($options as $i => $option) {
+				$selected = count($values) && $values[0]==$option['value'] ? ' checked="checked"' : '';
+				$input_attribs = '';
+				$label_class = '';
+				foreach ($option['attr'] as $k => $v) {
+					if ($k=='class') { $label_class = $v; continue; }
+					$input_attribs .= ' ' .$k. '="' .$v. '"';
+				}
+				$html .= '
+					<input id="'.$element_id.$i.'" type="radio" value="'.$option['value'].'" name="'.$fieldname.'" '. $input_attribs . $selected.'/>
+					<label class="'.$label_class.'" for="'.$element_id.$i.'" value="'.$option['text'].'">
+						'.$option['text'].'
+					</label>';
+			}
+			$html = '
+				<fieldset '.$_class.$_id.'>
+				'.$html.'
+				</fieldset>
+				';
+		}
+		else {
+			$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs);
+		}
 		if (!FLEXI_J16GE) $html = str_replace('<optgroup label="">', '</optgroup>', $html);
 		return $html.$maximize_link;
 	}

@@ -116,12 +116,30 @@
 	// Add toggling of dependent form elements
 	function fc_bind_form_togglers(container)
 	{
-		jQuery('#'+container+' .fcform_toggler_element').change(function() {
-			var show_list = jQuery('option:selected', this).attr('show_list').split(',');
-			var hide_list = jQuery('option:selected', this).attr('hide_list').split(',');
-			jQuery.each( show_list, function( i, val ) {  if (val) jQuery('.'+val).slideDown();  });
-			jQuery.each( hide_list, function( i, val ) {  if (val) jQuery('.'+val).slideUp();  });
+		var noFX = 1;
+		
+		// select
+		jQuery('#'+container+' select.fcform_toggler_element').change(function() {
+			var el = jQuery('option:selected', this);
+			var show_list = el.attr('show_list').split(',');
+			var hide_list = el.attr('hide_list').split(',');
+			jQuery.each( hide_list, function( i, val ) {  if (val) jQuery('.'+val).hide(noFX ? '' : 'fast');  });
+			jQuery.each( show_list, function( i, val ) {  if (val) jQuery('.'+val).show(noFX ? '' : 'slow');  });
 		});
-		jQuery('form .fcform_toggler_element').trigger('change');
+		
+		// radio
+		jQuery(document).on('click', '#'+container+' .fcform_toggler_element input:radio', function(event) {
+			//alert('reached');
+			var el = jQuery(this);
+			var show_list = el.attr('show_list').split(',');
+			var hide_list = el.attr('hide_list').split(',');
+			jQuery.each( hide_list, function( i, val ) {  if (val) jQuery('.'+val).hide(noFX ? '' : 'fast');  });
+			jQuery.each( show_list, function( i, val ) {  if (val) jQuery('.'+val).show(noFX ? '' : 'slow');  });
+		});
+		
+		// Update the form
+		jQuery('form select.fcform_toggler_element').trigger('change');
+		jQuery('form .fcform_toggler_element input[type="radio"]:checked').trigger('click');
+		//setTimeout(function(){ noFx = 0; }, 200);
 	}
 	
