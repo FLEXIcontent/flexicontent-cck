@@ -1593,7 +1593,7 @@ class flexicontent_html
 	{
 		if ( JRequest::getCmd('print') ) return;
 		
-		static $user = null, $requestapproval = null;
+		static $user = null, $requestApproval = null;
 		if ($user === null) {
 			$user	= JFactory::getUser();
 			$requestApproval = FLEXI_J16GE ? $user->authorise('flexicontent.requestapproval',	'com_flexicontent') : ($user->gid >= 20);
