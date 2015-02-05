@@ -1327,12 +1327,13 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	max-width: 80%;
 	width:  80%;
 	float: right;
+	text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
 	
 	/* important for proper form placement, override ALL or NONE */
 	border: 0px solid !important; /* non-zero causes wrapping */
 	margin: 0 !important;
 	padding: 8px 10% !important;
-	white-space: unset !important;
+	white-space: initial !important;
 }
 #flexicontent .label-toplevel {
 	background-color: #707070;
