@@ -260,12 +260,12 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			
 			$phonelabel = (!$use_label ? '' : '
 				<tr><td class="key">' .JText::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LABEL' ). '</td><td>
-					<input class="fcfield_textval phonelabel" name="'.$fieldname_n.'[label]" id="'.$elementid_n.'_label" type="text" value="'.$value['label'].'" '.$label_attribs.' />
+					<input class="fcfield_textval phonelabel" name="'.$fieldname_n.'[label]" id="'.$elementid_n.'_label" type="text" value="'.@$value['label'].'" '.$label_attribs.' />
 				</td></tr>');
 			
 			$phonecc = (!$use_cc ? '' : '
 				<tr><td class="key">' .JText::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE' ). '</td><td>
-					<input class="phonecc fcfield_textval inlineval" name="'.$fieldname_n.'[cc]" id="'.$elementid_n.'_cc" type="text" maxsize="4" value="'.$value['cc'].'" '.$cc_attribs.' />
+					<input class="phonecc fcfield_textval inlineval" name="'.$fieldname_n.'[cc]" id="'.$elementid_n.'_cc" type="text" maxsize="4" value="'.@$value['cc'].'" '.$cc_attribs.' />
 				</td></tr>');
 			
 			$phone = '

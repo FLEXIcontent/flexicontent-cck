@@ -353,7 +353,14 @@ div#fc-dash-sliders table.fc-table-list {
 
 div table.fc-table-list th,
 div#fc-dash-sliders table.fc-table-list th {
-	background: url(../images/noise1.png), linear-gradient(#777, #444);
+	background-color: #444444;
+	background-image: url(../images/noise1.png), -webkit-gradient(#777777, #444444);
+	background-image: url(../images/noise1.png), -webkit-linear-gradient(#777777, #444444);
+	background-image: url(../images/noise1.png), -moz-linear-gradient(#777777, #444444);
+	background-image: url(../images/noise1.png), -ms-linear-gradient(#777777, #444444);
+	background-image: url(../images/noise1.png), -o-linear-gradient(#777777, #444444);
+	background-image: url(../images/noise1.png), linear-gradient(#777777, #444444);
+	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#777777, endColorstr=#444444);
 	border-left: 1px solid #555;
 	border-right: 1px solid #777;
 	border-top: 1px solid #555;
@@ -430,17 +437,17 @@ div#fc-dash-sliders table.fc-table-list td:last-child {
 
 div table.fc-table-list tr,
 div#fc-dash-sliders table.fc-table-list tr {
-	background: url(../images/noise1.png);	
+	background: url(../images/noise1.png);
 }
 
 div table.fc-table-list tr:nth-child(odd) td,
 div#fc-dash-sliders table.fc-table-list tr:nth-child(odd) td {
-	background: #f1f1f1 url(../images/noise1.png);	
+	background: #f1f1f1 url(../images/noise1.png);
 }
 
 div table.fc-table-list tr:last-of-type td,
 div#fc-dash-sliders table.fc-table-list tr:last-of-type td {
-	box-shadow: inset 0 -1px 0 #fff; 
+	box-shadow: inset 0 -1px 0 #fff;
 }
 
 div table.fc-table-list tr:last-of-type td:first-child,
@@ -542,12 +549,13 @@ div#fc-dash-boardbtns .fc-board-button {
     height: 80px;
     text-align: center;
     background-color: #e1e1e1;
-    background-image: -moz-linear-gradient(#ededed, #e1e1e1);
-    background-image: -o-linear-gradient(#ededed, #e1e1e1);
-    background-image: -webkit-linear-gradient(#ededed, #e1e1e1);
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ededed), color-stop(1, #e1e1e1));
-    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr=#ededed, EndColorStr=#e1e1e1)";
+    background-image: -webkit-linear-gradient(#ededed, #e1e1e1);
+    background-image: -moz-linear-gradient(#ededed, #e1e1e1);
+    background-image: -ms-linear-gradient(#ededed, #e1e1e1);
+    background-image: -o-linear-gradient(#ededed, #e1e1e1);
     background-image: linear-gradient(#ededed, #e1e1e1);
+    filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ededed, endColorstr=#e1e1e1);
     border: 1px solid #d0d0d0;
     color: #444;
     text-shadow: 1px 1px 1px #fff;
@@ -560,12 +568,13 @@ div#fc-dash-boardbtns .fc-board-button {
 }
 div#fc-dash-boardbtns .fc-board-button:hover {
     background-color: #FffFfF;
-    background-image: -moz-linear-gradient(#ededed, #fff);
-    background-image: -o-linear-gradient(#ededed, #fff);
-    background-image: -webkit-linear-gradient(#ededed, #fff);
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ededed), color-stop(1, #fff));
-    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr=#ededed, EndColorStr=#fff)";
+    background-image: -webkit-linear-gradient(#ededed, #fff);
+    background-image: -moz-linear-gradient(#ededed, #fff);
+    background-image: -ms-linear-gradient(#ededed, #fff);
+    background-image: -o-linear-gradient(#ededed, #fff);
     background-image: linear-gradient(#ededed, #fff);
+    filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ededed, endColorstr=#ffffff);
     -moz-box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6);
     -webkit-box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6);
     box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.6);

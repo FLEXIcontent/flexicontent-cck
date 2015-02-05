@@ -972,7 +972,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	background-image: -moz-linear-gradient(top, white, lightgray);
 	background-image: -ms-linear-gradient(top, white, lightgray);
 	background-image: -o-linear-gradient(top, white, lightgray);
-	background-image: linear-gradient(to bottom, white, lightgray);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=lightgray);
+	background-image: linear-gradient(to bottom, white, lightgray);/*filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=lightgray);*//*filter prevents background image in ie8/ie9*/
 }
 /* default hover styling which we make more specific below */
 #flexicontent .fcfield-drag-handle:hover,
@@ -1162,8 +1162,13 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 #flexicontent .group-fcprimary .btn,
 #flexicontent .group-fcinfo .btn {
 	color: #333 !important;
-  background-color: #e6e6e6 !important;
-	background-image: linear-gradient(to bottom, #fff, #e6e6e6) !important;
+	background-color: #e6e6e6 !important;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#e6e6e6)) !important;
+	background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6) !important;
+	background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6) !important;
+	background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6) !important;
+	background-image: -o-linear-gradient(top, #ffffff, #e6e6e6) !important;
+	background-image: linear-gradient(to bottom, #ffffff, #e6e6e6) !important;filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ffffff, endColorstr=#e6e6e6) !important;
 	background-repeat: repeat-x !important;
 	border-color: #bbb #bbb #a2a2a2 !important;
 	border-image: none !important;

@@ -198,6 +198,7 @@ ul.tabbernav li.tabberactive a:hover
 {
 	color: black !important;
 	background-color: white !important;
+	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=white);
 	background-image: none;
 	border-bottom: 0px solid white !important;
 	border-left: 1px solid #D0D0D0;
