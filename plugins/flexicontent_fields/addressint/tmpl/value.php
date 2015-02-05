@@ -18,11 +18,12 @@ $field_suffix = $field->parameters->get('field_suffix','');
 $view = JRequest::getVar('view');
 
 $n = 0;
+$_add_map = ($view!='item' && ($show_map=='category' || $show_map=='both')) || ($view=='item' && ($show_map=='item' || $show_map=='both'));
 foreach ($values as $value)
 {
 	// generate map
 	$map = '';
-	if(($view=='category' && ($show_map=='category' || $show_map=='both')) || ($view!='category' && ($show_map=='item' || $show_map=='both')))
+	if($_add_map && (!empty($value['lon']) || !empty($value['lat'])) )
 	{
 		$map_link = "http://maps.google.com/maps?q=".$value['lat'].",".$value['lon'];
 		$map_url = "http://maps.google.com/maps/api/staticmap?center=".$value['lat'].",".$value['lon']."&zoom=".$map_zoom."&size=".$map_width."x".$map_height."&maptype=".$map_type."&markers=size:".$marker_size."%7Ccolor:".$marker_color."%7C|".$value['lat'].",".$value['lon']."&sensor=false";
@@ -32,6 +33,10 @@ foreach ($values as $value)
 		if($link_map==1) $map .= '<br />Click Map for Directions</a>';
 		$map .= '</div>';
 	}
+	if (
+		empty($map) && empty($value['addr1']) && empty($value['addr2']) &&
+		empty($value['city']) && empty($value['province'])  && empty($value['zip']) /*&& empty($value['state']) && empty($value['country'])*/
+	) continue;
 	
 	$field->{$prop}[$n] =
 		$field_prefix

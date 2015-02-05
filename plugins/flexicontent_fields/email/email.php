@@ -251,7 +251,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			);
 			$addr = '
 				<div class="nowrap_box">
-					<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
+					<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
 					<input class="emailaddr fcfield_textval validate-email'.$required.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" value="'.$value['addr'].'" '.$attribs.' />
 				</div>';
 			
@@ -261,7 +261,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				$value['text'] = isset($value['text']) ? htmlspecialchars($value['text'], ENT_COMPAT, 'UTF-8') : '';
 				$text = '
 				<div class="nowrap_box">
-					<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</label>
+					<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).'</label>
 					<input class="emailtext fcfield_textval" name="'.$fieldname_n.'[text]" type="text" size="'.$size.'" value="'.$value['text'].'" />
 				</div>';
 			}

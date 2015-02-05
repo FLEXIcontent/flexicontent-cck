@@ -857,18 +857,21 @@ class modFlexicontentHelper
 				$curitem	= $db->loadObject();
 				
 				// Get item dates
+				$idate = null;
 				if ($date_type == 0) {        // created
 					$idate = $curitem->created;			
 				} else if ($date_type == 1) { // modified
 					$idate = $curitem->modified;
 				} else if ($date_type == 2) { // publish up
 					$idate = $curitem->publish_up;
-				} else { // $date_type == 3
+				} else if (isset($curitem->custom_date)) { // $date_type == 3
 					$idate = $curitem->custom_date;
 				}
 				
-				$idate 	= explode(' ', $idate);
-				$cdate 	= $idate[0] . ' 00:00:00';
+				if ($idate) {
+					$idate 	= explode(' ', $idate);
+					$cdate 	= $idate[0] . ' 00:00:00';
+				}
 				$curritemcats = explode(',', $curitem->itemcats);
 			}
 		}

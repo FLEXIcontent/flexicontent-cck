@@ -263,7 +263,7 @@
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
 
 		</fieldset>
-		<fieldset name="group-images-thumbs" repeat="1" icon_class="icon-image" label="FLEXI_THUMBNAILS" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-image-thumbs" repeat="1" icon_class="icon-image" label="FLEXI_THUMBNAILS" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAIL_CREATION" description="FLEXI_IMGFIELD_THUMBNAIL_CREATION_DESC" level="level1" />
 			
