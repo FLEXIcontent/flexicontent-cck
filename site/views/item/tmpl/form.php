@@ -1599,6 +1599,7 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 		<input type="hidden" name="unique_tmp_itemid" value="<?php echo JRequest::getVar( 'unique_tmp_itemid' );?>" />
 
 	</form>
+	<div class="clear fcclear"></div>
 </div>
 
 <?php
