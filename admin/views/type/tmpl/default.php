@@ -18,6 +18,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 ?>
+<div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -177,6 +178,7 @@ defined('_JEXEC') or die('Restricted access');
 <input type="hidden" name="view" value="type" />
 <input type="hidden" name="task" value="" />
 </form>
+</div>
 
 <?php
 //keep session alive while editing
