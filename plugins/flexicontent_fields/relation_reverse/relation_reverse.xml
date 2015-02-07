@@ -19,7 +19,7 @@
 	<fields name="attribs" >
 	
 		<fieldset name="standard" repeat="1">
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -72,11 +72,11 @@
 				<option value="0">FLEXI_RELATED_DISPLAY_ID</option>
 				<option value="1">FLEXI_RELATED_DISPLAY_TITLE</option>
 			</field>
-			<field name="addlink_form" type="radio" default="1" label="FLEXI_ADD_ITEM_LINK" description="FLEXI_ADD_ITEM_LINK_DESC">
+			<field name="addlink_form" type="radio" default="1" label="FLEXI_ADD_ITEM_LINK" description="FLEXI_ADD_ITEM_LINK_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="addtooltip_form" type="radio" default="1" label="FLEXI_ADD_ITEM_TOOLTIP" description="FLEXI_ADD_ITEM_TOOLTIP_DESC">
+			<field name="addtooltip_form" type="radio" default="1" label="FLEXI_ADD_ITEM_TOOLTIP" description="FLEXI_ADD_ITEM_TOOLTIP_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -134,17 +134,17 @@
 				<option value="0">FLEXI_RELATED_DISPLAY_ID</option>
 				<option value="1">FLEXI_RELATED_DISPLAY_TITLE</option>
 			</field>
-			<field name="addlink" type="radio" default="1" label="FLEXI_ADD_ITEM_LINK" description="FLEXI_ADD_ITEM_LINK_DESC">
+			<field name="addlink" type="radio" default="1" label="FLEXI_ADD_ITEM_LINK" description="FLEXI_ADD_ITEM_LINK_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="addtooltip" type="radio" default="1" label="FLEXI_ADD_ITEM_TOOLTIP" description="FLEXI_ADD_ITEM_TOOLTIP_DESC">
+			<field name="addtooltip" type="radio" default="1" label="FLEXI_ADD_ITEM_TOOLTIP" description="FLEXI_ADD_ITEM_TOOLTIP_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

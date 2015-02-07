@@ -34,7 +34,7 @@
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
-			<field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC">
+			<field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -45,7 +45,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -61,7 +61,7 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_FILE_YES_NO_DESCRIPTION</option>
 			</field>
-			<field name="noaccess_addvars" type="radio" default="0" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS_DESC">
+			<field name="noaccess_addvars" type="radio" default="0" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -77,7 +77,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
-			<field name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC">
+			<field name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -87,11 +87,11 @@
 				<option value="1">FLEXI_YES_PREFER_FILE_TITLE</option>
 				<option value="2">FLEXI_YES</option>
 			</field>
-			<field name="lowercase_filename" type="radio" default="1" label="FLEXI_FIELD_FILE_LOWERCASE_FILENAME" description="FLEXI_FIELD_FILE_LOWERCASE_FILENAME_DESC">
+			<field name="lowercase_filename" type="radio" default="1" label="FLEXI_FIELD_FILE_LOWERCASE_FILENAME" description="FLEXI_FIELD_FILE_LOWERCASE_FILENAME_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="link_filename" type="radio" default="1" label="FLEXI_FIELD_FILE_LINK_FILENAME" description="FLEXI_FIELD_FILE_LINK_FILENAME_DESC">
+			<field name="link_filename" type="radio" default="1" label="FLEXI_FIELD_FILE_LINK_FILENAME" description="FLEXI_FIELD_FILE_LINK_FILENAME_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -120,14 +120,14 @@
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
 			
-			<field name="use_infoseptxt" type="radio" default="1" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC">
+			<field name="use_infoseptxt" type="radio" default="1" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="infoseptxt" type="text" default="" label="FLEXI_FIELD_FILE_INFO_SEP_CHARS" description="FLEXI_FIELD_FILE_INFO_SEP_CHARS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -159,7 +159,7 @@
 				<option value="1">FLEXI_FIELD_AFTER</option>
 			</field>
 
-			<field name="use_actionseptxt" type="radio" default="1" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC">
+			<field name="use_actionseptxt" type="radio" default="1" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -204,7 +204,7 @@
 			<field name="sharetext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT_DESC"/>			
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_DOWNLOAD_COUPONS" level="level1" />
-			<field name="enable_coupons" type="radio" default="0" label="FLEXI_FIELD_FILE_ENABLE_COUPONS" description="FLEXI_FIELD_FILE_ENABLE_COUPONS_DESC">
+			<field name="enable_coupons" type="radio" default="0" label="FLEXI_FIELD_FILE_ENABLE_COUPONS" description="FLEXI_FIELD_FILE_ENABLE_COUPONS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -215,7 +215,7 @@
 		<fieldset name="group-file-notifications" repeat="1" icon_class="icon-mail" label="Notifications" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_DOWNLOAD_NOTIFICATION" level="level1" />
-			<field name="send_notifications" type="radio" default="0" label="FLEXI_DOWNLOAD_HIT_NOTIFICATION" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC">
+			<field name="send_notifications" type="radio" default="0" label="FLEXI_DOWNLOAD_HIT_NOTIFICATION" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -225,7 +225,7 @@
 			
 			<field name="" type="separator" default="FLEXI_SEND_TO" level="level2" />
 			<field name="send_all_to_email" type="text" default="" label="FLEXI_SPE_EMAIL" description="FLEXI_SPE_EMAIL_DESC" />
-			<field name="send_to_current_item_owner" type="radio" default="0" label="FLEXI_CONTENT_OWNER" description="FLEXI_CONTENT_OWNER_DESC">
+			<field name="send_to_current_item_owner" type="radio" default="0" label="FLEXI_CONTENT_OWNER" description="FLEXI_CONTENT_OWNER_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

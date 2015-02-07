@@ -44,7 +44,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="js_popup_err" type="radio" default="0" label="FLEXI_FIELD_JS_POPUP_ERROR" description="FLEXI_FIELD_JS_POPUP_ERROR_DESC" >
+			<field name="js_popup_err" type="radio" default="0" label="FLEXI_FIELD_JS_POPUP_ERROR" description="FLEXI_FIELD_JS_POPUP_ERROR_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -56,7 +56,7 @@
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="sql_mode" type="radio" default="0" label="FLEXI_FIELD_SQL_MODE_WITH_IMAGE" description="FLEXI_FIELD_SQL_MODE_WITH_IMAGE_DESC">
+			<field name="sql_mode" type="radio" default="0" label="FLEXI_FIELD_SQL_MODE_WITH_IMAGE" description="FLEXI_FIELD_SQL_MODE_WITH_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -75,11 +75,11 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_ALTERNATIVE_DISPLAY" description="" level="level2" />
-			<field name="display_as_select" type="radio" default="0" label="FLEXI_FIELD_CONVERT_TO_MULTIPLE_SELECT" description="FLEXI_FIELD_CONVERT_TO_MULTIPLE_SELECT_DESC">
+			<field name="display_as_select" type="radio" default="0" label="FLEXI_FIELD_CONVERT_TO_MULTIPLE_SELECT" description="FLEXI_FIELD_CONVERT_TO_MULTIPLE_SELECT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usefirstoption" type="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC">
+			<field name="usefirstoption" type="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -106,7 +106,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -118,7 +118,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
-			<field name="lang_filter_values" type="radio" default="1" label="FLEXI_LANG_FILTER_LABELS" description="FLEXI_LANG_FILTER_LABELS_DESC">
+			<field name="lang_filter_values" type="radio" default="1" label="FLEXI_LANG_FILTER_LABELS" description="FLEXI_LANG_FILTER_LABELS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -127,7 +127,7 @@
 				<option value="1">FLEXI_LABEL</option>
 				<option value="2">FLEXI_IMAGE</option>
 			</field>
-			<field name="display_all" type="radio" default="0" label="FLEXI_DISPLAY_NONSELECTED_VALUES" description="FLEXI_DISPLAY_NONSELECTED_VALUES_DESC">
+			<field name="display_all" type="radio" default="0" label="FLEXI_DISPLAY_NONSELECTED_VALUES" description="FLEXI_DISPLAY_NONSELECTED_VALUES_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -144,7 +144,7 @@
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -180,7 +180,7 @@
 			</field>
 			<field name="filter_custom_options" type="textarea" rows="6" cols="25" label="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY" description="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY_DESC" default="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field_id}' AND value != '' GROUP BY value" />
 			<field name="filter_default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
-			<field name="filter_usefirstoption" type="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC">
+			<field name="filter_usefirstoption" type="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -194,11 +194,11 @@
 				<option value="2">FLEXI_FLOAT</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_FILTER_VALUES_MATCHING_CONF" level="level3" />
-			<field name="filter_values_require_all" type="radio" default="0" label="FLEXI_FILTER_VALUES_REQUIRE_ALL" description="FLEXI_FILTER_VALUES_REQUIRE_ALL_DESC">
+			<field name="filter_values_require_all" type="radio" default="0" label="FLEXI_FILTER_VALUES_REQUIRE_ALL" description="FLEXI_FILTER_VALUES_REQUIRE_ALL_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_SLOWER</option>
 			</field>
-			<field name="filter_values_require_all_tip" type="radio" default="0" label="FLEXI_FILTER_VALUES_REQUIRE_ALL_TIP" description="FLEXI_FILTER_VALUES_REQUIRE_ALL_TIP_DESC">
+			<field name="filter_values_require_all_tip" type="radio" default="0" label="FLEXI_FILTER_VALUES_REQUIRE_ALL_TIP" description="FLEXI_FILTER_VALUES_REQUIRE_ALL_TIP_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -225,18 +225,18 @@
 				<option value="1">FLEXI_IMAGE</option>
 				<option value="2">FLEXI_BOTH</option>
 			</field>
-			<field name="faceted_filter" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
-				<option value="0">FLEXI_FS_NONE</option>
-				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
-				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
+			<field name="faceted_filter" type="multilist" subtype="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC" toggle_related="1">
+				<option value="0" show_list="" hide_list="active-filts-mode">FLEXI_FS_NONE</option>
+				<option value="1" show_list="" hide_list="active-filts-mode">FLEXI_FS_PAGE_CONFIGURATION</option>
+				<option value="2" show_list="active-filts-mode" hide_list="">FLEXI_FS_ACTIVE_FILTERS</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FACETED_BEHAVIOR_ACTIVE_FILTERS" level="level3" />
-			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
+			<field name="" type="separator" default="FLEXI_FACETED_BEHAVIOR_ACTIVE_FILTERS" level="level3" depend_class="active-filts-mode"/>
+			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC" depend_class="active-filts-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="hide_disabled_values" type="radio" default="0" label="FLEXI_FILTER_UNAVAILABLE_VALUES" description="FLEXI_FILTER_UNAVAILABLE_VALUES_DESC">
+			<field name="hide_disabled_values" type="radio" default="0" label="FLEXI_FILTER_UNAVAILABLE_VALUES" description="FLEXI_FILTER_UNAVAILABLE_VALUES_DESC" depend_class="active-filts-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_HIDE</option>
 			</field>
@@ -261,18 +261,18 @@
 				<option value="1">FLEXI_IMAGE</option>
 				<option value="2">FLEXI_BOTH</option>
 			</field>
-			<field name="faceted_filter_s" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
-				<option value="0">FLEXI_FS_NONE</option>
-				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
-				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
+			<field name="faceted_filter_s" type="multilist" subtype="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC" toggle_related="1">
+				<option value="0" show_list="" hide_list="active-filts-mode-s">FLEXI_FS_NONE</option>
+				<option value="1" show_list="" hide_list="active-filts-mode-s">FLEXI_FS_PAGE_CONFIGURATION</option>
+				<option value="2" show_list="active-filts-mode-s" hide_list="">FLEXI_FS_ACTIVE_FILTERS</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FACETED_BEHAVIOR_ACTIVE_FILTERS" level="level3" />
-			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
+			<field name="" type="separator" default="FLEXI_FACETED_BEHAVIOR_ACTIVE_FILTERS" level="level3" depend_class="active-filts-mode-s"/>
+			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC" depend_class="active-filts-mode-s" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="hide_disabled_values_s" type="radio" default="0" label="FLEXI_FILTER_UNAVAILABLE_VALUES" description="FLEXI_FILTER_UNAVAILABLE_VALUES_DESC">
+			<field name="hide_disabled_values_s" type="radio" default="0" label="FLEXI_FILTER_UNAVAILABLE_VALUES" description="FLEXI_FILTER_UNAVAILABLE_VALUES_DESC" depend_class="active-filts-mode-s" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_HIDE</option>
 			</field>

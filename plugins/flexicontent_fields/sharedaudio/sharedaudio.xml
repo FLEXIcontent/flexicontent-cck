@@ -23,7 +23,7 @@
 		<fieldset name="group-sharedaudio-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -44,7 +44,7 @@
 			
 			<field name="" type="separator" default="Audio" level="level1" />
 			<field name="" type="separator" default="Audio Info" level="level2" />
-			<field name="display_title" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_DESC">
+			<field name="display_title" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -56,7 +56,7 @@
 				<option value="5">H5</option>
 				<option value="6">H6</option>
 			</field>
-			<field name="display_author" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_AUTHOR" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_AUTHOR_DESC">
+			<field name="display_author" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_AUTHOR" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_AUTHOR_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -64,7 +64,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field-->
-			<field name="display_description" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION_DESC">
+			<field name="display_description" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -72,7 +72,7 @@
 			<field name="" type="separator" default="Audio player" level="level2" />
 			<field name="width" type="text" default="480" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_WIDTH" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_WIDTH_DESC" />
 			<field name="height" type="text" default="170" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_HEIGHT" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_HEIGHT_DESC" />
-			<field name="autostart" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTOSTART" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTOSTART_DESC">
+			<field name="autostart" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTOSTART" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTOSTART_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

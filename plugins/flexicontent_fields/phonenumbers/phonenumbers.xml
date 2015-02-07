@@ -90,7 +90,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -104,7 +104,7 @@
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_OPTIONAL_PROPERTIES_EVERY_VALUE" level="level2" />
 			
-			<field name="display_phone_label" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_PHONE_LABEL" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_PHONE_LABEL_DESC">
+			<field name="display_phone_label" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_PHONE_LABEL" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_PHONE_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -154,7 +154,7 @@
 
 		<fieldset name="group-phonenumbers-fieldgrp" repeat="1" icon_class="icon-menu-3" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="" type="separator" default="FLEXI_REQUIRES_FIELDGROUP_FIELD" level="level2" />
-			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

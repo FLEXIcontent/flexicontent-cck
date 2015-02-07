@@ -88,7 +88,7 @@
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level3" />
 			<field name="height" type="text" default="350px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
 			<field name="" type="separator" default="FLEXI_EDITOR_BUTTONS" description="..." level="level4" />
-			<field name="show_buttons" type="radio" default="1" label="FLEXI_SHOW_EDITOR_BUTTONS" description="FLEXI_SHOW_EDITOR_BUTTONS_DESC">
+			<field name="show_buttons" type="radio" default="1" label="FLEXI_SHOW_EDITOR_BUTTONS" description="FLEXI_SHOW_EDITOR_BUTTONS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -99,7 +99,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -110,11 +110,11 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			<field name="encode_output" type="radio" default="0" label="FLEXI_ENCODE_OUTPUT" description="FLEXI_ENCODE_OUTPUT_DESC">
+			<field name="encode_output" type="radio" default="0" label="FLEXI_ENCODE_OUTPUT" description="FLEXI_ENCODE_OUTPUT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="clean_output" type="radio" default="0" label="FLEXI_CLEAN_OUTPUT" description="FLEXI_CLEAN_OUTPUT_DESC">
+			<field name="clean_output" type="radio" default="0" label="FLEXI_CLEAN_OUTPUT" description="FLEXI_CLEAN_OUTPUT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_UNSAFE_HTML</option>
 				<option value="2">FLEXI_ALL_HTML</option>
@@ -132,7 +132,7 @@
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -163,7 +163,7 @@
 
 		<fieldset name="group-termlist-fieldgrp" repeat="1" icon_class="icon-menu-3" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="" type="separator" default="FLEXI_REQUIRES_FIELDGROUP_FIELD" level="level2" />
-			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

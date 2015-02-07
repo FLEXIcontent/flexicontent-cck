@@ -36,7 +36,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -98,7 +98,7 @@
 				<option value="19">19</option>
 				<option value="20">20</option>
 			</field>
-			<field name="link_map" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_LINK" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_LINK_DESC">
+			<field name="link_map" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_LINK" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_LINK_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

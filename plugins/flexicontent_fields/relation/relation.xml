@@ -18,7 +18,7 @@
 	<fields name="attribs" >
 	
 		<fieldset name="standard" repeat="1">
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -51,7 +51,7 @@
 				<option value="h">FLEXI_RIFLD_SINGLE_ROW_FIT</option>
 				<option value="v">FLEXI_RIFLD_MULTI_ROW_FIT</option>
 			</field>
-			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_REQUIRED_DESC">
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -60,7 +60,7 @@
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_SELECTOR" level="level2" />
 			
-			<field name="prepend_item_state" type="radio" default="1" label="FLEXI_RIFLD_PREPEND_ITEM_STATE" description="FLEXI_RIFLD_PREPEND_ITEM_STATE_DESC" >
+			<field name="prepend_item_state" type="radio" default="1" label="FLEXI_RIFLD_PREPEND_ITEM_STATE" description="FLEXI_RIFLD_PREPEND_ITEM_STATE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -94,12 +94,12 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="display_cat_filter_label" type="radio" default="1" label="FLEXI_RIFLD_DISPLAY_CAT_FILTER_LABEL" description="FLEXI_RIFLD_DISPLAY_CAT_FILTER_LABEL_DESC">
+			<field name="display_cat_filter_label" type="radio" default="1" label="FLEXI_RIFLD_DISPLAY_CAT_FILTER_LABEL" description="FLEXI_RIFLD_DISPLAY_CAT_FILTER_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="display_title_filter_label" type="radio" default="1" label="FLEXI_RIFLD_DISPLAY_TITLE_FILTER_LABEL" description="FLEXI_RIFLD_DISPLAY_TITLE_FILTER_LABEL_DESC">
+			<field name="display_title_filter_label" type="radio" default="1" label="FLEXI_RIFLD_DISPLAY_TITLE_FILTER_LABEL" description="FLEXI_RIFLD_DISPLAY_TITLE_FILTER_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -110,7 +110,7 @@
 			<field name="" type="separator" default="FLEXI_RIFLD_CAT_SCOPE" hr="false" level="level3" />
 			<field name="method_cat" type="fcmethod" default="1" label="FLEXI_RIFLD_METHOD" description="FLEXI_RIFLD_METHOD_DESC" />
 			<field name="catids" type="flexicategories" multiple="true" size="9" label="FLEXI_RIFLD_CATEGORIES" description="FLEXI_RIFLD_CATEGORIES_DESC" />
-			<field name="usesubcats" type="radio" default="0" label="FLEXI_RIFLD_INCLUDE_SUBCATS" description="FLEXI_RIFLD_INCLUDE_SUBCATS_DESC">
+			<field name="usesubcats" type="radio" default="0" label="FLEXI_RIFLD_INCLUDE_SUBCATS" description="FLEXI_RIFLD_INCLUDE_SUBCATS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -120,7 +120,7 @@
 			<field name="types" type="types" multiple="true" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_OTHER_SCOPE_LIMITS" level="level3" />
-			<field name="samelangonly" type="radio" default="1" label="FLEXI_RIFLD_SAME_LANGUAGE_ONLY" description="FLEXI_RIFLD_SAME_LANGUAGE_ONLY_DESC">
+			<field name="samelangonly" type="radio" default="1" label="FLEXI_RIFLD_SAME_LANGUAGE_ONLY" description="FLEXI_RIFLD_SAME_LANGUAGE_ONLY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -128,7 +128,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="onlypublished" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC">
+			<field name="onlypublished" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -178,17 +178,17 @@
 				<option value="0">FLEXI_RELATED_DISPLAY_ID</option>
 				<option value="1">FLEXI_RELATED_DISPLAY_TITLE</option>
 			</field>
-			<field name="addlink" type="radio" default="1" label="FLEXI_ADD_ITEM_LINK" description="FLEXI_ADD_ITEM_LINK_DESC">
+			<field name="addlink" type="radio" default="1" label="FLEXI_ADD_ITEM_LINK" description="FLEXI_ADD_ITEM_LINK_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="addtooltip" type="radio" default="1" label="FLEXI_ADD_ITEM_TOOLTIP" description="FLEXI_ADD_ITEM_TOOLTIP_DESC">
+			<field name="addtooltip" type="radio" default="1" label="FLEXI_ADD_ITEM_TOOLTIP" description="FLEXI_ADD_ITEM_TOOLTIP_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -207,7 +207,7 @@
 			
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_AUTORELATE_SUBMISSION" description="FLEXI_RIFLD_AUTORELATE_SUBMISSION_DESC" hr="false" level="level1" />
-			<field name="auto_relate_curritem" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON" description="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON_DESC">
+			<field name="auto_relate_curritem" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON" description="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -239,11 +239,11 @@
 			<field name="total_append_text" type="text" label="FLEXI_RIFLD_TOTAL_APPEND_TEXT" description="FLEXI_RIFLD_TOTAL_APPEND_TEXT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_EXTRA_INFO" level="level3" />
-			<field name="total_show_auto_btn" type="radio" default="0" label="FLEXI_RIFLD_TOTAL_SHOW_AUTO_BTN" description="FLEXI_RIFLD_TOTAL_SHOW_AUTO_BTN_DESC">
+			<field name="total_show_auto_btn" type="radio" default="0" label="FLEXI_RIFLD_TOTAL_SHOW_AUTO_BTN" description="FLEXI_RIFLD_TOTAL_SHOW_AUTO_BTN_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="total_show_list" type="radio" default="0" label="FLEXI_RIFLD_TOTAL_SHOW_LIST" description="FLEXI_RIFLD_TOTAL_SHOW_LIST_DESC">
+			<field name="total_show_list" type="radio" default="0" label="FLEXI_RIFLD_TOTAL_SHOW_LIST" description="FLEXI_RIFLD_TOTAL_SHOW_LIST_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

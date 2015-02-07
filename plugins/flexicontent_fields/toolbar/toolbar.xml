@@ -26,7 +26,7 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
 			
-			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -147,7 +147,7 @@
 			
 			<field name="" type="separator" default="FLEXI_IMAGE" description="" level="level2" />
 			
-			<field name="add_og_image" type="radio" default="0" label="FLEXI_ADD" description="FLEXI_TOOLBAR_CONTENT_IMAGE_DESC">
+			<field name="add_og_image" type="radio" default="0" label="FLEXI_ADD" description="FLEXI_TOOLBAR_CONTENT_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
