@@ -1860,9 +1860,21 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			case 'categories':
 				//$filter_query = ' AND rel.catid IN ('. implode(",", $values) .')';
+				global $globalcats;
+				$cparams  = $this->_params;
+				$display_subcats = $cparams->get('display_subcategories_items', 0);   // include subcategory items
+				$query_catids = array();
+				foreach ($values as $id)
+				{
+					$query_catids[$id] = 1;
+					if ( $display_subcats==2 && !empty($globalcats[$id]->descendantsarray) ) {
+						foreach ($globalcats[$id]->descendantsarray as $subcatid) $query_catids[$subcatid] = 1;
+					}
+				}
+				$query_catids = array_keys($query_catids);
 				$query  = 'SELECT itemid'
 						. ' FROM #__flexicontent_cats_item_relations'
-						. ' WHERE catid IN ('. implode(",", $values) .')';
+						. ' WHERE catid IN ('. implode(",", $query_catids) .')';
 						;
 				$filter_query = ' AND i.id IN (' . $query . ')';
 			break;

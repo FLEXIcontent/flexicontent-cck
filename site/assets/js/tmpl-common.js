@@ -85,7 +85,7 @@
 			if ( element.type=='select-multiple' ) {
 				for (var p=0; p < element.length; p++) {
 					if ( ! element.options[p].selected ) continue;
-					extra_action += var_sep + element.name.replace("[]","") + '[' + p + ']=' + element.options[p].value;
+					extra_action += var_sep + element.name.replace("[]","") + '[' + ']=' + element.options[p].value;
 					var_sep = '&';
 				}
 			} else {

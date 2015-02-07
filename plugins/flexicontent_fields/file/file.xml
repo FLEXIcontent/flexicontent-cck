@@ -27,7 +27,7 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
-			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -49,11 +49,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="show_acc_msg" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="field-acc-msg">FLEXI_NO</option>
+				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
+			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_INACCESSIBLE_FILES_PARAMS_LABEL" level="level2" />
 			<field name="noaccess_display" type="radio" default="1" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY_DESC">
@@ -221,10 +221,10 @@
 			</field>
 			<field name="notifications_step" type="text" default="20" size="10" label="Every N hits" description="Send email every N hits" />
 			
-			<field name="notification_tmpl" type="textarea" cols="50" rows="10" default="%%FLEXI_HITS%% __FILE_HITS__ &#10; %%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" size="50" label="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE" description="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE_DESC" />
+			<field name="notification_tmpl" type="textarea" cols="50" rows="10" default="%%FLEXI_HITS%% __FILE_HITS__ &#10; %%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" label="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE" description="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_SEND_TO" level="level2" />
-			<field name="send_all_to_email" type="text" default="" size="50" label="FLEXI_SPE_EMAIL" description="FLEXI_SPE_EMAIL_DESC" />
+			<field name="send_all_to_email" type="text" default="" label="FLEXI_SPE_EMAIL" description="FLEXI_SPE_EMAIL_DESC" />
 			<field name="send_to_current_item_owner" type="radio" default="0" label="FLEXI_CONTENT_OWNER" description="FLEXI_CONTENT_OWNER_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

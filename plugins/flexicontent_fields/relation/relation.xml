@@ -22,11 +22,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="show_acc_msg" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="field-acc-msg">FLEXI_NO</option>
+				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
+			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 		</fieldset>
 		
 		<fieldset name="group-relation-editing" repeat="1" icon_class="icon-pencil" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -34,11 +34,15 @@
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
-			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
+				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC" depend_class="plg-trigger-mode" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_EDIT_OPTIONS" level="level1" />
