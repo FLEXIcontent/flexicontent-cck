@@ -238,12 +238,21 @@ window.addEvent('domready', function(){
 		}
 		
 		$label = $this->element['label'];
+		
 		$class = (FLEXI_J30GE ? ' hasTooltip' : ' hasTip');
+		if ( @$attributes['labelclass'] ) {
+			$class .= ' '.$attributes['labelclass'];
+		}
 		$title = "...";
 		if ($this->element['description']) {
 			$title = flexicontent_html::getToolTip($label, $this->element['description'], 1, 1);
 		}
-		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.JText::_($label).'</label> &nbsp; ';
+		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.JText::_($label).'</label>';
 	}
+	
+	function set($property, $value) {
+		$this->$property = $value;
+	}
+	
 }
 ?>

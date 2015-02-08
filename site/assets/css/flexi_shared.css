@@ -815,12 +815,20 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 }
 
 /* Edit form */
+#flexicontent .fc_tabset_inner {
+	float: none;
+	width: 100%;
+	margin: 1em 0%;
+	padding: 0px;
+	display: inline-block;
+	border: 0 none;
+}
 #flexicontent .fc_edit_container_full {
-	float:none !important;
-	width:98% !important;
-	margin:1em 1% 1em 1% !important;
-	padding:0px !important;
-	display:inline-block !important;
+	float: none;
+	width: 98%;
+	margin: 1em 1% 1em 1%;
+	padding: 0px;
+	display: inline-block;
 	border: 0 none;
 	/*background-color: cyan;*/ /* for testing */
 }
@@ -1297,7 +1305,7 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 #flexicontent label.fckey, #flexicontent .flexi_label {
 	display: inline-block;
 	color: white;
-	background-color: #707070;
+	background-color: #999;
 	border-radius: 3px;
 	
 	font-size: 12px;
@@ -1313,7 +1321,7 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	min-width:auto !important;
 	margin: 0px 1% 1px 0% !important;
 	padding: 8px 1% !important;
-	white-space: wrap !important;
+	white-space: normal !important;
 }
 #flexicontent .label-fcouter {
 	display: inline-block;
@@ -1337,10 +1345,10 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	border: 0px solid !important; /* non-zero causes wrapping */
 	margin: 0 !important;
 	padding: 8px 10% !important;
-	white-space: initial !important;
+	white-space: normal !important;
 }
 #flexicontent .label-toplevel {
-	background-color: #707070;
+	/*background-color: #707070;*/
 }
 #flexicontent .nowrap_box .label-fcouter {
 	float: none;
@@ -1453,14 +1461,23 @@ fieldset.flexiaccess, fieldset.adminform,
 	min-width: inherit !important; /* workaround for chrome fieldset width bug */
 	display: block;
 }
-#flexicontent fieldset legend { padding:0px 6px; width:auto; border:0px; margin:0px; font-size:14px; /* font-family:georgia */; font-weight:bold; }
-#flexicontent fieldset.basicfields_set legend { color: #3276B1; }
+#flexicontent fieldset.params_set legend,
+#flexicontent fieldset.customfields_set legend,
+#flexicontent fieldset.basicfields_set legend {
+	padding:0px 6px;
+	width:auto; border:0px;
+	margin:0px;
+	font-size:14px;
+	font-weight:bold; 
+	/* font-family:verdana */;
+	color: #3276B1;
+}
 
 fieldset.flexiaccess, fieldset.adminform { margin-bottom: 1em !important; }
 fieldset.flexiaccess { margin-top: 8px; }
 fieldset.flexiaccess legend, fieldset.adminform legend { font-weight:bold; font-size: 14px; }
 
-#flexicontent form :not(.input-prepend):not(.input-append):not(.btn-group) >input,
+#flexicontent form :not(.input-prepend):not(.input-append):not(.btn-group) > input:not(.btn),
 #flexicontent form button:not(.btn),
 #flexicontent form select,
 #flexicontent form textarea {

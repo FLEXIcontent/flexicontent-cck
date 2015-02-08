@@ -29,7 +29,9 @@
 			<field name="props_type" type="groupedlist" default="" label="FLEXI_COREPRPS_PROPRI" description="FLEXI_COREPRPS_PROPRI_DESC">
 				<group label="FLEXI_BASIC_SINGLE_PROPS">
 					<option value="alias"             >FLEXI_ALIAS</option>
+					<option value="lang"              >FLEXI_COREPROPS_LANGUAGE</option>
 					<option value="language"          >FLEXI_COREPROPS_LANGUAGE_N_ASSOCS</option>
+					<option value="category"          >FLEXI_COREPROPS_CATEGORY_MAIN</option>
 					<option value="disable_comments"  >FLEXI_COREPROPS_DISABLE_COMMENTS</option>
 					<option value="notify_subscribers">FLEXI_COREPROPS_NOTIFY_SUBSCRIBERS</option>
 					<option value="captcha"           >FLEXI_COREPROPS_CAPTCHA</option>
@@ -38,7 +40,7 @@
 					<option value="timezone_info"     >FLEXI_COREPROPS_TIMEZONE</option>
 					<option value="created_by_alias"  >FLEXI_COREPROPS_CREATE_BY_ALIAS</option>
 					<option value="publish_up"        >FLEXI_COREPROPS_PUBLISH_UP</option>
-					<option value="publish_down"      >FLEXI_COREPROPS_PUBLISH_DOWNß</option>
+					<option value="publish_down"      >FLEXI_COREPROPS_PUBLISH_DOWN</option>
 					<option value="access"            >FLEXI_COREPROPS_VIEW_ACCESS</option>
 				</group>
 				<group label="FLEXI_COREPROPS_PROP_GROUPS">

@@ -1513,7 +1513,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Build languages list
 		if (FLEXI_J16GE || FLEXI_FISH) {
 			$item_lang = $item->language;  // Model has already set default language according to parameters
-			$langdisplay = $params->get('langdisplay_fe', 3);
+			$langdisplay = $params->get('langdisplay_fe', 2);
 			$langconf = array();
 			$langconf['flags'] = $params->get('langdisplay_flags_fe', 1);
 			$langconf['texts'] = $params->get('langdisplay_texts_fe', 1);
@@ -1750,12 +1750,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		
 		// 3. Decide placement of CORE properties / fields
-		$tab_fields['above'] = $params->get('form_tabs_above',    'title, alias, type, state, disable_comments, notify_subscribers');
+		$tab_fields['above'] = $params->get('form_tabs_above',    'title, alias, category, lang, type, state, disable_comments, notify_subscribers');
 		
-		$tab_fields['tab01'] = $params->get('form_tab01_fields',  'categories, tags, language, perms');
-		$tab_fields['tab02'] = $params->get('form_tab02_fields',  'maintext');
-		$tab_fields['tab03'] = $params->get('form_tab03_fields',  'fields_manager');
-		$tab_fields['tab04'] = $params->get('form_tab04_fields',  (!FLEXI_J16GE ? 'timezone_info, publication_details' : 'timezone_info, created, createdby, created_by_alias, publish_up, publish_down, access'));
+		$tab_fields['tab01'] = $params->get('form_tab01_fields',  'maintext');
+		$tab_fields['tab02'] = $params->get('form_tab02_fields',  'fields_manager');
+		$tab_fields['tab03'] = $params->get('form_tab03_fields',  'categories, tags, language, perms');
+		$tab_fields['tab04'] = $params->get('form_tab04_fields',  'timezone_info, created, createdby, created_by_alias, publish_up, publish_down, access');
 		$tab_fields['tab05'] = $params->get('form_tab05_fields',  'metadata, seoconf');
 		$tab_fields['tab06'] = $params->get('form_tab06_fields',  'display_params');
 		$tab_fields['tab07'] = $params->get('form_tab07_fields',  'layout_selection, layout_params');
@@ -1791,8 +1791,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		// get TAB titles and TAB icon classes
-		$_tmp = $params->get('form_tab_titles', '1:FLEXI_DESCRIPTION, 2:FLEXI_BASIC, 3:__TYPE_NAME__, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
-		$_ico = $params->get('form_tab_icons',  '1:icon-file-2, 2:icon-tree-2, 3:icon-signup, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette');
+		$_tmp = $params->get('form_tab_titles', '1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
+		$_ico = $params->get('form_tab_icons',  '1:icon-file-2, 2:icon-signup, 3:icon-tree-2, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette');
 		
 		// Create title of the custom fields default TAB (field manager TAB)
 		if ($item->type_id) {

@@ -65,7 +65,7 @@
 
 	<fieldset name="params-basic" label="FLEXI_PARAMETERS_ITEM_BASIC" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
-		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" description="..." level="level2" />
+		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" description="..." level="level1" />
 		<!--field name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
@@ -92,7 +92,7 @@
 			<option value="1">FLEXI_SHOW</option>
 		</field>
 		
-		<field name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" description="..." level="level2" />
+		<field name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" description="..." level="level1" />
 		<field name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
@@ -146,8 +146,8 @@
 	</fieldset>
 	
 	<fieldset name="themes" label="FLEXI_TEMPLATE" addfieldpath="/administrator/components/com_flexicontent/elements">
-		<field name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" class="use_select2_lib" onchange="activatePanel(this.value);" />
-		<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" />
+		<field name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" class="use_select2_lib" labelclass="label-warning" onchange="activatePanel(this.value);" />
+		<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" labelclass="label-warning" />
 	</fieldset>
 	
 </fields>
