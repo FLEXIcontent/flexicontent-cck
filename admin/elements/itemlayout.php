@@ -19,17 +19,14 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('list');
-} else {
-	require_once(JPATH_ROOT.DS.'libraries'.DS.'joomla'.DS.'html'.DS.'html'.DS.'select.php');
-}
+
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
+jimport('joomla.form.helper');
+JFormHelper::loadFieldClass('list');
 
 /**
- * Renders a author element
+ * Renders an itemlayout element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
@@ -45,7 +42,7 @@ class JFormFieldItemlayout extends JFormFieldList
 	 */
 	protected $type = 'Itemlayout';
 
-	protected function getInput()
+	function getInput()
 	{
 		if (FLEXI_J16GE) {
 			$node = & $this->element;
@@ -171,7 +168,7 @@ function activatePanel(active) {
 	var inactives = tmpl.filter(function(item, index){
 		return item != active;
 	});
-
+	
 	inactives.each(function(el){
 		disablePanel(el);
 	});
@@ -183,7 +180,8 @@ function activatePanel(active) {
 		if ( $('__content_type_default_layout__') ) $('__content_type_default_layout__').setStyle('display','');
 	}
 }
-window.addEvent('domready', function() {
+
+window.addEvent('domready', function(){
 	activatePanel('".$value."');
 });
 ";
@@ -240,10 +238,10 @@ window.addEvent('domready', function() {
 		}
 		
 		$label = $this->element['label'];
-		$class = "hasTip flex_label"; $title = "";
+		$class = (FLEXI_J30GE ? ' hasTooltip' : ' hasTip');
+		$title = "...";
 		if ($this->element['description']) {
-			$class = "hasTip flexi_label";
-			$title = JText::_($label)."::".JText::_($this->element['description']);
+			$title = flexicontent_html::getToolTip($label, $this->element['description'], 1, 1);
 		}
 		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.JText::_($label).'</label> &nbsp; ';
 	}

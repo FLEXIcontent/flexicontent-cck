@@ -18,13 +18,12 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('list');
-}
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
+jimport('joomla.form.helper');
+JFormHelper::loadFieldClass('list');
 
 /**
  * Renders a categorylayout element
@@ -36,9 +35,10 @@ require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
 class JFormFieldCategorylayout extends JFormFieldList
 {
 	/**
-	 * Element name
-	 * @access	protected
+	 * The form field type.
+	 *
 	 * @var		string
+	 * @since	1.6
 	 */
 	protected $type = 'Categorylayout';
 
@@ -76,7 +76,7 @@ var tmpl = ['".$lays."'];
 
 function disablePanel(element) {
 	if ( ! $(element+'-attribs-options') ) return;
-
+	
 	var panel 	= $(element+'-attribs-options').getNext();
 	var selects = panel.getElements('select');
 	var inputs 	= panel.getElements('input');
@@ -92,7 +92,7 @@ function disablePanel(element) {
 
 function enablePanel(element) {
 	if ( ! $(element+'-attribs-options') ) return;
-
+	
 	var panel 	= $(element+'-attribs-options').getNext();
 	var selects = panel.getElements('select');
 	var inputs 	= panel.getElements('input');
@@ -109,22 +109,24 @@ function enablePanel(element) {
 function activatePanel(active) {
 	var inactives = tmpl.filter(function(item, index){
 		return item != active;
-		});
-			
+	});
+	
 	inactives.each(function(el){
 		disablePanel(el);
-		});
-		
-	if (active) enablePanel(active);
+	});
+	
+	if (active) {
+		enablePanel(active);
+	}
 }
 
 window.addEvent('domready', function(){
-	activatePanel('".$value."');			
+	activatePanel('".$value."');
 });
 ";
 		$doc->addScriptDeclaration($js);
 }
-	
+		
 		$layouts = array();
 		if (  @$attributes['firstoption'] ) {
 			$layouts[] = JHTMLSelect::option('', JText::_( $attributes['firstoption'] ));
@@ -146,9 +148,11 @@ window.addEvent('domready', function(){
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-		} else {
-			$attribs .= 'class="inputbox"';
 		}
+		if (@$attributes['class']) {
+			$attribs .= 'class="'.$attributes['class'].'"';
+		}
+		
 		if ( ! @$attributes['skipparams'] )
 		{
 			$attribs .= ' onchange="activatePanel(this.value);"';
@@ -156,6 +160,7 @@ window.addEvent('domready', function(){
 		
 		return JHTML::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id);
 	}
+	
 	
 	function getLabel()
 	{
@@ -173,10 +178,10 @@ window.addEvent('domready', function(){
 		}
 		
 		$label = $this->element['label'];
-		$class = "hasTip"; $title = "";
+		$class = (FLEXI_J30GE ? ' hasTooltip' : ' hasTip');
+		$title = "...";
 		if ($this->element['description']) {
-			$class = "hasTip";
-			$title = JText::_($label)."::".JText::_($this->element['description']);
+			$title = flexicontent_html::getToolTip($label, $this->element['description'], 1, 1);
 		}
 		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.JText::_($label).'</label> &nbsp; ';
 	}

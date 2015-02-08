@@ -213,7 +213,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data" >
 	
-	<div class="fc_edit_container_full" style="margin:0px 0px 10px 0px !important; width: 100%; padding:0; ">
+	<div class="container-fluid">
 	<?php /*<fieldset class="basicfields_set">
 		<legend>
 			<?php echo JText::_( 'FLEXI_BASIC' ); ?>
@@ -939,13 +939,13 @@ if ($this->row->type_id) {
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING'); ?> </h3>
 		
 		<?php
-		$hide_style = $this->perms['canparams'] ? '' : 'visibility:hidden;';
+		$hide_style = $this->perms['canparams'] ? '' : 'display:none;';
 		/*if (isset($fieldSet->description) && trim($fieldSet->description)) :
 			echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
 		endif;*/
 		?>
 		
-		<fieldset class="flexi_params fc_edit_container_full" style="<?php echo $hide_style; ?>" >
+		<div style="<?php echo $hide_style; ?>" >
 			<div class='fc_mini_note_box'>
 			<?php
 				// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
@@ -965,32 +965,44 @@ if ($this->row->type_id) {
 			
 			
 			<?php /*if ($this->perms['isSuperAdmin']) :*/ ?>
-			<div class="fcclear"></div><?php echo $this->form->getLabel('created_by'); ?>
-			<div class="container_fcfield"><?php echo $this->form->getInput('created_by'); ?></div>
+			<fieldset class="panelform">
+				<span class="label-fcouter"><?php echo str_replace('class="', 'class="label ', $this->form->getLabel('created_by')); ?></span>
+				<div class="container_fcfield"><?php echo $this->form->getInput('created_by'); ?></div>
+			</fieldset>	
 			<?php /*endif;*/ ?>
 			
 			<?php if ($this->perms['editcreationdate']) : ?>
-			<div class="fcclear"></div><?php echo $this->form->getLabel('created'); ?>
-			<div class="container_fcfield"><?php echo $this->form->getInput('created'); ?></div>
+			<fieldset class="panelform">
+				<span class="label-fcouter"><?php echo str_replace('class="', 'class="label ', $this->form->getLabel('created')); ?></span>
+				<div class="container_fcfield"><?php echo $this->form->getInput('created'); ?></div>
+			</fieldset>	
 			<?php endif; ?>
 			
-			<div class="fcclear"></div><?php echo $this->form->getLabel('created_by_alias'); ?>
-			<div class="container_fcfield"><?php echo $this->form->getInput('created_by_alias'); ?></div>
+			<fieldset class="panelform">
+				<span class="label-fcouter"><?php echo str_replace('class="', 'class="label ', $this->form->getLabel('created_by_alias')); ?></span>
+				<div class="container_fcfield"><?php echo $this->form->getInput('created_by_alias'); ?></div>
+			</fieldset>	
 			
-			<div class="fcclear"></div><?php echo $this->form->getLabel('publish_up'); ?>
-			<div class="container_fcfield"><?php echo $this->form->getInput('publish_up'); ?></div>
+			<fieldset class="panelform">
+				<span class="label-fcouter"><?php echo str_replace('class="', 'class="label ', $this->form->getLabel('publish_up')); ?></span>
+				<div class="container_fcfield"><?php echo $this->form->getInput('publish_up'); ?></div>
+			</fieldset>	
 			
-			<div class="fcclear"></div><?php echo $this->form->getLabel('publish_down'); ?>
-			<div class="container_fcfield"><?php echo $this->form->getInput('publish_down'); ?></div>
+			<fieldset class="panelform">
+				<span class="label-fcouter"><?php echo str_replace('class="', 'class="label ', $this->form->getLabel('publish_down')); ?></span>
+				<div class="container_fcfield"><?php echo $this->form->getInput('publish_down'); ?></div>
+			</fieldset>	
 			
-			<div class="fcclear"></div><?php echo $this->form->getLabel('access'); ?>
-			<?php if ($this->perms['canacclvl']) :?>
-				<div class="container_fcfield"><?php echo $this->form->getInput('access'); ?></div>
-			<?php else :?>
-				<div class="container_fcfield"><span class="label"><?php echo $this->row->access_level; ?></span></div>
-			<?php endif; ?>
+			<fieldset class="panelform">
+				<span class="label-fcouter"><?php echo str_replace('class="', 'class="label ', $this->form->getLabel('access')); ?></span>
+				<?php if ($this->perms['canacclvl']) :?>
+					<div class="container_fcfield"><?php echo $this->form->getInput('access'); ?></div>
+				<?php else :?>
+					<div class="container_fcfield"><span class="label"><?php echo $this->row->access_level; ?></span></div>
+				<?php endif; ?>
+			</fieldset>	
 
-		</fieldset>
+		</div>
 		
 	</div> <!-- end tab -->
 
@@ -1007,13 +1019,11 @@ if ($this->row->type_id) {
 		//echo $this->form->getInput('metakey');
 		?>
 		
-		<fieldset class="panelform params_set">
-			<legend>
-				<?php echo JText::_( 'FLEXI_META' ); ?>
-			</legend>
-			
-			<div class="fcclear"></div>
-			<?php echo $this->form->getLabel('metadesc'); ?>
+		<span class="fcsep_level1" style=""><?php echo JText::_( 'FLEXI_META' ); ?></span>
+		<div class="fcclear"></div>
+		
+		<fieldset class="panelform">
+			<span class="label-fcouter"><?php echo str_replace('class="', 'class="label ', $this->form->getLabel('metadesc')); ?></span>
 			
 			<div class="container_fcfield">
 				
@@ -1050,9 +1060,10 @@ if ($this->row->type_id) {
 				<?php endif; ?>
 				
 			</div>
+		</fieldset>
 			
-			<div class="fcclear"></div>
-			<?php echo $this->form->getLabel('metakey'); ?>
+		<fieldset class="panelform">
+			<span class="label-fcouter"><?php echo str_replace('class="', 'class="label ', $this->form->getLabel('metakey')); ?></span>
 			
 			<div class="container_fcfield">
 				<?php	if ( isset($this->row->item_translations) ) :?>
@@ -1088,36 +1099,41 @@ if ($this->row->type_id) {
 				<?php endif; ?>
 				
 				</div>
-
-			<?php foreach($this->form->getGroup('metadata') as $field): ?>
-				<div class="fcclear"></div>
-				<?php if ($field->hidden): ?>
-					<span style="visibility:hidden !important;">
-						<?php echo $field->input; ?>
-					</span>
-				<?php else: ?>
-					<?php echo $field->label; ?>
-					<div class="container_fcfield">
-						<?php echo $field->input;?>
-					</div>
-				<?php endif; ?>
-			<?php endforeach; ?>
 		</fieldset>
 		
-		<fieldset class="panelform params_set">
-			<legend>
-				<?php echo JText::_( 'FLEXI_SEO' ); ?>
-			</legend>
-			
-			<?php foreach ($this->form->getFieldset('params-seoconf') as $field) : ?>
-				<div class="fcclear"></div>
-				<?php echo $field->label; ?>
-				<div class="container_fcfield">
-					<?php echo $field->input;?>
-				</div>
-			<?php endforeach; ?>
-			
-		</fieldset>
+		<?php foreach($this->form->getGroup('metadata') as $field): ?>
+			<?php if ($field->hidden): ?>
+				<span style="display:none !important;">
+					<?php echo $field->input; ?>
+				</span>
+			<?php else: ?>
+				<fieldset class="panelform">
+					<?php echo ($field->label ? '
+						<span class="label-fcouter">'.str_replace('class="', 'class="label ', $field->label).'</span>
+						<span class="container_fcfield">'.$field->input.'</span>
+					' : $field->input); ?>
+				</fieldset>
+			<?php endif; ?>
+		<?php endforeach; ?>
+		
+		
+		<span class="fcsep_level1" style=""><?php echo JText::_( 'FLEXI_SEO' ); ?></span>
+		<div class="fcclear"></div>
+		
+		<?php foreach ($this->form->getFieldset('params-seoconf') as $field) : ?>
+			<?php if ($field->hidden): ?>
+				<span style="display:none !important;">
+					<?php echo $field->input; ?>
+				</span>
+			<?php else: ?>
+				<fieldset class="panelform">
+					<?php echo ($field->label ? '
+						<span class="label-fcouter">'.str_replace('class="', 'class="label ', $field->label).'</span>
+						<span class="container_fcfield">'.$field->input.'</span>
+					' : $field->input); ?>
+				</fieldset>
+			<?php endif; ?>
+		<?php endforeach; ?>
 		
 	</div> <!-- end tab -->
 
@@ -1135,17 +1151,23 @@ if ($this->row->type_id) {
 				//$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
 				//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
 				?>
-				<fieldset class="flexi_params panelform">
-					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-						<div class="fcclear"></div>
-						<?php echo $field->label; ?>
-						<?php if (strlen(trim($field->input))) :?>
-							<div class="container_fcfield">
-								<?php echo $field->input; ?>
-							</div>
-						<?php endif; ?>
-					<?php endforeach; ?>
-				</fieldset>
+				<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+					
+					<?php if ($field->hidden): ?>
+						<span style="display:none !important;">
+							<?php echo $field->input; ?>
+						</span>
+					<?php else: ?>
+						<fieldset class="panelform">
+							<?php echo ($field->label ? '
+								<span class="label-fcouter">'.str_replace('class="', 'class="label ', $field->label).'</span>
+								<span class="container_fcfield">'.$field->input.'</span>
+							' : $field->input); ?>
+						</fieldset>
+					<?php endif; ?>
+					
+				<?php endforeach; ?>
+				
 		<?php endforeach; ?>
 
 	</div> <!-- end tab -->
@@ -1171,7 +1193,7 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 			<?php foreach ($this->form->getGroup($fields_grp_name) as $field) : ?>
 				<div class="fcclear"></div>
 				<?php if ($field->hidden): ?>
-					<span style="visibility:hidden !important;">
+					<span style="display:none !important;">
 						<?php echo $field->input; ?>
 					</span>
 				<?php else: ?>
@@ -1194,42 +1216,45 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-palette">
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 		
-		<fieldset class="fc_edit_container_full">
-			<div class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">
-			<?php
-				echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
-				$type_default_layout = $this->tparams->get('ilayout');
-			?>
-				<br/><br/>
-				<ol style="margin:0 0 0 16px; padding:0;">
-					<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
-					<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
-				</ol>
-				<br/>
-				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
-			</div>
-			
-			<?php foreach($this->form->getFieldset('themes') as $field): ?>
-				<div class="fcclear"></div>
-				<?php if ($field->hidden): ?>
-					<span style="visibility:hidden !important;">
-						<?php echo $field->input; ?>
-					</span>
-				<?php else: ?>
-					<?php echo $field->label; ?>
+		<div class="fc-info fc-nobgimage fc-mssg-inline" style="margin: 8px 0px 48px 0px !important;">
+			<?php echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
+			<br/><br/>
+			<ol style="margin:0 0 0 16px; padding:0;">
+				<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
+				<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
+			</ol>
+			<br/>
+			<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
+		</div>
+		
+		<div class="fcclear"></div>
+		
+		<?php foreach($this->form->getFieldset('themes') as $field): ?>
+			<div class="fcclear"></div>
+			<?php if ($field->hidden): ?>
+				<span style="display:none !important;">
+					<?php echo $field->input; ?>
+				</span>
+			<?php else: ?>
+				<fieldset class="panelform">
+					<span class="label-fcouter"><?php echo str_replace('class="', 'class="label ', $field->label); ?></span>
 					<div class="container_fcfield">
 						<?php echo $field->input;?>
 					</div>
-				<?php endif; ?>
-			<?php endforeach; ?>
-
-			<div class="fcclear"></div>
-			<span class="fc-success fc-mssg-inline" id='__content_type_default_layout__'>
-				<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
-				<?php echo "<br/><br/>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
-			</span>
-			<div class="fcclear"></div>
-			
+				</fieldset>
+			<?php endif; ?>
+		<?php endforeach; ?>
+		
+		<div class="fcclear"></div>
+		<?php $type_default_layout = $this->tparams->get('ilayout'); ?>
+		<span class="fc-success fc-nobgimage fc-mssg-inline" id='__content_type_default_layout__'>
+			<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
+			<?php echo "<br/><br/>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
+		</span>
+		
+		<div class="fcclear"></div>
+		
+		<div style="max-width:1024px;">
 			<?php
 			echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 			$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
@@ -1247,20 +1272,22 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 						<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
 							$fieldname =  $field->__get('fieldname');
 							$value = $tmpl->params->getValue($fieldname, $groupname, $this->row->itemparams->get($fieldname));
-							echo $tmpl->params->getLabel($fieldname, $groupname);
-							echo
+							echo $tmpl->params->getLabel($fieldname, $groupname); ?>
+							<div class="container_fcfield">
+							<?php echo
 								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
 									str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
 										$tmpl->params->getInput($fieldname, $groupname, $value)
 									)
-								);
-						endforeach; ?>
+								); ?>
+							</div>
+						<?php endforeach; ?>
 					</fieldset>
 				<?php endforeach; //fieldSets ?>
 			<?php endforeach; //tmpls ?>
 			
 			<?php echo JHtml::_('sliders.end'); ?>
-		</fieldset>
+		</div>
 		
 	</div> <!-- end tab -->
 

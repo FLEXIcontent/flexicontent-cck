@@ -231,37 +231,38 @@ $js = "
 			<div class="tabbertab" id="tabset_cat_props_metaseo_tab" data-icon-class="icon-wrench" >
 				<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PARAMETERS_HANDLING'); ?> </h3>
 				
-				<div class="span6" style="width:auto!important;">
+				<div style="margin: 24px 0px;">
 					
-					<fieldset class="flexi_params">
-						<div class="fcdualline_container">
-							<?php echo $this->form->getLabel('copycid'); ?>
-							<div class="container_fcfield fcdualline">
-								<?php echo $this->Lists['copycid']; ?>
-							</div>
-						</div>
-						<div class="fcclear"></div>
-	
-						<?php foreach($this->form->getGroup('special') as $field): ?>
-						<div class="fcdualline_container">
+					<?php foreach($this->form->getGroup('special') as $field): ?>
+						<fieldset class="panelform">
 							<?php echo $field->label; ?>
 							<div class="container_fcfield fcdualline">
 								<?php echo $this->Lists[$field->fieldname]; ?>
 							</div>
-						</div>
-						<div class="fcclear"></div>
-						<?php endforeach; ?>
-					</fieldset>
+						</fieldset>
+					<?php endforeach; ?>
 					
-				</div>
-				<div class="span6">
-					
-					<span class="fc-info fc-mssg-inline" style="margin: 16px 0px!important; font-size:12px;">
+					<div class="fcclear"></div>
+					<span class="fc-success fc-mssg" style="margin: 16px 0px 48px 0px !important; font-size:12px;">
 						<?php echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS_INHERIT'); ?>
 					</span>
-
+					<div class="fcclear"></div>
+					
+					
+					<fieldset class="panelform">
+						<?php echo $this->form->getLabel('copycid'); ?>
+						<div class="container_fcfield fcdualline">
+							<?php echo $this->Lists['copycid']; ?>
+						</div>
+					</fieldset>
+					
+					<div class="fcclear"></div>
+					<span class="fc-warning fc-mssg" style="margin: 16px 0px !important; font-size:12px;">
+						<?php echo JText::_('FLEXI_COPY_PARAMETERS_DESC'); ?>
+					</span>
+					<div class="fcclear"></div>
+					
 				</div>
-				
 				
 				<?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_PARAMETERS'), 'cat-params-common');*/ ?>
 				
@@ -300,28 +301,39 @@ $js = "
 			<div class="tabbertab" id="tabset_cat_props_tmpl_tab" data-icon-class="icon-palette" >
 				<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 				
-
-				<div class="span6" style="">
+				<?php
+				echo '<span class="fc-info fc-nobgimage fc-mssg-inline" style="margin: 8px 0px 48px 0px !important; font-size:12px; min-width:50%;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
+				?>
+				<br/><br/>
+				<ol style="margin:0 0 0 16px; padding:0;">
+					<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
+					<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
+				</ol>
+				<br/>
+				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
+				</span>
 				
-					<fieldset class="panelform">
-					<?php foreach($this->form->getGroup('templates') as $field): ?>
-						<?php if ($field->hidden): ?>
-							<?php echo $field->input; ?>
-						<?php else: ?>
-							<?php 
-								echo $field->label;
-								if (method_exists ( $field , 'set' )) {
-									$field->set('input', null);
-									$field->set('value', @$this->row->params[$field->fieldname]);
-								}
-								echo $field->input;
-							?>
-						<?php endif; ?>
-						<div class="clear"></div>
-					<?php endforeach; ?>
-					</fieldset>
-					
-					<div class="clear" style="margin-bottom:24px !important;"></div>
+				<fieldset class="panelform">
+				<?php foreach($this->form->getGroup('templates') as $field): ?>
+					<?php if ($field->hidden): ?>
+						<?php echo $field->input; ?>
+					<?php else: ?>
+						<?php 
+							echo $field->label;
+							if (method_exists ( $field , 'set' )) {
+								$field->set('input', null);
+								$field->set('value', @$this->row->params[$field->fieldname]);
+							}
+							echo $field->input;
+						?>
+					<?php endif; ?>
+					<div class="clear"></div>
+				<?php endforeach; ?>
+				</fieldset>
+				
+				<div class="clear" style=""></div>
+				
+				<div style="max-width:1024px;">
 					
 					<?php
 					echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
@@ -354,20 +366,6 @@ $js = "
 					
 					<?php echo JHtml::_('sliders.end'); ?>
 					
-				</div>
-				<div class="span6">
-						
-					<?php
-					echo '<span class="fc-info fc-mssg-inline" style="margin: 16px 0px!important; font-size:12px; min-width:50%;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
-					?>
-					<br/><br/>
-					<ol style="margin:0 0 0 16px; padding:0;">
-						<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
-						<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
-					</ol>
-					<br/>
-					<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
-					</span>
 				</div>
 
 				<?php /*echo JHtml::_('tabs.end');*/ ?>
