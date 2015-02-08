@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `field_type` varchar(50) NOT NULL default '',
   `name` varchar(255) NOT NULL default '',
   `label` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL default '',
+  `description` text NOT NULL default '',
   `isfilter` tinyint(1) NOT NULL default '0',
   `isadvfilter` tinyint(1) NOT NULL default '0',
   `iscore` tinyint(1) NOT NULL default '0',
