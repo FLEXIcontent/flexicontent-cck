@@ -1226,8 +1226,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$nullDate = $db->getNullDate();
 	
 		// Get some parameters and other info
-		$catlang = $params->get('language', '');          // category language (currently UNUSED), this is property in J2.5 instead of as parameter in FC J1.5
-		$lang = flexicontent_html::getUserCurrentLang();   // Get user current language
+		$catlang = $params->get('language', '');          // Category language (currently UNUSED)
+		$lang = flexicontent_html::getUserCurrentLang();  // Get user current language
 		$filtercat  = $params->get('filtercat', 0);       // Filter items using currently selected language
 		$show_noauth = $params->get('show_noauth', 0);    // Show unauthorized items
 	
@@ -1235,22 +1235,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$where = ' WHERE 1 ';
 		if ($this->_authorid)
 			$where .= ' AND i.created_by = ' . $db->Quote($this->_authorid);
-	
+		
 		// Filter the category view with the current user language
-		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$lta = FLEXI_J16GE || $use_tmp ? 'i': 'ie';
-			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
+		if ($filtercat) {
+			$lta = $use_tmp ? 'i': 'ie';
+			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
 		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
-		if ( FLEXI_J16GE )
-			$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
-		else if (FLEXI_ACCESS)
-			$ignoreState = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'ignoreviewstate', 'users', $user->gmid) : 1;
-		else
-			$ignoreState = $user->gid  > 19;  // author has 19 and editor has 20
-	
+		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
+		
 		if (!$ignoreState) {
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
 			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
@@ -1259,36 +1254,19 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		}
-	
+		
 		// Count items according to full depth level !!!
 		$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
 		$where .= ' AND rel.catid IN ('.$catlist.')';
-	
+		
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		// Checking item, category, content type access level
-		$joinaccess = '';
 		if (!$show_noauth) {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$where .= ' AND ty.access IN (0,'.$aid_list.')';
-				$where .= ' AND mc.access IN (0,'.$aid_list.')';
-				$where .= ' AND  i.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
-					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
-				} else {
-					$where .= ' AND ty.access <= '.$aid;
-					$where .= ' AND mc.access <= '.$aid;
-					$where .= ' AND  i.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$where .= ' AND ty.access IN (0,'.$aid_list.')';
+			$where .= ' AND mc.access IN (0,'.$aid_list.')';
+			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}
 		
 		$query 	= 'SELECT COUNT(DISTINCT rel.itemid)'
@@ -1299,7 +1277,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 			. (!$use_tmp ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid = ie.item_id' : '' )
 			. ' JOIN #__flexicontent_types AS ty ON ' .(!$use_tmp ? 'ie' : 'i'). '.type_id = ty.id'
 			. ' JOIN #__categories AS mc ON mc.id =   i.catid AND mc.published = 1'
-			. $joinaccess
 			. $where
 			;
 		

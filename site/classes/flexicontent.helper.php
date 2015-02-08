@@ -518,7 +518,6 @@ class flexicontent_html
 				if ( $user_lang && $user_lang!='en' )
 				{
 					// Try language shortcode
-					$framework_folder.DS.'select2_locale_'.$user_lang.'.js';
 					if ( file_exists($framework_folder.DS.'select2_locale_'.$user_lang.'.js') ) {
 						$document->addScript($framework_path.'/select2_locale_'.$user_lang.'.js');
 					}
@@ -526,7 +525,7 @@ class flexicontent_html
 					else {
 						$languages = FLEXIUtilities::getLanguages($hash='shortcode');
 						$lang_code = isset($languages->$user_lang->code) ? $languages->$user_lang->code : false;
-						if ( $lang_code && file_exists($framework_folder.'/select2_locale_'.$lang_code.'.js') ) {
+						if ( $lang_code && file_exists($framework_folder.DS.'select2_locale_'.$lang_code.'.js') ) {
 							$document->addScript($framework_path.'/select2_locale_'.$lang_code.'.js');
 						}
 					}
