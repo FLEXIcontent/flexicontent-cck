@@ -37,16 +37,16 @@ $slider_mod =$params->get('slider_mod', 0);
 
 <?php 
 	if ($slider_mod){
-		$slider = JHtml::_('sliders.start',$slider_title, array('useCookie'=>1 ,'startOffset'=>-1, 'startTransition'=>1));
-		$slider .=  JHtml::_('sliders.panel', $slider_title, 'slider1');
-		$endslider= JHtml::_('sliders.end');
-		echo $slider;
+		$slider_mod = JHtml::_('sliders.start',$slider_title, array('useCookie'=>1 ,'startOffset'=>-1, 'startTransition'=>1));
+		$slider_mod .=  JHtml::_('sliders.panel', $slider_title, 'slider1');
+		$endslider_mod = JHtml::_('sliders.end');
+		echo $slider_mod;
 	}
 ?>
 <?php include(JPATH_SITE.'/components/com_flexicontent/tmpl_common/filters.php'); ?>
 <?php 
 	if ($slider_mod){
-		echo $endslider;
+		echo $endslider_mod;
 	} 
 ?>
 </form>

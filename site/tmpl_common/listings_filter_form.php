@@ -6,9 +6,23 @@ ob_start();
 // If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
 include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_body.php');
 
+//field in slider
+$slider_mod = $this->params->get('slider_mod', 0);
+$slider_cat_title =$this->params->get('slider_cat_title', 'FLEXI_SLIDER_SEARCH');
+
 $filter_form_body = trim(ob_get_contents());
 ob_end_clean();
 if ( empty($filter_form_body) ) return;
+?>
+
+
+<?php 
+	if ($slider_mod){
+		$slider_mod2 = JHtml::_('sliders.start',$slider_cat_title, array('useCookie'=>1 ,'startOffset'=>-1, 'startTransition'=>1));
+		$slider_mod2 .=  JHtml::_('sliders.panel', $slider_cat_title, 'slidercat');
+		$endslider_mod2 = JHtml::_('sliders.end');
+		echo $slider_mod2;
+	}
 ?>
 
 <form action="<?php echo $this->action; ?>" method="post" id="adminForm" onsubmit="" style="<?php echo $form_style;?>">
