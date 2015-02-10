@@ -16,6 +16,8 @@ $filter_placement = $params->get( 'filter_placement', 1 );
 $filter_container_class  = $filter_placement ? 'fc_filter_line' : 'fc_filter';
 $filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
 $text_search_val = JRequest::getString('filter', '', 'default');
+$slider_title =$params->get('slider_title', 'FLEXI_SLIDER_SEARCH');
+$slider_mod =$params->get('slider_mod', 0);
 
 // 4. Create (print) the form
 ?>
@@ -33,8 +35,20 @@ $text_search_val = JRequest::getString('filter', '', 'default');
 	<?php echo $cat_hidden_field; ?>
 <?php endif; ?>
 
+<?php 
+	if ($slider_mod){
+		$slider = JHtml::_('sliders.start',$slider_title, array('useCookie'=>1 ,'startOffset'=>-1, 'startTransition'=>1));
+		$slider .=  JHtml::_('sliders.panel', $slider_title, 'slider1');
+		$endslider= JHtml::_('sliders.end');
+		echo $slider;
+	}
+?>
 <?php include(JPATH_SITE.'/components/com_flexicontent/tmpl_common/filters.php'); ?>
-
+<?php 
+	if ($slider_mod){
+		echo $endslider;
+	} 
+?>
 </form>
 
 </div> <!-- mod_flexifilter_wrap -->

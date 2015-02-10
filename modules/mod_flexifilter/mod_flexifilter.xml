@@ -30,6 +30,11 @@
 			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
 			<field name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexifilter/tmpl"
 					default="default"  hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_" />
+			<field name="slider_mod" type="radio" default="0" label="FLEXI_SLIDER_MOD" description="FLEXI_SLIDER_MOD_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="slider_title" type="text" default="FLEXI_SLIDER_SEARCH" label="FLEXI_SLIDER_SEARCH_TEXT" description="FLEXI_SLIDER_SEARCH_TEXT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" menu="hide" />
 			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_PARAM_EXPLANATION" level="level3" menu="hide" />
