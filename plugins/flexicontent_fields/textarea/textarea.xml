@@ -102,15 +102,15 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
-			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
+			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
+				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC" depend_class="plg-trigger-mode" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
@@ -160,34 +160,34 @@
 			
 			<field name="" type="separator" default="FLEXI_PARSE_JOOMLA_TABS_PLUGIN_CODE" description="FLEXI_PARSE_JOOMLA_TABS_PLUGIN_CODE_DESC" level="level1" />
 			
-			<field name="editorarea_per_tab" type="radio" default="0" label="FLEXI_ENABLE" description="Enable to try to identify TABs via regex patterns">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="editorarea_per_tab" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE" toggle_related="1" description="Enable to try to identify TABs via regex patterns" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="textarea-tabs-mod">FLEXI_NO</option>
+				<option value="1" show_list="textarea-tabs-mod" hide_list="">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="Regular expression patterns" description="..." level="level2" />
+			<field name="" type="separator" default="Regular expression patterns" depend_class="textarea-tabs-mod" description="..." level="level2" />
 			
-			<field name="" type="separator" default="Tabset patterns" description="..." level="level3" />
-			<field name="start_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_TABSET_START_PATTERN" description="..." />
-			<field name="end_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_TABSET_END_PATTERN" description="..." />
+			<field name="" type="separator" default="Tabset patterns" depend_class="textarea-tabs-mod" description="..." level="level3" />
+			<field name="start_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_TABSET_START_PATTERN" depend_class="textarea-tabs-mod" description="..." />
+			<field name="end_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_TABSET_END_PATTERN" depend_class="textarea-tabs-mod" description="..." />
 			
-			<field name="" type="separator" default="Tab patterns" description="..." level="level3" />
-			<field name="start_of_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_START_PATTERN" description="..." />
-			<field name="end_of_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_END_PATTERN" description="..." />
+			<field name="" type="separator" default="Tab patterns" depend_class="textarea-tabs-mod" description="..." level="level3" />
+			<field name="start_of_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_START_PATTERN" depend_class="textarea-tabs-mod" description="..." />
+			<field name="end_of_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_END_PATTERN" depend_class="textarea-tabs-mod" description="..." />
 			
-			<field name="" type="separator" default="Inside tab start text" description="..." level="level4" />
-			<field name="title_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_TITLE_PATTERN" description="This is inside the text match as TAB start" />
+			<field name="" type="separator" default="Inside tab start text" depend_class="textarea-tabs-mod" description="..." level="level4" />
+			<field name="title_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_TITLE_PATTERN" depend_class="textarea-tabs-mod" description="This is inside the text match as TAB start" />
 			
-			<field name="" type="separator" default="Extra editor areas" description="Add extra editor areas for each case" level="level2" />
-			<field name="force_beforetabs" type="radio" default="1" label="Before tabset" description="Add extra editor area">
+			<field name="" type="separator" default="Extra editor areas" depend_class="textarea-tabs-mod" description="Add extra editor areas for each case" level="level2" />
+			<field name="force_beforetabs" type="radio" default="1" label="Before tabset" depend_class="textarea-tabs-mod" description="Add extra editor area">
 				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_ALWAYS</option>
 			</field>
-			<field name="force_aftertabs" type="radio" default="1" label="After tabset" description="Add extra editor area">
+			<field name="force_aftertabs" type="radio" default="1" label="After tabset" depend_class="textarea-tabs-mod" description="Add extra editor area">
 				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_ALWAYS</option>
 			</field>
-			<field name="allow_tabs_code_editing" type="radio" default="1" label="FLEXI_TABS_CODE_EDITABLE" description="FLEXI_TABS_CODE_EDITABLE_DESC" class="btn-group btn-group-yesno">
+			<field name="allow_tabs_code_editing" type="radio" default="1" label="FLEXI_TABS_CODE_EDITABLE" depend_class="textarea-tabs-mod" description="FLEXI_TABS_CODE_EDITABLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

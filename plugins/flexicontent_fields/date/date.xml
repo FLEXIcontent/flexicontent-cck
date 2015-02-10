@@ -87,11 +87,11 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
-			<field name="show_no_value" type="radio" default="0" label="FLEXI_FIELD_SHOW_NO_VALUE" description="FLEXI_FIELD_SHOW_NO_VALUE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="show_no_value" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_SHOW_NO_VALUE" toggle_related="1" description="FLEXI_FIELD_SHOW_NO_VALUE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
+				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="no_value_msg" type="text" default="" size="42" label="FLEXI_FIELD_NO_VALUE_MSG" description="FLEXI_FIELD_NO_VALUE_MSG_DESC" />
+			<field name="no_value_msg" type="text" default="" size="42" label="FLEXI_FIELD_NO_VALUE_MSG" depend_class="multivalue-mode" description="FLEXI_FIELD_NO_VALUE_MSG_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
@@ -105,14 +105,14 @@
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_DATE_PART" level="level2" />
-			<field name="date_format" type="list" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
-				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
-				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
-				<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
-				<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
-				<option value="">FLEXI_FIELD_CUSTOM_FORMAT</option>
+			<field name="date_format" type="multilist" subtype="list" default="" label="FLEXI_FIELD_DATE_FORMAT" toggle_related="1" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
+				<option value="DATE_FORMAT_LC1" show_list="" hide_list="multivalue-mode-dateformat">DATE_FORMAT_LC1</option>
+				<option value="DATE_FORMAT_LC2" show_list="" hide_list="multivalue-mode-dateformat">DATE_FORMAT_LC2</option>
+				<option value="DATE_FORMAT_LC3" show_list="" hide_list="multivalue-mode-dateformat">DATE_FORMAT_LC3</option>
+				<option value="DATE_FORMAT_LC4" show_list="" hide_list="multivalue-mode-dateformat">DATE_FORMAT_LC4</option>
+				<option value="" show_list="multivalue-mode-dateformat" hide_list="">FLEXI_FIELD_CUSTOM_FORMAT</option>
 			</field>
-			<field name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
+			<field name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" depend_class="multivalue-mode-dateformat" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TIMEZONE_PART" level="level2" />
 			<field name="display_tz_logged" type="list" default="0" label="FLEXI_DATE_TIMEZONE_LOGGED" description="FLEXI_DATE_TIMEZONE_LOGGED_DESC">
