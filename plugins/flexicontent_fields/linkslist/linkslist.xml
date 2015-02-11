@@ -67,7 +67,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
-			<field name="add_non_selected" type="list" default="0" label="FLEXI_FIELD_LIST_ADD_NON_SELECTED" description="FLEXI_FIELD_LIST_ADD_NON_SELECTED_DESC" class="btn-group btn-group-yesno">
+			<field name="add_non_selected" type="radio" default="0" label="FLEXI_FIELD_LIST_ADD_NON_SELECTED" description="FLEXI_FIELD_LIST_ADD_NON_SELECTED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

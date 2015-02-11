@@ -40,21 +40,21 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_CONTROLS" level="level1" />
 			
-			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_CSS" description="FLEXI_FIELD_TOOLBAR_CSS_DESC">
+			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_CSS" description="FLEXI_FIELD_TOOLBAR_CSS_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_VARIOUS_CONTROLS" level="level2" />
-			<field name="display_comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC">
+			<field name="display_comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
-			<field name="display_print" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_PRINT" description="FLEXI_FIELD_TOOLBAR_PRINT_DESC">
+			<field name="display_print" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_PRINT" description="FLEXI_FIELD_TOOLBAR_PRINT_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
-			<field name="display_email" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_EMAIL" description="FLEXI_FIELD_TOOLBAR_EMAIL_DESC">
+			<field name="display_email" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_EMAIL" description="FLEXI_FIELD_TOOLBAR_EMAIL_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
@@ -64,33 +64,33 @@
 			</field-->
 			
 			<field name="" type="separator" default="Voice Controls" level="level2" />
-			<field name="display_voice" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_VOICE" description="FLEXI_FIELD_TOOLBAR_VOICE_DESC">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
+			<field name="display_voice" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_TOOLBAR_VOICE" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_VOICE_DESC" class="btn-group btn-group-yesno">
+				<option value="1" show_list="hiddefield-mode" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="hiddefield-mode">FLEXI_NO</option>
 			</field>
-			<field name="voicetarget" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_VOICE_TARGET" description="FLEXI_FIELD_TOOLBAR_VOICE_TARGET_DESC" />
+			<field name="voicetarget" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_VOICE_TARGET" depend_class="hiddefield-mode" description="FLEXI_FIELD_TOOLBAR_VOICE_TARGET_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_REZIZE_CONTROLS" level="level2" />
-			<field name="display_resizer" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_RESIZER" description="FLEXI_FIELD_TOOLBAR_RESIZER_DESC">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
+			<field name="display_resizer" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_TOOLBAR_RESIZER" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_RESIZER_DESC" class="btn-group btn-group-yesno">
+				<option value="1" show_list="hiddefield-mode2" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="hiddefield-mode2">FLEXI_NO</option>
 			</field>
-			<field name="default_size" type="text" size="4" default="12" label="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE" description="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE_DESC" />
-			<field name="default_line" type="text" size="4" default="16" label="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE" description="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE_DESC" />
-			<field name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
+			<field name="default_size" type="text" size="4" default="12" label="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE_DESC" />
+			<field name="default_line" type="text" size="4" default="16" label="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE_DESC" />
+			<field name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" depend_class="hiddefield-mode2" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
 			
 		</fieldset>
 		<fieldset name="group-toolbar-social" repeat="1" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS_DESC" level="level1" />
 			
-			<field name="display_social" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS" description="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS_DESC">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
+			<field name="display_social" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS_DESC" class="btn-group btn-group-yesno">
+				<option value="1" show_list="hiddefield-mode3" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="hiddefield-mode3">FLEXI_NO</option>
 			</field>
-			<field name="addthis_user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USERNAME" description="FLEXI_FIELD_TOOLBAR_USERNAME_DESC" />
-			<field name="addthis_pubid" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_PUBID" description="FLEXI_FIELD_TOOLBAR_PUBID_DESC" />
-			<field name="addthis_outside_toolbar" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SOCIAL_POSITION" description="FLEXI_FIELD_TOOLBAR_SOCIAL_POSITION_DESC">
+			<field name="addthis_user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USERNAME" depend_class="hiddefield-mode3" description="FLEXI_FIELD_TOOLBAR_USERNAME_DESC" />
+			<field name="addthis_pubid" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_PUBID" depend_class="hiddefield-mode3" description="FLEXI_FIELD_TOOLBAR_PUBID_DESC" />
+			<field name="addthis_outside_toolbar" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SOCIAL_POSITION" depend_class="hiddefield-mode3" description="FLEXI_FIELD_TOOLBAR_SOCIAL_POSITION_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
@@ -113,14 +113,14 @@
 			
 			<field name="" type="separator" default="FLEXI_TEXT" description="" level="level2" />
 			
-			<field name="add_og_site_name" type="radio" default="0" label="FLEXI_FIELD_TOOLBAR_SITENAME" description="FLEXI_FIELD_TOOLBAR_SITENAME_DESC">
+			<field name="add_og_site_name" type="radio" default="0" label="FLEXI_FIELD_TOOLBAR_SITENAME" description="FLEXI_FIELD_TOOLBAR_SITENAME_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_FIELD_TOOLBAR_REAL_SITENAME</option>
 				<!--option value="2">Custom Field</option-->
 			</field>
 			<!--field name="og_site_name_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
 			
-			<field name="add_og_title" type="radio" default="0" label="FLEXI_TITLE" description="FLEXI_TOOLBAR_ADD_TITLE_DESC">
+			<field name="add_og_title" type="radio" default="0" label="FLEXI_TITLE" description="FLEXI_TOOLBAR_ADD_TITLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_TOOLBAR_ITEM_TITLE</option>
 				<!--option value="2">Custom Field</option-->
@@ -128,7 +128,7 @@
 			<!--field name="og_title_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
 			<!--field name="og_title_maxlen" type="text" default="100" label="Max length" description="Max length of the text" /-->
 			
-			<field name="add_og_descr" type="radio" default="0" label="FLEXI_TOOLBAR_DESCRIPTION" description="FLEXI_TOOLBAR_DESCRIPTION_DESC">
+			<field name="add_og_descr" type="radio" default="0" label="FLEXI_TOOLBAR_DESCRIPTION" description="FLEXI_TOOLBAR_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_TOOLBAR_ITEM_DESCRIPTION</option>
 				<!--option value="2">Custom Field</option-->
@@ -136,7 +136,7 @@
 			<!--field name="og_descr_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text or textarea field" /-->
 			<!--field name="og_descr_maxlen" type="text" default="300" label="Max length" description="Max length of the text" /-->
 			
-			<field name="add_og_type" type="radio" default="article" label="FLEXI_TOOLBAR_CONTENT_TYPE" description="FLEXI_TOOLBAR_CONTENT_TYPE_DESC">
+			<field name="add_og_type" type="radio" default="article" label="FLEXI_TOOLBAR_CONTENT_TYPE" description="FLEXI_TOOLBAR_CONTENT_TYPE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="article">FLEXI_TOOLBAR_CONTENT_TYPE_ARTICLE</option>
 				<option value="website">FLEXI_TOOLBAR_CONTENT_TYPE_SITE</option>
@@ -147,18 +147,18 @@
 			
 			<field name="" type="separator" default="FLEXI_IMAGE" description="" level="level2" />
 			
-			<field name="add_og_image" type="radio" default="0" label="FLEXI_ADD" description="FLEXI_TOOLBAR_CONTENT_IMAGE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="add_og_image" type="multilist" subtype="radio" default="0" label="FLEXI_ADD" toggle_related="1" description="FLEXI_TOOLBAR_CONTENT_IMAGE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="hiddefield-mode4">FLEXI_NO</option>
+				<option value="1" show_list="hiddefield-mode4" hide_list="">FLEXI_YES</option>
 			</field>
 
-			<field name="og_image_field" type="fcimage" default="" label="FLEXI_TOOLBAR_CONTENT_IMAGE_SOURCE" description="FLEXI_TOOLBAR_CONTENT_IMAGE_SOURCE_DESC" />
-			<field name="og_image_fallback" type="list" default="" label="FLEXI_FIELD_TOOLBAR_FALLBACK_IMG" description="FLEXI_FIELD_TOOLBAR_FALLBACK_IMG_DESC" >
+			<field name="og_image_field" type="fcimage" default="" label="FLEXI_TOOLBAR_CONTENT_IMAGE_SOURCE" depend_class="hiddefield-mode4" description="FLEXI_TOOLBAR_CONTENT_IMAGE_SOURCE_DESC" />
+			<field name="og_image_fallback" type="list" default="" label="FLEXI_FIELD_TOOLBAR_FALLBACK_IMG" depend_class="hiddefield-mode4" description="FLEXI_FIELD_TOOLBAR_FALLBACK_IMG_DESC" >
 				<option value="0">FLEXI_FIELD_TOOLBAR_NO_FALLBACK</option>
 				<option value="1">FLEXI_FIELD_TOOLBAR_USE_INTROTEXT_FALLBACK</option>
 				<option value="2">FLEXI_FIELD_TOOLBAR_USE_INTROTEXT_FALLBACK_IGNORE_DEFAULTIMG</option>
 			</field>
-			<field name="og_image_thumbsize" type="radio" default="medium" label="FLEXI_TOOLBAR_CONTENT_IMAGE_THUMB" description="FLEXI_TOOLBAR_CONTENT_IMAGE_THUMB_DESC">
+			<field name="og_image_thumbsize" type="radio" default="medium" label="FLEXI_TOOLBAR_CONTENT_IMAGE_THUMB" depend_class="hiddefield-mode4" description="FLEXI_TOOLBAR_CONTENT_IMAGE_THUMB_DESC" class="btn-group btn-group-yesno">
 				<option value="small">FLEXI_FIELD_TOOLBAR_SMALL_THUMB</option>
 				<option value="medium">FLEXI_FIELD_TOOLBAR_MEDIUM_THUMB</option>
 				<option value="large">FLEXI_FIELD_TOOLBAR_LARGE_THUMB</option>

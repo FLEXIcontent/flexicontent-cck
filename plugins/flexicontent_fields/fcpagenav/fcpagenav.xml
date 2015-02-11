@@ -48,26 +48,26 @@
 			<field name="item_sep" type="separator" hr="false" default="Previous / Next items" description="..." level="level2" />
 			
 			<field name="item_links_sep" type="separator" hr="false" default="Item links" description="..." level="level3" />
-			<field name="use_tooltip" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_USETIP" description="FLEXI_FIELD_PAGENAV_USETIP_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_tooltip" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_PAGENAV_USETIP" toggle_related="1" description="FLEXI_FIELD_PAGENAV_USETIP_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="tooltip-mode">FLEXI_NO</option>
+				<option value="1" show_list="tooltip-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="tooltip_title_next" type="text" default="" label="FLEXI_FIELD_PAGENAV_TIPTITLE_NEXT" description="FLEXI_FIELD_PAGENAV_TIPTITLE_NEXT_DESC" />
-			<field name="tooltip_title_prev" type="text" default="" label="FLEXI_FIELD_PAGENAV_TIPTITLE_PREV" description="FLEXI_FIELD_PAGENAV_TIPTITLE_PREV_DESC" />
-			<field name="use_title" type="radio" default="0" label="FLEXI_FIELD_PAGENAV_USETITLE" description="FLEXI_FIELD_PAGENAV_USETITLE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="tooltip_title_next" type="text" default="" label="FLEXI_FIELD_PAGENAV_TIPTITLE_NEXT" depend_class="tooltip-mode" description="FLEXI_FIELD_PAGENAV_TIPTITLE_NEXT_DESC" />
+			<field name="tooltip_title_prev" type="text" default="" label="FLEXI_FIELD_PAGENAV_TIPTITLE_PREV" depend_class="tooltip-mode" description="FLEXI_FIELD_PAGENAV_TIPTITLE_PREV_DESC" />
+			<field name="use_title" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_PAGENAV_USETITLE" toggle_related="1" depend_class="tooltip-mode" description="FLEXI_FIELD_PAGENAV_USETITLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="title-mode">FLEXI_NO</option>
+				<option value="1" show_list="title-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="prev_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_PREV" description="..." />
-			<field name="next_label" type="text" default="" label="FLEXI_FIELD_PAGENAV_NEXT" description="..." />
+			<field name="prev_label" type="text" default="" depend_class="title-mode" label="FLEXI_FIELD_PAGENAV_PREV" description="..." />
+			<field name="next_label" type="text" default="" depend_class="title-mode" label="FLEXI_FIELD_PAGENAV_NEXT" description="..." />
 			
 			<field name="item_image_sep" type="separator" hr="false" default="Item images" description="..." level="level3" />
-			<field name="item_use_image" type="radio" default="0" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="item_use_image" type="multilist" subtype="radio" default="0" label="FLEXI_USE_IMAGE" toggle_related="1" description="FLEXI_USE_IMAGE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="image-mode">FLEXI_NO</option>
+				<option value="1" show_list="image-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="item_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
-			<field name="item_image_size" type="radio" default="" label="FLEXI_IMAGE_SIZE" description="FLEXI_IMAGE_SIZE_DESC" class="btn-group btn-group-yesno">
+			<field name="item_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" depend_class="image-mode" description="FLEXI_IMAGE_SOURCE_DESC" />
+			<field name="item_image_size" type="radio" default="" label="FLEXI_IMAGE_SIZE" depend_class="image-mode" description="FLEXI_IMAGE_SIZE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_PARAMS</option>
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
@@ -76,27 +76,27 @@
 			</field>
 			
 			<field name="cat_sep" type="separator" hr="false" default="FLEXI_CATEGORY" description="..." level="level2" />
-			<field name="use_category_link" type="radio" default="0" label="FLEXI_FIELD_PAGENAV_USECATEGORY" description="FLEXI_FIELD_PAGENAV_USECATEGORY_DESC">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
+			<field name="use_category_link" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_PAGENAV_USECATEGORY" toggle_related="1" description="FLEXI_FIELD_PAGENAV_USECATEGORY_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="cat-mode">FLEXI_NO</option>
+				<option value="1" show_list="cat-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="category_label" type="text" default="" label="FLEXI_FIELDS_PAGENAV_CATEGORY" description="..." />
-			<field name="cat_image_sep" type="separator" hr="false" default="Category image" description="..." level="level3" />
-			<field name="cat_use_image" type="radio" default="0" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+			<field name="category_label" type="text" default="" depend_class="cat-mode" label="FLEXI_FIELDS_PAGENAV_CATEGORY" description="..." />
+			<field name="cat_image_sep" type="separator" hr="false" default="Category image" depend_class="cat-mode" description="..." level="level3" />
+			<field name="cat_use_image" type="multilist" subtype="radio" default="0" label="FLEXI_CAT_IMAGE" toggle_related="1" depend_class="cat-mode" description="FLEXI_CAT_IMAGE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="catimage-mode">FLEXI_HIDE</option>
+				<option value="1" show_list="catimage-mode" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="cat_image_source" type="radio" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" class="btn-group btn-group-yesno">
+			<field name="cat_image_source" type="radio" default="2" label="FLEXI_CATIMAGE_SOURCE" depend_class="catimage-mode" description="FLEXI_CATIMAGE_SOURCE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
 				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
 				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
 			</field>
 			
 			
-			<field name="image_thumbnail_sep" type="separator" hr="false" default="Thumbnailing parameters (enable above)" description="..." level="level1" />
-			<field name="nav_width" type="text" size="4" default="120" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="nav_height" type="text" size="4" default="60" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-			<field name="nav_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="btn-group btn-group-yesno">
+			<field name="image_thumbnail_sep" type="separator" hr="false" default="Thumbnailing parameters (enable above)" depend_class="catimage-mode" description="..." level="level1" />
+			<field name="nav_width" type="text" size="4" default="120" label="FLEXI_IMAGE_WIDTH" depend_class="catimage-mode" description="FLEXI_IMAGE_WIDTH" />
+			<field name="nav_height" type="text" size="4" default="60" label="FLEXI_IMAGE_HEIGHT" depend_class="catimage-mode" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="nav_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" depend_class="catimage-mode" description="FLEXI_PROCESSING_METHOD" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
