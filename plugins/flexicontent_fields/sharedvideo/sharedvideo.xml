@@ -22,15 +22,15 @@
 		<fieldset name="group-sharedvideo-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
 		<field name="" type="separator" default="Display field on form" level="level1" />
-		<field name="display_video_type" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TYPE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TYPE_FORM_DESC" class="btn-group btn-group-yesno">
+		<field name="display_videtype_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TYPE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TYPE_FORM_DESC" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="display_video_id" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_ID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_ID_FORM_DESC" class="btn-group btn-group-yesno">
+		<field name="display_videoid_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_ID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_ID_FORM_DESC" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="display_video_title" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TITLE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TITLE_FORM_DESC" class="btn-group btn-group-yesno">
+		<field name="display_title_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TITLE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TITLE_FORM_DESC" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
@@ -38,11 +38,11 @@
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="display_video_duration" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_FORM_DESC" class="btn-group btn-group-yesno">
+		<field name="display_duration_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_FORM_DESC" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="display_video_desc" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DESCRIPTION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DESCRIPTION_FORM_DESC" class="btn-group btn-group-yesno">
+		<field name="display_description_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DESCRIPTION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DESCRIPTION_FORM_DESC" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>

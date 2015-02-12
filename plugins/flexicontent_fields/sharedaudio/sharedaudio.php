@@ -35,11 +35,12 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 		$required = $field->parameters->get('required',0);
 		$required = $required ? ' required' : '';
 		$embedly_key = $field->parameters->get('embedly_key','') ;
-		$display_audio_type = $field->parameters->get('display_audio_type',1) ;
-		$display_audio_id = $field->parameters->get('display_audio_id',1) ;
-		$display_audio_title = $field->parameters->get('display_audio_title',1) ;
-		$display_audio_author= $field->parameters->get('display_audio_author',1) ;
-		$display_audio_description =$field->parameters->get('display_audio_description',1) ;
+		
+		$display_audiotype_form = $field->parameters->get('display_audiotype_form',1) ;
+		$display_audioid_form   = $field->parameters->get('display_audioid_form',1) ;
+		$display_title_form     = $field->parameters->get('display_title_form',1) ;
+		$display_author_form    = $field->parameters->get('display_author_form',1) ;
+		$display_description_form = $field->parameters->get('display_description_form',1) ;
 		
 		// get stored field value
 		if ( isset($field->value[0]) ) $value = unserialize($field->value[0]);
@@ -51,31 +52,37 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 			$value['author'] = '';
 			$value['description'] = '';
 		}
+		if (!isset($value['url']))         $value['url']= '';
+		if (!isset($value['audiotype']))   $value['audiotype'] = '';
+		if (!isset($value['audioid']))     $value['audioid'] = '';
+		if (!isset($value['title']))       $value['title'] = '';
+		if (!isset($value['author']))      $value['author'] = '';
+		if (!isset($value['description'])) $value['description'] = '';
 		
 		$field->html  = '';
 		$field->html .= '<table class="admintable" border="0" cellspacing="0" cellpadding="5">';
 		$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_URL').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" '.$required.' /> <input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_FETCH').'" onclick="fetchAudio_'.$field->name.'();" /></td></tr>';
-		 if ($display_audio_type) {
+		 if ($display_audiotype_form) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_TYPE').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][audiotype]" value="'.$value['audiotype'].'" size="10" readonly="readonly" style="background-color:#eee" /></td></tr>';
 		}else{
 			$field->html .= '<input type="hidden" class="fcfield_textval" name="custom['.$field->name.'][audiotype]" value="'.$value['audiotype'].'" size="10" readonly="readonly" style="background-color:#eee" />';
 		}
-		if ($display_audio_id) {
+		if ($display_audioid_form) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_ID').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][audioid]" value="'.$value['audioid'].'" size="15" readonly="readonly" style="background-color:#eee" /></td></tr>';
 		}else{
 			$field->html .= '<input type="hidden" class="fcfield_textval" name="custom['.$field->name.'][audioid]" value="'.$value['audioid'].'" size="15" readonly="readonly" style="background-color:#eee" />';
 		}
-		if ($display_audio_title) {
+		if ($display_title_form) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_TITLE').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" /></td></tr>';
 		}else{
 			$field->html .= '<input type="hidden" class="fcfield_textval" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />';
 		}
-		if ($display_audio_author) {
+		if ($display_author_form) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTHOR').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" /></td></tr>';
 		}else{
 			$field->html .= '<input type="hidden" class="fcfield_textval" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />';
 		}
-		if ($display_audio_description) {
+		if ($display_description_form) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DESCRIPTION').'</td><td><textarea class="fcfield_textareaval" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea></td></tr>';
 		}else{
 			$field->html .= '<textarea style="display:none;" class="fcfield_textareaval" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea>';
@@ -196,8 +203,10 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 			$display_author = $field->parameters->get('display_author',0) ;
 			$display_duration = $field->parameters->get('display_duration',0) ;
 			$display_description = $field->parameters->get('display_description',0) ;
+			
 			$pretext = $field->parameters->get('pretext','') ;
 			$posttext = $field->parameters->get('posttext','') ;
+			
 			$headinglevel = $field->parameters->get('headinglevel',3) ;
 			$width = $field->parameters->get('width',480) ;
 			$height = $field->parameters->get('height',270) ;
@@ -206,9 +215,9 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 			// generate html output
 			$field->{$prop} .= $pretext;
 			$field->{$prop} .= '<iframe class="sharedaudio" src="'.$value['audioid'].'?autoplay='.$autostart.'" width="'.$width.'" height="'.$height.'" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
-			if($display_title==1 && $value['title']!='') $field->{$prop} .= '<h'.$headinglevel.'>'.$value['title'].'</h'.$headinglevel.'>';
-			if($display_author==1 && $value['author']!='') $field->{$prop} .= '<div class="author">'.$value['author'].'</div>';
-			if($display_description==1 && $value['description']!='') $field->{$prop} .= '<div class="description">'.$value['description'].'</div>';
+			if ($display_title && !empty($value['title'])) $field->{$prop} .= '<h'.$headinglevel.'>'.$value['title'].'</h'.$headinglevel.'>';
+			if ($display_author && !empty($value['author'])) $field->{$prop} .= '<div class="author">'.$value['author'].'</div>';
+			if ($display_description && !empty($value['description'])) $field->{$prop} .= '<div class="description">'.$value['description'].'</div>';
 			$field->{$prop} .= $posttext;
 		}
 	}
