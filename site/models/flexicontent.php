@@ -183,57 +183,53 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
 		$orderby = $this->_buildCatOrderBy('cat_');
-
-		// Get a 2 character language tag
-		$lang = flexicontent_html::getUserCurrentLang();
-
-		// Do we filter the categories
-		$filtercat  = $params->get('filtercat', 0);
-		// show unauthorized items
-		$show_noauth = $params->get('show_noauth', 0);
-
+		
+		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
+		// thus the items are published globally at the time the author specified in his/her local clock
+		//$now  = JFactory::getApplication()->requestTime;   // NOT correct behavior it should be UTC (below)
+		//$now  = JFactory::getDate()->toSql();              // NOT good if string passed to function that will be cached, because string continuesly different
+		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
+		$nullDate = $db->getNullDate();
+		
+		// Get some parameters and other info
+		$catlang = $params->get('language', '');          // Category language (currently UNUSED)
+		$lang = flexicontent_html::getUserCurrentLang();  // Get user current language
+		$filtercat  = $params->get('filtercat', 0);       // Filter items using currently selected language
+		$show_noauth = $params->get('show_noauth', 0);    // Show unauthorized items
+		
 		// Build where clause
-		$where  = ' WHERE cc.published = 1';
-		$where .= ' AND c.id = cc.id';
-		// Filter the category view with the active active language
-		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$lta = FLEXI_J16GE || $use_tmp ? 'i': 'ie';
-			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
+		$sub_where  = ' WHERE cc.published = 1';
+		$sub_where .= ' AND c.id = cc.id';
+		
+		// Filter the category view with the current user language
+		if ($filtercat) {
+			$lta = $use_tmp ? 'i': 'ie';
+			$sub_where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
 		}
 		
-		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
-		$where .= ' AND i.state IN ('.$states.')';
+		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
+		// NOTE:  ACL view level is checked at a different place
+		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
 		
-		// Select only items that user has view access, if listing of unauthorized content is not enabled
-		$subjoin = $suband = $join = $and = '';
+		if (!$ignoreState) {
+			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
+			$sub_where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			
+			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
+			$sub_where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$sub_where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+		}
+		
+		// Select only items that user has view access, checking item, category, content type access level
+		$and = $asscat_and = '';
 		if (!$show_noauth) {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$suband .= ' AND ty.access IN (0,'.$aid_list.')';
-				$suband .= ' AND cc.access IN (0,'.$aid_list.')';
-				$suband .= ' AND i.access IN (0,'.$aid_list.')';
-				$and    .= ' AND c.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgt ON ty.id = sgt.axo AND sgt.aco = "read" AND sgt.axosection = "type"';
-					$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
-					$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgi ON i.id = sgi.axo AND sgi.aco = "read" AND sgi.axosection = "item"';
-					$suband  .= ' AND (sgt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					$suband  .= ' AND (sgc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. $aid . ')';
-					$suband  .= ' AND (sgi.aro IN ( '.$user->gmid.' ) OR i.access <= '. $aid . ')';
-					$join    .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$and     .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
-				} else {
-					$suband  .= ' AND ty.access <= '.$aid;
-					$suband  .= ' AND cc.access <= '.$aid;
-					$suband  .= ' AND i.access <= '.$aid;
-					$and     .= ' AND c.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$sub_where .= ' AND ty.access IN (0,'.$aid_list.')';
+			$sub_where .= ' AND cc.access IN (0,'.$aid_list.')';
+			$sub_where .= ' AND  i.access IN (0,'.$aid_list.')';
+			$and       .= ' AND  c.access IN (0,'.$aid_list.')';
 		}
-		$join .= (FLEXI_J16GE ? ' LEFT JOIN #__users AS u ON u.id = c.created_user_id' : '');
 		
 		if ($type=='feed') {
 		}
@@ -242,20 +238,20 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug,'
 			
 			. ' ('
-			. ' SELECT COUNT( DISTINCT i.id )'
-			. (!$use_tmp ? ' FROM #__content AS i' : ' FROM #__flexicontent_items_tmp AS i')
-			. (!$use_tmp ? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' : '')
-			. ' JOIN #__flexicontent_types AS ty ON '. (!$use_tmp ? 'ie.' : 'i.') .'type_id = ty.id'
-			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' SELECT COUNT( DISTINCT rel.itemid )'
+			. ' FROM #__flexicontent_cats_item_relations AS rel'
+			. (!$use_tmp ?
+				' JOIN #__content AS i ON rel.itemid = i.id' :
+				' JOIN #__flexicontent_items_tmp AS i ON rel.itemid = i.id')
+			. (!$use_tmp ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid = ie.item_id' : '')
+			. ' JOIN #__flexicontent_types AS ty ON '. (!$use_tmp ? 'ie' : 'i'). '.type_id = ty.id'
 			. ' JOIN #__categories AS cc ON cc.id = rel.catid'
-			. $subjoin
-			. $where
-			. $suband
-			. ') AS assigneditems'
+			. $sub_where
+			. ' ) AS assigneditems'
 			;
 		
 		$query .= ' FROM #__categories AS c'
-			. $join
+			. ' LEFT JOIN #__users AS u ON u.id = c.created_user_id'
 			. ' WHERE c.published = 1'
 			. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
 			. (!$this->_rootcat ? ' AND c.parent_id = '.(FLEXI_J16GE ? 1 : 0) : ' AND c.parent_id = '. (int)$this->_rootcat)
@@ -360,18 +356,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
+		$cat_orderby = $this->_buildCatOrderBy('subcat_');
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
-		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$app  = JFactory::getApplication();
-		//$now  = FLEXI_J16GE ? $app->requestTime : $app->get('requestTime');   // NOT correct behavior it should be UTC (below)
-		//$date = JFactory::getDate();
-		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
+		// thus the items are published globally at the time the author specified in his/her local clock
+		//$now  = JFactory::getApplication()->requestTime;   // NOT correct behavior it should be UTC (below)
+		//$now  = JFactory::getDate()->toSql();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
-		
-		$cat_orderby = $this->_buildCatOrderBy('subcat_');
-		$cat_and = '';
 		
 		// Get some parameters and other info
 		$catlang = $params->get('language', '');          // Category language (currently UNUSED)
@@ -380,13 +372,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$show_noauth = $params->get('show_noauth', 0);    // Show unauthorized items
 		
 		// Build where clause
-		$where  = ' WHERE cc.published = 1';
-		$where .= ' AND c.id = cc.id';
+		$sub_where  = ' WHERE cc.published = 1';
+		$sub_where .= ' AND c.id = cc.id';
 		
 		// Filter the category view with the current user language
 		if ($filtercat) {
 			$lta = $use_tmp ? 'i': 'ie';
-			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
+			$sub_where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
 		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -395,22 +387,23 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		if (!$ignoreState) {
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$sub_where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 			
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$sub_where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$sub_where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		}
 		
-		// Select only items that user has view access, if listing of unauthorized content is not enabled
-		// Checking item, category, content type access level
+		// Select only items that user has view access, checking item, category, content type access level
+		$and = $asscat_and = '';
 		if (!$show_noauth) {
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
-			$where .= ' AND ty.access IN (0,'.$aid_list.')';
-			$where .= ' AND cc.access IN (0,'.$aid_list.')';
-			$where .= ' AND  i.access IN (0,'.$aid_list.')';
-			$cat_and .= ' AND  c.access IN (0,'.$aid_list.')';
+			$sub_where .= ' AND ty.access IN (0,'.$aid_list.')';
+			$sub_where .= ' AND cc.access IN (0,'.$aid_list.')';
+			$sub_where .= ' AND  i.access IN (0,'.$aid_list.')';
+			$and       .= ' AND  c.access IN (0,'.$aid_list.')';
+			$asscat_and.= ' AND sc.access IN (0,'.$aid_list.')';
 		}
 		
 		$query = 'SELECT c.*,'
@@ -422,10 +415,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			. (!$use_tmp ?
 				' JOIN #__content AS i ON rel.itemid = i.id' :
 				' JOIN #__flexicontent_items_tmp AS i ON rel.itemid = i.id' )
-			. (!$use_tmp ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid = ie.item_id' : '' )
-			. ' JOIN #__flexicontent_types AS ty ON ' .(!$use_tmp ? 'ie' : 'i'). '.type_id = ty.id'
+			. (!$use_tmp ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid = ie.item_id' : '')
+			. ' JOIN #__flexicontent_types AS ty ON '. (!$use_tmp ? 'ie' : 'i'). '.type_id = ty.id'
 			. ' JOIN #__categories AS cc ON cc.id = rel.catid'
-			. $where
+			. $sub_where
 			. ' ) AS assignedsubitems,'
 			
 			. ' ('
@@ -433,13 +426,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			. ' FROM #__categories AS sc'
 			. ' WHERE c.id = sc.parent_id'
 			. ' AND sc.published = 1'
+			. $asscat_and
 			. ' ) AS assignedcats'
 			
 			. ' FROM #__categories AS c'
 			. ' WHERE c.published = 1'
 			. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
 			. ' AND c.parent_id = '.(int)$id
-			. $cat_and
+			. $and
 			. $cat_orderby
 			;
 		

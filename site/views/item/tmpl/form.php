@@ -599,8 +599,10 @@ ob_start();  // category ?>
 
 
 
-ob_start();  // lang ?>
-	<span class="label-fcouter"><?php echo str_replace('class="', 'class="flexi_label ', $this->form->getLabel('language')); ?></span>
+if ($this->params->get('uselang_fe', 1)) : ob_start();  // lang ?>
+	<span class="label-fcouter">
+		<?php echo str_replace('class="', 'class="flexi_label ', $this->form->getLabel('language')); ?>
+	</span>
 	
 	<div class="container_fcfield container_fcfield_name_language">
 		<?php if ( (in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew) && $this->params->get('uselang_fe', 1)==1 ) : ?>
@@ -609,7 +611,11 @@ ob_start();  // lang ?>
 			<?php echo $this->itemlang->image.' ['.$this->itemlang->name.']'; ?>
 		<?php endif; ?>
 	</div>
-<?php $captured['lang'] = ob_get_clean();
+<?php
+	$captured['lang'] = ob_get_clean();
+else:
+	$captured['lang'] = '';
+endif;
 
 
 
@@ -705,7 +711,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 
 
 
-if ((FLEXI_FISH || FLEXI_J16GE) && $this->params->get('uselang_fe', 1)) : ob_start(); // language ?>
+if ($this->params->get('uselang_fe', 1)) : ob_start(); // language ?>
 	<fieldset class="basicfields_set" id="fcform_language_container">
 		<legend>
 			<?php echo !isset($all_tab_fields['lang']) ? JText::_( 'FLEXI_LANGUAGE' ) : JText::_( 'FLEXI_LANGUAGE' ) . ' '. JText::_( 'FLEXI_ASSOCIATONS' ) ; ?>

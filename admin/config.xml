@@ -109,26 +109,6 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-		<field name="" type="separator" default="FLEXI_MOBILE_DEVICES_CONF" label="" level="level0" menu="hide" />
-			
-			<field name="use_mobile_layouts" type="radio" default="0" label="FLEXI_USE_MOBILE_LAYOUTS" description="FLEXI_USE_MOBILE_LAYOUTS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_MOBILE_NO_ONLY_IN_FIELDS</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="force_desktop_layout" type="radio" default="0" label="FLEXI_FORCE_DESKTOP_LAYOUT" description="FLEXI_FORCE_DESKTOP_LAYOUT_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NEVER</option>
-				<option value="1">FLEXI_TABLET_DETECTED</option>
-			</field>
-			
-			<field name="debug_mobile" type="radio" default="0" label="FLEXI_DEBUG_MOBILE" description="FLEXI_DEBUG_MOBILE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<!--field name="" type="separator" default="FLEXI_MOBILE_RES_LIMIT_DESKTOP_LAYOUT" label="" description="FLEXI_MOBILE_RES_LIMIT_DESKTOP_LAYOUT_DESC" level="level1" menu="hide" />
-			<field name="lowres_minwidth" type="text" size="8" default="800" label="FLEXI_MOBILE_RES_MINWIDTH" description="FLEXI_MOBILE_RES_MINWIDTH_DESC" menu="hide"/>
-			<field name="lowres_minheight" type="text" size="8" default="480" label="FLEXI_MOBILE_RES_MINHEIGHT" description="FLEXI_MOBILE_RES_MINHEIGHT_DESC" menu="hide"/-->
-
 		<field name="" type="separator" default="FLEXI_SEF_URL_OPTIONS" label="" level="level0" menu="hide" />
 			
 			<field name="default_menu_itemid" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
@@ -227,30 +207,10 @@
 				<option value="6">FLEXI_DISPLAY_LANG_AS_CHECKBOXES</option>
 			</field>
 			
-		<field name="" type="separator" default="FLEXI_HITS_UNIQUE_CONF" label="" level="level0" menu="hide" />
-			
-			<field name="hits_count_unique" type="radio" default="0" label="FLEXI_HITS_COUNT_UNIQUE" description="FLEXI_HITS_COUNT_UNIQUE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="hits_mins_to_unique" type="text" size="5" default="600" label="FLEXI_HITS_MINS_BETWEEN_UNIQUE" description="FLEXI_HITS_MINS_BETWEEN_UNIQUE_DESC" menu="hide" />
-			<field name="hits_skip_ips" type="radio" default="1" label="FLEXI_HITS_SKIP_IPS" description="FLEXI_HITS_SKIP_IPS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="hits_ips_list" type="textarea" cols="50" rows="4" default="127.0.0.1" label="FLEXI_HITS_IP_LIST" description="FLEXI_HITS_IP_LIST_DESC" menu="hide" />
-			<field name="hits_skip_bots" type="radio" default="1" label="FLEXI_HITS_SKIP_BOTS" description="FLEXI_HITS_SKIP_BOTS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" />
-			
 	</fieldset>
-	<fieldset name="content_display_conf" label="FLEXI_CONTENT_DISPLAY" description="" >
+	<fieldset name="common_fset" label="FLEXI_GENERAL_DISPLAY_CONF" description="" >
 		
-		<field name="" type="separator" default="FLEXI_VARIOUS_VIEWS" description="" level="level0" hr="false" menu="hide" />
-			
-			<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level1" menu="hide" />
 			<field name="show_icons" type="radio" default="2" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_TEXT</option>
 				<option value="1">FLEXI_ICONS</option>
@@ -283,7 +243,32 @@
 				<option value="button">FLEXI_BUTTON</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_ITEM_VIEW" label="" level="level1" menu="hide" />
+		<field name="" type="separator" default="FLEXI_MOBILE_DEVICES_CONF" label="" level="level1" menu="hide" />
+			
+			<field name="" type="separator" default="This will serve different HTML to mobile devices, aka a 'mobile version'. &lt;br/&gt; NOTE: this effects the component area, and not the full web-site" label="" level="level4" menu="hide" />	
+			<field name="use_mobile_layouts" type="radio" default="0" label="FLEXI_USE_MOBILE_LAYOUTS" description="FLEXI_USE_MOBILE_LAYOUTS_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_MOBILE_NO_ONLY_IN_FIELDS</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="force_desktop_layout" type="radio" default="0" label="FLEXI_FORCE_DESKTOP_LAYOUT" description="FLEXI_FORCE_DESKTOP_LAYOUT_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NEVER</option>
+				<option value="1">FLEXI_TABLET_DETECTED</option>
+			</field>
+			
+			<field name="debug_mobile" type="radio" default="0" label="FLEXI_DEBUG_MOBILE" description="FLEXI_DEBUG_MOBILE_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<!--field name="" type="separator" default="FLEXI_MOBILE_RES_LIMIT_DESKTOP_LAYOUT" label="" description="FLEXI_MOBILE_RES_LIMIT_DESKTOP_LAYOUT_DESC" level="level1" menu="hide" />
+			<field name="lowres_minwidth" type="text" size="8" default="800" label="FLEXI_MOBILE_RES_MINWIDTH" description="FLEXI_MOBILE_RES_MINWIDTH_DESC" menu="hide"/>
+			<field name="lowres_minheight" type="text" size="8" default="480" label="FLEXI_MOBILE_RES_MINHEIGHT" description="FLEXI_MOBILE_RES_MINHEIGHT_DESC" menu="hide"/-->
+
+	</fieldset>
+	<fieldset name="item_view_fset" label="FLEXI_ITEM_VIEW" description="" >
+		
+		<field name="" type="separator" default="FLEXI_CONTENT_DISPLAY" description="" level="level1" hr="false" menu="hide" />
+		
 			<field name="show_title" type="radio" default="1" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -296,7 +281,8 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="" type="separator" default="FLEXI_COMMENTS" label="" level="level2" menu="hide" />
+			
+		<field name="" type="separator" default="FLEXI_COMMENTS" label="" level="level1" menu="hide" />
 			<field name="comments" type="radio" default="0" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLE_OR_INTEGRATE_MANUALLY</option>
 				<option value="1">FLEXI_JCOMMENTS_INTEGRATION</option>
@@ -304,6 +290,27 @@
 			<field name="" type="separator" default="FLEXI_MANUAL_COMMENTS_INTEGRATION" label="" level="level3" menu="hide" />
 			<field name="comments_admin_link" type="text" default="" label="FLEXI_COMMENTS_BACKEND_ADMIN_LINK" description="FLEXI_COMMENTS_BACKEND_ADMIN_LINK_DESC" menu="hide" />
 			
+		<field name="" type="separator" default="FLEXI_HITS_UNIQUE_CONF" label="" level="level1" menu="hide" />
+			
+			<field name="hits_count_unique" type="radio" default="0" label="FLEXI_HITS_COUNT_UNIQUE" description="FLEXI_HITS_COUNT_UNIQUE_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="hits_mins_to_unique" type="text" size="5" default="600" label="FLEXI_HITS_MINS_BETWEEN_UNIQUE" description="FLEXI_HITS_MINS_BETWEEN_UNIQUE_DESC" menu="hide" />
+			<field name="hits_skip_ips" type="radio" default="1" label="FLEXI_HITS_SKIP_IPS" description="FLEXI_HITS_SKIP_IPS_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="hits_ips_list" type="textarea" cols="50" rows="4" default="127.0.0.1" label="FLEXI_HITS_IP_LIST" description="FLEXI_HITS_IP_LIST_DESC" menu="hide" />
+			<field name="hits_skip_bots" type="radio" default="1" label="FLEXI_HITS_SKIP_BOTS" description="FLEXI_HITS_SKIP_BOTS_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" />
+			
+	</fieldset>
+	<fieldset name="various_views_fset" label="FLEXI_VARIOUS_VIEWS" description="" >
+		
 		<field name="" type="separator" default="FLEXI_DIRECTORY_VIEW_CONF" level="level1" menu="hide" />
 		
 			<field name="cat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC" menu="hide" >
@@ -337,8 +344,14 @@
 			<option value="">FLEXI_NONE</option>
 		</field>
 		
-		<field name="" type="separator" default="FLEXI_CATEGORY_VIEW_CONF" label="" level="level0" menu="hide" />
+		
+	</fieldset>
+	<fieldset name="cat_display_conf" label="Lists: Category data" description="" >
+		
 			
+		<field name="" type="separator" default="Category, Author items, My items, Multi-category view" label="" level="level4" menu="hide" />
+		<field name="" type="separator" default="FLEXI_CATEGORIES" label="" level="level0" menu="hide" />
+		
 		<field name="" type="separator" default="FLEXI_PARAMETERS_CAT_INFO_OPTIONS" label="" level="level1" menu="hide" />
 			
 			<field name="inheritcid" type="radio" default="-1" label="FLEXI_CATS_INHERIT_PARAMS" description="FLEXI_CATS_INHERIT_PARAMS_DESC" menu="hide" class="btn-group btn-group-yesno">
@@ -565,11 +578,12 @@
 			
 
 	</fieldset>
-	<fieldset name="content_lists_conf" label="FLEXI_CONTENT_LISTS_CONF" description="" >
-			
+	<fieldset name="content_lists_conf" label="Lists: Item data" description="" >
+		
+		<field name="" type="separator" default="Category, Author items, My items, Multi-category view" label="" level="level4" menu="hide" />
 		<field name="" type="separator" default="FLEXI_ITEMS_LIST_CREATION_CONF" label="" level="level0" menu="hide" />
 			
-			<field name="" type="separator" default="FLEXI_ITEMS_LIST" level="level1" menu="hide" />
+			<!--field name="" type="separator" default="FLEXI_ITEMS_LIST" level="level1" menu="hide" /-->
 			<field name="show_addbutton" type="radio" default="1" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_LIST_BUTTON_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -743,10 +757,19 @@
 				defaultvals="_preconfigured_,date,rdate,modified,published,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order"
 				label="FLEXI_ORDER_OPTIONS_2ND" description="FLEXI_ORDER_OPTIONS_DESC" />
 			
+	</fieldset>
+	<fieldset name="content_lists_conf_search" label="Lists: Filtering" description="" >
+			
+		<field name="" type="separator" default="Category, Author items, My items, Multi-category view" label="" level="level4" menu="hide" />
 		<field name="" type="separator" default="FLEXI_ITEM_FILTERING_CONF" description="" level="level0" hr="false" menu="hide" />
 		
 			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level1" hr="false" menu="hide" />
-			<field name="show_search_go" type="radio" default="1" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="ff_placement" type="multilist" subtype="radio" default="0" label="FLEXI_SEARCH_FILTER_FORM_PLACEMENT" description="FLEXI_SEARCH_FILTER_FORM_PLACEMENT_DESC" class="btn-group group-fcsuccess">
+				<option value="0">FLEXI_SEARCH_FILTER_FORM_INLINE</option>
+				<option value="1">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
+			</field>
+			<field name="ff_toggle_search_title" type="text" size="20" default="FLEXI_TOGGLE_SEARCH_FORM" label="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE" description="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE_DESC" />
+			<field name="show_search_go" type="multilist" subtype="radio" default="1" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" menu="hide" class="btn-group group-fcsuccess">
 				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -876,6 +899,10 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
+	</fieldset>
+	<fieldset name="content_lists_conf_RSS" label="Lists: RSS Feeds" description="" >
+			
+		<field name="" type="separator" default="Category, Author items, My items, Multi-category view" label="" level="level4" menu="hide" />
 		<field name="" type="separator" default="FLEXI_FEED_LIST_CONF" label="" level="level0" menu="hide" />
 			
 			<field name="feed_limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" menu="hide" />
@@ -1216,9 +1243,9 @@
 			<field name="form_extra_js" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" menu="hide" />
 		
 	</fieldset>
-	<fieldset name="backend_tabs_conf" label="FLEXI_BACKEND_TABS_CONF" description="" >
+	<fieldset name="backend_tabs_fset" label="FLEXI_BACKEND_TABS_CONF" description="" >
 	
-	<field name="" type="separator" default="FLEXI_DASH_BOARD" label="" level="level0" menu="hide" />
+		<field name="" type="separator" default="FLEXI_DASH_BOARD" label="" level="level0" menu="hide" />
 			
 			<field name="dashboard_buttons_hide" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
 				checkoptions="FLEXI_ITEMS,FLEXI_NEW_ITEM,FLEXI_CATEGORIES,FLEXI_NEW_CATEGORY,FLEXI_COMMENTS,FLEXI_TYPES,FLEXI_ADD_TYPE,FLEXI_FIELDS,FLEXI_ADD_FIELD,FLEXI_TAGS,FLEXI_NEW_TAG,FLEXI_FILES,FLEXI_TEMPLATES,FLEXI_INDEX,FLEXI_STATISTICS,FLEXI_USERS,FLEXI_ADD_USER,FLEXI_GROUPS,FLEXI_ADD_GROUP,FLEXI_IMPORT,Plugins-Fields,Plugins-System,Plugins-Flexicontent"
@@ -1287,6 +1314,9 @@
 				<option value="DESC">FLEXI_ITEMS_MANAGER_ORDER_DIR_REVERSE</option>
 			</field>
 			
+	</fieldset>
+	<fieldset name="import_fset" label="FLEXI_IMPORT_CONF" description="" >
+		
 		<field name="" type="separator" default="FLEXI_IMPORT_MANAGER_CONF" label="" level="level0" menu="hide" />
 			<field name="import_items_per_step" type="text" default="2" size="12" label="FLEXI_IMPORT_ITEMS_PER_STEP" description="FLEXI_IMPORT_ITEMS_PER_STEP_DESC" menu="hide"/>
 			
@@ -1361,7 +1391,7 @@
 			<field name="import_docs_folder" type="text" default="tmp/fcimport_docs" size="60" label="FLEXI_IMPORT_DOCUMENTS_FOLDER" description="FLEXI_IMPORT_FOLDER_DESC" menu="hide"/>
 			
 	</fieldset>
-	<fieldset name="workflow_n_notifications_conf" label="FLEXI_WORKFLOW_AND_NOTIFICATIONS_CONF" description="" >
+	<fieldset name="workflow_fset" label="FLEXI_WORKFLOW_CONF" description="" >
 	
 		<field name="" type="separator" default="FLEXI_WORKFLOW_BASIC_CONF" label="" level="level0" menu="hide" />
 
@@ -1421,6 +1451,9 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+	</fieldset>
+	<fieldset name="notifications_fset" label="FLEXI_NOTIFICATIONS_CONF" description="" >
+	
 		<field name="" type="separator" default="FLEXI_CONTENT_NOTIFICATIONS_CONF" label="" level="level0" menu="hide" />
 			
 			<field name="enable_notifications" type="radio" default="1" label="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS" description="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS_DESC" menu="hide" class="btn-group btn-group-yesno">

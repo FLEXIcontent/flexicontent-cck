@@ -22,27 +22,27 @@
 		<fieldset name="group-sharedaudio-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
 		<field name="" type="separator" default="Display field on form" level="level1" />
-		<field name="display_audio_type_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TYPE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TYPE_FORM_DESC" class="btn-group btn-group-yesno">
+		<field name="display_audio_type" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TYPE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TYPE_FORM_DESC" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="display_audio_id_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_ID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_ID_FORM_DESC" class="btn-group btn-group-yesno">
+		<field name="display_audio_id" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_ID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_ID_FORM_DESC" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="display_audio_title_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_FORM_DESC" class="btn-group btn-group-yesno">
+		<field name="display_audio_title" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_FORM_DESC" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="display_audio_author_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_AUTHOR_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_AUTHOR_FORM_DESC" class="btn-group btn-group-yesno">
+		<field name="display_audio_author" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_AUTHOR_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_AUTHOR_FORM_DESC" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="display_audio_duration_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_FORM_DESC" class="btn-group btn-group-yesno">
+		<field name="display_audio_duration" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_FORM_DESC" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="display_audio_description_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION_FORM_DESC" class="btn-group btn-group-yesno">
+		<field name="display_audio_description" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION_FORM_DESC" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>

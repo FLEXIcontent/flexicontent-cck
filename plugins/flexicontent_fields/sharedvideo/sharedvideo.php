@@ -35,11 +35,11 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 		$required = $field->parameters->get('required',0);
 		$required = $required ? ' required' : '';
 		$embedly_key = $field->parameters->get('embedly_key','') ;
-		$display_video_type_form = $field->parameters->get('display_video_type_form',1) ;
-		$display_video_id_form = $field->parameters->get('display_video_id_form',1) ;
-		$display_video_title_form = $field->parameters->get('display_video_title_form',1) ;
-		$display_video_author_form= $field->parameters->get('display_video_author_form',1) ;
-		$display_video_description_form =$field->parameters->get('display_video_description_form',1) ;
+		$display_video_type = $field->parameters->get('display_video_type',1) ;
+		$display_video_id = $field->parameters->get('display_video_id',1) ;
+		$display_video_title = $field->parameters->get('display_video_title',1) ;
+		$display_video_author= $field->parameters->get('display_video_author',1) ;
+		$display_video_desc =$field->parameters->get('display_video_desc',1) ;
 		
 		// get stored field value
 		if ( isset($field->value[0]) ) $value = unserialize($field->value[0]);
@@ -56,32 +56,32 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 		$field->html  = '';
 		$field->html .= '<table class="admintable" border="0" cellspacing="0" cellpadding="5">';
 		$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_URL').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" '.$required.' /> <input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_FETCH').'" onclick="fetchVideo_'.$field->name.'();" /></td></tr>';
-		 if ($display_video_type_form) {
+		 if ($display_video_type) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_TYPE').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][videotype]" value="'.$value['videotype'].'" size="10" readonly="readonly" style="background-color:#eee" /></td></tr>';
 		}else{
 			$field->html	.= '<input type="hidden" name="custom['.$field->name.'][videotype]" value="'.$value['videotype'].'" size="10" readonly="readonly" style="background-color:#eee" />';
 		}
-		if ($display_video_id_form) {
+		if ($display_video_id) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_ID').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][videoid]" value="'.$value['videoid'].'" size="15" readonly="readonly" style="background-color:#eee" /></td></tr>';
 		}else{
 			$field->html	.= '<input class="fcfield_textval inputbox" type="hidden" name="custom['.$field->name.'][videoid]" value="'.$value['videoid'].'" size="15" readonly="readonly" style="background-color:#eee" />';
 		}
-		if ($display_video_title_form) {
+		if ($display_video_title) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_TITLE').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" /></td></tr>';
 		}else{
 			$field->html	.= '<input class="fcfield_textval inputbox" type="hidden" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />';
 		}
-		if ($display_video_author_form) {
+		if ($display_video_author) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_AUTHOR').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" /></td></tr>';
 		}else{
 			$field->html	.= '<input class="fcfield_textval inputbox" type="hidden" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />';
 		}
-		if ($display_video_duration_form) {
+		if ($display_video_duration) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DURATION').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" /></td></tr>';
 		}else{
 			$field->html	.= '<input class="fcfield_textval inputbox" type="hidden" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" />';
 		}
-		if ($display_video_description_form) {
+		if ($display_video_desc) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DESCRIPTION').'</td><td><textarea class="fcfield_textareaval" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea></td></tr>';
 		}else{
 			$field->html	.= '<textarea style="display:none;" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea>';

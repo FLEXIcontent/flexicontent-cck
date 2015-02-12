@@ -216,7 +216,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 	<div class="container-fluid">
 	<?php /*<fieldset class="basicfields_set">
 		<legend>
-			<?php echo JText::_( 'FLEXI_BASIC' ); ?>
+			<span class="fc_legend_text"><?php echo JText::_( 'FLEXI_BASIC' ); ?></span>
 		</legend>*/ ?>
 		
 		<div class="span6 full_width_980">
@@ -797,7 +797,7 @@ if ($this->row->type_id) {
 		<div class="fcclear"></div>
 		<fieldset class="basicfields_set" id="fcform_categories_tags_container">
 			<legend>
-				<?php echo JText::_( $fset_lbl ); ?>
+				<span class="fc_legend_text"><?php echo JText::_( $fset_lbl ); ?></span>
 			</legend>
 			
 			<?php if (1) : /* secondary categories always available in backend */ ?>
@@ -845,7 +845,7 @@ if ($this->row->type_id) {
 		<div class="fcclear"></div>
 		<fieldset class="basicfields_set" id="fcform_language_container">
 			<legend>
-				<?php echo JText::_('FLEXI_LANGUAGE') .' '. JText::_('FLEXI_ASSOCIATONS'); ?>
+				<span class="fc_legend_text"><?php echo JText::_('FLEXI_LANGUAGE') .' '. JText::_('FLEXI_ASSOCIATONS'); ?></span>
 			</legend>
 			
 			<?php if ( $this->params->get('enable_translation_groups') ) : ?>

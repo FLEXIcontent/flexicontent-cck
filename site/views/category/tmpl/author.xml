@@ -596,6 +596,12 @@
 		<fieldset name="cat_item_filtering" label="FLEXI_PARAMETERS_CAT_ITEM_FILTERING_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level2" hr="false" />
+			<field name="ff_placement" type="multilist" subtype="radio" default="" label="FLEXI_SEARCH_FILTER_FORM_PLACEMENT" description="FLEXI_SEARCH_FILTER_FORM_PLACEMENT_DESC" class="btn-group group-fcsuccess">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_SEARCH_FILTER_FORM_INLINE</option>
+				<option value="1">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
+			</field>
+			<field name="ff_slider_title" type="text" size="20" default="" label="FLEXI_SLIDER_NAME" description="FLEXI_SLIDER_NAME_DESC" />
 			<field name="show_search_go" type="radio" default="" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_AUTO</option>

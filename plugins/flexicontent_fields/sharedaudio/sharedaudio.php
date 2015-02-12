@@ -35,11 +35,11 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 		$required = $field->parameters->get('required',0);
 		$required = $required ? ' required' : '';
 		$embedly_key = $field->parameters->get('embedly_key','') ;
-		$display_audio_type_form = $field->parameters->get('display_audio_type_form',1) ;
-		$display_audio_id_form = $field->parameters->get('display_audio_id_form',1) ;
-		$display_audio_title_form = $field->parameters->get('display_audio_title_form',1) ;
-		$display_audio_author_form= $field->parameters->get('display_audio_author_form',1) ;
-		$display_audio_description_form =$field->parameters->get('display_audio_description_form',1) ;
+		$display_audio_type = $field->parameters->get('display_audio_type',1) ;
+		$display_audio_id = $field->parameters->get('display_audio_id',1) ;
+		$display_audio_title = $field->parameters->get('display_audio_title',1) ;
+		$display_audio_author= $field->parameters->get('display_audio_author',1) ;
+		$display_audio_description =$field->parameters->get('display_audio_description',1) ;
 		
 		// get stored field value
 		if ( isset($field->value[0]) ) $value = unserialize($field->value[0]);
@@ -55,27 +55,27 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 		$field->html  = '';
 		$field->html .= '<table class="admintable" border="0" cellspacing="0" cellpadding="5">';
 		$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_URL').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" '.$required.' /> <input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_FETCH').'" onclick="fetchAudio_'.$field->name.'();" /></td></tr>';
-		 if ($display_audio_type_form) {
+		 if ($display_audio_type) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_TYPE').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][audiotype]" value="'.$value['audiotype'].'" size="10" readonly="readonly" style="background-color:#eee" /></td></tr>';
 		}else{
 			$field->html .= '<input type="hidden" class="fcfield_textval" name="custom['.$field->name.'][audiotype]" value="'.$value['audiotype'].'" size="10" readonly="readonly" style="background-color:#eee" />';
 		}
-		if ($display_audio_id_form) {
+		if ($display_audio_id) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_ID').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][audioid]" value="'.$value['audioid'].'" size="15" readonly="readonly" style="background-color:#eee" /></td></tr>';
 		}else{
 			$field->html .= '<input type="hidden" class="fcfield_textval" name="custom['.$field->name.'][audioid]" value="'.$value['audioid'].'" size="15" readonly="readonly" style="background-color:#eee" />';
 		}
-		if ($display_audio_title_form) {
+		if ($display_audio_title) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_TITLE').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" /></td></tr>';
 		}else{
 			$field->html .= '<input type="hidden" class="fcfield_textval" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />';
 		}
-		if ($display_audio_author_form) {
+		if ($display_audio_author) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTHOR').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" /></td></tr>';
 		}else{
 			$field->html .= '<input type="hidden" class="fcfield_textval" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />';
 		}
-		if ($display_audio_description_form) {
+		if ($display_audio_description) {
 			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DESCRIPTION').'</td><td><textarea class="fcfield_textareaval" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea></td></tr>';
 		}else{
 			$field->html .= '<textarea style="display:none;" class="fcfield_textareaval" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea>';

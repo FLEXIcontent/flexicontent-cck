@@ -18,9 +18,6 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//field in slider
-$slider_mod = $this->params->get('slider_mod', 0);
-
 function utf8ord($char) {
 	$i = 0;
 	$number = '';
@@ -199,10 +196,4 @@ else $selected_letter = JRequest::getVar('letter', '', 'post');
 	
 	<?php
 	}?>
-		<?php 
-	if ($slider_mod){
-		$endslider_mod2= JHtml::_('sliders.end');
-		echo $endslider_mod2;
-	} 
-?>
 </div>

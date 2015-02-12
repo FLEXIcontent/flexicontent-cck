@@ -627,3 +627,18 @@ div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text.fcdisabled {
 body.view-items .select2-drop .select2-results {
 	max-height: 400px !important;
 }
+
+
+/* forms */
+legend .fc_legend_text {
+    background: none repeat scroll 0 0 transparent;
+    border: 1px solid lightgray !important;
+    border-radius: 6px !important;
+    color: gray !important;
+    display: inline-block !important;
+    line-height: 0.5em !important;
+    margin: 0 0 5px !important;
+    padding: 8px 10px !important;
+    position: relative !important;
+    top: 0 !important;
+}

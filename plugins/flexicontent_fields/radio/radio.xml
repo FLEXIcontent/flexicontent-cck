@@ -145,7 +145,7 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_CONF" description="" level="level2"/>
-			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_WARNING" description="" level="level3" />
+			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_WARNING" description="" level="level3"/>
 			<field name="filter_customize_options" type="multilist" subtype="list" default="0" label="FLEXI_CUSTOM_FILTER_VALUES" toggle_related="1" description="FLEXI_CUSTOM_FILTER_VALUES_DESC">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_USE_ALL_VALUES_DEFAULT</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_USE_CUSTOM_QUERY</option>

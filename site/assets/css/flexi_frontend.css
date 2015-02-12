@@ -286,6 +286,35 @@ div table.adminform td {
  * Frontend templates, FORM CSS for: SEARCH/FILTER/ALPHA-INDEX/SELECTORS(e.g. per page, orderby) FORM CSS
  ********************************************************************************************************/
 
+.fcfilter_form_outer > div > .panel > .title {
+	background-color: #dddddd;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#eeeeee), to(#dddddd));
+	background-image: -webkit-linear-gradient(top, #eeeeee, #dddddd);
+	background-image: -moz-linear-gradient(top, #eeeeee, #dddddd);
+	background-image: -ms-linear-gradient(top, #eeeeee, #dddddd);
+	background-image: -o-linear-gradient(top, #eeeeee, #dddddd);
+	background-image: linear-gradient(to bottom, #eeeeee, #dddddd);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee, endColorstr=#dddddd);
+	background-repeat: repeat-x;
+	border: 1px solid lightgray;
+	border-radius: 4px;
+	padding: 4px;
+	cursor: pointer;
+	-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+}
+.fcfilter_form_outer > div > .panel > .title:hover {
+	background-color: #cccccc;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#cccccc));
+	background-image: -webkit-linear-gradient(top, #dddddd, #cccccc);
+	background-image: -moz-linear-gradient(top, #dddddd, #cccccc);
+	background-image: -ms-linear-gradient(top, #dddddd, #cccccc);
+	background-image: -o-linear-gradient(top, #dddddd, #cccccc);
+	background-image: linear-gradient(to bottom, #dddddd, #cccccc);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd, endColorstr=#cccccc);
+}
+.fcfilter_form_outer > div > .panel > .pane-slider.content  {
+	margin: 12px 0px;
+	padding: 0px 0px;
+}
+
 /* Outer container of (a) text search, (b) field filters */
 #flexicontent #fc_filter_box {
 	display: block;
@@ -301,7 +330,8 @@ fieldset.fc_filter_set {
 	border: 1px solid #cccccc;
 	margin: 0px;
 	padding: 1%;
-	width: 98%;
+	width: 100%;
+	box-sizing: border-box;
 	min-width: inherit !important; /* workaround for chrome fieldset width bug */
 	display: block;
 }
@@ -568,9 +598,9 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 }
 
 .fc_filter.fc_even,
-.fc_filter_line.fc_even { background: #E0E0E0 !important; display:block !important; }
+.fc_filter_line.fc_even { background: #E0E0E0 !important; display:block; }
 .fc_filter.fc_odd,
-.fc_filter_line.fc_odd { background: #EEEEEE !important; display:block !important; }
+.fc_filter_line.fc_odd { background: #EEEEEE !important; display:block; }
 
 /* Container of each individual field filter HTML, either compact view (floating with separator element) or per line */
 .fc_filter .fc_filter_html,
@@ -612,7 +642,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 }
 .fc_filter_html .fc_text_filter.select2-container.select2-container-multi,
 .fc_filter_html .fc_field_filter.select2-container.select2-container-multi {
-	margin: 1px 0px 1px 4px !important;
+	margin: 2px 0px 2px 4px !important;
 }
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
@@ -626,17 +656,23 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html input.fc_field_filter:focus {
 	height: auto;
 	line-height: 150%;
-	padding: 6px 26px 7px 4px !important;
-	margin: 3px 4px 4px 8px !important;
+	padding: 5px 4px 6px 4px !important;
+	margin: 3px 4px 3px 8px !important;
 	position: relative;
 	/* background: transparent; ... does not work properly with ie8/9, it causes: */
 	/* any element with less z-index to be placed above this element, */
 	/* e.g. the span element for showing an inner is placed above, thus preventing focusing of the input !! */
 	border: 1px solid gray !important;
-	background: url(../images/magnifier-left.png) 96% 4px no-repeat white;
 	opacity: 0.5; filter:alpha(opacity=50);
 	min-width: 120px !important;
 	vertical-align: top;
+}
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter,
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus,
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
+	padding: 5px 26px 6px 4px !important;
+	background: url(../images/magnifier-left.png) 96% 4px no-repeat white;
 }
 .fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_field_filter,
@@ -708,7 +744,7 @@ ul.fc_field_filter.fc_checkradio_group label {
 .fc_has_inner_prompt.fc_has_inner_prompt_input {
 	left:14px !important; top:10px !important;
 	color: black !important;
-	line-height: 1em !important;
+	line-height: 150% !important;
 	padding: 0px 0px 0px 4px !important;
 }
 .fc_has_inner_label.fc_has_inner_label_select2,
@@ -1651,75 +1687,75 @@ div.fancybox-wrap a { background: none!important;}
 }
 
 #flexicontent .fc_markup {
-	float: right !important;
-	display: block !important;
-  background-color: #F2F2F2;
-  border-width: 0px!important;
-  font-style: normal !important;
-  font-size: 11px !important;
-  font-family: arial !important;
-  font-weight: bold !important;
-  text-align: right !important;
-  max-width: 150px !important;
-  min-width: auto !important;
-  margin: 0px !important;
-  padding: 0px !important;
-  border-radius: 6px !important;
-  line-height: 100%;
+	float: right;
+	display: block;
+	background-color: #F2F2F2;
+	border-width: 0px;
+	font-style: normal;
+	font-size: 11px;
+	font-family: arial;
+	font-weight: bold;
+	text-align: right;
+	max-width: 150px;
+	min-width: auto;
+	margin: 0px;
+	padding: 0px;
+	border-radius: 6px;
+	line-height: 100%;
 }
 
 #flexicontent .fc_markup.mu_has_text {
-  border-bottom: 1px solid #AAA !important;
-  border-right: 1px solid #AAA !important;
-  margin: 2px 2px 2px 12px !important;
-  padding: 8px 4px !important;
+	border-bottom: 1px solid #AAA;
+	border-right: 1px solid #AAA;
+	margin: 2px 2px 2px 12px;
+	padding: 8px 4px;
 }
 
 #flexicontent .fc_markup.mu_featured_cat.mu_has_text {
-	padding-left: 24px !important;
+	padding-left: 24px;
 	background: url(../images/star.png) 4px 50% no-repeat lightgoldenrodyellow;
-	color: black !important;
+	color: black;
 }
 
 #flexicontent .fc_markup.mu_normal_cat.mu_has_text {
-	padding-left: 24px !important;
+	padding-left: 24px;
 	background: url(../images/star-empty.png) 4px 50% no-repeat lightgoldenrodyellow;
-	color: #888 !important;
+	color: #888;
 }
 
 #flexicontent .fc_markup.mu_item_no_access.mu_has_text {
-	padding-left: 24px !important;
+	padding-left: 24px;
 	background: url(../images/eye-half.png) 4px 50% no-repeat #FFD700;
-	color: #555 !important;
+	color: #555;
 }
 
 #flexicontent .fc_markup.mu_item_free_access.mu_has_text {
-	padding-left: 24px !important;
+	padding-left: 24px;
 	background: url(../images/eye.png) 4px 50% no-repeat #50EE90;
-	color: #777 !important;
+	color: #777;
 }
 
 #flexicontent .fc_markup.mu_needed_acclvl.mu_has_text {
-	padding-left: 24px !important;
+	padding-left: 24px;
 	background: url(../images/lock.png) 4px 50% no-repeat darkorange;
-	color: white !important;
+	color: white;
 }
 
 #flexicontent .fc_markup.mu_obtained_acclvl.mu_has_text {
-	padding-left: 24px !important;
-	background: url(../images/lock-unlock.png) 4px 50% no-repeat transparent !important;
-	background-color: darkgreen !important;
-	color: white !important;
+	padding-left: 24px;
+	background: url(../images/lock-unlock.png) 4px 50% no-repeat transparent;
+	background-color: darkgreen;
+	color: white;
 }
 
 #flexicontent .fc_markup.mu_ra_timeframe.mu_has_text {
-	padding-left: 24px !important;
+	padding-left: 24px;
 	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat lightskyblue;
-	color: #333 !important;
+	color: #333;
 }
 
 #flexicontent .fc_markup.mu_ru_timeframe.mu_has_text {
-	padding-left: 24px !important;
+	padding-left: 24px;
 	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat lightskyblue;
-	color: #333 !important;
+	color: #333;
 }
