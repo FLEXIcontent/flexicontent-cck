@@ -3606,7 +3606,7 @@ class flexicontent_upload
 		}
 		// Sucosin limitation
 		if (extension_loaded('suhosin')) {
-			$post_max = parseByteLimit(ini_get('suhosin.post.max_value_length'));
+			$post_max = flexicontent_upload::parseByteLimit(ini_get('suhosin.post.max_value_length'));
 			if ($post_max < $limit['value']) $limit = array('value'=>$post_max, 'name'=>'suhosin.post.max_value_length');
 		}
 		return $limit;
