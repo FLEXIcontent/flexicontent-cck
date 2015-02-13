@@ -1017,7 +1017,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 /* we do not want joomla template link styling here !!!, allow only explicitly coded override */
 #flexicontent .fcfield-button-add a { 
 	padding: 6px 8px;
-	margin: 4px 2px 0px 6px;
+	margin: 0px 2px 0px 6px;
 	text-decoration: none!important;
 	background-color: white!important;
 	color: gray!important;

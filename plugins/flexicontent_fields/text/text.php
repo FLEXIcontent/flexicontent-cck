@@ -276,7 +276,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			break;
 		default:
 			if ($inputmask){
-				$validate_mask = " data-inputmask=\" 'alias': '".$inputmask."' "." \" ";
+				$validate_mask = " data-inputmask=\" 'alias': '".$inputmask."' \" ";
 				$classes .= ' has_inputmask';
 			}
 		}

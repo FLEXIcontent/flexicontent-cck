@@ -72,11 +72,24 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		// Input field display size & max characters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced
+		$inputmask	= $field->parameters->get( 'inputmask', 'email' ) ;
 		
 		// create extra HTML TAG parameters for the form field
 		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
 		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
 		$attribs .= ' size="'.$size.'" ';
+		$classes = $required;
+		
+		static $inputmask_added = false;
+	  if ($inputmask && !$inputmask_added) {
+			$inputmask_added = true;
+			flexicontent_html::loadFramework('inputmask');
+		}
+		if ($inputmask) {
+			$attribs .= " data-inputmask=\" 'alias': 'email' \" ";
+			$classes .= ' has_inputmask';
+		}
+		$classes .= ' validate-email';
 		
 		
 		// *************************************
@@ -153,6 +166,10 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				theInput = newField.find('input.emailtext').first();
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
+				
+				// Update inputmask
+				var has_inputmask = newField.find('input.has_inputmask').length != 0;
+				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
 				";
 			
 			// Add new field to DOM
@@ -252,7 +269,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$addr = '
 				<div class="nowrap_box">
 					<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
-					<input class="emailaddr fcfield_textval validate-email'.$required.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" value="'.$value['addr'].'" '.$attribs.' />
+					<input class="emailaddr fcfield_textval '.$classes.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" value="'.$value['addr'].'" '.$attribs.' />
 				</div>';
 			
 			$text = '';

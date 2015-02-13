@@ -632,13 +632,12 @@ body.view-items .select2-drop .select2-results {
 /* forms */
 legend .fc_legend_text {
     background: none repeat scroll 0 0 transparent;
-    border: 1px solid lightgray !important;
-    border-radius: 6px !important;
-    color: gray !important;
-    display: inline-block !important;
-    line-height: 0.5em !important;
-    margin: 0 0 5px !important;
-    padding: 8px 10px !important;
-    position: relative !important;
-    top: 0 !important;
+    border: 1px solid lightgray;
+    border-radius: 6px;
+    display: inline-block;
+    line-height: 0.5em;
+    margin: 0 0 5px;
+    padding: 8px 10px;
+    position: relative;
+    top: 0;
 }

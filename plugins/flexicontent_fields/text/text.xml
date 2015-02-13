@@ -76,6 +76,14 @@
 				<option value="" show_list="" hide_list="regexmask-mode,custommask-mode">FLEXI_NO_MASK</option>
 				<option value="__regex__" show_list="regexmask-mode"  hide_list="custommask-mode">- REGULAR EXPRESSION (regex) -</option>
 				<option value="__custom__" show_list="custommask-mode"  hide_list="regexmask-mode">- CUSTOM MASK (property list)</option>
+				<!-- Various aliases -->
+				<option value="url" show_list="" hide_list="regexmask-mode,custommask-mode">URL</option>
+				<option value="ip" show_list="" hide_list="regexmask-mode,custommask-mode">IP (i.i.i.i)</option>
+				<option value="email" show_list="" hide_list="regexmask-mode,custommask-mode">Email</option>
+				<option value="currency" show_list="" hide_list="regexmask-mode,custommask-mode">Currency ($)</option>
+				<option value="decimal" show_list="" hide_list="regexmask-mode,custommask-mode">Decimal</option>
+				<option value="integer" show_list="" hide_list="regexmask-mode,custommask-mode">Integer</option>
+				<!-- Date aliases -->
 				<option value="dd/mm/yyyy" show_list="" hide_list="regexmask-mode,custommask-mode">Date (dd/mm/yyyy)</option>
 				<option value="mm/dd/yyyy" show_list="" hide_list="regexmask-mode,custommask-mode">Date (mm/dd/yyyy)</option>
 				<option value="yyyy/mm/dd" show_list="" hide_list="regexmask-mode,custommask-mode">Date (yyyy/mm/dd)</option>
@@ -87,16 +95,11 @@
 				<option value="yyyy-mm-dd" show_list="" hide_list="regexmask-mode,custommask-mode">Date (yyyy-mm-dd)</option>
 				<option value="datetime" show_list="" hide_list="regexmask-mode,custommask-mode">Date Time 24h (dd/mm/yyyy hh:mm)</option>
 				<option value="datetime12" show_list="" hide_list="regexmask-mode,custommask-mode">Date Time 12h (dd/mm/yyyy hh:mm xm)</option>
-				<option value="hh:mm t" show_list="" hide_list="regexmask-mode,custommask-mode">Time (hh:mm xm)</option>
-				<!--option value="h:s t">Time (h:s t)</option-->
+				<option value="hh:mm t" show_list="" hide_list="regexmask-mode,custommask-mode">Time (hh:mm t)</option>
+				<option value="h:s t" show_list="" hide_list="regexmask-mode,custommask-mode">Time (h:s t)</option>
 				<option value="hh:mm:ss" show_list="" hide_list="regexmask-mode,custommask-mode">Time (hh:mm:ss)</option>
 				<option value="hh:mm" show_list="" hide_list="regexmask-mode,custommask-mode">Time (hh:mm)</option>
 				<option value="mm/yyyy" show_list="" hide_list="regexmask-mode,custommask-mode">Month/Year (mm/yyyy)</option>
-				<option value="url" show_list="" hide_list="regexmask-mode,custommask-mode">URL</option>
-				<option value="ip" show_list="" hide_list="regexmask-mode,custommask-mode">IP (i.i.i.i)</option>
-				<option value="decimal" show_list="" hide_list="regexmask-mode,custommask-mode">Decimal</option>
-				<!--option value="non-negative-decimal">Non-negative Decimal</option-->
-				<option value="integer" show_list="" hide_list="regexmask-mode,custommask-mode">Integer</option>
 			</field>
 			<field name="regexmask" type="text" default="" label="Regular Expression" depend_class="regexmask-mode" description="See PERL regular expression e.g. [0-9]{0-10}"  />
 			<field name="custommask" type="text" default="" label="FLEXI_VALUE_VALIDATION_CUSTOM_MASK" depend_class="custommask-mode" description="FLEXI_VALUE_VALIDATION_CUSTOM_MASK_DESC" />
