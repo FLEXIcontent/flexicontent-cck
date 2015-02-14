@@ -543,7 +543,7 @@ jQuery(document).ready(function() {
 		if ($display_total)
 		{
 			$total_append_text = $field->parameters->get('total_append_text', '');
-			$field->{$prop} .= '<span class="fcrelation_field_total">'. count($values) .' '. $total_append_text .'<span>';
+			$field->{$prop} .= '<span class="fcrelation_field_total">'. count($values) .' '. $total_append_text .'</span>';
 			
 			// Terminate if not adding any extra information
 			if ( !$total_show_list && !$total_show_auto_btn ) return;

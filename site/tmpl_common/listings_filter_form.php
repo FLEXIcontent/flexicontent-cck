@@ -52,4 +52,4 @@ if ($ff_placement){
 if ($ff_placement) echo JHtml::_('sliders.end');
 ?>
 
-<div>
+</div>

@@ -45,273 +45,247 @@ var JFormValidator = new Class({
 		this.custom		= Object();
 
 		// Default handlers
-		this.setHandler('username',
-			function (value) {
-				regex = new RegExp("[\<|\>|\"|\'|\%|\;|\(|\)|\&]", "i");
-				return !regex.test(value);
-			}
-		);
+		this.setHandler('username', function (value) {
+			regex = new RegExp("[\<|\>|\"|\'|\%|\;|\(|\)|\&]", "i");
+			return !regex.test(value);
+		});
 
-		this.setHandler('password',
-			function (value) {
-				regex=/^\S[\S ]{2,98}\S$/;
-				return regex.test(value);
-			}
-		);
+		this.setHandler('password', function (value) {
+			regex=/^\S[\S ]{2,98}\S$/;
+			return regex.test(value);
+		});
 
-		this.setHandler('numeric',
-			function (value) {
-				regex=/^(\d|-)?(\d|,)*\.?\d*$/;
-				return regex.test(value);
-			}
-		);
+		this.setHandler('numeric', function (value) {
+			regex=/^(\d|-)?(\d|,)*\.?\d*$/;
+			return regex.test(value);
+		});
 
-		this.setHandler('email',
-			function (value) {
-				regex=/^[a-zA-Z0-9._-]+(\+[a-zA-Z0-9._-]+)*@([a-zA-Z0-9.-]+\.)+[a-zA-Z0-9.-]{2,4}$/;
-				return regex.test(value);
-			}
-		);
+		this.setHandler('email', function (value) {
+			regex=/^[a-zA-Z0-9._-]+(\+[a-zA-Z0-9._-]+)*@([a-zA-Z0-9.-]+\.)+[a-zA-Z0-9.-]{2,4}$/;
+			return regex.test(value);
+		});
 
-		this.setHandler('fieldname',
-			function (value) {
-				regex=/^[a-zA-Z0-9_-]+$/;
-				return regex.test(value);
-			}
-		);
+		this.setHandler('fieldname', function (value) {
+			regex=/^[a-zA-Z0-9_-]+$/;
+			return regex.test(value);
+		});
 
-		this.setHandler('radio',
-			function (par) {
-				var nl, i;
-				if (par.parentNode == null) {
-					return true;
-				} else {
-					var options = par.parentNode.getElementsByTagName('input');
-			
-					for (i=0, nl = options; i<nl.length; i++) {
-						if (nl[i].checked) return true;
-					}
-			
-					return false;
-				}
-			}
-		);
-
-		this.setHandler('checkbox',
-			function (par) {
-				var nl, i;
-				if (par.parentNode == null) {
-					return true;
-				} else {
-					var options = par.parentNode.getElementsByTagName('input');
-			
-					for (i=0, nl = options; i<nl.length; i++) {
-						if (nl[i].checked) return true;
-					}
-			
-					return false;
-				}
-			}
-		);
-		
-		this.setHandler('checkbox2',
-			function (par) {
-				var nl, i;
-				if (par.parentNode == null) {
-					return true;
-				} else {
-					var options = par.parentNode.getElementsByTagName('input');
-			
-					var count = 0;
-					for (i=0, nl = options; i<nl.length; i++) {
-						if (nl[i].checked) count++;
-					}
-			
-					//exactly 2 options
-					if(count == 2) return true;
-					return false;
-				}
-			}
-		);
-		
-		this.setHandler('checkbox3',
-			function (par) {
-				var nl, i;
-				if (par.parentNode == null) {
-					return true;
-				} else {
-					var options = par.parentNode.getElementsByTagName('input');
-			
-					var count = 0;
-					for (i=0, nl = options; i<nl.length; i++) {
-						if (nl[i].checked) count++;
-					}
-			
-					//exactly 3 options
-					if(count == 3) return true;
-					return false;
-				}
-			}
-		);
-
-		this.setHandler('catid',
-			function (el) {
-				// Check for value if primary category is set
-				el = jQuery(el);
-				var value = el.val();
-				if (value) return true;
+		this.setHandler('radio', function (par) {
+			var nl, i;
+			if (par.parentNode == null) {
+				return true;
+			} else {
+				var options = par.parentNode.getElementsByTagName('input');
 				
-				// Retrieve selected values for secondary categories
-				var element_id = 'jform_cid';
-				var field_name = 'jform[cid][]';
-				
-				// If exactly one secondary category was selected then set it as primary
-				var values = jQuery(document.getElementsByName(field_name)).val();
-				if (values && values.length == 1) {
-					el.val(values[0]);
-					if (el.hasClass('use_select2_lib')) {
-						el.select2();
-					}
-					return true;
+				for (i=0, nl = options; i<nl.length; i++) {
+					if (nl[i].checked) return true;
 				}
+				
 				return false;
 			}
-		);
-		
-		this.setHandler('fccats',
-			function (el) {
-				//var value = el.get('value');
+		});
+
+		this.setHandler('checkbox', function (par) {
+			var nl, i;
+			if (par.parentNode == null) {
+				return true;
+			} else {
+				var options = par.parentNode.getElementsByTagName('input');
 				
-				// Retrieve selected values for secondary categories
-				var element_id = 'jform_cid';
-				var field_name = 'jform[cid][]';
-				var field_name_catid = 'jform[catid]';
-					
-				if(MooTools.version>="1.2.4") {
-					//var values = $(element_id).getSelected();  // does not work in old template form overrides with no id parameter
-					var values = $$(document.getElementsByName(field_name))[0].getSelected();
-					values = values.map( function(g) { return g.get('value'); } );
-					
-					var value_catid = $$(document.getElementsByName(field_name_catid))[0].getSelected();
-					value_catid = value_catid.map( function(g) { return g.get('value'); } );
-					value_catid = value_catid[0];
-				} else {
-					//values = $(element_id).getValue();  // does not work in old template form overrides with no id parameter
-					var values = $$(document.getElementsByName(field_name))[0].getValue();
-					//  ** Alternative code **
-					//var values = $(element_id).getChildren().filter( function(g) { return g.selected; } );
-					//values = values.map( function(g) { return g.getProperty('value'); } );
-					
-					var value_catid = $$(document.getElementsByName(field_name_catid))[0].getValue();
+				for (i=0, nl = options; i<nl.length; i++) {
+					if (nl[i].checked) return true;
 				}
 				
-				//window.console.log(values);
-				//window.console.log(existing_cats_fc);
+				return false;
+			}
+		});
+
+		this.setHandler('checkbox2', function (par) {
+			var nl, i;
+			if (par.parentNode == null) {
+				return true;
+			} else {
+				var options = par.parentNode.getElementsByTagName('input');
 				
-				// Check if maincat is not in already selected secondary cats
-				var add_val = ( value_catid && ( jQuery.inArray(value_catid, values) == -1) ) ? 1 : 0;
+				var count = 0;
+				for (i=0, nl = options; i<nl.length; i++) {
+					if (nl[i].checked) count++;
+				}
 				
-				// Check if the number of categories is over the allowed limit for current user
-				if (max_cat_assign_fc && (values.length+add_val) > max_cat_assign_fc) {
-					var existing_only = 1;
-					for (var i = 0; i < values.length; i++) {
-						existing_only = existing_only && ( jQuery.inArray(values[i], existing_cats_fc) >= 0 );
-					}
-					existing_only = existing_only && ( jQuery.inArray(value_catid, existing_cats_fc) >= 0 );
-					if (!existing_only) {
-						alert(max_cat_overlimit_msg_fc+max_cat_assign_fc);
-						return false;
-					}
+				//exactly 2 options
+				if(count == 2) return true;
+				return false;
+			}
+		});
+
+		this.setHandler('checkbox3', function (par) {
+			var nl, i;
+			if (par.parentNode == null) {
+				return true;
+			} else {
+				var options = par.parentNode.getElementsByTagName('input');
+				
+				var count = 0;
+				for (i=0, nl = options; i<nl.length; i++) {
+					if (nl[i].checked) count++;
+				}
+				
+				//exactly 3 options
+				if(count == 3) return true;
+				return false;
+			}
+		});
+
+		this.setHandler('catid', function (el) {
+			// Check for value if primary category is set
+			el = jQuery(el);
+			var value = el.val();
+			if (value) return true;
+			
+			// Retrieve selected values for secondary categories
+			var element_id = 'jform_cid';
+			var field_name = 'jform[cid][]';
+			
+			// If exactly one secondary category was selected then set it as primary
+			var values = jQuery(document.getElementsByName(field_name)).val();
+			if (values && values.length == 1) {
+				el.val(values[0]);
+				if (el.hasClass('use_select2_lib')) {
+					el.select2();
 				}
 				return true;
 			}
-		);
+			return false;
+		});
 
-		this.setHandler('sellimitations',
-			function (el) {
-				var nl, i;
-				if (el == null) {
-					return true;
-				} else {
-					var options = el.getElementsByTagName('option');
-					
-					var count = 0;
-					for (i=0, nl = options; i<nl.length; i++) {
-						if (nl[i].selected) count++;
-					}
-					
-					min_values = el.getAttribute("min_values");
-					min_values = min_values ? parseInt( min_values, 10 ) : 0;
+		this.setHandler('fccats', function (el) {
+			//var value = el.get('value');
 			
-					max_values = el.getAttribute("max_values");
-					max_values = max_values ? parseInt( max_values, 10 ) : 0;
+			// Retrieve selected values for secondary categories
+			var element_id = 'jform_cid';
+			var field_name = 'jform[cid][]';
+			var field_name_catid = 'jform[catid]';
 			
-					exact_values = el.getAttribute("exact_values");
-					exact_values = exact_values ? parseInt( exact_values, 10 ) : 0;
-					
-					js_popup_err = el.getAttribute("js_popup_err");
-					js_popup_err = js_popup_err ? parseInt( js_popup_err, 10 ) : 0;
-					
-					// Check maximum number of selected options
-					if ( min_values && count < min_values) {
-						if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is less than minimum allowed: '+min_values);
-						return false;
-					}
-					if ( max_values && count > max_values) {
-						if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is more than maximum allowed: '+max_values);
-						return false;
-					}
-					if ( exact_values && count != exact_values) {
-						if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n but it must be exactly '+exact_values);
-						return false;
-					}
-					return true;
+			if(MooTools.version>="1.2.4") {
+				//var values = $(element_id).getSelected();  // does not work in old template form overrides with no id parameter
+				var values = $$(document.getElementsByName(field_name))[0].getSelected();
+				values = values.map( function(g) { return g.get('value'); } );
+				
+				var value_catid = $$(document.getElementsByName(field_name_catid))[0].getSelected();
+				value_catid = value_catid.map( function(g) { return g.get('value'); } );
+				value_catid = value_catid[0];
+			} else {
+				//values = $(element_id).getValue();  // does not work in old template form overrides with no id parameter
+				var values = $$(document.getElementsByName(field_name))[0].getValue();
+				//  ** Alternative code **
+				//var values = $(element_id).getChildren().filter( function(g) { return g.selected; } );
+				//values = values.map( function(g) { return g.getProperty('value'); } );
+				
+				var value_catid = $$(document.getElementsByName(field_name_catid))[0].getValue();
+			}
+			
+			//window.console.log(values);
+			//window.console.log(existing_cats_fc);
+			
+			// Check if maincat is not in already selected secondary cats
+			var add_val = ( value_catid && ( jQuery.inArray(value_catid, values) == -1) ) ? 1 : 0;
+			
+			// Check if the number of categories is over the allowed limit for current user
+			if (max_cat_assign_fc && (values.length+add_val) > max_cat_assign_fc) {
+				var existing_only = 1;
+				for (var i = 0; i < values.length; i++) {
+					existing_only = existing_only && ( jQuery.inArray(values[i], existing_cats_fc) >= 0 );
+				}
+				existing_only = existing_only && ( jQuery.inArray(value_catid, existing_cats_fc) >= 0 );
+				if (!existing_only) {
+					alert(max_cat_overlimit_msg_fc+max_cat_assign_fc);
+					return false;
 				}
 			}
-		);
-		
-		this.setHandler('cboxlimitations',
-			function (el) {
-				var nl, i;
-				if (el.parentNode.parentNode == null) {
-					return true;
-				} else {
-					var options = el.parentNode.parentNode.getElementsByTagName('input');
-			
-					var count = 0;
-					for (i=0, nl = options; i<nl.length; i++) {
-						if (nl[i].checked) count++;
-					}
-					
-					min_values = el.getAttribute("min_values");
-					min_values = min_values ? parseInt( min_values, 10 ) : 0;
-			
-					max_values = el.getAttribute("max_values");
-					max_values = max_values ? parseInt( max_values, 10 ) : 0;
-			
-					exact_values = el.getAttribute("exact_values");
-					exact_values = exact_values ? parseInt( exact_values, 10 ) : 0;
-					
-					js_popup_err = el.getAttribute("js_popup_err");
-					js_popup_err = js_popup_err ? parseInt( js_popup_err, 10 ) : 0;
-					
-					// Check maximum number of selected options
-					if ( min_values && count < min_values) {
-						if (el.labelref && js_popup_err && fcflabels_errcnt[el.labelfor]==0) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is less than minimum allowed: '+min_values);
-						return false;
-					}
-					if ( max_values && count > max_values) {
-						if (el.labelref && js_popup_err && fcflabels_errcnt[el.labelfor]==0) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is more than maximum allowed: '+max_values);
-						return false;
-					}
-					if ( exact_values && count != exact_values) {
-						if (el.labelref && js_popup_err && fcflabels_errcnt[el.labelfor]==0) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n but it must be exactly '+exact_values);
-						return false;
-					}
-					return true;
+			return true;
+		});
+
+		this.setHandler('sellimitations', function (el) {
+			var nl, i;
+			if (el == null) {
+				return true;
+			} else {
+				var options = el.getElementsByTagName('option');
+				
+				var count = 0;
+				for (i=0, nl = options; i<nl.length; i++) {
+					if (nl[i].selected) count++;
 				}
+				
+				min_values = el.getAttribute("min_values");
+				min_values = min_values ? parseInt( min_values, 10 ) : 0;
+				
+				max_values = el.getAttribute("max_values");
+				max_values = max_values ? parseInt( max_values, 10 ) : 0;
+				
+				exact_values = el.getAttribute("exact_values");
+				exact_values = exact_values ? parseInt( exact_values, 10 ) : 0;
+				
+				js_popup_err = el.getAttribute("js_popup_err");
+				js_popup_err = js_popup_err ? parseInt( js_popup_err, 10 ) : 0;
+				
+				// Check maximum number of selected options
+				if ( min_values && count < min_values) {
+					if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is less than minimum allowed: '+min_values);
+					return false;
+				}
+				if ( max_values && count > max_values) {
+					if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is more than maximum allowed: '+max_values);
+					return false;
+				}
+				if ( exact_values && count != exact_values) {
+					if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n but it must be exactly '+exact_values);
+					return false;
+				}
+				return true;
 			}
-		);
+		});
+
+		this.setHandler('cboxlimitations', function (el) {
+			var nl, i;
+			if (el.parentNode.parentNode == null) {
+				return true;
+			} else {
+				var options = el.parentNode.parentNode.getElementsByTagName('input');
+				
+				var count = 0;
+				for (i=0, nl = options; i<nl.length; i++) {
+					if (nl[i].checked) count++;
+				}
+				
+				min_values = el.getAttribute("min_values");
+				min_values = min_values ? parseInt( min_values, 10 ) : 0;
+				
+				max_values = el.getAttribute("max_values");
+				max_values = max_values ? parseInt( max_values, 10 ) : 0;
+				
+				exact_values = el.getAttribute("exact_values");
+				exact_values = exact_values ? parseInt( exact_values, 10 ) : 0;
+				
+				js_popup_err = el.getAttribute("js_popup_err");
+				js_popup_err = js_popup_err ? parseInt( js_popup_err, 10 ) : 0;
+				
+				// Check maximum number of selected options
+				if ( min_values && count < min_values) {
+					if (el.labelref && js_popup_err && fcflabels_errcnt[el.labelfor]==0) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is less than minimum allowed: '+min_values);
+					return false;
+				}
+				if ( max_values && count > max_values) {
+					if (el.labelref && js_popup_err && fcflabels_errcnt[el.labelfor]==0) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is more than maximum allowed: '+max_values);
+					return false;
+				}
+				if ( exact_values && count != exact_values) {
+					if (el.labelref && js_popup_err && fcflabels_errcnt[el.labelfor]==0) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n but it must be exactly '+exact_values);
+					return false;
+				}
+				return true;
+			}
+		});
 	},
 
 	setHandler: function(name, fn, en)
