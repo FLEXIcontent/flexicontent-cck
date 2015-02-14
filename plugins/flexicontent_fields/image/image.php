@@ -1051,6 +1051,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Force opening in new window in backend
 		if ($isItemsManager && $linkto_url && $url_target!='multibox') $url_target = "_blank";
 		
+		// Only allow multibox (and TODO: add fancybox) when linking to URL, in other cases force fancybox
+		if ($isLinkToPopup) $popuptype = 1; else if ($linkto_url) $usepopup = 0;
+		
 		
 		// ************************************
 		// Social website sharing configuration
@@ -1492,7 +1495,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				// CASE 0: Add single image display information (e.g. image count)
 				
 				$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
-				$field->{$prop}[] =
+				$field->{$prop} =
 				'<span style="display: inline-block; text-align:center; ">
 					<a href="'.$item_link.'" style="display: inline-block;">
 					'.$img_nolegend.'
@@ -1502,7 +1505,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						'.count($values).' '.JText::_('FLEXI_IMAGES').'
 					</span>' : '').'
 				</span>';
-				break;
+				return; // do not apply any prefix/suffix/etc, since these are for the value list, end the function call
 				
 			} else if ($linkto_url) {
 				
@@ -1641,10 +1644,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		
-		// ************************************************************
+		// **************************************************************
 		// Apply separator and open/close tags and handle SPECIAL CASEs:
-		// by add some exta html required by some JS image libraries
-		// ************************************************************
+		// by adding (container) HTML required by some JS image libraries
+		// **************************************************************
 		
 		// Check for no values found
 		if ( !count($field->{$prop}) ) {
