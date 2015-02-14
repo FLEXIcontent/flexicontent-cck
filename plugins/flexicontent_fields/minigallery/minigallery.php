@@ -268,6 +268,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$document    = JFactory::getDocument();
 		$flexiparams = JComponentHelper::getParams('com_flexicontent');
 		$mediapath   = $flexiparams->get('media_path', 'components/com_flexicontent/medias');
+		$usepopup  = $flexiparams->get('usepopup', 1);
+		$popuptype = $flexiparams->get('popuptype', 4);
 
 		// some parameter shortcuts
 		$thumbposition		= $field->parameters->get( 'thumbposition', 3 ) ;
@@ -344,6 +346,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		  if(file_exists($csspath)) {
 				$document->addStyleSheet(JURI::root(true).'/templates/'.$mainframe->getTemplate().'/css/minigallery.css');
 		  }
+			if ($usepopup && $popuptype==4) flexicontent_html::loadFramework('fancybox');
 		}
 		$js_and_css_added = true;
 
@@ -412,8 +415,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$captions = '';
 		if($usecaptions===2)
 			$captions = $field->parameters->get( 'customcaptions', 'This is a caption' );
-		$field->{$prop} = '';
-		$field->{$prop} .= '<div id="'.$htmltag_id.'" class="slideshow">';
+		
+		$group_str = 'data-fancybox-group="fcitem_'.$field->item_id.'_fcfield_'.$field->id.'"';
 		$n = 0;
 		foreach($files_data as $file_id => $file_data)
 		{
@@ -429,20 +432,36 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					$srcb .= '&f='. $ext;
 				}
 
-				if($usecaptions===1) $captions = $file_data->altname;
-				$display[] = "<a href=\"javascript:;\"><img src=\"".$srcb."\" id=\"".$htmltag_id.'_'.$n."\" alt=\"{$captions}\" border=\"0\" /></a>\n";
-				$thumbs[] = "<li><a href=\"#{$htmltag_id}_{$n}\"><img src=\"{$srcs}\" border=\"0\" /></a></li>\n";
+				if ($usecaptions===1) $captions = $file_data->altname;
+				if ($usepopup && $popuptype == 4) {
+					$display[] = '
+						<a href="'.$img_path.'" class="fc_image_thumb fancybox" '.$group_str.' title="'.$captions.'" >
+							<img src="'.$srcb.'" id="'.$htmltag_id.'_'.$n.'" alt="'.$captions.'" border="0" />
+						</a>';
+				} else {
+					$display[] = '
+						<a href="javascript:;"><img src="'.$srcb.'" id="'.$htmltag_id.'_'.$n.'" alt="'.$captions.'" border="0" /></a>';
+				}
+				$thumbs[] = '
+					<li><a href="#'.$htmltag_id.'_'.$n.'"><img src="'.$srcs.'" border="0" /></a></li>';
 				$n++;
 			}
 		}
-
-		$field->{$prop} .= '<div class="slideshow-images">';
-		$field->{$prop} .= implode("\n", $display);
-		$field->{$prop} .= "</div>\n";
-		$field->{$prop} .= '<div class="slideshow-thumbnails">';
-		$field->{$prop} .= '<ul>'.implode("\n", $thumbs).'</ul>';
-		$field->{$prop} .= "</div>\n";
-		$field->{$prop} .= "</div><div class=\"clr\"></div><div class=\"clear\"></div>\n";
+		
+		$field->{$prop} = '
+		<div id="'.$htmltag_id.'" class="slideshow">
+			<div class="slideshow-images">
+				'.implode("\n", $display).'
+			</div>
+			<div class="slideshow-thumbnails">
+				<ul>
+				'.implode("\n", $thumbs).'
+				</ul>
+			</div>
+		</div>
+		<div class="clr"></div>
+		<div class="clear"></div>
+		';
 	}
 	
 	

@@ -56,18 +56,49 @@
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
-			<field name="" type="separator" level="level1" default="FLEXI_FIELD_GALLERY_IMAGES" description="FLEXI_FIELD_GALLERY_IMAGES_DESC" />
-			<field name="thumbposition" type="list" default="3" label="FLEXI_FIELD_GALLERY_THUMBS_POSITION" description="FLEXI_FIELD_GALLERY_THUMBS_POSITION_DESC">
+		</fieldset>
+		<fieldset name="group-minigallery-viewing-zoom" repeat="1" icon_class="icon-image" label_prefix="FLEXI_FIELD_VIEWING" label="FLEXI_FIELD_GALLERY_IMAGES" description="FLEXI_FIELD_GALLERY_IMAGES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="FLEXI_FIELD_MGALLERY_POPUP_ZOOMING" description="" level="level2" />
+			
+			<field name="usepopup" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_MGALLERY_ADD_POPUP_JS" description="FLEXI_FIELD_MGALLERY_ADD_POPUP_JS_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="field-usepopup">FLEXI_NO</option>
+				<option value="1" show_list="field-usepopup" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="popuptype" type="list" default="4" label="FLEXI_FIELD_MGALLERY_POPUP_GALLERY" description="FLEXI_FIELD_MGALLERY_POPUP_GALLERY_DESC" depend_class="field-usepopup">
+				<option value="4">Fancybox</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_MGALLERY_INLINE_PREVIEWING" level="level2" />
+			<field name="w_l" type="text" default="450" size="4" label="FLEXI_FIELD_GALLERY_WIDTH_LARGE" description="FLEXI_FIELD_GALLERY_WIDTH_LARGE_DESC" />
+			<field name="h_l" type="text" default="300" size="4" label="FLEXI_FIELD_GALLERY_HEIGHT_LARGE" description="FLEXI_FIELD_GALLERY_HEIGHT_LARGE_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_THUMBNAILS" level="level2" />
+			<field name="thumbnails" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_DISPLAY_THUMBNAILS" description="FLEXI_FIELD_DISPLAY_THUMBNAILS_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="field-thumbnails">FLEXI_NO</option>
+				<option value="1" show_list="field-thumbnails" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="thumbposition" type="list" default="3" label="FLEXI_FIELD_GALLERY_THUMBS_POSITION" description="FLEXI_FIELD_GALLERY_THUMBS_POSITION_DESC" depend_class="field-thumbnails">
 				<option value="1">FLEXI_FIELD_GALLERY_TOP</option>
 				<option value="2">FLEXI_FIELD_GALLERY_LEFT</option>
 				<option value="3">FLEXI_FIELD_GALLERY_BOTTOM</option>
 				<option value="4">FLEXI_FIELD_GALLERY_RIGHT</option>
 			</field>
-			<field name="w_l" type="text" default="450" size="4" label="FLEXI_FIELD_GALLERY_WIDTH_LARGE" description="FLEXI_FIELD_GALLERY_WIDTH_LARGE_DESC" />
-			<field name="h_l" type="text" default="300" size="4" label="FLEXI_FIELD_GALLERY_HEIGHT_LARGE" description="FLEXI_FIELD_GALLERY_HEIGHT_LARGE_DESC" />
-			<field name="w_s" type="text" default="100" size="4" label="FLEXI_FIELD_GALLERY_WIDTH_MINI" description="FLEXI_FIELD_GALLERY_WIDTH_MINI_DESC" />
-			<field name="h_s" type="text" default="66" size="4" label="FLEXI_FIELD_GALLERY_HEIGHT_MINI" description="FLEXI_FIELD_GALLERY_HEIGHT_MINI_DESC" />
- 			
+			<field name="w_s" type="text" default="100" size="4" label="FLEXI_FIELD_GALLERY_WIDTH_MINI" description="FLEXI_FIELD_GALLERY_WIDTH_MINI_DESC" depend_class="field-thumbnails" />
+			<field name="h_s" type="text" default="66" size="4" label="FLEXI_FIELD_GALLERY_HEIGHT_MINI" description="FLEXI_FIELD_GALLERY_HEIGHT_MINI_DESC" depend_class="field-thumbnails" />
+			<field name="scroll_thumbnails" type="list" default="1" label="FLEXI_FIELD_DISPLAY_SCROLL_THUMBS" description="FLEXI_FIELD_DISPLAY_SCROLL_THUMBS" depend_class="field-thumbnails">
+				<option value="1">FLEXI_FIELD_DISPLAY_SCROLL_THUMBS_1</option>
+				<option value="0">FLEXI_FIELD_DISPLAY_SCROLL_THUMBS_0</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_MGALLERY_CAPTIONS" level="level2" />
+			<field name="usecaptions" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_MGALLERY_USE_CAPTIONS" description="FLEXI_FIELD_MGALLERY_USE_CAPTIONS_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="field-usecaptions">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="field-usecaptions">FLEXI_YES</option>
+				<option value="2" show_list="field-usecaptions" hide_list="">FLEXI_FIELD_MGALLERY_CUSTOM_CAPTION</option>
+			</field>
+			<field name="customcaptions" type="text" default="This is a caption" label="FLEXI_FIELD_MGALLERY_CUSTOM_CAPTION" description="FLEXI_FIELD_MGALLERY_CUSTOM_CAPTION_DESC" depend_class="field-usecaptions" />
+			
 		</fieldset>
 		<fieldset name="group-minigallery-viewing-slideshow" repeat="1" icon_class="icon-image" label_prefix="FLEXI_FIELD_VIEWING" label="Slideshow" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
@@ -75,22 +106,8 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
-			<field name="thumbnails" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_THUMBNAILS" description="FLEXI_FIELD_DISPLAY_THUMBNAILS_DESC">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
-			</field>
-			<field name="scroll_thumbnails" type="list" default="1" label="FLEXI_FIELD_DISPLAY_SCROLL_THUMBS" description="FLEXI_FIELD_DISPLAY_SCROLL_THUMBS">
-				<option value="1">FLEXI_FIELD_DISPLAY_SCROLL_THUMBS_1</option>
-				<option value="0">FLEXI_FIELD_DISPLAY_SCROLL_THUMBS_0</option>
-			</field>
 			<field name="delay" type="text" default="4000" size="4" label="FLEXI_FIELD_GALLERY_WAIT" description="FLEXI_FIELD_GALLERY_WAIT_DESC" />
 			<field name="duration" type="text" default="1000" size="4" label="FLEXI_FIELD_GALLERY_DURATION" description="FLEXI_FIELD_GALLERY_DURATION_DESC" />
-			<field name="usecaptions" type="radio" default="1" label="FLEXI_USE_CAPTIONS" description="FLEXI_USE_CAPTIONS_DESC">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="2">FLEXI_USE_CUSTOM_CAPTIONS</option>
-			</field>
-			<field name="customcaptions" type="text" default="This is a caption" label="FLEXI_USE_CAPTIONS" description="FLEXI_USE_CAPTIONS_DESC" />
 			<field name="slideshowtype" type="list" default="slideshow" label="FLEXI_FIELD_GALLERY_SLIDESHOW_TYPE" description="FLEXI_FIELD_GALLERY_SLIDESHOW_TYPE_DESC">
 				<option value="slideshow">FLEXI_FIELD_GALLERY_SLIDESHOW_TYPE_SLIDESHOW</option>
 				<option value="Flash">FLEXI_FIELD_GALLERY_SLIDESHOW_TYPE_FLASH</option>
@@ -109,12 +126,10 @@
 				<option value="in:out">FLEXI_FIELD_GALERY_TRANSITION_DIRECTION_INOUT</option>
 				<option value="out:in">FLEXI_FIELD_GALERY_TRANSITION_DIRECTION_OUTIN</option>
 			</field>
-			<field name="otheroptions" type="textarea" default="" cols="40" rows="10" label="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS" description="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS_DESC">
-				<option value="1">FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS_TRUE</option>
-				<option value="0">FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS_FALSE</option>
-			</field>
-			
+			<field name="otheroptions" type="textarea" default="" cols="40" rows="3" label="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS" description="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS_DESC" />
+
 		</fieldset>
+
 	</fields>
 	</config>
 	<languages>
