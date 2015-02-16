@@ -250,7 +250,7 @@
 			
 		</fieldset>
 		
-		<!--fieldset name="group-checkbox-fieldgrp" repeat="1" icon_class="icon-menu-3" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<!--fieldset name="group-checkbox-fieldgrp" repeat="1" icon_class="icon-menu-3" label="FLEXI_FIELD_GROUPING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="" type="separator" default="FLEXI_REQUIRES_FIELDGROUP_FIELD" level="level2" />
 			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
 				<option value="0">FLEXI_NO</option>

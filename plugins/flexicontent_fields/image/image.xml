@@ -47,7 +47,7 @@
 			<field name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			
 		</fieldset>
-		<fieldset name="group-image-source" repeat="1" icon_class="icon-wrench" label="Image Source" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-image-source" repeat="1" icon_class="icon-wrench" label="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="image_source" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_IMAGE_SRC_MODE" description="FLEXI_FIELD_IMAGE_SRC_MODE_DESC" toggle_related="1" class="btn-group group-fcinfo">
 				<!--option value="-1">Joomla article images: (intro + full)</option-->
@@ -400,7 +400,7 @@
 			</field>
 
 		</fieldset>
-		<fieldset name="group-image-fieldgrp" repeat="1" icon_class="icon-menu-3" label="Field grouping" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-image-fieldgrp" repeat="1" icon_class="icon-menu-3" label="FLEXI_FIELD_GROUPING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="" type="separator" default="FLEXI_REQUIRES_FIELDGROUP_FIELD" level="level2" />
 			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
