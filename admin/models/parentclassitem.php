@@ -1603,6 +1603,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// Get an empty item model (with default values)
 		$item = $this->getTable('flexicontent_items', '');
+		$item->_isnew = $isnew;  // Pass information, if item is new to the fields
 		
 		// ... existing items
 		if ( !$isnew ) {

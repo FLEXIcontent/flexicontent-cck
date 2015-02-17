@@ -1935,6 +1935,9 @@ class FlexicontentFields
 				if ( !is_array($v) && !strlen($v) ) continue;
 				foreach ($required_props as $cp) if (!@$v[$cp]) continue;
 				
+				// Skip multi-property fields if search properties are not specified
+				if ( !count($search_props) && is_array($v)) continue;
+				
 				// Create search value
 				$search_value = array();
 				foreach ($search_props as $sp) {

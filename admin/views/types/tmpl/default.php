@@ -25,6 +25,8 @@ $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
 $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCtypes', $start_text, $end_text);
 
+$edit_entry = JText::_('FLEXI_EDIT_TYPE', true);
+
 $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
@@ -191,11 +193,16 @@ function delAllFilters() {
 						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
 						$task_str = FLEXI_J16GE ? 'types.checkin' : 'checkin';
 						if ($row->checked_out == $user->id) {
-							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time);
 						} else {
 							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">';
-							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->editor, $row->checked_out_time);
 						}
+						?>
+						<a class="jgrid <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
+							<img src="components/com_flexicontent/assets/images/lock_delete.png" alt="Check-in" />
+						</a>
+						<?php
 					} else {
 						echo '<span class="fc-noauth">'.JText::sprintf('FLEXI_RECORD_CHECKED_OUT_DIFF_USER').'</span><br/>';
 					}
@@ -208,10 +215,9 @@ function delAllFilters() {
 				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>">
-					<a href="<?php echo $link; ?>">
-					<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
-					</a></span>
+					<a href="<?php echo $link; ?>" title="<?php echo $edit_entry; ?>">
+						<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
+					</a>
 				<?php
 				}
 				?>

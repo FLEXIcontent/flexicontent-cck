@@ -32,7 +32,7 @@ $session = JFactory::getSession();
 $document = JFactory::getDocument();
 
 // Common language strings
-$edit_item_title = JText::_('FLEXI_EDIT_ITEM');
+$edit_entry = JText::_('FLEXI_EDIT_FILE');
 $usage_in_str = JText::_('FLEXI_USAGE_IN');
 $fields_str = JText::_('FLEXI_FIELDS');
 
@@ -636,9 +636,7 @@ function delAllFilters() {
 				<?php echo $checked; ?>
 			</td>
 			<td align="center">
-				<span class="editlinktip" title="<?php echo $edit_item_title; ?>">
-				<?php echo ' <a href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;cid[]='.$row->id.'">'.$thumb_or_icon.'</a>'; ?>
-				</span>
+				<?php echo ' <a href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;cid[]='.$row->id.'" title="'.$edit_entry.'">'.$thumb_or_icon.'</a>'; ?>
 			</td>
 			<td align="left">
 				<?php
@@ -648,9 +646,7 @@ function delAllFilters() {
 						$filename = htmlspecialchars($row->filename_displayed, ENT_QUOTES, 'UTF-8');
 					}
 				?>
-				<span class="editlinktip" title="<?php echo $edit_item_title; ?>">
-				<?php echo ' <a href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;cid[]='.$row->id.'">'.$filename.'</a>'; ?>
-				</span>
+				<?php echo ' <a href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;cid[]='.$row->id.'" title="'.$edit_entry.'">'.$filename.'</a>'; ?>
 				
 				<?php
 				if ($row->altname != $row->filename_displayed) {
