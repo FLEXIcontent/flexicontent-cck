@@ -21,7 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport('joomla.application.component.view');
 
 /**
- * View class for the FLEXIcontent categories screen
+ * View class for the FLEXIcontent tags screen
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -49,16 +49,16 @@ class FlexicontentViewTags extends JViewLegacy
 		// Get filters
 		$count_filters = 0;
 		
-		//get vars
+		// Get filter vars
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     't.name', 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', '', 'word' );
+		
 		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 		'filter_state',     '', 'word' );
 		$filter_assigned  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_assigned', 	'filter_assigned','', 'word' );
 		if ($filter_state) $count_filters++; if ($filter_assigned) $count_filters++;
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
 		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
-		if (strlen($search)) $count_filters++;
 		
 		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -204,4 +204,3 @@ class FlexicontentViewTags extends JViewLegacy
 		parent::display($tpl);
 	}
 }
-?>

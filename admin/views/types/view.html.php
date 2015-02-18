@@ -58,7 +58,6 @@ class FlexicontentViewTypes extends JViewLegacy
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
 		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
-		if (strlen($search)) $count_filters++;
 		
 		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -83,7 +82,7 @@ class FlexicontentViewTypes extends JViewLegacy
 		JToolBarHelper::title( $doc_title, 'types' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
-		$contrl = FLEXI_J16GE ? "types." : "";
+		$contrl = "types.";
 		JToolBarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
 		JToolBarHelper::divider(); JToolBarHelper::spacer();
 		JToolBarHelper::publishList($contrl.'publish');

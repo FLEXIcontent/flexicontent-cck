@@ -96,12 +96,12 @@ class FlexicontentViewItems extends JViewLegacy
 		$enddate	 		= $app->getUserStateFromRequest( $option.'.'.$view.'.enddate', 		'enddate', 		'', 		'cmd' );
 		if ($enddate) $count_filters++;
 		
-		$filter_id 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_id', 	'filter_id', 		'', 			'int' );
+		$filter_id  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_id', 	'filter_id', 		'', 			'int' );
+		$filter_id  = $filter_id ? $filter_id : '';
 		if ($filter_id) $count_filters++;
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
 		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
-		if (strlen($search)) $count_filters++;
 		
 		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -112,36 +112,34 @@ class FlexicontentViewItems extends JViewLegacy
 
 		$js = "window.addEvent('domready', function(){";
 		if ($filter_cats) {
-			$js .= "$$('.col_cats').each(function(el){ el.addClass('yellow'); });";
+			$js .= "jQuery('.col_cats').each(function(){ jQuery(this).addClass('yellow'); });";
 		}		
 		if ($filter_type) {
-			$js .= "$$('.col_type').each(function(el){ el.addClass('yellow'); });";
+			$js .= "jQuery('.col_type').each(function(){ jQuery(this).addClass('yellow'); });";
 		}
 		if ($filter_authors) {
-			$js .= "$$('.col_authors').each(function(el){ el.addClass('yellow'); });";
+			$js .= "jQuery('.col_authors').each(function(){ jQuery(this).addClass('yellow'); });";
 		}
 		if ($filter_state) {
-			$js .= "$$('.col_state').each(function(el){ el.addClass('yellow'); });";
+			$js .= "jQuery('.col_state').each(function(){ jQuery(this).addClass('yellow'); });";
 		}
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			if ($filter_lang) {
-				$js .= "$$('.col_lang').each(function(el){ el.addClass('yellow'); });";
+				$js .= "jQuery('.col_lang').each(function(){ jQuery(this).addClass('yellow'); });";
 			}
 		}
 		if ($filter_id) {
-			$js .= "$$('.col_id').each(function(el){ el.addClass('yellow'); });";
+			$js .= "jQuery('.col_id').each(function(){ jQuery(this).addClass('yellow'); });";
 		}
 		if ($startdate || $enddate) {
 			if ($date == 1) {
-				$js .= "$$('.col_created').each(function(el){ el.addClass('yellow'); });";
+				$js .= "jQuery('.col_created').each(function(){ jQuery(this).addClass('yellow'); });";
 			} else if ($date == 2) {
-				$js .= "$$('.col_revised').each(function(el){ el.addClass('yellow'); });";
+				$js .= "jQuery('.col_revised').each(function(){ jQuery(this).addClass('yellow'); });";
 			}
 		}
 		if (strlen($search)) {
-			$js .= "$$('.col_title').each(function(el){ el.addClass('yellow'); });";
-		} else {
-			$js .= "$$('.col_title').each(function(el){ el.removeClass('yellow'); });";
+			$js .= "jQuery('.col_title').each(function(){ jQuery(this).addClass('yellow'); });";
 		}
 		
 		// Check if user can create in at least one published category

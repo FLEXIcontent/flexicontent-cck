@@ -1,42 +1,64 @@
 <?php
 /**
- * @copyright	Copyright (C) 2005 - 2013 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version 1.5 stable $Id: view.html.php 1889 2014-04-26 03:25:28Z ggppdk $
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
-defined('_JEXEC') or die;
+defined( '_JEXEC' ) or die( 'Restricted access' );
+
+jimport('joomla.application.component.view');
 
 /**
- * View class for a list of user groups.
+ * View class for the FLEXIcontent (user) groups screen
  *
- * @package		Joomla.Administrator
- * @subpackage	com_flexicontent
- * @since		1.6
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @since 1.0
  */
 class FlexicontentViewGroups extends JViewLegacy
 {
 	protected $items;
 	protected $pagination;
 	protected $state;
-
-	/**
-	 * Display the view
-	 */
-	public function display($tpl = null)
+	
+	function display( $tpl = null )
 	{
 		$this->items		= $this->get('Items');
 		$this->pagination	= $this->get('Pagination');
 		$this->state		= $this->get('State');
 		
-		$document	= JFactory::getDocument();
-
+		$app      = JFactory::getApplication();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		$option   = JRequest::getCmd('option');
+		$view     = JRequest::getVar('view');
+		
 		// Check for errors.
 		if (count($errors = $this->get('Errors'))) {
 			JError::raiseError(500, implode("\n", $errors));
 			return false;
 		}
-
-		//add css and submenu to document
+		// Get filters
+		$count_filters = 0;
+		
+		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
+		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		
+		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
@@ -49,6 +71,10 @@ class FlexicontentViewGroups extends JViewLegacy
 		FLEXISubmenu('CanGroups');
 		
 		
+		// ******************
+		// Create the toolbar
+		// ******************
+		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_GROUPS' );
 		$site_title = $document->getTitle();
@@ -58,6 +84,13 @@ class FlexicontentViewGroups extends JViewLegacy
 		// Create the toolbar
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		$this->addToolbar();
+		
+		//assign data to template
+		$this->lists['search'] = $search;
+		$this->count_filters = $count_filters;
+		$this->option = $option;
+		$this->view   = $view;
+		
 		parent::display($tpl);
 	}
 

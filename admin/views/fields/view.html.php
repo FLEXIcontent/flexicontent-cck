@@ -68,7 +68,6 @@ class FlexicontentViewFields extends JViewLegacy
 		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
 		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
-		if (strlen($search)) $count_filters++;
 		
 		if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
 		{
@@ -196,23 +195,23 @@ class FlexicontentViewFields extends JViewLegacy
 		
 		// build field-type filter
 		$ALL = mb_strtoupper(JText::_( 'FLEXI_ALL' ), 'UTF-8') . ' : ';
-		$fftype 	= array();
-		$fftype[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
-		$fftype[] = JHTML::_('select.option',  'BV', $ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
-		$fftype[] = JHTML::_('select.option',  'C', $ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
-		$fftype[] = JHTML::_('select.option',  'NC', $ALL . JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
+		$fftypes 	= array();
+		$fftypes[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
+		$fftypes[] = JHTML::_('select.option',  'BV', $ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
+		$fftypes[] = JHTML::_('select.option',  'C', $ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
+		$fftypes[] = JHTML::_('select.option',  'NC', $ALL . JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
 		
 		foreach ($fieldtypes as $field_group => $ft_types) {
-			$fftype[] = JHTML::_('select.optgroup', $field_group );
+			$fftypes[] = JHTML::_('select.optgroup', $field_group );
 			foreach ($ft_types as $field_type => $ftdata) {
 				$field_friendlyname = str_ireplace("FLEXIcontent - ","",$ftdata->field_friendlyname);
-				$fftype[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_friendlyname);
+				$fftypes[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_friendlyname);
 			}
-			$fftype[] = JHTML::_('select.optgroup', '' );
+			$fftypes[] = JHTML::_('select.optgroup', '' );
 		}
 		
 		$lists['fftype'] = ($filter_fieldtype || 1 ? '<label class="label">'.JText::_('FLEXI_FIELD_TYPE').'</label>' : '').
-			JHTML::_('select.genericlist', $fftype, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
+			JHTML::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
 		if (!FLEXI_J16GE) $lists['fftype'] = str_replace('<optgroup label="">', '</optgroup>', $lists['fftype']);
 		
 		

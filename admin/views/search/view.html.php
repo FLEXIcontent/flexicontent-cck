@@ -16,53 +16,82 @@
  * GNU General Public License for more details.
  */
 
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die( 'Restricted access' );
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.view');
+
+/**
+ * View class for the FLEXIcontent search indexes screen
+ *
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @since 1.0
+ */
 class FLEXIcontentViewSearch extends JViewLegacy
 {
-	function display($tpl = null) {
+	function display( $tpl = null )
+	{
 		$layout = JRequest::getVar('layout', 'default');
 		if($layout=='indexer') {
 			$this->indexer($tpl);
 			return;
 		}
 		$app      = JFactory::getApplication();
-		$document = JFactory::getDocument();
-		$option   = JRequest::getCmd( 'option' );
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		$option   = JRequest::getCmd('option');
+		$view     = JRequest::getVar('view');
 		
-		$filter_order			= $app->getUserStateFromRequest( $option.'.search.filter_order', 			'filter_order', 'a.title', 'cmd' );
-		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.search.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
 		
-		$filter_fieldtype	= $app->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
-		$filter_itemtype	= $app->getUserStateFromRequest( $option.'.fields.filter_itemtype', 	'filter_itemtype', 		'', 'int' );
-		$filter_itemstate	= $app->getUserStateFromRequest( $option.'.fields.filter_itemstate', 'filter_itemstate', 	'', 'word' );
+		flexicontent_html::loadFramework('select2');
+		JHTML::_('behavior.tooltip');
+
+		// Get filters
+		$count_filters = 0;
 		
-		$search_index			= $app->getUserStateFromRequest( $option.'.search.search_index',			'search_index', '', 'string' );
-		$search_index			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search_index ) ) ) : $db->getEscaped( trim(JString::strtolower( $search_index ) ) );
-		$search_itemtitle	= $app->getUserStateFromRequest( $option.'.search.search_itemtitle',	'search_itemtitle', '', 'string' );
-		$search_itemid		= $app->getUserStateFromRequest( $option.'.search.search_itemid',	'search_itemid', '', 'string' );
-		$search_itemid		= strlen($search_itemid) ? (int)$search_itemid : '';
-		$filter_indextype	= $app->getUserStateFromRequest( $option.'.search.filter_indextype',		'filter_indextype',	'advanced',		'word' );
+		// Get filter vars
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     'a.title', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', '', 'word' );
+		
+		$filter_fieldtype	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
+		$filter_itemtype	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_itemtype', 	'filter_itemtype', 		'', 'int' );
+		$filter_itemstate	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_itemstate', 'filter_itemstate', 	'', 'word' );
+		if ($filter_fieldtype) $count_filters++; if ($filter_itemtype) $count_filters++; if ($filter_itemstate) $count_filters++;
+		
+		$search			= $app->getUserStateFromRequest( $option.'.'.$view.'.search',			'search', '', 'string' );
+		$search			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		
+		$search_itemtitle	= $app->getUserStateFromRequest( $option.'.'.$view.'.search_itemtitle',	'search_itemtitle', '', 'string' );
+		$search_itemid		= $app->getUserStateFromRequest( $option.'.'.$view.'.search_itemid',	'search_itemid', '', 'string' );
+		$search_itemid		= !empty($search_itemid) ? (int)$search_itemid : '';
+		if ($search_itemtitle) $count_filters++; if ($search_itemid) $count_filters++;
+		
+		$filter_indextype	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_indextype',		'filter_indextype',	'advanced',		'word' );
 		
 		$f_active['filter_fieldtype']	= (boolean)$filter_fieldtype;
 		$f_active['filter_itemtype']	= (boolean)$filter_itemtype;
 		$f_active['filter_itemstate']	= (boolean)$filter_itemstate;
 		
-		$f_active['search_index']			= strlen($search_index);
+		$f_active['search']			= strlen($search);
 		$f_active['search_itemtitle']	= strlen($search_itemtitle);
 		$f_active['search_itemid']		= (boolean)$search_itemid;
 		
-		//add css and submenu to document
+		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
-
-		// Create Submenu and check access
+		
+		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanIndex');
+		
+		
+		// ******************
+		// Create the toolbar
+		// ******************
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_SEARCH_INDEX' );
@@ -81,23 +110,28 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		//build backend visible filter
 		$fftypes = array();
-		$fftypes[] = JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_FIELDS_TYPE' ) .' -' );
+		$fftypes[] = JHTML::_('select.option',  '', '-' /*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
 		$fftypes[] = JHTML::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
 		$fftypes[] = JHTML::_('select.option',  'NC', JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
 		foreach ($fieldtypes as $field_type => $ftdata) {
 			$fftypes[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
 		}
-		$lists['filter_fieldtype'] = JHTML::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
+		
+		$lists['filter_fieldtype'] = ($filter_fieldtype || 1 ? '<label class="label">'.JText::_('FLEXI_FIELD_TYPE').'</label>' : '').
+			JHTML::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
 		
 		//build type select list
-		$lists['filter_itemtype'] = flexicontent_html::buildtypesselect($types, 'filter_itemtype', $filter_itemtype, true, 'class="inputbox" size="1" onchange="submitform( );"', 'filter_itemtype');
+		$lists['filter_itemtype'] = ($filter_itemtype|| 1 ? '<label class="label">'.JText::_('FLEXI_TYPE').'</label>' : '').
+			flexicontent_html::buildtypesselect($types, 'filter_itemtype', $filter_itemtype, '-'/*true*/, 'class="use_select2_lib" size="1" onchange="submitform( );"', 'filter_itemtype');
 		
 		//publish unpublished filter
-		$ffstate = array();
-		$ffstate[] = JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_SELECT_STATE' ) .' -' );
-		$ffstate[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$ffstate[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$lists['filter_itemstate'] = JHTML::_('select.genericlist', $ffstate, 'filter_itemstate', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_itemstate );
+		$ffstates = array();
+		$ffstates[] = JHTML::_('select.option',  '', '-' /*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$ffstates[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+		$ffstates[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
+		
+		$lists['filter_itemstate'] = ($filter_itemstate || 1 ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
+			JHTML::_('select.genericlist', $ffstates, 'filter_itemstate', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_itemstate );
 		
 		// build filter index type record listing
 		//$itn['basic'] = JText::_( 'FLEXI_INDEX_BASIC' );
@@ -117,21 +151,21 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$lists['order'] = $filter_order;
 		
 		// search index & item title  filter
-		$lists['search_index']= $search_index;
+		$lists['search']= $search;
 		$lists['search_itemtitle']= $search_itemtitle;
 		$lists['search_itemid']= $search_itemid;
 		
-		$data   = $this->get('Data');  // MUST BE BEFORE getCount and getPagination because it also calculates total rows
+		$rows   = $this->get('Data');  // MUST BE BEFORE getCount and getPagination because it also calculates total rows
 		$total  = $this->get('Count');
 		$pagination = $this->get('Pagination');
 		$limitstart = $this->get('LimitStart');
 
 		$js = "window.addEvent('domready', function(){";
 		if ($filter_fieldtype) {
-			$js .= "$$('.col_fieldtype').each(function(el){ el.addClass('yellow'); });";
+			$js .= "jQuery('.col_fieldtype').each(function(){ jQuery(this).addClass('yellow'); });";
 		}		
-		if ($search_index) {
-			$js .= "$$('.col_search_index').each(function(el){ el.addClass('yellow'); });";
+		if ($search) {
+			$js .= "jQuery('.col_search').each(function(){ jQuery(this).addClass('yellow'); });";
 		}		
 		$js .= "});";
 		$document->addScriptDeclaration($js);
@@ -150,12 +184,16 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			}
 		//}
 		
+		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('lists',	$lists);
 		$this->assignRef('pagination',	$pagination);
-		$this->assignRef('data', $data);
+		$this->assignRef('rows', $rows);
 		$this->assignRef('total', $total);
 		$this->assignRef('limitstart', $limitstart);
 		$this->assignRef('f_active', $f_active);
+		
+		$this->assignRef('option', $option);
+		$this->assignRef('view', $view);
 		
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);

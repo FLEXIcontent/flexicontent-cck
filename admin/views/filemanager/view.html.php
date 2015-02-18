@@ -67,7 +67,6 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$scope  = $app->getUserStateFromRequest( $option.'.'.$view.'.scope', 			'scope', 			1, 	'int' );
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 		'search', 		'', 'string' );
 		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
-		if (strlen($search)) $count_filters++;
 		
 		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');

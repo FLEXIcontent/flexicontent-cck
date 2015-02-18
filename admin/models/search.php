@@ -232,8 +232,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$filter_itemstate	= $app->getUserStateFromRequest( $option.'.search.filter_itemstate', 'filter_itemstate', '', 'word' );
 		$filter_itemtype	= $app->getUserStateFromRequest( $option.'.search.filter_itemtype', 'filter_itemtype', '', 'int' );
 		$filter_fieldtype = $app->getUserStateFromRequest( $option.'.search.filter_fieldtype', 'filter_fieldtype', '', 'word' );
-		$search_index 		= $app->getUserStateFromRequest( $option.'.search.search_index', 'search_index', '', 'string' );
-		$search_index 		= trim( JString::strtolower( $search_index ) );
+		$search  = $app->getUserStateFromRequest( $option.'.search.search', 'search', '', 'string' );
+		$search  = trim( JString::strtolower( $search ) );
 		$search_itemtitle	= $app->getUserStateFromRequest( $option.'.search.search_itemtitle', 'search_itemtitle', '', 'string' );
 		$search_itemid		= $app->getUserStateFromRequest( $option.'.search.search_itemid', 'search_itemid', '', 'int' );
 
@@ -261,9 +261,9 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$where[] = 'ext.type_id = ' . $filter_itemtype;
 		}
 
-		if ($search_index) {
-			$search_index_escaped = FLEXI_J16GE ? $this->_db->escape( $search_index, true ) : $this->_db->getEscaped( $search_index, true );
-			$where[] = ' LOWER(ai.search_index) LIKE '.$this->_db->Quote( '%'.$search_index_escaped.'%', false );
+		if ($search) {
+			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
+			$where[] = ' LOWER(ai.search_index) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
 		}
 		
 		if ($search_itemtitle) {

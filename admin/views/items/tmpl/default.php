@@ -106,9 +106,9 @@ $date_note_msg = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOT
 $date_zone_tip = '<span class="fc-padded-image '.$tip_class.'" data-placement="bottom" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'">'.$hintmage.'</span>';
 
 // COMMON repeated texts
-$edit_item_title = JText::_('FLEXI_EDIT_ITEM');
-$edit_cat_title = JText::_('FLEXI_EDIT_CATEGORY');
-$rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER');
+$edit_item_title = JText::_('FLEXI_EDIT_ITEM', true);
+$edit_cat_title = JText::_('FLEXI_EDIT_CATEGORY', true);
+$rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER', true);
 $rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
 $scheduled_for_publication = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION', true );
 $publication_expired = JText::_( 'FLEXI_PUBLICATION_EXPIRED', true );

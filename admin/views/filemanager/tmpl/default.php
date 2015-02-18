@@ -32,9 +32,10 @@ $session = JFactory::getSession();
 $document = JFactory::getDocument();
 
 // Common language strings
-$edit_entry = JText::_('FLEXI_EDIT_FILE');
-$usage_in_str = JText::_('FLEXI_USAGE_IN');
-$fields_str = JText::_('FLEXI_FIELDS');
+$edit_entry = JText::_('FLEXI_EDIT_FILE', true);
+$view_entry = JText::_('FLEXI_VIEW', true);
+$usage_in_str = JText::_('FLEXI_USAGE_IN', true);
+$fields_str = JText::_('FLEXI_FIELDS', true);
 
 $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
@@ -528,7 +529,7 @@ function delAllFilters() {
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
-			<th class="center hideOnDemandClass">
+			<th class="left hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				/
 				<?php echo JHTML::_('grid.sort', 'FLEXI_FILE_DISPLAY_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -704,7 +705,7 @@ function delAllFilters() {
 					<br/><br/>
 					<span class="badge badge-info"><?php echo count($row->itemids); ?></span>
 					<a href="<?php echo $items_list; ?>">
-					[<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>]
+					[<?php echo $view_entry;?>]
 					</a>
 				<?php endif; ?>
 			</td>

@@ -1,13 +1,32 @@
 <?php
 /**
- * @package		Joomla.Administrator
- * @subpackage	com_flexicontent
- * @copyright	Copyright (C) 2005 - 2013 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License version 2 or later; see LICENSE.txt
+ * @version 1.5 stable $Id$
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
-// No direct access.
-defined('_JEXEC') or die;
+defined('_JEXEC') or die('Restricted access');
+
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
+
+$start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
+$end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
+flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCgroups', $start_text, $end_text);
+
+$edit_entry = JText::_('FLEXI_EDIT', true);
+$view_entry = JText::_('FLEXI_VIEW', true);
 
 // Include the component HTML helpers.
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
@@ -16,7 +35,7 @@ JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 JHtml::_('behavior.tooltip');
 JHtml::_('behavior.multiselect');
 
-$user		= JFactory::getUser();
+$user    = JFactory::getUser();
 $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
 
@@ -46,7 +65,8 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 </script>
 
 <div class="flexicontent">
-<form action="index.php?option=com_flexicontent" method="post" name="adminForm" id="adminForm">
+
+<form action="index.php?option=<?php echo $this->option; ?>&view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
@@ -57,49 +77,68 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 	<div id="j-main-container">
 <?php endif;?>
 
-	<table class="adminform">
-		<tr>
-			<td align="left">
-				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
-				<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->escape($this->state->get('filter.search')); ?>" title="<?php echo JText::_('COM_USERS_SEARCH_IN_GROUPS'); ?>" />
-				<div id="fc-filter-buttons">
-					<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-					<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_CLEAR' ); ?></button>
-				</div>
-			</td>
-			<td nowrap="nowrap">
-				<span class="limit" style="display: inline-block;">
-					<?php
-					echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM');
-					$pagination_footer = $this->pagination->getListFooter();
-					if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
-					?>
-				</span>
-				
-				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
-					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
-				</span>
-				
-				<span class="fc_pages_counter">
-					<?php echo $this->pagination->getPagesCounter(); ?>
-				</span>
-			</td>
-		</tr>
-	</table>
+	<div id="fc-filters-header">
+		<span class="fc-filter nowrap_box">
+			<span class="btn-wrapper input-append" style="margin:0;">
+				<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
+				<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
+				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="delAllFilters();this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
+			</span>
+		</span>
+		
+		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
+		<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
+			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+		</div>
+		
+		<span class="fc-filter nowrap_box">
+			<span class="limit nowrap_box" style="display: inline-block;">
+				<label class="label">
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
+				</label>
+				<?php
+				$pagination_footer = $this->pagination->getListFooter();
+				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
+				?>
+			</span>
+			
+			<span class="fc_item_total_data nowrap_box badge badge-info">
+				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+			</span>
+			
+			<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
+			<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
+				<?php echo $getPagesCounter; ?>
+			</span>
+			<?php endif; ?>
+		</span>
+	</div>
+	
+	
+	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
+		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
+		
+		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+	</div>
+	
+	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>
+	
+	<div class="fcclear"></div>
 
-	<table class="adminlist" cellspacing="1">
+	<table id="adminListTableFCgroups" class="adminlist fcmanlist" style="min-width: 400px;">
 	<thead>
 		<tr>
-			<th width="1%">
+			<th>
 				<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 			</th>
-			<th class="left">
+			<th class="hideOnDemandClass left">
 				<?php echo JText::_('COM_USERS_HEADING_GROUP_TITLE'); ?>
 			</th>
-			<th width="10%">
+			<th class="hideOnDemandClass left">
 				<?php echo JText::_('COM_USERS_HEADING_USERS_IN_GROUP'); ?>
 			</th>
-			<th width="5%">
+			<th class="hideOnDemandClass">
 				<?php echo JText::_('JGRID_HEADING_ID'); ?>
 			</th>
 		</tr>
@@ -142,8 +181,16 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 					<?php echo JText::_('COM_USERS_DEBUG_GROUP');?></a></div></div></div>
 				<?php endif; ?>
 			</td>
-			<td class="center">
-				<?php echo $item->user_count ? $item->user_count : ''; ?>
+			<td class="left">
+				<?php
+				$user_count = '<span class="badge badge-info">'.$item->user_count.'</span>';
+				if ($item->user_count) {
+					$user_count .= '<a onclick="delAllFilters();"  href="index.php?option=com_flexicontent&amp;view=users&amp;filter_usergrp='.$item->id.'">
+					['.$view_entry.']
+					</a>';
+				}
+				echo $user_count;
+				?>
 			</td>
 			<td class="center">
 				<?php echo (int) $item->id; ?>
