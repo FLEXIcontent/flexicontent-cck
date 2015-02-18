@@ -173,7 +173,6 @@ function toggle_column(container_div_id, data_tbl_id, col_no, firstrun) {
   		_col_no++;
   	}
   }
-  alert(_col_no);
   
   // 4. Iterate through rows toggling the particular column
   for (var row=0; row<rows.length; row++) {
