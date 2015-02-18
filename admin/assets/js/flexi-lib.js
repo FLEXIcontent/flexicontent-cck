@@ -161,6 +161,20 @@ function toggle_column(container_div_id, data_tbl_id, col_no, firstrun) {
   var rows = jQuery(tbl).find('> thead > tr, > tbody > tr');
   var toggle_amount = 1;
   
+  // Find 'colspan' start of the column given the -index- 'col_no' of the head cell
+  var _col_no = 0;
+  var tcells = jQuery(rows[0]).children('td, th');
+  for (cell=0; cell<col_no; cell++) {
+  	if (cell>=tcells.length) break;
+		colspan = parseInt(jQuery(tcells[cell]).attr('colspan'));
+		if (colspan) {
+			_col_no = _col_no + colspan;
+		} else {
+  		_col_no++;
+  	}
+  }
+  alert(_col_no);
+  
   // 4. Iterate through rows toggling the particular column
   for (var row=0; row<rows.length; row++) {
     var cell_cnt, cell;
@@ -171,7 +185,7 @@ function toggle_column(container_div_id, data_tbl_id, col_no, firstrun) {
    	// First row is header, we will get 'colspan' of the HEAD CELL, which indicates how many 'toggle_amount' single-colspan columns should be toggled
     if (row==0) {
     	toggle_amount = parseInt(jQuery(tcells[col_no]).attr('colspan'));
-    	if (toggle_amount == 0) toggle_amount = 1;
+    	if (!toggle_amount) toggle_amount = 1;
     }
     
     // Find where the cell's index in current row, we need this loop since previous cell of row maybe using colspan
@@ -188,9 +202,9 @@ function toggle_column(container_div_id, data_tbl_id, col_no, firstrun) {
     		colspan = parseInt(jQuery(tcells[cell]).attr('data-colspan'));
     	}
     	
-    	if (cell_cnt==col_no+toggle_amount-1) break;
+    	if (cell_cnt==_col_no+toggle_amount-1) break;
     	var next_cnt = colspan ? cell_cnt + colspan : cell_cnt + 1;
-    	if (next_cnt > col_no) break;
+    	if (next_cnt > _col_no) break;
     	cell_cnt = next_cnt;
     }
     
