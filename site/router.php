@@ -115,12 +115,11 @@ function FLEXIcontentBuildRoute(&$query)
 	case FLEXI_ITEMVIEW:
 		$mcid = @$menu->query['cid']; // not set returns null
 		$cid  = !isset($query['cid']) ? null : (int)$query['cid'];
-		/*$mid = @$menu->query['id']; // not set returns null
+		$mid = @$menu->query['id']; // not set returns null
 		$id  = (int)$query['id'];
 		if ( $mid == $id && $mview == FLEXI_ITEMVIEW )	{
 			// add no segments, even if CIDs of menu item is not an exact match
-		} else*/
-		if ( $cid && ($mcid != $cid  ||  $mview != 'category') )	{
+		} else if ( $cid && ($mcid != $cid  ||  $mview != 'category') )	{
 			// We will make an item URL -with- CID ...
 			// cid EXISTs and cid/view URL variables to do not match those in the menu item
 			// IMPLY view = FLEXI_ITEMVIEW when count($segments) == 2
@@ -128,12 +127,17 @@ function FLEXIcontentBuildRoute(&$query)
 			$segments[] = @$query['id'];  // suppress error since it may not be set e.g. for new item form
 		}
 		
-		else if ($add_item_sef_segment) {
+		else {
 			// We wiil make an item URL -without- CID ...
 			// because cid is missing or matched cid/view URL variables matched those in menu item
-			// EXPLICIT view ('item' be contained in the url), because according to configuration,
-			// the 1-segment implies category view so we need to add /item/ segment (1st segment is view)
-			$segments[] = 'item';
+			if ($add_item_sef_segment) {
+				// EXPLICIT view ('item' be contained in the url), because according to configuration,
+				// the 1-segment implies --category-- view so we need to add /item/ segment (1st segment is view)
+				$segments[] = 'item';
+			} else {
+				// IMPLICIT view ('item' NOT contained in the url), because according to configuration,
+				// the 1-segment implies --item-- view so we do not need to add /item/ segment (1st segment is view)
+			}
 			$segments[] = @$query['id'];  // suppress error since it may not be set e.g. for new item form
 		}
 		unset($query['view']);
