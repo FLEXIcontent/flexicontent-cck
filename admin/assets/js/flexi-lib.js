@@ -159,13 +159,22 @@ function toggle_column(container_div_id, data_tbl_id, col_no, firstrun) {
   // 3. Get table and all its rows
   var tbl  = document.getElementById(data_tbl_id);
   var rows = jQuery(tbl).find('> thead > tr, > tbody > tr');
+  var toggle_amount = 1;
   
   // 4. Iterate through rows toggling the particular column
   for (var row=0; row<rows.length; row++) {
     var cell_cnt, cell;
     
-    // Hide the td cell of the column at the current row (if any)
+    // Get cell(s) of the current row
     var tcells = jQuery(rows[row]).children('td, th');
+    
+   	// First row is header, we will get 'colspan' of the HEAD CELL, which indicates how many 'toggle_amount' single-colspan columns should be toggled
+    if (row==0) {
+    	toggle_amount = parseInt(jQuery(tcells[col_no]).attr('colspan'));
+    	if (toggle_amount == 0) toggle_amount = 1;
+    }
+    
+    // Find where the cell's index in current row, we need this loop since previous cell of row maybe using colspan
     cell_cnt = 0;
     for (cell=0; cell<tcells.length; cell++) {
     	var colspan;
@@ -179,39 +188,49 @@ function toggle_column(container_div_id, data_tbl_id, col_no, firstrun) {
     		colspan = parseInt(jQuery(tcells[cell]).attr('data-colspan'));
     	}
     	
-    	if (cell_cnt==col_no) break;
+    	if (cell_cnt==col_no+toggle_amount-1) break;
     	var next_cnt = colspan ? cell_cnt + colspan : cell_cnt + 1;
     	if (next_cnt > col_no) break;
     	cell_cnt = next_cnt;
     }
-    if (cell<tcells.length) {
-    	var colspan = parseInt(jQuery(tcells[cell]).attr('colspan'));
-    	
-			jQuery(tcells[cell]).removeClass('initiallyHidden');
-    	if ( colspan ) {
-				if ( action_func == 'hide' ) {
-					if ( colspan > 1 ) {
-						jQuery(tcells[cell]).attr('colspan', colspan - 1);
-					} else {
-		    		firstrun ?
-				    	eval('jQuery(tcells[cell]).'+action_func+'()') :
-							eval('jQuery(tcells[cell]).'+action_func+'("slow")');
-			    	jQuery(tcells[cell]).addClass('isHidden');
-					}
-    		} else if (!firstrun) {
-					if ( !jQuery(tcells[cell]).hasClass('isHidden') ) {
-						jQuery(tcells[cell]).attr('colspan', colspan + 1);
-					} else {
-			    	eval('jQuery(tcells[cell]).'+action_func+'("slow")');
-			    	jQuery(tcells[cell]).removeClass('isHidden');
+    
+    // Finally TOGGLE the found cell, we take into account that the given cell may have colspan,
+    // if it does have colspan we increase / decrease, a ZERO remaining colspan, will make us hide the cell, and a non-zero makes us display the cell
+    var _cell = cell;
+    var colspan_remaining = toggle_amount;
+    for (cell=_cell; cell<_cell+toggle_amount; cell++) {
+    	if (cell<tcells.length) {
+	    	var colspan = parseInt(jQuery(tcells[cell]).attr('colspan'));
+	    	
+				jQuery(tcells[cell]).removeClass('initiallyHidden');
+	    	if ( colspan ) {
+					if ( action_func == 'hide' ) {
+						if ( colspan > colspan_remaining ) {
+							jQuery(tcells[cell]).attr('colspan', colspan - colspan_remaining);
+						} else {
+			    		firstrun ?
+					    	eval('jQuery(tcells[cell]).'+action_func+'()') :
+								eval('jQuery(tcells[cell]).'+action_func+'("slow")');
+				    	jQuery(tcells[cell]).addClass('isHidden');
+						}
+	    		} else if (!firstrun) {
+						if ( !jQuery(tcells[cell]).hasClass('isHidden') ) {
+							jQuery(tcells[cell]).attr('colspan', colspan + colspan_remaining);
+						} else {
+				    	eval('jQuery(tcells[cell]).'+action_func+'("slow")');
+				    	jQuery(tcells[cell]).removeClass('isHidden');
+				    }
 			    }
-		    }
-    	} else {
-    		firstrun ?
-		    	eval('jQuery(tcells[cell]).'+action_func+'()') :
-		    	eval('jQuery(tcells[cell]).'+action_func+'("slow")');
-		  }
-    }
+			    colspan_remaining = colspan_remaining - colspan;
+	    	} else {
+	    		firstrun ?
+			    	eval('jQuery(tcells[cell]).'+action_func+'()') :
+			    	eval('jQuery(tcells[cell]).'+action_func+'("slow")');
+			    colspan_remaining--;
+			  }
+	    }
+	    if (colspan_remaining<1) break; // no more colspan to toggle columns
+	  }
   }
   
   if (container_div_id) {

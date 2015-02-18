@@ -38,6 +38,7 @@ JHtml::_('behavior.multiselect');
 $user    = JFactory::getUser();
 $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
+$list_total_cols = 5;
 
 JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 ?>
@@ -135,7 +136,7 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 			<th class="hideOnDemandClass left">
 				<?php echo JText::_('COM_USERS_HEADING_GROUP_TITLE'); ?>
 			</th>
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass center" colspan="2">
 				<?php echo JText::_('COM_USERS_HEADING_USERS_IN_GROUP'); ?>
 			</th>
 			<th class="hideOnDemandClass">
@@ -147,7 +148,7 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 
 	<tfoot>
 		<tr>
-			<td colspan="4">
+			<td colspan="<?php echo $list_total_cols; ?>">
 				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>
@@ -181,15 +182,17 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 					<?php echo JText::_('COM_USERS_DEBUG_GROUP');?></a></div></div></div>
 				<?php endif; ?>
 			</td>
-			<td class="left">
+			<td align="right">
+				<?php echo '<span class="badge badge-info">'.$item->user_count.'</span>'; ?>
+			</td>
+			<td align="left">
 				<?php
-				$user_count = '<span class="badge badge-info">'.$item->user_count.'</span>';
 				if ($item->user_count) {
-					$user_count .= '<a onclick="delAllFilters();"  href="index.php?option=com_flexicontent&amp;view=users&amp;filter_usergrp='.$item->id.'">
+					echo '
+					<a onclick="delAllFilters();"  href="index.php?option=com_flexicontent&amp;view=users&amp;filter_usergrp='.$item->id.'">
 					['.$view_entry.']
 					</a>';
 				}
-				echo $user_count;
 				?>
 			</td>
 			<td class="center">

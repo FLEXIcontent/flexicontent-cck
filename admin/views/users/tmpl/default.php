@@ -41,6 +41,7 @@ if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
 $date_note_msg = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
 $date_zone_tip = '<span class="fc-padded-image '.$tip_class.'" data-placement="bottom" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'">'.$hintmage.'</span>';
 
+$list_total_cols = 13;
 
 // COMMON repeated texts
 $edit_entry = JText::_('FLEXI_EDIT_TAG', true);
@@ -258,7 +259,7 @@ window.addEvent('domready', function(){
 				</span>
 				<?php endif; ?>
 			</th>
-			<th class="hideOnDemandClass left" >
+			<th class="hideOnDemandClass center" colspan="2">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->filter_itemscount) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -332,7 +333,7 @@ window.addEvent('domready', function(){
 		</thead>
 		<tfoot>
 			<tr>
-				<td colspan="12">
+				<td colspan="<?php echo $list_total_cols; ?>">
 					<?php echo $pagination_footer; ?>
 				</td>
 			</tr>
@@ -369,10 +370,10 @@ window.addEvent('domready', function(){
 
 				$itemscount = '<span class="badge badge-info">'.$row->itemscount.'</span>';
 				if ($row->itemscount) {
-					$itemscount .= '<a onclick="delAllFilters();"  href="index.php?option=com_flexicontent&amp;view=items&amp;filter_authors='.$row->id.'">
+					$view_items_link = '<a onclick="delAllFilters();"  href="index.php?option=com_flexicontent&amp;view=items&amp;filter_authors='.$row->id.'">
 					['.$view_entry.']
 					</a>';
-				}
+				} else $view_items_link = '';
 			?>
 			<tr class="<?php echo "row$k"; ?>">
 				<td class="center">
@@ -385,8 +386,11 @@ window.addEvent('domready', function(){
 					<a href="<?php echo $link; ?>">
 						<?php echo $row->name; ?></a>
 				</td>
-				<td align="left" class="col_itemscount">
+				<td align="right" class="col_itemscount">
 					<?php echo $itemscount; ?>
+				</td>
+				<td align="left" class="col_view_items">
+					<?php echo $view_items_link; ?>
 				</td>
 				<td>
 					<!-- <a class="modal" rel="{handler: 'iframe', size: {x: 800, y: 500}, onClose: function() {alert('hello');} }" href="<?php echo $link; ?>"> -->
