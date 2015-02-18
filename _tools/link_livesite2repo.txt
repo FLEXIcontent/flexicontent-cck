@@ -1,4 +1,6 @@
 
+-- Rename 'dos' extension to 'bat' before running
+
 PURPOSE:
 This script will link a local Joomla installation (with flexicontent already installed) to your local flexicontent-cck repository
 
