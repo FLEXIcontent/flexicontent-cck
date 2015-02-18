@@ -502,7 +502,7 @@ table.adminlist td.yellow,
 table.adminlist tbody tr td.yellow,
 table.adminlist tbody tr.row0 td.yellow,
 table.adminlist tbody tr.row1 td.yellow {
-	background-color: #FFFFBB !important;
+	background: repeating-linear-gradient( 135deg, #e7e7e7, #e7e7e7 10px, #e0e0e0 10px, #e0e0e0 20px );
 }
 table.adminlist tbody th { font-weight: bold; } /* header cell inside tbody */
 

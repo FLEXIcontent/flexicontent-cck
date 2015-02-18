@@ -22,21 +22,24 @@ $onclick = $display_method == 1  ?  'javascript:return false;'  : '';  // need t
 	<ul class="tocList">
 
 		<?php
+		$curr_link = JUri::getInstance()->toString(array('path', 'query'));
+		$link_class = $display_method==1 ? ' tocPaginated' : ($display_method==0 ? ' tocScrolled' : ' tocReloaded');
+		
 		for ($i = 0; $i < $this->pagescount; $i++) :
 			$page = $this->_generateToc($this->row, $i);
 			if ($display_method == 1) $link = '#'.$page->name;
 			else if ($display_method == 2) $link = $page->link;
-			else  $link = '#'.$page->name.'_toc_page';
-			$active = $this->limitstart == $i  ?  'active'  : '';
+			else  $link = $curr_link.'#'.$page->name.'_toc_page';
+			$active = $this->limitstart == $i  ?  ' active'  : '';
 		?>
 			<li>
-				<a class="tocLink <?php echo $active ?>" id="<?php echo $page->id ?>" href="<?php echo $link; ?>" onclick="<?php echo $onclick ?>" ><?php echo $page->title ?></a>
+				<a class="tocLink<?php echo $link_class.$active ?>" id="<?php echo $page->id ?>" href="<?php echo $link; ?>" onclick="<?php echo $onclick ?>" ><?php echo $page->title ?></a>
 			</li>
 		<?php endfor; ?>
 
 		<?php if ( $this->params->get('allpages_link', 1) && $display_method != 0 ) : ?>
 			<li>
-				<a class="tocAll" id="showall" href="#showall" > - <?php echo $custom_allpages; ?> - </a>
+				<a class="tocAll" id="showall" onclick="<?php echo $onclick ?>" href="#showall"> - <?php echo $custom_allpages; ?> - </a>
 			</li>
 		<?php endif; ?>
 

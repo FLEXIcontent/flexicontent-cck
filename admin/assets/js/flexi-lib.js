@@ -193,19 +193,23 @@ function toggle_column(container_div_id, data_tbl_id, col_no, firstrun) {
 					if ( colspan > 1 ) {
 						jQuery(tcells[cell]).attr('colspan', colspan - 1);
 					} else {
-						eval('jQuery(tcells[cell]).'+action_func+'()');
+		    		firstrun ?
+				    	eval('jQuery(tcells[cell]).'+action_func+'()') :
+							eval('jQuery(tcells[cell]).'+action_func+'("slow")');
 			    	jQuery(tcells[cell]).addClass('isHidden');
 					}
     		} else if (!firstrun) {
 					if ( !jQuery(tcells[cell]).hasClass('isHidden') ) {
 						jQuery(tcells[cell]).attr('colspan', colspan + 1);
 					} else {
-			    	eval('jQuery(tcells[cell]).'+action_func+'()');
+			    	eval('jQuery(tcells[cell]).'+action_func+'("slow")');
 			    	jQuery(tcells[cell]).removeClass('isHidden');
 			    }
 		    }
     	} else {
-		    eval('jQuery(tcells[cell]).'+action_func+'()');
+    		firstrun ?
+		    	eval('jQuery(tcells[cell]).'+action_func+'()') :
+		    	eval('jQuery(tcells[cell]).'+action_func+'("slow")');
 		  }
     }
   }

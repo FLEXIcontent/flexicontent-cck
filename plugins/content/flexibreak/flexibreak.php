@@ -106,7 +106,7 @@ class plgContentFlexiBreak extends JPlugin
 		$pagenav = $this->params->get('pagination', 3);
 		
 		// Add Javascript instant navigation
-		if ($display_method == 1)
+		if ($display_method == 1 || $display_method == 0)
 		{
 			FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 			if (class_exists('flexicontent_html')) {

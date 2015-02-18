@@ -12,19 +12,35 @@ var flexibreak = new Class({
 		this.el   = jQuery('#'+element);
 		this.elid = element;
 		
-		this.titles = jQuery('#' + this.elid + ' ul li .tocLink').toArray();
+		this.anchors = jQuery('#' + this.elid + ' ul li .tocScrolled').toArray();
+		this.pages = jQuery('#' + this.elid + ' ul li .tocPaginated').toArray();
 		this.panels = jQuery('.articlePage').toArray();
-		this.show = jQuery('.tocAll').toArray();
+		this.tocAll = jQuery('.tocAll').toArray();
 		
-		this.titles.each(function(item) {
+		
+		this.anchors.each(function(item) {
+			jQuery(item).on('click',function (e) {
+				e.preventDefault();
+				var target = this.hash;
+				var $target = jQuery(target);
+				jQuery('html, body').stop().animate({
+					'scrollTop': $target.offset().top
+				}, 900, 'swing', function () {
+					window.location.hash = target;
+				});
+			});
+		});
+
+		
+		this.pages.each(function(item) {
 			jQuery(item).bind('click', function(){
-					index = this.titles.indexOf(item);
+					index = this.pages.indexOf(item);
 					this.activate(this.panels[index]);
 				}.bind(this)
 			);
 		}.bind(this));
 
-		this.show.each(function(item) {
+		this.tocAll.each(function(item) {
 			jQuery(item).bind('click', function(){
 					this.showall(item);
 				}.bind(this)
@@ -55,26 +71,17 @@ var flexibreak = new Class({
 		
 		var newPage = jQuery(page).attr('id');
 		jQuery(this.panels).removeClass('active');
-		jQuery(this.show).removeClass('active');
+		jQuery(this.tocAll).removeClass('active');
 		jQuery('.tocNav').css('display', 'block');
 		
 		this.activePanel = jQuery(this.panels).filter("#"+newPage)[0];
+		
 		jQuery(this.activePanel).addClass('active');
-
-		/*if(this.options.changeTransition != 'none' && skipAnim==false)
-		{
-			this.panels.filterById(newPage).setStyle('opacity', 0);
-			var changeEffect = new Fx.Elements(this.panels.filterById(newPage), {duration: this.options.duration, transition: this.options.changeTransition});
-			changeEffect.start({
-				'0': {
-					'opacity': [0, 1]
-				}
-			});
-		}*/
-
-		jQuery(this.titles).removeClass('active');
+		jQuery(this.activePanel).css('opacity', '0.01').animate({'opacity': '1'}, 600, 'linear');
+		
+		jQuery(this.pages).removeClass('active');
 		this.current = this.panels.indexOf(page);
-		jQuery(this.titles[this.current]).addClass('active');
+		jQuery(this.pages[this.current]).addClass('active');
 		this.activeTitle = page;
 		
 		if (this.options.wrap == false) {
@@ -111,9 +118,11 @@ var flexibreak = new Class({
 	
 	showall: function(page){
 		jQuery('.tocNav').css('display', 'none');
-		jQuery(this.panels).addClass('active');
 		
-		jQuery(this.titles).removeClass('active');
+		jQuery(this.panels).addClass('active');
+		jQuery(this.panels).css('opacity', '0.01').animate({'opacity': '1'}, 600, 'linear');
+		
+		jQuery(this.pages).removeClass('active');
 		jQuery(page).addClass('active');
 		this.activeTitle = page;
 	}
