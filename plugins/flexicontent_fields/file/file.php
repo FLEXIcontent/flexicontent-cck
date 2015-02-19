@@ -784,8 +784,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$field->{$prop}[]	=  $pretext . $str . $posttext;
 			
 			// Some extra data for developers: (absolute) file URL and (absolute) file path
-			$field->url[]      = $dl_link;
-			$file->abspath[] = $abspath;
+			$field->url[] = $dl_link;
+			$field->abspath[] = $abspath;
 			$field->file_data[] = $file_data;
 			
 			$n++;

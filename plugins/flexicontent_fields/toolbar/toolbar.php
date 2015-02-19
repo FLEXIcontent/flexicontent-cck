@@ -48,21 +48,21 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-		if(JRequest::getCmd('print')) return;
-
-		global $mainframe, $addthis;
-		$view		= JRequest::getString('view', FLEXI_ITEMVIEW);
+		
+		$view = JRequest::getString('view', FLEXI_ITEMVIEW);
+		
 		if ($view != FLEXI_ITEMVIEW) return;
+		if (JRequest::getCmd('print')) return;
+		
+		global $mainframe, $addthis;
+		$scheme = JURI::getInstance()->getScheme();
 		$document	= JFactory::getDocument();
-		$lang     = $document->getLanguage();
-		if(FLEXI_FISH) {
-			$lang = @$item->lang?$item->lang:$lang;
-		}else{
-			$lang = $item->params->get('language', $lang);
-		}
-		$lang = $lang?$lang:'en-GB';
-		$lang   	= substr($lang, 0, 2);
-		$lang		= in_array($lang, array('en','es','it','th')) ? $lang : 'en';
+		
+		$lang = $document->getLanguage();
+		$lang = $item->params->get('language', $lang);
+		$lang = $lang ? $lang : 'en-GB';
+		$lang = substr($lang, 0, 2);
+		$lang = in_array($lang, array('en','es','it','th')) ? $lang : 'en';
 		
 		// parameters shortcuts
 		$display_comments	= $field->parameters->get(FLEXI_J16GE ? 'display_comments' : 'display-comments', 1) && $item->parameters->get('comments',0);
@@ -330,7 +330,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					case 4:
 						$addthis_code .= '
 						<!-- AddThis Button BEGIN -->
-						<a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=300&pubid='.$addthis_pubid.'"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="'.JText::_('FLEXI_FIELD_TOOLBAR_SHARE').'" style="border:0"/></a>
+						<a class="addthis_button" href="'.$scheme.'://www.addthis.com/bookmark.php?v=300&pubid='.$addthis_pubid.'"><img src="'.$scheme.'://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="'.JText::_('FLEXI_FIELD_TOOLBAR_SHARE').'" style="border:0"/></a>
 						<!-- AddThis Button END -->
 						';
 						break;
@@ -382,7 +382,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			
 			if (!$addthis) {
 				$document->addCustomTag('	
-					<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid='.$addthis_pubid.'"></script>
+					<script type="text/javascript" src="'.$scheme.'://s7.addthis.com/js/300/addthis_widget.js#pubid='.$addthis_pubid.'"></script>
 					<script type="text/javascript">
 					var addthis_config = {
 					     services_exclude: "print,email"
