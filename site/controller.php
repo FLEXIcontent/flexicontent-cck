@@ -354,7 +354,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 		
 		// Enforce maintaining secondary categories
-		if (!$enable_cid_selector) {
+		if (!$enable_cid_selector && (empty($data['submit_conf']) || empty($data['cid'])) ) { // respect submit menu cat override
 			if ($isnew) {
 				$data['cid'] = $tparams->get('cid_default');
 			} else if ( isset($featured_cid) ) {
@@ -367,7 +367,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 		}
 		
-		if (!$enable_catid_selector) {
+		if (!$enable_catid_selector && (empty($data['submit_conf']) || empty($data['catid'])) ) { // respect submit menu cat override
 			if ($isnew && $tparams->get('catid_default'))
 				$data['catid'] = $tparams->get('catid_default');
 			else if ($model->get('catid'))
