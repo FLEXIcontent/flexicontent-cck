@@ -63,10 +63,10 @@
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_INSTANT_FILTERS" hr="false" level="level3" />
 			
-			<field name="cat_filter" type="radio" default="1" label="FLEXI_RIFLD_CAT_FILTER" description="FLEXI_RIFLD_CAT_FILTER_DESC" >	
+			<field name="cat_filter" type="radio" default="1" label="FLEXI_RIFLD_CAT_FILTER" description="FLEXI_RIFLD_CAT_FILTER_DESC" class="btn-group btn-group-yesno">	
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="title_filter" type="radio" default="1" label="FLEXI_RIFLD_TITLE_FILTER" description="FLEXI_RIFLD_TITLE_FILTER_DESC" >	
+			<field name="title_filter" type="radio" default="1" label="FLEXI_RIFLD_TITLE_FILTER" description="FLEXI_RIFLD_TITLE_FILTER_DESC" class="btn-group btn-group-yesno">	
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -101,7 +101,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" >	
+			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" class="btn-group btn-group-yesno">	
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -109,7 +109,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC">
+			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_RIFLD_ANY_USER</option>
 				<option value="1">FLEXI_RIFLD_EDITOR</option>
 				<option value="2">FLEXI_RIFLD_ITEM_OWNER</option>
@@ -213,18 +213,18 @@
 		<fieldset name="group-relation-autorelate-submission" repeat="1" icon_class="icon-new" label_prefix="FLEXI_FIELD_VIEWING" label="Submit related" addfieldpath="/administrator/components/com_flexicontent/elements">		
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_AUTORELATE_SUBMISSION" description="FLEXI_RIFLD_AUTORELATE_SUBMISSION_DESC" hr="false" level="level0" />
-			<field name="auto_relate_curritem" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON" description="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="auto_relate_curritem" type="multilist" subtype="radio"  default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON" toggle_related="1" description="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="button-relation-mode">FLEXI_NO</option>
+				<option value="1" show_list="button-relation-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="auto_relate_submit_text" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT_DESC" />
-			<field name="auto_relate_position" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_POSITION" description="FLEXI_RIFLD_AUTORELATE_POSITION_DESC">
+			<field name="auto_relate_submit_text" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT" depend_class="button-relation-mode" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT_DESC" />
+			<field name="auto_relate_position" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_POSITION" depend_class="button-relation-mode" description="FLEXI_RIFLD_AUTORELATE_POSITION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_BEFORE</option>
 				<option value="1">FLEXI_AFTER</option>
 				<option value="2">FLEXI_BOTH</option>
 			</field>
-			<field name="auto_relate_menu_itemid" type="text" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" />
-			<field name="auto_relate_show_to_unauth" type="list" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED" description="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED_DESC">
+			<field name="auto_relate_menu_itemid" type="text" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" depend_class="button-relation-mode" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" />
+			<field name="auto_relate_show_to_unauth" type="list" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED" depend_class="button-relation-mode" description="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_EXCLUDE_GUESTS</option>
 				<option value="2">FLEXI_YES</option>
@@ -236,15 +236,15 @@
 			<field name="" type="separator" default="FLEXI_RIFLD_SPECIAL_DISPLAY_CASES" level="level0" />
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_SHOW_TOTAL_ONLY" level="level1" />
-			<field name="show_total_only" type="radio" default="0" label="FLEXI_RIFLD_SHOW_TOTAL_RELATED" description="FLEXI_RIFLD_SHOW_TOTAL_RELATED_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-				<option value="2">FLEXI_YES_HIDE_ZERO</option>
+			<field name="show_total_only" type="multilist" subtype="radio" default="0" label="FLEXI_RIFLD_SHOW_TOTAL_RELATED" toggle_related="1" description="FLEXI_RIFLD_SHOW_TOTAL_RELATED_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="relation-total-mode">FLEXI_NO</option>
+				<option value="1" show_list="relation-total-mode" hide_list="">FLEXI_YES</option>
+				<option value="2" show_list="relation-total-mode" hide_list="">FLEXI_YES_HIDE_ZERO</option>
 			</field>
 			<field name="total_in_view" type="fccheckbox" default=""
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="backend"
-				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
-			<field name="total_append_text" type="text" label="FLEXI_RIFLD_TOTAL_APPEND_TEXT" description="FLEXI_RIFLD_TOTAL_APPEND_TEXT_DESC" />
+				label="FLEXI_FIELD_ENABLE_IN_VIEWS" depend_class="relation-total-mode" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" class="btn-group btn-group-yesno" />
+			<field name="total_append_text" type="text" label="FLEXI_RIFLD_TOTAL_APPEND_TEXT" depend_class="relation-total-mode" description="FLEXI_RIFLD_TOTAL_APPEND_TEXT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_EXTRA_INFO" level="level2" />
 			<field name="total_show_auto_btn" type="radio" default="0" label="FLEXI_RIFLD_TOTAL_SHOW_AUTO_BTN" description="FLEXI_RIFLD_TOTAL_SHOW_AUTO_BTN_DESC" class="btn-group btn-group-yesno">
