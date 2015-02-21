@@ -47,6 +47,7 @@ class JFormFieldFccheckbox extends JFormField
 		} else {
 			$attributes = & $node->_attributes;
 		}
+		static $js_added = false;
 		
 		$values			= FLEXI_J16GE ? $this->value : $value;
 		if ( empty($values) )							$values = array();
@@ -91,7 +92,7 @@ class JFormFieldFccheckbox extends JFormField
 				$check_global = ' checked="checked" ';
 				$disable_all = ' disabled="disabled" ';
 			}
-			$html .= '<div style="'.$inline_style.'" ><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="toggle_options_fc_'.$element_id.'(this)" />';
+			$html .= '<div style="'.$inline_style.'" ><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="fc_toggle_checkbox_group(\''.$element_id.'\', this)" />';
 			$html .= '<label for="'.$element_id.'_useglobal" >'.JText::_('FLEXI_USE_GLOBAL').'</label></div>';
 		}
 
@@ -108,25 +109,12 @@ class JFormFieldFccheckbox extends JFormField
 		$html .= '<input id="'.$element_id.'9999" type="hidden"  name="'.$fieldname.'" value="__SAVED__" '.$disable_all.'/> ';
 		$html .= '</fieldset>';
 		
-		$js 	= "
-function toggle_options_fc_".$element_id."(element) {
-	
-	var panel 	= $('".$element_id."');
-	var inputs 	= panel.getElements('input');
-	if ( $(element).checked ) {
-		inputs.each(function(el){
-			el.setProperty('disabled', 'disabled');
-		});
-	} else {
-		inputs.each(function(el){
-			el.setProperty('disabled', '');
-		});
-	}
-	element.setProperty('disabled', '');
-}";
-
-		$doc = JFactory::getDocument();
-		$doc->addScriptDeclaration($js);
+		if (!$js_added) {
+			$doc = JFactory::getDocument();
+			$doc->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js' );
+			//$js = "";
+			//if ($js) $doc->addScriptDeclaration($js);
+		}
 		
 		return $html;
 	}

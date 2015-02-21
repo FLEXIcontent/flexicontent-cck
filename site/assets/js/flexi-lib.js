@@ -123,8 +123,29 @@
 			var el = jQuery('option:selected', this);
 			var show_list = el.attr('show_list').split(',');
 			var hide_list = el.attr('hide_list').split(',');
-			jQuery.each( hide_list, function( i, val ) {  if (val) jQuery('.'+val).hide(noFX ? '' : 'fast');  });
-			jQuery.each( show_list, function( i, val ) {  if (val) jQuery('.'+val).show(noFX ? '' : 'slow');  });
+			jQuery.each( hide_list, function( i, val ) {
+				if (val) {
+					jQuery('.'+val).each(function( index ) {
+						var c = jQuery(this);
+						var dlist = c.data('fc_depend_list');
+						if (!dlist) dlist = {};
+						dlist[val] = 1;
+						c.data('fc_depend_list', dlist);
+						c.hide(noFX ? '' : 'fast');
+					});
+				}
+			});
+			jQuery.each( show_list, function( i, val ) {
+				if (val) {
+					jQuery('.'+val).each(function( index ) {
+						var c = jQuery(this);
+						var dlist = c.data('fc_depend_list');
+						if (dlist && dlist.hasOwnProperty(val)) delete dlist[val];
+						c.data('fc_depend_list', dlist);
+						if ( jQuery.isEmptyObject(dlist) ) c.show(noFX ? '' : 'slow');
+					});
+				}
+			});
 		});
 		
 		// radio
@@ -133,8 +154,29 @@
 			var el = jQuery(this);
 			var show_list = el.attr('show_list').split(',');
 			var hide_list = el.attr('hide_list').split(',');
-			jQuery.each( hide_list, function( i, val ) {  if (val) jQuery('.'+val).hide(noFX ? '' : 'fast');  });
-			jQuery.each( show_list, function( i, val ) {  if (val) jQuery('.'+val).show(noFX ? '' : 'slow');  });
+			jQuery.each( hide_list, function( i, val ) {
+				if (val) {
+					jQuery('.'+val).each(function( index ) {
+						var c = jQuery(this);
+						var dlist = c.data('fc_depend_list');
+						if (!dlist) dlist = {};
+						dlist[val] = 1;
+						c.data('fc_depend_list', dlist);
+						c.hide(noFX ? '' : 'fast');
+					});
+				}
+			});
+			jQuery.each( show_list, function( i, val ) {
+				if (val) {
+					jQuery('.'+val).each(function( index ) {
+						var c = jQuery(this);
+						var dlist = c.data('fc_depend_list');
+						if (dlist && dlist.hasOwnProperty(val)) delete dlist[val];
+						c.data('fc_depend_list', dlist);
+						if ( jQuery.isEmptyObject(dlist) ) c.show(noFX ? '' : 'slow');
+					});
+				}
+			});
 		});
 		
 		// Update the form
