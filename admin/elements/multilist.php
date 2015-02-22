@@ -144,6 +144,22 @@ class JFormFieldMultiList extends JFormField
 			}
 		}
 		
+		/* support for parameter multi-value, multi-parameter dependencies in non-FLEXIcontent views */
+		static $js_added = false;
+		if (!$js_added) {
+			$js_added = true;
+			$doc = JFactory::getDocument();
+			$doc->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js');
+			if ( JRequest::getCmd('option')!='com_flexicontent' ) {
+				$js = "
+				jQuery(document).ready(function(){
+					fc_bind_form_togglers('body');
+				});
+				";
+				$doc->addScriptDeclaration($js);
+			}
+		}
+		
 		if ($subtype=='radio') {
 			$_class = ' class ="'.$attribs['list.attr']['class'].'"';
 			$_id = ' id="'.$element_id.'"';

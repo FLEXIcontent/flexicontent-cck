@@ -50,7 +50,6 @@ class FlexicontentViewField extends JViewLegacy
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
 		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
-		$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js' );
 		
 		//Load pane behavior
 		jimport('joomla.html.pane');
@@ -134,7 +133,7 @@ class FlexicontentViewField extends JViewLegacy
 								var ajax_JTooltips = new Tips($('fieldspecificproperties').getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
 								")."
 								tabberAutomatic(tabberOptions, 'fieldspecificproperties');
-								fc_bind_form_togglers('fieldspecificproperties');
+								fc_bind_form_togglers('#fieldspecificproperties');
 								jQuery('#field_typename').html(jQuery('".$_field_id."').val());
 							}
 						});

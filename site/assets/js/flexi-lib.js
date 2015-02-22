@@ -119,7 +119,7 @@
 		var noFX = 1;
 		
 		// select
-		jQuery('#'+container+' select.fcform_toggler_element').change(function() {
+		jQuery(container+' select.fcform_toggler_element').change(function() {
 			var el = jQuery('option:selected', this);
 			var show_list = el.attr('show_list').split(',');
 			var hide_list = el.attr('hide_list').split(',');
@@ -149,7 +149,7 @@
 		});
 		
 		// radio
-		jQuery(document).on('click', '#'+container+' .fcform_toggler_element input:radio', function(event) {
+		jQuery(document).on('click', container+' .fcform_toggler_element input:radio', function(event) {
 			//alert('reached');
 			var el = jQuery(this);
 			var show_list = el.attr('show_list').split(',');

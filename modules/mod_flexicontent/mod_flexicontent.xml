@@ -44,12 +44,12 @@
 			<field name="" type="separator" default="CSS/HTML developers please read: &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-template-for-universal-content-module.html' target='_blank' a&gt;Custom templates HOW-TO&lt;/a&gt;" description="" level="level3" />
 			
 			<field name="" type="separator" default="FLEXI_MENU_ITEM" level="level1" menu="hide" />
-			<field name="itemid_force" type="radio" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_MOD_CURRENT</option>
-				<option value="2">FLEXI_MOD_SPECIFIC</option>
+			<field name="itemid_force" type="multilist" subtype="radio" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC" toggle_related="1">
+				<option value="0" show_list="" hide_list="specific_itemid">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="specific_itemid">FLEXI_MOD_CURRENT</option>
+				<option value="2" show_list="specific_itemid" hide_list="">FLEXI_MOD_SPECIFIC</option>
 			</field>
-			<field name="itemid_force_value" type="text" default="" label="FLEXI_MOD_SPECIFIC_MENU_ITEMID" description="FLEXI_MOD_SPECIFIC_MENU_ITEMID_DESC" />
+			<field name="itemid_force_value" type="text" default="" label="FLEXI_MOD_SPECIFIC_MENU_ITEMID" ssshowon="itemid_force:2" class="specific_itemid" labelclass="specific_itemid" description="FLEXI_MOD_SPECIFIC_MENU_ITEMID_DESC" />
 			
 		</fieldset>
 		

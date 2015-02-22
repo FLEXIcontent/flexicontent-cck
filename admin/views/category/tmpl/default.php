@@ -41,7 +41,7 @@ $this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/as
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 $js = "
 	jQuery(document).ready(function(){
-		fc_bind_form_togglers('flexicontent');
+		fc_bind_form_togglers('#flexicontent');
 	});
 ";
 ?>

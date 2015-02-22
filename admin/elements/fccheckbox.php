@@ -47,7 +47,6 @@ class JFormFieldFccheckbox extends JFormField
 		} else {
 			$attributes = & $node->_attributes;
 		}
-		static $js_added = false;
 		
 		$values			= FLEXI_J16GE ? $this->value : $value;
 		if ( empty($values) )							$values = array();
@@ -109,7 +108,9 @@ class JFormFieldFccheckbox extends JFormField
 		$html .= '<input id="'.$element_id.'9999" type="hidden"  name="'.$fieldname.'" value="__SAVED__" '.$disable_all.'/> ';
 		$html .= '</fieldset>';
 		
+		static $js_added = false;
 		if (!$js_added) {
+			$js_added = true;
 			$doc = JFactory::getDocument();
 			$doc->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js' );
 			//$js = "";
