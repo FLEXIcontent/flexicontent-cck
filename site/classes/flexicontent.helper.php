@@ -2527,8 +2527,9 @@ class flexicontent_html
 		if (!is_numeric($top) && is_string($top)) $typelist[] = JHTML::_( 'select.option', '', $top );
 		else if ($top) $typelist[] 	= JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_AUTHOR' ) );
 		
+		$user_id_str = JText::_('FLEXI_ID') .': ';
 		foreach ($list as $item) {
-			$typelist[] = JHTML::_( 'select.option', $item->id, $item->name);
+			$typelist[] = JHTML::_( 'select.option', $item->id, $item->name ? $item->name : $user_id_str . $item->id );
 		}
 		return JHTML::_('select.genericlist', $typelist, $name, $attribs, 'value', 'text', $selected );
 	}

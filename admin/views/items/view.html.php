@@ -77,10 +77,11 @@ class FlexicontentViewItems extends JViewLegacy
 		$filter_order      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',			'filter_order',				'',		'cmd' );
 		$filter_order_Dir  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',		'',		'word' );
 		
-		$filter_type			= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',				'filter_type',			0,		'int' );
-		$filter_authors		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_authors',			'filter_authors',		0,		'int' );
+		$filter_type			= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',				'filter_type',			'',		'int' );
+		$filter_authors		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_authors',			'filter_authors',		'',		'cmd' );
+		if (strlen($filter_authors)) $filter_authors = (int)$filter_authors; // support for ZERO author id
 		$filter_state 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',				'filter_state',			'',		'word' );
-		if ($filter_type) $count_filters++; if ($filter_authors) $count_filters++; if ($filter_state) $count_filters++;
+		if ($filter_type) $count_filters++; if (strlen($filter_authors)) $count_filters++; if ($filter_state) $count_filters++;
 		
 		//$filter_stategrp	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_stategrp',		'filter_stategrp',	'',		'word' );
 		

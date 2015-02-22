@@ -792,9 +792,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Current view variable / FLAGs
 		// *****************************
 		
-		$view   = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
+		$realview = JRequest::getVar('view', FLEXI_ITEMVIEW);
+		$view = JRequest::getVar('flexi_callview', $realview);
 		$isFeedView = JRequest::getCmd('format', null) == 'feed';
-		$isItemsManager = $app->isAdmin() && $view=='items' && $option=='com_flexicontent';
+		$isItemsManager = $app->isAdmin() && $realview=='items' && $option=='com_flexicontent';
 		$isSite = $app->isSite();
 		
 		
@@ -985,11 +986,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// ************************
 		// JS gallery configuration
 		// ************************
-		$usepopup   = $field->parameters->get( 'usepopup',  1 ) ; // use JS gallery
-		$popuptype  = $field->parameters->get( 'popuptype', 1 ) ; // JS gallery type
+		$usepopup   = (int)$field->parameters->get( 'usepopup',  1 ) ; // use JS gallery
+		$popuptype  = (int)$field->parameters->get( 'popuptype', 1 ) ; // JS gallery type
 		
 		// Different for mobile clients
-		$popuptype_mobile = $field->parameters->get( 'popuptype_mobile', $popuptype ) ;  // this defaults to desktop when empty
+		$popuptype_mobile = (int)$field->parameters->get( 'popuptype_mobile', $popuptype ) ;  // this defaults to desktop when empty
 		$popuptype = $useMobile ? $popuptype_mobile : $popuptype;
 		
 		// Enable/Disable according to current view

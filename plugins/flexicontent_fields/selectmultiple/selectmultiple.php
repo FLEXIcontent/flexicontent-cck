@@ -90,7 +90,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		static $select2_added = null;
 	  if ( $use_select2 && $select2_added === null ) $select2_added = flexicontent_html::loadFramework('select2');
 		
-		// DISPLAY without using select2 JS
+		// Parameters for DISPLAY without using select2 JS
 		$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
 		$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
 		$size = $field->parameters->get( 'size', 6 ) ;
@@ -241,7 +241,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$display_as_select = 1;
 		if ($display_as_select) {
 			$attribs  = '';
-			$classes  = 'fcfield_textselval' . ($select2_added ? ' use_select2_lib' : '');
+			$classes  = 'fcfield_textselval' . ($use_jslib && $select2_added ? ' use_select2_lib' : '');
 			$classes .= $required;
 			$onchange = "";
 			$attribs = 'multiple="multiple" '.$size;
@@ -264,11 +264,11 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		
 		// Create form field options
 		$options = array();
-		if ($usefirstoption && !$select2_added) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
+		if ($usefirstoption && (!$use_jslib || !$select2_added)) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 		foreach ($elements as $element) $options[] = JHTML::_('select.option', $element->value, $element->text);
 		
 		// Add 1st (non-value) option (a prompt to select value)
-		$field->html  = ($usefirstoption && $select2_added) ? '<span class="fcselect_lbl">'.JText::_($firstoptiontext).':</span> ' : '';
+		$field->html  = ($usefirstoption && ($use_jslib && $select2_added)) ? '<span class="fcselect_lbl">'.JText::_($firstoptiontext).':</span> ' : '';
 		
 		// Render the drop down select
 		$field->html .= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $field->value, $elementid);

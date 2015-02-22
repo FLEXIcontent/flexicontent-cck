@@ -150,11 +150,13 @@ class JFormFieldFields extends JFormField
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
-			if ((boolean) @ $attributes['displa_useglobal']) {
-				array_unshift($fields, JHTML::_('select.option', '' , JText::_('FLEXI_USE_GLOBAL')));
-				array_unshift($fields, JHTML::_('select.option', '0', JText::_('FLEXI_NOT_SET')));   // Compatibility with older FC versions
+			if ((boolean) @ $attributes['display_useglobal']) {
+				array_unshift($fields, JHTML::_('select.option', '' , '- '.JText::_('FLEXI_USE_GLOBAL').' -'));
+				array_unshift($fields, JHTML::_('select.option', '0', '- '.JText::_('FLEXI_NOT_SET').' -'));   // Compatibility with older FC versions
 			} else {
-				array_unshift($fields, JHTML::_('select.option', '0', JText::_('FLEXI_PLEASE_SELECT')));
+				$custom_prompt = @ $attributes['custom_prompt'];
+				$custom_prompt = $custom_prompt ? $custom_prompt : 'FLEXI_PLEASE_SELECT';
+				array_unshift($fields, JHTML::_('select.option', '0', '- '.JText::_($custom_prompt).' -'));
 			}
 			$attribs .= 'class="inputbox"';
 			$maximize_link = '';

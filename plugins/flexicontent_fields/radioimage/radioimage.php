@@ -198,7 +198,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 					var elem = jQuery(this);
 					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
-					".($prettycheckable_added ?
+					".($use_prettycheckable && $prettycheckable_added ?
 						"elem.prev('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" :
 						"elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."
 					nr++;
@@ -306,7 +306,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		$display_as_radioset = 1;
 		if ($display_as_radioset) {
 			$attribs  = '';
-			$classes  = ($prettycheckable_added ? ' use_prettycheckable ' : '');
+			$classes  = $use_prettycheckable && $prettycheckable_added ? ' use_prettycheckable ' : '';
 			$classes .= $required;
 			$onchange = "";
 			if ($required) $classes .= ' validate-radio ';  // if required then set appropriate validate-* CSS class (*=handler name)
@@ -327,7 +327,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		// Create field's HTML display for item form
 		// *****************************************
 		
-		$input_attribs = $prettycheckable_added ? ' data-labelPosition="right" data-customClass="fcradiocheckimage"' : '';
+		$input_attribs = $use_prettycheckable && $prettycheckable_added ? ' data-labelPosition="right" data-customClass="fcradiocheckimage"' : '';
 		$label_class = 'fccheckradio_lbl'
 			.(FLEXI_J30GE ? ' hasTooltip' : ' hasTip')
 			;

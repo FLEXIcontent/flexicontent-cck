@@ -204,7 +204,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 					var elem = jQuery(this);
 					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
-					".($prettycheckable_added ?
+					".($use_prettycheckable && $prettycheckable_added ?
 						"elem.prev('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" :
 						"elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."
 					nr++;
@@ -312,7 +312,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$display_as_checkbox = 1;
 		if ($display_as_checkbox) {
 			$attribs  = '';
-			$classes  = ($prettycheckable_added ? ' use_prettycheckable ' : '');
+			$classes  = $use_prettycheckable && $prettycheckable_added ? ' use_prettycheckable ' : '';
 			$classes .= $required;
 			$onchange = "";
 			if ($exact_values)  {
@@ -339,13 +339,13 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		foreach ($elements as $element) {
 			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
 			$elementid_no = $elementid.'_'.$i;
-			$extra_params = $prettycheckable_added ? ' data-customClass="fcradiocheckimage"' : '';
+			$extra_params = $use_prettycheckable && $prettycheckable_added ? ' data-customClass="fcradiocheckimage"' : '';
 			$input_fld = ' <input type="checkbox" id="'.$elementid_no.'" data-element-grpid="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />';
 			$img_exists = file_exists($imgfolder . $element->image);
 			$options[] = ''
-				.($prettycheckable_added ? $input_fld : '')
+				.($use_prettycheckable && $prettycheckable_added ? $input_fld : '')
 				.'<label for="'.$elementid_no.'" class="'.(FLEXI_J30GE ? 'hasTooltip' : 'hasTip').' fccheckradio_lbl" title="'.flexicontent_html::getToolTip(null, $element->text, 0, 1).'" >'
-				. (!$prettycheckable_added ? $input_fld : '')
+				. (!$use_prettycheckable || !$prettycheckable_added ? $input_fld : '')
 				.($form_vals_display!=1 ? $element->text : '')
 				.($form_vals_display==2 ? ' <br/>' : '')
 				.($form_vals_display >0 ? ($img_exists ? ' <img src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />' : '[NOT found]: '. $imgpath . $element->image) : '')

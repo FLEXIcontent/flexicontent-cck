@@ -195,7 +195,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 					var elem = jQuery(this);
 					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
-					".($prettycheckable_added ?
+					".($use_prettycheckable && $prettycheckable_added ?
 						"elem.prev('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" :
 						"elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."
 					nr++;
@@ -290,15 +290,10 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		
 		// Display as checkboxes
 		$display_as_checkbox = 1;
-		if ($display_as_checkbox) {
-			static $prettycheckable_added = null;
-		  if ( $use_prettycheckable && $prettycheckable_added === null )
-		  {
-				$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
-			}
-			
+		if ($display_as_checkbox)
+		{
 			$attribs  = '';
-			$classes  = ($prettycheckable_added ? ' use_prettycheckable ' : '');
+			$classes  = $use_prettycheckable && $prettycheckable_added ? ' use_prettycheckable ' : '';
 			$classes .= $required;
 			$onchange = "";
 			if ($exact_values)  {
@@ -325,11 +320,11 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		foreach ($elements as $element) {
 			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
 			$elementid_no = $elementid.'_'.$i;
-			$extra_params = $prettycheckable_added ? ' data-labeltext="'.$element->text.'" data-labelPosition="right" data-customClass="fcradiocheck"' : '';
+			$extra_params = $use_prettycheckable && $prettycheckable_added ? ' data-labeltext="'.$element->text.'" data-labelPosition="right" data-customClass="fcradiocheck"' : '';
 			$options[] = ''
-				.(!$prettycheckable_added ? '<label class="fccheckradio_lbl">' : '')
+				.(!$use_prettycheckable || !$prettycheckable_added ? '<label class="fccheckradio_lbl">' : '')
 				.' <input type="checkbox" id="'.$elementid_no.'" data-element-grpid="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />'
-				.(!$prettycheckable_added ? '&nbsp;'.$element->text.'</label>' : '')
+				.(!$use_prettycheckable || !$prettycheckable_added ? '&nbsp;'.$element->text.'</label>' : '')
 				;
 			$i++;
 		}

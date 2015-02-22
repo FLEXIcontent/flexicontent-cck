@@ -259,6 +259,7 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$fields = $this->get( 'Extrafields' );
+		$item->fields = & $fields;
 		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);

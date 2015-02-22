@@ -839,7 +839,8 @@ class FlexicontentModelItems extends JModelLegacy
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang 	= $app->getUserStateFromRequest( $option.'.items.filter_lang', 	'filter_lang', '', 'string' );
 		}
-		$filter_authors = $app->getUserStateFromRequest( $option.'.items.filter_authors', 'filter_authors', '', 'int' );
+		$filter_authors = $app->getUserStateFromRequest( $option.'.items.filter_authors', 'filter_authors', '', 'cmd' );
+		if (strlen($filter_authors)) $filter_authors = (int)$filter_authors; // support for ZERO author id
 		$scope     = $app->getUserStateFromRequest( $option.'.items.scope', 			'scope', '', 'int' );
 		$search    = $app->getUserStateFromRequest( $option.'.items.search', 		'search', '', 'string' );
 		$search    = trim( JString::strtolower( $search ) );
@@ -1002,7 +1003,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// ***********************************************************************
 		
 		if ( $filter_type )    $where[] = 'i.type_id = ' . $filter_type;
-		if ( $filter_authors ) $where[] = 'i.created_by = ' . $filter_authors;
+		if ( strlen($filter_authors) ) $where[] = 'i.created_by = ' . $filter_authors;
 		if ( $filter_id )      $where[] = 'i.id = ' . $filter_id;
 		if ( (FLEXI_FISH || FLEXI_J16GE) && $filter_lang ) {
 			$where[] = 'i.language = ' . $this->_db->Quote($filter_lang);

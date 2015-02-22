@@ -84,7 +84,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		static $select2_added = null;
 	  if ( $use_select2 && $select2_added === null ) $select2_added = flexicontent_html::loadFramework('select2');
 		
-		// DISPLAY with / without using select2 JS
+		// Parameters for DISPLAY with / without using select2 JS
 		$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
 		$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
 		
@@ -234,7 +234,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$display_as_select = 1;
 		if ($display_as_select) {
 			$attribs  = '';
-			$classes  = 'fcfield_textselval' . ($select2_added ? ' use_select2_lib' : '');
+			$classes  = 'fcfield_textselval' . ($use_jslib && $select2_added ? ' use_select2_lib' : '');
 			$classes .= $required;
 			$onchange = "";
 			if ($classes)  $attribs .= ' class="'.$classes.'" ';

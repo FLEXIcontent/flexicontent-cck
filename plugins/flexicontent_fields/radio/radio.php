@@ -191,7 +191,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 					var elem = jQuery(this);
 					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
-					".($prettycheckable_added ?
+					".($use_prettycheckable && $prettycheckable_added ?
 						"elem.prev('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" :
 						"elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."
 					nr++;
@@ -288,7 +288,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		$display_as_radioset = 1;
 		if ($display_as_radioset) {
 			$attribs  = '';
-			$classes  = ($prettycheckable_added ? ' use_prettycheckable ' : '');
+			$classes  = $use_prettycheckable && $prettycheckable_added ? ' use_prettycheckable ' : '';
 			$classes .= $required;
 			$onchange = "";
 			if ($required) $classes .= ' validate-radio ';  // if required then set appropriate validate-* CSS class (*=handler name)
@@ -305,7 +305,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		// Create field's HTML display for item form
 		// *****************************************
 		
-		$input_attribs = $prettycheckable_added ? ' data-labelPosition="right" data-customClass="fcradiocheck"' : '';
+		$input_attribs = $use_prettycheckable && $prettycheckable_added ? ' data-labelPosition="right" data-customClass="fcradiocheck"' : '';
 		$label_class = 'fccheckradio_lbl'
 			;
 		$field->html = array();
@@ -337,10 +337,10 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 			}
 			
 			// Apply (item form) separator and open/close tags to create the radio field
-			$radioset_field = $opentag . implode($separator, $options) . $closetag;
+			$radio_set_field = $opentag . implode($separator, $options) . $closetag;
 			
 			$field->html[] = '
-				'.$radioset_field.'
+				'.$radio_set_field.'
 				'.($use_ingroup ? '' : $move2).'
 				'.($use_ingroup ? '' : $remove_button).'
 				'.($use_ingroup || !$add_position ? '' : $add_here).'

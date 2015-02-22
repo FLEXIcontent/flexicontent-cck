@@ -472,7 +472,7 @@ table.adminlist thead th {
 	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
 	color: #555;
 	text-align: center;
-	padding: 6px 8px !important; /* allow only specific overrides */
+	padding: 6px 8px;
 }
 
 table.adminlist thead th.center { text-align: center !important; }
