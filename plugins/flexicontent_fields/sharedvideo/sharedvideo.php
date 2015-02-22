@@ -63,38 +63,66 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 		if (!isset($value['description'])) $value['description'] = '';
 		
 		$field->html  = '';
-		$field->html .= '<table class="admintable" border="0" cellspacing="0" cellpadding="5">';
-		$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_URL').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" '.$required.' /> <input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_FETCH').'" onclick="fetchVideo_'.$field->name.'();" /></td></tr>';
-		 if ($display_videotype_form) {
-			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_TYPE').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][videotype]" value="'.$value['videotype'].'" size="10" readonly="readonly" style="background-color:#eee" /></td></tr>';
-		}else{
-			$field->html	.= '<input type="hidden" name="custom['.$field->name.'][videotype]" value="'.$value['videotype'].'" size="10" readonly="readonly" style="background-color:#eee" />';
-		}
-		if ($display_videoid_form) {
-			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_ID').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][videoid]" value="'.$value['videoid'].'" size="15" readonly="readonly" style="background-color:#eee" /></td></tr>';
-		}else{
-			$field->html	.= '<input class="fcfield_textval inputbox" type="hidden" name="custom['.$field->name.'][videoid]" value="'.$value['videoid'].'" size="15" readonly="readonly" style="background-color:#eee" />';
-		}
-		if ($display_title_form) {
-			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_TITLE').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" /></td></tr>';
-		}else{
-			$field->html	.= '<input class="fcfield_textval inputbox" type="hidden" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />';
-		}
-		if ($display_author_form) {
-			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_AUTHOR').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" /></td></tr>';
-		}else{
-			$field->html	.= '<input class="fcfield_textval inputbox" type="hidden" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />';
-		}
-		if ($display_duration_form) {
-			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DURATION').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" /></td></tr>';
-		}else{
-			$field->html	.= '<input class="fcfield_textval inputbox" type="hidden" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" />';
-		}
-		if ($display_description_form) {
-			$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DESCRIPTION').'</td><td><textarea class="fcfield_textareaval" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea></td></tr>';
-		}else{
-			$field->html	.= '<textarea style="display:none;" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea>';
-		}
+		$field->html .= '
+		<table class="admintable" border="0" cellspacing="0" cellpadding="5">
+			<tr>
+				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_URL').'</td>
+				<td>
+					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" '.$required.' />
+					<input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_FETCH').'" onclick="fetchVideo_'.$field->name.'();" />
+					<span id="fcfield_fetching_msg_'.$field->id.'"></span>
+				</td>
+			</tr>'
+		.($display_videotype_form ? '
+			<tr>
+				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_TYPE').'</td>
+				<td>
+					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][videotype]" value="'.$value['videotype'].'" size="10" readonly="readonly" style="background-color:#eee" />
+				</td>
+			</tr>' : '
+			<input type="hidden" name="custom['.$field->name.'][videotype]" value="'.$value['videotype'].'" size="10" readonly="readonly" style="background-color:#eee" />')
+		.($display_videoid_form ? '
+			<tr>
+				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_ID').'</td>
+				<td>
+					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][videoid]" value="'.$value['videoid'].'" size="15" readonly="readonly" style="background-color:#eee" />
+				</td>
+			</tr>' : '
+			<input type="hidden" name="custom['.$field->name.'][videoid]" value="'.$value['videoid'].'" size="15" readonly="readonly" style="background-color:#eee" />')
+		.($display_title_form ? '
+			<tr>
+				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_TITLE').'</td>
+				<td>
+					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />
+				</td>
+			</tr>' : '
+			<input type="hidden" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />')
+		.($display_author_form ? '
+			<tr>
+				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_AUTHOR').'</td>
+				<td>
+					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />
+				</td>
+			</tr>' : '
+			<input type="hidden" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />')
+		.($display_duration_form ? '
+			<tr>
+				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DURATION').'</td>
+				<td>
+					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" />
+				</td>
+			</tr>' : '
+			<input type="hidden" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" />')
+		.($display_description_form ? '
+			<tr>
+				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DESCRIPTION').'</td>
+				<td>
+					<textarea class="fcfield_textareaval" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea>
+				</td>
+			</tr>' : '
+			<textarea style="display:none;" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea>')
+		;
+		
 		$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PREVIEW').'</td><td><div id="'.$field->name.'_thumb">';
 		if($value['videotype']!="" && $value['videoid']!="") {
 			$iframecode = '<iframe class="sharedvideo" src="';
@@ -108,8 +136,12 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 				case "dailymotion":
 					$iframecode .= "//www.dailymotion.com/embed/video/";
 					break;
+				default:
+					// For embed.ly we will have added 'URL' into our 'id' variable (below)
+					break;
 			}
-			$iframecode .= $value['videoid'].'" width="240" height="135" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
+			$val_id = $value['videoid'];  // In case of embed.ly, this is not id but it is full URL
+			$iframecode .= $val_id.'" width="240" height="135" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
 			$field->html .= $iframecode;
 		}
 		$field->html	.= '</div></td></tr>';
@@ -120,8 +152,12 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 			var fieldname = \'custom['.$field->name.']\';
 			var url = fieldname+"[url]";
 			url = document.forms["adminForm"].elements[url].value;
-			var videoID = false;
-			var videoType = false;
+			var videoID = "";
+			var videoType = "";
+			
+			var _loading_img = "<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">";
+			jQuery("#fcfield_fetching_msg_'.$field->id.'").html(_loading_img);
+			
 			if(window.console) window.console.log("Fetching "+url);
 			// try youtube
 			var myregexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
@@ -142,8 +178,8 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 				videoType = "dailymotion";
 			}
 			var jsonurl;
-			updateVideoInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
-			updateVideoTypeId_'.$field->name.'(videoType,videoID);
+			updateValueInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
+			updateValueTypeId_'.$field->name.'(videoType,videoID);
 			if(videoID && videoType){
 				if(window.console) window.console.log("Video type: "+videoType);
 				if(window.console) window.console.log("Video ID: "+videoID);
@@ -170,37 +206,41 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 				document.body.appendChild(jsonscript);
 			}
 			else {
-				updateVideoInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
-				updateVideoTypeId_'.$field->name.'("","");				
+				updateValueInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
+				updateValueTypeId_'.$field->name.'("","");				
 			}
 		}
 		function youtubeCallback_'.$field->name.'(data){
-			updateVideoInfo_'.$field->name.'({title: data.entry.title.$t, author: data.entry.author[0].name.$t, duration: data.entry.media$group.yt$duration.seconds, description: data.entry.media$group.media$description.$t, thumb: data.entry.media$group.media$thumbnail[0].url});
+			updateValueInfo_'.$field->name.'({title: data.entry.title.$t, author: data.entry.author[0].name.$t, duration: data.entry.media$group.yt$duration.seconds, description: data.entry.media$group.media$description.$t, thumb: data.entry.media$group.media$thumbnail[0].url});
+			jQuery("#fcfield_fetching_msg_'.$field->id.'").html("");
 		}
 		function vimeoCallback_'.$field->name.'(data){
-			updateVideoInfo_'.$field->name.'({title: data[0].title, author: data[0].user_name, duration: data[0].duration, description: data[0].description, thumb: data[0].thumbnail_small});
+			updateValueInfo_'.$field->name.'({title: data[0].title, author: data[0].user_name, duration: data[0].duration, description: data[0].description, thumb: data[0].thumbnail_small});
+			jQuery("#fcfield_fetching_msg_'.$field->id.'").html("");
 		}
 		function dailymotionCallback_'.$field->name.'(data){
-			updateVideoInfo_'.$field->name.'({title: data.title, author: data["owner.screenname"], duration: data.duration, description: data.description, thumb: data.thumbnail_60_url});
+			updateValueInfo_'.$field->name.'({title: data.title, author: data["owner.screenname"], duration: data.duration, description: data.description, thumb: data.thumbnail_60_url});
+			jQuery("#fcfield_fetching_msg_'.$field->id.'").html("");
 		}
 		function embedlyCallback_'.$field->name.'(data){
 			if(data.type!="error") {
-				var myregexp = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
+				var myregexp = /(http:|ftp:|https:)?\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
 				if(data.html.match(myregexp) != null) {
 					var iframeurl = data.html.match(myregexp)[0];
 					var iframecode = \'<iframe class="sharedvideo" src="\'+iframeurl+\'" width="240" height="135" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>\';
-					updateVideoTypeId_'.$field->name.'("embed.ly:"+data.provider_name.toLowerCase(),iframeurl);
-					updateVideoInfo_'.$field->name.'({title: data.title, author: data.author_name, duration: "", description: data.description, thumb: data.thumbnail_url});
+					updateValueTypeId_'.$field->name.'("embed.ly:"+data.provider_name.toLowerCase(),iframeurl);
+					updateValueInfo_'.$field->name.'({title: data.title, author: data.author_name, duration: "", description: data.description, thumb: data.thumbnail_url});
 					document.getElementById("'.$field->name.'_thumb").innerHTML = iframecode;
 				}
 			}
 			else {
 				alert("'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_UNABLE_TO_PARSE').'"); 
-				updateVideoInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
-				updateVideoTypeId_'.$field->name.'("","");				
+				updateValueInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
+				updateValueTypeId_'.$field->name.'("","");				
 			}
+			jQuery("#fcfield_fetching_msg_'.$field->id.'").html("");
 		}
-		function updateVideoTypeId_'.$field->name.'(videoType,videoID){
+		function updateValueTypeId_'.$field->name.'(videoType,videoID){
 			var fieldname = \'custom['.$field->name.']\';
 			field = fieldname+"[videotype]";
 			document.forms["adminForm"].elements[field].value = videoType;
@@ -227,7 +267,7 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 			}
 
 		}
-		function updateVideoInfo_'.$field->name.'(data){
+		function updateValueInfo_'.$field->name.'(data){
 			var fieldname = \'custom['.$field->name.']\';
 			field = fieldname+"[title]";
 			document.forms["adminForm"].elements[field].value = data.title;
@@ -295,9 +335,13 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 					$_show_related = '&related=0';
 					$_show_srvlogo = '&logo=0';
 					break;
+				default:
+					// For embed.ly we will have added 'URL' into our 'id' variable (below)
+					break;
 			}
+			$val_id = $value['videoid'];  // In case of embed.ly, this is not id but it is full URL
 			$field->{$prop} .= '
-				'.$value['videoid'].'?autoplay='.$autostart.$_show_related.$_show_srvlogo.'" width="'.$width.'" height="'.$height.'" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+				'.$val_id.'?autoplay='.$autostart.$_show_related.$_show_srvlogo.'" width="'.$width.'" height="'.$height.'" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
 				'.($display_title && !empty($value['title'])   ? '<h'.$headinglevel.'>'.$value['title'].'</h'.$headinglevel.'>' : '').'
 				'.($display_author && !empty($value['author']) ? '<div class="author">'.$value['author'].'</div>' : '')
 				;
@@ -311,7 +355,7 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 				$s = str_pad($s,2,'0',STR_PAD_LEFT);
 				$field->{$prop} .= '<div class="duration">'.$h.$m.$s.'</div>';
 			}
-			if($display_description==1 && !empty($value['description'])) $field->{$prop} .= '<div class="description">'.$value['description'].'</div>';
+			if ($display_description && !empty($value['description'])) $field->{$prop} .= '<div class="description">'.$value['description'].'</div>';
 			$field->{$prop} .= $posttext;
 		}
 	}
@@ -327,15 +371,43 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
-		// Check if field has posted data
-		if ( empty($post) ) return;
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
+		
+		// Currently post is an array of properties, TODO: make field multi-value
+		$post = array(0=>$post);
+		
+		// Reformat the posted data
+		$newpost = array();
+		$new = 0;
+		foreach ($post as $n => $v)
+		{
+			// ***********************************************************
+			// Validate URL, skipping URLs that are empty after validation
+			// ***********************************************************
+			
+			$url = flexicontent_html::dataFilter($post[$n]['url'], 0, 'URL', 0);  // Clean bad text/html
+			if ( empty($url) && !$use_ingroup ) continue;  // Skip empty values if not in field group
+			
+			$newpost[$new] = array();
+			$newpost[$new]['url'] = $url;
+			
+			// Validate other value properties
+			$newpost[$new]['videotype'] = flexicontent_html::dataFilter(@$post[$n]['videotype'], 0, 'STRING', 0);
+			$newpost[$new]['videoid'] = flexicontent_html::dataFilter(@$post[$n]['videoid'], 0, 'STRING', 0);
+			$newpost[$new]['title'] = flexicontent_html::dataFilter(@$post[$n]['title'], 0, 'STRING', 0);
+			$newpost[$new]['author'] = flexicontent_html::dataFilter(@$post[$n]['author'], 0, 'STRING', 0);
+			$newpost[$new]['duration'] = flexicontent_html::dataFilter(@$post[$n]['duration'], 0, 'INT', 0);
+			$newpost[$new]['description'] = flexicontent_html::dataFilter(@$post[$n]['description'], 0, 'STRING', 0);
+
+			$new++;
+		}
+		
+		$post = $newpost;
 		
 		// Serialize multi-property data before storing them into the DB
-		if( !empty($post['url']) ) {
-			$post = serialize($post);
-		}
-		else {
-			unset($post);
+		foreach($post as $i => $v) {
+			$post[$i] = serialize($v);
 		}
 	}
 	
@@ -365,4 +437,5 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('url'), $search_properties=array('title','author','description','videotype'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
+
 }
