@@ -1150,7 +1150,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 }
 
 /* workaround yes-no forced styling */
-#flexicontent .btn {
+.btn {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -1158,9 +1158,9 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	-ms-user-select: none;
 	user-select: none;
 }
-#flexicontent .group-fcinfo .btn:not(.btn-primary),
-#flexicontent .group-fcprimary .btn:not(.btn-primary),
-#flexicontent .group-fcinfo .btn:not(.btn-primary) {
+body .group-fcinfo .btn:not(.btn-primary),
+body .group-fcprimary .btn:not(.btn-primary),
+body .group-fcinfo .btn:not(.btn-primary) {
 	color: #333 !important;
 	background-color: #e6e6e6 !important;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#e6e6e6)) !important;
@@ -1173,9 +1173,9 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	border-color: #bbb #bbb #a2a2a2 !important;
 	border-image: none !important;
 }
-#flexicontent .group-fcinfo .btn.active:not(.btn-primary),
-#flexicontent .group-fcprimary .btn.active:not(.btn-primary),
-#flexicontent .group-fcsuccess .btn.active:not(.btn-primary) {
+body .group-fcinfo .btn.active:not(.btn-primary),
+body .group-fcprimary .btn.active:not(.btn-primary),
+body .group-fcsuccess .btn.active:not(.btn-primary) {
 	color: #fff !important;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
 	
@@ -1183,9 +1183,9 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) inset, 0 1px 2px rgba(0, 0, 0, 0.15) !important;
 	outline: 0 none !important;
 }
-#flexicontent .group-fcinfo .btn.active:not(.btn-primary) { background-color: #2f96b4 !important; border-color: #2f96b4 #2f96b4 #1f6377 !important; }
-#flexicontent .group-fcprimary .btn.active:not(.btn-primary) { background-color: #15497c !important; border-color: #15497c #15497c #0a223b !important; }
-#flexicontent .group-fcsuccess .btn.active:not(.btn-primary) { background-color: #51a351 !important; border-color: #51a351 #51a351 #387038 !important; }
+body .group-fcinfo .btn.active:not(.btn-primary) { background-color: #2f96b4 !important; border-color: #2f96b4 #2f96b4 #1f6377 !important; }
+body .group-fcprimary .btn.active:not(.btn-primary) { background-color: #15497c !important; border-color: #15497c #15497c #0a223b !important; }
+body .group-fcsuccess .btn.active:not(.btn-primary) { background-color: #51a351 !important; border-color: #51a351 #51a351 #387038 !important; }
 
 
 /*#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append):not(.btn-group) > input,

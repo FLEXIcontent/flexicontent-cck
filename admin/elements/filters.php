@@ -278,8 +278,12 @@ class JFormFieldFilters extends JFormFieldList
 			$onchange = 'fcfield_add_sortable_element(this);';
 			$attribs .= ' onchange="'.$onchange.'"';
 			
+			$classes = "positions_container";
+			if ($class = @$attributes['class']) {
+				$classes .= ' '.$class;
+			}
 			$sorter_html  = '<div class="clear"></div>';
-			$sorter_html .= '<div class="positions_container" style="width: auto!important; margin:6px; min-width:100%; min-height:64px; overflow-y:hidden!important">';
+			$sorter_html .= '<div class="'.$classes.'" style="margin:6px; min-height:64px; overflow-y:hidden!important">';
 			$sorter_html .= '<ul id="'.$sortable_id.'" class="positions"> ';
 			foreach($values as $val) {
 				if( !isset($fields[$val]) ) continue;
@@ -288,9 +292,10 @@ class JFormFieldFilters extends JFormFieldList
 				$sorter_html .= '<a title="'.JText::_('FLEXI_REMOVE').'" align="right" onclick="javascript:fcfield_del_sortable_element(this);" class="deletetag" href="javascript:;"></a>';
 				$sorter_html .= '</li>';
 			}
-			$sorter_html .= '</ul></div>';
-			$sorter_html .= '<div class="clear"></div>';
+			$sorter_html .= '</ul>';
 			$sorter_html .= '<input type="hidden" value="'.implode(',', $values).'" id="'.$_element_id.'" name="'.$_fieldname.'" />';
+			$sorter_html .= '</div>';
+			$sorter_html .= '<div class="clear"></div>';
 			
 			$js = "
 				if (sorttable_fcfield_lists)

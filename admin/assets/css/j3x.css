@@ -205,8 +205,8 @@ fieldset.panelform fieldset.radio,
 fieldset.adminform-legacy fieldset.radio {
 	border: 0 none !important;
 	float: left !important;
-	margin: 2px 0 0 4px;
-	padding: 0px 0px;
+	margin: 2px 0 0 0px;
+	padding: 0px 0px !important;
 }
 
 div fieldset label.radiobtn {
@@ -277,7 +277,7 @@ fieldset.panelform select,
 fieldset.panelform :not(.input-prepend):not(.input-append) > input:not(.input-small),
 fieldset.panelform img, fieldset.panelform :not(.input-prepend):not(.input-append) > button {
 	float: left !important;
-	margin: 2px 8px 0px 6px!important;
+	margin: 2px 8px 0px 0px;
 	padding: 3px !important;
 	display: inline-block;
 	font-size: 12px;
