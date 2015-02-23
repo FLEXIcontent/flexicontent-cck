@@ -235,21 +235,21 @@
 			
 		<field name="" type="separator" default="FLEXI_HITS_UNIQUE_CONF" label="" level="level1" menu="hide" />
 			
-			<field name="hits_count_unique" type="radio" default="0" label="FLEXI_HITS_COUNT_UNIQUE" description="FLEXI_HITS_COUNT_UNIQUE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="hits_count_unique" type="multilist" subtype="radio" default="0" label="FLEXI_HITS_COUNT_UNIQUE" description="FLEXI_HITS_COUNT_UNIQUE_DESC" menu="hide" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="count_unique">FLEXI_NO</option>
+				<option value="1" show_list="count_unique" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_mins_to_unique" type="text" size="5" default="600" label="FLEXI_HITS_MINS_BETWEEN_UNIQUE" description="FLEXI_HITS_MINS_BETWEEN_UNIQUE_DESC" menu="hide" />
-			<field name="hits_skip_ips" type="radio" default="1" label="FLEXI_HITS_SKIP_IPS" description="FLEXI_HITS_SKIP_IPS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="hits_mins_to_unique" type="text" size="5" default="600" label="FLEXI_HITS_MINS_BETWEEN_UNIQUE" class="count_unique" labelclass="count_unique" description="FLEXI_HITS_MINS_BETWEEN_UNIQUE_DESC" menu="hide" />
+			<field name="hits_skip_ips" type="multilist" subtype="radio" default="1" label="FLEXI_HITS_SKIP_IPS" description="FLEXI_HITS_SKIP_IPS_DESC" toggle_related="1" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="iplist">FLEXI_NO</option>
+				<option value="1" show_list="iplist" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_ips_list" type="textarea" cols="50" rows="4" default="127.0.0.1" label="FLEXI_HITS_IP_LIST" description="FLEXI_HITS_IP_LIST_DESC" menu="hide" />
-			<field name="hits_skip_bots" type="radio" default="1" label="FLEXI_HITS_SKIP_BOTS" description="FLEXI_HITS_SKIP_BOTS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="hits_ips_list" type="textarea" cols="50" rows="4" default="127.0.0.1" label="FLEXI_HITS_IP_LIST" class="iplist" labelclass="iplist" description="FLEXI_HITS_IP_LIST_DESC" menu="hide" />
+			<field name="hits_skip_bots" type="multilist" subtype="radio" default="1" label="FLEXI_HITS_SKIP_BOTS" description="FLEXI_HITS_SKIP_BOTS_DESC" toggle_related="1" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="botlist">FLEXI_NO</option>
+				<option value="1" show_list="botlist" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" />
+			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" class="botlist" labelclass="botlist" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" />
 			
 	</fieldset>
 	<fieldset name="lists_catdata_fset" label="FLEXI_LISTS_CATDATA_CONF" description="" >
@@ -271,32 +271,32 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" menu="hide" />
-			<field name="show_cat_title" type="radio" default="1" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+			<field name="show_cat_title" type="multilist" subtype="radio" default="1" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC" toggle_related="1" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="cat_title">FLEXI_HIDE</option>
+				<option value="1" show_list="cat_title" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" menu="hide" />
+			<field name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" class="cat_title" labelclass="cat_title" description="FLEXI_TITLE_MAXLEN_DESC" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" menu="hide" />
-			<field name="show_description_image" type="radio" default="1" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+			<field name="show_description_image" type="multilist" subtype="radio" default="0" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC" toggle_related="1" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="cat_img">FLEXI_HIDE</option>
+				<option value="1" show_list="cat_img" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="cat_image_source" type="radio" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="cat_image_source" type="radio" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" menu="hide" labelclass="cat_img" class="cat_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
 				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
 				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
 			</field>
-			<field name="cat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="cat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" menu="hide" labelclass="cat_img" class="cat_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="cat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="cat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" menu="hide" labelclass="cat_img" class="cat_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="cat_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" menu="hide" />
-			<field name="cat_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" menu="hide" />
+			<field name="cat_image_width" type="text" size="4" default="80" labelclass="cat_img" class="cat_img" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" menu="hide" />
+			<field name="cat_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" labelclass="cat_img" class="cat_img"  description="FLEXI_IMAGE_HEIGHT" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" menu="hide" />
 			<field name="show_description" type="radio" default="1" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC" menu="hide" class="btn-group btn-group-yesno">
@@ -311,11 +311,11 @@
 			
 		<field name="" type="separator" default="FLEXI_PARAMETERS_SUBCATS_INFO_OPTIONS" level="level1" menu="hide" />
 			
-			<field name="show_subcategories" type="radio" default="1" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+			<field name="show_subcategories" type="multilist" subtype="radio" default="0" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC" menu="hide" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="subcategories_display">FLEXI_HIDE</option>
+				<option value="1" show_list="subcategories_display" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="subcat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC" menu="hide" >
+			<field name="subcat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" class="subcategories_display" labelclass="subcategories_display" description="FLEXI_CATEGORY_ORDER_DESC" menu="hide" >
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
 				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
@@ -328,58 +328,58 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER_CAT</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" description="FLEXI_SUBCATEGORY_INFO_DESC" level="level2" menu="hide" />
-			<field name="show_label_subcats" type="radio" default="1" label="FLEXI_SHOW_SUBCATS_LABEL" description="FLEXI_SHOW_SUBCATS_LABEL_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" description="FLEXI_SUBCATEGORY_INFO_DESC" class="subcategories_display" labelclass="subcategories_display" level="level2" menu="hide" />
+			<field name="show_label_subcats" type="radio" default="1" label="FLEXI_SHOW_SUBCATS_LABEL" description="FLEXI_SHOW_SUBCATS_LABEL_DESC" menu="hide"  labelclass="subcategories_display" class="subcategories_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_itemcount" type="radio" default="1" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-				<option value="2">FLEXI_SHOW_WITH_LABEL</option>
-			</field>
-			<field name="show_subcatcount" type="radio" default="0" label="FLEXI_SHOW_SUBCATS_COUNT" description="FLEXI_SHOW_SUBCATS_COUNT_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="show_itemcount" type="radio" default="1" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC" menu="hide" labelclass="subcategories_display" class="subcategories_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 				<option value="2">FLEXI_SHOW_WITH_LABEL</option>
 			</field>
-			<field name="show_empty_cats" type="radio" default="1" label="FLEXI_SHOW_EMPTY_CATS" description="FLEXI_SHOW_EMPTY_CATS_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="show_subcatcount" type="radio" default="0" label="FLEXI_SHOW_SUBCATS_COUNT" description="FLEXI_SHOW_SUBCATS_COUNT_DESC" menu="hide" labelclass="subcategories_display" class="subcategories_display btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+				<option value="2">FLEXI_SHOW_WITH_LABEL</option>
+			</field>
+			<field name="show_empty_cats" type="radio" default="1" label="FLEXI_SHOW_EMPTY_CATS" description="FLEXI_SHOW_EMPTY_CATS_DESC" menu="hide" labelclass="subcategories_display" class="subcategories_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" menu="hide" />
-			<field name="show_description_image_subcat" type="radio" default="0" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+			<field name="" type="separator" default="FLEXI_IMAGE" description="..." labelclass="subcategories_display" class="subcategories_display" level="level3" menu="hide" />
+			<field name="show_description_image_subcat" type="multilist" subtype="radio" default="0" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC" menu="hide" toggle_related="1" labelclass="subcategories_display" class="subcategories_display btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="subcategories_display_img">FLEXI_HIDE</option>
+				<option value="1" show_list="subcategories_display_img" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="subcat_image_source" type="radio" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="subcat_image_source" type="radio" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" menu="hide" labelclass="subcategories_display_img" class="subcategories_display_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
 				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
 				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
 			</field>
-			<field name="subcat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="subcat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" menu="hide" labelclass="subcategories_display_img" class="subcategories_display_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="subcat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="subcat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" menu="hide" labelclass="subcategories_display_img" class="subcategories_display_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="subcat_image_width" type="text" size="4" default="24" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" menu="hide" />
-			<field name="subcat_image_height" type="text" size="4" default="24" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" menu="hide" />
+			<field name="subcat_image_width" type="text" size="4" default="24" label="FLEXI_IMAGE_WIDTH" labelclass="subcategories_display_img" class="subcategories_display_img"  description="FLEXI_IMAGE_WIDTH" menu="hide" />
+			<field name="subcat_image_height" type="text" size="4" default="24" label="FLEXI_IMAGE_HEIGHT" labelclass="subcategories_display_img" class="subcategories_display_img"  description="FLEXI_IMAGE_HEIGHT" menu="hide" />
 			
-			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" menu="hide" />
-			<field name="show_description_subcat" type="radio" default="0" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" labelclass="subcategories_display" class="subcategories_display"  menu="hide" />
+			<field name="show_description_subcat" type="multilist" subtype="radio" default="0" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC" menu="hide" toggle_related="1" labelclass="subcategories_display" class="subcategories_display btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="subcategories_display_desc">FLEXI_HIDE</option>
+				<option value="1" show_list="subcategories_display_desc" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="description_cut_text_subcat" type="text" size="3" default="120" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" menu="hide" />
+			<field name="description_cut_text_subcat" type="text" size="3" default="120" label="FLEXI_CATDESCR_MAXLEN" labelclass="subcategories_display_desc" class="subcategories_display_desc" description="FLEXI_CATDESCR_MAXLEN_DESC" menu="hide" />
 			
-			<field name="" type="separator" default="FLEXI_SUBCATEGORY_ENCLOSING" level="level3" menu="hide" />
-			<field name="subcat_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" menu="hide" />
-			<field name="subcat_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" menu="hide" />
-			<field name="subcat_separatorf" type="list" default="0" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC" menu="hide">
+			<field name="" type="separator" default="FLEXI_SUBCATEGORY_ENCLOSING" level="level3" labelclass="subcategories_display" class="subcategories_display" menu="hide" />
+			<field name="subcat_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" labelclass="subcategories_display" class="subcategories_display"  description="FLEXI_RECORD_PREFIX_TEXT_DESC" menu="hide" />
+			<field name="subcat_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" labelclass="subcategories_display" class="subcategories_display" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" menu="hide" />
+			<field name="subcat_separatorf" type="list" default="0" label="FLEXI_RECORD_SEPARATOR" labelclass="subcategories_display" class="subcategories_display" description="FLEXI_RECORD_SEPARATOR_DESC" menu="hide">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>
@@ -387,17 +387,17 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="subcat_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" menu="hide" />
-			<field name="subcat_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" menu="hide" />
+			<field name="subcat_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" labelclass="subcategories_display" class="subcategories_display"  description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" menu="hide" />
+			<field name="subcat_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" labelclass="subcategories_display" class="subcategories_display"  description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" menu="hide" />
 			
 
 		<field name="" type="separator" default="FLEXI_PARAMETERS_PEERCATS_INFO_OPTIONS" level="level1" menu="hide" />
 			
-			<field name="show_peercategories" type="radio" default="1" label="FLEXI_SHOW_PEERCATS" description="FLEXI_SHOW_PEERCATS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+			<field name="show_peercategories" type="multilist" subtype="radio" default="1" label="FLEXI_SHOW_PEERCATS" description="FLEXI_SHOW_PEERCATS_DESC" menu="hide" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="peercategories_display">FLEXI_HIDE</option>
+				<option value="1" show_list="peercategories_display" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="peercat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC" menu="hide" >
+			<field name="peercat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" labelclass="peercategories_display" class="peercategories_display" description="FLEXI_CATEGORY_ORDER_DESC" menu="hide" >
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
 				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
@@ -410,58 +410,58 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER_CAT</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" menu="hide" />
-			<field name="show_label_peercats" type="radio" default="1" label="FLEXI_SHOW_PEERCATS_LABEL" description="FLEXI_SHOW_PEERCATS_LABEL_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" labelclass="peercategories_display" class="peercategories_display" level="level2" menu="hide" />
+			<field name="show_label_peercats" type="radio" default="1" label="FLEXI_SHOW_PEERCATS_LABEL" description="FLEXI_SHOW_PEERCATS_LABEL_DESC" menu="hide" labelclass="peercategories_display" class="peercategories_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_itemcount_peercat" type="radio" default="0" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-				<option value="2">FLEXI_SHOW_WITH_LABEL</option>
-			</field>
-			<field name="show_subcatcount_peercat" type="radio" default="0" label="FLEXI_SHOW_SUBCATS_COUNT_PEER" description="FLEXI_SHOW_SUBCATS_COUNT_PEER_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="show_itemcount_peercat" type="radio" default="0" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC" menu="hide" labelclass="peercategories_display" class="peercategories_display btn-group btn-group-yesno btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 				<option value="2">FLEXI_SHOW_WITH_LABEL</option>
 			</field>
-			<field name="show_empty_peercats" type="radio" default="1" label="FLEXI_SHOW_EMPTY_CATS" description="FLEXI_SHOW_EMPTY_CATS_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="show_subcatcount_peercat" type="radio" default="0" label="FLEXI_SHOW_SUBCATS_COUNT_PEER" description="FLEXI_SHOW_SUBCATS_COUNT_PEER_DESC" menu="hide" labelclass="peercategories_display" class="peercategories_display btn-group btn-group-yesno btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+				<option value="2">FLEXI_SHOW_WITH_LABEL</option>
+			</field>
+			<field name="show_empty_peercats" type="radio" default="1" label="FLEXI_SHOW_EMPTY_CATS" description="FLEXI_SHOW_EMPTY_CATS_DESC" menu="hide" labelclass="peercategories_display" class="peercategories_display btn-group btn-group-yesno btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" menu="hide" />
-			<field name="show_description_image_peercat" type="radio" default="0" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+			<field name="" type="separator" default="FLEXI_IMAGE" description="..." labelclass="peercategories_display" class="peercategories_display" level="level3" menu="hide" />
+			<field name="show_description_image_peercat" type="multilist" subtype="radio" default="0" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC" menu="hide" toggle_related="1" labelclass="peercategories_display" class="peercategories_display btn-group btn-group-yesno btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="peercategories_display_img">FLEXI_HIDE</option>
+				<option value="1" show_list="peercategories_display_img" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="peercat_image_source" type="radio" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="peercat_image_source" type="radio" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" menu="hide" labelclass="peercategories_display_img" class="peercategories_display_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
 				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
 				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
 			</field>
-			<field name="peercat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="peercat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" menu="hide" labelclass="peercategories_display_img" class="peercategories_display_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="peercat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="peercat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" menu="hide" labelclass="peercategories_display_img" class="peercategories_display_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="peercat_image_width" type="text" size="4" default="24" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" menu="hide" />
-			<field name="peercat_image_height" type="text" size="4" default="24" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" menu="hide" />
+			<field name="peercat_image_width" type="text" size="4" default="24" label="FLEXI_IMAGE_WIDTH" labelclass="peercategories_display_img" class="peercategories_display_img" description="FLEXI_IMAGE_WIDTH" menu="hide" />
+			<field name="peercat_image_height" type="text" size="4" default="24" label="FLEXI_IMAGE_HEIGHT" labelclass="peercategories_display_img" class="peercategories_display_img btn-group" description="FLEXI_IMAGE_HEIGHT" menu="hide" />
 			
-			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" menu="hide" />
-			<field name="show_description_peercat" type="radio" default="0" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." labelclass="peercategories_display" class="peercategories_display btn-group btn-group-yesno" level="level3" menu="hide" />
+			<field name="show_description_peercat" type="multilist" subtype="radio" default="0" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC" menu="hide" toggle_related="1" class="peercategories_display btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="peercategories_display_desc">FLEXI_HIDE</option>
+				<option value="1" show_list="peercategories_display_desc" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="description_cut_text_peercat" type="text" size="3" default="120" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" menu="hide" />
+			<field name="description_cut_text_peercat" type="text" size="3" default="120" label="FLEXI_CATDESCR_MAXLEN" labelclass="peercategories_display_desc" class="peercategories_display_desc" description="FLEXI_CATDESCR_MAXLEN_DESC" menu="hide" />
 			
-			<field name="" type="separator" default="FLEXI_PEERCATEGORY_ENCLOSING" level="level3" menu="hide" />
-			<field name="peercat_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" menu="hide" />
-			<field name="peercat_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" menu="hide" />
-			<field name="peercat_separatorf" type="list" default="0" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC" menu="hide">
+			<field name="" type="separator" default="FLEXI_PEERCATEGORY_ENCLOSING" level="level3" labelclass="peercategories_display" class="peercategories_display" menu="hide" />
+			<field name="peercat_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" labelclass="peercategories_display" class="peercategories_display" menu="hide" />
+			<field name="peercat_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" labelclass="peercategories_display" class="peercategories_display" menu="hide" />
+			<field name="peercat_separatorf" type="list" default="0" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC" labelclass="peercategories_display" class="peercategories_display" menu="hide">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>
@@ -469,8 +469,8 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="peercat_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" menu="hide" />
-			<field name="peercat_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" menu="hide" />
+			<field name="peercat_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" labelclass="peercategories_display" class="peercategories_display" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" menu="hide" />
+			<field name="peercat_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" labelclass="peercategories_display" class="peercategories_display" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" menu="hide" />
 			
 
 	</fieldset>
