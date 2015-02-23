@@ -202,6 +202,9 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		}
 		
 		$class = 'fcsep_'.$level; $title = "";
+		if ($_class = @$attributes['class']) {
+			$class .= ' '.$_class;
+		}
 		if ($description) {
 			$class .= FLEXI_J30GE ? " hasTooltip" : " hasTip";
 			$title = flexicontent_html::getToolTip($value, $description, 1, 1);

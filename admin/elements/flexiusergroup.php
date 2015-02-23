@@ -164,12 +164,8 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		$attribs .= @$this->element['onchange'] ? ' onchange="' . (string) $this->element['onchange'] . '"' : '';		
 		
 		$classes = '';
-		if ( @$attributes['required'] && @$attributes['required']!='false' ) {
-			$classes .= ' required';
-		}
-		if ( $node->attributes('validation_class') ) {
-			$classes .= ' '.$node->attributes('validation_class');
-		}
+		$classes .= @$attributes['required'] && @$attributes['required']!='false' ? ' required' : '';
+		$classes .= @$attributes['class'] ? ' '.$attributes['class'] : '';
 		$attribs .= ' class="'.$classes.'"';
 		
 		$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);

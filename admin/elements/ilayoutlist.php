@@ -75,12 +75,8 @@ class JFormFieldIlayoutlist extends JFormFieldList
 		$attribs = '';
 		
 		$classes = 'use_select2_lib ';
-		if ( $node->attributes('required') && $node->attributes('required')=='true' ) {
-			$classes .= 'required ';
-		}
-		if ( $node->attributes('validation_class') ) {
-			$classes .= $node->attributes('validation_class');
-		}
+		$classes .= @$attributes['required'] && @$attributes['required']!='false' ? ' required' : '';
+		$classes .= @$attributes['class'] ? ' '.$attributes['class'] : '';
 		$attribs = ' class="'.$classes.'" '.$attribs;
 		
 		$attribs .= ' style="float:left;" ';

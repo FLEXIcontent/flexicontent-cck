@@ -115,6 +115,7 @@ class JFormFieldMultiList extends JFormField
 				foreach ($option->children() as $sub_option)
 				{
 					$attr_arr = array();
+					if (isset($sub_option->attributes()->force_list)) $attr_arr['force_list'] = $sub_option->attributes()->force_list;
 					if (isset($sub_option->attributes()->show_list))  $attr_arr['show_list'] = $sub_option->attributes()->show_list;
 					if (isset($sub_option->attributes()->hide_list))  $attr_arr['hide_list'] = $sub_option->attributes()->hide_list;
 					if (isset($sub_option->attributes()->class))  $attr_arr['class'] = $sub_option->attributes()->class;
@@ -131,6 +132,7 @@ class JFormFieldMultiList extends JFormField
 			}
 			else {
 				$attr_arr = array();
+				if (isset($option->attributes()->force_list)) $attr_arr['force_list'] = $option->attributes()->force_list;
 				if (isset($option->attributes()->show_list))  $attr_arr['show_list'] = $option->attributes()->show_list;
 				if (isset($option->attributes()->hide_list))  $attr_arr['hide_list'] = $option->attributes()->hide_list;
 				if (isset($option->attributes()->class))  $attr_arr['class'] = $option->attributes()->class;

@@ -61,6 +61,9 @@ class JFormFieldFcdate extends JFormField
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		$format = '%Y-%m-%d';
 		$attribs = (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="18" ';
+		if ($class = @$attributes['class']) {
+			$attribs .= 'class="'.$class.'"';
+		}
 		
  		//return JHTML::_('calendar', $value, $fieldname, $element_id, $format, $attribs);
  		return $this->calendar($value, $fieldname, $element_id, $format, $attribs);

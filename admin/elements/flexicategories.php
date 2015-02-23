@@ -99,17 +99,15 @@ class JFormFieldFlexicategories extends JFormField
 				."if (parent.hasClass(\"jpane-slider\")) parent.setStyle(\"height\", \"auto\");"
 			;
 			$style = 'display:inline-block;'.(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px');
-			$maximize_link = "<a style='$style' href='javascript:;' onclick='$onclick' >Maximize/Minimize</a>";*/
+			*/
 		} else {
-			//$maximize_link = '';
 		}
-		$maximize_link = '';
 		
 		$top = @$attributes['top'] ? $attributes['top'] : false;
 		
 		$classes = 'use_select2_lib ';
-		$classes .= ( @$attributes['required'] && @$attributes['required']!='false' ) ? ' required' : '';
-		$classes .= $node->attributes('validation_class') ? ' '.$node->attributes('validation_class') : '';
+		$classes .= @$attributes['required'] && @$attributes['required']!='false' ? ' required' : '';
+		$classes .= @$attributes['class'] ? ' '.$attributes['class'] : '';
 		$classes = ' class="'.$classes.'"';
 		$attribs .= $classes .' style="float:left;" ';
 		
@@ -149,7 +147,7 @@ class JFormFieldFlexicategories extends JFormField
 			false, true, $actions_allowed=array('core.create')
 		);
 		
-		return $html.$maximize_link;
+		return $html;
 	}
 }
 ?>

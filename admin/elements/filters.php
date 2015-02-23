@@ -256,11 +256,9 @@ class JFormFieldFilters extends JFormFieldList
 				."if (parent.hasClass(\"jpane-slider\")) parent.setStyle(\"height\", \"auto\");"
 			;
 			$style = 'display:inline-block;'.(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px');
-			$maximize_link = "<a style='$style' href='javascript:;' onclick='$onclick' >Maximize/Minimize</a>";
 		} else {
 			array_unshift($options, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
-			$maximize_link = '';
 		}
 		
 		$html = $sorter_html = $tip = '';
@@ -317,7 +315,7 @@ class JFormFieldFilters extends JFormFieldList
 		
 		$html =
 		'<div style="border-width:0px; margin:0px; padding:0px; width:68%; float:left;">'.
-			$html.$maximize_link.$tip.$sorter_html.
+			$html.$tip.$sorter_html.
 		'</div>';
 		return $html;
 	}

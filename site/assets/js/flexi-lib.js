@@ -121,8 +121,9 @@
 		// select
 		jQuery(container+' select.fcform_toggler_element').change(function() {
 			var el = jQuery('option:selected', this);
-			var show_list = el.attr('show_list').split(',');
-			var hide_list = el.attr('hide_list').split(',');
+			var show_list  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
+			var hide_list  = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
+			var force_list = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
 			jQuery.each( hide_list, function( i, val ) {
 				if (val) {
 					jQuery('.'+val).each(function( index ) {
@@ -131,7 +132,7 @@
 						if (!dlist) dlist = {};
 						dlist[val] = 1;
 						c.data('fc_depend_list', dlist);
-						c.hide(noFX ? '' : 'fast');
+						c.hasClass('panelform') ? c.slideUp(noFX ? '' : 'fast') : c.parent().slideUp(noFX ? '' : 'fast');
 					});
 				}
 			});
@@ -142,7 +143,17 @@
 						var dlist = c.data('fc_depend_list');
 						if (dlist && dlist.hasOwnProperty(val)) delete dlist[val];
 						c.data('fc_depend_list', dlist);
-						if ( jQuery.isEmptyObject(dlist) ) c.show(noFX ? '' : 'slow');
+						if ( jQuery.isEmptyObject(dlist) ) {
+							c.hasClass('panelform') ? c.slideDown(noFX ? '' : 'slow') : c.parent().slideDown(noFX ? '' : 'slow');
+						}
+					});
+				}
+			});
+			jQuery.each( force_list, function( i, val ) {
+				if (val) {
+					jQuery('.'+val).each(function( index ) {
+						var c = jQuery(this);
+						c.hasClass('panelform') ? c.slideDown(noFX ? '' : 'slow') : c.parent().slideDown(noFX ? '' : 'slow');
 					});
 				}
 			});
@@ -152,8 +163,9 @@
 		jQuery(document).on('click', container+' .fcform_toggler_element input:radio', function(event) {
 			//alert('reached');
 			var el = jQuery(this);
-			var show_list = el.attr('show_list').split(',');
-			var hide_list = el.attr('hide_list').split(',');
+			var show_list  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
+			var hide_list  = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
+			var force_list = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
 			jQuery.each( hide_list, function( i, val ) {
 				if (val) {
 					jQuery('.'+val).each(function( index ) {
@@ -162,7 +174,7 @@
 						if (!dlist) dlist = {};
 						dlist[val] = 1;
 						c.data('fc_depend_list', dlist);
-						c.hide(noFX ? '' : 'fast');
+						c.hasClass('panelform') ? c.slideUp(noFX ? '' : 'fast') : c.parent().slideUp(noFX ? '' : 'fast');
 					});
 				}
 			});
@@ -173,7 +185,17 @@
 						var dlist = c.data('fc_depend_list');
 						if (dlist && dlist.hasOwnProperty(val)) delete dlist[val];
 						c.data('fc_depend_list', dlist);
-						if ( jQuery.isEmptyObject(dlist) ) c.show(noFX ? '' : 'slow');
+						if ( jQuery.isEmptyObject(dlist) ) {
+							c.hasClass('panelform') ? c.slideDown(noFX ? '' : 'slow') : c.parent().slideDown(noFX ? '' : 'slow');
+						}
+					});
+				}
+			});
+			jQuery.each( force_list, function( i, val ) {
+				if (val) {
+					jQuery('.'+val).each(function( index ) {
+						var c = jQuery(this);
+						c.hasClass('panelform') ? c.slideDown(noFX ? '' : 'slow') : c.parent().slideDown(noFX ? '' : 'slow');
 					});
 				}
 			});
