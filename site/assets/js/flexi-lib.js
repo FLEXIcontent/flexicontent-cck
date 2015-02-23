@@ -124,6 +124,9 @@
 			var show_list  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
 			var hide_list  = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
 			var force_list = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
+			
+			var toBeUpdated = Array();
+			var u = 0;
 			jQuery.each( hide_list, function( i, val ) {
 				if (val) {
 					jQuery('.'+val).each(function( index ) {
@@ -132,7 +135,7 @@
 						if (!dlist) dlist = {};
 						dlist[val] = 1;
 						c.data('fc_depend_list', dlist);
-						c.hasClass('panelform') ? c.slideUp(noFX ? '' : 'fast') : c.parent().slideUp(noFX ? '' : 'fast');
+						toBeUpdated[u++] = c;
 					});
 				}
 			});
@@ -143,9 +146,7 @@
 						var dlist = c.data('fc_depend_list');
 						if (dlist && dlist.hasOwnProperty(val)) delete dlist[val];
 						c.data('fc_depend_list', dlist);
-						if ( jQuery.isEmptyObject(dlist) ) {
-							c.hasClass('panelform') ? c.slideDown(noFX ? '' : 'slow') : c.parent().slideDown(noFX ? '' : 'slow');
-						}
+						toBeUpdated[u++] = c;
 					});
 				}
 			});
@@ -153,9 +154,25 @@
 				if (val) {
 					jQuery('.'+val).each(function( index ) {
 						var c = jQuery(this);
-						c.hasClass('panelform') ? c.slideDown(noFX ? '' : 'slow') : c.parent().slideDown(noFX ? '' : 'slow');
+						c.data('fc_forced_display', 1);
+						toBeUpdated[u++] = c;
 					});
 				}
+			});
+			
+			jQuery.each( toBeUpdated, function( i, val ) {
+				var c = jQuery(this);
+				var dlist = c.data('fc_depend_list');
+				var forced = c.data('fc_forced_display');
+				if ( jQuery.isEmptyObject(dlist) || forced ) {
+					c.hasClass('panelform') ? c.slideDown(noFX ? '' : 'slow') : c.parent().slideDown(noFX ? '' : 'slow');
+				} else {
+					c.hasClass('panelform') ? c.slideUp(noFX ? '' : 'fast') : c.parent().slideUp(noFX ? '' : 'fast');
+				}
+			});
+			jQuery.each( toBeUpdated, function( i, val ) {
+				var c = jQuery(this);
+				c.data('fc_forced_display', 0);
 			});
 		});
 		
