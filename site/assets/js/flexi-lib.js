@@ -112,110 +112,86 @@
 			}
 		}
 	}
-
-	// Add toggling of dependent form elements
-	function fc_bind_form_togglers(container)
+	
+	
+	function toggleDepentParams(el, toggleParent, toggleParentSelector)
 	{
 		var noFX = 1;
+		var show_list  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
+		var hide_list  = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
+		var force_list = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
 		
-		// select
-		jQuery(container+' select.fcform_toggler_element').change(function() {
-			var el = jQuery('option:selected', this);
-			var show_list  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
-			var hide_list  = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
-			var force_list = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
-			
-			var toBeUpdated = Array();
-			var u = 0;
-			jQuery.each( hide_list, function( i, val ) {
-				if (val) {
-					jQuery('.'+val).each(function( index ) {
-						var c = jQuery(this);
-						var dlist = c.data('fc_depend_list');
-						if (!dlist) dlist = {};
-						dlist[val] = 1;
-						c.data('fc_depend_list', dlist);
-						toBeUpdated[u++] = c;
-					});
-				}
-			});
-			jQuery.each( show_list, function( i, val ) {
-				if (val) {
-					jQuery('.'+val).each(function( index ) {
-						var c = jQuery(this);
-						var dlist = c.data('fc_depend_list');
-						if (dlist && dlist.hasOwnProperty(val)) delete dlist[val];
-						c.data('fc_depend_list', dlist);
-						toBeUpdated[u++] = c;
-					});
-				}
-			});
-			jQuery.each( force_list, function( i, val ) {
-				if (val) {
-					jQuery('.'+val).each(function( index ) {
-						var c = jQuery(this);
-						c.data('fc_forced_display', 1);
-						toBeUpdated[u++] = c;
-					});
-				}
-			});
-			
-			jQuery.each( toBeUpdated, function( i, val ) {
-				var c = jQuery(this);
-				var dlist = c.data('fc_depend_list');
-				var forced = c.data('fc_forced_display');
-				if ( jQuery.isEmptyObject(dlist) || forced ) {
-					c.hasClass('panelform') ? c.slideDown(noFX ? '' : 'slow') : c.parent().slideDown(noFX ? '' : 'slow');
-				} else {
-					c.hasClass('panelform') ? c.slideUp(noFX ? '' : 'fast') : c.parent().slideUp(noFX ? '' : 'fast');
-				}
-			});
-			jQuery.each( toBeUpdated, function( i, val ) {
-				var c = jQuery(this);
-				c.data('fc_forced_display', 0);
-			});
+		var toBeUpdated = Array();
+		var u = 0;
+		jQuery.each( hide_list, function( i, val ) {
+			if (val) {
+				jQuery('.'+val).each(function( index ) {
+					var c = jQuery(this);
+					var dlist = c.data('fc_depend_list');
+					if (!dlist) dlist = {};
+					dlist[val] = 1;
+					c.data('fc_depend_list', dlist);
+					toBeUpdated[u++] = c;
+				});
+			}
+		});
+		jQuery.each( show_list, function( i, val ) {
+			if (val) {
+				jQuery('.'+val).each(function( index ) {
+					var c = jQuery(this);
+					var dlist = c.data('fc_depend_list');
+					if (dlist && dlist.hasOwnProperty(val)) delete dlist[val];
+					c.data('fc_depend_list', dlist);
+					toBeUpdated[u++] = c;
+				});
+			}
+		});
+		jQuery.each( force_list, function( i, val ) {
+			if (val) {
+				jQuery('.'+val).each(function( index ) {
+					var c = jQuery(this);
+					c.data('fc_forced_display', 1);
+					toBeUpdated[u++] = c;
+				});
+			}
 		});
 		
-		// radio
+		jQuery.each( toBeUpdated, function( i, val ) {
+			var c = jQuery(this);
+			var dlist = c.data('fc_depend_list');
+			var forced = c.data('fc_forced_display');
+			if ( jQuery.isEmptyObject(dlist) || forced ) {
+				!toggleParent ? c.slideDown(noFX ? '' : 'slow') :
+					(toggleParentSelector ?
+						c.parents(toggleParentSelector).slideDown(noFX ? '' : 'slow') :
+						c.parents().eq(toggleParent).slideDown(noFX ? '' : 'slow')
+					);
+			} else {
+				!toggleParent ? c.slideUp(noFX ? '' : 'fast') :
+					(toggleParentSelector ?
+						c.parents(toggleParentSelector).slideUp(noFX ? '' : 'fast') :
+						c.parents().eq(toggleParent).slideUp(noFX ? '' : 'fast')
+					);
+			}
+		});
+		jQuery.each( toBeUpdated, function( i, val ) {
+			var c = jQuery(this);
+			c.data('fc_forced_display', 0);
+		});
+	}
+	
+	
+	// Add toggling of dependent form elements
+	function fc_bind_form_togglers(container, toggleParent, toggleParentSelector)
+	{
+		// Bind select elements
+		jQuery(container+' select.fcform_toggler_element').change(function() {
+			toggleDepentParams( jQuery('option:selected', this), toggleParent, toggleParentSelector);
+		});
+		
+		// Bind radio elements
 		jQuery(document).on('click', container+' .fcform_toggler_element input:radio', function(event) {
-			//alert('reached');
-			var el = jQuery(this);
-			var show_list  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
-			var hide_list  = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
-			var force_list = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
-			jQuery.each( hide_list, function( i, val ) {
-				if (val) {
-					jQuery('.'+val).each(function( index ) {
-						var c = jQuery(this);
-						var dlist = c.data('fc_depend_list');
-						if (!dlist) dlist = {};
-						dlist[val] = 1;
-						c.data('fc_depend_list', dlist);
-						c.hasClass('panelform') ? c.slideUp(noFX ? '' : 'fast') : c.parent().slideUp(noFX ? '' : 'fast');
-					});
-				}
-			});
-			jQuery.each( show_list, function( i, val ) {
-				if (val) {
-					jQuery('.'+val).each(function( index ) {
-						var c = jQuery(this);
-						var dlist = c.data('fc_depend_list');
-						if (dlist && dlist.hasOwnProperty(val)) delete dlist[val];
-						c.data('fc_depend_list', dlist);
-						if ( jQuery.isEmptyObject(dlist) ) {
-							c.hasClass('panelform') ? c.slideDown(noFX ? '' : 'slow') : c.parent().slideDown(noFX ? '' : 'slow');
-						}
-					});
-				}
-			});
-			jQuery.each( force_list, function( i, val ) {
-				if (val) {
-					jQuery('.'+val).each(function( index ) {
-						var c = jQuery(this);
-						c.hasClass('panelform') ? c.slideDown(noFX ? '' : 'slow') : c.parent().slideDown(noFX ? '' : 'slow');
-					});
-				}
-			});
+			toggleDepentParams( jQuery(this), toggleParent, toggleParentSelector );
 		});
 		
 		// Update the form

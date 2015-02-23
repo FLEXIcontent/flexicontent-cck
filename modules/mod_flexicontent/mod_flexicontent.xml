@@ -295,15 +295,6 @@
 			<!-- DATE SCOPE -->
 			<field name="" type="separator" default="FLEXI_DATES_SCOPE" level="level1" />
 			
-			<!-- DATE SCOPE: COMMON -->
-			<field name="date_type" type="multilist" subtype="radio" default="0" label="FLEXI_DATE_DATA" description="FLEXI_DATE_DATA_DESC" toggle_related="1" class="method_dates_ops dateStaB dateDataSrc" labelclass="method_dates_ops dateStaB dateDataSrc" >
-				<option value="0" show_list="" hide_list="date_custom_fld">FLEXI_DATE_CREATED</option>
-				<option value="1" show_list="" hide_list="date_custom_fld">FLEXI_DATE_MODIFIED</option>
-				<option value="2" show_list="" hide_list="date_custom_fld">FLEXI_DATE_PUBLISH_UP</option>
-				<option value="3" show_list="date_custom_fld" hide_list="">FLEXI_CUSTOM_DATE_FIELD</option>
-			</field>
-			<field name="datecomp_field" type="fields" fieldnameastext="true" default="" multiple="false" field_type="date" label="FLEXI_CUSTOM_FIELD_AS_DATE_DATA" description="FLEXI_CUSTOM_FIELD_AS_DATE_DATA_DESC" class="date_custom_fld" labelclass="date_custom_fld" />
-			
 			<!-- DYNAMIC/STATIC HEADERS -->
 			<field name="" type="separator" default="FLEXI_DYNAMIC_DATE_BEHAVIOUR" level="level2" class="dateDynB" labelclass="dateDynB" />
 			<field name="" type="separator" default="FLEXI_STATIC_DATE_BEHAVIOUR" level="level2" class="dateStaB" labelclass="dateStaB" />
@@ -351,6 +342,15 @@
 				<option value="2" show_list="method_dates_ops" hide_list="">FLEXI_EXCLUDE</option>
 				<option value="3" show_list="method_dates_ops" hide_list="">FLEXI_INCLUDE</option>
 			</field>
+			
+			<!-- DATE SCOPE: COMMON -->
+			<field name="date_type" type="multilist" subtype="radio" default="0" label="FLEXI_DATE_DATA" description="FLEXI_DATE_DATA_DESC" toggle_related="1" class="method_dates_ops dateStaB dateDataSrc" labelclass="method_dates_ops dateStaB dateDataSrc" >
+				<option value="0" show_list="" hide_list="date_custom_fld">FLEXI_DATE_CREATED</option>
+				<option value="1" show_list="" hide_list="date_custom_fld">FLEXI_DATE_MODIFIED</option>
+				<option value="2" show_list="" hide_list="date_custom_fld">FLEXI_DATE_PUBLISH_UP</option>
+				<option value="3" show_list="date_custom_fld" hide_list="">FLEXI_CUSTOM_DATE_FIELD</option>
+			</field>
+			<field name="datecomp_field" type="fields" fieldnameastext="true" default="" multiple="false" field_type="date" label="FLEXI_CUSTOM_FIELD_AS_DATE_DATA" description="FLEXI_CUSTOM_FIELD_AS_DATE_DATA_DESC" class="date_custom_fld" labelclass="date_custom_fld" />
 			
 			<!-- STATIC BEHAVIOUR -->
 			<field name="bdate" type="fcdate" size="50" label="FLEXI_BDATE" description="FLEXI_BDATE_DESC" class="method_dates_ops dateStaB cDateTxts" labelclass="method_dates_ops dateStaB cDateTxts" />
