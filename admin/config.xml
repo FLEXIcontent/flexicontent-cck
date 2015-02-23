@@ -661,20 +661,16 @@
 		<field name="" type="separator" default="Category, Author items, My items, Multi-category view" label="" level="level4" menu="hide" />
 		
 			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level1" menu="hide" />
-			<field name="ff_placement" type="multilist" subtype="radio" default="0" label="FLEXI_SEARCH_FILTER_FORM_PLACEMENT" description="FLEXI_SEARCH_FILTER_FORM_PLACEMENT_DESC" class="btn-group group-fcsuccess">
-				<option value="0">FLEXI_SEARCH_FILTER_FORM_INLINE</option>
-				<option value="1">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
+			<field name="ff_placement" type="multilist" subtype="radio" default="0" label="FLEXI_SEARCH_FILTER_FORM_PLACEMENT" description="FLEXI_SEARCH_FILTER_FORM_PLACEMENT_DESC" toggle_related="1"  class="btn-group group-fcsuccess">
+				<option value="0" show_list="" hide_list="searchplacement_display">FLEXI_SEARCH_FILTER_FORM_INLINE</option>
+				<option value="1" show_list="searchplacement_display" hide_list="">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
 			</field>
-			<field name="ff_toggle_search_title" type="text" size="20" default="FLEXI_TOGGLE_SEARCH_FORM" label="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE" description="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE_DESC" />
-			<field name="show_search_go" type="multilist" subtype="radio" default="1" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" menu="hide" class="btn-group group-fcsuccess">
-				<option value="0">FLEXI_AUTO</option>
-				<option value="1">FLEXI_SHOW</option>
+			<field name="ff_toggle_search_title" type="text" size="20" default="FLEXI_TOGGLE_SEARCH_FORM" label="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE" labelclass="searchplacement_display" class="searchplacement_display" description="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE_DESC" />
+			<field name="show_search_go" type="multilist" subtype="radio" default="1" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC"  toggle_related="1" menu="hide" class="btn-group group-fcsuccess">
+				<option value="0" show_list="" hide_list="gobutton_display">FLEXI_AUTO</option>
+				<option value="1" show_list="gobutton_display" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="show_search_reset" type="radio" default="1" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			<field name="flexi_button_class_go" type="list" default="" label="FLEXI_BUTTON_CLASS_GO" description="FLEXI_BUTTON_CLASS_GO_DESC" menu="hide">
+			<field name="flexi_button_class_go" type="list" default="" label="FLEXI_BUTTON_CLASS_GO" labelclass="gobutton_display" class="gobutton_display" description="FLEXI_BUTTON_CLASS_GO_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
 				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
@@ -685,8 +681,12 @@
 				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
 				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
-			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" />
-			<field name="flexi_button_class_reset" type="list" default="" label="FLEXI_BUTTON_CLASS_RESET" description="FLEXI_BUTTON_CLASS_RESET_DESC" menu="hide">
+			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" labelclass="gobutton_display" class="gobutton_display" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" />
+			<field name="show_search_reset" type="multilist" subtype="radio" default="1" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC"  toggle_related="1" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="resetbutton_display">FLEXI_HIDE</option>
+				<option value="1" show_list="resetbutton_display" hide_list="">FLEXI_SHOW</option>
+			</field>
+			<field name="flexi_button_class_reset" type="list" default="" label="FLEXI_BUTTON_CLASS_RESET" labelclass="resetbutton_display" class="resetbutton_display" description="FLEXI_BUTTON_CLASS_RESET_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
 				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
@@ -697,7 +697,7 @@
 				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
 				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
-			<field name="flexi_button_class_reset_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" />
+			<field name="flexi_button_class_reset_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" labelclass="resetbutton_display" class="resetbutton_display" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" />
 			<field name="filter_autosubmit" type="radio" default="0" label="FLEXI_FILTER_FORM_AUTO_SUBMIT" description="FLEXI_FILTER_FORM_AUTO_SUBMIT_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -760,29 +760,29 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level1" menu="hide" />
-			<field name="use_filters" type="radio" default="0" label="FLEXI_DISPLAY_FILTERS" description="FLEXI_DISPLAY_FILTERS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_filters" type="multilist" subtype="radio" default="0" label="FLEXI_DISPLAY_FILTERS" toggle_related="1" description="FLEXI_DISPLAY_FILTERS_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="filter_display">FLEXI_NO</option>
+				<option value="1" show_list="filter_display" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="filters_order" type="radio" default="1" label="FLEXI_FILTERS_ORDER" description="FLEXI_FILTERS_ORDER_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="filters_order" type="radio" default="1" label="FLEXI_FILTERS_ORDER" description="FLEXI_FILTERS_ORDER_DESC" menu="hide" labelclass="filter_display" class="filter_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_ORDER_FMAN</option>
 				<option value="1">FLEXI_ORDER_CUSTOM_BELOW</option>
 			</field>
-			<field name="filters" type="filters" multiple="false" default="" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" menu="hide" />
+			<field name="filters" type="filters" multiple="false" default="" label="FLEXI_SELECT_FILTERS" labelclass="filter_display" class="filter_display" description="FLEXI_SELECT_FILTERS_DESC" menu="hide" />
 			
-			<field name="show_filter_labels" type="radio" default="1" label="FLEXI_FILTER_LABELS" description="FLEXI_FILTER_LABELS_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="show_filter_labels" type="radio" default="1" label="FLEXI_FILTER_LABELS" description="FLEXI_FILTER_LABELS_DESC" menu="hide" labelclass="filter_display" class="filter_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
-			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" menu="hide" />
+			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTER_VALUES" labelclass="filter_display" class="filter_display" description="FLEXI_INITIAL_FILTER_VALUES_DESC" menu="hide" />
 
 			<field name="" type="separator" default="FLEXI_LOCKED_FILTERS" description="" level="level3" menu="hide" />
-			<field name="use_persistent_filters" type="radio" default="0" label="FLEXI_USE_LOCKED_FILTERS" description="FLEXI_USE_LOCKED_FILTERS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_persistent_filters" type="multilist" subtype="radio" default="0" label="FLEXI_USE_LOCKED_FILTERS" toggle_related="1" description="FLEXI_USE_LOCKED_FILTERS_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="locked_filter_display">FLEXI_NO</option>
+				<option value="1" show_list="locked_filter_display" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_LOCKED_FILTER_VALUES" description="FLEXI_LOCKED_FILTER_VALUES_DESC" menu="hide" />
+			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_LOCKED_FILTER_VALUES" labelclass="locked_filter_display" class="locked_filter_display" description="FLEXI_LOCKED_FILTER_VALUES_DESC" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level1" menu="hide" />
 			
