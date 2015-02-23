@@ -867,24 +867,24 @@
 			
 			<field name="" type="separator" default="FLEXI_IMAGE" description="FLEXI_USE_IMAGE" level="level1" menu="hide" />
 			
-			<field name="feed_use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="feed_use_image" type="multilist" subtype="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" toggle_related="1" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="rssimage_display">FLEXI_NO</option>
+				<option value="1" show_list="rssimage_display" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="feed_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" labelclass="rssimage_display"  menu="hide" class="rssimage_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="feed_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="feed_image_source" type="fcimage" valcolumn="id" size="5" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" menu="hide"/>
-			<field name="feed_image_size" type="radio" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="feed_image_source" type="fcimage" valcolumn="id" size="5" default="" label="FLEXI_IMAGE_SOURCE" labelclass="rssimage_display" class="rssimage_display" description="FLEXI_IMAGE_SOURCE_DESC" menu="hide"/>
+			<field name="feed_image_size" type="radio" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC" menu="hide" class="rssimage_display btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_PARAMS</option>
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
 				<option value="l">FLEXI_LARGE</option>
 			</field>
-			<field name="feed_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH"  menu="hide"/>
-			<field name="feed_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT"  menu="hide"/>
-			<field name="feed_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="feed_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" labelclass="rssimage_display" class="rssimage_display" description="FLEXI_IMAGE_WIDTH"  menu="hide"/>
+			<field name="feed_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT"  labelclass="rssimage_display" class="rssimage_display" description="FLEXI_IMAGE_HEIGHT"  menu="hide"/>
+			<field name="feed_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" labelclass="rssimage_display" description="FLEXI_PROCESSING_METHOD_DESC" menu="hide" class="rssimage_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
@@ -911,17 +911,17 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" menu="hide" />
-			<field name="feed_orderbycustomfield" type="radio" default="1" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="feed_orderbycustomfield" type="multilist" subtype="radio" default="0" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" toggle_related="1" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="orderbycustomfield1_display">FLEXI_NO</option>
+				<option value="1" show_list="orderbycustomfield1_display" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="feed_orderbycustomfieldid" type="fields" default="0" orderable="1" isnotcore="1" display_useglobal="0"
-				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" menu="hide" />
-			<field name="feed_orderbycustomfielddir" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="feed_orderbycustomfieldid" type="fields" default="0" orderable="1" isnotcore="1"  display_useglobal="0"
+				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" menu="hide" labelclass="orderbycustomfield1_display" class="orderbycustomfield1_display" />
+			<field name="feed_orderbycustomfielddir" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" menu="hide" labelclass="orderbycustomfield1_display" class="orderbycustomfield1_display btn-group btn-group-yesno">
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>
 			</field>
-			<field name="feed_orderbycustomfieldint" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="feed_orderbycustomfieldint" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" menu="hide" labelclass="orderbycustomfield1_display" class="orderbycustomfield1_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_NUMERIC</option>
 			</field>
@@ -945,18 +945,18 @@
 				<option value="rated">FLEXI_ORDER_BEST_RATED</option>
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
-			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" menu="hide" />
-			<field name="feed_orderbycustomfield_2nd" type="radio" default="1" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description=""  level="level3" menu="hide" />
+			<field name="feed_orderbycustomfield_2nd" type="multilist" subtype="radio" default="1" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" toggle_related="1" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="orderbycustomfield2_display">FLEXI_NO</option>
+				<option value="1" show_list="orderbycustomfield2_display" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="feed_orderbycustomfieldid_2nd" type="fields" default="0" orderable="1" isnotcore="1" display_useglobal="0"
-				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" menu="hide" />
-			<field name="feed_orderbycustomfielddir_2nd" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="feed_orderbycustomfieldid_2nd" type="fields"  default="0" orderable="1" isnotcore="1" display_useglobal="0"
+				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" menu="hide" labelclass="orderbycustomfield2_display" class="orderbycustomfield2_display" />
+			<field name="feed_orderbycustomfielddir_2nd" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" menu="hide" labelclass="orderbycustomfield2_display" class="orderbycustomfield2_display btn-group btn-group-yesno">
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>
 			</field>
-			<field name="feed_orderbycustomfieldint_2nd" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="feed_orderbycustomfieldint_2nd" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" menu="hide" labelclass="orderbycustomfield2_display" class="orderbycustomfield2_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_NUMERIC</option>
 			</field>
