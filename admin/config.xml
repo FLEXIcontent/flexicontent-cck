@@ -823,30 +823,30 @@
 			<field name="mu_free_acc_text" type="text" size="60" default="FLEXI_MU_FREE" label="FLEXI_MU_FREE_ACC_TEXT" description="FLEXI_MU_FREE_ACC_TEXT_DESC" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_MU_RADDED" description="FLEXI_MU_RADDED_DESC" level="level1" menu="hide" />
-			<field name="mu_addcss_radded" type="radio" default="0" label="FLEXI_MU_ADD_MARKUP" description="FLEXI_MU_ADD_MARKUP_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="mu_addcss_radded" type="multilist" subtype="radio" default="0" label="FLEXI_MU_ADD_MARKUP" description="FLEXI_MU_ADD_MARKUP_DESC" toggle_related="1" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="radded_display">FLEXI_NO</option>
+				<option value="1" show_list="radded_display" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="mu_addtext_radded" type="radio" default="1" label="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME" labelclass="radded_display" description="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME_DESC" menu="hide" class="radded_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="mu_addtext_radded" type="radio" default="1" label="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME" description="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="" type="separator" default="FLEXI_MU_RADDED_TIMEFRAMES_CONF" description="FLEXI_MU_RADDED_TIMEFRAMES_CONF_DESC" level="level3" menu="hide" />
-			<field name="mu_ra_timeframe_intervals" type="text" size="60" default="24h , 2d , 7d , 1m , 3m , 1y , 3y" label="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS" description="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS_DESC" menu="hide" />
-			<field name="mu_ra_timeframe_names" type="textarea" rows="4" cols="60" default="FLEXI_24H_RA , FLEXI_2D_RA , FLEXI_7D_RA , FLEXI_1M_RA , FLEXI_3M_RA , FLEXI_1Y_RA , FLEXI_3Y_RA" label="FLEXI_MU_RADDED_TIMEFRAME_NAMES" description="FLEXI_MU_RADDED_TIMEFRAME_NAMES_DESC" menu="hide" />
+			<field name="" type="separator" default="FLEXI_MU_RADDED_TIMEFRAMES_CONF" labelclass="radded_display" class="radded_display" description="FLEXI_MU_RADDED_TIMEFRAMES_CONF_DESC" level="level3" menu="hide" />
+			<field name="mu_ra_timeframe_intervals" type="text" size="60" default="24h , 2d , 7d , 1m , 3m , 1y , 3y" label="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS" labelclass="radded_display" class="radded_display" description="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS_DESC" menu="hide" />
+			<field name="mu_ra_timeframe_names" type="textarea" rows="4" cols="60" default="FLEXI_24H_RA , FLEXI_2D_RA , FLEXI_7D_RA , FLEXI_1M_RA , FLEXI_3M_RA , FLEXI_1Y_RA , FLEXI_3Y_RA" label="FLEXI_MU_RADDED_TIMEFRAME_NAMES" labelclass="radded_display" class="radded_display" description="FLEXI_MU_RADDED_TIMEFRAME_NAMES_DESC" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_MU_RUPDATED" description="FLEXI_MU_RUPDATED_DESC" level="level1" menu="hide" />
-			<field name="mu_addcss_rupdated" type="radio" default="0" label="FLEXI_MU_ADD_MARKUP" description="FLEXI_MU_ADD_MARKUP_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="mu_addcss_rupdated" type="multilist" subtype="radio" default="0" label="FLEXI_MU_ADD_MARKUP" description="FLEXI_MU_ADD_MARKUP_DESC" toggle_related="1" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="rupdated_display">FLEXI_NO</option>
+				<option value="1" show_list="rupdated_display" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="mu_addtext_rupdated" type="radio" default="1" label="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME" description="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME_DESC" menu="hide" labelclass="rupdated_display" class="rupdated_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="mu_addtext_rupdated" type="radio" default="1" label="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME" description="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="" type="separator" default="FLEXI_MU_RUPDATED_TIMEFRAMES_CONF" description="FLEXI_MU_RUPDATED_TIMEFRAMES_CONF_DESC" level="level3" menu="hide" />
-			<field name="mu_ru_timeframe_intervals" type="text" size="60" default="24h , 2d , 7d , 1m , 3m , 1y , 3y" label="FLEXI_MU_RUPDATED_TIMEFRAME_INTERVALS" description="FLEXI_MU_RUPDATED_TIMEFRAME_INTERVALS_DESC" menu="hide" />
-			<field name="mu_ru_timeframe_names" type="textarea" rows="4" cols="60" default="FLEXI_24H_RU , FLEXI_2D_RU , FLEXI_7D_RU , FLEXI_1M_RU , FLEXI_3M_RU , FLEXI_1Y_RU , FLEXI_3Y_RU" label="FLEXI_MU_RUPDATED_TIMEFRAME_NAMES" description="FLEXI_MU_RUPDATED_TIMEFRAME_NAMES_DESC" menu="hide" />
+			<field name="" type="separator" default="FLEXI_MU_RUPDATED_TIMEFRAMES_CONF" description="FLEXI_MU_RUPDATED_TIMEFRAMES_CONF_DESC" labelclass="rupdated_display" class="rupdated_display" level="level3" menu="hide" />
+			<field name="mu_ru_timeframe_intervals" type="text" size="60" default="24h , 2d , 7d , 1m , 3m , 1y , 3y" label="FLEXI_MU_RUPDATED_TIMEFRAME_INTERVALS" description="FLEXI_MU_RUPDATED_TIMEFRAME_INTERVALS_DESC" labelclass="rupdated_display" class="rupdated_display" menu="hide" />
+			<field name="mu_ru_timeframe_names" type="textarea" rows="4" cols="60" default="FLEXI_24H_RU , FLEXI_2D_RU , FLEXI_7D_RU , FLEXI_1M_RU , FLEXI_3M_RU , FLEXI_1Y_RU , FLEXI_3Y_RU" label="FLEXI_MU_RUPDATED_TIMEFRAME_NAMES" labelclass="rupdated_display" class="rupdated_display" description="FLEXI_MU_RUPDATED_TIMEFRAME_NAMES_DESC" menu="hide" />
 		
 	</fieldset>
 	<fieldset name="lists_rss_fset" label="FLEXI_LISTS_RSS_CONF" description="" >
