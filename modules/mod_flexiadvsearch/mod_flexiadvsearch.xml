@@ -35,11 +35,11 @@
 						/> <!-- params_source="file" -->
 			
 			<field name="" type="separator" default="FLEXI_MOD_MENU_ITEM" level="level1" menu="hide" />
-			<field name="itemid_force" type="list" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC">
-				<option value="0">FLEXI_MOD_MENU_ITEMID_DEFAULT</option>
-				<option value="1">FLEXI_MOD_MENU_ITEMID_CUSTOM</option>
+			<field name="itemid_force" type="multilist" subtype="list" toggle_related="1" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC">
+				<option value="0" show_list="" hide_list="itemforce">FLEXI_MOD_MENU_ITEMID_DEFAULT</option>
+				<option value="1" show_list="itemforce" hide_list="">FLEXI_MOD_MENU_ITEMID_CUSTOM</option>
 			</field>
-			<field name="itemid_force_value" type="text" default="" label="FLEXI_MOD_CUSTOM_MENU_ITEMID" description="FLEXI_MOD_CUSTOM_MENU_ITEMID" />
+			<field name="itemid_force_value" type="text" default="" label="FLEXI_MOD_CUSTOM_MENU_ITEMID" description="FLEXI_MOD_CUSTOM_MENU_ITEMID" class="itemforce"/>
 			
 			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
 			
@@ -48,40 +48,40 @@
 			<field name="search_inner_prompt" type="text" default="FLEXI_ADV_MOD_SEARCH_PROMPT" label="FLEXI_MOD_TEXT_SEARCH_PROMPT" description="FLEXI_MOD_TEXT_SEARCH_PROMPT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_MOD_GO_BUTTON" level="level2" menu="hide" />
-			<field name="button" type="radio" default="" label="FLEXI_MOD_SHOW_GO_BUTTON" description="FLEXI_MOD_SHOW_GO_BUTTON_DESC">
-				<option value="">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="button" type="multilist" subtype="radio" toggle_related="1" default="" label="FLEXI_MOD_SHOW_GO_BUTTON" description="FLEXI_MOD_SHOW_GO_BUTTON_DESC" class="btn-group btn-group-yesno">
+				<option value="" show_list="" hide_list="gobutton">FLEXI_NO</option>
+				<option value="1" show_list="gobutton" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="flexi_button_class_go" type="list" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="btn-group btn-group-yesno">
-				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
-				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
-				<option value="btn btn-success">FLEXI_BUTTON_CLASS_SUCCESS</option>
-				<option value="btn btn-info">FLEXI_BUTTON_CLASS_INFO</option>
-				<option value="btn btn-warning">FLEXI_BUTTON_CLASS_WARNING</option>
-				<option value="btn btn-danger">FLEXI_BUTTON_CLASS_DANGER</option>
-				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
-				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
+			<field name="flexi_button_class_go" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="gobutton">
+				<option value="fc_button" show_list="" hide_list="customgobutton">FLEXI_BUTTON_CLASS_FCBUTTON</option>
+				<option value="btn btn-primary" show_list="" hide_list="customgobutton">FLEXI_BUTTON_CLASS_PRIMARY</option>
+				<option value="btn btn-success" show_list="" hide_list="customgobutton">FLEXI_BUTTON_CLASS_SUCCESS</option>
+				<option value="btn btn-info" show_list="" hide_list="customgobutton">FLEXI_BUTTON_CLASS_INFO</option>
+				<option value="btn btn-warning" show_list="" hide_list="customgobutton">FLEXI_BUTTON_CLASS_WARNING</option>
+				<option value="btn btn-danger" show_list="" hide_list="customgobutton">FLEXI_BUTTON_CLASS_DANGER</option>
+				<option value="btn btn-inverse" show_list="" hide_list="customgobutton">FLEXI_BUTTON_CLASS_INVERSE</option>
+				<option value="-1" show_list="customgobutton" hide_list="">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
-			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_CUSTOM" description="FLEXI_BUTTON_CLASS_CUSTOM_DESC" />
-			<field name="button_pos" type="list" default="right" label="FLEXI_MOD_BUTTON_POSITION" description="FLEXI_MOD_BUTTON_POSITION_DESC">
+			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_CUSTOM" description="FLEXI_BUTTON_CLASS_CUSTOM_DESC" class="customgobutton" />
+			<field name="button_pos" type="list" default="right" label="FLEXI_MOD_BUTTON_POSITION" description="FLEXI_MOD_BUTTON_POSITION_DESC" class="gobutton">
 				<option value="right">FLEXI_BUTTON_RIGHT</option>
 				<option value="left">FLEXI_BUTTON_LEFT</option>
 				<option value="top">FLEXI_BUTTON_TOP</option>
 				<option value="bottom">FLEXI_BUTTON_BOTTOM</option>
 			</field>
-			<field name="button_as" type="radio" default="0" label="FLEXI_MOD_BUTTON_AS" description="FLEXI_MOD_BUTTON_AS_DESC">
-				<option value="0">FLEXI_MOD_BUTTON_AS_TEXT</option>
-				<option value="1">FLEXI_MOD_BUTTON_AS_IMAGE</option>
+			<field name="button_as" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_BUTTON_AS" description="FLEXI_MOD_BUTTON_AS_DESC" class="gobutton btn-group btn-group-yesno">
+				<option value="0" show_list="buttontypetext" hide_list="buttontypeimage">FLEXI_MOD_BUTTON_AS_TEXT</option>
+				<option value="1" show_list="buttontypeimage" hide_list="buttontypetext">FLEXI_MOD_BUTTON_AS_IMAGE</option>
 			</field>
-			<field name="button_image" type="text" default="" label="FLEXI_MOD_BUTTON_IMAGE_SRC" description="FLEXI_MOD_BUTTON_IMAGE_SRC" />
-			<field name="button_text"  type="text" default="FLEXI_ADV_MOD_GO" label="FLEXI_MOD_BUTTON_TEXT" description="FLEXI_MOD_BUTTON_TEXT_DESC" />
+			<field name="button_image" type="text" default="" label="FLEXI_MOD_BUTTON_IMAGE_SRC" description="FLEXI_MOD_BUTTON_IMAGE_SRC" class="buttontypeimage"/>
+			<field name="button_text"  type="text" default="FLEXI_ADV_MOD_GO" label="FLEXI_MOD_BUTTON_TEXT" description="FLEXI_MOD_BUTTON_TEXT_DESC" class="buttontypetext"/>
 			
 			<field name="" type="separator" default="FLEXI_MOD_DIRECT_BUTTON" level="level2" menu="hide" />
-			<field name="direct_button" type="radio" default="" label="FLEXI_MOD_SHOW_DIRECT_BUTTON" description="FLEXI_MOD_SHOW_DIRECT_BUTTON_DESC">
-				<option value="">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="direct_button" ype="multilist" subtype="radio" toggle_related="1" default="" label="FLEXI_MOD_SHOW_DIRECT_BUTTON" description="FLEXI_MOD_SHOW_DIRECT_BUTTON_DESC" class="btn-group btn-group-yesno">
+				<option value="" show_list="" hide_list="directbutton">FLEXI_NO</option>
+				<option value="1" show_list="directbutton" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="flexi_button_class_direct" type="list" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="btn-group btn-group-yesno">
+			<field name="flexi_button_class_direct" type="list" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="directbutton">
 				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
 				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success">FLEXI_BUTTON_CLASS_SUCCESS</option>
@@ -106,7 +106,7 @@
 			<field name="direct_text"  type="text" default="FLEXI_ADV_MOD_DIRECT" label="FLEXI_MOD_DIRECT_TEXT" description="FLEXI_MOD_DIRECT_TEXT_DESC" />
 
 			<field name="" type="separator" default="FLEXI_MOD_ADV_SEARCH" description="FLEXI_MOD_ADV_SEARCH_DESC" level="level2" menu="hide" />
-			<field name="linkadvsearch" type="radio" default="1" label="FLEXI_MOD_ADV_SEARCH_SHOW_LINK" description="FLEXI_MOD_ADV_SEARCH_SHOW_LINK_DESC">
+			<field name="linkadvsearch" type="radio" default="1" label="FLEXI_MOD_ADV_SEARCH_SHOW_LINK" description="FLEXI_MOD_ADV_SEARCH_SHOW_LINK_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -125,7 +125,7 @@
 		</fieldset>
 		
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
-			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC">
+			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC" class="btn-group btn-group-yesno">
 				<option value="OR">FLEXI_OR</option>
 				<option value="AND">FLEXI_AND</option>
 			</field>
@@ -139,17 +139,17 @@
 			/>
 			
 			<field name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level2" menu="hide" />
-			<field name="enable_php_rule" type="radio" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="enable_php_rule" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="php_rule">FLEXI_NO</option>
+				<option value="1" show_list="php_rule" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" />
+			<field name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="php_rule" />
 		</fieldset>
 
 		<fieldset name="FLEXI_MOD_ADVANCED" label="FLEXI_MOD_ADVANCED">
 			<field name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
 			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
-			<field name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC">
+			<field name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
