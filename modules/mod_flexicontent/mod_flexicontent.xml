@@ -44,7 +44,7 @@
 			<field name="" type="separator" default="CSS/HTML developers please read: &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-template-for-universal-content-module.html' target='_blank' a&gt;Custom templates HOW-TO&lt;/a&gt;" level="level3" />
 			
 			<field name="" type="separator" default="FLEXI_MENU_ITEM" level="level1" />
-			<field name="itemid_force" type="multilist" subtype="radio" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC" toggle_related="1">
+			<field name="itemid_force" type="multilist" subtype="radio" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC" toggle_related="1" class="btn-group group-yesno">
 				<option value="0" show_list="" hide_list="specific_itemid">FLEXI_NO</option>
 				<option value="1" show_list="" hide_list="specific_itemid">FLEXI_MOD_CURRENT</option>
 				<option value="2" show_list="specific_itemid" hide_list="">FLEXI_MOD_SPECIFIC</option>
@@ -54,7 +54,7 @@
 		</fieldset>
 		
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
-			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC">
+			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC" class="btn-group group-success">
 				<option value="OR">FLEXI_OR</option>
 				<option value="AND">FLEXI_AND</option>
 			</field>
@@ -68,7 +68,7 @@
 			/>
 			
 			<field name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level3" />
-			<field name="enable_php_rule" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC" toggle_related="1">
+			<field name="enable_php_rule" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC" toggle_related="1" class="btn-group group-yesno">
 				<option value="0" show_list="" hide_list="using_php_rule">FLEXI_NO</option>
 				<option value="1" show_list="using_php_rule" hide_list="">FLEXI_YES</option>
 			</field>
@@ -81,7 +81,7 @@
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" level="level2" />
 			<field name="ordering" type="fcordering" default="added" size="16" multiple="true" label="FLEXI_ORDERING_GROUPS" description="FLEXI_ORDERING_GROUPS_DESC" />
-			<field name="ordering_addtitle" type="radio" default="0" label="FLEXI_ORDERING_GROUP_ADDTITLE" description="FLEXI_ORDERING_GROUP_ADDTITLE_DESC">
+			<field name="ordering_addtitle" type="radio" default="0" label="FLEXI_ORDERING_GROUP_ADDTITLE" description="FLEXI_ORDERING_GROUP_ADDTITLE_DESC" class="btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -89,11 +89,11 @@
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDER" level="level3" />
 			<field name="orderbycustomfieldid" type="fields" default="0" orderable="1" isnotcore="1" display_useglobal="0"
 				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" />
-			<field name="orderbycustomfielddir" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" >
+			<field name="orderbycustomfielddir" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" class="btn-group group-success">
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>
 			</field>
-			<field name="orderbycustomfieldint" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" >
+			<field name="orderbycustomfieldint" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" class="btn-group group-yesno" >
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_NUMERIC</option>
 			</field>
@@ -117,34 +117,34 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" level="level3" />
-			<field name="orderbycustomfield_2nd" type="multilist" subtype="radio" default="1" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" toggle_related="1">
+			<field name="orderbycustomfield_2nd" type="multilist" subtype="radio" default="0" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" toggle_related="1" class="btn-group group-yesno">
 				<option value="0" show_list="" hide_list="customorder2_ops">FLEXI_NO</option>
 				<option value="1" show_list="customorder2_ops" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="orderbycustomfieldid_2nd" type="fields" default="0" orderable="1" isnotcore="1" display_useglobal="0"
 				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" class="customorder2_ops" />
-			<field name="orderbycustomfielddir_2nd" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" class="customorder2_ops" >
+			<field name="orderbycustomfielddir_2nd" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" class="customorder2_ops btn-group group-yesno" >
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>
 			</field>
-			<field name="orderbycustomfieldint_2nd" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" class="customorder2_ops" >
+			<field name="orderbycustomfieldint_2nd" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" class="customorder2_ops btn-group group-yesno">
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_NUMERIC</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_EMPTY_FIELD_FILTER" level="level1" />
-			<field name="skip_items" type="multilist" default="0" label="FLEXI_SKIP_ITEMS" description="FLEXI_SKIP_ITEMS_DESC" toggle_related="1">
+			<field name="skip_items" type="multilist" subtype="radio" default="0" label="FLEXI_SKIP_ITEMS" description="FLEXI_SKIP_ITEMS_DESC" toggle_related="1"  class="btn-group group-yesno">
 				<option value="0" show_list="" hide_list="skipping_items">FLEXI_NO</option>
 				<option value="1" show_list="skipping_items" hide_list="">FLEXI_YES_CHECK_FIELD_VALUE_EMPTY_FAST</option>
 				<option value="2" show_list="skipping_items" hide_list="">FLEXI_YES_CHECK_FIELD_DISPLAY_EMPTY_SLOWER</option>
 			</field>
 			<field name="skiponempty_fields" type="textarea" cols="35" rows="4" default="" label="FLEXI_EMPTY_FIELDS_LIST" description="FLEXI_EMPTY_FIELDS_LIST_DESC" class="skipping_items" />
 			<field name="maxskipcount" type="text" default="50" size="4" label="FLEXI_MAX_SKIP_COUNT" description="FLEXI_MAX_SKIP_COUNT_DESC" class="skipping_items" />
-			<field name="onempty_fields_combination" type="radio" default="any" label="FLEXI_EMPTY_FIELDS_COMBINATION" description="FLEXI_EMPTY_FIELDS_COMBINATION_DESC" class="skipping_items">
+			<field name="onempty_fields_combination" type="radio" default="any" label="FLEXI_EMPTY_FIELDS_COMBINATION" description="FLEXI_EMPTY_FIELDS_COMBINATION_DESC" class="skipping_items btn-group group-yesno">
 				<option value="any">FLEXI_SKIP_ON_ANY_EMPTY</option>
 				<option value="all">FLEXI_SKIP_WHEN_ALL_EMPTY</option>
 			</field>
-			<field name="striptags_onempty_fields" type="radio" default="0" label="FLEXI_STRIP_HTML_ON_EMPTY_FIELDS" description="FLEXI_STRIP_HTML_ON_EMPTY_FIELDS_DESC" class="skipping_items">
+			<field name="striptags_onempty_fields" type="radio" default="0" label="FLEXI_STRIP_HTML_ON_EMPTY_FIELDS" description="FLEXI_STRIP_HTML_ON_EMPTY_FIELDS_DESC" class="skipping_items btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -156,35 +156,35 @@
 			<field name="" type="separator" default="FLEXI_UMOD_SET_METHOD_TO_ALL_TO_DISABLE" level="level3" />
 			
 			<field name="" type="separator" default="FLEXI_CURITEM_SCOPE" level="level2" />
-			<field name="method_curitem" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_CURITEM_DESC">
+			<field name="method_curitem" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_CURITEM_DESC" class="btn-group group-sucess">
 				<option value="0">FLEXI_ALL</option>
 				<option value="1">FLEXI_EXCLUDE</option>
 				<option value="2">FLEXI_INCLUDE_CURRENT_ONLY</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_CURLANG_SCOPE" level="level2" />
-			<field name="method_curlang" type="radio" default="0" label="FLEXI_METHOD" description="FLEXI_CURLANG_DESC">
+			<field name="method_curlang" type="radio" default="0" label="FLEXI_METHOD" description="FLEXI_CURLANG_DESC" class="btn-group group-sucess">
 				<option value="0">FLEXI_ALL</option>
 				<option value="1">FLEXI_EXCLUDE</option>
 				<option value="2">FLEXI_INCLUDE_CURRENT_ONLY</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_CURUSERFAVS_SCOPE" level="level2" />
-			<field name="method_curuserfavs" type="radio" default="0" label="FLEXI_METHOD" description="FLEXI_CURUSERFAVS_DESC">
+			<field name="method_curuserfavs" type="radio" default="0" label="FLEXI_METHOD" description="FLEXI_CURUSERFAVS_DESC" class="btn-group group-sucess">
 				<option value="0">FLEXI_ALL</option>
 				<option value="1">FLEXI_EXCLUDE</option>
 				<option value="2">FLEXI_INCLUDE</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FEATURED_ITEMS_SCOPE" level="level2" />
-			<field name="method_featured" type="radio" default="0" label="FLEXI_METHOD_STATIC" description="FLEXI_FEATURED_ITEMS_DESC">
+			<field name="method_featured" type="radio" default="0" label="FLEXI_METHOD_STATIC" description="FLEXI_FEATURED_ITEMS_DESC" class="btn-group group-sucess">
 				<option value="0">FLEXI_ALL</option>
 				<option value="1">FLEXI_EXCLUDE</option>
 				<option value="2">FLEXI_INCLUDE</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_STATES_SCOPE" level="level2" />
-			<field name="method_states" type="multilist" subtype="radio" default="0" label="FLEXI_METHOD_STATIC" description="FLEXI_STATES_DESC" toggle_related="1">
+			<field name="method_states" type="multilist" subtype="radio" default="0" label="FLEXI_METHOD_STATIC" description="FLEXI_STATES_DESC" toggle_related="1" class="btn-group group-sucess">
 				<option value="0" show_list="" hide_list="method_states_ops">FLEXI_NORMAL_STATES</option>
 				<option value="1" show_list="method_states_ops" hide_list="">FLEXI_EXCLUDE</option>
 				<option value="2" show_list="method_states_ops" hide_list="">FLEXI_INCLUDE</option>
@@ -192,13 +192,13 @@
 			<field name="item_states" type="fcitemstate" multiple="true" size="6" default="" label="FLEXI_ITEM_STATES" description="FLEXI_ITEM_STATES_DESC" class="method_states_ops" />
 			
 			<field name="" type="separator" default="FLEXI_TAGS_SCOPE" level="level2" />
-			<field name="method_tags" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_DESC" toggle_related="1">
+			<field name="method_tags" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_DESC" toggle_related="1" class="btn-group group-sucess">
 				<option value="1" show_list="" hide_list="method_tags_ops">FLEXI_ALL</option>
 				<option value="2" show_list="method_tags_ops" hide_list="">FLEXI_EXCLUDE</option>
 				<option value="3" show_list="method_tags_ops" hide_list="">FLEXI_INCLUDE</option>
 			</field>
 			<field name="tag_ids" type="tags" default="" multiple="true" size="6" label="FLEXI_SELECT_TAGS" description="FLEXI_SELECT_TAGS_DESC" class="method_tags_ops" />
-			<field name="combine_tags" type="radio" default="1" label="FLEXI_TAGS_REQUIRE_ALL" description="FLEXI_TAGS_REQUIRE_ALL_DESC" class="method_tags_ops" >
+			<field name="combine_tags" type="radio" default="1" label="FLEXI_TAGS_REQUIRE_ALL" description="FLEXI_TAGS_REQUIRE_ALL_DESC" class="method_tags_ops btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_SLOW</option>
 			</field>
@@ -208,7 +208,7 @@
 			
 			<field name="" type="separator" default="FLEXI_CAT_SCOPE" level="level2" />
 			<field name="" type="separator" default="FLEXI_UMOD_STATIC_SET_TO_ALL_TO_DISABLE" level="level3" />
-			<field name="method_cat" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1">
+			<field name="method_cat" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1" class="btn-group group-sucess">
 				<option value="1" show_list="" hide_list="method_cat_ops">FLEXI_ALL</option>
 				<option value="2" show_list="method_cat_ops" hide_list="">FLEXI_EXCLUDE</option>
 				<option value="3" show_list="method_cat_ops" hide_list="">FLEXI_INCLUDE</option>
@@ -236,7 +236,7 @@
 			
 			<field name="" type="separator" default="FLEXI_TYPES_SCOPE" level="level2" />
 			<field name="" type="separator" default="FLEXI_UMOD_STATIC_SET_TO_ALL_TO_DISABLE" level="level3" />
-			<field name="method_types" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1">
+			<field name="method_types" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1" class="btn-group group-sucess">
 				<option value="1" show_list="" hide_list="method_types_ops">FLEXI_ALL</option>
 				<option value="2" show_list="method_types_ops" hide_list="">FLEXI_EXCLUDE</option>
 				<option value="3" show_list="method_types_ops" hide_list="">FLEXI_INCLUDE</option>
@@ -253,7 +253,7 @@
 	
 			<field name="" type="separator" default="FLEXI_AUTH_MY_ITEMS_SCOPE" level="level2" />
 			<field name="" type="separator" default="FLEXI_UMOD_STATIC_SET_TO_ALL_TO_DISABLE" level="level3" />
-			<field name="method_auth" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1">
+			<field name="method_auth" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1" class="btn-group group-sucess">
 				<option value="1" show_list="" hide_list="method_auth_ops">FLEXI_ALL</option>
 				<option value="2" show_list="method_auth_ops" hide_list="">FLEXI_EXCLUDE</option>
 				<option value="3" show_list="method_auth_ops" hide_list="">FLEXI_INCLUDE</option>
@@ -271,7 +271,7 @@
 			
 			<field name="" type="separator" default="FLEXI_ITEM_SCOPE" level="level2" />
 			<field name="" type="separator" default="FLEXI_UMOD_STATIC_SET_TO_ALL_TO_DISABLE" level="level3" />
-			<field name="method_items" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1">
+			<field name="method_items" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1" class="btn-group group-sucess">
 				<option value="1" show_list="" hide_list="method_items_ops">FLEXI_ALL</option>
 				<option value="2" show_list="method_items_ops" hide_list="">FLEXI_EXCLUDE</option>
 				<option value="3" show_list="method_items_ops" hide_list="">FLEXI_INCLUDE</option>
@@ -337,14 +337,14 @@
 			
 			<!-- STATIC METHOD -->
 			<field name="" type="separator" default="FLEXI_UMOD_STATIC_SET_TO_ALL_TO_DISABLE" level="level3" class="dateStaB" />
-			<field name="method_dates" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1" class="dateStaB" >
+			<field name="method_dates" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1" class="dateStaB btn-group group-sucess">
 				<option value="1" show_list="" hide_list="method_dates_ops">FLEXI_ALL</option>
 				<option value="2" show_list="method_dates_ops" hide_list="">FLEXI_EXCLUDE</option>
 				<option value="3" show_list="method_dates_ops" hide_list="">FLEXI_INCLUDE</option>
 			</field>
 			
 			<!-- DATE SCOPE: COMMON -->
-			<field name="date_type" type="multilist" subtype="radio" default="0" label="FLEXI_DATE_DATA" description="FLEXI_DATE_DATA_DESC" toggle_related="1" class="method_dates_ops dateStaB dateDataSrc" >
+			<field name="date_type" type="multilist" subtype="radio" default="0" label="FLEXI_DATE_DATA" description="FLEXI_DATE_DATA_DESC" toggle_related="1" class="method_dates_ops dateStaB dateDataSrc btn-group group-fcinfo" >
 				<option value="0" show_list="" hide_list="date_custom_fld">FLEXI_DATE_CREATED</option>
 				<option value="1" show_list="" hide_list="date_custom_fld">FLEXI_DATE_MODIFIED</option>
 				<option value="2" show_list="" hide_list="date_custom_fld">FLEXI_DATE_PUBLISH_UP</option>
@@ -355,21 +355,21 @@
 			<!-- STATIC BEHAVIOUR -->
 			<field name="bdate" type="fcdate" size="50" label="FLEXI_BDATE" description="FLEXI_BDATE_DESC" class="method_dates_ops dateStaB cDateTxts" />
 			<field name="edate" type="fcdate" size="50" label="FLEXI_EDATE" description="FLEXI_EDATE_DESC" class="method_dates_ops dateStaB cDateTxts" />
-			<field name="raw_bdate" type="radio" default="0" label="FLEXI_TREAT_BDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC" class="method_dates_ops dateStaB">
+			<field name="raw_bdate" type="radio" default="0" label="FLEXI_TREAT_BDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC" class="method_dates_ops dateStaB btn-group group-fcinfo">
 				<option value="0">FLEXI_DATE_STRING</option>
 				<option value="1">FLEXI_DATE_EXPRESSION</option>
 			</field>
-			<field name="raw_edate" type="radio" default="0" label="FLEXI_TREAT_EDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC" class="method_dates_ops dateStaB">
+			<field name="raw_edate" type="radio" default="0" label="FLEXI_TREAT_EDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC" class="method_dates_ops dateStaB btn-group group-fcinfo">
 				<option value="0">FLEXI_DATE_STRING</option>
 				<option value="1">FLEXI_DATE_EXPRESSION</option>
 			</field>
 
 			<!-- DYNAMIC BEHAVIOUR -->
-			<field name="date_compare" type="radio" default="0" label="FLEXI_COMPARE_DATE_DATA_WITH" description="FLEXI_COMPARE_DATE_DATA_WITH_DESC" class="dateDynB">
+			<field name="date_compare" type="radio" default="0" label="FLEXI_COMPARE_DATE_DATA_WITH" description="FLEXI_COMPARE_DATE_DATA_WITH_DESC" class="dateDynB btn-group group-fcinfo">
 				<option value="0">FLEXI_CURRENT_SERVER_TIME</option>
 				<option value="1">FLEXI_CURRENT_ITEM_DATE_ABOVE</option>
 			</field>
-			<field name="week_start" type="radio" default="0" label="FLEXI_FIRST_DAY_OF_WEEK" description="FLEXI_FIRST_DAY_OF_WEEK_DESC" class="dateDynB">
+			<field name="week_start" type="radio" default="0" label="FLEXI_FIRST_DAY_OF_WEEK" description="FLEXI_FIRST_DAY_OF_WEEK_DESC" class="dateDynB btn-group group-fcinfo">
 				<option value="0">FLEXI_FIRST_DAY_SUNDAY</option>
 				<option value="5">FLEXI_FIRST_DAY_MONDAY</option>
 			</field>
@@ -377,7 +377,7 @@
 			
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_SCOPE" description="FLEXI_CUSTOM_FIELD_SCOPE_DESC" level="level1" />
 			<field name="" type="separator" default="FLEXI_UMOD_STATIC_SET_TO_ALL_TO_DISABLE" level="level2" />
-			<field name="method_filt" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1" >
+			<field name="method_filt" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1" class="dateStaB btn-group group-sucess">
 				<option value="1" show_list="" hide_list="method_filt_ops">FLEXI_ALL</option>
 				<option value="2" show_list="method_filt_ops" hide_list="">FLEXI_EXCLUDE</option>
 				<option value="3" show_list="method_filt_ops" hide_list="">FLEXI_INCLUDE</option>
@@ -401,55 +401,55 @@
 			
 			<field name="" type="separator" default="FLEXI_TITLE" level="level1" />
 			<field name="" type="separator" default="FLEXI_STD" level="level3" />
-			<field name="display_title" type="radio" default="1" label="FLEXI_DISPLAY_TITLE" description="FLEXI_DISPLAY_TITLE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_title" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_DISPLAY_TITLE" description="FLEXI_DISPLAY_TITLE_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="display_titleitem">FLEXI_NO</option>
+				<option value="1" show_list="display_titleitem" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="link_title" type="radio" default="1" label="FLEXI_LINK_TITLE" description="FLEXI_LINK_TITLE_DESC">
+			<field name="link_title" type="radio" default="1" label="FLEXI_LINK_TITLE" description="FLEXI_LINK_TITLE_DESC" class="display_titleitem btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="cuttitle" type="text" default="40" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" />
 			<field name="" type="separator" default="FLEXI_FEAT" level="level3" />
-			<field name="display_title_feat" type="radio" default="1" label="FLEXI_DISPLAY_TITLE" description="FLEXI_DISPLAY_TITLE_DESC">
+			<field name="display_title_feat" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_DISPLAY_TITLE" description="FLEXI_DISPLAY_TITLE_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="display_titlefeat">FLEXI_NO</option>
+				<option value="1" show_list="display_titlefeat" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="link_title_feat" type="radio" default="1" label="FLEXI_LINK_TITLE" description="FLEXI_LINK_TITLE_DESC" class="display_titlefeat btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="link_title_feat" type="radio" default="1" label="FLEXI_LINK_TITLE" description="FLEXI_LINK_TITLE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="cuttitle_feat" type="text" default="40" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" />
+			<field name="cuttitle_feat" type="text" default="40" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" class="display_titlefeat" />
 			
 			<field name="" type="separator" default="FLEXI_TEXT_PARAMS" level="level1" />
 			<field name="" type="separator" default="FLEXI_STD" level="level3" />
-			<field name="display_text" type="radio" default="1" label="FLEXI_DISPLAY_TEXT" description="FLEXI_DISPLAY_TEXT_DESC">
+			<field name="display_text" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_DISPLAY_TEXT" description="FLEXI_DISPLAY_TEXT_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="display_text">FLEXI_NO</option>
+				<option value="1" show_list="display_text" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="mod_do_stripcat" type="radio" default="1" label="FLEXI_STRIP_HTML_N_CUT" description="FLEXI_STRIP_HTML_N_CUT_DESC" class="display_text btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="mod_do_stripcat" type="radio" default="1" label="FLEXI_STRIP_HTML_N_CUT" description="FLEXI_STRIP_HTML_N_CUT_DESC" >
+			<field name="mod_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC" class="display_text btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="mod_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="mod_cut_text" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
+			<field name="mod_cut_text" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" class="display_text"/>
 			<field name="" type="separator" default="FLEXI_FEAT" level="level3" />
-			<field name="display_text_feat" type="radio" default="1" label="FLEXI_DISPLAY_TEXT" description="FLEXI_DISPLAY_TEXT_DESC">
+			<field name="display_text_feat" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_DISPLAY_TEXT" description="FLEXI_DISPLAY_TEXT_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="display_feattext">FLEXI_NO</option>
+				<option value="1" show_list="display_feattext" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="mod_do_stripcat_feat" type="radio" default="1" label="FLEXI_STRIP_HTML_N_CUT" description="FLEXI_STRIP_HTML_N_CUT" class="display_feattext btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="mod_do_stripcat_feat" type="radio" default="1" label="FLEXI_STRIP_HTML_N_CUT" description="FLEXI_STRIP_HTML_N_CUT" >
+			<field name="mod_readmore_feat" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC" class="display_feattext btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="mod_readmore_feat" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="mod_cut_text_feat" type="text" size="4" default="200" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
+			<field name="mod_cut_text_feat" type="text" size="4" default="200" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" class="display_feattext"/>
 			
 			<field name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level1" />
 			<field name="mod_image" type="fcimage" valcolumn="id" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
@@ -463,117 +463,117 @@
 				<option value="2">FLEXI_USE_INTROTEXT_FALLBACK_IGNORE_DEFAULTIMG</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_STD" level="level3" />
-			<field name="mod_use_image" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES_RESIZE</option>
-				<option value="small">FLEXI_YES_USE_SMALL_THUMB_FASTER</option>
-				<option value="medium">FLEXI_YES_USE_MEDIUM_THUMB_FASTER</option>
-				<option value="large">FLEXI_YES_USE_LARGE_THUMB_FASTER</option>
-				<option value="original">FLEXI_YES_USE_ORIGINAL_IMAGE</option>
+			<field name="mod_use_image" type="multilist" subtype="list" toggle_related="1" default="medium" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
+				<option value="0" show_list="" hide_list="use_image,link_image">FLEXI_NO</option>
+				<option value="1" show_list="use_image,link_image" hide_list="">FLEXI_YES_RESIZE</option>
+				<option value="small" show_list="link_image" hide_list="use_image">FLEXI_YES_USE_SMALL_THUMB_FASTER</option>
+				<option value="medium" show_list="link_image" hide_list="use_image">FLEXI_YES_USE_MEDIUM_THUMB_FASTER</option>
+				<option value="large" show_list="link_image" hide_list="use_image">FLEXI_YES_USE_LARGE_THUMB_FASTER</option>
+				<option value="original" show_list="link_image" hide_list="use_image">FLEXI_YES_USE_ORIGINAL_IMAGE</option>
 			</field>
-			<field name="mod_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+			<field name="mod_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" class="link_image btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="mod_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD">
+			<field name="mod_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="use_image btn-group group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="mod_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="mod_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="mod_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" class="use_image" />
+			<field name="mod_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" class="use_image"/>
 			<field name="" type="separator" default="FLEXI_FEAT" level="level3" />
-			<field name="mod_use_image_feat" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES_RESIZE</option>
-				<option value="small">FLEXI_YES_USE_SMALL_THUMB_FASTER</option>
-				<option value="medium">FLEXI_YES_USE_MEDIUM_THUMB_FASTER</option>
-				<option value="large">FLEXI_YES_USE_LARGE_THUMB_FASTER</option>
-				<option value="original">FLEXI_YES_USE_ORIGINAL_IMAGE</option>
+			<field name="mod_use_image_feat" type="multilist" subtype="list" toggle_related="1" default="medium" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
+				<option value="0" show_list="" hide_list="use_imagefeat,link_imagefeat">FLEXI_NO</option>
+				<option value="1" show_list="use_imagefeat,link_imagefeat" hide_list="">FLEXI_YES_RESIZE</option>
+				<option value="small" show_list="link_imagefeat" hide_list="use_imagefeat">FLEXI_YES_USE_SMALL_THUMB_FASTER</option>
+				<option value="medium" show_list="link_imagefeat" hide_list="use_imagefeat">FLEXI_YES_USE_MEDIUM_THUMB_FASTER</option>
+				<option value="large" show_list="link_imagefeat" hide_list="use_imagefeat">FLEXI_YES_USE_LARGE_THUMB_FASTER</option>
+				<option value="original" show_list="link_imagefeat" hide_list="use_imagefeat">FLEXI_YES_USE_ORIGINAL_IMAGE</option>
 			</field>
-			<field name="mod_link_image_feat" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+			<field name="mod_link_image_feat" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" class="link_imagefeat btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="mod_method_feat" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD">
+			<field name="mod_method_feat" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="use_imagefeat btn-group group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="mod_width_feat" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="mod_height_feat" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="mod_width_feat" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" class="use_imagefeat btn-group group-yesno"/>
+			<field name="mod_height_feat" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" class="use_imagefeat btn-group group-yesno"/>
 			
 			<field name="" type="separator" default="FLEXI_DEFAULT_IMAGE" level="level3" />
-			<field name="mod_default_img_show" type="radio" default="1" label="Show default image" description="Select to show a default image for items without one">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="mod_default_img_show" type="multilist" subtype="radio" default="0" toggle_related="1" label="Show default image" description="Select to show a default image for items without one" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="defaultimage">FLEXI_NO</option>
+				<option value="1" show_list="defaultimage" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="mod_default_img_path" type="text" size="80" default="components/com_flexicontent/assets/images/image.png" label="Default image" description="This is the image to show if item has no image" />
+			<field name="mod_default_img_path" type="text" size="80" default="components/com_flexicontent/assets/images/image.png" label="Default image" description="This is the image to show if item has no image" class="defaultimage" />
 			
 			<field name="" type="separator" default="FLEXI_DATE_PARAMS" level="level1" />
 			<field name="" type="separator" default="FLEXI_STD" level="level3" />
-			<field name="display_date" type="radio" default="1" label="FLEXI_DISPLAY_DATE" description="FLEXI_DISPLAY_DATE_DESC" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_date" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_DISPLAY_DATE" description="FLEXI_DISPLAY_DATE_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="displaydate">FLEXI_NO</option>
+				<option value="1" show_list="displaydate" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="date_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<field name="date_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="displaydate btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="date_fields" type="fccheckbox" default=""
 					checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="created,modified" defaultvals="created,modified"
-					label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
+					label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC" class="displaydate"
 			/>
-			<field name="date_format" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" description="...">
-				<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
-				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
-				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
-				<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
-				<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
-				<option value="custom">FLEXI_CUSTOM</option>
+			<field name="date_format" type="multilist" subtype="list" toggle_related="1" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" description="..." class="displaydate">
+				<option value="DATE_FORMAT_LC" show_list="" hide_list="customdate">DATE_FORMAT_LC</option>
+				<option value="DATE_FORMAT_LC1" show_list="" hide_list="customdate">DATE_FORMAT_LC1</option>
+				<option value="DATE_FORMAT_LC2" show_list="" hide_list="customdate">DATE_FORMAT_LC2</option>
+				<option value="DATE_FORMAT_LC3" show_list="" hide_list="customdate">DATE_FORMAT_LC3</option>
+				<option value="DATE_FORMAT_LC4" show_list="" hide_list="customdate">DATE_FORMAT_LC4</option>
+				<option value="custom" show_list="customdate" hide_list="">FLEXI_CUSTOM</option>
 			</field>
-			<field name="custom_date_format" type="text" default="" label="FLEXI_CUSTOM_DATE_FORMAT" description="FLEXI_CUSTOM_DATE_FORMAT_DESC" />
+			<field name="custom_date_format" type="text" default="" label="FLEXI_CUSTOM_DATE_FORMAT" description="FLEXI_CUSTOM_DATE_FORMAT_DESC" class="customdate" />
 			
 			<field name="" type="separator" default="FLEXI_FEAT" level="level3" />
-			<field name="display_date_feat" type="radio" default="1" label="FLEXI_DISPLAY_DATE" description="FLEXI_DISPLAY_DATE_DESC" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_date_feat" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_DISPLAY_DATE" description="FLEXI_DISPLAY_DATE_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="displaydatefeat">FLEXI_NO</option>
+				<option value="1" show_list="displaydatefeat" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="date_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<field name="date_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="displaydatefeat btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="date_fields_feat" type="fccheckbox" default=""
 					checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="created,modified" defaultvals="created,modified"
-					label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
+					label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC" class="displaydatefeat"
 			/>
-			<field name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" description="...">
-				<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
-				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
-				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
-				<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
-				<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
-				<option value="custom">FLEXI_CUSTOM</option>
+			<field name="date_format_feat" type="multilist" subtype="list" toggle_related="1" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" description="..." class="displaydatefeat">
+				<option value="DATE_FORMAT_LC" show_list="" hide_list="customdatefeat">DATE_FORMAT_LC</option>
+				<option value="DATE_FORMAT_LC1" show_list="" hide_list="customdatefeat">DATE_FORMAT_LC1</option>
+				<option value="DATE_FORMAT_LC2" show_list="" hide_list="customdatefeat">DATE_FORMAT_LC2</option>
+				<option value="DATE_FORMAT_LC3" show_list="" hide_list="customdatefeat">DATE_FORMAT_LC3</option>
+				<option value="DATE_FORMAT_LC4" show_list="" hide_list="customdatefeat">DATE_FORMAT_LC4</option>
+				<option value="custom" show_list="customdatefeat" hide_list="">FLEXI_CUSTOM</option>
 			</field>
-			<field name="custom_date_format_feat" type="text" default="" label="FLEXI_CUSTOM_DATE_FORMAT_FEAT" description="FLEXI_CUSTOM_DATE_FORMAT_FEAT_DESC" />
+			<field name="custom_date_format_feat" type="text" default="" label="FLEXI_CUSTOM_DATE_FORMAT_FEAT" description="FLEXI_CUSTOM_DATE_FORMAT_FEAT_DESC" class="customdatefeat" />
 			
 			
 			<field name="" type="separator" default="FLEXI_HITS_PARAMS" level="level1" />
 			<field name="" type="separator" default="FLEXI_STD" level="level3" />
-			<field name="display_hits" type="radio" default="1" label="FLEXI_DISPLAY_HITS" description="FLEXI_DISPLAY_HITS_DESC" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_hits" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_HITS" description="FLEXI_DISPLAY_HITS_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="displayhit">FLEXI_NO</option>
+				<option value="1" show_list="displayhit" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<field name="hits_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="displayhit btn-group group-yesno">
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_NO</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FEAT" level="level3" />
-			<field name="display_hits_feat" type="radio" default="1" label="FLEXI_DISPLAY_HITS" description="FLEXI_DISPLAY_HITS_DESC" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_hits_feat" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_HITS" description="FLEXI_DISPLAY_HITS_DESC" class="btn-group group-yesno" >
+				<option value="0" show_list="" hide_list="displayhitfeat">FLEXI_NO</option>
+				<option value="1" show_list="displayhitfeat" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<field name="hits_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="displayhitfeat btn-group group-yesno">
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_NO</option>
@@ -582,48 +582,48 @@
 			
 			<field name="" type="separator" default="FLEXI_VOTING_PARAMS" level="level1" />
 			<field name="" type="separator" default="FLEXI_STD" level="level3" />
-			<field name="display_voting" type="radio" default="1" label="FLEXI_DISPLAY_VOTING" description="FLEXI_DISPLAY_VOTING_DESC" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_voting" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_VOTING" description="FLEXI_DISPLAY_VOTING_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="displayvote">FLEXI_NO</option>
+				<option value="1" show_list="displayvote" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="voting_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<field name="voting_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="displayvote btn-group group-yesno">
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_NO</option>
 			</field>
-			<field name="vote_stars" type="radio" default="1" label="FLEXI_VOTING_NUMOF_STARS" description="FLEXI_VOTING_NUMOF_STARS_DESC" >
+			<field name="vote_stars" type="radio" default="1" label="FLEXI_VOTING_NUMOF_STARS" description="FLEXI_VOTING_NUMOF_STARS_DESC" class="displayvote btn-group group-yesno">
 				<option value="1">FLEXI_VOTING_ONE_STAR_RECOMMENDED</option>
 				<option value="5">FLEXI_VOTING_FIVE_STAR</option>
 			</field>
-			<field name="allow_vote" type="radio" default="0" label="FLEXI_VOTING_ALLOW" description="FLEXI_VOTING_ALLOW_DESC" >
+			<field name="allow_vote" type="radio" default="0" label="FLEXI_VOTING_ALLOW" description="FLEXI_VOTING_ALLOW_DESC" class="displayvote btn-group group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="vote_counter" type="radio" default="1" label="FLEXI_VOTING_SHOW_COUNTER" description="FLEXI_VOTING_SHOW_COUNTER_DESC" >
+			<field name="vote_counter" type="radio" default="1" label="FLEXI_VOTING_SHOW_COUNTER" description="FLEXI_VOTING_SHOW_COUNTER_DESC" class="displayvote btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FEAT" level="level3" />
-			<field name="display_voting_feat" type="radio" default="1" label="FLEXI_DISPLAY_VOTING" description="FLEXI_DISPLAY_VOTING_DESC" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_voting_feat" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_VOTING" description="FLEXI_DISPLAY_VOTING_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="displayvotefeat">FLEXI_NO</option>
+				<option value="1" show_list="displayvotefeat" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="voting_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<field name="voting_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="displayvotefeat btn-group group-yesno">
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_NO</option>
 			</field>
-			<field name="vote_stars_feat" type="radio" default="1" label="FLEXI_VOTING_NUMOF_STARS" description="FLEXI_VOTING_NUMOF_STARS_DESC" >
+			<field name="vote_stars_feat" type="radio" default="1" label="FLEXI_VOTING_NUMOF_STARS" description="FLEXI_VOTING_NUMOF_STARS_DESC" class="displayvotefeat btn-group group-yesno">
 				<option value="1">FLEXI_VOTING_ONE_STAR_RECOMMENDED</option>
 				<option value="5">FLEXI_VOTING_FIVE_STAR</option>
 				<option value="0">FLEXI_VOTING_DEFAULT_STARS</option>
 			</field>
-			<field name="allow_vote_feat" type="radio" default="0" label="FLEXI_VOTING_ALLOW" description="FLEXI_VOTING_ALLOW_DESC" >
+			<field name="allow_vote_feat" type="radio" default="0" label="FLEXI_VOTING_ALLOW" description="FLEXI_VOTING_ALLOW_DESC" class="displayvotefeat btn-group group-yesno">
 				<option value="0">FLEXI_NO_RECOMMENDED</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="vote_counter_feat" type="radio" default="1" label="FLEXI_VOTING_SHOW_COUNTER" description="FLEXI_VOTING_SHOW_COUNTER_DESC" >
+			<field name="vote_counter_feat" type="radio" default="1" label="FLEXI_VOTING_SHOW_COUNTER" description="FLEXI_VOTING_SHOW_COUNTER_DESC" class="displayvotefeat btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -631,22 +631,22 @@
 
 			<field name="" type="separator" default="FLEXI_COMMENTS_PARAMS" level="level1" />
 			<field name="" type="separator" default="FLEXI_STD" level="level3" />
-			<field name="display_comments" type="radio" default="1" label="FLEXI_DISPLAY_COMMENTS" description="FLEXI_DISPLAY_COMMENTS_DESC" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_comments" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_COMMENTS" description="FLEXI_DISPLAY_COMMENTS_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="displaycomment">FLEXI_NO</option>
+				<option value="1" show_list="displaycomment" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="comments_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<field name="comments_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="displaycomment btn-group group-yesno" >
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_NO</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FEAT" level="level3" />
-			<field name="display_comments_feat" type="radio" default="1" label="FLEXI_DISPLAY_comments" description="FLEXI_DISPLAY_COMMENTS_DESC" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_comments_feat" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_comments" description="FLEXI_DISPLAY_COMMENTS_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="displaycommentfeat">FLEXI_NO</option>
+				<option value="1" show_list="displaycommentfeat" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="comments_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<field name="comments_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="displaycommentfeat btn-group group-yesno">
 				<option value="0">FLEXI_YES_AFTER_COUNTER</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_NO</option>
@@ -669,36 +669,36 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELDS_PARAMS" level="level1" />
 			<field name="" type="separator" default="FLEXI_STD" level="level3" />
-			<field name="use_fields" type="radio" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC">
+			<field name="use_fields" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC" class="btn-group group-yesno" >
+				<option value="0" show_list="" hide_list="usefield">FLEXI_NO</option>
+				<option value="1" show_list="usefield" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="display_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="usefield btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="display_label" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<field name="hide_label_onempty" type="radio" default="0" label="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY" description="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY_DESC" class="usefield btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="hide_label_onempty" type="radio" default="0" label="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY" description="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="text_after_label" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" />
-			<field name="fields" type="textarea" cols="35" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
+			<field name="text_after_label" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" class="usefield"/>
+			<field name="fields" type="textarea" cols="35" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" class="usefield"/>
 			
 			<field name="" type="separator" default="FLEXI_FEAT" level="level3" />
-			<field name="use_fields_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC">
+			<field name="use_fields_feat" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="usefieldfeat">FLEXI_NO</option>
+				<option value="1" show_list="usefieldfeat" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="display_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC" class="usefieldfeat btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="display_label_feat" type="radio" default="0" label="FLEXI_DISPLAY_FIELD_LABEL" description="FLEXI_DISPLAY_FIELD_LABEL_DESC">
+			<field name="hide_label_onempty_feat" type="radio" default="0" label="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY" description="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY_DESC" class="usefieldfeat btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="hide_label_onempty_feat" type="radio" default="0" label="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY" description="FLEXI_HIDE_LBL_WHEN_DISP_ISEMPTY_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="text_after_label_feat" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" />
-			<field name="fields_feat" type="textarea" cols="35" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" />
+			<field name="text_after_label_feat" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" class="usefieldfeat btn-group group-yesno"/>
+			<field name="fields_feat" type="textarea" cols="35" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" class="usefieldfeat btn-group group-yesno"/>
 		</fieldset>
 		
 		
@@ -706,11 +706,11 @@
 			
 			<field name="" type="separator" default="FLEXI_CATS" level="level1" />
 			
-			<field name="apply_config_per_category" type="radio" default="0" label="FLEXI_MOD_APPLY_CON_PER_CAT" description="FLEXI_MOD_APPLY_CON_PER_CAT_DESC">
+			<field name="apply_config_per_category" type="radio" default="0" label="FLEXI_MOD_APPLY_CON_PER_CAT" description="FLEXI_MOD_APPLY_CON_PER_CAT_DESC" class="btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="skip_category_if_noitems" type="radio" default="0" label="FLEXI_MOD_SKIP_CATEGORY_IF_NOITEMS" description="FLEXI_MOD_SKIP_CATEGORY_IF_NOITEMS_DESC">
+			<field name="skip_category_if_noitems" type="radio" default="0" label="FLEXI_MOD_SKIP_CATEGORY_IF_NOITEMS" description="FLEXI_MOD_SKIP_CATEGORY_IF_NOITEMS_DESC" class="btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -729,124 +729,124 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_CATS_INFO" level="level3" />
-			<field name="cats_showtitle" type="list" default="0" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC">
+			<field name="cats_showtitle" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="cattitle">FLEXI_NO</option>
+				<option value="1" show_list="cattitle" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="cats_link_title" type="radio" default="0" label="FLEXI_CAT_LINK_TITLE" description="FLEXI_CAT_LINK_TITLE_DESC" class="cattitle btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="cats_link_title" type="radio" default="0" label="FLEXI_CAT_LINK_TITLE" description="FLEXI_CAT_LINK_TITLE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="cats_cuttitle" type="text" default="40" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" class="cattitle"/>
+			<field name="cats_showdescr" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SHOW_CAT_DESCR" description="FLEXI_SHOW_CAT_DESCR_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="catdesc">FLEXI_NO</option>
+				<option value="1" show_list="catdesc" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="cats_cuttitle" type="text" default="40" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" />
-			<field name="cats_showdescr" type="list" default="0" label="FLEXI_SHOW_CAT_DESCR" description="FLEXI_SHOW_CAT_DESCR_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="cats_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
-			<field name="cats_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC">
+			<field name="cats_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" class="catdesc" />
+			<field name="cats_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC" class="catdesc btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level3" />
-			<field name="cats_show_image" type="list" default="0" label="FLEXI_SHOW_CATIMAGE" description="FLEXI_SHOW_CATIMAGE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="cats_show_image" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SHOW_CATIMAGE" description="FLEXI_SHOW_CATIMAGE_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="catimage">FLEXI_NO</option>
+				<option value="1" show_list="catimage" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="cats_image_source" type="list" default="0" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC">
+			<field name="cats_image_source" type="list" default="0" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" class="catimage btn-group group-yesno">
 				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
 				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
 				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
 			</field>
-			<field name="cats_link_image" type="radio" default="0" label="FLEXI_CAT_LINK_IMAGE" description="FLEXI_CAT_LINK_IMAGE_DESC">
+			<field name="cats_link_image" type="radio" default="0" label="FLEXI_CAT_LINK_IMAGE" description="FLEXI_CAT_LINK_IMAGE_DESC" class="catimage btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="cats_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD">
+			<field name="cats_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="catimage btn-group group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="cats_image_width" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="cats_image_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="cats_image_width" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" class="catimage"/>
+			<field name="cats_image_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" class="catimage" />
 			
 		 <field name="" type="separator" default="FLEXI_CURRCAT" level="level1" />
 		 
-			<field name="currcat_custom_display" type="radio" default="0" label="FLEXI_CURRCAT_CUSTOM_DISPLAY" description="FLEXI_CURRCAT_CUSTOM_DISPLAY_DESC" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="currcat_custom_display" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_CURRCAT_CUSTOM_DISPLAY" description="FLEXI_CURRCAT_CUSTOM_DISPLAY_DESC" class="btn-group group-yesno" >
+				<option value="0" show_list="" hide_list="currcat">FLEXI_NO</option>
+				<option value="1" show_list="currcat" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="currcat_source" type="radio" default="0" label="Current category is" description="Select which category is considered current category" >
+			<field name="currcat_source" type="radio" default="0" label="Current category is" description="Select which category is considered current category" class="currcat btn-group group-fcinfo" >
 				<option value="0">Category of Item in item view</option>
 				<option value="1">Active Category in category view</option>
 				<option value="2">Both</option>
 			</field>
-			<field name="currcat_fallback_maincat" type="radio" default="0" label="FLEXI_FALLBACK_MAINCAT" description="FLEXI_FALLBACK_MAINCAT_DESC" >
+			<field name="currcat_fallback_maincat" type="radio" default="0" label="FLEXI_FALLBACK_MAINCAT" description="FLEXI_FALLBACK_MAINCAT_DESC" class="currcat btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_CURRCAT_INFO" level="level3" />
-			<field name="currcat_showtitle" type="list" default="0" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC">
+			<field name="currcat_showtitle" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="currcat_title">FLEXI_NO</option>
+				<option value="1" show_list="currcat_title" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="currcat_link_title" type="radio" default="0" label="FLEXI_CAT_LINK_TITLE" description="FLEXI_CAT_LINK_TITLE_DESC" class="currcat_title btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="currcat_link_title" type="radio" default="0" label="FLEXI_CAT_LINK_TITLE" description="FLEXI_CAT_LINK_TITLE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="currcat_cuttitle" type="text" default="20" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" class="currcat_title"/>
+			<field name="currcat_showdescr" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SHOW_CAT_DESCR" description="FLEXI_SHOW_CAT_DESCR_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="currcat_desc">FLEXI_NO</option>
+				<option value="1" show_list="currcat_desc" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="currcat_cuttitle" type="text" default="20" size="4" label="FLEXI_MAX_TITLE_LENGTH" description="FLEXI_MAX_TITLE_LENGTH_DESC" />
-			<field name="currcat_showdescr" type="list" default="0" label="FLEXI_SHOW_CAT_DESCR" description="FLEXI_SHOW_CAT_DESCR_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="currcat_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
-			<field name="currcat_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC">
+			<field name="currcat_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" class="currcat_desc" />
+			<field name="currcat_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC" class="currcat_desc btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level3" />
-			<field name="currcat_show_image" type="list" default="0" label="FLEXI_SHOW_CATIMAGE" description="FLEXI_SHOW_CATIMAGE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="currcat_show_image" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SHOW_CATIMAGE" description="FLEXI_SHOW_CATIMAGE_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="currcat_image">FLEXI_NO</option>
+				<option value="1" show_list="currcat_image" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="currcat_image_source" type="list" default="0" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC">
+			<field name="currcat_image_source" type="list" default="0" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" class="currcat_image">
 				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
 				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
 				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
 			</field>
-			<field name="currcat_link_image" type="radio" default="0" label="FLEXI_CAT_LINK_IMAGE" description="FLEXI_CAT_LINK_IMAGE_DESC">
+			<field name="currcat_link_image" type="radio" default="0" label="FLEXI_CAT_LINK_IMAGE" description="FLEXI_CAT_LINK_IMAGE_DESC" class="currcat_image btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="currcat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD">
+			<field name="currcat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="currcat_image btn-group group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="currcat_image_width" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="currcat_image_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="currcat_image_width" type="text" size="4" default="110" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" class="currcat_image btn-group group-yesno"/>
+			<field name="currcat_image_height" type="text" size="4" default="110" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" class="currcat_image btn-group group-yesno"/>
 		</fieldset>
 			
 		<fieldset name="FLEXI_SPECIAL_LISTS_AND_INFO" label="FLEXI_SPECIAL_LISTS_AND_INFO" description="FLEXI_SPECIAL_LISTS_AND_INFO_DESC">
 
 			<field name="" type="separator" default="FLEXI_MOD_RECENTLY_ADDED_FAVOURITES" level="level1" />
-			<field name="display_favlist" type="radio" default="0" label="FLEXI_MOD_RECENT_FAVOURITES_LIST" description="FLEXI_MOD_RECENT_FAVOURITES_LIST_DESC">
+			<field name="display_favlist" type="radio" default="0" label="FLEXI_MOD_RECENT_FAVOURITES_LIST" description="FLEXI_MOD_RECENT_FAVOURITES_LIST_DESC" class="btn-group group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_MOD_FOOTER_MORE" level="level1" />
-			<field name="show_more" type="radio" default="0" label="FLEXI_MOD_DISPLAY_MORE" description="FLEXI_MOD_DISPLAY_MORE_DESC">
+			<field name="show_more" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_DISPLAY_MORE" description="FLEXI_MOD_DISPLAY_MORE_DESC" class="btn-group group-yesno">
+				<option value="0" show_list="" hide_list="readmore_link">FLEXI_NO</option>
+				<option value="1" show_list="readmore_link" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="more_title" type="text" default="" label="FLEXI_MOD_MORE_TITLE" description="FLEXI_MOD_MORE_TITLE_DESC" size="40" class="readmore_link"/>
+			<field name="more_link" type="text" default="index.php" label="FLEXI_MOD_MORE_LINK" description="FLEXI_MOD_MORE_LINK" class="readmore_link"/>
+			<field name="more_blank" type="radio" default="0" label="FLEXI_MOD_MORE_NEW_WINDOW" description="FLEXI_MOD_MORE_NEW_WINDOW_DESC" class="readmore_link btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="more_title" type="text" default="" label="FLEXI_MOD_MORE_TITLE" description="FLEXI_MOD_MORE_TITLE_DESC" size="40" />
-			<field name="more_link" type="text" default="index.php" label="FLEXI_MOD_MORE_LINK" description="FLEXI_MOD_MORE_LINK" />
-			<field name="more_blank" type="radio" default="0" label="FLEXI_MOD_MORE_NEW_WINDOW" description="FLEXI_MOD_MORE_NEW_WINDOW_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="more_css" type="textarea" cols="30" rows="3" default="" label="FLEXI_MOD_MORE_CSS" description="FLEXI_MOD_MORE_CSS_DESC" />
+			<field name="more_css" type="textarea" cols="30" rows="3" default="" label="FLEXI_MOD_MORE_CSS" description="FLEXI_MOD_MORE_CSS_DESC" class="readmore_link" />
 		</fieldset>
 		
 		<fieldset name="FLEXI_MOD_ADVANCED_CACHE_STYLING" label="FLEXI_MOD_ADVANCED_CACHE_STYLING">
@@ -860,11 +860,11 @@
 			
 			<field name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" />
 			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
-			<field name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC">
+			<field name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC" class="btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS" description="FLEXI_ADD_TOOLTIPS_DESC">
+			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS" description="FLEXI_ADD_TOOLTIPS_DESC" class="btn-group group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
