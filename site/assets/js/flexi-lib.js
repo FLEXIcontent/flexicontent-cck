@@ -200,3 +200,32 @@
 		//setTimeout(function(){ noFx = 0; }, 200);
 	}
 	
+	function fcUpdateCascadedField(from, to, field_id, item_id, ftype) {
+		to.parent().find('.field_loading').html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">');
+		to.empty().append('<option selected="selected" value="">... Loading</option>');
+		to.trigger('change');
+		jQuery.ajax({
+			type: 'POST',
+			url: 'index.php?option=com_flexicontent&tmpl=component&format=raw',
+			data: {
+				task: 'call_extfunc',
+				omethod: 'html', /* unused */
+				exttype: 'plugins',
+				extfolder: 'flexicontent_fields',
+				extname: ftype,
+				extfunc: 'getCascadedField',
+				field_id: field_id,
+				item_id: item_id,
+				valgrps: from.val()
+			}
+		}).done( function(data) {
+			to.parent().find('.field_loading').html('');
+			
+			to.empty().append(data).val('');
+			to.trigger('change');
+			
+			/*if (to.hasClass('use_select2_lib'))  to.select2('val', '');  else  to.val('');*/
+			//var cascadeFunc = 'fcCascadedField_'+field_id+'();';
+			//eval(cascadeFunc);
+		});
+	}
