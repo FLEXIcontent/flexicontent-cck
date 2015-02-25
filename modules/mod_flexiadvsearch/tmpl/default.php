@@ -55,44 +55,47 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		$search_inner_prompt = JText::_($params->get('search_inner_prompt', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
 		$maxchars = $params->get('maxchars', 200);
 		$output = '<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'" class="'.$text_search_class.'"
-				data-fc_label_text="'.$search_inner_prompt.'" name="searchword" width="'.$search_inner_width.'" size="" maxlength="'.$maxchars.'" 
-				id="search_searchword" value="" />';
+			data-fc_label_text="'.$search_inner_prompt.'" name="searchword" width="'.$search_inner_width.'" size="" maxlength="'.$maxchars.'"
+			id="search_searchword" value="" />';
 		
 		
 		// Search GO button
 		if ($button) :
-		    if ($button_as) :
-		        $button = '<input type="image" value="'.$button_text.'" class="'.$flexi_button_class_go.'" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
-		    else :
-		        $button = '<input type="submit" value="'.$button_text.'" class="'.$flexi_button_class_go.'" onclick="this.form.searchword.focus();"/>';
-		    endif;
+			if ($button_as) :
+				$button = '<input type="image" value="'.$button_text.'" class="'.$flexi_button_class_go.'" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
+			else :
+				$button = '<input type="submit" value="'.$button_text.'" class="'.$flexi_button_class_go.'" onclick="this.form.searchword.focus();"/>';
+			endif;
+		else :
+			/* Hidden submit button so that pressing Enter will work */
+			$button = '<input type="submit" value="'.$button_text.'" style="position:absolute; left:-9999px;" onclick="this.form.searchword.focus();" />';
 		endif;
 		
 		switch ($button_pos) :
-		    case 'top'   : $output = $button.'<br />'.$output;  break;
-		    case 'bottom': $output = $output.'<br />'.$button;  break;
-		    case 'right' : $output = $output.$button;  break;
-		    case 'left'  :
-		    default      : $output = $button.$output; break;
+			case 'top'   : $output = $button.'<br />'.$output;  break;
+			case 'bottom': $output = $output.'<br />'.$button;  break;
+			case 'right' : $output = $output.$button;  break;
+			case 'left'  :
+			default      : $output = $button.$output; break;
 		endswitch;
 		
 		
 		// Search DIRECT (lucky) button
 		if ($direct) :
-		    if ($direct_as) :
-		        $direct = '<input type="image" value="'.$direct_text.'" class="'.$flexi_button_class_direct.'" src="'.JURI::base().$direct_image.'" onclick="this.form.direct.value=1; this.form.searchword.focus();"/>';
-		        $direct .= '<input type="hidden" name="direct" value="" />'; // workaround for image button not being able to submit a value
-		    else :
-		        $direct = '<input type="submit" name="direct" value="'.$direct_text.'" class="'.$flexi_button_class_direct.'" onclick="this.form.searchword.focus();"/>';
-		    endif;
+			if ($direct_as) :
+				$direct = '<input type="image" value="'.$direct_text.'" class="'.$flexi_button_class_direct.'" src="'.JURI::base().$direct_image.'" onclick="this.form.direct.value=1; this.form.searchword.focus();"/>';
+				$direct .= '<input type="hidden" name="direct" value="" />'; // workaround for image button not being able to submit a value
+			else :
+			 $direct = '<input type="submit" name="direct" value="'.$direct_text.'" class="'.$flexi_button_class_direct.'" onclick="this.form.searchword.focus();"/>';
+			endif;
 		endif;
 		
 		switch ($direct_pos) :
-		    case 'top'   : $output = $direct.'<br />'.$output;  break;
-		    case 'bottom': $output = $output.'<br />'.$direct;  break;
-		    case 'right' : $output = $output.$direct;  break;
-		    case 'left'  :
-		    default      : $output = $direct.$output; break;
+			case 'top'   : $output = $direct.'<br />'.$output;  break;
+			case 'bottom': $output = $output.'<br />'.$direct;  break;
+			case 'right' : $output = $output.$direct;  break;
+			case 'left'  :
+			default      : $output = $direct.$output; break;
 		endswitch;
 		
 		
@@ -109,10 +112,7 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		</span>
 	</div>
 	
-	
-	
 </form>
-
 </div>
 
 <?php

@@ -574,7 +574,7 @@ class flexicontent_html
 								var val = el_select.val();
 								if (val === null) {
 									//el.addClass('fc_highlight_disabled');
-								} else if (val.length) {
+								} else if (!!val && val.length) {
 									el.addClass('fc_highlight');
 								} else {
 									el.removeClass('fc_highlight');
@@ -619,7 +619,7 @@ class flexicontent_html
 							if ( ! el_select.attr('multiple') && !el_select.hasClass('fc_skip_highlight') ) {
 								var el = jQuery(this).prev('div').find('.select2-choice');
 								var val = el_select.val();
-								if (val.length) {
+								if (!!val && val.length) {
 									el.addClass('fc_highlight');
 								} else {
 									el.removeClass('fc_highlight');
@@ -631,7 +631,8 @@ class flexicontent_html
 						jQuery('div.use_select2_lib.select2-container-multi input').on('keydown', function() {
 							var el = jQuery(this);
 							setTimeout(function() {
-								if (el.val().length) {
+								var val = el.val();
+								if (!!val && val.length) {
 									var el_prompt = el.prevAll('.fc_has_inner_prompt');
 									if (el_prompt) el_prompt.hide();
 								} else {
@@ -5649,7 +5650,8 @@ class fcjsJText extends JText
 }
 
 
-class flexicontent_zip extends ZipArchive {
+class flexicontent_zip extends ZipArchive
+{
 	/**
 	 * Add a directory with files and subdirectories to the archive
 	 *
@@ -5683,5 +5685,70 @@ class flexicontent_zip extends ZipArchive {
 			$do = (filetype( $pathname . $file) == 'dir') ? 'addDir' : 'addFile';
 			$this->$do($pathname . $file, $name . $file);
 		}
+	}
+}
+
+
+class flexicontent_ajax
+{
+	static function call_extfunc()
+	{
+		$exttype = JRequest::getVar( 'exttype', 'modules' );
+		$extname = JRequest::getVar( 'extname', '' );
+		$extfunc = JRequest::getVar( 'extfunc', '' );
+		$extfolder = JRequest::getVar( 'extfolder', '' );
+		
+		if ($exttype!='modules' && $exttype!='plugins') { echo 'only modules and plugins are supported'; jexit(); }  // currently supporting only module and plugins
+		if (!$extname || !$extfunc) { echo 'function or extension name not set'; jexit(); }  // require variable not set
+		if ($exttype=='plugins' && $extfolder=='') { echo 'plugin folder is not set'; jexit(); }  // currently supporting only module and plugins		
+		
+		if ($exttype=='modules') {
+			// Import module helper file
+			$helper_path = JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php';
+			if ( !file_exists($helper_path) ) { echo "no helper file found at expected path, filepath is ".$helper_path; jexit(); }
+			require_once ($helper_path);
+			
+			// Create object
+			$classname = 'mod'.ucwords($extname).'Helper';
+			if ( !class_exists($classname) ) { echo "no correctly named class inside helper file"; jexit(); }
+			$obj = new $classname();
+		}
+		
+		else {  // exttype is 'plugins'
+			// Load Flexicontent Field (the Plugin file) if not already loaded
+			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($extname);
+			$path = JPATH_ROOT.DS.'plugins'.DS.$extfolder.$plgfolder.DS.strtolower($extname).'.php';
+			if ( !file_exists($path) ) { echo "no plugin file found at expected path, filepath is ".$path; jexit(); }
+			require_once ($path);
+			
+			// Create class name of the plugin
+			$classname = 'plg'. ucfirst($extfolder).$extname;
+			if ( !class_exists($classname) ) { echo "no correctly named class inside plugin file"; jexit(); }
+			
+			// Create a plugin instance
+			$dispatcher = JDispatcher::getInstance();
+			$obj = new $classname($dispatcher, array());
+			
+			// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters), CHECKING if parameters exist
+			$plugin_db_data = JPluginHelper::getPlugin($extfolder,$extname);
+			$obj->params = FLEXI_J16GE ? new JRegistry( @ $plugin_db_data->params ) : new JParameter( @ $plugin_db_data->params );
+		}
+		
+		// Security concern, only 'confirmed' methods will be callable
+		if ( !in_array($extfunc, $obj->task_callable) ) { echo "non-allowed method called"; jexit(); }
+		
+		// Method actually exists
+		if ( !method_exists($obj, $extfunc) ) { echo "non-existing method called "; jexit(); }
+		
+		// Load extension's english language file then override with current language file
+		if ($exttype=='modules')
+			$extension_name = 'mod_'.strtolower($extname);
+		else
+			$extension_name = 'plg_'.strtolower($extname);
+		JFactory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB', true);
+		JFactory::getLanguage()->load($extension_name, JPATH_SITE, null, true);
+		
+		// Call the method
+		$obj->$extfunc();
 	}
 }

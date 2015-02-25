@@ -1341,5 +1341,10 @@ VALUES
 	function doPlgAct() {
 		FLEXIUtilities::doPlgAct();
 	}
+	
+	function call_extfunc()
+	{
+		flexicontent_ajax::call_extfunc();
+	}
 }
 ?>
