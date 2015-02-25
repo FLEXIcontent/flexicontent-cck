@@ -48,9 +48,9 @@
 			<field name="search_inner_prompt" type="text" default="FLEXI_ADV_MOD_SEARCH_PROMPT" label="FLEXI_MOD_TEXT_SEARCH_PROMPT" description="FLEXI_MOD_TEXT_SEARCH_PROMPT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_MOD_GO_BUTTON" level="level2" menu="hide" />
-			<field name="button" type="multilist" subtype="radio" toggle_related="1" default="" label="FLEXI_MOD_SHOW_GO_BUTTON" description="FLEXI_MOD_SHOW_GO_BUTTON_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="disp_gobtn">FLEXI_HIDE</option>
-				<option value="1" show_list="disp_gobtn" hide_list="">FLEXI_SHOW</option>
+			<field name="button" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_SHOW_GO_BUTTON" description="FLEXI_MOD_SHOW_GO_BUTTON_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp_gobtn">FLEXI_NO</option>
+				<option value="1" show_list="disp_gobtn" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="flexi_button_class_go" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="disp_gobtn">
 				<option value="fc_button" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_FCBUTTON</option>
@@ -77,11 +77,11 @@
 			<field name="button_text"  type="text" default="FLEXI_ADV_MOD_GO" label="FLEXI_MOD_BUTTON_TEXT" description="FLEXI_MOD_BUTTON_TEXT_DESC" class="disp_gobtn gobtn_txt"/>
 			
 			<field name="" type="separator" default="FLEXI_MOD_DIRECT_BUTTON" level="level2" menu="hide" />
-			<field name="direct_button" type="multilist" subtype="radio" toggle_related="1" default="" label="FLEXI_MOD_SHOW_DIRECT_BUTTON" description="FLEXI_MOD_SHOW_DIRECT_BUTTON_DESC" class="btn-group btn-group-yesno">
+			<field name="direct_button" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_SHOW_DIRECT_BUTTON" description="FLEXI_MOD_SHOW_DIRECT_BUTTON_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_directbtn">FLEXI_NO</option>
 				<option value="1" show_list="disp_directbtn" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="flexi_button_class_direct" type="list" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="disp_directbtn">
+			<field name="flexi_button_class_direct" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="disp_directbtn">
 				<option value="fc_button" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_FCBUTTON</option>
 				<option value="btn btn-primary" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_SUCCESS</option>
@@ -98,7 +98,7 @@
 				<option value="top">FLEXI_DIRECT_TOP</option>
 				<option value="bottom">FLEXI_DIRECT_BOTTOM</option>
 			</field>
-			<field name="direct_as" type="radio" default="0" label="FLEXI_MOD_DIRECT_AS" description="FLEXI_MOD_DIRECT_AS_DESC" class="disp_directbtn">
+			<field name="direct_as" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_DIRECT_AS" description="FLEXI_MOD_DIRECT_AS_DESC" class="disp_directbtn btn-group btn-group-yesno">
 				<option value="0" show_list="directbtn_txt" hide_list="directbtn_img">FLEXI_MOD_BUTTON_AS_TEXT</option>
 				<option value="1" show_list="directbtn_img" hide_list="directbtn_txt">FLEXI_MOD_BUTTON_AS_IMAGE</option>
 			</field>
@@ -106,12 +106,12 @@
 			<field name="direct_text"  type="text" default="FLEXI_ADV_MOD_DIRECT" label="FLEXI_MOD_DIRECT_TEXT" description="FLEXI_MOD_DIRECT_TEXT_DESC" class="disp_directbtn directbtn_txt" />
 
 			<field name="" type="separator" default="FLEXI_MOD_ADV_SEARCH" description="FLEXI_MOD_ADV_SEARCH_DESC" level="level2" menu="hide" />
-			<field name="linkadvsearch" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_MOD_ADV_SEARCH_SHOW_LINK" description="FLEXI_MOD_ADV_SEARCH_SHOW_LINK_DESC" class="btn-group btn-group-yesno">
+			<field name="linkadvsearch" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_ADV_SEARCH_SHOW_LINK" description="FLEXI_MOD_ADV_SEARCH_SHOW_LINK_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_advlink">FLEXI_NO</option>
 				<option value="1" show_list="disp_advlink" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="linkadvsearch_txt" type="text" default="FLEXI_ADV_MOD_ADVANCED_SEARCH" label="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT" description="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT_DESC" class="disp_advlink" />
-			<field name="flexi_button_class_advanced" type="list" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="disp_advlink btn-group btn-group-yesno">
+			<field name="flexi_button_class_advanced" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="disp_advlink">
 				<option value="fc_button fcsimple flexiadvsearchlink" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_FCBUTTON</option>
 				<option value="btn btn-primary" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_SUCCESS</option>
