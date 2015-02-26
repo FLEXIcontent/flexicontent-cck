@@ -55,7 +55,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		if (JRequest::getCmd('print')) return;
 		
 		global $mainframe, $addthis;
-		$scheme = JURI::getInstance()->getScheme();
+		//$scheme = JURI::getInstance()->getScheme();  // we replaced http(s):// with //
 		$document	= JFactory::getDocument();
 		
 		$lang = $document->getLanguage();
@@ -190,7 +190,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"openwindow('".$voicetarget."','".$lang."');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
 					";
 			} else {
-				$document->addScript('http://vozme.com/get_text.js');
+				$document->addScript('//vozme.com/get_text.js');
 				$display .="
 					<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"get_id('".$voicetarget."','".$lang."','fm');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
 					";
@@ -330,7 +330,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					case 4:
 						$addthis_code .= '
 						<!-- AddThis Button BEGIN -->
-						<a class="addthis_button" href="'.$scheme.'://www.addthis.com/bookmark.php?v=300&pubid='.$addthis_pubid.'"><img src="'.$scheme.'://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="'.JText::_('FLEXI_FIELD_TOOLBAR_SHARE').'" style="border:0"/></a>
+						<a class="addthis_button" href="//www.addthis.com/bookmark.php?v=300&pubid='.$addthis_pubid.'"><img src="//s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="'.JText::_('FLEXI_FIELD_TOOLBAR_SHARE').'" style="border:0"/></a>
 						<!-- AddThis Button END -->
 						';
 						break;
@@ -382,7 +382,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			
 			if (!$addthis) {
 				$document->addCustomTag('	
-					<script type="text/javascript" src="'.$scheme.'://s7.addthis.com/js/300/addthis_widget.js#pubid='.$addthis_pubid.'"></script>
+					<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid='.$addthis_pubid.'"></script>
 					<script type="text/javascript">
 					var addthis_config = {
 					     services_exclude: "print,email"

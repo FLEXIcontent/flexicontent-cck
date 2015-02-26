@@ -115,7 +115,7 @@ $js = "
 					});
 				");
 				?>
-				<fieldset class="flexiaccess" style="width: 95%;">
+				<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%">
 						<tr>

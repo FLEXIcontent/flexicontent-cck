@@ -1097,7 +1097,7 @@
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,save_preview,preview_latest" defaultvals="apply,save_preview,preview_latest"
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" menu="hide"/>
-			<field name="buttons_placement_fe" type="radio" default="0" label="FLEXI_BUTTONS_PLACEMENT" description="FLEXI_BUTTONS_PLACEMENT_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="buttons_placement_fe" type="radio" default="0" label="FLEXI_BUTTONS_PLACEMENT" description="FLEXI_BUTTONS_PLACEMENT_DESC" menu="hide" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_TOP</option>
 				<option value="1">FLEXI_BOTTOM</option>
 			</field>
@@ -1113,7 +1113,7 @@
 				<option value="1">FLEXI_GUESTS_RECOMMENEDED</option>
 				<option value="2">FLEXI_ANY_USER</option>
 			</field>
-			<field name="captcha_formop" type="radio" default="0" label="FLEXI_OPERATION_TYPE" description="FLEXI_OPERATION_TYPE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="captcha_formop" type="radio" default="0" label="FLEXI_OPERATION_TYPE" description="FLEXI_OPERATION_TYPE_DESC" menu="hide" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_SUBMIT_RECOMMENDED</option>
 				<option value="1">FLEXI_SUBMIT_EDIT</option>
 			</field>
@@ -1399,7 +1399,7 @@
 				<option value="1">FLEXI_IN_SLIDER</option>
 			</field>
 		
-		<field name="" type="separator" default="FLEXI_ITEMS_MANAGER_CONF" label="" level="level0" menu="hide" />
+		<field name="" type="separator" default="FLEXI_ITEMS_MANAGER" label="" level="level0" menu="hide" />
 			
 		<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR" label="" level="level1" menu="hide" />
 			

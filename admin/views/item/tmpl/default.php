@@ -209,7 +209,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 <?php /* echo "type_id: ". @$this->row->type_id."<br/>\n"; */?>
 
 
-<div id="flexicontent" class="flexi_edit" >
+<div id="flexicontent" class="flexi_edit flexicontent" >
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data" >
 	
@@ -1565,8 +1565,8 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 		
 		<div class="fc_tabset_inner">
 		<?php /*
-		<fieldset class="flexiaccess">
-			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend-->
+		<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
+			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 			<div id="tabacces">
 		*/ ?>
 				<div id="access"><?php echo $this->form->getInput('rules'); ?></div>

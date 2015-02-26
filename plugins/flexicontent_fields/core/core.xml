@@ -1143,13 +1143,13 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="validation" type="radio" default="2" label="FLEXI_FIELD_SERVER_SIDE_VALIDATION" description="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION_DESC">
+			<field name="validation" type="radio" default="2" label="FLEXI_FIELD_SERVER_SIDE_VALIDATION" description="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION_DESC" class="btn-group group-fcsuccess">
 				<option value="2">Usergroup Text Filters</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			
-			<field name="hide_html" type="radio" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC">
+			<field name="hide_html" type="radio" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC" class="btn-group group-fcsuccess">
 				<option value="0">FLEXI_HTML_EDITOR</option>
 				<option value="1">FLEXI_SIMPLE_TEXTAREA</option>
 			</field>

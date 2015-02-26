@@ -828,7 +828,7 @@ if ( $this->perms['canright'] ) : ob_start(); // perms ?>
 		");
 	?>
 	
-	<fieldset class="flexiaccess">
+	<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
 		<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 		<div id="tabacces">
 			<div id="accessrules"><?php echo $this->form->getInput('rules'); ?></div>

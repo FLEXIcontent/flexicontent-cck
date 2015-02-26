@@ -305,8 +305,8 @@ $this->document->addScriptDeclaration($js);
 				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
 				
 				<?php /*
-				<fieldset class="flexiaccess">
-					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend-->
+				<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
+					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<div id="tabacces">
 				*/ ?>
 						<div id="access"><?php echo $this->form->getInput('rules'); ?></div>

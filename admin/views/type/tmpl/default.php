@@ -17,58 +17,70 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+// Load JS tabber lib
+$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
+$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
+$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+$js = "
+	jQuery(document).ready(function(){
+		fc_bind_form_togglers('#flexicontent', 0, '');
+	});
+";
+$this->document->addScriptDeclaration($js);
 ?>
+
 <div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
-	<table cellspacing="0" cellpadding="0" border="0" width="100%">
-		<tr>
-			<td valign="top" style="width:50%;">
-				<table  class="admintable">
-					<tr>
-						<td class="key">
-								<?php echo $this->form->getLabel('name'); ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('name'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('published'); ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('published'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('access'); ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('access'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('alias'); ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('alias'); ?>
-						</td>
-					</tr>
-					<?php if (FLEXI_ACCESS || FLEXI_J16GE) : ?>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('itemscreatable'); ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('itemscreatable'); ?>
-						</td>
-					</tr>
-					<?php endif; ?>
-				</table>
-				
+	<div class="container-fluid">
+		<div class="span6 full_width_980">
+			
+			<table class="fc-form-tbl" style="margin-bottom:12px;">
+				<tr>
+					<td class="key">
+							<?php echo $this->form->getLabel('name'); ?>
+					</td>
+					<td>
+						<?php echo $this->form->getInput('name'); ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<?php echo $this->form->getLabel('published'); ?>
+					</td>
+					<td>
+						<?php echo $this->form->getInput('published'); ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<?php echo $this->form->getLabel('access'); ?>
+					</td>
+					<td>
+						<?php echo $this->form->getInput('access'); ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<?php echo $this->form->getLabel('alias'); ?>
+					</td>
+					<td>
+						<?php echo $this->form->getInput('alias'); ?>
+					</td>
+				</tr>
+				<?php if (FLEXI_ACCESS || FLEXI_J16GE) : ?>
+				<tr>
+					<td class="key">
+						<?php echo $this->form->getLabel('itemscreatable'); ?>
+					</td>
+					<td>
+						<?php echo $this->form->getInput('itemscreatable'); ?>
+					</td>
+				</tr>
+				<?php endif; ?>
+			</table>
+
 			<?php
 			if ($this->permission->CanConfig) :
 				$this->document->addScriptDeclaration("
@@ -83,93 +95,157 @@ defined('_JEXEC') or die('Restricted access');
 					});
 				");
 			?>
-			<fieldset class="flexiaccess">
-				<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-				<table id="tabacces" class="admintable" width="100%">
-					<tr>
-						<td>
-							<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
-						</td>
-					</tr>
-				</table>
-				<div id="notabacces">
+				<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
+					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
+					<div id="tabacces">
+						<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
+					</div>
+					<div id="notabacces">
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-				</div>
-			</fieldset>
-		<?php endif; ?>
-			
-			</td>
-			<td valign="top" style="width:50%; padding: 7px 0 0 5px" align="left">
-				<?php
-				echo JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS');
-				echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
-				$fieldSets = $this->form->getFieldsets('attribs');
-				foreach ($fieldSets as $fsname => $fieldSet) :
-					if ( $fsname=='themes' ) continue;
-					
-					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
-					echo JHtml::_('sliders.panel',JText::_($label), $fsname.'-options');
-					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
-					endif;
-					?>
-					<fieldset class="panelform">
-						<?php
-						foreach ($this->form->getFieldset($fsname) as $field) :
-							echo $field->label;
-							echo $field->input;
-						endforeach;
-						?>
-					</fieldset>
-				<?php endforeach;
-				echo JHtml::_('sliders.end');
-				?>
-				
-				<fieldset class="panelform">
-					<?php
-					echo '<span class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) .'</span>';
-					echo '<div class="clear"></div>';
-					
-					foreach ($this->form->getFieldset('themes') as $field) :
-						if ($field->hidden) echo $field->input;
-						else echo $field->label . $field->input;
-						echo '<div class="clear"></div>';
-					endforeach;
-					?>
+					</div>
 				</fieldset>
+			<?php endif; ?>
+		
+		</div>
+		<div class="span6 full_width_980" style="padding: 0px 0 0 24px">
+
+			<fieldset id="templates_set" class="templates_set basicfields_set" style="margin:0px 0px 24px 0px; padding:0 16px 16px 16px !important;">
+				<legend><?php echo JText::_( 'FLEXI_DISPLAYING' ); ?></legend>
 				
-			<?php
-			echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
-			$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
-			foreach ($this->tmpls as $tmplname => $tmpl) :
-				$fieldSets = $tmpl->params->getFieldsets($groupname);
-				foreach ($fieldSets as $fsname => $fieldSet) :
-					$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-					echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$fsname.'-options');
-					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
-					endif;
-					?>
-					<fieldset class="panelform">
-						<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
-							$fieldname =  $field->__get('fieldname');
-							$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->attribs[$fieldname]);
-							echo $tmpl->params->getLabel($fieldname, $groupname);
-							echo
-								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
-									str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-										$tmpl->params->getInput($fieldname, $groupname, $value)
-									)
-								);
-						endforeach; ?>
+				<?php
+				echo '<span class="fc-warning fc-nobgimage fc-mssg-inline" style="margin: 0px 0px 0px 0px !important; font-size:12px; min-width:100%; box-sizing:border-box;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
+				?>
+				<br/>
+				<ol style="margin:0 0 0 16px; padding:0;">
+					<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
+					<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
+				</ol>
+				<br/>
+				</span>
+				<span class="fc-note fc-nobgimage fc-mssg-inline" style="margin: 8px 0px 0px 0px !important; font-size:12px; min-width:100%; box-sizing:border-box;">
+				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
+				</span>
+				<div class="clear"></div>
+				
+				<?php
+				foreach ($this->form->getFieldset('themes') as $field) :
+					$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
+						$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+					echo '
+					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						'.($field->label && empty($field->hidden) ? '
+							<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+							<span class="container_fcfield">'.$field->input.'</span>
+						' : $field->input).'
 					</fieldset>
-				<?php endforeach; //fieldSets ?>
-			<?php endforeach; //tmpls ?>
+					';
+				endforeach;
+				
+				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
+				foreach ($this->tmpls as $tmplname => $tmpl) :
+					$fieldSets = $tmpl->params->getFieldsets($groupname);
+					foreach ($fieldSets as $fsname => $fieldSet) :
+						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
+						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$fsname.'-options');
+						if (isset($fieldSet->description) && trim($fieldSet->description)) :
+							echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+						endif;
+						?>
+						<fieldset class="panelform">
+							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
+								$fieldname =  $field->__get('fieldname');
+								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->attribs[$fieldname]);
+								echo $tmpl->params->getLabel($fieldname, $groupname);
+								echo
+									str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+										str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+											$tmpl->params->getInput($fieldname, $groupname, $value)
+										)
+									);
+							endforeach; ?>
+						</fieldset>
+					<?php endforeach; //fieldSets ?>
+				<?php endforeach; //tmpls ?>
+				
+				<?php echo JHtml::_('sliders.end'); ?>
+			</fieldset>
+
+		</div>
+	</div>
+
+	<div class="fctabber fields_tabset" id="field_specific_props_tabset">
+		
+		<div class="tabbertab" id="core_fields-options" data-icon-class="icon-cogs" >
+			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CORE_FIELDS'); ?> </h3>
 			
-			<?php echo JHtml::_('sliders.end'); ?>
-			</td>
-		</tr>
-	</table>
+			<?php
+			//echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+			$fieldSets = $this->form->getFieldsets('attribs');
+			$prefix_len = strlen('customize_field-');
+			foreach ($fieldSets as $fsname => $fieldSet) :
+				if ( substr($fsname, 0, $prefix_len)!='customize_field-' ) continue;
+				
+				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
+				//echo JHtml::_('sliders.panel',JText::_($label), $fsname.'-options');
+				if (isset($fieldSet->description) && trim($fieldSet->description)) :
+					echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+				endif;
+				
+				foreach ($this->form->getFieldset($fsname) as $field) :
+					$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
+						$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+					echo '
+					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						'.($field->label ? '
+							<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+							<span class="container_fcfield">'.$field->input.'</span>
+						' : $field->input).'
+					</fieldset>
+					';
+				endforeach;
+			endforeach;
+			//echo JHtml::_('sliders.end');
+			?>
+		</div>
+
+		<?php
+		//echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+		$fieldSets = $this->form->getFieldsets('attribs');
+		$prefix_len = strlen('customize_field-');
+		foreach ($fieldSets as $fsname => $fieldSet) :
+			if ( $fsname=='themes' || substr($fsname, 0, $prefix_len)=='customize_field-' ) continue;
+			
+			$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
+?>
+		<div class="tabbertab" id="<?php echo $fsname; ?>-options" data-icon-class="<?php echo isset($fieldSet->icon_class) ? $fieldSet->icon_class : 'icon-pencil';?>" >
+			<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
+<?php
+			//echo JHtml::_('sliders.panel',JText::_($label), $fsname.'-options');
+			if (isset($fieldSet->description) && trim($fieldSet->description)) :
+				echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+			endif;
+			
+			foreach ($this->form->getFieldset($fsname) as $field) :
+				$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
+					$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+				echo '
+				<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+					'.($field->label ? '
+						<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+						<span class="container_fcfield">'.$field->input.'</span>
+					' : $field->input).'
+				</fieldset>
+				';
+			endforeach;
+		?>
+		</div>
+		
+		<?php endforeach;
+		//echo JHtml::_('sliders.end');
+		?>
+	
+	</div>
 
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
@@ -179,6 +255,11 @@ defined('_JEXEC') or die('Restricted access');
 <input type="hidden" name="task" value="" />
 </form>
 </div>
+
+<span class="fc-info fc-nobgimage fc-mssg" style="display:block; float:left; clear:both; margin: 32px 0px 32px 0px !important; font-size:12px;">
+	<?php echo str_replace('<br/>', ' ', JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS')); ?>
+</span>
+
 
 <?php
 //keep session alive while editing

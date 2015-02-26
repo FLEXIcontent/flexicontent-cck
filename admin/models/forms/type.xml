@@ -2,13 +2,13 @@
 <form>
 	<field name="id" type="hidden" default="0" label="JGLOBAL_FIELD_ID_LABEL" description ="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" />
 	<field name="asset_id" type="hidden" filter="unset" />
-	<field name="name" type="text" label="FLEXI_TYPE_NAME" description="JFIELD_TITLE_DESC" class="inputbox required" size="40" required="true" />
-	<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" />
-	<field name="published" type="radio" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC" class="btn-group btn-group-yesno">
+	<field name="name" type="text" label="FLEXI_TYPE_NAME" description="JFIELD_TITLE_DESC" class="inputbox required" size="40" required="true" labelclass="label" />
+	<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" labelclass="label" />
+	<field name="published" type="radio" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC" labelclass="label" class="btn-group btn-group-yesno">
 		<option value="1">JPUBLISHED</option>
 		<option value="0">JUNPUBLISHED</option>
 	</field>
-	<field name="itemscreatable" type="radio" default="0" label="FLEXI_PERMIT_SUBMISSION" description="FLEXI_PERMIT_SUBMISSION_DESC" class="btn-group btn-group-yesno">
+	<field name="itemscreatable" type="radio" default="0" label="FLEXI_PERMIT_SUBMISSION" description="FLEXI_PERMIT_SUBMISSION_DESC" labelclass="label" class="btn-group group-fcmethod">
 		<option value="0">FLEXI_ANY_AUTHOR</option>
 		<option value="1">FLEXI_USE_ACL_TO_HIDE</option>
 		<option value="2">FLEXI_USE_ACL_TO_DISABLE</option>
@@ -16,19 +16,232 @@
 	
 	<field name="checked_out" type="hidden" filter="unset" />
 	<field name="checked_out_time" type="hidden" filter="unset" />	
-	<field id="access" name="access" type="accesslevel" label="JField_Access_Label" description="JField_Access_Desc" class="inputbox" size="1" default="" />
+	<field id="access" name="access" type="accesslevel" label="JField_Access_Label" description="JField_Access_Desc" class="inputbox" size="1" default="" labelclass="label" />
 	<field name="rules" type="rules" label="COM_CONTENT_FIELD_RULES_DESC" description="COM_CONTENT_FIELD_RULES_DESC" class="inputbox" filter="rules" component="com_flexicontent" section="type" />
 	
 	<fields name="attribs">
 		
-		<fieldset name="basic">
+		<!--FLEXI_TYPE_DESC_CUSTOMIZE--><!--FLEXI_TYPE_FIELDS1_CUSTOMIZE--><!--FLEXI_TYPE_FIELDS2_CUSTOMIZE-->s
+
+		<fieldset name="customize_field-title" label="FLEXI_TITLE">
+		
+			<field name="" type="separator" default="FLEXI_FIELD_TITLE" level="level1" />
+			<field name="title_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="title_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="title_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="title_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
-			<field name="" type="separator" default="Item form" level="level1" menu="hide" />
+		</fieldset>
+		<fieldset name="customize_field-description" label="FLEXI_DESCRIPTION">
+			
+			<field name="" type="separator" default="FLEXI_DESCRIPTION" level="level1" />
+			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level2" />
+			<field name="maintext_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="maintext_label" type="text" default="" size="60" label="FLEXI_MAINTEXT_LABEL" description="FLEXI_MAINTEXT_LABEL_DESC" />
+			<field name="maintext_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="maintext_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2" />
+			<field name="hide_maintext" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="display_maintext">FLEXI_NO</option>
+				<option value="1" show_list="display_maintext" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="maintext_hide_html" type="radio" default="" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC" depend_class="display_maintext" class="btn-group group-fcsuccess">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HTML_EDITOR</option>
+				<option value="1">FLEXI_SIMPLE_TEXTAREA</option>
+			</field>
+			<field name="maintext_height" type="text" default="400" size="2" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" depend_class="display_maintext" />
+			
+		</fieldset>
+		<fieldset name="customize_field-categories" label="FLEXI_CATEGORIES">
+			
+			<field name="" type="separator" default="FLEXI_CATEGORIES" level="level1" />
+			<field name="categories_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="categories_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="categories_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="categories_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+		</fieldset>
+		<fieldset name="customize_field-created" label="FLEXI_FIELD_CREATED" icon_class="icon-calendar">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_CREATED" level="level1" />
+			<field name="created_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="created_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="created_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="created_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+		</fieldset>
+		<fieldset name="customize_field-created_by" label="FLEXI_FIELD_CREATED_BY" icon_class="icon-user">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_CREATED_BY" level="level1" />
+			<field name="created_by_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="created_by_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="created_by_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="created_by_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+		</fieldset>
+		<fieldset name="customize_field-modified" label="FLEXI_FIELD_MODIFIED" icon_class="icon-calendar">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_MODIFIED" level="level1" />
+			<field name="modified_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="modified_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="modified_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="modified_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+		</fieldset>
+		<fieldset name="customize_field-modified_by" label="FLEXI_FIELD_MODIFIED_BY" icon_class="icon-user">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_MODIFIED_BY" level="level1" />
+			<field name="modified_by_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="modified_by_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="modified_by_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="modified_by_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+		</fieldset>
+		<fieldset name="customize_field-document_type" label="FLEXI_FIELD_DOCUMENT_TYPE" icon_class="icon-briefcase">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_DOCUMENT_TYPE" level="level1" />
+			<field name="document_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="document_type_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="document_type_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="document_type_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+		</fieldset>
+		<fieldset name="customize_field-hits" label="FLEXI_FIELD_HITS">
+		
+			<field name="" type="separator" default="FLEXI_FIELD_HITS" level="level1" />
+			<field name="hits_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="hits_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="hits_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="hits_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+		</fieldset>
+		<fieldset name="customize_field-version" label="FLEXI_FIELD_VERSION">
+		
+			<field name="" type="separator" default="FLEXI_FIELD_VERSION" level="level1" />
+			<field name="version_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="version_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="version_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="version_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+		</fieldset>
+		<fieldset name="customize_field-state" label="FLEXI_FIELD_STATE">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_STATE" level="level1" />
+			<field name="state_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="state_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="state_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="state_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+		</fieldset>
+		<fieldset name="customize_field-voting" label="FLEXI_FIELD_VOTING">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_VOTING" level="level1" />
+			<field name="voting_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="voting_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="voting_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="voting_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="voting_counter" type="radio" default="" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+				<option value="2">FLEXI_FIELD_VOTE_DISABLE_IN_EXTRA_VOTES</option>
+				<option value="3">FLEXI_FIELD_VOTE_DISABLE_IN_MAIN_VOTE</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_EXTRA_VOTES" level="level2" />
+			<field name="voting_override_extra_votes" type="radio" default="" label="FLEXI_OVERRIDE_VOTE_EXTRA" description="FLEXI_OVERRIDE_VOTE_EXTRA_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="voting_extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_EXTRA" description="FLEXI_FIELD_VOTE_EXTRA_DESC" />
+			<field name="voting_main_label" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
+			
+		</fieldset>
+		<fieldset name="customize_field-favourites" label="FLEXI_FIELD_FAVOURITES">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_FAVOURITES" level="level1" />
+			<field name="favourites_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="favourites_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="favourites_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="favourites_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+		</fieldset>
+		<fieldset name="customize_field-tags" label="FLEXI_FIELD_TAGS">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_TAGS" level="level1" />
+			<field name="tags_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="tags_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="tags_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="tags_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+	
+		</fieldset>
+		<fieldset name="editing" label="FLEXI_AUTHORING" icon_class="icon-lock">
+			
+			<field name="" type="separator" default="FLEXI_AUTHORING" level="level1" menu="hide" />
 			
 			<field name="" type="separator" default="Main category" level="level2" menu="hide" />
 			<field name="catid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
-				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be used for selecting main category" />
+				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be used for selecting main category" labelclass="label-success" />
 			<field name="catid_allowed_parent_disable" type="radio" default="1" label="Disable subtree parent" description="Usually you would want to disable selecting the root category of the category subtree" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -40,7 +253,7 @@
 			<field name="" type="separator" default="Secondary categories" level="level2" menu="hide" />
 			<field name="cid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
-				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be allowed to be used for selecting secondary categories" />
+				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be allowed to be used for selecting secondary categories" labelclass="label-success" />
 			<field name="cid_allowed_parent_disable" type="radio" default="1" label="Disable subtree parent" description="Usually you would want to disable selecting the root category of the category subtree" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -50,12 +263,14 @@
 				default="" label="Default categories" description="Select the default secondary categories" />
 			
 			<field name="" type="separator" default="Item layout" level="level2" menu="hide" />
-			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" />
+			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" labelclass="label-success"/>
 			
+		</fieldset>
+		<fieldset name="viewing" label="FLEXI_ITEM_VIEW" icon_class="icon-eye-open">
 			
-			<field name="" type="separator" default="Item view" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level0" menu="hide" />
 			
-			<field name="" type="separator" default="Menu Item" level="level2" menu="hide" />
+			<field name="" type="separator" default="Menu Item" level="level1" menu="hide" />
 			<field name="type_menu_itemid" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_TYPE_MENU_ITEM_FOR_URLS" description="FLEXI_TYPE_MENU_ITEM_FOR_URLS_DESC" />
 			<field name="type_menu_itemid_usage" type="radio" default="0" label="FLEXI_TYPE_MENU_ITEM_USAGE" description="FLEXI_TYPE_MENU_ITEM_USAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NONE</option>
@@ -63,7 +278,7 @@
 				<option value="2">FLEXI_TYPE_MENU_ITEM_AFTER_CAT</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_TYPE_CONTENT_CONF" level="level2"  />		
+			<field name="" type="separator" default="FLEXI_TYPE_CONTENT_CONF" level="level1" />		
 			<field name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -85,7 +300,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_TYPE_ICONS_CONF" level="level2"  />
+			<field name="" type="separator" default="FLEXI_TYPE_ICONS_CONF" level="level1" />
 			<!--field name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
@@ -112,194 +327,11 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
-			<!--field name="" type="separator" default="FLEXI_PDF_VIEW_CONF" level="level2"  />
+			<!--field name="" type="separator" default="FLEXI_PDF_VIEW_CONF" level="level2" />
 			<field name="pdf_format_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_PDF_FORMAT_FIELDS" description="FLEXI_PDF_FORMAT_FIELDS_DESC"  /-->
-			
-		</fieldset>
-		
-		<fieldset name="type_desc_customize" label="FLEXI_TYPE_DESC_CUSTOMIZE">
-		
-			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level2"  />
-			<field name="maintext_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="maintext_label" type="text" default="" size="60" label="FLEXI_MAINTEXT_LABEL" description="FLEXI_MAINTEXT_LABEL_DESC" />
-			<field name="maintext_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="maintext_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			<!-- TODO ADD/IMPLEMENT FOR other CORE Fields -->
-			<field name="hide_maintext" type="radio" default="0" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2"  />
-			<field name="maintext_hide_html" type="radio" default="" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_HTML_EDITOR</option>
-				<option value="1">FLEXI_SIMPLE_TEXTAREA</option>
-			</field>
-			<field name="maintext_height" type="text" default="400" size="2" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
-			
-		</fieldset>
-		
-		<fieldset name="type_fields1_customize" label="FLEXI_TYPE_FIELDS1_CUSTOMIZE">
-		
-			<field name="" type="separator" default="FLEXI_FIELD_TITLE" level="level2"  />
-			<field name="title_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="title_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="title_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="title_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_CATEGORIES" level="level2"  />
-			<field name="categories_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="categories_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="categories_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="categories_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_CREATED" level="level2"  />
-			<field name="created_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="created_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="created_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="created_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_CREATED_BY" level="level2"  />
-			<field name="created_by_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="created_by_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="created_by_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="created_by_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_MODIFIED" level="level2"  />
-			<field name="modified_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="modified_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="modified_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="modified_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_MODIFIED_BY" level="level2"  />
-			<field name="modified_by_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="modified_by_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="modified_by_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="modified_by_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_DOCUMENT_TYPE" level="level2"  />
-			<field name="document_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="document_type_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="document_type_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="document_type_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 				
-		</fieldset>
-		
-		<fieldset name="type_fields2_customize" label="FLEXI_TYPE_FIELDS2_CUSTOMIZE">
-		
-			<field name="" type="separator" default="FLEXI_FIELD_HITS" level="level2"  />
-			<field name="hits_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="hits_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="hits_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="hits_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_VERSION" level="level2"  />
-			<field name="version_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="version_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="version_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="version_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_STATE" level="level2"  />
-			<field name="state_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="state_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="state_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="state_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_VOTING" level="level2"  />
-			<field name="voting_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="voting_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="voting_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="voting_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			<field name="voting_counter" type="radio" default="" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_DISABLE</option>
-				<option value="1">FLEXI_ENABLE</option>
-				<option value="2">FLEXI_FIELD_VOTE_DISABLE_IN_EXTRA_VOTES</option>
-				<option value="3">FLEXI_FIELD_VOTE_DISABLE_IN_MAIN_VOTE</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_EXTRA_VOTES" level="level3"  />
-			<field name="voting_override_extra_votes" type="radio" default="" label="FLEXI_OVERRIDE_VOTE_EXTRA" description="FLEXI_OVERRIDE_VOTE_EXTRA_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="voting_extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_EXTRA" description="FLEXI_FIELD_VOTE_EXTRA_DESC" />
-			<field name="voting_main_label" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
-			
-			<field name="" type="separator" default="FLEXI_FIELD_FAVOURITES" level="level2"  />
-			<field name="favourites_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="favourites_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="favourites_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="favourites_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_FIELD_TAGS" level="level2"  />
-			<field name="tags_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="tags_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="tags_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="tags_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-	
-		</fieldset>
-		
-		<fieldset name="seo_conf" label="FLEXI_SEO_CONF">
-			
-			<field name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level2"  />
+			<field name="" type="separator" default="FLEXI_SEO" level="level1" />
+			<field name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level2" />
 			<field name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -309,7 +341,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_TYPE_SEO_OTHER" level="level2"  />
+			<field name="" type="separator" default="FLEXI_TYPE_SEO_OTHER" level="level2" />
 			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -322,17 +354,17 @@
 			</field-->
 			
 		</fieldset>
-		
-		<fieldset name="search_view" label="FLEXI_SEARCH_VIEW_CONF">
+		<fieldset name="search_view" label="FLEXI_SEARCH_VIEW_CONF" icon_class="icon-search">
 			
+			<field name="" type="separator" default="FLEXI_SEARCH_VIEW_CONF" level="level1" />
+			<field name="" type="separator" default="Search view can do &lt;b&gt;text search&lt;/b&gt; and &lt;b&gt;filtering&lt;/b&gt;, differently per content type, &lt;br/&gt; -- you may set search behaviour here. &lt;br/&gt; &lt;b&gt;NOTE:&lt;/b&gt; these are not used in category-like views (content lists), for these views configure in component / category / menu items" level="level4" menu="hide" />
 			<field name="searchable" type="filters" isadvsearch="1" fieldnameasvalue="1" multiple="false" type_id_variable="cid" default="" label="FLEXI_TYPE_SEARCHABLE_FIELDS" description="FLEXI_TYPE_SEARCHABLE_FIELDS_DESC" />
 			<field name="filters" type="filters" isadvfilter="1" fieldnameasvalue="1" multiple="false" type_id_variable="cid" default="" label="FLEXI_TYPE_FILTERS" description="FLEXI_TYPE_FILTERS_DESC" />
 			
 		</fieldset>
-		
-		<fieldset name="frontend_item_form" label="FLEXI_FRONTEND_ITEM_FORM">
+		<fieldset name="frontend_item_form" label="FLEXI_ITEM_FORM_FE" icon_class="icon-undo">
 			
-			<field name="" label="" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" level="level0" />
+			<field name="" label="" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" level="level1" />
 			
 			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
@@ -486,24 +518,21 @@
 			<field name="form_extra_js_fe" type="textarea" default="" rows="5" cols="36" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" />
 			
 		</fieldset>
-		
-		<fieldset name="backend_item_form" label="FLEXI_BACKEND_ITEM_FORM">
+		<fieldset name="backend_item_form" label="FLEXI_ITEM_FORM_BE" icon_class="icon-redo">
 			
 			<field name="" type="separator" default="FLEXI_STYLING" label="" level="level2" />
 			<field name="form_extra_css_be" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
 			<field name="form_extra_js_be" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" />
 			
 		</fieldset>
-		
-		<fieldset name="frontend_backend_item_form" label="FLEXI_FRONTEND_BACKEND_ITEM_FORM">
+		<fieldset name="frontend_backend_item_form" label="FLEXI_ITEM_FORM_FE_BE" icon_class="icon-loop">
 			
 			<field name="" type="separator" default="FLEXI_STYLING" label="" level="level2" />
 			<field name="form_extra_css" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
 			<field name="form_extra_js" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" />
 			
 		</fieldset>
-		
-		<fieldset name="notifications_conf" label="FLEXI_EMAIL_NOTIFICATIONS_CONF" description="" >
+		<fieldset name="notifications_conf" label="FLEXI_NOTIFICATIONS_CONF" icon_class="icon-mail">
 			
 			<field name="" type="separator" default="FLEXI_CONTENT_NOTIFICATIONS_CONF" label="" level="level1" />
 			
@@ -566,17 +595,17 @@
 			<field name="userlist_notify_existing_reviewal" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" />
 			<field name="text_notify_existing_reviewal" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" />
 			
-		</fieldset>		
-		
-		<fieldset name="items_manager" label="FLEXI_ITEMS_MANAGER_CONF">
+		</fieldset>
+		<fieldset name="items_manager" label="FLEXI_ITEMS_MANAGER" icon_class="icon-list">
 			
-			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC"  />
+			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" />
 			
 		</fieldset>
-		
 		<fieldset name="themes" label="FLEXI_PARAMETERS_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="ilayout" type="itemlayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" onchange="activatePanel(this.value);" />
+			
+			<field name="ilayout" type="itemlayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" onchange="activatePanel(this.value);" labelclass="label-warning"/>
 			<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
+			
 		</fieldset>
 		
 	</fields>

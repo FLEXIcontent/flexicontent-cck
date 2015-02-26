@@ -3,8 +3,12 @@
  * Small labels
  **************/
  
-.label, .badge, .flexicontent label.label {
-	margin: 0px 2px 2px 4px !important;
+.flexicontent .label,
+.flexicontent .badge,
+.flexicontent span.label,
+.flexicontent label.label {
+	margin: 0px 2px 2px 4px;
+	display: inline-block;
 }
 .label.highlight, .badge.highlight {
 	color: darkred;

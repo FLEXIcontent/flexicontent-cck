@@ -766,36 +766,6 @@ function submitbutton(pressbutton) {
 	</table>
 
 
-<?php
-if (FLEXI_ACCESS) :
-$this->document->addScriptDeclaration("
-	window.addEvent('domready', function() {
-	var slideaccess = new Fx.Slide('tabacces');
-	var slidenoaccess = new Fx.Slide('notabacces');
-	slideaccess.hide();
-		$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
-			slideaccess.toggle();
-			slidenoaccess.toggle();
-			});
-		});
-	");
-?>
-<fieldset class="flexiaccess">
-	<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-	<table id="tabacces" class="admintable" width="100%">
-	<tr>
-		<td>
-		<div id="access"><?php echo $this->lists['access']; ?></div>
-	</td>
-	</tr>
-</table>
-	<div id="notabacces">
-	<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-</div>
-</fieldset>
-<?php endif; ?>
-
-
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <?php if (!$this->row->url) : ?>

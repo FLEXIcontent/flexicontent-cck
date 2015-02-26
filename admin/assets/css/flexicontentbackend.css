@@ -1,6 +1,15 @@
 @import url('../../../../../components/com_flexicontent/assets/css/flexi_form.css');
 @import url('../../../../../components/com_flexicontent/assets/css/flexi_containers.css');
 @import url('../../../../../components/com_flexicontent/assets/css/flexi_shared.css');
+
+.flexicontent [class^="icon-"]:before, .flexicontent [class*=" icon-"]:before {
+	font-size: 14px;
+	vertical-align: bottom;
+}
+.flexicontent [class^="icon-"], .flexicontent [class*=" icon-"] {
+	width: 16px;
+}
+
 /***********
 HEADER ICONS
 ************/
