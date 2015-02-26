@@ -64,15 +64,15 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		{
 			if ($field->value) {
 				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row ));
-				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFieldValue', array( &$field, $row ));
+				$field_type = $field->iscore ? 'core' : $field->field_type;
+				FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFieldValue', array( &$field, $row ));
 			} else {
 				$field->display = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 			}
 			if ($field->version) {
 				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
-				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
+				$field_type = $field->iscore ? 'core' : $field->field_type;
+				FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
 			} else {
 				$field->displayversion = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 			}

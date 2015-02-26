@@ -166,6 +166,7 @@
 
 <additional>
 	<plugin name="addressint"       folder="plugins/flexicontent_fields/addressint"       instfolder="flexicontent_fields">FLEXIcontent - International Address / Google Maps</plugin>
+	<plugin name="fieldgroup"       folder="plugins/flexicontent_fields/fieldgroup"       instfolder="flexicontent_fields">FLEXIcontent - Fieldgroup (Multivalued field that groups other fields)</plugin>
 	<plugin name="checkbox"         folder="plugins/flexicontent_fields/checkbox"         instfolder="flexicontent_fields">FLEXIcontent - Checkbox</plugin>
 	<plugin name="checkboximage"    folder="plugins/flexicontent_fields/checkboximage"    instfolder="flexicontent_fields">FLEXIcontent - Checkbox Image</plugin>
 	<plugin name="core"             folder="plugins/flexicontent_fields/core"             instfolder="flexicontent_fields">FLEXIcontent - Core Fields (Joomla article properties)</plugin>

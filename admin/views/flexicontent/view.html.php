@@ -465,14 +465,14 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 				$check['released'] = $released->data();
 				$check['connect']  = 1;
 				$check['enabled']  = 1;
-				$check['current']  = version_compare( $check['current_version'], $check['version'] );
+				$check['current']  = version_compare( str_replace(' ', '', $check['current_version']), str_replace(' ', '', $check['version']) );
 			} else {
 				$xml = JFactory::getXML($data, $isFile=false);
 				$check['version']  = (string)$xml->version;
 				$check['released'] = (string)$xml->released;
 				$check['connect']  = 1;
 				$check['enabled']  = 1;
-				$check['current']  = version_compare( $check['current_version'], $check['version'] );
+				$check['current']  = version_compare( str_replace(' ', '', $check['current_version']), str_replace(' ', '', $check['version']) );
 			}
 		}
 		
