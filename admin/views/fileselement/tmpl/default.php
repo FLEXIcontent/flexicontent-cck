@@ -40,13 +40,13 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 	?>
 	
 	<!-- File(s) by uploading -->
-	
+
 	<?php if ($this->CanUpload):
 		echo FLEXI_J16GE ?
 			JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
 			$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
 	?>
-	
+
 	<!-- File Upload Form -->
 	<fieldset class="filemanager-tab" >
 		<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>

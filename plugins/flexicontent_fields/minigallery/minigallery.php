@@ -106,7 +106,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
 			
-			function qfSelectFile".$field->id."(id, file)
+			function qfSelectFile".$field->id."(obj, id, file)
 			{
 				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
 				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
