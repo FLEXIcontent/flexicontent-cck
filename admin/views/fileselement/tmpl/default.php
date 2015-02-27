@@ -320,6 +320,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 				$thumb_or_icon = "<img src=\"$thumb_or_icon\" alt=\"$display_filename\" />";
 			}
 			$file_preview = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&w='.$this->thumb_w.'&h='.$this->thumb_h;
+			$file_preview2 = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&w=120&h=90';
 			if ($this->folder_mode) {
 				$img_assign_link = "window.parent.qmAssignFile".$this->fieldid."('".$this->targetid."', '".$filename."', '".$file_preview."');";
 			} else {
@@ -347,7 +348,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 			</td>
 			<td align="left">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' );?>::<?php echo $row->filename; ?>">
-					<a style="cursor:pointer" id="file<?php echo $row->id;?>" rel="<?php echo $filename; ?>" onclick="<?php echo $img_assign_link; ?>">
+					<a style="cursor:pointer" id="file<?php echo $row->id;?>" prv="<?php echo $file_preview2;?>" rel="<?php echo $filename; ?>" onclick="<?php echo $img_assign_link; ?>">
 					<?php 
 							if (JString::strlen($row->filename) > 100) {
 								echo JString::substr( htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
