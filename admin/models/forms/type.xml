@@ -498,15 +498,15 @@
 			<field name="" type="separator" default="FLEXI_NOT_PLACED_FIELDS_AND_DISABLING" label="" level="level4" menu="hide" />
 			
 			<field name="form_tabs_above"   type="textarea" default="" rows="1" cols="60" label="FLEXI_ABOVE_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
-			<field name="form_tabs_below"   type="textarea" default="" rows="1" cols="60" label="FLEXI_BELOW_TABS" description="FLEXI_TEMPLATE_FORM_TAB_DESC" />
+			<field name="form_tabs_below"   type="textarea" default="" rows="1" cols="60" label="FLEXI_BELOW_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
 			
 			<field name="form_tab01_fields" type="textarea" default="" rows="1" cols="60" label="TAB 1" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
 			<field name="form_tab02_fields" type="textarea" default="" rows="1" cols="60" label="TAB 2" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
 			<field name="form_tab03_fields" type="textarea" default="" rows="1" cols="60" label="TAB 3" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
 			<field name="form_tab04_fields" type="textarea" default="" rows="1" cols="60" label="TAB 4" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
-			<field name="form_tab05_fields" type="textarea" default="" rows="1" cols="60" label="TAB 5" description="FLEXI_META_SEO_FORM_TAB_DESC" />
-			<field name="form_tab06_fields" type="textarea" default="" rows="1" cols="60" label="TAB 6" description="FLEXI_DISPLAYING_FORM_TAB_DESC" />
-			<field name="form_tab07_fields" type="textarea" default="" rows="1" cols="60" label="TAB 7" description="FLEXI_TEMPLATE_FORM_TAB_DESC" />
+			<field name="form_tab05_fields" type="textarea" default="" rows="1" cols="60" label="TAB 5" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
+			<field name="form_tab06_fields" type="textarea" default="" rows="1" cols="60" label="TAB 6" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
+			<field name="form_tab07_fields" type="textarea" default="" rows="1" cols="60" label="TAB 7" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
 			
 			<field name="" type="separator" default="FLEXI_PLACEMENT_VIA_FIELDS_MANAGER" label="" level="level3" />
 			<field name="form_tabs_fieldsman" type="textarea" default="" rows="6" cols="60" label="FLEXI_HANDLED_BY_FIELDS_MANAGER" description="FLEXI_HANDLED_BY_FIELDS_MANAGER_DESC" />

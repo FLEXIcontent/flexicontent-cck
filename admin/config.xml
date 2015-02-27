@@ -1213,20 +1213,18 @@
 			<field name="" type="separator" default="FLEXI_NOT_PLACED_FIELDS_AND_DISABLING" label="" level="level4" menu="hide" />
 			
 			<field name="form_tabs_above"   type="textarea" default="title, alias, category, lang, type, state, disable_comments, notify_subscribers" rows="1" cols="60" label="FLEXI_ABOVE_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
-			<field name="form_tabs_below"   type="textarea" default="_skip_" rows="1" cols="60" label="FLEXI_BELOW_TABS" description="FLEXI_TEMPLATE_FORM_TAB_DESC" menu="hide" />
+			<field name="form_tabs_below"   type="textarea" default="_skip_" rows="1" cols="60" label="FLEXI_BELOW_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
 			
 			<field name="form_tab01_fields" type="textarea" default="maintext" rows="1" cols="60" label="TAB 1" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
 			<field name="form_tab02_fields" type="textarea" default="fields_manager" rows="1" cols="60" label="TAB 2" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
 			<field name="form_tab03_fields" type="textarea" default="categories, tags, language, perms" rows="1" cols="60" label="TAB 3" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
 			<field name="form_tab04_fields" type="textarea" default="timezone_info, created, created_by, created_by_alias, publish_up, publish_down, access" rows="1" cols="60" label="TAB 4" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
-			<field name="form_tab05_fields" type="textarea" default="metadata, seoconf" rows="1" cols="60" label="TAB 5" description="FLEXI_META_SEO_FORM_TAB_DESC" menu="hide" />
-			<field name="form_tab06_fields" type="textarea" default="display_params" rows="1" cols="60" label="TAB 6" description="FLEXI_DISPLAYING_FORM_TAB_DESC" menu="hide" />
-			<field name="form_tab07_fields" type="textarea" default="layout_selection, layout_params" rows="1" cols="60" label="TAB 7" description="FLEXI_TEMPLATE_FORM_TAB_DESC" menu="hide" />
+			<field name="form_tab05_fields" type="textarea" default="metadata, seoconf" rows="1" cols="60" label="TAB 5" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
+			<field name="form_tab06_fields" type="textarea" default="display_params" rows="1" cols="60" label="TAB 6" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
+			<field name="form_tab07_fields" type="textarea" default="layout_selection, layout_params" rows="1" cols="60" label="TAB 7" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_PLACEMENT_VIA_FIELDS_MANAGER" label="" level="level3" menu="hide" />
-			
 			<field name="form_tabs_fieldsman" type="textarea" default="" rows="6" cols="60" label="FLEXI_HANDLED_BY_FIELDS_MANAGER" description="FLEXI_HANDLED_BY_FIELDS_MANAGER_DESC" />
-			
 			
 			<field name="" type="separator" default="FLEXI_STYLING" label="" level="level1" menu="hide" />
 			

@@ -91,12 +91,15 @@ class FlexicontentViewField extends JViewLegacy
 		if ( property_exists ($classname, 'prior_to_version') ) {
 			$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
 			$com_xml = JApplicationHelper::parseXMLInstallFile( $manifest_path );
-			if (version_compare( str_replace(' ', '.', $com_xml['version']), str_replace(' ', '.', $classname::$prior_to_version), '>=')) {
-				echo '
-				<span class="fc-note fc-nobgimage fc-mssg">
-					Warning: installed version of Field: \'<b>'.$extname.'</b>\' was meant for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.' <br/> It may or may not work properly in later versions<br/>
+			$ver_exceeded = version_compare( str_replace(' ', '.', $com_xml['version']), str_replace(' ', '.', $classname::$prior_to_version), '>=');
+			if ($ver_exceeded) echo '
+				<span class="fc-note fc-mssg">
+					Warning: installed version of Field: \'<b>'.$extname.'</b>\' was meant for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.' <br/> It may or may not work properly in later versions
 				</span>';
-			}
+			else echo '
+				<span class="fc-note fc-mssg">
+					Note: installed version of Field: \'<b>'.$extname.'</b>\' is meant for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.', &nbsp; and it is given freely in BETA versions prior to: '.$classname::$prior_to_version.', &nbsp; nevertheless it will continue to function after FLEXIcontent is upgraded.
+				</span>';
 		}
 		
 		// load plugin's english language file then override with current language file

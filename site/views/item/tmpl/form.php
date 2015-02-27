@@ -618,8 +618,7 @@ else:
 endif;
 
 
-
-ob_start();  // categories ?>
+if ($secondary_displayed || !empty($this->lists['featured_cid']) || !isset($all_tab_fields['category'])) : ob_start();  // categories ?>
 	<fieldset class="basicfields_set" id="fcform_categories_container">
 		<legend>
 			<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
@@ -654,7 +653,7 @@ ob_start();  // categories ?>
 			</div>
 		<?php endif; ?>
 	</fieldset>
-<?php $captured['categories'] = ob_get_clean();
+<?php $captured['categories'] = ob_get_clean(); endif;
 
 
 
@@ -1164,7 +1163,7 @@ if ($this->fields && $typeid) :
 			// SKIP frontend hidden fields from this listing
 			if ( $field->iscore &&  isset($tab_fields['fman'][ $field->field_type ]) ) {
 				if ( !isset($captured[ $field->field_type ]) ) continue;
-				echo $captured[ $field->field_type ];
+				echo $captured[ $field->field_type ]; unset($captured[ $field->field_type ]);
 				echo "\n<div class='fcclear'></div>\n";
 				continue;
 			} else if (
@@ -1189,7 +1188,7 @@ if ($this->fields && $typeid) :
 				$props_type = $field->parameters->get('props_type');
 				if ( isset($tab_fields['fman'][$props_type]) ) {
 					if ( !isset($captured[ $props_type ]) ) continue;
-					echo $captured[ $props_type ];
+					echo $captured[ $props_type ]; unset($captured[ $props_type ]);
 					echo "\n<div class='fcclear'></div>\n";
 				}
 				continue;
@@ -1605,6 +1604,7 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 		<?php echo $captured[$fn]; unset($captured[$fn]); ?>
 	<?php endforeach; ?>
 	
+	<?php /* ALSO print any fields that were not placed above, this list may contain fields zero-length HTML which is OK */ ?>
 	<?php foreach($captured as $fn => $i) : ?>
 		<div class="fcclear"></div>
 		<?php echo $captured[$fn]; unset($captured[$fn]); ?>
