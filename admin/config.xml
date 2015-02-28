@@ -1109,12 +1109,16 @@
 			<field name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level2" menu="hide" />
-			<field name="use_captcha" type="radio" default="1" label="FLEXI_USER_TYPE" description="FLEXI_USER_TYPE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NEVER</option>
-				<option value="1">FLEXI_GUESTS_RECOMMENEDED</option>
-				<option value="2">FLEXI_ANY_USER</option>
+			<field name="use_captcha" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_USE_CAPTCHA" description="FLEXI_USE_CAPTCHA_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp_captcha">FLEXI_DISABLE</option>
+				<option value="1" show_list="disp_captcha" hide_list="">FLEXI_GUESTS_RECOMMENEDED</option>
+				<option value="2" show_list="disp_captcha" hide_list="">FLEXI_ANY_USER</option>
 			</field>
-			<field name="captcha_formop" type="radio" default="0" label="FLEXI_OPERATION_TYPE" description="FLEXI_OPERATION_TYPE_DESC" menu="hide" class="btn-group group-fcinfo">
+			<field name="captcha" type="plugins" folder="captcha" default="" label="FLEXI_CAPTCHA_PLG" description="FLEXI_CAPTCHA_PLG_DESC" filter="cmd" class="disp_captcha">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="0">JOPTION_DO_NOT_USE</option>
+			</field>
+			<field name="captcha_formop" type="radio" default="0" label="FLEXI_OPERATION_TYPE" description="FLEXI_OPERATION_TYPE_DESC" menu="hide" class="disp_captcha btn-group group-fcinfo">
 				<option value="0">FLEXI_SUBMIT_RECOMMENDED</option>
 				<option value="1">FLEXI_SUBMIT_EDIT</option>
 			</field>

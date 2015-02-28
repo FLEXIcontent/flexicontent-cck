@@ -635,33 +635,30 @@ class FlexicontentViewItem  extends JViewLegacy
 			
 			// Force using recaptcha
 			if ($display_captcha) {
-				// Try to force the use of recaptcha plugin
-				JFactory::getConfig()->set('captcha', 'recaptcha');
-				
-				if ( !$app->getCfg('captcha') ) {
-					$captcha_errmsg  = '-- Please select <b>CAPTCHA Type</b> at global Joomla parameters';
-				} else if ($app->getCfg('captcha') != 'recaptcha') {
-					$captcha_errmsg  = '-- Captcha Type: <b>'.$app->getCfg('captcha').'</b> not supported';
-				} else if ( ! JPluginHelper::isEnabled('captcha', 'recaptcha') ) {
-					$captcha_errmsg  = '-- Please enable & configure the Joomla <b>ReCaptcha Plugin</b>';
-				} else {
-					$captcha_errmsg  = '';
-					
-					JPluginHelper::importPlugin('captcha');
-					$dispatcher->trigger('onInit','dynamic_recaptcha_1');
-					
-					$label_class  = 'flexi_label';
-					$label_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-					$label_tooltip = flexicontent_html::getToolTip(null, 'FLEXI_CAPTCHA_ENTER_CODE_DESC', 1, 1);
-					
-					$captcha_field = '
-						<label id="recaptcha_response_field-lbl" for="recaptcha_response_field" class="'.$label_class.'" title="'.$label_tooltip.'" >
-						'. JText::_( 'FLEXI_CAPTCHA_ENTER_CODE' ).'
-						</label>
-						<div class="container_fcfield container_fcfield_name_captcha">
-							<div id="dynamic_recaptcha_1"></div>
-						</div>
-						';
+				// Get configured captcha plugin
+				$c_plugin = $params->get('captcha', $app->getCfg('captcha')); // TODO add param to override default
+				if ($c_plugin) {
+					$c_name = 'captcha_response_field';
+					$c_id = 'dynamic_recaptcha_1';
+					$c_class = ' required';
+					$c_namespace = 'fc_item_form';
+					// Try to load the configured captcha plugin, (check if disabled or uninstalled), Joomla will enqueue an error message if needed
+					$captcha_obj = JCaptcha::getInstance($c_plugin, array('namespace' => $c_namespace));
+					if ($captcha_obj) {
+						$captcha_field = $captcha_obj->display($c_name, $c_id, $c_class);
+						$label_class  = 'flexi_label';
+						$label_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+						$label_tooltip = flexicontent_html::getToolTip(null, 'FLEXI_CAPTCHA_ENTER_CODE_DESC', 1, 1);
+						$captcha_field = '
+							<label id="'.$c_name.'-lbl" for="'.$c_name.'" class="'.$label_class.'" title="'.$label_tooltip.'" >
+							'. JText::_( 'FLEXI_CAPTCHA_ENTER_CODE' ).'
+							</label>
+							<div id="container_fcfield_'.$c_plugin.'" class="container_fcfield container_fcfield_name_'.$c_plugin.'">
+								<div class="fcfieldval_container valuebox fcfieldval_container_'.$c_plugin.'">
+								'.$captcha_field.'
+								</div>
+							</div>';
+					}
 				}
 			}
 		}
