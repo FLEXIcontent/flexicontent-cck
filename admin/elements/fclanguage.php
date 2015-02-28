@@ -84,22 +84,20 @@ class JFormFieldFclanguage extends JFormField
 		}
 		
 		// Create HTML tag parameters
-		$attribs = ' style="float:left;" ';
+		$attribs = '';
+		$classes = 'use_select2_lib';
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
-			$attribs .= 'class="inputbox"';
-			$maximize_link = '';
 		}
 		if ($onchange = @$attributes['onchange']) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
+		$attribs .= ' class="'.$classes.'" ';
 		
 		// Render the field's HTML
-		$html = JHTML::_('select.genericlist', $langs, $fieldname, $attribs, 'value', 'text', $values, $element_id);
-		return $html.$maximize_link;
+		return JHTML::_('select.genericlist', $langs, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }
