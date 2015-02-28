@@ -395,7 +395,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// @TODO trigger the plugin selectively
 		// and delete the plugins tags if not active
-		if ($params->get('trigger_onprepare_content_cat')) // just check if the parmeter is active
+		if ($params->get('trigger_onprepare_content_cat')) // just check if the parameter is active
 		{
 			JPluginHelper::importPlugin('content');
 	

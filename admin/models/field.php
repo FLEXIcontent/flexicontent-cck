@@ -607,7 +607,7 @@ class FlexicontentModelField extends JModelAdmin
 		}
 
 		// Trigger the default form events.
-		parent::preprocessForm($form, $data);
+		parent::preprocessForm($form, $data, $plugin_type='_none_');  // by default content plugins are imported, skip them
 	}
 	
 	/**

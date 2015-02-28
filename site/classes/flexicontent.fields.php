@@ -216,7 +216,6 @@ class FlexicontentFields
 		$dispatcher = JDispatcher::getInstance();
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
-		jimport('joomla.html.parameter');
 		
 		foreach ($items as $i => $item)
 		{
@@ -238,44 +237,19 @@ class FlexicontentFields
 			// ONCE per Content Item Type
 			if ( !isset($type_fields[$item->type_id]) )
 			{
-				$select_access = '';
-				$joinaccess = '';
 				// Field's has_access flag
-				if (FLEXI_J16GE) {
-					$aid_arr = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
-					$aid_list = implode(",", $aid_arr);
-					$select_access .= ', CASE WHEN fi.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_access';
-				} else {
-					$aid = $aid!==false ? $aid : $user->get('aid');
-					if (FLEXI_ACCESS) {
-						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"';
-						$select_access .= ', CASE WHEN (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_access';
-					} else {
-						$select_access .= ', CASE WHEN (fi.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_access';
-					}
-				}
-				
-				/*if (FLEXI_J16GE) {
-					$aid_arr = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
-					$aid_list = implode(",", $aid);
-					$andaccess 	= ' AND fi.access IN (0,'.$aid_list.')' ;
-					$joinaccess = '';
-				} else {
-					$aid = $aid!==false ? (int) $aid : (int) $user->get('aid');
-					$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $aid . ')' : ' AND fi.access <= '.$aid ;
-					$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
-				}*/
+				$aid_arr = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
+				$aid_list = implode(",", $aid_arr);
+				$select_access = ', CASE WHEN fi.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_access';
 				
 				$query 	= 'SELECT fi.*'
-						. $select_access
-						. ' FROM #__flexicontent_fields AS fi'
-						. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = '.$item->type_id
-						. $joinaccess
-						. ' WHERE fi.published = 1'
-						//. $andaccess
-						. ' GROUP BY fi.id'
-						. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
-						;
+					. $select_access
+					. ' FROM #__flexicontent_fields AS fi'
+					. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = '.$item->type_id
+					. ' WHERE fi.published = 1'
+					. ' GROUP BY fi.id'
+					. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
+					;
 				$db->setQuery($query);
 				$type_fields[$item->type_id] = $db->loadObjectList('name');
 				//echo "<pre>";  print_r( array_keys($type_fields[$item->type_id]) ); exit;
@@ -285,7 +259,7 @@ class FlexicontentFields
 				$item->fields[$field_name]	= clone($field_data);
 			$item->fields	= $item->fields	? $item->fields	: array();
 			
-			if (!isset($item->parameters)) $item->parameters = FLEXI_J16GE ? new JRegistry($item->attribs) : new JParameter($item->attribs);
+			if (!isset($item->parameters)) $item->parameters = new JRegistry($item->attribs);
 			$item->params		= $item->parameters;
 			
 			$item->text			= $item->introtext . chr(13).chr(13) . $item->fulltext;
@@ -641,6 +615,22 @@ class FlexicontentFields
 			$fcdispatcher = FCDispatcher::getInstance_FC($debug);
 		}
 		
+		
+		// CASE: FLEXIcontent item view:
+		// Set triggering 'context' to 'com_content.article', (and also set the 'view' request variable)
+		if ($view == FLEXI_ITEMVIEW) {
+		  JRequest::setVar('view', 'article');
+		  $context = 'com_content.article';
+		}
+		
+		// ALL OTHER CASES: (FLEXIcontent category, FLEXIcontent module, etc),
+		// Set triggering 'context' to 'com_content.category', (and also set the 'view' request variable)
+		else {
+		  JRequest::setVar('view', 'category');
+		  $context = 'com_content.category';
+		}
+		
+		
 		if ($debug) echo "<br><br>Executing plugins for <b>".$field->name."</b>:<br>";
 		
 		if ( !@$_fields_plgs[$field->name] )
@@ -677,8 +667,9 @@ class FlexicontentFields
 		FLEXIUtilities::suppressPlugins($suppress_arr, 'suppress' );
 		
 		// Initialize field for plugin triggering
-		$field->text = isset($field->{$method}) ? $field->{$method} : '';
-		$field->introtext = $field->text;  // needed by some plugins that do not use or clear ->text property
+		$method_text = isset($field->{$method}) ? $field->{$method} : '';
+		$field->text = $method_text;
+		$field->introtext = $method_text;  // needed by some plugins that do not use or clear ->text property
 		$field->created_by = $item->created_by;
 		$field->title = $item->title;
 		$field->slug = isset($item->slug) ? $item->slug : $item->id;
@@ -689,20 +680,6 @@ class FlexicontentFields
 		$field->id = $item->id;
 		$field->state = $item->state;
 		$field->type_id = $item->type_id;
-
-		// CASE: FLEXIcontent item view:
-		// Set triggering 'context' to 'com_content.article', (and also set the 'view' request variable)
-		if ($view == FLEXI_ITEMVIEW) {
-		  JRequest::setVar('view', 'article');
-		  $context = 'com_content.article';
-		}
-		
-		// ALL OTHER CASES: (FLEXIcontent category, FLEXIcontent module, etc),
-		// Set triggering 'context' to 'com_content.category', (and also set the 'view' request variable)
-		else {
-		  JRequest::setVar('view', 'category');
-		  $context = 'com_content.category';
-		}
 		
 		// Set the 'option' to 'com_content' but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
 		JRequest::setVar('option', 'com_content');
@@ -1193,7 +1170,7 @@ class FlexicontentFields
 		static $tinfo   = array();
 		static $fdata   = array();
 		static $no_typeparams = null;
-		if ($no_typeparams) $no_typeparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+		if ($no_typeparams) $no_typeparams = new JRegistry();
 		static $is_form=null;
 		if ($is_form===null) $is_form = JRequest::getVar('task')=='edit' && JRequest::getVar('option')=='com_flexicontent';
 		
