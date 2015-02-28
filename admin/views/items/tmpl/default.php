@@ -30,6 +30,8 @@ $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &
 $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCitems', $start_text, $end_text);
 
+$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef');
+
 global $globalcats;
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $limit = $this->pagination->limit;
@@ -747,7 +749,10 @@ window.addEvent('domready', function() {
 			<td align="center">
 				<?php
 				$item_link = str_replace('&', '&amp;', FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug, 0, $row));
-				$item_link = JRoute::_(JURI::root().$item_link, $xhtml=false);  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
+				$item_link = !$_sh404sef ?  // Only build SEF preview URLs if SH404SEF is not installed, we do not know how to call SH404SEF in backend
+					JRoute::_(JURI::root().$item_link, $xhtml=false) : // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
+					JURI::root().$item_link;
+				
 				$previewlink = $item_link .'&amp;preview=1' .$autologin;
 				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
 				?>
