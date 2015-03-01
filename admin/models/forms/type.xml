@@ -347,6 +347,13 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="robots" type="radio" label="FLEXI_METADATA_ROBOTS_LABEL" description="FLEXI_METADATA_ROBOTS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="index, follow">JGLOBAL_INDEX_FOLLOW</option>
+				<option value="noindex, follow">JGLOBAL_NOINDEX_FOLLOW</option>
+				<option value="index, nofollow">JGLOBAL_INDEX_NOFOLLOW</option>
+				<option value="noindex, nofollow">JGLOBAL_NOINDEX_NOFOLLOW</option>
+			</field>
 	
 			<!--field name="show_item_navigation" type="radio" default="1" label="Show Navigation" description="PARAMNAVIGATIONARTICLE" class="btn-group btn-group-yesno">
 				<option value="0">Hide</option>
@@ -390,7 +397,7 @@
 			</field>
 			<field name="captcha" type="plugins" folder="captcha" default="" label="FLEXI_CAPTCHA_PLG" description="FLEXI_CAPTCHA_PLG_DESC" filter="cmd">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">JOPTION_DO_NOT_USE</option>
+				<option value="0">FLEXI_DISABLE</option>
 			</field>
 			<field name="captcha_formop" type="radio" default="" label="FLEXI_OPERATION_TYPE" description="FLEXI_OPERATION_TYPE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>

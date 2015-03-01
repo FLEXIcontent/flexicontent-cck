@@ -43,7 +43,7 @@
 			</field>
 			<field name="captcha" type="plugins" folder="captcha" default="" label="FLEXI_CAPTCHA_PLG" description="FLEXI_CAPTCHA_PLG_DESC" filter="cmd">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">JOPTION_DO_NOT_USE</option>
+				<option value="0">FLEXI_DISABLE</option>
 			</field>
 			
 		</fieldset>

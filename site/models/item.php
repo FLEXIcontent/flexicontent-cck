@@ -363,36 +363,26 @@ class FlexicontentModelItem extends ParentClassItem
 		}
 		
 		// Retrieve item's Content Type parameters
-		$query = 'SELECT t.attribs'
-				. ' FROM #__flexicontent_types AS t'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-				. ' WHERE ie.item_id = ' . (int)$this->_id
-				;
-		$this->_db->setQuery($query);
-		$typeParams = $this->_db->loadResult();
+		$typeParams = $this->getTypeparams();
 		
 		
 		// ***************************************************************************************************
 		// Merge parameters in order: component, menu, (item 's) current category, (item's) content type, item
 		// ***************************************************************************************************
 		
-		// Get the COMPONENT only parameters, then merge the menu parameters
+		// a. Get and clone the COMPONENT parameters
 		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
-		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) {
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
-			$params->merge($menu_params);
-		}
+		$params = clone ($comp_params); // clone( JComponentHelper::getParams('com_flexicontent') );
 		
 		// b. Merge parameters from current category
-		$catParams = FLEXI_J16GE ? new JRegistry($catParams) : new JParameter($catParams);
+		$catParams = new JRegistry($catParams);
 		$catParams->set('show_title', '');       // Prevent show_title from propagating ... to the item, it is meant for category view only
 		$catParams->set('title_linkable', '');   // Prevent title_linkable from propagating ... to the item, it is meant for category view only
 		$catParams->set('show_editbutton', '');  // Prevent title_linkable from propagating ... to the item, it is meant for category view only
 		$params->merge($catParams);
 		
 		// c. Merge TYPE parameters into the page configuration
-		$typeParams = FLEXI_J16GE ? new JRegistry($typeParams) : new JParameter($typeParams);
+		$typeParams = new JRegistry($typeParams);
 		$params->merge($typeParams);
 
 		// d. Merge ITEM parameters into the page configuration
@@ -404,16 +394,19 @@ class FlexicontentModelItem extends ParentClassItem
 		$params->merge($itemparams);
 
 		// e. Merge ACCESS permissions into the page configuration
-		if (FLEXI_J16GE) {
-			$accessperms = $this->getItemAccess();
-			$params->merge($accessperms);
+		$accessperms = $this->getItemAccess();
+		$params->merge($accessperms);
+		
+		// d. Merge the active menu parameters
+		if ($menu) {
+			$params->merge($menu->params);
 		}
 		
-		// Covert metadata property string to parameters object
+		// Also convert metadata property string to parameters object
 		if ( !empty($this->_item->metadata) ) {
-			$this->_item->metadata = FLEXI_J16GE ? new JRegistry($this->_item->metadata) : new JParameter($this->_item->metadata);
+			$this->_item->metadata = new JRegistry($this->_item->metadata);
 		} else {
-			$this->_item->metadata = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+			$this->_item->metadata = new JRegistry();
 		}
 		
 		// *********************************************

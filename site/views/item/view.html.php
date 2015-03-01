@@ -140,7 +140,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// (c) Create the type parameters
 		$tparams = $this->get( 'Typeparams' );
-		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
+		$tparams = new JRegistry($tparams);
 
 		// (d) Verify the layout is within templates, Content Type default template OR Content Type allowed templates
 		$allowed_tmpls = $tparams->get('allowed_ilayouts');
@@ -512,11 +512,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		$nullDate   = $db->getNullDate();
 		$menu				= $app->getMenu()->getActive();
 		
-		// Get the COMPONENT only parameters, then merge the menu parameters
+		// ... we do not YET have item parameters ... and we need to do some work before creating the item ...
+		// Get the COMPONENT only parameters, then merge the ACTIVE MENU parameters
 		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
-		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
+		$params = clone ($comp_params); // clone( JComponentHelper::getParams('com_flexicontent') );
 		if ($menu) {
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$menu_params = $menu->params;
 			$params->merge($menu_params);
 		}
 		
@@ -567,9 +568,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/itemscreen.js' );
 		
 		
-		// ***********************************************
-		// Get item and create form (that loads item data)
-		// ***********************************************
+		// *********************************************************
+		// Get item data and create item form (that loads item data)
+		// *********************************************************
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
@@ -597,8 +598,24 @@ class FlexicontentViewItem  extends JViewLegacy
 		$form = $this->get('Form');
 		
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
-
+		
+		// Replace component/menu 'params' with thee merged component/category/type/item/menu ETC ... parameters
+		$params = $item->parameters;
+		
+		// is new item and ownership Flags
+		$isnew = !$item->id;
+		$isOwner = ( $item->created_by == $user->get('id') );
+		
+		// Get available types and the currently selected/requested type
+		$types         = $model->getTypeslist();
+		$typesselected = $model->getTypesselected();
+		
+		// Get type parameters, these are needed besides the 'merged' item parameters, e.g. to get Type's default layout
+		$tparams = $this->get( 'Typeparams' );
+		$tparams = new JRegistry($tparams);
+		
+		
+		
 		// *********************************************************************************************************
 		// Get language stuff, and also load Template-Specific language file to override or add new language strings
 		// *********************************************************************************************************
@@ -607,16 +624,12 @@ class FlexicontentViewItem  extends JViewLegacy
 
 		if (FLEXI_FISH || FLEXI_J16GE)
 			FLEXIUtilities::loadTemplateLanguageFile( $item->parameters->get('ilayout', 'default') );
-
-
-
-		// ****************************************************************************************
-		// CHECK EDIT / CREATE PERMISSIONS (this is duplicate since it also done at the controller)
-		// ****************************************************************************************
-
-		// new item and ownership variables
-		$isnew = !$item->id;
-		$isOwner = ( $item->created_by == $user->get('id') );
+		
+		
+		
+		// *************************************
+		// Create captcha field via custom logic
+		// *************************************
 		
 		// create and set (into HTTP request) a unique item id for plugins that needed it
 		JRequest::setVar( 'unique_tmp_itemid', $item->id ? $item->id : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
@@ -627,6 +640,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$notauth_itemid     = $params->get('notauthurl', '');          // menu itemid (to redirect) when user is not authorized to create content
 		
 		// Create captcha field or messages
+		// Maybe some code can be removed by using Joomla's built-in form element (in XML file), instead of calling the captcha plugin ourselves
 		if (FLEXI_J16GE) {
 			$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
 			$captcha_formop = $params->get('captcha_formop', 0);  // 0 for submit, 1 for submit/edit (aka always)
@@ -663,10 +677,16 @@ class FlexicontentViewItem  extends JViewLegacy
 			}
 		}
 		
+		
+		
+		// ****************************************************************************************
+		// CHECK EDIT / CREATE PERMISSIONS (this is duplicate since it also done at the controller)
+		// ****************************************************************************************
+		
 		// User Group / Author parameters
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
 		$authorparams = $db->loadResult();
-		$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
+		$authorparams = new JRegistry($authorparams);
 		$max_auth_limit = $authorparams->get('max_auth_limit', 0);  // maximum number of content items the user can create
 
 		if (!$isnew)
@@ -798,38 +818,18 @@ class FlexicontentViewItem  extends JViewLegacy
 			}
 
 		}
-
-
-		// *********************************************
-		// Get more variables to push into the FORM view
-		// *********************************************
-
-		// Get available types and the currently selected/requested type
-		$types         = $model->getTypeslist();
-		$typesselected = $model->getTypesselected();
-		
-		// Create the type parameters
-		$tparams = $this->get( 'Typeparams' );
-		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
-
-		// Merge item parameters, or type/menu parameters for new item
-		if ( $isnew ) {
-			if ( $new_typeid ) $params->merge($tparams);       // Apply type configuration if it type is set
-			if ( $menu )   $params->merge($menu_params);  // Apply menu configuration if it menu is set, to override type configuration
-		} else {
-			$params = $item->parameters;
-		}
 		
 		
-		// Check if saving an item that translates an original content in site's default language
-		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($item->language, 0,2);
-		$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
 		
 		// *****************************************************************************
 		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
 		// (a) Apply Content Type Customization to CORE fields (label, description, etc)
 		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
 		// *****************************************************************************
+		
+		// Check if saving an item that translates an original content in site's default language
+		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($item->language, 0,2);
+		$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
 		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$fields = $this->get( 'Extrafields' );
@@ -904,10 +904,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 
 		// Load permissions (used by form template)
-		$perms = $this->_getItemPerms($item, $typesselected);
+		$perms = $this->_getItemPerms($item);
 
 		// Get the edit lists
-		$lists = $this->_buildEditLists($perms, $params, $authorparams, $typesselected, $tparams);
+		$lists = $this->_buildEditLists($perms, $params, $authorparams);
 
 		// Get number of subscribers
 		$subscribers = $this->get( 'SubscribersCount' );
@@ -1165,7 +1165,7 @@ class FlexicontentViewItem  extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function _buildEditLists(&$perms, &$params, &$authorparams, &$typesselected, &$tparams)
+	function _buildEditLists(&$perms, &$params, &$authorparams)
 	{
 		$db       = JFactory::getDBO();
 		$user     = JFactory::getUser();	// get current user
@@ -1176,9 +1176,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		global $globalcats;
 		$categories = $globalcats;			// get the categories tree
 		$types = $this->get( 'Typeslist' );
-		$subscribers = $this->get( 'SubscribersCount' );
-		//$typesselected = new stdClass();
-		//$typesselected->id = 0;
+		$typesselected = $this->get( 'Typesselected' );
+		$subscribers   = $this->get( 'SubscribersCount' );
 		$isnew = !$item->id;
 
 		// *******************************
@@ -1195,11 +1194,11 @@ class FlexicontentViewItem  extends JViewLegacy
 				$selectedcats = array();
 			}
 			
-			if ( $tparams->get('cid_default') ) {
-				$selectedcats = $tparams->get('cid_default');
+			if ( $params->get('cid_default') ) {
+				$selectedcats = $params->get('cid_default');
 			}
-			if ( $tparams->get('catid_default') ) {
-				$item->catid = $tparams->get('catid_default');
+			if ( $params->get('catid_default') ) {
+				$item->catid = $params->get('catid_default');
 			}
 			
 		} else {
@@ -1383,9 +1382,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		$enable_cid_selector = $perms['multicat'] && $perms['canchange_seccat'];
 		if ( 1 )
 		{
-			if ($tparams->get('cid_allowed_parent')) {
-				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('cid_allowed_parent'), $depth_limit=0);
-				$disabled_cats = $tparams->get('cid_allowed_parent_disable', 1) ? array($tparams->get('cid_allowed_parent')) : array();
+			if ($params->get('cid_allowed_parent')) {
+				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$params->get('cid_allowed_parent'), $depth_limit=0);
+				$disabled_cats = $params->get('cid_allowed_parent_disable', 1) ? array($params->get('cid_allowed_parent')) : array();
 			} else {
 				$cid_tree = & $categories;
 				$disabled_cats = array();
@@ -1434,11 +1433,11 @@ class FlexicontentViewItem  extends JViewLegacy
 		$attribs = 'class="'.$class.'"';
 		$fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
 		
-		$enable_catid_selector = ($isnew && !$tparams->get('catid_default')) || (!$isnew && empty($item->catid)) || $perms['canchange_cat'];
+		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && empty($item->catid)) || $perms['canchange_cat'];
 		
-		if ($tparams->get('catid_allowed_parent')) {
-			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('catid_allowed_parent'), $depth_limit=0);
-			$disabled_cats = $tparams->get('catid_allowed_parent_disable', 1) ? array($tparams->get('catid_allowed_parent')) : array();
+		if ($params->get('catid_allowed_parent')) {
+			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$params->get('catid_allowed_parent'), $depth_limit=0);
+			$disabled_cats = $params->get('catid_allowed_parent_disable', 1) ? array($params->get('catid_allowed_parent')) : array();
 		} else {
 			$catid_tree = & $categories;
 			$disabled_cats = array();
@@ -1528,8 +1527,9 @@ class FlexicontentViewItem  extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function _getItemPerms( &$item, &$type )
+	function _getItemPerms( &$item )
 	{
+		$typesselected = $this->get( 'Typesselected' );
 		$user = JFactory::getUser();	// get current user\
 		$isOwner = ( $item->created_by == $user->get('id') );
 
@@ -1581,12 +1581,12 @@ class FlexicontentViewItem  extends JViewLegacy
 			}
 		}
 		
-		if ( $type->id )
+		if ( $typesselected->id )
 		{
 			if (FLEXI_J16GE) {
-				$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $type->id);
-				$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $type->id);
-				$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $type->id);
+				$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $typesselected->id);
+				$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $typesselected->id);
+				$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $typesselected->id);
 			}
 		}
 		

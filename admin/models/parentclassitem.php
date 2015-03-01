@@ -61,6 +61,13 @@ class ParentClassItem extends JModelAdmin
 	var $_cid = null;
 	
 	/**
+	 * Item 's type or type via URL variable for new items
+	 *
+	 * @var int
+	 */
+	var $_typeid = null;  /* not used yet */
+	
+	/**
 	 * Item version of loaded data
 	 *
 	 * @var int
@@ -1431,7 +1438,7 @@ class ParentClassItem extends JModelAdmin
 			$item->author       = null;
 			$item->text         = null;
 			$item->sectionid    = FLEXI_SECTION;
-			$item->type_id      = JRequest::getVar('typeid', 0, '', 'int');  // Get default type from HTTP request
+			$item->type_id      = JRequest::getInt('typeid', 0);  // Get default type from HTTP request
 			$item->typename     = null;
 			$item->typealias    = null;
 			$item->score        = 0;
@@ -3131,28 +3138,31 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function getTypesselected($force = false)
 	{
-		static $used = null;
-		if (!$used || $force) {
-			if ($this->_id) {
-				$query = 'SELECT ie.type_id as id,t.name FROM #__flexicontent_items_ext as ie'
-					. ' JOIN #__flexicontent_types as t ON ie.type_id=t.id'
-					. ' WHERE ie.item_id = ' . (int)$this->_id;
-				$this->_db->setQuery($query);
-				$used = $this->_db->loadObject();
-			} else {
-				$typeid = (int)JRequest::getInt('typeid', 0);
-				$query = 'SELECT t.id,t.name FROM #__flexicontent_types as t'
-					. ' WHERE t.id = ' . (int)$typeid;
-				$this->_db->setQuery($query);
-				$used = $this->_db->loadObject();
-			}
-			if (!$used) {
-				$used = new stdClass();
-				$used->id = 0;
-				$used->name = null;
-			}
+		static $typedata = array();
+		if ( !$force && isset($typedata[$this->_id]) ) return $typedata[$this->_id];
+		
+		if ($this->_id) {
+			$query = 'SELECT ie.type_id as id,t.name FROM #__flexicontent_items_ext as ie'
+				. ' JOIN #__flexicontent_types as t ON ie.type_id=t.id'
+				. ' WHERE ie.item_id = ' . (int)$this->_id;
+			$this->_db->setQuery($query);
+			$_typedata = $this->_db->loadObject();
+		} else {
+			$typeid = $this->_typeid ? $this->_typeid : JRequest::getInt('typeid', 0);
+			$query = 'SELECT t.id,t.name FROM #__flexicontent_types as t'
+				. ' WHERE t.id = ' . (int)$typeid;
+			$this->_db->setQuery($query);
+			$_typedata = $this->_db->loadObject();
 		}
-		return $used;
+		if (!$_typedata) {
+			$_typedata = new stdClass();
+			$_typedata->id = 0;
+			$_typedata->name = null;
+		}
+		
+		// Cache and return
+		$typedata[$this->_id] = & $_typedata;
+		return $typedata;
 	}
 	
 	
@@ -3196,14 +3206,17 @@ class ParentClassItem extends JModelAdmin
 	 * @return string
 	 * @since 1.5
 	 */
-	function getTypeparams ()
+	function getTypeparams($force = false)
 	{
+		static $typeparams = array();
+		if ( !$force && isset($typeparams[$this->_id]) ) return $typeparams[$this->_id];
+		
 		$query	= 'SELECT t.attribs'
 				. ' FROM #__flexicontent_types AS t';
 
 		if ( !$this->_id ) {
-			$type_id = JRequest::getInt('typeid', 0);
-			$query .= ' WHERE t.id = ' . (int)$type_id;
+			$typeid = $this->_typeid ? $this->_typeid : JRequest::getInt('typeid', 0);
+			$query .= ' WHERE t.id = ' . (int)$typeid;
 		} else {
 			$query .= ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
 				. ' WHERE ie.item_id = ' . (int)$this->_id
@@ -3211,7 +3224,10 @@ class ParentClassItem extends JModelAdmin
 		}
 		$this->_db->setQuery($query);
 		$tparams = $this->_db->loadResult();
-		return $tparams ? $tparams : '';
+		
+		// Cache and return
+		$typeparams[$this->_id] = $tparams ? $tparams : '';
+		return $typeparams[$this->_id];
 	}
 	
 	
@@ -3223,6 +3239,11 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function getTypeslist ( $type_ids=false, $check_perms = false )
 	{
+		static $all_types;
+		// Return cached result
+		if ( empty( $type_ids ) && isset( $all_types[$check_perms] ) )   return $all_types[$check_perms];
+		
+		// Custom type_ids array given, do the query
 		if ( !empty($type_ids) && is_array($type_ids) ) {
 			foreach ($type_ids as $i => $type_id)
 				$type_ids[$i] = (int) $type_id;
@@ -3251,6 +3272,8 @@ class ParentClassItem extends JModelAdmin
 			$types = $_types;
 		}
 		
+		// Cache function result
+		if ( empty($type_ids ) )  $all_types[$check_perms] = $types;
 		return $types;
 	}
 	
@@ -4236,7 +4259,7 @@ class ParentClassItem extends JModelAdmin
 			$params->merge($cparams);
 				
 			$tparams = $this->getTypeparams();
-			$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
+			$tparams = new JRegistry($tparams);
 			$params->merge($tparams);
 					
 			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
