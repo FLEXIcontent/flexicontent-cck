@@ -437,8 +437,8 @@ function fc_recalculateWindow()
 	
 	//document.body.scroll = "no";  // old ie versions ??
 	setTimeout(function() {
-		document.documentElement.style.overflow = "auto";  // firefox, chrome, ie11+
-		//document.body.style.overflow = "auto";
+		document.documentElement.style.overflow = "";  // firefox, chrome, ie11+
+		document.body.style.overflow = "";
 		//document.body.scroll = "yes";  // old ie versions ??
 	}, 100);
 	
