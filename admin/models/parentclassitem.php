@@ -3162,7 +3162,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// Cache and return
 		$typedata[$this->_id] = & $_typedata;
-		return $typedata;
+		return $typedata[$this->_id];
 	}
 	
 	
