@@ -75,7 +75,7 @@
 				FLEXI_TEMPLATES
 			</menu>
 			<menu link="option=com_flexicontent&amp;view=users">
-				FLEXI_USER
+				FLEXI_USERS
 			</menu>
 			<menu link="option=com_flexicontent&amp;view=filemanager">
 				FLEXI_FILEMANAGER

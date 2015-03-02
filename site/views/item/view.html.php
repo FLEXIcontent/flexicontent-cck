@@ -679,9 +679,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		
 		
-		// ****************************************************************************************
-		// CHECK EDIT / CREATE PERMISSIONS (this is duplicate since it also done at the controller)
-		// ****************************************************************************************
+		// *******************************
+		// CHECK EDIT / CREATE PERMISSIONS 
+		// *******************************
 		
 		// User Group / Author parameters
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
@@ -726,6 +726,31 @@ class FlexicontentViewItem  extends JViewLegacy
 				if ($session->has('rendered_uneditable', 'flexicontent')) {
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
+				}
+			}
+			
+			if ( !$canEdit ) {
+				// No edit privilege, check if edit COUPON was provided
+				$edittok = JRequest::getCmd('edittok', false);
+				if ($edittok)
+				{
+					$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_edit_coupons"';
+					$db->setQuery($query);
+					$tbl_exists = (boolean) count($db->loadObjectList());
+					if ($tbl_exists) {
+						$query = 'SELECT * FROM #__flexicontent_edit_coupons '
+							. ' WHERE token = ' . $db->Quote($edittok) . ' AND id = ' . $model->get('id')	;
+						$db->setQuery( $query );
+						$tokdata = $db->loadObject();
+						if ($tokdata) {
+							$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+							$rendered_uneditable[$model->get('id')]  = 1;
+							$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
+							$canEdit = 1;
+						} else {
+							JError::raiseNotice( 403, JText::_( 'EDIT_TOKEN_IS_INVALID' ) .' : '. $edittok );
+						}
+					}
 				}
 			}
 			
