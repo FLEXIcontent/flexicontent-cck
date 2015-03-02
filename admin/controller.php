@@ -653,25 +653,23 @@ VALUES
 	{
 		$db = JFactory::getDBO();
 		
-		// Set default language for items that do not have their language set
+		// This should be match items that come from J1.5 upgrade only
+		// and copy the J1.5 language from items_ext table into the content table
 		$query 	= 'UPDATE #__content AS i'
 					.' LEFT JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id'
 				. ' SET i.language = ie.language'
 				. ' WHERE ie.language<>"" AND ('
-				. '  i.language="" OR '
-				. '  (i.language="*" AND i.language<>ie.language)'
+				. '  i.language="" OR (i.language="*" AND i.language<>ie.language)'
 				. ' )'
 				;
 		$db->setQuery($query);
 		$result1 = $db->query();
 		
-		// Set default language for items that do not have their language set
+		// Sync language of items_ext table using the language from Joomla content table
 		$query 	= 'UPDATE #__flexicontent_items_ext AS ie'
 					.' LEFT JOIN #__content as i ON i.id=ie.item_id'
 				. ' SET ie.language = i.language'
-				. ' WHERE i.language<>"" AND ('
-				. '  ie.language="" OR '
-				. '  (ie.language="*" AND i.language<>ie.language)'
+				. ' WHERE i.language<>ie.language'
 				. ' )'
 				;
 		$db->setQuery($query);
