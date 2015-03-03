@@ -267,6 +267,8 @@ class FlexicontentController extends JControllerLegacy
 		$task	   = JRequest::getVar('task');
 		$model   = $this->getModel(FLEXI_ITEMVIEW);
 		$isnew   = !$model->getId();
+		$isOwner = $model->get('created_by') == $user->get('id');
+		
 		$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 		
 		$fc_params  = JComponentHelper::getParams( 'com_flexicontent' );
@@ -473,24 +475,27 @@ class FlexicontentController extends JControllerLegacy
 		// ... canPublish IS RECALCULATED after saving, maybe comment out ?
 		// ****************************************************************
 		
+		$hasCoupon = false;
 		if (!$isnew)
 		{
 			$asset = 'com_content.article.' . $model->get('id');
-			$canPublish = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $model->get('created_by') == $user->get('id'));
-			$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+			$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 			// ALTERNATIVE 1
 			//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 			// ALTERNATIVE 2
 			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
 			
 			if ( !$canEdit ) {
 				// No edit privilege, check if item is editable till logoff
 				if ($session->has('rendered_uneditable', 'flexicontent')) {
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
+					$hasCoupon = $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
 				}
 			}
+			$canPublish = $user->authorise('core.edit.state', $asset) // edit.state on ITEM
+				|| ($user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));  // OR edit.state.own on ITEM AND (is item owner OR has edit Coupon)
 		}
 		
 		else
@@ -578,7 +583,7 @@ class FlexicontentController extends JControllerLegacy
 		// Get newly saved -latest- version (store task gets latest) of the item, and also calculate publish privelege
 		// ***********************************************************************************************************
 		$item = $model->getItem($post['id'], $check_view_access=false, $no_cache=true, $force_version=-1);
-		$canPublish = $model->canEditState( $item, $check_cat_perm=true );
+		$canPublish = $model->canEditState( $item, $check_cat_perm=true ) || $hasCoupon;
 		
 		
 		// ********************************************************************************************
@@ -708,12 +713,12 @@ class FlexicontentController extends JControllerLegacy
 		// and thus being able to set this category as item's main category, but then have no edit/editown permission for this category
 		// ****************************************************************************************************************************
 		$asset = 'com_content.article.' . $model->get('id');
-		$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+		$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 		// ALTERNATIVE 1
 		//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 		// ALTERNATIVE 2
 		//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-		//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+		//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
 		
 		
 		// *******************************************************************************************************
@@ -1012,25 +1017,26 @@ class FlexicontentController extends JControllerLegacy
 
 		// Get an item model
 		$model = $this->getModel(FLEXI_ITEMVIEW);
+		$isOwner = $model->get('created_by') == $user->get('id');
 		
 		// CHECK-IN the item if user can edit
 		if ($model->get('id') > 1)
 		{
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');
-				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 				// ALTERNATIVE 1
 				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 				// ALTERNATIVE 2
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
 			} else if ($user->gid >= 25) {
 				$canEdit = true;
 			} else if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
+				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $isOwner) ;
 			} else {
-				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $isOwner);
 			}
 			
 			if ( !$canEdit ) {

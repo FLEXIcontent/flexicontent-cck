@@ -1334,54 +1334,31 @@ class ParentClassItem extends JModelAdmin
 	{
 		if ( empty($item) ) $item = & $this->_item;
 		$user = JFactory::getUser();
-		$isOwner = !empty($item->created_by) && ( $item->created_by == $user->get('id') );
+		$session = JFactory::getSession();
 		
-		if (FLEXI_J16GE)
-		{
-			if ( !empty($item->id) )
-			{
-				// Existing item, use item specific permissions
-				$asset = 'com_content.article.' . $item->id;
-				return $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
-			}
-			elseif ( $check_cat_perm && !empty($item->catid) )
-			{
-				// *** New item *** with main category set
-				$cat_asset = 'com_content.category.' . (int)@ $item->catid;
-				return $user->authorise('core.edit.state', $cat_asset) || ($user->authorise('core.edit.state.own', $cat_asset) && $isOwner);
-			}
-			else
-			{
-				// *** New item *** get general edit/publish/delete permissions
-				return $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
-			}
+		$isOwner = !empty($item->created_by) && ( $item->created_by == $user->get('id') );
+		$hasCoupon = false;
+		if ($session->has('rendered_uneditable', 'flexicontent')) {
+			$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+			$hasCoupon = !empty($item->id) && $rendered_uneditable[$item->id] == 2;  // editable via coupon
 		}
-		else if (FLEXI_ACCESS)
+		
+		if ( !empty($item->id) )
 		{
-			if ( !empty($item->id) )
-			{
-				// Existing item, use item specific permissions
-				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				return ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
-			}
-			elseif ( $check_cat_perm && !empty($item->catid) )
-			{
-				// *** New item *** with main category set
-				$rights = FAccess::checkAllCategoryAccess('com_content', 'users', $user->gmid, $item->catid);
-				return ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
-			}
-			else
-			{
-				// *** New item *** get general edit/publish/delete permissions
-				$canPublishAll 		= FAccess::checkAllContentAccess('com_content','publish','users',$user->gmid,'content','all');
-				$canPublishOwnAll	= FAccess::checkAllContentAccess('com_content','publishown','users',$user->gmid,'content','all');
-				return ($user->gid < 25) ? $canPublishAll || $canPublishOwnAll : 1;
-			}
+			// Existing item, use item specific permissions
+			$asset = 'com_content.article.' . $item->id;
+			return $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));
+		}
+		elseif ( $check_cat_perm && !empty($item->catid) )
+		{
+			// *** New item *** with main category set
+			$cat_asset = 'com_content.category.' . (int)@ $item->catid;
+			return $user->authorise('core.edit.state', $cat_asset) || ($user->authorise('core.edit.state.own', $cat_asset) && ($isOwner || $hasCoupon));
 		}
 		else
 		{
-			// J1.5 permissions with no FLEXIaccess are only general, no item specific permissions
-			return ($user->gid >= 21);
+			// *** New item *** get general edit/publish/delete permissions
+			return $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
 		}
 	}
 	

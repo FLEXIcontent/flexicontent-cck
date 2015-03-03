@@ -688,7 +688,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		$authorparams = $db->loadResult();
 		$authorparams = new JRegistry($authorparams);
 		$max_auth_limit = $authorparams->get('max_auth_limit', 0);  // maximum number of content items the user can create
-
+		
+		$hasCoupon = false;
 		if (!$isnew)
 		{
 			// EDIT action
@@ -703,28 +704,19 @@ class FlexicontentViewItem  extends JViewLegacy
 			//Checkout the item
 			$model->checkout();
 
-			if (FLEXI_J16GE) {
-				$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
-				// ALTERNATIVE 1
-				//$asset = 'com_content.article.' . $model->get('id');
-				//$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
-				// ALTERNATIVE 2
-				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
-			} else if ($user->gid >= 25) {
-				$canEdit = true;
-			} else if (FLEXI_ACCESS) {
-				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
-			} else {
-				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
-				//$canEdit = ($user->gid >= 20);  // At least J1.5 Editor
-			}
+			$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+			// ALTERNATIVE 1
+			//$asset = 'com_content.article.' . $model->get('id');
+			//$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+			// ALTERNATIVE 2
+			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
+			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
 
 			if ( !$canEdit ) {
 				// No edit privilege, check if item is editable till logoff
 				if ($session->has('rendered_uneditable', 'flexicontent')) {
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+					$hasCoupon = $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
 					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
 				}
 			}
@@ -743,8 +735,9 @@ class FlexicontentViewItem  extends JViewLegacy
 						$db->setQuery( $query );
 						$tokdata = $db->loadObject();
 						if ($tokdata) {
+							$hasCoupon = true;
 							$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-							$rendered_uneditable[$model->get('id')]  = 1;
+							$rendered_uneditable[$model->get('id')]  = 2;   // 2: indicates, that has edit via EDIT Coupon
 							$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
 							$canEdit = 1;
 						} else {
@@ -929,7 +922,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 
 		// Load permissions (used by form template)
-		$perms = $this->_getItemPerms($item);
+		$perms = $this->_getItemPerms($item, $hasCoupon);
 
 		// Get the edit lists
 		$lists = $this->_buildEditLists($perms, $params, $authorparams);
@@ -1552,7 +1545,7 @@ class FlexicontentViewItem  extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function _getItemPerms( &$item )
+	function _getItemPerms( &$item, $hasCoupon )
 	{
 		$typesselected = $this->get( 'Typesselected' );
 		$user = JFactory::getUser();	// get current user\
@@ -1587,32 +1580,19 @@ class FlexicontentViewItem  extends JViewLegacy
 		// OVERRIDE global with existing item's atomic settings
 		if ( $item->id )
 		{
-			if (FLEXI_J16GE) {
-				$asset = 'com_content.article.' . $item->id;
-				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
-				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
-				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
-			}
-			else if (FLEXI_ACCESS) {
-				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$perms['canedit']			= ($user->gid < 25) ? ( (in_array('editown', $rights) && $isOwner) || (in_array('edit', $rights)) ) : 1;
-				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
-				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $isOwner) || (in_array('delete', $rights)) ) : 1;
-				// Only FLEXI_ACCESS has per item rights permission
-				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
-			}
-			else {
-				// J1.5 permissions with no FLEXIaccess are only general, no item specific permissions
-			}
+			$asset = 'com_content.article.' . $item->id;
+			$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+			$perms['canpublish']	= $user->authorise('core.edit.state', $asset) // edit.state on ITEM
+				|| ($user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));  // OR edit.state.own on ITEM AND (is item owner OR has edit Coupon)
+			$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
+			//echo "perms['canpublish']: ". ((int)$perms['canpublish']). " - ". ((int)$hasCoupon). "<br/>";
 		}
 		
 		if ( $typesselected->id )
 		{
-			if (FLEXI_J16GE) {
-				$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $typesselected->id);
-				$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $typesselected->id);
-				$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $typesselected->id);
-			}
+			$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $typesselected->id);
+			$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $typesselected->id);
+			$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $typesselected->id);
 		}
 		
 		return $perms;
