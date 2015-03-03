@@ -716,7 +716,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				// No edit privilege, check if item is editable till logoff
 				if ($session->has('rendered_uneditable', 'flexicontent')) {
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-					$hasCoupon = $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
+					$hasCoupon = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
 					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
 				}
 			}

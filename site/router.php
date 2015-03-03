@@ -116,7 +116,7 @@ function FLEXIcontentBuildRoute(&$query)
 		$mcid = @$menu->query['cid']; // not set returns null
 		$cid  = !isset($query['cid']) ? null : (int)$query['cid'];
 		$mid = @$menu->query['id']; // not set returns null
-		$id  = (int)$query['id'];
+		$id  = !isset($query['id']) ? null : (int)$query['id'];
 		if ( $mid == $id && $mview == FLEXI_ITEMVIEW )	{
 			// add no segments, even if CIDs of menu item is not an exact match
 		} else if ( $cid && ($mcid != $cid  ||  $mview != 'category') )	{

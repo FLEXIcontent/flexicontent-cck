@@ -1340,7 +1340,7 @@ class ParentClassItem extends JModelAdmin
 		$hasCoupon = false;
 		if ($session->has('rendered_uneditable', 'flexicontent')) {
 			$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-			$hasCoupon = !empty($item->id) && $rendered_uneditable[$item->id] == 2;  // editable via coupon
+			$hasCoupon = !empty($item->id) && isset($rendered_uneditable[$item->id]) && $rendered_uneditable[$item->id] == 2;  // editable via coupon
 		}
 		
 		if ( !empty($item->id) )

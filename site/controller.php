@@ -491,7 +491,7 @@ class FlexicontentController extends JControllerLegacy
 				if ($session->has('rendered_uneditable', 'flexicontent')) {
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
-					$hasCoupon = $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
+					$hasCoupon = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
 				}
 			}
 			$canPublish = $user->authorise('core.edit.state', $asset) // edit.state on ITEM
