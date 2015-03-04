@@ -11,10 +11,11 @@
 		  	document.getElementById(msg_id).innerHTML = '';
 				var reader = new FileReader();
 				reader.onload = function (e) {
-					jQuery('#'+img_id)
-					.attr('src', e.target.result)
-					.width(thumb_w).height(thumb_h)
-					.show();
+					var img = jQuery('#'+img_id);
+					img.attr('src', e.target.result);
+					if (thumb_w) img.width(thumb_w);
+					if (thumb_h) img.height(thumb_h);
+					img.show();
 				};
 				reader.readAsDataURL(input_files[0]);
 			}

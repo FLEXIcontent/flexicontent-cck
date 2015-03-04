@@ -71,7 +71,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$image_source = 1;
 			}
 		}
-		$imagepicker  = $field->parameters->get('imagepicker', 1);
+		$existing_imgs= $field->parameters->get('existing_imgs', 1);
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$dir          = $field->parameters->get('dir');
@@ -91,6 +91,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$autoupload = $field->parameters->get('autoupload', 0);
 		$autoassign = $field->parameters->get('autoassign', 0);
 		$always_allow_removal = $field->parameters->get('always_allow_removal', 0);
+		$imgsel_visible = $field->parameters->get('imgsel_visible', 0);
 		
 		$thumb_w_s = $field->parameters->get( 'w_s', 120 );
 		$thumb_h_s = $field->parameters->get( 'h_s', 90 );
@@ -172,7 +173,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// WARNING: bellow we also use $field->name which is different than $fieldname
 			
 			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$auto_enable_imgpicker = 0;  // Disabled to help performance
+			$auto_enable_imgpicker = 0;  // Disabled imagepicker during copy to help performance
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -328,7 +329,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var originalname = row.find( originalfftag ).val();
 				var existingname = row.find( existingfftag ).val();
 				if ( originalname != '' || existingname != '' ) {
-					var valcounter = jQuery('#".$field->name."');
+					var valcounter = document.getElementById('".$field->name."');
 					valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
 				}
@@ -391,11 +392,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var elementid = tagid.replace(ff_suffix,'');
 				
 				// Get current value of new / existing filename fields
-				var originalname = jQuery('#' + elementid + '_originalname' ).val();
-				var existingname = jQuery('#' + elementid + '_existingname' ).val();
+				var original_obj = jQuery('#' + elementid + '_originalname' );
+				var existing_obj = jQuery('#' + elementid + '_existingname' );
+				var _existing = existing_obj.length != 0;
+				
+				var originalname = original_obj.val();
+				var existingname = _existing ? existing_obj.val() : '';
 				
 				// Get counter
-				var valcounter = jQuery('#".$field->name."');
+				var valcounter = document.getElementById('".$field->name."');
 				
 				if (file=='')  // DB-mode
 				{
@@ -405,7 +410,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					if ( ff_suffix == '_newfile' )
 					{
 						if ( jQuery('#' + elementid + '_newfile' ).hasClass('no_value_selected') && newfilename!='' ) {
-							var modify = ( originalname=='' && existingname=='' );
+							var modify = ( originalname=='' && existingname=='' ) ? 1 : 0;
 							jQuery('#' + elementid + '_newfile' ).removeClass('no_value_selected');
 						} else if ( !jQuery('#' + elementid + '_newfile' ).hasClass('no_value_selected') && newfilename=='' ) {
 							var modify = -1;
@@ -413,18 +418,18 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						} else {
 							var modify = 0;
 						}
-						jQuery('#' + elementid + '_existingname' ).addClass('no_value_selected').val('');
+						if (_existing) existing_obj.addClass('no_value_selected').val('');
 					}
 					
 					// Assigning existingfile
 					else
 					{
-						if ( jQuery('#' + elementid + '_existingname' ).hasClass('no_value_selected') && existingname!='' ) {
-							var modify = ( originalname=='' && newfilename=='' );
-							jQuery('#' + elementid + '_existingname' ).removeClass('no_value_selected');
-						} else if ( !jQuery('#' + elementid + '_existingname' ).hasClass('no_value_selected') && existingname=='' ) {
+						if ( _existing && existingname!='' && existing_obj.hasClass('no_value_selected') ) {
+							var modify = ( originalname=='' && existingname=='' ) ? 1 : 0;
+							existing_obj.removeClass('no_value_selected');
+						} else if ( _existing && existingname=='' && !existing_obj.hasClass('no_value_selected') ) {
 							var modify = -1;
-							jQuery('#' + elementid + '_existingname' ).addClass('no_value_selected');
+							existing_obj.addClass('no_value_selected');
 						} else {
 							var modify = 0;
 						}
@@ -433,7 +438,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					
 					// Update value counter, we do not use ZERO, instead we set to empty string, so that is-required validation works
 					if (modify>0) {
-						if ( valcounter.value=='' ) valcounter.value = '1';
+						if ( typeof valcounter.value === 'undefined' || valcounter.value=='' ) valcounter.value = '1';
 						else valcounter.value = parseInt(valcounter.value) + modify;
 					} else if (modify<0) {
 						if ( valcounter.value=='1' ) valcounter.value = '';
@@ -450,21 +455,24 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				//if(window.console) window.console.log(valcounter.value);
 				
-				var existing_obj = jQuery('#' + elementid + '_existingname' );
-				var original_obj = jQuery('#' + elementid + '_originalname' );
-				
 				var prv_obj = jQuery('#' + elementid + '_preview_image' );
 				
 				// Folder-Mode
-				if (file != '')  existing_obj.val(file);
+				if (file != '' && _existing)  existing_obj.val(file);
 				original_obj.val('');
 				
 				// DB-Mode
-				if (file == '') jQuery( '#' + elementid + '_imgdelete' ).remove();
+				if (file == '') {
+					var imgdel_box = jQuery( '#' + elementid + '_imgdelete' );
+					//imgdel_box.remove();
+					imgdel_box.hide();
+					imgdel_box.find('input').prop('type', 'text');
+					imgdel_box.find('input').val(originalname);
+				}
 				
 				if (prv_obj) {
 					preview_msg = '<span id=\"'+elementid+'_preview_msg\"></span>';
-					if (file || !jQuery('#' + elementid + '_existingname' ).hasClass('no_value_selected') ) {
+					if (file || (_existing && !existing_obj.hasClass('no_value_selected')) ) {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" alt=\"Preview image\" />';
 					} else {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"\" style=\"border: 1px solid silver; float:left;\" alt=\"Preview image\" />';
@@ -481,9 +489,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					tmpDiv.insertAfter( prv_obj );
 					prv_obj.remove();
 					
-					if (file || !jQuery('#' + elementid + '_existingname' ).hasClass('no_value_selected') ) {
+					if (file || (_existing && !existing_obj.hasClass('no_value_selected')) ) {
 					} else {
-						fc_loadImagePreview(tagid, elementid+'_preview_image', elementid+'_preview_msg', ".$thumb_w_s.", ".$thumb_h_s.");
+						fc_loadImagePreview(tagid, elementid+'_preview_image', elementid+'_preview_msg', ".$thumb_w_s.", "./*$thumb_h_s*/'0'.");
 					}
 				}
 				// Close dialog if open
@@ -518,7 +526,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			";
 			if ($js)  $document->addScriptDeclaration($js);
 		} else {
-			$select = $this->buildSelectList( $field );
+			$select = $existing_imgs ? $this->buildSelectList( $field ) : '';
 		}
 		
 		$class = ' class="'.$required.' "';
@@ -614,7 +622,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$imgpreview = '<div class="empty_image empty_image'.$field->id.'" id="'.$elementid_n.'_preview_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>';
 			}
 			
-			if ( !$image_source ) {
+			if ( !$image_source && !$imgsel_visible ) {
 				$change .= ' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname_n.'[change]" id="'.$elementid_n.'_change" onchange="fx_toggle_upload_select_tbl(this)" value="1" '.($image_name ? '' : ' checked="checked" ').'/>';
 				$change .= ' <span></span><label class="fcfield-button" style="margin: 0px 0px 4px 0px !important;" for="'.$elementid_n.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>';
 			}
@@ -650,18 +658,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					<td><input class="imgcust2" size="40" name="'.$fieldname_n.'[cust2]" value="'.(isset($value['cust2']) ? $value['cust2'] : $default_cust2).'" type="text" /></td>
 				</tr>';
 			
-			$curr_select = str_replace('__FORMFLDNAME__', $fieldname_n.'[existingname]', $select);
-			$curr_select = str_replace('__FORMFLDID__', $elementid_n.'_existingname', $curr_select);
+			$curr_select = $select ? str_replace('__FORMFLDNAME__', $fieldname_n.'[existingname]', $select) : '';
+			$curr_select = $select ? str_replace('__FORMFLDID__', $elementid_n.'_existingname', $curr_select) : '';
 			
 			$field->html[] = '
 			'.($image_source ? $curr_select : $change).'
-			'.($use_ingroup || !$none_props ? '' : '<div class="fcclear"></div>').'
-			'.($use_ingroup ? '' : '<div class="nowrap_box">').'
-			'.($use_ingroup ? '' : $move2).'
-			'.($use_ingroup ? '' : $remove_button).'
-			'.($use_ingroup || !$add_position ? '' : $add_here).'
-			'.($use_ingroup ? '' : '</div>').'
-			'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
+			'.($multiple ? '
+				'.(!$none_props ? '<div class="fcclear"></div>' : '').'
+				<div class="nowrap_box">
+				'.$move2.'
+				'.$remove_button.'
+				'.($add_position ? $add_here : '').'
+				</div>
+				<div class="fcclear"></div>
+				' : '').'
 			<div class="fcimg_preview_box" style="float:left!important; clear:none!important; margin-right:5px!important;">
 				'.$imgpreview.'
 				'.$originalname.'
@@ -687,9 +697,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			: '').
 			
 			( !$image_source ? '
-				<table class="admintable fcfield'.$field->id.' img_upload_select" id="'.$field->name.'_upload_select_tbl_'.$n.'" style="'.($image_name ? "display:none;" : "").'" ><tbody>
+				<table class="admintable fcfield'.$field->id.' img_upload_select" id="'.$field->name.'_upload_select_tbl_'.$n.'" style="'.($image_name && $imgsel_visible==0 ? "display:none;" : "").($multiple ? '' : 'width:auto;').'" >
+				<tbody>
 					<tr class="img_newfile_row">
-						<td class="key fckey_high">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
+						'.($curr_select ? '<td class="key fckey_high">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>' : '').'
 						<td style="white-space: normal;">'.
 							'<input name="'.$field->name.'['.$n.']" id="'.$elementid_n.'_newfile"  class="newfile no_value_selected" '.$onchange.' type="file" /><br/>' .
 							$uploadLimitsTxt.
@@ -697,10 +708,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 							'<span style="margin-left:12px;">'.str_replace(",", ", ", $field->parameters->get('upload_extensions')) .'</span>
 						</td>
 					</tr>
+					'.($curr_select ? '
 					<tr class="img_existingfile_row">
 						<td class="key fckey_high">'.JText::_( !$image_source ? 'FLEXI_FIELD_EXISTINGFILE' : 'FLEXI_SELECT' ).':</td>
 						<td>'.$curr_select.'</td>
 					</tr>
+					' : '').'
 				</tbody></table>
 			'  :  '')
 			;
@@ -1884,14 +1897,23 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				// (b) Handle removing image assignment OR deleting the image file
 				if ($v['originalname']) {
-					if ( $v['delete'] ) {
-						$filename = $v['originalname'];
-						$this->removeOriginalFile( $field, $filename );
-						//JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . JText::_('Deleted image from server storage'));
+					if ( $v['delete']==1 || !$field->parameters->get('existing_imgs', 1) ) {
+						// Try to clean unused values (this is forced to YES if existing image list is disabled)
+						$filename = $v['delete'] == 1 ? $v['originalname'] : $v['delete'];
+						$canDeleteImage = $this->canDeleteImage( $field, $filename, $item );  // security concern check if value is in use
+						if ($canDeleteImage) {
+							$this->removeOriginalFile( $field, $filename );
+							JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . 'Deleted image file: '.$filename.' from server storage');
+						} else {
+							JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . 'Cannot delete image file: '.$filename.' from server storage, it is in use');
+						}
 					} elseif ( $v['remove'] && $v['existingname'] ) {
-						//JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . JText::_('Removed image assignment to the field'));
+						JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . 'Removed image assignment of file: '.$filename.' from the field');
 					}
 				}
+				
+				// Need to clear 'delete' if not, to allow saving new value, we use 'delete' to post the auto-saved clear text
+				$v['delete'] = $v['delete'] == 1 ? $v['delete'] : false;
 				
 				// (c) Handle replacing image with a new existing image
 				if ( $v['existingname'] ) {
@@ -2560,7 +2582,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$required		       = $field->parameters->get( 'required', 0 ) ;
 		$required		       = $required ? ' required' : '';
 		$autoupload        = $field->parameters->get('autoupload', 1);
-		$imagepickerlimit  = $field->parameters->get('imagepickerlimit', 200);
+		
+		$existing_imgs    = $field->parameters->get('existing_imgs', 1);
+		$imagepickerlimit = $field->parameters->get('imagepickerlimit', 200);
+		
 		$all_media         = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$limit_by_uploader = $field->parameters->get('limit_by_uploader', 0);  // USED ONLY WHEN all_media is ENABLED
@@ -2626,7 +2651,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 	  // Add Image Picker script on the document.ready event
 		static $imagepicker_added = false;
-		$use_imgpicker = $images_count <= $imagepickerlimit;
+		$use_imgpicker = $existing_imgs==1 && $images_count <= $imagepickerlimit;
 		if ( $use_imgpicker )
 		{
 			$classes .= ' image-picker masonry show-labels show-html ';
@@ -2739,17 +2764,34 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	
 	function getUploadLimitsTxt(&$field) {
 		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-		$hintmage = JHTML::image ( 'components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+		$hint_image = JHTML::image ( 'components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 		
 		$upload_maxsize = $field->parameters->get('upload_maxsize');
 		$phpUploadLimit = flexicontent_upload::getPHPuploadLimit();
-		$sys_limit_class = ($phpUploadLimit['value'] < $upload_maxsize) ? 'badge-warning' : '';
+		$server_limit_exceeded = $phpUploadLimit['value'] < $upload_maxsize;
 		
-		return '<span class="label label-info">'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span>'
-			.'<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip('FLEXI_CONF_UPLOAD_MAX_LIMIT', 'FLEXI_CONF_UPLOAD_MAX_LIMIT_DESC', 1, 1).'">'.$hintmage.'</span>'
-			.'<span class="badge badge">'.round($upload_maxsize / (1024*1024), 2).' M </span>'
-			.'<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SERVER_UPLOAD_MAX_LIMIT'), JText::sprintf('FLEXI_SERVER_UPLOAD_MAX_LIMIT_DESC', $phpUploadLimit['name']), 0, 1).'">'.$hintmage.'</span>'
-			.'<span class="badge '.$sys_limit_class.'">'.round($phpUploadLimit['value'] / (1024*1024), 2).' M </span>'
-			;
+		if ($server_limit_exceeded) {
+			$warn_image = JHTML::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+		}
+		
+		$conf_limit_class = $server_limit_exceeded ? '' : 'badge-success';
+		$conf_limit_style = $server_limit_exceeded ? 'text-decoration: line-through;' : '';
+		$conf_lim_image   = $server_limit_exceeded ? $warn_image.$hint_image : $hint_image;
+		$sys_limit_class  = $server_limit_exceeded ? 'badge-important' : '';
+		
+		return '
+		<span class="fc-img-field-upload-limits-box">
+			<span class="label label-info fc-upload-box-lbl">'.JText::_( $server_limit_exceeded ? 'FLEXI_UPLOAD_LIMITS' : 'FLEXI_UPLOAD_LIMIT' ).'</span>
+			<span class="fc-php-upload-limit-box">
+				<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_CONF_UPLOAD_MAX_LIMIT', 'FLEXI_FIELD_CONF_UPLOAD_MAX_LIMIT_DESC', 1, 1).'">'.$conf_lim_image.'</span>
+				<span class="badge '.$conf_limit_class.'" style="'.$conf_limit_style.'">'.round($upload_maxsize / (1024*1024), 2).' M </span>
+			</span>
+			'.($server_limit_exceeded ? '
+			<span class="fc-sys-upload-limit-box">
+				<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SERVER_UPLOAD_MAX_LIMIT'), JText::sprintf('FLEXI_SERVER_UPLOAD_MAX_LIMIT_DESC', $phpUploadLimit['name']), 0, 1).'">'.$hint_image.'</span>
+				<span class="badge '.$sys_limit_class.'">'.round($phpUploadLimit['value'] / (1024*1024), 2).' M </span>
+			</span>' : '').'
+		</span>
+		';
 	}
 }
