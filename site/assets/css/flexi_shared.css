@@ -1737,7 +1737,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 
 /* Table for forms with label styling */
 table.fc-form-tbl td {
-	vertical-align: top;
+	vertical-align: middle;
 	padding: 4px 24px 4px 0px;
 }
 table.fc-form-tbl td.key {

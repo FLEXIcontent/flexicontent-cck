@@ -498,6 +498,38 @@ class FlexicontentHelperPerm
 	}
 	
 	
+	
+	/*
+	 * Lookups the ACTION for the content type
+	 *
+	 * @access	public
+	 * @param	integer		$type_id		The TYPE ID
+	 * @param	string		$rule				The ACL rule name
+	 * @param	string		$type				A type object
+	 *
+	 * @return boolean							True if action is allowd
+	 * @since	3.0
+	 * 
+	 */
+	static function checkTypeAccess($type_id, $rule, $type=null)
+	{
+		static $allowed;
+		if (!$type_id) return true;  // a not set type defaults to true
+		
+		if ( !isset($allowed[$rule][$type_id]) )
+		{
+			if ($rule=='core.create')
+				$allowed[$rule][$type_id] = ($type ? ! $type->itemscreatable : true) || $user->authorise($rule, 'com_flexicontent.type.'.$type_id);
+			else
+				// featured not enabled yet
+				//$allowed[$rule][$type_id] = $user->authorise($rule, 'com_flexicontent.type.'.$type_id);
+				$allowed[$rule][$type_id] = true;
+		}
+		return $allowed[$rule][$type_id];
+	}
+	
+	
+	
 	//*******************************************************************************
 	// THIS function implementation  works properly too, but the above is more proper
 	//*******************************************************************************

@@ -1080,10 +1080,17 @@ class ParentClassItem extends JModelAdmin
 	function getItemAccess($create_cats=array()) {
 		$iparams_extra = new JRegistry;
 		$user		= JFactory::getUser();
+		$session = JFactory::getSession();
 		$asset	= 'com_content.article.'.$this->_id;
 		
-		// NOTE, technically in J1.6+ a guest may edit able to edit/delete an item, so we commented out the guest check bellow,
-		// this applies for creating item, but flexicontent already allows create to guests via menu item too, so no check there too
+		$isOwner = !empty($this->_item->created_by) && $this->_item->created_by == $user->get('id');
+		$hasTmpEdit = false;
+		$hasCoupon  = false;
+		if ($session->has('rendered_uneditable', 'flexicontent')) {
+			$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+			$hasTmpEdit = !empty($this->_id) && !empty($rendered_uneditable[$this->_id]);  // editable temporarily
+			$hasCoupon  = !empty($this->_id) && !empty($rendered_uneditable[$this->_id]) && $rendered_uneditable[$this->_id] == 2;  // editable temporarily via coupon
+		}
 		
 		// Compute CREATE access permissions.
 		if ( !$this->_id ) {
@@ -1094,6 +1101,11 @@ class ParentClassItem extends JModelAdmin
 				$iparams_extra->set('access-create', false);
 				return $iparams_extra;  // New item, so do not calculate EDIT, DELETE and VIEW access
 			}*/
+			
+			$hasTypeCreate = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.create'); // an empty type_id, results to true, maybe later check all types for create
+			if (!$hasTypeCreate) {
+				return $iparams_extra;  // no create items access in type, return
+			}
 			
 			// Check that user can create item in at least one category ... this check is not wasted,
 			// since joomla will cache it and use it later during creation of allowed Category Tree
@@ -1115,39 +1127,56 @@ class ParentClassItem extends JModelAdmin
 
 		// Compute EDIT access permissions.
 		if ( $this->_id ) {
-			// first check edit permission on the item
-			if ($user->authorise('core.edit', $asset)) {
-				$iparams_extra->set('access-edit', true);
-			}
-			// no edit permission, check if edit.own is available for this item
-			else if ( $user->authorise('core.edit.own', $asset) && $user->get('id') == $this->_item->created_by  /* && !$user->get('guest') */ )
+			if ($hasTmpEdit)
 			{
 				$iparams_extra->set('access-edit', true);
+			} else {
+				
+				// get "edit items" permission on the type of the item
+				$hasTypeEdit = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.edit');
+				$hasTypeEditOwn = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.edit.own');
+				
+				// first check edit permission on the item
+				if ($hasTypeEdit && $user->authorise('core.edit', $asset)) {
+					$iparams_extra->set('access-edit', true);
+				}
+				// no edit permission, check if edit.own is available for this item
+				else if ($hasTypeEditOwn && $user->authorise('core.edit.own', $asset) && $isOwner)
+				{
+					$iparams_extra->set('access-edit', true);
+				}
 			}
 		}
 
 		// Compute EDIT STATE access permissions.
 		if ( $this->_id ) {
+			// get "edit state of items" permission on the type of the item
+			$hasTypeEditState = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.edit.state');
+			$hasTypeEditStateOwn = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.edit.state.own');
+			
 			// first check edit.state permission on the item
-			if ($user->authorise('core.edit.state', $asset)) {
+			if ($hasTypeEditState && $user->authorise('core.edit.state', $asset)) {
 				$iparams_extra->set('access-edit-state', true);
 			}
 			// no edit.state permission, check if edit.state.own is available for this item
-			else if ( $user->authorise('core.edit.state.own', $asset) && $user->get('id') == $this->_item->created_by  /* && !$user->get('guest') */ )
+			else if ($hasTypeEditStateOwn && $user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon)) // hasCoupon acts as item owner
 			{
 				$iparams_extra->set('access-edit-state', true);
 			}
 		}
 		
 		// Compute DELETE access permissions.
-		if ( $this->_id ) {
-		
+		if ( $this->_id )
+		{
+			$hasTypeDelete = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.delete');
+			$hasTypeDeleteOwn = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.delete.own');
+			
 			// first check delete permission on the item
-			if ($user->authorise('core.delete', $asset)) {
+			if ($hasTypeDelete && $user->authorise('core.delete', $asset)) {
 				$iparams_extra->set('access-delete', true);
 			}
 			// no delete permission, chekc delete.own permission if the item is owned by the user
-			else if ( $user->authorise('core.delete.own', $asset) && $user->get('id') == $this->_item->created_by  /* && !$user->get('guest') */ )
+			else if ($hasTypeDeleteOwn && $user->authorise('core.delete.own', $asset) && ($isOwner || $hasCoupon)) // hasCoupon acts as item owner
 			{
 				$iparams_extra->set('access-delete', true);
 			}
@@ -1332,7 +1361,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function canEditState($item=null, $check_cat_perm=true)
 	{
-		if ( empty($item) ) $item = & $this->_item;
+		if ( empty($item) || !isset($item->id) ) $item = & $this->_item;
 		$user = JFactory::getUser();
 		$session = JFactory::getSession();
 		
@@ -1340,26 +1369,39 @@ class ParentClassItem extends JModelAdmin
 		$hasCoupon = false;
 		if ($session->has('rendered_uneditable', 'flexicontent')) {
 			$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-			$hasCoupon = !empty($item->id) && isset($rendered_uneditable[$item->id]) && $rendered_uneditable[$item->id] == 2;  // editable via coupon
+			$hasCoupon = !empty($item->id) && !empty($rendered_uneditable[$item->id]) && $rendered_uneditable[$item->id] == 2;  // editable temporarily via coupon
 		}
+		
+		// get "edit items state" permission on the type of the item
+		$hasTypeEditState    = $item->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit.state');
+		$hasTypeEditStateOwn = $item->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit.state.own');
+		if (!$hasTypeEditState && !$hasTypeEditStateOwn) return false;
 		
 		if ( !empty($item->id) )
 		{
 			// Existing item, use item specific permissions
 			$asset = 'com_content.article.' . $item->id;
-			return $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));
+			$allowed =
+				($hasTypeEditState && $user->authorise('core.edit.state', $asset)) ||
+				($hasTypeEditStateOwn && $user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));
 		}
 		elseif ( $check_cat_perm && !empty($item->catid) )
 		{
 			// *** New item *** with main category set
 			$cat_asset = 'com_content.category.' . (int)@ $item->catid;
-			return $user->authorise('core.edit.state', $cat_asset) || ($user->authorise('core.edit.state.own', $cat_asset) && ($isOwner || $hasCoupon));
+			$allowed =
+				($hasTypeEditState && $user->authorise('core.edit.state', $cat_asset)) ||
+				($hasTypeEditStateOwn && $user->authorise('core.edit.state.own', $cat_asset) && $isOwner);
 		}
 		else
 		{
 			// *** New item *** get general edit/publish/delete permissions
-			return $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
+			$allowed =
+				($hasTypeEditState && $user->authorise('core.edit.state', 'com_flexicontent')) ||
+				($hasTypeEditStateOwn && $user->authorise('core.edit.state.own', 'com_flexicontent'));
 		}
+		
+		return $allowed;
 	}
 	
 	

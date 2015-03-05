@@ -727,9 +727,10 @@ class FlexicontentController extends JControllerLegacy
 		if (!$canEdit)
 		{
 			if ($task=='apply') {
-				// APPLY TASK: Temporarily set item to be editable till closing it
+				// APPLY TASK: Temporarily set item to be editable till closing it and not through all session
+				// (we will/should clear this flag when item is closed, since we have another flag to indicate new items
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-				$rendered_uneditable[$model->get('id')]  = 1;
+				$rendered_uneditable[$model->get('id')] = -1;
 				$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
 				$canEdit = 1;
 			}

@@ -163,7 +163,7 @@ function delAllFilters() {
 					
 					<tr>
 						<td id="file-upload-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_FILE', 'FLEXI_CHOOSE_FILE_DESC', 1, 1); ?>">
-							<label class="label" for="file-upload" id="file-upload-lbl" >
+							<label class="label" id="file-upload-lbl" for="file-upload" >
 							<?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?>
 							</label>
 						</td>
@@ -204,7 +204,7 @@ function delAllFilters() {
 					<tr>
 						<td id="secure-lbl-container" class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
 							<label class="label" id="secure-lbl">
-							<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
+							<?php echo JText::_( 'FLEXI_TARGET_DIRECTORY' ); ?>
 							</label>
 						</td>
 						<td id="secure-container">
@@ -406,7 +406,7 @@ function delAllFilters() {
 					<tr>
 						<td class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
 							<label class="label">
-							<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
+							<?php echo JText::_( 'FLEXI_TARGET_DIRECTORY' ); ?>
 							</label>
 						</td>
 						<td>

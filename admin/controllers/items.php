@@ -228,9 +228,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		// checked them on edit form load, because user may have tampered with the form ... 
 		// ********************************************************************************
 		
-		if (FLEXI_J16GE) $itemAccess = $model->getItemAccess();
-		$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $itemAccess->get('access-create');
-		$canEdit = !FLEXI_J16GE ? $model->canEdit() : $itemAccess->get('access-edit');
+		$itemAccess = $model->getItemAccess();
+		$canAdd  = $itemAccess->get('access-create');
+		$canEdit = $itemAccess->get('access-edit');
 		
 		$type_id = (int) $post['type_id'];  // Typecast to int, (already done for J2.5 via validating)
 		if ( !$isnew && $model->get('type_id') == $type_id) {

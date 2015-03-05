@@ -69,7 +69,7 @@ $this->document->addScriptDeclaration($js);
 					<?php echo $form->getLabel('name'); ?>
 				</td>
 				<td>
-					<?php echo $form->getValue("name"); ?>
+					<span class="badge badge-info"><?php echo $form->getValue("name"); ?></span>
 				</td>
 			</tr>
 			<?php endif; ?>

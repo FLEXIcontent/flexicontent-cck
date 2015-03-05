@@ -163,7 +163,7 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		// Get user allowed permissions on the item ... to be used by the form rendering
 		// Also hide parameters panel if user can not edit parameters
-		$perms = $this->_getItemPerms($item, $typesselected);
+		$perms = $this->_getItemPerms($item);
 		if (!$perms['canparams'])  $document->addStyleDeclaration( (FLEXI_J16GE ? '#details-options' : '#det-pane') .'{display:none;}');
 		
 		
@@ -815,14 +815,13 @@ class FlexicontentViewItem extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function _getItemPerms( &$item, &$type )
+	function _getItemPerms( &$item )
 	{
-		$user = JFactory::getUser();	// get current user\
-		$isOwner = ( $item->created_by == $user->get('id') );
-
+		$user = JFactory::getUser();	// get current user
+		$permission = FlexicontentHelperPerm::getPerm();  // get global perms
+		$model = $this->getModel();
+		
 		$perms 	= array();
-
-		$permission = FlexicontentHelperPerm::getPerm();
 		$perms['isSuperAdmin'] = $permission->SuperAdmin;
 		$perms['multicat']     = $permission->MultiCat;
 		$perms['cantags']      = $permission->CanUseTags;
@@ -832,11 +831,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$perms['canright']     = $permission->CanRights;
 		$perms['canacclvl']    = $permission->CanAccLvl;
 		$perms['canversion']   = $permission->CanVersion;
-		
-		// J2.5+ specific
-		if (FLEXI_J16GE) $perms['editcreationdate'] = $permission->EditCreationDate;
-		//else if (FLEXI_ACCESS) $perms['editcreationdate'] = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'editcreationdate', 'users', $user->gmid) : 1;
-		//else $perms['editcreationdate'] = ($user->gid >= 25);
+		$perms['editcreationdate'] = $permission->EditCreationDate;
 		
 		// Get general edit/publish/delete permissions (we will override these for existing items)
 		$perms['canedit']    = $permission->CanEdit    || $permission->CanEditOwn;
@@ -847,34 +842,22 @@ class FlexicontentViewItem extends JViewLegacy
 		$perms['canchange_featcat'] = $permission->CanChangeFeatCat;
 		
 		// OVERRIDE global with existing item's atomic settings
-		if ( $item->id )
+		if ( $model->get('id') )
 		{
-			if (FLEXI_J16GE) {
-				$asset = 'com_content.article.' . $item->id;
-				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
-				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
-				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
-			}
-			else if (FLEXI_ACCESS) {
-				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$perms['canedit']			= ($user->gid < 25) ? ( (in_array('editown', $rights) && $isOwner) || (in_array('edit', $rights)) ) : 1;
-				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
-				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $isOwner) || (in_array('delete', $rights)) ) : 1;
-				// Only FLEXI_ACCESS has per item rights permission
-				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
-			}
-			else {
-				// J1.5 permissions with no FLEXIaccess are only general, no item specific permissions
-			}
+			// the following include the "owned" checks too
+			$itemAccess = $model->getItemAccess();
+			$perms['canedit']    = $itemAccess->get('access-edit');  // includes temporary editable via session's 'rendered_uneditable'
+			$perms['canpublish'] = $itemAccess->get('access-edit-state');  // includes (frontend) check (and allows) if user is editing via a coupon and has 'edit.state.own'
+			$perms['candelete']  = $itemAccess->get('access-delete');
 		}
 		
+		// Get can change categories ACL access
+		$type = $this->get( 'Typesselected' );
 		if ( $type->id )
 		{
-			if (FLEXI_J16GE) {
-				$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $type->id);
-				$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $type->id);
-				$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $type->id);
-			}
+			$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $type->id);
+			$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $type->id);
+			$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $type->id);
 		}
 		
 		return $perms;

@@ -2495,12 +2495,7 @@ class flexicontent_html
 			$allowed = 1;
 			if ($check_perms)
 			{
-				if (FLEXI_J16GE)
-					$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
-				else if (FLEXI_ACCESS && $user->gid < 25)
-					$allowed = ! $type->itemscreatable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'type', $type->id);
-				else
-					$allowed = 1;
+				$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
 			}
 			
 			if ( !$allowed && $type->itemscreatable == 1 ) continue;

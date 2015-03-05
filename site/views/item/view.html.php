@@ -689,7 +689,14 @@ class FlexicontentViewItem  extends JViewLegacy
 		$authorparams = new JRegistry($authorparams);
 		$max_auth_limit = $authorparams->get('max_auth_limit', 0);  // maximum number of content items the user can create
 		
-		$hasCoupon = false;
+		$hasTmpEdit = false;
+		$hasCoupon  = false;
+		// Check session
+		if ($session->has('rendered_uneditable', 'flexicontent')) {
+			$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+			$hasTmpEdit = !empty( $rendered_uneditable[$model->get('id')] );
+			$hasCoupon  = !empty( $rendered_uneditable[$model->get('id')] ) && $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
+		}
 		if (!$isnew)
 		{
 			// EDIT action
@@ -703,26 +710,12 @@ class FlexicontentViewItem  extends JViewLegacy
 
 			//Checkout the item
 			$model->checkout();
-
-			$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
-			// ALTERNATIVE 1
-			//$asset = 'com_content.article.' . $model->get('id');
-			//$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
-			// ALTERNATIVE 2
-			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
-
-			if ( !$canEdit ) {
-				// No edit privilege, check if item is editable till logoff
-				if ($session->has('rendered_uneditable', 'flexicontent')) {
-					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-					$hasCoupon = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
-					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
-				}
-			}
 			
+			// Get edit access, this includes privileges edit and edit-own and the temporary EDIT flag ('rendered_uneditable')
+			$canEdit = $model->getItemAccess()->get('access-edit');
+			
+			// If no edit privilege, check if edit COUPON was provided
 			if ( !$canEdit ) {
-				// No edit privilege, check if edit COUPON was provided
 				$edittok = JRequest::getCmd('edittok', false);
 				if ($edittok)
 				{
@@ -747,6 +740,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				}
 			}
 			
+			// Edit check finished, throw error if needed
 			if (!$canEdit) {
 				if ($user->guest) {
 					$uri		= JFactory::getURI();
@@ -774,26 +768,17 @@ class FlexicontentViewItem  extends JViewLegacy
 
 		} else {
 			// CREATE action
-
-			if (FLEXI_J16GE) {
-				$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
-				$not_authorised = !$canAdd;
-			} else if ($user->gid >= 25) {
-				$not_authorised = 0;
-			} else if (FLEXI_ACCESS) {
-				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
-				$not_authorised = ! ( @$canAdd['content'] || @$canAdd['category'] );
-			} else {
-				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
-				//$canAdd = ($user->gid >= 19);  // At least J1.5 Author
-				$not_authorised = ! $canAdd;
-			}
+			// Get create access, this includes check of creating in at least one category, and type's "create items"
+			$canAdd = $model->getItemAccess()->get('access-create');
+			$not_authorised = !$canAdd;
 			
 			// Check if Content Type can be created by current user
 			if ( empty($canCreateType) ) {
 				if ($new_typeid) {
+					// not needed, already done be model when type_id is set, check and remove
 					$canCreateType = $model->canCreateType( array($new_typeid) );  // Can create given Content Type
 				} else {
+					// needed not done be model yet
 					$canCreateType = $model->canCreateType( );  // Can create at least one Content Type
 				}
 			}
@@ -922,7 +907,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 
 		// Load permissions (used by form template)
-		$perms = $this->_getItemPerms($item, $hasCoupon);
+		$perms = $this->_getItemPerms($item);
 
 		// Get the edit lists
 		$lists = $this->_buildEditLists($perms, $params, $authorparams);
@@ -1545,15 +1530,13 @@ class FlexicontentViewItem  extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function _getItemPerms( &$item, $hasCoupon )
+	function _getItemPerms( &$item )
 	{
-		$typesselected = $this->get( 'Typesselected' );
-		$user = JFactory::getUser();	// get current user\
-		$isOwner = ( $item->created_by == $user->get('id') );
-
+		$user = JFactory::getUser();	// get current user
+		$permission = FlexicontentHelperPerm::getPerm();  // get global perms
+		$model = $this->getModel();
+		
 		$perms 	= array();
-
-		$permission = FlexicontentHelperPerm::getPerm();
 		$perms['isSuperAdmin'] = $permission->SuperAdmin;
 		$perms['multicat']     = $permission->MultiCat;
 		$perms['cantags']      = $permission->CanUseTags;
@@ -1563,11 +1546,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$perms['canright']     = $permission->CanRights;
 		$perms['canacclvl']    = $permission->CanAccLvl;
 		$perms['canversion']   = $permission->CanVersion;
-		
-		// J2.5+ specific
-		if (FLEXI_J16GE) $perms['editcreationdate'] = $permission->EditCreationDate;
-		//else if (FLEXI_ACCESS) $perms['editcreationdate'] = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'editcreationdate', 'users', $user->gmid) : 1;
-		//else $perms['editcreationdate'] = ($user->gid >= 25);
+		$perms['editcreationdate'] = $permission->EditCreationDate;
 		
 		// Get general edit/publish/delete permissions (we will override these for existing items)
 		$perms['canedit']    = $permission->CanEdit    || $permission->CanEditOwn;
@@ -1578,21 +1557,22 @@ class FlexicontentViewItem  extends JViewLegacy
 		$perms['canchange_featcat'] = $permission->CanChangeFeatCat;
 		
 		// OVERRIDE global with existing item's atomic settings
-		if ( $item->id )
+		if ( $model->get('id') )
 		{
-			$asset = 'com_content.article.' . $item->id;
-			$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
-			$perms['canpublish']	= $user->authorise('core.edit.state', $asset) // edit.state on ITEM
-				|| ($user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));  // OR edit.state.own on ITEM AND (is item owner OR has edit Coupon)
-			$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
-			//echo "perms['canpublish']: ". ((int)$perms['canpublish']). " - ". ((int)$hasCoupon). "<br/>";
+			// the following include the "owned" checks too
+			$itemAccess = $model->getItemAccess();
+			$perms['canedit']    = $itemAccess->get('access-edit');  // includes temporary editable via session's 'rendered_uneditable'
+			$perms['canpublish'] = $itemAccess->get('access-edit-state');  // includes (frontend) check (and allows) if user is editing via a coupon and has 'edit.state.own'
+			$perms['candelete']  = $itemAccess->get('access-delete');
 		}
 		
-		if ( $typesselected->id )
+		// Get can change categories ACL access
+		$type = $this->get( 'Typesselected' );
+		if ( $type->id )
 		{
-			$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $typesselected->id);
-			$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $typesselected->id);
-			$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $typesselected->id);
+			$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $type->id);
+			$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $type->id);
+			$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $type->id);
 		}
 		
 		return $perms;
