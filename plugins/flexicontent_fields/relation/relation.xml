@@ -22,15 +22,20 @@
 		
 		<fieldset name="group-relation-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
-			
-			<field name="initial_placement" type="list" default="h" label="FLEXI_RIFLD_INITIAL_PLACEMENT" description="FLEXI_RIFLD_INITIAL_PLACEMENT_DESC">
-				<option value="h">FLEXI_RIFLD_SINGLE_ROW_FIT</option>
-				<option value="v">FLEXI_RIFLD_MULTI_ROW_FIT</option>
-			</field>
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
+			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="1">FLEXI_FLOATED_LEFT</option>
+				<option value="2">FLEXI_CLEARED</option>
+			</field>
+			<field name="initial_placement" type="list" default="h" label="FLEXI_RIFLD_INITIAL_PLACEMENT" description="FLEXI_RIFLD_INITIAL_PLACEMENT_DESC">
+				<option value="h">FLEXI_RIFLD_SINGLE_ROW_FIT</option>
+				<option value="v">FLEXI_RIFLD_MULTI_ROW_FIT</option>
 			</field>
 			<field name="size" type="text" default="12" size="2" label="FLEXI_RIFLD_SELECTBOX_LINES" description="FLEXI_RIFLD_SELECTBOX_LINES_DESC" />
 			

@@ -64,7 +64,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$menu  = $menus->getActive();
 		$uri   = JFactory::getURI();
 		$user  = JFactory::getUser();
-		$aid   = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id) : (int) $user->get('aid');
+		$aid   = JAccess::getAuthorisedViewLevels($user->id);
 		$db    = JFactory::getDBO();
 		$nullDate = $db->getNullDate();
 		
@@ -162,7 +162,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : 'default';
 			$app->enqueueMessage("<small>Current Item Layout Template is '$ilayout' does not exist<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Template Layout: '$fixed_ilayout'</small>", 'notice');
 			$ilayout = $fixed_ilayout;
-			if (FLEXI_FISH || FLEXI_J16GE) FLEXIUtilities::loadTemplateLanguageFile( $ilayout ); // Manually load Template-Specific language file of back fall ilayout
+			FLEXIUtilities::loadTemplateLanguageFile( $ilayout ); // Manually load Template-Specific language file of back fall ilayout
 		}
 
 		// (h) finally set the template name back into the item's parameters
@@ -261,14 +261,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		// Check and prepend or append site name
-		if (FLEXI_J16GE) {  // Not available in J1.5
-			// Add Site Name to page title
-			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
-			}
-			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
-			}
+		// Add Site Name to page title
+		if ($app->getCfg('sitename_pagetitles', 0) == 1) {
+			$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
+		}
+		elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
+			$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
 		}
 		
 		// Finally, set document title
@@ -298,13 +296,11 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		// Overwrite with menu META data if menu matched
-		if (FLEXI_J16GE) {
-			if ($menu_matches) {
-				if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
-				if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
-				if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
-				if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
-			}
+		if ($menu_matches) {
+			if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
+			if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
+			if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
+			if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
 		}
 		
 		
@@ -312,7 +308,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Add rel canonical html head link tag (TODO: improve multi-page handing)
 		// ************************************
 		
-		$base  = $uri->getScheme() . '://' . $uri->getHost();
+		$port =  $uri->getPort();
+		$base  = $uri->getScheme() . '://' . $uri->getHost() . ($port ? ':'. $port : '');
 		$ucanonical = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $globalcats[$item->maincatid]->slug, 0, $item));  // $item->categoryslug
 		if ($params->get('add_canonical')) {
 			$head_obj = $document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
@@ -373,16 +370,13 @@ class FlexicontentViewItem  extends JViewLegacy
 		// These events return text that could be displayed at appropriate positions by our templates
 		$item->event = new stdClass();
 
-		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterTitle', array('com_content.article', &$item, &$params, 0));
-		else              $results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
+		$results = $dispatcher->trigger('onContentAfterTitle', array('com_content.article', &$item, &$params, $limitstart));
 		$item->event->afterDisplayTitle = trim(implode("\n", $results));
 
-		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.article', &$item, &$params, 0));
-		else              $results = $dispatcher->trigger('onBeforeDisplayContent', array (&$item, &$params, $limitstart));
+		$results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.article', &$item, &$params, $limitstart));
 		$item->event->beforeDisplayContent = trim(implode("\n", $results));
 
-		if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.article', &$item, &$params, 0));
-		else              $results = $dispatcher->trigger('onAfterDisplayContent', array (&$item, &$params, $limitstart));
+		$results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.article', &$item, &$params, $limitstart));
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 
 		// Reverse the compatibility steps, set the view and option back to 'items' and 'com_flexicontent'
@@ -579,11 +573,22 @@ class FlexicontentViewItem  extends JViewLegacy
 		// ** WE NEED TO get OR decide the Content Type, before we call the getItem
 		// ** We rely on typeid Request variable to decide type for new items so make sure this is set,
 		// ZERO means allow user to select type, but if user is only allowed a single type, then autoselect it!
-		if ( $menu && isset($menu->query['typeid']) )
+
+		// Try type from session
+		$jdata = $app->getUserState('com_flexicontent.edit.item.data');   //print_r($jdata);
+		if (!empty($jdata['type_id']) )
+		{
+			JRequest::setVar('typeid', (int)$jdata['type_id']);  // This also forces zero if value not set
+		}
+		
+		// Try type from active menu
+		else if ( $menu && isset($menu->query['typeid']) )
 		{
 			JRequest::setVar('typeid', (int)$menu->query['typeid']);  // This also forces zero if value not set
 		}
 		$new_typeid = JRequest::getVar('typeid', 0, '', 'int');
+		
+		// Verify type is allowed to the user
 		if ( !$new_typeid )
 		{
 			$types = $model->getTypeslist($type_ids_arr = false, $check_perms = true);
@@ -620,10 +625,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Get language stuff, and also load Template-Specific language file to override or add new language strings
 		// *********************************************************************************************************
 		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
-		if (FLEXI_FISH || FLEXI_J16GE)   $langs = FLEXIUtilities::getLanguages('code');
-
-		if (FLEXI_FISH || FLEXI_J16GE)
-			FLEXIUtilities::loadTemplateLanguageFile( $item->parameters->get('ilayout', 'default') );
+		$langs = FLEXIUtilities::getLanguages('code');
+		FLEXIUtilities::loadTemplateLanguageFile( $item->parameters->get('ilayout', 'default') );
 		
 		
 		
@@ -632,7 +635,14 @@ class FlexicontentViewItem  extends JViewLegacy
 		// *************************************
 		
 		// create and set (into HTTP request) a unique item id for plugins that needed it
-		JRequest::setVar( 'unique_tmp_itemid', $item->id ? $item->id : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
+		if ($item->id) {
+			$unique_tmp_itemid = $item->id;
+		} else {
+			$unique_tmp_itemid = $app->getUserState('com_flexicontent.edit.item.unique_tmp_itemid');
+			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
+		}
+		//print_r($unique_tmp_itemid);
+		JRequest::setVar( 'unique_tmp_itemid', $unique_tmp_itemid );
 		
 		// Component / Menu Item parameters
 		$allowunauthorize   = $params->get('allowunauthorize', 0);     // allow unauthorised user to submit new content
@@ -840,6 +850,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$jcustom = $app->getUserState('com_flexicontent.edit.item.custom');   //print_r($jcustom);
 		foreach ($fields as $field)
 		{
 			// a. Apply CONTENT TYPE customizations to CORE FIELDS, e.g a type specific label & description
@@ -852,18 +863,19 @@ class FlexicontentViewItem  extends JViewLegacy
 			// NOTE: this is DONE only for CUSTOM fields, since form field html is created by the form for all CORE fields, EXCEPTION is the 'text' field (see bellow)
 			if (!$field->iscore)
 			{
-				if (FLEXI_J16GE)
-					$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
-				else if (FLEXI_ACCESS && $user->gid < 25)
-					$is_editable = !$field->valueseditable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'field', $field->id);
-				else
-					$is_editable = 1;
+				$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
 
 				if ( !$is_editable ) {
 					$field->html = '<div class="fc-mssg fc-warning">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
 				} else if ($modify_untraslatable_values && $field->untranslatable) {
 					$field->html = '<div class="fc-mssg fc-note">'. JText::_('FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE') . '</div>';
 				} else {
+					if ( isset($jcustom[$field->name]) ) {
+						$field->value = array();
+						foreach ($jcustom[$field->name] as $i => $_val) {
+							$field->value[$i] = is_array($_val) ? serialize($_val) : $_val;
+						}
+					}
 					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
 				}
 			}
@@ -1156,10 +1168,13 @@ class FlexicontentViewItem  extends JViewLegacy
 
 		$this->assignRef('tmpls',		$tmpls);
 		
+		// Clear custom form data from session
+		$app->setUserState($form->option.'.edit.'.$form->context.'.custom', false);
+		$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', false);
+		$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', false);
+		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		
 		parent::display($tpl);
-		
 		if ( $print_logging_info ) $fc_run_times['form_rendering'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 

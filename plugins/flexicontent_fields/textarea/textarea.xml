@@ -55,6 +55,11 @@
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
 			
+			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_FLOATED_LEFT</option>
+				<option value="2">FLEXI_CLEARED</option>
+			</field>
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="use_html" type="radio" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC">
 				<option value="1">FLEXI_HTML_EDITOR</option>

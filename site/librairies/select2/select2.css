@@ -841,10 +841,10 @@ html[dir="rtl"] .select2-container .select2-choice {
 }
 /* Form validation failed, having 'invalid' CLASS */
 .select2-container.invalid .select2-choice > .select2-chosen {
-	color: #9d261d !important;
+	color: red !important;
 }
 .select2-container-multi.invalid .select2-choices .select2-search-field input.select2-input {
-	border: 1px solid #9d261d !important;
+	border: 1px solid red !important;
 }
 
 

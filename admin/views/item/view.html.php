@@ -118,7 +118,14 @@ class FlexicontentViewItem extends JViewLegacy
 		$isnew = ! $cid;
 		
 		// Create and set a unique item id for plugins that needed it
-		JRequest::setVar( 'unique_tmp_itemid', $cid ? $cid : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
+		if ($cid) {
+			$unique_tmp_itemid = $cid;
+		} else {
+			$unique_tmp_itemid = $app->getUserState('com_flexicontent.edit.item.unique_tmp_itemid');
+			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
+		}
+		//print_r($unique_tmp_itemid);
+		JRequest::setVar( 'unique_tmp_itemid', $unique_tmp_itemid );
 		
 		// Get number of subscribers
 		$subscribers = $model->getSubscribersCount();
@@ -235,7 +242,7 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// Common Buttons
 		if (FLEXI_J16GE) {
-			JToolBarHelper::apply('items.apply');
+			JToolBarHelper::apply($item->type_id ? 'items.apply') : 'items.apply_type';  // Applying new item type is a special case that has not loaded custom fieds yet
 			if (!$isnew || $item->version) JToolBarHelper::save('items.save');
 			if (!$isnew || $item->version) JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 			JToolBarHelper::cancel('items.cancel');
@@ -263,6 +270,7 @@ class FlexicontentViewItem extends JViewLegacy
 		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$jcustom = $app->getUserState('com_flexicontent.edit.item.custom');   //print_r($jcustom);
 		foreach ($fields as $field)
 		{
 			// a. Apply CONTENT TYPE customizations to CORE FIELDS, e.g a type specific label & description
@@ -275,18 +283,19 @@ class FlexicontentViewItem extends JViewLegacy
 			// NOTE: this is DONE only for CUSTOM fields, since form field html is created by the form for all CORE fields, EXCEPTION is the 'text' field (see bellow)
 			if (!$field->iscore)
 			{
-				if (FLEXI_J16GE)
-					$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
-				else if (FLEXI_ACCESS && $user->gid < 25)
-					$is_editable = !$field->valueseditable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'field', $field->id);
-				else
-					$is_editable = 1;
+				$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
 
 				if ( !$is_editable ) {
 					$field->html = '<div class="fc-mssg fc-warning">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
 				} else if ($modify_untraslatable_values && $field->untranslatable) {
 					$field->html = '<div class="fc-mssg fc-note">'. JText::_('FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE') . '</div>';
 				} else {
+					if ( isset($jcustom[$field->name]) ) {
+						$field->value = array();
+						foreach ($jcustom[$field->name] as $i => $_val) {
+							$field->value[$i] = is_array($_val) ? serialize($_val) : $_val;
+						}
+					}
 					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
 				}
 			}
@@ -803,6 +812,11 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->assignRef('usedtags'			, $usedtags);
 		$this->assignRef('perms'				, $perms);
 		$this->assignRef('current_page'	, $current_page);
+		
+		// Clear custom form data from session
+		$app->setUserState($form->option.'.edit.'.$form->context.'.custom', false);
+		$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', false);
+		$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', false);
 		
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		parent::display($tpl);

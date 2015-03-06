@@ -551,10 +551,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
-			$image_name = trim(@$value['originalname']);
+			$image_name = isset($value['existingname']) ? $value['existingname'] : trim(@$value['originalname']);  // existingname should be present only via form reloading
 			
 			// Check and rebuild thumbnails if needed
-			$rebuild_res = plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item);
+			$rebuild_res = isset($value['existingname']) ? true : plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item);
 			
 			// Check if rebuilding thumbnails failed (e.g. file has been deleted)  
 			if ( !$rebuild_res ) {
@@ -611,9 +611,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
 				
-				$img_link  = JURI::root(true).'/'.$dir_url;
-				$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : "");
-				$img_link .= '/s_' .$extra_prefix. $value['originalname'];
+				if (!empty($image_name)) {
+					$img_link  = JURI::root(true).'/'.$dir_url;
+					$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : "");
+					$img_link .= $item->id ? '/s_' .$extra_prefix. $image_name : '/original/'. $image_name;
+					if (isset($value['existingname'])) {
+ 						$img_link = str_replace('\\','/', $img_link);
+ 						$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w=120&amp;h=90';
+ 					}
+				} else {
+					$img_link = '';
+				}
 				$imgpreview = '<img class="preview_image" id="'.$elementid_n.'_preview_image" src="'.$img_link.'" style="border: 1px solid silver; float:left;" alt="Preview image" />';
 				
 			} else {

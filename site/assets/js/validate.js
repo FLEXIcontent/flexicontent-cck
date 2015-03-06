@@ -150,10 +150,12 @@ var JFormValidator = new Class({
 			var values = jQuery(document.getElementsByName(field_name)).val();
 			if (values && values.length == 1) {
 				jqEL.val(values[0]);
-				if (jqEL.hasClass('use_select2_lib')) {
-					jqEL.trigger('change');
+				if (jqEL.val()) {  // main category tree maybe different than secondary, so check value exists
+					if (jqEL.hasClass('use_select2_lib')) {
+						jqEL.trigger('change');
+					}
+					return true;
 				}
-				return true;
 			}
 			return false;
 		});

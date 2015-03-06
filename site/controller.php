@@ -40,8 +40,9 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Register Extra task
 		$this->registerTask( 'save_a_preview', 'save');
-		$this->registerTask( 'apply', 'save');
-		$this->registerTask( 'download_tree', 'download');
+		$this->registerTask( 'apply_type',     'save');
+		$this->registerTask( 'apply',          'save');
+		$this->registerTask( 'download_tree',  'download');
 	}
 	
 	
@@ -303,6 +304,7 @@ class FlexicontentController extends JControllerLegacy
 		$data   = JRequest::getVar('jform', array(), 'post', 'array');   // Core Fields and and item Parameters
 		$custom = JRequest::getVar('custom', array(), 'post', 'array');  // Custom Fields
 		$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
+		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid' );
 		if ( ! @ $data['rules'] ) $data['rules'] = array();
 		
 		// Set data id into model in case not already set ?
@@ -404,6 +406,8 @@ class FlexicontentController extends JControllerLegacy
 					// Set POST form date into the session, so that they get reloaded
 					$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session.
 					$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);  // Save the custom fields data in the session.
+					$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', $jfdata);  // Save the falang translations into the session
+					$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 					
 					// Redirect back to the registration form.
 					$this->setRedirect( $_SERVER['HTTP_REFERER'] );
@@ -426,6 +430,8 @@ class FlexicontentController extends JControllerLegacy
 			// Set POST form date into the session, so that they get reloaded
 			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
 			$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);  // Save the custom fields data in the session
+			$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', $jfdata);  // Save the falang translations into the session
+			$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 			
 			// Redirect back to the registration form.
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
@@ -594,9 +600,11 @@ class FlexicontentController extends JControllerLegacy
 			$saved_fcitems = $session->get('saved_fcitems', array(), 'flexicontent');
 			$is_first_save = $isnew ? true : !isset($saved_fcitems[$model->get('id')]);
 		}
-		// Add item to saved items of the corresponding session array
-		$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
-		$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
+		if ($isnew) {
+			// Add item to saved items of the corresponding session array
+			$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
+			$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
+		}
 		
 		
 		// ********************************************
@@ -726,7 +734,7 @@ class FlexicontentController extends JControllerLegacy
 		// *******************************************************************************************************
 		if (!$canEdit)
 		{
-			if ($task=='apply') {
+			if ($task=='apply' || $task=='apply_type') {
 				// APPLY TASK: Temporarily set item to be editable till closing it and not through all session
 				// (we will/should clear this flag when item is closed, since we have another flag to indicate new items
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
@@ -773,7 +781,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for new Content Item is being closed, and clear some flags
 		// ****************************************************************
 		
-		if ($task!='apply' && $newly_submitted_item )
+		if ($task!='apply' && $task!='apply_type' && $newly_submitted_item )
 		{
 			// Clear item from being marked as newly submitted
 			unset($newly_submitted[$model->get('id')]);
@@ -796,7 +804,7 @@ class FlexicontentController extends JControllerLegacy
 		// ****************************************
 		
 		// REDIRECT CASE FOR APPLYING: Save and reload the item edit form
-		if ($task=='apply') {
+		if ($task=='apply' || $task=='apply_type') {
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 			
 			// Create the URL

@@ -1149,6 +1149,11 @@
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			
+			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_FLOATED_LEFT</option>
+				<option value="2">FLEXI_CLEARED</option>
+			</field>
 			<field name="hide_html" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC" class="btn-group group-fcsuccess">
 				<option value="0" show_list="using-html-editor" hide_list="using-plain-area">FLEXI_HTML_EDITOR</option>
 				<option value="1" show_list="using-plain-area" hide_list="using-html-editor">FLEXI_SIMPLE_TEXTAREA</option>

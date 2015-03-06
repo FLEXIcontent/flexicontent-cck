@@ -317,7 +317,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Add rel canonical html head link tag (TODO: improve multi-page handing)
 		// ************************************
 		
-		$base  = $uri->getScheme() . '://' . $uri->getHost();
+		$port =  $uri->getPort();
+		$base  = $uri->getScheme() . '://' . $uri->getHost() . ($port ? ':'. $port : '');
 		$start = JRequest::getInt('start', '');
 		$start = $start ? "&start=".$start : "";
 		$ucanonical 	= $base . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug).$start);

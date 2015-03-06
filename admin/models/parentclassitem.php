@@ -65,7 +65,7 @@ class ParentClassItem extends JModelAdmin
 	 *
 	 * @var int
 	 */
-	var $_typeid = null;  /* not used yet */
+	var $_typeid = null;
 	
 	/**
 	 * Item version of loaded data
@@ -117,7 +117,8 @@ class ParentClassItem extends JModelAdmin
 			}
 			$curcatid = 0;
 		}
-		$this->setId($pk, $curcatid);  // NOTE: when setting $pk to a new value the $this->_item is cleared
+		$typeid = JRequest::getInt('typeid', 0);
+		$this->setId($pk, $curcatid, $typeid);  // NOTE: when setting $pk to a new value the $this->_item is cleared
 		
 		
 		// Get component parameters
@@ -125,15 +126,18 @@ class ParentClassItem extends JModelAdmin
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 		
-		// Merge into them the type parameters
-		$tparams = $this->getTypeparams();
-		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
-		$params->merge($tparams);
+		// Merge into them the type parameters, *(type was set/verified above)
+		if ($this->_typeid) {
+			$tparams = $this->getTypeparams();
+			$tparams = new JRegistry($tparams);
+			$params->merge($tparams);
+		}
 		
+		// Merge (frontend) the active menu parameters
 		if (!$app->isAdmin()) {
 			$menu = $app->getMenu()->getActive();
 			if ($menu) {
-				$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+				$menu_params = $menu->params;
 				$params->merge($menu_params);
 			}
 		}
@@ -148,7 +152,7 @@ class ParentClassItem extends JModelAdmin
 	 * @access	public
 	 * @param	int item identifier
 	 */
-	function setId($id, $currcatid=0)
+	function setId($id, $currcatid=0, $typeid=0)
 	{
 		// Set a new item id and wipe data
 		if ($this->_id != $id) {
@@ -157,13 +161,23 @@ class ParentClassItem extends JModelAdmin
 		}
 		$this->_id = (int) $id;
 		
-		// Set current category, but verify item is assigned to this category, (SECURITY concern)
+		// Set current category and verify that item is assigned to this category, (SECURITY concern)
 		$this->_cid = (int) $currcatid;
-		if ($this->_cid) {
+		if ($this->_cid)
+		{
 			$q = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid =". (int)$this->_id ." AND catid = ". (int)$this->_cid;
 			$this->_db->setQuery($q);
 			$result = $this->_db->loadResult();
 			$this->_cid = $result ? $this->_cid : 0;  // Clear cid, if category not assigned to the item
+		}
+		
+		// Set item type
+		$this->_typeid = $typeid;
+		
+		// Get the type of an existing item, or check that the type of new item exists
+		if ($this->_id || $this->_typeid)
+		{
+			$this->getTypesselected()->id;  // Check, set, or clear member variable: $this->_typeid
 		}
 	}
 	
@@ -271,14 +285,12 @@ class ParentClassItem extends JModelAdmin
 		// --. Initialize new item, currently this succeeds always
 		else
 		{
+			$this->_typeid = JRequest::getInt('typeid', 0);  // Get this again since it might have been change since model was constructed
 			$this->_initItem();
 		}
 		
-		// Extra Steps for Backend
-		if ( $app->isAdmin() )  {
-			// Set item type id for existing or new item ('typeid' of the JRequest array) ... verifying that the type exists ...
-			$this->_item->type_id = $this->getTypesselected()->id;
-		}
+		// Verify item's type
+		$this->_item->type_id = $this->getTypesselected()->id;  // Also checks, sets, or clears member variable: $this->_typeid
 		
 		return $this->_item;
 	}
@@ -572,6 +584,7 @@ class ParentClassItem extends JModelAdmin
 				
 				if (!$data) {
 					$this->_item = false;
+					$this->_typeid = 0;
 					if (!$version) $items[$this->_id] = & $this->_item;
 					return false; // item not found, return
 				}
@@ -582,6 +595,7 @@ class ParentClassItem extends JModelAdmin
 				
 				$item = & $data;
 			}
+			$this->_typeid = $item->type_id;
 			
 			// -- Create the description field called 'text' by appending introtext + readmore + fulltext
 			$item->text = $item->introtext;
@@ -1102,7 +1116,7 @@ class ParentClassItem extends JModelAdmin
 				return $iparams_extra;  // New item, so do not calculate EDIT, DELETE and VIEW access
 			}*/
 			
-			$hasTypeCreate = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.create'); // an empty type_id, results to true, maybe later check all types for create
+			$hasTypeCreate = FlexicontentHelperPerm::checkTypeAccess($this->_typeid, 'core.create'); // an empty type_id, results to true, maybe later check all types for create
 			if (!$hasTypeCreate) {
 				return $iparams_extra;  // no create items access in type, return
 			}
@@ -1133,8 +1147,8 @@ class ParentClassItem extends JModelAdmin
 			} else {
 				
 				// get "edit items" permission on the type of the item
-				$hasTypeEdit = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.edit');
-				$hasTypeEditOwn = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.edit.own');
+				$hasTypeEdit = FlexicontentHelperPerm::checkTypeAccess($this->_typeid, 'core.edit');
+				$hasTypeEditOwn = FlexicontentHelperPerm::checkTypeAccess($this->_typeid, 'core.edit.own');
 				
 				// first check edit permission on the item
 				if ($hasTypeEdit && $user->authorise('core.edit', $asset)) {
@@ -1151,8 +1165,8 @@ class ParentClassItem extends JModelAdmin
 		// Compute EDIT STATE access permissions.
 		if ( $this->_id ) {
 			// get "edit state of items" permission on the type of the item
-			$hasTypeEditState = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.edit.state');
-			$hasTypeEditStateOwn = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.edit.state.own');
+			$hasTypeEditState = FlexicontentHelperPerm::checkTypeAccess($this->_typeid, 'core.edit.state');
+			$hasTypeEditStateOwn = FlexicontentHelperPerm::checkTypeAccess($this->_typeid, 'core.edit.state.own');
 			
 			// first check edit.state permission on the item
 			if ($hasTypeEditState && $user->authorise('core.edit.state', $asset)) {
@@ -1168,8 +1182,8 @@ class ParentClassItem extends JModelAdmin
 		// Compute DELETE access permissions.
 		if ( $this->_id )
 		{
-			$hasTypeDelete = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.delete');
-			$hasTypeDeleteOwn = FlexicontentHelperPerm::checkTypeAccess($this->_item->type_id, 'core.delete.own');
+			$hasTypeDelete = FlexicontentHelperPerm::checkTypeAccess($this->_typeid, 'core.delete');
+			$hasTypeDeleteOwn = FlexicontentHelperPerm::checkTypeAccess($this->_typeid, 'core.delete.own');
 			
 			// first check delete permission on the item
 			if ($hasTypeDelete && $user->authorise('core.delete', $asset)) {
@@ -1201,7 +1215,7 @@ class ParentClassItem extends JModelAdmin
 				$this->_item->has_mcat_access = $no_mcat_info || in_array($this->_item->category_access, $groups);
 			}
 			if ( !isset($this->_item->has_type_access) ) {
-				$no_type_info = $this->_item->type_id == 0 || !isset($this->_item->type_access) || $this->_item->type_access === null;
+				$no_type_info = $this->_typeid == 0 || !isset($this->_item->type_access) || $this->_item->type_access === null;
 				$this->_item->has_type_access = $no_type_info || in_array($this->_item->type_access, $groups);
 			}
 			$iparams_extra->set('access-view', $this->_item->has_item_access && $this->_item->has_mcat_access && $this->_item->has_type_access);
@@ -1457,7 +1471,7 @@ class ParentClassItem extends JModelAdmin
 			$item->author       = null;
 			$item->text         = null;
 			$item->sectionid    = FLEXI_SECTION;
-			$item->type_id      = JRequest::getInt('typeid', 0);  // Get default type from HTTP request
+			$item->type_id      = $this->_typeid;
 			$item->typename     = null;
 			$item->typealias    = null;
 			$item->score        = 0;
@@ -2145,21 +2159,24 @@ class ParentClassItem extends JModelAdmin
 		// Save fields values to appropriate tables (versioning table or normal tables)
 		// NOTE: This allow canceling of item save operation, if 'abort' is returned
 		// ****************************************************************************
-		$files  = JRequest::get( 'files', JREQUEST_ALLOWRAW );
-		$result = $this->saveFields($isnew, $item, $data, $files);
+		
+		// Do not try to load fields / save field values, if applying type
+		$task  = JRequest::getCmd( 'task' );
+		if ($task != 'apply_type')
+		{
+			$files = JRequest::get( 'files', JREQUEST_ALLOWRAW );
+			$result = $this->saveFields($isnew, $item, $data, $files);
+		}
 		$version_approved = $isnew || $data['vstate']==2;
 		if( $result==='abort' ) {
 			if ($isnew) {
-				if (FLEXI_J16GE) {
-					$db->setQuery('DELETE FROM #__assets WHERE id = (SELECT asset_id FROM #__content WHERE id='.$item->id.')');
-					$db->query();
-				} else if (FLEXI_ACCESS) {
-					$db->setQuery('DELETE FROM #__flexiaccess_acl WHERE acosection = `com_content` AND axosection = `item` AND axo ='.$item->id);
-					$db->query();
-				}
+				$db->setQuery('DELETE FROM #__assets WHERE id = (SELECT asset_id FROM #__content WHERE id='.$item->id.')');
+				$db->query();
 				$db->setQuery('DELETE FROM #__content WHERE id ='.$item->id);
 				$db->query();
 				$db->setQuery('DELETE FROM #__flexicontent_items_ext WHERE item_id='.$item->id);
+				$db->query();
+				$db->setQuery('DELETE FROM #__flexicontent_items_tmp WHERE item_id='.$item->id);
 				$db->query();
 				
 				$this->setId(0);
@@ -2365,12 +2382,7 @@ class ParentClassItem extends JModelAdmin
 				// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
 				$field->item_vstate = $data['vstate'];
 				
-				if (FLEXI_J16GE)
-					$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
-				else if (FLEXI_ACCESS && $user->gid < 25)
-					$is_editable = !$field->valueseditable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'field', $field->id);
-				else
-					$is_editable = 1;
+				$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
 				
 				// FORM HIDDEN FIELDS (FRONTEND/BACKEND) AND (ACL) UNEDITABLE FIELDS: maintain their DB value ...
 				if (
@@ -2393,7 +2405,7 @@ class ParentClassItem extends JModelAdmin
 					
 				// OTHER CUSTOM FIELDS (not hidden and not untranslatable)
 				} else {
-					$postdata[$field->name] = !FLEXI_J16GE  ?   @$data[$field->name]  :  @$data['custom'][$field->name];
+					$postdata[$field->name] = @$data['custom'][$field->name];
 				}
 				
 				// Unserialize values already serialized values, e.g. (a) if current values used are from DB or (b) are being imported from CSV file
@@ -3160,20 +3172,29 @@ class ParentClassItem extends JModelAdmin
 		static $typedata = array();
 		if ( !$force && isset($typedata[$this->_id]) ) return $typedata[$this->_id];
 		
-		if ($this->_id) {
+		// Existing item, get its type
+		if ($this->_id)
+		{
 			$query = 'SELECT ie.type_id as id,t.name FROM #__flexicontent_items_ext as ie'
 				. ' JOIN #__flexicontent_types as t ON ie.type_id=t.id'
 				. ' WHERE ie.item_id = ' . (int)$this->_id;
 			$this->_db->setQuery($query);
 			$_typedata = $this->_db->loadObject();
-		} else {
-			$typeid = $this->_typeid ? $this->_typeid : JRequest::getInt('typeid', 0);
+			if ($_typedata) $this->_typeid = $_typedata->id;
+		}
+		
+		 // New item check type exists
+		else if ( (int)$this->_typeid )
+		{
 			$query = 'SELECT t.id,t.name FROM #__flexicontent_types as t'
-				. ' WHERE t.id = ' . (int)$typeid;
+				. ' WHERE t.id = ' . (int)$this->_typeid;
 			$this->_db->setQuery($query);
 			$_typedata = $this->_db->loadObject();
+			if (!$_typedata) $this->_typeid = 0;
 		}
-		if (!$_typedata) {
+		
+		// Create default type object, if type not specified or not found
+		if (empty($_typedata)) {
 			$_typedata = new stdClass();
 			$_typedata->id = 0;
 			$_typedata->name = null;
@@ -3230,22 +3251,24 @@ class ParentClassItem extends JModelAdmin
 		static $typeparams = array();
 		if ( !$force && isset($typeparams[$this->_id]) ) return $typeparams[$this->_id];
 		
-		$query	= 'SELECT t.attribs'
-				. ' FROM #__flexicontent_types AS t';
-
-		if ( !$this->_id ) {
-			$typeid = $this->_typeid ? $this->_typeid : JRequest::getInt('typeid', 0);
-			$query .= ' WHERE t.id = ' . (int)$typeid;
-		} else {
-			$query .= ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-				. ' WHERE ie.item_id = ' . (int)$this->_id
+		if ( $this->_id || $this->_typeid)
+		{
+			$query	= 'SELECT t.attribs'
+				. ' FROM #__flexicontent_types AS t'
 				;
+			if ( $this->_id ) {
+				$query .= ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
+					. ' WHERE ie.item_id = ' . (int)$this->_id
+					;
+			} else {
+				$query .= ' WHERE t.id = ' . (int)$this->_typeid;
+			}
+			$this->_db->setQuery($query);
+			$tparams = $this->_db->loadResult();
 		}
-		$this->_db->setQuery($query);
-		$tparams = $this->_db->loadResult();
 		
 		// Cache and return
-		$typeparams[$this->_id] = $tparams ? $tparams : '';
+		$typeparams[$this->_id] = !empty($tparams) ? $tparams : '';
 		return $typeparams[$this->_id];
 	}
 	
@@ -4209,7 +4232,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// Merge into them the type parameters
 		$tparams = $this->getTypeparams();
-		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
+		$tparams = new JRegistry($tparams);
 		$params->merge($tparams);
 		
 		// We will use the email receivers of --new items-- pending approval, as receivers of the manual approval request
@@ -4235,7 +4258,7 @@ class ParentClassItem extends JModelAdmin
 		$user = JFactory::getUser();
 		$approvables = $this->isUserDraft($cid);
 		
-		$requestApproval = FLEXI_J16GE ? $user->authorise('flexicontent.requestapproval',	'com_flexicontent') : ($user->gid >= 20);  // or at least a J1.5 Editor
+		$requestApproval = $user->authorise('flexicontent.requestapproval',	'com_flexicontent');
 		
 		$submitted = 0;
 		$noprivilege = array();
@@ -4273,7 +4296,7 @@ class ParentClassItem extends JModelAdmin
 			}
 					
 			// Get component parameters and them merge into them the type parameters
-			$params  = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+			$params  = new JRegistry();
 			$cparams = JComponentHelper::getParams('com_flexicontent');
 			$params->merge($cparams);
 				
@@ -4331,19 +4354,12 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		// This may not be needed since the item was already in unpublished stated ??
-		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache($group='', 0);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-			$cache = FLEXIUtilities::getCache($group='', 1);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-		} else {
-			$itemcache = JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
-			$filtercache = JFactory::getCache('com_flexicontent_filters');
-			$filtercache->clean();
-		}
+		$cache = FLEXIUtilities::getCache($group='', 0); // backend
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
+		$cache = FLEXIUtilities::getCache($group='', 1); // frontend
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
 		
 		return $msg;
 	}

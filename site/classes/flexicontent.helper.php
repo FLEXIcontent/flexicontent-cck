@@ -1136,19 +1136,12 @@ class flexicontent_html
 		}
 
 		// Clean cache
-		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache($group='', 0);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-			$cache = FLEXIUtilities::getCache($group='', 1);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-		} else {
-			$itemcache = JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
-			$filtercache = JFactory::getCache('com_flexicontent_filters');
-			$filtercache->clean();
-		}
+		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
+		$cache = FLEXIUtilities::getCache($group='', 1);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
 
 		// Output new state icon and terminate
 		$tmpparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
