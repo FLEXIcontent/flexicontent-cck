@@ -230,7 +230,10 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 
 		// Common Buttons
-		JToolBarHelper::apply($item->type_id ? 'items.apply' : 'items.apply_type');  // Applying new item type is a special case that has not loaded custom fieds yet
+		
+		// Applying new item type is a special case that has not loaded custom fieds yet
+		JToolBarHelper::apply($item->type_id ? 'items.apply' : 'items.apply_type', !$isnew ? 'FLEXI_APPLY' : ($typesselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ), false);
+		
 		if (!$isnew || $item->version) JToolBarHelper::save('items.save');
 		if (!$isnew || $item->version) JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel('items.cancel');

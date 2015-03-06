@@ -332,6 +332,11 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	{
 		if($field->iscore != 1) return;
 		if(!is_array($post) && !strlen($post)) return;
+		
+		if ($filter->field_type == 'maintext') {
+			// field_type is not changed textarea so that field can handle this field type
+			FLEXIUtilities::call_FC_Field_Func('textarea', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
+		}
 	}
 	
 	

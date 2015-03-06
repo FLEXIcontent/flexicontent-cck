@@ -53,6 +53,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		static $common_js_css_added = false;
 		
+		// Get a unique id to use as item id if current item is new
+		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
+		
+		// Check if using folder of original content being translated
+		$of_usage = $field->untranslatable ? 1 : $field->parameters->get('of_usage', 0);
+		$u_item_id = ($of_usage && $item->lang_parent_id && $item->lang_parent_id != $item->id)  ?  $item->lang_parent_id  :  $u_item_id;
+		
+		
+		
 		// ****************
 		// Number of values
 		// ****************
@@ -77,12 +86,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$dir          = $field->parameters->get('dir');
 		$dir_url      = str_replace('\\','/', $dir);
 		
-		// Get a unique id to use as item id if current item is new
-		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
-		
-		// Check if using folder of original content being translated
-		$of_usage = $field->untranslatable ? 1 : $field->parameters->get('of_usage', 0);
-		$u_item_id = ($of_usage && $item->lang_parent_id && $item->lang_parent_id != $item->id)  ?  $item->lang_parent_id  :  $u_item_id;
 		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
 		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
@@ -573,15 +576,22 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$count_vals++;
 			}
 			
-			if ( $image_source ) {
+			if ( $image_source )
+			{
+				$linkfsel = JURI::base(true)
+					.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;folder_mode=1'
+					.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid='.$elementid_n."_existingname&amp;thumb_w=$thumb_w_s&amp;thumb_h=$thumb_h_s&amp;autoassign=".$autoassign
+					.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+				
 				$select = "
 				<input class='existingname fcfield_textval' id='".$elementid_n."_existingname' name='".$fieldname_n."[existingname]' value='".$image_name."' readonly='readonly' style='float:none;' />
 				".($none_props ? '<br/>' : '')."
 				<span class=\"fcfield-button-add\">
 					<a class=\"addfile_".$field->id."\" id='".$elementid_n."_addfile' title=\"".JText::_( 'FLEXI_SELECT_IMAGE' )."\"
 						".//href=\"#\" style=\"margin: 0px;\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",'".$u_item_id."',".$thumb_w_s.",".$thumb_h_s.")\"
-						"href=\"".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid_n."_existingname&thumb_w=$thumb_w_s&thumb_h=$thumb_h_s&autoassign=".$autoassign."\"
-						rel=\"{handler: 'iframe', size: {x: (MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT_IMAGE' )."</a>
+						"href=\"".$linkfsel."\"
+						rel=\"{handler: 'iframe', size: {x: (MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT_IMAGE' )."
+					</a>
 				</span>
 					";
 			}
