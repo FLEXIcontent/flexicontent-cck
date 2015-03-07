@@ -184,8 +184,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$js .= "
 				var boxClass = 'txtarea';
 				var container = newField.find('.fc_'+boxClass);
+				var txtArea = container.find('textarea')
+				var hasMCE  = txtArea.hasClass('mce_editable');
 				container.after('<div class=\"fc_'+boxClass+'\"></div>');  // Append a new container box
-				container.find('textarea').show().appendTo(container.next()); // Copy only the textarea (first make it visible) into the new container
+				container.find('textarea').show().css('visibility', 'visible').appendTo(container.next()); // Copy only the textarea (first make it visible) into the new container
 				container.remove(); // Remove old (cloned) container box along with all the contents
 				
 				// Prepare the new textarea for attaching the HTML editor
@@ -207,7 +209,20 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			
 			// Attach a new JS HTML editor object
 			if ($use_html) $js .= "
-				if (typeof tinyMCE !== 'undefined') tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+				if (typeof tinyMCE !== 'undefined' && hasMCE)
+				{
+          if(tinyMCE.majorVersion >= 4) {
+						tinyMCE.init({
+							mode : 'exact',
+							elements :'".$elementid."_'+uniqueRowNum".$field->id."
+						});
+          	tinyMCE.editors['".$elementid."_'+uniqueRowNum".$field->id."].show();
+          } else {
+						tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id.");
+						tinyMCE.execCommand('mceFocus', false, '".$elementid."_'+uniqueRowNum".$field->id.");
+          }
+					theArea.addClass('mce_editable');
+				}
 				";
 			
 			// Add new element to sortable objects (if field not in group)
