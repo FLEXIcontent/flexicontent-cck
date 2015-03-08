@@ -514,10 +514,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ($css) $document->addStyleDeclaration($css);
 		flexicontent_html::loadFramework('flexi-lib');
 		
+		// Add jQuery modal window to the select image file button, the container will be created if it does not exist already
 		if ( $image_source ) {
 			$js ="
 			jQuery(document).ready(function() {
-				// Add jQuery modal window to the select image file button, the container will be created if it does not exist already
 				jQuery('a.addfile_".$field->id."').each(function(index, value) {
 					jQuery(this).on('click', function() {
 						var url = jQuery(this).attr('href');
@@ -583,17 +583,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid='.$elementid_n."_existingname&amp;thumb_w=$thumb_w_s&amp;thumb_h=$thumb_h_s&amp;autoassign=".$autoassign
 					.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
 				
+				$_prompt_txt = JText::_( 'FLEXI_SELECT_IMAGE' );
 				$select = "
 				<input class='existingname fcfield_textval' id='".$elementid_n."_existingname' name='".$fieldname_n."[existingname]' value='".$image_name."' readonly='readonly' style='float:none;' />
-				".($none_props ? '<br/>' : '')."
-				<span class=\"fcfield-button-add\">
-					<a class=\"addfile_".$field->id."\" id='".$elementid_n."_addfile' title=\"".JText::_( 'FLEXI_SELECT_IMAGE' )."\"
-						".//href=\"#\" style=\"margin: 0px;\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",'".$u_item_id."',".$thumb_w_s.",".$thumb_h_s.")\"
-						"href=\"".$linkfsel."\"
-						rel=\"{handler: 'iframe', size: {x: (MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT_IMAGE' )."
+				".($none_props ? '<br/>' : '').'
+				<span class="fcfield-button-add">
+					<a class="addfile_'.$field->id.'" id="'.$elementid_n.'_addfile" title="'.$_prompt_txt.'" href="'.$linkfsel.'" >'
+						.$_prompt_txt.'
 					</a>
-				</span>
-					";
+				</span>';
 			}
 			
 			// Add current image or add an empty image container
@@ -1078,13 +1076,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$linkto_url	= $field->parameters->get('linkto_url',0);
 		$url_target = $field->parameters->get('url_target','_self');
-		$isLinkToPopup = $linkto_url && $url_target=='multibox';
+		$isLinkToPopup = $linkto_url && ($url_target=='multibox' || $url_target=='fancybox');
 		
-		// Force opening in new window in backend
-		if ($isItemsManager && $linkto_url && $url_target!='multibox') $url_target = "_blank";
+		// Force opening in new window in backend, if URL target is _self
+		if ($isItemsManager && $url_target=='_self') $url_target = "_blank";
 		
 		// Only allow multibox (and TODO: add fancybox) when linking to URL, in other cases force fancybox
-		if ($isLinkToPopup) $popuptype = 1; else if ($linkto_url) $usepopup = 0;
+		if ($isLinkToPopup && $url_target=='multibox') $popuptype = 1;
+		if ($isLinkToPopup && $url_target=='fancybox') $popuptype = 4;
+		else if ($linkto_url) $usepopup = 0;
 		
 		
 		// ************************************
@@ -1546,21 +1546,36 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (!$urllink) {
 					// CASE: Just image thumbnail since url link is empty
 					$field->{$prop}[] = $pretext.$img_legend.$inline_info.$posttext;
-				}	else if ($url_target=='multibox') {
-					// CASE: Link to URL that opens inside a popup
-					$field->{$prop}[] = $pretext.
-					'<script>document.write(\'<a style="'.$style.'" href="'.$urllink.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>=\'1.2.4\' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>=\'1.2.4\' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>
+				}
+				
+				else if ($url_target=='multibox') {
+					// CASE: Link to URL that opens inside a popup via multibox
+					$field->{$prop}[] = $pretext.'
+					<script>document.write(\'<a style="'.$style.'" href="'.$urllink.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+(jQuery(window).width()-150)+\',height:\'+(jQuery(window).height()-150)+\'">\')</script>
 						'.$img_legend.'
 					<script>document.write(\'</a>\')</script>
-					<div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.($desc ? $desc : $title).'</div>'
-					.$inline_info.$posttext;
-				} else {
-					// CASE: Just link to URL without popup
-					$field->{$prop}[] = $pretext.
-					'<a href="'.$urllink.'" target="'.$url_target.'">
+					<div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.($desc ? $desc : $title).'</div>
+					'.$inline_info.$posttext;
+				}
+				
+				else if ($url_target=='fancybox') {
+					// CASE: Link to URL that opens inside a popup via fancybox
+					$field->{$prop}[] = $pretext.'
+					<span class="fc_image_thumb" style="'.$style.'; cursor: pointer;" '.
+						'onclick="jQuery.fancybox.open([{ type: \'iframe\', href: \''.$urllink.'\', topRatio: 0.9, leftRatio: 0.9, title: \''.($desc ? $desc : $title).'\' }], { padding : 0});"
+					>
 						'.$img_legend.'
-					</a>'
-					.$inline_info.$posttext;
+					</span>
+					'.$inline_info.$posttext;
+				}
+				
+				else {
+					// CASE: Just link to URL without popup
+					$field->{$prop}[] = $pretext.'
+					<a href="'.$urllink.'" target="'.$url_target.'">
+						'.$img_legend.'
+					</a>
+					'.$inline_info.$posttext;
 				}
 				
 			} else if (

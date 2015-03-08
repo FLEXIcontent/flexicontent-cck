@@ -119,6 +119,7 @@
 				<option value="_self">FLEXI_FIELD_SAME_FRM_WIN_TAB</option>
 				<option value="_blank">FLEXI_FIELD_NEW_WIN_TAB</option>
 				<option value="multibox">FLEXI_FIELD_MODAL_POPUP_WIN</option>
+				<option value="fancybox">Modal popup window (Fancybox)</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_ALTERN_TEXT" level="level3" />

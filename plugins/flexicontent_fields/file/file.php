@@ -52,6 +52,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$document = JFactory::getDocument();
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		
 		
 		// ****************
@@ -59,10 +60,14 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		// ****************
 		$multiple   = $use_ingroup || 1;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = (int)$field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
 		// Input field configuration
+		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;
+		
+		// Get a unique id to use as item id if current item is new
+		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
 		
 		// Load file data
 		if ( !$field->value ) {
@@ -79,13 +84,19 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		//$value_classes .= ' floated';
 		
 		// Field name and HTML TAG id
-		$fieldname = 'custom['.$field->name.'][]';
-		//$elementid = 'custom_'.$field->name;
+		if ($inputmode)
+		{
+			$fieldname = 'custom['.$field->name.'][]';
+			$elementid = 'custom_'.$field->name;
+		} else {
+			$fieldname = 'custom['.$field->name.']';
+			$elementid = 'custom_'.$field->name;
+		}
 		
 		$js = "";
 		$css = "";
 		
-		if ($multiple) // handle multiple records
+		if ($multiple && $inputmode==1) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
 			if (!$use_ingroup) $js .= "
@@ -98,7 +109,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			});
 			";
 			
-			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values)  JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -122,7 +133,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					<span class=\"fcfield_textval inputbox inline_style_published\" id=\"a_name'+id+'\">'+file+'</span> \
 					<input type=\"hidden\" id=\"a_id'+id+'_".$field->id."\" name=\"".$fieldname."\" value=\"'+id+'\"/> \
 					<span class=\"fcfield-drag-handle\" title=\"".JText::_( 'FLEXI_CLICK_TO_DRAG' )."\"></span> \
-					<span class=\"fcfield-button fcfield-delvalue\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\" onclick=\"deleteField".$field->id."(this);\"></span> \
+					<span class=\"fcfield-delvalue\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\" onclick=\"deleteField".$field->id."(this);\"></span> \
 				</li>\
 				');
 					";
@@ -133,6 +144,15 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
+				
+				// Add jQuery modal window to the select image file button
+				jQuery('a.addfile_".$field->id."').each(function(index, value) {
+					jQuery(this).on('click', function() {
+						var url = jQuery(this).attr('href');
+						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container');
+						return false;
+					});
+				});
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -193,28 +213,63 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
+		flexicontent_html::loadFramework('flexi-lib');
+		
+		// Add jQuery modal window to the select image file button, the container will be created if it does not exist already
+		if ( $inputmode ) {
+			$js ="
+			jQuery(document).ready(function() {
+				jQuery('a.addfile_".$field->id."').each(function(index, value) {
+					jQuery(this).on('click', function() {
+						var url = jQuery(this).attr('href');
+						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container');
+						return false;
+					});
+				});
+			});
+			";
+			if ($js)  $document->addScriptDeclaration($js);
+		}
+		
 		
 		$field->html = array();
 		$n = 0;
-		foreach($files_data as $file_id => $file_data)
+		if ($inputmode == 0)
 		{
-			$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
+			foreach($files_data as $file_id => $file_data)
+			{
+				$fieldname_n = $fieldname.'['.$n.']';
+				$elementid_n = $elementid.'_'.$n;
+				$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
 			
-			$field->html[] = '
-				'.($file_data->published ?
-				'  <span class="fcfield_textval inputbox inline_style_published" id="a_name'.$n.'">'.$filename_original.'</span> '
-					.($file_data->url ? ' ['.$file_data->altname.']' : '') :
-				'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" id="a_name'.$n.'" [UNPUBLISHED]">'.$filename_original.'</span> '
-					.($file_data->url ? ' ['.$file_data->altname.']' : '')
-				).'
-				'.'<input type="hidden" id="a_id'.$file_id.'_'.$field->id.'" name="'.$fieldname.'" value="'.$file_id.'" />'.'
-				'.($use_ingroup ? '' : $move2).'
-				'.($use_ingroup ? '' : $remove_button).'
+				$field->html[] = '
+				<table class="fc-form-tbl" cellspacing="0" cellpadding="0" border="0" class="file-upload-form-box">
+				</table>
 				';
-			
-			$n++;
-			//if ($max_values && $n >= $max_values) break;  // break out of the loop, if maximum file limit was reached
+			}	
+		}
+		
+		else
+		{
+			foreach($files_data as $file_id => $file_data)
+			{
+				$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
+				
+				$field->html[] = '
+					'.($file_data->published ?
+					'  <span class="fcfield_textval inputbox inline_style_published" id="a_name'.$n.'">'.$filename_original.'</span> '
+						.($file_data->url ? ' ['.$file_data->altname.']' : '') :
+					'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" id="a_name'.$n.'" [UNPUBLISHED]">'.$filename_original.'</span> '
+						.($file_data->url ? ' ['.$file_data->altname.']' : '')
+					).'
+					'.'<input type="hidden" id="a_id'.$file_id.'_'.$field->id.'" name="'.$fieldname.'" value="'.$file_id.'" />'.'
+					'.($use_ingroup ? '' : $move2).'
+					'.($use_ingroup ? '' : $remove_button).'
+					';
+				
+				$n++;
+				//if ($max_values && $n >= $max_values) break;  // break out of the loop, if maximum file limit was reached
+			}
 		}
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
@@ -230,12 +285,18 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		// Add button for popup file selection
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
-		$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$n.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;autoselect='.$autoselect.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
-		$field->html .= "
-			<span class=\"fcfield-button-add\">
-				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
-			</span>
-				";
+		$linkfsel = JURI::base(true)
+			.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=default&amp;filter_secure=S&amp;folder_mode=0&amp;index='.$n
+			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoselect='.$autoselect.'&amp;filter_uploader='.$user->id
+			.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+		
+		$_prompt_txt = JText::_( 'FLEXI_ADD_FILE' );
+		$field->html .= '
+			<span class="fcfield-button-add">
+				<a class="addfile_'.$field->id.'" id="'.$elementid.'_addfile" title="'.$_prompt_txt.'" href="'.$linkfsel.'" >'
+					.$_prompt_txt.'
+				</a>
+			</span>';
 		
 		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
 	}
@@ -407,9 +468,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 		// Get user access level (these are multiple for J2.5)
 		$user = JFactory::getUser();
-		if (FLEXI_J16GE) $aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-		else             $aid = (int) $user->get('aid');
-
+		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+		
 		$n = 0;
 
 		// Get All file information at once (Data maybe cached already)
@@ -431,14 +491,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				$_attribs = ' class="icon-hits"';
 			}
 			
-			$hits_icon = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) :
-				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
-			$hits_icon .= ' ';
+			$hits_icon = JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) . ' ';
 		}
 		
 		$show_filename = $display_filename || $prop=='namelist';
-		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
+		$public_acclevel = 1;
 		foreach($files_data as $file_id => $file_data)
 		{
 			// Check if it exists and get file size
@@ -455,13 +512,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$authorized = true;
 			$is_public  = true;
 			if ( !empty($file_data->access) ) {
-				if (FLEXI_J16GE) {
-					$authorized = in_array($file_data->access,$aid_arr);
-					$is_public  = in_array($public_acclevel,$aid_arr);
-				} else {
-					$authorized = $file_data->access <= $aid;
-					$is_public  = $file_data->access <= $public_acclevel;
-				}
+				$authorized = in_array($file_data->access,$aid_arr);
+				$is_public  = in_array($public_acclevel,$aid_arr);
 			}
 			
 			// If no access and set not to show then continue
@@ -1164,7 +1216,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$q = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
 		$db->setQuery($q);
 		$fld = $db->loadObject();
-		$field_params = FLEXI_J16GE ? new JRegistry($fld->attribs) : new JParameter($fld->attribs);
+		$field_params = new JRegistry($fld->attribs);
 		
 		// Get all needed data related to the given file
 		$query  = 'SELECT f.id, f.filename, f.altname, f.secure, f.url,'
@@ -1307,9 +1359,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$attachment=null; $replyto=null; $replytoname=null;
 		
 		// Send the email
-		$send_result = FLEXI_J16GE ?
-			JFactory::getMailer()->sendMail( $from, $sender, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
-			JUtility::sendMail( $from, $sender, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+		$send_result = JFactory::getMailer()->sendMail( $from, $sender, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 		if ( $send_result !== true )
 		{
 			JError::raiseNotice(500, JText:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
@@ -1327,82 +1377,28 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$user  = JFactory::getUser();
 		$select_access = $joinacc = $andacc = '';
 		
+		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+		$aid_list = implode(",", $aid_arr);
+		
 		// Access Flags for: content item and field
 		if ( $get_select_access ) {
 			$select_access = '';
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				if ($include_file) $select_access .= ', CASE WHEN'.
-					'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
-				$select_access .= ', CASE WHEN'.
-					'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
-				$select_access .= ', CASE WHEN'.
-					'  ty.access IN (0,'.$aid_list.') AND '.
-					'   c.access IN (0,'.$aid_list.') AND '.
-					'   i.access IN (0,'.$aid_list.')'.
-					' THEN 1 ELSE 0 END AS has_content_access';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					if ($include_file) $select_access .= ', CASE WHEN'.
-						'   (gf.aro IN ( '.$user->gmid.' ) OR  f.access <= '. $aid . ')  THEN 1 ELSE 0 END AS has_file_access';
-					$select_access .= ', CASE WHEN'.
-						'  (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')  THEN 1 ELSE 0 END AS has_field_access';
-					$select_access .= ', CASE WHEN'.
-						'   (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ') AND '.
-						'   (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ') AND '.
-						'   (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')'.
-						' THEN 1 ELSE 0 END AS has_content_access';
-				} else {
-					if ($include_file) $select_access .= ', CASE WHEN'.
-						'   f.access <= '. $aid . '  THEN 1 ELSE 0 END AS has_file_access';
-					$select_access .= ', CASE WHEN'.
-						' fi.access <= '. $aid . '  THEN 1 ELSE 0 END AS has_field_access';
-					$select_access .= ', CASE WHEN'.
-						'  ty.access <= '. $aid . ' AND '.
-						'   c.access <= '. $aid . ' AND '.
-						'   i.access <= '. $aid .
-						' THEN 1 ELSE 0 END AS has_content_access';
-				}
-			}
+			if ($include_file) $select_access .= ', CASE WHEN'.
+				'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
+			$select_access .= ', CASE WHEN'.
+				'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
+			$select_access .= ', CASE WHEN'.
+				'  ty.access IN (0,'.$aid_list.') AND '.
+				'   c.access IN (0,'.$aid_list.') AND '.
+				'   i.access IN (0,'.$aid_list.')'.
+				' THEN 1 ELSE 0 END AS has_content_access';
 		}
 		
 		else {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				if ($include_file)
-					$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
-				$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
-				$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					if ($include_file) $andacc .=
-						' AND  (gf.aro IN ( '.$user->gmid.' ) OR f.access <= '. $aid . ' OR f.access IS NULL)';  // AND file access
-					$andacc   .=
-						' AND (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')';  // AND field access
-					$andacc   .=
-						' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';   // AND content access: type, cat, item
-						' AND  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
-						' AND  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
-				} else {
-					if ($include_file)
-						$andacc .= ' AND (f.access <= '.$aid .' OR f.access IS NULL)';  // AND file access
-					$andacc   .= ' AND fi.access <= '.$aid ;                          // AND field access
-					$andacc   .= ' AND ty.access <= '.$aid . ' AND  c.access <= '.$aid . ' AND  i.access <= '.$aid ;  // AND content access
-				}
-			}
-		}
-		
-		if (FLEXI_ACCESS) {
 			if ($include_file)
-				$joinacc .= ' LEFT JOIN #__flexiaccess_acl AS gf ON f.id = gf.axo AND gf.aco = "read" AND gf.axosection = "file"';        // JOIN file access
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gfi ON fi.id = gfi.axo AND gfi.aco = "read" AND gfi.axosection = "field"';  // JOIN field access
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';       // JOIN content access: type, cat, item
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+				$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
+			$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
+			$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
 		}
 		
 		$clauses['select'] = $select_access;

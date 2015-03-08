@@ -62,9 +62,9 @@ $this->document->addScriptDeclaration($js);
 				<td>
 					<?php echo $form->getInput('name'); ?>
 					<?php if ($form->getValue('field_type')=='textarea') : ?>
-						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline">Note:
+						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline"><?php echo JText::_('FLEXI_NOTES'); ?>:
 							<span class="<?php echo $tip_class; ?>" data-placement="bottom"
-									title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_CORE_FIELDS_CUSTOMIZATION', 'text', 'description', 'text'), 0, 1); ?>">
+									title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_CORE_FIELDS_CUSTOMIZATION', 'text', '<b>'.JText::_('FLEXI_DESCRIPTION').'</b>', 'text'), 0, 1); ?>">
 								<?php echo $hint_image; ?>
 							</span>
 						</span>
@@ -78,6 +78,14 @@ $this->document->addScriptDeclaration($js);
 				</td>
 				<td>
 					<span class="badge badge-info"><?php echo $form->getValue("name"); ?></span>
+					<?php if ($form->getValue('field_type')=='maintext') : ?>
+						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline"><?php echo JText::_('FLEXI_NOTES'); ?>:
+							<span class="<?php echo $tip_class; ?>" data-placement="bottom"
+									title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_FIELD_CUSTOMIZE_PER_CONTENT_TYPE', 'textarea', 'text', 'text'), 0, 1); ?>">
+								<?php echo $hint_image; ?>
+							</span>
+						</span>
+					<?php endif; ?>
 				</td>
 			</tr>
 			<?php endif; ?>

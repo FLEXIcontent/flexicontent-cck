@@ -745,7 +745,17 @@ class flexicontent_html
 				// Attach fancybox to all elements having a specific CSS class
 				$js .= "
 					jQuery(document).ready(function(){
-						jQuery('.fancybox').fancybox();
+						jQuery('.fancybox').each(function(i, v) {
+							var el = jQuery(this);
+							var href = null;//el.attr('href') ? el.attr('href') : null;
+							el.fancybox({
+								'openEffect'	: 'elastic',
+								'closeEffect'	: 'elastic',
+								'openEasing'  : 'easeOutCubic',
+								'closeEasing' : 'easeInCubic',
+								'href' : href
+							});
+						});
 					});
 				";
 				break;
