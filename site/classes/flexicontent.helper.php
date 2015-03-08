@@ -3607,7 +3607,7 @@ class flexicontent_html
 			$mcats_list = explode(',', $mcats_list);
 		}
 		// make sure given data are integers ... and skipping zero values
-		$layout_vars['cids'] = array();
+		$cids = array();
 		foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
 		$layout_vars['cids'] = implode(',' , $cids);
 		
