@@ -78,13 +78,13 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		$default_value = $default_value ? JText::_($default_value) : '';
 		
-		// Input field display size & max characters
-		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (TODO try to apply it at client-side)
-		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 1 );  // load HTML editor
+		// Editing method, text editor or HTML editor
+		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 );
 		
-		// *** Simple Textarea & HTML Editor (shared configuration) ***
+		// *** Simple Textarea ***
 		$rows  = $field->parameters->get( 'rows', ($field->field_type == 'maintext') ? 6 : 3 ) ;
 		$cols  = $field->parameters->get( 'cols', 80 ) ;
+		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
 		
 		// *** HTML Editor configuration  ***
 		$width = $field->parameters->get( 'width', '98%') ;
@@ -137,8 +137,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					}
 				}
 			}
+			if ($multiple) { $field->html[0] ='This textarea field: '.$field->label.' ['.$field->name.'] is being used to render the description field, which is not allowed to be multiple'; return; }
+			if ($use_ingroup) { $field->html[0] ='This textarea field: '.$field->label.' ['.$field->name.'] is being used to render the description field, which is not allowed to be grouped'; return; }
 			$multiple = 0;
-			if ($use_ingroup) { $field->html[0] ='This textarea field is being used to render the description field, which is not allowed to be grouped'; return; }
+			$use_ingroup = 0;
 		}
 		
 		$js = "";
@@ -180,12 +182,12 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				";
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			// Update the new textarea
 			$js .= "
+				// Update the new textarea
 				var boxClass = 'txtarea';
 				var container = newField.find('.fc_'+boxClass);
-				var txtArea = container.find('textarea')
-				var hasMCE  = txtArea.hasClass('mce_editable');
+				var editor = typeof tinyMCE === 'undefined' ? false : tinyMCE.get( container.find('textarea').first().attr('id') );
+				
 				container.after('<div class=\"fc_'+boxClass+'\"></div>');  // Append a new container box
 				container.find('textarea').show().css('visibility', 'visible').appendTo(container.next()); // Copy only the textarea (first make it visible) into the new container
 				container.remove(); // Remove old (cloned) container box along with all the contents
@@ -196,7 +198,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
 				theArea.removeClass(); // Remove all classes from the textarea
-				theArea.addClass(boxClass);
 				";
 			
 			// Add new field to DOM
@@ -209,19 +210,20 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			
 			// Attach a new JS HTML editor object
 			if ($use_html) $js .= "
-				if (typeof tinyMCE !== 'undefined' && hasMCE)
+				if (editor)
 				{
           if(tinyMCE.majorVersion >= 4) {
-						tinyMCE.init({
-							mode : 'exact',
-							elements :'".$elementid."_'+uniqueRowNum".$field->id."
-						});
-          	tinyMCE.editors['".$elementid."_'+uniqueRowNum".$field->id."].show();
+          	//var ed = new tinymce.Editor('textareaid', { mode : 'exact' }, tinymce.EditorManager);
+						//tinyMCE.init({  mode : 'exact',  elements :'".$elementid."_'+uniqueRowNum".$field->id."  });
+          	//tinyMCE.editors['".$elementid."_'+uniqueRowNum".$field->id."].show();
+          	tinymce.EditorManager.execCommand('mceAddEditor', true, '".$elementid."_'+uniqueRowNum".$field->id.");
           } else {
-						tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id.");
-						tinyMCE.execCommand('mceFocus', false, '".$elementid."_'+uniqueRowNum".$field->id.");
+          	tinymce.EditorManager.execCommand('mceAddControl', true, '".$elementid."_'+uniqueRowNum".$field->id.");
+						//tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id.");
           }
+          tinyMCE.EditorManager.execCommand('mceFocus', false, '".$elementid."_'+uniqueRowNum".$field->id.");
 					theArea.addClass('mce_editable');
+					newField.find('.mce-container').css('display', '');
 				}
 				";
 			
@@ -260,7 +262,15 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ this.remove(); });
+					row.slideUp(400, function(){
+						var txtareas = jQuery(this).find('textarea');
+						txtareas.each(function( i, txtarea) {
+							var areaid = jQuery(txtarea).attr('id');
+							var editor = tinyMCE.get(areaid);
+							if (editor) tinymce.EditorManager.execCommand('mceRemoveEditor', false, areaid);
+						});
+						this.remove();
+					});
 					rowCount".$field->id."--;
 				}
 			}
@@ -314,7 +324,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 			$txtarea = !$use_html ? '
-				<textarea id="'.$elementid_n.'" name="'.$fieldname_n.'" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
+				<textarea class="fcfield_textval txtarea" id="'.$elementid_n.'" name="'.$fieldname_n.'" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
 					.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : $editor->display(
@@ -325,8 +335,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$txtarea = '
 				<div class="fc_txtarea">
 					'.$txtarea.'
-				</div>
-				';
+				</div>';
 			
 			$field->html[] = '
 				'.($use_ingroup ? '' : $move2).'
@@ -390,7 +399,11 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$values = array($default_value);
 		}
 		
+		
+		// ******************************************
 		// Language filter, clean output, encode HTML
+		// ******************************************
+		
 		if ($clean_output) {
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
@@ -457,7 +470,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			break;
 		}
 		
-		// Initialise property with default value
+		// Create field's HTML
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)
@@ -530,7 +543,9 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		// Server side validation
 		$validation = $field->parameters->get( 'validation', 2 ) ;
+		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 );
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
+		$maxlength  = $use_html ? 0 : $maxlength;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -540,12 +555,17 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			// Do server-side validation and skip empty values
-			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
 			
+			
+			// **************************************************************
+			// Validate data, skipping values that are empty after validation
+			// **************************************************************
+			
+			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
 			if (!strlen($post[$n]) && !$use_ingroup) continue; // skip empty values
 			
 			$newpost[$new] = $post[$n];
+			
 			$new++;
 		}
 		$post = $newpost;

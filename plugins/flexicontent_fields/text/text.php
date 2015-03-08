@@ -55,7 +55,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		// ****************
 		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = (int)$field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
@@ -168,7 +168,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			if ($field->field_type=='textselect')
 				$js .= "
 				newField.parent().find('select.fcfield_textselval').val('');
-					";
+				";
 			
 			// Add new field to DOM
 			$js .= "
@@ -213,7 +213,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ this.remove(); });
+					row.slideUp(400, function(){
+						this.remove();
+					});
 					rowCount".$field->id."--;
 				}
 			}
