@@ -909,8 +909,9 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 #flexicontent .fcfield-sortables > li .input-prepend { float: left; margin-bottom: 0px; }
 #flexicontent .fcfield-sortables > li .input-append { margin-right: 10px; }
 #flexicontent .fcfield-sortables > li .use_select2_lib { vertical-align: top; }
-#flexicontent .fcfield-sortables > li > * { vertical-align: top; cursor: pointer;}
-#flexicontent .fcfield-sortables > li > .fcfield-drag-handle {cursor: move;}
+#flexicontent .fcfield-sortables > li > * { vertical-align: top; }
+#flexicontent .fcfield-sortables > li > [class^="fcfield-"],
+#flexicontent .fcfield-sortables > li > [class*=" fcfield-"] { cursor: pointer; }
 
 /* FIELD-GROUP: list of value containers */
 #flexicontent ul.fcfield-sortables.fcfield-group {
@@ -1104,6 +1105,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 
 /* FIELDs: DRAG (sort) handle */
 #flexicontent .fcfield-drag-handle {
+	cursor: move;
 	margin:0px 0px 2px 0px;
 	padding: 12px;
 	background: url(../images/move2.png) 4px 4px no-repeat white;

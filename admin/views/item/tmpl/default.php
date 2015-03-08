@@ -666,16 +666,16 @@ if ($this->row->type_id) {
 		<div class="fc_tabset_inner">
 			
 			<?php
-			$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
+			$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 			$row_k = 0;
 			foreach ($this->fields as $field)
 			{
-				// SKIP backend hidden fields from this listing
 				if (
-					($field->iscore && $field->field_type!='maintext')  ||
-					$field->parameters->get('backend_hidden')  ||
-					(in_array($field->field_type, $hidden) && empty($field->html)) ||
-					in_array($field->formhidden, array(2,3))
+					// SKIP backend hidden fields from this listing
+					($field->iscore && $field->field_type!='maintext')   ||   $field->parameters->get('backend_hidden')  ||   in_array($field->formhidden, array(2,3))   ||
+					
+					// Skip hide-if-empty fields from this listing
+					( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
 				) continue;
 				
 				// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc

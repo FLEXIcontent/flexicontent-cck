@@ -1155,22 +1155,27 @@ if ($this->fields && $typeid) :
 	<div class="fc_edit_container_full">
 		
 		<?php
-		$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
+		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 		$noplugin = sprintf( $alert_box, '', 'warning', 'fc-nobgimage', JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) );
 		$row_k = 0;
 		foreach ($this->fields as $field_name => $field)
 		{
-			// SKIP frontend hidden fields from this listing
-			if ( $field->iscore &&  isset($tab_fields['fman'][ $field->field_type ]) ) {
-				if ( !isset($captured[ $field->field_type ]) ) continue;
-				echo $captured[ $field->field_type ]; unset($captured[ $field->field_type ]);
-				echo "\n<div class='fcclear'></div>\n";
+			if ( $field->iscore &&  isset($tab_fields['fman'][ $field->field_type ]) )
+			{
+				// Print any CORE fields that are placed by field manager
+				if ( isset($captured[ $field->field_type ]) ) {
+					echo $captured[ $field->field_type ]; unset($captured[ $field->field_type ]);
+					echo "\n<div class='fcclear'></div>\n";
+				}
 				continue;
-			} else if (
-				($field->iscore && $field->field_type!='maintext')  ||
-				$field->parameters->get('frontend_hidden')  ||
-				(in_array($field->field_type, $hidden) && empty($field->html)) ||
-				in_array($field->formhidden, array(1,3))
+			}
+			
+			else if (
+				// SKIP frontend hidden fields 
+				($field->iscore && $field->field_type!='maintext')   ||   $field->parameters->get('frontend_hidden')   ||   in_array($field->formhidden, array(1,3))   ||
+				
+				// Skip hide-if-empty fields from this listing
+				( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
 			) continue;
 			
 			if ( $field->field_type=='maintext' && isset($all_tab_fields['maintext']) ) {
