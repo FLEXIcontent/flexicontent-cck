@@ -1167,8 +1167,10 @@ class flexicontent_html
 		$base  	= $uri->toString( array('scheme', 'host', 'port'));
 
 		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
-		if($view == 'category') {
-			$link = $base . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($slug).'&format=feed&type=rss');
+		if($view == 'category')
+		{
+			flexicontent_html::createCatLink($slug, $non_sef_link);
+			$link = $base . JRoute::_($non_sef_link.'&format=feed&type=rss');
 			//$link = $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
 		} elseif($view == FLEXI_ITEMVIEW) {
 			$link = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $slug, 0, $item).'&format=feed&type=rss');
@@ -3553,6 +3555,54 @@ class flexicontent_html
 		}
 	}
 	
+	static function createCatLink($slug, &$non_sef_link)
+	{
+		$menus  = JFactory::getApplication()->getMenu();
+		$menu   = $menus->getActive();
+		$Itemid = $menu ? $menu->id : 0;
+		
+		// Get URL variables
+		$layout_vars = flexicontent_html::getCatViewLayoutVars();
+		$cid  = $layout_vars['cid'];
+		
+		$urlvars = array();
+		if ($layout_vars['layout'])   $urlvars['layout']   = $layout_vars['layout'];
+		if ($layout_vars['authorid']) $urlvars['authorid'] = $layout_vars['authorid'];
+		if ($layout_vars['tagid'])    $urlvars['tagid']    = $layout_vars['tagid'];
+		if ($layout_vars['cids'])     $urlvars['cids']     = $layout_vars['cids'];
+		
+    // Category link for single/multiple category(-ies)  --OR--  "current layout" link for myitems/author layouts
+   	$non_sef_link = FlexicontentHelperRoute::getCategoryRoute($slug, $Itemid, $urlvars);
+		$category_link = JRoute::_($non_sef_link, false);
+		
+		return $category_link;
+	}
+	
+	
+	static function getCatViewLayoutVars()
+	{
+		static $layout_vars;
+		if ($layout_vars) return $layout_vars;
+		
+		// Get URL variables
+		$layout_vars = array();
+		$layout_vars['cid'] = JRequest::getInt('cid', 0);
+		$layout_vars['authorid'] = JRequest::getInt('authorid', 0);
+		$layout_vars['tagid']    = JRequest::getInt('tagid', 0);
+		$layout_vars['layout']   = JRequest::getCmd('layout', '');
+		
+		$mcats_list = JRequest::getVar('cids', '');
+		if ( !is_array($mcats_list) ) {
+			$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
+			$mcats_list = explode(',', $mcats_list);
+		}
+		// make sure given data are integers ... and skipping zero values
+		$layout_vars['cids'] = array();
+		foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+		$layout_vars['cids'] = implode(',' , $cids);
+		
+		return $layout_vars;
+	}
 }
 
 class flexicontent_upload

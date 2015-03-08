@@ -26,6 +26,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 function FLEXIcontentBuildRoute(&$query)
 {
 	$segments = array();
+	static $catVars = array('layout', 'authorid', 'tagid', 'cids');
 	
 	$app = JFactory::getApplication();
 	$params = JComponentHelper::getParams('com_flexicontent');
@@ -111,7 +112,8 @@ function FLEXIcontentBuildRoute(&$query)
 	$mview = @$menu->query['view'];
 	$view  = @$query['view'];
 	
-	switch ($view) {	
+	switch ($view)
+	{
 	case FLEXI_ITEMVIEW:
 		$mcid = @$menu->query['cid']; // not set returns null
 		$cid  = !isset($query['cid']) ? null : (int)$query['cid'];
@@ -157,6 +159,16 @@ function FLEXIcontentBuildRoute(&$query)
 			}
 			// IMPLY view = 'category' when count($segments) == 1
 			$segments[] = @$query['cid'];  // it is optional, some category view layouts do not use category id
+		}
+		// Handle layout variables, for links of various views using the category model/view/templating
+		foreach ($catVars as $i => $var)
+		{
+			if ( !isset($menu->query[$var]) || !isset($query[$var]) )
+				continue;
+			$m_var = is_array($menu->query[$var]) ?
+				implode($menu->query[$var], ",") : $menu->query[$var];
+			if ( $m_var == $query[$var])
+				unset($query[$var]);
 		}
 		unset($query['view']);
 		unset($query['cid']);

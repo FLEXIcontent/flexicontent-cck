@@ -489,13 +489,18 @@ class FlexicontentHelperRoute
 		// Create the link
 		// ***************
 		
-		$link = 'index.php?option=com_flexicontent&view=category&cid='.$catid;
+		$link = 'index.php?option=com_flexicontent&view=category';
+		if ($_catid) $link .= '&cid='.$_catid;
 		
 		// Other data to pass to _findCategory()
 		$data = array();
 		
 		// Append given variables
-		foreach ($urlvars as $varname => $varval) $link .= '&'.$varname.'='.$varval;
+		foreach ($urlvars as $varname => $varval) 
+			if ($varval)
+				$link .= '&'.$varname.'='.$varval;
+			else
+				unset($urlvars[$varname]);
 		$data['urlvars'] = $urlvars;
 		
 		

@@ -136,20 +136,12 @@ class FlexicontentViewCategory extends JViewLegacy
 		$params->set('clayout', $clayout);
 		
 		// Get URL variables
-		$cid = JRequest::getInt('cid', 0);
-		$authorid = JRequest::getInt('authorid', 0);
-		$tagid    = JRequest::getInt('tagid', 0);
-		$layout   = JRequest::getCmd('layout', '');
-		
-		$mcats_list = JRequest::getVar('cids', '');
-		if ( !is_array($mcats_list) ) {
-			$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
-			$mcats_list = explode(',', $mcats_list);
-		}
-		// make sure given data are integers ... !!
-		$cids = array();
-		foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
-		$cids = implode(',' , $cids);
+		$layout_vars = flexicontent_html::getCatViewLayoutVars();
+		$layout   = $layout_vars['layout'];
+		$authorid = $layout_vars['authorid'];
+		$tagid    = $layout_vars['tagid'];
+		$cids = $layout_vars['cids'];
+		$cid  = $layout_vars['cid'];
 		
 		$authordescr_item = false;
 		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed') {
@@ -160,10 +152,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($format != 'feed') {
 			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
 		}
-
+		
 		//Set layout
 		$this->setLayout('category');
-
+		
 		$limit		= $app->getUserStateFromRequest('com_flexicontent'.$category->id.'.category.limit', 'limit', $params->def('limit', 0), 'int');
 		
 		// Pathway needed variables
@@ -313,6 +305,15 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		
+		// *********************************************************************
+		// Create category link, but also consider current 'layout', and use the 
+		// layout specific variables so that filtering form will work properly
+		// *********************************************************************
+		
+		$non_sef_link = null;
+		$category_link = flexicontent_html::createCatLink($category->slug, $non_sef_link);
+		
+		
 		// ************************************
 		// Add rel canonical html head link tag (TODO: improve multi-page handing)
 		// ************************************
@@ -332,7 +333,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		if ($params->get('show_feed_link', 1) == 1) {
 			//add alternate feed link
-			$link	= '&format=feed';
+			$link	= $non_sef_link.'&format=feed';
 			$attribs = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
 			$document->addHeadLink(JRoute::_($link.'&type=rss'), 'alternate', 'rel', $attribs);
 			$attribs = array('type' => 'application/atom+xml', 'title' => 'Atom 1.0');
@@ -761,30 +762,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$pageNav = $this->get('pagination');
 		$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
-		
-		
-		// *********************************************************************
-		// Create category link, but also consider current 'layout', and use the 
-		// layout specific variables so that filtering form will work properly
-		// *********************************************************************
-		
-		$Itemid = $menu ? $menu->id : 0;
-		$layout_vars = array();
-		if ($layout)   $layout_vars['layout']   = $layout;
-		if ($authorid) $layout_vars['authorid'] = $authorid;
-		if ($tagid)    $layout_vars['tagid']    = $tagid;
-		if ($cids)     $layout_vars['cids']     = $cids;
-		
-    // Category link for single/multiple category(-ies)  --OR--  "current layout" link for myitems/author layouts
-    if ($cid) {
-			$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, $Itemid, $layout_vars), false);
-    } else {
-	    $urlvars_str = '';
-	    foreach ($layout_vars as $urlvar_name => $urlvar_val) {
-	    	$urlvars_str .= '&'.$urlvar_name.'='.$urlvar_val;
-	    }
-			$category_link = JRoute::_('index.php?Itemid='.$Itemid.'&option=com_flexicontent&view=category'.$urlvars_str.($Itemid ? '&Itemid='.$Itemid : ''));
-		}
 		
 		
 		// **********************************************************************

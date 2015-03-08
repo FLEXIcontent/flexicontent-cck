@@ -63,12 +63,8 @@ $this->document->addScriptDeclaration($js);
 					<?php echo $form->getInput('name'); ?>
 					<?php if ($form->getValue('field_type')=='textarea') : ?>
 						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline">Note:
-							<span class="<?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'),
-								'Use "text_{typealias}" as \'name\', to customize (override) the item form related parameters of the description field for specific type. Open type configuration to find out the \'{typealias}\ e.g. use \'text_article\' for the article content type
-								<br/><br/>Please note that 
-								- only the field parameters are used and not the field properties, <br/>
-								- and that display / server-side validation parameters can not yet be overriden, <br/>
-								!! but make sure you set them because they will be used in the future', 0, 1); ?>">
+							<span class="<?php echo $tip_class; ?>" data-placement="bottom"
+									title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_CORE_FIELDS_CUSTOMIZATION', 'text', 'description', 'text'), 0, 1); ?>">
 								<?php echo $hint_image; ?>
 							</span>
 						</span>
