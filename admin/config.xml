@@ -240,16 +240,16 @@
 				<option value="1" show_list="count_unique_hits" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="hits_mins_to_unique" type="text" size="5" default="600" label="FLEXI_HITS_MINS_BETWEEN_UNIQUE" description="FLEXI_HITS_MINS_BETWEEN_UNIQUE_DESC" menu="hide" class="count_unique_hits" />
-			<field name="hits_skip_ips" type="multilist" subtype="radio" default="1" label="FLEXI_HITS_SKIP_IPS" description="FLEXI_HITS_SKIP_IPS_DESC" menu="hide" toggle_related="1" class="btn-group btn-group-yesno">
+			<field name="hits_skip_ips" type="multilist" subtype="radio" default="1" label="FLEXI_HITS_SKIP_IPS" description="FLEXI_HITS_SKIP_IPS_DESC" menu="hide" toggle_related="1" class="count_unique_hits btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="iplist_hits">FLEXI_NO</option>
 				<option value="1" show_list="iplist_hits" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_ips_list" type="textarea" cols="50" rows="4" default="127.0.0.1" label="FLEXI_HITS_IP_LIST" description="FLEXI_HITS_IP_LIST_DESC" menu="hide" class="iplist_hits"/>
-			<field name="hits_skip_bots" type="multilist" subtype="radio" default="1" label="FLEXI_HITS_SKIP_BOTS" description="FLEXI_HITS_SKIP_BOTS_DESC" menu="hide" toggle_related="1" class="btn-group btn-group-yesno">
+			<field name="hits_ips_list" type="textarea" cols="50" rows="4" default="127.0.0.1" label="FLEXI_HITS_IP_LIST" description="FLEXI_HITS_IP_LIST_DESC" menu="hide" class="count_unique_hits iplist_hits"/>
+			<field name="hits_skip_bots" type="multilist" subtype="radio" default="1" label="FLEXI_HITS_SKIP_BOTS" description="FLEXI_HITS_SKIP_BOTS_DESC" menu="hide" toggle_related="1" class="count_unique_hits btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="botlist_hits">FLEXI_NO</option>
 				<option value="1" show_list="botlist_hits" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" class="botlist_hits" />
+			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" class="count_unique_hits botlist_hits" />
 			
 	</fieldset>
 	<fieldset name="lists_catdata_fset" label="FLEXI_LISTS_CATDATA_CONF" description="" >
