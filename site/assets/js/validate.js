@@ -311,7 +311,11 @@ var JFormValidator = new Class({
 				if (el.hasClass('validate')) {
 					el.onclick = function(){return document.formvalidator.isValid(this.form);};
 				}
-			} else {
+			}
+			else if (el.hasClass('use_select2_lib')) {
+				el.on('change', function(){return document.formvalidator.validate(this);});
+			}
+			else {
 				el.on('blur', function(){return document.formvalidator.validate(this);});
 			}
 		});

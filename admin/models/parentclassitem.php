@@ -2176,7 +2176,7 @@ class ParentClassItem extends JModelAdmin
 				$db->query();
 				$db->setQuery('DELETE FROM #__flexicontent_items_ext WHERE item_id='.$item->id);
 				$db->query();
-				$db->setQuery('DELETE FROM #__flexicontent_items_tmp WHERE item_id='.$item->id);
+				$db->setQuery('DELETE FROM #__flexicontent_items_tmp WHERE id='.$item->id);
 				$db->query();
 				
 				$this->setId(0);
