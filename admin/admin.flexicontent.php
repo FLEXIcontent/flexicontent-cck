@@ -302,6 +302,9 @@ if ( ($force_print || $print_logging_info) && JRequest::getWord('tmpl')!='compon
 	if (isset($fc_run_times['item_store_core']))
 		$msg .= sprintf('<br/>-- [Store item core data: %.2f s] ', $fc_run_times['item_store_core']/1000000);
 
+	if (isset($fc_run_times['item_store_custom']))
+		$msg .= sprintf('<br/>-- [Store item custom fields data: %.2f s] ', $fc_run_times['item_store_custom']/1000000);
+
 	// **** BOF: BACKEND SPECIFIC
 	if (isset($fc_run_times['unassoc_items_query']))
 		$msg .= sprintf('<br/>-- [Execute Unassociate Items Query: %.2f s] ', $fc_run_times['unassoc_items_query']/1000000);

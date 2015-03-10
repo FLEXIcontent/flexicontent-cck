@@ -204,14 +204,11 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
 				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
 				theArea.removeClass(); // Remove all classes from the textarea
-				theArea.addClass(boxClass);
 				
 				// Update the labels
-				//newField.find('label.labeltitle').text('".$title_label." '+parseInt(rowCount".$field->id."+1)+':');
-				//newField.find('label.labeltitle').text('".$value_label." '+parseInt(rowCount".$field->id."+1)+':');
 				newField.find('label.labeltitle').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				newField.find('label.labeltext').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-					";
+				";
 			
 			// Add new field to DOM
 			$js .= "
@@ -223,7 +220,21 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			
 			// Attach a new JS HTML editor object
 			if ($use_html) $js .= "
-				if (typeof tinyMCE !== 'undefined') tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+				if (editor)
+				{
+          if(tinyMCE.majorVersion >= 4) {
+          	//var ed = new tinymce.Editor('textareaid', { mode : 'exact' }, tinymce.EditorManager);
+						//tinyMCE.init({  mode : 'exact',  elements :'".$elementid."_'+uniqueRowNum".$field->id."+'_text'  });
+          	//tinyMCE.editors['".$elementid."_'+uniqueRowNum".$field->id."+'_text'].show();
+						tinyMCE.EditorManager.execCommand('mceAddEditor', true, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+          } else {
+          	tinyMCE.EditorManager.execCommand('mceAddControl', true, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+						//tinyMCE.execCommand('mceAddControl', true, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+          }
+          //tinyMCE.EditorManager.execCommand('mceFocus', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+					theArea.addClass('mce_editable');
+					newField.find('.mce-container').css('display', '');
+				}
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -494,8 +505,8 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$n = 0;
 		foreach ($values as $value)
 		{
-			if ( empty($value['title']) && !$use_ingroup ) continue;
-			if ( empty($value['title']) ) {
+			if ( !strlen($value['title']) && !$use_ingroup ) continue;
+			if ( !strlen($value['title']) ) {
 				$field->{$prop}[$n++]	= '';
 				continue;
 			}

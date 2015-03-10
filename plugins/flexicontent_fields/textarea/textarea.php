@@ -216,9 +216,9 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
           	//var ed = new tinymce.Editor('textareaid', { mode : 'exact' }, tinymce.EditorManager);
 						//tinyMCE.init({  mode : 'exact',  elements :'".$elementid."_'+uniqueRowNum".$field->id."  });
           	//tinyMCE.editors['".$elementid."_'+uniqueRowNum".$field->id."].show();
-          	tinymce.EditorManager.execCommand('mceAddEditor', true, '".$elementid."_'+uniqueRowNum".$field->id.");
+          	tinyMCE.EditorManager.execCommand('mceAddEditor', true, '".$elementid."_'+uniqueRowNum".$field->id.");
           } else {
-          	tinymce.EditorManager.execCommand('mceAddControl', true, '".$elementid."_'+uniqueRowNum".$field->id.");
+          	tinyMCE.EditorManager.execCommand('mceAddControl', true, '".$elementid."_'+uniqueRowNum".$field->id.");
 						//tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id.");
           }
           tinyMCE.EditorManager.execCommand('mceFocus', false, '".$elementid."_'+uniqueRowNum".$field->id.");
@@ -570,10 +570,11 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		}
 		$post = $newpost;
 		
-		// Reconstruct value if it has splitted up e.g. to tabs, MULTI-VALUE AND TAB-SPLIT not supported simutaneusly
+		// Reconstruct value if it has splitted up e.g. to tabs or if given field is the description field,
+		// for textarea MULTI-VALUE and TAB-SPLIT not supported simutaneusly 
 		if ($field->parameters->get('editorarea_per_tab', 0) && count($post)>1)
 		{
-			$post = array(implode(' ', $post));
+			$post = array(implode(' ', $post)) ;
 		}
 		/*if ($use_ingroup) {
 			$app = JFactory::getApplication();

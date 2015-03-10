@@ -253,7 +253,9 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	
 	if (isset($fc_run_times['item_store_core']))
 		$msg .= sprintf('<br/>-- [Store item core data: %.2f s] ', $fc_run_times['item_store_core']/1000000);
-
+	
+	if (isset($fc_run_times['item_store_custom']))
+		$msg .= sprintf('<br/>-- [Store item custom fields data: %.2f s] ', $fc_run_times['item_store_custom']/1000000);
 	
 	if (isset($fc_run_times['execute_main_query']))
 		$msg .= sprintf('<br/>-- [Query: item LISTING: %.2f s] ', $fc_run_times['execute_main_query']/1000000);

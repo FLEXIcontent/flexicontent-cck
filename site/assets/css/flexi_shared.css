@@ -1469,7 +1469,7 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
 	clear: both; width:100%; padding:0; margin:0;
 }
 
-#flexicontent { margin:0px!important; }
+#flexicontent { margin: 0px; }
 #flexicontent fieldset.basicfields_set,
 fieldset.flexiaccess, fieldset.adminform,
 #flexicontent fieldset.customfields_set,
