@@ -226,18 +226,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				newField.find('a.addfile_".$field->id."').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
 				newField.find('a.addfile_".$field->id."').attr('href','".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$thumb_w_s.'&thumb_h='.$thumb_h_s.'&autoassign='.$autoassign."');
 				
-				// COPYING an existing value
-				if (newField.find('img.preview_image')) {
+				// COPY an preview box
+				var img_preview = newField.find('img.preview_image');
+				var empty_img   = newField.find('img.preview_image');
+				var old_preview = img_preview.length ? img_preview : newField.find('div.empty_image');
+				
+				if (old_preview.length)
+				{
 					var tmpDiv = jQuery('<div class=\"empty_image empty_image".$field->id."\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>');
 					tmpDiv.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
-					tmpDiv.insertAfter( newField.find('img.preview_image') );
-					newField.find('img.preview_image').remove();
-				}
-				
-				// COPYING an empty value
-				else if (newField.find('div.empty_image')) {
-					newField.find('div.empty_image').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
-					newField.find('div.empty_image').html('');
+					tmpDiv.insertAfter( old_preview );
+					old_preview.remove();
 				}
 				
 				var imgchange_toggler = newField.find('input.imgchange');

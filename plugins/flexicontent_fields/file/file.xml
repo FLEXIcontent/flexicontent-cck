@@ -27,15 +27,25 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
+			<field name="allow_multiple" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
+				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<!--field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="multivalue-mode" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
+				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
+				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
+				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
+			</field-->
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			<field name="inputmode" type="multilist" subtype="radio" toggle_related="1" default="1" label="Input mode" description="Select to display file upload elements inline or in modal popup window" class="btn-group group-fcinfo">
-				<!--option value="0" show_list="db-inline-mode" hide_list="db-popup-mode">FLEXI_INLINE</option-->
+				<option value="0" show_list="db-inline-mode" hide_list="db-popup-mode">FLEXI_INLINE</option>
 				<option value="1" show_list="db-popup-mode" hide_list="db-inline-mode">FLEXI_POPUP</option>
 			</field>
 			<field name="" type="separator" default="Inline mode, supports only single file selection" description="" level="level4" />

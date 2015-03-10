@@ -78,7 +78,21 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		if ($task=='uploads') {
 			$file 	= JRequest::getVar( 'file', '', 'files', 'array' );
 		} else {
-			$file		= JRequest::getVar( 'Filedata', '', 'files', 'array' );
+			// Default field <input type="file" is name="Filedata" ... get the file
+			$ffname = JRequest::getCmd( 'file-ffname', 'Filedata', 'post' );
+			$file   = JRequest::getVar( $ffname, '', 'files', 'array' );
+			
+			// Refactor the array swapping positions
+			$file = $this->refactorFilesArray($file);
+			
+			// Get nested position, and reach the final file data array
+			$fname_level1 = JRequest::getCmd( 'fname_level1', null, 'post' );
+			$fname_level2 = JRequest::getCmd( 'fname_level2', null, 'post' );
+			$fname_level3 = JRequest::getCmd( 'fname_level3', null, 'post' );
+			
+			if (strlen($fname_level1))  $file = $file[$fname_level1];
+			if (strlen($fname_level2))  $file = $file[$fname_level2];
+			if (strlen($fname_level3))  $file = $file[$fname_level3];
 		}
 		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
 		$secure		= JRequest::getVar( 'secure', 1, '', 'int');
@@ -239,7 +253,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			} else {
 				$file_id = 0;
 			}
-				
+			
 			// JSON output: Terminate printing a message
 			if ($format == 'json') {
 				if ($task=='uploads') {
@@ -254,7 +268,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
 				} else {
 					$app->enqueueMessage(JText::_( 'FLEXI_UPLOAD_COMPLETE' ));
-					if ( !$return ) return;  // No return URL
+					if ( !$return ) return $file_id;  // No return URL, return the file ID
 					$app->redirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
 				}
 			}
@@ -863,5 +877,43 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$url = 'index.php?option=com_flexicontent&view=filemanager';
 		}
 		$this->setRedirect($url, $msg);
+	}
+	
+	
+	/* Restructure a FILES array for easier usage */
+	function refactorFilesArray(&$f)
+	{
+		if ( empty($f['name']) || !is_array($f['name']) )  return $f; // nothing more to do
+		
+		$level0_keys = array_keys($f);
+		$level1_keys = array_keys($f['name']);
+		
+		// Swap indexLevel_N with indexLeveL_N+1, until there are no more inner arrays
+		foreach ($level0_keys  as  $i)  // level0_keys are: name, type, tmp_name, error, size
+		{
+			foreach ($level1_keys  as  $k1)  // level1_keys are: the indexes of ... file['name']
+			{
+				$r1[$k1][$i] = $f[$i][$k1];
+				if ( !is_array($r1[$k1][$i]) ) continue;
+				
+				foreach(array_keys($r1[$k1][$i])  as  $k2)
+				{
+					$r2[$k1][$k2][$i] = $r1[$k1][$i][$k2];
+					if ( !is_array($r2[$k1][$k2][$i]) ) continue;
+					
+					foreach(array_keys($r2[$k1][$k2][$i])  as  $k3)
+					{
+						$r3[$k1][$k2][$k3][$i] = $r2[$k1][$k2][$i][$k3];
+					}
+				}
+			}
+		}
+		
+		if (isset($r3))
+			return $r3;
+		else if (isset($r2))
+			return $r2;
+		else
+			return $r1;
 	}
 }

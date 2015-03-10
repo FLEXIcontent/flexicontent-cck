@@ -745,16 +745,11 @@ class flexicontent_html
 				// Attach fancybox to all elements having a specific CSS class
 				$js .= "
 					jQuery(document).ready(function(){
-						jQuery('.fancybox').each(function(i, v) {
-							var el = jQuery(this);
-							var href = null;//el.attr('href') ? el.attr('href') : null;
-							el.fancybox({
-								'openEffect'	: 'elastic',
-								'closeEffect'	: 'elastic',
-								'openEasing'  : 'easeOutCubic',
-								'closeEasing' : 'easeInCubic',
-								'href' : href
-							});
+						jQuery('.fancybox').fancybox({
+							'openEffect'	: 'elastic',
+							'closeEffect'	: 'elastic',
+							'openEasing'  : 'easeOutCubic',
+							'closeEasing' : 'easeInCubic',
 						});
 					});
 				";
@@ -2681,8 +2676,8 @@ class flexicontent_html
 		if ( !count($user_langs) )  return "user is not allowed to use any language";
 		if (!$selected_found) $selected = $user_langs[0]->code;  // Force first language to be selected
 		
-		$element_id = preg_replace('#[\[\]]#', '_', $name);
-		
+		$element_id = preg_replace('#[\[]#', '_', $name);
+		$element_id = preg_replace('#[\]]#', '', $element_id);		
 		
 		if ( $conf && empty($conf['flags']) && empty($conf['texts']) ) {
 			 $conf['flags'] = $conf['texts'] = 1;
@@ -2704,7 +2699,7 @@ class flexicontent_html
 				foreach ($user_langs as $lang) {
 					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
 				}
-				$list = JHTML::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected );
+				$list = JHTML::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected, $element_id);
 				break;
 			
 			// RADIO selection of ALL languages , e.g. item form,
@@ -2716,8 +2711,8 @@ class flexicontent_html
 					if ($lang->code == $selected) {
 						$checked = ' checked="checked"';
 					}
-					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
-					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'" >';
+					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
+					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'" >';
 					if($lang->shortcode=="*") {
 						$list 	.= '<span class="lang_lbl">'.JText::_('FLEXI_ALL').'</span>';  // Can appear in J1.6+ only
 					} else {
@@ -2751,8 +2746,8 @@ class flexicontent_html
 				$list .= '</label><div class="clear"></div>';
 
 				foreach ($user_langs as $lang) {
-					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
-					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -2767,8 +2762,8 @@ class flexicontent_html
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					if ($lang->code==$selected) continue;
-					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
-					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -2783,8 +2778,8 @@ class flexicontent_html
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					$checked = $lang->code==$selected ? 'checked="checked"' : '';
-					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" '.$checked.'/>';
-					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" '.$checked.'/>';
+					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {

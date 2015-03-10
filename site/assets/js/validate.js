@@ -382,6 +382,8 @@ var JFormValidator = new Class({
 		if (handler == "sellimitations" || handler == "cboxlimitations") {
 			// Execute the validation handler and return result
 			if (this.handlers[handler].exec(el) != true) {
+				//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
+				//else window.console.log('INVALID with element id:' + el_id);
 				this.handleResponse(false, el);
 				return false;
 			}
@@ -390,12 +392,16 @@ var JFormValidator = new Class({
 			if ( typeof fcpass_element[el_id] != 'undefined' ) {
 				// Execute the validation handler and return result
 				if (this.handlers[handler].exec(el) != true) {
+					//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
+					//else window.console.log('INVALID with element id:' + el_id);
 					this.handleResponse(false, el);
 					return false;
 				}
 			} else if ((handler) && (handler != 'none') && (this.handlers[handler]) && el_value) {
 				// Execute the validation handler and return result
 				if (this.handlers[handler].exec(el_value) != true) {
+					//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
+					//else window.console.log('INVALID with element id:' + el_id);
 					this.handleResponse(false, el);
 					return false;
 				}
@@ -406,6 +412,8 @@ var JFormValidator = new Class({
 					if (jqEL.hasClass('required')) {
 						// Execute the validation handler and return result
 						if (this.handlers[handler].exec(el.parentNode) != true) {
+							//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
+							//else window.console.log('INVALID with element id:' + el_id);
 							this.handleResponse(false, el);
 							return false;
 						}

@@ -224,17 +224,6 @@ ul.statetoggler {
 	padding:15px 0 15px 15px
 }
 /* mirror .cssbox_head right/left */
-/* Validation */
-.invalid {
-	color:#CC0000;
-}
-select.invalid,
-input.invalid,
-textarea.invalid {
-/* 	border: 1px solid #CC0000; */
-	border-style: dotted;
-}
-/* EOF Validation */
 .calendar {
 	vertical-align: middle;
 }
@@ -1434,9 +1423,25 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
 	background: none !important;
 }
 
+#flexicontent form textarea.invalid,
+#flexicontent form input.invalid,
+#flexicontent form select.invalid,
+select.invalid, input.invalid, textarea.invalid {
+	border: 1px dotted #CC0000 !important;
+}
+
+.use_prettycheckable.invalid + a + label,
+input.invalid + .fccheckradio_lbl {
+	color: #cc0000 !important;
+	border: 1px dotted #CC0000 !important;
+	border-radius: 4px;
+}
+#flexicontent .label.invalid,
+#flexicontent .label-fcinner.invalid,
 #flexicontent .flexi_label.invalid,
 #flexicontent .flexi_label.invalid.required {
-	color:red !important;
+	color: #CC0000 !important;
+	border: 1px dotted #CC0000 !important;
 }
 #flexicontent .flexi_label.required:after {
 	content:"*";
@@ -1462,9 +1467,6 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
 	vertical-align: top;
 }
 
-#flexicontent .flexi_label.invalid {
-	font-weight: bold;
-}
 #flexicontent .flexi_formblock {
 	clear: both; width:100%; padding:0; margin:0;
 }
@@ -1503,12 +1505,6 @@ fieldset.adminform legend { font-weight:bold; font-size: 14px; }
 	/*border: 1px solid #dddddd;*/
 	/*cursor: pointer;*/
 	/*padding: 0.1em 0.4em 0.1em 0.2em;*/
-}
-
-#flexicontent form textarea.invalid,
-#flexicontent form input.invalid,
-#flexicontent form select.invalid {
-	border: 1px dotted #ff0000 !important;
 }
 
 div.flexi_box_left,

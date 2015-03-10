@@ -44,7 +44,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
-		$use_ingroup = 0;  // Not supported
+		$use_ingroup = 0; // $field->parameters->get('use_ingroup', 0);
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 		
@@ -58,30 +58,52 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		// ****************
 		// Number of values
 		// ****************
-		$multiple   = $use_ingroup || 1;
+		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 1 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = (int)$field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
 		// Input field configuration
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;
+		if ($inputmode==0 && $multiple) echo "Multi-value mode is not implenent for inline mode in current version, it will be in a future version";
+		$multiple  = !$inputmode ? 0 : $multiple;
+		if ($inputmode==0) {
+			$iform_title = $field->parameters->get('iform_title', 1);
+			$iform_desc  = $field->parameters->get('iform_desc',  1);
+			$iform_lang  = $field->parameters->get('iform_lang',  0);
+			$iform_dir   = $field->parameters->get('iform_dir',   0);
+		}
 		
 		// Get a unique id to use as item id if current item is new
 		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
 		
 		// Load file data
 		if ( !$field->value ) {
+			// Field value empty
 			$files_data = array();
 			$field->value = array();
-		} else {
+		}
+		else {
+			// Get data for given file ids
 			$files_data = $this->getFileData( $field->value, $published=false );
 			$field->value = array();
 			foreach($files_data as $file_id => $file_data) $field->value[] = $file_id;
 		}
 		
+		// Inline mode needs an default value
+		if ($inputmode==0 && empty($field->value))
+		{
+			// Create fake value, to allow the inline form fields to work
+			$field->value = array(0=>0);
+			$files_data = array(0 => (object)array(
+				'id'=>'', 'filename'=>'', 'filename_original'=>'', 'altname'=>'', 'description'=>'',
+				'url'=>'', 'secure'=>1, 'ext'=>'', 'published'=>1, 'language'=>'*', 'hits'=>0,
+				'uploaded'=>'', 'uploaded_by'=>0, 'checked_out'=>false, 'checked_out_time'=>'', 'access'=>0,
+			) );
+		}
+		
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		//$value_classes .= ' floated';
 		
 		// Field name and HTML TAG id
 		if ($inputmode)
@@ -109,7 +131,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			});
 			";
 			
-			if ($max_values)  JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -136,7 +158,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					<span class=\"fcfield-delvalue\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\" onclick=\"deleteField".$field->id."(this);\"></span> \
 				</li>\
 				');
-					";
+				";
 			
 			// Add new field to DOM
 			$js .= "
@@ -190,17 +212,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ this.remove(); });
+					row.slideUp(400, function(){
+						this.remove();
+					});
 					rowCount".$field->id."--;
 				}
 			}
 			";
-			
-			$css .= '
-			#sortables_'.$field->id.' li span.fcfield_textval { cursor:text; padding:4px!important; font-family:tahoma!important; white-space:pre-wrap!important; word-wrap:break-word!important; min-width:220px;}
-			#sortables_'.$field->id.' li span.inline_style_published   { color:#444!important; }
-			#sortables_'.$field->id.' li span.inline_style_unpublished { background: #ffffff; color:gray; border-width:0px; text-decoration:line-through; }
-			';
 			
 			$remove_button = '<span class="fcfield-delvalue" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2 = '<span class="fcfield-drag-handle" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
@@ -211,6 +229,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$css .= '';
 		}
 		
+		$css .= '
+			#sortables_'.$field->id.' li span.fcfield_textval { cursor:text; padding:4px!important; font-family:tahoma!important; white-space:pre-wrap!important; word-wrap:break-word!important; min-width:220px;}
+			#sortables_'.$field->id.' li span.inline_style_published   { color:#444!important; }
+			#sortables_'.$field->id.' li span.inline_style_unpublished { background: #ffffff; color:gray; border-width:0px; text-decoration:line-through; }
+			';
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 		flexicontent_html::loadFramework('flexi-lib');
@@ -234,47 +257,104 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
-		if ($inputmode == 0)
+		if ($inputmode == 0) foreach($files_data as $file_id => $file_data)
 		{
-			foreach($files_data as $file_id => $file_data)
-			{
-				$fieldname_n = $fieldname.'['.$n.']';
-				$elementid_n = $elementid.'_'.$n;
-				$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
+			$fieldname_n = $fieldname.'['.$n.']';
+			$elementid_n = $elementid.'_'.$n;
+			$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
 			
-				$field->html[] = '
-				<table class="fc-form-tbl" cellspacing="0" cellpadding="0" border="0" class="file-upload-form-box">
-				</table>
-				';
-			}	
-		}
-		
-		else
-		{
-			foreach($files_data as $file_id => $file_data)
-			{
-				$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
-				
-				$field->html[] = '
+			$field->html[] = '
+				<div class="nowrap_box inlinefile-file-info-box">
+					<label class="label inlinefile-file-info-lbl '.$tip_class.'" title="'.flexicontent_html::getToolTip('Selected file', 'You can replace an already selected file by a new one', 1, 1).'" id="'.$elementid_n.'_Filedata-lbl" for='.$elementid_n.'_Filedata" >
+						'.JText::_( 'Selected file' ).'
+					</label>
 					'.($file_data->published ?
 					'  <span class="fcfield_textval inputbox inline_style_published" id="a_name'.$n.'">'.$filename_original.'</span> '
 						.($file_data->url ? ' ['.$file_data->altname.']' : '') :
 					'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" id="a_name'.$n.'" [UNPUBLISHED]">'.$filename_original.'</span> '
 						.($file_data->url ? ' ['.$file_data->altname.']' : '')
 					).'
-					'.'<input type="hidden" id="a_id'.$file_id.'_'.$field->id.'" name="'.$fieldname.'" value="'.$file_id.'" />'.'
-					'.($use_ingroup ? '' : $move2).'
-					'.($use_ingroup ? '' : $remove_button).'
-					';
+				</div>
 				
-				$n++;
-				//if ($max_values && $n >= $max_values) break;  // break out of the loop, if maximum file limit was reached
-			}
+				<div class="nowrap_box inlinefile-upload-box">
+					<label class="label inlinefile-upload-lbl '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_CHOOSE_FILE', 'FLEXI_CHOOSE_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_Filedata-lbl" for='.$elementid_n.'_Filedata" >
+						'.JText::_( 'FLEXI_CHOOSE_FILE' ).'
+					</label>
+					<span class="inlinefile-file-data">
+						<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.$file_id.'" />'.'
+						<input type="file" id="'.$elementid_n.'_file-data" name="'.$fieldname_n.'[file-data]" value="'.$file_data->id.'" class="'.$required.'" />
+					</span>
+				</div>'.
+				
+				( $iform_title ? '
+				<div class="nowrap_box inlinefile-title-box">
+					<label class="label inlinefile-title-lbl '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1).'" id="'.$elementid_n.'_file-title-lbl" for="'.$elementid_n.'_file-title">
+						'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'
+					</label>
+					<span class="inlinefile-title-data">
+						<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.$file_data->altname.'" class="'.$required.'" />
+					</span>
+				</div>' : '').
+				
+				( $iform_lang ? '
+				<div class="nowrap_box inlinefile-lang-box">
+					<label class="label inlinefile-lang-lbl '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1).'" id="'.$elementid_n.'_file-lang-lbl" for="'.$elementid_n.'_file-lang">
+						'.JText::_( 'FLEXI_LANGUAGE' ).'
+					</label>
+					<span class="inlinefile-lang-data">
+						'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="use_select2_lib"', $file_data->language, 1).'
+					</span>
+				</div>' : '').
+				
+				( $iform_desc ? '
+				<div class="nowrap_box inlinefile-desc-box">
+					<label class="label inlinefile-desc-lbl '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1).'" id="'.$elementid_n.'_file-desc-lbl" for="'.$elementid_n.'_file-desc">
+						'.JText::_( 'FLEXI_DESCRIPTION' ).'
+					</label>
+					<span class="inlinefile-desc-data">
+						<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]">'.$file_data->description.'</textarea>
+					</span>
+				</div>' : '').
+				
+				( $iform_dir ? '
+				<div class="inlinefile-secure-box">
+					<label class="label inlinefile-secure-lbl '.$tip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
+						'.JText::_( 'FLEXI_TARGET_DIRECTORY' ).'
+					</label>
+					<span class="inlinefile-secure-data">
+						'.flexicontent_html::buildradiochecklist( array(0=> JText::_( 'FLEXI_MEDIA' ), 1=> JText::_( 'FLEXI_SECURE' )) , $fieldname_n.'[secure]', 1, 1, '', $elementid_n.'_secure').'
+					</span>
+				</div>' : '').
+				'
+				<div class="fcclear"></div>'
+				;
+			$n++;
+		}
+		
+		else foreach($files_data as $file_id => $file_data)
+		{
+			$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
+			
+			$field->html[] = '
+				'.($file_data->published ?
+				'  <span class="fcfield_textval inputbox inline_style_published" id="a_name'.$n.'">'.$filename_original.'</span> '
+					.($file_data->url ? ' ['.$file_data->altname.']' : '') :
+				'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" id="a_name'.$n.'" [UNPUBLISHED]">'.$filename_original.'</span> '
+					.($file_data->url ? ' ['.$file_data->altname.']' : '')
+				).'
+				'.'<input type="hidden" id="a_id'.$file_id.'_'.$field->id.'" name="'.$fieldname.'" value="'.$file_id.'" />'.'
+				'.($use_ingroup ? '' : $move2).'
+				'.($use_ingroup ? '' : $remove_button).'
+				';
+			
+			$n++;
+			//if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
+			//if ($max_values && $n >= $max_values) break;  // break out of the loop, if maximum file limit was reached
 		}
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
-			$field->html =
+			$field->html = !count($field->html) ? '' :
 				'<li class="'.$value_classes.'">'.
 					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
@@ -284,21 +364,24 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		}
 		
 		// Add button for popup file selection
-		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
-		$linkfsel = JURI::base(true)
-			.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=default&amp;filter_secure=S&amp;folder_mode=0&amp;index='.$n
-			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoselect='.$autoselect.'&amp;filter_uploader='.$user->id
-			.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
-		
-		$_prompt_txt = JText::_( 'FLEXI_ADD_FILE' );
-		$field->html .= '
-			<span class="fcfield-button-add">
-				<a class="addfile_'.$field->id.'" id="'.$elementid.'_addfile" title="'.$_prompt_txt.'" href="'.$linkfsel.'" >'
-					.$_prompt_txt.'
-				</a>
-			</span>';
-		
-		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
+		if ($inputmode)
+		{
+			$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
+			$linkfsel = JURI::base(true)
+				.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=default&amp;filter_secure=S&amp;folder_mode=0&amp;index='.$n
+				.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoselect='.$autoselect.'&amp;filter_uploader='.$user->id
+				.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+			
+			$_prompt_txt = JText::_( 'FLEXI_ADD_FILE' );
+			$field->html .= '
+				<span class="fcfield-button-add">
+					<a class="addfile_'.$field->id.'" id="'.$elementid.'_addfile" title="'.$_prompt_txt.'" href="'.$linkfsel.'" >'
+						.$_prompt_txt.'
+					</a>
+				</span>';
+			
+			$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
+		}
 	}
 	
 	
@@ -407,8 +490,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$db->setQuery($query);
 			$mod_is_enabled = $db->loadResult();
 			if (!$mod_is_enabled) {
-				$app = JFactory::getApplication();
-				$app->enqueueMessage("FILE FIELD: please disable parameter \"Use Downloads Manager Module\", the module is not install or not published", 'message' );
+				JFactory::getApplication()->enqueueMessage("FILE FIELD: please disable parameter \"Use Downloads Manager Module\", the module is not install or not published", 'message' );
 			}
 		}
 		$allowaddtocart = $allowaddtocart ? $mod_is_enabled : 0;
@@ -868,16 +950,25 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if ( empty($post) ) return;
 		
 		// Make sure posted data is an array 
+		//echo "<pre>"; print_r($post); exit;
 		$post = !is_array($post) ? array($post) : $post;   //echo "<pre>"; print_r($post);
 		
 		// Get configuration
+		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;
 		$is_importcsv      = JRequest::getVar('task') == 'importcsv';
 		$import_docs_folder  = JRequest::getVar('import_docs_folder');
+		
+		if ($inputmode==0) {
+			$iform_title = $field->parameters->get('iform_title', 1);
+			$iform_desc  = $field->parameters->get('iform_desc',  1);
+			$iform_lang  = $field->parameters->get('iform_lang',  0);
+			$iform_dir   = $field->parameters->get('iform_dir',   0);
+		}
 		
 		// Execute once
 		static $initialized = null;
 		static $srcpath_original = '';
-		if ( $is_importcsv && !$initialized ) {
+		if ( ($is_importcsv || $inputmode==0) && !$initialized ) {
 			$initialized = 1;
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.jpath');
@@ -905,10 +996,81 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					JRequest::setVar( 'secure', 1, 'post' );
 					JRequest::setVar( 'keep', 1, 'post' );
 					$file_ids = $fman->addlocal();
-					$v = !empty($file_ids) ? reset($file_ids) : ''; // Get fist element
+					$v = !empty($file_ids) ? reset($file_ids) : false; // Get fist element
 					//$_filetitle = key($file_ids);  this is the cleaned up filename, currently not needed
 				}
 			}
+			
+			else if ( $inputmode==0 ) {
+				$dbdata = array();
+				$file_id = $dbdata['id'] = (int) $v['file-id'];
+				
+				if ($iform_title)  $dbdata['altname'] = flexicontent_html::dataFilter($v['file-title'],  1000,  'STRING', 0);
+				if ($iform_desc)   $dbdata['description'] = flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
+				if ($iform_lang)   $dbdata['language'] = flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
+				if ($iform_dir)    $dbdata['secure'] = (int) $v['secure'];
+				
+				$err_code = $_FILES["custom"]["error"][$field->name][$n]['file-data'];
+				$new_file = $err_code == 0;
+				if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE)
+				{
+					$err_msg = array(
+						UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+						UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+						UPLOAD_ERR_PARTIAL  => 'The uploaded file was only partially uploaded',
+						UPLOAD_ERR_NO_FILE  => 'No file was uploaded',
+						UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder',
+						UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+						UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload'
+					);
+					JFactory::getApplication()->enqueueMessage("FILE FIELD: ".$err_msg[$err_code], 'warning' );
+					continue;
+				}
+				
+				// UPDATE existing file
+				if( !$new_file && $file_id ) {
+				
+					// Load file data from DB
+					$row = JTable::getInstance('flexicontent_files', '');
+					$row->load( $dbdata['id'] );
+					
+					// Set the changed data into the object
+					foreach ($dbdata as $index => $data) $row->{$index} = $data;
+					
+					// Update DB data of the file 
+					if ( !$row->check() || !$row->store() ) {
+						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDBO()->getErrorMsg(), 'warning' );
+						continue;
+					}
+					
+					// Set file id as value of the field
+					$v = $file_id;
+				}
+				
+				//INSERT new file
+				else if( $new_file ) {
+					$fman = new FlexicontentControllerFilemanager();
+					JRequest::setVar( 'return-url', null, 'post' );  // needed !
+					JRequest::setVar( 'secure', $v['file-id'], 'post' );
+					JRequest::setVar( 'file-title', $v['file-title'], 'post' );
+					JRequest::setVar( 'file-desc', $v['file-desc'], 'post' );
+					JRequest::setVar( 'file-lang', $v['file-lang'], 'post' );
+					
+					// The dform field name of the <input type="file" ...
+					JRequest::setVar( 'file-ffname', 'custom', 'post' );
+					JRequest::setVar( 'fname_level1', $field->name, 'post' );
+					JRequest::setVar( 'fname_level2', $n, 'post' );
+					JRequest::setVar( 'fname_level3', 'file-data', 'post' );
+					$file_id = $fman->upload();
+					$v = !empty($file_id) ? $file_id : false;
+				}
+				
+				else {
+					// no existing file and no new file uploaded
+					$v = 0;
+				}
+			}
+			
 			if ( !empty ($v) && is_numeric($v) ) $newpost[$v] = $new++;
     }
     $post = array_flip($newpost);
