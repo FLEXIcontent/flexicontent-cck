@@ -1849,7 +1849,8 @@ class ParentClassItem extends JModelAdmin
 		// If cannot edit state prevent user from changing state related parameters
 		if ( !$canEditState )
 		{
-			$data['vstate'] = 1;
+			$AutoApproveChanges = $user->authorise('flexicontent.autoapprovechanges',	'com_flexicontent');
+			$data['vstate'] = $AutoApproveChanges ? 2 : 1;
 			unset( $data['featured'] );
 			unset( $data['publish_up'] );
 			unset( $data['publish_down'] );

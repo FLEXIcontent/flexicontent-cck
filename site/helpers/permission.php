@@ -154,10 +154,11 @@ class FlexicontentHelperPerm
 		$permission->CanParams		= $user->authorise('flexicontent.paramsitem',	'com_flexicontent'); // (backend) Edit item parameters like meta data and template parameters
 		$permission->CanVersion		= $user->authorise('flexicontent.versioning',	'com_flexicontent'); // (backend) Use item versioning
 		
-		$permission->AssocAnyTrans		= $user->authorise('flexicontent.assocanytrans',		'com_flexicontent'); // (item edit form) associate any translation
-		$permission->EditCreationDate	= $user->authorise('flexicontent.editcreationdate',	'com_flexicontent'); // (item edit form) edit creation date (frontend)
-		$permission->IgnoreViewState	= $user->authorise('flexicontent.ignoreviewstate',	'com_flexicontent'); // (Frontend Content Lists) ignore view state
-		$permission->RequestApproval	= $user->authorise('flexicontent.requestapproval',	'com_flexicontent'); // (Workflow) Send Approval Requests (for ANY draft items)
+		$permission->AssocAnyTrans		  = $user->authorise('flexicontent.assocanytrans',	  	'com_flexicontent'); // (item edit form) associate any translation
+		$permission->EditCreationDate	  = $user->authorise('flexicontent.editcreationdate',	  'com_flexicontent'); // (item edit form) edit creation date (frontend)
+		$permission->IgnoreViewState	  = $user->authorise('flexicontent.ignoreviewstate',	  'com_flexicontent'); // (Frontend Content Lists) ignore view state
+		$permission->RequestApproval	  = $user->authorise('flexicontent.requestapproval',	  'com_flexicontent'); // (Workflow) Send Approval Requests (for ANY draft items)
+		$permission->AutoApproveChanges = $user->authorise('flexicontent.autoapprovechanges',	'com_flexicontent'); // (Workflow) Can publish document changes regardless of edit state
 		
 		// CATEGORIES: management tab and usage
 		$permission->CanCats			= $user->authorise('flexicontent.managecats',	'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
