@@ -154,18 +154,20 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			// Update new URL's address
 			$js .= "
-				theInput = newField.find('input.urllink').first();
+				var theInput = newField.find('input.urllink').first();
 				theInput.val('".$default_link."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
+				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
+				newField.find('.urllink-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
 				";
 				
 			// Update new URL optional properties
 			if ($usetitle) $js .= "
-				theInput = newField.find('input.urltitle').first();
+				var theInput = newField.find('input.urltitle').first();
 				theInput.val('".$default_title."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
+				newField.find('.urltitle-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				";
 				
 			if ($usehits) $js .="
@@ -173,6 +175,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				theInput.val('0');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_hits');
+				newField.find('.urlhits-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_hits');
 				
 				// Set hits to zero for new row value
 				newField.find('span span').html('0');
@@ -291,8 +294,8 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			);
 			$link = '
 				<div class="nowrap_box">
-					<label class="label">'.JText::_( 'FLEXI_FIELD_URL' ).'</label>
-					<input class="urllink fcfield_textval '.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'" type="text" '.$attribs.' value="'.$value['link'].'" />
+					<label class="label urllink-lbl" for="'.$elementid_n.'_link">'.JText::_( 'FLEXI_FIELD_URL' ).'</label>
+					<input class="urllink fcfield_textval '.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'_link" type="text" '.$attribs.' value="'.$value['link'].'" />
 				</div>';
 			
 			$title = '';
@@ -300,8 +303,8 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				$value['title'] = !empty($value['title']) ? $value['title'] : $default_title;
 				$value['title'] = htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8');
 				$title = '
-				<div class="nowrap_box">
-					<label class="label">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).'</label>
+				<div class="nowrap_box urltitle-lbl">
+					<label class="label" for="'.$elementid_n.'_title">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).'</label>
 					<input class="urltitle fcfield_textval" name="'.$fieldname_n.'[title]" id="'.$elementid_n.'_title" type="text" size="'.$size.'" value="'.$value['title'].'" />
 				</div>';
 			}
@@ -310,8 +313,8 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			if ($usehits) {
 				$hits = (int) @ $value['hits'];
 				$hits = '
-					<div class="nowrap_box">
-						<label class="label hits">'.JText::_( 'FLEXI_FIELD_HITS' ).'</label>
+					<div class="nowrap_box urlhits-lbl">
+						<label class="label hits" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_FIELD_HITS' ).'</label>
 						<span class="hitcount">'.$hits.'</span> 
 						<input class="urlhits" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="hidden" value="'.$hits.'" />
 					</div>';

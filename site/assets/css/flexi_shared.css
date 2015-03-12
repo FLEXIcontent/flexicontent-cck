@@ -1430,12 +1430,13 @@ select.invalid, input.invalid, textarea.invalid {
 	border: 1px dotted #CC0000 !important;
 }
 
-.use_prettycheckable.invalid + a + label,
+/*.use_prettycheckable.invalid + a + label,
 input.invalid + .fccheckradio_lbl {
 	color: #cc0000 !important;
-	border: 1px dotted #CC0000 !important;
-	border-radius: 4px;
 }
+.use_prettycheckable.invalid + a + label > img {
+	border: 1px dotted #CC0000 !important;
+}*/
 #flexicontent .label.invalid,
 #flexicontent .label-fcinner.invalid,
 #flexicontent .flexi_label.invalid,

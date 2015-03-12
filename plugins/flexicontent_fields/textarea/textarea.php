@@ -222,7 +222,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 						//tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id.");
           }
           tinyMCE.EditorManager.execCommand('mceFocus', false, '".$elementid."_'+uniqueRowNum".$field->id.");
-					theArea.addClass('mce_editable');
+					theArea.addClass('mce_editable').addClass(boxclass);
 					newField.find('.mce-container').css('display', '');
 				}
 				";
@@ -266,7 +266,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 						var txtareas = jQuery(this).find('textarea');
 						txtareas.each(function( i, txtarea) {
 							var areaid = jQuery(txtarea).attr('id');
-							var editor = tinyMCE.get(areaid);
+							var editor = typeof tinyMCE === 'undefined' ? false : tinyMCE.get(areaid);
 							if (editor) tinymce.EditorManager.execCommand('mceRemoveEditor', false, areaid);
 						});
 						this.remove();

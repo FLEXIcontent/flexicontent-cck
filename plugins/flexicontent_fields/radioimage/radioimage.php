@@ -169,6 +169,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
 				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
 				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				var exec_prep_clean = (typeof params!== 'undefined' && typeof params.exec_prep_clean !== 'undefined') ? params.exec_prep_clean : 1;
 				
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
@@ -177,18 +178,9 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 				
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				
-				// Remove prettyCheckable before cloning (if having appropriate CSS class)
-				lastField.find('input.use_prettycheckable:radio').each(function() { jQuery(this).prettyCheckable('destroy'); });
-				
+				if ( exec_prep_clean )  beforeAddField".$field->id."(fieldval_box);  // not in Group
 				var newField  = lastField.clone();
-				
-				// Re-add prettyCheckable after cloning (if having appropriate CSS class)
-				lastField.find('.use_prettycheckable').each(function() {
-					var elem = jQuery(this);
-					var lbl_html = elem.prev('label').html();
-					elem.prev('label').remove();
-					elem.prettyCheckable({ label: lbl_html });
-				});
+				if ( exec_prep_clean )   afterAddField".$field->id."(fieldval_box);  // not in Group
 				
 				// Update the new radios
 				var theSet = newField.find('input:radio');
@@ -198,6 +190,9 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 					var elem = jQuery(this);
 					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
+					".($use_prettycheckable && $prettycheckable_added ?
+						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" :
+						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" )."
 					".($use_prettycheckable && $prettycheckable_added ?
 						"elem.prev('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" :
 						"elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."
@@ -261,6 +256,20 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 					rowCount".$field->id."--;
 				}
 			}
+			
+			function beforeAddField".$field->id."(fieldval_box) {
+				// Remove prettyCheckable before cloning (if having appropriate CSS class)
+				fieldval_box.find('input.use_prettycheckable:radio').each(function() { jQuery(this).prettyCheckable('destroy'); });
+			}
+			function afterAddField".$field->id."(fieldval_box) {
+				// Re-add prettyCheckable after cloning (if having appropriate CSS class)
+				fieldval_box.find('.use_prettycheckable').each(function() {
+					var elem = jQuery(this);
+					var lbl_html = elem.prev('label').html();
+					elem.prev('label').remove();
+					elem.prettyCheckable({ label: lbl_html });
+				});
+			}
 			";
 			
 			$css .= '';
@@ -304,7 +313,8 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		
 		// Display as radio-set
 		$display_as_radioset = 1;
-		if ($display_as_radioset) {
+		if ($display_as_radioset)
+		{
 			$attribs  = '';
 			$classes  = $use_prettycheckable && $prettycheckable_added ? ' use_prettycheckable ' : '';
 			$classes .= $required;
@@ -347,7 +357,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 			foreach ($elements as $element) {
 				$checked  = $element->value == $value  ?  ' checked="checked"'  :  '';
 				$elementid_no = $elementid_n.'_'.$i;
-				$input_fld = ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid.'" name="'.$fieldname_n.'" '.$attribs.' value="'.$element->value.'" '.$checked . $input_attribs.' />';
+				$input_fld = ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid_n.'" name="'.$fieldname_n.'" '.$attribs.' value="'.$element->value.'" '.$checked . $input_attribs.' />';
 				$options[] = ''
 					.$pretext
 					.$input_fld

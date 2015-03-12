@@ -136,27 +136,32 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 				theInput.val('');
 				theInput.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][label]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_label');
+				newField.find('.phonelabel-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_label');
 				
 				theInput = newField.find('input.phonecc').first();
 				theInput.val('');
 				theInput.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][cc]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_cc');
+				newField.find('.phonecc-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_cc');
 				
 				theInput = newField.find('input.phonenum1').first();
 				theInput.val('');
 				theInput.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][phone1]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_phone1');
+				newField.find('.phonenum1-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_phone1');
 				
 				theInput = newField.find('input.phonenum2').first();
 				theInput.val('');
 				theInput.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][phone2]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_phone2');
+				newField.find('.phonenum2-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_phone2');
 				
 				theInput = newField.find('input.phonenum3').first();
 				theInput.val('');
 				theInput.attr('name','custom[".$field->name."]['+uniqueRowNum".$field->id."+'][phone3]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_phone3');
-					";
+				newField.find('.phonenum3-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_phone3');
+				";
 			
 			// Add new field to DOM
 			$js .= "
@@ -229,12 +234,6 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			$part1_lbl = $use_phone > 1 ? 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_AREA_CODE' : '';
 			$part2_lbl = $use_phone == 2 ? 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LOCAL_NUM' : ($use_phone == 3 ? 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_PART_2' : '' );
 			$part3_lbl = $use_phone >  2 ? 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_PART_3' : '';
-			
-			$part1_lbl = $part1_lbl ? '<label class="label">'.JText::_($part1_lbl).'</label><br/>' : '';
-			$part2_lbl = $part2_lbl ? '<label class="label">'.JText::_($part2_lbl).'</label><br/>' : '';
-			$part3_lbl = $part3_lbl ? '<label class="label">'.JText::_($part3_lbl).'</label><br/>' : '';
-		} else {
-			$part1_lbl = $part2_lbl = $part3_lbl = '';
 		}
 		
 		// *****************************************
@@ -271,19 +270,22 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			$phone = '
 				<tr><td class="key">' .JText::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER' ). '</td><td>
 					<div class="nowrap_box">
-						'.$part1_lbl.' <input class="phonenum1 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone1]" id="'.$elementid_n.'_phone1" type="text" value="'.$value['phone1'].'" '.$phone1_attribs.' />
+						'.($show_part_labels && $part2_lbl ? '<label class="label phonenum1-lbl" for="'.$elementid_n.'_phone2" >'.JText::_($part2_lbl).'</label><br/>' : '').'
+						<input class="phonenum1 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone1]" id="'.$elementid_n.'_phone1" type="text" value="'.$value['phone1'].'" '.$phone1_attribs.' />
 						'.($use_phone > 1 ? '-' : '').'
 					</div>
 					
 					'.($use_phone >= 2 ? '
 					<div class="nowrap_box">
-						'.$part2_lbl.' <input class="phonenum2 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone2]" id="'.$elementid_n.'_phone2" type="text" value="'.$value['phone2'].'" '.$phone2_attribs.' />
+						'.($show_part_labels && $part3_lbl ? '<label class="label phonenum2-lbl" for="'.$elementid_n.'_phone3" >'.JText::_($part3_lbl).'</label><br/>' : '').'
+						<input class="phonenum2 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone2]" id="'.$elementid_n.'_phone2" type="text" value="'.$value['phone2'].'" '.$phone2_attribs.' />
 						'.($use_phone > 2 ? '-' : '').'
 					</div>' : '').'
 					
 					'.($use_phone > 2 ? '
 					<div class="nowrap_box">
-						'.$part3_lbl.' <input class="phonenum3 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone3]" id="'.$elementid_n.'_phone3" type="text" value="'.$value['phone3'].'" '.$phone3_attribs.' />
+						'.($show_part_labels && $part1_lbl ? '<label class="label phonenum3-lbl" for="'.$elementid_n.'_phone1" >'.JText::_($part1_lbl).'</label><br/>' : '').'
+						<input class="phonenum3 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone3]" id="'.$elementid_n.'_phone3" type="text" value="'.$value['phone3'].'" '.$phone3_attribs.' />
 					</div>' : '').'
 				</td></tr>';
 			

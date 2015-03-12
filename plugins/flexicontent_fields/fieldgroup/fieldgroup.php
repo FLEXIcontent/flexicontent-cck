@@ -123,7 +123,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 			// Create function call for add/deleting Field values
 			$addField_pattern = "
-				var fieldval_box = groupval_box.find('.fcfieldval_container_%s');
+				var fieldval_box = groupval_box.find('.fcfieldval_container__GRP_FID_');
 				fieldval_box.find('.invalid').removeClass('invalid').attr('aria-invalid', 'false');
 				var newSubLabel = fieldval_box.prev('label.sub_label');
 				var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
@@ -131,13 +131,26 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				newSubLabel.attr('for_bck', newLabelFor);
 				fcflabels[ newLabelFor ] = newSubLabel;
 				fcflabels_errcnt[ newLabelFor ] = 0;
-				addField%s(null, groupval_box, groupval_box.find('.fcfieldval_container_%s'), add_params);";
+				addField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'), add_params);";
 			$delField_pattern = "
-				deleteField%s(null, groupval_box, groupval_box.find('.fcfieldval_container_%s'));";
+				if(rowCount".$field->id." == 1)
+				{
+					// We need to update the current grouped label of the field if this was the last element being re-added
+					var fieldval_box = groupval_box.find('.fcfieldval_container__GRP_FID_');
+					fieldval_box.find('.invalid').removeClass('invalid').attr('aria-invalid', 'false');
+					var newSubLabel = fieldval_box.prev('label.sub_label');
+					var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
+					newSubLabel.attr('for', newLabelFor);
+					newSubLabel.attr('for_bck', newLabelFor);
+					fcflabels[ newLabelFor ] = newSubLabel;
+					fcflabels_errcnt[ newLabelFor ] = 0;
+				}
+				deleteField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'));
+				";
 			$addField_funcs = $delField_funcs = '';
 			foreach($grpfields as $field_id => $grpfield) {
-				$addField_funcs .= sprintf($addField_pattern, $grpfield->id, $grpfield->name, $grpfield->id, $grpfield->id);
-				$delField_funcs .= sprintf($delField_pattern, $grpfield->id, $grpfield->id);
+				$addField_funcs .= str_replace("_GRP_FID_",  $grpfield->id,  sprintf($addField_pattern, $grpfield->name)  );
+				$delField_funcs .= str_replace("_GRP_FID_",  $grpfield->id,  sprintf($delField_pattern, $grpfield->name)  );
 			}
 		
 			$js .= "
@@ -154,6 +167,10 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				}
 				
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
+				
+				// Remove prettyCheckable before cloning (if having appropriate CSS class)
+				lastField.find('input.use_prettycheckable:radio').each(function() { jQuery(this).prettyCheckable('destroy'); });
+				
 				var newField  = lastField.clone();
 				";
 			
@@ -162,7 +179,6 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				lastField ?
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
-				if (remove_previous) lastField.remove();
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -175,10 +191,23 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				
 				// Add new values for each field
 				var groupval_box = newField;
-				var add_params = {remove_previous: 1, scroll_visible: 0, animate_visible: 0};
+				var add_params = {remove_previous: 1, scroll_visible: 0, animate_visible: 0, exec_prep_clean: 0};
 				".$addField_funcs."
 				";
 			
+			// Readd prettyCheckable and remove previous if so requested
+			$js .="
+				// Re-add prettyCheckable after cloning (if having appropriate CSS class)
+				lastField.find('.use_prettycheckable').each(function() {
+					var elem = jQuery(this);
+					var lbl_html = elem.prev('label').html();
+					elem.prev('label').remove();
+					elem.prettyCheckable({ label: lbl_html });
+				});
+				
+				if (remove_previous) lastField.remove();
+				";
+				
 			// Show new field, increment counters
 			$js .="
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
@@ -209,9 +238,13 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			{
 				var row = jQuery(el).closest('li');
 				
-				// Do cleanup by calling the deleteField of each individual field
+				// Do cleanup by calling the deleteField of each individual field, these functions will re-add last element as empty if needed
 				var groupval_box = jQuery(el).closest('li');
 				".$delField_funcs."
+				if(rowCount".$field->id." == 1)
+				{
+					uniqueRowNum".$field->id."++;   // increment unique row id, since last group was re-added
+				}
 				
 				// Also remove the group field values container if not last one
 				if(rowCount".$field->id." > 1) {

@@ -153,19 +153,25 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
-				
-				// Update the new email address
+				";
+			
+			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
+			// Update the new email address
+			$js .= "
 				var theInput = newField.find('input.emailaddr').first();
-				theInput.val('');
+				theInput.val('".$default_addr."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addr');
+				newField.find('.emailaddr-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_addr');
 				";
 				
+			// Update the new email linking text
 			if ($usetitle) $js .= "
-				// Update the new email linking text
-				theInput = newField.find('input.emailtext').first();
-				theInput.val('');
+				var theInput = newField.find('input.emailtext').first();
+				theInput.val('".$default_title."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
+				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+				newField.find('.emailtext-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
 				
 				// Update inputmask
 				var has_inputmask = newField.find('input.has_inputmask').length != 0;
@@ -268,8 +274,8 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			);
 			$addr = '
 				<div class="nowrap_box">
-					<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
-					<input class="emailaddr fcfield_textval '.$classes.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" value="'.$value['addr'].'" '.$attribs.' />
+					<label class="label emailaddr-lbl" for="'.$elementid_n.'_addr">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
+					<input class="emailaddr fcfield_textval '.$classes.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'_addr" type="text" value="'.$value['addr'].'" '.$attribs.' />
 				</div>';
 			
 			$text = '';
@@ -278,8 +284,8 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				$value['text'] = isset($value['text']) ? htmlspecialchars($value['text'], ENT_COMPAT, 'UTF-8') : '';
 				$text = '
 				<div class="nowrap_box">
-					<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).'</label>
-					<input class="emailtext fcfield_textval" name="'.$fieldname_n.'[text]" type="text" size="'.$size.'" value="'.$value['text'].'" />
+					<label class="label emailtext-lbl" for="'.$elementid_n.'_text">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).'</label>
+					<input class="emailtext fcfield_textval" name="'.$fieldname_n.'[text]"  id="'.$elementid_n.'_text" type="text" size="'.$size.'" value="'.$value['text'].'" />
 				</div>';
 			}
 			

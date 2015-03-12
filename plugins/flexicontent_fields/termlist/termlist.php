@@ -193,7 +193,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				var container = newField.find('.fc_'+boxClass);
 				var editor = typeof tinyMCE === 'undefined' ? false : tinyMCE.get( container.find('textarea').first().attr('id') );
 				
-				container.after('<div class=\"fc_'+boxClass+'\"></div>');  // Append a new container box
+				container.after('<div class=\"nowrap_box fc_'+boxClass+'\"></div>');  // Append a new container box
 				container.find('label.labeltext').show().appendTo(container.next()); // Copy the label
 				container.find('textarea').show().css('visibility', 'visible').appendTo(container.next()); // Copy only the textarea (first make it visible) into the new container
 				container.remove(); // Remove old (cloned) container box along with all the contents
@@ -232,7 +232,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 						//tinyMCE.execCommand('mceAddControl', true, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
           }
           //tinyMCE.EditorManager.execCommand('mceFocus', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-					theArea.addClass('mce_editable');
+					theArea.addClass('mce_editable').addClass(boxClass);
 					newField.find('.mce-container').css('display', '');
 				}
 				";
@@ -276,7 +276,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 						var txtareas = jQuery(this).find('textarea');
 						txtareas.each(function( i, txtarea) {
 							var areaid = jQuery(txtarea).attr('id');
-							var editor = tinyMCE.get(areaid);
+							var editor = typeof tinyMCE === 'undefined' ? false : tinyMCE.get(areaid);
 							if (editor) tinymce.EditorManager.execCommand('mceRemoveEditor', false, areaid);
 						});
 						this.remove();

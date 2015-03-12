@@ -305,18 +305,28 @@ var JFormValidator = new Class({
 				el.attr('required', 'required');
 				el.attr('aria-required', 'true');
 			}
-			var tag_name = el.prop("tagName").toLowerCase();
-			var validate_flag = (tag_name == 'input' || tag_name == 'button') && el.prop('type') == 'submit';
-			if (validate_flag) {
-				if (el.hasClass('validate')) {
-					el.onclick = function(){return document.formvalidator.isValid(this.form);};
-				}
-			}
-			else if (el.hasClass('use_select2_lib')) {
+			
+			// Styled via JS
+			if (el.hasClass('use_select2_lib') || el.hasClass('use_prettycheckable')) {
 				el.on('change', function(){return document.formvalidator.validate(this);});
 			}
+			// Radio / checkbox
+			else if (el.attr('type') == 'radio' || el.attr('type') == 'checkbox') {
+				el.on('click', function(){return document.formvalidator.validate(this);});
+			}
 			else {
-				el.on('blur', function(){return document.formvalidator.validate(this);});
+				var tag_name = el.prop("tagName").toLowerCase();
+				var tag_type = el.attr('type');
+				// Submit button 
+				if ( (tag_name == 'input' || tag_name == 'button') && tag_type == 'submit' ) {
+					if (el.hasClass('validate')) {
+						el.on('click', function(){return document.formvalidator.isValid(this.form);});
+					}
+				}
+				// text inputs, selects, ... other ?
+				else {
+					el.on('blur', function(){return document.formvalidator.validate(this);});
+				}
 			}
 		});
 	},
@@ -346,10 +356,23 @@ var JFormValidator = new Class({
 			if ( !el.labelref )  el.labelref = fcflabels[  lblfor = 'custom_' + lblfor  ];  // try adding 'custom_'
 			if ( el.labelref ) {
 				el.labelfor = lblfor; // store HTML tag id of the label, to use in error counter of multi-value fields
+			} else {
+				var lbl = jQuery('label[for="'+lblfor+'"]');
+				if (lbl.length) {
+					el.labelref = fcflabels[lblfor] = lbl;
+				}
 			}
 		} else if (!el.labelref) {
 			el.labelref = null;
 			el.labelfor = null;
+		} else if (el_id || el_grpid) {
+			var lblfor = el_grpid ? el_grpid : el_id;
+			if ( el.labelref != fcflabels[ lblfor ]) {
+				var lbl = jQuery('label[for="'+lblfor+'"]');
+				if (lbl.length) {
+					el.labelref = fcflabels[lblfor] = lbl;
+				}
+			}
 		}
 		
 		// Ignore the element if its currently disabled, because are not submitted for the http-request. For those case return always true.
@@ -519,7 +542,9 @@ var JFormValidator = new Class({
 			jqEL.addClass('invalid').attr('aria-invalid', 'true');
 			if (el.labelref) {
 				var labelref = jQuery(el.labelref);
-				if (!isInvalid) fcflabels_errcnt[el.labelfor]++; // Increment error count for multi-value field
+				// Increment error count for multi-value field or set FLAG for others
+				if (!isInvalid)
+					fcflabels_errcnt[el.labelfor] = jqEL.attr('type') == 'checkbox'  ?  ++fcflabels_errcnt[el.labelfor]  :  1;
 				//window.console.log(el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
 				// Mark /  the label to indicate validation error for current form field / fieldset
 				labelref.addClass('invalid').attr('aria-invalid', 'true');
@@ -529,7 +554,9 @@ var JFormValidator = new Class({
 			jqEL.removeClass('invalid').attr('aria-invalid', 'false');
 			if (el.labelref) {
 				var labelref = jQuery(el.labelref);
-				if (isInvalid) fcflabels_errcnt[el.labelfor]--; // Decrement error count for multi-value field
+				// Decrement error count for multi-value field or clear FLAG for others
+				if (isInvalid)
+					fcflabels_errcnt[el.labelfor] = jqEL.attr('type') == 'checkbox'  ?  --fcflabels_errcnt[el.labelfor]  :  0;
 				if (fcflabels_errcnt[el.labelfor] == 0) {
 					// Unmarkup / clear CSS style to indicate no validation error for current form field / fieldset
 					labelref.removeClass('invalid');
@@ -555,6 +582,7 @@ jQuery(document).ready(function() {
 	{
 		fcflabels = new Object;
 		fcflabels_errcnt = new Object;  // error counter for multi-value fields
+		var err_cnt = 0;
 		jQuery('label, span.label-fcouter > span').each( function(g) {
 			g = jQuery(this);
 			label_for = g.attr('for_bck');
@@ -562,9 +590,14 @@ jQuery(document).ready(function() {
 			if ( label_for )  {
 				fcflabels[ label_for ] = this;
 				fcflabels_errcnt[ label_for ] = 0;
+			} else {
+				//window.console.log( g.append(jQuery('#xxx').clone()).html() );
+				err_cnt++;
 			}
 		} );
-		//var fcflabels_size = Object.size(fcflabels);  alert(fcflabels_size);
+		var fcflabels_size = Object.keys(fcflabels).length; 
+		//window.console.log('fcflabels_size: ' + fcflabels_size); //alert(fcflabels_size);
+		//window.console.log('err_cnt: ' + err_cnt); //alert(err_cnt);
 	}
 });
 

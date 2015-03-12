@@ -419,7 +419,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 		
 			<div class="fcclear"></div>
 			<span class="label-fcouter">
-			<span class="label pull-left label-fcinner label-toplevel">
+			<span id="jform_language-lbl" for="jform_language" class="label pull-left label-fcinner label-toplevel" >
 				<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 			</span>
 			</span>
