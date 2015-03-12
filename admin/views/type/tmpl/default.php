@@ -85,12 +85,13 @@ $this->document->addScriptDeclaration($js);
 		<div class="span6 full_width_980" style="padding: 0px 0 0 24px">
 
 			<span class="fc-info fc-nobgimage fc-mssg" style="display:block; float:left; clear:both; margin: 32px 0px 32px 0px !important; font-size:12px;">
-	<?php echo str_replace('<br/>', ' ', JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS')); ?>
-</span>
+				<?php echo str_replace('<br/>', ' ', JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS')); ?>
+			</span>
 
 		</div>
 	</div>
-
+	
+	
 	<div class="fctabber fields_tabset" id="field_specific_props_tabset">
 		
 		<div class="tabbertab" id="core_fields-options" data-icon-class="icon-cogs" >
@@ -162,12 +163,13 @@ $this->document->addScriptDeclaration($js);
 		//echo JHtml::_('sliders.end');
 		?>
 		
-			<!-- Template tab -->
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-palette">
-		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 		
-		<div class="fc_tabset_inner">
-		<fieldset id="templates_set" class="templates_set basicfields_set" style="margin:0px 0px 24px 0px; padding:0 16px 16px 16px !important;">
+		<!-- Template tab -->
+		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-palette">
+			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
+		
+			<div class="fc_tabset_inner">
+			<fieldset id="templates_set" class="templates_set basicfields_set" style="margin:0px 0px 24px 0px; padding:0 16px 16px 16px !important;">
 				<legend><?php echo JText::_( 'FLEXI_DISPLAYING' ); ?></legend>
 				
 				<?php
@@ -229,29 +231,20 @@ $this->document->addScriptDeclaration($js);
 				<?php echo JHtml::_('sliders.end'); ?>
 			</fieldset>
 		</div>	
-	</div> <!-- end tab -->
-		<!-- Permissions tab -->
+	</div>
+	
+	
+	<!-- Permissions tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-power-cord">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
 		
 		<div class="fc_tabset_inner">
-		<?php /*
-		<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
-			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-			<div id="tabacces">
-		*/ ?>
-				<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
-		<?php /*
-			</div>
-			<div id="notabacces">
-			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-			</div>
-		</fieldset>
-		*/ ?>
+			<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
 		</div>
 		
 	</div> <!-- end tab -->
-	</div>
+	
+</div> <!-- end of tab set -->
 
 <?php echo JHTML::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />

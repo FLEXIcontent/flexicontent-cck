@@ -1556,56 +1556,23 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 	
 	</div>
 	</div> <!-- end tab -->
-
-<?php if ( $this->perms['canright'] ) : ?>
-	<?php
-	/*$this->document->addScriptDeclaration("
-		window.addEvent('domready', function() {
-		var slideaccess = new Fx.Slide('tabacces');
-		var slidenoaccess = new Fx.Slide('notabacces');
-		slideaccess.hide();
-			$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
-				slideaccess.toggle();
-				slidenoaccess.toggle();
-				});
-			});
-		");*/
-	?>
 	
+	
+	<?php if ( $this->perms['canright'] ) : ?>
 	<!-- Permissions tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-power-cord">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
 		
 		<div class="fc_tabset_inner">
-		<?php /*
-		<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
-			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-			<div id="tabacces">
-		*/ ?>
-				<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
-		<?php /*
-			</div>
-			<div id="notabacces">
-			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-			</div>
-		</fieldset>
-		*/ ?>
+			<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
 		</div>
 		
 	</div> <!-- end tab -->
+	<?php endif; ?>
 	
-<?php endif; ?>
-
-
-
-<?php
-// ***************
-// MAIN TABSET END
-// ***************
-?>
 </div> <!-- end of tab set -->
-<?php $tabSetCnt = array_pop($tabSetStack); ?>
 
+<?php $tabSetCnt = array_pop($tabSetStack); ?>
 
 
 <?php echo JHTML::_( 'form.token' ); ?>

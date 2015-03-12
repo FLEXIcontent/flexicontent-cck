@@ -225,16 +225,12 @@ class FlexicontentViewFileselement extends JViewLegacy
 				obj.className = 'striketext';
 				document.adminForm.file.value=id;
 			}
-			window.addEvent('domready', function() {
-				//fileobjs = window.parent.document.getElementsByName('{$formfieldname}');
+			window.addEvent('domready', function()
+			{
 				existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .existingname');
 				for(i=0,n=existing_objs.length; i<n; i++) {
-					//row = document.getElementById('file'+existing_objs[i].value);
-					var rows = $(document.body).getElements('a[rel='+ existing_objs[i].value +']');
+					var rows = jQuery.find('a[rel='+ existing_objs[i].value +']');
 					rows.addClass('striketext');
-					/*if( (typeof row) != 'undefined' && row != null) {
-						row.className = 'striketext';
-					}*/
 				}
 				"
 				.(($autoselect && $newfileid) ? "qffileselementadd( document.getElementById('file".$newfileid."'), '".$newfileid."', '".$newfilename."');" : "")
