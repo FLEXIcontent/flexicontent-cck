@@ -38,7 +38,6 @@ class FlexicontentViewItemelement extends JViewLegacy {
 		//initialise variables
 		$db = JFactory::getDBO();
 		$document	= JFactory::getDocument();
-		$template = $app->isSite() ? (!FLEXI_J16GE ? 'khepri' : (FLEXI_J30GE ? 'hathor' : 'bluestork')) : $app->getTemplate();
 		
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
@@ -55,14 +54,23 @@ class FlexicontentViewItemelement extends JViewLegacy {
 		$search = $app->getUserStateFromRequest( $option.'.itemelement.search', 			'search', 			'', 'string' );
 		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
-		//prepare the document
+		// Prepare the document: set title, add css files, etc
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
-		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
+		
+		if ($app->isSite()) {
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
+		} else {
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
+		}
+		
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
-		$document->addStyleSheet(JURI::base(true).'/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
-
+		
+		// Include backend CSS template CSS file , access to backend folder may not be allowed but ...
+		//$template = $app->isSite() ? (!FLEXI_J16GE ? 'khepri' : (FLEXI_J30GE ? 'hathor' : 'bluestork')) : $app->getTemplate();
+		//$document->addStyleSheet(JURI::base(true).'/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
+		
 		//Get data from the model
 		$rows     = $this->get( 'Data');
 		$types		= $this->get( 'Typeslist' );
