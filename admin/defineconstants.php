@@ -135,5 +135,5 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/
 
 // Version constants
 define('FLEXI_VERSION',	FLEXI_J16GE ? '3.0' : '3.0');
-define('FLEXI_RELEASE',	'dev');
+define('FLEXI_RELEASE',	'BETA5');
 ?>
