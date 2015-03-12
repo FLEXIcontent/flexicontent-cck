@@ -745,7 +745,12 @@ class flexicontent_html
 				// Attach fancybox to all elements having a specific CSS class
 				$js .= "
 					jQuery(document).ready(function(){
-						jQuery('.fancybox').fancybox();
+						jQuery('.fancybox').fancybox({
+							'openEffect'	: 'elastic',
+							'closeEffect'	: 'elastic',
+							'openEasing'  : 'easeOutCubic',
+							'closeEasing' : 'easeInCubic',
+						});
 					});
 				";
 				break;
@@ -1136,19 +1141,12 @@ class flexicontent_html
 		}
 
 		// Clean cache
-		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache($group='', 0);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-			$cache = FLEXIUtilities::getCache($group='', 1);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-		} else {
-			$itemcache = JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
-			$filtercache = JFactory::getCache('com_flexicontent_filters');
-			$filtercache->clean();
-		}
+		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
+		$cache = FLEXIUtilities::getCache($group='', 1);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
 
 		// Output new state icon and terminate
 		$tmpparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
@@ -1174,8 +1172,10 @@ class flexicontent_html
 		$base  	= $uri->toString( array('scheme', 'host', 'port'));
 
 		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
-		if($view == 'category') {
-			$link = $base . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($slug).'&format=feed&type=rss');
+		if($view == 'category')
+		{
+			flexicontent_html::createCatLink($slug, $non_sef_link);
+			$link = $base . JRoute::_($non_sef_link.'&format=feed&type=rss');
 			//$link = $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
 		} elseif($view == FLEXI_ITEMVIEW) {
 			$link = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $slug, 0, $item).'&format=feed&type=rss');
@@ -2495,12 +2495,7 @@ class flexicontent_html
 			$allowed = 1;
 			if ($check_perms)
 			{
-				if (FLEXI_J16GE)
-					$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
-				else if (FLEXI_ACCESS && $user->gid < 25)
-					$allowed = ! $type->itemscreatable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'type', $type->id);
-				else
-					$allowed = 1;
+				$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
 			}
 			
 			if ( !$allowed && $type->itemscreatable == 1 ) continue;
@@ -2681,8 +2676,8 @@ class flexicontent_html
 		if ( !count($user_langs) )  return "user is not allowed to use any language";
 		if (!$selected_found) $selected = $user_langs[0]->code;  // Force first language to be selected
 		
-		$element_id = preg_replace('#[\[\]]#', '_', $name);
-		
+		$element_id = preg_replace('#[\[]#', '_', $name);
+		$element_id = preg_replace('#[\]]#', '', $element_id);		
 		
 		if ( $conf && empty($conf['flags']) && empty($conf['texts']) ) {
 			 $conf['flags'] = $conf['texts'] = 1;
@@ -2704,7 +2699,7 @@ class flexicontent_html
 				foreach ($user_langs as $lang) {
 					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
 				}
-				$list = JHTML::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected );
+				$list = JHTML::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected, $element_id);
 				break;
 			
 			// RADIO selection of ALL languages , e.g. item form,
@@ -2716,8 +2711,8 @@ class flexicontent_html
 					if ($lang->code == $selected) {
 						$checked = ' checked="checked"';
 					}
-					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
-					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'" >';
+					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
+					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'" >';
 					if($lang->shortcode=="*") {
 						$list 	.= '<span class="lang_lbl">'.JText::_('FLEXI_ALL').'</span>';  // Can appear in J1.6+ only
 					} else {
@@ -2751,8 +2746,8 @@ class flexicontent_html
 				$list .= '</label><div class="clear"></div>';
 
 				foreach ($user_langs as $lang) {
-					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
-					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -2767,8 +2762,8 @@ class flexicontent_html
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					if ($lang->code==$selected) continue;
-					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
-					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -2783,8 +2778,8 @@ class flexicontent_html
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					$checked = $lang->code==$selected ? 'checked="checked"' : '';
-					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" '.$checked.'/>';
-					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" '.$checked.'/>';
+					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -3565,6 +3560,54 @@ class flexicontent_html
 		}
 	}
 	
+	static function createCatLink($slug, &$non_sef_link)
+	{
+		$menus  = JFactory::getApplication()->getMenu();
+		$menu   = $menus->getActive();
+		$Itemid = $menu ? $menu->id : 0;
+		
+		// Get URL variables
+		$layout_vars = flexicontent_html::getCatViewLayoutVars();
+		$cid  = $layout_vars['cid'];
+		
+		$urlvars = array();
+		if ($layout_vars['layout'])   $urlvars['layout']   = $layout_vars['layout'];
+		if ($layout_vars['authorid']) $urlvars['authorid'] = $layout_vars['authorid'];
+		if ($layout_vars['tagid'])    $urlvars['tagid']    = $layout_vars['tagid'];
+		if ($layout_vars['cids'])     $urlvars['cids']     = $layout_vars['cids'];
+		
+    // Category link for single/multiple category(-ies)  --OR--  "current layout" link for myitems/author layouts
+   	$non_sef_link = FlexicontentHelperRoute::getCategoryRoute($slug, $Itemid, $urlvars);
+		$category_link = JRoute::_($non_sef_link, false);
+		
+		return $category_link;
+	}
+	
+	
+	static function getCatViewLayoutVars()
+	{
+		static $layout_vars;
+		if ($layout_vars) return $layout_vars;
+		
+		// Get URL variables
+		$layout_vars = array();
+		$layout_vars['cid'] = JRequest::getInt('cid', 0);
+		$layout_vars['authorid'] = JRequest::getInt('authorid', 0);
+		$layout_vars['tagid']    = JRequest::getInt('tagid', 0);
+		$layout_vars['layout']   = JRequest::getCmd('layout', '');
+		
+		$mcats_list = JRequest::getVar('cids', '');
+		if ( !is_array($mcats_list) ) {
+			$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
+			$mcats_list = explode(',', $mcats_list);
+		}
+		// make sure given data are integers ... and skipping zero values
+		$cids = array();
+		foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+		$layout_vars['cids'] = implode(',' , $cids);
+		
+		return $layout_vars;
+	}
 }
 
 class flexicontent_upload
@@ -5548,105 +5591,6 @@ function FLEXISubmenu($cando)
 				(FLEXI_J30GE ? '<span class="fcsb-icon-plugins"></span>' : '').JText::_( 'FLEXI_PLUGINS' ).
 			'</a>', '', false);
 	}
-}
-
-
-/*	
-*	fcjsJText Helper for Joomla 1.5
-*
-*	original Author: 	Robert Gerald Porter <rob@weeverapps.com>
-*	License: 	GPL v3.0
-*
-*/
-class fcjsJText extends JText
-{
-	protected static $strings=array();
-
-	/**
-	 * Translate a string into the current language and stores it in the JavaScript language store.
-	 *
-	 * @param	string	The JText key.
-	 * @since	1.6
-	 * 
-	 * Backport for Joomla 1.5
-	 * Example use: 
-	 *
-	 * //use this method call for each string you will be needing in javascript
-	 * fcjsJText::script("MY_FIRST_COMPONENT_STRING_NEEDED_IN_JS");
-	 * fcjsJText::script("MY_NTH_COMPONENT_STRING_NEEDED_IN_JS");  
-	 * // and so on…
-	 * // you must then call load(), as below:
-	 * fcjsJText::load();
-	 *
-	 * in the JS files, load localization via:
-	 *
-	 * //String is loaded in javascript via Joomla.JText._() method
-	 * alert( Joomla.JText._('MY_FIRST_COMPONENT_STRING_NEEDED_IN_JS') );
-	 * 				
-	 */
-	public static function script($string = null, $jsSafe = false, $interpretBackSlashes = true)
-	{
-		static $language = null;
-		if ($language===null) $language = JFactory::getLanguage();
-		
-		// Add the string to the array if not null.
-		if ($string !== null) {
-			// Normalize the key and translate the string.
-			self::$strings[strtoupper($string)] = $language->_($string, $jsSafe);
-		} else {
-			return self::$strings;
-		}
-	}
-	
-	
-	/**
-	 * Load strings translated for Javascript into JS environment. To be called after all fcjsJText::script() calls have been made.
-	 */
-	public static function load($after_render=true)
-	{
-		static $loaded = null;
-		if ($loaded !== null) return;
-		$loaded = true;
-		if (FLEXI_J16GE) return;
-		
-		$js = '
-			
-			<script type="text/javascript">
-			// <![CDATA[
-			if (typeof(Joomla) === "undefined")
-			{
-				var Joomla = {};
-				if (typeof(Joomla.JText) === "undefined") {
-					Joomla.JText = {
-						strings: {},
-						"_": function(key, def) {
-							return typeof this.strings[key.toUpperCase()] !== "undefined" ? this.strings[key.toUpperCase()] : def;
-						},
-						load: function(object) {
-							for (var key in object) {
-								this.strings[key.toUpperCase()] = object[key];
-							}
-							return this;
-						}
-					};
-				}
-			}
-			var strings = '.json_encode(self::$strings).';
-			Joomla.JText.load(strings);
-			// ]]>
-			</script>
-		';
-		
-		if ($after_render) {
-			// Add to header, after rendering has completed ...
-			$buffer = JResponse::getBody();
-			$buffer = str_replace ("</head>", "\n\n" .$js ."\n\n</head>", $buffer );
-			JResponse::setBody($buffer);
-		} else {
-			JFactory::getDocument()->addCustomTag ($js);
-		}
-	}
-
 }
 
 

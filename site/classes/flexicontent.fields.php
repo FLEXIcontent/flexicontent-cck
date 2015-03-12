@@ -1204,7 +1204,7 @@ class FlexicontentFields
 				
 				// CUSTOM field or CORE field with no type
 				$fdata[$tindex][$field->name] = new stdClass();
-				$fdata[$tindex][$field->name]->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
+				$fdata[$tindex][$field->name]->parameters = new JRegistry($field->attribs);
 				if ($field->field_type=='maintext' && $fdata[$tindex][$field->name]->parameters->get('trigger_onprepare_content', '')==='') {
 					$fdata[$tindex][$field->name]->parameters->set(1);  // Default for maintext (description field) is to trigger plugins
 				}
@@ -1215,7 +1215,7 @@ class FlexicontentFields
 				
 				// Initialize an empty object, and create parameters object of the field
 				$fdata[$tindex][$field->name] = new stdClass();
-				$fdata[$tindex][$field->name]->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
+				$fdata[$tindex][$field->name]->parameters = new JRegistry($field->attribs);
 				
 				// SET a type specific label, description for the current CORE  field (according to current language)
 				$field_label_type = $tparams[$type_id]->get($pn_prefix.'_label', '');
@@ -1238,7 +1238,7 @@ class FlexicontentFields
 				
 				// Finally merge custom field parameters with the type specific parameters ones
 				if ($data) {
-					$ts_params = FLEXI_J16GE ? new JRegistry($data->attribs) : new JParameter($data->attribs);
+					$ts_params = new JRegistry($data->attribs);
 					$fdata[$tindex][$field->name]->parameters->merge($ts_params);
 				}
 			}
@@ -1279,7 +1279,7 @@ class FlexicontentFields
 		if ( $typedata ) {
 			$tinfo['typename']  = $typedata->name;
 			$tinfo['typealias'] = $typedata->alias;
-			$tparams = FLEXI_J16GE ? new JRegistry($typedata->attribs) : new JParameter($typedata->attribs);
+			$tparams = new JRegistry($typedata->attribs);
 			
 			$_tparams = $tparams->toArray();
 			$tinfo['params'] = array();
@@ -1692,7 +1692,7 @@ class FlexicontentFields
 			}
 			$field->item_id		= $item_id;
 			$field->value     = !$item_id ? false : $this->getExtrafieldvalue($field->id, $version=0, $item_id);  // WARNING: getExtrafieldvalue() is Frontend method
-			if ($load_params) $field->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
+			if ($load_params) $field->parameters = new JRegistry($field->attribs);
 			$sp_fields[$field_id] = $field;
 		}
 		
@@ -3200,7 +3200,7 @@ class FlexicontentFields
 		
 		// Create filter parameters, language filter label, etc
 		foreach ($filters as $filter) {
-			$filter->parameters = FLEXI_J16GE ? new JRegistry($filter->attribs) : new JParameter($filter->attribs);
+			$filter->parameters = new JRegistry($filter->attribs);
 			$filter->label = JText::_($filter->label);
 		}
 		

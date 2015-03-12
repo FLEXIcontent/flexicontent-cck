@@ -646,5 +646,58 @@ jQuery(document).ready(function() {
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
+
+	
+	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a search filter for the advanced search view
+	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	{
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		
+		self::onDisplayFilter($filter, $value, $formName, $isSearchView=1);
+	}
+	
+	
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
+	{
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		
+		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
+		// partial SQL clauses
+		$filter->filter_valuesselect = ' i.id AS value, i.title AS text';
+		$filter->filter_valuesjoin   = null;  // use default
+		$filter->filter_valueswhere  = null;  // use default
+		// full SQL clauses
+		$filter->filter_groupby = null;  // use default, which is 'value'
+		$filter->filter_having  = null;  // use default
+		$filter->filter_orderby = null;  // use default, no ordering done to improve speed, it will be done inside PHP code
+		FlexicontentFields::createFilter($filter, $value, $formName);
+	}
+	
+	
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for content lists e.g. category view, and not for search view
+	function getFiltered(&$filter, $value)
+	{
+		// execute the code only if the field type match the plugin type
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		
+		return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
+	}
+	
+	
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for search view
+	function getFilteredSearch(&$filter, $value)
+	{
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		
+		$filter->isindexed = true;
+		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql=true);
+	}
 	
 }

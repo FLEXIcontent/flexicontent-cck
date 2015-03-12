@@ -62,6 +62,37 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$_closetag = $field->parameters->get( 'closetag', '' );
 		$pretext_cacheable = $posttext_cacheable = $opentag_cacheable = $closetag_cacheable = false;
 		
+		switch($separatorf)
+		{
+			case 0:
+			$separatorf = ' ';
+			break;
+
+			case 1:
+			$separatorf = '<br />';
+			break;
+
+			case 2:
+			$separatorf = ' | ';
+			break;
+
+			case 3:
+			$separatorf = ', ';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
+			break;
+
+			case 5:
+			$separatorf = '';
+			break;
+
+			default:
+			$separatorf = '&nbsp;';
+			break;
+		}
+		
 		foreach($items as $item)
 		{
 			//if (!is_object($_field)) echo $item->id." - ".$_field ."<br/>";
@@ -83,38 +114,6 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			if (!$opentag_cacheable)  $opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $_opentag, 'opentag', $opentag_cacheable );     // used by some fields
 			if (!$closetag_cacheable) $closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $_closetag, 'closetag', $closetag_cacheable );   // used by some fields
 			
-			
-			switch($separatorf)
-			{
-				case 0:
-				$separatorf = ' ';
-				break;
-	
-				case 1:
-				$separatorf = '<br />';
-				break;
-	
-				case 2:
-				$separatorf = ' | ';
-				break;
-	
-				case 3:
-				$separatorf = ', ';
-				break;
-	
-				case 4:
-				$separatorf = $closetag . $opentag;
-				break;
-	
-				case 5:
-				$separatorf = '';
-				break;
-	
-				default:
-				$separatorf = '&nbsp;';
-				break;
-			}
-				
 			$field->value = array();
 			switch ($field->field_type)
 			{
@@ -332,6 +331,11 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	{
 		if($field->iscore != 1) return;
 		if(!is_array($post) && !strlen($post)) return;
+		
+		if ($field->field_type == 'maintext') {
+			// field_type is not changed textarea so that field can handle this field type
+			FLEXIUtilities::call_FC_Field_Func('textarea', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
+		}
 	}
 	
 	

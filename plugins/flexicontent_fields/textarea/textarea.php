@@ -54,9 +54,9 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		// Create the editor object of editor prefered by the user,
 		// this will also add the needed JS to the HTML head
-		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
+		$editor_name = $field->parameters->get( 'editor',  $user->getParam('editor', $app->getCfg('editor'))  );
 		$editor  = JFactory::getEditor($editor_name);
-		$editor_plg_params = array();  // Override parameters of the editor plugin, nothing yet
+		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 		
 		
 		// ****************
@@ -64,7 +64,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// ****************
 		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = (int)$field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
@@ -78,17 +78,18 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		$default_value = $default_value ? JText::_($default_value) : '';
 		
-		// Input field display size & max characters
-		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
-		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 1 );  // load HTML editor
+		// Editing method, text editor or HTML editor
+		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 );
 		
-		// *** Simple Textarea configuration  ***
-		$rows  = $field->parameters->get( 'rows', 6 ) ;
+		// *** Simple Textarea ***
+		$rows  = $field->parameters->get( 'rows', ($field->field_type == 'maintext') ? 6 : 3 ) ;
 		$cols  = $field->parameters->get( 'cols', 80 ) ;
+		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
 		
 		// *** HTML Editor configuration  ***
-		
-		$height = $field->parameters->get( 'height', ($field->field_type == 'textarea') ? '300px' : '400px' ) ;
+		$width = $field->parameters->get( 'width', '98%') ;
+		if ($width != (int)$width) $width .= 'px';
+		$height = $field->parameters->get( 'height', ($field->field_type == 'textarea') ? '250px' : '400px' ) ;
 		if ($height != (int)$height) $height .= 'px';
 		
 		// Decide editor plugin buttons to SKIP
@@ -136,9 +137,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					}
 				}
 			}
-			$required = '';
+			if ($multiple) { $field->html[0] ='This textarea field: '.$field->label.' ['.$field->name.'] is being used to render the description field, which is not allowed to be multiple'; return; }
+			if ($use_ingroup) { $field->html[0] ='This textarea field: '.$field->label.' ['.$field->name.'] is being used to render the description field, which is not allowed to be grouped'; return; }
 			$multiple = 0;
-			if ($use_ingroup) { $field->html[0] ='This textarea field is being used to render the description field, which is not allowed to be grouped'; return; }
+			$use_ingroup = 0;
 		}
 		
 		$js = "";
@@ -180,12 +182,14 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				";
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			// Update the new textarea
 			$js .= "
+				// Update the new textarea
 				var boxClass = 'txtarea';
 				var container = newField.find('.fc_'+boxClass);
+				var editor = typeof tinyMCE === 'undefined' ? false : tinyMCE.get( container.find('textarea').first().attr('id') );
+				
 				container.after('<div class=\"fc_'+boxClass+'\"></div>');  // Append a new container box
-				container.find('textarea').show().appendTo(container.next()); // Copy only the textarea (first make it visible) into the new container
+				container.find('textarea').show().css('visibility', 'visible').appendTo(container.next()); // Copy only the textarea (first make it visible) into the new container
 				container.remove(); // Remove old (cloned) container box along with all the contents
 				
 				// Prepare the new textarea for attaching the HTML editor
@@ -194,7 +198,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
 				theArea.removeClass(); // Remove all classes from the textarea
-				theArea.addClass(boxClass);
 				";
 			
 			// Add new field to DOM
@@ -207,7 +210,21 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			
 			// Attach a new JS HTML editor object
 			if ($use_html) $js .= "
-				if (typeof tinyMCE !== 'undefined') tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+				if (editor)
+				{
+          if(tinyMCE.majorVersion >= 4) {
+          	//var ed = new tinymce.Editor('textareaid', { mode : 'exact' }, tinymce.EditorManager);
+						//tinyMCE.init({  mode : 'exact',  elements :'".$elementid."_'+uniqueRowNum".$field->id."  });
+          	//tinyMCE.editors['".$elementid."_'+uniqueRowNum".$field->id."].show();
+          	tinyMCE.EditorManager.execCommand('mceAddEditor', true, '".$elementid."_'+uniqueRowNum".$field->id.");
+          } else {
+          	tinyMCE.EditorManager.execCommand('mceAddControl', true, '".$elementid."_'+uniqueRowNum".$field->id.");
+						//tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id.");
+          }
+          tinyMCE.EditorManager.execCommand('mceFocus', false, '".$elementid."_'+uniqueRowNum".$field->id.");
+					theArea.addClass('mce_editable');
+					newField.find('.mce-container').css('display', '');
+				}
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -245,7 +262,15 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ this.remove(); });
+					row.slideUp(400, function(){
+						var txtareas = jQuery(this).find('textarea');
+						txtareas.each(function( i, txtarea) {
+							var areaid = jQuery(txtarea).attr('id');
+							var editor = tinyMCE.get(areaid);
+							if (editor) tinymce.EditorManager.execCommand('mceRemoveEditor', false, areaid);
+						});
+						this.remove();
+					});
 					rowCount".$field->id."--;
 				}
 			}
@@ -299,19 +324,18 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 			$txtarea = !$use_html ? '
-				<textarea id="'.$elementid_n.'" name="' . $fieldname_n . '" style="width:auto;" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
+				<textarea class="fcfield_textval txtarea" id="'.$elementid_n.'" name="'.$fieldname_n.'" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
 					.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : $editor->display(
-					$fieldname_n, htmlspecialchars( $field->value[$n], ENT_COMPAT, 'UTF-8' ), '100%', $height, $cols, $rows,
+					$fieldname_n, htmlspecialchars( $field->value[$n], ENT_COMPAT, 'UTF-8' ), $width, $height, $_cols='', $_rows='',
 					$skip_buttons_arr, $elementid_n, $_asset_ = null, $_author_ = null, $editor_plg_params
 				);
 			
 			$txtarea = '
 				<div class="fc_txtarea">
 					'.$txtarea.'
-				</div>
-				';
+				</div>';
 			
 			$field->html[] = '
 				'.($use_ingroup ? '' : $move2).'
@@ -375,7 +399,11 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$values = array($default_value);
 		}
 		
+		
+		// ******************************************
 		// Language filter, clean output, encode HTML
+		// ******************************************
+		
 		if ($clean_output) {
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
@@ -442,7 +470,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			break;
 		}
 		
-		// Initialise property with default value
+		// Create field's HTML
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)
@@ -515,7 +543,9 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		// Server side validation
 		$validation = $field->parameters->get( 'validation', 2 ) ;
+		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 );
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
+		$maxlength  = $use_html ? 0 : $maxlength;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -525,20 +555,26 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			// Do server-side validation and skip empty values
-			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
 			
+			
+			// **************************************************************
+			// Validate data, skipping values that are empty after validation
+			// **************************************************************
+			
+			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
 			if (!strlen($post[$n]) && !$use_ingroup) continue; // skip empty values
 			
 			$newpost[$new] = $post[$n];
+			
 			$new++;
 		}
 		$post = $newpost;
 		
-		// Reconstruct value if it has splitted up e.g. to tabs, MULTI-VALUE AND TAB-SPLIT not supported simutaneusly
+		// Reconstruct value if it has splitted up e.g. to tabs or if given field is the description field,
+		// for textarea MULTI-VALUE and TAB-SPLIT not supported simutaneusly 
 		if ($field->parameters->get('editorarea_per_tab', 0) && count($post)>1)
 		{
-			$post = array(implode(' ', $post));
+			$post = array(implode(' ', $post)) ;
 		}
 		/*if ($use_ingroup) {
 			$app = JFactory::getApplication();
@@ -701,37 +737,40 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	function createTabs(&$field, &$item, $fieldname, $elementid)
 	{
 		// initialize framework objects and other variables
+		$document = JFactory::getDocument();
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		
 		
 		// Create the editor object of editor prefered by the user,
 		// this will also add the needed JS to the HTML head
-		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
+		$editor_name = $field->parameters->get( 'editor',  $user->getParam('editor', $app->getCfg('editor'))  );
 		$editor  = JFactory::getEditor($editor_name);
-		$editor_plg_params = array();  // Override parameters of the editor plugin, nothing yet
+		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 		
 		
-		$required = $field->parameters->get( 'required', 0 ) ;
-		$required = $required ? ' required' : '';
+		// ****************
+		// Number of values
+		// ****************
+		$required   = (int)$field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
 		
 		// **************
 		// Value handling
 		// **************
-		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		
-		// Input max characters & editing
-		$maxlength = $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
+		// Input field display size & max characters
+		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (TODO try to apply it at client-side)
 		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 1 );  // load HTML editor
 		
-		// *** Simple Textarea configuration  ***
-		$rows  = $field->parameters->get( 'rows', 6 ) ;
+		// *** Simple Textarea & HTML Editor (shared configuration) ***
+		$rows  = $field->parameters->get( 'rows', ($field->field_type == 'maintext') ? 6 : 3 ) ;
 		$cols  = $field->parameters->get( 'cols', 80 ) ;
 		
 		// *** HTML Editor configuration  ***
-		
-		$height = $field->parameters->get( 'height', ($field->field_type == 'textarea') ? '300px' : '400px' ) ;
+		$width = $field->parameters->get( 'width', '98%') ;
+		if ($width != (int)$width) $width .= 'px';
+		$height = $field->parameters->get( 'height', ($field->field_type == 'textarea') ? '250px' : '400px' ) ;
 		if ($height != (int)$height) $height .= 'px';
 		
 		$show_buttons = $field->parameters->get( 'show_buttons', 1 ) ;
@@ -752,6 +791,8 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		}
 		
 		$skip_buttons_arr = ($show_buttons && $editor_name=='jce' && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
+		$_asset_ = null;
+		$_author_ = null;
 		
 		
 		// ****************************************
@@ -778,14 +819,20 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$field->tab_names[$ta_count] = $fieldname.'['.($ta_count).']';
 			$field->tab_labels[$ta_count] = /*$field->label.'<br />'.*/ 'Intro Text';
 			
+			$elementid_t = $elementid.'_'.$ta_count;
+			$fieldname_t = $field->tab_names[$ta_count];
+			
 			if (!$use_html) {
 				$field->html[$ta_count] = '
-				<textarea id="'.$elementid.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
+				<textarea id="'.$elementid_t.'" name="'.$fieldname_t.'" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
 					.htmlspecialchars( $ti->beforetabs, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				';
 			} else {
-				$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], htmlspecialchars( $ti->beforetabs, ENT_COMPAT, 'UTF-8' ), '100%', $height, $cols, $rows, $skip_buttons_arr );
+				$field->html[$ta_count] = $editor->display(
+					$fieldname_t, htmlspecialchars( $ti->beforetabs, ENT_COMPAT, 'UTF-8' ), $width, $height, $_cols='', $_rows='',
+					$skip_buttons_arr, $elementid_t, $_asset_, $_author_, $editor_plg_params
+				);
 			}
 			$ta_count++;
 		}
@@ -794,8 +841,12 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// 2. START OF TABSET
 		$field->tab_names[$ta_count] = $fieldname.'['.($ta_count).']';
 		if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = !$merge_tabs_code_editor ? 'TabBegin' : 'T';
+		
+		$elementid_t = $elementid.'_'.$ta_count;
+		$fieldname_t = $field->tab_names[$ta_count];
+		
 		if (!$merge_tabs_code_editor) {
-			$field->html[$ta_count] = '<textarea id="'.$elementid.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $ti->tabs_start .'</textarea>'."\n";
+			$field->html[$ta_count] = '<textarea id="'.$elementid_t.'" name="'.$fieldname_t.'" style="display:block!important;" cols="70" rows="3">'. $ti->tabs_start .'</textarea>'."\n";
 			$ta_count++;
 		} else {
 			$field->html[$ta_count] = $ti->tabs_start;
@@ -805,28 +856,42 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			// START OF TAB
 			$field->tab_names[$ta_count] = $fieldname.'['.($ta_count).']';
 			if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = 'T';//'Start of tab: '. $ti->tab_titles[$i]; 
-			$field->html[$ta_count] = '<textarea id="'.$elementid.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$ti->tab_startings[$i] .'</textarea>'."\n";
+			
+			$elementid_t = $elementid.'_'.$ta_count;
+			$fieldname_t = $field->tab_names[$ta_count];
+			
+			$field->html[$ta_count] = '<textarea id="'.$elementid_t.'" name="'.$fieldname_t.'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$ti->tab_startings[$i] .'</textarea>'."\n";
 			$ta_count++;
 
 			$field->tab_names[$ta_count] = $fieldname.'['.($ta_count).']';
 			$field->tab_labels[$ta_count] = /*$field->label.'<br />'.*/ $ti->tab_titles[$i]; 
 			
+			$elementid_t = $elementid.'_'.$ta_count;
+			$fieldname_t = $field->tab_names[$ta_count];
+			
 			if (!$use_html) {
 				$field->html[$ta_count] = '
-				<textarea id="'.$elementid.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
+				<textarea id="'.$elementid_t.'" name="'.$fieldname_t.'" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
 					.htmlspecialchars( $tab_content, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				';
 			} else {
-				$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], htmlspecialchars( $tab_content, ENT_COMPAT, 'UTF-8' ), '100%', $height, $cols, $rows, $skip_buttons_arr );
+				$field->html[$ta_count] = $editor->display(
+					$fieldname_t, htmlspecialchars( $tab_content, ENT_COMPAT, 'UTF-8' ), $width, $height, $_cols='', $_rows='',
+					$skip_buttons_arr, $elementid_t, $_asset_, $_author_, $editor_plg_params
+				);
 			}
 			$ta_count++;
 			
 			// END OF TAB
 			$field->tab_names[$ta_count] = $fieldname.'['.($ta_count).']';
-			if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = 'T';//'End of tab: '. $ti->tab_titles[$i]; 
+			if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = 'T';//'End of tab: '. $ti->tab_titles[$i];
+			
+			$elementid_t = $elementid.'_'.$ta_count;
+			$fieldname_t = $field->tab_names[$ta_count];
+			
 			if (!$merge_tabs_code_editor) {
-				$field->html[$ta_count] = '<textarea id="'.$elementid.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $ti->tab_endings[$i] .'</textarea>'."\n";
+				$field->html[$ta_count] = '<textarea id="'.$elementid_t.'" name="'.$fieldname_t.'" style="display:block!important;" cols="70" rows="3">'. $ti->tab_endings[$i] .'</textarea>'."\n";
 				$ta_count++;
 			} else {
 				$field->html[$ta_count] = $ti->tab_endings[$i];
@@ -837,7 +902,11 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// 3. END OF TABSET
 		$field->tab_names[$ta_count] = $fieldname.'['.($ta_count).']';
 		if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] =  !$merge_tabs_code_editor ? 'TabEnd' : 'T';
-		$field->html[$ta_count] = '<textarea id="'.$elementid.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$ti->tabs_end .'</textarea>'."\n";
+		
+		$elementid_t = $elementid.'_'.$ta_count;
+		$fieldname_t = $field->tab_names[$ta_count];
+		
+		$field->html[$ta_count] = '<textarea id="'.$elementid_t.'" name="'.$fieldname_t.'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$ti->tabs_end .'</textarea>'."\n";
 		$ta_count++;
 		
 		
@@ -846,14 +915,20 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$field->tab_names[$ta_count] = $fieldname.'['.($ta_count).']';
 			$field->tab_labels[$ta_count] = /*$field->label.'<br />'.*/ 'Foot Text' ;
 			
+			$elementid_t = $elementid.'_'.$ta_count;
+			$fieldname_t = $field->tab_names[$ta_count];
+			
 			if (!$use_html) {
 				$field->html[$ta_count]	 = '
-				<textarea id="'.$elementid.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
+				<textarea id="'.$elementid_t.'" name="'.$fieldname_t.'" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
 					.htmlspecialchars( $ti->aftertabs, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				';
 			} else {
-				$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], htmlspecialchars( $ti->aftertabs, ENT_COMPAT, 'UTF-8' ), '100%', $height, $cols, $rows, $skip_buttons_arr );
+				$field->html[$ta_count] = $editor->display(
+					$fieldname_t, htmlspecialchars( $ti->aftertabs, ENT_COMPAT, 'UTF-8' ), $width, $height, $_cols='', $_rows='',
+					$skip_buttons_arr, $elementid_t, $_asset_, $_author_, $editor_plg_params
+				);
 			}
 			$ta_count++;
 		}

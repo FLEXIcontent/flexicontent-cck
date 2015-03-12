@@ -39,9 +39,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'add',					'edit' );
-		$this->registerTask( 'apply', 			'save' );
-		$this->registerTask( 'saveandnew', 	'save' );
+		$this->registerTask( 'add',        'edit' );
+		$this->registerTask( 'apply_type', 'save' );
+		$this->registerTask( 'apply',      'save' );
+		$this->registerTask( 'saveandnew', 'save' );
 		if (!FLEXI_J16GE) {
 			$this->registerTask( 'accesspublic',		'access' );
 			$this->registerTask( 'accessregistered','access' );
@@ -87,18 +88,11 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Get data from request
 		// *********************
 		
-		if (FLEXI_J16GE)
-		{
-			// Retrieve form data these are subject to basic filtering
-			$data   = JRequest::getVar('jform', array(), 'post', 'array');   // Core Fields and and item Parameters
-			$custom = JRequest::getVar('custom', array(), 'post', 'array');  // Custom Fields
-			$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
-		}
-		
-		else {
-			// Retrieve form data these are subject to basic filtering
-			$data = JRequest::get( 'post' );  // Core & Custom Fields and item Parameters
-		}
+		// Retrieve form data these are subject to basic filtering
+		$data   = JRequest::getVar('jform', array(), 'post', 'array');   // Core Fields and and item Parameters
+		$custom = JRequest::getVar('custom', array(), 'post', 'array');  // Custom Fields
+		$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
+		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid' );
 		
 		// Set data id into model in case not already set ?
 		$model->setId((int) $data['id']);
@@ -112,16 +106,12 @@ class FlexicontentControllerItems extends FlexicontentController
 		$perms = FlexicontentHelperPerm::getPerm();
 		// Per content type change category permissions
 		// Per content type change category permissions
-		if (FLEXI_J16GE) {
-			$current_type_id  = ($isnew || !$model->get('type_id')) ? $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
-			$CanChangeFeatCat = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
-			$CanChangeSecCat  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $current_type_id);
-			$CanChangeCat     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $current_type_id);
-		} else {
-			$CanChangeFeatCat = 1;
-			$CanChangeSecCat  = 1;
-			$CanChangeCat     = 1;
-		}
+		$current_type_id  = ($isnew || !$model->get('type_id')) ? $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
+		$CanChangeFeatCat = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
+		$CanChangeSecCat  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $current_type_id);
+		$CanChangeCat     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $current_type_id);
+		
+		$AutoApproveChanges = $perms->AutoApproveChanges;
 		
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
 		$featured_cats = array();
@@ -170,47 +160,41 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Basic Form data validation
 		// **************************
 		
-		if (FLEXI_J16GE)
-		{
-			// Validate Form data for core fields and for parameters
-			$form = $model->getForm();          // Do not pass any data we only want the form object in order to validate the data and not create a filled-in form
-			$post = $model->validate($form, $data);
-			if (!$post) {
-				//JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
-				echo "Error while validating data: " . $model->getError();
-				echo '<span class="fc_return_msg">'.JText::sprintf('FLEXI_CLICK_HERE_TO_RETURN', '"JavaScript:window.history.back();"').'</span>';
-				jexit();
+		// Validate Form data for core fields and for parameters
+		$form = $model->getForm();          // Do not pass any data we only want the form object in order to validate the data and not create a filled-in form
+		$post = $model->validate($form, $data);
+		
+		// Check for validation error
+		if (!$post) {
+			// Get the validation messages and push up to three validation messages out to the user
+			$errors	= $form->getErrors();
+			for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++) {
+				$app->enqueueMessage($errors[$i] instanceof Exception ? $errors[$i]->getMessage() : $errors[$i], 'error');
 			}
 			
-			// Some values need to be assigned after validation
-			$post['attribs'] = @$data['attribs'];  // Workaround for item's template parameters being clear by validation since they are not present in item.xml
-			$post['custom']  = & $custom;          // Assign array of custom field values, they are in the 'custom' form array instead of jform
-			$post['jfdata']  = & $jfdata;          // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform
+			// Set POST form date into the session, so that they get reloaded
+			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
+			$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);  // Save the custom fields data in the session
+			$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', $jfdata);  // Save the falang translations into the session
+			$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 			
-			// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
-			$ilayout = $data['attribs']['ilayout'];
-			if( !empty($data['layouts'][$ilayout]) ) {
-				//echo "<pre>"; print_r($post['attribs']);
-				//$post['attribs'] = array_merge($post['attribs'], $data['layouts'][$ilayout]);
-				$post['attribs']['layouts'] = $data['layouts'];
-				//echo "<pre>"; print_r($post['attribs']); exit;
-			}
+			// Redirect back to the registration form.
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			return false; //die('error');
 		}
 		
-		else {
-			$post = $data;
-			
-			// Some values need to be assigned after validation
-			$post['text'] = JRequest::getVar( 'text', '', 'post', 'string', JREQUEST_ALLOWRAW ); // Workaround for allowing raw text field
-			
-			// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
-			$ilayout = $post['params']['ilayout'];
-			if( !empty($post['layouts'][$ilayout]) ) {
-				//echo "<pre>"; print_r($post['attribs']);
-				//$post['attribs'] = array_merge($post['attribs'], $data['layouts'][$ilayout]);
-				$post['params']['layouts'] = $post['layouts'];
-				//echo "<pre>"; print_r($post['params']); exit;
-			}
+		// Some values need to be assigned after validation
+		$post['attribs'] = @$data['attribs'];  // Workaround for item's template parameters being clear by validation since they are not present in item.xml
+		$post['custom']  = & $custom;          // Assign array of custom field values, they are in the 'custom' form array instead of jform
+		$post['jfdata']  = & $jfdata;          // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform
+		
+		// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
+		$ilayout = $data['attribs']['ilayout'];
+		if( !empty($data['layouts'][$ilayout]) ) {
+			//echo "<pre>"; print_r($post['attribs']);
+			//$post['attribs'] = array_merge($post['attribs'], $data['layouts'][$ilayout]);
+			$post['attribs']['layouts'] = $data['layouts'];
+			//echo "<pre>"; print_r($post['attribs']); exit;
 		}
 		
 		// USEFULL FOR DEBUGING for J2.5 (do not remove commented code)
@@ -220,7 +204,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// Make sure Content ID in the REQUEST is set, this is needed in BACKEND, needed in some cases
 		// NOTE this is not the same as jform['cid'] which is the category IDs of the Content Item
-		if (FLEXI_J16GE)  JRequest::setVar( 'cid', array($model->getId()), 'post', 'array' );
+		JRequest::setVar( 'cid', array($model->getId()), 'post', 'array' );
 		
 		
 		// ********************************************************************************
@@ -228,9 +212,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		// checked them on edit form load, because user may have tampered with the form ... 
 		// ********************************************************************************
 		
-		if (FLEXI_J16GE) $itemAccess = $model->getItemAccess();
-		$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $itemAccess->get('access-create');
-		$canEdit = !FLEXI_J16GE ? $model->canEdit() : $itemAccess->get('access-edit');
+		$itemAccess = $model->getItemAccess();
+		$canAdd  = $itemAccess->get('access-create');
+		$canEdit = $itemAccess->get('access-edit');
 		
 		$type_id = (int) $post['type_id'];  // Typecast to int, (already done for J2.5 via validating)
 		if ( !$isnew && $model->get('type_id') == $type_id) {
@@ -388,7 +372,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$last_version    = FLEXIUtilities::getLastVersions($item->id, true);    // Get last version (=latest one saved, highest version id),
 			
 			// $post variables vstate & state may have been (a) tampered in the form, and/or (b) altered by save procedure so better not use them
-			$needs_version_reviewal     = !$isnew && ($last_version > $current_version) && !$canPublish;
+			$needs_version_reviewal     = !$isnew && ($last_version > $current_version) && !$canPublish && !$AutoApproveChanges;
 			$needs_publication_approval =  $isnew && ($item->state == $pending_approval_state) && !$canPublish;
 			
 			$draft_from_non_publisher = $item->state==$draft_state && !$canPublish;
@@ -492,7 +476,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// *******************************************************************************************************
 		if (!$canEdit)
 		{
-			if ($task=='apply') {
+			if ($task=='apply' || $task=='apply_type') {
 				// APPLY TASK: Temporarily set item to be editable till closing it
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 				$rendered_uneditable[$model->get('id')]  = 1;
@@ -538,7 +522,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for new Content Item is being closed, and clear some flags
 		// ****************************************************************
 		
-		if ($task!='apply' && $newly_submitted_item )
+		if ($task!='apply' && $task!='apply_type' && $newly_submitted_item )
 		{
 			// Clear item from being marked as newly submitted
 			unset($newly_submitted[$model->get('id')]);
@@ -560,16 +544,16 @@ class FlexicontentControllerItems extends FlexicontentController
 		// ****************************************
 		switch ($task)
 		{
-			case 'apply' :
+			case 'apply':
+			case 'apply_type':
 				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&cid='.(int) $model->get('id');
 				break;
-			case 'saveandnew' :
-				if( $type_id )
-					$link = 'index.php?option=com_flexicontent&view=item&typeid='.$type_id;
-				else
-					$link = 'index.php?option=com_flexicontent&view=item';
+			case 'saveandnew':
+				$link = $type_id ?
+					'index.php?option=com_flexicontent&view=item&typeid='.$type_id :
+					'index.php?option=com_flexicontent&view=item' ;
 				break;
-			default :
+			default:
 				$link = 'index.php?option=com_flexicontent&view=items';
 				break;
 		}

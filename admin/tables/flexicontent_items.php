@@ -411,6 +411,7 @@ class flexicontent_items extends _flexicontent_items {
 					//$jAp= JFactory::getApplication();
 					//$jAp->enqueueMessage('Setting default lang_parent_id to '. $type->id,'message');
 					$type_ext->$p = $type->id;
+					$type_tmp->$p = $type->id;
 				}
 			}
 				
@@ -423,7 +424,7 @@ class flexicontent_items extends _flexicontent_items {
 		if( $this->$k )
 		{
 			$ret = $this->_db->updateObject( $this->_tbl, $type, $this->_tbl_key, $updateNulls );
-			$type_ext->$frn_key_ext   = $this->$k;
+			$type_ext->$frn_key_ext = $this->$k;
 			$type_tmp->$frn_key_tmp = $this->$k;
 		}
 		else
@@ -431,7 +432,7 @@ class flexicontent_items extends _flexicontent_items {
 			$ret = $this->_db->insertObject( $this->_tbl, $type, $this->_tbl_key );
 			// set the type_id
 			$this->id = $type->id;
-			$this->id = $this->id?$this->id:$this->_db->insertid();
+			$this->id = $this->id ? $this->id : $this->_db->insertid();
 		}
 
 		if( !$ret )
@@ -451,7 +452,11 @@ class flexicontent_items extends _flexicontent_items {
 			}
 			
 			else {
-				if ($type_ext->lang_parent_id == 0) $type_ext->lang_parent_id = $this->id;  // case of new item we need to set lang_parent_id after initial content creation
+				if ($type_ext->lang_parent_id == 0) {
+					// case of new item we need to set lang_parent_id after initial content creation
+					$type_ext->lang_parent_id = $this->id;
+				}
+				$type_tmp->lang_parent_id = $type_ext->lang_parent_id;
 				
 				// insert into #__flexicontent_items_ext table
 				$type_ext->$frn_key_ext = $this->id;
@@ -562,8 +567,7 @@ class flexicontent_items extends _flexicontent_items {
 		$this->introtext = trim( $filter->clean( $this->introtext ) );
 		$this->fulltext =  trim( $filter->clean( $this->fulltext ) );
 		*/
-
-
+		
 		if(empty($this->title)) {
 			$this->setError(JText::_( 'FLEXI_ARTICLES_MUST_HAVE_A_TITLE' ));
 			return false;

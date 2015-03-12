@@ -51,8 +51,8 @@
 			
 			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2" />
 			<field name="hide_maintext" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="display_maintext">FLEXI_NO</option>
-				<option value="1" show_list="display_maintext" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="display_maintext" hide_list="">FLEXI_NO</option>
+				<option value="1" show_list="" hide_list="display_maintext">FLEXI_YES</option>
 			</field>
 			<field name="maintext_hide_html" type="radio" default="" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC" depend_class="display_maintext" class="btn-group group-fcsuccess">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -347,6 +347,13 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="robots" type="radio" label="FLEXI_METADATA_ROBOTS_LABEL" description="FLEXI_METADATA_ROBOTS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="index, follow">JGLOBAL_INDEX_FOLLOW</option>
+				<option value="noindex, follow">JGLOBAL_NOINDEX_FOLLOW</option>
+				<option value="index, nofollow">JGLOBAL_INDEX_NOFOLLOW</option>
+				<option value="noindex, nofollow">JGLOBAL_NOINDEX_NOFOLLOW</option>
+			</field>
 	
 			<!--field name="show_item_navigation" type="radio" default="1" label="Show Navigation" description="PARAMNAVIGATIONARTICLE" class="btn-group btn-group-yesno">
 				<option value="0">Hide</option>
@@ -382,12 +389,15 @@
 			<field name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level2" />
-			
-			<field name="use_captcha" type="radio" default="" label="FLEXI_USER_TYPE" description="FLEXI_USER_TYPE_DESC" class="btn-group btn-group-yesno">
+			<field name="use_captcha" type="multilist" subtype="radio" default="" label="FLEXI_USE_CAPTCHA" description="FLEXI_USE_CAPTCHA_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NEVER</option>
+				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_GUESTS_RECOMMENEDED</option>
 				<option value="2">FLEXI_ANY_USER</option>
+			</field>
+			<field name="captcha" type="plugins" folder="captcha" default="" label="FLEXI_CAPTCHA_PLG" description="FLEXI_CAPTCHA_PLG_DESC" filter="cmd">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_DISABLE</option>
 			</field>
 			<field name="captcha_formop" type="radio" default="" label="FLEXI_OPERATION_TYPE" description="FLEXI_OPERATION_TYPE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -425,17 +435,18 @@
 			<field name="default_language_fe" type="fclanguage" default="" use_global="1" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_DEFAULT_LANGUAGE_DESC" />
 			<field name="disable_languages_fe" type="fclanguage" default="" use_global="1" multiple="multiple" class="use_select2_lib" label="FLEXI_MENU_DISABLE_LANGUAGES" description="FLEXI_MENU_DISABLE_LANGUAGES_DESC" />
 			
-			<field name="langdisplay_fe" type="radio" default="" label="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS" description="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS_DESC">
+			<field name="" type="separator" default="FLEXI_MENU_LANG_SELECTOR" label="" level="level3" menu="hide" />
+			<field name="langdisplay_fe" type="radio" default="" label="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS" description="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="2">FLEXI_LANG_AS_DROP_DOWN</option>
 				<option value="3">FLEXI_LANG_AS_RADIO</option>
 			</field>
-			<field name="langdisplay_flags_fe" type="radio" default="" label="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO" description="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO_DESC">
+			<field name="langdisplay_flags_fe" type="radio" default="" label="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO" description="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="langdisplay_texts_fe" type="radio" default="" label="FLEXI_MENU_LANG_SHOW_TEXT_RADIO" description="FLEXI_MENU_LANG_SHOW_TEXT_RADIO_DESC">
+			<field name="langdisplay_texts_fe" type="radio" default="" label="FLEXI_MENU_LANG_SHOW_TEXT_RADIO" description="FLEXI_MENU_LANG_SHOW_TEXT_RADIO_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_LANG_NO_TEXT</option>
 				<option value="1">FLEXI_LANG_CODE</option>

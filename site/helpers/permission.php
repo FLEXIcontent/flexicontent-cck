@@ -154,10 +154,11 @@ class FlexicontentHelperPerm
 		$permission->CanParams		= $user->authorise('flexicontent.paramsitem',	'com_flexicontent'); // (backend) Edit item parameters like meta data and template parameters
 		$permission->CanVersion		= $user->authorise('flexicontent.versioning',	'com_flexicontent'); // (backend) Use item versioning
 		
-		$permission->AssocAnyTrans		= $user->authorise('flexicontent.assocanytrans',		'com_flexicontent'); // (item edit form) associate any translation
-		$permission->EditCreationDate	= $user->authorise('flexicontent.editcreationdate',	'com_flexicontent'); // (item edit form) edit creation date (frontend)
-		$permission->IgnoreViewState	= $user->authorise('flexicontent.ignoreviewstate',	'com_flexicontent'); // (Frontend Content Lists) ignore view state
-		$permission->RequestApproval	= $user->authorise('flexicontent.requestapproval',	'com_flexicontent'); // (Workflow) Send Approval Requests (for ANY draft items)
+		$permission->AssocAnyTrans		  = $user->authorise('flexicontent.assocanytrans',	  	'com_flexicontent'); // (item edit form) associate any translation
+		$permission->EditCreationDate	  = $user->authorise('flexicontent.editcreationdate',	  'com_flexicontent'); // (item edit form) edit creation date (frontend)
+		$permission->IgnoreViewState	  = $user->authorise('flexicontent.ignoreviewstate',	  'com_flexicontent'); // (Frontend Content Lists) ignore view state
+		$permission->RequestApproval	  = $user->authorise('flexicontent.requestapproval',	  'com_flexicontent'); // (Workflow) Send Approval Requests (for ANY draft items)
+		$permission->AutoApproveChanges = $user->authorise('flexicontent.autoapprovechanges',	'com_flexicontent'); // (Workflow) Can publish document changes regardless of edit state
 		
 		// CATEGORIES: management tab and usage
 		$permission->CanCats			= $user->authorise('flexicontent.managecats',	'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
@@ -496,6 +497,38 @@ class FlexicontentHelperPerm
 		
 		return $actions[$uid][$asset];  // RETURN the (shortened) action names
 	}
+	
+	
+	
+	/*
+	 * Lookups the ACTION for the content type
+	 *
+	 * @access	public
+	 * @param	integer		$type_id		The TYPE ID
+	 * @param	string		$rule				The ACL rule name
+	 * @param	string		$type				A type object
+	 *
+	 * @return boolean							True if action is allowd
+	 * @since	3.0
+	 * 
+	 */
+	static function checkTypeAccess($type_id, $rule, $type=null)
+	{
+		static $allowed;
+		if (!$type_id) return true;  // a not set type defaults to true
+		
+		if ( !isset($allowed[$rule][$type_id]) )
+		{
+			if ($rule=='core.create')
+				$allowed[$rule][$type_id] = ($type ? ! $type->itemscreatable : true) || $user->authorise($rule, 'com_flexicontent.type.'.$type_id);
+			else
+				// featured not enabled yet
+				//$allowed[$rule][$type_id] = $user->authorise($rule, 'com_flexicontent.type.'.$type_id);
+				$allowed[$rule][$type_id] = true;
+		}
+		return $allowed[$rule][$type_id];
+	}
+	
 	
 	
 	//*******************************************************************************

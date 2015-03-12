@@ -20,7 +20,8 @@ defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$hint_image = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$warn_image = JHTML::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
 $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
@@ -133,14 +134,26 @@ function delAllFilters() {
 		// Configuration
 		$upload_maxsize = $this->params->get('upload_maxsize');
 		$phpUploadLimit = flexicontent_upload::getPHPuploadLimit();
-		$sys_limit_class = ($phpUploadLimit['value'] < $upload_maxsize) ? 'badge-warning' : '';
+		$server_limit_exceeded = $phpUploadLimit['value'] < $upload_maxsize;
 		
-		echo '<span class="label label-info">'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span>'
-			.'<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip('FLEXI_CONF_UPLOAD_MAX_LIMIT', 'FLEXI_CONF_UPLOAD_MAX_LIMIT_DESC', 1, 1).'">'.$hintmage.'</span>'
-			.'<span class="badge badge">'.round($upload_maxsize / (1024*1024), 2).' M </span>'
-			.'<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SERVER_UPLOAD_MAX_LIMIT'), JText::sprintf('FLEXI_SERVER_UPLOAD_MAX_LIMIT_DESC', $phpUploadLimit['name']), 0, 1).'">'.$hintmage.'</span>'
-			.'<span class="badge '.$sys_limit_class.'">'.round($phpUploadLimit['value'] / (1024*1024), 2).' M </span>'
-			;
+		$conf_limit_class = $server_limit_exceeded ? '' : 'badge-success';
+		$conf_limit_style = $server_limit_exceeded ? 'text-decoration: line-through;' : '';
+		$conf_lim_image   = $server_limit_exceeded ? $warn_image.$hint_image : $hint_image;
+		$sys_limit_class  = $server_limit_exceeded ? 'badge-important' : '';
+		
+		echo '
+		<span class="fc-fileman-upload-limits-box">
+			<span class="label label-info">'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span>
+			<span class="fc-php-upload-limit-box">
+				<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip('FLEXI_CONF_UPLOAD_MAX_LIMIT', 'FLEXI_CONF_UPLOAD_MAX_LIMIT_DESC', 1, 1).'">'.$conf_lim_image.'</span>
+				<span class="badge '.$conf_limit_class.'" style="'.$conf_limit_style.'">'.round($upload_maxsize / (1024*1024), 2).' M </span>
+			</span>
+			<span class="fc-sys-upload-limit-box">
+				<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SERVER_UPLOAD_MAX_LIMIT'), JText::sprintf('FLEXI_SERVER_UPLOAD_MAX_LIMIT_DESC', $phpUploadLimit['name']), 0, 1).'">'.$hint_image.'</span>
+				<span class="badge '.$sys_limit_class.'">'.round($phpUploadLimit['value'] / (1024*1024), 2).' M </span>
+			</span>
+		</span>
+		';
 		?>
 		
 		<fieldset class="actions" id="filemanager-1">
@@ -150,7 +163,7 @@ function delAllFilters() {
 					
 					<tr>
 						<td id="file-upload-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_FILE', 'FLEXI_CHOOSE_FILE_DESC', 1, 1); ?>">
-							<label class="label" for="file-upload" id="file-upload-lbl" >
+							<label class="label" id="file-upload-lbl" for="file-upload" >
 							<?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?>
 							</label>
 						</td>
@@ -191,7 +204,7 @@ function delAllFilters() {
 					<tr>
 						<td id="secure-lbl-container" class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
 							<label class="label" id="secure-lbl">
-							<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
+							<?php echo JText::_( 'FLEXI_TARGET_DIRECTORY' ); ?>
 							</label>
 						</td>
 						<td id="secure-container">
@@ -393,7 +406,7 @@ function delAllFilters() {
 					<tr>
 						<td class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
 							<label class="label">
-							<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
+							<?php echo JText::_( 'FLEXI_TARGET_DIRECTORY' ); ?>
 							</label>
 						</td>
 						<td>

@@ -235,7 +235,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		<div id="flexi_form_submit_btns" class="flexi_buttons">
 			
 			<?php if ( $this->perms['canedit'] || in_array( 'apply', $allowbuttons_fe) || !$typeid ) : ?>
-				<button class="<?php echo $btn_class;?> btn-success" type="button" onclick="return flexi_submit('apply', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
+				<button class="<?php echo $btn_class;?> btn-success" type="button" onclick="return flexi_submit('<?php echo !$typeid ? 'apply_type' : 'apply'; ?>', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 					<span class="fcbutton_apply"><?php echo JText::_( !$isnew ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
 				</button>
 			<?php endif; ?>
@@ -1155,22 +1155,27 @@ if ($this->fields && $typeid) :
 	<div class="fc_edit_container_full">
 		
 		<?php
-		$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
+		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 		$noplugin = sprintf( $alert_box, '', 'warning', 'fc-nobgimage', JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) );
 		$row_k = 0;
 		foreach ($this->fields as $field_name => $field)
 		{
-			// SKIP frontend hidden fields from this listing
-			if ( $field->iscore &&  isset($tab_fields['fman'][ $field->field_type ]) ) {
-				if ( !isset($captured[ $field->field_type ]) ) continue;
-				echo $captured[ $field->field_type ]; unset($captured[ $field->field_type ]);
-				echo "\n<div class='fcclear'></div>\n";
+			if ( $field->iscore &&  isset($tab_fields['fman'][ $field->field_type ]) )
+			{
+				// Print any CORE fields that are placed by field manager
+				if ( isset($captured[ $field->field_type ]) ) {
+					echo $captured[ $field->field_type ]; unset($captured[ $field->field_type ]);
+					echo "\n<div class='fcclear'></div>\n";
+				}
 				continue;
-			} else if (
-				($field->iscore && $field->field_type!='maintext')  ||
-				$field->parameters->get('frontend_hidden')  ||
-				(in_array($field->field_type, $hidden) && empty($field->html)) ||
-				in_array($field->formhidden, array(1,3))
+			}
+			
+			else if (
+				// SKIP frontend hidden fields 
+				($field->iscore && $field->field_type!='maintext')   ||   $field->parameters->get('frontend_hidden')   ||   in_array($field->formhidden, array(1,3))   ||
+				
+				// Skip hide-if-empty fields from this listing
+				( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
 			) continue;
 			
 			if ( $field->field_type=='maintext' && isset($all_tab_fields['maintext']) ) {
@@ -1208,18 +1213,26 @@ if ($this->fields && $typeid) :
 			if ($required)  $lbl_class .= ' required';
 			
 			// Some fields may force a container width ?
+			$display_label_form = $field->parameters->get('display_label_form', 1);
 			$row_k = 1 - $row_k;
-			$width = $field->parameters->get('container_width', '' );
-			$width = !$width ? '' : 'width:' .$width. ($width != (int)$width ? 'px' : '');
+			$full_width = $display_label_form==0 || $display_label_form==2;
+			$width = $field->parameters->get('container_width', ($full_width ? '100%!important;' : false) );
+			$container_width = empty($width) ? '' : 'width:' .$width. ($width != (int)$width ? 'px!important;' : '');
 			$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
 			?>
 			
 			<div class='fcclear'></div>
-			<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
-				<?php echo $field->label; ?>
-			</label>
 			
-			<div style="<?php echo $width; ?>;" class="<?php echo $container_class; ?>" id="container_fcfield_<?php echo $field->id; ?>">
+			<?php if($display_label_form): ?>
+				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
+					<?php echo $field->label; ?>
+				</label>
+				<?php if($display_label_form==2):  ?>
+					<div class='fcclear'></div>
+				<?php endif; ?>
+			<?php endif; ?>
+			
+			<div style="<?php echo $container_width; ?>" class="<?php echo $container_class; ?>" id="container_fcfield_<?php echo $field->id; ?>">
 				<?php echo ($field->description && $edithelp==3)  ?  sprintf( $alert_box, '', 'info', 'fc-nobgimage', $field->description )  :  ''; ?>
 				
 			<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing of joomfish (J1.5) or falang (J2.5+)

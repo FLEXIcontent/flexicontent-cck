@@ -224,17 +224,6 @@ ul.statetoggler {
 	padding:15px 0 15px 15px
 }
 /* mirror .cssbox_head right/left */
-/* Validation */
-.invalid {
-	color:#CC0000;
-}
-select.invalid,
-input.invalid,
-textarea.invalid {
-/* 	border: 1px solid #CC0000; */
-	border-style: dotted;
-}
-/* EOF Validation */
 .calendar {
 	vertical-align: middle;
 }
@@ -910,7 +899,8 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 #flexicontent .fcfield-sortables > li .input-append { margin-right: 10px; }
 #flexicontent .fcfield-sortables > li .use_select2_lib { vertical-align: top; }
 #flexicontent .fcfield-sortables > li > * { vertical-align: top; }
-
+#flexicontent .fcfield-sortables > li > [class^="fcfield-"],
+#flexicontent .fcfield-sortables > li > [class*=" fcfield-"] { cursor: pointer; }
 
 /* FIELD-GROUP: list of value containers */
 #flexicontent ul.fcfield-sortables.fcfield-group {
@@ -1104,6 +1094,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 
 /* FIELDs: DRAG (sort) handle */
 #flexicontent .fcfield-drag-handle {
+	cursor: move;
 	margin:0px 0px 2px 0px;
 	padding: 12px;
 	background: url(../images/move2.png) 4px 4px no-repeat white;
@@ -1432,9 +1423,25 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
 	background: none !important;
 }
 
+#flexicontent form textarea.invalid,
+#flexicontent form input.invalid,
+#flexicontent form select.invalid,
+select.invalid, input.invalid, textarea.invalid {
+	border: 1px dotted #CC0000 !important;
+}
+
+.use_prettycheckable.invalid + a + label,
+input.invalid + .fccheckradio_lbl {
+	color: #cc0000 !important;
+	border: 1px dotted #CC0000 !important;
+	border-radius: 4px;
+}
+#flexicontent .label.invalid,
+#flexicontent .label-fcinner.invalid,
 #flexicontent .flexi_label.invalid,
 #flexicontent .flexi_label.invalid.required {
-	color:red !important;
+	color: #CC0000 !important;
+	border: 1px dotted #CC0000 !important;
 }
 #flexicontent .flexi_label.required:after {
 	content:"*";
@@ -1460,14 +1467,11 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
 	vertical-align: top;
 }
 
-#flexicontent .flexi_label.invalid {
-	font-weight: bold;
-}
 #flexicontent .flexi_formblock {
 	clear: both; width:100%; padding:0; margin:0;
 }
 
-#flexicontent { margin:0px!important; }
+#flexicontent { margin: 0px; }
 #flexicontent fieldset.basicfields_set,
 fieldset.flexiaccess, fieldset.adminform,
 #flexicontent fieldset.customfields_set,
@@ -1501,12 +1505,6 @@ fieldset.adminform legend { font-weight:bold; font-size: 14px; }
 	/*border: 1px solid #dddddd;*/
 	/*cursor: pointer;*/
 	/*padding: 0.1em 0.4em 0.1em 0.2em;*/
-}
-
-#flexicontent form textarea.invalid,
-#flexicontent form input.invalid,
-#flexicontent form select.invalid {
-	border: 1px dotted #ff0000 !important;
 }
 
 div.flexi_box_left,
@@ -1683,7 +1681,6 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	margin: 0px 6px 2px 0 !important;
 	position: relative;
 	text-decoration: none;
-	white-space: nowrap;
 	font-size: 12px;
 }
 
@@ -1738,7 +1735,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 
 /* Table for forms with label styling */
 table.fc-form-tbl td {
-	vertical-align: top;
+	vertical-align: middle;
 	padding: 4px 24px 4px 0px;
 }
 table.fc-form-tbl td.key {

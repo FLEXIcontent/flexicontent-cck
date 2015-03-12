@@ -13,8 +13,8 @@
 		<filename plugin="textarea">textarea.php</filename>
 		<filename>index.html</filename>
 	</files>
-	<config>
 	
+	<config>
 	<fields name="attribs">
 		
 		<fieldset name="group-textarea-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -53,26 +53,38 @@
 				<option value="HTML">FLEXI_FIELD_PLAIN_TEXT_ALLOW_ENTITIES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			
-			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
-			<field name="use_html" type="radio" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC">
-				<option value="1">FLEXI_HTML_EDITOR</option>
-				<option value="0">FLEXI_SIMPLE_TEXTAREA</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_SIMPLE_TEXTAREA" description="FLEXI_SIMPLE_TEXTAREA_DESC" level="level2" />
-			<field name="rows" type="text" default="6" size="2" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" />
-			<field name="cols" type="text" default="80" size="2" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" />
-			<field name="height" type="text" default="350px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
-			<field name="" type="separator" default="FLEXI_EDITOR_BUTTONS" description="" level="level3" />
-			<field name="show_buttons" type="radio" default="1" label="FLEXI_SHOW_EDITOR_BUTTONS" description="FLEXI_SHOW_EDITOR_BUTTONS_DESC" class="btn-group btn-group-yesno">
+			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="1">FLEXI_FLOATED_LEFT</option>
+				<option value="2">FLEXI_CLEARED</option>
 			</field>
-			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_BUTTONS_JCE_ONLY" description="FLEXI_SKIP_BUTTONS_JCE_ONLY_DESC" />
+			<field name="use_html" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC" class="btn-group group-fcinfo">
+				<option value="1" show_list="using-html-editor" hide_list="using-plain-area">FLEXI_HTML_EDITOR</option>
+				<option value="0" show_list="using-plain-area" hide_list="using-html-editor">FLEXI_SIMPLE_TEXTAREA</option>
+			</field>
+			
+			
+			<field name="" type="separator" default="FLEXI_SIMPLE_TEXTAREA" description="FLEXI_SIMPLE_TEXTAREA_DESC" level="level2" depend_class="using-plain-area" />
+			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" depend_class="using-plain-area" />
+			<field name="rows" type="text" default="3" size="3" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" depend_class="using-plain-area" />
+			<field name="cols" type="text" default="80" size="3" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" depend_class="using-plain-area" />
+			
+			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" depend_class="using-html-editor" />
+			<field name="" type="separator" default= "NOTE: for multi-value, only editors based on: &lt;b&gt;tinyMCE&lt;/b&gt; are supported, otherwise then the editor on new values will appear only after saving" description="" level="level4" depend_class="using-html-editor" />
+			<field name="width" type="text" default="98%" size="6" label="FLEXI_FIELD_WIDTH" description="FLEXI_FIELD_WIDTH_DESC" depend_class="using-html-editor" />
+			<field name="height" type="text" default="250px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" depend_class="using-html-editor" />
+			<field name="editor" type="plugins" folder="editors" label="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" depend_class="using-html-editor">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_EDITOR_BUTTONS" description="" level="level3" depend_class="using-html-editor" />
+			<field name="show_buttons" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SHOW_EDITOR_BUTTONS" description="FLEXI_SHOW_EDITOR_BUTTONS_DESC" depend_class="using-html-editor" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="using-editor-btns">FLEXI_NO</option>
+				<option value="1" show_list="using-editor-btns" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_BUTTONS_JCE_ONLY" description="FLEXI_SKIP_BUTTONS_JCE_ONLY_DESC" depend_class="using-html-editor using-editor-btns" />
 			
 
 		</fieldset>

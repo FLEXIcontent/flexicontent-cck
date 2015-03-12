@@ -20,7 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:top; margin-top:6px;" ' );
+$hint_image = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 unset($form);
 $form = & $this->form;
 
@@ -61,6 +61,14 @@ $this->document->addScriptDeclaration($js);
 				</td>
 				<td>
 					<?php echo $form->getInput('name'); ?>
+					<?php if ($form->getValue('field_type')=='textarea') : ?>
+						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline"><?php echo JText::_('FLEXI_NOTES'); ?>:
+							<span class="<?php echo $tip_class; ?>" data-placement="bottom"
+									title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_CORE_FIELDS_CUSTOMIZATION', 'text', '<b>'.JText::_('FLEXI_DESCRIPTION').'</b>', 'text'), 0, 1); ?>">
+								<?php echo $hint_image; ?>
+							</span>
+						</span>
+					<?php endif; ?>
 				</td>
 			</tr>
 			<?php else : ?>
@@ -69,7 +77,15 @@ $this->document->addScriptDeclaration($js);
 					<?php echo $form->getLabel('name'); ?>
 				</td>
 				<td>
-					<?php echo $form->getValue("name"); ?>
+					<span class="badge badge-info"><?php echo $form->getValue("name"); ?></span>
+					<?php if ($form->getValue('field_type')=='maintext') : ?>
+						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline"><?php echo JText::_('FLEXI_NOTES'); ?>:
+							<span class="<?php echo $tip_class; ?>" data-placement="bottom"
+									title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_FIELD_CUSTOMIZE_PER_CONTENT_TYPE', 'textarea', 'text', 'text'), 0, 1); ?>">
+								<?php echo $hint_image; ?>
+							</span>
+						</span>
+					<?php endif; ?>
 				</td>
 			</tr>
 			<?php endif; ?>

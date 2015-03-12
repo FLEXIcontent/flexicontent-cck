@@ -40,8 +40,9 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Register Extra task
 		$this->registerTask( 'save_a_preview', 'save');
-		$this->registerTask( 'apply', 'save');
-		$this->registerTask( 'download_tree', 'download');
+		$this->registerTask( 'apply_type',     'save');
+		$this->registerTask( 'apply',          'save');
+		$this->registerTask( 'download_tree',  'download');
 	}
 	
 	
@@ -267,6 +268,8 @@ class FlexicontentController extends JControllerLegacy
 		$task	   = JRequest::getVar('task');
 		$model   = $this->getModel(FLEXI_ITEMVIEW);
 		$isnew   = !$model->getId();
+		$isOwner = $model->get('created_by') == $user->get('id');
+		
 		$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 		
 		$fc_params  = JComponentHelper::getParams( 'com_flexicontent' );
@@ -297,18 +300,12 @@ class FlexicontentController extends JControllerLegacy
 		// Get data from request
 		// *********************
 		
-		if (FLEXI_J16GE) {
-			// Retrieve form data these are subject to basic filtering
-			$data   = JRequest::getVar('jform', array(), 'post', 'array');   // Core Fields and and item Parameters
-			$custom = JRequest::getVar('custom', array(), 'post', 'array');  // Custom Fields
-			$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
-			if ( ! @ $data['rules'] ) $data['rules'] = array();
-		}
-		
-		else {
-			// Retrieve form data these are subject to basic filtering
-			$data = JRequest::get( 'post' );  // Core & Custom Fields and item Parameters
-		}
+		// Retrieve form data these are subject to basic filtering
+		$data   = JRequest::getVar('jform', array(), 'post', 'array');   // Core Fields and and item Parameters
+		$custom = JRequest::getVar('custom', array(), 'post', 'array');  // Custom Fields
+		$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
+		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid' );
+		if ( ! @ $data['rules'] ) $data['rules'] = array();
 		
 		// Set data id into model in case not already set ?
 		$model->setId((int) $data['id']);
@@ -321,16 +318,12 @@ class FlexicontentController extends JControllerLegacy
 		
 		$perms = FlexicontentHelperPerm::getPerm();
 		// Per content type change category permissions
-		if (FLEXI_J16GE) {
-			$current_type_id  = ($isnew || !$model->get('type_id')) ? $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
-			$CanChangeFeatCat = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
-			$CanChangeSecCat  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $current_type_id);
-			$CanChangeCat     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $current_type_id);
-		} else {
-			$CanChangeFeatCat = 1;
-			$CanChangeSecCat  = 1;
-			$CanChangeCat     = 1;
-		}
+		$current_type_id  = ($isnew || !$model->get('type_id')) ? $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
+		$CanChangeFeatCat = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
+		$CanChangeSecCat  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $current_type_id);
+		$CanChangeCat     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $current_type_id);
+		
+		$AutoApproveChanges = $perms->AutoApproveChanges;
 		
 		$enable_featured_cid_selector = $perms->MultiCat && $CanChangeFeatCat;
 		$enable_cid_selector   = $perms->MultiCat && $CanChangeSecCat;
@@ -380,92 +373,84 @@ class FlexicontentController extends JControllerLegacy
 		// Basic Form data validation
 		// **************************
 		
-		if (FLEXI_J16GE)
+		// Get the JForm object, but do not pass any data we only want the form object in order to validate the data and not create a filled-in form
+		$form = $model->getForm();
+		
+		// *** MANUALLY CHECK CAPTCHA ***
+		$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
+		$captcha_formop = $params->get('captcha_formop', 0);  // 0 for submit, 1 for submit/edit (aka always)
+		$is_submitop = ((int) $data['id']) == 0;
+		$display_captcha = $use_captcha >= 2 || ( $use_captcha == 1 &&  $user->guest );
+		$display_captcha = $display_captcha && ( $is_submitop || $captcha_formop);  // for submit operation we do not need to check 'captcha_formop' ...
+		if ($display_captcha)
 		{
-			// *** MANUALLY CHECK CAPTCHA ***
-			$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
-			$captcha_formop = $params->get('captcha_formop', 0);  // 0 for submit, 1 for submit/edit (aka always)
-			$is_submitop = ((int) $data['id']) == 0;
-			$display_captcha = $use_captcha >= 2 || ( $use_captcha == 1 &&  $user->guest );
-			$display_captcha = $display_captcha && ( $is_submitop || $captcha_formop);  // for submit operation we do not need to check 'captcha_formop' ...
-			if ($display_captcha)
-			{
-				// Try to force the use of recaptcha plugin
-				JFactory::getConfig()->set('captcha', 'recaptcha');
+			$c_plugin = $params->get('captcha', $app->getCfg('captcha')); // TODO add param to override default
+			if ($c_plugin) {
+				$c_name = 'captcha_response_field';
+				$c_value = JRequest::getString($c_name);
+				$c_id = 'dynamic_recaptcha_1';
+				$c_namespace = 'fc_item_form';
 				
-				if ( $app->getCfg('captcha') == 'recaptcha' && JPluginHelper::isEnabled('captcha', 'recaptcha') ) {
-					JPluginHelper::importPlugin('captcha');
-					$dispatcher = JDispatcher::getInstance();
-					$result = $dispatcher->trigger('onCheckAnswer', JRequest::getString('recaptcha_response_field'));
-					if (!$result[0]) {
-						$errmsg  = JText::_('FLEXI_CAPTCHA_FAILED');
-						$errmsg .= ' '.JText::_('FLEXI_MUST_REFILL_SOME_FIELDS');
-						echo "<script>alert('".$errmsg."');";
-						echo "window.history.back();";
-						echo "</script>";
-						jexit();
-					}
+				$captcha_obj = JCaptcha::getInstance($c_plugin, array('namespace' => $c_namespace));
+				if (!$captcha_obj->checkAnswer($c_value))
+				{
+					// Get the captch validation message and push it out to the user
+					//$error = $captcha_obj->getError();
+					//$app->enqueueMessage($error instanceof Exception ? $error->getMessage() : $error, 'error');
+					$app->enqueueMessage(JText::_('FLEXI_CAPTCHA_FAILED') .' '. JText::_('FLEXI_MUST_REFILL_SOME_FIELDS'), 'error');
+					
+					// Set POST form date into the session, so that they get reloaded
+					$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session.
+					$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);  // Save the custom fields data in the session.
+					$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', $jfdata);  // Save the falang translations into the session
+					$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
+					
+					// Redirect back to the registration form.
+					$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+					return false;
 				}
 			}
-			
-			// Validate Form data for core fields and for parameters
-			$form = $model->getForm();          // Do not pass any data we only want the form object in order to validate the data and not create a filled-in form
-			$post = $model->validate($form, $data);
-			
-			// Check for validation error
-			if (!$post) {
-				// Get the validation messages.
-				$errors	= $form->getErrors();
-	
-				// Push up to three validation messages out to the user.
-				for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++) {
-					if ($errors[$i] instanceof Exception)
-						$app->enqueueMessage($errors[$i]->getMessage(), 'notice');
-					else
-						$app->enqueueMessage($errors[$i], 'notice');
-				}
-	
-				// Save the jform data in the session.
-				$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);
-				// Save the custom fields data in the session.
-				$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);
-				
-				// Redirect back to the registration form.
-				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-				return false;
-				//die('error');
-			}
-			
-			/*if (!$post) {
-				//JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
-				echo "Error while validating data: " . $model->getError();
-				echo '<span class="fc_return_msg">'.JText::sprintf('FLEXI_CLICK_HERE_TO_RETURN', '"JavaScript:window.history.back();"').'</span>';
-				jexit();
-			}*/
-			
-			// Some values need to be assigned after validation
-			$post['attribs'] = @$data['attribs'];  // Workaround for item's template parameters being clear by validation since they are not present in item.xml
-			$post['custom']  = & $custom;          // Assign array of custom field values, they are in the 'custom' form array instead of jform
-			$post['jfdata']  = & $jfdata;          // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform
-			
-			// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
-			$ilayout = @ $data['attribs']['ilayout'];  // normal not be set if frontend template editing is not shown
-			if( $ilayout && !empty($data['layouts'][$ilayout]) )   $post['attribs']['layouts'] = $data['layouts'];
-			//echo "<pre>"; print_r($post['attribs']); exit;
 		}
 		
-		else {
-			$post = $data;
+		// Validate Form data for core fields and for parameters
+		$post = $model->validate($form, $data);
+		
+		// Check for validation error
+		if (!$post) {
+			// Get the validation messages and push up to three validation messages out to the user
+			$errors	= $form->getErrors();
+			for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++) {
+				$app->enqueueMessage($errors[$i] instanceof Exception ? $errors[$i]->getMessage() : $errors[$i], 'error');
+			}
 			
-			// Some values need to be assigned after validation
-			$post['text'] = JRequest::getVar( 'text', '', 'post', 'string', JREQUEST_ALLOWRAW ); // Workaround for allowing raw text field
+			// Set POST form date into the session, so that they get reloaded
+			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
+			$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);  // Save the custom fields data in the session
+			$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', $jfdata);  // Save the falang translations into the session
+			$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 			
-			// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
-			$ilayout = @ $post['params']['ilayout'];  // normal not be set if frontend template editing is not shown
-			if( $ilayout && !empty($post['layouts'][$ilayout]) )  $post['params']['layouts'] = $post['layouts'];
-			//echo "<pre>"; print_r($post['params']); exit;
-			
+			// Redirect back to the registration form.
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			return false; //die('error');
 		}
+		
+		/*if (!$post) {
+			//JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
+			echo "Error while validating data: " . $model->getError();
+			echo '<span class="fc_return_msg">'.JText::sprintf('FLEXI_CLICK_HERE_TO_RETURN', '"JavaScript:window.history.back();"').'</span>';
+			jexit();
+		}*/
+		
+		// Some values need to be assigned after validation
+		$post['attribs'] = @$data['attribs'];  // Workaround for item's template parameters being clear by validation since they are not present in item.xml
+		$post['custom']  = & $custom;          // Assign array of custom field values, they are in the 'custom' form array instead of jform
+		$post['jfdata']  = & $jfdata;          // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform
+		
+		// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
+		$ilayout = @ $data['attribs']['ilayout'];  // normal not be set if frontend template editing is not shown
+		if( $ilayout && !empty($data['layouts'][$ilayout]) )   $post['attribs']['layouts'] = $data['layouts'];
+		//echo "<pre>"; print_r($post['attribs']); exit;
+		
 		
 		// USEFULL FOR DEBUGING for J2.5 (do not remove commented code)
 		//$diff_arr = array_diff_assoc ( $data, $post);
@@ -492,61 +477,34 @@ class FlexicontentController extends JControllerLegacy
 		// ... canPublish IS RECALCULATED after saving, maybe comment out ?
 		// ****************************************************************
 		
-		if (!$isnew) {
-			
-			if (FLEXI_J16GE) {
-				$asset = 'com_content.article.' . $model->get('id');
-				$canPublish = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $model->get('created_by') == $user->get('id'));
-				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
-				// ALTERNATIVE 1
-				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
-				// ALTERNATIVE 2
-				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
-			} else if ($user->gid >= 25) {
-				$canPublish = true;
-				$canEdit = true;
-			} else if (FLEXI_ACCESS) {
-				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-				$canPublish = in_array('publish', $rights) || (in_array('publishown', $rights) && $model->get('created_by') == $user->get('id')) ;
-				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
-			} else {
-				$canPublish = $user->authorize('com_content', 'publish', 'content', 'all');
-				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
-				//$canPublish = ($user->gid >= 21);  // At least J1.5 Publisher
-				//$canEdit = ($user->gid >= 20);  // At least J1.5 Editor
-			}
+		$hasCoupon = false;
+		if (!$isnew)
+		{
+			$asset = 'com_content.article.' . $model->get('id');
+			$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+			// ALTERNATIVE 1
+			//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+			// ALTERNATIVE 2
+			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
+			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
 			
 			if ( !$canEdit ) {
 				// No edit privilege, check if item is editable till logoff
 				if ($session->has('rendered_uneditable', 'flexicontent')) {
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
+					$hasCoupon = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
 				}
 			}
-
-		} else {
-			
-			if (FLEXI_J16GE) {
-				$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
-				$not_authorised = !$canAdd;
-				
-				$canPublish	= $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
-			} else if ($user->gid >= 25) {
-				$canAdd = 1;
-			} else if (FLEXI_ACCESS) {
-				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
-				$canAdd = @$canAdd['content'] || @$canAdd['category'];
-				
-				$canPublishAll 		= FAccess::checkAllContentAccess('com_content','publish','users',$user->gmid,'content','all');
-				$canPublishOwnAll	= FAccess::checkAllContentAccess('com_content','publishown','users',$user->gmid,'content','all');
-				$canPublish	= ($user->gid < 25) ? $canPublishAll || $canPublishOwnAll : 1;
-			} else {
-				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
-				//$canAdd = ($user->gid >= 19);  // At least J1.5 Author
-				$not_authorised = ! $canAdd;
-				$canPublish	= ($user->gid >= 21);
-			}
+			$canPublish = $user->authorise('core.edit.state', $asset) // edit.state on ITEM
+				|| ($user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));  // OR edit.state.own on ITEM AND (is item owner OR has edit Coupon)
+		}
+		
+		else
+		{
+			$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
+			$not_authorised = !$canAdd;
+			$canPublish	= $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
 			
 			if ( $allowunauthorize ) {
 				$canAdd = true;
@@ -595,21 +553,15 @@ class FlexicontentController extends JControllerLegacy
 			// Set error message about saving failed, and also the reason (=model's error message)
 			$msg = JText::_( 'FLEXI_ERROR_STORING_ITEM' );
 			JError::raiseWarning( 500, $msg .": " . $model->getError() );
-
-			// Since an error occured, check if (a) the item is new and (b) was not created
-			if ($isnew && !$model->get('id')) {
-				$msg = '';
-				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'add&id=0&typeid='.$type_id.'&'. (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()) .'=1';
-				$this->setRedirect($link, $msg);
-			} else {
-				$msg = '';
-				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&id='.$model->get('id').'&'. (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()) .'=1';
-				$this->setRedirect($link, $msg);
-			}
 			
-			// Saving has failed check-in and return, (above redirection will be used)
+			// Set POST form date into the session, so that they get reloaded
+			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
+			$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);  // Save the custom fields data in the session
+			
+			// Redirect back to the registration form.
 			$model->checkin();
-			return;
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			return false; //die('save error');
 		}
 		
 		
@@ -633,7 +585,7 @@ class FlexicontentController extends JControllerLegacy
 		// Get newly saved -latest- version (store task gets latest) of the item, and also calculate publish privelege
 		// ***********************************************************************************************************
 		$item = $model->getItem($post['id'], $check_view_access=false, $no_cache=true, $force_version=-1);
-		$canPublish = $model->canEditState( $item, $check_cat_perm=true );
+		$canPublish = $model->canEditState( $item, $check_cat_perm=true ) || $hasCoupon;
 		
 		
 		// ********************************************************************************************
@@ -644,9 +596,11 @@ class FlexicontentController extends JControllerLegacy
 			$saved_fcitems = $session->get('saved_fcitems', array(), 'flexicontent');
 			$is_first_save = $isnew ? true : !isset($saved_fcitems[$model->get('id')]);
 		}
-		// Add item to saved items of the corresponding session array
-		$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
-		$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
+		if ($isnew) {
+			// Add item to saved items of the corresponding session array
+			$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
+			$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
+		}
 		
 		
 		// ********************************************
@@ -687,7 +641,7 @@ class FlexicontentController extends JControllerLegacy
 			$last_version    = FLEXIUtilities::getLastVersions($item->id, true);    // Get last version (=latest one saved, highest version id),
 			
 			// $post variables vstate & state may have been (a) tampered in the form, and/or (b) altered by save procedure so better not use them
-			$needs_version_reviewal     = !$isnew && ($last_version > $current_version) && !$canPublish;
+			$needs_version_reviewal     = !$isnew && ($last_version > $current_version) && !$canPublish && !$AutoApproveChanges;
 			$needs_publication_approval =  $isnew && ($item->state == $pending_approval_state) && !$canPublish;
 			
 			$draft_from_non_publisher = $item->state==$draft_state && !$canPublish;
@@ -750,40 +704,25 @@ class FlexicontentController extends JControllerLegacy
 		// ***************************************************
 		// CLEAN THE CACHE so that our changes appear realtime
 		// ***************************************************
-		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache($group='', 0);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-			$cache = FLEXIUtilities::getCache($group='', 1);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-		} else {
-			$itemcache = JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
-			$filtercache = JFactory::getCache('com_flexicontent_filters');
-			$filtercache->clean();
-		}
+		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
+		$cache = FLEXIUtilities::getCache($group='', 1);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
 		
 		
 		// ****************************************************************************************************************************
 		// Recalculate EDIT PRIVILEGE of new item. Reason for needing to do this is because we can have create permission in a category
 		// and thus being able to set this category as item's main category, but then have no edit/editown permission for this category
 		// ****************************************************************************************************************************
-		if (FLEXI_J16GE) {
-			$asset = 'com_content.article.' . $model->get('id');
-			$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
-			// ALTERNATIVE 1
-			//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
-			// ALTERNATIVE 2
-			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
-		} else if (FLEXI_ACCESS && $user->gid < 25) {
-			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-			$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
-		} else {
-			// This is meaningful when executed in frontend, since all backend users (managers and above) can edit items
-			$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
-		}
+		$asset = 'com_content.article.' . $model->get('id');
+		$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+		// ALTERNATIVE 1
+		//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+		// ALTERNATIVE 2
+		//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
+		//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
 		
 		
 		// *******************************************************************************************************
@@ -791,10 +730,11 @@ class FlexicontentController extends JControllerLegacy
 		// *******************************************************************************************************
 		if (!$canEdit)
 		{
-			if ($task=='apply') {
-				// APPLY TASK: Temporarily set item to be editable till closing it
+			if ($task=='apply' || $task=='apply_type') {
+				// APPLY TASK: Temporarily set item to be editable till closing it and not through all session
+				// (we will/should clear this flag when item is closed, since we have another flag to indicate new items
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-				$rendered_uneditable[$model->get('id')]  = 1;
+				$rendered_uneditable[$model->get('id')] = -1;
 				$session->set('rendered_uneditable', $rendered_uneditable, 'flexicontent');
 				$canEdit = 1;
 			}
@@ -837,7 +777,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for new Content Item is being closed, and clear some flags
 		// ****************************************************************
 		
-		if ($task!='apply' && $newly_submitted_item )
+		if ($task!='apply' && $task!='apply_type' && $newly_submitted_item )
 		{
 			// Clear item from being marked as newly submitted
 			unset($newly_submitted[$model->get('id')]);
@@ -860,7 +800,7 @@ class FlexicontentController extends JControllerLegacy
 		// ****************************************
 		
 		// REDIRECT CASE FOR APPLYING: Save and reload the item edit form
-		if ($task=='apply') {
+		if ($task=='apply' || $task=='apply_type') {
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 			
 			// Create the URL
@@ -1082,25 +1022,26 @@ class FlexicontentController extends JControllerLegacy
 
 		// Get an item model
 		$model = $this->getModel(FLEXI_ITEMVIEW);
+		$isOwner = $model->get('created_by') == $user->get('id');
 		
 		// CHECK-IN the item if user can edit
 		if ($model->get('id') > 1)
 		{
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');
-				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 				// ALTERNATIVE 1
 				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 				// ALTERNATIVE 2
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
+				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
 			} else if ($user->gid >= 25) {
 				$canEdit = true;
 			} else if (FLEXI_ACCESS) {
 				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
+				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $isOwner) ;
 			} else {
-				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $isOwner);
 			}
 			
 			if ( !$canEdit ) {

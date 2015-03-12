@@ -565,18 +565,23 @@ $tabCnt[$tabSetCnt] = 0;
 			}
 			
 			// Some fields may force a container width ?
-			$width = $field->parameters->get('container_width', '' );
-			$width = !$width ? '' : 'width:' .$width. ($width != (int)$width ? 'px' : '');
-			$container_class = " container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
+			$display_label_form = $field->parameters->get('display_label_form', 1);
+			$full_width = $display_label_form==0 || $display_label_form==2;
+			$width = $field->parameters->get('container_width', ($full_width ? '100%!important;' : false) );
+			$container_width = empty($width) ? '' : 'width:' .$width. ($width != (int)$width ? 'px!important;' : '');
+			$container_class = "container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
 			?>
 			
-			<?php /*
-			<span class="label-fcouter">
-			<span id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" <?php echo $label_tooltip;?> >
-				<?php echo $field->label; ?>
-			</span>
-			</span>
-			*/ ?>
+			<?php /*if ($display_label_form): ?>
+				<span class="label-fcouter">
+				<span id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" <?php echo $label_tooltip;?> >
+					<?php echo $field->label; ?>
+				</span>
+				</span>
+				<?php if($display_label_form==2):  ?>
+					<div class='fcclear'></div>
+				<?php endif; ?>
+			<?php endif; */?>
 			
 			<div style="<?php echo $width; ?>;" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
 				<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>
@@ -661,16 +666,16 @@ if ($this->row->type_id) {
 		<div class="fc_tabset_inner">
 			
 			<?php
-			$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
+			$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
 			$row_k = 0;
 			foreach ($this->fields as $field)
 			{
-				// SKIP backend hidden fields from this listing
 				if (
-					($field->iscore && $field->field_type!='maintext')  ||
-					$field->parameters->get('backend_hidden')  ||
-					(in_array($field->field_type, $hidden) && empty($field->html)) ||
-					in_array($field->formhidden, array(2,3))
+					// SKIP backend hidden fields from this listing
+					($field->iscore && $field->field_type!='maintext')   ||   $field->parameters->get('backend_hidden')  ||   in_array($field->formhidden, array(2,3))   ||
+					
+					// Skip hide-if-empty fields from this listing
+					( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
 				) continue;
 				
 				// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
@@ -705,19 +710,27 @@ if ($this->row->type_id) {
 				}
 				
 				// Some fields may force a container width ?
+				$display_label_form = $field->parameters->get('display_label_form', 1);
 				$row_k = 1 - $row_k;
-				$width = $field->parameters->get('container_width', '' );
-				$width = !$width ? '' : 'width:' .$width. ($width != (int)$width ? 'px' : '');
+				$full_width = $display_label_form==0 || $display_label_form==2;
+				$width = $field->parameters->get('container_width', ($full_width ? '100%!important;' : false) );
+				$container_width = empty($width) ? '' : 'width:' .$width. ($width != (int)$width ? 'px!important;' : '');
 				$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
 				?>
 				
 				<div class='fcclear'></div>
-				<span class="label-fcouter">
-				<span id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" <?php echo $label_tooltip;?> >
-					<?php echo $field->label; ?>
-				</span>
-				</span>
-				<div style="<?php echo $width; ?>;" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
+				<?php if($display_label_form): ?>
+					<span class="label-fcouter">
+					<span id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" <?php echo $label_tooltip;?> >
+						<?php echo $field->label; ?>
+					</span>
+					</span>
+					<?php if($display_label_form==2):  ?>
+						<div class='fcclear'></div>
+					<?php endif; ?>
+				<?php endif; ?>
+								
+				<div style="<?php echo $container_width; ?>;" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
 					<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>
 				
 				<?php if ( !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>

@@ -146,7 +146,7 @@ class FlexicontentViewItems extends JViewLegacy
 		// Check if user can create in at least one published category
 		require_once("components/com_flexicontent/models/item.php");
 		$itemmodel = new FlexicontentModelItem();
-		$CanAdd = !FLEXI_J16GE ? $itemmodel->canAdd()  : $itemmodel->getItemAccess()->get('access-create');
+		$CanAdd = $itemmodel->getItemAccess()->get('access-create');
 		
 		// Performance consideration: ... CHECK ONLY global permissions, and not individual categories
 		$perms = FlexicontentHelperPerm::getPerm();

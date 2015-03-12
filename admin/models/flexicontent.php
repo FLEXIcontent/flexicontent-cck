@@ -536,11 +536,24 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($return !== NULL) return $return;
 		$return = false;
 		
+		// Clear orphan data from the EXTENDED data tables
+		$query = "DELETE d.* FROM #__flexicontent_items_tmp AS d"
+			." LEFT JOIN #__content AS c ON d.id = c.id"
+			." WHERE c.id IS NULL";
+		$this->_db->setQuery($query);
+		$this->_db->query();
+		
+		// Clear orphan data from the TMP data tables
+		$query = "DELETE d.* FROM #__flexicontent_items_ext AS d"
+			." LEFT JOIN #__content AS c ON d.item_id = c.id"
+			." WHERE c.id IS NULL";
+		$this->_db->setQuery($query);
+		$this->_db->query();
+
 		// Find columns cached
 		$cache_tbl = "#__flexicontent_items_tmp";
 		$tbls = array($cache_tbl);
-		if (!FLEXI_J16GE) $tbl_fields = $this->_db->getTableFields($tbls);
-		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $this->_db->getTableColumns($tbl);
+		foreach ($tbls as $tbl) $tbl_fields[$tbl] = $this->_db->getTableColumns($tbl);
 		
 		// Get the column names
 		$tbl_fields = array_keys($tbl_fields[$cache_tbl]);

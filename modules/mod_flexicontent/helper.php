@@ -735,6 +735,7 @@ class modFlexicontentHelper
 		// date scope parameters
 		$method_dates	= (int)$params->get('method_dates', 1);  // parameter added later, maybe not to break compatibility this should be INCLUDE=3 by default ?
 		$date_type		= (int)$params->get('date_type', 0);
+		$nulldates		= (int)$params->get('nulldates', 0);
 		$bdate 				= $params->get('bdate', '');
 		$edate 				= $params->get('edate', '');
 		$raw_bdate		= $params->get('raw_bdate', 0);
@@ -1305,18 +1306,22 @@ class modFlexicontentHelper
 			
 			if (!$raw_edate && $edate && !FLEXIUtilities::isSqlValidDate($edate)) {
 				echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior 'custom offset') and enter custom offset e.g. five days ago (be careful with space character): -5 d<br/>";
-				//$edate = '';
 				return;
 			} else if ($edate) {
-				$where .= ' AND '.$negate_op.' ( '.$comp.' <= '.(!$raw_edate ? $db->Quote($edate) : $edate).' )';
+				$where .= ' AND ( '
+					.$negate_op.' ( '.$comp.' <= '.(!$raw_edate ? $db->Quote($edate) : $edate).' )'
+					.($nulldates ? ' OR '.$comp.' IS NULL OR '.$comp.'="" ' : '')
+				.' )';
 			}
 			
 			if (!$raw_bdate && $bdate && !FLEXIUtilities::isSqlValidDate($bdate)) {
 				echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior 'custom offset') and enter custom offset e.g. five days ago (be careful with space character): -5 d<br/>";
-				//$bdate = '';
 				return;
 			} else if ($bdate) {
-				$where .= ' AND '.$negate_op.' ( '.$comp.' >= '.(!$raw_bdate ? $db->Quote($bdate) : $bdate).' )';
+				$where .= ' AND ( '
+					.$negate_op.' ( '.$comp.' >= '.(!$raw_bdate ? $db->Quote($bdate) : $bdate).' )'
+					.($nulldates ? ' OR '.$comp.' IS NULL OR '.$comp.'="" ' : '')
+				.' )';
 			}
 		}
 		
@@ -1333,21 +1338,33 @@ class modFlexicontentHelper
 			{
 				case '1' : // custom offset
 					if ($edate) {
-						$edate = explode(' ', $edate);
-						if (count($edate)!=2) {
+						$edate = array(
+							0 => preg_replace("/[^-+0-9]/", "", $edate),
+							1=> preg_replace("/[0-9-+]/", "", $edate)
+						);
+						if (empty($edate[1])) {
 							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d (DO NOT FORGET the space between e.g. '-5 d')<br/>";
 							return;
 						} else {
-							$where .= ' AND ( '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, $edate[0], $edate[1])).' )';
+							$where .= ' AND ( '
+								.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, $edate[0], $edate[1]))
+								.($nulldates ? ' OR '.$comp.' IS NULL OR '.$comp.'="" ' : '')
+							.' )';
 						}
 					}
 					if ($bdate) {
-						$bdate = explode(' ', $bdate);
-						if (count($bdate)!=2) {
+						$bdate = array(
+							0 => preg_replace("/[^-+0-9]/", "", $bdate),
+							1=> preg_replace("/[0-9-+]/", "", $bdate)
+						);
+						if (empty($bdate[1])) {
 							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date: Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d (DO NOT FORGET the space between e.g. '-5 d')<br/>";
 							return;
 						} else {
-							$where .= ' AND ( '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, $bdate[0], $bdate[1])).' )';
+							$where .= ' AND ( '
+								.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, $bdate[0], $bdate[1]))
+								.($nulldates ? ' OR '.$comp.' IS NULL OR '.$comp.'="" ' : '')
+							.' )';
 						}
 					}
 				break;

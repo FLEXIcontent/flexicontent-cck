@@ -71,6 +71,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$search           = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.search',           'search',           '',          'string' );
 		$filter_item      = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.item_id',          'item_id',          '',           'int' );
 		$u_item_id 	      = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.u_item_id',        'u_item_id',        0,           'string' );
+		if ($u_item_id && (int)$u_item_id = $u_item_id) $filter_item = $u_item_id;   // set it if integer
+		if (!$u_item_id && $filter_item)   $u_item_id   = $filter_item;
 		$autoselect       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.autoselect',       'autoselect',       0, 				  'int' );
 		$autoassign       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.autoassign',       'autoassign',       0, 				  'int' );
 		
@@ -87,22 +89,22 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$newfilename	= base64_decode(JRequest::getVar('newfilename', ''));
 		$delfilename	= base64_decode(JRequest::getVar('delfilename', ''));
 		
-		//add css and submenu to document
+		// Prepare the document: set title, add css files, etc
+		$document->setTitle(JText::_( 'FLEXI_FILE' ));
+		
 		if ($app->isSite()) {
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
 		} else {
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		}
+		
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
 		
-		// include backend CSS template CSS file , access to backend folder may not be allowed but ...
-		$document->addStyleSheet( JURI::root() . 'administrator/templates/system/css/system.css');
-		if ($app->isSite()) {
-			$template = !FLEXI_J16GE ? 'khepri' : (FLEXI_J30GE ? 'hathor' : 'bluestork');
-			$document->addStyleSheet(JURI::root().'administrator/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
-		}
+		// Include backend CSS template CSS file , access to backend folder may not be allowed but ...
+		//$template = $app->isSite() ? (!FLEXI_J16GE ? 'khepri' : (FLEXI_J30GE ? 'hathor' : 'bluestork')) : $app->getTemplate();
+		//$document->addStyleSheet(JURI::base(true).'/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
 		
 		//a trick to avoid loosing general style in modal window
 		$css = 'body, td, th { font-size: 11px; }

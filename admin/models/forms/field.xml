@@ -35,6 +35,7 @@
 		<option value="1">FLEXI_FRONTEND</option>
 		<option value="2">FLEXI_BACKEND</option>
 		<option value="3">FLEXI_BOTH</option>
+		<option value="4">FLEXI_IF_EMPTY</option>
 	</field>
 	<field name="valueseditable" type="radio" default="0" label="FLEXI_VALUES_EDITABLE_BY" description="FLEXI_VALUES_EDITABLE_BY_DESC" class="btn-group btn-group-yesno" labelclass="label">
 		<option value="0">FLEXI_ANY_EDITOR</option>

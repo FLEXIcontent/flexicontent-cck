@@ -1,3 +1,8 @@
+	
+	window.fc_init_hide_dependent = 1;
+	window.fc_refreshing_dependent = 0;
+	window.fc_dependent_params = {};
+
 	function fc_loadImagePreview(input_id, img_id, msg_id, thumb_w, thumb_h)
 	{
 		var input = document.getElementById(input_id);
@@ -11,10 +16,11 @@
 		  	document.getElementById(msg_id).innerHTML = '';
 				var reader = new FileReader();
 				reader.onload = function (e) {
-					jQuery('#'+img_id)
-					.attr('src', e.target.result)
-					.width(thumb_w).height(thumb_h)
-					.show();
+					var img = jQuery('#'+img_id);
+					img.attr('src', e.target.result);
+					if (thumb_w) img.width(thumb_w);
+					if (thumb_h) img.height(thumb_h);
+					img.show();
 				};
 				reader.readAsDataURL(input_files[0]);
 			}
@@ -116,88 +122,172 @@
 	
 	function toggleDepentParams(el, toggleParent, toggleParentSelector)
 	{
-		var noFX = 1;
-		var show_list  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
-		var hide_list  = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
-		var force_list = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
+		var show_list = el.data('show_list');
+		var hide_list = el.data('hide_list');
+		var force_list = el.data('force_list');
+		var refsh_list = el.data('refsh_list');
+		
+		var _d;
+		if (!show_list) {
+			_d  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
+			show_list = {};
+			for (var i = 0; i<_d.length; i++) show_list[_d[i]] = 1;
+			el.data('show_list', show_list);
+		}
+		if (!hide_list) {
+			_d = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
+			hide_list = {};
+			for (var i = 0; i<_d.length; i++) hide_list[_d[i]] = 1;
+			el.data('hide_list', hide_list);
+		}
+		if (!force_list) {
+			_d = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
+			force_list = {};
+			for (var i = 0; i<_d.length; i++) force_list[_d[i]] = 1;
+			el.data('force_list', force_list);
+		}
+		if (!refsh_list) {
+			_d = el.attr('refsh_list') ? el.attr('refsh_list').split(',') : Array();
+			refsh_list = {};
+			for (var i = 0; i<_d.length; i++) refsh_list[_d[i]] = 1;
+			el.data('refsh_list', refsh_list);
+		}
 		
 		var toBeUpdated = Array();
 		var u = 0;
-		jQuery.each( hide_list, function( i, val ) {
+		jQuery.each( force_list, function( cname, val ) {
+			if (!fc_dependent_params.hasOwnProperty(cname))  fc_dependent_params[cname] = Array();
+			fc_dependent_params[cname][fc_dependent_params[cname].length] = el;
+			
 			if (val) {
-				jQuery('.'+val).each(function( index ) {
+				jQuery('.'+cname).each(function( index ) {
+					var c = jQuery(this);
+					c.attr('data-fc_forced_display', '1');
+					toBeUpdated[u++] = c;
+				});
+			}
+		});
+		jQuery.each( hide_list, function( cname, val ) {
+			if (!fc_dependent_params.hasOwnProperty(cname))  fc_dependent_params[cname] = Array();
+			fc_dependent_params[cname][fc_dependent_params[cname].length] = el;
+			
+			if (val) {
+				jQuery('.'+cname).each(function( index ) {
 					var c = jQuery(this);
 					var dlist = c.data('fc_depend_list');
 					if (!dlist) dlist = {};
-					dlist[val] = 1;
+					if (dlist.hasOwnProperty(cname)) dlist[cname]++; else dlist[cname]= 1;
 					c.data('fc_depend_list', dlist);
-					toBeUpdated[u++] = c;
+					if (c.attr('data-fc_forced_display')!='1') {
+						toBeUpdated[u++] = c;
+					}
 				});
 			}
 		});
-		jQuery.each( show_list, function( i, val ) {
+		jQuery.each( show_list, function( cname, val ) {
+			if (!fc_dependent_params.hasOwnProperty(cname))  fc_dependent_params[cname] = Array();
+			fc_dependent_params[cname][fc_dependent_params[cname].length] = el;
+			
 			if (val) {
-				jQuery('.'+val).each(function( index ) {
+				jQuery('.'+cname).each(function( index ) {
 					var c = jQuery(this);
 					var dlist = c.data('fc_depend_list');
-					if (dlist && dlist.hasOwnProperty(val)) delete dlist[val];
+					if (!dlist) dlist = {};
+					if (dlist.hasOwnProperty(cname)) dlist[cname]--; else dlist[cname]= -1;
 					c.data('fc_depend_list', dlist);
-					toBeUpdated[u++] = c;
-				});
-			}
-		});
-		jQuery.each( force_list, function( i, val ) {
-			if (val) {
-				jQuery('.'+val).each(function( index ) {
-					var c = jQuery(this);
-					c.data('fc_forced_display', 1);
-					toBeUpdated[u++] = c;
+					if (c.attr('data-fc_forced_display')!='1') {
+						toBeUpdated[u++] = c;
+					}
 				});
 			}
 		});
 		
-		jQuery.each( toBeUpdated, function( i, val ) {
-			var c = jQuery(this);
-			var dlist = c.data('fc_depend_list');
-			var forced = c.data('fc_forced_display');
-			if ( jQuery.isEmptyObject(dlist) || forced ) {
-				!toggleParent ? c.slideDown(noFX ? '' : 'slow') :
-					(toggleParentSelector ?
-						c.parents(toggleParentSelector).slideDown(noFX ? '' : 'slow') :
-						c.parents().eq(toggleParent).slideDown(noFX ? '' : 'slow')
-					);
-			} else {
-				!toggleParent ? c.slideUp(noFX ? '' : 'fast') :
-					(toggleParentSelector ?
-						c.parents(toggleParentSelector).slideUp(noFX ? '' : 'fast') :
-						c.parents().eq(toggleParent).slideUp(noFX ? '' : 'fast')
-					);
+		if (!fc_init_hide_dependent) {
+			var noFX = fc_refreshing_dependent ? 1 : 0;
+			fc_applyDependencies(toBeUpdated, toggleParent, toggleParentSelector, 0);
+			
+			if (!fc_refreshing_dependent) {
+				fc_refreshing_dependent = 1;
+				
+				// Refresh needed dependencies
+				if (typeof refsh_list != 'string') jQuery.each( refsh_list, function( cname, val ) {
+					jQuery.each( fc_dependent_params[cname], function( index, elem ) {
+						if (elem.is('select'))
+							elem.trigger('change');
+						else if (elem.is('input[type="radio"]'))
+							elem.closest('.fcform_toggler_element').find('input[type="radio"]:checked').trigger('click');
+					});
+				});
 			}
-		});
-		jQuery.each( toBeUpdated, function( i, val ) {
-			var c = jQuery(this);
-			c.data('fc_forced_display', 0);
-		});
+			fc_refreshing_dependent = 0;
+		}
+		return toBeUpdated;
 	}
 	
 	
 	// Add toggling of dependent form elements
 	function fc_bind_form_togglers(container, toggleParent, toggleParentSelector)
 	{
+		var toBeUpdated_ALL = Array();
+		var k = 0;
+		
 		// Bind select elements
 		jQuery(container+' select.fcform_toggler_element').change(function() {
-			toggleDepentParams( jQuery('option:selected', this), toggleParent, toggleParentSelector);
+			var toBeUpdated = toggleDepentParams( jQuery('option:selected', this), toggleParent, toggleParentSelector );
+			for (var i = 0; i < toBeUpdated.length; i++) {
+				toBeUpdated_ALL[k++] = toBeUpdated[i];
+			}
 		});
 		
 		// Bind radio elements
 		jQuery(document).on('click', container+' .fcform_toggler_element input:radio', function(event) {
-			toggleDepentParams( jQuery(this), toggleParent, toggleParentSelector );
+			var toBeUpdated = toggleDepentParams( jQuery(this), toggleParent, toggleParentSelector );
+			for (var i = 0; i < toBeUpdated.length; i++) {
+				toBeUpdated_ALL[k++] = toBeUpdated[i];
+			}
 		});
 		
 		// Update the form
 		jQuery('form select.fcform_toggler_element').trigger('change');
 		jQuery('form .fcform_toggler_element input[type="radio"]:checked').trigger('click');
-		//setTimeout(function(){ noFx = 0; }, 200);
+		
+		//alert(toBeUpdated_ALL.length);
+		fc_applyDependencies(toBeUpdated_ALL, toggleParent, toggleParentSelector, 1);
+		fc_init_hide_dependent = 0;
+		
+		/*setTimeout(function(){ }, 20);*/
+	}
+	
+	function fc_applyDependencies(toBeUpdated, toggleParent, toggleParentSelector, noFX)
+	{
+		jQuery.each( toBeUpdated, function( i, val ) {
+			var c = jQuery(this);
+			var dlist = c.data('fc_depend_list');
+			var forced = c.attr('data-fc_forced_display');
+			
+			jQuery.each(dlist, function( i, val ) { if(val<=0) delete dlist[i]; if(val>=1) dlist[i]=1 ;});
+			c.data('fc_depend_list', dlist);
+			
+			if ( jQuery.isEmptyObject(dlist) || forced=='1' ) {
+				!toggleParent ? c.slideDown(noFX ? 0 : 500) :
+					(toggleParentSelector ?
+						c.parents(toggleParentSelector).slideDown(noFX ? 0 : 500) :
+						c.parents().eq(toggleParent).slideDown(noFX ? 0 : 500)
+					);
+			} else {
+				!toggleParent ? c.slideUp(noFX ? 0 : 'fast') :
+					(toggleParentSelector ?
+						c.parents(toggleParentSelector).slideUp(noFX ? 0 : 'fast') :
+						c.parents().eq(toggleParent).slideUp(noFX ? 0 : 'fast')
+					);
+			}
+		});
+		
+		jQuery.each( toBeUpdated, function( i, val ) {
+			var c = jQuery(this);
+			c.attr('data-fc_forced_display', '0');
+		});
+	
 	}
 	
 	function fcUpdateCascadedField(from, to, field_id, item_id, ftype) {

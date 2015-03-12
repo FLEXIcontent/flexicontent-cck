@@ -58,7 +58,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 					
 					<tr>
 						<td id="file-upload-lbl-container" class="key">
-							<label for="file-upload" id="file-upload-lbl" >
+							<label id="file-upload-lbl" for="file-upload" >
 							<?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?>
 							</label>
 						</td>
@@ -81,7 +81,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 					<tr>
 						<td id="secure-lbl-container" class="key hasTip"  title="<?php echo JText::_( 'FLEXI_CHOOSE_DIR' ); ?>">
 							<label id="secure-lbl">
-							<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
+							<?php echo JText::_( 'FLEXI_TARGET_DIRECTORY' ); ?>
 							</label>
 						</td>
 						<td id="secure-container">

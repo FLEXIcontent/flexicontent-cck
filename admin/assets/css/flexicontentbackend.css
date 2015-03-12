@@ -2,6 +2,10 @@
 @import url('../../../../../components/com_flexicontent/assets/css/flexi_containers.css');
 @import url('../../../../../components/com_flexicontent/assets/css/flexi_shared.css');
 
+#flexicontent.flexicontent {
+	margin-bottom: 24px;   /* needed because of Joomla's bottom info bar overlaping the content */
+}
+
 .flexicontent [class^="icon-"]:before, .flexicontent [class*=" icon-"]:before {
 	font-size: 14px;
 	vertical-align: bottom;

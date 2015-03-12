@@ -240,16 +240,16 @@
 				<option value="1" show_list="count_unique_hits" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="hits_mins_to_unique" type="text" size="5" default="600" label="FLEXI_HITS_MINS_BETWEEN_UNIQUE" description="FLEXI_HITS_MINS_BETWEEN_UNIQUE_DESC" menu="hide" class="count_unique_hits" />
-			<field name="hits_skip_ips" type="multilist" subtype="radio" default="1" label="FLEXI_HITS_SKIP_IPS" description="FLEXI_HITS_SKIP_IPS_DESC" menu="hide" toggle_related="1" class="btn-group btn-group-yesno">
+			<field name="hits_skip_ips" type="multilist" subtype="radio" default="1" label="FLEXI_HITS_SKIP_IPS" description="FLEXI_HITS_SKIP_IPS_DESC" menu="hide" toggle_related="1" class="count_unique_hits btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="iplist_hits">FLEXI_NO</option>
 				<option value="1" show_list="iplist_hits" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_ips_list" type="textarea" cols="50" rows="4" default="127.0.0.1" label="FLEXI_HITS_IP_LIST" description="FLEXI_HITS_IP_LIST_DESC" menu="hide" class="iplist_hits"/>
-			<field name="hits_skip_bots" type="multilist" subtype="radio" default="1" label="FLEXI_HITS_SKIP_BOTS" description="FLEXI_HITS_SKIP_BOTS_DESC" menu="hide" toggle_related="1" class="btn-group btn-group-yesno">
+			<field name="hits_ips_list" type="textarea" cols="50" rows="4" default="127.0.0.1" label="FLEXI_HITS_IP_LIST" description="FLEXI_HITS_IP_LIST_DESC" menu="hide" class="count_unique_hits iplist_hits"/>
+			<field name="hits_skip_bots" type="multilist" subtype="radio" default="1" label="FLEXI_HITS_SKIP_BOTS" description="FLEXI_HITS_SKIP_BOTS_DESC" menu="hide" toggle_related="1" class="count_unique_hits btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="botlist_hits">FLEXI_NO</option>
 				<option value="1" show_list="botlist_hits" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" class="botlist_hits" />
+			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" class="count_unique_hits botlist_hits" />
 			
 	</fieldset>
 	<fieldset name="lists_catdata_fset" label="FLEXI_LISTS_CATDATA_CONF" description="" >
@@ -1093,6 +1093,7 @@
 		<field name="" type="separator" default="FLEXI_FRONTEND_ITEM_FORM" label="" level="level0" menu="hide" />
 			
 			<field name="" label="" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" level="level1" menu="hide" />
+			
 			<field name="allowbuttons_fe" type="fccheckbox" default=""
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,save_preview,preview_latest" defaultvals="apply,save_preview,preview_latest"
@@ -1102,18 +1103,22 @@
 				<option value="1">FLEXI_BOTTOM</option>
 			</field>
 			
-			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level3" menu="hide" />
+			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level2" menu="hide" />
 			<field name="submit_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" />
 			<field name="submit_redirect_url_fe" type="text" default="" size="106" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" menu="hide" />
 			<field name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" menu="hide" />
 			
-			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level3" menu="hide" />
-			<field name="use_captcha" type="radio" default="1" label="FLEXI_USER_TYPE" description="FLEXI_USER_TYPE_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NEVER</option>
-				<option value="1">FLEXI_GUESTS_RECOMMENEDED</option>
-				<option value="2">FLEXI_ANY_USER</option>
+			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level2" menu="hide" />
+			<field name="use_captcha" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_USE_CAPTCHA" description="FLEXI_USE_CAPTCHA_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp_captcha">FLEXI_DISABLE</option>
+				<option value="1" show_list="disp_captcha" hide_list="">FLEXI_GUESTS_RECOMMENEDED</option>
+				<option value="2" show_list="disp_captcha" hide_list="">FLEXI_ANY_USER</option>
 			</field>
-			<field name="captcha_formop" type="radio" default="0" label="FLEXI_OPERATION_TYPE" description="FLEXI_OPERATION_TYPE_DESC" menu="hide" class="btn-group group-fcinfo">
+			<field name="captcha" type="plugins" folder="captcha" default="" label="FLEXI_CAPTCHA_PLG" description="FLEXI_CAPTCHA_PLG_DESC" filter="cmd" class="disp_captcha">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="0">FLEXI_DISABLE</option>
+			</field>
+			<field name="captcha_formop" type="radio" default="0" label="FLEXI_OPERATION_TYPE" description="FLEXI_OPERATION_TYPE_DESC" menu="hide" class="disp_captcha btn-group group-fcinfo">
 				<option value="0">FLEXI_SUBMIT_RECOMMENDED</option>
 				<option value="1">FLEXI_SUBMIT_EDIT</option>
 			</field>
@@ -1145,7 +1150,6 @@
 			<field name="disable_languages_fe" type="fclanguage" default="" multiple="multiple" class="use_select2_lib" label="FLEXI_MENU_DISABLE_LANGUAGES" description="FLEXI_MENU_DISABLE_LANGUAGES_DESC" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_MENU_LANG_SELECTOR" label="" level="level3" menu="hide" />
-			
 			<field name="langdisplay_fe" type="radio" default="2" label="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS" description="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="2">FLEXI_LANG_AS_DROP_DOWN</option>
 				<option value="3">FLEXI_LANG_AS_RADIO</option>
