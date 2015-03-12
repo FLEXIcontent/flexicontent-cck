@@ -101,34 +101,7 @@ $js = "
 					
 				</div>
 				
-				<?php
-				if ($this->perms->CanConfig) :
-				$this->document->addScriptDeclaration("
-					window.addEvent('domready', function() {
-						var slideaccess = new Fx.Slide('tabacces');
-						var slidenoaccess = new Fx.Slide('notabacces');
-						slideaccess.hide();
-						$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
-							slideaccess.toggle();
-							slidenoaccess.toggle();
-						});
-					});
-				");
-				?>
-				<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
-					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-					<table id="tabacces" class="admintable" width="100%">
-						<tr>
-							<td>
-								<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
-							</td>
-						</tr>
-					</table>
-					<div id="notabacces">
-						<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-					</div>
-				</fieldset>
-				<?php endif; ?>
+			
 				
 				
 			<?php /*echo JHtml::_('tabs.start','core-tabs-'.$this->form->getValue("id"), array('useCookie'=>1));*/ ?>
@@ -336,7 +309,7 @@ $js = "
 				<div style="max-width:1024px;">
 					
 					<?php
-					echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+					echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1,'show'=>1,));
 					$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 					
 					foreach ($this->tmpls as $tmpl) :
@@ -367,6 +340,35 @@ $js = "
 					<?php echo JHtml::_('sliders.end'); ?>
 					
 				</div>
+				
+			</div>	
+				<!-- Permissions tab -->
+	<div class="tabbertab" id="fcform_tabset_perms_tab" data-icon-class="icon-power-cord">
+		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
+		
+		<div class="fc_tabset_inner">
+			<?php
+				if ($this->perms->CanConfig) :
+				?>
+				<?php /*
+		<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
+			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
+			<div id="tabacces">
+		*/ ?>
+				<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
+		<?php /*
+			</div>
+			<div id="notabacces">
+			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+			</div>
+		</fieldset>
+		*/ ?>
+				<?php endif; ?>
+		</div>
+		
+	</div> <!-- end tab -->
+				
+				
 
 				<?php /*echo JHtml::_('tabs.end');*/ ?>
 				</div>
