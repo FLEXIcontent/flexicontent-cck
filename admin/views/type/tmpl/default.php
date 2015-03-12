@@ -80,96 +80,13 @@ $this->document->addScriptDeclaration($js);
 				</tr>
 				<?php endif; ?>
 			</table>
-
-			<?php
-			if ($this->permission->CanConfig) :
-				$this->document->addScriptDeclaration("
-					window.addEvent('domready', function() {
-						var slideaccess = new Fx.Slide('tabacces');
-						var slidenoaccess = new Fx.Slide('notabacces');
-						slideaccess.hide();
-						$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
-							slideaccess.toggle();
-							slidenoaccess.toggle();
-						});
-					});
-				");
-			?>
-				<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
-					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-					<div id="tabacces">
-						<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
-					</div>
-					<div id="notabacces">
-					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
-					</div>
-				</fieldset>
-			<?php endif; ?>
 		
 		</div>
 		<div class="span6 full_width_980" style="padding: 0px 0 0 24px">
 
-			<fieldset id="templates_set" class="templates_set basicfields_set" style="margin:0px 0px 24px 0px; padding:0 16px 16px 16px !important;">
-				<legend><?php echo JText::_( 'FLEXI_DISPLAYING' ); ?></legend>
-				
-				<?php
-				echo '<span class="fc-warning fc-nobgimage fc-mssg-inline" style="margin: 0px 0px 0px 0px !important; font-size:12px; min-width:100%; box-sizing:border-box;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
-				?>
-				<br/>
-				<ol style="margin:0 0 0 16px; padding:0;">
-					<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
-					<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
-				</ol>
-				<br/>
-				</span>
-				<span class="fc-note fc-nobgimage fc-mssg-inline" style="margin: 8px 0px 0px 0px !important; font-size:12px; min-width:100%; box-sizing:border-box;">
-				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
-				</span>
-				<div class="clear"></div>
-				
-				<?php
-				foreach ($this->form->getFieldset('themes') as $field) :
-					$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
-						$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
-					echo '
-					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-						'.($field->label && empty($field->hidden) ? '
-							<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-							<span class="container_fcfield">'.$field->input.'</span>
-						' : $field->input).'
-					</fieldset>
-					';
-				endforeach;
-				
-				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
-				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
-				foreach ($this->tmpls as $tmplname => $tmpl) :
-					$fieldSets = $tmpl->params->getFieldsets($groupname);
-					foreach ($fieldSets as $fsname => $fieldSet) :
-						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$fsname.'-options');
-						if (isset($fieldSet->description) && trim($fieldSet->description)) :
-							echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
-						endif;
-						?>
-						<fieldset class="panelform">
-							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
-								$fieldname =  $field->__get('fieldname');
-								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->attribs[$fieldname]);
-								echo $tmpl->params->getLabel($fieldname, $groupname);
-								echo
-									str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
-										str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-											$tmpl->params->getInput($fieldname, $groupname, $value)
-										)
-									);
-							endforeach; ?>
-						</fieldset>
-					<?php endforeach; //fieldSets ?>
-				<?php endforeach; //tmpls ?>
-				
-				<?php echo JHtml::_('sliders.end'); ?>
-			</fieldset>
+			<span class="fc-info fc-nobgimage fc-mssg" style="display:block; float:left; clear:both; margin: 32px 0px 32px 0px !important; font-size:12px;">
+	<?php echo str_replace('<br/>', ' ', JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS')); ?>
+</span>
 
 		</div>
 	</div>
@@ -244,7 +161,96 @@ $this->document->addScriptDeclaration($js);
 		<?php endforeach;
 		//echo JHtml::_('sliders.end');
 		?>
-	
+		
+			<!-- Template tab -->
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-palette">
+		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
+		
+		<div class="fc_tabset_inner">
+		<fieldset id="templates_set" class="templates_set basicfields_set" style="margin:0px 0px 24px 0px; padding:0 16px 16px 16px !important;">
+				<legend><?php echo JText::_( 'FLEXI_DISPLAYING' ); ?></legend>
+				
+				<?php
+				echo '<span class="fc-warning fc-nobgimage fc-mssg-inline" style="margin: 0px 0px 0px 0px !important; font-size:12px; min-width:100%; box-sizing:border-box;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
+				?>
+				<br/>
+				<ol style="margin:0 0 0 16px; padding:0;">
+					<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
+					<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
+				</ol>
+				<br/>
+				</span>
+				<span class="fc-note fc-nobgimage fc-mssg-inline" style="margin: 8px 0px 0px 0px !important; font-size:12px; min-width:100%; box-sizing:border-box;">
+				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
+				</span>
+				<div class="clear"></div>
+				
+				<?php
+				foreach ($this->form->getFieldset('themes') as $field) :
+					$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
+						$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+					echo '
+					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						'.($field->label && empty($field->hidden) ? '
+							<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+							<span class="container_fcfield">'.$field->input.'</span>
+						' : $field->input).'
+					</fieldset>
+					';
+				endforeach;
+				
+				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
+				foreach ($this->tmpls as $tmplname => $tmpl) :
+					$fieldSets = $tmpl->params->getFieldsets($groupname);
+					foreach ($fieldSets as $fsname => $fieldSet) :
+						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
+						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$fsname.'-options');
+						if (isset($fieldSet->description) && trim($fieldSet->description)) :
+							echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+						endif;
+						?>
+						<fieldset class="panelform">
+							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
+								$fieldname =  $field->__get('fieldname');
+								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->attribs[$fieldname]);
+								echo $tmpl->params->getLabel($fieldname, $groupname);
+								echo
+									str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+										str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+											$tmpl->params->getInput($fieldname, $groupname, $value)
+										)
+									);
+							endforeach; ?>
+						</fieldset>
+					<?php endforeach; //fieldSets ?>
+				<?php endforeach; //tmpls ?>
+				
+				<?php echo JHtml::_('sliders.end'); ?>
+			</fieldset>
+		</div>	
+	</div> <!-- end tab -->
+		<!-- Permissions tab -->
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-power-cord">
+		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
+		
+		<div class="fc_tabset_inner">
+		<?php /*
+		<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
+			<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
+			<div id="tabacces">
+		*/ ?>
+				<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
+		<?php /*
+			</div>
+			<div id="notabacces">
+			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+			</div>
+		</fieldset>
+		*/ ?>
+		</div>
+		
+	</div> <!-- end tab -->
 	</div>
 
 <?php echo JHTML::_( 'form.token' ); ?>
@@ -255,10 +261,6 @@ $this->document->addScriptDeclaration($js);
 <input type="hidden" name="task" value="" />
 </form>
 </div>
-
-<span class="fc-info fc-nobgimage fc-mssg" style="display:block; float:left; clear:both; margin: 32px 0px 32px 0px !important; font-size:12px;">
-	<?php echo str_replace('<br/>', ' ', JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS')); ?>
-</span>
 
 
 <?php
