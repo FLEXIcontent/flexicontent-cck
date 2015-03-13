@@ -26,11 +26,11 @@
 			</field>
 			<field name="" type="separator" hr="false" default="FLEXI_BASIC_PARAMS_LABEL" description="" level="level2" menu="hide" />
 			<field name="introtext" type="textarea" default="" label="FLEXI_INTROTEXT_FIELD" rows="5" cols="48" description="FLEXI_INTROTEXT_FIELD_TIP"/>
-			<field name="showintrotext" type="radio" default="0" label="FLEXI_DISPLAY_INTROTEXT" description="FLEXI_DISPLAY_INTROTEXT_TIP">
+			<field name="showintrotext" type="radio" default="0" label="FLEXI_DISPLAY_INTROTEXT" description="FLEXI_DISPLAY_INTROTEXT_TIP" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="showassignated" type="radio" default="0" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC">
+			<field name="showassignated" type="radio" default="0" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -50,20 +50,20 @@
 				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER_CAT</option>
 			</field>
-			<field name="hide_empty_cats" type="radio" default="0" label="FLEXI_HIDE_EMPTY_CATS" description="FLEXI_HIDE_EMPTY_CATS_DESC">
+			<field name="hide_empty_cats" type="radio" default="0" label="FLEXI_HIDE_EMPTY_CATS" description="FLEXI_HIDE_EMPTY_CATS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_cat_descr" type="radio" default="1" label="FLEXI_DESCRIPTION" description="FLEXI_SHOW_DESCRIPTION_DESC" menu="hide">
+			<field name="show_cat_descr" type="radio" default="1" label="FLEXI_DESCRIPTION" description="FLEXI_SHOW_DESCRIPTION_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="cat_descr_cut" type="text" size="4" default="100" label="FLEXI_DESCRIPTION_MAXLEN" description="FLEXI_DESCRIPTION_MAXLEN_DESC" menu="hide"/>
-			<field name="cat_link_title" type="radio" default="1" label="FLEXI_LINKED_TITLES" description="...">
+			<field name="cat_link_title" type="radio" default="1" label="FLEXI_LINKED_TITLES" description="..." class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_cat_image" type="radio" default="1" label="FLEXI_IMAGE" description="FLEXI_SHOW_IMAGE_DESC">
+			<field name="show_cat_image" type="radio" default="1" label="FLEXI_IMAGE" description="FLEXI_SHOW_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -72,11 +72,11 @@
 				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
 				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
 			</field>
-			<field name="cat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+			<field name="cat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="cat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
+			<field name="cat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
@@ -97,16 +97,16 @@
 				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
-			<field name="hide_empty_subcats" type="radio" default="0" label="FLEXI_HIDE_EMPTY_SUBCATS" description="FLEXI_HIDE_EMPTY_SUBCATS_DESC">
+			<field name="hide_empty_subcats" type="radio" default="0" label="FLEXI_HIDE_EMPTY_SUBCATS" description="FLEXI_HIDE_EMPTY_SUBCATS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_subcat_descr" type="radio" default="1" label="FLEXI_DESCRIPTION" description="FLEXI_SHOW_DESCRIPTION_DESC" menu="hide">
+			<field name="show_subcat_descr" type="radio" default="1" label="FLEXI_DESCRIPTION" description="FLEXI_SHOW_DESCRIPTION_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="subcat_descr_cut" type="text" size="4" default="50" label="FLEXI_DESCRIPTION_MAXLEN" description="FLEXI_DESCRIPTION_MAXLEN_DESC" menu="hide"/>
-			<field name="show_subcat_image" type="radio" default="1" label="FLEXI_IMAGE" description="FLEXI_SHOW_IMAGE_DESC">
+			<field name="show_subcat_image" type="radio" default="1" label="FLEXI_IMAGE" description="FLEXI_SHOW_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -115,11 +115,11 @@
 				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
 				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
 			</field>
-			<field name="subcat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+			<field name="subcat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="subcat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
+			<field name="subcat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		

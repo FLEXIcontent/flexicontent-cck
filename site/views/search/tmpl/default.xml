@@ -12,12 +12,12 @@
 		
 		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Content Types&lt;/small&gt;" description="The content types the search will include, selecting none will include ALL. &lt;br/&gt; NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here &lt;br/&gt; NOTE: if only 1 content type is selected below, then selector will be hidden"/>
 			
-			<field name="canseltypes" type="list" default="1" label="User selection" description="Allow users to select content types they want to include in their search">
+			<field name="canseltypes" type="radio" default="1" label="User selection" description="Allow users to select content types they want to include in their search" class="btn-group btn-group-yesno">
 				<option value="0">No, Use all below</option>
 				<option value="1">Yes</option>
 			</field>
 
-			<field name="show_type_label" type="list" default="" label="FLEXI_TYPE_SEARCH_LABEL" description="FLEXI_TYPE_SEARCH_LABEL_DESC">
+			<field name="show_type_label" type="radio" default="" label="FLEXI_TYPE_SEARCH_LABEL" description="FLEXI_TYPE_SEARCH_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -34,13 +34,13 @@
 				<option value="2">Advanced Index (use configured fields, allow user selection)</option>
 			</field>
 			
-			<field name="show_search_label" type="list" default="" label="FLEXI_TEXT_SEARCH_LABEL" description="FLEXI_TEXT_SEARCH_LABEL_DESC" >
+			<field name="show_search_label" type="radio" default="" label="FLEXI_TEXT_SEARCH_LABEL" description="FLEXI_TEXT_SEARCH_LABEL_DESC" class="btn-group btn-group-yesno" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_OUTSIDE_INPUT</option>
 				<option value="2">FLEXI_INSIDE_INPUT</option>
 			</field>
-			<field name="show_searchphrase" type="radio" default="1" label="Word Combination" description="Allow users to select method of combining the search words, e.g. phrase, phrase with guessing relevant, all, any, exact phrase">
+			<field name="show_searchphrase" type="radio" default="1" label="Word Combination" description="Allow users to select method of combining the search words, e.g. phrase, phrase with guessing relevant, all, any, exact phrase" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -51,7 +51,7 @@
 				<option value="any">FLEXI_ANY_WORDS</option>
 				<option value="exact">FLEXI_EXACT_PHRASE</option>
 			</field>
-			<field name="search_autocomplete" type="list" default="" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" menu="hide" >
+			<field name="search_autocomplete" type="radio" default="" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_AUTOCOMPLETE_SIMPLE</option>
@@ -62,7 +62,7 @@
 			
 		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Advanced Options&lt;/small&gt;" />
 		
-			<field name="autodisplayadvoptions" type="list" default="1" label="Advanced Search Box" description="If this is disabled. Then a clickable text will appear to allow user to toggle the advanced search box on/off.">
+			<field name="autodisplayadvoptions" type="radio" default="1" label="Advanced Search Box" description="If this is disabled. Then a clickable text will appear to allow user to toggle the advanced search box on/off." class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_YES_INITIALLY_DISABLED</option>
 				<option value="2">FLEXI_YES_INITIALLY_ENABLED</option>
@@ -71,14 +71,14 @@
 			
 			<field name="" type="separator" level="level2" default="PER content type configuration (ADVANCED Index)" description="1. Fields manager: mark -fields- as ADVANCED text-searchable and filterable &lt;br/&gt; 2. Indexes manager: rebuild advanced index &lt;br/&gt; 3. Type manager: in each content type, select text-search fields and filters &lt;br/&gt;&lt;br/&gt; NOTE: if this is enabled content type selector becomes -visible- and -single- value"/>
 			
-			<field name="show_txtfields" type="radio" default="1" label="FLEXI_TEXT_SEARCH_FIELDS" description="FLEXI_TEXT_SEARCH_FIELDS_DESC">
+			<field name="show_txtfields" type="radio" default="1" label="FLEXI_TEXT_SEARCH_FIELDS" description="FLEXI_TEXT_SEARCH_FIELDS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_ACCORDING_TO_TYPE</option>
 				<option value="2">FLEXI_NO_CONFIGURE_BELOW</option>
 			</field>
 			<field name="txtflds" type="filters" isadvsearch="1" fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index text-searchable are listed" />
 			
-			<field name="show_filters" type="radio" default="1" label="FLEXI_FIELDS_AS_FILTERS" description="FLEXI_FIELDS_AS_FILTERS_DESC">
+			<field name="show_filters" type="radio" default="1" label="FLEXI_FIELDS_AS_FILTERS" description="FLEXI_FIELDS_AS_FILTERS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_ACCORDING_TO_TYPE</option>
 				<option value="2">FLEXI_NO_CONFIGURE_BELOW</option>
@@ -96,14 +96,14 @@
 			
 			<field name="" type="separator" level="level2" default="Search Areas (non-FC Content)" description=""/>
 			
-			<field name="show_searchareas" type="radio" default="0" label="Show selection" description="Allow the user to select and search other areas of the website content, e.g. like weblinks, user contacts, etc">
+			<field name="show_searchareas" type="radio" default="0" label="Show selection" description="Allow the user to select and search other areas of the website content, e.g. like weblinks, user contacts, etc" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="searchareas" type="radio" default="" label="Search Areas" description="The site's (non-FC content) search areas, that the search will include. NOTE: if user is allowed to select Search Areas, then the selection list will be LIMITED to display ONLY the search areas selected here" >
+			<field name="searchareas" type="radio" default="" label="Search Areas" description="The site's (non-FC content) search areas, that the search will include. NOTE: if user is allowed to select Search Areas, then the selection list will be LIMITED to display ONLY the search areas selected here" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_ALL</option>
 			</field>
-			<field name="show_searchordering" type="radio" default="1" label="Show ordering" description="Allow frontend users to select ordering of results of other areas of the website content. NOTE this is different ordering from the ordering used for main content results.">
+			<field name="show_searchordering" type="radio" default="1" label="Show ordering" description="Allow frontend users to select ordering of results of other areas of the website content. NOTE this is different ordering from the ordering used for main content results." class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -121,56 +121,56 @@
 			
 			<field name="" type="separator" level="level2" default="Basic Information (used by non-FC results too)" description=""/>
 			
-			<field name="show_section" type="radio" default="1" label="Show section" description="Display content section for each result, e.g. 'weblinks', 'contacts' etc, plus category tree of it.">
+			<field name="show_section" type="radio" default="1" label="Show section" description="Display content section for each result, e.g. 'weblinks', 'contacts' etc, plus category tree of it." class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_text" type="radio" default="1" label="Show context &lt;br/&gt; &lt;small&gt;(Always ON for non-FC results)&lt;/small&gt;" description="Display search words found along with content text around them. The search words found are highlighted">
+			<field name="show_text" type="radio" default="1" label="Show context &lt;br/&gt; &lt;small&gt;(Always ON for non-FC results)&lt;/small&gt;" description="Display search words found along with content text around them. The search words found are highlighted" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="text_chars" type="text" default="240" label="Context Limit &lt;br/&gt; &lt;small&gt; (# of characters) &lt;/small&gt;" description="Number of characters of content text shown of around each found search word" />
-			<field name="show_date" type="radio" default="1" label="Show creation date" description="Display for each result its creation date">
+			<field name="show_date" type="radio" default="1" label="Show creation date" description="Display for each result its creation date" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
 			
-			<field name="fcr_use_image" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="fcr_use_image" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp_img">FLEXI_NO</option>
+				<option value="1" show_list="disp_img" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="fcr_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
-			<field name="fcr_position" type="list" default="0" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC">
+			<field name="fcr_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" class="disp_img"/>
+			<field name="fcr_position" type="radio" default="0" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC" class="disp_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_IMAGE_LEFT</option>
 				<option value="1">FLEXI_IMAGE_RIGHT</option>
 			</field>		
-			<field name="fcr_link_image" type="list" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+			<field name="fcr_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" class="disp_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="fcr_image_size" type="list" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC">
+			<field name="fcr_image_size" type="list" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC" class="disp_img">
 				<option value="">FLEXI_USE_PARAMS</option>
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
 				<option value="l">FLEXI_LARGE</option>
 			</field>
-			<field name="fcr_width" type="text" size="4" default="180" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="fcr_height" type="text" size="4" default="180" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-			<field name="fcr_method" type="list" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD">
+			<field name="fcr_width" type="text" size="4" default="180" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" class="disp_img"/>
+			<field name="fcr_height" type="text" size="4" default="180" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" class="disp_img"/>
+			<field name="fcr_method" type="radio" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD" class="disp_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
 			
 			<field name="" type="separator" level="level2" default="Display Fields (Render their HTML)" description=""/>
 			
-			<field name="use_infoflds" type="radio" default="1" label="Display Extra Fields" description="Display for each result its creation date">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_infoflds" type="multilist" subtype="radio" toggle_related="1" default="0" label="Display Extra Fields" description="Display for each result its creation date" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp_field">FLEXI_NO</option>
+				<option value="1" show_list="disp_field" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="info_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" onchange="f=document.getElementById('{control_name}infoflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
-			<field name="infoflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to render their values and display them in the search results. You can separate each fieldname by comma(,)." cols="30" rows="3" />
+			<field name="info_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" onchange="f=document.getElementById('{control_name}infoflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" class="disp_field"/>
+			<field name="infoflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to render their values and display them in the search results. You can separate each fieldname by comma(,)." cols="30" rows="3" class="disp_field"/>
 		
 		
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
@@ -195,19 +195,19 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
-			<field name="orderbycustomfield" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC">
+			<field name="orderbycustomfield" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="orderbycustomfieldid" type="fields" default="" orderable="1" isnotcore="1" display_useglobal="1"
 				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" />
-			<field name="orderbycustomfielddir" type="list" default="" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" >
+			<field name="orderbycustomfielddir" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>
 			</field>
-			<field name="orderbycustomfieldint" type="list" default="" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" >
+			<field name="orderbycustomfieldint" type="radio" default="" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_NUMERIC</option>
@@ -233,36 +233,36 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
-			<field name="orderbycustomfield_2nd" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC">
+			<field name="orderbycustomfield_2nd" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="orderbycustomfieldid_2nd" type="fields" default="" orderable="1" isnotcore="1" display_useglobal="1"
 				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" />
-			<field name="orderbycustomfielddir_2nd" type="list" default="" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" >
+			<field name="orderbycustomfielddir_2nd" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>
 			</field>
-			<field name="orderbycustomfieldint_2nd" type="list" default="" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" >
+			<field name="orderbycustomfieldint_2nd" type="radio" default="" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_NUMERIC</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level1" />
-			<field name="limit_override" type="list" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC">
+			<field name="limit_override" type="radio" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="orderby_override" type="list" default="" label="FLEXI_ORDER_1ST" description="FLEXI_ORDER_1ST_DESC">
+			<field name="orderby_override" type="radio" default="" label="FLEXI_ORDER_1ST" description="FLEXI_ORDER_1ST_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="orderby_override_2nd" type="list" default="" label="FLEXI_ORDER_2ND" description="FLEXI_ORDER_2ND_DESC">
+			<field name="orderby_override_2nd" type="radio" default="" label="FLEXI_ORDER_2ND" description="FLEXI_ORDER_2ND_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -284,17 +284,17 @@
 		<field name="" type="separator" level="level1" default="FC Advanced Search plugin: &lt;small&gt;Override Configuration&lt;/small&gt;" />
 			
 			<field name="search_limit" type="text" size="5" default="" label="Search Limit" description="Limit maximum number of results the plugin can return,"/>
-			<field name="filter_lang" type="list" default="" label="Language Filter" description="Return content having current language only">
+			<field name="filter_lang" type="radio" default="" label="Language Filter" description="Return content having current language only" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="search_archived" type="list" default="" label="Search archived" description="Also include archive items into the search">
+			<field name="search_archived" type="radio" default="" label="Search archived" description="Also include archive items into the search" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="browsernav" type="list" default="" label="Browser Navigator" description="Browser Navigator">
+			<field name="browsernav" type="radio" default="" label="Browser Navigator" description="Browser Navigator" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="1">Open New Window</option>
 				<option value="2">Open Same Window</option>
