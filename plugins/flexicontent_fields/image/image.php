@@ -459,18 +459,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				var prv_obj = jQuery('#' + elementid + '_preview_image' );
 				
-				// Folder-Mode
-				if (file != '' && _existing)  existing_obj.val(file);
-				original_obj.val('');
-				
 				// DB-Mode
 				if (file == '') {
 					var imgdel_box = jQuery( '#' + elementid + '_imgdelete' );
 					//imgdel_box.remove();
 					imgdel_box.hide();
-					imgdel_box.find('input').prop('type', 'text');
-					imgdel_box.find('input').val(originalname);
+					if (originalname) {
+						imgdel_box.find('input').prop('type', 'text');
+						imgdel_box.find('input').val(originalname);
+					}
 				}
+				
+				// Folder-Mode
+				if (file != '' && _existing)  existing_obj.val(file);
+				original_obj.val('');
 				
 				if (prv_obj) {
 					preview_msg = '<span id=\"'+elementid+'_preview_msg\"></span>';
@@ -608,7 +610,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						$delete .= ' <input class="imgdelete" type="checkbox" name="'.$fieldname_n.'[delete]" id="'.$elementid_n.'_delete" value="1"'.$delete_disabled.' />';
 						$delete .= ' <label for="'.$elementid_n.'_delete">'.JText::_( 'FLEXI_FIELD_DELETE_FILE' ).'</label>';
 						$delete .= '</div>';
-						$remove_disabled = $always_allow_removal ? '' : $canDeleteImage ? ' disabled="disabled"' : '';
+						$remove_disabled = $always_allow_removal ? '' : ($canDeleteImage ? ' disabled="disabled"' : '');
 					}
 					$remove  = '<div id="'.$elementid_n.'_imgremove" class="imgremove">';
 					$remove .= ' <input class="imgremove" type="checkbox" name="'.$fieldname_n.'[remove]" id="'.$elementid_n.'_remove" value="1"'.$remove_disabled.' />';
@@ -1853,12 +1855,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// **************************************************************************
 		// Rearrange file array so that file properties are groupped per image number
 		// **************************************************************************
+		//echo "<pre>"; print_r($file); echo "</pre>";
 		$files = array();
 		if ($file) foreach( $file as $key => $all ) {
 			foreach( $all as $i => $val ) {
 				$files[$i][$key] = $val;
 			}
 		}
+		//echo "<pre>"; print_r($files); echo "</pre>";
 		
 		
 		// *****************************************************************************************
@@ -1885,9 +1889,28 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 			}
 			
-			// (a) Handle uploading a new original file
-			if ( isset($files[$n]) ) {
-				$this->uploadOriginalFile($field, $v, $files[$n]);
+			// Add system message if upload error
+			$err_code = isset($files[$n]['error']) ? $files[$n]['error'] : false;
+			if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE)
+			{
+				$err_msg = array(
+					UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+					UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+					UPLOAD_ERR_PARTIAL  => 'The uploaded file was only partially uploaded',
+					UPLOAD_ERR_NO_FILE  => 'No file was uploaded',
+					UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder',
+					UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+					UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload'
+				);
+				JFactory::getApplication()->enqueueMessage("FILE FIELD: ".$err_msg[$err_code], 'warning' );
+				continue;
+			}
+			
+			// Handle uploading a new original file
+			$new_file = $err_code === 0;
+			$new_file_uploaded = null;
+			if ($new_file) {
+				$new_file_uploaded = $this->uploadOriginalFile($field, $v, $files[$n]);
 			}
 			
 			// Handle copying original files from a server folder during CSV import
@@ -1929,15 +1952,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				// (b) Handle removing image assignment OR deleting the image file
 				if ($v['originalname']) {
-					if ( $v['delete']==1 || !$field->parameters->get('existing_imgs', 1) ) {
+					if ( $v['delete']==1 || ($new_file_uploaded && !$field->parameters->get('existing_imgs', 1)) ) {
 						// Try to clean unused values (this is forced to YES if existing image list is disabled)
-						$filename = $v['delete'] == 1 ? $v['originalname'] : $v['delete'];
+						$filename = $v['delete']==1 ? $v['originalname'] : $v['delete'];   // we may submit filename for deletion via 'delete' form field
 						$canDeleteImage = $this->canDeleteImage( $field, $filename, $item );  // security concern check if value is in use
 						if ($canDeleteImage) {
 							$this->removeOriginalFile( $field, $filename );
-							JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . 'Deleted image file: '.$filename.' from server storage');
+							//JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . 'Deleted image file: '.$filename.' from server storage');
 						} else {
-							JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . 'Cannot delete image file: '.$filename.' from server storage, it is in use');
+							if ($v['delete'] == 1) JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . 'Cannot delete image file: '.$filename.' from server storage, it is in use');
 						}
 					} elseif ( $v['remove'] && $v['existingname'] ) {
 						JFactory::getApplication()->enqueueMessage($field->label . ' ['.$n.'] : ' . 'Removed image assignment of file: '.$filename.' from the field');
@@ -2155,7 +2178,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					die('Error. Unsupported Media Type!');
 				} else {
 					JError::raiseNotice(100, $field->label . ' : ' . JText::_($err));
-					return;
+					return false;
 				}
 			}
 			
@@ -2171,7 +2194,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					jexit('Error. File already exists');
 				} else {
 					JError::raiseWarning(100, $field->label . ' : ' . JText::_('Error. Unable to upload file'));
-					return;
+					return false;
 				}
 			} else {
 				$db     = JFactory::getDBO();
@@ -2179,13 +2202,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$config = JFactory::getConfig();
 				
 				$timezone = $config->get('offset');
-				if (FLEXI_J16GE) {
-					$date = JFactory::getDate('now');
-					$date->setTimeZone( new DateTimeZone( $timezone ) );
-				} else {
-					$tz_offset = $timezone;
-					$date = JFactory::getDate('now', $tz_offset);
-				}
+				$date = JFactory::getDate('now');
+				$date->setTimeZone( new DateTimeZone( $timezone ) );
 				
 				$obj = new stdClass();
 				$obj->filename	= $filename;
@@ -2217,9 +2235,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						// set the filename for posting
 						$post['originalname'] = $filename;
 					}
-					return;
+					return true;
 				}
 			}
+		} else {
+			$err = 'File upload failed';
+			JError::raiseNotice(100, $field->label . ' : ' . JText::_($err));
+			return false;
 		}
 	}
 	
