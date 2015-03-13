@@ -494,7 +494,7 @@ window.addEvent('domready', function() {
 				<?php endif; ?>
 			</th>
 			<th class="center hideOnDemandClass">
-				<?php echo JText::_( 'FLEXI_AUTHOR' ); ?>
+				<?php echo JHTML::_('grid.sort', 'FLEXI_AUTHOR', 'i.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_authors) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_authors');document.adminForm.submit();" />

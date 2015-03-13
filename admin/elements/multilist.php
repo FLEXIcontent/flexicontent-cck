@@ -18,10 +18,8 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-}
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
 
 /**
 * Renders a multiple select element
@@ -40,15 +38,11 @@ class JFormFieldMultiList extends JFormField
 
 	function getInput()
 	{
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
-		$values			= FLEXI_J16GE ? $this->value : $value;
+		$values = $this->value;
 		if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
@@ -194,7 +188,15 @@ class JFormFieldMultiList extends JFormField
 		else {
 			$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs);
 		}
-		if (!FLEXI_J16GE) $html = str_replace('<optgroup label="">', '</optgroup>', $html);
-		return $html.$maximize_link;
+		if ($inline_tip = @$attributes['inline_tip'])
+		{
+			$tip_img = @$attributes['tip_img'];
+			$tip_img = $tip_img ? $tip_img : 'comment.png';
+			$tip_class = @$attributes['tip_class'];
+			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' align="left" style="margin-left:12px;" ' );
+			$tip_text = '<span class="'.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.'</span>';
+		}
+		return $html.@$tip_text.$maximize_link;
 	}
 }
