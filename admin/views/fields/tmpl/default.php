@@ -458,7 +458,6 @@ function delAllFilters() {
 				<?php echo $row->name; ?>
 			</td>
 			<td align="left">
-				<?php $row->field_friendlyname = str_ireplace("FLEXIcontent - ","",$row->field_friendlyname); ?>
 				<?php
 				echo "<strong>".$row->type."</strong><br/><small>-&nbsp;";
 				if ($row->field_type=='groupmarker') {
@@ -466,7 +465,7 @@ function delAllFilters() {
 				} else if ($row->field_type=='coreprops') {
 					echo $fld_params->get('props_type');
 				} else {
-					echo $row->iscore?"[Core]" : "{$row->field_friendlyname}";
+					echo $row->iscore?"[Core]" : "{$row->friendlyname}";
 				}
 				echo "&nbsp;-</small>";
 				?>

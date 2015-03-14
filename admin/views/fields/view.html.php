@@ -173,10 +173,9 @@ class FlexicontentViewFields extends JViewLegacy
 		$rows       = $this->get( FLEXI_J16GE ? 'Items' : 'Data' );
 		$pagination = $this->get( 'Pagination' );
 		$types      = $this->get( 'Typeslist' );
-		$fieldtypes = $model->getFieldtypes($fields_in_groups = true);
-
-		$lists = array();
+		$fieldtypes = flexicontent_db::getFieldTypes($_group = true, $_usage=true, $_published=false);
 		
+		$lists = array();
 		
 		// build item-type filter
 		$lists['filter_type'] = ($filter_type|| 1 ? '<label class="label">'.JText::_('FLEXI_TYPE').'</label>' : '').
@@ -204,8 +203,7 @@ class FlexicontentViewFields extends JViewLegacy
 		foreach ($fieldtypes as $field_group => $ft_types) {
 			$fftypes[] = JHTML::_('select.optgroup', $field_group );
 			foreach ($ft_types as $field_type => $ftdata) {
-				$field_friendlyname = str_ireplace("FLEXIcontent - ","",$ftdata->field_friendlyname);
-				$fftypes[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_friendlyname);
+				$fftypes[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $ftdata->friendlyname);
 			}
 			$fftypes[] = JHTML::_('select.optgroup', '' );
 		}

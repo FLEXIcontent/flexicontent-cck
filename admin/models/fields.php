@@ -136,7 +136,7 @@ class FlexicontentModelFields extends JModelList
 			$query = $db->getQuery(true);
 			$query->select(
 				$this->getState( 'list.select',
-					't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, level.title AS access_level, rel.ordering as typeordering, t.field_type as type, plg.name as field_friendlyname'
+					't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, level.title AS access_level, rel.ordering as typeordering, t.field_type as type, plg.name as friendlyname'
 				)
 			);
 			$query->from('#__flexicontent_fields AS t');
@@ -644,48 +644,6 @@ class FlexicontentModelFields extends JModelList
 		$this->_db->setQuery($query);
 		$types = $this->_db->loadObjectList();
 		return $types;	
-	}
-	
-	
-	/**
-	 * Method to get list of field types used
-	 * 
-	 * @return array
-	 * @since 1.5
-	 */
-	function getFieldTypes ($group=false)
-	{
-		$query = 'SELECT plg.element AS field_type, count(f.id) as assigned, plg.name as field_friendlyname'
-				. ' FROM ' . (FLEXI_J16GE ? '#__extensions': '#__plugins') .' AS plg'
-				. ' LEFT JOIN #__flexicontent_fields AS f ON (plg.element = f.field_type AND f.iscore=0)'
-				. ' WHERE plg.folder="flexicontent_fields" AND plg.element<>"core"'. (FLEXI_J16GE ? ' AND plg.type="plugin" ' : '')
-				. ' GROUP BY plg.element'
-				;
-		$this->_db->setQuery($query);
-		$ft_types = $this->_db->loadObjectList('field_type');
-		if (!$group) return $ft_types;
-		
-		$ft_grps = array(
-			'Selection fields'         => array('radio', 'radioimage', 'checkbox', 'checkboximage', 'select', 'selectmultiple'),
-			'Media fields / Mini apps' => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
-			'Single property fields'   => array('date', 'text', 'textarea', 'textselect'),
-			'Multi property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers', 'termlist'),
-			'Item form'                => array('groupmarker', 'coreprops'),
-			'Item relations fields'    => array('relation', 'relation_reverse', 'autorelationfilters'),
-			'Special action fields'    => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist')
-		);
-		foreach($ft_grps as $ft_grpname => $ft_arr) {
-			//$ft_types_grp[$ft_grpname] = array();
-			foreach($ft_arr as $ft) {
-				if ( !empty($ft_types[$ft]) )
-				$ft_types_grp[$ft_grpname][$ft] = $ft_types[$ft];
-				unset($ft_types[$ft]);
-			}
-		}
-		// Remaining fields
-		$ft_types_grp['3rd-Party / Other Fields'] = $ft_types;
-		
-		return $ft_types_grp;
 	}
 	
 	

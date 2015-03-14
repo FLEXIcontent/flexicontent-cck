@@ -125,14 +125,18 @@ class FlexicontentViewField extends JViewLegacy
 		
 		//build field_type list
 		if (!$row->field_type) $row->field_type = 'text';
-		if ($row->iscore == 1) { $class = 'disabled="disabled"'; } else {
-			$class = '';
-			$_field_id = '#'.(FLEXI_J16GE ? 'jform_' : ''). 'field_type';
-			$_row_id = FLEXI_J16GE ? $form->getValue("id") : $row->id;
-			$_ctrl_task = FLEXI_J16GE ? 'task=fields.getfieldspecificproperties' : 'controller=fields&task=getfieldspecificproperties';
+		
+		$_attribs = ' class="use_select2_lib fc_skip_highlight" ';
+		if ($row->iscore == 1) {
+			$_attribs .= ' disabled="disabled" ';
+		}
+		else {
+			$_field_id = 'jform_field_type';
+			$_row_id = $form->getValue("id");
+			$_ctrl_task = 'task=fields.getfieldspecificproperties';
 			$document->addScriptDeclaration("
 				jQuery(document).ready(function() {
-					jQuery('".$_field_id."').on('change', function() {
+					jQuery('#".$_field_id."').on('change', function() {
 						jQuery('#fieldspecificproperties').html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
 						jQuery.ajax({
 							type: \"GET\",
@@ -155,7 +159,7 @@ class FlexicontentViewField extends JViewLegacy
 								")."
 								tabberAutomatic(tabberOptions, 'fieldspecificproperties');
 								fc_bind_form_togglers('#fieldspecificproperties', 0, '');
-								jQuery('#field_typename').html(jQuery('".$_field_id."').val());
+								jQuery('#field_typename').html(jQuery('#".$_field_id."').val());
 							}
 						});
 					});
@@ -164,7 +168,8 @@ class FlexicontentViewField extends JViewLegacy
 		}
 		
 		//build field select list
-		$lists['field_type'] = flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type, $group=true, ' class="use_select2_lib fc_skip_highlight" ');
+		$fieldtypes = flexicontent_db::getFieldTypes($_grouped=true, $_usage=false, $_published=true);
+		$lists['field_type'] = flexicontent_html::buildfieldtypeslist($fieldtypes, 'jform[field_type]', ($_grouped ? 1 : 0), $row->field_type, $_attribs);
 		
 		//build type select list
 		$attribs  = 'class="use_select2_lib" multiple="multiple" size="6"';

@@ -2537,37 +2537,31 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildfieldtypeslist($name, $class, $selected, $group=false, $attribs = 'class="inputbox"')
+	static function buildfieldtypeslist($list, $name, $selected, $top, $attribs = 'class="inputbox"', $tagid=null)
 	{
-		$field_types = flexicontent_db::getfieldtypes($group);
-		if (!$group) {
-			// This should not be neccessary as, it was already done in DB query above
-			foreach($field_types as $field_type) {
-				$field_type->text = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->text);
-				$field_arr[$field_type->text] = $field_type;
-			}
+		$field_types = & $list;
+		if (!$top) {   // $top == 0, is ungrouped
 			ksort( $field_arr, SORT_STRING );
-			
-			$list = JHTML::_('select.genericlist', $field_arr, $name, $class, 'value', 'text', $selected );
-		} else {
+			$list = JHTML::_('select.genericlist', $field_arr, $name, $attribs, 'value', 'text', $selected, $tagid );
+		}
+		
+		else { // $top == 1, is grouped
 			$fftype = array();
 			foreach ($field_types as $field_group => $ft_types) {
 				$fftype[] = JHTML::_('select.optgroup', $field_group );
 				foreach ($ft_types as $field_type => $ftdata) {
-					$field_friendlyname = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $ftdata->text);
-					$fftype[] = JHTML::_('select.option', $field_type, $field_friendlyname);
+					$fftype[] = JHTML::_('select.option', $field_type, $ftdata->friendlyname);
 				}
 				$fftype[] = JHTML::_('select.optgroup', '' );
 			}
 			
-			$fieldname = FLEXI_J16GE ? 'jform[field_type]' : 'field_type';
-			$elementid = FLEXI_J16GE ? 'jform_field_type'  : 'field_type';
-			$list = JHTML::_('select.genericlist', $fftype, $fieldname, $attribs, 'value', 'text', $selected, $elementid );
-			if (!FLEXI_J16GE) $list = str_replace('<optgroup label="">', '</optgroup>', $list);
+			$elementid = 'jform_field_type';
+			$list = JHTML::_('select.genericlist', $fftype, $name, $attribs, 'value', 'text', $selected, $tagid );
 		}
 		return $list;
 	}
-
+	
+	
 	/**
 	 * Method to build the file extension list
 	 *
@@ -5468,38 +5462,47 @@ class flexicontent_db
 	 * @return array
 	 * @since 1.5
 	 */
-	static function getfieldtypes($group=false)
+	static function getFieldTypes($group=false, $usage=false, $published=false)
 	{
 		$db = JFactory::getDBO();
-
-		$query = 'SELECT element AS value, REPLACE(name, "FLEXIcontent - ", "") AS text'
-		. ' FROM '.(FLEXI_J16GE ? '#__extensions' : '#__plugins')
-		. ' WHERE '.(FLEXI_J16GE ? 'enabled = 1' : 'published = 1')
-		. (FLEXI_J16GE ? ' AND `type`=' . $db->Quote('plugin') : '')
-		. ' AND folder = ' . $db->Quote('flexicontent_fields')
-		. ' AND element <> ' . $db->Quote('core')
-		. ' ORDER BY text ASC'
-		;
-
-		$db->setQuery($query);
-		$field_types = $db->loadObjectList('value');
+		$query = 'SELECT plg.element AS field_type, plg.name as title'
+			.($usage ? ', count(f.id) as assigned' : '')
+			.' FROM #__extensions AS plg'
+			.($usage ? ' LEFT JOIN #__flexicontent_fields AS f ON (plg.element = f.field_type AND f.iscore=0)' : '')
+			.' WHERE '.($published ? 'plg.enabled=1' : '1')
+			.'  AND plg.`type` = ' . $db->Quote('plugin')
+			.'  AND plg.`folder` = ' . $db->Quote('flexicontent_fields')
+			.'  AND plg.`element` <> ' . $db->Quote('core')
+			.($usage ? ' GROUP BY plg.element' : '')
+			.' ORDER BY title ASC'
+			;
 		
+		$db->setQuery($query);
+		$field_types = $db->loadObjectList('field_type');
+		
+		foreach($field_types as $field_type) {
+			$field_type->friendlyname = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->title);
+		}
 		if (!$group) return $field_types;
 		
-		$ft_grps = array(
-			'Selection fields'         => array('radio', 'radioimage', 'checkbox', 'checkboximage', 'select', 'selectmultiple'),
-			'Media fields / Mini apps' => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
-			'Single property fields'   => array('date', 'text', 'textarea', 'textselect'),
-			'Multi property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers', 'termlist'),
-			'Item form'                => array('groupmarker', 'coreprops'),
-			'Item relations fields'    => array('relation', 'relation_reverse', 'autorelationfilters'),
-			'Special action fields'    => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist')
+		$grps = array(
+			JText::_('FLEXI_SELECTION_FIELDS')          => array('radio', 'radioimage', 'checkbox', 'checkboximage', 'select', 'selectmultiple'),
+			JText::_('FLEXI_SINGLE_PROP_FIELDS')        => array('date', 'text', 'textarea', 'textselect'),
+			JText::_('FLEXI_MULTIPLE_PROP_FIELDS')      => array('weblink', 'email', 'extendedweblink', 'phonenumbers', 'termlist'),
+			JText::_('FLEXI_MEDIA_MINI_APPS_FIELDS')    => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
+			JText::_('FLEXI_ITEM_FORM_FIELDS')          => array('fieldgroup', 'account_via_submit', 'groupmarker', 'coreprops'),
+			JText::_('FLEXI_DISPLAY_MANAGEMENT_FIELDS') => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist'),
+			JText::_('FLEXI_ITEM_RELATION_FIELDS')      => array('relation', 'relation_reverse', 'autorelationfilters')
 		);
-		foreach($ft_grps as $ft_grpname => $ft_arr) {
-			foreach($ft_arr as $ft) {
-				if ( !empty($field_types[$ft]) )
-				$field_types_grp[$ft_grpname][$ft] = $field_types[$ft];
-				unset($field_types[$ft]);
+		foreach($grps as $grpname => $field_type_arr)
+		{
+			$field_types_grp[$grpname] = array();
+			foreach($field_type_arr as $field_type)
+			{
+				if ( !empty($field_types[$field_type]) ) {
+					$field_types_grp[$grpname][$field_type] = $field_types[$field_type];
+				}
+				unset($field_types[$field_type]);
 			}
 		}
 		// Remaining fields

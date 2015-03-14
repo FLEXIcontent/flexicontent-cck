@@ -103,7 +103,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$this->setToolbar();
 		
 		$types			= $this->get( 'Typeslist' );
-		$fieldtypes	= $this->get( 'Fieldtypes' );
+		$fieldtypes = flexicontent_db::getFieldTypes($_grouped=false, $_usage=true, $_published=false);
 		
 		// Build select lists
 		$lists = array();

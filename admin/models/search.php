@@ -302,25 +302,6 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	
 	
 	/**
-	 * Method to get list of field types used
-	 * 
-	 * @return array
-	 * @since 1.5
-	 */
-	function getFieldTypes ()
-	{
-		$query = 'SELECT field_type, count(id) as assigned'
-				. ' FROM #__flexicontent_fields'
-				. ' WHERE iscore=0 '
-				. ' GROUP BY field_type'
-				;
-		$this->_db->setQuery($query);
-		$fieldtypes = $this->_db->loadObjectList('field_type');
-		return $fieldtypes;
-	}
-	
-	
-	/**
 	 * Method to get a list pagination object.
 	 *
 	 * @access	public
