@@ -122,12 +122,24 @@
 	
 	function toggleDepentParams(el, toggleParent, toggleParentSelector)
 	{
+		var seton_list = el.data('seton_list');
+		var setoff_list = el.data('setoff_list');
 		var show_list = el.data('show_list');
 		var hide_list = el.data('hide_list');
 		var force_list = el.data('force_list');
 		var refsh_list = el.data('refsh_list');
 		
 		var _d;
+		if (!seton_list) {
+			seton_list = {};
+			seton_list[0] = el.attr('seton_list')  ? el.attr('seton_list')  : null;
+			el.data('seton_list', seton_list);
+		}
+		if (!setoff_list) {
+			setoff_list = {};
+			setoff_list[0] = el.attr('setoff_list')  ? el.attr('setoff_list')  : null;
+			el.data('setoff_list', setoff_list);
+		}
 		if (!show_list) {
 			_d  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
 			show_list = {};
@@ -201,6 +213,26 @@
 				});
 			}
 		});
+		
+		setTimeout(function(){
+			jQuery.each( setoff_list, function( i, selector ) {
+				if (selector) {
+					jQuery(selector).each(function( index ) {
+						var c = jQuery(this);
+						c.slideUp('fast');
+					});
+				}
+			});
+			jQuery.each( seton_list, function( i, selector ) {
+				if (selector) {
+					jQuery(selector).each(function( index ) {
+						var c = jQuery(this);
+						c.slideDown('fast');
+					});
+				}
+			});
+		}, !fc_init_hide_dependent ? 0 : 50);
+		
 		
 		if (!fc_init_hide_dependent) {
 			var noFX = fc_refreshing_dependent ? 1 : 0;

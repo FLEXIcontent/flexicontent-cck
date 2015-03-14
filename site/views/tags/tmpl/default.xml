@@ -26,7 +26,7 @@
 			<field name="" type="separator" default="FLEXI_FIELDS" description="" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_IMAGE" description="FLEXI_USE_IMAGE" level="level2" />
-			<field name="use_image"  type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SHOW" description="..." class="btn-group btn-group-yesno">
+			<field name="use_image" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SHOW" description="..." class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_img">FLEXI_NO</option>
 				<option value="1" show_list="disp_img" hide_list="">FLEXI_YES</option>
 			</field>
@@ -74,7 +74,7 @@
 			<field name="show_pagination" type="radio" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
-				<option value="2">Auto</option>
+				<option value="2">FLEXI_AUTO</option>
 			</field>
 			<field name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
