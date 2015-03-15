@@ -63,48 +63,62 @@ class FlexicontentViewItems extends JViewLegacy
 		// Get filters
 		$count_filters = 0;
 		
+		// File id filtering
 		$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
 		$filter_fileid = JRequest::getInt('filter_fileid', 0);
 		if ($filter_fileid) $count_filters++;
 		
+		// Category filtering
 		$filter_cats       = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',				'filter_cats',			'',		'int' );
 		$filter_subcats    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_subcats',		'filter_subcats',		1,		'int' );
 		$filter_catsinstate = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_catsinstate', 'filter_catsinstate', 1,		'int' );
 		if ($filter_cats) $count_filters++;
 		
+		// Order type, order, order direction
 		$filter_order_type = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_type',	'filter_order_type',	1,		'int' );
-		
 		$filter_order      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',			'filter_order',				'',		'cmd' );
 		$filter_order_Dir  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',		'',		'word' );
 		
-		$filter_type			= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',				'filter_type',			'',		'int' );
-		$filter_authors		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_authors',			'filter_authors',		'',		'cmd' );
-		if (strlen($filter_authors)) $filter_authors = (int)$filter_authors; // support for ZERO author id
-		$filter_state 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',				'filter_state',			'',		'word' );
-		if ($filter_type) $count_filters++; if (strlen($filter_authors)) $count_filters++; if ($filter_state) $count_filters++;
+		// Other filters
+		$filter_tag    = JRequest::getVar('filter_tag');    //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_tag',    'filter_type',   '',   'int' );
+		$filter_lang	 = JRequest::getVar('filter_lang');   //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',   '',   'string' );
+		$filter_type   = JRequest::getVar('filter_type');   //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',   'filter_type',   '',   'int' );
+		$filter_author = JRequest::getVar('filter_author'); //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author', '',   'cmd' );
+		$filter_state  = JRequest::getVar('filter_state');  //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',  'filter_state',  '',   'word' );
 		
-		//$filter_stategrp	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_stategrp',		'filter_stategrp',	'',		'word' );
+		// Support for ZERO author id
+		if (!is_array($filter_author) && !strlen($filter_author)) $filter_author = array();
+		// Support for using 'ALL', 'ORPHAN' fake states, by clearing other values
+		if (is_array($filter_state) && in_array('ALL', $filter_state))     $filter_state = array('ALL');
+		if (is_array($filter_state) && in_array('ORPHAN', $filter_state))  $filter_state = array('ORPHAN');
 		
-		$filter_lang	 = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang', 		'filter_lang', 		'', 			'string' );
-		if ($filter_lang) $count_filters++;
+		// Count active filters
+		if ($filter_tag)   $count_filters++;  if ($filter_lang)   $count_filters++;
+		if ($filter_type)  $count_filters++;  if ($filter_author) $count_filters++;
+		if ($filter_state) $count_filters++;
 		
-		$scope	 			= $app->getUserStateFromRequest( $option.'.'.$view.'.scope', 			'scope', 			1, 			'int' );
+		// Date filters
 		$date	 				= $app->getUserStateFromRequest( $option.'.'.$view.'.date', 			'date', 			1, 			'int' );
-		
 		$startdate	 	= $app->getUserStateFromRequest( $option.'.'.$view.'.startdate', 	'startdate',	'',			'cmd' );
-		if ($startdate) $count_filters++;
-		
 		$enddate	 		= $app->getUserStateFromRequest( $option.'.'.$view.'.enddate', 		'enddate', 		'', 		'cmd' );
-		if ($enddate) $count_filters++;
+		if ($startdate) $count_filters++;
+		if ($enddate)   $count_filters++;
 		
+		// Item ID filter
 		$filter_id  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_id', 	'filter_id', 		'', 			'int' );
 		$filter_id  = $filter_id ? $filter_id : '';
 		if ($filter_id) $count_filters++;
 		
+		// Text search
+		$scope  = $app->getUserStateFromRequest( $option.'.'.$view.'.scope', 			'scope', 			1, 			'int' );
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
 		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
 		
+		
+		// *********************************
 		// Add custom css and js to document
+		// *********************************
+		
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
@@ -118,16 +132,17 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($filter_type) {
 			$js .= "jQuery('.col_type').each(function(){ jQuery(this).addClass('yellow'); });";
 		}
-		if ($filter_authors) {
+		if ($filter_author) {
 			$js .= "jQuery('.col_authors').each(function(){ jQuery(this).addClass('yellow'); });";
 		}
 		if ($filter_state) {
 			$js .= "jQuery('.col_state').each(function(){ jQuery(this).addClass('yellow'); });";
 		}
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			if ($filter_lang) {
-				$js .= "jQuery('.col_lang').each(function(){ jQuery(this).addClass('yellow'); });";
-			}
+		if ($filter_lang) {
+			$js .= "jQuery('.col_lang').each(function(){ jQuery(this).addClass('yellow'); });";
+		}
+		if ($filter_tag) {
+			$js .= "jQuery('.col_tag').each(function(){ jQuery(this).addClass('yellow'); });";
 		}
 		if ($filter_id) {
 			$js .= "jQuery('.col_id').each(function(){ jQuery(this).addClass('yellow'); });";
@@ -380,8 +395,8 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// filter publication state
 		$states 	= array();
+		//$states[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
 		$states[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_SINGLE_STATUS' ) );
-		$states[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_SELECT_STATE' )*/ );
 		$states[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 		$states[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
 		$states[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
@@ -400,7 +415,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$states[] = JHTML::_('select.optgroup', '' );
 
 		$lists['filter_state'] = ($filter_state || 1 ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
-			JHTML::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
+			JHTML::_('select.genericlist', $states, 'filter_state[]', 'class="use_select2_lib fcfilter_be" multiple="multiple" size="3" onchange="submitform();"', 'value', 'text', $filter_state );
 			//JHTML::_('grid.state', $filter_state );
 		
 		// build filter state group
@@ -450,10 +465,8 @@ class FlexicontentViewItems extends JViewLegacy
 		$catsinstate[1] = JText::_( 'FLEXI_PUBLISHED' );
 		$catsinstate[0] = JText::_( 'FLEXI_UNPUBLISHED' );
 		$catsinstate[99] = JText::_( 'FLEXI_ANY' );
-		if (FLEXI_J16GE) {
-			$catsinstate[2] = JText::_( 'FLEXI_ARCHIVED_STATE' );
-			$catsinstate[-2] = JText::_( 'FLEXI_TRASHED_STATE' );
-		}
+		$catsinstate[2] = JText::_( 'FLEXI_ARCHIVED_STATE' );
+		$catsinstate[-2] = JText::_( 'FLEXI_TRASHED_STATE' );
 		$_catsinstate = array();
 		foreach ($catsinstate as $i => $v) {
 			$_catsinstate[] = JHTML::_('select.option', $i, $v);
@@ -477,15 +490,15 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// build the categories select list for filter
 		$lists['filter_cats'] = ($filter_cats || 1 ? '<label class="label">'.JText::_('FLEXI_CATEGORY').'</label>' : '').
-			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="submitform( );"', $check_published=false, $check_perms=false);
+			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="submitform();"', $check_published=false, $check_perms=false);
 
 		//build type select list
 		$lists['filter_type'] = ($filter_type || 1 ? '<label class="label">'.JText::_('FLEXI_TYPE').'</label>' : '').
-			flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*true*/, 'class="use_select2_lib" size="1" onchange="submitform( );"', 'filter_type');
+			flexicontent_html::buildtypesselect($types, 'filter_type[]', $filter_type, 0/*'-'*//*true*/, 'class="use_select2_lib fcfilter_be" multiple="multiple" size="3" onchange="submitform();"', 'filter_type');
 
 		//build authors select list
-		$lists['filter_authors'] = ($filter_authors || 1 ? '<label class="label">'.JText::_('FLEXI_AUTHOR').'</label>' : '').
-			flexicontent_html::buildauthorsselect($authors, 'filter_authors', $filter_authors, '-'/*true*/, 'class="use_select2_lib" size="1" onchange="submitform( );"');
+		$lists['filter_author'] = ($filter_author || 1 ? '<label class="label">'.JText::_('FLEXI_AUTHOR').'</label>' : '').
+			flexicontent_html::buildauthorsselect($authors, 'filter_author[]', $filter_author, 0/*'-'*//*true*/, 'class="use_select2_lib fcfilter_be" multiple="multiple" size="3" onchange="submitform();"');
 
 		if ($badcatitems) $lists['default_cat'] = flexicontent_cats::buildcatselect($categories, 'default_cat', '', 2, 'class="use_select2_lib"', false, false);
 		
@@ -554,9 +567,13 @@ class FlexicontentViewItems extends JViewLegacy
 			$ordering = ($lists['order'] == 'catsordering');
 		}
 		
+		//build tags filter
+		$lists['filter_tag'] = ($filter_tag || 1 ? '<label class="label">'.JText::_('FLEXI_TAG').'</label>' : '').
+			flexicontent_html::buildtagsselect('filter_tag[]', 'class="use_select2_lib fcfilter_be" onchange="submitform();" multiple="multiple" size="3" ', $filter_tag, 0);
+
 		//build languages filter
 		$lists['filter_lang'] = ($filter_lang || 1 ? '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>' : '').
-			flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="submitform();" size="1" ', $filter_lang, '-'/*2*/);
+			flexicontent_html::buildlanguageslist('filter_lang[]', 'class="use_select2_lib fcfilter_be" onchange="submitform();" multiple="multiple" size="3" ', $filter_lang, 1/*'-'*//*2*/);
 		
 		// filter by item usage a specific file
 		if ($fileid_to_itemids && count($fileid_to_itemids)) {
@@ -593,7 +610,7 @@ class FlexicontentViewItems extends JViewLegacy
 		// filters
 		$this->assignRef('filter_id'			, $filter_id);
 		$this->assignRef('filter_state'		, $filter_state);
-		$this->assignRef('filter_authors'	, $filter_authors);
+		$this->assignRef('filter_author'	, $filter_author);
 		$this->assignRef('filter_type'		, $filter_type);
 		$this->assignRef('filter_cats'		, $filter_cats);
 		$this->assignRef('filter_subcats'	, $filter_subcats);

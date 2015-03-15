@@ -189,8 +189,9 @@ function delFilter(name)
 
 function delAllFilters() {
 	delFilter('search'); delFilter('filter_type'); delFilter('filter_state');
-	delFilter('filter_cats'); delFilter('filter_authors'); delFilter('filter_id');
+	delFilter('filter_cats'); delFilter('filter_author'); delFilter('filter_id');
 	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');
+	delFilter('filter_tag');
 }
 
 <?php if ($this->ordering) : ?>
@@ -398,7 +399,11 @@ window.addEvent('domready', function() {
 		<?php endif; ?>
 		
 		<span class="fc-filter nowrap_box">
-			<?php echo $this->lists['filter_authors']; ?>
+			<?php echo $this->lists['filter_author']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
+			<?php echo $this->lists['filter_tag']; ?>
 		</span>
 		
 		<span class="fc-filter nowrap_box">
@@ -495,13 +500,22 @@ window.addEvent('domready', function() {
 			</th>
 			<th class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_AUTHOR', 'i.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				<?php if ($this->filter_authors) : ?>
+				<?php if ($this->filter_author) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_authors');document.adminForm.submit();" />
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_author');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
-			</th>			
-			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+			</th>
+			
+			<!--th nowrap="nowrap" class="center hideOnDemandClass">
+				<?php echo JHTML::_('grid.sort', 'FLEXI_TAG', 'tg.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php if ($this->filter_tag) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_tag');document.adminForm.submit();" />
+				</span>
+				<?php endif; ?>
+			</th-->
+			
 			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'i.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
@@ -510,7 +524,6 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<?php endif; ?>
 			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
@@ -800,19 +813,19 @@ window.addEvent('domready', function() {
 			<td align="center" class="col_authors">
 				<?php echo $row->author; ?>
 			</td>
-
-		<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>
+			
+			<!--td align="center" class="col_tag">
+				item tags
+			</td-->
+			
 			<td align="center" class="col_lang" title="<?php echo ($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
-
 				<?php if ( !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
 					<img src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
 				<?php elseif( !empty($row->lang) ) : ?>
 					<?php echo $row->lang=='*' ? JText::_("FLEXI_ALL") : $row->lang;?>
 				<?php endif; ?>
-
 			</td>
-		<?php endif; ?>
-
+			
 			<td align="center" class="col_type">
 				<?php echo $row->type_name; ?>
 			</td>

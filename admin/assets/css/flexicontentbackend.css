@@ -636,9 +636,26 @@ div#fc-dash-boardbtns .fc-board-button .fc-board-btn-text.fcdisabled {
 	font-style: italic;
 }
 
-/* items manager */
-body.view-items .select2-drop .select2-results {
+
+/* Increase max height of select2 drop downs */
+.admin.com_flexicontent .select2-drop .select2-results {
 	max-height: 400px !important;
+}
+
+
+/* Shrink the search box but enlarge when focused, and highlight selected values */
+.fcfilter_be.select2-container-multi .select2-choices .select2-search-field input.select2-input {
+	width: 32px !important;
+	min-width: 32px !important;
+	cursor: pointer;
+}
+.fcfilter_be.select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
+	width: 128px !important;
+	min-width: 128px !important;
+	cursor: pointer;
+}
+.fcfilter_be.select2-container-multi .select2-choices .select2-search-choice {
+	color: darkorange !important;
 }
 
 

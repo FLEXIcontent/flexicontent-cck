@@ -308,10 +308,10 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$lists['secure'] = JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_secure );
 
 		//build ext filterlist
-		$lists['ext'] = flexicontent_html::buildfilesextlist('filter_ext', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_ext);
+		$lists['ext'] = flexicontent_html::buildfilesextlist('filter_ext', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_ext, 1);
 
 		//build uploader filterlist
-		$lists['uploader'] = flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_uploader);
+		$lists['uploader'] = flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_uploader, 1);
 
 		// table ordering
 		$lists['order_Dir']	= $filter_order_Dir;

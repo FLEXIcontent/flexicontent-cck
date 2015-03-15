@@ -732,7 +732,7 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
 }
 /* results listing box */
 .select2-drop .select2-results {
-	max-height: 240px !important;
+	max-height: 280px !important;
 	text-align: left !important;
 	float:left;
 	width: 100%;
@@ -755,6 +755,11 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
          -moz-user-select: none !important;
           -ms-user-select: none !important;
               user-select: none !important;
+}
+
+/* Options Group Label */
+.select2-results li.select2-result-with-children > .select2-result-label {
+    background-color: #e0e0e0;
 }
 
 /* EXISTING CSS stricter: result label */
@@ -875,6 +880,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 /* Make search (filtering) field always visible, forcing the search icon too  */
 .select2-container-multi .select2-choices .select2-search-field input.select2-input,
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
+	cursor: pointer;
 	width: auto !important;
 	min-width: 124px !important;
 	min-height: 20px !important;
@@ -888,6 +894,10 @@ html[dir="rtl"] .select2-container .select2-choice {
 	background: url('select2.png') no-repeat 100% -22px, -webkit-linear-gradient(center bottom, #fff 85%, #eee 99%) !important;
 	background: url('select2.png') no-repeat 100% -22px, -moz-linear-gradient(center bottom, #fff 85%, #eee 99%) !important;
 	background: url('select2.png') no-repeat 100% -22px, linear-gradient(to bottom, #fff 85%, #eee 99%) 0 0 !important;
+}
+.select2-container-multi .select2-choices .select2-search-field input.select2-input {
+	min-width: 32px !important;
+	cursor: default;
 }
 
 /* Enlarge above when focused */

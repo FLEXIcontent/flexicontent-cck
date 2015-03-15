@@ -422,34 +422,15 @@ class ParentClassItem extends JModelAdmin
 				// Item Retrieval FRONTEND
 				// ***********************
 				
-				// Tables needed to be joined for calculating access
-				$joinaccess = '';
 				// Extra access columns for main category and content type (item access will be added as 'access')
 				$select_access = 'mc.access as category_access, ty.access as type_access';
 				
 				// Access Flags for: content type, main category, item
-				if (FLEXI_J16GE) {
-					$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-					$aid_list = implode(",", $aid_arr);
-					$select_access .= ', CASE WHEN ty.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_type_access';
-					$select_access .= ', CASE WHEN mc.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_mcat_access';
-					$select_access .= ', CASE WHEN  i.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_item_access';
-				} else {
-					$aid = (int) $user->get('aid');
-					if (FLEXI_ACCESS) {
-						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-						$select_access .= ', CASE WHEN (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_type_access';
-						$select_access .= ', CASE WHEN (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_mcat_access';
-						$select_access .= ', CASE WHEN (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_item_access';
-					} else {
-						$select_access .= ', CASE WHEN (ty.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_type_access';
-						$select_access .= ', CASE WHEN (mc.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_mcat_access';
-						$select_access .= ', CASE WHEN ( i.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_item_access';
-					}
-					$select_access .= ', ';
-				}
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+				$aid_list = implode(",", $aid_arr);
+				$select_access .= ', CASE WHEN ty.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_type_access';
+				$select_access .= ', CASE WHEN mc.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_mcat_access';
+				$select_access .= ', CASE WHEN  i.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_item_access';
 				
 				// SQL date strings, current date and null date
 				$nowDate = $db->Quote( FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL() );
@@ -458,112 +439,74 @@ class ParentClassItem extends JModelAdmin
 				// Decide to limit to CURRENT CATEGORY
 				$limit_to_cid = $this->_cid ? ' AND rel.catid = '. (int) $this->_cid : ' AND rel.catid = i.catid';
 				
-				if (FLEXI_J16GE)
-				{
-					// Initialize query
-					$query = $db->getQuery(true);
-					
-					$query->select('i.*, ie.*');                              // Item basic and extended data
-					$query->select($select_access);                              // Access Columns and Access Flags for: content type, main category, item
-					if ($version) $query->select('ver.version_id');           // Versioned item viewing
-					$query->select('c.id AS catid, i.catid as maincatid');    // Current category id and Main category id
-					$query->select(
-						'c.title AS category_title, c.alias AS category_alias, c.lft,c.rgt');   // Current category data
-					$query->select('ty.name AS typename, ty.alias as typealias');             // Content Type data, and author data
-					$query->select('u.name AS author');                                       // Author data
-					
-					// Rating count, Rating & Score
-					$query->select('v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score');
-					
-					// Item and Current Category slugs (for URL)
-					$query->select('CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug');
-					$query->select('CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug');
-					
-					// Publication Scheduled / Expired Flags
-					$query->select('CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled');
-					$query->select('CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired' );
-					
-					// From content table, and extended item table, content type table, user table, rating table, categories relation table
-					$query->from('#__content AS i');
-					$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id');
-					$query->join('LEFT', '#__flexicontent_types AS ty ON ie.type_id = ty.id');
-					$query->join('LEFT', '#__users AS u on u.id = i.created_by');
-					$query->join('LEFT', '#__content_rating AS v ON i.id = v.content_id');
-					$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid);
-					
-					// Join twice on category table, once for current category and once for item's main category
-					$query->join('LEFT', '#__categories AS c on c.id = rel.catid');   // All item's categories
-					$query->join('LEFT', '#__categories AS mc on mc.id = i.catid');   // Item's main category
-					
-					// HANDLE J1.6+ ancestor category being unpublished, when badcats.id is not null,
-					// then the item is inside in an unpublished ancestor category, thus inaccessible
-					/*$query->select('CASE WHEN badcats.id is null THEN 1 ELSE 0 END AS ancestor_cats_published');
-					$subquery = ' (SELECT cat.id as id FROM #__categories AS cat JOIN #__categories AS parent ';
-					$subquery .= 'ON cat.lft BETWEEN parent.lft AND parent.rgt ';
-					$subquery .= 'WHERE parent.extension = ' . $db->Quote('com_content');
-					$subquery .= ' AND parent.published <= 0 GROUP BY cat.id)';
-					$query->join('LEFT', $subquery . ' AS badcats ON badcats.id = c.id');*/
-					
-					if ($version) {
-						// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists
-						$query->join('LEFT', '#__flexicontent_versions AS ver ON ver.item_id = i.id AND ver.version_id = '. $db->Quote($version) );
-					}
-					
-					// Join on contact table, to get contact data of author
-					//$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'contact_details"';
-					//$db->setQuery($query);
-					//$contact_details_tbl_exists = (boolean) count($db->loadObjectList());
-					//if ( $contact_details_tbl_exists) {
-					//	$query->select('contact.id as contactid' ) ;
-					//	$query->join('LEFT','#__contact_details AS contact on contact.user_id = i.created_by');
-					//}
-					
-					// Join over the categories to get parent category titles
-					//$query->select('parent.title as parent_title, parent.id as parent_id, parent.path as parent_route, parent.alias as parent_alias');
-					//$query->join('LEFT', '#__categories as parent ON parent.id = c.parent_id');
-					
-					$query->where('i.id = ' . (int) $this->_id);
-					//echo $db->replacePrefix($query);
-				}
-				else
-				{
+				
+				// *******************************
+				// Initialize and create the query
+				// *******************************
+				$query = $db->getQuery(true);
+				
+				$query->select('i.*, ie.*');                              // Item basic and extended data
+				$query->select($select_access);                              // Access Columns and Access Flags for: content type, main category, item
+				if ($version) $query->select('ver.version_id');           // Versioned item viewing
+				$query->select('c.id AS catid, i.catid as maincatid');    // Current category id and Main category id
+				$query->select(
+					'c.title AS category_title, c.alias AS category_alias, c.lft,c.rgt');   // Current category data
+				$query->select('ty.name AS typename, ty.alias as typealias');             // Content Type data, and author data
+				$query->select('u.name AS author');                                       // Author data
+				
+				// Rating count, Rating & Score
+				$query->select('v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score');
+				
+				// Item and Current Category slugs (for URL)
+				$query->select('CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug');
+				$query->select('CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug');
+				
+				// Publication Scheduled / Expired Flags
+				$query->select('CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled');
+				$query->select('CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired' );
+				
+				// From content table, and extended item table, content type table, user table, rating table, categories relation table
+				$query->from('#__content AS i');
+				$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id');
+				$query->join('LEFT', '#__flexicontent_types AS ty ON ie.type_id = ty.id');
+				$query->join('LEFT', '#__users AS u on u.id = i.created_by');
+				$query->join('LEFT', '#__content_rating AS v ON i.id = v.content_id');
+				$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid);
+				
+				// Join twice on category table, once for current category and once for item's main category
+				$query->join('LEFT', '#__categories AS c on c.id = rel.catid');   // All item's categories
+				$query->join('LEFT', '#__categories AS mc on mc.id = i.catid');   // Item's main category
+				
+				// HANDLE J1.6+ ancestor category being unpublished, when badcats.id is not null,
+				// then the item is inside in an unpublished ancestor category, thus inaccessible
+				/*$query->select('CASE WHEN badcats.id is null THEN 1 ELSE 0 END AS ancestor_cats_published');
+				$subquery = ' (SELECT cat.id as id FROM #__categories AS cat JOIN #__categories AS parent ';
+				$subquery .= 'ON cat.lft BETWEEN parent.lft AND parent.rgt ';
+				$subquery .= 'WHERE parent.extension = ' . $db->Quote('com_content');
+				$subquery .= ' AND parent.published <= 0 GROUP BY cat.id)';
+				$query->join('LEFT', $subquery . ' AS badcats ON badcats.id = c.id');*/
+				
+				if ($version) {
 					// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists
-					$version_join =  $version ? ' LEFT JOIN #__flexicontent_versions AS ver ON ver.item_id = i.id AND ver.version_id = '. $db->Quote($version) : '';
-					$where	= $this->_buildItemWhere();
-					
-					$query = 'SELECT i.*, ie.*, '                                   // Item basic and extended data
-					. $select_access                                                // Access Columns and Access Flags for: content type, main category, item
-					. ($version ? 'ver.version_id,'  : '')                          // Versioned item viewing
-					. ' c.id AS catid, i.catid as maincatid,'                       // Current category id and Main category id
-					. ' c.published AS catpublished,'                               // Current category published (in J1.6+ this includes all ancestor categories)
-					. ' c.title AS category_title, c.alias AS category_alias,'      // Current category data
-					. ' ty.name as typename, ty.alias as typealias,'                // Content Type data
-					. ' u.name AS author, u.usertype,'                              // Author data
-					
-					// Rating count, Rating & Score
-					. ' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score,'
-					
-					// Item and Current Category slugs (for URL)
-					. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
-					
-					// Publication Scheduled / Expired Flags
-					. ' CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled,'
-					. ' CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired'
-					
-					. ' FROM #__content AS i'
-					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-					. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid
-					. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-					. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
-					. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-					. ' LEFT JOIN #__content_rating AS v ON i.id = v.content_id'
-					. $joinaccess
-					. $version_join 
-					. $where
-					;
+					$query->join('LEFT', '#__flexicontent_versions AS ver ON ver.item_id = i.id AND ver.version_id = '. $db->Quote($version) );
 				}
+				
+				// Join on contact table, to get contact data of author
+				//$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'contact_details"';
+				//$db->setQuery($query);
+				//$contact_details_tbl_exists = (boolean) count($db->loadObjectList());
+				//if ( $contact_details_tbl_exists) {
+				//	$query->select('contact.id as contactid' ) ;
+				//	$query->join('LEFT','#__contact_details AS contact on contact.user_id = i.created_by');
+				//}
+				
+				// Join over the categories to get parent category titles
+				//$query->select('parent.title as parent_title, parent.id as parent_id, parent.path as parent_route, parent.alias as parent_alias');
+				//$query->join('LEFT', '#__categories as parent ON parent.id = c.parent_id');
+				
+				$query->where('i.id = ' . (int) $this->_id);
+				//echo $db->replacePrefix($query);
+
 				
 				$db->setQuery($query);
 				

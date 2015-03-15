@@ -136,7 +136,7 @@ class FlexicontentModelFields extends JModelList
 			$query = $db->getQuery(true);
 			$query->select(
 				$this->getState( 'list.select',
-					't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, level.title AS access_level, rel.ordering as typeordering, t.field_type as type, plg.name as friendlyname'
+					't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, level.title AS access_level, rel.ordering as typeordering, t.field_type as type, plg.name as friendly'
 				)
 			);
 			$query->from('#__flexicontent_fields AS t');

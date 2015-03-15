@@ -2456,10 +2456,11 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildradiochecklist($options, $name, $selected, $buildtype=0, $attribs = '', $tagid='')
+	static function buildradiochecklist($options, $name, $selected, $buildtype=0, $attribs = '', $tagid=null)
 	{
 		$selected = is_array($selected) ? $selected : array($selected);
-		$tagid = $tagid ? $tagid : $name;
+		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
+		
 		$n = 0;
 		$html = $buildtype==1 || $buildtype==3 ? '<fieldset class="radio btn-group btn-group-yesno">' : '';
 		$attribs = $buildtype==1 || $buildtype==3  ? ' class="btn" '.$attribs : $attribs;
@@ -2477,36 +2478,39 @@ class flexicontent_html
 	
 	
 	/**
-	 * Method to build the list for types when performing an edit action
+	 * Method to build the list for types
 	 *
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildtypesselect($types, $name, $selected, $top, $class = 'class="inputbox"', $tagid='', $check_perms=false)
+	static function buildtypesselect($types, $name, $selected, $displaytype, $attribs = 'class="inputbox"', $tagid=null, $check_perms=false)
 	{
-		$user = JFactory::getUser();
+		$_list = array();
 		
-		$typelist = array();
-		if (!is_numeric($top) && is_string($top)) $typelist[] = JHTML::_( 'select.option', '', $top );
-		else if ($top) $typelist[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_TYPE' ) );
+		if (!is_numeric($displaytype) && is_string($displaytype))
+			$_list[] = JHTML::_( 'select.option', '', $displaytype );
+		else if ($displaytype)
+			$_list[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_TYPE' ) );
+		
+		if ($check_perms)
+			$user = JFactory::getUser();
 		
 		foreach ($types as $type)
 		{
-			$allowed = 1;
+			$allowed = true;
 			if ($check_perms)
-			{
 				$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
-			}
 			
 			if ( !$allowed && $type->itemscreatable == 1 ) continue;
 			
 			if ( !$allowed && $type->itemscreatable == 2 )
-				$typelist[] = JHTML::_( 'select.option', $type->id, $type->name, 'value', 'text', $disabled = true );
+				$_list[] = JHTML::_( 'select.option', $type->id, $type->name, 'value', 'text', $disabled = true );
 			else
-				$typelist[] = JHTML::_( 'select.option', $type->id, $type->name);
+				$_list[] = JHTML::_( 'select.option', $type->id, $type->name);
 		}
 		
-		return JHTML::_('select.genericlist', $typelist, $name, $class, 'value', 'text', $selected, $tagid );
+		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
+		return JHTML::_('select.genericlist', $_list, $name, $attribs, 'value', 'text', $selected, $tagid );
 	}
 	
 	
@@ -2516,49 +2520,99 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildauthorsselect($list, $name, $selected, $top, $attribs = 'class="inputbox"')
+	static function buildauthorsselect($list, $name, $selected, $displaytype, $attribs = 'class="inputbox"', $tagid=null)
 	{
-		$typelist 	= array();
+		$_list = array();
 
-		if (!is_numeric($top) && is_string($top)) $typelist[] = JHTML::_( 'select.option', '', $top );
-		else if ($top) $typelist[] 	= JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_AUTHOR' ) );
+		if (!is_numeric($displaytype) && is_string($displaytype))
+			$_list[] = JHTML::_( 'select.option', '', $displaytype );
+		else if ($displaytype)
+			$_list[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_AUTHOR' ) );
 		
 		$user_id_str = JText::_('FLEXI_ID') .': ';
 		foreach ($list as $item) {
-			$typelist[] = JHTML::_( 'select.option', $item->id, $item->name ? $item->name : $user_id_str . $item->id );
+			$_list[] = JHTML::_( 'select.option', $item->id, $item->name ? $item->name : $user_id_str . $item->id );
 		}
-		return JHTML::_('select.genericlist', $typelist, $name, $attribs, 'value', 'text', $selected );
+		
+		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
+		return JHTML::_('select.genericlist', $_list, $name, $attribs, 'value', 'text', $selected, $tagid );
 	}
 
 
+	/**
+	 * Method to build the list of the autors
+	 *
+	 * @return array
+	 * @since 1.5
+	 */
+	static function buildtagsselect($name, $attribs, $selected, $displaytype=1, $tagid=null)
+	{
+		$db = JFactory::getDBO();
+		$query = 'SELECT id, name'
+		. ' FROM #__flexicontent_tags'
+		. ' ORDER BY name ASC'
+		;
+		$db->setQuery($query);
+		$data = $db->loadObjectList();
+		
+		if (!is_numeric($displaytype) && is_string($displaytype))
+			$options[] = JHTML::_( 'select.option', '', $displaytype);
+		else if ($displaytype)
+			$options[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_TAG' ));
+		
+		foreach ($data as $val)
+			$options[] = JHTML::_( 'select.option', $val->id, $val->name);
+		
+		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
+		return JHTML::_('select.genericlist', $options, $name, $attribs, 'value', 'text', $selected, $tagid );
+	}
+	
+	
 	/**
 	 * Method to build the list for types when performing an edit action
 	 *
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildfieldtypeslist($list, $name, $selected, $top, $attribs = 'class="inputbox"', $tagid=null)
+	static function buildfieldtypeslist($list, $name, $selected, $displaytype, $attribs = 'class="inputbox"', $tagid=null)
 	{
-		$field_types = & $list;
-		if (!$top) {   // $top == 0, is ungrouped
-			ksort( $field_arr, SORT_STRING );
-			$list = JHTML::_('select.genericlist', $field_arr, $name, $attribs, 'value', 'text', $selected, $tagid );
+		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
+		
+		if (!$displaytype) {   // $displaytype: 0, is ungrouped
+			ksort( $list, SORT_STRING );
+			return JHTML::_('select.genericlist', $list, $name, $attribs, 'value', 'text', $selected, $tagid );
 		}
 		
-		else { // $top == 1, is grouped
-			$fftype = array();
-			foreach ($field_types as $field_group => $ft_types) {
-				$fftype[] = JHTML::_('select.optgroup', $field_group );
-				foreach ($ft_types as $field_type => $ftdata) {
-					$fftype[] = JHTML::_('select.option', $field_type, $ftdata->friendlyname);
-				}
-				$fftype[] = JHTML::_('select.optgroup', '' );
+		else { // $displaytype: 1, is grouped
+			$field_types = array();
+			foreach ($list as $key => $data)
+			{
+				if ( is_object($data) )
+					$field_types[] = $data;
+				
+				else if ( is_string($data) )
+					$field_types[] = JHTML::_('select.optgroup', $data);
+				
+				else
+					$field_types[] = $data;
 			}
 			
-			$elementid = 'jform_field_type';
-			$list = JHTML::_('select.genericlist', $fftype, $name, $attribs, 'value', 'text', $selected, $tagid );
+			$xml = new SimpleXMLElement("<element $attribs />");
+			$xml = (array)$xml->attributes();
+			$attribs = $xml['@attributes'];
+			
+			$attribs = array(
+		    'id' => $tagid, // HTML id for select field
+		    'list.attr' => $attribs, // array(),  // additional HTML attributes for select field
+		    'list.translate'=>false, // true to translate
+		    'option.key'=>'value', // key name for value in data array
+		    'option.text'=>'text', // key name for text in data array
+		    'option.attr'=>'attr', // key name for attr in data array
+		    'list.select'=>$selected, // value of the SELECTED field
+			);
+			
+			return JHTML::_('select.genericlist', $field_types, $name, $attribs);
 		}
-		return $list;
 	}
 	
 	
@@ -2568,30 +2622,26 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildfilesextlist($name, $class, $selected, $type=1)
+	static function buildfilesextlist($name, $attribs, $selected, $displaytype=1, $tagid=null)
 	{
 		$db = JFactory::getDBO();
-
 		$query = 'SELECT DISTINCT ext'
 		. ' FROM #__flexicontent_files'
 		. ' ORDER BY ext ASC'
 		;
 		$db->setQuery($query);
-		$exts = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+		$data = $db->loadColumn();
 		
-		if (!is_numeric($type)) {
-			$options[] = JHTML::_( 'select.option', '', $type);
-		} else {
+		if (!is_numeric($displaytype) && is_string($displaytype))
+			$options[] = JHTML::_( 'select.option', '', $displaytype);
+		else if ($displaytype)
 			$options[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_ALL_EXT' ));
-		}
 		
-		foreach ($exts as $ext) {
-			$options[] = JHTML::_( 'select.option', $ext, $ext);
-		}
-
-		$list = JHTML::_('select.genericlist', $options, $name, $class, 'value', 'text', $selected );
-
-		return $list;
+		foreach ($data as $val)
+			$options[] = JHTML::_( 'select.option', $val, $val);
+		
+		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
+		return JHTML::_('select.genericlist', $options, $name, $attribs, 'value', 'text', $selected, $tagid );
 	}
 
 	/**
@@ -2600,31 +2650,27 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function builduploaderlist($name, $class, $selected, $type=1)
+	static function builduploaderlist($name, $attribs, $selected, $displaytype=1, $tagid=null)
 	{
 		$db = JFactory::getDBO();
-
 		$query = 'SELECT DISTINCT f.uploaded_by AS uid, u.name AS name'
 		. ' FROM #__flexicontent_files AS f'
 		. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
 		. ' ORDER BY f.ext ASC'
 		;
 		$db->setQuery($query);
-		$exts = $db->loadObjectList();
+		$data = $db->loadObjectList();
 		
-		if (!is_numeric($type)) {
-			$options[] = JHTML::_( 'select.option', '', $type);
-		} else {
+		if (!is_numeric($displaytype) && is_string($displaytype))
+			$options[] = JHTML::_( 'select.option', '', $displaytype);
+		else if ($displaytype)
 			$options[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_ALL_UPLOADERS' ));
-		}
 		
-		foreach ($exts as $ext) {
-			$options[] = JHTML::_( 'select.option', $ext->uid, $ext->name);
-		}
-
-		$list = JHTML::_('select.genericlist', $options, $name, $class, 'value', 'text', $selected );
-
-		return $list;
+		foreach ($data as $val)
+			$options[] = JHTML::_( 'select.option', $val->uid, $val->name);
+		
+		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
+		return JHTML::_('select.genericlist', $options, $name, $attribs, 'value', 'text', $selected, $tagid );
 	}
 
 
@@ -2634,10 +2680,12 @@ class flexicontent_html
 	 * @return object
 	 * @since 1.5
 	 */
-	static function buildlanguageslist($name, $attribs, $selected, $type=1, $allowed_langs=null, $published_only=true, $disable_langs=null, $add_all=true, $conf=false)
+	static function buildlanguageslist($name, $attribs, $selected, $displaytype=1, $allowed_langs=null, $published_only=true, $disable_langs=null, $add_all=true, $conf=false)
 	{
 		$db = JFactory::getDBO();
-
+		$tagid = null; // ... not provided
+		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
+		
 		$selected_found = false;
 		$all_langs = FLEXIUtilities::getlanguageslist($published_only, $add_all);
 		$user_langs = null;
@@ -2670,30 +2718,27 @@ class flexicontent_html
 		if ( !count($user_langs) )  return "user is not allowed to use any language";
 		if (!$selected_found) $selected = $user_langs[0]->code;  // Force first language to be selected
 		
-		$element_id = preg_replace('#[\[]#', '_', $name);
-		$element_id = preg_replace('#[\]]#', '', $element_id);		
-		
 		if ( $conf && empty($conf['flags']) && empty($conf['texts']) ) {
 			 $conf['flags'] = $conf['texts'] = 1;
 		}
 		
 		$langs = array();
-		switch ($type)
+		switch ($displaytype)
 		{
+			// Drop-down SELECT of ALL languages
 			case 1: case 2: default:
-				if ($type==1) {
-					// Drop-down SELECT of ALL languages , WITHOUT empty prompt to select language
-				} else if ($type==2) {
-				  // Drop-down SELECT of ALL languages , WITH empty prompt to select language, e.g. used in items/category manager
+				if (!is_numeric($displaytype) && is_string($displaytype))
+					// WITH custom prompt to select language
+					$langs[] = JHTML::_('select.option',  '', $displaytype);
+				
+				else if ($displaytype==2)
+					// WITH empty prompt to select language, e.g. used in items/category manager
 					$langs[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_LANGUAGE' ));
-				} else if (!is_numeric($type)) {
-				  // Drop-down SELECT of ALL languages , WITH custom prompt to select language
-					$langs[] = JHTML::_('select.option',  '', $type);
-				}
+				
 				foreach ($user_langs as $lang) {
 					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
 				}
-				$list = JHTML::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected, $element_id);
+				$list = JHTML::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected, $tagid);
 				break;
 			
 			// RADIO selection of ALL languages , e.g. item form,
@@ -2705,8 +2750,8 @@ class flexicontent_html
 					if ($lang->code == $selected) {
 						$checked = ' checked="checked"';
 					}
-					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
-					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'" >';
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
+					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'" >';
 					if($lang->shortcode=="*") {
 						$list 	.= '<span class="lang_lbl">'.JText::_('FLEXI_ALL').'</span>';  // Can appear in J1.6+ only
 					} else {
@@ -2740,8 +2785,8 @@ class flexicontent_html
 				$list .= '</label><div class="clear"></div>';
 
 				foreach ($user_langs as $lang) {
-					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
-					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -2756,8 +2801,8 @@ class flexicontent_html
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					if ($lang->code==$selected) continue;
-					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
-					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -2772,8 +2817,8 @@ class flexicontent_html
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					$checked = $lang->code==$selected ? 'checked="checked"' : '';
-					$list 	.= '<input id="'.$element_id.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" '.$checked.'/>';
-					$list 	.= '<label class="lang_box" for="'.$element_id.'_'.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" '.$checked.'/>';
+					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -2801,7 +2846,7 @@ class flexicontent_html
 	 * @return object
 	 * @since 1.5
 	 */
-	static function buildstateslist($name, $attribs, $selected, $type=1)
+	static function buildstateslist($name, $attribs, $selected, $displaytype=1, $tagid=null)
 	{
 	 	static $state_names = null;
 	 	static $state_descrs = null;
@@ -2821,10 +2866,13 @@ class flexicontent_html
 		$state[] = JHTML::_('select.option',  (FLEXI_J16GE ? 2:-1), $state_names[(FLEXI_J16GE ? 2:-1)] );
 		$state[] = JHTML::_('select.option',  -2, $state_names[-2] );
 		
-		if ($type==1) {
-			$list = JHTML::_('select.genericlist', $state, $name, $attribs, 'value', 'text', $selected );
-		} else if ($type==2) {
-
+		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
+		
+		if ($displaytype==1)
+			$list = JHTML::_('select.genericlist', $state, $name, $attribs, 'value', 'text', $selected, $tagid);
+		
+		else if ($displaytype==2)
+		{
 			$state_ids   = array(1, -5, 0, -3, -4);
 			$state_ids[] = FLEXI_J16GE ? 2:-1;
 			$state_ids[]  = -2;
@@ -2846,10 +2894,11 @@ class flexicontent_html
 			$list 	.= '<label class="state_box'.$tooltip_class.'" for="state9999" title="'.$tooltip_title.'">';
 			$list 	.= '<span class="state_lbl">'.JText::_( 'FLEXI_USE_STATE_COLUMN' ).'</span>';
 			$list 	.= '</label>';
-		} else {
-			$list = 'Bad type in buildstateslist()';
 		}
-
+		
+		else
+			$list = 'Bad type in buildstateslist()';
+		
 		return $list;
 	}
 
@@ -5481,7 +5530,7 @@ class flexicontent_db
 		$field_types = $db->loadObjectList('field_type');
 		
 		foreach($field_types as $field_type) {
-			$field_type->friendlyname = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->title);
+			$field_type->friendly = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->title);
 		}
 		if (!$group) return $field_types;
 		

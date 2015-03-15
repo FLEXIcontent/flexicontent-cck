@@ -465,7 +465,7 @@ function delAllFilters() {
 				} else if ($row->field_type=='coreprops') {
 					echo $fld_params->get('props_type');
 				} else {
-					echo $row->iscore?"[Core]" : "{$row->friendlyname}";
+					echo $row->iscore? "[Core]" : $row->friendly;
 				}
 				echo "&nbsp;-</small>";
 				?>

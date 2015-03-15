@@ -172,8 +172,9 @@ class FlexicontentViewFields extends JViewLegacy
 		$model = $this->getModel();
 		$rows       = $this->get( FLEXI_J16GE ? 'Items' : 'Data' );
 		$pagination = $this->get( 'Pagination' );
-		$types      = $this->get( 'Typeslist' );
-		$fieldtypes = flexicontent_db::getFieldTypes($_group = true, $_usage=true, $_published=false);
+		$types      = $this->get( 'Typeslist' );  // Content types
+		$fieldtypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
+		
 		
 		$lists = array();
 		
@@ -187,30 +188,27 @@ class FlexicontentViewFields extends JViewLegacy
 		$assigned[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS' )*/ );
 		$assigned[] = JHTML::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
 		$assigned[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
-
+		
 		$lists['assigned'] = ($filter_assigned || 1 ? '<label class="label">'.JText::_('FLEXI_ASSIGNED').'</label>' : '').
 			JHTML::_('select.genericlist', $assigned, 'filter_assigned', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_assigned );
 		
 		
 		// build field-type filter
 		$ALL = mb_strtoupper(JText::_( 'FLEXI_ALL' ), 'UTF-8') . ' : ';
-		$fftypes 	= array();
-		$fftypes[] = JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
-		$fftypes[] = JHTML::_('select.option',  'BV', $ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
-		$fftypes[] = JHTML::_('select.option',  'C', $ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
-		$fftypes[] = JHTML::_('select.option',  'NC', $ALL . JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
-		
+		$fftypes = array();
+		$fftypes[] = array('value'=>'', 'text'=>'-'/*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
+		$fftypes[] = array('value'=>'BV', 'text'=>$ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
+		$fftypes[] = array('value'=>'C',  'text'=>$ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
+		$fftypes[] = array('value'=>'NC', 'text'=>$ALL . JText::_( 'FLEXI_NON_CORE_FIELDS' ));
 		foreach ($fieldtypes as $field_group => $ft_types) {
-			$fftypes[] = JHTML::_('select.optgroup', $field_group );
+			$fftypes[] = $field_group;
 			foreach ($ft_types as $field_type => $ftdata) {
-				$fftypes[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $ftdata->friendlyname);
+				$fftypes[] = array('value'=>$ftdata->field_type, 'text'=>'-'.$ftdata->assigned.'- '. $ftdata->friendly);
 			}
-			$fftypes[] = JHTML::_('select.optgroup', '' );
+			$fftypes[] = '';
 		}
-		
 		$lists['fftype'] = ($filter_fieldtype || 1 ? '<label class="label">'.JText::_('FLEXI_FIELD_TYPE').'</label>' : '').
-			JHTML::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
-		if (!FLEXI_J16GE) $lists['fftype'] = str_replace('<optgroup label="">', '</optgroup>', $lists['fftype']);
+			flexicontent_html::buildfieldtypeslist($fftypes, 'filter_fieldtype', $filter_fieldtype, ($_grouped ? 1 : 0), 'class="use_select2_lib" size="1" onchange="submitform( );"');
 		
 		
 		// build publication state filter
