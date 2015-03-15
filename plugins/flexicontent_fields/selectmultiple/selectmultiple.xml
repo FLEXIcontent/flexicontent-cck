@@ -44,9 +44,9 @@
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
 			-->
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="multivalue-mode" />
-			<field name="min_values" type="text" default="0" size="2" label="FLEXI_FIELD_MIN_VALUES" description="FLEXI_FIELD_MIN_VALUES_DESC" />
-			<field name="exact_values" type="text" default="0" size="2" label="FLEXI_FIELD_EXACT_VALUES" description="FLEXI_FIELD_EXACT_VALUES_DESC" />
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
+			<field name="min_values" type="text" default="0" size="2" label="FLEXI_FIELD_MIN_VALUES" depend_class="fieldgroupoff" description="FLEXI_FIELD_MIN_VALUES_DESC" />
+			<field name="exact_values" type="text" default="0" size="2" label="FLEXI_FIELD_EXACT_VALUES" depend_class="fieldgroupoff" description="FLEXI_FIELD_EXACT_VALUES_DESC" />
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -71,10 +71,10 @@
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			<field name="usefirstoption" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="multivalue-mode3">FLEXI_NO</option>
-				<option value="1" show_list="multivalue-mode3" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="use_prompt">FLEXI_NO</option>
+				<option value="1" show_list="use_prompt" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="firstoptiontext" type="text" default="FLEXI_SELECT" label="FLEXI_FIELD_FIRST_OPTION_TEXT" depend_class="multivalue-mode3" description="FLEXI_FIELD_FIRST_OPTION_TEXT_DESC" />
+			<field name="firstoptiontext" type="text" default="FLEXI_SELECT" label="FLEXI_FIELD_FIRST_OPTION_TEXT" depend_class="use_prompt" description="FLEXI_FIELD_FIRST_OPTION_TEXT_DESC" />
 			<field name="size" type="text" default="6" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			<field name="use_jslib" type="radio" default="1" label="FLEXI_USE_JS_FORM_FIELD" description="FLEXI_USE_JS_FORM_FIELD_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -83,6 +83,12 @@
 			
 		</fieldset>
 		
+		<fieldset name="group-selectmultiple-cascade" repeat="1" icon_class="icon-link" label="Cascade" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="If field depends on the value of another select file, then please select it here, and make sure &lt;br/&gt;-- you have added property 'valgroup' in the options of this field, or a DB column '... AS valgroup' &lt;br/&gt; The 'valgroup' property of this field will match the 'value' property of the 'Cascade on field'" level="level4" />
+			<field name="cascade_onfield" type="fields" field_type="select" label="Cascade on field" description="Select field, which FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE_DESC" custom_prompt="FLEXI_NO_CASCADE" />
+			<field name="cascade_custom_prompt" type="text" default="" label="Select prompt" description="A prompt to ask user to select a value in the cascade-on field" />
+		</fieldset>
+				
 		<fieldset name="group-selectmultiple-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
