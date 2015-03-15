@@ -72,6 +72,14 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	var $_cats = null;
 	
+	
+	/**
+	 * Tag Data of listed items
+	 *
+	 * @var array
+	 */
+	var $_tags = null;
+	
 	/**
 	 * Associated item translations
 	 *
@@ -196,17 +204,24 @@ class FlexicontentModelItems extends JModelLegacy
 			// 5, reorder items and get cat ids
 			$this->_data = array();
 			$this->_catids = array();
+			$this->_tagids = array();
 			foreach($query_ids as $item_id) {
 				$item = $_data[$item_id];
 				
-				$item->categories = preg_split("/[\s]*,[\s]*/", $item->relcats);
-				foreach ($item->categories as $item_cat) {
+				$item->cats = preg_split("/[\s]*,[\s]*/", $item->relcats);
+				foreach ($item->cats as $item_cat) {
 					if ($item_cat) $this->_catids[$item_cat] = 1;
+				}
+				
+				$item->tags = preg_split("/[\s]*,[\s]*/", $item->taglist);
+				foreach ($item->tags as $item_tag) {
+					if ($item_tag) $this->_tagids[$item_tag] = 1;
 				}
 				
 				$this->_data[] = $item;
 			}
 			$this->_catids = array_keys($this->_catids);
+			$this->_tagids = array_keys($this->_tagids);
 			
 			// 6, get other item data
 			$k = 0;
@@ -692,8 +707,9 @@ class FlexicontentModelItems extends JModelLegacy
 		} else {
 			$query =
 				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' u.name AS editor, rel.catid as rel_catid, '
-				.' GROUP_CONCAT(DISTINCT rel.catid SEPARATOR  ",") AS relcats, '
-				. (FLEXI_J16GE ? 'level.title AS access_level, ' : 'g.name AS groupname, ')
+				. 'GROUP_CONCAT(DISTINCT rel.catid SEPARATOR  ",") AS relcats, '
+				. 'GROUP_CONCAT(DISTINCT tg.tid    SEPARATOR  ",") AS taglist, '
+				. 'level.title AS access_level, '
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
 					'CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN (2) THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order, ' : ''
 					)
@@ -711,7 +727,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. ($use_tmp ? ' FROM #__flexicontent_items_tmp AS i' :' FROM #__content AS i')
 				. ($tmp_only ? '' : ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id')
 				. ' JOIN #__categories AS c ON c.id = i.catid'
-				. (!empty($filter_tag)  ? ' JOIN #__flexicontent_tags_item_relations AS tg ON i.id=tg.itemid' : '')
+				. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON i.id=tg.itemid'
 				. (in_array('RV', $filter_state)  ? ' JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
 				.    ($filter_cats && !$filter_subcats ? ' AND rel.catid='.$filter_cats : '')
@@ -2269,7 +2285,8 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 		return true;
 	}
-
+	
+	
 	/**
 	 * Method to fetch the assigned categories
 	 *
@@ -2286,8 +2303,6 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$query = 'SELECT DISTINCT c.id, c.title'
 				. ' FROM #__categories AS c'
-			//. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-			//. ' WHERE rel.itemid = '.(int)$id
 				. ' WHERE c.id IN ('. implode(',', $catids) .') ' 
 				. (FLEXI_J16GE ? ' AND c.extension="'.FLEXI_CAT_EXTENSION.'"' : '')
 				;
@@ -2297,7 +2312,34 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		return $this->_cats;
 	}
-
+	
+	
+	/**
+	 * Method to fetch the assigned categories
+	 *
+	 * @access	public
+	 * @return	object
+	 * @since	1.0
+	 */
+	function getItemTags($tagids=null)
+	{
+		if ($this->_tags !== null) return $this->_tags;
+		
+		if (empty($tagids)) $tagids = $this->_tagids;
+		if (empty($tagids)) return array();
+		
+		$query = 'SELECT DISTINCT t.*'
+				. ' FROM #__flexicontent_tags AS t'
+				. ' WHERE t.id IN ('. implode(',', $tagids) .') ' 
+				;
+		$this->_db->setQuery( $query );
+		$this->_tags = $this->_db->loadObjectList('id');
+		//print_r($this->_cats);
+		
+		return $this->_tags;
+	}
+	
+	
 	/**
 	 * Method to get the name of the author of an item
 	 *

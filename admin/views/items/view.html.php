@@ -346,6 +346,7 @@ class FlexicontentViewItems extends JViewLegacy
 		// these depend on data rows and must be called after getting data
 		$extraCols  = $this->get( 'ExtraCols' );
 		$itemCats   = $this->get( 'ItemCats' );
+		$itemTags   = $this->get( 'ItemTags' );
 		
 		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
 		if (FLEXI_FISH || FLEXI_J16GE)   $langs = FLEXIUtilities::getLanguages('code');
@@ -596,6 +597,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$this->assignRef('lists'		, $lists);
 		$this->assignRef('rows'			, $rows);
 		$this->assignRef('itemCats'	, $itemCats);
+		$this->assignRef('itemTags'	, $itemTags);
 		$this->assignRef('extra_fields'	, $extraCols);
 		if ($enable_translation_groups)  $this->assignRef('lang_assocs', $langAssocs);
 		if (FLEXI_FISH || FLEXI_J16GE)   $this->assignRef('langs', $langs);
@@ -618,6 +620,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$this->assignRef('filter_order_type', $filter_order_type);
 		$this->assignRef('filter_order', $filter_order);
 		$this->assignRef('filter_lang'		, $filter_lang);
+		$this->assignRef('filter_tag'		, $filter_tag);
 		$this->assignRef('filter_fileid'	, $filter_fileid);
 		
 		$this->assignRef('inline_ss_max'	, $inline_ss_max);
