@@ -169,7 +169,15 @@ class FlexicontentViewField extends JViewLegacy
 		
 		//build field select list
 		$fieldtypes = flexicontent_db::getFieldTypes($_grouped=true, $_usage=false, $_published=true);
-		$lists['field_type'] = flexicontent_html::buildfieldtypeslist($fieldtypes, 'jform[field_type]', ($_grouped ? 1 : 0), $row->field_type, $_attribs);
+		$fftypes = array();
+		foreach ($fieldtypes as $field_group => $ft_types) {
+			$fftypes[] = $field_group;
+			foreach ($ft_types as $field_type => $ftdata) {
+				$fftypes[] = array('value'=>$ftdata->field_type, 'text'=>$ftdata->friendly);
+			}
+			$fftypes[] = '';
+		}
+		$lists['field_type'] = flexicontent_html::buildfieldtypeslist($fftypes, 'jform[field_type]', $row->field_type, ($_grouped ? 1 : 0), $_attribs);
 		
 		//build type select list
 		$attribs  = 'class="use_select2_lib" multiple="multiple" size="6"';

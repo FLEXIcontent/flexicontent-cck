@@ -96,7 +96,6 @@ class FlexicontentFields
 	}
 	
 	
-	
 	/**
 	 * Method to bind fields to an items object
 	 * 
@@ -198,7 +197,71 @@ class FlexicontentFields
 		}
 		return $items;
 	}
-
+	
+	
+	/**
+	 * Method to get fields configuration data by field ids
+	 * 
+	 * @access private
+	 * @return object
+	 * @since 3
+	 */
+	static function & getFieldsByIds($field_ids) 
+	{
+		$db   = JFactory::getDBO();
+		$user = JFactory::getUser();
+		JArrayHelper::toInteger($field_ids);
+		
+		// Field's has_access flag
+		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+		$aid_list = implode(",", $aid_arr);
+		$select_access = ', CASE WHEN fi.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_access';
+		
+		$query 	= 'SELECT fi.*'
+			. $select_access
+			. ' FROM #__flexicontent_fields AS fi'
+			. ' WHERE fi.id IN ('.implode(",", $field_ids).') '
+			;
+		$db->setQuery($query);
+		$fields = $db->loadObjectList('id');
+		
+		return $fields;
+	}
+	
+	
+	/**
+	 * Method to get fields values data by field ids + item ids
+	 * 
+	 * @access private
+	 * @return object
+	 * @since 3
+	 */
+	static function & getFieldValsById($field_ids, $item_ids, $version=0)
+	{
+		$db = JFactory::getDBO();
+		JArrayHelper::toInteger($field_ids);
+		JArrayHelper::toInteger($item_ids);
+		
+		$query = 'SELECT item_id, field_id, value, valueorder'
+				.( $version ? ' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
+				.' WHERE item_id IN ('.implode(",", $item_ids).') '
+				.' AND field_id IN ('.implode(",", $field_ids).') '
+				.( $version ? ' AND version=' . (int)$version:'')
+				.' AND value > "" '
+				.' ORDER BY field_id, valueorder'
+				;
+		$db->setQuery($query);
+		$values = $db->loadObjectList();
+		//if ($db->getErrorNum()) echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+		
+		$fieldvalues = array();
+		foreach ($values as $v) {
+			$fieldvalues[$v->item_id][$f->field_id][] = $v->value;
+		}
+		return $fieldvalues;
+	}
+	
+	
 	/**
 	 * Method to fetch the fields from an item object
 	 * 
@@ -1358,7 +1421,7 @@ class FlexicontentFields
 	// **************************************************************************************
 	
 	// Common method to get the allowed element values (field values with index,label,... properties) for fields that use indexed values
-	static function indexedField_getElements(&$field, $item, $extra_props=array(), &$item_pros=true, $create_filter=false)
+	static function indexedField_getElements(&$field, $item, $extra_props=array(), &$item_pros=true, $create_filter=false, $and_clause='')
 	{
 		static $_elements_cache = null;
 		if ( isset($_elements_cache[$field->id]) ) return $_elements_cache[$field->id];
@@ -1367,6 +1430,8 @@ class FlexicontentFields
 		$sql_mode = $field->parameters->get( 'sql_mode', 0 ) ;   // For fields that use this parameter
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
 		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
+		
+		$default_extra_props = array('image','valgroup');
 		
 		if ($create_filter) {
 			$filter_customize_options = $field->parameters->get('filter_customize_options', 0);
@@ -1394,6 +1459,13 @@ class FlexicontentFields
 			// Get/verify query string, check if item properties and other replacements are allowed and replace them
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
 			$query = FlexicontentFields::doQueryReplacements($field_elements, $field, $item, $item_pros, $canCache);
+			if ($query && $and_clause) {
+				$count = 0;
+				$query = preg_replace('/[\s]+WHERE[\s]+/iu', ' WHERE 1 '.$and_clause.' AND ', $query, -1, $count);
+				if (!$count) {
+					$query = preg_replace('/[\s]+FROM[\s]+([^\s]{1,})/iu', 'FROM $1 WHERE 1 '.$and_clause.' ', $query, -1, $count);
+				}
+			}
 			
 			// Execute SQL query to retrieve the field value - label pair, and any other extra properties
 			if ( $query ) {
@@ -1435,9 +1507,16 @@ class FlexicontentFields
 				$results[$val]->value = $listelement_props[0];
 				$results[$val]->text  = $lang_filter_values ? JText::_($listelement_props[1]) : $listelement_props[1];
 				$el_prop_count = 2;
-				foreach ($extra_props as $extra_prop) {
-					$results[$val]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it
-					$el_prop_count++;
+				if (!empty($extra_props)) {
+					foreach ($extra_props as $extra_prop) {
+						$results[$val]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it
+						$el_prop_count++;
+					}
+				} else {
+					foreach ($default_extra_props as $extra_prop) {
+						$results[$val]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it
+						$el_prop_count++;
+					}
 				}
 			}
 			
