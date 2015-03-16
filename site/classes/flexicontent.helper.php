@@ -5324,13 +5324,13 @@ class flexicontent_db
 				$order_col	= 'u.name';
 				$order_dir	= 'DESC';
 				break;
-			case 'hits':
-				$order_col	= $i_as.'.hits';
-				$order_dir	= 'ASC';
-				break;
-			case 'rhits': case 'popular': /* 2nd is for module */
+			case 'hits': case 'popular': /* 2nd is for module */
 				$order_col	= $i_as.'.hits';
 				$order_dir	= 'DESC';
+				break;
+			case 'rhits':
+				$order_col	= $i_as.'.hits';
+				$order_dir	= 'ASC';
 				break;
 			case 'order': case 'catorder': /* 2nd is for module */
 				$order_col	= $rel_as.'.catid, '.$rel_as.'.ordering ASC, '.$i_as.'.id DESC';
@@ -5425,11 +5425,11 @@ class flexicontent_db
 				break;
 			case 'hits' :                  // *** J2.5 only ***
 				$order_col = $c_as.'.hits';
-				$order_dir = 'ASC';
+				$order_dir = 'DESC';
 				break;
 			case 'rhits' :                 // *** J2.5 only ***
 				$order_col = $c_as.'.hits';
-				$order_dir = 'DESC';
+				$order_dir = 'ASC';
 				break;
 			case 'order' :
 				$order_col = !FLEXI_J16GE ? $c_as.'.ordering' : $c_as.'.lft';
