@@ -67,7 +67,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="field_elements" type="textarea" default="1::Yes%% 0::No%% " class="required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
+			<field name="field_elements" type="textarea" default="1::Yes%% 0::No%% " class="required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			<field name="usefirstoption" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC" class="btn-group btn-group-yesno">
@@ -84,9 +84,9 @@
 		</fieldset>
 		
 		<fieldset name="group-selectmultiple-cascade" repeat="1" icon_class="icon-link" label="Cascade" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" default="If field depends on the value of another select file, then please select it here, and make sure &lt;br/&gt;-- you have added property 'valgroup' in the options of this field, or a DB column '... AS valgroup' &lt;br/&gt; The 'valgroup' property of this field will match the 'value' property of the 'Cascade on field'" level="level4" />
-			<field name="cascade_onfield" type="fields" field_type="select" label="Cascade on field" description="Select field, which FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE_DESC" custom_prompt="FLEXI_NO_CASCADE" />
-			<field name="cascade_custom_prompt" type="text" default="" label="Select prompt" description="A prompt to ask user to select a value in the cascade-on field" />
+			<field name="" type="separator" default="If field depends on the value of another select file, then please select it here, and make sure &lt;br/&gt;-- you have added property 'valgrp' in the options of this field, or a DB column '... AS valgrp' &lt;br/&gt; The 'valgrp' property of this field will match the 'value' property of the 'Cascade on field'" level="level4" />
+			<field name="cascade_onfield" type="fields" field_type="select,selectmultiple" label="Cascade on field" description="Select field, which FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE_DESC" custom_prompt="FLEXI_NO_CASCADE" />
+			<field name="cascade_prompt" type="text" default="" label="Select prompt" description="A prompt to ask user to select a value in the cascade-on field" />
 		</fieldset>
 				
 		<fieldset name="group-selectmultiple-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">

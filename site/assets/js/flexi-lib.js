@@ -322,9 +322,9 @@
 	
 	}
 	
-	function fcUpdateCascadedField(from, to, field_id, item_id, ftype) {
-		to.parent().find('.field_loading').html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">');
-		to.empty().append('<option selected="selected" value="">... Loading</option>');
+	function fcUpdateCascadedField(from, to, field_id, item_id, field_type) {
+		to.parent().find('.field_cascade_loading').html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\" /> ... Loading');
+		//to.empty().append('<option selected="selected" value="">... Loading</option>');
 		to.trigger('change');
 		jQuery.ajax({
 			type: 'POST',
@@ -334,14 +334,14 @@
 				omethod: 'html', /* unused */
 				exttype: 'plugins',
 				extfolder: 'flexicontent_fields',
-				extname: ftype,
+				extname: field_type,
 				extfunc: 'getCascadedField',
 				field_id: field_id,
 				item_id: item_id,
 				valgrps: from.val()
 			}
 		}).done( function(data) {
-			to.parent().find('.field_loading').html('');
+			to.parent().find('.field_cascade_loading').html('');
 			
 			to.empty().append(data).val('');
 			to.trigger('change');
@@ -349,5 +349,27 @@
 			/*if (to.hasClass('use_select2_lib'))  to.select2('val', '');  else  to.val('');*/
 			//var cascadeFunc = 'fcCascadedField_'+field_id+'();';
 			//eval(cascadeFunc);
+		});
+	}
+	
+	
+	
+	function fcCascadedField(field_id, item_id, field_type, srcELid, trgELid, cascade_prompt, add_inner) {
+		var onEL  = jQuery('#'+srcELid);
+		var onEL2 = onEL.parent().find('select.use_select2_lib');
+		var isSel2 = onEL2.length != 0;
+		
+		var srcEL = isSel2 ? onEL2 : onEL;
+		var trgEL = jQuery('#'+trgELid);
+		
+		//srcEL.off('change');
+		srcEL.on('change', function(){
+			if ( !! srcEL.val() )
+				fcUpdateCascadedField( srcEL, trgEL, field_id, item_id, field_type );
+			else {
+				trgEL.empty();
+				if (add_inner) trgEL.append('<option selected=\"selected\" value=\"\">'+cascade_prompt+'</option>');
+				trgEL.trigger('change');
+			}
 		});
 	}

@@ -108,7 +108,47 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$js = "";
 		$css = "";
 		
-		if (!$ajax && $multiple) // handle multiple records
+		
+		// *********************************************************************************************
+		// Handle adding the needed JS code to CASCADE (listen to) changes of the dependent master field
+		// *********************************************************************************************
+		
+		if ($cascade_onfield && !$ajax)
+		{
+			$byIds = FlexicontentFields::indexFieldsByIds($item->fields);
+			
+			if ( isset($byIds[$cascade_onfield]) )
+			{
+				$cascade_prompt = $field->parameters->get('cascade_prompt', '');
+				$cascade_prompt = $cascade_prompt ? JText::_($cascade_prompt) : JText::_('FLEXI_PLEASE_SELECT').': '.$byIds[$cascade_onfield]->label;
+				
+				$srcELid = 'custom_'.$byIds[$cascade_onfield]->name;
+				$trgELid = $elementid;
+				
+				// Get values of cascade (on) source field
+				$field->valgrps = $byIds[$cascade_onfield]->value ? $byIds[$cascade_onfield]->value : null;
+				
+				// Create a cascaded function that can be called later
+				$js .= "
+				jQuery(document).ready(function(){
+					fcCascadedField(
+						".$field->id.", '".$field->item_id."', '".$field->field_type."',
+						'".$srcELid."', '".$trgELid."', '".$cascade_prompt."',
+						1
+					);
+				});
+				";
+			} else {
+				$cascade_prompt = 'Error field no: '.$cascade_onfield.' not found';
+			}
+		}
+		
+		
+		// ***********************
+		// Handle multiple records
+		// ***********************
+		
+		if ($multiple && !$ajax)
 		{
 			// Add the drag and drop sorting feature
 			if (!$use_ingroup) $js .="
@@ -147,6 +187,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				theSelect.val('');
 				theSelect.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theSelect.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
+				theSelect.attr('data-uniqueRowNum', uniqueRowNum);
 				
 				// Destroy any select2 elements
 				var has_select2 = newField.find('div.select2-container').length != 0;
@@ -221,57 +262,17 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		}
 		
 		
-		// Handle adding the needed JS code to CASCADE (listen to) changes of the dependent master field
-		if (!$ajax && $cascade_onfield) {
-			static $fields_byID = null;
-			if ($fields_byID===null) {
-				$fields_byID = array();
-				foreach($item->fields as $_field) {
-					$fields_byID[$_field->id] = $_field;
-				}
-			}
-			$cascade_custom_prompt = $field->parameters->get('cascade_custom_prompt', '');
-			if ( isset($fields_byID[$cascade_onfield]) ) {
-				$cascade_custom_prompt = $cascade_custom_prompt ? JText::_($cascade_custom_prompt) : '...'.JText::_('FLEXI_PLEASE_SELECT').': '.$fields_byID[$cascade_onfield]->label;
-				
-				$cascadeOn_Elementid_0 = 'custom_'.$fields_byID[$cascade_onfield]->name.'_0';
-				$cascaded_Elementid_0 = $elementid.'_0';
-				
-				// Create a cascaded function that can be called later
-				$js .= "
-				function fcCascadedField_".$field->id."() {
-					var cascadeOn_ElementSel = jQuery('#".$cascadeOn_Elementid_0."');
-					var cascadeOn_ElementSel2 = cascadeOn_ElementSel.parent().find('select.use_select2_lib');
-					var has_select2 = cascadeOn_ElementSel2.length != 0;
-					
-					var cascadeOn_Element = has_select2 ? cascadeOn_ElementSel2 : cascadeOn_ElementSel;
-					var cascaded_Element  = jQuery('#".$cascaded_Elementid_0."');
-					
-					//cascadeOn_Element.off('change');
-					cascadeOn_Element.on('change', function(){
-						if ( !! cascadeOn_Element.val() )
-							fcUpdateCascadedField( cascadeOn_Element, cascaded_Element, '".$field->id."', '".$field->item_id."', '".$field->field_type."' );
-						else {
-							cascaded_Element.empty();
-							cascaded_Element.append('<option selected=\"selected\" value=\"\">".$cascade_custom_prompt."</option>');
-							cascaded_Element.trigger('change');
-						}
-					});
-				}
-				jQuery(document).ready(function(){
-					fcCascadedField_".$field->id."();
-				});
-				";
-			} else {
-				$cascade_onfield_err = 1;
-			}
-		}
-		
+		// Added field's custom CSS / JS
 		if (!$ajax && $js)  $document->addScriptDeclaration($js);
 		if (!$ajax && $css) $document->addStyleDeclaration($css);
 		
+		
+		// **************************
 		// Get indexed element values
-		if ($sql_mode) {
+		// **************************
+		
+		if ($sql_mode)  // SQL query mode
+		{
 			$and_clause = '';
 			if (isset($field->valgrps))
 			{
@@ -283,17 +284,22 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			}
 			$item_pros = true;
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props, $item_pros, false, $and_clause);
-		} else if (isset($field->valgrps)) {
-			$_valgrps = explode(',', $field->valgrps);
-			$_valgrps = array_flip($_valgrps);
-			$_elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
-			$elements = array();
-			foreach($_elements as $element) {
-				if (!isset($_valgrps[$element->valgroup])) continue;
-				$elements[] = $element;
+		}
+		
+		else  // Elements mode
+		{
+			if (isset($field->valgrps)) {
+				$_valgrps = is_array($field->valgrps) ? $field->valgrps : explode(',', $field->valgrps);
+				$_valgrps = array_flip($_valgrps);
+				$_elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
+				$elements = array();
+				foreach($_elements as $element) {
+					if (!isset($_valgrps[$element->valgroup])) continue;
+					$elements[] = $element;
+				}
+			} else {
+				$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
 			}
-		} else {
-			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
 		}
 		
 		if ( !$elements ) {
@@ -323,35 +329,37 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$options = array();
 		
 		// CASE 1: Either add the field options (non-cascaded field or AJAX request (cascade)
-		if (!$cascade_onfield || $ajax) {
+		if ($cascade_onfield || !$cascade_onfield || $ajax) {
 			// Add the select prompt internally regardless of using JS
 			if ($usefirstoption) {
 				$options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 			}
 			foreach ($elements as $element) $options[] = JHTML::_('select.option', $element->value, $element->text);
+			$_msg = '';
 		}
 		
 		// CASE 2: Or add cascade prompt, asking user to select value on the depend-from field
 		else {
-			$options[] = JHTML::_('select.option', '', !empty($cascade_onfield_err) ? 'Error field no: '.$cascade_onfield.' not found' : $cascade_custom_prompt);
+			//$options[] = JHTML::_('select.option', '', $cascade_prompt);
+			$_msg = $cascade_prompt;
 		}
 		
 		
+		// Render the drop down select
 		$field->html = array();
 		$n = 0;
-		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
 			if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
 			if (!$ajax)
 			{
-				$fieldname_n = $fieldname.'['.$n.']';
-				$elementid_n = $elementid.'_'.$n;
-				$select_field = JHTML::_('select.genericlist', $options, $fieldname_n, $attribs, 'value', 'text', $value, $elementid_n);
+				$fieldname_n = !$multiple ? $fieldname : $fieldname.'['.$n.']';
+				$elementid_n = !$multiple ? $elementid : $elementid.'_'.$n;
+				$select_field = JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n);
 				
 				$field->html[] = '
-					'.$select_field.($cascade_onfield ? '<span class="field_loading"></span>' : '').'
+					'.$select_field.($cascade_onfield ? '<span class="field_cascade_loading"></span>' : '').'
 					'.($use_ingroup ? '' : $move2).'
 					'.($use_ingroup ? '' : $remove_button).'
 					'.($use_ingroup || !$add_position ? '' : $add_here).'

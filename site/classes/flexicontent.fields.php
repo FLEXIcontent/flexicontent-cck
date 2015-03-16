@@ -206,6 +206,25 @@ class FlexicontentFields
 	 * @return object
 	 * @since 3
 	 */
+	static function & indexFieldsByIds($fields) 
+	{
+		static $byIds = null;
+		if ($byIds===null) {
+			foreach($fields as $_field) {
+				$byIds[$_field->id] = $_field;
+			}
+		}
+		return $byIds;
+	}
+	
+	
+	/**
+	 * Method to get fields configuration data by field ids
+	 * 
+	 * @access private
+	 * @return object
+	 * @since 3
+	 */
 	static function & getFieldsByIds($field_ids) 
 	{
 		$db   = JFactory::getDBO();
