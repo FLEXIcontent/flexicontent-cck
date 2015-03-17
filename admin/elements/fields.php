@@ -166,12 +166,23 @@ class JFormFieldFields extends JFormField
 			$onchange = str_replace('{control_name}', $control_name, $onchange);
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
+		if ($inline_tip = @$attributes['inline_tip'])
+		{
+			$tip_img = @$attributes['tip_img'];
+			$tip_img = $tip_img ? $tip_img : 'comment.png';
+			$tip_class = @$attributes['tip_class'];
+			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' align="left" style="margin-left:12px;" ' );
+			$tip_text = '<span class="'.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.'</span>';
+		}
 		
 		
 		// ***********************
 		// Create the field's HTML
 		// ***********************
 		
-		return JHTML::_('select.genericlist', $fields, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return
+			JHTML::_('select.genericlist', $fields, $fieldname, $attribs, 'value', 'text', $values, $element_id)
+			.@$tip_text;
 	}
 }

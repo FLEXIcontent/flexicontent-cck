@@ -63,11 +63,19 @@
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="sql_mode" type="radio" default="0" label="FLEXI_FIELD_SQL_MODE" description="FLEXI_FIELD_SQL_MODE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="sql_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_SQL_MODE" description="FLEXI_FIELD_SQL_MODE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="elements_list" hide_list="elements_sql">FLEXI_NO</option>
+				<option value="1" show_list="elements_sql" hide_list="elements_list">FLEXI_YES</option>
 			</field>
+			<field name="" type="separator" default="SELECT ... AS value, ... AS text, ... AS image, ... AS valgrp ..." level="level4" depend_class="elements_sql" />
+			<field name="" type="separator" default="value1::label1::image1::valgrp%%&lt;br/&gt; value2::label2::image2::valgrp%% ..." level="level4" depend_class="elements_list" />
 			<field name="field_elements" type="textarea" default="1::Yes%% 0::No%% " class="required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" />
+			
+			<field name="" type="separator" default="CASCADE -- load values when another field is changed" description="Select a field whose value(s) will be used to select values in this field, the VALUE of the field will much the VALGRP of this field" level="level3" />
+			<field name="cascade_onfield" type="fields" field_type="select,selectmultiple" label="Cascade after field" description="Select field, which " 
+				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of cascade-after fields will filter values of this field and thus only by matching the 'valgrp' property of the elements of this field" tip_class="fieldgroupon" tip_img="comment.png" 
+				labelclass="label-warning" custom_prompt="FLEXI_NO_CASCADE" />
+			<field name="cascade_prompt" type="text" default="" label="Cascade prompt" description="A prompt to ask user to select a value in the cascade-after field, so that this field loads dependent values" />
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			<field name="usefirstoption" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC" class="btn-group btn-group-yesno">
@@ -83,12 +91,6 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-selectmultiple-cascade" repeat="1" icon_class="icon-link" label="Cascade" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" default="If field depends on the value of another select file, then please select it here, and make sure &lt;br/&gt;-- you have added property 'valgrp' in the options of this field, or a DB column '... AS valgrp' &lt;br/&gt; The 'valgrp' property of this field will match the 'value' property of the 'Cascade on field'" level="level4" />
-			<field name="cascade_onfield" type="fields" field_type="select,selectmultiple" label="Cascade on field" description="Select field, which FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE_DESC" custom_prompt="FLEXI_NO_CASCADE" />
-			<field name="cascade_prompt" type="text" default="" label="Select prompt" description="A prompt to ask user to select a value in the cascade-on field" />
-		</fieldset>
-				
 		<fieldset name="group-selectmultiple-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />

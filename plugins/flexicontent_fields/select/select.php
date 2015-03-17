@@ -276,6 +276,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			$and_clause = '';
 			if (isset($field->valgrps))
 			{
+				// Filter out values not in the the value group
 				$db = JFactory::getDBO();
 				$_valgrps = explode(',', $field->valgrps);
 				foreach($_valgrps as & $vg) $vg = $db->Quote($vg);
@@ -284,30 +285,31 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			}
 			$item_pros = true;
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props, $item_pros, false, $and_clause);
+			if ( !$elements ) {
+				$field->html = $ajax ? '<option selected="selected" value="" disabled="disabled">No data found</option>' : JText::_('FLEXI_FIELD_INVALID_QUERY');
+				return;
+			}
 		}
 		
 		else  // Elements mode
 		{
-			if (isset($field->valgrps)) {
+			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
+			if ( !$elements ) {
+				$field->html = $ajax ? '<option selected="selected" value="" disabled="disabled">No data found</option>' : JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+				return;
+			}
+			if (isset($field->valgrps))
+			{
+				// Filter out values not in the the value group
 				$_valgrps = is_array($field->valgrps) ? $field->valgrps : explode(',', $field->valgrps);
 				$_valgrps = array_flip($_valgrps);
-				$_elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
-				$elements = array();
-				foreach($_elements as $element) {
-					if (!isset($_valgrps[$element->valgroup])) continue;
-					$elements[] = $element;
-				}
-			} else {
-				$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
+				$_elements = array();
+				foreach($elements as $element)
+					if (isset($_valgrps[$element->valgroup]))  $_elements[$element->value] = $element;
+				$elements = $_elements;
 			}
 		}
 		
-		if ( !$elements ) {
-			$field->html = $ajax ?
-				'<option selected="selected" value="">No data found</option>' :
-				JText::_($sql_mode ? 'FLEXI_FIELD_INVALID_QUERY' : 'FLEXI_FIELD_INVALID_ELEMENTS') ;
-			return;
-		}
 		
 		// Display as (single) select
 		$display_as_select = 1;
