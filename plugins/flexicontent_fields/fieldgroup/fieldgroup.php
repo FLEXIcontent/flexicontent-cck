@@ -92,7 +92,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				$grpfield->value[$n] = null;
 			}
 			$grpfield->ingroup = 1;
-			FLEXIUtilities::call_FC_Field_Func($grpfield->field_type, 'onDisplayField', array(&$grpfield, &$item, true));
+			$grpfield->item_id = $item->id;
+			FLEXIUtilities::call_FC_Field_Func($grpfield->field_type, 'onDisplayField', array(&$grpfield, &$item));
 			unset($grpfield->ingroup);
 		}
 		

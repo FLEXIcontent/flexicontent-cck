@@ -40,7 +40,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 	// *******************************************
 	
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item, $ajax=0)
+	function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
@@ -48,6 +48,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$use_ingroup = 0;  // Not supported
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
+		$ajax = !empty($field->isAjax);
 		
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
@@ -93,7 +94,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		static $select2_added = null;
 	  if ( $use_select2 && $select2_added === null ) $select2_added = flexicontent_html::loadFramework('select2');
 		
-		// Parameters for DISPLAY without using select2 JS
+		// Parameters for DISPLAY with / without using select2 JS
 		$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
 		$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
 		$size = $field->parameters->get( 'size', 6 ) ;
@@ -278,12 +279,14 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		// Get indexed element values
 		// **************************
 		
+		$ismul = 1;
 		if ($sql_mode)  // SQL query mode
 		{
 			$and_clause = '';
-			if (isset($field->valgrps))
+			if ($cascade_onfield) 
 			{
 				// Filter out values not in the the value group
+				$field->valgrps = isset($field->valgrps) ? $field->valgrps : array();
 				$db = JFactory::getDBO();
 				$_valgrps = explode(',', $field->valgrps);
 				foreach($_valgrps as & $vg) $vg = $db->Quote($vg);
@@ -292,8 +295,8 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			}
 			$item_pros = true;
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props, $item_pros, false, $and_clause);
-			if ( !$elements ) {
-				$field->html = $ajax ? '<option selected="selected" value="" disabled="disabled">No data found</option>' : JText::_('FLEXI_FIELD_INVALID_QUERY');
+			if ( !is_array($elements) ) {
+				$field->html = $ajax ? '<option '.($ismul ? 'value="_field_selection_prompt_" disabled="disabled"' : 'value="" ').'>'.JText::_('FLEXI_FIELD_INVALID_QUERY').'</option>' : JText::_('FLEXI_FIELD_INVALID_QUERY');
 				return;
 			}
 		}
@@ -301,13 +304,14 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		else  // Elements mode
 		{
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
-			if ( !$elements ) {
-				$field->html = $ajax ? '<option selected="selected" value="" disabled="disabled">No data found</option>' : JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+			if ( !is_array($elements) ) {
+				$field->html = $ajax ? '<option '.($ismul ? 'value="_field_selection_prompt_" disabled="disabled"' : 'value="" ').'>'.JText::_('FLEXI_FIELD_INVALID_ELEMENTS').'</option>' : JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
 				return;
 			}
-			if (isset($field->valgrps))
+			if ($cascade_onfield) 
 			{
 				// Filter out values not in the the value group
+				$field->valgrps = isset($field->valgrps) ? $field->valgrps : array();
 				$_valgrps = is_array($field->valgrps) ? $field->valgrps : explode(',', $field->valgrps);
 				$_valgrps = array_flip($_valgrps);
 				$_elements = array();
@@ -346,21 +350,22 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		// Create form field options
 		$options = array();
 		
-		// CASE 1: Either add the field options (non-cascaded field or AJAX request (cascade)
-		if ($cascade_onfield || !$cascade_onfield || $ajax) {
-			// Add the select prompt internally if not using JS
-			if ($usefirstoption && !$use_jslib) {   // NOTE: $select2_added was not calculated, we will not use it
-				$options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
+		if ($cascade_onfield && !count($elements)) {
+			// CASE: Add cascade prompt, asking user to select value on the cascade-from field
+			if (!$ajax)
+				$options[] = JHTML::_('select.option', ($ismul ? '_field_selection_prompt_' : ''), $cascade_prompt, 'value', 'text', ($ismul ? 'disabled' : null));
+			else {
+				$field->html = '<option '.($ismul ? 'value="_field_selection_prompt_" disabled="disabled"' : 'value="" ').'>No data found</option>';
+				return;
 			}
-			foreach ($elements as $element) $options[] = JHTML::_('select.option', $element->value, $element->text);
-			$_msg = '';
+		}
+		else if ($usefirstoption) {
+			// CASE: Add selection prompt
+			$options[] = JHTML::_('select.option', ($ismul ? '_field_selection_prompt_' : ''), JText::_($firstoptiontext), 'value', 'text', ($ismul ? 'disabled' : null));
 		}
 		
-		// CASE 2: Or add cascade prompt, asking user to select value on the depend-from field
-		else {
-			//$options[] = JHTML::_('select.option', '', $cascade_prompt);
-			$_msg = $cascade_prompt;
-		}
+		// Add any (allowed / filtered) elements
+		foreach ($elements as $element) $options[] = JHTML::_('select.option', $element->value, $element->text);
 		
 		
 		// Render the drop down select
@@ -386,12 +391,6 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 				$field->html = JHTML::_('select.options', $options, 'value', 'text', $value, $translate = false);
 			}
 		}
-			
-		// Add the select prompt externally
-		if ($cascade_onfield)
-			$field->html[0] = $field->html[0] . '<span class="fcselect_lbl">'.$_msg.'</span>';
-		else if ($usefirstoption && ($use_jslib && $select2_added))
-			$field->html[0] = $field->html[0] . '<span class="fcselect_lbl">'.JText::_($firstoptiontext).'</span>';
 		
 		if ($ajax) {
 			return; // Done
@@ -441,7 +440,8 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$field->value = !empty($_fieldvalues[$item_id][$field_id]) ? $_fieldvalues[$item_id][$field_id] : array();
 		
 		// Render field
-		$this->onDisplayField($field, $item, 1);
+		$field->isAjax = 1;
+		$this->onDisplayField($field, $item);
 		
 		// Output the field
 		echo $field->html;

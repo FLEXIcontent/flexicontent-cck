@@ -1491,13 +1491,13 @@ class FlexicontentFields
 				$db->setQuery($query);
 				$results = $db->loadObjectList('value');
 			}
-			if ($lang_filter_values) {
+			if ($results && $lang_filter_values) {
 				foreach ($results as $val=>$result) {
 					$results[$val]->text  = JText::_($result->text);  // the text label
 				}
 			}
 			
-			// !! CHECK: DB query failed or produced no data
+			// !! CHECK: DB query failed or produced an error (AN EMPTY ARRAY IS NOT AN ERROR)
 			if (!$query || !is_array($results)) {
 				if ( !$canCache ) return false;
 				else return ($_elements_cache[$field->id] = false);

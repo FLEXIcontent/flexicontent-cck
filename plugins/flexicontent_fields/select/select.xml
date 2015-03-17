@@ -63,7 +63,7 @@
 			
 			<field name="" type="separator" default="CASCADE -- load values when another field is changed" description="Select a field whose value(s) will be used to select values in this field, the VALUE of the field will much the VALGRP of this field" level="level3" />
 			<field name="cascade_onfield" type="fields" field_type="select,selectmultiple" label="Cascade after field" description="Select field, which " 
-				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of cascade-after fields will filter values of this field and thus only by matching the 'valgrp' property of the elements of this field" tip_class="fieldgroupon" tip_img="comment.png" 
+				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of cascade-after fields will filter values of this field and thus only by matching the 'valgrp' property of the elements of this field" tip_class="" tip_img="comment.png" 
 				labelclass="label-warning" custom_prompt="FLEXI_NO_CASCADE" />
 			<field name="cascade_prompt" type="text" default="" label="Cascade prompt" description="A prompt to ask user to select a value in the cascade-after field, so that this field loads dependent values" />
 			
@@ -72,7 +72,7 @@
 				<option value="0" show_list="" hide_list="use_prompt">FLEXI_NO</option>
 				<option value="1" show_list="use_prompt" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="firstoptiontext" type="text" default="FLEXI_SELECT" label="FLEXI_FIELD_FIRST_OPTION_TEXT" depend_class="use_prompt" description="FLEXI_FIELD_FIRST_OPTION_TEXT_DESC" />
+			<field name="firstoptiontext" type="text" default="FLEXI_PLEASE_SELECT" label="FLEXI_FIELD_FIRST_OPTION_TEXT" depend_class="use_prompt" description="FLEXI_FIELD_FIRST_OPTION_TEXT_DESC" />
 			<field name="use_jslib" type="radio" default="1" label="FLEXI_USE_JS_FORM_FIELD" description="FLEXI_USE_JS_FORM_FIELD_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">select2</option>
