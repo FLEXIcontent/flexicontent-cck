@@ -274,7 +274,7 @@ class FlexicontentFields
 		//if ($db->getErrorNum()) echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 		
 		$fieldvalues = array();
-		foreach ($values as $v) {
+		if ($values) foreach ($values as $v) {
 			$fieldvalues[$v->item_id][$f->field_id][] = $v->value;
 		}
 		return $fieldvalues;
@@ -530,7 +530,7 @@ class FlexicontentFields
 		// ***********************************************************************************************************
 		foreach($items as $item) {
 			$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
-			$field->item_id = (int)$item->id;
+			$field->item_id = (int)$item->id;  // Some code may make use of this
 			
 			// CHECK IF only rendering single field object for a single item  -->  thus we need to use custom values if these were given !
 			// NOTE: values are overwritten by onDisplayCoreFieldValue() of CORE fields, and only used by onDisplayFieldValue() of CUSTOM fields
@@ -1440,7 +1440,7 @@ class FlexicontentFields
 	// **************************************************************************************
 	
 	// Common method to get the allowed element values (field values with index,label,... properties) for fields that use indexed values
-	static function indexedField_getElements(&$field, $item, $extra_props=array(), &$item_pros=true, $create_filter=false, $and_clause='')
+	static function indexedField_getElements(&$field, $item, $extra_props=array(), &$item_pros=true, $create_filter=false, $and_clause=false)
 	{
 		static $_elements_cache = null;
 		if ( isset($_elements_cache[$field->id]) ) return $_elements_cache[$field->id];
@@ -1499,8 +1499,8 @@ class FlexicontentFields
 			
 			// !! CHECK: DB query failed or produced an error (AN EMPTY ARRAY IS NOT AN ERROR)
 			if (!$query || !is_array($results)) {
-				if ( !$canCache ) return false;
-				else return ($_elements_cache[$field->id] = false);
+				if ( $canCache && !$and_clause ) $_elements_cache[$field->id] = false;
+				return false;
 			}
 			
 		} else { // Elements mode, parameter field_elements contain list of allowed values
@@ -1542,7 +1542,7 @@ class FlexicontentFields
 		}
 		
 		// Return found elements, caching them if possible (if no item specific elements are used)
-		if ( $canCache ) $_elements_cache[$field->id] = & $results;
+		if ( $canCache && !$and_clause ) $_elements_cache[$field->id] = & $results;
 		return $results;
 	}
 	
@@ -1967,7 +1967,7 @@ class FlexicontentFields
 		
 		// A null indicates to retrieve values
 		if ($values===null) {
-			$items_values = FlexicontentFields::searchIndex_getFieldValues($field,$item, $for_advsearch);
+			$items_values = FlexicontentFields::searchIndex_getFieldValues($field, $item, $for_advsearch);
 		} else {
 			$items_values = !is_array($values) ? array($values) : $values;
 			$items_values = array($field->item_id => $items_values);

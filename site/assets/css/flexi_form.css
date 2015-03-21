@@ -494,8 +494,9 @@ body.contentpane  {
 	font-weight:bold;
 }
 .fcsep_level2 {
-	background-color: #9fd1f2;
-	color: #3a77ad;
+	background-color: #7fc1ff;
+	color: #3a57ad;
+	/*font-weight:bold;*/
 	padding: 0.4em 1%;
 	margin: 4px 0% 2px 0%;
 	display: block;
@@ -504,7 +505,7 @@ body.contentpane  {
 	clear: both;
 	float:left;
 	width:98%;
-	font-size:13px;
+	font-size:12px;
 }
 
 /* prevent margin when parameter list starts */
@@ -526,8 +527,8 @@ table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
 div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-of-type > div > .fcsep_level1, div.control-group:first-of-type > div > .fcsep_level2 {margin-top:0px;}
 
 .fcsep_level3 {
-	background-color: #d0d0d0;
-	color: black;
+	background-color: #9fe1ff;
+	color: #3a579d;
 	padding: 0.4em 2em;
 	margin: 5px 5% 1px;
 	display: block;

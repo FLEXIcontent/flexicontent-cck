@@ -914,6 +914,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 }
 /* FIELD-GROUP: label of grouped field */
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label {
+	max-width: 150px;
 	width: 18% !important;
 	padding: 4px 1% !important;
 	margin: 0 1% 0 0 !important;

@@ -71,18 +71,11 @@ class FlexicontentControllerFields extends FlexicontentController
 		$field_id		= (int)$cid[0];
 		
 		// calculate access
-		if (FLEXI_J16GE) {
-			$asset = 'com_flexicontent.field.' . $field_id;
-			if (!$field_id) {
-				$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
-			} else {
-				$is_authorised = $user->authorise('flexicontent.editfield', $asset);
-			}
-		} else if (FLEXI_ACCESS && $user->gid < 25) {
-			$is_authorised = FAccess::checkAllContentAccess('com_content','edit','users', $user->gmid, 'field', $field_id);
+		$asset = 'com_flexicontent.field.' . $field_id;
+		if (!$field_id) {
+			$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
 		} else {
-			// Only admin or super admin can save fields
-			$is_authorised = $user->gid >= 24;
+			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
 		}
 		
 		// check access
@@ -92,7 +85,7 @@ class FlexicontentControllerFields extends FlexicontentController
 			return;
 		}
 		
-		$data = FLEXI_J16GE ? $post['jform'] : $post;
+		$data = $post['jform'];
 		if ( $model->store($data) )
 		{
 			switch ($task)
@@ -165,15 +158,8 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 		
 		// calculate access
-		if (FLEXI_J16GE) {
-			$asset = 'com_flexicontent.field.' . $field_id;
-			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
-		} else if (FLEXI_ACCESS && $user->gid < 25) {
-			$is_authorised = FAccess::checkAllContentAccess('com_content','publish','users', $user->gmid, 'field', $field_id);
-		} else {
-			// Only admin or super admin can publish fields
-			$is_authorised = $user->gid >= 24;
-		}
+		$asset = 'com_flexicontent.field.' . $field_id;
+		$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
 		
 		// check access
 		if ( !$is_authorised ) {
@@ -226,15 +212,8 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 		
 		// calculate access
-		if (FLEXI_J16GE) {
-			$asset = 'com_flexicontent.field.' . $field_id;
-			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
-		} else if (FLEXI_ACCESS && $user->gid < 25) {
-			$is_authorised = FAccess::checkAllContentAccess('com_content','publish','users', $user->gmid, 'field', $field_id);
-		} else {
-			// Only admin or super admin can unpublish fields
-			$is_authorised = $user->gid >= 24;
-		}
+		$asset = 'com_flexicontent.field.' . $field_id;
+		$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
 		
 		// check access
 		if ( !$is_authorised ) {
@@ -282,15 +261,8 @@ class FlexicontentControllerFields extends FlexicontentController
 			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_TOGGLE_PROPERTIES_THESE_FIELDS' ));*/
 		} else {
 			
-			if (FLEXI_J16GE) {
-				$asset = 'com_flexicontent.field.' . $field_id;
-				$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
-			} else if (FLEXI_ACCESS && $user->gid < 25) {
-				$is_authorised = FAccess::checkAllContentAccess('com_content','publish','users', $user->gmid, 'field', $field_id);
-			} else {
-				// Only admin or super admin can unpublish fields
-				$is_authorised = $user->gid >= 24;
-			}
+			$asset = 'com_flexicontent.field.' . $field_id;
+			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
 			
 			if ( !$is_authorised ) {
 				$msg = '';
@@ -345,15 +317,8 @@ class FlexicontentControllerFields extends FlexicontentController
 			JError::raiseNotice(500, JText::_( 'FLEXI_YOU_CANNOT_REMOVE_CORE_FIELDS' ));
 		} else {
 			
-			if (FLEXI_J16GE) {
-				$asset = 'com_flexicontent.field.' . $field_id;
-				$is_authorised = $user->authorise('flexicontent.deletefield', $asset);
-			} else if (FLEXI_ACCESS && $user->gid < 25) {
-				$is_authorised = FAccess::checkAllContentAccess('com_content','delete','users', $user->gmid, 'field', $field_id);
-			} else {
-				// Only admin or super admin can delete fields
-				$is_authorised = $user->gid >= 24;
-			}
+			$asset = 'com_flexicontent.field.' . $field_id;
+			$is_authorised = $user->authorise('flexicontent.deletefield', $asset);
 			
 			if ( !$is_authorised ) {
 				$msg = '';
@@ -411,23 +376,11 @@ class FlexicontentControllerFields extends FlexicontentController
 		$field_id = (int)$cid[0];
 
 		// calculate access
-		if (FLEXI_J16GE) {
-			$asset = 'com_flexicontent.field.' . $field_id;
-			if (!$field_id) {
-				$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
-			} else {
-				$is_authorised = $user->authorise('flexicontent.editfield', $asset);
-			}
-		} else if (FLEXI_ACCESS && $user->gid < 25) {
-			$perms = FlexicontentHelperPerm::getPerm();
-			if (!$field_id) {
-				$is_authorised = $perms->CanFields;  // For FLEXIAccess consider MANAGE privilege as CREATE Field privilege
-			} else {
-				$is_authorised = FAccess::checkAllContentAccess('com_content','edit','users', $user->gmid, 'field', $field_id);
-			}
+		$asset = 'com_flexicontent.field.' . $field_id;
+		if (!$field_id) {
+			$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
 		} else {
-			// Only admin or super admin can edit fields
-			$is_authorised = $user->gid >= 24;
+			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
 		}
 		
 		// check access
@@ -473,15 +426,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		
 		// calculate access
-		if (FLEXI_J16GE) {
-			$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
-		} else if (FLEXI_ACCESS && $user->gid < 25) {
-			$perms = FlexicontentHelperPerm::getPerm();
-			$is_authorised = $perms->CanFields;  // For FLEXIAccess consider MANAGE privilege as REORDER Field privilege
-		} else {
-			// Only admin or super admin can reorder fields
-			$is_authorised = $user->gid >= 24;
-		}
+		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
 		
 		// check access
 		if ( !$is_authorised ) {
@@ -540,15 +485,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		$order = JRequest::getVar( 'order', array(0), 'post', 'array' );
 		
 		// calculate access
-		if (FLEXI_J16GE) {
-			$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
-		} else if (FLEXI_ACCESS && $user->gid < 25) {
-			$perms = FlexicontentHelperPerm::getPerm();
-			$is_authorised = $perms->CanFields;  // For FLEXIAccess consider MANAGE privilege as REORDER Field privilege
-		} else {
-			// Only admin or super admin can reorder fields
-			$is_authorised = $user->gid >= 24;
-		}
+		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
 		
 		// check access
 		if ( !$is_authorised ) {
@@ -582,15 +519,8 @@ class FlexicontentControllerFields extends FlexicontentController
 		$field_id = (int)$cid[0];
 		
 		// calculate access
-		if (FLEXI_J16GE) {
-			$asset = 'com_flexicontent.field.' . $field_id;
-			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
-		} else if (FLEXI_ACCESS && $user->gid < 25) {
-			$is_authorised = FAccess::checkAllContentAccess('com_content','publish','users', $user->gmid, 'field', $field_id);
-		} else {
-			// Only admin or super admin can change View Level of fields
-			$is_authorised = $user->gid >= 24;
-		}
+		$asset = 'com_flexicontent.field.' . $field_id;
+		$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
 		
 		// check access
 		if ( !$is_authorised ) {
@@ -599,22 +529,8 @@ class FlexicontentControllerFields extends FlexicontentController
 			return;
 		}
 		
-		if (FLEXI_J16GE) {
-			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
-			$access = $accesses[$field_id];
-		} else {
-			if ($task == 'accesspublic') {
-				$access = 0;
-			} elseif ($task == 'accessregistered') {
-				$access = 1;
-			} else {
-				if (FLEXI_ACCESS) {
-					$access = 3;
-				} else {
-					$access = 2;
-				}
-			}
-		}
+		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+		$access = $accesses[$field_id];
 		
 		if(!$model->saveaccess( $field_id, $access )) {
 			$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
@@ -647,12 +563,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		$task  = JRequest::getVar( 'task', 'copy' );
 		
 		// calculate access
-		if (FLEXI_J16GE) {
-			$is_authorised = $user->authorise('flexicontent.copyfields', 'com_flexicontent');
-		} else {
-			// With / Without FLEXI_ACCESS there is no global privilege, so we will check publish (edit state) privilege bellow (for backend users it will be always true)
-			$is_authorised = true;
-		}
+		$is_authorised = $user->authorise('flexicontent.copyfields', 'com_flexicontent');
 		
 		// check access
 		if ( !$is_authorised ) {
@@ -682,14 +593,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		foreach ($non_core_cid as $id)
 		{
 			$asset = 'com_flexicontent.field.' . $id;
-			if (FLEXI_J16GE) {
-				$is_authorised = $user->authorise('flexicontent.editfield', $asset);
-			} else if (FLEXI_ACCESS && $user->gid < 25) {
-				$is_authorised = FAccess::checkAllContentAccess('com_content','edit','users', $user->gmid, 'field', $id);
-			} else {
-				// Only admin or super admin can copy fields
-				$is_authorised = $user->gid >= 24;
-			}
+			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
 			
 			if ($is_authorised) {
 				$auth_cid[] = $id;
@@ -721,12 +625,12 @@ class FlexicontentControllerFields extends FlexicontentController
 			$cache->clean();
 		}
 		
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+		$filter_type = $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 		if ($filter_type) {
-			$mainframe->setUserState( $option.'.fields.filter_type', '' );
+			$app->setUserState( $option.'.fields.filter_type', '' );
 			$msg .= ' '.JText::_('FLEXI_TYPE_FILTER_CLEARED_TO_VIEW_NEW_FIELDS');
 		}
 		$this->setRedirect('index.php?option=com_flexicontent&view=fields', $msg );

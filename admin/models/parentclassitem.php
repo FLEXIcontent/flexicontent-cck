@@ -2323,7 +2323,7 @@ class ParentClassItem extends JModelAdmin
 					
 					// For CORE field get the modified data, which will be used for storing in DB (these will be re-bind later)
 					if ( isset($core_via_post[$field->name]) ) {
-						$core_data_via_events[$field->name] = $postdata[$field->name][0];
+						$core_data_via_events[$field->name] = isset($postdata[$field->name][0]) ? $postdata[$field->name][0] : '';  // The validation may have skipped it !!
 					}
 					
 				} else {

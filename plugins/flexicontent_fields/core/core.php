@@ -200,7 +200,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$field->display = $pretext.'
 					<span class="fav-block">
 						'.flexicontent_html::favicon( $field, $favoured, $item ).'
-						<span id="fcfav-reponse_'.$field->item_id.'" class="fcfav-reponse">
+						<span id="fcfav-reponse_'.$item->id.'" class="fcfav-reponse">
 							<small>'.$favs.'</small>
 						</span>
 					</span>
