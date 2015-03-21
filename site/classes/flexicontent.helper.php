@@ -725,6 +725,7 @@ class flexicontent_html
 
 			case 'fancybox':
 				if ($load_jquery) flexicontent_html::loadJQuery();
+				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js' );
 				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/fancybox';
 				
@@ -866,6 +867,7 @@ class flexicontent_html
 				//var _FC_POST = ".json_encode($_POST).";
 				//var _FC_REQUEST = ".json_encode($_REQUEST).";
 				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js' );
+				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js' );
 				FLEXI_J16GE ? JText::script("FLEXI_APPLYING_FILTERING", true) : fcjsJText::script("FLEXI_APPLYING_FILTERING", true);
 				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_LIST", true) : fcjsJText::script("FLEXI_TYPE_TO_LIST", true);
 				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_FILTER", true) : fcjsJText::script("FLEXI_TYPE_TO_FILTER", true);
@@ -3428,10 +3430,10 @@ class flexicontent_html
 		if ( $mu_addcss_radded )
 		{
 		  $nowdate_secs = time();
-			$ra_timeframes = $params->get('mu_ra_timeframe_intervals', '24h,2d,7d,1m,3m,1y,3y');
+			$ra_timeframes = trim($params->get('mu_ra_timeframe_intervals', '24h,2d,7d,1m,3m,1y,3y'));
 			$ra_timeframes = preg_split("/\s*,\s*/u", $ra_timeframes);
 			
-			$ra_names = $params->get('mu_ra_timeframe_names', 'FLEXI_24H_RA , FLEXI_2D_RA , FLEXI_7D_RA , FLEXI_1M_RA , FLEXI_3M_RA , FLEXI_1Y_RA , FLEXI_3Y_RA');
+			$ra_names = trim($params->get('mu_ra_timeframe_names', 'FLEXI_24H_RA , FLEXI_2D_RA , FLEXI_7D_RA , FLEXI_1M_RA , FLEXI_3M_RA , FLEXI_1Y_RA , FLEXI_3Y_RA'));
 			$ra_names = preg_split("/\s*,\s*/u", $ra_names);
 			
 			$unit_hour_map = array('h'=>1, 'd'=>24, 'm'=>24*30, 'y'=>24*365);
@@ -3457,10 +3459,10 @@ class flexicontent_html
 		if ( $mu_addcss_rupdated )
 		{
 		  $nowdate_secs = time();
-			$ru_timeframes = $params->get('mu_ru_timeframe_intervals', '24h,2d,7d,1m,3m,1y,3y');
+			$ru_timeframes = trim($params->get('mu_ru_timeframe_intervals', '24h,2d,7d,1m,3m,1y,3y'));
 			$ru_timeframes = preg_split("/\s*,\s*/u", $ru_timeframes);
 			
-			$ru_names = $params->get('mu_ru_timeframe_names', 'FLEXI_24H_RU , FLEXI_2D_RU , FLEXI_7D_RU , FLEXI_1M_RU , FLEXI_3M_RU , FLEXI_1Y_RU , FLEXI_3Y_RU');
+			$ru_names = trim($params->get('mu_ru_timeframe_names', 'FLEXI_24H_RU , FLEXI_2D_RU , FLEXI_7D_RU , FLEXI_1M_RU , FLEXI_3M_RU , FLEXI_1Y_RU , FLEXI_3Y_RU'));
 			$ru_names = preg_split("/\s*,\s*/u", $ru_names);
 			
 			$unit_hour_map = array('h'=>1, 'd'=>24, 'm'=>24*30, 'y'=>24*365);
