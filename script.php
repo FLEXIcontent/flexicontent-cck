@@ -566,6 +566,13 @@ class com_flexicontentInstallerScript
 						if (!empty($_querycols)) $queries[] = $_query . implode(",", $_querycols);
 					}
 					
+					if ($fi_rels_tbl_exists && !array_key_exists('suborder', $tbl_fields['#__flexicontent_fields_item_relations'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `suborder` INT(11) NOT NULL DEFAULT '1' AFTER `valueorder`";
+					}
+					if ($fi_vers_tbl_exists && !array_key_exists('suborder', $tbl_fields['#__flexicontent_items_versions'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `suborder` INT(11) NOT NULL DEFAULT '1' AFTER `valueorder`";
+					}
+					
 					/*if ($fi_rels_tbl_exists && !array_key_exists('qindex01', $tbl_fields['#__flexicontent_fields_item_relations'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `qindex01` MEDIUMTEXT NULL DEFAULT NULL AFTER `value`";
 					}

@@ -860,23 +860,34 @@ VALUES
 			
 			foreach($missing_indexes as $tblname => $indexnames)
 			{
-				$index_cols = array();
+				$index_cmds = array();
 				if ( isset($indexnames['__indexing_started__']) ) continue;
-				foreach($indexnames as $indexname => $size) {
-					$size_str = $size ? "(".$size.")" : "";
-					$index_cols[]	= " ADD INDEX ".$indexname."(`".$indexname."`" .$size_str. ")";
+				foreach($indexnames as $indexname => $iconf) {
+					if (!is_array($iconf)) {
+						$indexlen = $iconf ? "(".$iconf.")" : "";
+						$index_cmds[] = " ADD INDEX " . $indexname . "(`".$indexname."`" .$indexlen. ")";
+					} else {
+						$indexdrop = !empty($iconf['custom_add']) ? $iconf['custom_drop'].", " : "";
+						$indexadd  = !empty($iconf['custom_add']) ? $iconf['custom_add'] : " ADD INDEX " . $indexname;
+						$_col_list = [];
+						foreach($iconf['cols'] as $indexcol => $len) {
+							$indexlen  = $len ? "(".$len.")" : "";
+							$_col_list[] = "`".$indexcol."`" .$indexlen;
+						}
+						$index_cmds[]	= $indexdrop . $indexadd . "(". implode(", ", $_col_list) .")";
+					}
 				}
 				
 				// For MyISAM the table is copied for the purpose of adding indexes and then old table is dropped
 				// so it is better to add ALL table indexes via single command ?
 				// For InnoDB in MySQL 5.1+, table is not copied so these when adding indexes it is better to have InnoDB tables
-				if ( !empty($index_cols) ) {
+				if ( !empty($index_cmds) ) {
 					$file = JPATH_SITE.DS.'tmp'.DS.'tbl_indexes_'.$tblname;
 					$file_contents = "".time();
 					JFile::write($file, $file_contents);
 					
 					$query  = "ALTER TABLE `#__".$tblname."` ";
-					$query .= implode(', ', $index_cols);
+					$query .= implode(', ', $index_cmds);
 					$db->setQuery($query);
 					
 					try { $result = $db->query(); }
@@ -1154,7 +1165,7 @@ VALUES
 			if($row->version > $lastversion)
 			{
 				// Get field values of the current item version
-				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder,f.iscore "
+				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder,fir.suborder,f.iscore "
 						." FROM #__flexicontent_fields_item_relations as fir"
 						." JOIN #__flexicontent_fields as f on f.id=fir.field_id "
 						." WHERE fir.item_id=".$row->id." AND f.iscore=0";  // old versions stored categories & tags into __flexicontent_fields_item_relations
@@ -1173,6 +1184,7 @@ VALUES
 				$f->id					= 1;
 				$f->iscore			= 1;
 				$f->valueorder	= 1;
+				$f->suborder    = 1;
 				$f->field_type	= "maintext";
 				$f->name				= "text";
 				$f->value				= $row->introtext;
@@ -1198,6 +1210,7 @@ VALUES
 				$f->id					= 13;
 				$f->iscore			= 1;
 				$f->valueorder	= 1;
+				$f->suborder    = 1;
 				$f->version		= (int)$row->version;
 				$f->value		= serialize($categories);
 				if ($add_cats) $fields[] = $f;
@@ -1210,6 +1223,7 @@ VALUES
 				$f->id					= 14;
 				$f->iscore			= 1;
 				$f->valueorder	= 1;
+				$f->suborder    = 1;
 				$f->version		= (int)$row->version;
 				$f->value		= serialize($tags);
 				if ($add_tags) $fields[] = $f;
@@ -1221,9 +1235,10 @@ VALUES
 					$obj->field_id   = $field->id;
 					$obj->item_id    = $row->id;
 					$obj->valueorder = $field->valueorder;
+					$obj->suborder   = $field->suborder;
 					$obj->version    = (int)$row->version;
 					$obj->value      = $field->value;
-					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder."<br />";
+					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder.",suborder : ".$obj->suborder."<br />";
 					//echo "inserting into __flexicontent_items_versions<br />";
 					$db->insertObject('#__flexicontent_items_versions', $obj);
 					if( !$field->iscore ) {

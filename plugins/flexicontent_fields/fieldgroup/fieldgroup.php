@@ -344,7 +344,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$grpfields = $this->getGroupFields($field);
 		
 		// Get values of fields making sure that also empty values are created too
-		$max_count = 1;
+		$max_count = 0;
 		$this->getGroupFieldsValues($grpfields, $item, $max_count);
 		
 		foreach($grpfields as $grpfield) {
@@ -443,16 +443,18 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$item->fieldvalues = $itemmodel->getCustomFieldsValues($item->id);
 		}
 		
-		$max_count = 1;
 		$_grpfields = array();
 		foreach($grpfields as $field_id => $grpfield)
 		{
 			// Set field values
-			$grpfield->value = isset($item->fieldvalues[$field_id]) ? $item->fieldvalues[$field_id] : array();
-			$grpfield->value = is_array($grpfield->value) ? $grpfield->value : array($grpfield->value);
+			if ( isset($item->fieldvalues[$field_id]) ) {
+				$grpfield->value = is_array($item->fieldvalues[$field_id])  ?  $item->fieldvalues[$field_id]  :  array($item->fieldvalues[$field_id]);
+			} else {
+				$grpfield->value = null;
+			}
 			
 			// Update max value count
-			$value_count = count($grpfield->value);
+			$value_count = is_array($grpfield->value) ? count($grpfield->value) : 0;
 			$max_count = $value_count > $max_count ? $value_count : $max_count;
 			
 			// Create field parameters (for 'custom' fields loadFieldConfig() is optional)

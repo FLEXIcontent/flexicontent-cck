@@ -2468,11 +2468,15 @@ class ParentClassItem extends JModelAdmin
 					$obj->field_id 		= $field->id;
 					$obj->item_id 		= $item->id;
 					$obj->valueorder	= $i;
+					$obj->suborder    = 1;
 					$obj->version			= (int)$last_version+1;
 					$use_ingroup = $field->parameters->get('use_ingroup', 0);
 					
 					// Serialize the properties of the value, normally this is redudant, since the field must have had serialized the parameters of each value already
-					$obj->value = is_array($postvalue) ? serialize($postvalue) : $postvalue;
+					if ( !empty($field->use_suborder) && is_array($postvalue) )
+						$obj->value = null;
+					else
+						$obj->value = is_array($postvalue) ? serialize($postvalue) : $postvalue;
 					//$obj->qindex01 = isset($qindex_values['qindex01']) ? $qindex_values['qindex01'] : NULL;
 					//$obj->qindex02 = isset($qindex_values['qindex02']) ? $qindex_values['qindex02'] : NULL;
 					//$obj->qindex03 = isset($qindex_values['qindex03']) ? $qindex_values['qindex03'] : NULL;
@@ -2480,27 +2484,51 @@ class ParentClassItem extends JModelAdmin
 					// -- a. Add versioning values, but do not version the 'hits' or 'state' or 'voting' fields
 					if ($record_versioned_data && $field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting') {
 						// Insert only if value non-empty
-						if ( isset($obj->value) && ($use_ingroup || JString::strlen(trim($obj->value))) )
+						if ( !empty($field->use_suborder) && is_array($postvalue) ) {
+							$obj->suborder = 1;
+							foreach ($postvalue as $v) {
+								$obj->value = $v;
+								if (! $mval_query) $this->_db->insertObject('#__flexicontent_items_versions', $obj);
+								else $ver_query_vals[] = "("
+									.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$obj->version. "," .$this->_db->Quote($obj->value)
+								.")";
+								$obj->suborder++;
+							}
+							unset($v);
+						}
+						else if ( isset($obj->value) && ($use_ingroup || strlen(trim($obj->value))) )
 						{
 							if (! $mval_query) $this->_db->insertObject('#__flexicontent_items_versions', $obj);
 							else $ver_query_vals[] = "("
-								.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->version. "," .$this->_db->Quote($obj->value)
+								.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$obj->version. "," .$this->_db->Quote($obj->value)
 								//. "," .$this->_db->Quote($obj->qindex01) . "," .$this->_db->Quote($obj->qindex02) . "," .$this->_db->Quote($obj->qindex03)
 							.")";
 						}
 					}
-					//echo $field->field_type." - ".$field->name." - ".JString::strlen(trim($obj->value))." ".$field->iscore."<br/>";
+					//echo $field->field_type." - ".$field->name." - ".strlen(trim($obj->value))." ".$field->iscore."<br/>";
 					
 					// -- b. If item is new OR version is approved, AND field is not core (aka stored in the content table or in special table), then add field value to field values table
 					if(	( $isnew || $data['vstate']==2 ) && !$field->iscore )
 					{
 						// UNSET version it it used only verion data table, and insert only if value non-empty
 						unset($obj->version);
-						if ( isset($obj->value) && ($use_ingroup || JString::strlen(trim($obj->value))) )
+						if ( !empty($field->use_suborder) && is_array($postvalue) ) {
+							$obj->suborder = 1;
+							foreach ($postvalue as $v) {
+								$obj->value = $v;
+								if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+								else $rel_query_vals[] = "("
+									.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$this->_db->Quote($obj->value)
+								.")";
+								$obj->suborder++;
+							}
+							unset($v);
+						}
+						else if ( isset($obj->value) && ($use_ingroup || strlen(trim($obj->value))) )
 						{
 							if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 							else $rel_query_vals[] = "("
-								.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$this->_db->Quote($obj->value)
+								.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$this->_db->Quote($obj->value)
 								//. "," .$this->_db->Quote($obj->qindex01) . "," .$this->_db->Quote($obj->qindex02) . "," .$this->_db->Quote($obj->qindex03)
 							.")";
 							
@@ -2511,7 +2539,7 @@ class ParentClassItem extends JModelAdmin
 									$obj->item_id = $t_item_id;
 									if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 									else $rel_query_vals[] = "("
-										.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$this->_db->Quote($obj->value)
+										.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->suborder. "," .$this->_db->Quote($obj->value)
 										//. "," .$this->_db->Quote($obj->qindex01) . "," .$this->_db->Quote($obj->qindex02) . "," .$this->_db->Quote($obj->qindex03)
 									.")";
 								}
@@ -2529,7 +2557,7 @@ class ParentClassItem extends JModelAdmin
 			
 			if ( count($ver_query_vals) ) {
 				$query = "INSERT INTO #__flexicontent_items_versions "
-					." (field_id,item_id,valueorder,version,value"
+					." (field_id,item_id,valueorder,suborder,version,value"
 					//.",qindex01,qindex02,qindex03"
 					.") VALUES "
 					."\n".implode(",\n", $ver_query_vals);
@@ -2545,7 +2573,7 @@ class ParentClassItem extends JModelAdmin
 			
 			if ( count($rel_query_vals) ) {
 				$query = "INSERT INTO #__flexicontent_fields_item_relations "
-					." (field_id,item_id,valueorder,value"
+					." (field_id,item_id,valueorder,suborder,value"
 					//.",qindex01,qindex02,qindex03"
 					.") VALUES "
 					."\n".implode(",\n", $rel_query_vals);
@@ -2565,6 +2593,7 @@ class ParentClassItem extends JModelAdmin
 				$obj->field_id 		= -2;  // ID of Fake Field used to contain item properties not having a corresponding CORE field
 				$obj->item_id 		= $item->id;
 				$obj->valueorder	= 1;
+				$obj->suborder	  = 1;
 				$obj->version			= (int)$last_version+1;
 				
 				$item_data = array();
@@ -2586,6 +2615,7 @@ class ParentClassItem extends JModelAdmin
 				$obj->field_id 		= -1;  // ID of Fake Field used to contain the Joomfish translated item data
 				$obj->item_id 		= $item->id;
 				$obj->valueorder	= 1;
+				$obj->suborder    = 1;
 				$obj->version			= (int)$last_version+1;
 				
 				$item_lang = substr($item->language ,0,2);
@@ -2902,7 +2932,7 @@ class ParentClassItem extends JModelAdmin
 		$this->_db->query();
 		
 		// load field values from the version to restore
-		$query 	= 'SELECT item_id, field_id, value, valueorder, iscore'
+		$query 	= 'SELECT item_id, field_id, value, valueorder, suborder, iscore'
 				. ' FROM #__flexicontent_items_versions as iv'
 				. ' LEFT JOIN #__flexicontent_fields as f ON iv.field_id=f.id'
 				. ' WHERE item_id = '. (int)$id
@@ -3309,11 +3339,11 @@ class ParentClassItem extends JModelAdmin
 		$cparams = $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
 		
-		$query = 'SELECT field_id, value'
+		$query = 'SELECT field_id, value, valueorder, suborder'
 			.( ($version<=0 || !$use_versioning) ? ' FROM #__flexicontent_fields_item_relations AS fv' : ' FROM #__flexicontent_items_versions AS fv' )
 			.' WHERE fv.item_id = ' . (int)$item_id
 			.( ($version>0 && $use_versioning) ? ' AND fv.version='.((int)$version) : '')
-			.' ORDER BY field_id, valueorder'
+			.' ORDER BY field_id, valueorder, suborder'
 			;
 		$this->_db->setQuery($query);
 		$rows = $this->_db->loadObjectList();
@@ -3321,8 +3351,17 @@ class ParentClassItem extends JModelAdmin
 		// Add values to cached array
 		$field_values[$item_id][$version] = array();
 		foreach ($rows as $row) {
-			$field_values[$item_id][$version][$row->field_id][] = $row->value;
+			$field_values[$item_id][$version][$row->field_id][$row->valueorder-1][$row->suborder-1] = $row->value;
 		}
+		
+		foreach ($field_values[$item_id][$version] as & $fv) {
+			foreach ($fv as & $ov) {
+				if (count($ov) == 1) $ov = reset($ov);
+			}
+			unset($ov);
+		}
+		unset($fv);
+		
 		return $field_values[$item_id][$version];
 	}
 	

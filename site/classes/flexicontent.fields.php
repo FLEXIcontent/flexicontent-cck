@@ -261,13 +261,13 @@ class FlexicontentFields
 		JArrayHelper::toInteger($field_ids);
 		JArrayHelper::toInteger($item_ids);
 		
-		$query = 'SELECT item_id, field_id, value, valueorder'
+		$query = 'SELECT item_id, field_id, value, valueorder, suborder'
 				.( $version ? ' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
 				.' WHERE item_id IN ('.implode(",", $item_ids).') '
 				.' AND field_id IN ('.implode(",", $field_ids).') '
 				.( $version ? ' AND version=' . (int)$version:'')
 				.' AND value > "" '
-				.' ORDER BY field_id, valueorder'
+				.' ORDER BY field_id, valueorder, suborder'
 				;
 		$db->setQuery($query);
 		$values = $db->loadObjectList();
@@ -275,8 +275,19 @@ class FlexicontentFields
 		
 		$fieldvalues = array();
 		if ($values) foreach ($values as $v) {
-			$fieldvalues[$v->item_id][$f->field_id][] = $v->value;
+			$fieldvalues[$v->item_id][$f->field_id][$v->valueorder - 1][$v->suborder - 1] = $v->value;
 		}
+		foreach ($fieldvalues as & $iv) {
+			foreach ($iv as & $fv) {
+				foreach ($fv as & $ov) {
+					if (count($ov) == 1) $ov = reset($ov);
+				}
+				unset($ov);
+			}
+			unset($fv);
+		}
+		unset($iv);
+		
 		return $fieldvalues;
 	}
 	
@@ -371,19 +382,6 @@ class FlexicontentFields
 			
 			// custom field values
 			$item->fieldvalues = $custom;
-			
-			// !!! ??? Remove values for no accessible fields, in case custom code tries to use them
-			// This is not best, but some template may simply check if field exists
-			// and ... then show value via custom code ??
-			/*foreach($item->fields as $field)
-				if ( !$field->has_access )  $item->fieldvalues[$field->id] = null;
-			}*/
-			
-			/*if ($item->fields) {
-				// IMPORTANT the items model and possibly other will set item PROPERTY version_id to indicate loading an item version,
-				// It is not the responisibility of this CODE to try to detect previewing of an item version, it is better left to the model
-				$item->fieldvalues = FlexicontentFields::_getFieldsvalues($item->id, $item->fields, !empty($item->version_id) ? $item->version_id : 0);
-			}*/
 		}
 		
 		return $items;
@@ -909,37 +907,6 @@ class FlexicontentFields
 		}
 		return $items;
 	}
-
-	/**
-	 * Method to get the values of the fields for an item
-	 * 
-	 * @access private
-	 * @return object
-	 * @since 1.5
-	 */
-	static function _getFieldsvalues($item, $fields, $version=0)
-	{
-		$db = JFactory::getDBO();
-		$query = 'SELECT field_id, value'
-				.( $version ? ' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
-				.' WHERE item_id = ' . (int)$item
-				.( $version ? ' AND version=' . (int)$version:'')
-				.' AND value > "" '
-				.' ORDER BY field_id, valueorder'
-				;
-		$db->setQuery($query);
-		$values = $db->loadObjectList();
-
-		$fieldvalues = array();
-		foreach ($fields as $f) {
-			foreach ($values as $v) {
-				if ((int)$f->id == (int)$v->field_id) {
-					$fieldvalues[$f->id][] = $v->value;
-				}
-			}
-		}
-		return $fieldvalues;
-	}
 	
 	
 	/**
@@ -958,20 +925,30 @@ class FlexicontentFields
 		foreach ($items as $item) $item_ids[] = $item->id;
 		
 		$db = JFactory::getDBO();
-		$query = 'SELECT field_id, value, item_id'
+		$query = 'SELECT field_id, value, item_id, valueorder, suborder'
 				.( $version ? ' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
 				.' WHERE item_id IN (' . implode(',', $item_ids) .')'
 				.( $version ? ' AND version=' . (int)$version:'')
 				.' AND value > "" '
-				.' ORDER BY item_id, field_id, valueorder'  // first 2 parts are not needed ...
+				.' ORDER BY item_id, field_id, valueorder, suborder'  // first 2 parts are not needed ...
 				;
 		$db->setQuery($query);
 		$values = $db->loadObjectList();
 		
 		$fieldvalues = array();
 		foreach ($values as $v) {
-			$fieldvalues[$v->item_id][$v->field_id][] = $v->value;
+			$fieldvalues[$v->item_id][$v->field_id][$v->valueorder - 1][$v->suborder - 1] = $v->value;
 		}
+		foreach ($fieldvalues as & $iv) {
+			foreach ($iv as & $fv) {
+				foreach ($fv as & $ov) {
+					if (count($ov) == 1) $ov = reset($ov);
+				}
+				unset($ov);
+			}
+			unset($fv);
+		}
+		unset($iv);
 		return $fieldvalues;
 	}
 	

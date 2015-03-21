@@ -614,8 +614,8 @@ class FlexicontentModelFields extends JModelList
 			}
 			
 			// Copy field values assigned to items
-			$query = 'INSERT INTO #__flexicontent_fields_item_relations (field_id, item_id, valueorder, value)'
-				.' SELECT '.$target_id.',item_id, valueorder, value FROM #__flexicontent_fields_item_relations as rel'
+			$query = 'INSERT INTO #__flexicontent_fields_item_relations (field_id, item_id, valueorder, suborder, value)'
+				.' SELECT '.$target_id.',item_id, valueorder, suborder, value FROM #__flexicontent_fields_item_relations as rel'
 				.' WHERE rel.field_id='.$source_id;
 			$db->setQuery($query);
 			$db->query();

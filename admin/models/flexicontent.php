@@ -642,11 +642,25 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$tblname_indexnames = array(
 			'flexicontent_items_ext'=>array('lang_parent_id'=>0, 'type_id'=>0),
 			'flexicontent_items_tmp'=>array('state'=>0, 'catid'=>0, 'created_by'=>0, 'access'=>0, 'featured'=>0, 'language'=>0, 'type_id'=>0, 'lang_parent_id'=>0),
-			'flexicontent_fields_item_relations'=>array('value'=>32),
+			'flexicontent_fields_item_relations'=>array(
+				'value'=>32,
+				'PRIMARY'=>array(
+					'custom_drop'=>'DROP PRIMARY KEY',
+					'custom_add'=>'ADD PRIMARY KEY',
+					'cols'=>array('field_id'=>0, 'item_id'=>0, 'valueorder'=>0, 'suborder'=>0)
+				)
+			),
+			'flexicontent_items_versions'=>array(
+				'value'=>32,
+				'PRIMARY'=>array(
+					'custom_drop'=>'DROP PRIMARY KEY',
+					'custom_add'=>'ADD PRIMARY KEY',
+					'cols'=>array('version'=>0, 'field_id'=>0, 'item_id'=>0, 'valueorder'=>0, 'suborder'=>0)
+				)
+			),
 			'flexicontent_download_history'=>array('user_id'=>0, 'file_id'=>0),
 			'flexicontent_download_coupons'=>array('user_id'=>0, 'file_id'=>0, 'token'=>0, 'expire_on'=>0)
 		);
-		if (!FLEXI_J16GE) unset($tblname_indexnames['flexicontent_items_tmp']['featured']);
 		
 		$missing = array();
 		$all_started = true;
@@ -661,10 +675,15 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				}
 			}
 			
-			foreach($indexnames as $indexname => $size) {
-				$query = "SELECT COUNT(1) IndexIsThere "
+			foreach($indexnames as $indexname => $iconf) {
+				$query = "SELECT COUNT(1) AS IndexIsThere "
 					." FROM INFORMATION_SCHEMA.STATISTICS"
-					." WHERE table_schema='".$dbname."' AND table_name='".$dbprefix.$tblname."' AND index_name='".$indexname."'";
+					." WHERE table_schema='".$dbname."' AND table_name='".$dbprefix.$tblname."' AND index_name='".$indexname."'"
+					.(is_array($iconf) && !empty($iconf['cols'])  ? 
+						" AND COLUMN_NAME IN ('".implode("','", array_keys($iconf['cols']))."')".
+						" HAVING IndexIsThere = ".count($iconf['cols'])
+					: "");
+				//if (is_array($iconf) && !empty($iconf['cols'])) echo $query ."<br/>";
 				$this->_db->setQuery($query);
 				$exists = $this->_db->loadResult();
 				if ($indexing_started) {
@@ -675,7 +694,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					else $missing[$tblname]['__indexing_started__'] = 1;
 				} else if (!$exists) {
 					$all_started = false;
-					$missing[$tblname][$indexname] = $size;
+					$missing[$tblname][$indexname] = $iconf;
 				}
 			}
 		}
@@ -1155,7 +1174,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$row = & $rows[$item_id];
 				
 				// Get field values of the current item version
-				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder,f.iscore "
+				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder,fir.suborder,f.iscore "
 						." FROM #__flexicontent_fields_item_relations as fir"
 					//." LEFT JOIN #__flexicontent_items_versions as iv ON iv.field_id="
 						." LEFT JOIN #__flexicontent_fields as f on f.id=fir.field_id "
@@ -1182,6 +1201,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$f->id					= 1;
 				$f->iscore			= 1;
 				$f->valueorder	= 1;
+				$f->suborder		= 1;
 				$f->field_type	= "maintext";
 				$f->name				= "text";
 				$f->value				= $row->introtext;
@@ -1207,6 +1227,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$f->id 					= 13;
 				$f->iscore			= 1;
 				$f->valueorder	= 1;
+				$f->suborder		= 1;
 				$f->version		= (int)$row->version;
 				$f->value		= serialize($categories);
 				if ($add_cats) $fieldsvals[] = $f;
@@ -1219,6 +1240,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$f->id 					= 14;
 				$f->iscore			= 1;
 				$f->valueorder	= 1;
+				$f->suborder		= 1;
 				$f->version		= (int)$row->version;
 				$f->value		= serialize($tags);
 				if ($add_tags) $fieldsvals[] = $f;
@@ -1230,9 +1252,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					$obj->field_id   = $fieldval->id;
 					$obj->item_id    = $row->id;
 					$obj->valueorder = $fieldval->valueorder;
+					$obj->suborder   = $fieldval->suborder;
 					$obj->version    = (int)$row->version;
 					$obj->value      = $fieldval->value;
-					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder."<br />";
+					//echo "version: ".$obj->version.",fieldid : ".$obj->field_id.",value : ".$obj->value.",valueorder : ".$obj->valueorder.",suborder : ".$obj->suborder."<br />";
 					//echo "inserting into __flexicontent_items_versions<br />";
 					$db->insertObject('#__flexicontent_items_versions', $obj);
 					if( $clean_database && !$fieldval->iscore ) { // If clean_database is on we need to re-add the deleted values

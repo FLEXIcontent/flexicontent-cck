@@ -32,16 +32,25 @@ class flexicontent_fields_item_relations extends JTable
 	 * @var int
 	 */
 	var $field_id 				= null;
+	
 	/**
 	 * Primary Key
 	 * @var int
 	 */
 	var $item_id				= null;
+	
 	/**
-	 * Primary Key
+	 * Main order
 	 * @var int
 	 */
 	var $valueorder				= null;
+	
+	/**
+	 * Sub order
+	 * @var int
+	 */
+	var $suborder				= null;
+	
 	/**
 	 * @var text
 	 */

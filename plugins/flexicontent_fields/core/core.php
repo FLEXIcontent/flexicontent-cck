@@ -122,12 +122,12 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
 					$customdate = $field->parameters->get( 'custom_date', '' ) ;		
 					$dateformat = $dateformat ? $dateformat : $customdate;
-					$field->display = $pretext.JHTML::_( 'date', $item->created, JText::_($dateformat) ).$posttext;
+					$field->{$prop} = $pretext.JHTML::_( 'date', $item->created, JText::_($dateformat) ).$posttext;
 					break;
 				
 				case 'createdby': // created by
 					$field->value[] = $item->created_by;
-					$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->cuname : $item->creator).$posttext;
+					$field->{$prop} = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->cuname : $item->creator).$posttext;
 					break;
 	
 				case 'modified': // modified
@@ -135,17 +135,17 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
 					$customdate = $field->parameters->get( 'custom_date', '' ) ;		
 					$dateformat = $dateformat ? $dateformat : $customdate;
-					$field->display = $pretext.JHTML::_( 'date', $item->modified, JText::_($dateformat) ).$posttext;
+					$field->{$prop} = $pretext.JHTML::_( 'date', $item->modified, JText::_($dateformat) ).$posttext;
 					break;
 				
 				case 'modifiedby': // modified by
 					$field->value[] = $item->modified_by;
-					$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->muname : $item->modifier).$posttext;
+					$field->{$prop} = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->muname : $item->modifier).$posttext;
 					break;
 	
 				case 'title': // title
 					$field->value[] = $item->title;
-					$field->display = $pretext.$item->title.$posttext;
+					$field->{$prop} = $pretext.$item->title.$posttext;
 					
 					// Get ogp configuration
 					$useogp     = $field->parameters->get('useogp', 1);
@@ -155,7 +155,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					
 					if ($useogp && $field->{$prop}) {
 						if ( in_array($view, $ogpinview) ) {
-							$content_val = flexicontent_html::striptagsandcut($field->display, $ogpmaxlen);
+							$content_val = flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen);
 							JFactory::getDocument()->addCustomTag('<meta property="og:title" content="'.$content_val.'" />');
 						}
 					}
@@ -163,22 +163,22 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	
 				case 'hits': // hits
 					$field->value[] = $item->hits;
-					$field->display = $pretext.$item->hits.$posttext;
+					$field->{$prop} = $pretext.$item->hits.$posttext;
 					break;
 	
 				case 'type': // document type
 					$field->value[] = $item->type_id;
-					$field->display = $pretext.JText::_($item->typename).$posttext;
+					$field->{$prop} = $pretext.JText::_($item->typename).$posttext;
 					break;
 	
 				case 'version': // version
 					$field->value[] = $item->version;
-					$field->display = $pretext.$item->version.$posttext;
+					$field->{$prop} = $pretext.$item->version.$posttext;
 					break;
 	
 				case 'state': // state
 					$field->value[] = $item->state;
-					$field->display = $pretext.flexicontent_html::stateicon( $item->state, $field->parameters ).$posttext;
+					$field->{$prop} = $pretext.flexicontent_html::stateicon( $item->state, $field->parameters ).$posttext;
 					break;
 	
 				case 'voting': // voting button
@@ -186,7 +186,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					else $vote = & $_vote;
 					
 					$field->value[] = 'button'; // dummy value to force display
-					$field->display = $pretext.flexicontent_html::ItemVote( $field, 'all', $vote ).$posttext;
+					$field->{$prop} = $pretext.flexicontent_html::ItemVote( $field, 'all', $vote ).$posttext;
 					break;
 	
 				case 'favourites': // favourites button
@@ -197,7 +197,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					
 					$field->value[] = 'button'; // dummy value to force display
 					$favs = flexicontent_html::favoured_userlist( $field, $item, $favourites);
-					$field->display = $pretext.'
+					$field->{$prop} = $pretext.'
 					<span class="fav-block">
 						'.flexicontent_html::favicon( $field, $favoured, $item ).'
 						<span id="fcfav-reponse_'.$item->id.'" class="fcfav-reponse">
@@ -208,7 +208,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					break;
 	
 				case 'categories': // assigned categories
-					$field->display = '';
+					$field->{$prop} = '';
 					
 					if ($_categories===false) $categories = & $item->cats;
 					else $categories = & $_categories;
@@ -219,7 +219,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 						if ( !is_array($globalnoroute) ) $globalnoroute = array();
 						
 						// Create list of category links, excluding the "noroute" categories
-						$field->display = array();
+						$field->{$prop} = array();
 						foreach ($categories as $category) {
 							$cat_id = $category->id;
 							if ( in_array($cat_id, @$globalnoroute) )  continue;
@@ -227,33 +227,33 @@ class plgFlexicontent_fieldsCore extends JPlugin
 							if ( !isset($cat_links[$cat_id]) )   $cat_links[$cat_id] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
 							$cat_link = $cat_links[$cat_id];
 							$display = '<a class="fc_categories fc_category_' .$cat_id. ' link_' .$field->name. '" href="' . $cat_link . '">' . $category->title . '</a>';
-							$field->display[] = $pretext. $display .$posttext;
+							$field->{$prop}[] = $pretext. $display .$posttext;
 							$field->value[] = $category->title;
 						}
-						$field->display = implode($separatorf, $field->display);
-						$field->display = $opentag . $field->display . $closetag;
+						$field->{$prop} = implode($separatorf, $field->{$prop});
+						$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 					endif;
 					break;
 	
 				case 'tags': // assigned tags
-					$field->display = '';
+					$field->{$prop} = '';
 					
 					if ($_tags===false) $tags = & $item->tags;
 					else $tags = & $_tags;
 					
 					if ($tags) :
 						// Create list of tag links
-						$field->display = array();
+						$field->{$prop} = array();
 						foreach ($tags as $tag) :
 							$tag_id = $tag->id;
 							if ( !isset($tag_links[$tag_id]) )   $tag_links[$tag_id] = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug));
 							$tag_link = $tag_links[$tag_id];
 							$display = '<a class="fc_tags fc_tag_' .$tag->id. ' link_' .$field->name. '" href="' . $tag_link . '">' . $tag->name . '</a>';
-							$field->display[] = $pretext. $display .$posttext;
+							$field->{$prop}[] = $pretext. $display .$posttext;
 							$field->value[] = $tag->name; 
 						endforeach;
-						$field->display = implode($separatorf, $field->display);
-						$field->display = $opentag . $field->display . $closetag;
+						$field->{$prop} = implode($separatorf, $field->{$prop});
+						$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 					endif;
 					break;
 				
@@ -272,7 +272,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					// Check for no fulltext present and force using introtext
 					else if ( !$item->fulltext )
 					{
-						$field->display = $item->introtext;
+						$field->{$prop} = $item->introtext;
 					}
 					
 					// Multi-item views: category/tags/favourites/module etc, only show introtext, but we have added 'force_full' item parameter
@@ -281,9 +281,9 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					{	
 						if ( $item->parameters->get('force_full', 0) )
 						{
-							$field->display = $item->introtext . chr(13).chr(13) . $item->fulltext;
+							$field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;
 						} else {
-							$field->display = $item->introtext;
+							$field->{$prop} = $item->introtext;
 						}
 					}
 						
@@ -292,9 +292,9 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					{
 						if ( $item->parameters->get('show_intro', 1) )
 						{
-							$field->display = $item->introtext . chr(13).chr(13) . $item->fulltext;
+							$field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;
 						} else {
-							$field->display = $item->fulltext;
+							$field->{$prop} = $item->fulltext;
 						}
 					}
 					
@@ -309,7 +309,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 							if ( $item->metadesc ) {
 								JFactory::getDocument()->addCustomTag('<meta property="og:description" content="'.$item->metadesc.'" />');
 							} else {
-								$content_val = flexicontent_html::striptagsandcut($field->display, $ogpmaxlen);
+								$content_val = flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen);
 								JFactory::getDocument()->addCustomTag('<meta property="og:description" content="'.$content_val.'" />');
 							}
 						}

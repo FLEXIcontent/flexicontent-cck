@@ -200,7 +200,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 				// Update the new select field
 				var theSelect= newField.find('select.fcfield_textselval').first();
 				theSelect.val('');
-				theSelect.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+'][]');
+				theSelect.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
 				theSelect.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 				theSelect.attr('data-uniqueRowNum', uniqueRowNum".$field->id.");
 				
@@ -363,7 +363,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			
 			if (!$ajax)
 			{
-				$fieldname_n = $fieldname.'['.$n.']';
+				$fieldname_n = $fieldname.'['.$n.']'. (self::$valueIsArr ? '[]' : '');
 				$elementid_n = $elementid.'_'.$n;
 				$select_field = JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n);
 				
@@ -530,6 +530,9 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
+		// Get field values
+		$values = $values ? $values : $field->value;
+		
 		// Check for no values and not displaying ALL elements
     $display_all = $field->parameters->get( 'display_all', 0 ) ;
 		if ( empty($values) && !$display_all ) { $field->{$prop} = ''; $field->display_index = ''; return; }
@@ -598,7 +601,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		// Handle case of FORM fields that each value is an array of values
 		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
 		// we make sure that values should be an array of arrays
-		$values = $multiple && self::$valueIsArr ? $field->value : array($field->value);
+		$values = $multiple && self::$valueIsArr ? $values : array($values);
 		
 		
 		// Create display of field
@@ -712,6 +715,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$field->use_suborder = $multiple && self::$valueIsArr;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -745,11 +749,11 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		// Handle case of FORM fields that each value is an array of values
 		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
 		// then each value is an array of values and will need to be serialized
-		foreach($post as $i => $v) {
+		/*foreach($post as $i => $v) {
 			if (is_array($v)) {
 				$post[$i] = serialize($v);
 			}
-		}
+		}*/
 		/*if ($use_ingroup) {
 			$app = JFactory::getApplication();
 			$app->enqueueMessage( print_r($post, true), 'warning');

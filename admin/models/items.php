@@ -334,7 +334,7 @@ class FlexicontentModelItems extends JModelLegacy
 			.' WHERE fi.name IN ("' . implode('","',array_keys($methodnames)) . '")'
 			.' ORDER BY FIELD(fi.name, "'. implode('","',array_keys($methodnames)) . '" )';
 		$this->_db->setQuery($query);
-		$extra_fields = $this->_db->loadObjectList();
+		$extra_fields = $this->_db->loadObjectList('id');
 		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		foreach($extra_fields as $field) {
@@ -356,28 +356,39 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function getExtraColValues()
 	{
-		if ( $this->_extra_cols== null) $this->getExtraCols();
+		if ( $this->_extra_cols==null) $this->getExtraCols();
 		
 		if ( empty($this->_extra_cols) ) return;
 		if ( empty($this->_data) ) return;
 		
-		foreach($this->_data as $row)
-		{
-			foreach($this->_extra_cols as $field)
-			{
-		    // STEP 2: Get the field value for the current item
-		    $query = ' SELECT v.value'
-					 .' FROM #__flexicontent_fields_item_relations as v'
-		       .' WHERE v.item_id = '.(int)$row->id
-		       .'   AND v.field_id = '.$field->id
-		       .' ORDER BY v.valueorder';
-		    $this->_db->setQuery($query);
-		    $values = $this->_db->loadColumn();
-				//if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-				
-				$row->extra_field_value[$field->name] = $values;
-			}
+		$item_ids  = array_keys($this->_data);
+		$field_ids = array_keys($this->_extra_cols);
+		$db = JFactory::getDBO();
+		$query = 'SELECT field_id, value, item_id, valueorder, suborder'
+				.' FROM #__flexicontent_fields_item_relations'
+				.' WHERE item_id IN (' . implode(',', $item_ids) .')'
+				.' AND field_id IN (' . implode(',', $field_ids) . ')'
+				.' AND value > "" '
+				.' ORDER BY item_id, field_id, valueorder, suborder'  // first 2 parts are not needed ...
+				;
+		$db->setQuery($query);
+		$values = $db->loadObjectList();
+		
+		foreach ($values as $v) {
+			$field_name = $this->_extra_cols[$v->field_id]->name;
+			$this->_data[$v->item_id]->extra_field_value[ $field_name ][$v->valueorder - 1][$v->suborder - 1] = $v->value;
 		}
+		foreach ($this->_data as & $iv) {
+			if (!isset($iv->extra_field_value)) continue;
+			foreach ($iv->extra_field_value as & $fv) {
+				foreach ($fv as & $ov) {
+					if (count($ov) == 1) $ov = reset($ov);
+				}
+				unset($ov);
+			}
+			unset($fv);
+		}
+		unset($iv);
 	}
 	
 	
@@ -1292,9 +1303,9 @@ class FlexicontentModelItems extends JModelLegacy
 				foreach($fields as $field)
 				{
 					if (strlen($field->value)) {
-						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
-								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($field->value) . ')'
-								;
+						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `suborder`, `value`)'
+							.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $field->suborder . ', ' . $this->_db->Quote($field->value) . ')'
+							;
 						$this->_db->setQuery($query);
 						$this->_db->query();
 					}
@@ -1323,9 +1334,9 @@ class FlexicontentModelItems extends JModelLegacy
 				$curversions = $this->_db->loadObjectList();
 
 				foreach ($curversions as $cv) {
-					$query 	= 'INSERT INTO #__flexicontent_items_versions (`version`, `field_id`, `item_id`, `valueorder`, `value`)'
-							. ' VALUES(1 ,'  . $cv->field_id . ', ' . $copyid . ', ' . $cv->valueorder . ', ' . $this->_db->Quote($cv->value) . ')'
-							;
+					$query 	= 'INSERT INTO #__flexicontent_items_versions (`version`, `field_id`, `item_id`, `valueorder`, `suborder`, `value`)'
+						. ' VALUES(1 ,'  . $cv->field_id . ', ' . $copyid . ', ' . $cv->valueorder . ', ' . $cv->suborder . ', ' . $this->_db->Quote($cv->value) . ')'
+						;
 					$this->_db->setQuery($query);
 					$this->_db->query();
 				}
@@ -1566,6 +1577,7 @@ class FlexicontentModelItems extends JModelLegacy
 					. ' AND item_id = ' . (int)$itemid
 					. ' AND field_id = 13'
 					. ' AND valueorder = 1'
+					. ' AND suborder = 1'
 					;
 			$this->_db->setQuery($query);
 			$this->_db->query();
