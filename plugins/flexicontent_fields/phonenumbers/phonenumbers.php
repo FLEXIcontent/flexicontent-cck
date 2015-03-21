@@ -328,7 +328,6 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		
 		// Some variables
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
-		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Get field values

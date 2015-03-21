@@ -340,7 +340,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		// Some variables
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
-		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		$config = JFactory::getConfig();
 		$user = JFactory::getUser();
@@ -495,7 +494,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			}
 			
 			// Add prefix / suffix
-			$field->{$prop}[$n]	= !$add_enclosers ? $date : $pretext.$date.$posttext;
+			$field->{$prop}[$n]	= $pretext.$date.$posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist

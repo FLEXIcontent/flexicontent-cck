@@ -399,7 +399,6 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		
 		// Some variables
 		$use_ingroup = 0;  // Not supported
-		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Get field values
@@ -519,7 +518,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			else if ($text_or_value == 1) $disp =$element->text;
 			else $disp = '<img src="'.$imgpath . $element->image .'" class="'.$tooltip_class.'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'" alt="'.$element->text.'" />';
 			
-			$field->{$prop}[] = !$add_enclosers ? $disp : $pretext . $disp . $posttext;
+			$field->{$prop}[] = $pretext . $disp . $posttext;
 			$display_index[] = $element->value;
 		}
 		

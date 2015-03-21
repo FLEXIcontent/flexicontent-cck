@@ -372,7 +372,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		// Some variables
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
-		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Value handling parameters
@@ -482,7 +481,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			}
 			
 			// Add prefix / suffix
-			$field->{$prop}[$n]	= !$add_enclosers ? $value : $pretext . $value . $posttext;
+			$field->{$prop}[$n]	= $pretext . $value . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist

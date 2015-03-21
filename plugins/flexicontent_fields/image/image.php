@@ -772,8 +772,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
+		// Some variables
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
-		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
 		
 		
 		// ***********************
@@ -1697,9 +1697,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// by adding (container) HTML required by some JS image libraries
 		// **************************************************************
 		
+		// Using in field group, return array
+		if ( $use_ingroup ) {
+			return;
+		}
+		
 		// Check for no values found
 		if ( !count($field->{$prop}) ) {
-			$field->{$prop} = $use_ingroup ? array() : '';
+			$field->{$prop} = '';
 			return;
 		}
 		

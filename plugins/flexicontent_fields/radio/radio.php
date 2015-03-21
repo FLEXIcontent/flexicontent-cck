@@ -383,7 +383,6 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		
 		// Some variables
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
-		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Get field values
@@ -496,7 +495,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp =$element->text;
 			
-			$field->{$prop}[] = !$add_enclosers ? $disp : $pretext . $disp . $posttext;
+			$field->{$prop}[] = $pretext . $disp . $posttext;
 			$display_index[] = $element->value;
 		}
 		
