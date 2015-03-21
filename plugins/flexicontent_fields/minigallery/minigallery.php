@@ -416,7 +416,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		if($usecaptions===2)
 			$captions = $field->parameters->get( 'customcaptions', 'This is a caption' );
 		
-		$group_str = 'data-fancybox-group="fcitem_'.$field->item_id.'_fcfield_'.$field->id.'"';
+		$group_str = 'data-fancybox-group="fcitem_'.$item->id.'_fcfield_'.$field->id.'"';
 		$n = 0;
 		foreach($files_data as $file_id => $file_data)
 		{

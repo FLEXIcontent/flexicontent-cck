@@ -727,7 +727,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$str = '<span class="fcfile_noauth_msg fc-mssg-inline fc-noauth">' .$noaccess_msg. '</span> ';
 				}
 			} else {
-				$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
+				$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$item->id.'&fid='.$field->id.'&task=download' );
 			}
 			
 			// SOME behavior FLAGS
@@ -778,7 +778,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					if ( !$authorized && $noaccess_addvars) {
 						$file_data_fields =
 							'<input type="hidden" name="fc_field_id" value="'.$field->id.'"/>'."\n".
-							'<input type="hidden" name="fc_item_id" value="'.$field->item_id.'"/>'."\n".
+							'<input type="hidden" name="fc_item_id" value="'.$item->id.'"/>'."\n".
 							'<input type="hidden" name="fc_file_id" value="'.$file_id.'"/>'."\n";
 					}
 					
@@ -807,7 +807,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$attribs .= ' title="'. $addtocartinfo .'"';
 					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filetitle,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';
-					$attribs .= ' contentid="'. $field->item_id .'"';
+					$attribs .= ' contentid="'. $item->id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';
 					$actions_arr[] =
 						'<input type="button" '. $attribs .' value="'.$addtocarttext.'" />';
@@ -844,7 +844,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					if ( !$authorized && $noaccess_addvars) {
 						$dl_link .=
 							'&fc_field_id="'.$field->id.
-							'&fc_item_id="'.$field->item_id.
+							'&fc_item_id="'.$item->id.
 							'&fc_file_id="'.$file_id;
 					}
 					
@@ -873,7 +873,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$attribs .= ' title="'. $addtocartinfo .'"';
 					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filetitle,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';
-					$attribs .= ' contentid="'. $field->item_id .'"';
+					$attribs .= ' contentid="'. $item->id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';
 					$actions_arr[] =
 						'<a href="javascript:;" '. $attribs .' >'

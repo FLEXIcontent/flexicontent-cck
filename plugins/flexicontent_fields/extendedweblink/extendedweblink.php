@@ -630,7 +630,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				$href = $value['link'];
 			else 
 				// Indirect access to the web-link, via calling FLEXIcontent component, thus counting hits too
-				$href = JRoute::_( 'index.php?option=com_flexicontent&fid='. $field->id .'&cid='.$field->item_id.'&ord='.($n+1).'&task=weblink' );
+				$href = JRoute::_( 'index.php?option=com_flexicontent&fid='. $field->id .'&cid='.$item->id.'&ord='.($n+1).'&task=weblink' );
 			
 			// Create indirect link to web-link address with custom displayed text
 			if( empty($linktext) )

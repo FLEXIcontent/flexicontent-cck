@@ -430,8 +430,8 @@ div#fc-dash-sliders table.fc-table-list.fc-tbl-short td:first-child {
 	text-align: right;
 }
 
-div table.fc-table-list td a,
-div#fc-dash-sliders table.fc-table-list td a {
+div table.fc-table-list td a:not(.btn),
+div#fc-dash-sliders table.fc-table-list td a:not(.btn) {
 	text-decoration: none;
 	color:rgb(0, 136, 204);
 	font-weight:bold;
@@ -487,8 +487,8 @@ div#fc-dash-sliders table.fc-table-list tbody tr:hover td {
 	background-color: #ffffdd;
 }
 
-div table.fc-table-list tbody tr:hover td a,
-div#fc-dash-sliders table.fc-table-list tbody tr:hover td a {
+div table.fc-table-list tbody tr:hover td a:not(.btn),
+div#fc-dash-sliders table.fc-table-list tbody tr:hover td a:not(.btn) {
 	color: rgb(0, 136, 204);
 	/*text-shadow: 1px 1px 2px #888;*/
 }

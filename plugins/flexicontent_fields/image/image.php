@@ -1395,7 +1395,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$style = ($i!=0 && in_array($_method, array('display_single', 'display_single_total'))) ? 'display:none;' : '';
 			
 			// Create a unique id for the link tags, and a class name for image tags
-			$uniqueid = $field->item_id . '_' . $field->id . '_' . $i;
+			$uniqueid = $item->id . '_' . $field->id . '_' . $i;
 			
 			switch ($thumb_size)
 			{
@@ -1411,8 +1411,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// Create a grouping name
 			switch ($grouptype)
 			{
-				case 0: $group_name = 'fcview_'.$view.'_fcitem_'.$field->item_id.'_fcfield_'.$field->id; break;
-				case 1: $group_name = 'fcview_'.$view.'_fcitem_'.$field->item_id; break;
+				case 0: $group_name = 'fcview_'.$view.'_fcitem_'.$item->id.'_fcfield_'.$field->id; break;
+				case 1: $group_name = 'fcview_'.$view.'_fcitem_'.$item->id; break;
 				case 2: $group_name = 'fcview_'.$view; break;
 				default: $group_name = ''; break;
 			}
@@ -1832,7 +1832,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$dir = $field->parameters->get('dir');
 			$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid', '' );
 			
-			$destpath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$field->item_id . '_field_'.$field->id .DS );
+			$destpath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id . '_field_'.$field->id .DS );
 			if ( $image_source > 1 ) ; // TODO
 			
 			// Create original images folder if doing CSV import and folder does not exist
@@ -1845,7 +1845,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			
 			// New items have no item id during submission, thus we need to rename the temporary name of images upload folder
-			else if ( $unique_tmp_itemid && $field->item_id != $unique_tmp_itemid ) {
+			else if ( $unique_tmp_itemid && $item->id != $unique_tmp_itemid ) {
 				$temppath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$unique_tmp_itemid. '_field_'.$field->id .DS );
 				JFolder::move($temppath, $destpath);
 			}
@@ -2032,7 +2032,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			jimport('joomla.filesystem.jpath');
 			
 			// Delete image folder if it exists
-			$destpath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$field->item_id   . '_field_'.$field->id .DS);
+			$destpath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id   . '_field_'.$field->id .DS);
 			if ( $image_source > 1 ) ; // TODO
 			
 			if ( JFolder::exists($destpath) && !JFolder::delete($destpath) ) {

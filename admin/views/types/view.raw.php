@@ -25,12 +25,11 @@ class FlexicontentViewTypes extends JViewLegacy{
 	
 	function display( $tpl = null ) {
 		
-		echo '<div id="flexicontent">';
 		echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css" />';
 		if      (FLEXI_J30GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
 		else if (FLEXI_J16GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j25.css';
 		else                  $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j15.css';
-		echo '<link rel="stylesheet" href="'.$fc_css.'" />';
+		echo '<link rel="stylesheet" href="'.JURI::root(true).'/media/jui/css/bootstrap.min.css" />';
 		
 		$user = JFactory::getUser();
 		$db = JFactory::getDBO();
@@ -43,52 +42,57 @@ class FlexicontentViewTypes extends JViewLegacy{
 		$types = $db->loadObjectList();
 		$types = is_array($types) ? $types : array();
 		
-		echo '<label class="flexi_label">'. JText::_( 'FLEXI_SELECT_TYPE' ).':</label><br/><br/>';
-
 		$ctrl_task = FLEXI_J16GE ? 'items.add' : 'add';
 		$icon = "components/com_flexicontent/assets/images/layout_add.png";
+		$btn_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall';
+		
+		echo '
+<div id="flexicontent">
+	<table class="fc-table-list">
+		<tr>
+			<th>'.JText::_( 'FLEXI_SELECT_TYPE' ).'</th>
+		</tr>
+		<tr>
+			<td>
+		';
+		$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
+		$_name = '- '.JText::_("FLEXI_ANY") .' -';//.' ... '. JText::_("FLEXI_TYPE");
+		?>
+			<a class="<?php echo $btn_class; ?> btn-primary" href="<?php echo $link; ?>" target="_parent">
+				<!--<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $_name; ?>" />&nbsp;-->
+				<?php echo $_name; ?>
+			</a>
+		<?php
 		
 		foreach($types as $type)
 		{
-			if (FLEXI_J16GE)
-				$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
-			else if (FLEXI_ACCESS && $user->gid < 25)
-				$allowed = ! $type->itemscreatable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'type', $type->id);
-			else
-				$allowed = 1;
-			
+			$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
 			if ( !$allowed && $type->itemscreatable == 1 ) continue;
 			
 			$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
 			
 			if ( !$allowed && $type->itemscreatable == 2 ) {
 				?>
-				<span class="fc_button">
-					<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $type->name; ?>" />&nbsp;
+				<span class="badge badge-warning">
+					<!--<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $type->name; ?>" />&nbsp;-->
 					<?php echo $type->name; ?>
 				</span>
 				<?php
 			} else {
 				?>
-				<a class="fc_button" href="<?php echo $link; ?>" target="_parent">
-					<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $type->name; ?>" />&nbsp;
+				<a class="<?php echo $btn_class; ?> btn-success" href="<?php echo $link; ?>" target="_parent">
+					<!--<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $type->name; ?>" />&nbsp;-->
 					<?php echo $type->name; ?>
 				</a>
 			<?php
 			}
 		}
-		
-		$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
-		$_name = JText::_("FLEXI_ANY") .' ... '. JText::_("FLEXI_TYPE");
-		?>
-			<div class="fcclear"></div>
-			<br/>
-			<a class="fc_button fcsimple" href="<?php echo $link; ?>" target="_parent">
-				<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $_name; ?>" />&nbsp;
-				<?php echo $_name; ?>
-			</a>
-		</div>
-		<?php
+		echo '
+			</td>
+		</tr>
+	</table>
+</div>
+		';
 	}
 }
 ?>
