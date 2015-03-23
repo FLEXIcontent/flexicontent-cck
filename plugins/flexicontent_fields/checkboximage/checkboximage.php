@@ -18,8 +18,13 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsCheckboximage extends JPlugin
 {
+	var $task_callable = array('getCascadedField');
+	
 	static $field_types = array('checkboximage');
 	static $extra_props = array('image');
+	static $valueIsArr = 1;
+	static $isDropDown = 0;
+	
 	
 	// ***********
 	// CONSTRUCTOR
@@ -43,9 +48,10 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
-		$use_ingroup = 0;  // Not supported
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$ajax = !empty($field->isAjax);
 		if ($use_ingroup) $field->formhidden = 3;
-		if ($use_ingroup && empty($field->ingroup)) return;
+		if ($use_ingroup && empty($field->ingroup) && !$ajax) return;
 		
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
@@ -53,12 +59,13 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
+		$cascade_after  = (int)$field->parameters->get('cascade_after', 0);
 		
 		
 		// ****************
 		// Number of values
 		// ****************
-		$multiple   = $use_ingroup || 0; //(int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$min_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'min_values', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
@@ -66,6 +73,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		// Sanitize limitations
 		$exact_values	= $field->parameters->get( 'exact_values', 0 ) ;
+		if ($required && !$min_values) $min_values = 1;
 		if ($exact_values) $max_values = $min_values = $exact_values;
 		$js_popup_err	= $field->parameters->get( 'js_popup_err', 0 ) ;
 		
@@ -76,7 +84,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_values = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_values', '' ) : '';
+		$default_values = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_values', '' )) : '';
 		
 		
 		// *************************
@@ -89,17 +97,14 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		static $prettycheckable_added = null;
 	  if ( $use_prettycheckable && $prettycheckable_added === null ) $prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		
+		// Display text label, use checkbox/radio image field for more
+		$form_vals_display = $field->parameters->get( 'form_vals_display', 1 ) ;  // this field includes image but it can be more convenient/compact not to be display image in item form
+		
 		// when field is displayed as drop-down select (item edit form only)
 		$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
 		$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
 		$size = $field->parameters->get( 'size', 6 ) ;
 		$size = $size ? ' size="'.$size.'"' : '';
-		
-		// image specific variables
-		$form_vals_display = $field->parameters->get( 'form_vals_display', 1 ) ;  // this field includes image but it can be more convenient/compact not to be display image in item form
-		$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
-		$imgpath  = JURI::root(true) .'/'. $imagedir;
-		$imgfolder = JPATH_SITE .DS. $imagedir;
 		
 		// Prefix - Suffix - Separator (item FORM) parameters, for the checkbox/radio elements
 		$pretext			= $field->parameters->get( 'pretext_form', '' ) ;
@@ -137,20 +142,65 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
-			$field->value = strlen($default_values) ? explode(",", $default_values) : array('');
+			$field->value = preg_split("/\s*,\s*/u", $default_values);
 		}
 		
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
 		
 		// Field name and HTML TAG id
-		$fieldname = 'custom['.$field->name.']'.'[]';
+		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 		
 		$js = "";
 		$css = "";
 		
-		if ($multiple) // handle multiple records
+		
+		// *********************************************************************************************
+		// Handle adding the needed JS code to CASCADE (listen to) changes of the dependent master field
+		// *********************************************************************************************
+		
+		if ($cascade_after && !$ajax)
+		{
+			$byIds = FlexicontentFields::indexFieldsByIds($item->fields);
+			
+			if ( isset($byIds[$cascade_after]) )
+			{
+				$cascade_prompt = $field->parameters->get('cascade_prompt', '');
+				$cascade_prompt = $cascade_prompt ? JText::_($cascade_prompt) : JText::_('FLEXI_PLEASE_SELECT').': '.$byIds[$cascade_after]->label;
+				
+				$srcELid = 'custom_'.$byIds[$cascade_after]->name;
+				$trgELid = $elementid;
+				
+				// Get values of cascade (on) source field
+				$field->valgrps = $byIds[$cascade_after]->value ? $byIds[$cascade_after]->value : array();
+				foreach($field->valgrps as & $vg) {
+					if (is_array($vg));
+					else if (@unserialize($vg)!== false || $vg === 'b:0;' ) {
+						$vg = unserialize($vg);
+					} else {
+						$vg = array($vg);
+					}
+				}
+				unset($vg);
+			} else {
+				$cascade_after = 0;
+				echo 'Error in field '.$field->label.' ['.$field->id.']'.' cannot cascaded after field no: '.$cascade_after.', field was not found <br/>';
+			}
+		}
+		
+		else if ($cascade_after && $ajax)
+		{
+			$field->valgrps = isset($field->valgrps) ? $field->valgrps : array();
+			$field->valgrps = is_array($field->valgrps) ? $field->valgrps : preg_split("/\s*,\s*/u", trim($field->valgrps));
+		}
+		
+		
+		// ***********************
+		// Handle multiple records
+		// ***********************
+		
+		if ($multiple && !$ajax)
 		{
 			// Add the drag and drop sorting feature
 			if (!$use_ingroup) $js .="
@@ -188,14 +238,19 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 				var newField  = lastField.clone();
 				if ( exec_prep_clean )   afterAddField".$field->id."(fieldval_box);  // not in Group
 				
+				// Update set container id
+				newField.find('.fc_input_set').attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
+				var js_class = '".($use_prettycheckable && $prettycheckable_added ? ' use_prettycheckable' : '')."';
+				
 				// Update the new checkboxes
 				var theSet = newField.find('input:checkbox');
 				//if(window.console) window.console.log('theSet.length: ' + theSet.length);
 				var nr = 0;
 				theSet.each(function() {
 					var elem = jQuery(this);
-					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
+					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
 					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
+					elem.attr('class', '".$elementid."_'+uniqueRowNum".$field->id." + js_class);
 					".($use_prettycheckable && $prettycheckable_added ?
 						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" :
 						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" )."
@@ -221,6 +276,11 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
+				";
+			
+			// Listen to the changes of cascade-after field
+			if ($cascade_after) $js .= "
+				fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+uniqueRowNum".$field->id."+', input.".$srcELid."_'+uniqueRowNum".$field->id.", '#".$trgELid."_'+uniqueRowNum".$field->id.", '".$cascade_prompt."', 1, uniqueRowNum".$field->id.");
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -293,37 +353,49 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			$css .= '';
 		}
 		
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
 		
+		// Added field's custom CSS / JS
+		if (!$ajax && $js)  $document->addScriptDeclaration($js);
+		if (!$ajax && $css) $document->addStyleDeclaration($css);
+		
+		
+		// **************************
 		// Get indexed element values
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
-		if ( !$elements ) {
-			if ($sql_mode)
-				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
-			else
-				$field->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+		// **************************
+		
+		// If cascading we will get it inside the value loop for every value, thus supporting field grouping properly
+		$elements = !$cascade_after ? $this->getLimitedProps($field, $item) : array();
+		if ( !is_array($elements) ) {
+			$field->html = $elements;
 			return;
 		}
 		
-		// Display as (multiple) select
+		
+		// *****************************************
+		// Create field's HTML display for item form
+		// *****************************************
+		
+		// Create form field options
+		$options = array();
+		foreach ($elements as $element) {
+			$options[] = JHTML::_('select.option', $element->value, $element->text);
+		}
 		if ( $field->parameters->get( 'display_as_select', 0 ) ) {
-			$options = array();
 			if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
-			foreach ($elements as $element) {
-				$options[] = JHTML::_('select.option', $element->value, $element->text);
-			}
 			$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value, $elementid);
 			return;
-		} // else ...
+		}
 		
-		// Display as checkboxes
+		// Create the attributes of the form field
+		$fftype = 'checkbox';
 		$display_as_checkbox = 1;
-		if ($display_as_checkbox) {
-			$attribs  = '';
+		if ($display_as_checkbox)
+		{
 			$classes  = $use_prettycheckable && $prettycheckable_added ? ' use_prettycheckable ' : '';
 			$classes .= $required;
-			$onchange = "";
+			$onchange = '';
+			// Extra properties
+			$attribs  = '';
 			if ($exact_values)  {
 				$attribs .= ' exact_values="'.$exact_values.'" ';
 			} else {
@@ -333,43 +405,110 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			if ($js_popup_err)  $attribs .= ' js_popup_err="'.$js_popup_err.'" ';
 			if ($max_values || $min_values || $exact_values)  $classes .= ' validate-cboxlimitations ';
 			else if ($required) $classes .= ' validate-checkbox ';  // No min/max/exact values allow basic 'required' validation
-			if ($classes)  $attribs .= ' class="'.$classes.'" ';
 			if ($onchange) $attribs .= ' onchange="'.$onchange.'" ';
 		}
+		$label_class = 'fccheckradio_lbl'.(FLEXI_J30GE ? ' hasTooltip' : ' hasTip');
+		$label_style = '';
+		
+		// Handle case of FORM fields that each value is an array of values
+		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
+		$values = self::$valueIsArr && !$multiple ? array($field->value) : $field->value;
 		
 		
 		// *****************************************
 		// Create field's HTML display for item form
 		// *****************************************
 		
-		// Create form field options
-		$i = 0;
-		$options = array();
-		foreach ($elements as $element) {
-			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
-			$elementid_no = $elementid.'_'.$i;
-			$extra_params = $use_prettycheckable && $prettycheckable_added ? ' data-customClass="fcradiocheckimage"' : '';
-			$input_fld = ' <input type="checkbox" id="'.$elementid_no.'" data-element-grpid="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />';
-			$img_exists = file_exists($imgfolder . $element->image);
-			$options[] = ''
-				.($use_prettycheckable && $prettycheckable_added ? $input_fld : '')
-				.'<label for="'.$elementid_no.'" class="'.(FLEXI_J30GE ? 'hasTooltip' : 'hasTip').' fccheckradio_lbl" title="'.flexicontent_html::getToolTip(null, $element->text, 0, 1).'" >'
-				. (!$use_prettycheckable || !$prettycheckable_added ? $input_fld : '')
-				.($form_vals_display!=1 ? $element->text : '')
-				.($form_vals_display==2 ? ' <br/>' : '')
-				.($form_vals_display >0 ? ($img_exists ? ' <img src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />' : '[NOT found]: '. $imgpath . $element->image) : '')
-				.'</label>'
-				;
-			$i++;
+		$field->html = array();
+		$n = $ajax ? $field->valindex : 0;
+		$js = "";
+		foreach ($values as $value)
+		{
+			// Compatibility for serialized values
+			if ( self::$valueIsArr ) {
+				if (is_array($value));
+				else if (@unserialize($value)!== false || $value === 'b:0;' ) {
+					$value = unserialize($value);
+				} else {
+					$value = array($value);
+				}
+				if ( !count($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+			} else {
+				if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+				$value = array($value);
+			}
+			
+			// Get options according to cascading, this is here so that it works with field grouping too
+			if ($cascade_after) {
+				$elements = $this->getLimitedProps($field, $item, !$ajax ? $cascade_prompt : null, $ajax, $n);
+			}
+			
+			if (1)
+			{
+				$fieldname_n = $fieldname.'['.$n.']'. (self::$valueIsArr ? '[]' : '');
+				$elementid_n = $elementid.'_'.$n;
+				
+				// Create form field options
+				$i = 0;
+				$options = array();
+				foreach ($elements as $element)
+				{
+					if ( !empty($element->isprompt) ) {
+						$options[] = '<span style="float: left;" class="'.$element->isprompt.'">'.$element->text.'</span>';
+						continue;
+					}
+					$checked  = in_array($element->value, $value)  ?  ' checked="checked"'  :  '';
+					$elementid_no = $elementid_n.'_'.$i;
+					//echo " &nbsp; &nbsp; $elementid_n , $elementid_no , $fieldname_n  , &nbsp; value: {$element->value} <br/>\n";
+					$input_attribs  = $use_prettycheckable && $prettycheckable_added ? ' data-customClass="fcradiocheckimage"'/*.' data-labelPosition="right" data-labeltext="'.$element->text.'"'*/ : '';
+					$input_attribs .= ' class="'.@ $classes.' '.$elementid_n.'" ';
+					$input_fld = ' <input type="'.$fftype.'" id="'.$elementid_no.'" data-element-grpid="'.$elementid_n.'" name="'.$fieldname_n.'" '.$attribs.$input_attribs.' value="'.$element->value.'" '.$checked.' />';
+					$options[] = ''
+						.$pretext
+						.($use_prettycheckable && $prettycheckable_added ? $input_fld : '')
+						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" title="'.$element->label_tip.'">'
+							. (!$use_prettycheckable || !$prettycheckable_added ? $input_fld : '')
+							.($form_vals_display!=1 ? $element->text : '')
+							.($form_vals_display==2 ? ' <br/>' : '')
+							.($form_vals_display >0 ? $element->image_html : '')
+						.'</label>'
+						.$posttext
+						;
+					$i++;
+				}
+				
+				// Apply (item form) separator and open/close tags to create the radio field
+				$form_field = $opentag . implode($separator, $options) . $closetag;
+			}
+			
+			if (!$ajax)
+			{
+				$field->html[] = '
+					'.'<div id="'.$elementid_n.'" class="fc_input_set">'.$form_field.'</div>'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
+					'.($use_ingroup ? '' : $move2).'
+					'.($use_ingroup ? '' : $remove_button).'
+					'.($use_ingroup || !$add_position ? '' : $add_here).'
+					';
+				
+				// Listen to the changes of cascade-after field
+				if ($cascade_after && !$ajax) $js .= "
+				jQuery(document).ready(function(){
+					fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$n.", input.".$srcELid.'_'.$n."', '#".$trgELid.'_'.$n."', '".$cascade_prompt."', 1, ".$n.");
+				});
+				";
+			} else {
+				$field->html = $form_field;
+			}
+			
+			$n++;
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
+		if ($js)  $document->addScriptDeclaration($js);
 		
-		// Apply values separator
-		$field->html = implode($separator, $options);
 		
-		// Apply field 's opening / closing texts
-		$field->html = $field->html ? array($opentag . $field->html . $closetag) : array('');
-		
-		if ($use_ingroup) { // do not convert the array to string if field is in a group
+		if ($ajax) {
+			return; // Done
+		} else if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
 			$field->html =
 				'<li class="'.$value_classes.'">'.
@@ -390,6 +529,142 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 	}
 	
 	
+	function & getLimitedProps(&$field, &$item, $cascade_prompt='Please select above', $ajax=false, $i=0)
+	{
+		// some parameter shortcuts
+		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
+		$field_elements	= $field->parameters->get( 'field_elements' ) ;
+		$cascade_after  = (int)$field->parameters->get('cascade_after', 0);
+		
+		if ($cascade_after)
+		{
+			$_valgrps = $ajax ? $field->valgrps : (isset($field->valgrps[$i]) ? $field->valgrps[$i] : null);
+			if (empty($_valgrps)) {
+				$elements = array();
+				if (!$ajax) {
+					//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $cascade_prompt, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+					$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$cascade_prompt, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
+					$elements = array($prompt);
+				}
+				return $elements;
+			}
+		}
+		
+		if ($sql_mode)  // SQL query mode
+		{
+			$and_clause = '';
+			if ($cascade_after)
+			{
+				// Filter out values not in the the value group, this is done by modifying the SQL query
+				$db = JFactory::getDBO();
+				$_elements = array();
+				foreach($_valgrps as & $vg) $vg = $db->Quote($vg);
+				unset($vg);
+				$and_clause = ' AND valgroup IN ('.implode(',', $_valgrps).')';
+			}
+			$item_pros = true;
+			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props, $item_pros, false, $and_clause);
+			if ( !is_array($elements) ) {
+				//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_QUERY'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_QUERY'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
+				$elements = array($prompt);
+				return $elements;
+			}
+		}
+		
+		else  // Elements mode
+		{
+			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
+			if ( !is_array($elements) ) {
+				//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
+				$elements = array($prompt);
+				return $elements;
+			}
+			if ($cascade_after)
+			{
+				// Filter out values not in the the value group, this is done after the elements text is parsed
+				$_elements = array();
+				$_valgrps = array_flip($_valgrps);
+				foreach($elements as $element)
+					if (isset($_valgrps[$element->valgroup]))  $_elements[$element->value] = $element;
+				$elements = $_elements;
+			}
+		}
+		
+		if (empty($elements)) {
+			//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), 'No data found', 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+			$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_NO_DATA_FOUND'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-warning' );
+			$elements = array(0=>$prompt);
+			return $elements;
+		} else {
+			$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
+			$usefirstoption  = $field->parameters->get( 'usefirstoption', self::$isDropDown ? 1 : 0 ) ;
+			if ($usefirstoption) { // Add selection prompt
+				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_($firstoptiontext), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_($firstoptiontext), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-success' );
+				array_unshift($elements, $prompt);
+			}
+		}
+		
+		if ($field->field_type=='radioimage' || $field->field_type=='checkboximage')
+		{
+			// image specific variables
+			$form_vals_display = $field->parameters->get( 'form_vals_display', 1 ) ;  // this field includes image but it can be more convenient/compact not to be display image in item form
+			$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
+			$imgpath  = JURI::root(true) .'/'. $imagedir;
+			$imgfolder = JPATH_SITE .DS. $imagedir;
+			
+			foreach ($elements as $element) {
+				if ($form_vals_display >0 && !isset($element->image_html))
+					$element->image_html = file_exists($imgfolder . $element->image) ?
+						'<img style="vertical-align:unset!important;" src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />' :
+						'[NOT found]: '. $imgpath . $element->image;
+				if (!isset($element->label_tip))
+					$element->label_tip = flexicontent_html::getToolTip(null, $element->text, 0, 1);
+			}
+		}
+		
+		return $elements;
+	}
+	
+	
+	// Method called via AJAX to get dependent values
+	function getCascadedField()
+	{
+		$field_id = JRequest::getInt('field_id', 0);
+		$item_id  = JRequest::getInt('item_id', 0);
+		$valgrps  = JRequest::getVar('valgrps', '');
+		$valindex = JRequest::getVar('valindex', 0);
+		
+		// Load field
+		$_fields = FlexicontentFields::getFieldsByIds(array($field_id), array($item_id));
+		$field = $_fields[$field_id];
+		$field->item_id = $item_id;
+		$field->valgrps = $valgrps;
+		$field->valindex = $valindex;
+		
+		// Load item
+		$item = JTable::getInstance( $_type = 'flexicontent_items', $_prefix = '', $_config = array() );
+		$item->load( $item_id );
+		
+		// Get field configuration
+		FlexicontentFields::loadFieldConfig($field, $item);
+		
+		// Get field values
+		//$_fieldvalues = FlexicontentFields::getFieldValsById(array($field_id), array($item_id));
+		$field->value = null; //isset($_fieldvalues[$item_id][$field_id]) ? $_fieldvalues[$item_id][$field_id] : array();
+		
+		// Render field
+		$field->isAjax = 1;
+		$this->onDisplayField($field, $item);
+		
+		// Output the field
+		echo $field->html;
+		exit;
+	}
+	
+	
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
@@ -398,7 +673,8 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// Some variables
-		$use_ingroup = 0;  // Not supported
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Get field values
@@ -424,9 +700,10 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
 		$text_or_value  = $field->parameters->get( 'text_or_value', 2 ) ;
 		
-		// image specific variables
+		// image specific or image related variables
 		$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
 		$imgpath  = JURI::root(true) .'/'. $imagedir;
+		$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 		
 		switch($separatorf)
 		{
@@ -459,7 +736,6 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			break;
 		}
 		
-		$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 		
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
@@ -473,6 +749,13 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		// Check for no elements found
 		if ( empty($elements) )  { $field->{$prop} = ''; $field->display_index = ''; return; }
 		
+		
+		// Handle case of FORM fields that each value is an array of values
+		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
+		// we make sure that values should be an array of arrays
+		$values = $multiple && self::$valueIsArr ? $values : array($values);
+		
+		
 		// Create display of field
 		$field->{$prop} = array();
 		$display_index = array();
@@ -480,8 +763,6 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		// Prepare for looping
 		if ( !$values ) $values = array();
 		if ( $display_all ) {
-			$indexes = array_flip($values);
-			
 			// non-selected value shortcuts
 	    $ns_pretext			= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_pretext', '' ), 'ns_pretext' );
   	  $ns_posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_posttext', '' ), 'ns_posttext' );
@@ -491,48 +772,83 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 	    $ns_posttext = $remove_space ? $ns_posttext : ' ' . $ns_posttext;
 		}
 		
-		// CASE a. Display ALL elements (selected and NON-selected).  NOTE: not supported if field in field group
-		if ( $display_all && !$use_ingroup ) foreach ($elements as $val => $element)
+		foreach ($values as $value)
 		{
-			if ($text_or_value == 0) $disp = $element->value;
-			else if ($text_or_value == 1) $disp =$element->text;
-			else $disp = '<img src="'.$imgpath . $element->image .'" class="'.$tooltip_class.'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'" alt="'.$element->text.'" />';
-			
-			$is_selected = isset($indexes[$val]);
-			
-			$field->{$prop}[] = $is_selected ?  $pretext.$disp.$posttext : $ns_pretext.$disp.$ns_posttext;
-			if ( $is_selected ) $display_index[] = $element->value;
-		}
-		
-		// CASE b. Display only selected elements. NOTE: This is forced if field is in field group
-		else foreach ($values as $n => $val)
-		{
-			// Skip empty/invalid values but add empty display, if in field group
-			$element = !strlen($val) ? false : @$elements[ $val ];
-			if ( !$element ) {
-				if ( $use_ingroup ) $field->{$prop}[$n]	= '';
-				continue;
+			// Compatibility for serialized values
+			if ( $multiple && self::$valueIsArr ) {
+				if ( is_array($value) );
+				else if (@unserialize($value)!== false || $value === 'b:0;' ) {
+					$value = unserialize($value);
+				} else {
+					$value = array($value);
+				}
+				if ( !count($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			}
 			
-			if ($text_or_value == 0) $disp = $element->value;
-			else if ($text_or_value == 1) $disp =$element->text;
-			else $disp = '<img src="'.$imgpath . $element->image .'" class="'.$tooltip_class.'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'" alt="'.$element->text.'" />';
+			$html  = array();
+			$index = array();
 			
-			$field->{$prop}[] = $pretext . $disp . $posttext;
-			$display_index[] = $element->value;
+			// CASE a. Display ALL elements (selected and NON-selected)
+			if ( $display_all )
+			{
+				// *** value is always an array we made sure above
+				$indexes = array_flip($value);
+				foreach ($elements as $val => $element)
+				{
+					if ($text_or_value == 0) $disp = $element->value;
+					else if ($text_or_value == 1) $disp =$element->text;
+					else $disp = '<img src="'.$imgpath . $element->image .'" class="'.$tooltip_class.'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'" alt="'.$element->text.'" />';
+					
+					if ( isset($indexes[$val]) ) {
+						$html[]  = $pretext.$disp.$posttext;
+						$index[] = $element->value;
+					} else
+						$html[]  = $ns_pretext.$disp.$ns_posttext;
+				}
+			}
+			
+			// CASE b. Display only selected elements
+			else
+			{
+				foreach ($value as $v) {
+					// Skip empty/invalid values but add empty display, if in field group
+					$element = !strlen($v) ? false : @$elements[ $v ];
+					if ( !$element ) {
+						if ( $use_ingroup ) $html[]	= '';
+						continue;
+					}
+					
+					if ($text_or_value == 0) $disp = $element->value;
+					else if ($text_or_value == 1) $disp = $element->text;
+					else $disp = '<img src="'.$imgpath . $element->image .'" class="'.$tooltip_class.'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'" alt="'.$element->text.'" />';
+					
+					$html[]  = $pretext . $disp . $posttext;
+					$index[] = $pretext . $element->value . $posttext;
+				}
+			}
+			if ($multiple && self::$valueIsArr) {
+				// For current array of values, apply values separator, and field 's opening / closing texts
+				$field->{$prop}[] = !count($html) ? '' : $opentag . implode($separatorf, $html)  . $closetag;
+				$display_index[]  = !count($html) ? '' : $opentag . implode($separatorf, $index) . $closetag;
+			} else {
+				// Done, there should not be more !!, since we handled an array of singular values
+				$field->{$prop} = $html;
+				$display_index = $index;
+				break;
+			}
 		}
+		
 		
 		if (!$use_ingroup)  // do not convert the array to string if field is in a group
 		{
-			// Apply values separator
-			$field->{$prop} = implode($separatorf, $field->{$prop});
-			$field->display_index = implode($separatorf, $display_index);
-			
-			// Apply field 's opening / closing texts
-			if ( $field->{$prop}!=='' ) {
-				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			if ($multiple && self::$valueIsArr) {
+				// Values separator, field 's opening / closing texts, were already applied for every array of values
+				$field->{$prop} = implode("", $field->{$prop});
+				$field->display_index = implode("", $display_index);
 			} else {
-				$field->{$prop} = '';
+				// Apply values separator, and field 's opening / closing texts
+				$field->{$prop} = !count($field->{$prop}) ? '' : $opentag . implode($separatorf, $field->{$prop}) . $closetag;
+				$field->display_index = !count($field->{$prop}) ? '' : $opentag . implode($separatorf, $display_index) . $closetag;
 			}
 		}
 	}
@@ -548,10 +864,12 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
-		$use_ingroup = 0;  // Not supported
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$field->use_suborder = $multiple && self::$valueIsArr;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -563,17 +881,22 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		foreach ($post as $n => $v)
 		{
 			// Do server-side validation and skip empty/invalid values
-			$element = !strlen($post[$n]) ? false : @$elements[ $post[$n] ];
-			if ( !$element ) {
-				$post[$n] = '';  // clear invalid value
-				if (!$use_ingroup) continue;
+			$vals = array();
+			foreach ($v as $i => $nv) {
+				$element = !strlen($nv) ? false : @$elements[$nv];
+				if ( $element ) $vals[] = $nv;  // include value
 			}
-			// max values limitation
-			if ($max_values && $n > $max_values) continue;
 			
-			$newpost[$new] = array();
-			$newpost[$new] = $post[$n];
+			// Skip empty value ARRAY if not in group
+			if (empty($vals) && !$use_ingroup) continue;
+			// If multiple disabled, use 1st value ARRAY only
+			if (!$multiple) {  $newpost = $vals;  break;  }
+			
+			$newpost[$new] = $vals;
 			$new++;
+			
+			// max values limitation (*if in group, this was zeroed above)
+			if ($max_values && $new >= $max_values) continue;
 		}
 		$post = $newpost;
 		/*if ($use_ingroup) {

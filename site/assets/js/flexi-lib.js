@@ -322,7 +322,7 @@
 	
 	}
 	
-	function fcUpdateCascadedField(from, to, field_id, item_id, field_type, cascade_prompt, add_enabled)
+	function fcUpdateCascadedField(elVal, to, field_id, item_id, field_type, cascade_prompt, add_enabled, valindex)
 	{
 		to.parent().find('.field_cascade_loading').html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\" /> ... Loading');
 		to.empty();
@@ -340,9 +340,11 @@
 				extfunc: 'getCascadedField',
 				field_id: field_id,
 				item_id: item_id,
-				valgrps: from.val()
+				valgrps: elVal,
+				valindex: valindex
 			}
 		}).done( function(data) {
+			//window.console.log ('Got data for:' + to.parent().attr('id'));
 			to.parent().find('.field_cascade_loading').html('');
 			data = data.trim();
 			
@@ -356,22 +358,32 @@
 	}
 	
 	
-	function fcCascadedField(field_id, item_id, field_type, srcELid, trgELid, cascade_prompt, add_enabled)
+	function fcCascadedField(field_id, item_id, field_type, srcSelector, trgSelector, cascade_prompt, add_enabled, valindex)
 	{
-		var onEL  = jQuery('#'+srcELid);
+		var onEL  = jQuery(srcSelector);
 		var onEL2 = onEL.parent().find('select.use_select2_lib');
 		var isSel2 = onEL2.length != 0;
 		
 		var srcEL = isSel2 ? onEL2 : onEL;
-		var trgEL = jQuery('#'+trgELid);
+		var trgEL = jQuery(trgSelector);
 		
 		srcEL.on('change', function(){
-			if ( !! srcEL.val() ) {
-				//window.console.log ('Updating:' + trgEL.attr('id'));
-				fcUpdateCascadedField(srcEL, trgEL, field_id, item_id, field_type, cascade_prompt, add_enabled);
+			var elType = srcEL.attr('type');
+			var elVal  = (elType=='radio' || elType=='checkbox') ? srcEL.parent().find('input:checked').val() : srcEL.val();
+			//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' , CHECKED: ' + srcEL.is(':checked') + ' type: '+srcEL.attr('type'));
+			if ( !! elVal ) {
+				//window.console.log ('value checked: -' + elVal + '- value this: ' + srcEL.val() + ' type: '+srcEL.attr('type'));
+				window.console.log ('Updating:' + trgEL.attr('id'));
+				fcUpdateCascadedField(elVal, trgEL, field_id, item_id, field_type, cascade_prompt, add_enabled, valindex);
 			} else {
-				trgEL.empty().append('<option value="" '+(!add_enabled ? 'disabled="disabled"' : '')+'>'+cascade_prompt+'</option>');
-				trgEL.trigger('change');
+				var trgTagName = trgEL.prop("tagName");
+				if (trgTagName=='SELECT') {
+					trgEL.empty().append('<option value="" '+(!add_enabled ? 'disabled="disabled"' : '')+'>'+cascade_prompt+'</option>');
+					trgEL.trigger('change');
+				} else {
+					trgEL.find('input').first().trigger('change');
+					trgEL.empty().append('<span class="badge">'+cascade_prompt+'</span>');
+				}
 			}
 		});
 	}

@@ -275,7 +275,7 @@ class FlexicontentFields
 		
 		$fieldvalues = array();
 		if ($values) foreach ($values as $v) {
-			$fieldvalues[$v->item_id][$f->field_id][$v->valueorder - 1][$v->suborder - 1] = $v->value;
+			$fieldvalues[$v->item_id][$v->field_id][$v->valueorder - 1][$v->suborder - 1] = $v->value;
 		}
 		foreach ($fieldvalues as & $iv) {
 			foreach ($iv as & $fv) {
@@ -936,7 +936,7 @@ class FlexicontentFields
 		$values = $db->loadObjectList();
 		
 		$fieldvalues = array();
-		foreach ($values as $v) {
+		if ($values) foreach ($values as $v) {
 			$fieldvalues[$v->item_id][$v->field_id][$v->valueorder - 1][$v->suborder - 1] = $v->value;
 		}
 		foreach ($fieldvalues as & $iv) {

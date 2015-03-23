@@ -23,6 +23,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 	static $field_types = array('select');
 	static $extra_props = array();
 	static $valueIsArr = 0;
+	static $isDropDown = 1;
 	
 	
 	// ***********
@@ -180,6 +181,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
 				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
 				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				var exec_prep_clean = (typeof params!== 'undefined' && typeof params.exec_prep_clean !== 'undefined') ? params.exec_prep_clean : 1;
 				
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
@@ -187,14 +189,17 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				}
 				
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
+				
+				if ( exec_prep_clean )  beforeAddField".$field->id."(fieldval_box);  // not in Group
 				var newField  = lastField.clone();
+				if ( exec_prep_clean )   afterAddField".$field->id."(fieldval_box);  // not in Group
 				
 				// Update the new select field
-				var theSelect= newField.find('select.fcfield_textselval').first();
-				theSelect.val('');
-				theSelect.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
-				theSelect.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
-				theSelect.attr('data-uniqueRowNum', uniqueRowNum".$field->id.");
+				var elem= newField.find('select.fcfield_textselval').first();
+				elem.val('');
+				elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
+				elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
+				elem.attr('data-uniqueRowNum', uniqueRowNum".$field->id.");
 				
 				// Destroy any select2 elements
 				var has_select2 = newField.find('div.select2-container').length != 0;
@@ -212,11 +217,9 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				if (remove_previous) lastField.remove();
 				";
 			
-				// Listen to the changes of cascade-after field
+			// Listen to the changes of cascade-after field
 			if ($cascade_after) $js .= "
-				jQuery(document).ready(function(){
-					fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', '".$srcELid."_'+uniqueRowNum".$field->id.", '".$trgELid."_'+uniqueRowNum".$field->id.", '".$cascade_prompt."', 1);
-				});
+				fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+uniqueRowNum".$field->id."+', input.".$srcELid."_'+uniqueRowNum".$field->id.", '#".$trgELid."_'+uniqueRowNum".$field->id.", '".$cascade_prompt."', 1, uniqueRowNum".$field->id.");
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -258,6 +261,11 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 					rowCount".$field->id."--;
 				}
 			}
+			
+			function beforeAddField".$field->id."(fieldval_box) {
+			}
+			function afterAddField".$field->id."(fieldval_box) {
+			}
 			";
 			
 			$css .= '';
@@ -297,7 +305,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		// Create field's HTML display for item form
 		// *****************************************
 		
-		// Create form field options, adding the value elements
+		// Create form field options
 		$options = array();
 		foreach ($elements as $element) {
 			$options[] = JHTML::_('select.option', $element->value, $element->text);
@@ -305,23 +313,28 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		
 		// Create the attributes of the form field
 		$display_as_select = 1;
-		if ($display_as_select) {
-			$attribs  = '';
+		if ($display_as_select)
+		{
 			$classes  = 'fcfield_textselval' . ($use_jslib && $select2_added ? ' use_select2_lib' : '');
 			$classes .= $required;
-			$onchange = "";
+			$onchange = '';
+			// Extra properties
+			$attribs  = '';
 			if ($classes)  $attribs .= ' class="'.$classes.'" ';
 			if ($onchange) $attribs .= ' onchange="'.$onchange.'" ';
 		}
 		
 		// Handle case of FORM fields that each value is an array of values
 		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
-		// then force single UNSERIALIZED value array, to be used
 		$values = self::$valueIsArr && !$multiple ? array($field->value) : $field->value;
 		
-		// Render the drop down select
+		
+		// *****************************************
+		// Create field's HTML display for item form
+		// *****************************************
+		
 		$field->html = array();
-		$n = 0;
+		$n = $ajax ? $field->valindex : 0;
 		$js = "";
 		foreach ($values as $value)
 		{
@@ -340,17 +353,19 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			}
 			
 			// Get options according to cascading, this is here so that it works with field grouping too
-			if ($cascade_after)
-				$options = $this->getLimitedProps($field, $item, $cascade_prompt, $ajax, $n);
+			if ($cascade_after) {
+				$elements = $this->getLimitedProps($field, $item, !$ajax ? $cascade_prompt : null, $ajax, $n);
+				$options = & $elements;
+			}
 			
 			if (!$ajax)
 			{
 				$fieldname_n = $fieldname.'['.$n.']'. (self::$valueIsArr ? '[]' : '');
 				$elementid_n = $elementid.'_'.$n;
-				$select_field = JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n);
+				$form_field = JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n);
 				
 				$field->html[] = '
-					'.$select_field.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
+					'.$form_field.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
 					'.($use_ingroup ? '' : $move2).'
 					'.($use_ingroup ? '' : $remove_button).'
 					'.($use_ingroup || !$add_position ? '' : $add_here).'
@@ -359,7 +374,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				// Listen to the changes of cascade-after field
 				if ($cascade_after && !$ajax) $js .= "
 				jQuery(document).ready(function(){
-					fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', '".$srcELid.'_'.$n."', '".$trgELid.'_'.$n."', '".$cascade_prompt."', 1);
+					fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$n.", input.".$srcELid.'_'.$n."', '#".$trgELid.'_'.$n."', '".$cascade_prompt."', 1, ".$n.");
 				});
 				";
 			} else {
@@ -388,10 +403,8 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 	}
 	
 	
-	
-	function & getLimitedProps(&$field, &$item, $cascade_prompt='Select value in above field', $ajax=false, $i=0)
+	function & getLimitedProps(&$field, &$item, $cascade_prompt='Please select above', $ajax=false, $i=0)
 	{
-		
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
@@ -401,7 +414,12 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		{
 			$_valgrps = $ajax ? $field->valgrps : (isset($field->valgrps[$i]) ? $field->valgrps[$i] : null);
 			if (empty($_valgrps)) {
-				$elements = array(JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $cascade_prompt, 'value', 'text', (self::$valueIsArr ? 'disabled' : null)));
+				$elements = array();
+				if (!$ajax) {
+					//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $cascade_prompt, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+					$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$cascade_prompt, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
+					$elements = array($prompt);
+				}
 				return $elements;
 			}
 		}
@@ -421,7 +439,9 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			$item_pros = true;
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props, $item_pros, false, $and_clause);
 			if ( !is_array($elements) ) {
-				$elements = array(JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_QUERY'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null)));
+				//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_QUERY'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_QUERY'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
+				$elements = array($prompt);
 				return $elements;
 			}
 		}
@@ -430,16 +450,16 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		{
 			$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
 			if ( !is_array($elements) ) {
-				$elements = array(JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null)));
+				//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_INVALID_ELEMENTS'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-important' );
+				$elements = array($prompt);
 				return $elements;
 			}
 			if ($cascade_after)
 			{
 				// Filter out values not in the the value group, this is done after the elements text is parsed
 				$_elements = array();
-				if ($ajax) print_r($_valgrps);
 				$_valgrps = array_flip($_valgrps);
-				if ($ajax) print_r($_valgrps);
 				foreach($elements as $element)
 					if (isset($_valgrps[$element->valgroup]))  $_elements[$element->value] = $element;
 				$elements = $_elements;
@@ -447,17 +467,41 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		}
 		
 		if (empty($elements)) {
-			$elements = array(JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), 'No data found', 'value', 'text', (self::$valueIsArr ? 'disabled' : null)));
+			//$prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), 'No data found', 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+			$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_('FLEXI_FIELD_NO_DATA_FOUND'), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-warning' );
+			$elements = array(0=>$prompt);
 			return $elements;
 		} else {
 			$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
-			$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
-			if ($usefirstoption) // Add selection prompt
-				array_unshift($elements, JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_($firstoptiontext), 'value', 'text', (self::$valueIsArr ? 'disabled' : null)));
+			$usefirstoption  = $field->parameters->get( 'usefirstoption', self::$isDropDown ? 1 : 0 ) ;
+			if ($usefirstoption) { // Add selection prompt
+				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_($firstoptiontext), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_($firstoptiontext), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-success' );
+				array_unshift($elements, $prompt);
+			}
+		}
+		
+		if ($field->field_type=='radioimage' || $field->field_type=='checkboximage')
+		{
+			// image specific variables
+			$form_vals_display = $field->parameters->get( 'form_vals_display', 1 ) ;  // this field includes image but it can be more convenient/compact not to be display image in item form
+			$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
+			$imgpath  = JURI::root(true) .'/'. $imagedir;
+			$imgfolder = JPATH_SITE .DS. $imagedir;
+			
+			foreach ($elements as $element) {
+				if ($form_vals_display >0 && !isset($element->image_html))
+					$element->image_html = file_exists($imgfolder . $element->image) ?
+						'<img style="vertical-align:unset!important;" src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />' :
+						'[NOT found]: '. $imgpath . $element->image;
+				if (!isset($element->label_tip))
+					$element->label_tip = flexicontent_html::getToolTip(null, $element->text, 0, 1);
+			}
 		}
 		
 		return $elements;
 	}
+	
 	
 	// Method called via AJAX to get dependent values
 	function getCascadedField()
@@ -465,12 +509,14 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$field_id = JRequest::getInt('field_id', 0);
 		$item_id  = JRequest::getInt('item_id', 0);
 		$valgrps  = JRequest::getVar('valgrps', '');
+		$valindex = JRequest::getVar('valindex', 0);
 		
 		// Load field
 		$_fields = FlexicontentFields::getFieldsByIds(array($field_id), array($item_id));
 		$field = $_fields[$field_id];
 		$field->item_id = $item_id;
 		$field->valgrps = $valgrps;
+		$field->valindex = $valindex;
 		
 		// Load item
 		$item = JTable::getInstance( $_type = 'flexicontent_items', $_prefix = '', $_config = array() );
@@ -480,8 +526,8 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		FlexicontentFields::loadFieldConfig($field, $item);
 		
 		// Get field values
-		$_fieldvalues = FlexicontentFields::getFieldValsById(array($field_id), array($item_id));
-		$field->value = isset($_fieldvalues[$item_id][$field_id]) ? $_fieldvalues[$item_id][$field_id] : array();
+		//$_fieldvalues = FlexicontentFields::getFieldValsById(array($field_id), array($item_id));
+		$field->value = null; //isset($_fieldvalues[$item_id][$field_id]) ? $_fieldvalues[$item_id][$field_id] : array();
 		
 		// Render field
 		$field->isAjax = 1;
