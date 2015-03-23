@@ -1711,11 +1711,18 @@ class flexicontent_html
 		$button_classes .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
-		// Maintain menu item ? e.g. current category view, 
-		$Itemid = JRequest::getInt('Itemid', 0);  //$Itemid = 0;
-		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
-		$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=edit';
-		$output	= '<a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		if ( $params->get('show_editbutton', 1) == '1') {
+			// Maintain menu item ? e.g. current category view, 
+			$Itemid = JRequest::getInt('Itemid', 0);  //$Itemid = 0;
+			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
+			$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=edit';
+			$targetLink = "_self";
+		} else if ( $params->get('show_editbutton', 1) == '2' ) {
+			$link = JURI::base(true).'/administrator/index.php?option=com_flexicontent&view=items&filter_id='.$item->id;
+			//$link = JURI::base(true).'/administrator/index.php?option=com_flexicontent&task=items.edit&cid[]='.$item->id;
+			$targetLink = "_blank";
+		}
+		$output	= '<a href="'.$link.'" class="'.$button_classes.'" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 		
 		return $output;

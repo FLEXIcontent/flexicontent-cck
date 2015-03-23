@@ -84,7 +84,8 @@
 		<field name="show_editbutton" type="radio" default="" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
-			<option value="1">FLEXI_SHOW</option>
+			<option value="1">FLEXI_SHOWFRONT</option>
+			<option value="2">FLEXI_SHOWBACK</option>
 		</field>
 		<field name="show_state_icon" type="radio" default="" label="FLEXI_STATE_ICON" description="FLEXI_STATE_ICON_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
