@@ -2,6 +2,7 @@
 	window.fc_init_hide_dependent = 1;
 	window.fc_refreshing_dependent = 0;
 	window.fc_dependent_params = {};
+	window.fc_cascade_field_funcs = {};
 
 	function fc_loadImagePreview(input_id, img_id, msg_id, thumb_w, thumb_h)
 	{
@@ -319,15 +320,15 @@
 			var c = jQuery(this);
 			c.attr('data-fc_forced_display', '0');
 		});
-	
 	}
 	
-	function fcUpdateCascadedField(elVal, to, field_id, item_id, field_type, cascade_prompt, add_enabled, valindex)
+	function fcCascadedField_update(elVal, trgID, field_id, item_id, field_type, cascade_prompt, prompt_enabled, valindex)
 	{
-		to.parent().find('.field_cascade_loading').html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\" /> ... Loading');
-		to.empty();
-		to.append('<option value="" '+(!add_enabled ? 'disabled="disabled"' : '')+'> Please wait </option>');
-		to.trigger('change');
+		var trgEL = jQuery('#'+trgID);
+		trgEL.parent().find('.field_cascade_loading').html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\" /> ... Loading');
+		
+		fcCascadedField_clear(trgEL, 'Please wait', prompt_enabled);
+		
 		jQuery.ajax({
 			type: 'POST',
 			url: 'index.php?option=com_flexicontent&tmpl=component&format=raw',
@@ -344,46 +345,70 @@
 				valindex: valindex
 			}
 		}).done( function(data) {
-			//window.console.log ('Got data for:' + to.parent().attr('id'));
-			to.parent().find('.field_cascade_loading').html('');
+			//window.console.log ('Got data for:' + trgEL.attr('id'));
+			trgEL.parent().find('.field_cascade_loading').html('');
 			data = data.trim();
 			
 			if (data!='') {
-				to.empty().append(data).val('');
+				trgEL.empty().append(data).val('');
+				var trgTagName = trgEL.prop("tagName");
+				if (fc_cascade_field_funcs.hasOwnProperty(trgID) && trgTagName!='SELECT') {
+					//window.console.log ('Readding cascade function for source ID:' + trgID);
+					fc_cascade_field_funcs[trgID]();
+				}
+				
+				// Add prettyCheckable to new radio set (if having appropriate CSS class)
+				trgEL.find('.use_prettycheckable').each(function() {
+					var elem = jQuery(this);
+					var lbl = elem.next('label');
+					var lbl_html = elem.next('label').html();
+					lbl.remove();
+					elem.prettyCheckable({
+						color: 'blue',
+						label: lbl_html
+					});
+				});
 			} else {
-				to.empty().append('<option value="" '+(!add_enabled ? 'disabled="disabled"' : '')+'>'+cascade_prompt+'</option>');
+				trgEL.empty().append('<option value="" '+(!prompt_enabled ? 'disabled="disabled"' : '')+'>'+cascade_prompt+'</option>');
 			}
-			to.trigger('change');  // Retrigger change event to update select2 display
+			trgEL.trigger('change');  // Retrigger change event to update select2 display
 		});
 	}
 	
+	function fcCascadedField_clear(el, prompt, prompt_enabled)
+	{
+		var trgTagName = el.prop("tagName");
+		if (trgTagName=='SELECT') {
+			el.empty().append('<option value="" '+(!prompt_enabled ? 'disabled="disabled"' : '')+'>'+prompt+'</option>');
+			el.trigger('change', [{elementClear:1}]);
+		} else {
+			el.find('input').first().trigger('change', [{elementClear:1}]);
+			el.empty().append('<span class="badge">'+prompt+'</span>');
+		}
+	}
 	
-	function fcCascadedField(field_id, item_id, field_type, srcSelector, trgSelector, cascade_prompt, add_enabled, valindex)
+	function fcCascadedField(field_id, item_id, field_type, srcSelector, trgID, cascade_prompt, prompt_enabled, valindex)
 	{
 		var onEL  = jQuery(srcSelector);
 		var onEL2 = onEL.parent().find('select.use_select2_lib');
 		var isSel2 = onEL2.length != 0;
 		
 		var srcEL = isSel2 ? onEL2 : onEL;
-		var trgEL = jQuery(trgSelector);
+		var trgEL = jQuery('#'+trgID);
+		//window.console.log ('fcCascadedField FOR source SELECTOR: ' + srcSelector + ' target ID: ' + trgID + ' , valindex: ' + valindex);
 		
-		srcEL.on('change', function(){
+		srcEL.on('change', function(e, data){
+			var elementClear = (typeof data!== 'undefined' && typeof data.elementClear !== 'undefined') ? data.elementClear : 0;  // workaround for radio, checkbox causing unneeded server call
 			var elType = srcEL.attr('type');
 			var elVal  = (elType=='radio' || elType=='checkbox') ? srcEL.parent().find('input:checked').val() : srcEL.val();
-			//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' , CHECKED: ' + srcEL.is(':checked') + ' type: '+srcEL.attr('type'));
-			if ( !! elVal ) {
-				//window.console.log ('value checked: -' + elVal + '- value this: ' + srcEL.val() + ' type: '+srcEL.attr('type'));
-				window.console.log ('Updating:' + trgEL.attr('id'));
-				fcUpdateCascadedField(elVal, trgEL, field_id, item_id, field_type, cascade_prompt, add_enabled, valindex);
+			
+			//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' , isCHECKED: ' + srcEL.is(':checked') + ' type: '+srcEL.attr('type'));
+			if ( !elementClear && !! elVal ) {
+				//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' --> Updating:' + trgEL.attr('id') + ' for VALGROUP: -' + elVal + '-  value of 1st element: ' + srcEL.val() + ' type: '+srcEL.attr('type'));
+				fcCascadedField_update(elVal, trgID, field_id, item_id, field_type, cascade_prompt, prompt_enabled, valindex);
 			} else {
-				var trgTagName = trgEL.prop("tagName");
-				if (trgTagName=='SELECT') {
-					trgEL.empty().append('<option value="" '+(!add_enabled ? 'disabled="disabled"' : '')+'>'+cascade_prompt+'</option>');
-					trgEL.trigger('change');
-				} else {
-					trgEL.find('input').first().trigger('change');
-					trgEL.empty().append('<span class="badge">'+cascade_prompt+'</span>');
-				}
+				//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' --> Clearing:' + trgEL.attr('id') + ' TAG type: ' + trgEL.prop("tagName"));
+				fcCascadedField_clear(trgEL, cascade_prompt, prompt_enabled);
 			}
 		});
 	}

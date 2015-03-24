@@ -24,6 +24,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 	static $extra_props = array();
 	static $valueIsArr = 0;
 	static $isDropDown = 1;
+	static $promptEnabled = 1;
 	
 	
 	// ***********
@@ -219,7 +220,12 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			
 			// Listen to the changes of cascade-after field
 			if ($cascade_after) $js .= "
-				fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+uniqueRowNum".$field->id."+', input.".$srcELid."_'+uniqueRowNum".$field->id.", '#".$trgELid."_'+uniqueRowNum".$field->id.", '".$cascade_prompt."', 1, uniqueRowNum".$field->id.");
+				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."] = function(rowNo){
+					return function () {
+						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+rowNo+', input.".$srcELid."_'+rowNo, '".$trgELid."_'+rowNo, '".$cascade_prompt."', ".self::$promptEnabled.", rowNo);
+					}
+				}(uniqueRowNum".$field->id.");
+				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."]();
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -374,7 +380,10 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				// Listen to the changes of cascade-after field
 				if ($cascade_after && !$ajax) $js .= "
 				jQuery(document).ready(function(){
-					fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$n.", input.".$srcELid.'_'.$n."', '#".$trgELid.'_'.$n."', '".$cascade_prompt."', 1, ".$n.");
+					fc_cascade_field_funcs['".$srcELid.'_'.$n."'] = function(){
+						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$n.", input.".$srcELid.'_'.$n."', '".$trgELid.'_'.$n."', '".$cascade_prompt."', ".self::$promptEnabled.", ".$n.");
+					}
+					fc_cascade_field_funcs['".$srcELid.'_'.$n."']();
 				});
 				";
 			} else {
@@ -490,7 +499,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			$imgfolder = JPATH_SITE .DS. $imagedir;
 			
 			foreach ($elements as $element) {
-				if ($form_vals_display >0 && !isset($element->image_html))
+				if ($form_vals_display >0 && !isset($element->image_html) && empty($element->isprompt))
 					$element->image_html = file_exists($imgfolder . $element->image) ?
 						'<img style="vertical-align:unset!important;" src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />' :
 						'[NOT found]: '. $imgpath . $element->image;
