@@ -22,6 +22,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	static $extra_props = array();
 	static $prior_to_version = "3.0 rc";
 	
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -29,7 +30,6 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	function plgFlexicontent_fieldsFieldgroup( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		
 		JPlugin::loadLanguage('plg_flexicontent_fields_fieldgroup', JPATH_ADMINISTRATOR);
 	}
 	
@@ -64,10 +64,11 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$db = JFactory::getDBO();
 		$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 		
+		
 		// ****************
 		// Number of values
 		// ****************
-		$multiple   = $use_ingroup || 1; //$field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
@@ -167,12 +168,19 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 					return 'cancel';
 				}
 				
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				
-				// Remove prettyCheckable before cloning (if having appropriate CSS class)
-				lastField.find('input.use_prettycheckable:radio').each(function() { jQuery(this).prettyCheckable('destroy'); });
-				
 				var newField  = lastField.clone();
+				
+				// Need to at least change FORM field names and HTML tag IDs before adding the container to the DOM
+				var theSet = newField.find('input, select');
+				var nr = 0;
+				theSet.each(function() {
+					var elem = jQuery(this);
+					elem.attr('name', '_duplicated_".$field->id."_'+uniqueRowNum".$field->id."+'_'+nr);
+					elem.attr('id', '_duplicated_".$field->id."_'+uniqueRowNum".$field->id."+'_'+nr);
+					nr++;
+				});
 				";
 			
 			// Add new field to DOM
@@ -192,20 +200,12 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				
 				// Add new values for each field
 				var groupval_box = newField;
-				var add_params = {remove_previous: 1, scroll_visible: 0, animate_visible: 0, exec_prep_clean: 0};
+				var add_params = {remove_previous: 1, scroll_visible: 0, animate_visible: 0};
 				".$addField_funcs."
 				";
 			
 			// Readd prettyCheckable and remove previous if so requested
 			$js .="
-				// Re-add prettyCheckable after cloning (if having appropriate CSS class)
-				lastField.find('.use_prettycheckable').each(function() {
-					var elem = jQuery(this);
-					var lbl_html = elem.prev('label').html();
-					elem.prev('label').remove();
-					elem.prettyCheckable({ label: lbl_html });
-				});
-				
 				if (remove_previous) lastField.remove();
 				";
 				
@@ -294,7 +294,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				// field has tooltip
 				$edithelp = $grpfield->edithelp ? $grpfield->edithelp : 1;
 				if ( $grpfield->description && ($edithelp==1 || $edithelp==2) ) {
-					 $lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon_fe ' : ' ') .$tooltip_class;
+					 $lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon ' : ' ') .$tooltip_class;
 					 $lbl_title = flexicontent_html::getToolTip(trim($field->label, ':'), $grpfield->description, 0, 1);
 				}
 				
@@ -306,6 +306,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				.'</div>
 				';
 			}
+			
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
 		// Non value HTML

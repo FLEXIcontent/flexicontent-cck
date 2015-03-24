@@ -121,7 +121,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="text_or_value" type="radio" default="1" label="FLEXI_LABEL_OR_VALUE_ETC" description="FLEXI_LABEL_OR_VALUE_ETC_DESC">
+			<field name="text_or_value" type="radio" default="1" label="FLEXI_LABEL_OR_VALUE_ETC" description="FLEXI_LABEL_OR_VALUE_ETC_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_VALUE</option>
 				<option value="1">FLEXI_LABEL</option>
 			</field>

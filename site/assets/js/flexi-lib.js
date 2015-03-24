@@ -383,7 +383,7 @@
 			el.trigger('change', [{elementClear:1}]);
 		} else {
 			el.find('input').first().trigger('change', [{elementClear:1}]);
-			el.empty().append('<span class="badge">'+prompt+'</span>');
+			el.empty().append('<span class="badge badge-info">'+prompt+'</span>');
 		}
 	}
 	

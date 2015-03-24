@@ -558,7 +558,7 @@ $tabCnt[$tabSetCnt] = 0;
 			// field has tooltip
 			$edithelp = $field->edithelp ? $field->edithelp : 1;
 			if ( $field->description && ($edithelp==1 || $edithelp==2) ) {
-				$lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon_bg' : '');
+				$lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon' : '');
 				$label_tooltip = 'class="'.$tip_class.' '.$lbl_class.' label pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
 			} else {
 				$label_tooltip = 'class="'.$lbl_class.' label pull-left label-fcinner label-toplevel"';
@@ -703,7 +703,7 @@ if ($this->row->type_id) {
 				// field has tooltip
 				$edithelp = $field->edithelp ? $field->edithelp : 1;
 				if ( $field->description && ($edithelp==1 || $edithelp==2) ) {
-					$lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon_bg' : '');
+					$lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon' : '');
 					$label_tooltip = 'class="'.$tip_class.' '.$lbl_class.' label pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field->description, 0, 1).'"';
 				} else {
 					$label_tooltip = 'class="'.$lbl_class.' label pull-left label-fcinner label-toplevel"';

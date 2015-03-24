@@ -163,7 +163,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .="
+			if (!$use_ingroup) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
@@ -302,7 +302,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				";
 			
 			// Add new element to sortable objects (if field not in group)
-			if (!$use_ingroup) $js .="
+			if (!$use_ingroup) $js .= "
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
 					containment: 'parent',

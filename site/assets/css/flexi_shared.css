@@ -914,9 +914,10 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 }
 /* FIELD-GROUP: label of grouped field */
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label {
-	max-width: 150px;
-	width: 18% !important;
-	padding: 4px 1% !important;
+	box-sizing: border-box;
+	max-width: 150px !important;
+	width: 20% !important;
+	padding: 4px 6px 4px 6px !important;
 	margin: 0 1% 0 0 !important;
 	float:none !important;
 	
@@ -924,11 +925,10 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	display:inline-block;
 	border-width: 0px !important;
 }
-#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label.fc_tooltip_icon_fe {
-	padding-right: 3% !important;
-	width: 14% !important;
-	background-image: url(../images/icon-16-hint.png);
-	background-position: 99% 5px;
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label.fc_tooltip_icon {
+	padding: 4px 6px 4px 20px !important;
+	background-image: url(../images/comment.png);
+	background-position: 2px 2px;
 	background-repeat: no-repeat;
 }
 /* FIELD-GROUP: value of grouped field */
@@ -1345,18 +1345,27 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 #flexicontent .label-fcinner {
 	font-size: 12px;
 	text-align: right;
-	min-width: 40px;
-	max-width: 80%;
-	width:  80%;
+	min-width: 64px;
+	width: 100%;
 	float: right;
 	text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
 	
 	/* important for proper form placement, override ALL or NONE */
 	border: 0px solid !important; /* non-zero causes wrapping */
 	margin: 0 !important;
-	padding: 8px 10% !important;
+	padding: 8px 8px 8px 8px !important;
+	box-sizing: border-box;
 	white-space: normal !important;
 }
+
+#flexicontent .label-fcouter > label.fc_tooltip_icon,
+#flexicontent .label-fcinner.fc_tooltip_icon {
+	padding: 8px 8px 8px 20px !important;
+	background-image: url(../images/comment.png);
+	background-position: 2px 5px;
+	background-repeat: no-repeat;
+}
+
 #flexicontent .label-toplevel {
 	/*background-color: #707070;*/
 }
@@ -1447,26 +1456,6 @@ input.invalid + .fccheckradio_lbl {
 }
 #flexicontent .flexi_label.required:after {
 	content:"*";
-}
-
-
-#flexicontent .flexi_label.fc_tooltip_icon_fe {
-  padding:6px 3% 6px 1% !important;
-  width: 14%;
-  max-width:126px;
-	background-image: url(../images/icon-16-hint.png);
-	background-position: 99% 5px;
-	background-repeat: no-repeat;
-}
-
-#flexicontent .flexi_label.fc_tooltip_icon_bg {
-  padding: 6px 3% 6px 1% !important;
-  width: 14%;
-  max-width:126px;
-	background-image: url(../images/information.png);
-	background-position: 98% 7px;
-	background-repeat: no-repeat;
-	vertical-align: top;
 }
 
 #flexicontent .flexi_formblock {

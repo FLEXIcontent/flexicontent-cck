@@ -984,7 +984,7 @@ class FlexicontentModelItems extends JModelLegacy
 				if ( isset($FS['T']) )      array_push($states, -2);
 				$states = array_unique($states, SORT_REGULAR);
 				if (!empty($states))
-					echo $where[] = 'i.state IN ('.implode(',', $states).')';
+					$where[] = 'i.state IN ('.implode(',', $states).')';
 			}
 		}
 		

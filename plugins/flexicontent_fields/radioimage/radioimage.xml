@@ -61,7 +61,7 @@
 			<field name="imagedir" type="text" default="images/stories/" class="required" label="FLEXI_FIELD_IMAGEDIR" description="FLEXI_FIELD_IMAGEDIR_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
-			<field name="form_vals_display" type="radio" default="1" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC">
+			<field name="form_vals_display" type="radio" default="1" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_LABEL</option>
 				<option value="1">FLEXI_IMAGE</option>
 				<option value="2">FLEXI_BOTH</option>
@@ -118,7 +118,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="text_or_value" type="radio" default="2" label="FLEXI_LABEL_OR_VALUE_ETC" description="FLEXI_LABEL_OR_VALUE_ETC_DESC">
+			<field name="text_or_value" type="radio" default="2" label="FLEXI_LABEL_OR_VALUE_ETC" description="FLEXI_LABEL_OR_VALUE_ETC_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_VALUE</option>
 				<option value="1">FLEXI_LABEL</option>
 				<option value="2">FLEXI_IMAGE</option>

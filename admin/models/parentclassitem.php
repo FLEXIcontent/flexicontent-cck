@@ -1750,6 +1750,7 @@ class ParentClassItem extends JModelAdmin
 		$allowed_cid = $overridecatperms ?
 			@ $submit_conf['cids'] :
 			FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create'), $require_all=true) ;
+		if ($overridecatperms && @ $submit_conf['maincatid']) $allowed_cid[] = $submit_conf['maincatid'];  // add the "default" main category to allowed categories
 		
 		if ( isset($allowed_cid) ) {
 			// Add existing item's categories into the user allowed categories

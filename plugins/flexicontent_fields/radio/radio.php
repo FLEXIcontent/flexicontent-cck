@@ -192,7 +192,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		if ($multiple && !$ajax)
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .="
+			if (!$use_ingroup) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
@@ -214,25 +214,32 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
 				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
 				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-				var exec_prep_clean = (typeof params!== 'undefined' && typeof params.exec_prep_clean !== 'undefined') ? params.exec_prep_clean : 1;
 				
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
 				
+				
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				
-				if ( exec_prep_clean )  beforeAddField".$field->id."(fieldval_box);  // not in Group
 				var newField  = lastField.clone();
-				if ( exec_prep_clean )   afterAddField".$field->id."(fieldval_box);  // not in Group
 				
-				// Update set container id
+				// Remove HTML added by prettyCheckable JS, from the dupicate new INPUT SET
+				var prettyContainers = newField.find('.prettyradio, .prettycheckbox');
+				prettyContainers.find('input, label').each(function() {
+					var el = jQuery(this);
+					el.insertAfter(el.parent());
+				});
+				prettyContainers.remove();
+				
+				
+				// Update INPUT SET container id
 				newField.find('.fc_input_set').attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 				var js_class = '".($use_prettycheckable && $prettycheckable_added ? ' use_prettycheckable' : '')."';
 				
-				// Update the new radios
-				var theSet = newField.find('input:radio');
+				// Update the new INPUT SET
+				var theSet = newField.find('input:radio, input:checkbox');
 				//if(window.console) window.console.log('theSet.length: ' + theSet.length);
 				var nr = 0;
 				theSet.each(function() {
@@ -249,7 +256,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 					nr++;
 				});
 				
-				// Add prettyCheckable to new radio set (if having appropriate CSS class)
+				// Reapply prettyCheckable JS 
 				newField.find('.use_prettycheckable').each(function() {
 					var elem = jQuery(this);
 					var lbl = elem.prev('label');
@@ -315,20 +322,6 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 					row.slideUp(400, function(){ this.remove(); });
 					rowCount".$field->id."--;
 				}
-			}
-			
-			function beforeAddField".$field->id."(fieldval_box) {
-				// Remove prettyCheckable before cloning (if having appropriate CSS class)
-				fieldval_box.find('input.use_prettycheckable:radio').each(function() { jQuery(this).prettyCheckable('destroy'); });
-			}
-			function afterAddField".$field->id."(fieldval_box) {
-				// Re-add prettyCheckable after cloning (if having appropriate CSS class)
-				fieldval_box.find('.use_prettycheckable').each(function() {
-					var elem = jQuery(this);
-					var lbl_html = elem.prev('label').html();
-					elem.prev('label').remove();
-					elem.prettyCheckable({ label: lbl_html });
-				});
 			}
 			";
 			
@@ -446,9 +439,8 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 					$input_fld = ' <input type="'.$fftype.'" id="'.$elementid_no.'" data-element-grpid="'.$elementid_n.'" name="'.$fieldname_n.'" '.$attribs.$input_attribs.' value="'.$element->value.'" '.$checked.' />';
 					$options[] = ''
 						.$pretext
-						.($use_prettycheckable && $prettycheckable_added ? $input_fld : '')
+						.$input_fld
 						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" title="'.@$element->label_tip.'">'
-							. (!$use_prettycheckable || !$prettycheckable_added ? $input_fld : '')
 							.($form_vals_display!=1 ? $element->text : '')
 						.'</label>'
 						.$posttext
@@ -577,7 +569,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 			$usefirstoption  = $field->parameters->get( 'usefirstoption', self::$isDropDown ? 1 : 0 ) ;
 			if ($usefirstoption) { // Add selection prompt
 				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_($firstoptiontext), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
-				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_($firstoptiontext), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-success' );
+				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_($firstoptiontext), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
 				array_unshift($elements, $prompt);
 			}
 		}

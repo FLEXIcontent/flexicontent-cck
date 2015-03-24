@@ -1205,7 +1205,7 @@ if ($this->fields && $typeid) :
 			// field has tooltip
 			$edithelp = $field->edithelp ? $field->edithelp : 1;
 			if ( $field->description && ($edithelp==1 || $edithelp==2) ) {
-				 $lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon_fe ' : ' ') .$tip_class;
+				 $lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon ' : ' ') .$tip_class;
 				 $lbl_title = flexicontent_html::getToolTip(trim($field->label, ':'), $field->description, 0, 1);
 			}
 			// field is required

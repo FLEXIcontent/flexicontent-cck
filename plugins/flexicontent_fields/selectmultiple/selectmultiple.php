@@ -168,7 +168,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		if ($multiple && !$ajax)
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .="
+			if (!$use_ingroup) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag-handle',
@@ -190,7 +190,6 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
 				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
 				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-				var exec_prep_clean = (typeof params!== 'undefined' && typeof params.exec_prep_clean !== 'undefined') ? params.exec_prep_clean : 1;
 				
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
@@ -198,10 +197,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 				}
 				
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				
-				if ( exec_prep_clean )  beforeAddField".$field->id."(fieldval_box);  // not in Group
 				var newField  = lastField.clone();
-				if ( exec_prep_clean )   afterAddField".$field->id."(fieldval_box);  // not in Group
 				
 				// Update the new select field
 				var elem= newField.find('select.fcfield_textselval').first();
@@ -274,11 +270,6 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 					row.slideUp(400, function(){ this.remove(); });
 					rowCount".$field->id."--;
 				}
-			}
-			
-			function beforeAddField".$field->id."(fieldval_box) {
-			}
-			function afterAddField".$field->id."(fieldval_box) {
 			}
 			";
 			
@@ -508,7 +499,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			$usefirstoption  = $field->parameters->get( 'usefirstoption', self::$isDropDown ? 1 : 0 ) ;
 			if ($usefirstoption) { // Add selection prompt
 				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_($firstoptiontext), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
-				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_($firstoptiontext), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-success' );
+				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_($firstoptiontext), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
 				array_unshift($elements, $prompt);
 			}
 		}
