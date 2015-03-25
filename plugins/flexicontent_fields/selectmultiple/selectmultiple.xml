@@ -61,7 +61,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			<field name="sql_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_SQL_MODE" description="FLEXI_FIELD_SQL_MODE_DESC"
-				inline_tip="SELECT ... AS value, ... AS text, ... AS image, ... AS valgrp ..." tip_class="elements_sql" tip_img="comment.png"  preview_img="database_green.png" 
+				inline_tip="SELECT ... AS value, ... AS text, ... AS image, ... AS valgrp ... FROM ... WHERE _valgrp_in_ AND (...)" tip_class="elements_sql" tip_img="comment.png"  preview_img="database_green.png" 
 				inline_tip2="value1::label1::image1::valgrp%%&lt;br/&gt; value2::label2::image2::valgrp%% ..." tip_class2="elements_list" tip_img2="comment.png" preview_img2="text_area.png" 
 				class="btn-group group-fcinfo">
 				<option value="0" show_list="elements_list" hide_list="elements_sql">FLEXI_NO</option>

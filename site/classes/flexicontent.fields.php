@@ -1456,11 +1456,7 @@ class FlexicontentFields
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
 			$query = FlexicontentFields::doQueryReplacements($field_elements, $field, $item, $item_pros, $canCache);
 			if ($query && $and_clause) {
-				$count = 0;
-				$query = preg_replace('/[\s]+WHERE[\s]+/iu', ' WHERE 1 '.$and_clause.' AND ', $query, -1, $count);
-				if (!$count) {
-					$query = preg_replace('/[\s]+FROM[\s]+([^\s]{1,})/iu', 'FROM $1 WHERE 1 '.$and_clause.' ', $query, -1, $count);
-				}
+				$query = preg_replace('/_valgrp_in_/ui', $and_clause, $query);
 			}
 			
 			// Execute SQL query to retrieve the field value - label pair, and any other extra properties
