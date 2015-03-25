@@ -406,18 +406,16 @@ class FlexicontentModelCategories extends JModelList
 			return false;
 		}
 		
-		if (FLEXI_J16GE) {
-			// Check access to delete of categories, this may seem redundant, but it is a security check in case user manipulates the backend adminform ...
-			foreach ($rows as $row) {
-				$canDelete		= $user->authorise('core.delete', 'com_content.category.'.$row->id);
-				$canDeleteOwn	= $user->authorise('core.delete.own', 'com_content.category.'.$row->id) && $row->created_user_id == $user->get('id');
-				if	( !$canDelete && !$canDeleteOwn ) {
-					$this->setError(
-						'You are not authorised to delete category with id: '. $row->id
-						.'<br />NOTE: when deleting a category the children categories will get deleted too'
-					);
-					return false;
-				}
+		// Check access to delete of categories, this may seem redundant, but it is a security check in case user manipulates the backend adminform ...
+		foreach ($rows as $row) {
+			$canDelete		= $user->authorise('core.delete', 'com_content.category.'.$row->id);
+			$canDeleteOwn	= $user->authorise('core.delete.own', 'com_content.category.'.$row->id) && $row->created_user_id == $user->get('id');
+			if	( !$canDelete && !$canDeleteOwn ) {
+				$this->setError(
+					'You are not authorised to delete category with id: '. $row->id
+					.'<br />NOTE: when deleting a category the children categories will get deleted too'
+				);
+				return false;
 			}
 		}
 		
@@ -436,40 +434,11 @@ class FlexicontentModelCategories extends JModelList
 		// Remove categories only if no errors were found
 		if (count( $cid ) && count($err) == 0)
 		{
-			if (FLEXI_J16GE) {
-				// table' is object of 'JTableNested' extended class, which will also delete assets
-				$cids = $cid;
-				foreach ($cids as $id) {
-					$table-> id = $id;
-					$table->delete($id);
-				}
-			} else {
-
-				$cids = implode( ',', $cid );
-				$query = 'DELETE FROM #__categories'
-						. ' WHERE id IN ('. $cids .')';
-				
-				$this->_db->setQuery( $query );
-				
-				if(!$this->_db->query()) {
-					$this->setError($this->_db->getErrorMsg());
-					return false;
-				}
-			}
-			
-			// remove also categories acl if applicable
-			if (FLEXI_ACCESS) {
-				$query 	= 'DELETE FROM #__flexiaccess_acl'
-						. ' WHERE acosection = ' . $this->_db->Quote('com_content')
-						. ' AND axosection = ' . $this->_db->Quote('category')
-						. ' AND axo IN ('. $cids .')'
-						;
-				$this->_db->setQuery( $query );
-				
-				if(!$this->_db->query()) {
-					$this->setError($this->_db->getErrorMsg());
-					return false;
-				}
+			// table' is object of 'JTableNested' extended class, which will also delete assets
+			$cids = $cid;
+			foreach ($cids as $id) {
+				$table-> id = $id;
+				$table->delete($id);
 			}
 		}
 		

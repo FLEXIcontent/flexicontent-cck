@@ -143,19 +143,19 @@ class FlexicontentViewCategories extends JViewLegacy
 		if ($add_divider) JToolBarHelper::divider();
 		
 		$add_divider = false;
-		if ( !FLEXI_J16GE || ( $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent') ) ) {
+		if ( $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent') ) {
 			JToolBarHelper::publishList($contrl.'publish');
 			JToolBarHelper::unpublishList($contrl.'unpublish');
 			JToolBarHelper::divider();
-			if (FLEXI_J16GE) JToolBarHelper::archiveList($contrl.'archive');
+			JToolBarHelper::archiveList($contrl.'archive');
 		}
 		
 		$add_divider = false;
-		if ( !FLEXI_J16GE || ( $filter_state == -2 && $user->authorise('core.delete', 'com_flexicontent') ) ) {
+		if ( $filter_state == -2 && $user->authorise('core.delete', 'com_flexicontent') ) {
 			//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
 			// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
 			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
-			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
+			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
 			$btn_task    = $contrl.'remove';
 			$extra_js    = "";
 			flexicontent_html::addToolBarButton(
