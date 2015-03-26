@@ -27,6 +27,38 @@ if (!function_exists('json_encode')) { // PHP < 5.2 lack support for json
 
 class flexicontent_html
 {
+	static function & checkPHPLimits($required=null, $recommended=null)
+	{
+		if (!$required)    $required=array('max_input_vars'=>2000, 'suhosin.post.max_vars'=>2000, 'suhosin.request.max_vars'=>2000);
+		if (!$recommended) $recommended=array('max_input_vars'=>4000, 'suhosin.post.max_vars'=>4000, 'suhosin.request.max_vars'=>4000);
+		
+		$suhosin_loaded = extension_loaded('suhosin');
+		$result = array();
+		foreach($required as $varname => $req_value)
+		{
+			if ( substr( $varname, 0, strlen('suhosin.') ) === 'suhosin.' && !$suhosin_loaded ) continue;
+			$sys_value = flexicontent_upload::parseByteLimit(ini_get($varname));
+			$required_ok    = $sys_value >=  $required[$varname];
+			$recommended_ok = $sys_value >=  $recommended[$varname];
+			$conf_limit_class  = $recommended_ok ? 'badge-success' : ($required_ok ? 'badge-warning' : 'badge-important');
+			
+			$result[ $recommended_ok ? 'message' : ($required_ok ? 'notice' : 'warning') ][] = '
+			<span class="fc-php-limits-box">
+				<span class="label label-info">'.$varname.'</span>
+				<span class="badge '.$conf_limit_class.'">'.$sys_value.'</span>
+				&nbsp; &nbsp; &nbsp;
+				<span class="fc-php-limits-box">
+					<span class="label">'.JText::_('FLEXI_REQUIRED').'</span>
+					<b class="">'.$required[$varname].'</b>
+					<span class="label">'.JText::_('FLEXI_RECOMMENDED').'</span>
+					<b class="">'.$recommended[$varname].'</b>
+				</span>
+			</span>';
+		}
+		return $result;
+	}
+	
+	
 	static function getDefaultCanonical()
 	{
 		$app = JFactory::getApplication();
@@ -3684,6 +3716,12 @@ class flexicontent_upload
 	}
 	
 	
+	/**
+	 * Gets upload Limits
+	 *
+	 * @return array with limits
+	 * @since 3.0
+	 */
 	static function getPHPuploadLimit()
 	{
 		$post_max   = flexicontent_upload::parseByteLimit(ini_get('post_max_size'));
@@ -3701,8 +3739,8 @@ class flexicontent_upload
 		}
 		return $limit;
 	}
-
-
+	
+	
 	/**
 	 * Gets the extension of a file name
 	 *

@@ -68,7 +68,7 @@ class com_flexicontentInstallerScript
 			if ( $memory_limit < 64000000 ) @ini_set( 'memory_limit', '64M' );
 		}
 		
-		// first check if PHP5 is running
+		// first check if PHP v5.3.0 or later is running
 		$PHP_VERSION_NEEDED = '5.3.0';
 		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
 		{
