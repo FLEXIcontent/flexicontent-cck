@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - User account via submit</name>
+	<author>ggppdk</author>
+	<creationDate>February 2015</creationDate>
+	<copyright>Copyright (C) 2015 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>ggppdk</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>FLEXI_FIELD_EMAIL</description>
+	<files>
+		<filename plugin="account_via_submit">account_via_submit.php</filename>
+		<filename>index.html</filename>
+		<folder>installation</folder>
+	</files>
+	
+	<install>
+		<sql>
+			<file driver="mysql" charset="utf8">installation/install.mysql.utf8.sql</file>
+		</sql>
+	</install>
+	<uninstall>
+		<sql>
+			<file driver="mysql" charset="utf8">installation/uninstall.mysql.utf8.sql</file>
+		</sql>
+	</uninstall>
+	
+	<config>
+	<fields name="attribs">
+		
+		<!--fieldset name="standard" repeat="1">
+		</fieldset-->
+		
+		<fieldset name="group-account_via_submit-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
+			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
+			
+			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_FLOATED_LEFT</option>
+				<option value="2">FLEXI_CLEARED</option>
+			</field>
+			
+			<field name="" type="separator" default="Email address" description="FLEXI_FORM_FIELD_CONF_DESC" level="level2" />
+			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
+			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="extra_attributes" type="text" default="" label="FLEXI_FIELD_EXTRA_ATTRIBUTES" description="FLEXI_FIELD_EXTRA_ATTRIBUTES_DESC" />
+			<field name="inputmask" type="multilist" subtype="radio" default="email" label="FLEXI_VALUE_MASK_VALIDATE_CONF" description="FLEXI_VALUE_MASK_VALIDATE_CONF_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="email">FLEXI_YES</option>
+			</field>
+			<field name="email_confirm" type="radio" default="0" label="Confirm email address" description="Require that email address is entered twice" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+			</field>
+			
+			<field name="" type="separator" default="Optional Properties" description="" level="level2" />
+			<field name="" type="separator" default="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" level="level3" />
+			<field name="use_full" type="radio" default="0" label="Full name" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="use_first" type="radio" default="0" label="Fist name" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="use_last" type="radio" default="0" label="Last name" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="use_gender" type="radio" default="0" label="Gender" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+			</field>
+			
+		</fieldset>
+		<fieldset name="group-account_via_submit-accountman" repeat="1" icon_class="icon-user" label="User creation / Edit coupons" description="... create new users, and/or allow them to edit items as guests" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="handle_existing_email" type="radio" default="0" label="Email exists" description="..." class="btn-group btn-group-yesno">
+				<option value="0">Cancel item creation</option>
+				<option value="1">Assign new item</option>
+			</field>
+			<field name="" type="separator" default="Existing item Or user is logged" description="" level="level2" />
+			<field name="display_item_owner" type="radio" default="0" label="Existing items" description="" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Show item owner info</option>
+			</field>
+			<field name="display_when_logged" type="radio" default="0" label="New items" description="" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Show logged user info</option>
+			</field>
+			
+			<field name="" type="separator" default="Account creation" description="" level="level1" />
+			<field name="create_accounts" type="multilist" subtype="radio" default="1" toggle_related="1" label="Create new accounts" description="Create new account to use as item owner" class="btn-group btn-group-yesno">
+				<option value="0" hide_list="create_acc" show_list="">FLEXI_NO</option>
+				<option value="1" hide_list="" show_list="create_acc">FLEXI_YES</option>
+			</field>
+			<field name="new_usertype" type="usergroup" default="" label="COM_USERS_CONFIG_FIELD_NEW_USER_TYPE_LABEL" description="COM_USERS_CONFIG_FIELD_NEW_USER_TYPE_DESC" depend_class="create_acc" >
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+			</field>
+			<field name="useractivation" type="list" default="" label="COM_USERS_CONFIG_FIELD_USERACTIVATION_LABEL" description="COM_USERS_CONFIG_FIELD_USERACTIVATION_DESC" depend_class="create_acc" >
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="0">JNONE</option>
+				<option value="1">COM_USERS_CONFIG_FIELD_USERACTIVATION_OPTION_SELFACTIVATION</option>
+				<option value="2">COM_USERS_CONFIG_FIELD_USERACTIVATION_OPTION_ADMINACTIVATION</option>
+			</field>
+			<field name="" type="separator" default="Admin notifications" description="" level="level2" depend_class="create_acc" />
+			<field name="mail_to_admin" type="radio" default="" label="COM_USERS_CONFIG_FIELD_MAILTOADMIN_LABEL" description="COM_USERS_CONFIG_FIELD_MAILTOADMIN_DESC" depend_class="create_acc" class="btn-group btn-group-yesno" >
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="admin_send_as_bcc" type="radio" default="1" label="FLEXI_NF_SEND_AS_BCC" description="FLEXI_NF_SEND_AS_BCC_DESC" menu="hide" depend_class="create_acc" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="Edit coupons" description="" level="level1" />
+			<field name="create_coupons" type="multilist" subtype="radio" default="1" toggle_related="1" label="Create/Send edit coupons" description="Create an edit coupon per new item and send an email with a direct edit link that uses the edit coupon" class="btn-group btn-group-yesno">
+				<option value="0" hide_list="send_coupons" show_list="">FLEXI_NO</option>
+				<option value="1" hide_list="" show_list="send_coupons">FLEXI_YES</option>
+			</field>
+			<field name="coupon_desc" type="textarea" default="Add a custom message here" label="Edit coupoun email text" description="A text to be used as email body message when sending the item edit link" depend_class="send_coupons" />
+			
+			<field name="initialized" type="hidden" default="0" label="Initialized" description="SQL tables initialized" />
+		</fieldset>
+		
+	</fields>
+	</config>
+	
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_account_via_submit.ini</language>
+	</languages>
+</extension>

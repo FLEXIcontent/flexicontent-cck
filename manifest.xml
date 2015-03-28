@@ -165,7 +165,7 @@
 	</administration>
 
 <additional>
-	<plugin name="account_via_submit" folder="plugins/flexicontent_fields/account_via_submit" instfolder="flexicontent_fields">FLEXIcontent - Fieldgroup (Multivalued field that groups other fields)</plugin>
+	<plugin name="account_via_submit" folder="plugins/flexicontent_fields/account_via_submit" instfolder="flexicontent_fields">FLEXIcontent - Account via submit (Creates new user accounts via submit form)</plugin>
 	<plugin name="addressint"         folder="plugins/flexicontent_fields/addressint"         instfolder="flexicontent_fields">FLEXIcontent - International Address / Google Maps</plugin>
 	<plugin name="checkbox"           folder="plugins/flexicontent_fields/checkbox"           instfolder="flexicontent_fields">FLEXIcontent - Checkbox</plugin>
 	<plugin name="checkboximage"      folder="plugins/flexicontent_fields/checkboximage"      instfolder="flexicontent_fields">FLEXIcontent - Checkbox Image</plugin>
