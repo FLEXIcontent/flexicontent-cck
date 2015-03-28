@@ -406,11 +406,13 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 				}
 			}
 			
-			if (!is_array($value)){
-				if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
-				$value = array($value);
-			}
-			if ( !count($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+			// Make sure value is an array
+			if (!is_array($value))
+				$value = strlen($value) ? array($value) : array();
+			
+			// Skip empty if not in field group, and at least one value was added
+			if ( !count($value) && !$use_ingroup && $n)
+				continue;
 			
 			// Get options according to cascading, this is here so that it works with field grouping too
 			if ($cascade_after) {
@@ -741,11 +743,16 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 				if ( is_array($value) );
 				else if (@unserialize($value)!== false || $value === 'b:0;' ) {
 					$value = unserialize($value);
-				} else {
-					$value = array($value);
 				}
-				if ( !count($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			}
+			
+			// Make sure value is an array
+			if (!is_array($value))
+				$value = strlen($value) ? array($value) : array();
+			
+			// Skip empty if not in field group
+			if ( !count($value) && !$use_ingroup )
+				continue;
 			
 			$html  = array();
 			$index = array();

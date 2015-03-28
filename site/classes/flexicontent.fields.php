@@ -1488,11 +1488,17 @@ class FlexicontentFields
 			// Split elements into their properties: value, label, extra_prop1, extra_prop2
 			$listarrays = array();
 			$results = array();
-			foreach ($listelements as $listelement) {
+			foreach ($listelements as $listelement)
+			{
 				$listelement_props  = preg_split("/[\s]*::[\s]*/", $listelement);
-				if (count($listelement_props) < $props_needed) {
-					echo "Error in field: ".$field->label." while splitting element: ".$listelement." properties needed: ".$props_needed." properties found: ".count($listelement_props);
-					return ($_elements_cache[$field->id] = false);
+				if (count($listelement_props) < $props_needed)
+				{
+					if (count($listelement_props)==3 && $extra_props[1]=='valgroup') {
+						$listelement_props[3] = '';
+					} else {
+						echo "Error in field: ".$field->label." while splitting element: ".$listelement." properties needed: ".$props_needed." properties found: ".count($listelement_props);
+						return ($_elements_cache[$field->id] = false);
+					}
 				}
 				$val = $listelement_props[0];
 				$results[$val] = new stdClass();
