@@ -451,3 +451,12 @@ dl#content-pane.tabs {
 .fcsbnav-content-viewing {color: #777; }
 .fcsbnav-users {color: #777; }
 .fcsbnav-expert {color:#777; }
+
+/* Fix size of prompt for choosen */
+.chzn-container-multi .chzn-choices li.search-field {
+	width: 100% !important;
+}
+.chzn-container-multi .chzn-choices li.search-field input.default {
+	width: 96% !important;
+	padding: 5px 2%;
+}

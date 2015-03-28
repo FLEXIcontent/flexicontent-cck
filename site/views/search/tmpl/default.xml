@@ -119,6 +119,7 @@
 		
 		<field name="" type="separator" level="level1" default="Results List" />
 			
+			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" />
 			<field name="" type="separator" level="level2" default="Basic Information (used by non-FC results too)" description=""/>
 			
 			<field name="show_section" type="radio" default="1" label="Show section" description="Display content section for each result, e.g. 'weblinks', 'contacts' etc, plus category tree of it." class="btn-group btn-group-yesno">

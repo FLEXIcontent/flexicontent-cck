@@ -403,14 +403,14 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 				if (is_array($value));
 				else if (@unserialize($value)!== false || $value === 'b:0;' ) {
 					$value = unserialize($value);
-				} else {
-					$value = array($value);
 				}
-				if ( !count($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
-			} else {
+			}
+			
+			if (!is_array($value)){
 				if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 				$value = array($value);
 			}
+			if ( !count($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
 			// Get options according to cascading, this is here so that it works with field grouping too
 			if ($cascade_after) {

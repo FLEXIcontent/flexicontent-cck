@@ -42,11 +42,6 @@ class FlexicontentControllerFields extends FlexicontentController
 		$this->registerTask( 'add',          'edit' );
 		$this->registerTask( 'apply',        'save' );
 		$this->registerTask( 'saveandnew',   'save' );
-		if (!FLEXI_J16GE) {
-			$this->registerTask( 'accesspublic',     'access' );
-			$this->registerTask( 'accessregistered', 'access' );
-			$this->registerTask( 'accessspecial',    'access' );
-		}
 		$this->registerTask( 'copy',         'copy' );
 		$this->registerTask( 'copy_wvalues', 'copy' );
 	}
@@ -369,9 +364,24 @@ class FlexicontentControllerFields extends FlexicontentController
 	{
 		JRequest::setVar( 'view', 'field' );
 		JRequest::setVar( 'hidemainmenu', 1 );
-
+		
+		$user     = JFactory::getUser();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
+		
+		// Get/Create the view
+		$viewType   = $document->getType();
+		$viewName   = FLEXI_J30GE ? $this->input->get('view', $this->default_view) : JRequest::getVar('view');
+		$viewLayout = FLEXI_J30GE ? $this->input->get('layout', 'default', 'string') : JRequest::getVar('layout', 'default', 'string');
+		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
+		
+		// Get/Create the model
 		$model = $this->getModel('field');
-		$user  = JFactory::getUser();
+		
+		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
+		$view->setModel($model, true);
+		$view->document = $document;
+		
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$field_id = (int)$cid[0];
 
@@ -404,7 +414,7 @@ class FlexicontentControllerFields extends FlexicontentController
 			return;
 		}
 		
-		parent::display();
+		$view->display();
 	}
 
 
@@ -634,5 +644,91 @@ class FlexicontentControllerFields extends FlexicontentController
 			$msg .= ' '.JText::_('FLEXI_TYPE_FILTER_CLEARED_TO_VIEW_NEW_FIELDS');
 		}
 		$this->setRedirect('index.php?option=com_flexicontent&view=fields', $msg );
+	}
+	
+	
+	function exportcsv()
+	{
+		$cid = JRequest::getVar( 'cid' );
+		$db  = JFactory::getDBO();
+		$query = 'SELECT *'
+				. ' FROM #__flexicontent_fields'
+				. ($cid ? ' WHERE id = '.$cid : '')
+				;
+		$db->setQuery($query);
+		$_fields = $db->loadObjectList('id');
+		
+		$fp = fopen('php://output', 'w');
+		if ($fp && $_fields) {
+			header('Content-Type: text/csv');
+			header('Content-Disposition: attachment; filename="export.csv"');
+			foreach($_fields as $row) {
+				fputcsv($fp, array_values((array)$row));
+			}
+			die;
+		}
+	}
+	
+	
+	function exportsql()
+	{
+		$targetfolder = JPATH_SITE.DS.'tmp';
+		$filename = "field_export_".time().".sql";
+		$abspath  = $targetfolder.DS.$filename;
+		$abspath  = str_replace(DS, '/', $abspath);
+		
+		$cid = JRequest::getInt( 'cid' );
+		$db  = JFactory::getDBO();
+		$query = 'SELECT * INTO OUTFILE "'.$abspath.'" '
+				. ' FROM #__flexicontent_fields'
+				. ($cid ? ' WHERE id = '.$cid : '')
+				;
+		$db->setQuery($query);
+		if (!$db->query()) {
+			echo $db->getError();
+			exit;
+		}
+		
+		
+		// Get file filesize and extension
+		$dlfile = new stdClass();
+		$dlfile->filename = $filename;
+		$dlfile->abspath  = $abspath;
+		$dlfile->size = filesize($dlfile->abspath);
+		$dlfile->ext  = strtolower(JFile::getExt($dlfile->filename));
+		
+		// Set content type of file (that is an archive for multi-download)
+		$ctypes = array(
+			"pdf" => "application/pdf", "exe" => "application/octet-stream", "rar" => "application/zip", "zip" => "application/zip",
+			"txt" => "text/plain", "doc" => "application/msword", "xls" => "application/vnd.ms-excel", "ppt" => "application/vnd.ms-powerpoint",
+			"gif" => "image/gif", "png" => "image/png", "jpeg" => "image/jpg", "jpg" => "image/jpg", "mp3" => "audio/mpeg"
+		);
+		$dlfile->ctype = isset($ctypes[$dlfile->ext]) ? $ctypes[$dlfile->ext] : "application/force-download";
+		
+		// *****************************************
+		// Output an appropriate Content-Type header
+		// *****************************************
+		header("Pragma: public"); // required
+		header("Expires: 0");
+		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		header("Cache-Control: private", false); // required for certain browsers
+		header("Content-Type: ".$dlfile->ctype);
+		//quotes to allow spaces in filenames
+		$download_filename = $dlfile->filename;
+		header("Content-Disposition: attachment; filename=\"".$download_filename."\";" );
+		header("Content-Transfer-Encoding: binary");
+		header("Content-Length: ".$dlfile->size);
+		
+		
+		$handle = @fopen($abspath,"rb");
+		while(!feof($handle))
+		{
+			print(@fread($handle, 1024*8));
+			ob_flush();
+			flush();
+		}
+		
+		unlink($file);
+		$app->close();
 	}
 }

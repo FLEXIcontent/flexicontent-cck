@@ -17,6 +17,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
 jimport('joomla.application.component.view');
 
 /**
@@ -28,10 +29,12 @@ jimport('joomla.application.component.view');
  */
 class FlexicontentViewField extends JViewLegacy
 {
-	function display($tpl = null) {
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-
+	function display($tpl = null)
+	{
+		//initialise variables
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
+		
 		JHTML::_('behavior.tooltip');
 
 		//get vars
@@ -39,10 +42,9 @@ class FlexicontentViewField extends JViewLegacy
 		$field_type = JRequest::getVar( 'field_type', 0 );
 		
 		//Get data from the model
-		$model = $this->getModel();
-		if (FLEXI_J16GE) {
-			$form = $this->get('Form');
-		} else {
+		$model  = $this->getModel();
+		$form   = $this->get('Form');
+		if (!FLEXI_J16GE) {
 			$row = & $this->get( 'Field' );
 			
 			//Import File system

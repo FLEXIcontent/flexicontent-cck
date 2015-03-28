@@ -472,6 +472,8 @@ var JFormValidator = new Class({
 			}
 		});
 		
+		// Special handling for making the recaptcha field to be "required", for other captcha plugins,
+		// we will have only the server side validation, or also any client side checks done by the plugin itself
 		var recaptcha = jQuery('#recaptcha_response_field');
 		var recaptcha_lbl = jQuery('#recaptcha_response_field-lbl');
 		if ( recaptcha.length ) {

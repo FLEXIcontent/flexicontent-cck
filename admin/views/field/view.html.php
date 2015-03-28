@@ -58,10 +58,8 @@ class FlexicontentViewField extends JViewLegacy
 
 		//Get data from the model
 		$model  = $this->getModel();
-		$row    = $this->get( 'Field' );
-		if (FLEXI_J16GE) {
-			$form = $this->get('Form');
-		}
+		$row    = $this->get('Field');
+		$form   = $this->get('Form');
 		$types				= $this->get( 'Typeslist' );
 		$typesselected= $this->get( 'Typesselected' );
 		
@@ -78,6 +76,8 @@ class FlexicontentViewField extends JViewLegacy
 		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel( $ctrl.'cancel' );
 		
+		JToolBarHelper::custom( $ctrl.'exportcsv', 'download.png', 'download.png', 'Export CSV', false );
+		JToolBarHelper::custom( $ctrl.'exportsql', 'download.png', 'download.png', 'Export SQL', false );
 		
 		// Import Joomla plugin that implements the type of current flexi field
 		$extfolder = 'flexicontent_fields';
@@ -260,10 +260,9 @@ class FlexicontentViewField extends JViewLegacy
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
 		
 		// assign permissions for J2.5
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$this->assignRef('permission' , $permission);
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$this->assignRef('permission' , $permission);
+		
 		//assign data to template
 		$this->assignRef('document'   , $document);
 		$this->assignRef('row'        , $row);

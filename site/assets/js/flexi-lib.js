@@ -400,7 +400,15 @@
 		srcEL.on('change', function(e, data){
 			var elementClear = (typeof data!== 'undefined' && typeof data.elementClear !== 'undefined') ? data.elementClear : 0;  // workaround for radio, checkbox causing unneeded server call
 			var elType = srcEL.attr('type');
-			var elVal  = (elType=='radio' || elType=='checkbox') ? srcEL.parent().find('input:checked').val() : srcEL.val();
+			if (elType=='radio' || elType=='checkbox') {
+				var elVal = Array();
+				srcEL.parent().parent().find('input:checked').each(function( index ) {
+					elVal[elVal.length] = jQuery(this).val();
+				});
+				elVal = elVal.join(',');
+			} else {
+				var elVal = srcEL.val();
+			}
 			
 			//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' , isCHECKED: ' + srcEL.is(':checked') + ' type: '+srcEL.attr('type'));
 			if ( !elementClear && !! elVal ) {

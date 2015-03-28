@@ -655,13 +655,13 @@ class FlexicontentViewItem  extends JViewLegacy
 		$display_captcha = $use_captcha >= 2 || ( $use_captcha == 1 &&  $user->guest );
 		$display_captcha = $display_captcha && ($isnew || $captcha_formop);
 		
-		// Force using recaptcha
+		// Trigger the configured captcha plugin
 		if ($display_captcha) {
 			// Get configured captcha plugin
 			$c_plugin = $params->get('captcha', $app->getCfg('captcha')); // TODO add param to override default
 			if ($c_plugin) {
 				$c_name = 'captcha_response_field';
-				$c_id = 'dynamic_recaptcha_1';
+				$c_id = $c_plugin=='recaptcha' ? 'dynamic_recaptcha_1' : 'fc_dynamic_captcha';
 				$c_class = ' required';
 				$c_namespace = 'fc_item_form';
 				// Try to load the configured captcha plugin, (check if disabled or uninstalled), Joomla will enqueue an error message if needed

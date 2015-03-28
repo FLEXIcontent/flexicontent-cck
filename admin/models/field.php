@@ -547,7 +547,7 @@ class FlexicontentModelField extends JModelAdmin
 				$registry->loadString($item->attribs, 'JSON');
 				$item->attribs = $registry->toArray();
 			}
-			$field_type = $pk ? $table->field_type : JRequest::getVar('field_type', 'text');
+			$field_type = JRequest::getVar('field_type', ($pk ? $table->field_type : 'text'));
 			$this->setState('field.field_type', $field_type);
 		}
 		return $item;

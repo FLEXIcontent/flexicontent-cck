@@ -388,7 +388,7 @@ class FlexicontentController extends JControllerLegacy
 			if ($c_plugin) {
 				$c_name = 'captcha_response_field';
 				$c_value = JRequest::getString($c_name);
-				$c_id = 'dynamic_recaptcha_1';
+				$c_id = $c_plugin=='recaptcha' ? 'dynamic_recaptcha_1' : 'fc_dynamic_captcha';
 				$c_namespace = 'fc_item_form';
 				
 				$captcha_obj = JCaptcha::getInstance($c_plugin, array('namespace' => $c_namespace));
