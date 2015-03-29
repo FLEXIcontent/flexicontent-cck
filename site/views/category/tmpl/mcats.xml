@@ -329,7 +329,8 @@
 			<field name="show_editbutton_lists" type="radio" default="" label="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS" description="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+				<option value="1">FLEXI_LINK_TO_FE</option>
+				<option value="2">FLEXI_LINK_TO_BE</option>
 			</field>
 			<field name="show_comments_count" type="radio" default="" label="FLEXI_SHOW_COMMENTS_COUNTER" description="FLEXI_SHOW_COMMENTS_COUNTER_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -594,7 +595,7 @@
 				<option value="1">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
 			</field>
 			<field name="ff_slider_title" type="text" size="20" default="" label="FLEXI_SLIDER_NAME" description="FLEXI_SLIDER_NAME_DESC" />
-			<field name="show_search_go" type="radio" default="" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" class="btn-group btn-group-yesno">
+			<field name="show_search_go" type="multilist" subtype="radio" default="" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_SHOW</option>

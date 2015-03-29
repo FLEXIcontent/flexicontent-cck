@@ -490,7 +490,8 @@
 			</field>
 			<field name="show_editbutton_lists" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS" description="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+				<option value="1">FLEXI_LINK_TO_FE</option>
+				<option value="2">FLEXI_LINK_TO_BE</option>
 			</field>
 			<field name="show_comments_count" type="radio" default="1" label="FLEXI_SHOW_COMMENTS_COUNTER" description="FLEXI_SHOW_COMMENTS_COUNTER_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
@@ -984,8 +985,10 @@
 			</field>
 			<field name="show_editbutton" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+				<option value="1">FLEXI_LINK_TO_FE</option>
+				<option value="2">FLEXI_LINK_TO_BE</option>
 			</field>
+
 			<field name="show_state_icon" type="radio" default="1" label="FLEXI_STATE_ICON" description="FLEXI_STATE_ICON_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
