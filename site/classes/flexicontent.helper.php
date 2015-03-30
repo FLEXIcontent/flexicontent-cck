@@ -2835,7 +2835,7 @@ class flexicontent_html
 					} else {
 						$list 	.= $lang->name;
 					}
-					$list 	.= '&nbsp;</label><div class="clear"></div>';
+					$list 	.= '&nbsp;</label>';
 				}
 				break;
 			case 5:   // RADIO selection of ALL languages, EXCLUDE selected language, e.g. when translating items into another language

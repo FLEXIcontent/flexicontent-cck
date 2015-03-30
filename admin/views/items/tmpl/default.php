@@ -20,7 +20,8 @@ defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), ' align="left" ' );
+$hintimg = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), ' align="left" ' );
+$featimg = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/star.png', JText::_( 'FLEXI_FEATURED' ), ' align="left" title="'.JText::_( 'FLEXI_FEATURED' ).'"' );
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &nbsp; '
 .'<a onclick="alert(this.title);" title="'.str_replace("<br/>","\\n", JText::_('FLEXI_CAN_ADD_CUSTOM_FIELD_COLUMNS_COMPONENT_AND_PER_TYPE', true)).'" style="vertical-align:middle; font-size:12px; cursor:pointer;" href="javascript:;" >'
@@ -98,7 +99,7 @@ $tz_offset = $tz->getOffset(new JDate()) / 3600;
 $tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
 $tz_info .= ' ('.$user_zone.')';
 $date_note_msg = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
-$date_zone_tip = '<span class="fc-padded-image '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'">'.$hintmage.'</span>';
+$date_zone_tip = '<span class="fc-padded-image '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'">'.$hintimg.'</span>';
 
 // COMMON repeated texts
 $edit_item_title = JText::_('FLEXI_EDIT_ITEM', true);
@@ -273,7 +274,7 @@ window.addEvent('domready', function() {
 <?php endif; ?>
 
 </script>
-<div class="flexicontent">
+<div id="flexicontent" class="flexicontent">
 
 <?php if ($this->unassociated && !$this->badcatitems) : ?>
 	<div class="fc-mssg fc-warning">
@@ -795,6 +796,7 @@ window.addEvent('domready', function() {
 				<?php if ($extra_img) : ?>
 					<img src="components/com_flexicontent/assets/images/<?php echo $extra_img;?>" width="16" height="16" border="0" class="<?php echo $tip_class; ?>" alt="<?php echo $extra_alt; ?>" title="<?php echo $extra_alt; ?>" />
 				<?php endif; ?>
+				<?php echo $row->featured ? $featimg : ''; ?>
 			</td>
 
 			<td align="center">
@@ -1045,6 +1047,7 @@ window.addEvent('domready', function() {
 	<input type="hidden" name="newstate" id="newstate" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 	
 	</div>

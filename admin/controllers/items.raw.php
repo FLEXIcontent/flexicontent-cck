@@ -210,36 +210,44 @@ class FlexicontentControllerItems extends FlexicontentController
 			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");
-
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css" />';
+			
 			if      (FLEXI_J30GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
 			else if (FLEXI_J16GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j25.css';
 			else                  $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j15.css';
-			echo '<link rel="stylesheet" href="'.$fc_css.'" />';
+			?>
+<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css" />
+<link rel="stylesheet" href="'.$fc_css.'" />
+<link rel="stylesheet" href="'.JURI::root(true).'/media/jui/css/bootstrap.min.css" />
+	<div id="flexicontent" class="flexicontent">
+
+			<?php
+			$btn_class = FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 			
 			if ($auth_publish) {
-				$state['P'] = array( 'name' =>'FLEXI_PUBLISHED', 'desc' =>'FLEXI_PUBLISHED_DESC', 'icon' => 'tick.png', 'color' => 'darkgreen' );
-				$state['IP'] = array( 'name' =>'FLEXI_IN_PROGRESS', 'desc' =>'FLEXI_NOT_FINISHED_YET', 'icon' => 'publish_g.png', 'color' => 'darkgreen', 'clear' => true );
-				$state['U'] = array( 'name' =>'FLEXI_UNPUBLISHED', 'desc' =>'FLEXI_UNPUBLISHED_DESC', 'icon' => 'publish_x.png', 'color' => 'darkred' );
-				$state['PE'] = array( 'name' =>'FLEXI_PENDING', 'desc' =>'FLEXI_NEED_TO_BE_APPROVED', 'icon' => 'publish_r.png', 'color' => 'darkred' );
-				$state['OQ'] = array( 'name' =>'FLEXI_TO_WRITE', 'desc' =>'FLEXI_TO_WRITE_DESC', 'icon' => 'publish_y.png', 'color' => 'darkred', 'clear' => true );
+				$state['P'] = array( 'name' =>'FLEXI_PUBLISHED', 'desc' =>'FLEXI_PUBLISHED_DESC', 'icon' => 'tick.png', 'btn_class' => 'btn-success' );
+				$state['IP'] = array( 'name' =>'FLEXI_IN_PROGRESS', 'desc' =>'FLEXI_NOT_FINISHED_YET', 'icon' => 'publish_g.png', 'btn_class' => 'btn-success', 'clear' => true );
+				$state['U'] = array( 'name' =>'FLEXI_UNPUBLISHED', 'desc' =>'FLEXI_UNPUBLISHED_DESC', 'icon' => 'publish_x.png', 'btn_class' => 'btn-warning' );
+				$state['PE'] = array( 'name' =>'FLEXI_PENDING', 'desc' =>'FLEXI_NEED_TO_BE_APPROVED', 'icon' => 'publish_r.png', 'btn_class' => 'btn-warning' );
+				$state['OQ'] = array( 'name' =>'FLEXI_TO_WRITE', 'desc' =>'FLEXI_TO_WRITE_DESC', 'icon' => 'publish_y.png', 'btn_class' => 'btn-warning', 'clear' => true );
 			}
 			if ($auth_archive) {
-				$state['A'] = array( 'name' =>'FLEXI_ARCHIVED', 'desc' =>'FLEXI_ARCHIVED_STATE', 'icon' => 'archive.png', 'color' => 'gray' );
+				$state['A'] = array( 'name' =>'FLEXI_ARCHIVED', 'desc' =>'FLEXI_ARCHIVED_STATE', 'icon' => 'archive.png', 'btn_class' => 'btn-info' );
 			}
 			if ($auth_delete) {
-				$state['T'] = array( 'name' =>'FLEXI_TRASHED', 'desc' =>'FLEXI_TRASHED_TO_BE_DELETED', 'icon' => 'trash.png', 'color' => 'gray' );
+				$state['T'] = array( 'name' =>'FLEXI_TRASHED', 'desc' =>'FLEXI_TRASHED_TO_BE_DELETED', 'icon' => 'trash.png', 'btn_class' => 'btn-danger' );
 			}
 			echo "<b>". JText::_( 'FLEXI_SELECT_STATE' ).":</b><br /><br />";
 		?>
 			
 		<?php
 			foreach($state as $shortname => $statedata) {
-				$css = "width:28%; margin:0px 1% 12px 1%; padding:1%; color:".$statedata['color'].";";
+				$css = "width:216px; margin:0px 24px 12px 0px;";
 				$link = JURI::base(true)."/index.php?option=com_flexicontent&task=items.changestate&newstate=".$shortname."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
 				$icon = "../components/com_flexicontent/assets/images/".$statedata['icon'];
 		?>
-				<a style="<?php echo $css; ?>" class="fc_button" href="javascript:;"
+			<span class="fc-filter nowrap_box">
+				<?php /*<img src="<?php echo $icon; ?>" style="margin:4px 0 0 0; border-width:0px; vertical-align:top;" alt="<?php echo JText::_( $statedata['desc'] ); ?>" /> &nbsp;*/ ?>
+				<span style="<?php echo $css; ?>" class="<?php echo $btn_class.' '.$statedata['btn_class']; ?>"
 						onclick="
 							window.parent.document.adminForm.newstate.value='<?php echo $shortname; ?>';
 							if(window.parent.document.adminForm.boxchecked.value==0)
@@ -251,14 +259,14 @@ class FlexicontentControllerItems extends FlexicontentController
 								window.parent.submitbutton('changestate')";
 		<?php } ?>
 						target="_parent">
-					<img src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo JText::_( $statedata['desc'] ); ?>" />
 					<?php echo JText::_( $statedata['name'] ); ?>
-				</a>
+				</span>
+			</span>
 		<?php
-				if ( isset($statedata['clear']) ) echo "<div style='width:100%; float: left; clear both;'></div>";
+				if ( isset($statedata['clear']) ) echo '<div class="fcclear"></div>';
 			}
 		?>
-			
+	</div>
 		<?php
 			exit();
 		}

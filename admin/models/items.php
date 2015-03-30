@@ -290,10 +290,11 @@ class FlexicontentModelItems extends JModelLegacy
 		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$view   = JRequest::getVar('view');
-		$user = JFactory::getUser();
+		$user   = JFactory::getUser();
+		$fcform = JRequest::getInt('fcform', 0);
 		$flexiparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
-		$filter_type = JRequest::getVar('filter_type'); //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_type', 	'filter_type', '', 'int' );
+		$filter_type = $fcform ? JRequest::getVar('filter_type')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',		'filter_type',   false, 'array' );
 		
 		if ( $this->_extra_cols !== null) return $this->_extra_cols;
 		
@@ -554,8 +555,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$query_len = 0;
 		foreach ($rows as $row)
 		{
-			if (FLEXI_J16GE) $ilang = $row->language ? $row->language : $default_lang;
-			else $ilang = $default_lang;  // J1.5 has no language setting
+			$ilang = $row->language ? $row->language : $default_lang;
 			$itemext[$i] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.$row->text_stripped).', '.(int)$row->id.')';
 			$id_arr[$i] = (int)$row->id;
 			$query_len += strlen($itemext[$i]) + 2;  // Sum of query length so far
@@ -681,6 +681,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$app     = JFactory::getApplication();
 		$option  = JRequest::getCmd( 'option' );
 		$view    = JRequest::getVar('view');
+		$fcform  = JRequest::getInt('fcform', 0);
 		
 		// Get the WHERE and ORDER BY clauses for the query
 		$extra_joins = "";
@@ -692,10 +693,11 @@ class FlexicontentModelItems extends JModelLegacy
 		$lang  = 'ie.language AS lang, ie.lang_parent_id, ';
 		$lang .= 'CASE WHEN ie.lang_parent_id=0 THEN i.id ELSE ie.lang_parent_id END AS lang_parent_id, ';
 		
-		$filter_tag       = JRequest::getVar('filter_tag');  //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_tag',	'filter_tag',  '', 'int' );
+		$filter_tag 		= $fcform ? JRequest::getVar('filter_tag')   : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_tag',		'filter_tag',    false, 'array' );
+		$filter_state   = $fcform ? JRequest::getVar('filter_state') : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',	'filter_state',  false, 'array' );
+		
 		$filter_cats    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',    'filter_cats',     '',  'int' );
 		$filter_subcats = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_subcats', 'filter_subcats',  1,   'int' );
-		$filter_state   = JRequest::getVar('filter_state');  //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',  'filter_state',     '',  'word' );
 		$filter_order   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',   'filter_order',    '',  'cmd' );
 		
 		$nullDate = $this->_db->Quote($this->_db->getNullDate());
@@ -813,6 +815,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$user    = JFactory::getUser();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		$perms   = FlexicontentHelperPerm::getPerm();
+		$fcform   = JRequest::getInt('fcform', 0);
 		
 		
 		// ***********************************
@@ -847,15 +850,16 @@ class FlexicontentModelItems extends JModelLegacy
 		// Get item list filters
 		// *********************
 		
-		$filter_tag 		= JRequest::getVar('filter_tag');  //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_tag',	'filter_tag',  '', 'int' );
-		$filter_type 		= JRequest::getVar('filter_type'); //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',	'filter_type', '', 'int' );
+		$filter_tag 		= $fcform ? JRequest::getVar('filter_tag')   : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_tag',		'filter_tag',    false, 'array' );
+		$filter_lang    = $fcform ? JRequest::getVar('filter_lang')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',		'filter_lang',   false, 'array' );
+		$filter_type 		= $fcform ? JRequest::getVar('filter_type')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',		'filter_type',   false, 'array' );
+		$filter_author	= $fcform ? JRequest::getVar('filter_author'): $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author',	'filter_author', false, 'array' );
+		$filter_state   = $fcform ? JRequest::getVar('filter_state') : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',	'filter_state',  false, 'array' );
+		
 		$filter_cats 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',	'filter_cats', '', 'int' );
 		$filter_subcats	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_subcats',	'filter_subcats', 1, 'int' );
 		$filter_catsinstate = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_catsinstate',	'filter_catsinstate', 1, 'int' );
-		$filter_state   = JRequest::getVar('filter_state');  //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',  'filter_state',     '',  'word' );
 		$filter_id	 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_id', 		'filter_id', '', 'int' );
-		$filter_lang    = JRequest::getVar('filter_lang'); //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang', 	'filter_lang');
-		$filter_author	= JRequest::getVar('filter_author'); //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author', '', 'cmd' );
 		if (!is_array($filter_author) && strlen($filter_author)) $filter_author = array((int)$filter_author); // support for ZERO author id
 		
 		$scope     = $app->getUserStateFromRequest( $option.'.'.$view.'.scope', 			'scope', '', 'int' );
@@ -1095,7 +1099,16 @@ class FlexicontentModelItems extends JModelLegacy
 		$app = JFactory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		
-		// Try to find falang
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$use_versioning = $cparams->get('use_versioning', 1);
+		
+		require_once("components/com_flexicontent/models/item.php");
+		
+		
+		// ************************************************************************
+		// Try to find Falang/Joomfish, to import translation data, if so requested
+		// ************************************************************************
+		
 		$_FALANG = false;
 		$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'falang_content"');
 		$_FALANG = (boolean) count($this->_db->loadObjectList());
@@ -1129,10 +1142,12 @@ class FlexicontentModelItems extends JModelLegacy
 		} else {
 			$translate_method = 0;
 		}
-		// If translation method includes autotranslate ...
+		
+		// If translation method import the translator class
 		if ($translate_method==3 || $translate_method==4) {
 			require_once(JPATH_COMPONENT_SITE.DS.'helpers'.DS.'translator.php');
 		}
+		
 		// If translation method load description field to allow some parsing according to parameters
 		if ($translate_method==3 || $translate_method==4) {
 			$this->_db->setQuery('SELECT id FROM #__flexicontent_fields WHERE name = "text" ');
@@ -1141,9 +1156,14 @@ class FlexicontentModelItems extends JModelLegacy
 			$desc_field->load($desc_field_id);
 		}
 		
+		
+		// ************************************************************
+		// Loop through the items, copying, moving, or translating them
+		// ************************************************************
+		
 		foreach ($cid as $itemid)
 		{
-			for( $i=0; $i < $copynr; $i++ )
+			for( $nr=0; $nr < $copynr; $nr++ )  // Number of copies to create, meaningful only when copying items
 			{
 				// (a) Get existing item
 				$item = JTable::getInstance('flexicontent_items', '');
@@ -1163,7 +1183,7 @@ class FlexicontentModelItems extends JModelLegacy
 				// (d) Start altering the properties of the cloned item
 				$row->title 		= ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
 				$row->hits 			= 0;
-				if ($translate_method)  // cleared featured flag if not translating
+				if (!$translate_method)  // cleared featured flag if not translating
 					$row->featured = 0;
 				$row->version 	= 1;
 				$datenow 				= JFactory::getDate();
@@ -1265,16 +1285,18 @@ class FlexicontentModelItems extends JModelLegacy
 						$result = autoTranslator::translateItem($fieldnames_arr, $fieldvalues_arr, $lang_from, $lang_to);
 						
 						if (intval($result)) {
-							$i = 0;
+							$n = 0;
 							foreach($fieldnames_arr as $fieldname) {
-								$row->{$fieldname} = $fieldvalues_arr[$i]->translationValue;
-								$i++;
+								$row->{$fieldname} = $fieldvalues_arr[$n]->translationValue;
+								$n++;
 							}
 						}
 					}
 				}
 				//print_r($row->fulltext); exit;
 				
+				
+				// Create a new item in the content fc_items_ext table
 				$row->store();
 				$copyid = (int)$row->id;
 				
@@ -1283,8 +1305,11 @@ class FlexicontentModelItems extends JModelLegacy
 					$row->lang_parent_id = $copyid;
 					$row->store();
 				}
-
-				// get the item fields
+				
+				
+				// ***********************************************************
+				// Copy custom fields, translating the fields if so configured
+				// ***********************************************************
 				$doTranslation = $translate_method == 3 || $translate_method == 4;
 				$query 	= 'SELECT fir.*, f.* '
 						. ' FROM #__flexicontent_fields_item_relations as fir'
@@ -1295,9 +1320,7 @@ class FlexicontentModelItems extends JModelLegacy
 				$fields = $this->_db->loadObjectList();
 				//echo "<pre>"; print_r($fields); exit;
 				
-				if ($doTranslation) {
-					$this->translateFieldValues( $fields, $row, $lang_from, $lang_to);
-				}
+				if ($doTranslation)  $this->translateFieldValues( $fields, $row, $lang_from, $lang_to);
 				//foreach ($fields as $field)  if ($field->field_type!='text' && $field->field_type!='textarea') { print_r($field->value); echo "<br><br>"; }
 				
 				foreach($fields as $field)
@@ -1311,9 +1334,7 @@ class FlexicontentModelItems extends JModelLegacy
 					}
 				}
 				
-				// fix issue 39 => http://code.google.com/p/flexicontent/issues/detail?id=39
-				$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-				$use_versioning = $cparams->get('use_versioning', 1);
+				
 				if($use_versioning) {
 					$v = new stdClass();
 					$v->item_id 		= (int)$item->id;
@@ -1386,6 +1407,11 @@ class FlexicontentModelItems extends JModelLegacy
 				{
 					$row->catid = $maincat ? $maincat : $row->catid;
 					$this->moveitem($copyid, $row->catid, $seccats);
+					
+					// Load item model and save it once, e.g. updating Joomla featured FLAG data
+					//$itemmodel = new FlexicontentModelItem();
+					//$itemmodel->getItem($copyid);
+					//$itemmodel->store((array)$row);
 				}
 			}
 		}
@@ -2238,17 +2264,9 @@ class FlexicontentModelItems extends JModelLegacy
 		// *****************************
 		// Delete item asset/ACL records
 		// *****************************
-		if (FLEXI_J16GE) {
-			$query 	= 'DELETE FROM #__assets'
-					. ' WHERE id in ('.$assetidslist.')'
-					;
-		} else if (FLEXI_ACCESS) {
-			$query 	= 'DELETE FROM #__flexiaccess_acl'
-					. ' WHERE acosection = ' . $this->_db->Quote('com_content')
-					. ' AND axosection = ' . $this->_db->Quote('item')
-					. ' AND axo IN ('. $cids .')'
-					;
-		}
+		$query 	= 'DELETE FROM #__assets'
+			. ' WHERE id in ('.$assetidslist.')'
+			;
 		$this->_db->setQuery( $query );
 		
 		if(!$this->_db->query()) {
@@ -2260,11 +2278,9 @@ class FlexicontentModelItems extends JModelLegacy
 		// ****************************************************************
 		// Trigger Event 'onContentAfterDelete' of Joomla's Content plugins
 		// ****************************************************************
-		if (FLEXI_J16GE) {
-			$event_after_delete = 'onContentAfterDelete';  // NOTE: $itemmodel->event_after_delete is protected property
-			foreach($item_arr as $item) {
-				$dispatcher->trigger($event_after_delete, array('com_content.article', $item));
-			}
+		$event_after_delete = 'onContentAfterDelete';  // NOTE: $itemmodel->event_after_delete is protected property
+		foreach($item_arr as $item) {
+			$dispatcher->trigger($event_after_delete, array('com_content.article', $item));
 		}
 		
 		return true;
@@ -2461,7 +2477,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// Get the category default parameters in a string
 		$xml = new JSimpleXML;
 		$xml->loadFile(JPATH_COMPONENT.DS.'models'.DS.'category.xml');
-		$catparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+		$catparams = new JRegistry();
 		
 		foreach ($xml->document->params as $paramGroup) {
 			foreach ($paramGroup->param as $param) {

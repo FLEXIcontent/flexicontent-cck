@@ -430,19 +430,12 @@ class FlexicontentControllerItems extends FlexicontentController
 		// ***************************************************
 		// CLEAN THE CACHE so that our changes appear realtime
 		// ***************************************************
-		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache($group='', 0);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-			$cache = FLEXIUtilities::getCache($group='', 1);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-		} else {
-			$itemcache = JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
-			$filtercache = JFactory::getCache('com_flexicontent_filters');
-			$filtercache->clean();
-		}
+		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
+		$cache = FLEXIUtilities::getCache($group='', 1);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
 		
 		
 		// ****************************************************************************************************************************
@@ -571,11 +564,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$prev_order = JRequest::getVar( 'prev_order', array(0), 'post', 'array' );
 		
 		// calculate access
-		if (FLEXI_J16GE) {
-			$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
-		} else {
-			$canOrder = $user->gid < 25 ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid) : 1;
-		}
+		$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
 		
 		// check access
 		if ( !$canOrder ) {
@@ -637,11 +626,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$prev_order = JRequest::getVar( 'prev_order', array(0), 'post', 'array' );
 		
 		// calculate access
-		if (FLEXI_J16GE) {
-			$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
-		} else {
-			$canOrder = $user->gid < 25 ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid) : 1;
-		}
+		$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
 		
 		// check access
 		if ( !$canOrder ) {
@@ -866,19 +851,12 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// CLEAN THE CACHE so that our changes appear realtime
 		if ($clean_cache_flag) {
-			if (FLEXI_J16GE) {
-				$cache = FLEXIUtilities::getCache($group='', 0);
-				$cache->clean('com_flexicontent_items');
-				$cache->clean('com_flexicontent_filters');
-				$cache = FLEXIUtilities::getCache($group='', 1);
-				$cache->clean('com_flexicontent_items');
-				$cache->clean('com_flexicontent_filters');
-			} else {
-				$itemcache = JFactory::getCache('com_flexicontent_items');
-				$itemcache->clean();
-				$filtercache = JFactory::getCache('com_flexicontent_filters');
-				$filtercache->clean();
-			}
+			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+			$cache = FLEXIUtilities::getCache($group='', 1);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
 		}
 		
 		$this->setRedirect($link, $msg);
@@ -914,14 +892,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		$user  = JFactory::getUser();
 		$model = $this->getModel('items');
 		
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$canImport = $permission->CanConfig;
-		} else if ($user->gid >= 25) {
-			$canImport = 1;
-		} else {
-			$canImport = 0;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$canImport = $permission->CanConfig;
 		
 		if(!$canImport) {
 			echo JText::_( 'ALERTNOTAUTH' );
@@ -929,15 +901,11 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		$logs = $model->import();
-		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache($group='', 0);
-			$cache->clean('com_flexicontent_cats');
-			$cache = FLEXIUtilities::getCache($group='', 1);
-			$cache->clean('com_flexicontent_cats');
-		} else {
-			$catcache = JFactory::getCache('com_flexicontent_cats');
-			$catcache->clean();
-		}
+		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent_cats');
+		$cache = FLEXIUtilities::getCache($group='', 1);
+		$cache->clean('com_flexicontent_cats');
+		
 		$msg  = JText::_( 'FLEXI_IMPORT_SUCCESSFUL' );
 		$msg .= '<ul class="import-ok">';
 		if (!FLEXI_J16GE) {
@@ -1042,20 +1010,13 @@ class FlexicontentControllerItems extends FlexicontentController
 			$msg = count($auth_cid) ." ". JText::_('FLEXI_ITEMS') ." : &nbsp; ". JText::_( 'FLEXI_ITEMS_STATE_CHANGED_TO')." -- ".JText::_( $statenames[$newstate] ) ." --";
 		}
 
-		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache($group='', 0);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-			$cache = FLEXIUtilities::getCache($group='', 1);
-			$cache->clean('com_flexicontent_items');
-			$cache->clean('com_flexicontent_filters');
-		} else {
-			$itemcache = JFactory::getCache('com_flexicontent_items');
-			$itemcache->clean();
-			$filtercache = JFactory::getCache('com_flexicontent_filters');
-			$filtercache->clean();
-		}
-
+		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
+		$cache = FLEXIUtilities::getCache($group='', 1);
+		$cache->clean('com_flexicontent_items');
+		$cache->clean('com_flexicontent_filters');
+		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
 	}
 
@@ -1145,19 +1106,12 @@ class FlexicontentControllerItems extends FlexicontentController
 			JError::raiseWarning(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
 		} else {
 			$msg = count($auth_cid).' '.JText::_( 'FLEXI_ITEMS_DELETED' );
-			if (FLEXI_J16GE) {
-				$cache = FLEXIUtilities::getCache($group='', 0);
-				$cache->clean('com_flexicontent_items');
-				$cache->clean('com_flexicontent_filters');
-				$cache = FLEXIUtilities::getCache($group='', 1);
-				$cache->clean('com_flexicontent_items');
-				$cache->clean('com_flexicontent_filters');
-			} else {
-				$itemcache = JFactory::getCache('com_flexicontent_items');
-				$itemcache->clean();
-				$filtercache = JFactory::getCache('com_flexicontent_filters');
-				$filtercache->clean();
-			}
+			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+			$cache = FLEXIUtilities::getCache($group='', 1);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
 		}
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
@@ -1206,19 +1160,12 @@ class FlexicontentControllerItems extends FlexicontentController
 			JError::raiseWarning( 500, $msg ." " . $model->getError() );
 			$msg = '';
 		} else {
-			if (FLEXI_J16GE) {
-				$cache = FLEXIUtilities::getCache($group='', 0);
-				$cache->clean('com_flexicontent_items');
-				$cache->clean('com_flexicontent_filters');
-				$cache = FLEXIUtilities::getCache($group='', 1);
-				$cache->clean('com_flexicontent_items');
-				$cache->clean('com_flexicontent_filters');
-			} else {
-				$itemcache = JFactory::getCache('com_flexicontent_items');
-				$itemcache->clean();				
-				$filtercache = JFactory::getCache('com_flexicontent_filters');
-				$filtercache->clean();				
-			}
+			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+			$cache = FLEXIUtilities::getCache($group='', 1);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
 		}
 		
 		$this->setRedirect('index.php?option=com_flexicontent&view=items' );

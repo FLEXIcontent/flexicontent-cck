@@ -44,6 +44,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$task     = JRequest::getVar('task', '');
 		$cid      = JRequest::getVar('cid', array());
 		$bind_limit = JRequest::getInt('bind_limit', 1000);
+		$fcform   = JRequest::getInt('fcform', 0);
 		
 		$session = JFactory::getSession();
 		
@@ -80,11 +81,20 @@ class FlexicontentViewItems extends JViewLegacy
 		$filter_order_Dir  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',		'',		'word' );
 		
 		// Other filters
-		$filter_tag    = JRequest::getVar('filter_tag');    //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_tag',    'filter_type',   '',   'int' );
-		$filter_lang	 = JRequest::getVar('filter_lang');   //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',   '',   'string' );
-		$filter_type   = JRequest::getVar('filter_type');   //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',   'filter_type',   '',   'int' );
-		$filter_author = JRequest::getVar('filter_author'); //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author', '',   'cmd' );
-		$filter_state  = JRequest::getVar('filter_state');  //$app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',  'filter_state',  '',   'word' );
+		$filter_tag    = $fcform ? JRequest::getVar('filter_tag')   : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_tag',    'filter_tag',   false,   'array' );
+		$filter_lang	 = $fcform ? JRequest::getVar('filter_lang')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',   false,   'array' );
+		$filter_type   = $fcform ? JRequest::getVar('filter_type')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',   'filter_type',   false,   'array' );
+		$filter_author = $fcform ? JRequest::getVar('filter_author'): $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author', false,   'array' );
+		$filter_state  = $fcform ? JRequest::getVar('filter_state') : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',  'filter_state',  false,   'array' );
+		
+		// Important set the session data of multiple-value filters
+		if ($fcform) {
+			$app->setUserState( $option.'.'.$view.'.filter_tag',    $filter_tag );
+			$app->setUserState( $option.'.'.$view.'.filter_lang',   $filter_lang );
+			$app->setUserState( $option.'.'.$view.'.filter_type',   $filter_type );
+			$app->setUserState( $option.'.'.$view.'.filter_author', $filter_author );
+			$app->setUserState( $option.'.'.$view.'.filter_state',  $filter_state );
+		}
 		
 		// Support for ZERO author id
 		if (!is_array($filter_author) && !strlen($filter_author)) $filter_author = array();
@@ -174,6 +184,10 @@ class FlexicontentViewItems extends JViewLegacy
 		$CanPublishOwn	= $perms->CanPublishOwn;
 		$CanDeleteOwn		= $perms->CanDeleteOwn;
 		
+		$hasEdit    = $CanEdit    || $CanEditOwn;
+		$hasPublish = $CanPublish || $CanPublishOwn;
+		$hasDelete  = $CanDelete  || $CanDeleteOwn;
+		
 		$CanCats		= $perms->CanCats;
 		$CanAccLvl	= $perms->CanAccLvl;
 		$CanOrder		= $perms->CanOrder;
@@ -206,7 +220,7 @@ class FlexicontentViewItems extends JViewLegacy
 			$add_divider = true;
 		}*/
 		
-		/*if ( ($CanDelete || $CanDeleteOwn) && $filter_stategrp != 'trashed' ) {
+		/*if ( $hasDelete && $filter_stategrp != 'trashed' ) {
 			$btn_task    = FLEXI_J16GE ? 'items.display' : 'display';
 			$extra_js    = "document.getElementById('filter_stategrptrashed').checked=true;";
 			flexicontent_html::addToolBarButton(
@@ -226,7 +240,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// Implementation of multiple-item state selector
 		$add_divider = false;
-		if ( $CanPublish || $CanPublishOwn ) {
+		if ( $hasPublish ) {
 			$btn_task = '';
 			$ctrl_task = FLEXI_J16GE ? '&task=items.selectstate' : '&controller=items&task=selectstate';
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent'.$ctrl_task.'&format=raw';
@@ -245,11 +259,19 @@ class FlexicontentViewItems extends JViewLegacy
 			}
 			$add_divider = true;
 		}
-		if ($CanDelete || $CanDeleteOwn) {
-			if ( $filter_state == 'T' ) {
-				$btn_msg = 'FLEXI_ARE_YOU_SURE';
-				$btn_task = FLEXI_J16GE ? 'items.remove' : 'remove';
-				JToolBarHelper::deleteList($btn_msg, $btn_task);
+		
+		if ($hasDelete) {
+			if ( $filter_state && in_array('T',$filter_state) ) {
+				//$btn_msg = JText::_('FLEXI_ARE_YOU_SURE');
+				//$btn_task = FLEXI_J16GE ? 'items.remove' : 'remove';
+				//JToolBarHelper::deleteList($btn_msg, $btn_task);
+				$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
+				$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
+				$btn_task    = FLEXI_J16GE ? 'items.remove' : 'remove';
+				$extra_js    = "";
+				flexicontent_html::addToolBarButton(
+					'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning");
 			} else {
 				$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_TRASH') );
 				$msg_confirm = JText::_('FLEXI_TRASH_CONFIRM');
@@ -257,11 +279,12 @@ class FlexicontentViewItems extends JViewLegacy
 				$extra_js    = "document.adminForm.newstate.value='T';";
 				flexicontent_html::addToolBarButton(
 					'FLEXI_TRASH', 'trash', '', $msg_alert, $msg_confirm,
-					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="");
 			}
 			$add_divider = true;
 		}
-		if ($CanArchives && $filter_state != 'A') {
+		
+		if ($CanArchives && (!$filter_state || !in_array('A',$filter_state))) {
 			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_ARCHIVE')  );
 			$msg_confirm = JText::_('FLEXI_ARCHIVE_CONFIRM');
 			$btn_task    = FLEXI_J16GE ? 'items.changestate' : 'changestate';
@@ -271,7 +294,11 @@ class FlexicontentViewItems extends JViewLegacy
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 			$add_divider = true;
 		}
-		if ( ($CanArchives && $filter_state=='A') || (($CanDelete || $CanDeleteOwn) && $filter_state=='T') ) {
+		
+		if (
+			($CanArchives && $filter_state && in_array('A',$filter_state)) ||
+			($hasDelete   && $filter_state && in_array('T',$filter_state))
+		) {
 			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_RESTORE') );
 			$msg_confirm = JText::_('FLEXI_RESTORE_CONFIRM');
 			$btn_task    = FLEXI_J16GE ? 'items.changestate' : 'changestate';
@@ -301,7 +328,7 @@ class FlexicontentViewItems extends JViewLegacy
 			}
 			$add_divider = true;
 		}
-		if ($CanEdit || $CanEditOwn) {
+		if ($hasEdit) {
 			$btn_task = FLEXI_J16GE ? 'items.edit' : 'edit';
 			JToolBarHelper::editList($btn_task);
 			$add_divider = true;
@@ -349,7 +376,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$itemTags   = $this->get( 'ItemTags' );
 		
 		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
-		if (FLEXI_FISH || FLEXI_J16GE)   $langs = FLEXIUtilities::getLanguages('code');
+		$langs = FLEXIUtilities::getLanguages('code');
 		$categories = $globalcats ? $globalcats : array();
 		
 		
@@ -420,12 +447,12 @@ class FlexicontentViewItems extends JViewLegacy
 			//JHTML::_('grid.state', $filter_state );
 		
 		// build filter state group
-		if ($CanDelete || $CanDeleteOwn || $CanArchives)   // Create state group filter only if user can delete or archive
+		if ($hasDelete || $CanArchives)   // Create state group filter only if user can delete or archive
 		{
 			//$stategroups[''] = JText::_( 'FLEXI_GRP_NORMAL' ) .' '. JText::_( 'FLEXI_STATE_S' );
 			//$stategroups['published'] = JText::_( 'FLEXI_GRP_PUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
 			//$stategroups['unpublished'] = JText::_( 'FLEXI_GRP_UNPUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
-			/*if ($CanDelete || $CanDeleteOwn)
+			/*if ($hasDelete)
 				$stategroups['trashed']  = JText::_( 'FLEXI_GRP_TRASHED' );*/
 			/*if ($CanArchives)
 				$stategroups['archived'] = JText::_( 'FLEXI_GRP_ARCHIVED' );*/
@@ -472,7 +499,7 @@ class FlexicontentViewItems extends JViewLegacy
 		foreach ($catsinstate as $i => $v) {
 			$_catsinstate[] = JHTML::_('select.option', $i, $v);
 		}
-		$lists['filter_catsinstate'] = ($filter_state || 1 ? '<label class="label">'.JText::_('FLEXI_LIST_ITEMS_IN_CATS').'</label>' : '').
+		$lists['filter_catsinstate'] = ($filter_catsinstate || 1 ? '<label class="label">'.JText::_('FLEXI_LIST_ITEMS_IN_CATS').'</label>' : '').
 			JHTML::_('select.genericlist', $_catsinstate, 'filter_catsinstate', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="submitform();"', 'value', 'text', $filter_catsinstate, 'filter_catsinstate' );
 		//$lists['filter_catsinstate'] = JHTML::_('select.radiolist', $_catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_catsinstate );
 		/*$lists['filter_catsinstate']  = '';

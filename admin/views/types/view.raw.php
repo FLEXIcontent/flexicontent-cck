@@ -25,11 +25,14 @@ class FlexicontentViewTypes extends JViewLegacy{
 	
 	function display( $tpl = null ) {
 		
-		echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css" />';
 		if      (FLEXI_J30GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
 		else if (FLEXI_J16GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j25.css';
 		else                  $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j15.css';
-		echo '<link rel="stylesheet" href="'.JURI::root(true).'/media/jui/css/bootstrap.min.css" />';
+		echo '
+		<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css" />
+		<link rel="stylesheet" href="'.$fc_css.'" />
+		<link rel="stylesheet" href="'.JURI::root(true).'/media/jui/css/bootstrap.min.css" />
+		';
 		
 		$user = JFactory::getUser();
 		$db = JFactory::getDBO();
@@ -44,7 +47,7 @@ class FlexicontentViewTypes extends JViewLegacy{
 		
 		$ctrl_task = FLEXI_J16GE ? 'items.add' : 'add';
 		$icon = "components/com_flexicontent/assets/images/layout_add.png";
-		$btn_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall';
+		$btn_class = FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		
 		echo '
 <div id="flexicontent">
@@ -58,7 +61,7 @@ class FlexicontentViewTypes extends JViewLegacy{
 		$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
 		$_name = '- '.JText::_("FLEXI_ANY") .' -';//.' ... '. JText::_("FLEXI_TYPE");
 		?>
-			<a class="<?php echo $btn_class; ?> btn-primary" href="<?php echo $link; ?>" target="_parent">
+			<a class="<?php echo $btn_class; ?> btn-info" href="<?php echo $link; ?>" style="min-width:60px;" target="_parent">
 				<!--<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $_name; ?>" />&nbsp;-->
 				<?php echo $_name; ?>
 			</a>

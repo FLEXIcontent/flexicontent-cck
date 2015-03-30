@@ -480,18 +480,12 @@ var JFormValidator = new Class({
 			if ( recaptcha.val() == '' ) {
 				recaptcha.addClass('invalid');
 				recaptcha.attr('aria-invalid', 'true');
-				if (recaptcha_lbl.length) {
-					recaptcha_lbl.addClass('invalid');
-					recaptcha_lbl.attr('aria-invalid', 'true');
-				}
+				if (recaptcha_lbl.length) recaptcha_lbl.addClass('invalid');
 				valid = false;
 			} else {
 				recaptcha.removeClass('invalid');
 				recaptcha.attr('aria-invalid', 'false');
-				if (recaptcha_lbl.length) {
-					recaptcha_lbl.removeClass('invalid');
-					recaptcha_lbl.attr('aria-invalid', 'false');
-				}
+				if (recaptcha_lbl.length) recaptcha_lbl.removeClass('invalid');
 			}
 		}
 		
@@ -549,7 +543,6 @@ var JFormValidator = new Class({
 					fcflabels_errcnt[el.labelfor] = jqEL.attr('type') == 'checkbox'  ?  ++fcflabels_errcnt[el.labelfor]  :  1;
 				//window.console.log(el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
 				// Mark /  the label to indicate validation error for current form field / fieldset
-				labelref.addClass('invalid').attr('aria-invalid', 'true');
 			}
 		} else {
 			var isInvalid = jqEL.hasClass('invalid') || jqEL.attr('aria-invalid')=='true';
@@ -562,7 +555,6 @@ var JFormValidator = new Class({
 				if (fcflabels_errcnt[el.labelfor] == 0) {
 					// Unmarkup / clear CSS style to indicate no validation error for current form field / fieldset
 					labelref.removeClass('invalid');
-					labelref.attr('aria-invalid', 'false');
 				}
 			}
 		}

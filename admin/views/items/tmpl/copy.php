@@ -40,7 +40,7 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 						<?php
 						foreach ($this->rows as $row) :
 							if (in_array($row->id, $this->cid)) :
-								foreach ($row->categories as $catid) :
+								foreach ($row->cats as $catid) :
 									if ($catid == $row->catid) :
 										$maincat = $this->itemCats[$catid]->title;
 						?>

@@ -251,9 +251,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// Initialise and set primary if it was not given already
 		$pk = !empty($pk) ? $pk : $this->_id;
-		if (FLEXI_J16GE) {
-			$pk = !empty($pk) ? $pk : (int) $this->getState($this->getName().'.id');
-		}
+		$pk = !empty($pk) ? $pk : (int) $this->getState($this->getName().'.id');
 		
 		// Set new item id, clearing item data, ONLY IF DIFFERENT than existing primary key
 		if ($pk != $this->_id) {
@@ -723,21 +721,15 @@ class ParentClassItem extends JModelAdmin
 			// Retrieve item properties not defined in the model's CLASS
 			// *********************************************************
 			
-			if (FLEXI_J16GE) {
-				$query = 'SELECT title FROM #__viewlevels WHERE id = '. (int) $item->access;
-			} else {
-				$query = 'SELECT name FROM #__groups WHERE id = '. (int) $item->access;
-			}
+			$query = 'SELECT title FROM #__viewlevels WHERE id = '. (int) $item->access;
 			$db->setQuery($query);
 			$item->access_level = $db->loadResult();
 			
 			// Category access is retrieved here for J1.6+, for J1.5 we use FLEXIaccess
-			if (FLEXI_J16GE) {
-				// Get category access for the item's main category, used later to determine viewing of the item
-				$query = 'SELECT access FROM #__categories WHERE id = '. (int) $item->catid;
-				$db->setQuery($query);
-				$item->category_access = $db->loadResult();
-			}
+			// Get category access for the item's main category, used later to determine viewing of the item
+			$query = 'SELECT access FROM #__categories WHERE id = '. (int) $item->catid;
+			$db->setQuery($query);
+			$item->category_access = $db->loadResult();
 			
 			// Typecast some properties in case LEFT JOIN produced nulls
 			if ( !isset($item->type_access) ) {
@@ -2598,11 +2590,7 @@ class ParentClassItem extends JModelAdmin
 				$obj->version			= (int)$last_version+1;
 				
 				$item_data = array();
-				$iproperties = array('alias', 'catid', 'metadesc', 'metakey', 'metadata', 'attribs');
-				if (FLEXI_J16GE) {
-					$j16ge_iproperties = array('urls', 'images');
-					$iproperties = array_merge($iproperties, $j16ge_iproperties);
-				}
+				$iproperties = array('alias', 'catid', 'metadesc', 'metakey', 'metadata', 'attribs', 'urls', 'images');
 				foreach ( $iproperties as $iproperty) $item_data[$iproperty] = $item->{$iproperty};
 				
 				$obj->value = serialize( $item_data );
@@ -3484,37 +3472,35 @@ class ParentClassItem extends JModelAdmin
 		// ****************************************************************
 		// Trigger Event 'onContentChangeState' of Joomla's Content plugins
 		// ****************************************************************
-		if (FLEXI_J16GE) {
-			// Make sure we import flexicontent AND content plugins since we will be triggering their events
-			JPluginHelper::importPlugin('content');
-			
-			// PREPARE FOR TRIGGERING content events
-			// We need to fake joomla's states ... when triggering events
-			$fc_state = $state;
-			if ( in_array($fc_state, array(1,-5)) ) $jm_state = 1;           // published states
-			else if ( in_array($fc_state, array(0,-3,-4)) ) $jm_state = 0;   // unpublished states
-			else $jm_state = $fc_state;                                      // trashed & archive states
-			$fc_itemview = $app->isSite() ? FLEXI_ITEMVIEW : 'item';
-			
-			$item = new stdClass();
-			
-			// Compatibility steps (including Joomla compatible state),
-			// so that 3rd party plugins using the change state event work properly
-		  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
-			$item->state = $jm_state;
-			
-			$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
-			
-			// Revert compatibilty steps ... the $item->state is not used further regardless if it was changed,
-			// besides the event_change_state using plugin should have updated DB state value anyway
-			JRequest::setVar('view', $fc_itemview);	  JRequest::setVar('option', 'com_flexicontent');
-			if ($item->state == $jm_state) $item->state = $fc_state;  // this check is redundant, item->state is not used further ...
-			
-			if (in_array(false, $result, true) && !$event_failed_notice_added) {
-				JError::raiseNotice(10, JText::_('One of plugin event handler for onContentChangeState failed') );
-				$event_failed_notice_added = true;
-				return false;
-			}
+		// Make sure we import flexicontent AND content plugins since we will be triggering their events
+		JPluginHelper::importPlugin('content');
+		
+		// PREPARE FOR TRIGGERING content events
+		// We need to fake joomla's states ... when triggering events
+		$fc_state = $state;
+		if ( in_array($fc_state, array(1,-5)) ) $jm_state = 1;           // published states
+		else if ( in_array($fc_state, array(0,-3,-4)) ) $jm_state = 0;   // unpublished states
+		else $jm_state = $fc_state;                                      // trashed & archive states
+		$fc_itemview = $app->isSite() ? FLEXI_ITEMVIEW : 'item';
+		
+		$item = new stdClass();
+		
+		// Compatibility steps (including Joomla compatible state),
+		// so that 3rd party plugins using the change state event work properly
+	  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
+		$item->state = $jm_state;
+		
+		$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
+		
+		// Revert compatibilty steps ... the $item->state is not used further regardless if it was changed,
+		// besides the event_change_state using plugin should have updated DB state value anyway
+		JRequest::setVar('view', $fc_itemview);	  JRequest::setVar('option', 'com_flexicontent');
+		if ($item->state == $jm_state) $item->state = $fc_state;  // this check is redundant, item->state is not used further ...
+		
+		if (in_array(false, $result, true) && !$event_failed_notice_added) {
+			JError::raiseNotice(10, JText::_('One of plugin event handler for onContentChangeState failed') );
+			$event_failed_notice_added = true;
+			return false;
 		}
 		
 		return true;
