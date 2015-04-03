@@ -670,7 +670,6 @@ VALUES
 					.' LEFT JOIN #__content as i ON i.id=ie.item_id'
 				. ' SET ie.language = i.language'
 				. ' WHERE i.language<>ie.language'
-				. ' )'
 				;
 		$db->setQuery($query);
 		$result1 = $db->query();
