@@ -556,7 +556,7 @@ class com_flexicontentInstallerScript
 					if ($iext_tbl_exists)    $tbls[] = "#__flexicontent_items_ext";
 					if ($content_cache_tbl_exists)    $tbls[] = "#__flexicontent_items_tmp";
 					if ($advsearch_index_tbl_exists)  $tbls[] = "#__flexicontent_advsearch_index";
-					$tbl_fields[$tbl] = $db->getTableColumns($tbl);
+					foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
 					
 					$queries = array();
 					if ( $iext_tbl_exists ) {
