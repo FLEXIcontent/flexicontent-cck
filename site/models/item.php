@@ -329,8 +329,64 @@ class FlexicontentModelItem extends ParentClassItem
 		
 		return $where;
 	}
+	
+	
+	/**
+	 * Method to decide which item layout to use
+	 *
+	 * @access	public
+	 * @param	int item identifier
+	 */
+	function decideLayout(&$compParams, &$typeParams, &$itemParams)
+	{
+		// Decide to use mobile or normal item template layout
+		$useMobile = $compParams->get('use_mobile_layouts', 0 );
+		if ($useMobile) {
+			$force_desktop_layout = $compParams->get('force_desktop_layout', 0 );
+			$mobileDetector = flexicontent_html::getMobileDetector();
+			$isMobile = $mobileDetector->isMobile();
+			$isTablet = $mobileDetector->isTablet();
+			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+		}
+		$_ilayout = $useMobile ? 'ilayout_mobile' : 'ilayout';
+		
+		// Get item layout (... if not already set), from the configuration parameter (that was decided above)
+		$ilayout = $this->_ilayout=='__request__' ? JRequest::getVar($_ilayout, false) : false;
+		if (!$ilayout) {
+			$desktop_ilayout = $itemParams->get('ilayout', $typeParams->get('ilayout', 'default'));
+			$ilayout = !$useMobile ? $desktop_ilayout : $itemParams->get('ilayout_mobile', $typeParams->get('ilayout_mobile', $desktop_ilayout));
+		}
+		
+		// Verify the layout is within allowed templates, that is Content Type 's default template OR Content Type allowed templates
+		$allowed_tmpls = $typeParams->get('allowed_ilayouts');
+		$type_default_layout = $typeParams->get('ilayout', 'default');
+		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
+		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = explode("|", $allowed_tmpls);
+		
+		// Verify the item layout is within templates: Content Type default template OR Content Type allowed templates
+		if ( $ilayout!=$type_default_layout && count($allowed_tmpls) && !in_array($ilayout,$allowed_tmpls) ) {
+			$app->enqueueMessage("<small>Current item Layout (template) is '$ilayout':<br/>- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Content Type Default Template Layout: '$type_default_layout'</small>", 'notice');
+			$ilayout = $type_default_layout;
+		}
 
+		// Get cached template data, without loading language file, (this will be done at the view)
+		$themes = flexicontent_tmpl::getTemplates( null );
 
+		// Verify the item layout exists
+		if ( !isset($themes->items->{$ilayout}) ) {
+			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : 'default';
+			$app->enqueueMessage("<small>Current Item Layout Template is '$ilayout' does not exist<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Template Layout: '$fixed_ilayout'</small>", 'notice');
+			$ilayout = $fixed_ilayout;
+			FLEXIUtilities::loadTemplateLanguageFile( $ilayout ); // Manually load Template-Specific language file of back fall ilayout
+		}
+		
+		// Finally set the ilayout (template name) into model / item's parameters / HTTP Request
+		$this->setItemLayout($ilayout);
+		$itemParams->set('ilayout', $ilayout);
+		JRequest::setVar('ilayout', $ilayout);
+	}
+	
+	
 	/**
 	 * Method to load content article parameters
 	 *
@@ -351,47 +407,55 @@ class FlexicontentModelItem extends ParentClassItem
 		// Retrieve RELATED parameters that will be merged into item's parameters
 		// **********************************************************************
 		
+		// Retrieve COMPONENT parameters
+		$compParams = JComponentHelper::getComponent('com_flexicontent')->params;
+		
 		// Retrieve parameters of current category (NOTE: this applies when cid variable exists in the URL)
 		$catParams = "";
 		if ( $this->_cid ) {
-			$query = 'SELECT c.params'
-					. ' FROM #__categories AS c'
-					. ' WHERE c.id = ' . (int) $this->_cid
-					;
+			$query = 'SELECT c.params FROM #__categories AS c WHERE c.id = ' . (int) $this->_cid;
 			$this->_db->setQuery($query);
 			$catParams = $this->_db->loadResult();
 		}
+		$catParams = new JRegistry($catParams);
 		
-		// Retrieve item's Content Type parameters
+		// Retrieve/Create item's Content Type parameters
 		$typeParams = $this->getTypeparams();
+		$typeParams = new JRegistry($typeParams);
+		
+		// Create item parameters
+		if ( is_string($this->_item->attribs) )
+			$itemParams = new JRegistry($this->_item->attribs);
+		else
+			$itemParams = $this->_item->attribs;
+		
+		// Retrieve Layout's parameters, also deciding the layout
+		$this->decideLayout($compParams, $typeParams, $itemParams);
+		$layoutParams = $this->getLayoutparams();
+		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
 		
 		
 		// ***************************************************************************************************
 		// Merge parameters in order: component, menu, (item 's) current category, (item's) content type, item
 		// ***************************************************************************************************
 		
-		// a. Get and clone the COMPONENT parameters
-		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
-		$params = clone ($comp_params); // clone( JComponentHelper::getParams('com_flexicontent') );
+		// a. Start by cloning the COMPONENT parameters
+		$params = clone ($compParams); // clone( JComponentHelper::getParams('com_flexicontent') );
 		
 		// b. Merge parameters from current category
-		$catParams = new JRegistry($catParams);
 		$catParams->set('show_title', '');       // Prevent show_title from propagating ... to the item, it is meant for category view only
 		$catParams->set('title_linkable', '');   // Prevent title_linkable from propagating ... to the item, it is meant for category view only
 		$catParams->set('show_editbutton', '');  // Prevent title_linkable from propagating ... to the item, it is meant for category view only
 		$params->merge($catParams);
 		
-		// c. Merge TYPE parameters into the page configuration
-		$typeParams = new JRegistry($typeParams);
+		// c0. Merge Layout parameters into the page configuration
+		$params->merge($layoutParams);
+
+		// c1. Merge TYPE parameters into the page configuration
 		$params->merge($typeParams);
 
 		// d. Merge ITEM parameters into the page configuration
-		if ( is_string($this->_item->attribs) ) {
-			$itemparams = FLEXI_J16GE ? new JRegistry($this->_item->attribs) : new JParameter($this->_item->attribs);
-		} else {
-			$itemparams = $this->_item->attribs;
-		}
-		$params->merge($itemparams);
+		$params->merge($itemParams);
 
 		// e. Merge ACCESS permissions into the page configuration
 		$accessperms = $this->getItemAccess();

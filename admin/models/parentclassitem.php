@@ -61,6 +61,13 @@ class ParentClassItem extends JModelAdmin
 	var $_cid = null;
 	
 	/**
+	 * Template configuration name (layout)
+	 *
+	 * @var int
+	 */
+	var $_ilayout = null;
+	
+	/**
 	 * Item 's type or type via URL variable for new items
 	 *
 	 * @var int
@@ -122,7 +129,7 @@ class ParentClassItem extends JModelAdmin
 		
 		
 		// Get component parameters
-		$params  = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+		$params  = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 		
@@ -141,18 +148,21 @@ class ParentClassItem extends JModelAdmin
 				$params->merge($menu_params);
 			}
 		}
+		
+		// Set component + type + menu parameters, these are enough for the backend and are needed before frontend view's complete parameters are created
 		$this->_cparams = $params;
 		
 		$this->populateState();
 	}
-
+	
+	
 	/**
 	 * Method to set the identifier
 	 *
 	 * @access	public
 	 * @param	int item identifier
 	 */
-	function setId($id, $currcatid=0, $typeid=0)
+	function setId($id, $currcatid=0, $typeid=0, $ilayout=null)
 	{
 		// Set a new item id and wipe data
 		if ($this->_id != $id) {
@@ -170,6 +180,9 @@ class ParentClassItem extends JModelAdmin
 			$result = $this->_db->loadResult();
 			$this->_cid = $result ? $this->_cid : 0;  // Clear cid, if category not assigned to the item
 		}
+		
+		// Set item layout
+		$this->_ilayout = $ilayout;
 		
 		// Set item type
 		$this->_typeid = $typeid;
@@ -192,8 +205,20 @@ class ParentClassItem extends JModelAdmin
 	{
 		return $this->_id;
 	}
-
-
+	
+	
+	/**
+	 * Method to set & override item's layout
+	 *
+	 * @access	public
+	 * @param	int item identifier
+	 */
+	function setItemLayout($name=null)
+	{
+		$this->_ilayout = $name;
+	}
+	
+	
 	/**
 	 * Overridden get method to get properties from the item
 	 *
@@ -277,7 +302,7 @@ class ParentClassItem extends JModelAdmin
 			$msg = $pk ?
 				JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $pk) :   // ID is set, indicate that it was not found
 				JText::_( 'FLEXI_REQUESTED_PAGE_COULD_NOT_BE_FOUND' );  // ID is not set propably some bad URL so give a more general message
-			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+			throw new Exception($msg, 404);
 		}
 		
 		// --. Initialize new item, currently this succeeds always
@@ -518,9 +543,7 @@ class ParentClassItem extends JModelAdmin
 				}
 				
 				// Check for SQL error
-				if ( $db->getErrorNum() ) {
-					if (FLEXI_J16GE) throw new Exception($db->getErrorMsg(), 500); else JError::raiseError(500, $db->getErrorMsg());
-				}
+				if ( $db->getErrorNum() )  throw new Exception($db->getErrorMsg(), 500);
 				//print_r($data); exit;
 				
 				if (!$data) {
@@ -800,7 +823,7 @@ class ParentClassItem extends JModelAdmin
 			if ($e->getCode() == 404) {
 				// Need to go thru the error handler to allow Redirect to work.
 				$msg = $e->getMessage();
-				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+				throw new Exception($msg, 404);
 			}
 			else {
 				$this->setError($e);
@@ -821,12 +844,8 @@ class ParentClassItem extends JModelAdmin
 		// return true if item was loaded successfully
 		return (boolean) $this->_item;
 	}
-
 	
-// ************
-// BOF of J1.6+
-// ************
-
+	
 	/**
 	 * Returns a Table object, always creating it
 	 *
@@ -863,7 +882,7 @@ class ParentClassItem extends JModelAdmin
 		// (b) Set property 'cid' (form field categories)
 		// *********************************************************
 		
-		$this->_item->itemparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+		$this->_item->itemparams = new JRegistry();
 		
 		if ($this->_id) {
 			// Convert the images
@@ -1183,73 +1202,6 @@ class ParentClassItem extends JModelAdmin
 		
 		return $allow;
 	}
-
-// ************
-// EOF of J1.6+
-// ************
-
-// ************
-// BOF of J1.5
-// ************
-
-	/**
-	 * Method (for J1.5) to check if the user can add an item anywhere
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.5
-	 */
-	function canAdd()
-	{
-		$user	= JFactory::getUser();
-
-		if (FLEXI_ACCESS && ($user->gid < 25))
-		{
-			$canSubmit = FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid);
-			$canAdd = FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all');
-			if 	(!$canSubmit && !$canAdd) return false;
-		} else {
-			$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
-			if (!$canAdd) return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Method (for J1.5) to check if the user can edit the item
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.5
-	 */
-	function canEdit()
-	{
-		$user	= JFactory::getUser();
-		
-		if ( (!$this->_item && !$this->_loadItem()) || $user->gid >= 25 ) {
-			return true;
-		} else if (FLEXI_ACCESS) {
-			// This should not be used, as it bypasses individual item rights
-			//$canEditAll			= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
-			//$canEditOwnAll	= FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all');
-			if ($this->_item->id && $this->_item->catid)
-			{
-				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $this->_item->id, $this->_item->catid);
-				$canEdit 	= in_array('edit', $rights) /*|| $canEditAll*/;
-				$canEditOwn	= ( in_array('editown', $rights) /*|| $canEditOwnAll*/ ) && $this->_item->created_by == $user->get('id');
-				if (!$canEdit && !$canEditOwn) return false;
-			}
-		} else {
-			$canEdit= $user->authorize('com_content', 'edit', 'content', 'all');
-			if (!$canEdit) return false;
-		}
-		return true;
-	}
-	
-	
-// ************
-// EOF of J1.5
-// ************
 	
 	
 	/**
@@ -1440,7 +1392,7 @@ class ParentClassItem extends JModelAdmin
 		// Initialise variables.
 		$this->setState($this->getName().'.id', $this->_id);
 
-		// Load global parameters
+		// Set global parameters: component + type + menu parameters, ? UNUSED ? maybe used by parent class
 		$this->setState('params', $this->_cparams);
 	}
 	
@@ -2779,10 +2731,10 @@ class ParentClassItem extends JModelAdmin
 			
 			if ($dbtype == 'mysqli') {
 				$result = mysqli_query( $db_connection , $query );
-				if ($result===false) return JError::raiseWarning( 500, "error _saveJFdata():: ".mysqli_error($db_connection));
+				if ($result===false) return JError::raiseError( 500, "error _saveJFdata():: ".mysqli_error($db_connection));
 			} else if ($dbtype == 'mysql') {
 				$result = mysql_query( $query, $db_connection  );
-				if ($result===false) return JError::raiseWarning( 500, "error _saveJFdata():: ".mysql_error($db_connection));
+				if ($result===false) return JError::raiseError( 500, "error _saveJFdata():: ".mysql_error($db_connection));
 			} else {
 				$msg = 'unreachable code in _saveJFdata(): direct db query, unsupported DB TYPE';
 				throw new Exception($msg, 500);
@@ -3170,12 +3122,39 @@ class ParentClassItem extends JModelAdmin
 				$query .= ' WHERE t.id = ' . (int)$this->_typeid;
 			}
 			$this->_db->setQuery($query);
-			$tparams = $this->_db->loadResult();
+			$attribs = $this->_db->loadResult();
 		}
 		
 		// Cache and return
-		$typeparams[$this->_id] = !empty($tparams) ? $tparams : '';
+		$typeparams[$this->_id] = !empty($attribs) ? $attribs : '';
 		return $typeparams[$this->_id];
+	}
+	
+	
+	/**
+	 * Method to get the layout parameters of an item
+	 * 
+	 * @return string
+	 * @since 1.5
+	 */
+	function getLayoutparams($force = false)
+	{
+		static $layoutparams = array();
+		if ( !$force && isset($layoutparams[$this->_id]) ) return $layoutparams[$this->_id];
+		
+		if ($this->_ilayout)
+		{
+			$query	= 'SELECT attribs'
+				. ' FROM #__flexicontent_layouts_conf'
+				. ' WHERE layout = "item"'
+				. '  AND template = ' . $this->_db->Quote($this->_ilayout);
+			$this->_db->setQuery($query);
+			$attribs = $this->_db->loadResult();
+		}
+		
+		// Cache and return
+		$layoutparams[$this->_id] = !empty($attribs) ? $attribs : '';
+		return $layoutparams[$this->_id];
 	}
 	
 	
@@ -3209,12 +3188,7 @@ class ParentClassItem extends JModelAdmin
 			$user = JFactory::getUser();
 			$_types = array();
 			foreach ($types as $type) {
-				if (FLEXI_J16GE)
-					$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
-				else if (FLEXI_ACCESS && $user->gid < 25)
-					$allowed = ! $type->itemscreatable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'type', $type->id);
-				else
-					$allowed = 1;
+				$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
 				if ( $allowed ) $_types[] = $type;
 			}
 			$types = $_types;
@@ -3445,7 +3419,7 @@ class ParentClassItem extends JModelAdmin
 			;
 			$this->_db->setQuery( $query );
 			$this->_db->query();
-			if ( $this->_db->getErrorNum() )  if (FLEXI_J16GE) throw new Exception($this->_db->getErrorMsg(), 500); else JError::raiseError(500, $this->_db->getErrorMsg());
+			if ( $this->_db->getErrorNum() )  throw new Exception($this->_db->getErrorMsg(), 500);
 			
 			$query = 'UPDATE #__flexicontent_items_tmp'
 				. ' SET state = ' . (int)$state
@@ -3454,7 +3428,7 @@ class ParentClassItem extends JModelAdmin
 			;
 			$this->_db->setQuery( $query );
 			$this->_db->query();
-			if ( $this->_db->getErrorNum() )  if (FLEXI_J16GE) throw new Exception($this->_db->getErrorMsg(), 500); else JError::raiseError(500, $this->_db->getErrorMsg());
+			if ( $this->_db->getErrorNum() )  throw new Exception($this->_db->getErrorMsg(), 500);
 			
 			$query = 'UPDATE #__flexicontent_items_versions'
 				. ' SET value = ' . (int)$state
@@ -3465,7 +3439,7 @@ class ParentClassItem extends JModelAdmin
 				;
 			$this->_db->setQuery( $query );
 			$this->_db->query();
-			if ( $this->_db->getErrorNum() )  if (FLEXI_J16GE) throw new Exception($this->_db->getErrorMsg(), 500); else JError::raiseError(500, $this->_db->getErrorMsg());
+			if ( $this->_db->getErrorNum() )  throw new Exception($this->_db->getErrorMsg(), 500);
 		}
 		
 		
@@ -3568,7 +3542,7 @@ class ParentClassItem extends JModelAdmin
 		// Build item parameters INI string
 		if (is_array($params))
 		{
-			$item->attribs = FLEXI_J16GE ? new JRegistry($item->attribs) : new JParameter($item->attribs);
+			$item->attribs = new JRegistry($item->attribs);
 			
 			
 			$new_ilayout = isset($params['ilayout']) ? $params['ilayout'] : null;  // a non-set will return null, but let's make this cleaner
@@ -3628,7 +3602,7 @@ class ParentClassItem extends JModelAdmin
 		// Build item metadata INI string
 		if (is_array($metadata))
 		{
-			$item->metadata = FLEXI_J16GE ? new JRegistry($item->metadata) : new JParameter($item->metadata);
+			$item->metadata = new JRegistry($item->metadata);
 			foreach ($metadata as $k => $v) {
 				if ( $k == 'description' && !FLEXI_J16GE ) {  // is jform field in J1.6+
 					$item->metadesc = $v;
@@ -3684,7 +3658,7 @@ class ParentClassItem extends JModelAdmin
 			$mcats_params = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			
 			foreach ($mcats_params as $cat_params) {
-				$cat_params = FLEXI_J16GE ? new JRegistry($cat_params) : new JParameter($cat_params);
+				$cat_params = new JRegistry($cat_params);
 				if ( ! $cat_params->get('cats_enable_notifications', 0) ) continue;  // Skip this category if category-specific notifications are not enabled for this category
 				
 				$cats_userlist_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
@@ -4144,7 +4118,7 @@ class ParentClassItem extends JModelAdmin
 	function getApprovalRequestReceivers($id, $catid)
 	{
 		// Get component parameters
-		$params  = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+		$params  = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 		

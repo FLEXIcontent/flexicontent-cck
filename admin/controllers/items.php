@@ -1140,7 +1140,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		$model = $this->getModel('item');
 		
-		$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');
+		$canEdit = $model->getItemAccess()->get('access-edit');
 		
 		// Check if user can edit the item
 		if ( !$canEdit ) {
@@ -1255,8 +1255,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		$isnew  = !$model->getId();
 		
-		$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $model->getItemAccess()->get('access-create');
-		$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');
+		$canAdd  = $model->getItemAccess()->get('access-create');
+		$canEdit = $model->getItemAccess()->get('access-edit');
 
 		if ( !$canEdit ) {
 			// No edit privilege, check if item is editable till logoff

@@ -1178,11 +1178,11 @@ if ($this->fields && $typeid) :
 				( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
 			) continue;
 			
-			if ( $field->field_type=='maintext' && isset($all_tab_fields['maintext']) ) {
+			if ( $field->field_type=='maintext' && isset($all_tab_fields['text']) ) {
 				ob_start();
 			}
 			
-			// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
+			// check to SKIP (hide) field e.g. description field ('maintext' field type), alias field etc
 			if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
 			
 			$not_in_tabs = "";
@@ -1309,8 +1309,8 @@ if ($this->fields && $typeid) :
 			</div>
 			
 		<?php
-			if ( $field->field_type=='maintext' && isset($all_tab_fields['maintext']) ) {
-				$captured['maintext'] = ob_get_clean();
+			if ( $field->field_type=='maintext' && isset($all_tab_fields['text']) ) {
+				$captured['text'] = ob_get_clean();
 			}
 		}
 		?>

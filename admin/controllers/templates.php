@@ -56,21 +56,26 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$task		= JRequest::getVar('task');
-		$type 		= JRequest::getVar('type',  'items', '', 'word');
-		$folder 	= JRequest::getVar('folder',  'default', '', 'cmd');
-		$positions 	= JRequest::getVar('positions',  '');
+		$post   = JRequest::get( 'post' );
+		$task   = JRequest::getVar('task');
+		$type   = JRequest::getVar('type',  'items', '', 'word');
+		$folder = JRequest::getVar('folder',  'default', '', 'cmd');
+		$cfgname= JRequest::getVar('cfgname',  '', '', 'cmd');
 		
+		$positions = JRequest::getVar('positions',  '');
 		$positions = explode(',', $positions);
+		$attribs = $post['jform']['layouts'][$folder];
 		
-		//Sanitize
-		$post = JRequest::get( 'post' );
+		// Get model
 		$model = $this->getModel('template');
-
-		foreach ($positions as $p) {
-			$model->store($folder, $type, $p, $post[$p]);
-		}
-
+		
+		// Store field positions
+		$model->storeFieldPositions($folder, $cfgname, $type, $positions, $post);
+		
+		// Store Layout configurations (template parameters)
+		$model->storeLayoutConf($folder, $cfgname, $type, $attribs);
+		
+		
 		switch ($task)
 		{
 			case 'apply' :

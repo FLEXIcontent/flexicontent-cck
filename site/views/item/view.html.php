@@ -73,22 +73,30 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Get item, model and create form (that loads item data)
 		// ******************************************************
 		
-		// Get various data from the model
+		// Get model
 		$model  = $this->getModel();
 		$cid    = $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id
+		
+		// Decide version to load
+		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+		$preview = JRequest::getVar( 'preview', 0, 'request', 'int' );   // Preview versioned data FLAG ... if previewing and version is not set then ... we load version -1 (=latest version)
+		$version = $preview && !$version ? -1 : $version;
+		
+		// Allow iLayout from HTTP request, this will be checked during loading item parameters
+		$model->setItemLayout('__request__');
+		
 		
 		// Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
 		// indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
 		$start_microtime = microtime(true);
-
-		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
-		$preview = JRequest::getVar( 'preview', 0, 'request', 'int' );   // Preview versioned data FLAG ... if previewing and version is not set then ... we load version -1 (=latest version)
-		$version = $preview && !$version ? -1 : $version;
 		$item = $model->getItem(null, $check_view_access=2, $no_cache=($version||$preview), $force_version=($version||$preview ? $version : 0));  // ZERO means unversioned data
 		$_run_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
-		// Set item parameters as VIEW's parameters (item parameters are merged with component/page/type/current category/access parameters already)
+		// Get item parameters as VIEW's parameters (item parameters are merged parameters in order: component/category/layout/type/item/menu/access)
 		$params = $item->parameters;
+		
+		// Get item 's layout as this may have been altered
+		$ilayout = $item->parameters->get('ilayout');
 		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
@@ -116,72 +124,26 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		
-		// ********************
-		// ITEM LAYOUT handling
-		// ********************
-
-		// (a) Decide to use mobile or normal item template layout
-		$useMobile = $params->get('use_mobile_layouts', 0 );
-		if ($useMobile) {
-			$force_desktop_layout = $params->get('force_desktop_layout', 0 );
-			$mobileDetector = flexicontent_html::getMobileDetector();
-			$isMobile = $mobileDetector->isMobile();
-			$isTablet = $mobileDetector->isTablet();
-			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
-		}
-		$_ilayout = $useMobile ? 'ilayout_mobile' : 'ilayout';
-
-		// (b) Get from item parameters, allowing URL override
-		$ilayout = JRequest::getVar($_ilayout, false);
-		if (!$ilayout) {
-			$desktop_ilayout = $params->get('ilayout', 'default');
-			$ilayout = !$useMobile ? $desktop_ilayout : $params->get('ilayout_mobile', $desktop_ilayout);
-		}
+		// *************************************************************
+		// Get cached template data, loading any template language files
+		// *************************************************************
 		
-		// (c) Create the type parameters
-		$tparams = $this->get( 'Typeparams' );
-		$tparams = new JRegistry($tparams);
-
-		// (d) Verify the layout is within templates, Content Type default template OR Content Type allowed templates
-		$allowed_tmpls = $tparams->get('allowed_ilayouts');
-		$type_default_layout = $tparams->get('ilayout', 'default');
-		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
-		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
-
-		// (e) Verify the item layout is within templates: Content Type default template OR Content Type allowed templates
-		if ( $ilayout!=$type_default_layout && count($allowed_tmpls) && !in_array($ilayout,$allowed_tmpls) ) {
-			$app->enqueueMessage("<small>Current Item Layout Template is '$ilayout':<br/>- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Content Type Default Template Layout: '$type_default_layout'</small>", 'notice');
-			$ilayout = $type_default_layout;
-		}
-
-		// (f) Get cached template data
 		$themes = flexicontent_tmpl::getTemplates( $lang_files = array($ilayout) );
-
-		// (g) Verify the item layout exists
-		if ( !isset($themes->items->{$ilayout}) ) {
-			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : 'default';
-			$app->enqueueMessage("<small>Current Item Layout Template is '$ilayout' does not exist<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Template Layout: '$fixed_ilayout'</small>", 'notice');
-			$ilayout = $fixed_ilayout;
-			FLEXIUtilities::loadTemplateLanguageFile( $ilayout ); // Manually load Template-Specific language file of back fall ilayout
-		}
-
-		// (h) finally set the template name back into the item's parameters
-		$params->set('ilayout', $ilayout);
-
-		// Bind Fields
+		
+		
+		// *****************
+		// Get Item's Fields
+		// *****************
+		
 		$_items = array(&$item);
 		FlexicontentFields::getFields($_items, FLEXI_ITEMVIEW, $params, $aid);
-
-		// Note : This parameter doesn't exist yet but it will be used by the future gallery template
-		/*if ($params->get('use_panes', 1)) {
-			jimport('joomla.html.pane');
-			$pane = JPane::getInstance('Tabs');
-			$this->assignRef('pane', $pane);
-		}*/
-
 		$fields = $item->fields;
 		
+		
+		// ************************
 		// Pathway needed variables
+		// ************************
+		
 		//$catshelper = new flexicontent_cats($cid);
 		//$parents    = $catshelper->getParentlist();
 		//echo "<pre>".print_r($parents,true)."</pre>";
@@ -1630,7 +1592,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// 2. Field name arrays:  (a) placeable and  (b) placeable via placer  (c) above tabs fields
 		$via_core_field  = array(
-			'title'=>1, 'type_id'=>1, 'state'=>1, 'cats'=>1, 'tags'=>1, 'maintext'=>1
+			'title'=>1, 'type_id'=>1, 'state'=>1, 'cats'=>1, 'tags'=>1, 'text'=>1
 		);
 		$via_core_field = array_merge($via_core_field, FLEXI_J16GE ?
 			array('created'=>1, 'created_by'=>1, 'modified'=>1, 'modified_by'=>1) :
@@ -1652,7 +1614,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// 3. Decide placement of CORE properties / fields
 		$tab_fields['above'] = $params->get('form_tabs_above',    'title, alias, category, lang, type, state, disable_comments, notify_subscribers');
 		
-		$tab_fields['tab01'] = $params->get('form_tab01_fields',  'maintext');
+		$tab_fields['tab01'] = $params->get('form_tab01_fields',  'text');
 		$tab_fields['tab02'] = $params->get('form_tab02_fields',  'fields_manager');
 		$tab_fields['tab03'] = $params->get('form_tab03_fields',  'categories, tags, language, perms');
 		$tab_fields['tab04'] = $params->get('form_tab04_fields',  'timezone_info, created, createdby, created_by_alias, publish_up, publish_down, access');
@@ -1663,10 +1625,11 @@ class FlexicontentViewItem  extends JViewLegacy
 		$tab_fields['fman']  = $params->get('form_tabs_fieldsman','');
 		$tab_fields['below'] = $params->get('form_tabs_below',    '');
 		
-		// fix aliases
+		// Fix aliases, also replacing field types with field names
 		foreach($tab_fields as $tab_name => $field_list) {
 			$field_list = str_replace('created_by', 'createdby', $field_list);
 			$field_list = str_replace('createdby_alias', 'created_by_alias', $field_list);
+			$field_list = str_replace('maintext', 'text', $field_list);
 			$tab_fields[$tab_name] = $field_list;
 		}
 		//echo "<pre>"; print_r($tab_fields); echo "</pre>";
@@ -1675,19 +1638,18 @@ class FlexicontentViewItem  extends JViewLegacy
 		$all_tab_fields = array();
 		foreach($tab_fields as $i => $field_list)
 		{
+			// Split field names and flip the created sub-array to make field names be the indexes of the sub-array
 			$tab_fields[$i] = (empty($tab_fields[$i]) || $tab_fields[$i]=='_skip_')  ?  array()  :  array_flip( preg_split("/[\s]*,[\s]*/", $field_list ) );
-			foreach ($tab_fields[$i] as $tbl_name => $ignore) {
-				$all_tab_fields[$tbl_name] = 1;
-			}
-			//$all_tab_fields = array_merge($all_tab_fields, $tab_fields[$i]);
+			
+			// Find all field names of the placed fields, we can use this to find non-placed fields
+			foreach ($tab_fields[$i] as $field_name => $ignore)
+				$all_tab_fields[$field_name] = 1;
 		}
+		
 		// Find fields missing from configuration, and place them below the tabs
 		foreach($placeable_fields as $fn => $i)
 		{
-			if ( !isset($all_tab_fields[$fn]) )
-			{
-				$tab_fields['below'][$fn] = 1;
-			}
+			if ( !isset($all_tab_fields[$fn]) )   $tab_fields['below'][$fn] = 1;
 		}
 		
 		// get TAB titles and TAB icon classes

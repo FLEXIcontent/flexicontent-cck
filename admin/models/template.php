@@ -31,12 +31,45 @@ jimport('joomla.application.component.model');
 class FlexicontentModelTemplate extends JModelLegacy
 {
 	/**
-	 * Layout data
+	 * Layout data (XML schema, CSS/JS files, image, etc)
 	 *
 	 * @var object
 	 */
 	var $_layout = null;
-
+	
+	/**
+	 * Layout type (Either: item -or- category -or- ...)
+	 *
+	 * @var object
+	 */
+	var $_type = null;
+	
+	/**
+	 * Layout template folder (real folder in storage)
+	 *
+	 * @var object
+	 */
+	var $_folder = null;
+	
+	
+	/**
+	 * Layout configuration name
+	 *
+	 * @var object
+	 */
+	var $_cfgname = null;
+	
+	
+	/**
+	 * Layout configuration data (template parameters / attibutes)
+	 *
+	 * @var object
+	 */
+	var $_config = null;
+	
+	
+	
+	
 	/**
 	 * Constructor
 	 *
@@ -48,24 +81,30 @@ class FlexicontentModelTemplate extends JModelLegacy
 
 		$type 	= JRequest::getVar('type',  'items', '', 'word');
 		$folder = JRequest::getVar('folder',  'default', '', 'cmd');
-		$this->setId($type, $folder);
+		$cfgname = JRequest::getVar('cfgname',  '', '', 'cmd');
+		$this->setId($type, $folder, $cfgname);
 	}
-
+	
+	
 	/**
 	 * Method to set the identifier
 	 *
 	 * @access	public
 	 * @param	int item identifier
 	 */
-	function setId($type, $folder)
+	function setId($type, $folder, $cfgname)
 	{
 		// Set item id and wipe data
-		$this->_type	    = $type;
-		$this->_folder		= $folder;
+		$this->_layout  = null;
+		$this->_config  = null;
+		$this->_type    = $type;
+		$this->_folder  = $folder;
+		$this->_cfgname = $cfgname;
 	}
-
+	
+	
 	/**
-	 * Method to get templates data
+	 * Method to get the layout data (XML schema, CSS/JS files, image, etc)
 	 *
 	 * @access public
 	 * @return array
@@ -80,7 +119,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 
 		return $this->_layout;
 	}
-
+	
 	
 	/**
 	 * Method to get the object
@@ -98,8 +137,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 		return $layout;
 	}
 	
-
-
+	
 	/**
 	 * Method to get all available fields
 	 *
@@ -120,6 +158,72 @@ class FlexicontentModelTemplate extends JModelLegacy
 		$fields = $this->_db->loadObjectList('name');
 		
 		return $fields;
+	}
+	
+	
+	/**
+	 * Method to get Layout configuration data (template parameters / attibutes)
+	 *
+	 * @access public
+	 * @return array
+	 */
+	function getLayoutConf()
+	{
+		$query  = 'SELECT * '
+			. ' FROM #__flexicontent_layouts_conf as f '
+			. ' WHERE template = ' . $this->_db->Quote($this->_folder)
+			. '  AND cfgname = ' . $this->_db->Quote($this->_cfgname)
+			. '  AND layout = ' . $this->_db->Quote($this->_type)
+			;
+		$this->_db->setQuery($query);
+		$layoutConf = $this->_db->loadObject();
+		if ($layoutConf===false) {
+			JError::raiseWarning( 500, $this->_db->getError() );
+		}
+		if (!$layoutConf) {
+			$layoutConf = new stdClass();
+			$layoutConf->template = $this->_folder;
+			$layoutConf->cfgname = $this->_cfgname;
+			$layoutConf->attribs = '';
+		}
+		$layoutConf->attribs = new JRegistry($layoutConf->attribs);
+		$layoutConf->attribs = $layoutConf->attribs->toArray();
+		
+		//echo "<pre>"; print_r($layoutConf); echo "</pre>";
+		return $layoutConf;
+	}
+	
+		/**
+	 * Method to get Layout configuration data (template parameters / attibutes)
+	 *
+	 * @access public
+	 * @return array
+	 */
+	function storeLayoutConf($folder, $cfgname, $layout, $attribs)
+	{
+		// delete old record
+		$query 	= 'DELETE FROM #__flexicontent_layouts_conf'
+			. ' WHERE template = ' . $this->_db->Quote($folder)
+			. '  AND cfgname = ' . $this->_db->Quote($cfgname)
+			. '  AND layout = ' . $this->_db->Quote($layout)
+			;
+		$this->_db->setQuery($query);
+		$this->_db->query();
+		
+		$attribs = json_encode($attribs);
+		
+		$query 	= 'INSERT INTO #__flexicontent_layouts_conf (`template`, `cfgname`, `layout`, `attribs`)'
+			.' VALUES(' .
+				$this->_db->Quote($folder) . ',' .
+				$this->_db->Quote($cfgname) . ',' .
+				$this->_db->Quote($layout) . ',' .
+				$this->_db->Quote($attribs) .
+			')'
+			;
+		$this->_db->setQuery($query);
+		$this->_db->query();
+		
+		return true;
 	}
 	
 	
@@ -153,11 +257,11 @@ class FlexicontentModelTemplate extends JModelLegacy
 		$db = JFactory::getDBO();
 		
 		$query = 'SELECT element AS type_name, REPLACE(name, "FLEXIcontent - ", "") AS field_name '
-		. ' FROM '.(FLEXI_J16GE ? '#__extensions' : '#__plugins')
-		. ' WHERE '.(FLEXI_J16GE ? 'enabled = 1' : 'published = 1')
-		. (FLEXI_J16GE ? ' AND `type`=' . $db->Quote('plugin') : '')
-		. ' AND folder = ' . $db->Quote('flexicontent_fields')
-		. ' AND element <> ' . $db->Quote('core')
+		. ' FROM #__extensions'
+		. ' WHERE enabled = 1'
+		. '  AND `type`=' . $db->Quote('plugin')
+		. '  AND `folder` = ' . $db->Quote('flexicontent_fields')
+		. '  AND `element` <> ' . $db->Quote('core')
 		. ' ORDER BY field_name ASC'
 		;
 		
@@ -184,10 +288,11 @@ class FlexicontentModelTemplate extends JModelLegacy
 	function getFieldsByPositions()
 	{
 		$query  = 'SELECT *'
-				. ' FROM #__flexicontent_templates'
-				. ' WHERE template = ' . $this->_db->Quote($this->_folder)
-				. ' AND layout = ' . $this->_db->Quote($this->_type)
-				;				;
+			. ' FROM #__flexicontent_templates'
+			. ' WHERE template = ' . $this->_db->Quote($this->_folder)
+			. '  AND cfgname = ' . $this->_db->Quote($this->_cfgname)
+			. '  AND layout = ' . $this->_db->Quote($this->_type)
+			;
 		$this->_db->setQuery($query);
 		$positions = $this->_db->loadObjectList('position');
 
@@ -220,10 +325,11 @@ class FlexicontentModelTemplate extends JModelLegacy
 	function deletePosition($pos)
 	{
 		$query  = 'DELETE FROM #__flexicontent_templates'
-				. ' WHERE template = ' . $this->_db->Quote($this->_folder)
-				. ' AND layout = ' . $this->_db->Quote($this->_type)
-				. ' AND position = ' . $this->_db->Quote($pos)
-				;
+			. ' WHERE template = ' . $this->_db->Quote($this->_folder)
+			. '  AND cfgname = ' . $this->_db->Quote($this->_cfgname)
+			. '  AND layout = ' . $this->_db->Quote($this->_type)
+			. '  AND position = ' . $this->_db->Quote($pos)
+			;
 		$this->_db->setQuery( $query );
 		if (!$this->_db->query()) {
 			JError::raiseWarning( 500, $this->_db->getError() );
@@ -249,37 +355,50 @@ class FlexicontentModelTemplate extends JModelLegacy
 		}
 		return ($usedfields ? array_unique($usedfields) : array());
 	}
-
+	
+	
 	/**
-	 * Method to store a field group
+	 * Method to store a field positions
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function store($folder, $type, $p, $record)
+	function storeFieldPositions($folder, $cfgname, $type, &$positions, &$records)
 	{
-		// delete old record
+		$folder_quoted  = $this->_db->Quote($folder);
+		$cfgname_quoted = $this->_db->Quote($cfgname);
+		$type_quoted    = $this->_db->Quote($type);
+		
+		$pos_quoted = array();
+		$rec_vals = array();
+		foreach ($positions as $pos) {
+			$pos_quoted[$pos] = $this->_db->Quote($pos);
+			if ($records[$pos] != '')
+				$rec_vals[$pos] = '('. $folder_quoted. ',' .$cfgname_quoted. ',' .$type_quoted. ',' .$pos_quoted[$pos]. ',' .$this->_db->Quote($records[$pos]) .')';
+		}
+		
+		// Delete old records
 		$query 	= 'DELETE FROM #__flexicontent_templates'
-				. ' WHERE template = ' . $this->_db->Quote($folder)
-				. ' AND layout = ' . $this->_db->Quote($type)
-				. ' AND position = ' . $this->_db->Quote($p)
-				;
+			. ' WHERE template = ' . $this->_db->Quote($folder)
+			. '  AND cfgname = ' . $this->_db->Quote($cfgname)
+			. '  AND layout = ' . $this->_db->Quote($type)
+			. '  AND position IN (' . implode(',', $pos_quoted) . ')'
+			;
 		$this->_db->setQuery($query);
 		$this->_db->query();
 		
-		if ($record != '') {
-			$query 	= 'INSERT INTO #__flexicontent_templates (`template`, `layout`, `position`, `fields`)'
-					.' VALUES(' . $this->_db->Quote($folder) . ',' . $this->_db->Quote($type) . ',' . $this->_db->Quote($p) . ',' . $this->_db->Quote($record) . ')'
-					;
+		if ( count($rec_vals) ) {
+			$query 	= 'INSERT INTO #__flexicontent_templates '.
+				'(`template`, `cfgname`, `layout`, `position`, `fields`)'
+				.'  VALUES '
+				.implode(",\n", $rec_vals);
 			$this->_db->setQuery($query);
 			$this->_db->query();
-			// don't forget to check if no field was prevouilsly altered
 		}
 		
 		return true;
 	}
-
-
+	
 }
 ?>

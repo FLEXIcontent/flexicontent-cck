@@ -57,7 +57,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	var $_childs = null;
 	
-
+	/**
+	 * Template configuration name (layout)
+	 *
+	 * @var int
+	 */
+	var $_clayout = null;
+	
 	/**
 	 * Array of peer-categories data
 	 *
@@ -144,6 +150,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	protected function populateCategoryState($ordering = null, $direction = null) {
 		$this->_layout = JRequest::getCmd('layout', '');  // !! This should be empty for empty for 'category' layout
+		$this->_clayout = JRequest::getCmd('clayout', '');  // !! This should be empty for using view's configured clayout (template)
 		
 		if ($this->_layout=='author') {
 			$this->_authorid = JRequest::getInt('authorid', 0);
@@ -176,13 +183,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('layout', $this->_layout);
 		$this->setState('authorid', $this->_authorid);
 		$this->setState('cids', $this->_ids);
-
-		// We need to merge parameters here to get the correct page limit value, we must call this after populating layout and author variables
-		$this->_loadCategoryParams($this->_id);
-		$cparams = $this->_params;
+		$this->setState('clayout', $this->_clayout);
+		
+		// We load parameters here, AFTER populating category ID and author ID, etc variables 
+		$this->_loadCategoryParams();
 		
 		// Set the pagination variables into state (We get them from http request OR use default category parameters)
-		$limit = JRequest::getInt('limit') ? JRequest::getInt('limit') : $cparams->get('limit');
+		$limit = strlen(JRequest::getVar('limit')) ? JRequest::getInt('limit') : $this->_params->get('limit');
 		$limitstart	= JRequest::getInt('limitstart', JRequest::getInt('start', 0, '', 'int'), '', 'int');
 		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
 		
@@ -223,11 +230,24 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_total     = null;
 			$this->_params    = null;
 			$this->_comments  = null;
+			$this->_clayout   = null;
 		}
 		$this->_id = $cid;
-	}		
-
-
+	}
+	
+	
+	/**
+	 * Method to set & override item's layout
+	 *
+	 * @access	public
+	 * @param	int item identifier
+	 */
+	function setCatLayout($name=null)
+	{
+		$this->_clayout = $name;
+	}
+	
+	
 	/**
 	 * Method to get Data
 	 *
@@ -239,11 +259,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$format	= JRequest::getCmd('format', null);
 		
 		$cparams = $this->_params;
+		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		// Allow limit zero to achieve a category view without items
-		if ($this->getState('limit') <= 0)
+		$limit = (int) $this->getState('limit');
+		$limitstart = (int) $this->getState('limitstart');
+		if ($limit <= 0)
 		{
 			$this->_data = array();
 		}
@@ -259,12 +282,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 				// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
 				// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
 				// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
-				$query_limited = $query . ' LIMIT '.(int)$this->getState('limit').' OFFSET '.(int)$this->getState('limitstart');
+				$query_limited = $query . ' LIMIT '.$limit.' OFFSET '.$limitstart;
 				$rows = flexicontent_db::directQuery($query_limited);
 				$query_ids = array();
 				foreach ($rows as $row) $query_ids[] = $row->id;
-				//$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
-				//$query_ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+				//$this->_db->setQuery($query, $limitstart, $limit);
+				//$query_ids = $this->_db->loadColumn();
 				
 				// 3, get current items total for pagination
 				$this->_db->setQuery("SELECT FOUND_ROWS()");
@@ -273,8 +296,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			catch (Exception $e) {
 				// 2, get items via normal joomla SQL layer
-				$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
-				$query_ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+				$this->_db->setQuery($query, $limitstart, $limit);
+				$query_ids = $this->_db->loadColumn();
 				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 				
 				// 3, get current items total for pagination
@@ -289,13 +312,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$fc_catview['view_total']  = $this->_total;
 			
 			/*if ((int)$this->getState('limitstart') < (int)$this->_total) {
-				$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
+				$this->_data = $this->_getList( $query, $limitstart, $limit );
 			} else {
 				$this->setState('limitstart',0);
 				$this->setState('start',0);
 				JRequest::setVar('start',0);
 				JRequest::setVar('limitstart',0);
-				$this->_data = $this->_getList( $query, 0, $this->getState('limit') );
+				$this->_data = $this->_getList( $query, 0, $limit );
 			}*/
 			
 			// 4, get item data
@@ -355,9 +378,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 	public function getPagination() {
 		// Load the content if it doesn't already exist
 		if (empty($this->_pagination)) {
+			$limit = (int) $this->getState('limit');
+			$limitstart = (int) $this->getState('limitstart');
+			
 			//jimport('joomla.html.pagination');
 			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
-			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+			$this->_pagination = new FCPagination($this->getTotal(), $limitstart, $limit);
 		}
 		return $this->_pagination;
 	}
@@ -507,7 +533,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		global $globalcats;
 		$cparams  = $this->_params;
 		$user     = JFactory::getUser();
-		$ordering = FLEXI_J16GE ? 'c.lft ASC' : 'c.ordering ASC';
+		$ordering = 'c.lft ASC';
 
 		$show_noauth = $cparams->get('show_noauth', 0);   // show unauthorized items
 		$display_subcats = $cparams->get('display_subcategories_items', 0);   // include subcategory items
@@ -578,7 +604,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			;
 		
 		$this->_db->setQuery($query);
-		$this->_data_cats = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$this->_data_cats = $this->_db->loadColumn();
 		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		return $this->_data_cats;
@@ -673,7 +699,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		$request_var = '';
 		$config_param = 'subcat_orderby';
-		$default_order = FLEXI_J16GE ? 'c.lft' : 'c.ordering';
+		$default_order = 'c.lft';
 		$default_order_dir = 'ASC';
 		
 		// Precedence: $request_var ==> $order ==> $config_param ==> $default_order
@@ -842,7 +868,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$session  = JFactory::getSession();
 		
 		// Featured items, this item property exists in J1.6+ only
-		$flag_featured = FLEXI_J16GE ? $cparams->get('display_flag_featured', 0) : 0;
+		$flag_featured = $cparams->get('display_flag_featured', 0);
 		switch ($flag_featured) {
 			case 1: $where .= ' AND i.featured=0'; break;   // 1: normal only
 			case 2: $where .= ' AND i.featured=1'; break;   // 2: featured only
@@ -921,7 +947,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if( strlen($text) )
 		{
 			$ts = 'ie';
-			$escaped_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
+			$escaped_text = $db->escape($text, true);
 			$quoted_text = $db->Quote( $escaped_text, false );
 			
 			switch ($phrase)
@@ -947,7 +973,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					} else {
 						// speed optimization ... 2-level searching: first require ALL words, then require exact text
 						$newtext = '+' . implode( ' +', $words );
-						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+						$quoted_text = $db->escape($newtext, true);
 						$quoted_text = $db->Quote( $quoted_text, false );
 						$exact_text  = $db->Quote( '%'. $escaped_text .'%', false );
 						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
@@ -963,7 +989,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
 					$newtext = '+' . implode( '* +', $words ) . '*';
-					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+					$quoted_text = $db->escape($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
 					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
@@ -982,7 +1008,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						JRequest::setVar('shortwords', implode(' ', $shortwords));
 						
 						$newtext = implode( '* ', $words ) . '*';
-						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+						$quoted_text = $db->escape($newtext, true);
 						$quoted_text = $db->Quote( $quoted_text, false );
 						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					}
@@ -1130,7 +1156,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			elseif (!empty($alpha)) {
 				$where = ' AND ( CONVERT (LOWER( i.title ) USING BINARY) REGEXP CONVERT ('.$regexp.' USING BINARY) )' ;
 			}
-			//$alpha_term = FLEXI_J16GE ? $this->_db->escape( '^['.$alpha.']', true ) : $this->_db->getEscaped( '^['.$alpha.']', true );
+			//$alpha_term = $this->_db->escape( '^['.$alpha.']', true );
 			//$where = ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $alpha_term, false );
 		}
 		
@@ -1183,7 +1209,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$orderby = $this->_buildCatOrderBy();
 		
 		// JOIN clause : category creator (needed for J2.5 category ordering)
-		$creator_join = FLEXI_J16GE ? ' LEFT JOIN #__users AS u ON u.id = c.created_user_id' : '';
+		$creator_join = ' LEFT JOIN #__users AS u ON u.id = c.created_user_id';
 		
 		$query = 'SELECT c.*,'
 			. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug'
@@ -1447,9 +1473,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		//initialize some vars
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+		
 		$cparams = $this->_params;
 		if ($pk) $this->_id = $pk;  // Set a specific id
-		
 		
 		$cat_usable = !$this->_layout || $this->_layout!='mcats';
 		if ($this->_id && $cat_usable)
@@ -1625,35 +1651,99 @@ class FlexicontentModelCategory extends JModelLegacy {
 	
 	
 	/**
+	 * Method to decide which item layout to use
+	 *
+	 * @access	public
+	 * @param	int item identifier
+	 */
+	function decideLayout(&$params)
+	{
+		// *********************************************************************************
+		// Get category layout from configuration if not already set (e.g. via HTTP Request)
+		// *********************************************************************************
+		
+		//echo "decideLayout: ". $this->_clayout ."<br/>";
+		$clayout = $this->_clayout;
+		if (!$clayout)
+		{
+			// Decide to use mobile or normal category template layout
+			$useMobile = $params->get('use_mobile_layouts', 0 );
+			if ($useMobile) {
+				$force_desktop_layout = $params->get('force_desktop_layout', 0 );
+				$mobileDetector = flexicontent_html::getMobileDetector();
+				$isMobile = $mobileDetector->isMobile();
+				$isTablet = $mobileDetector->isTablet();
+				$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+			}
+			
+			$desktop_clayout = $params->get('clayout', 'blog');
+			$clayout = !$useMobile ? $desktop_clayout : $params->get('clayout_mobile', $desktop_clayout);
+		}
+		
+		
+		// Get cached template data, without loading language file, (this will be done at the view)
+		$themes = flexicontent_tmpl::getTemplates( null );
+		
+		
+		// *********************************
+		// Verify the category layout exists
+		// *********************************
+		
+		if ( !isset($themes->category->{$clayout}) )
+		{
+			$cat_default_layout = 'blog';  // Layout default
+			$fixed_clayout = isset($themes->category->{$cat_default_layout}) ? $cat_default_layout : 'default';
+			$app->enqueueMessage("<small>Current category Layout (template) is '$clayout' does not exist<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
+			$clayout = $fixed_clayout;
+			FLEXIUtilities::loadTemplateLanguageFile( $clayout ); // Manually load Template-Specific language file of back fall clayout
+		}
+		
+		
+		// *****************************************************************************************
+		// Finally set the clayout (template name) into model / category's parameters / HTTP Request
+		// *****************************************************************************************
+		
+		$this->setCatLayout($clayout);
+		$params->set('clayout', $clayout);
+		JRequest::setVar('clayout', $clayout);
+	}
+	
+	
+	/**
 	 * Method to load content article parameters
 	 *
 	 * @access	private
 	 * @return	void
 	 * @since	1.5
 	 */
-	function _loadCategoryParams($id)
+	function _loadCategoryParams()
 	{
 		if ( $this->_params !== NULL ) return;
+		$id = (int)$this->_id;
 		
 		$app  = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();     // Retrieve active menu item
 		if ($menu)
 			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);  // Get active menu item parameters
-		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;     // Get the COMPONENT only parameters
 		
 		// a. Clone component parameters ... we will use these as parameters base for merging
-		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
-		$debug_inheritcid = JRequest::getCmd('print') ? 0 : $params->get('debug_inheritcid');
-		if ($debug_inheritcid)	$app->enqueueMessage("CLONED COMPONENT PARAMETERS<br/>\n");
+		$compParams = clone(JComponentHelper::getComponent('com_flexicontent')->params);     // Get the COMPONENT only parameters
+		
+		$debug_inheritcid = JRequest::getCmd('print') ? 0 : $compParams->get('debug_inheritcid');
+		if ($debug_inheritcid) {
+			$merge_stack = array();
+			array_push($merge_stack, "CLONED COMPONENT PARAMETERS");
+			array_push($merge_stack, "MERGED LAYOUT PARAMETERS");
+		}
 		
 		// b. Retrieve category parameters and create parameter object
 		if ($id) {
 			$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
 			$this->_db->setQuery($query);
-			$catparams = $this->_db->loadResult();
-			$cparams = FLEXI_J16GE ? new JRegistry($catparams) : new JParameter($catparams);
+			$catParams = $this->_db->loadResult();
+			$catParams = new JRegistry($catParams);
 		} else {
-			$cparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+			$catParams = new JRegistry();
 		}
 		
 		
@@ -1665,29 +1755,30 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ($author_extdata)
 			{
 				// Merge author basic parameters
-				$_author_basicreg = FLEXI_J16GE ? new JRegistry($author_extdata->author_basicparams) : new JParameter($author_extdata->author_basicparams);
+				$_author_basicreg = new JRegistry($author_extdata->author_basicparams);
 				if ($_author_basicreg->get('orderbycustomfieldid')==="0") $_author_basicreg->set('orderbycustomfieldid', '');
-				$cparams->merge( $_author_basicreg );
+				$catParams->merge( $_author_basicreg );
 				
 				// Merge author OVERRIDDEN category parameters
-				$_author_catreg = FLEXI_J16GE ? new JRegistry($author_extdata->author_catparams)   : new JParameter($author_extdata->author_catparams);
+				$_author_catreg = new JRegistry($author_extdata->author_catparams);
 				if ( $_author_basicreg->get('override_currcat_config',0) ) {
 					if ($_author_catreg->get('orderbycustomfieldid')==="0") $_author_catreg->set('orderbycustomfieldid', '');
-					$cparams->merge( $_author_catreg );
+					$catParams->merge( $_author_catreg );
 				}
 			}
 		}
 		
 		
-		// d. Retrieve parent categories parameters and create parameter object
+		// d. Retrieve inherited parameter and create parameter objects
 		global $globalcats;
 		$heritage_stack = array();
-		$inheritcid = $cparams->get('inheritcid', '');
-		$inheritcid_comp = $params->get('inheritcid', '');
+		$inheritcid = $catParams->get('inheritcid', '');
+		$inheritcid_comp = $compParams->get('inheritcid', '');
 		$inrerit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
 		
+		// CASE A: inheriting from parent category tree
 		if ( $id && $inrerit_parent && !empty($globalcats[$id]->ancestorsonly) ) {
-			$order_clause = FLEXI_J16GE ? 'level' : 'FIELD(id, ' . $globalcats[$id]->ancestorsonly . ')';
+			$order_clause = 'level';  // 'FIELD(id, ' . $globalcats[$id]->ancestorsonly . ')';
 			$query = 'SELECT title, id, params FROM #__categories'
 				.' WHERE id IN ( ' . $globalcats[$id]->ancestorsonly . ')'
 				.' ORDER BY '.$order_clause.' DESC';
@@ -1695,38 +1786,49 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$catdata = $this->_db->loadObjectList('id');
 			if (!empty($catdata)) {
 				foreach ($catdata as $parentcat) {
-					$parentcat->params = FLEXI_J16GE ? new JRegistry($parentcat->params) : new JParameter($parentcat->params);
+					$parentcat->params = new JRegistry($parentcat->params);
 					array_push($heritage_stack, $parentcat);
 					$inheritcid = $parentcat->params->get('inheritcid', '');
 					$inrerit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
 					if ( !$inrerit_parent ) break; // Stop inheriting from further parent categories
 				}
 			}
-		} else if ( $id && $inheritcid > 0 && !empty($globalcats[$inheritcid]) ){
+		}
+		
+		// CASE B: inheriting from specific category
+		else if ( $id && $inheritcid > 0 && !empty($globalcats[$inheritcid]) ){
 			$query = 'SELECT title, params FROM #__categories WHERE id = '. $inheritcid;
 			$this->_db->setQuery($query);
 			$catdata = $this->_db->loadObject();
 			if ($catdata) {
-				$catdata->params = FLEXI_J16GE ? new JRegistry($catdata->params) : new JParameter($catdata->params);
+				$catdata->params = new JRegistry($catdata->params);
 				array_push($heritage_stack, $catdata);
 			}
 		}
 		
-		// e. Merge inherited category parameters (e.g. ancestor categories or specific category)
+		
+		// ***************************
+		// Start merging of parameters
+		// ***************************
+		
+		// 0. Start from component parameters
+		$params = clone($compParams);
+		
+		// 1. Merge category's inherited parameters (e.g. ancestor categories or specific category)
 		while (!empty($heritage_stack)) {
 			$catdata = array_pop($heritage_stack);
 			if ($catdata->params->get('orderbycustomfieldid')==="0") $catdata->params->set('orderbycustomfieldid', '');
 			$params->merge($catdata->params);
-			if ($debug_inheritcid) $app->enqueueMessage("MERGED CATEGORY PARAMETERS of (inherit-from) category: ".$catdata->title ."<br/>\n");
+			if ($debug_inheritcid) array_push($merge_stack, "MERGED CATEGORY PARAMETERS of (inherit-from) category: ".$catdata->title);
 		}
 		
-		// f. Merge category parameter / author overriden category parameters
-		if ($cparams->get('orderbycustomfieldid')==="0") $cparams->set('orderbycustomfieldid', '');
-		$params->merge($cparams);
+		// 2. Merge category parameters (potentially overriden via  author's category parameters)
+		if ($catParams->get('orderbycustomfieldid')==="0") $catParams->set('orderbycustomfieldid', '');
+		$params->merge($catParams);
 		if ($debug_inheritcid && $id)
-			$app->enqueueMessage("MERGED CATEGORY PARAMETERS of current category<br/>\n");
+			array_push($merge_stack, "MERGED CATEGORY PARAMETERS of current category");
 		if ($debug_inheritcid && $this->_authorid && !empty($_author_catreg) && $_author_catreg->get('override_currcat_config',0))
-			$app->enqueueMessage("MERGED CATEGORY PARAMETERS of (current) author: {$this->_authorid} <br/>\n");
+			array_push($merge_stack, "MERGED CATEGORY PARAMETERS of (current) author: {$this->_authorid}");
 		
 		// g. Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
 		if ( !empty($menu) )
@@ -1736,9 +1838,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$view_ok      = @$menu->query['view']     == 'category';
 			$cid_ok       = @$menu->query['cid']      == $this->_id;
 			$layout_ok    = @$menu->query['layout']   == $this->_layout;
-			// Ignore empty author_id when layout is 'myitems' or 'favs', for them this is set explicitely (* see populateCategoryState() function)
-			$authorid_ok  = (@$menu->query['authorid'] == $this->_authorid) || ($this->_layout=='myitems' || $this->_layout=='favs');
-			$tagid_ok     = (@$menu->query['tagid'] == $this->_tagid) || ($this->_layout!='tags');  // Examine tagid only for tags layout
+			// Examine author only for author layout, !! thus ignoring empty author_id when layout is 'myitems' or 'favs', for them this is set explicitely (* see populateCategoryState() function)
+			$authorid_ok  = ($this->_layout!='author') || (@$menu->query['authorid'] == $this->_authorid);
+			// Examine tagid only for tags layout
+			$tagid_ok     = ($this->_layout!='tags')   || (@$menu->query['tagid'] == $this->_tagid);
 			
 			// We will merge menu parameters last, thus overriding the default categories parameters if either
 			// (a) override is enabled in the menu or (b) category Layout is 'myitems' or 'favs' or 'tags' or 'mcats' which has no default parameters
@@ -1749,7 +1852,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				// Add - all - menu parameters related or not related to category parameters override
 				if ($menu_params->get('orderbycustomfieldid')==="0") $menu_params->set('orderbycustomfieldid', '');
 				$params->merge($menu_params);
-				if ($debug_inheritcid) $app->enqueueMessage("MERGED CATEGORY PARAMETERS of (current) menu item: ".$menu->id."<br/>\n");
+				if ($debug_inheritcid) array_push($merge_stack, "MERGED CATEGORY PARAMETERS of (current) menu item: ".$menu->id);
 			} else if ($menu_matches) {
 				// Add menu parameters - not - related to category parameters override
 				$params->set( 'item_depth', $menu_params->get('item_depth') );
@@ -1759,7 +1862,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$params->set( 'pageclass_sfx', $menu_params->get('pageclass_sfx') );
 			}
 		}
-		
 		
 		
 		// Parameters meant for lists
@@ -1783,11 +1885,22 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 		}
 		
-		$this->_params = $params;
+		
+		// Retrieve Layout's parameters, also deciding the layout
+		$this->decideLayout($params);
+		$layoutParams = $this->getLayoutparams();
+		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
+		
+		// Allow global layout parameters to be inherited properly
+		$this->_params = clone($layoutParams);
+		$this->_params->merge($params);
+		$merge_stack[1] = "MERGED LAYOUT PARAMETERS of '".$this->_clayout ."'";
+		
+		if ($debug_inheritcid) $app->enqueueMessage(implode("<br/>\n", $merge_stack));
 		
 		// Also set into a global variable
 		global $fc_catview;
-		$fc_catview['params'] = $params;
+		$fc_catview['params'] = $this->_params;
 	}
 	
 	
@@ -1889,7 +2002,35 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		return $filter_query;
 	}
-
+	
+	
+	/**
+	 * Method to get the layout parameters of an item
+	 * 
+	 * @return string
+	 * @since 1.5
+	 */
+	function getLayoutparams($force = false)
+	{
+		static $layoutparams = array();
+		if ( !$force && isset($layoutparams[$this->_id]) ) return $layoutparams[$this->_id];
+		
+		if ($this->_clayout)
+		{
+			$query	= 'SELECT attribs'
+				. ' FROM #__flexicontent_layouts_conf'
+				. ' WHERE layout = "category"'
+				. '  AND template = ' . $this->_db->Quote($this->_clayout);
+			$this->_db->setQuery($query);
+			$attribs = $this->_db->loadResult();
+		}
+		
+		// Cache and return
+		$layoutparams[$this->_id] = !empty($attribs) ? $attribs : '';
+		return $layoutparams[$this->_id];
+	}
+	
+	
 	/**
 	 * Method to build the alphabetical index
 	 * 
@@ -1915,7 +2056,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			. ' ORDER BY alpha ASC'
 			;
 		$this->_db->setQuery($query);
-		$alpha = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$alpha = $this->_db->loadColumn();
 		
 		if ( $print_logging_info ) @$fc_run_times['execute_alphaindex_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		

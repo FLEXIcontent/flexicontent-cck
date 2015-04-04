@@ -88,15 +88,15 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 			else :
 			 $direct = '<input type="submit" name="direct" value="'.$direct_text.'" class="'.$flexi_button_class_direct.'" onclick="this.form.searchword.focus();"/>';
 			endif;
+			
+			switch ($direct_pos) :
+				case 'top'   : $output = $direct.'<br />'.$output;  break;
+				case 'bottom': $output = $output.'<br />'.$direct;  break;
+				case 'right' : $output = $output.$direct;  break;
+				case 'left'  :
+				default      : $output = $direct.$output; break;
+			endswitch;
 		endif;
-		
-		switch ($direct_pos) :
-			case 'top'   : $output = $direct.'<br />'.$output;  break;
-			case 'bottom': $output = $output.'<br />'.$direct;  break;
-			case 'right' : $output = $output.$direct;  break;
-			case 'left'  :
-			default      : $output = $direct.$output; break;
-		endswitch;
 		
 		
 		// Display search box and the optional buttons
