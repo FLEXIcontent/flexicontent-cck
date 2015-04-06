@@ -60,10 +60,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Get category and set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
 		$category = $this->get('Category');
 		$params   = $category->parameters;
-		if ($category->id && FLEXI_J16GE)
+		if ($category->id)
 			$meta_params = new JRegistry($category->metadata);
-		else
-			$meta_params = false;
 		
 		// Get various data from the model
 		$categories = $this->get('Childs'); // this will also count sub-category items is if  'show_itemcount'  is enabled
@@ -132,7 +130,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$fixed_clayout = 'blog';
 			$app->enqueueMessage("<small>Current Category Layout Template is '$clayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
 			$clayout = $fixed_clayout;
-			if (FLEXI_FISH || FLEXI_J16GE) FLEXIUtilities::loadTemplateLanguageFile( $clayout );  // Manually load Template-Specific language file of back fall clayout
+			FLEXIUtilities::loadTemplateLanguageFile( $clayout );  // Manually load Template-Specific language file of back fall clayout
 		}
 		
 		// (e) finally set the template name back into the category's parameters
@@ -246,14 +244,12 @@ class FlexicontentViewCategory extends JViewLegacy
 		$doc_title  =  !$meta_params  ?  $params->get( 'page_title' )  :  $meta_params->get('page_title', $params->get( 'page_title' ));
 		
 		// Check and prepend or append site name
-		if (FLEXI_J16GE) {  // Not available in J1.5
-			// Add Site Name to page title
-			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
-			}
-			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
-			}
+		// Add Site Name to page title
+		if ($app->getCfg('sitename_pagetitles', 0) == 1) {
+			$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
+		}
+		elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
+			$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
 		}
 		
 		// Finally, set document title
@@ -269,42 +265,35 @@ class FlexicontentViewCategory extends JViewLegacy
 		if (($_mp=$app_params->get('robots')))    $document->setMetadata('robots', $_mp);
 		
 		if ($category->id) {   // possibly not set for author items OR my items
-			if (FLEXI_J16GE) {
-				if ($category->metadesc) $document->setDescription( $category->metadesc );
-				if ($category->metakey)  $document->setMetadata('keywords', $category->metakey);
-				
-				// meta_params are always set if J1.6+ and category id is set
-				if ( $meta_params->get('robots') )  $document->setMetadata('robots', $meta_params->get('robots'));
-				
-				// ?? Deprecated <title> tag is used instead by search engines
-				if ($app->getCfg('MetaTitle') == '1') {
-					$meta_title = $meta_params->get('page_title') ? $meta_params->get('page_title') : $category->title;
-					$document->setMetaData('title', $meta_title);
+			if ($category->metadesc) $document->setDescription( $category->metadesc );
+			if ($category->metakey)  $document->setMetadata('keywords', $category->metakey);
+			
+			// meta_params are always set if J1.6+ and category id is set
+			if ( $meta_params->get('robots') )  $document->setMetadata('robots', $meta_params->get('robots'));
+			
+			// ?? Deprecated <title> tag is used instead by search engines
+			if ($app->getCfg('MetaTitle') == '1') {
+				$meta_title = $meta_params->get('page_title') ? $meta_params->get('page_title') : $category->title;
+				$document->setMetaData('title', $meta_title);
+			}
+			
+			if ($app->getCfg('MetaAuthor') == '1') {
+				if ( $meta_params->get('author') ) {
+					$meta_author = $meta_params->get('author');
+				} else {
+					$table = JUser::getTable();
+					$meta_author = $table->load( $category->created_user_id ) ? $table->name : '';
 				}
-				
-				if ($app->getCfg('MetaAuthor') == '1') {
-					if ( $meta_params->get('author') ) {
-						$meta_author = $meta_params->get('author');
-					} else {
-						$table = JUser::getTable();
-						$meta_author = $table->load( $category->created_user_id ) ? $table->name : '';
-					}
-					$document->setMetaData('author', $meta_author);
-				}
-			} else {
-				// ?? Deprecated <title> tag is used instead by search engines
-				if ($app->getCfg('MetaTitle') == '1')   $document->setMetaData('title', $category->title);
+				$document->setMetaData('author', $meta_author);
 			}
 		}
 		
 		// Overwrite with menu META data if menu matched
-		if (FLEXI_J16GE) {
-			if ($menu_matches) {
-				if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
-				if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
-				if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
-				if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
-			}
+		if ($menu_matches) {
+			if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
+			if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
+			if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
+			if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
 		}
 		
 		
@@ -407,8 +396,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			// Allow to trigger content plugins on category description
 			// NOTE: for J2.5, we will trigger the plugins as if description text was an article text, using ... 'com_content.article'
 			$category->text = $category->description;
-			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$category, &$params, 0));
-			else              $results = $dispatcher->trigger('onPrepareContent', array (& $category, & $params, 0));
+			$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$category, &$params, 0));
 			
 			$category->description 	= $category->text;
 		}
@@ -420,7 +408,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		foreach ($items as $item) 
 		{
 			$item->event 	= new stdClass();
-			$item->params = FLEXI_J16GE ? new JRegistry($item->attribs) : new JParameter($item->attribs);
+			$item->params = new JRegistry($item->attribs);
 			
 			// !!! The triggering of the event onPrepareContent(J1.5)/onContentPrepare(J1.6+) of content plugins
 			// !!! for description field (maintext) along with all other flexicontent
@@ -471,16 +459,13 @@ class FlexicontentViewCategory extends JViewLegacy
 			// These events return text that could be displayed at appropriate positions by our templates
 			$item->event = new stdClass();
 			
-			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterTitle', array('com_content.category', &$item, &$params, 0));
-			else              $results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $_page=0));
+			$results = $dispatcher->trigger('onContentAfterTitle', array('com_content.category', &$item, &$params, 0));
 			$item->event->afterDisplayTitle = trim(implode("\n", $results));
 	
-			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.category', &$item, &$params, 0));
-			else              $results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $params, $_page=0));
+			$results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.category', &$item, &$params, 0));
 			$item->event->beforeDisplayContent = trim(implode("\n", $results));
 	
-			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.category', &$item, &$params, 0));
-			else              $results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $_page=0));
+			$results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.category', &$item, &$params, 0));
 			$item->event->afterDisplayContent = trim(implode("\n", $results));
 							
 			// Set the option back to 'com_flexicontent'
@@ -610,7 +595,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		foreach ($categories as $cat) {
 			$image = "";
 			if ($show_cat_image)  {
-				if (FLEXI_J16GE && !is_object($cat->params)) {
+				if (!is_object($cat->params)) {
 					$cat->params = new JRegistry($cat->params);
 				}
 				
@@ -680,7 +665,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		foreach ($peercats as $cat) {
 			$image = "";
 			if ($show_cat_image)  {
-				if (FLEXI_J16GE && !is_object($cat->params)) {
+				if (!is_object($cat->params)) {
 					$cat->params = new JRegistry($cat->params);
 				}
 				
@@ -820,7 +805,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// increment the hit counter ONLY once per user visit
 		// **************************************************
 		// MOVED to flexisystem plugin due to ...
-		/*if (FLEXI_J16GE && $category->id && empty($layout)) {
+		/*if ($category->id && empty($layout)) {
 			$hit_accounted = false;
 			$hit_arr = array();
 			if ($session->has('cats_hit', 'flexicontent')) {
