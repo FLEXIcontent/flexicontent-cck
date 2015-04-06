@@ -388,7 +388,7 @@ class FlexicontentHelperRoute
 		// view
 		$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW;
 		// category id
-		if ($catid) $link .= '&cid='.$catid;
+		if ($_catid) $link .= '&cid='.$catid;
 		// item id
 		$link .= '&id='. $id;
 		
@@ -490,7 +490,7 @@ class FlexicontentHelperRoute
 		// ***************
 		
 		$link = 'index.php?option=com_flexicontent&view=category';
-		if ($_catid) $link .= '&cid='.$_catid;
+		if ($_catid) $link .= '&cid='.$catid;
 		
 		// Other data to pass to _findCategory()
 		$data = array();
