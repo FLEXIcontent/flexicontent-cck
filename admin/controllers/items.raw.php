@@ -207,6 +207,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if($auth_publish || $auth_archive || $auth_delete) {
 			//header('Content-type: application/json');
 			@ob_end_clean();
+			header('Content-type: text/html');
 			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");
@@ -214,10 +215,12 @@ class FlexicontentControllerItems extends FlexicontentController
 			if      (FLEXI_J30GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
 			else if (FLEXI_J16GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j25.css';
 			else                  $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j15.css';
+			echo '
+			<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css" />
+			<link rel="stylesheet" href="'.$fc_css.'" />
+			<link rel="stylesheet" href="'.JURI::root(true).'/media/jui/css/bootstrap.min.css" />
+			';
 			?>
-<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css" />
-<link rel="stylesheet" href="'.$fc_css.'" />
-<link rel="stylesheet" href="'.JURI::root(true).'/media/jui/css/bootstrap.min.css" />
 	<div id="flexicontent" class="flexicontent">
 
 			<?php
@@ -253,11 +256,7 @@ class FlexicontentControllerItems extends FlexicontentController
 							if(window.parent.document.adminForm.boxchecked.value==0)
 								alert('<?php echo JText::_('FLEXI_NO_ITEMS_SELECTED'); ?>');
 							else
-		<?php if (FLEXI_J16GE) { ?>
-								window.parent.Joomla.submitbutton('items.changestate')";
-		<?php } else { ?>
-								window.parent.submitbutton('changestate')";
-		<?php } ?>
+								window.parent.Joomla.submitbutton('items.changestate')"
 						target="_parent">
 					<?php echo JText::_( $statedata['name'] ); ?>
 				</span>

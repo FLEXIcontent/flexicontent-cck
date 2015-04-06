@@ -870,6 +870,7 @@
 		</fieldset>
 		
 		<fieldset name="FLEXI_MOD_ADVANCED_CACHE_STYLING" label="FLEXI_MOD_ADVANCED_CACHE_STYLING">
+			
 			<field name="" type="separator" default="FLEXI_CACHING" level="level1" />
 			<field name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
 				<option value="2">FLEXI_FORCE_CACHE</option>
@@ -883,6 +884,7 @@
 			<field name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">CSS links inside HTML (allows capturing)</option>
 			</field>
 			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS" description="FLEXI_ADD_TOOLTIPS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -892,7 +894,7 @@
 			<field name="height" type="text" size="4" default="" label="FLEXI_MODULE_HEIGHT" description="FLEXI_MODULE_HEIGHT_DESC" />
 			
 		</fieldset>
-	
+		
 	</fields>
 	</config>
 </extension>

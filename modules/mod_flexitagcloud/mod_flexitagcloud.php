@@ -61,18 +61,21 @@ if ( $show_mod )
 	$layout 				= $params->get('layout', 'default');
 
 	// Add css
+	$modulename = 'mod_flexitagcloud';
 	if ($add_ccs) {
-		if ($caching && !FLEXI_J16GE) {
-			// Work around for caching bug in J1.5
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexitagcloud/tmpl/mod_flexitagcloud.css">';
+		// Work around for extension that capture module's HTML 
+		if ($add_ccs==2) {
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css">';
 			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
 			}
-		} else {
-			// Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
-			$document->addStyleSheet(JURI::base(true).'/modules/mod_flexitagcloud/tmpl/mod_flexitagcloud.css');
+		}
+		
+		// Standards compliant implementation by placing CSS link into the HTML HEAD
+		else {
+			$document->addStyleSheet(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css');
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {

@@ -161,26 +161,29 @@ if ( $show_mod )
 	if ($add_tooltips) JHTML::_('behavior.tooltip');
 	
 	// Add css
+	$modulename = 'mod_flexicontent';
 	if ($add_ccs && $layout) {
-		if ($caching && !FLEXI_J16GE) {
-			// Work around for caching bug in J1.5
+		// Work around for extension that capture module's HTML 
+		if ($add_ccs==2) {
 			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
 				// active layout css
-				echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css">';
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css">';
 			}
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css">';
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl_common/module.css">';
 			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
 			}
-		} else {
-			// Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
+		}
+		
+		// Standards compliant implementation by placing CSS link into the HTML HEAD
+		else {
 			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
 				// active layout css
-				$document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css');
+				$document->addStyleSheet(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css');
 			}
-			$document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css');
+			$document->addStyleSheet(JURI::base(true).'/modules/'.$modulename.'/tmpl_common/module.css');
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
@@ -188,6 +191,9 @@ if ( $show_mod )
 			}
 		}
 	}
+	
+	// Include module header
+	require(JModuleHelper::getLayoutPath('mod_flexicontent', '_header'));
 	
 	// Render Layout, (once per category if apply per category is enabled ...)
 	foreach ($catdata_arr as $i => $catdata) {
@@ -210,12 +216,9 @@ if ( $show_mod )
 		require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout));
 	}
 	
-	// Add module Read More
-	if ($show_more == 1) : ?>
-	<span class="module_readon<?php echo $params->get('moduleclass_sfx'); ?>"<?php if ($more_css) : ?> style="<?php echo $more_css; ?>"<?php endif;?>>
-		<a class="readon" href="<?php echo JRoute::_($more_link); ?>" <?php if ($params->get('more_blank') == 1) {echo 'target="_blank"';} ?>><span><?php echo JText::_($more_title); ?></span></a>
-	</span>
-	<?php endif;
+	// Include module footer, e.g. includes module's Read More
+	require(JModuleHelper::getLayoutPath('mod_flexicontent', '_footer'));
+	
 	
 	$mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['rendering_template'];
 	
