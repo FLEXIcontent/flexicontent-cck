@@ -193,7 +193,7 @@ if ( $show_mod )
 	}
 	
 	// Include module header
-	require(JModuleHelper::getLayoutPath('mod_flexicontent', '_header'));
+	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout.'/header'));
 	
 	// Render Layout, (once per category if apply per category is enabled ...)
 	foreach ($catdata_arr as $i => $catdata) {
@@ -217,7 +217,7 @@ if ( $show_mod )
 	}
 	
 	// Include module footer, e.g. includes module's Read More
-	require(JModuleHelper::getLayoutPath('mod_flexicontent', '_footer'));
+	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout.'/footer'));
 	
 	
 	$mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['rendering_template'];
