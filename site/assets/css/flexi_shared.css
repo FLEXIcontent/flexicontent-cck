@@ -1091,6 +1091,9 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	background-color: lightgray;
 	color: white;
 }
+table.img_upload_select {
+  width: 60% !important;
+}
 
 
 /* FIELDs: DRAG (sort) handle */
