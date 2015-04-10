@@ -659,7 +659,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				)
 			),
 			'flexicontent_download_history'=>array('user_id'=>0, 'file_id'=>0),
-			'flexicontent_download_coupons'=>array('user_id'=>0, 'file_id'=>0, 'token'=>0, 'expire_on'=>0)
+			'flexicontent_download_coupons'=>array('user_id'=>0, 'file_id'=>0, 'token'=>0, 'expire_on'=>0),
+			'flexicontent_templates'=>array(
+				'PRIMARY'=>array(
+					'custom_drop'=>'DROP PRIMARY KEY',
+					'custom_add'=>'ADD PRIMARY KEY',
+					'cols'=>array('template'=>0, 'cfgname'=>0, 'layout'=>0, 'position'=>0)
+				)
+			)
 		);
 		
 		$missing = array();

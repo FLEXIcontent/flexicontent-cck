@@ -28,7 +28,7 @@
 	<field name="modified_user_id" type="user" label="JGLOBAL_FIELD_MODIFIED_BY_LABEL" description="JGLOBAL_FIELD_MODIFIED_BY_DESC" class="readonly" readonly="true" filter="unset"/>
 	<field name="modified_time" type="text" label="JGLOBAL_MODIFIED" description="Modification Time" class="readonly" filter="unset" readonly="true" />
 	<field name="hits" type="hidden" filter="unset"/>
-	<field name="language" type="contentlanguage" label="FLEXI_CATEGORY_LANGUAGE" description="FLEXI_CATEGORY_LANGUAGE_DESC" class="inputbox">
+	<field name="language" type="contentlanguage" label="FLEXI_CATEGORY_LANGUAGE" description="FLEXI_CATEGORY_LANGUAGE_DESC" class="use_select2_lib">
 		<option value="*">JALL</option>
 	</field>
 	<field id="rules" name="rules" type="rules" label="JFIELD_RULES_LABEL" description="JFIELD_RULES_DESC" filter="rules" class="inputbox" component="com_flexicontent" section="category" />

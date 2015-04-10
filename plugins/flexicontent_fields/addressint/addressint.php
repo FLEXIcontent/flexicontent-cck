@@ -53,14 +53,14 @@ class plgFlexicontent_fieldsAddressint extends FCField {
 						var lonfield = fieldname+"[lon]";
 						document.forms["adminForm"].elements[latfield].value = latitude;
 						document.forms["adminForm"].elements[lonfield].value = longitude;
-						document.getElementById(plainname+"_map").innerHTML = \'<img src="http://maps.google.com/maps/api/staticmap?center=\'+latitude+\',\'+longitude+\'&zoom=12&size=250x150&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|\'+latitude+\',\'+longitude+\'&sensor=false" alt="Geographical address locator" />\';
+						document.getElementById(plainname+"_map").innerHTML = \'<img src="http://maps.google.com/maps/api/staticmap?center=\'+latitude+\',\'+longitude+\'&zoom=12&size=320x240&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|\'+latitude+\',\'+longitude+\'&sensor=false" alt="Geographical address locator" />\';
 					} 
 					else {
 						var latfield = fieldname+"[lat]";
 						var lonfield = fieldname+"[lon]";
 						document.forms["adminForm"].elements[latfield].value = "";
 						document.forms["adminForm"].elements[lonfield].value = "";
-						document.getElementById(plainname+"_map").innerHTML = \'<img src="http://maps.google.com/maps/api/staticmap?center=0,0&zoom=12&size=250x150&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|0,0&sensor=false" alt="Geographical address locator" />\';
+						document.getElementById(plainname+"_map").innerHTML = \'<img src="http://maps.google.com/maps/api/staticmap?center=0,0&zoom=12&size=320x240&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|0,0&sensor=false" alt="Geographical address locator" />\';
 					}
 				}); 
 			}

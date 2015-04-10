@@ -252,13 +252,13 @@ class plgSystemFlexisystem extends JPlugin
 				// *** Specific Redirect Exclusions ***
 				
 				//--. (J2.5 only) Selecting Joomla article for menu item
-				if ( FLEXI_J16GE && $layout=="modal" && $function="jSelectArticle_jform_request_id" ) return false;
+				if ( $layout=="modal" && $function="jSelectArticle_jform_request_id" ) return false;
 				
 				//--. JA jatypo (editor-xtd plugin button for text style selecting)
 				if (JRequest::getCMD('jatypo')!="" && $layout=="edit") return false;
 
 				//--. Allow listing featured backend management
-				if (FLEXI_J16GE && $view=="featured") return false;
+				if ($view=="featured") return false;
 				//return false;  // for testing
 				
 				if ($task == 'edit') {
@@ -278,11 +278,7 @@ class plgSystemFlexisystem extends JPlugin
 			} elseif ( $option == 'com_categories' ) {
 				
 				// Check if a user group is groups, that are excluded from category redirection
-				if (FLEXI_J16GE) {
-					if( count(array_intersect($usergroups, $exclude_cats)) ) return false;
-				} else {
-					if( $user->gid > $mincats ) return false;
-				}
+				if( count(array_intersect($usergroups, $exclude_cats)) ) return false;
 				
 				// Default (target) redirection url
 				$urlItems = 'index.php?option=com_flexicontent&view=categories';

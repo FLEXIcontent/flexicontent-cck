@@ -897,50 +897,45 @@ class FlexicontentController extends JControllerLegacy
 		// Display a FLEXIcontent frontend view (category, item, favourites, etc)
 		else {
 			
-			// Default cacheable behaviour for J1.5: WITHOUT CACHING (logged users) and WITH CACHING (guests)
-			if (!FLEXI_J16GE) {
-				$cachable = JFactory::getUser()->get('id') ? false : true;
-				parent::display($cachable);
+			// AVOID MAKING TOO LARGE: (case 1) SEARCH view or OTHER view with TEXT search active
+			if ( JRequest::getVar('view')=='search' || JRequest::getVar('filter') ) {
+				$cachable = false;
 			}
 			
-			// J1.6+
+			// AVOID MAKING TOO LARGE: (case 2) some field filters are active
 			else {
-				// Exception 1: Do not cache logged users
-				/*if (JFactory::getUser()->get('id')) {
-					$cachable = false;
-				}
-				
-				// Exception 2: SEARCH view or OTHER view with TEXT search active
-				else*/ if ( JRequest::getVar('view')=='search' || JRequest::getVar('filter') ) {
-					$cachable = false;
-				}
-				
-				// Exception 3: some field filters are active, avoiding caching this since it can make the cache really large
-				else {
-					$cachable = true;
-					foreach($_GET as $i => $v) {
-						if (substr($i, 0, 7) === "filter_") {
-							$cachable = false;
-							break;
-						}
+				$cachable = true;
+				foreach($_GET as $i => $v) {
+					if (substr($i, 0, 7) === "filter_") {
+						$cachable = false;
+						break;
 					}
 				}
-				
-				// IF urlparams are empty then use the FULL URL request array (_GET)
-				if (empty($urlparams)) {
-					$safeurlparams = array();
-					// Add menu URL variables
-					$menu = JFactory::getApplication()->getMenu()->getActive();
-					if ($menu) foreach($menu->query as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
-					// Add any existing URL variables (=submitted via GET),  ... we only need variable names, (so can use them unfiltered)
-					foreach($_GET as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
-				} else {
-					$safeurlparams = & $urlparams;
-				}
-				//echo "cacheable: ".(int)$cachable." - " . print_r($safeurlparams, true) ."<br/>";
-				
-				parent::display($cachable, $safeurlparams);
 			}
+			
+			// CASE: urlparams were explicitely given
+			if (!empty($urlparams)) $safeurlparams = & $urlparams;
+			
+			// CASE: urlparams are empty, use the FULL URL request array (_GET)
+			else {
+				$safeurlparams = array();
+				// Add menu URL variables
+				$menu = JFactory::getApplication()->getMenu()->getActive();
+				if ($menu) foreach($menu->query as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
+				// Add any existing URL variables (=submitted via GET),  ... we only need variable names, (so can use them unfiltered)
+				foreach($_GET as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
+			}
+			
+			// Workaround user seeing same page after login/logout, pages are still cachable,
+			// just make sure that cache is different after login/logout and per user
+			$user_id = JFactory::getUser()->get('id');
+			if ($user_id) {
+				JRequest::setVar('__fc_user_id__', $user_id);
+				$safeurlparams['__fc_user_id__'] = 'STRING';
+			}
+			
+			//echo "cacheable: ".(int)$cachable." - " . print_r($safeurlparams, true) ."<br/>";
+			parent::display($cachable, $safeurlparams);
 		}
 	}
 

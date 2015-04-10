@@ -474,6 +474,14 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
 		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_templates"';
+		$db->setQuery($query);
+		$templates_tbl_exists = (boolean) count($db->loadObjectList());
+		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_layouts_conf"';
+		$db->setQuery($query);
+		$layouts_conf_tbl_exists = (boolean) count($db->loadObjectList());
+		
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_items_tmp"';
 		$db->setQuery($query);
 		$content_cache_tbl_exists = (boolean) count($db->loadObjectList());
@@ -546,12 +554,10 @@ class com_flexicontentInstallerScript
 					if ($fields_tbl_exists)  $tbls[] = "#__flexicontent_fields";
 					if ($types_tbl_exists)   $tbls[] = "#__flexicontent_types";
 					if ($iext_tbl_exists)    $tbls[] = "#__flexicontent_items_ext";
-					if ($content_cache_tbl_exists)
-						$tbls[] = "#__flexicontent_items_tmp";
-					if ($advsearch_index_tbl_exists)
-						$tbls[] = "#__flexicontent_advsearch_index";
-					if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
-					else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
+					if ($templates_tbl_exists)        $tbls[] = "#__flexicontent_templates";
+					if ($content_cache_tbl_exists)    $tbls[] = "#__flexicontent_items_tmp";
+					if ($advsearch_index_tbl_exists)  $tbls[] = "#__flexicontent_advsearch_index";
+					foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
 					
 					$queries = array();
 					if ( $iext_tbl_exists ) {
@@ -632,6 +638,11 @@ class com_flexicontentInstallerScript
 					}
 					if ( $types_tbl_exists && !array_key_exists('itemscreatable', $tbl_fields['#__flexicontent_types'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_types` ADD `itemscreatable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `published`";
+					}
+					
+					// Templates TABLE
+					if ( $templates_tbl_exists && !array_key_exists('cfgname', $tbl_fields['#__flexicontent_templates'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_templates` ADD `cfgname` varchar(50) NOT NULL default '' AFTER `template`";
 					}
 					
 					if ( !empty($queries) ) {
@@ -731,7 +742,8 @@ class com_flexicontentInstallerScript
 					
 			    $queries = array();
 					if ( !$authors_ext_tbl_exists ) {
-						$queries[] = "CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
+						$queries[] = "
+						CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
 						  `user_id` int(11) unsigned NOT NULL,
 						  `author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
 						  `author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
@@ -868,6 +880,43 @@ class com_flexicontentInstallerScript
 						}
 						if ( $result !== false ) {
 							echo "<span style='$success_style'>table(s) created or upgraded</span>";
+						}
+					}
+					else echo "<span style='$success_style'>nothing to do</span>";
+					?>
+					</td>
+				</tr>
+				
+		<?php
+		// Create layouts_conf table if it does not exist
+		?>
+				<tr class="row0">
+					<td class="key">Create/Upgrade layouts configuration DB table: </td>
+					<td>
+					<?php
+					
+			    $queries = array();
+					if ( !$layouts_conf_tbl_exists ) {
+						$queries[] = "
+						CREATE TABLE IF NOT EXISTS `#__flexicontent_layouts_conf` (
+						  `template` varchar(50) NOT NULL default '',
+						  `cfgname` varchar(50) NOT NULL default '',
+						  `layout` varchar(20) NOT NULL default '',
+						  `attribs` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+						  PRIMARY KEY  (`template`,`cfgname`,`layout`)
+						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					}
+					
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) {
+								$result = false;
+								echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>";
+							}
+						}
+						if ( $result !== false ) {
+							echo "<span style='$success_style'>table created</span>";
 						}
 					}
 					else echo "<span style='$success_style'>nothing to do</span>";

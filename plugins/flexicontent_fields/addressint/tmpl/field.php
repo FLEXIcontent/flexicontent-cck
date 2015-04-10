@@ -7,6 +7,7 @@ $required = $required ? ' class="required"' : '';
 
 // States drop down list
 $list_states = array(
+	''=>JText::_('FLEXI_PLEASE_SELECT'),
 	'AL'=>'Alabama',
 	'AK'=>'Alaska',
 	'AS'=>'American Samoa',
@@ -69,6 +70,7 @@ $list_states = array(
 
 // Country drop down list
 $list_countries = array(
+	''=>JText::_('FLEXI_PLEASE_SELECT'),
 	'AF'=>'Afghanistan',
 	'AX'=>'&Aring;land Islands',
 	'AL'=>'Albania',
@@ -320,29 +322,9 @@ $list_countries = array(
 	'ZW'=>'Zimbabwe'
 );
 
-$options_states = array();
-$options_states[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
-
-$options_countries = array();
-$options_countries[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
-
 $n = 0;
 foreach ($values as $value)
 {
-	$_state = $value['state'];
-	if ( !empty($_state)  && isset($list_states[$_state]) ) {
-		$display_state = $list_states[$_state];
-	} else {
-		$display_state = "";
-	}
-	
-	$_country = $value['country'];
-	if ( !empty($_country)  && isset($list_countries[$_country]) ) {
-		$display_country = $list_countries[$_country];
-	} else {
-		$display_country = "";
-	}
-	
 	$field->html[$n] = '
 	<table class="admintable" border="0" cellspacing="0" cellpadding="5">
 		<tr>
@@ -359,7 +341,7 @@ foreach ($values as $value)
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][city]" id="city" value="'.$value['city'].'" size="50" maxlength="100" /></td>
 		</tr><tr>
 			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').':</td>
-			<td>'.JHTML::_('select.genericlist', $options_states, 'custom['.$field->name.'][state]', $required, 'value', 'text', $value['state']).'</td>
+			<td>'.JHTML::_('select.genericlist', $list_states, 'custom['.$field->name.'][state]', $required, 'value', 'text', $value['state']).'</td>
 		</tr><tr>
 			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').':</td>
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][province]" value="'.$value['province'].'" size="50" maxlength="100" /></td>
@@ -368,9 +350,9 @@ foreach ($values as $value)
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][zip]" value="'.$value['zip'].'" size="10" maxlength="10"'.$required.' /></td>
 		</tr><tr>
 			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').':</td>
-			<td>'.JHTML::_('select.genericlist', $options_countries, 'custom['.$field->name.'][country]', $required, 'value', 'text', $value['country']).'</td>
+			<td>'.JHTML::_('select.genericlist', $list_countries, 'custom['.$field->name.'][country]', $required, 'value', 'text', $value['country']).'</td>
 		</tr><tr>
-			<td></td><td><input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GEOLOCATE').'" onclick="geolocateAddr(\'custom['.$field->name.']\', \''.$field->name.'\');" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lat]" value="'.$value['lat'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lon]" value="'.$value['lon'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <div id="'.$field->name.'_map"><img src="http://maps.google.com/maps/api/staticmap?center='.$value['lat'].','.$value['lon'].'&zoom=12&size=250x150&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|'.$value['lat'].','.$value['lon'].'&sensor=false" alt="" /></div></td>
+			<td></td><td><input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GEOLOCATE').'" onclick="geolocateAddr(\'custom['.$field->name.']\', \''.$field->name.'\');" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lat]" value="'.$value['lat'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lon]" value="'.$value['lon'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <div id="'.$field->name.'_map"><img src="http://maps.google.com/maps/api/staticmap?center='.$value['lat'].','.$value['lon'].'&zoom=12&size=320x240&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|'.$value['lat'].','.$value['lon'].'&sensor=false" alt="" /></div></td>
 		</tr>
 	</table>
 	';

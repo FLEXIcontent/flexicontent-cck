@@ -89,7 +89,6 @@ if ( $show_mod )
 	$linkadvsearch     = $params->get('linkadvsearch', 1);
 	$linkadvsearch_txt = JText::_($params->get('linkadvsearch_txt', 'FLEXI_ADV_MOD_ADVANCED_SEARCH'));
 	
-	// Currently no JS/CSS needed
 	
 	// Load needed JS libs & CSS styles
 	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
@@ -100,26 +99,29 @@ if ( $show_mod )
 	if ($add_tooltips) JHTML::_('behavior.tooltip');
 	
 	// Add css
+	$modulename = 'mod_flexiadvsearch';
 	if ($add_ccs && $layout) {
-		if ($caching && !FLEXI_J16GE) {
-			// Work around for caching bug in J1.5
+		// Work around for extension that capture module's HTML 
+		if ($add_ccs==2) {
 			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
 				// active layout css
-				echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/'.$layout.'/'.$layout.'.css">';
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css">';
 			}
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexiadvsearch/tmpl_common/module.css">';
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl_common/module.css">';
 			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
 			}
-		} else {
-			// Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
+		}
+		
+		// Standards compliant implementation by placing CSS link into the HTML HEAD
+		else {
 			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
 				// active layout css
-				$document->addStyleSheet(JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/'.$layout.'/'.$layout.'.css');
+				$document->addStyleSheet(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css');
 			}
-			$document->addStyleSheet(JURI::base(true).'/modules/mod_flexiadvsearch/tmpl_common/module.css');
+			$document->addStyleSheet(JURI::base(true).'/modules/'.$modulename.'/tmpl_common/module.css');
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {

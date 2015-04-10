@@ -2596,6 +2596,7 @@ class flexicontent_html
 		$db->setQuery($query);
 		$data = $db->loadObjectList();
 		
+		$options = array();
 		if (!is_numeric($displaytype) && is_string($displaytype))
 			$options[] = JHTML::_( 'select.option', '', $displaytype);
 		else if ($displaytype)

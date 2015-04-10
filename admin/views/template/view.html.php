@@ -33,27 +33,22 @@ class FlexicontentViewTemplate extends JViewLegacy {
 	{
 		
 		//initialise variables
-		$mainframe = JFactory::getApplication();
-		$option    = JRequest::getVar('option');
+		$app = JFactory::getApplication();
+		$option   = JRequest::getVar('option');
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
 		
-		$use_jquery_sortable = true; //FLEXI_J16GE ? true : false;
-		
-		if (!$use_jquery_sortable) {
-			// mootools sortable
-			$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/sortables.js' );
-		}
-		
+		$use_jquery_sortable = true;
 		$type 	= JRequest::getVar('type',  'items', '', 'word');
 		$folder = JRequest::getVar('folder',  'default', '', 'cmd');
 		
-		if (FLEXI_FISH || FLEXI_J16GE)
-			FLEXIUtilities::loadTemplateLanguageFile( $folder );
+		FLEXIUtilities::loadTemplateLanguageFile( $folder );
 
 		//Get data from the model
 		$layout  = $this->get( 'Data');
+		$conf    = $this->get( 'LayoutConf');
+		
 		$fields  = $this->get( 'Fields');
 		$fbypos  = $this->get( 'FieldsByPositions');
 		$used    = $this->get( 'UsedFields');
@@ -106,7 +101,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 			}
 			foreach ($idsort as $k => $v) {
 				if ($k > 1) {
-					$jssort[] = $use_jquery_sortable  ?  'storeordering(jQuery("#sortable-'.$v.'"))'  :  'results('.$k.',\''.$v.'\')';
+					$jssort[] = 'storeordering(jQuery("#sortable-'.$v.'"))';
 				}
 			}
 			$positions = implode(',', $idsort);
@@ -114,65 +109,30 @@ class FlexicontentViewTemplate extends JViewLegacy {
 			$jssort = implode("; ", $jssort);
 			$sortable_ids = "#".implode(",#", $sort);
 			
-			if ($use_jquery_sortable) {
-				$js = "
-				jQuery(function() {
-					my = jQuery( \"$sortable_ids\" ).sortable({
-						connectWith: \"".$sortable_ids."\",
-						update: function(event, ui) {
-							if(ui.sender) {
-								storeordering(jQuery(ui.sender));
-							}else{
-								storeordering(jQuery(ui.item).parent());
-							}
+			$js = "
+			jQuery(function() {
+				my = jQuery( \"$sortable_ids\" ).sortable({
+					connectWith: \"".$sortable_ids."\",
+					update: function(event, ui) {
+						if(ui.sender) {
+							storeordering(jQuery(ui.sender));
+						}else{
+							storeordering(jQuery(ui.item).parent());
 						}
-					});
-					initordering();
+					}
 				});
-				function storeordering(parent_element) {
-					hidden_id = '#'+jQuery.trim(parent_element.attr('id').replace('sortable-',''));
-					fields = new Array();
-					i = 0;
-					parent_element.children('li').each(function(){
-						fields[i++] = jQuery(this).attr('id').replace('field_', '');
-					});
-					jQuery(hidden_id).val(fields.join(','))
-				}
-				";
-			} else {
-				$js = "
-				var my = '';
-				window.addEvent('domready', function(){
-					var mySortables = new Sortables('.positions', {
-						constrain: false,
-						clone: false,
-						revert: true,
-						onComplete: storeordering
-					});
-					my = mySortables;
-					storeordering();
-
-					var slideaccess = new Fx.Slide('propvisible');
-					var slidenoaccess = new Fx.Slide('propnovisible');
-					var legend = $$('fieldset.tmplprop legend');
-					slidenoaccess.hide();
-					legend.addEvent('click', function(ev) {
-						legend.toggleClass('open');
-						slideaccess.toggle();
-						slidenoaccess.toggle();
-					});
-
-
+				initordering();
+			});
+			function storeordering(parent_element) {
+				hidden_id = '#'+jQuery.trim(parent_element.attr('id').replace('sortable-',''));
+				fields = new Array();
+				i = 0;
+				parent_element.children('li').each(function(){
+					fields[i++] = jQuery(this).attr('id').replace('field_', '');
 				});
-
-				function results(i, field) {
-					var res = my.serialize(i, function(element, index){
-					return element.getProperty('id').replace('field_','');
-				}).join(',');
-					$(field).value = res;
-				}
-				";
+				jQuery(hidden_id).val(fields.join(','))
 			}
+			";
 			
 			$js .= '
 			var fieldListFilters = new Array( "content_type", "field_type" );
@@ -214,10 +174,10 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
+		
 		$permission = FlexicontentHelperPerm::getPerm();
-
 		if (!$permission->CanTemplates) {
-			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+			$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
 		//Create Submenu
@@ -225,17 +185,28 @@ class FlexicontentViewTemplate extends JViewLegacy {
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TEMPLATE' ), 'templates' );
+		JToolBarHelper::apply('templates.apply');
+		JToolBarHelper::save('templates.save');
+		JToolBarHelper::cancel('templates.cancel');
+		
+		
+		// **********************************************************************************
+		// Get Templates and apply Template Parameters values into the form fields structures 
+		// **********************************************************************************
+		
 		if (FLEXI_J16GE) {
-			JToolBarHelper::apply('templates.apply');
-			JToolBarHelper::save('templates.save');
-			JToolBarHelper::cancel('templates.cancel');
+			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
+			$jform->load($layout->params);
+			$layout->params = $jform;
+			// ... values applied at the template form file
 		} else {
-			JToolBarHelper::apply();
-			JToolBarHelper::save();
-			JToolBarHelper::cancel();
+			$layout->params->loadINI($row->params);
 		}
+		//print_r($layout);
 		
 		//assign data to template
+		//print_r($conf);
+		$this->assignRef('conf'   	  , $conf);
 		$this->assignRef('layout'   	, $layout);
 		$this->assignRef('fields'   	, $fields);
 		$this->assignRef('user'     	, $user);

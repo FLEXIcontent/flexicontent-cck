@@ -177,10 +177,11 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_versions` (
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
   `template` varchar(50) NOT NULL default '',
+  `cfgname` varchar(50) NOT NULL default '',
   `layout` varchar(20) NOT NULL default '',
   `position` varchar(100) NOT NULL default '',
   `fields` text NOT NULL,
-  PRIMARY KEY  (`template`,`layout`,`position`)
+  PRIMARY KEY  (`template`,`cfgname`,`layout`,`position`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_advsearch_index` (
@@ -203,6 +204,14 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
   `author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY  (`user_id`)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `#__flexicontent_layouts_conf` (
+  `template` varchar(50) NOT NULL default '',
+  `cfgname` varchar(50) NOT NULL default '',
+  `layout` varchar(20) NOT NULL default '',
+  `attribs` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  PRIMARY KEY  (`template`,`cfgname`,`layout`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_download_history` (

@@ -108,7 +108,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		// Get if we can create inside at least one (com_content) category
-		if ( !FLEXI_J16GE || $user->authorise('core.create', 'com_flexicontent') ) {
+		if ( $user->authorise('core.create', 'com_flexicontent') ) {
 			$cancreate_cat = true;
 		} else {
 			$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
@@ -162,10 +162,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		$editor 	   = JFactory::getEditor($editor_name);
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$bar     = JToolBar::getInstance('toolbar');
-		if (!FLEXI_J16GE) {
-			$pane  = JPane::getInstance('sliders');
-			$tpane = JPane::getInstance('tabs', array('startOffset'=>0, 'allowAllClose'=>true, 'opacityTransition'=>true, 'duration'=>600));
-		}
 		$categories = $globalcats;
 		
 		
@@ -305,10 +301,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->assignRef('editor'		, $editor);
 		$this->assignRef('tmpls'		, $tmpls);
 		$this->assignRef('cparams'	, $cparams);
-		if (!FLEXI_J16GE) {
-			$this->assignRef('pane'		, $pane);
-			$this->assignRef('tpane'	, $tpane);
-		}
 
 		parent::display($tpl);
 	}

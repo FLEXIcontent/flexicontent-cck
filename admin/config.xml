@@ -1222,7 +1222,7 @@
 			<field name="form_tabs_above"   type="textarea" default="title, alias, category, lang, type, state, disable_comments, notify_subscribers" rows="1" cols="60" label="FLEXI_ABOVE_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
 			<field name="form_tabs_below"   type="textarea" default="_skip_" rows="1" cols="60" label="FLEXI_BELOW_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
 			
-			<field name="form_tab01_fields" type="textarea" default="maintext" rows="1" cols="60" label="TAB 1" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
+			<field name="form_tab01_fields" type="textarea" default="text" rows="1" cols="60" label="TAB 1" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
 			<field name="form_tab02_fields" type="textarea" default="fields_manager" rows="1" cols="60" label="TAB 2" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
 			<field name="form_tab03_fields" type="textarea" default="categories, tags, language, perms" rows="1" cols="60" label="TAB 3" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />
 			<field name="form_tab04_fields" type="textarea" default="timezone_info, created, created_by, created_by_alias, publish_up, publish_down, access" rows="1" cols="60" label="TAB 4" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" menu="hide" />

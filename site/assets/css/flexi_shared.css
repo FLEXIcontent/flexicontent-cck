@@ -1205,12 +1205,14 @@ body .group-fcmethod .btn.active:not(.btn-primary) { background-color: #faa732 !
 /*#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append):not(.btn-group) > input,
 #flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append):not(.btn-group) > button,*/
 #flexicontent form div fieldset.panelform > div.input-append, #flexicontent form div fieldset.panelform > div.input-prepend, #flexicontent form div fieldset.panelform > div.inpubtn-group,
+#flexicontent form div fieldset.panelform > div.select2-container, 
 #flexicontent form div fieldset.panelform > input,
 #flexicontent form div fieldset.panelform > button,
 #flexicontent form div fieldset.panelform > textarea,
 #flexicontent form div fieldset.panelform > select,
 #flexicontent form div fieldset.panelform > img,
 form div fieldset > div.input-append, div fieldset > div.input-prepend, div fieldset > div.btn-group,
+form div fieldset > div.select2-container,
 form div fieldset > input,
 form div fieldset > button
 form div fieldset > textarea,
