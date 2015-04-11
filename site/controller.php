@@ -2396,6 +2396,7 @@ class FlexicontentController extends JControllerLegacy
 		if($CanUseTags) {
 			//header('Content-type: application/json');
 			@ob_end_clean();
+			//header('Content-type: text/plain; charset=utf-8');  // this text/plain is browser's default
 			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");

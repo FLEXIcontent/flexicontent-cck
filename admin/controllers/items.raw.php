@@ -162,6 +162,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if($CanUseTags) {
 			//header('Content-type: application/json');
 			@ob_end_clean();
+			//header('Content-type: text/plain; charset=utf-8');  // this text/plain is browser's default
 			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");
@@ -207,7 +208,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if($auth_publish || $auth_archive || $auth_delete) {
 			//header('Content-type: application/json');
 			@ob_end_clean();
-			header('Content-type: text/html');
+			header('Content-type: text/html; charset=utf-8');
 			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");

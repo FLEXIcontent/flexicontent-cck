@@ -868,7 +868,7 @@ VALUES
 					} else {
 						$indexdrop = !empty($iconf['custom_add']) ? $iconf['custom_drop'].", " : "";
 						$indexadd  = !empty($iconf['custom_add']) ? $iconf['custom_add'] : " ADD INDEX " . $indexname;
-						$_col_list = [];
+						$_col_list = array();
 						foreach($iconf['cols'] as $indexcol => $len) {
 							$indexlen  = $len ? "(".$len.")" : "";
 							$_col_list[] = "`".$indexcol."`" .$indexlen;

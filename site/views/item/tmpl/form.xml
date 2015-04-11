@@ -158,7 +158,7 @@
 		<fieldset name="catpermsoverride" label="FLEXI_MENU_OVERRIDE_CATEGORY_ACL" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements" >
 
 			<field name="" label="" type="separator" default="FLEXI_CATEGORIES" level="level1"/>
-			<field name="overridecatperms" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE" description="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE_DESC" class="btn-group group-fcmethod">
+			<field name="overridecatperms" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE" description="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE_DESC" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="overridecatperms_on">FLEXI_MENU_NO_OVERRIDE_USE_ACL</option>
 				<option value="1" show_list="overridecatperms_on" hide_list="">FLEXI_YES</option>
 			</field>
