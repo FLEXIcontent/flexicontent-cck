@@ -79,8 +79,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$this->setId((int)$id);
 		$params = & $this->_params;
 		
-		// Set the pagination variables into state (We get them from http request OR use default tags view parameters)
-		$limit = JRequest::getVar('limit') ? JRequest::getVar('limit') : $params->get('limit');
+		// Set the pagination variables into state (We get them from http request OR use default search view parameters)
+		$limit = strlen(JRequest::getVar('limit')) ? JRequest::getInt('limit') : $this->_params->get('limit');
 		$limitstart	= JRequest::getInt('limitstart', JRequest::getInt('start', 0, '', 'int'), '', 'int');
 		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
 		
