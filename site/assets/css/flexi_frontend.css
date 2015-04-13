@@ -285,30 +285,28 @@ div table.adminform td {
 /********************************************************************************************************
  * Frontend templates, FORM CSS for: SEARCH/FILTER/ALPHA-INDEX/SELECTORS(e.g. per page, orderby) FORM CSS
  ********************************************************************************************************/
-
 .fcfilter_form_outer > div > .panel > .title {
 	background-color: #dddddd;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#eeeeee), to(#dddddd));
-	background-image: -webkit-linear-gradient(top, #eeeeee, #dddddd);
-	background-image: -moz-linear-gradient(top, #eeeeee, #dddddd);
-	background-image: -ms-linear-gradient(top, #eeeeee, #dddddd);
-	background-image: -o-linear-gradient(top, #eeeeee, #dddddd);
-	background-image: linear-gradient(to bottom, #eeeeee, #dddddd);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee, endColorstr=#dddddd);
-	background-repeat: repeat-x;
+	background: url('../images/flexi-search.png')no-repeat 2px 5px, -webkit-gradient(linear, left top, left bottom, from(#eeeeee), to(#dddddd));
+	background: url('../images/flexi-search.png')no-repeat 2px 5px, -webkit-linear-gradient(top, #eeeeee, #dddddd);
+	background: url('../images/flexi-search.png')no-repeat 2px 5px, -moz-linear-gradient(top, #eeeeee, #dddddd);
+	background: url('../images/flexi-search.png')no-repeat 2px 5px, -ms-linear-gradient(top, #eeeeee, #dddddd);
+	background: url('../images/flexi-search.png')no-repeat 2px 5px, -o-linear-gradient(top, #eeeeee, #dddddd);
+	background: url('../images/flexi-search.png')no-repeat 2px 5px, linear-gradient(to bottom, #eeeeee, #dddddd);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee, endColorstr=#dddddd);
 	border: 1px solid lightgray;
 	border-radius: 4px;
-	padding: 4px;
+	padding: 4px 4px 4px 25px;
 	cursor: pointer;
 	-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
 }
 .fcfilter_form_outer > div > .panel > .title:hover {
 	background-color: #cccccc;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#cccccc));
-	background-image: -webkit-linear-gradient(top, #dddddd, #cccccc);
-	background-image: -moz-linear-gradient(top, #dddddd, #cccccc);
-	background-image: -ms-linear-gradient(top, #dddddd, #cccccc);
-	background-image: -o-linear-gradient(top, #dddddd, #cccccc);
-	background-image: linear-gradient(to bottom, #dddddd, #cccccc);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd, endColorstr=#cccccc);
+	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#cccccc));
+	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, -webkit-linear-gradient(top, #dddddd, #cccccc);
+	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, -moz-linear-gradient(top, #dddddd, #cccccc);
+	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, -ms-linear-gradient(top, #dddddd, #cccccc);
+	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, -o-linear-gradient(top, #dddddd, #cccccc);
+	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, linear-gradient(to bottom, #dddddd, #cccccc);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd, endColorstr=#cccccc);
 }
 .fcfilter_form_outer > div > .panel > .pane-slider.content  {
 	margin: 12px 0px;
@@ -1473,11 +1471,11 @@ table.admintable td {
 /* PANELs */
 #flexicontent .pane-sliders .pane-toggler span {
     background: url("../../../../administrator/templates/bluestork/images/j_arrow.png") no-repeat scroll 5px 50% transparent;
-    padding-left: 20px;
+    padding-left: 0px;
 }
 #flexicontent .pane-sliders .pane-toggler-down span {
     background: url("../../../../administrator/templates/bluestork/images/j_arrow_down.png") no-repeat scroll 5px 50% transparent;
-    padding-left: 20px;
+    padding-left: 0px;
 }
 
 
