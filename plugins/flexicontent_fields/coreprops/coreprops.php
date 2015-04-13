@@ -49,6 +49,14 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 			
 			$field->{$prop} = @$lang_data->title_native ? $lang_data->title_native : $lang_data->name;
 		}
+		
+		else if ($props_type == 'alias') {
+			$field->{$prop} = $item->{$props_type};
+		}
+		
+		else {
+			$field->{$prop} = $props_type;
+		}
 	}
 	
 	// *********************************

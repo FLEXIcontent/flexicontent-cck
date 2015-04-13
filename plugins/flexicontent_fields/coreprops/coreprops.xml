@@ -53,6 +53,8 @@
 				</group>
 			</field>
 			
+			<field name="" type="separator" default="NOTE, fields: language, alias can also be displayed in frontend. For displaying 'publish_up', 'publish_down' please use date field in appropriate mode" level="level4"/>
+			
 		</fieldset>
 		<fieldset name="group-coreprops-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			

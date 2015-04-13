@@ -933,22 +933,25 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Intro-full mode get their values from item's parameters
 		if ( $image_source == -1 ) {
 			$values = array();
-			$_image_name = $view=='item' ? 'full' : 'intro';
-			$_image_path = $item->images->get('image_'.$_image_name, '');
-			if ( $_image_path ) {
+			$_image_name = $view=='item' ? 'fulltext' : 'intro';
+			if ( $item->images ) {
+				if (!is_object($item->images)) $item->images = new JRegistry($item->images);
+				//echo "<pre>"; print_r($item->images); echo "</pre>";
+				$_image_path = $item->images->get('image_'.$_image_name, '');
 				$image_by_params = array();
 				// field attributes (mode-specific)
 				$image_by_params['image_size']  = $_image_name;
 				$image_by_params['image_path']  = $_image_path;
 				// field attributes (value)
 				$image_by_params['originalname'] = basename($_image_path);
-				$image_by_params['alt']   = $item->images->get($_image_name.'_alt', '');
-				$image_by_params['title'] = $item->images->get($_image_name.'_alt', '');
-				$image_by_params['desc']  = $item->images->get($_image_name.'_caption', '');
+				$image_by_params['alt']   = $item->images->get('image_'.$_image_name.'_alt', '');
+				$image_by_params['title'] = $item->images->get('image_'.$_image_name.'_alt', '');
+				$image_by_params['desc']  = $item->images->get('image_'.$_image_name.'_caption', '');
 				$image_by_params['cust1'] = '';
 				$image_by_params['cust2'] = '';
 				$image_by_params['urllink'] = '';
 				$values = array(serialize($image_by_params));
+				//echo "<pre>"; print_r($image_by_params); echo "</pre>"; exit;
 			}
 		}
 		
