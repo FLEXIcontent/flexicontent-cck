@@ -26,11 +26,8 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-if (FLEXI_J16GE) {
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('spacer');
-}
-
+jimport('joomla.form.helper');
+JFormHelper::loadFieldClass('spacer');
 
 class JFormFieldSeparator extends JFormFieldSpacer
 {
@@ -115,7 +112,11 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		
 		$js = '';
 			
-		if ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') {
+		if ( JFactory::getApplication()->isAdmin() && (
+			($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') ||
+			($option=='com_modules' && $view == 'module') ||
+			($option=='com_flexicontent' && ($view == 'category' || $view == 'item'))
+		) ) {
 			if (FLEXI_J30GE) {
 				// Make sure chosen JS file is loaded before our code
 				JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
@@ -124,35 +125,26 @@ class JFormFieldSeparator extends JFormFieldSpacer
 					jQuery.fn.chosen = function(){};
 				";
 			}
-			
-			if (FLEXI_J16GE) {
-				/*$js .= "
-					function fc_prepare_config_form(){
-						jQuery('#jform_fcdata_serialized').val( '' );
-						jQuery('#jform_fcdata_serialized').val( JSON.stringify(jQuery('#component-form').serializeArray()) );
-						jQuery('#component-form select').attr('disabled', true);
-						jQuery('#component-form textarea').attr('disabled', true);
-						jQuery('#component-form input[type=text], #component-form input[type=checkbox], #component-form input[type=radio]').attr('disabled', true);
-					}
-					jQuery(document).ready(function() {
-						jQuery('#component-form').attr('onsubmit', \"fc_prepare_config_form();\");
-					})
-				";*/
-			}
+			$js .= "
+				jQuery(document).ready(function() {
+					jQuery(document.forms['adminForm']).attr('data-fc_doserialized_submit', '1');
+					//if ('".$option."'=='com_flexicontent') jQuery(document.forms['adminForm']).attr('data-fc_doajax_submit', '1');
+				});
+				var fc_max_input_vars = ".ini_get('max_input_vars').";
+			";
 		}
 		if ($js) $document->addScriptDeclaration($js);
 		
-		if (FLEXI_J16GE) {
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-			FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-			flexicontent_html::loadJQuery();
-			// Add js function to overload the joomla submitform validation
-			JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
-			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
-			//if (!FLEXI_J30GE)  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
-			if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
-		}
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+		flexicontent_html::loadJQuery();
+		
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
+		//if (!FLEXI_J30GE)  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+		if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 	}
 	
 	
@@ -168,13 +160,10 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			$js_css_added = true;
 		}
 		
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+		
 		$level = $attributes['level'];
 		$description = @$attributes['description'];
 		$initial_tbl_hidden = @$attributes['initial_tbl_hidden'];

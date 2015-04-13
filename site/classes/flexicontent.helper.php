@@ -27,10 +27,58 @@ if (!function_exists('json_encode')) { // PHP < 5.2 lack support for json
 
 class flexicontent_html
 {
+	static function get_system_messages_html($add_containers=false)
+	{
+		$msgList = array();  // Initialise variables.
+		$messages = JFactory::getApplication()->getMessageQueue();  // Get the message queue
+
+		// Build the sorted message list
+		if (is_array($messages) && !empty($messages)) {
+			foreach ($messages as $msg) {
+				if (isset($msg['type']) && isset($msg['message'])) $msgList[$msg['type']][] = $msg['message'];
+			}
+		}
+		
+		$alert = array('error' => 'alert-error', 'warning' => '', 'notice' => 'alert-info', 'message' => 'alert-success');
+		ob_start();
+	?>
+<?php if ($add_containers) : ?>
+<div class="row-fluid">
+	<div class="span12">		
+		<div id="system-message-container">
+<?php endif; ?>
+			<div>
+			<?php if (is_array($msgList) && $msgList) : ?>
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				<?php foreach ($msgList as $type => $msgs) : ?>
+					<div class="alert <?php echo $alert[$type]; ?>">
+						<h4 class="alert-heading"><?php echo JText::_($type); ?></h4>
+						<?php if ($msgs) : ?>
+							<?php foreach ($msgs as $msg) : ?>
+								<p><?php echo $msg; ?></p>
+							<?php endforeach; ?>
+						<?php endif; ?>
+					</div>
+				<?php endforeach; ?>
+			<?php endif; ?>
+			</div>
+<?php if ($add_containers) : ?>
+		</div>
+	</div>
+</div>
+<?php endif; ?>
+
+		<?php
+		$msgs_html = ob_get_contents();
+		ob_end_clean();
+		return $msgs_html;
+	}
+	
+	
 	static function & checkPHPLimits($required=null, $recommended=null)
 	{
-		if (!$required)    $required=array('max_input_vars'=>2000, 'suhosin.post.max_vars'=>2000, 'suhosin.request.max_vars'=>2000);
-		if (!$recommended) $recommended=array('max_input_vars'=>4000, 'suhosin.post.max_vars'=>4000, 'suhosin.request.max_vars'=>4000);
+		if (!$required)    $required=array('max_input_vars'=>1000, 'suhosin.post.max_vars'=>1000, 'suhosin.request.max_vars'=>1000);
+		if (!$recommended) $recommended=array('max_input_vars'=>2000, 'suhosin.post.max_vars'=>2000, 'suhosin.request.max_vars'=>2000);
 		
 		$suhosin_loaded = extension_loaded('suhosin');
 		$result = array();
@@ -3333,15 +3381,15 @@ class flexicontent_html
 		return $output;
 	}
 
-	static function addToolBarButton($text='Button Text', $name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask', $extra_js='', $list=true, $menu=true, $confirm=true, $btn_class="")
+	static function addToolBarButton($text='Button Text', $btn_name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask', $extra_js='', $list=true, $menu=true, $confirm=true, $btn_class="", $btn_icon="")
 	{
 		$toolbar = JToolBar::getInstance('toolbar');
 		$text  = JText::_( $text );
-		$class = 'icon-32-'.$name;
+		$class = $btn_icon ? $btn_icon : 'icon-32-'.$btn_name;
 
 		if ( !$full_js )
 		{
-			$err_msg = $err_msg ? $err_msg : JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', $name );
+			$err_msg = $err_msg ? $err_msg : JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', $btn_name );
 			$err_msg = addslashes($err_msg);
 			$confirm_msg = $confirm_msg ? $confirm_msg : JText::_('FLEXI_ARE_YOU_SURE');
 
@@ -3364,7 +3412,7 @@ class flexicontent_html
 		$button_html	.= "$text\n";
 		$button_html	.= "</a>\n";
 
-		$toolbar->appendButton('Custom', $button_html, $name);
+		$toolbar->appendButton('Custom', $button_html, $btn_name);
 	}
 	
 	

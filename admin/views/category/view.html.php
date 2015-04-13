@@ -36,10 +36,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		$user     = JFactory::getUser();
 		$document = JFactory::getDocument();
 		
-		if (FLEXI_J16GE) {
-			JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
-		}
+		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
 		
 		// ***********************************************************
 		// Get category data, and check if item is already checked out
@@ -53,7 +51,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		} else {
 			$row  = $this->get( 'Category' );
 		}
-		$catparams = FLEXI_J16GE ? new JRegistry($row->params) : new JParameter($row->params);
+		$catparams = new JRegistry($row->params);
 		
 		$cid    =	$row->id;
 		$isnew  = !$cid;
@@ -181,32 +179,27 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		// Add apply and save buttons
-		if (FLEXI_J16GE) {
-			JToolBarHelper::apply('category.apply');
-			JToolBarHelper::save('category.save');
-		} else {
-			JToolBarHelper::apply();
-			JToolBarHelper::save();
-		}
+		JToolBarHelper::apply('category.apply', 'FLEXI_APPLY');
+		if ( !$isnew ) flexicontent_html::addToolBarButton(
+			'FLEXI_FAST_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('category.apply_ajax')", $msg_alert='', $msg_confirm='',
+			$btn_task='category.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info", $btn_icon="icon-loop");
+		JToolBarHelper::save('category.save');
 		
 		// Add a save and new button, if user can create inside at least one (com_content) category
 		if ( $cancreate_cat ) {
-			if (FLEXI_J16GE) JToolBarHelper::save2new('category.save2new');
-			else             JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+			JToolBarHelper::save2new('category.save2new');
 		}
 		
 		// Add a save as copy button, if editing an existing category (J2.5 only)
-		if (FLEXI_J16GE && !$isnew && $cancreate_cat) {
+		if (!$isnew && $cancreate_cat) {
 			JToolBarHelper::save2copy('category.save2copy');
 		}
 		
 		// Add a cancel or close button
 		if ($isnew)  {
-			if (FLEXI_J16GE) JToolBarHelper::cancel('category.cancel');
-			else             JToolBarHelper::cancel();
+			JToolBarHelper::cancel('category.cancel');
 		} else {
-			if (FLEXI_J16GE) JToolBarHelper::cancel('category.cancel', 'JTOOLBAR_CLOSE');
-			else             JToolBarHelper::custom('cancel', 'cancel.png', 'cancel.png', 'CLOSE', false );
+			JToolBarHelper::cancel('category.cancel', 'JTOOLBAR_CLOSE');
 		}
 		
 		

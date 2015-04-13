@@ -91,20 +91,22 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 		
 		// Set a system message with warning of failed PHP limits
 		$phplimits_printed = $app->getUserStateFromRequest( $option.'.flexicontent.phplimits_printed',	'phplimits_printed',	0, 'int' );
-		if ($this->dopostinstall && isset($php_lims['warning']))
+		if ($this->dopostinstall && isset($php_lims['notice']))
 		{
 			$app->setUserState( $option.'.flexicontent.phplimits_printed', $phplimits_printed+1 );
-			echo '<div class="fc-mssg fc-note">';
-			/*if ($phplimits_printed < 2)*/ echo '<b>PHP/DB requirements</b><br/>';
-			foreach($php_lims as $type => $html) {
-				echo implode('<br/>', $html);
+			if ($phplimits_printed < 1) {
+				echo '<div class="fc-mssg fc-note">';
+				echo '<b>PHP/DB requirements</b><br/>';
+				foreach($php_lims as $type => $html) {
+					echo implode('<br/>', $html);
+				}
+				echo JText::sprintf(
+					'<br/>(you may have to contact your web hosting company for setting these for you)<br/>
+					For more information on changing these limitations, please see this article: %s',
+					'<a href="http://www.flexicontent.org/documentation/faq/78-installation-upgrade/591">PHP/DB Requirements</a>'
+				);
+				echo '</div>';
 			}
-			/*if ($phplimits_printed < 2)*/ echo JText::sprintf(
-				'<br/>(you may have to contact your web hosting company for setting these for you)<br/>
-				For more information on changing these limitations, please see this article: %s',
-				'<a href="http://www.flexicontent.org/documentation/faq/78-installation-upgrade/591">PHP/DB Requirements</a>'
-			);
-			echo '</div>';
 		}
 		
 		if ( isset($php_lims['warning']) ) {

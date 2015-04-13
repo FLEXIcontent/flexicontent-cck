@@ -223,13 +223,13 @@ class JFormFieldFilters extends JFormFieldList
 		$issortable = @$attributes['issortable'];
 		// Not set mean make sortable
 		$issortable = $issortable === null ? 1 : $issortable;
-		$_suffix = $issortable ? '_selector' : '';
+		$suffix = $issortable ? 'selector' : '';
 		
-		$_fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$fieldname	= FLEXI_J16GE ? $this->name.$_suffix : $control_name.'['.$name.$_suffix.']';
+		$_fieldname	= $this->name;
+		$fieldname	= $this->name.'['.$suffix.']';
 		
-		$_element_id = $element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
-		$element_id .= $_suffix;
+		$_element_id = $this->id;
+		$element_id  = $this->id.'_'.$suffix;
 		
 		
 		$attribs = ' style="float:left;" ';
@@ -240,7 +240,6 @@ class JFormFieldFilters extends JFormFieldList
 		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="8" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 			$onclick = ""
 				."${element_id} = document.getElementById(\"${element_id}\");"
 				."if (${element_id}.size<20) {"

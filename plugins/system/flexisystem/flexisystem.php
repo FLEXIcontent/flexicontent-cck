@@ -51,6 +51,8 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function onAfterInitialise()
 	{
+		if (JFactory::getApplication()->isAdmin()) $this->handleSerialized();
+		
 		// fix for return urls with unicode aliases
 		$return = JRequest::getVar('return', null);
 		$isfcurl = JRequest::getVar('isfcurl', null);
@@ -69,15 +71,10 @@ class plgSystemFlexisystem extends JPlugin
 		{
 			$session->set('clear_cats_cache', 0, 'flexicontent');
 			// Clean cache
-			if (FLEXI_J16GE) {
-				$cache = $this->getCache($group='', 0);
-				$cache->clean('com_flexicontent_cats');
-				$cache = $this->getCache($group='', 1);
-				$cache->clean('com_flexicontent_cats');
-			} else {
-				$catcache = JFactory::getCache('com_flexicontent_cats');
-				$catcache->clean();
-			}
+			$cache = $this->getCache($group='', 0);
+			$cache->clean('com_flexicontent_cats');
+			$cache = $this->getCache($group='', 1);
+			$cache->clean('com_flexicontent_cats');
 			//JFactory::getApplication()->enqueueMessage( "cleaned cache group 'com_flexicontent_cats'", 'message');
 		}
 		
@@ -569,7 +566,7 @@ class plgSystemFlexisystem extends JPlugin
 	 * @access public
 	 * @return void
 	 */
-	function trackSaveConf() 
+	function trackSaveConf()
 	{
 		$option   = JRequest::getVar('option');
 		$component= JRequest::getVar('component');
@@ -583,31 +580,49 @@ class plgSystemFlexisystem extends JPlugin
 			// (we will not do this at this step, because new component configuration has not been saved yet)
 			$session->set('clear_cats_cache', 1, 'flexicontent');
 			
-			// Workaround for max_input_vars (PHP 5.3.9+), in the case that form sender is com_config
-			// J1.6+ adds ACL which is 50+ variables (due to FLEXIcontent's access.xml) per user-group
-			/*if (FLEXI_J16GE) {
-				$data = $this->parse_json_decode( $_POST['jform']['fcdata_serialized'] );
-				//echo "<pre>".$_POST['jform']['fcdata_serialized'];
-				//print_r($_POST);
-				//print_r($data);
-				//exit;
-				foreach($data as $n => $v) {
-					JRequest::setVar($n, $v, 'POST');
-				}
-			}
-			
-			if (!FLEXI_J16GE) {
-				$total_vars = count($_POST);
-			} else {
-				$total_vars = count($_POST['jform']);
-				if ( !empty($_POST['jform']['rules']) ) {
-					foreach($_POST['jform']['rules'] as $grp)
-					$total_vars += count($grp);
-				}
-			}*/
-			//JFactory::getApplication()->enqueueMessage( "FLEXIcontent component parameters saved, max_input_vars:".ini_get('max_input_vars')." total parameters: ".$total_vars, 'message');
 		}
 	}
+	
+	
+	function handleSerialized()
+	{
+		// Workaround for max_input_vars (PHP 5.3.9+), in the case that form sender is com_config
+		// J1.6+ adds ACL which is 50+ variables (due to FLEXIcontent's access.xml) per user-group
+		if ( !empty($_POST['fcdata_serialized']) )
+		{
+			//print_r($_REQUEST); exit;
+			//echo count($_REQUEST, COUNT_RECURSIVE); exit;
+			
+			$form_data = $this->parse_json_decode( $_POST['fcdata_serialized'] );
+			//parse_str($_POST['fcdata_serialized'], $form_data);  // Combined with "jQuery.serialize()", but cannot be used to overcome 'max_input_vars'
+			foreach($form_data as $n => $v)  JRequest::setVar($n, $v, 'POST');
+			
+			/*foreach($_GET as $var => $val) {
+				if ( !isset($_POST[$var]) ) JFactory::getApplication()->enqueueMessage( "GET variable: ".$var . " is not set in the POST ARRAY", 'message');
+			}*/
+			
+			$total_vars = 0;
+			foreach($_REQUEST as $var_1) {   // Level 1
+				if (!is_array($var_1)) $total_vars++;
+				else foreach($var_1 as $var_2) {     // Level 2
+					if (!is_array($var_2)) $total_vars++;
+					else foreach($var_2 as $var_3) {   // Level 3
+						$total_vars += !is_array($var_3) ? 1 : count($var_3);
+					}
+				}
+			}
+			//echo $total_vars." - ".count($_REQUEST, COUNT_RECURSIVE); exit;
+			
+			JFactory::getApplication()->enqueueMessage(
+				"Form data were serialized, ".
+				'<b class="label">PHP max_input_vars</b> <span class="badge badge-info">'.ini_get('max_input_vars').'</span> '.
+				'<b class="label">Estimated / Actual FORM variables</b>'.
+				'<span class="badge badge-warning">'.$_POST['fcdata_serialized_count'].'</span> / <span class="badge">'.$total_vars.'</span> ',
+				'message'
+			);
+		}
+	}
+	
 	
 	
 	/**
@@ -1129,31 +1144,26 @@ class plgSystemFlexisystem extends JPlugin
 	
 	
 	/*
-	 * Function to restore serialized form data
+	 * Function to restore serialized form data with:  JSON.stringify( jform.serializeArray() )
+	 * This is currently UNUSED, we use parse_str instead
 	 */
-	function parse_json_decode($string) {
+	private function parse_json_decode($string) {
 		$result = array();
 		$pairs = json_decode($string, true);
 		//echo "<pre>"; print_r($pairs); exit;
 		
 		// find the pairs "name=value"
-		//$pairs = explode('&', $string);
 		$toEvaluate = ''; // we will do a big eval() at the end not pretty but simplier
 		foreach ($pairs as $pair) {
-			//list($name, $value) = explode('=', $pair, 2);
-			//$name = urldecode($name);
-			//$value = urldecode($value);
 			$name = $pair['name'];
 			$value = $pair['value'];
 			
-			// escape the name and value strings
+			// Escape name and value strings
 			$name = str_replace('\\', '\\\\', $name);
 			$value = str_replace('\\', '\\\\', $value);
 			
-			// Always quote the value even if it is numeric, the parameters in Joomla are treated as strings
-			//if (!is_numeric($value)) {
-				$value = '"' . str_replace('"', '\"', $value) . '"';
-			//}
+			// Always quote the value even if it is numeric, this is proper as parameters in Joomla are treated as strings
+			$value = '"' . str_replace('"', '\"', $value) . '"';
 			
 			// CASE: name is an array,  some'var[index1][inde'x2]=value    -->   ][\'some\\\'var\'][\'index1\'][\'index2\']=\'value\';
 			if (strpos($name, '[') !== false)
@@ -1165,7 +1175,8 @@ class plgSystemFlexisystem extends JPlugin
 				// WHEN no index name, remove the empty string being used as index, thus an integer auto-incremented index will be used (e.g. checkbox values)
 				$name = str_replace("['']", '[]', $name);
 				// Final create the assignment to be evaluated:  $result['na']['me'] = 'value';
-				$toEvaluate .= '$result[\'' . $name . ' = ' . $value . "; \n"; ;
+				//$toEvaluate .= '$result[\'' . $name . ' = ' . $value . "; \n";
+				eval('$result[\'' . $name . ' = ' . $value . "; \n");
 			}
 			
 			// CASE name is not an array, a single variable assignment
@@ -1173,10 +1184,11 @@ class plgSystemFlexisystem extends JPlugin
 				// Add double slashes to index name
 				$name = str_replace('\'', '\\\'', $name);
 				// Finally quote the name, thus treating index as string and create assignment to be evaluated: $result['name'] = 'value';
-				$toEvaluate .= '$result[\'' . $name . '\'] = ' . $value . "; \n";
+				//$toEvaluate .= '$result[\'' . $name . '\'] = ' . $value . "; \n";
+				eval('$result[\'' . $name . '\'] = ' . $value . "; \n");
 			}
 		}
-		eval($toEvaluate);
+		//eval($toEvaluate);
 		//echo "<pre>". $toEvaluate; exit;
 		return $result;
 	}
@@ -1297,5 +1309,4 @@ class plgSystemFlexisystem extends JPlugin
 			//die('onExtensionBeforeSave: '. $layoutpath);
 		}
 	}
-	
 }

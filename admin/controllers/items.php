@@ -42,6 +42,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$this->registerTask( 'add',        'edit' );
 		$this->registerTask( 'apply_type', 'save' );
 		$this->registerTask( 'apply',      'save' );
+		$this->registerTask( 'apply_ajax', 'save' );
 		$this->registerTask( 'saveandnew', 'save' );
 	}
 	
@@ -175,6 +176,10 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			// Redirect back to the registration form.
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			if ( JRequest::getVar('fc_doajax_submit') ) {
+				echo flexicontent_html::get_system_messages_html();
+				exit();  // Ajax submit, do not rerender the view
+			}
 			return false; //die('error');
 		}
 		
@@ -226,6 +231,10 @@ class FlexicontentControllerItems extends FlexicontentController
 				' Content Type '.$type_id.' was not found OR is not published';
 			JError::raiseWarning( 403, $msg );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '' );
+			if ( JRequest::getVar('fc_doajax_submit') ) {
+				echo flexicontent_html::get_system_messages_html();
+				exit();  // Ajax submit, do not rerender the view
+			}
 			return;
 		}
 		
@@ -242,6 +251,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		if ($isnew && !$canAdd) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '' );
+			if ( JRequest::getVar('fc_doajax_submit') ) {
+				echo flexicontent_html::get_system_messages_html();
+				exit();  // Ajax submit, do not rerender the view
+			}
 			return;
 		}
 		
@@ -250,6 +263,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (!$isnew && !$canEdit) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_EDIT' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '' );
+			if ( JRequest::getVar('fc_doajax_submit') ) {
+				echo flexicontent_html::get_system_messages_html();
+				exit();  // Ajax submit, do not rerender the view
+			}
 			return;
 		}
 		
@@ -285,6 +302,11 @@ class FlexicontentControllerItems extends FlexicontentController
 				$msg = '';
 				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&cid='.$model->get('id');
 				$this->setRedirect($link, $msg);
+			}
+			if ( JRequest::getVar('fc_doajax_submit') ) {
+				JFactory::getApplication()->enqueueMessage($msg, 'message');
+				echo flexicontent_html::get_system_messages_html();
+				exit();  // Ajax submit, do not rerender the view
 			}
 			
 			// Saving has failed check-in and return, (above redirection will be used)
@@ -539,6 +561,12 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 		$this->setRedirect($link, $msg);
+		
+		if ( JRequest::getVar('fc_doajax_submit') ) {
+			JFactory::getApplication()->enqueueMessage($msg, 'message');
+			echo flexicontent_html::get_system_messages_html();
+			exit();  // Ajax submit, do not rerender the view
+		}
 		
 		//echo "</body></html>"; exit;
 	}

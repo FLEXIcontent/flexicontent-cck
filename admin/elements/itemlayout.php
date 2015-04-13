@@ -44,17 +44,13 @@ class JFormFieldItemlayout extends JFormFieldList
 
 	function getInput()
 	{
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls_all	= $themes->items ? $themes->items : array();
-		$value = FLEXI_J16GE ? $this->value : $value;
+		$value = $this->value;
 		
 		$view	= JRequest::getVar('view');
 		$controller	= JRequest::getVar('controller');
@@ -96,7 +92,7 @@ class JFormFieldItemlayout extends JFormFieldList
 			
 			// Finally get allowed templates
 			if ($typedata) {
-				$tparams = FLEXI_J16GE ? new JRegistry($typedata->attribs) : new JParameter($typedata->attribs);
+				$tparams = new JRegistry($typedata->attribs);
 				$type_default_layout = $tparams->get('ilayout', 'default');
 				$type_default_layout_mobile = $tparams->get('ilayout_mobile', JText::_('FLEXI_USE_DESKTOP'));
 				$allowed_tmpls = $tparams->get('allowed_ilayouts');
@@ -133,39 +129,39 @@ if ( ! @$attributes['skipparams'] ) {
 var tmpl = ['".$lays."'];	
 
 function disablePanel(element) {
-	if ( ! $(element+'-attribs-options') ) return;
+	if ( ! jQuery('#'+element+'-attribs-options') ) return;
 	
-	var panel 	= $(element+'-attribs-options').getNext();
-	var selects = panel.getElements('select');
-	var inputs 	= panel.getElements('input');
-	panel.getParent().addClass('pane-disabled');
-	selects.each(function(el){
-		el.setProperty('disabled', 'disabled');
+	var panel 	= jQuery('#'+element+'-attribs-options').next();
+	var selects = panel.find('select');
+	var inputs 	= panel.find('input');
+	panel.parent().addClass('pane-disabled');
+	selects.each(function(index){
+		jQuery(this).attr('disabled', 'disabled');
 	});
-	inputs.each(function(el){
-		el.setProperty('disabled', 'disabled');
+	inputs.each(function(index){
+		jQuery(this).attr('disabled', 'disabled');
 	});
-	panel.getParent().setStyle('display','none');
+	panel.parent().css('display','none');
 }
 
 function enablePanel(element) {
-	if ( ! $(element+'-attribs-options') ) return;
+	if ( ! jQuery('#'+element+'-attribs-options') ) return;
 	
-	var panel 	= $(element+'-attribs-options').getNext();
-	var selects = panel.getElements('select');
-	var inputs 	= panel.getElements('input');
-	panel.getParent().removeClass('pane-disabled');
-	selects.each(function(el){
-    	el.setProperty('disabled', '');
+	var panel 	= jQuery('#'+element+'-attribs-options').next();
+	var selects = panel.find('select');
+	var inputs 	= panel.find('input');
+	panel.parent().removeClass('pane-disabled');
+	selects.each(function(index){
+		jQuery(this).removeAttr('disabled');
 	});
-	inputs.each(function(el){
-    	el.setProperty('disabled', '');
+	inputs.each(function(index){
+		jQuery(this).removeAttr('disabled');
 	});
-	panel.getParent().setStyle('display','');
+	panel.parent().css('display','');
 }
 
 function activatePanel(active) {
-	var inactives = tmpl.filter(function(item, index){
+	var inactives = jQuery.grep(tmpl, function( item, index ) {
 		return item != active;
 	});
 	
@@ -175,13 +171,13 @@ function activatePanel(active) {
 	
 	if (active) {
 		enablePanel(active);
-		if ( $('__content_type_default_layout__') ) $('__content_type_default_layout__').setStyle('display','none');
+		if ( jQuery('#__content_type_default_layout__') ) jQuery('#__content_type_default_layout__').css('display','none');
 	} else {
-		if ( $('__content_type_default_layout__') ) $('__content_type_default_layout__').setStyle('display','');
+		if ( jQuery('#__content_type_default_layout__') ) jQuery('#__content_type_default_layout__').css('display','');
 	}
 }
 
-window.addEvent('domready', function(){
+jQuery(document).ready(function() {
 	activatePanel('".$value."');
 });
 ";
@@ -200,14 +196,13 @@ window.addEvent('domready', function(){
 			$layouts[] = JHTMLSelect::option( $tmpl->name, ':: ' . $tmpl->name . ' ::');
 		}
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
-		$attribs = !FLEXI_J16GE ? ' style="float:left;" ' : '';
+		$attribs = '';
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 		}
 		if (@$attributes['class']) {
 			$attribs .= 'class="'.$attributes['class'].'"';
@@ -224,13 +219,9 @@ window.addEvent('domready', function(){
 	
 	function getLabel()
 	{
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		if ( @$attributes['enableparam'] ) {
 			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
