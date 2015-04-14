@@ -110,7 +110,7 @@ class modFlexicontentHelper
 			$db->setQuery($query);
 			$mod_image_dbdata = $db->loadObject();
 			$mod_image_name = $mod_image_dbdata->name;
-			//$img_fieldparams = FLEXI_J16GE ? new JRegistry($mod_image_dbdata->attribs) : new JParameter($mod_image_dbdata->attribs);
+			//$img_fieldparams = new JRegistry($mod_image_dbdata->attribs);
 		}
 		if ($mod_default_img_show) {
 			$src = $mod_default_img_path;
@@ -155,13 +155,13 @@ class modFlexicontentHelper
 			
 			if ($display_hits || $display_hits_feat) {
 				$hitsfield = $disp_fields_data['hits'];
-				$hitsfield->parameters = FLEXI_J16GE ? new JRegistry($hitsfield->attribs) : new JParameter($hitsfield->attribs);
-				$has_access_hits = FLEXI_J16GE ? in_array($hitsfield->access, $aid_arr) : $hitsfield->access <= $aid;
+				$hitsfield->parameters = new JRegistry($hitsfield->attribs);
+				$has_access_hits = in_array($hitsfield->access, $aid_arr);
 			}
 			if ($display_voting || $display_voting_feat) {
 				$votingfield = $disp_fields_data['voting'];
-				$votingfield->parameters = FLEXI_J16GE ? new JRegistry($votingfield->attribs) : new JParameter($votingfield->attribs);
-				$has_access_voting = FLEXI_J16GE ? in_array($votingfield->access, $aid_arr) : $votingfield->access <= $aid;
+				$votingfield->parameters = new JRegistry($votingfield->attribs);
+				$has_access_voting = in_array($votingfield->access, $aid_arr);
 			}
 		}
 		
@@ -218,7 +218,7 @@ class modFlexicontentHelper
 			
 			// 0. Add ONLY skipfields to the list of fields to be rendered
 			$fields_list = implode(',', $skiponempty_fields);
-			//$skip_params = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+			//$skip_params = new JRegistry();
 			//$skip_params->set('fields',$fields_list);
 			
 			foreach($cat_items_arr as $catid => $cat_items)
@@ -674,7 +674,7 @@ class modFlexicontentHelper
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
 		//$now		= $app->get('requestTime');
-		$now			= FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
+		$now			= JFactory::getDate()->toSql();
 		$nullDate	= $db->getNullDate();
 		
 		// $display_category_data
@@ -791,27 +791,11 @@ class modFlexicontentHelper
 		
 		$joinaccess = '';
 		if (!$show_noauth) {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$where .= ' AND ty.access IN (0,'.$aid_list.')';
-				$where .= ' AND mc.access IN (0,'.$aid_list.')';
-				$where .= ' AND  i.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
-					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
-				} else {
-					$where .= ' AND ty.access <= '.$aid;
-					$where .= ' AND mc.access <= '.$aid;
-					$where .= ' AND  i.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$where .= ' AND ty.access IN (0,'.$aid_list.')';
+			$where .= ' AND mc.access IN (0,'.$aid_list.')';
+			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}
 		
 		
@@ -927,14 +911,12 @@ class modFlexicontentHelper
 		// joomla featured property scope
 		// ******************************
 		
-		if (FLEXI_J16GE) {
-	  	if ($method_featured == 1) { // exclude method  ---  exclude currently logged user favourites
-				$where .= ' AND i.featured=0';
-			} else if ($method_featured == 2) { // include method  ---  include currently logged user favourites
-				$where .= ' AND i.featured=1';
-			} else {
-			  // All Items regardless of being featured or not
-			}
+  	if ($method_featured == 1) { // exclude method  ---  exclude currently logged user favourites
+			$where .= ' AND i.featured=0';
+		} else if ($method_featured == 2) { // include method  ---  include currently logged user favourites
+			$where .= ' AND i.featured=1';
+		} else {
+		  // All Items regardless of being featured or not
 		}
 		
 		
@@ -1208,7 +1190,7 @@ class modFlexicontentHelper
 					.$where2
 					;
 				$db->setQuery($query2);
-				$related = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$related = $db->loadColumn();
 				$related = is_array($related) ? array_map( 'intval', $related ) : $related;
 			}
 			
@@ -1232,7 +1214,7 @@ class modFlexicontentHelper
 					' FROM #__flexicontent_tags_item_relations' .
 					' WHERE itemid = '.(int) $id;
 			$db->setQuery($query2);
-			$tags = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$tags = $db->loadColumn();
 			$tags = array_diff($tags,$excluded_tags);
 			
 			unset($related);
@@ -1247,7 +1229,7 @@ class modFlexicontentHelper
 						$where2
 						;
 				$db->setQuery($query2);
-				$related = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$related = $db->loadColumn();
 			}
 			
 			if (isset($related) && count($related)) {
@@ -1766,7 +1748,7 @@ class modFlexicontentHelper
 			// Get content list per given category
 			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
 			$db->setQuery($per_cat_query, 0, $count);
-			$content = FLEXI_J16GE ? $db->loadColumn(0) : $db->loadResultArray(0);
+			$content = $db->loadColumn(0);
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			@ $mod_fc_run_times['query_items'] += $modfc_jprof->getmicrotime() - $_microtime;
 			
@@ -1894,10 +1876,9 @@ class modFlexicontentHelper
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		if (!$catdata_arr)  return false;
 		
-		if (!FLEXI_J16GE) jimport( 'joomla.html.parameter' );
 		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 		foreach( $catdata_arr as $i => $catdata ) {
-			$catdata->params = FLEXI_J16GE ? new JRegistry($catdata->params) : new JParameter($catdata->params);
+			$catdata->params = new JRegistry($catdata->params);
 			
 			// Category Title
 			$catdata->title = flexicontent_html::striptagsandcut($catdata->title, $catconf->cuttitle);

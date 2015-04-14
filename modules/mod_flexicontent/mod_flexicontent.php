@@ -192,8 +192,10 @@ if ( $show_mod )
 		}
 	}
 	
-	// Include module header
-	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout.'/header'));
+	// Include module header, but make sure that file exists, because otherwise the Joomla module helper will include ... 'default.php'
+	// module template ! thus a Joomla override template header is allowed only if template header.php file exists locally too !!
+	if ( file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.'header.php') )
+		require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout.'/header'));
 	
 	// Render Layout, (once per category if apply per category is enabled ...)
 	foreach ($catdata_arr as $i => $catdata) {
@@ -216,8 +218,10 @@ if ( $show_mod )
 		require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout));
 	}
 	
-	// Include module footer, e.g. includes module's Read More
-	require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout.'/footer'));
+	// Include module footer, e.g. includes module's Read More, because otherwise the Joomla module helper will include ... 'default.php'
+	// module template ! thus a Joomla override template header is allowed only if template header.php file exists locally too !!
+	if ( file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.'footer.php') )
+		require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout.'/footer'));
 	
 	
 	$mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['rendering_template'];
