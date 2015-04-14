@@ -4,14 +4,16 @@
 	window.fc_dependent_params = {};
 	window.fc_cascade_field_funcs = {};
 
-	function fc_loadImagePreview(input_id, img_id, msg_id, thumb_w, thumb_h)
+	function fc_loadImagePreview(input_id, img_id, msg_id, thumb_w, thumb_h, nonimg_mssg)
 	{
+		var nonimg_mssg = typeof nonimg_mssg !== 'undefined' ? nonimg_mssg : '';
 		var input = document.getElementById(input_id);
 		var input_files = input.files;
 		if (input_files && input_files[0]) {
 			var imageType = /image.*/;
 			if (!input_files[0].type.match(imageType)) {
-		  	document.getElementById(msg_id).innerHTML = Joomla.JText._('FLEXI_NOT_AN_IMAGE_FILE');
+		  	if (nonimg_mssg=='-1') ;
+		  	else document.getElementById(msg_id).innerHTML = (nonimg_mssg!='' ? nonimg_mssg : Joomla.JText._('FLEXI_NOT_AN_IMAGE_FILE'));
 		  	jQuery('#'+img_id).hide();
 		  } else {
 		  	document.getElementById(msg_id).innerHTML = '';

@@ -16,7 +16,6 @@
  * GNU General Public License for more details.
  */
 
-// no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.view');
@@ -31,7 +30,7 @@ jimport('joomla.application.component.view');
 class FlexicontentViewFileselement extends JViewLegacy
 {
 	/**
-	 * Creates the Filemanagerview
+	 * Creates the Fileselement view
 	 *
 	 * @since 1.0
 	 */
@@ -40,57 +39,79 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 		
-		flexicontent_html::loadJQuery();
-		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.tooltip');
-		// Load the form validation behavior
-		JHTML::_('behavior.formvalidation');
-		
 		//initialise variables
 		$app      = JFactory::getApplication();
-		$option   = JRequest::getVar('option');
 		$document = JFactory::getDocument();
+		
+		$option   = JRequest::getCmd('option');
+		$view     = JRequest::getVar('view');
+		$layout   = JRequest::getVar('layout', 'default');
+		
 		$db       = JFactory::getDBO();
 		$user     = JFactory::getUser();
-		$params   = JComponentHelper::getParams('com_flexicontent');
+		
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		//$authorparams = flexicontent_db::getUserConfig($user->id);
 		$langs = FLEXIUtilities::getLanguages('code');
 		
 		$fieldid	= JRequest::getVar( 'field', null, 'request', 'int' );
 		$client		= $app->isAdmin() ? '../' : '';
 		
-		//get vars
-		$filter_order     = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_order',     'filter_order',    'f.filename', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_order_Dir', 'filter_order_Dir', '',          'word' );
-		$filter           = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter',           'filter',           1,           'int' );
-		$filter_lang			= $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_lang',      'filter_lang',      '',          'string' );
-		$filter_uploader  = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_uploader',  'filter_uploader',  0,           'int' );
-		$filter_url       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_url',       'filter_url',       '',          'word' );
-		$filter_secure    = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_secure',    'filter_secure',    '',          'word' );
-		$filter_ext       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_ext',       'filter_ext',       '',          'alnum' );
-		$search           = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.search',           'search',           '',          'string' );
-		$filter_item      = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.item_id',          'item_id',          '',           'int' );
-		$u_item_id 	      = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.u_item_id',        'u_item_id',        0,           'string' );
+		flexicontent_html::loadJQuery();
+		flexicontent_html::loadFramework('select2');
+		JHTML::_('behavior.tooltip');
+		// Load the form validation behavior
+		JHTML::_('behavior.formvalidation');
+
+		// Get filters
+		$count_filters = 0;
+		$_view = $view.$fieldid;
+		
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_order',     'filter_order',    'f.filename', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_order_Dir', 'filter_order_Dir', '',          'word' );
+		
+		$filter_lang			= $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_lang',      'filter_lang',      '',          'string' );
+		$filter_url       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_url',       'filter_url',       '',          'word' );
+		$filter_secure    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_secure',    'filter_secure',    '',          'word' );
+		
+		$filter_ext       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_ext',       'filter_ext',       '',          'alnum' );
+		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_uploader',  'filter_uploader',  '',           'int' );
+		$filter_item      = $app->getUserStateFromRequest( $option.'.'.$_view.'.item_id',          'item_id',          '',           'int' );
+		
+		if ($layout!='image') {
+			if ($filter_lang) $count_filters++;
+			if ($filter_url) $count_filters++;
+			if ($filter_secure) $count_filters++;
+		}
+		if ($filter_ext) $count_filters++;
+		if ($filter_uploader) $count_filters++;
+		if ($filter_item) $count_filters++;
+		
+		$u_item_id 	      = $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id',        'u_item_id',        0,           'string' );
 		if ($u_item_id && (int)$u_item_id = $u_item_id) $filter_item = $u_item_id;   // set it if integer
 		if (!$u_item_id && $filter_item)   $u_item_id   = $filter_item;
-		$autoselect       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.autoselect',       'autoselect',       0, 				  'int' );
-		$autoassign       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.autoassign',       'autoassign',       0, 				  'int' );
+		$autoselect       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoselect',       'autoselect',       0, 				  'int' );
+		$autoassign       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoassign',       'autoassign',       0, 				  'int' );
 		
-		$folder_mode			= $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.folder_mode',      'folder_mode',      0, 				  'int' );
-		$folder_param			= $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.folder_param',     'folder_param',		 'dir',				'string' );
-		$append_item			= $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.append_item',      'append_item',      1, 				  'int' );
-		$append_field			= $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.append_field',     'append_field',     1, 				  'int' );
-		$targetid					= $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.targetid',    		 'targetid',     		 '', 				  'string' );
-		$thumb_w					= $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.thumb_w',    			 'thumb_w',     		 120, 				'int' );
-		$thumb_h					= $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.thumb_h',    			 'thumb_h',     		 90, 				  'int' );
+		$folder_mode			= $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode',      'folder_mode',      0,           'int' );
+		$folder_param			= $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_param',     'folder_param',		 'dir',				'string' );
+		$append_item			= $app->getUserStateFromRequest( $option.'.'.$_view.'.append_item',      'append_item',      1, 				  'int' );
+		$append_field			= $app->getUserStateFromRequest( $option.'.'.$_view.'.append_field',     'append_field',     1, 				  'int' );
+		$targetid					= $app->getUserStateFromRequest( $option.'.'.$_view.'.targetid',    		 'targetid',     		 '', 				  'string' );
+		$thumb_w					= $app->getUserStateFromRequest( $option.'.'.$_view.'.thumb_w',    			 'thumb_w',     		 120, 				'int' );
+		$thumb_h					= $app->getUserStateFromRequest( $option.'.'.$_view.'.thumb_h',    			 'thumb_h',     		 90, 				  'int' );
 		
-		$search				= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$scope   = $app->getUserStateFromRequest( $option.'.'.$_view.'.scope',            'scope',            1,           'int' );
+		$search  = $app->getUserStateFromRequest( $option.'.'.$_view.'.search',           'search',           '',          'string' );
+		$search  = $db->escape( trim(JString::strtolower( $search ) ) );
+		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
+		$filter_item      = $filter_item ? $filter_item : '';
+		
 		$newfileid		= JRequest::getInt('newfileid');
 		$newfilename	= base64_decode(JRequest::getVar('newfilename', ''));
 		$delfilename	= base64_decode(JRequest::getVar('delfilename', ''));
 		
-		// Prepare the document: set title, add css files, etc
-		$document->setTitle(JText::_( 'FLEXI_FILE' ));
+		// Add custom css and js to document
 		
 		if ($app->isSite()) {
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
@@ -120,6 +141,10 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$perms = FlexicontentHelperPerm::getPerm();
 		
 		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_FILE' );
+		$site_title = $document->getTitle();
+		$document->setTitle($doc_title .' - '. $site_title);
 		// ***********************
 		// Get data from the model
 		// ***********************
@@ -249,21 +274,16 @@ class FlexicontentViewFileselement extends JViewLegacy
 		 ** BUILD LISTS **
 		 *****************/
 		
-		$lists 				= array();
+		$lists = array();
 		
 		// ** FILE UPLOAD FORM **
 		
 		// Build languages list
 		//$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		//$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
-		$display_file_lang_as = $params->get('display_file_lang_as', 3);
-		
+		$display_file_lang_as = $cparams->get('display_file_lang_as', 3);
 		$allowed_langs = null;
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', '', '*', $display_file_lang_as, $allowed_langs, $published_only=false);
-		} else {
-			$lists['file-lang'] = flexicontent_html::getSiteDefaultLang() . '<input type="hidden" name="file-lang" value="'.flexicontent_html::getSiteDefaultLang().'" />';
-		}
+		$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', '', '*', $display_file_lang_as, $allowed_langs, $published_only=false);
 		
 		
 		/*************
@@ -271,7 +291,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 		 *************/
 		
 		// language filter
-		$lists['language'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="submitform();" size="1" ', $filter_lang, 2);
+		$lists['language'] = ($filter_lang || 1 ? '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>' : '').
+			flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="submitform();" size="1" ', $filter_lang, '-'/*2*/);
 		
 		// search
 		$lists['search'] 	= $search;
@@ -280,15 +301,16 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$filters = array();
 		$filters[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_FILENAME' ) );
 		$filters[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ) );
-		$lists['filter'] = JHTML::_('select.genericlist', $filters, 'filter', 'size="1" class="use_select2_lib"', 'value', 'text', $filter );
+		$lists['scope'] = JHTML::_('select.genericlist', $filters, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"', 'value', 'text', $scope );
 
 		//build url/file filterlist
 		$url 	= array();
-		$url[] 	= JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_FILES' ) .' -' );
+		$url[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FILES' )*/ );
 		$url[] 	= JHTML::_('select.option',  'F', JText::_( 'FLEXI_FILE' ) );
 		$url[] 	= JHTML::_('select.option',  'U', JText::_( 'FLEXI_URL' ) );
 
-		$lists['url'] = JHTML::_('select.genericlist', $url, 'filter_url', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_url );
+		$lists['url'] = ($filter_url || 1 ? '<label class="label">'.JText::_('FLEXI_ALL_FILES').'</label>' : '').
+			JHTML::_('select.genericlist', $url, 'filter_url', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_url );
 
 		//item lists
 		/*$items_list = array();
@@ -301,17 +323,20 @@ class FlexicontentViewFileselement extends JViewLegacy
 		
 		//build secure/media filterlist
 		$secure 	= array();
-		$secure[] 	= JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_DIRECTORIES' ) .' -' );
+		$secure[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_DIRECTORIES' )*/ );
 		$secure[] 	= JHTML::_('select.option',  'S', JText::_( 'FLEXI_SECURE_DIR' ) );
 		$secure[] 	= JHTML::_('select.option',  'M', JText::_( 'FLEXI_MEDIA_DIR' ) );
 
-		$lists['secure'] = JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_secure );
+		$lists['secure'] = ($filter_secure || 1 ? '<label class="label">'.JText::_('FLEXI_ALL_DIRECTORIES').'</label>' : '').
+			JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_secure );
 
 		//build ext filterlist
-		$lists['ext'] = flexicontent_html::buildfilesextlist('filter_ext', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_ext, 1);
+		$lists['ext'] = ($filter_ext || 1 ? '<label class="label">'.JText::_('FLEXI_ALL_EXT').'</label>' : '').
+			flexicontent_html::buildfilesextlist('filter_ext', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_ext, '-'/*1*/);
 
 		//build uploader filterlist
-		$lists['uploader'] = flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_uploader, 1);
+		$lists['uploader'] = ($filter_uploader || 1 ? '<label class="label">'.JText::_('FLEXI_ALL_UPLOADERS').'</label>' : '').
+			flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_uploader, '-'/*1*/);
 
 		// table ordering
 		$lists['order_Dir']	= $filter_order_Dir;
@@ -338,14 +363,9 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$files .= $file;
 		
 		//assign data to template
-		$this->assignRef('params'     , $params);
+		$this->assignRef('count_filters', $count_filters);
+		$this->assignRef('params'     , $cparams);
 		$this->assignRef('client'     , $client);
-		//Load pane behavior
-		if (!FLEXI_J16GE) {
-			jimport('joomla.html.pane');
-			$pane = JPane::getInstance('Tabs');
-			$this->assignRef('pane'       , $pane);
-		}
 		$this->assignRef('lists'      , $lists);
 		$this->assignRef('rows'       , $rows);
 		$this->assignRef('folder_mode', $folder_mode);
@@ -363,6 +383,9 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$this->assignRef('files_selected'  , $files_selected);
 		$this->assignRef('langs', $langs);
 		
+		$this->assignRef('option', $option);
+		$this->assignRef('view', $view);
+
 		parent::display($tpl);
 	}
 }
