@@ -1258,7 +1258,7 @@ class plgSystemFlexisystem extends JPlugin
 	function onExtensionBeforeSave($context, $table, $isNew)
 	{
 		// Check for com_modules context
-		if ($context=='com_modules.module')
+		if ($context=='com_modules.module' || $context=='com_advancedmodules.module')
 		{
 			// Check for non-empty layout parameter
 			$layout = $_POST['jform']['params']['layout'];

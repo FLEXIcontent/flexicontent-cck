@@ -114,7 +114,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			
 		if ( JFactory::getApplication()->isAdmin() && (
 			($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') ||
-			($option=='com_modules' && $view == 'module') ||
+			(($option=='com_modules' || $option=='com_advancedmodules') && $view == 'module') ||
 			($option=='com_flexicontent' && ($view == 'category' || $view == 'item'))
 		) ) {
 			if (FLEXI_J30GE) {
