@@ -47,7 +47,7 @@ class flexicontent_html
 	<div class="span12">		
 		<div id="system-message-container">
 <?php endif; ?>
-			<div>
+			<div id="fc_ajax_system_messages">
 			<?php if (is_array($msgList) && $msgList) : ?>
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
 				<?php foreach ($msgList as $type => $msgs) : ?>

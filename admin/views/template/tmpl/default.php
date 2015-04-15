@@ -28,6 +28,57 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 	function <?php echo $this->use_jquery_sortable ? 'initordering' : 'storeordering'; ?>() {
 	<?php echo $this->jssort . ';' ; ?>
 	}
+	
+	function save_layout_file(formid)
+	{
+		var form = jQuery('#'+formid);
+		var layout_name  = jQuery('#editor__layout_name').val();
+		var file_subpath = jQuery('#editor__file_subpath').val();
+		if (file_subpath=='') {
+			alert('Please load a file before trying to save');
+			return;
+		}
+		
+		txtarea = jQuery('#editor__file_contents');
+		txtarea.after('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Saving</span>');
+		
+		jQuery.ajax({
+			type: "POST",
+			url: "index.php?option=com_flexicontent&task=templates.savelayoutfile&format=raw",
+			data: form.serialize(),
+			success: function (data) {
+				jQuery('#fc_doajax_loading').remove();
+				var theData = jQuery.parseJSON(data);
+				jQuery('#ajax-system-message-container').html(theData.sysmssg);
+				txtarea.val(theData.content);
+				txtarea.show();
+			}
+		});
+	}
+	
+	function load_layout_file(layout_name, file_subpath)
+	{
+		jQuery('#editor__layout_name').val(layout_name);
+		jQuery('#editor__file_subpath').val(file_subpath);
+		
+		txtarea = jQuery('#editor__file_contents');
+		txtarea.hide();
+		txtarea.after('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Saving</span>');
+		jQuery('#layout_edit_name_container').html(file_subpath);
+		
+		jQuery.ajax({
+			type: "POST",
+			url: "index.php?option=com_flexicontent&task=templates.loadlayoutfile&format=raw",
+			data: { layout_name: layout_name, file_subpath: file_subpath },
+			success: function (data) {
+				jQuery('#fc_doajax_loading').remove();
+				var theData = jQuery.parseJSON(data);
+				jQuery('#ajax-system-message-container').html(theData.sysmssg);
+				txtarea.val(theData.content);
+				txtarea.show();
+			}
+		});
+	}
 </script>
 
 <div id="flexicontent" class="flexicontent">
@@ -308,8 +359,8 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				</table>
 		
 		</div>
-		<div class="tabbertab" id="tabset_layout_fields_tab" data-icon-class="icon-options" >
-			
+		
+		<div class="tabbertab" id="tabset_layout_fields_tab" data-icon-class="icon-options" >	
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMETERS' ); ?> </h3>
 			
 			<div class="fcclear"></div>
@@ -353,6 +404,54 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				
 			</div>
 		</div>
+		
+		<div class="tabbertab" id="tabset_cat_props_desc_tab" data-icon-class="icon-signup" >
+			<h3 class="tabberheading"> <?php echo JText::_( 'Edit files' ); ?></h3>
+			
+			<div id="layout-filelist-container" class="span3">
+				<?php
+				$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$this->layout->name;
+				$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir)), '#'.$this->layout->view.'#');
+				//$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir));
+				$it->rewind();
+				while($it->valid())
+				{
+					if (!$it->isDot()) {
+						/*echo '<span class="label">SubPathName</span> '. $it->getSubPathName();
+						echo ' -- <span class="label">SubPath</span> '. $it->getSubPath();
+						echo ' -- <span class="label">Key</span> '. $it->key();*/
+						$subpath = $it->getSubPath();
+						$subpath_file = $it->getSubPathName();
+						echo
+						'<a href="javascript:;" onclick="load_layout_file(\''.addslashes($this->layout->name).'\', \''.addslashes($it->getSubPathName()).'\'); return false;">'
+							.'<span class="badge">'.$subpath.'</span>'.preg_replace('#^'.$subpath.'#', '', $it->getSubPathName()).
+						'</a>';
+						echo "<br/>";
+					}
+					
+					$it->next();
+				}
+				?>
+			</div>
+
+			<div id="layout-fileeditor-container" class="span9">
+				<div id="ajax-system-message-container">
+				</div>
+				<div class="fcclear"></div>
+				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
+					<?php echo JText::_( 'Layout file editor' ); ?>
+					<span id="layout_edit_name_container" class="badge badge-info">no file loaded</span>
+				</span>
+				
+				
+				<textarea name="file_contents" id="editor__file_contents" style="width: 100%;" rows="16" form="layout_file_editor_form"></textarea>
+				<input type="hidden" name="layout_name" id="editor__layout_name" form="layout_file_editor_form"/>
+				<input type="hidden" name="file_subpath" id="editor__file_subpath" form="layout_file_editor_form"/>
+				<input type="button" name="save_file_btn" id="editor__save_file_btn" class="btn btn-success" onclick="save_layout_file('layout_file_editor_form'); return false;" value="Save File" form="layout_file_editor_form"/>
+			</div>
+			
+		</div>
+			
 	</div>
 	
 	
@@ -366,5 +465,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 	<input type="hidden" name="task" value="" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
+
+<form id="layout_file_editor_form" name="layout_file_editor_form"></form>
 
 </div>

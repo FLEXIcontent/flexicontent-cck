@@ -202,4 +202,98 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		}
 		//parent::display($tpl);
 	}
+
+
+	function loadlayoutfile()
+	{
+		jimport('joomla.filesystem.file');
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$var['sysmssg'] = '';
+		$var['content'] = '';
+		
+		//get vars
+		$layout_name  = JRequest::getVar( 'layout_name', 'default' );
+		$file_subpath = JRequest::getVar( 'file_subpath', '' );
+		$layout_name  = preg_replace("/\.\.\//", "", $layout_name);
+		$file_subpath = preg_replace("/\.\.\//", "", $file_subpath);
+		//$file_subpath = preg_replace("#\\#", DS, $file_subpath);
+		if (!$layout_name) JFactory::getApplication()->enqueueMessage( 'Layout name is empty / invalid', 'warning');
+		if (!$file_subpath) JFactory::getApplication()->enqueueMessage( 'File path is empty / invalid', 'warning');
+		
+		if (!$layout_name || !$file_subpath) {
+			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
+			echo json_encode($var);
+			exit();
+		}
+		
+		$path = JPath::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$layout_name);
+		if (!is_dir($path)) {
+			JFactory::getApplication()->enqueueMessage( 'Path: '.$path.' was not found', 'warning');
+			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
+			echo json_encode($var);
+			exit();
+		}
+		
+		$file_path = JPath::clean($path.DS.$file_subpath);
+		if (!file_exists($file_path)) {
+			JFactory::getApplication()->enqueueMessage( 'File: '.$file_path.' was not found', 'warning');
+			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
+			echo json_encode($var);
+			exit();
+		}
+		
+		$var['content'] = file_get_contents($file_path);
+		echo json_encode($var);
+	}
+	
+	
+	function savelayoutfile()
+	{
+		jimport('joomla.filesystem.file');
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$var['sysmssg'] = '';
+		$var['content'] = '';
+		
+		//get vars
+		$file_contents = $_POST['file_contents'];
+		$layout_name  = JRequest::getVar( 'layout_name', 'default' );
+		$file_subpath = JRequest::getVar( 'file_subpath', '' );
+		$layout_name  = preg_replace("/\.\.\//", "", $layout_name);
+		$file_subpath = preg_replace("/\.\.\//", "", $file_subpath);
+		if (!$layout_name) JFactory::getApplication()->enqueueMessage( 'Layout name is empty / invalid', 'warning');
+		if (!$file_subpath) JFactory::getApplication()->enqueueMessage( 'File path is empty / invalid', 'warning');
+		
+		if (!$layout_name || !$file_subpath) {
+			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
+			echo json_encode($var);
+			exit();
+		}
+		
+		$path = JPath::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$layout_name);
+		if (!is_dir($path)) {
+			JFactory::getApplication()->enqueueMessage( 'Layout: '.$layout_name.' was not found', 'warning');
+			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
+			echo json_encode($var);
+			exit();
+		}
+		
+		$file_path = JPath::clean($path.DS.$file_subpath);
+		if (!file_exists($file_path)) {
+			JFactory::getApplication()->enqueueMessage( 'Layout: '.$layout_name.' was not found', 'warning');
+			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
+			echo json_encode($var);
+			exit();
+		}
+		
+		if (file_put_contents($file_path, $file_contents)) {
+			JFactory::getApplication()->enqueueMessage( 'File: '.$file_path.' was saved ', 'message');
+		} else {
+			JFactory::getApplication()->enqueueMessage( 'Failed to save file: '.$layout_name, 'warning');
+		}
+		$var['sysmssg'] = flexicontent_html::get_system_messages_html();
+		$var['content'] = file_get_contents($file_path);
+		echo json_encode($var);
+	}
 }

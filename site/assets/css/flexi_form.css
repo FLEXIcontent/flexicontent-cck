@@ -304,7 +304,7 @@ html button {
 
 .flexi_buttons, .fc_buttons { margin: 0px; padding:0px 2px 0px 2px; display: inline-block; }
 
-.flexicontent button:not(.btn),
+.flexicontent button:not(.btn):not(.close),
 .fc_button:not(.btn),
 .fc_buttons button:not(.btn),
 .flexi_buttons button:not(.btn) {
