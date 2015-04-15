@@ -308,8 +308,6 @@ function delAllFilters() {
 		<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
 			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-		</div>
-		<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
 			<input type="button" id="fc_upload_box_btn" class="<?php echo $_class; ?> btn-success" onclick="fc_toggle_box_via_btn('uploader_tabset', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_UPLOAD' ); ?>" />
 		</div>
 		
