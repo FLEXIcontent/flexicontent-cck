@@ -1286,28 +1286,28 @@
 
 		<field name="" type="separator" default="FLEXI_VERSIONING_CONF" label="" level="level0" menu="hide" />
 			
-			<field name="use_versioning" type="radio" default="1" label="FLEXI_ENABLE_VERSIONING" description="FLEXI_ENABLE_VERSIONING_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_versioning" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ENABLE_VERSIONING" description="FLEXI_ENABLE_VERSIONING_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="dispversionning">FLEXI_NO</option>
+				<option value="1" show_list="dispversionning" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="nr_versions" type="radio" default="10" label="FLEXI_NR_OF_VERSIONS" description="FLEXI_NR_OF_VERSIONS_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="nr_versions" type="radio" default="10" label="FLEXI_NR_OF_VERSIONS" description="FLEXI_NR_OF_VERSIONS_DESC" menu="hide" class="dispversionning btn-group btn-group-yesno">
 				<option value="5">FLEXI_5</option>
 				<option value="10">FLEXI_10</option>
 				<option value="20">FLEXI_20</option>
 				<option value="50">FLEXI_50</option>
 				<option value="100">FLEXI_100_NOT_RECOMMENDED</option>
 			</field>
-			<field name="versionsperpage" type="radio" default="5" label="FLEXI_VERSION_PER_PAGE" description="FLEXI_VERSION_PER_PAGE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="versionsperpage" type="radio" default="5" label="FLEXI_VERSION_PER_PAGE" description="FLEXI_VERSION_PER_PAGE_DESC" menu="hide" class="dispversionning btn-group btn-group-yesno" >
 				<option value="5">FLEXI_5</option>
 				<option value="10">FLEXI_10</option>
 				<option value="20">FLEXI_20</option>
 				<option value="50">FLEXI_50</option>
 			</field>
-			<field name="auto_approve" type="radio" default="1" label="FLEXI_AUTO_APPROVE" description="FLEXI_AUTO_APPROVE_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="auto_approve" type="radio" default="1" label="FLEXI_AUTO_APPROVE" description="FLEXI_AUTO_APPROVE_DESC" menu="hide" class="dispversionning btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="disable_diff" type="radio" default="0" label="FLEXI_DISABLE_HTML_DIFF" description="FLEXI_DISABLE_HTML_DIFF_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="disable_diff" type="radio" default="0" label="FLEXI_DISABLE_HTML_DIFF" description="FLEXI_DISABLE_HTML_DIFF_DESC" menu="hide" class="dispversionning btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
