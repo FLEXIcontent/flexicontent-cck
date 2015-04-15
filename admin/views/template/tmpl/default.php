@@ -29,6 +29,31 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 	<?php echo $this->jssort . ';' ; ?>
 	}
 	
+	function set_editor_contents(txtarea, theData)
+	{
+		var CM = txtarea.next();//.get(0).CodeMirror;
+		if (CM.hasClass('CodeMirror')) {
+			CM.get(0).CodeMirror.toTextArea();
+			txtarea.val(theData.content);
+			txtarea.attr('form', 'layout_file_editor_form');
+			txtarea.show();
+			CM = CodeMirror.fromTextArea(txtarea.get(0),
+			{
+				lineNumbers: true,
+				matchBrackets: true,
+				lineWrapping: true,
+				onCursorActivity: function() 
+				{
+					CM.setLineClass(hlLine, null);
+					hlLine = CM.setLineClass(CM.getCursor().line, "activeline");
+				}	
+			});
+		} else {
+			txtarea.val(theData.content);
+			txtarea.show();
+		}
+	}
+	
 	function save_layout_file(formid)
 	{
 		var form = jQuery('#'+formid);
@@ -39,8 +64,14 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 			return;
 		}
 		
+		<?php
+		if (in_array($this->layout->name, array('blog','default','faq','items-tabbed','presentation'))) {
+			echo 'if (!confirm("This is a built-in template files will be RESET on upgrade. Please duplicate template and edit files of new template. Continue ?")) return false;';
+		}
+		?>
+		
 		txtarea = jQuery('#editor__file_contents');
-		txtarea.after('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Saving</span>');
+		txtarea.before('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... <?php echo JText::_("FLEXI_SAVING");?><br/></span>');
 		
 		jQuery.ajax({
 			type: "POST",
@@ -50,20 +81,25 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				jQuery('#fc_doajax_loading').remove();
 				var theData = jQuery.parseJSON(data);
 				jQuery('#ajax-system-message-container').html(theData.sysmssg);
-				txtarea.val(theData.content);
-				txtarea.show();
+				if (!theData.content) return;  // Saving task may return modified data, if so set them into the editor
+				set_editor_contents(txtarea, theData);
 			}
 		});
 	}
 	
 	function load_layout_file(layout_name, file_subpath)
 	{
+		<?php
+		if (in_array($this->layout->name, array('blog','default','faq','items-tabbed','presentation'))) {
+			echo 'if (!confirm("This is a built-in template files will be RESET on upgrade. Please duplicate template and edit files of new template. Continue ?")) return false;';
+		}
+		?>
 		jQuery('#editor__layout_name').val(layout_name);
 		jQuery('#editor__file_subpath').val(file_subpath);
 		
 		txtarea = jQuery('#editor__file_contents');
 		txtarea.hide();
-		txtarea.after('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Saving</span>');
+		txtarea.before('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... <?php echo JText::_("FLEXI_LOADING");?><br/></span>');
 		jQuery('#layout_edit_name_container').html(file_subpath);
 		
 		jQuery.ajax({
@@ -74,8 +110,8 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				jQuery('#fc_doajax_loading').remove();
 				var theData = jQuery.parseJSON(data);
 				jQuery('#ajax-system-message-container').html(theData.sysmssg);
-				txtarea.val(theData.content);
-				txtarea.show();
+				// Loading task always return data, even empty data, set them into the editor
+				set_editor_contents(txtarea, theData);
 			}
 		});
 	}
@@ -196,7 +232,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 	<div class="fctabber tabset_layout" id="tabset_layout" style="margin:32px 0 !important;">
 		
 		<div class="tabbertab" id="tabset_cat_props_desc_tab" data-icon-class="icon-signup" >
-			<h3 class="tabberheading"> <?php echo JText::_( 'Field positions' ); ?></h3>
+			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
 				
 				<div class="fcclear"></div>
 				<span class="fc-mssg-inline fc-success" style="font-size:100%; margin: 12px 0 0 0!important;">
@@ -361,7 +397,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		</div>
 		
 		<div class="tabbertab" id="tabset_layout_fields_tab" data-icon-class="icon-options" >	
-			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMETERS' ); ?> </h3>
+			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_DISPLAY_PARAMETERS' ); ?> </h3>
 			
 			<div class="fcclear"></div>
 			<span class="fc-mssg-inline fc-success" style="font-size:100%; margin: 12px 0 0 0!important;">
@@ -370,9 +406,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					'Parameters specific to the layout, your <b>content types</b> will inherit defaults from here' :
 					'Parameters specific to the layout, your <b>content lists</b> (categories, etc) will inherit defaults from here'
 				);?>
-			</span>
-			<br/>
-			<span class="fc-mssg-inline fc-success" style="font-size:100%; margin: 12px 0 0 0!important;">
+				<br/>
 				<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
 				<?php echo JText::_( 'Setting any parameter below to <b>"Use global"</b>, will use default</b> value inside the <b>template\'s PHP code</b>');?>
 			</span>
@@ -406,12 +440,12 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		</div>
 		
 		<div class="tabbertab" id="tabset_cat_props_desc_tab" data-icon-class="icon-signup" >
-			<h3 class="tabberheading"> <?php echo JText::_( 'Edit files' ); ?></h3>
+			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_EDIT_LAYOUT_FILES' ); ?></h3>
 			
 			<div id="layout-filelist-container" class="span3">
 				<?php
 				$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$this->layout->name;
-				$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir)), '#'.$this->layout->view.'#');
+				$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir)), '#'.$this->layout->view.'.*\.(php|css)#i');
 				//$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir));
 				$it->rewind();
 				while($it->valid())
@@ -421,10 +455,15 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 						echo ' -- <span class="label">SubPath</span> '. $it->getSubPath();
 						echo ' -- <span class="label">Key</span> '. $it->key();*/
 						$subpath = $it->getSubPath();
+						$subpath_highlighted = '<span class="badge badge-success">'.$subpath.'</span>';
 						$subpath_file = $it->getSubPathName();
+						$filename_only = preg_replace('#^'.$subpath.'#', '', $subpath_file);
+						$filename_only = preg_replace('#'.$this->layout->view.'_#', '<span class="badge">'.$this->layout->view.'</span>_', $filename_only, 1);
 						echo
-						'<a href="javascript:;" onclick="load_layout_file(\''.addslashes($this->layout->name).'\', \''.addslashes($it->getSubPathName()).'\'); return false;">'
-							.'<span class="badge">'.$subpath.'</span>'.preg_replace('#^'.$subpath.'#', '', $it->getSubPathName()).
+						'
+						<img src="components/com_flexicontent/assets/images/layout_edit.png" align="center" />
+						<a href="javascript:;" onclick="load_layout_file(\''.addslashes($this->layout->name).'\', \''.addslashes($it->getSubPathName()).'\'); return false;">'
+							.$subpath_highlighted.$filename_only.
 						'</a>';
 						echo "<br/>";
 					}
@@ -439,12 +478,24 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				</div>
 				<div class="fcclear"></div>
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
-					<?php echo JText::_( 'Layout file editor' ); ?>
-					<span id="layout_edit_name_container" class="badge badge-info">no file loaded</span>
+					<span id="layout_edit_name_container" class="badge badge-info"><?php echo JText::_( 'FLEXI_NO_FILE_LOADED' ); ?></span>
 				</span>
 				
+				<?php
+				$editor = JFactory::getEditor('codemirror');
+				$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 				
-				<textarea name="file_contents" id="editor__file_contents" style="width: 100%;" rows="16" form="layout_file_editor_form"></textarea>
+				$elementid_n = "editor__file_contents";  $fieldname_n = "file_contents";
+				$cols=""; $rows="16";   $width = '100%'; $height='400px';
+				$class="fcfield_textval";
+				$show_buttons = false; // true/false, or this can be skip button array
+				$use_editor = true;
+				$txtarea = $use_editor ? '
+					<textarea id="'.$elementid_n.'" name="'.$fieldname_n.'" style="width: 100%;" cols="'.$cols.'" rows="'.$rows.'" class="'.$class.'" form="layout_file_editor_form"></textarea>' :
+					$editor->display( $fieldname_n, '', $width, $height, $_cols='', $_rows='', $show_buttons, $elementid_n, $_asset_ = null, $_author_ = null, $editor_plg_params );
+				echo $txtarea;
+				?>
+				
 				<input type="hidden" name="layout_name" id="editor__layout_name" form="layout_file_editor_form"/>
 				<input type="hidden" name="file_subpath" id="editor__file_subpath" form="layout_file_editor_form"/>
 				<input type="button" name="save_file_btn" id="editor__save_file_btn" class="btn btn-success" onclick="save_layout_file('layout_file_editor_form'); return false;" value="Save File" form="layout_file_editor_form"/>
