@@ -367,6 +367,34 @@ flexicontent_html::loadFramework('flexi-lib');
 		<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
 			<input type="button" id="fc_upload_box_btn" class="<?php echo $_class; ?> btn-success" onclick="fc_toggle_box_via_btn('uploader_tabset', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_UPLOAD' ); ?>" />
 		</div>
+		
+<?php if (!$this->folder_mode) : ?>
+		<div class="fcclear"></div>
+		<span class="fc-filter nowrap_box">
+			<span class="limit nowrap_box" style="display: inline-block;">
+				<label class="label">
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
+				</label>
+				<?php
+				$pagination_footer = $this->pagination->getListFooter();
+				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
+				?>
+			</span>
+			
+			<span class="fc_item_total_data nowrap_box badge badge-info">
+				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+			</span>
+			
+			<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
+			<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
+				<?php echo $getPagesCounter; ?>
+			</span>
+			<?php endif; ?>
+		</span>
+	</div>
+<?php endif; ?>
+	
+	
 	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
 		
@@ -411,6 +439,15 @@ flexicontent_html::loadFramework('flexi-lib');
 		</tr>
 	</thead>
 
+<?php if (!$this->folder_mode) : ?>
+	<tfoot>
+		<tr>
+			<td colspan="<?php echo $list_total_cols; ?>">
+				<?php echo $pagination_footer; ?>
+			</td>
+		</tr>
+	</tfoot>
+<?php endif; ?>
 
 	<tbody>
 		<?php
@@ -423,6 +460,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			unset($thumb_or_icon);
 			$filename    = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 			$filename_original = $this->folder_mode ? '' : str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
+			$fileid = $this->folder_mode ? '' : $row->id;
 			$display_filename  = $filename_original ? $filename_original : $filename;
 			
 			if ( !in_array(strtolower($row->ext), $imageexts)) continue;  // verify image is in allowed extensions
@@ -478,7 +516,7 @@ flexicontent_html::loadFramework('flexi-lib');
 						$filename_cut = htmlspecialchars($display_filename, ENT_QUOTES, 'UTF-8');
 					}
 				?>
-					<a style="cursor:pointer" id="file<?php echo $row->id;?>" class="<?php echo $btn_class.' '.$tip_class; ?> btn-small" prv="<?php echo $file_preview2;?>" rel="<?php echo $filename; ?>" onclick="<?php echo $img_assign_link; ?> "title="<?php echo $flexi_select; ?>">
+					<a style="cursor:pointer" id="file<?php echo $row->id;?>" class="<?php echo $btn_class.' '.$tip_class; ?> btn-small" prv="<?php echo $file_preview2;?>" data-fileid="<?php echo $fileid; ?>" data-filename="<?php echo $filename; ?>" onclick="<?php echo $img_assign_link; ?> "title="<?php echo $flexi_select; ?>">
 						<?php echo $filename_cut; ?>
 					</a>
 				

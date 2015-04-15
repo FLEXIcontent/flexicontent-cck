@@ -313,6 +313,8 @@ function delAllFilters() {
 			<input type="button" id="fc_upload_box_btn" class="<?php echo $_class; ?> btn-success" onclick="fc_toggle_box_via_btn('uploader_tabset', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_UPLOAD' ); ?>" />
 		</div>
 		
+<?php if (!$this->folder_mode) : ?>
+		<div class="fcclear"></div>
 		<span class="fc-filter nowrap_box">
 			<span class="limit nowrap_box" style="display: inline-block;">
 				<label class="label">
@@ -335,6 +337,7 @@ function delAllFilters() {
 			<?php endif; ?>
 		</span>
 	</div>
+<?php endif; ?>
 	
 	
 	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
@@ -398,6 +401,7 @@ function delAllFilters() {
 		</tr>
 	</thead>
 
+<?php if (!$this->folder_mode) : ?>
 	<tfoot>
 		<tr>
 			<td colspan="<?php echo $list_total_cols; ?>">
@@ -405,6 +409,7 @@ function delAllFilters() {
 			</td>
 		</tr>
 	</tfoot>
+<?php endif; ?>
 
 	<tbody>
 		<?php
@@ -417,6 +422,7 @@ function delAllFilters() {
 			unset($thumb_or_icon);
 			$filename    = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 			$filename_original = $this->folder_mode ? '' : str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
+			$fileid = $this->folder_mode ? '' : $row->id;
 			$display_filename  = $filename_original ? $filename_original : $filename;
 			
 			if ( !in_array(strtolower($row->ext), $imageexts)) $thumb_or_icon = JHTML::image($row->icon, $row->filename);
@@ -477,7 +483,7 @@ function delAllFilters() {
 						$filename_cut = htmlspecialchars($display_filename, ENT_QUOTES, 'UTF-8');
 					}
 				?>
-					<a style="cursor:pointer" id="file<?php echo $row->id;?>" class="<?php echo $btn_class.' '.$tip_class; ?> btn-small" prv="<?php echo $file_preview2;?>" rel="<?php echo $filename; ?>" onclick="<?php echo $img_assign_link; ?> "title="<?php echo $flexi_select; ?>">
+					<a style="cursor:pointer" id="file<?php echo $row->id;?>" class="<?php echo $btn_class.' '.$tip_class; ?> btn-small" prv="<?php echo $file_preview2;?>" data-fileid="<?php echo $fileid; ?>" data-filename="<?php echo $filename; ?>" onclick="<?php echo $img_assign_link; ?> "title="<?php echo $flexi_select; ?>">
 						<?php echo $filename_cut; ?>
 					</a>
 				
@@ -500,20 +506,10 @@ function delAllFilters() {
 			<td align="center">
 			<?php
 			$is_authorised = $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by);
-			if (FLEXI_J16GE) {
-				if ($is_authorised) {
-					$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'filemanager.access\')"');
-				} else {
-					$access = strlen($row->access_level) ? $this->escape($row->access_level) : '-';
-				}
-			} else if (FLEXI_ACCESS) {
-				if ($is_authorised) {
-					$access 	= FAccess::accessswitch('file', $row, $i);
-				} else {
-					$access 	= FAccess::accessswitch('file', $row, $i, 'content', 1);
-				}
+			if ($is_authorised) {
+				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'filemanager.access\')"');
 			} else {
-				$access = JHTML::_('grid.access', $row, $i );
+				$access = strlen($row->access_level) ? $this->escape($row->access_level) : '-';
 			}
 			echo $access;
 			?>
@@ -536,7 +532,7 @@ function delAllFilters() {
 			<td align="center"><?php echo $row->size; ?></td>
 			<td align="center"><?php echo $row->hits; ?></td>
 			<td align="center"><?php echo $row->uploader; ?></td>
-			<td align="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC2' ) ); ?></td>
+			<td align="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC4' )." H:i:s" ); ?></td>
 <?php if (!$this->folder_mode) { ?>
 			<td align="center"><?php echo $row->id; ?></td>
 <?php } ?>

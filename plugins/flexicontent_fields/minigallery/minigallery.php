@@ -127,7 +127,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				var newField = jQuery('\
 				<li class=\"".$value_classes."\">\
 					<img alt=\"Thumbnail\" src=\"'+thumb_src+'\" class=\"thumbs\">\
-					<input type=\"hidden\" id=\"a_id'+id+'_".$field->id."\" name=\"".$fieldname."\" value=\"'+id+'\"/> \
+					<input type=\"hidden\" id=\"a_id'+id+'_".$field->id."\" name=\"".$fieldname."\" value=\"'+id+'\" class=\"contains_fileid\"/> \
 					<span class=\"fcfield-drag-handle\" title=\"".JText::_( 'FLEXI_CLICK_TO_DRAG' )."\"></span> \
 					<span class=\"fcfield-button fcfield-delvalue\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\" onclick=\"deleteField".$field->id."(this);\"></span> \
 				</li>\
@@ -212,7 +212,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$field->html[] = '
 				<img class="thumbs" src="'.$src.'" alt="Thumbnail" />
 				'.'
-				'.'<input type="hidden" id="a_id'.$file_id.'_'.$field->id.'" name="'.$fieldname.'" value="'.$file_id.'" />'.'
+				'.'<input type="hidden" id="a_id'.$file_id.'_'.$field->id.'" name="'.$fieldname.'" value="'.$file_id.'"  class="contains_fileid" />'.'
 				'.($use_ingroup ? '' : $move2).'
 				'.($use_ingroup ? '' : $remove_button).'
 				';

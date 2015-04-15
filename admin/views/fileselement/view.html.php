@@ -181,42 +181,30 @@ class FlexicontentViewFileselement extends JViewLegacy
 		//add js to document
 		if ($folder_mode) {
 			$js = "
-			
-			window.addEvent('domready', function() {
-
-		    function closest (obj, el) {
-		        var find = obj.getElement(el);
-		        var self = obj;
-		        
-		        while (self && !find) {
-		            self = self.getParent();
-		            find = self ? self.getElement(el) : null;
-		        }
-		        return find;
-		    }
-
+			jQuery(document).ready(function()
+			{
 				var delfilename = '".$delfilename."';
 				var remove_existing_files_from_list = 0;
 				var remove_new_files_from_list = 0;
-				original_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .originalname');
-				existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .existingname');
+				
+				// Find and mark file usage by filename search
+				var original_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .originalname');
+				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .existingname');
 				
 				var imgobjs = Array();
 				for(i=0,n=original_objs.length; i<n; i++)  {
 					if (original_objs[i].value) imgobjs.push(original_objs[i].value);
-					if ( delfilename!='' && original_objs[i].value == delfilename)
+					if (delfilename!='' && original_objs[i].value == delfilename)
 					{
-						window.parent.deleteField".$fieldid."( original_objs[i].getParent() );
+						window.parent.qmAssignFile".$fieldid."('".$targetid."', '', '', '1');
 						remove_existing_files_from_list = 1;
 					}
 				}
 				for(i=0,n=existing_objs.length; i<n; i++) {
-					if ( existing_objs[i].value) imgobjs.push(existing_objs[i].value);
-					if ( delfilename!='' && existing_objs[i].value == delfilename)
+					if (existing_objs[i].value) imgobjs.push(existing_objs[i].value);
+					if (delfilename!='' && existing_objs[i].value == delfilename)
 					{
-						window.parent.deleteField".$fieldid."(
-							(MooTools.version>='1.2.4')  ?  existing_objs[i].getParent('.img_value_props')  :  closest (existing_objs[i] , '.img_value_props')
-						);
+						window.parent.qmAssignFile".$fieldid."('".$targetid."', '', '', '1');
 						remove_new_files_from_list = 1;
 					}
 				}
@@ -225,17 +213,12 @@ class FlexicontentViewFileselement extends JViewLegacy
 					mssg = '".JText::_('FLEXI_DELETE_FILE_IN_LIST_WINDOW_MUST_CLOSE')."';
 					mssg = mssg + '\\n' + (remove_existing_files_from_list ? '".JText::_('FLEXI_EXISTING_FILE_REMOVED_SAVE_RECOMMENEDED',true)."' : '');
 					alert( mssg );
-					(MooTools.version>='1.2.4') ?  window.parent.SqueezeBox.close()  :  window.parent.document.getElementById('sbox-window').close();
+					window.parent.qmAssignFile".$fieldid."('".$targetid."', '', '', '2');
 				}
 				
 				for(i=0,n=imgobjs.length; i<n; i++) {
-					var rows = $(document.body).getElements('a[rel='+ imgobjs[i] +']');
-					rows.addClass('striketext');
-					
-					//if( (typeof rows) != 'undefined' && rows != null) {
-						//alert(rows[0]);
-						//row.className = 'striketext';
-					//}
+					var rows = jQuery.find('a[data-filename=\"'+ imgobjs[i] +'\"]');
+					jQuery(rows).addClass('striketext');
 				}
 				"
 				.($autoassign && $newfilename ? "window.parent.qmAssignFile".$fieldid."('".$targetid."', '".$newfilename."', '".$thumb."');" : "")
@@ -250,13 +233,26 @@ class FlexicontentViewFileselement extends JViewLegacy
 				obj.className = 'striketext';
 				document.adminForm.file.value=id;
 			}
-			window.addEvent('domready', function()
+			jQuery(document).ready(function()
 			{
-				existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .existingname');
+				// Find and mark file usage by filename search
+				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .existingname');
 				for(i=0,n=existing_objs.length; i<n; i++) {
-					var rows = jQuery.find('a[rel='+ existing_objs[i].value +']');
-					rows.addClass('striketext');
+					var rows = jQuery.find('a[data-filename=\"'+ existing_objs[i].value +'\"]');
+					jQuery(rows).addClass('striketext');
 				}
+				
+				// Find and mark file usage by fileid search
+				var id_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." input.contains_fileid');
+				var imgids = Array();
+				for(i=0,n=id_objs.length; i<n; i++) {
+					if ( id_objs[i].value) imgids.push(id_objs[i].value);
+				}
+				for(i=0,n=imgids.length; i<n; i++) {
+					var rows = jQuery.find('a[data-fileid=\"'+ imgids[i] +'\"]');
+					jQuery(rows).addClass('striketext');
+				}
+				
 				"
 				.(($autoselect && $newfileid) ? "qffileselementadd( document.getElementById('file".$newfileid."'), '".$newfileid."', '".$newfilename."');" : "")
 				."

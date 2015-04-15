@@ -387,9 +387,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$image_folder = JURI::root(true).'/'.$dir_url;
 		$js .= "
 			var fc_db_img_path='".$image_folder."';
-			function qmAssignFile".$field->id."(tagid, file, file_url)
+			function qmAssignFile".$field->id."(tagid, file, file_url, action)
 			{
 				// Get TAG ID of the main form element of this field
+				var action = typeof action!== 'undefined' ? action : '0';
 				var ff_suffix = (tagid.indexOf('_existingname') > -1) ? '_existingname' : '_newfile';
 				var elementid = tagid.replace(ff_suffix,'');
 				
@@ -476,15 +477,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				if (prv_obj) {
 					preview_msg = '<span id=\"'+elementid+'_preview_msg\"></span>';
-					if (file || (_existing && !existing_obj.hasClass('no_value_selected')) ) {
+					if (file || (file_url && _existing && !existing_obj.hasClass('no_value_selected')) ) {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" alt=\"Preview image\" />';
+					} else if (action!='0') {
+						var preview_container = '<div class=\"empty_image empty_image".$field->id."\" id=\"'+elementid+'_preview_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\">';
 					} else {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"\" style=\"border: 1px solid silver; float:left;\" alt=\"Preview image\" />';
-						
-						/*var preview_container = '<div class=\"empty_image empty_image".$field->id."\" id=\"'+elementid+'_preview_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\">'
-						if ( ff_suffix == '_newfile' && newfilename!='' )
-							preview_container += newfilename.replace(/^.*[\\\/]/, '');
-						preview_container = preview_container + '</div>';*/
 					}
 					
 					var tmpDiv = jQuery(preview_container);
@@ -493,13 +491,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					tmpDiv.insertAfter( prv_obj );
 					prv_obj.remove();
 					
-					if (file || (_existing && !existing_obj.hasClass('no_value_selected')) ) {
+					if (file || (file_url && _existing && !existing_obj.hasClass('no_value_selected')) || action!='0') {
 					} else {
 						fc_loadImagePreview(tagid, elementid+'_preview_image', elementid+'_preview_msg', ".$thumb_w_s.", "./*$thumb_h_s*/'0'.");
 					}
 				}
-				// Close dialog if open
-				if (fc_field_dialog_handle_".$field->id.")
+				// Close dialog if open,  action=='1'  means do not closing modal popup
+				if (action!='1' && fc_field_dialog_handle_".$field->id.")
 					fc_field_dialog_handle_".$field->id.".dialog('close');
 			}
 		";

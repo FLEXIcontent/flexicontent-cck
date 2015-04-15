@@ -285,14 +285,17 @@ div table.adminform td {
 /********************************************************************************************************
  * Frontend templates, FORM CSS for: SEARCH/FILTER/ALPHA-INDEX/SELECTORS(e.g. per page, orderby) FORM CSS
  ********************************************************************************************************/
+.fcfilter_form_outer > div > .panel > .title a {
+	color: unset;
+}
 .fcfilter_form_outer > div > .panel > .title {
 	background-color: #dddddd;
-	background: url('../images/flexi-search.png')no-repeat 2px 5px, -webkit-gradient(linear, left top, left bottom, from(#eeeeee), to(#dddddd));
-	background: url('../images/flexi-search.png')no-repeat 2px 5px, -webkit-linear-gradient(top, #eeeeee, #dddddd);
-	background: url('../images/flexi-search.png')no-repeat 2px 5px, -moz-linear-gradient(top, #eeeeee, #dddddd);
-	background: url('../images/flexi-search.png')no-repeat 2px 5px, -ms-linear-gradient(top, #eeeeee, #dddddd);
-	background: url('../images/flexi-search.png')no-repeat 2px 5px, -o-linear-gradient(top, #eeeeee, #dddddd);
-	background: url('../images/flexi-search.png')no-repeat 2px 5px, linear-gradient(to bottom, #eeeeee, #dddddd);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee, endColorstr=#dddddd);
+	background: url('../images/search.png') no-repeat 2px 5px, -webkit-gradient(linear, left top, left bottom, from(#eeeeee), to(#dddddd));
+	background: url('../images/search.png') no-repeat 2px 5px, -webkit-linear-gradient(top, #eeeeee, #dddddd);
+	background: url('../images/search.png') no-repeat 2px 5px, -moz-linear-gradient(top, #eeeeee, #dddddd);
+	background: url('../images/search.png') no-repeat 2px 5px, -ms-linear-gradient(top, #eeeeee, #dddddd);
+	background: url('../images/search.png') no-repeat 2px 5px, -o-linear-gradient(top, #eeeeee, #dddddd);
+	background: url('../images/search.png') no-repeat 2px 5px, linear-gradient(to bottom, #eeeeee, #dddddd);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee, endColorstr=#dddddd);
 	border: 1px solid lightgray;
 	border-radius: 4px;
 	padding: 4px 4px 4px 25px;
@@ -301,12 +304,12 @@ div table.adminform td {
 }
 .fcfilter_form_outer > div > .panel > .title:hover {
 	background-color: #cccccc;
-	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#cccccc));
-	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, -webkit-linear-gradient(top, #dddddd, #cccccc);
-	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, -moz-linear-gradient(top, #dddddd, #cccccc);
-	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, -ms-linear-gradient(top, #dddddd, #cccccc);
-	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, -o-linear-gradient(top, #dddddd, #cccccc);
-	background-image: url('../images/flexi-search.png')no-repeat 2px 5px, linear-gradient(to bottom, #dddddd, #cccccc);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd, endColorstr=#cccccc);
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#cccccc));
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -webkit-linear-gradient(top, #dddddd, #cccccc);
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -moz-linear-gradient(top, #dddddd, #cccccc);
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -ms-linear-gradient(top, #dddddd, #cccccc);
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -o-linear-gradient(top, #dddddd, #cccccc);
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, linear-gradient(to bottom, #dddddd, #cccccc);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd, endColorstr=#cccccc);
 }
 .fcfilter_form_outer > div > .panel > .pane-slider.content  {
 	margin: 12px 0px;
@@ -1471,11 +1474,11 @@ table.admintable td {
 /* PANELs */
 #flexicontent .pane-sliders .pane-toggler span {
     background: url("../../../../administrator/templates/bluestork/images/j_arrow.png") no-repeat scroll 5px 50% transparent;
-    padding-left: 0px;
+    padding-left: 20px;
 }
 #flexicontent .pane-sliders .pane-toggler-down span {
     background: url("../../../../administrator/templates/bluestork/images/j_arrow_down.png") no-repeat scroll 5px 50% transparent;
-    padding-left: 0px;
+    padding-left: 20px;
 }
 
 
