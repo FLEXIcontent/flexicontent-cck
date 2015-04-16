@@ -124,7 +124,7 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// (c) Route PDF format to HTML format for J1.6+
 		$redirect_pdf_format = $this->params->get('redirect_pdf_format', 1);
-		if (FLEXI_J16GE && $redirect_pdf_format && JRequest::getVar('format') == 'pdf' ) {
+		if ($redirect_pdf_format && JRequest::getVar('format') == 'pdf' ) {
 			JRequest::setVar('format', 'html');
 			if ($redirect_pdf_format==2) {
 				JFactory::getApplication()->enqueueMessage('PDF generation is not supported, the HTML version is displayed instead', 'notice');
@@ -160,14 +160,8 @@ class plgSystemFlexisystem extends JPlugin
 		if ($fparams->get('use_mobile_layouts') || $app->isAdmin()) $this->detectClientResolution($fparams);
 		
 		// Exclude pagebreak outputing dialog from redirection
-		if( !FLEXI_J16GE ) {
-			if ( $option=='com_content' && $task=='ins_pagebreak' ) return;
-		} else {
-			if ( $option=='com_content' && $layout=='pagebreak' ) return;
-		}
+		if ( $option=='com_content' && $layout=='pagebreak' ) return;
 		//if( $option=='com_content' && $view=='articles' && $layout=='modal' && $tmpl=='component' ) return;
-
-
 		
 		// Detect saving configuration, e.g. set a flag to indicate cleaning categories cache on next page load
 		$this->trackSaveConf();
@@ -193,12 +187,10 @@ class plgSystemFlexisystem extends JPlugin
 		$option = JRequest::getCMD('option');
 		$user   = JFactory::getUser();
 		
-		if (FLEXI_J16GE) {
-			// NOTE: in J1.6+, a user can be assigned multiple groups, so we need to retrieve them
-			$usergroups = $user->get('groups');
-			$usergroups = is_array($usergroups) ? $usergroups : array();
-			$usergroups = array_keys($usergroups);
-		}
+		// NOTE: in J1.6+, a user can be assigned multiple groups, so we need to retrieve them
+		$usergroups = $user->get('groups');
+		$usergroups = is_array($usergroups) ? $usergroups : array();
+		$usergroups = array_keys($usergroups);
 		
 		// Get user groups excluded from redirection
 		if (FLEXI_J16GE) {
@@ -359,6 +351,20 @@ class plgSystemFlexisystem extends JPlugin
 					$catid = $db->loadResult();
 				}
 				$in_limits = ($catid>=FLEXI_LFT_CATEGORY && $catid<=FLEXI_RGT_CATEGORY);
+				
+				// Allow Joomla article view for non-bound items or for specific content types
+				if ($in_limits && $view == 'article') {
+					$db->setQuery('SELECT	attribs'
+					. ' FROM #__flexicontent_types AS ty '
+					. ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = ty.id '
+					. ' WHERE ie.item_id = ' . $id);
+					$type_params = $db->loadResult();
+					if (!$type_params) $in_limits = false; // article not bound to FLEXIcontent yet
+					else {
+						$type_params = new JRegistry($type_params);
+						$in_limits = $type_params->get('allow_jview') == 0;  // Allow viewing by article view, if so configured
+					}
+				}
 			}
 			
 			if ( empty($in_limits) ) return;
@@ -1019,10 +1025,10 @@ class plgSystemFlexisystem extends JPlugin
 				$db->setQuery('UPDATE #__flexicontent_items_tmp SET hits=hits+1 WHERE id = '.$item_id );
 				$db->query();
 			}
-		} else if (FLEXI_J16GE && $option=='com_flexicontent' &&  $view=='category') {
+		} else if ($option=='com_flexicontent' &&  $view=='category') {
 			$cat_id = JRequest::getInt('cid');
 			$layout = JRequest::getVar('layout');
-			if (FLEXI_J16GE && $cat_id && empty($layout)) {
+			if ($cat_id && empty($layout)) {
 				$hit_accounted = false;
 				$hit_arr = array();
 				$session = JFactory::getSession();
