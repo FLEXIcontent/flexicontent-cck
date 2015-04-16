@@ -23,6 +23,9 @@ $this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets
 $this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
+
 $app = JFactory::getApplication();
 $db = JFactory::getDbo();
 
@@ -103,31 +106,41 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		});
 	}
 	
-	function load_layout_file(layout_name, file_subpath, load_common)
+	function load_layout_file(layout_name, file_subpath, load_mode)
 	{
-		var load_common = (typeof load_common != "undefined") ? load_common : 0;
-		
 		var layout_name  = (typeof layout_name != "undefined"  && layout_name!='')  ? layout_name  : jQuery('#editor__layout_name').val();
 		var file_subpath = (typeof file_subpath != "undefined" && file_subpath!='') ? file_subpath : jQuery('#editor__file_subpath').val();
+		var load_mode = (typeof load_mode != "undefined") ? load_mode : 0;
+		var form = jQuery('#layout_file_editor_form');
 		
 		jQuery('#editor__layout_name').val(layout_name);
 		jQuery('#editor__file_subpath').val(file_subpath);
+		jQuery('#editor__load_mode').val(load_mode);
+		
+		if (load_mode == '2') {
+			form.submit();
+			return;
+		}
 		
 		txtarea = jQuery('#editor__file_contents');
-		txtarea.hide();
 		txtarea.before('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... <?php echo JText::_("FLEXI_LOADING");?><br/></span>');
+		txtarea.hide();
 		jQuery('#layout_edit_name_container').html(file_subpath);
 		
 		jQuery.ajax({
-			type: "POST",
-			url: "index.php?option=com_flexicontent&task=templates.loadlayoutfile&format=raw",
-			data: { layout_name: layout_name, file_subpath: file_subpath, load_common: load_common, '<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>': 1 },
+			type: form.attr('method'),
+			url: form.attr('action'),
+			data: { layout_name: layout_name, file_subpath: file_subpath, load_mode: load_mode, '<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>': 1 },
 			success: function (data) {
 				jQuery('#fc_doajax_loading').remove();
 				var theData = jQuery.parseJSON(data);
 				jQuery('#ajax-system-message-container').html(theData.sysmssg);
 				// Loading task always return data, even empty data, set them into the editor
 				set_editor_contents(txtarea, theData);
+				// Display the buttons
+				jQuery('#editor__save_file_btn').css('display', '');
+				jQuery('#editor__download_file_btn').css('display', '');
+				jQuery('#editor__load_common_file_btn').css('display', parseInt(theData.default_exists) ? '' : 'none');
 			}
 		});
 	}
@@ -427,7 +440,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				<?php echo JText::_( 'Setting any parameter below to <b>"Use global"</b>, will use default</b> value inside the <b>template\'s PHP code</b>');?>
 			</span>
 			
-			<div style="max-width:1024px;">
+			<div style="max-width:1024px; margin-top:16px;">
 			
 				<?php
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
@@ -460,7 +473,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			
 			<div id="layout-filelist-container" class="span3">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
-					<span class="badge"><?php echo JText::_( 'Template files' ); ?></span>
+					<span class="badge"><?php echo JText::_( 'FLEXI_LAYOUT_FILES' ); ?></span>
 				</span>
 				<?php
 				$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$this->layout->name;
@@ -481,9 +494,11 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						//$filename_only = preg_replace('#'.$this->layout->view.'_#', '<span class="badge">'.$this->layout->view.'</span>_', $filename_only, 1);
 						
 						if (preg_match('#\.php#', $filename_only)) $file_type = '<span class="badge badge-success">php</span> ';
-						if (preg_match('#\.xml#', $filename_only)) $file_type = '<span class="badge badge-info">xml</span> ';
-						if (preg_match('#\.css#', $filename_only)) $file_type = '<span class="badge badge-warning">css</span> ';
-						if (preg_match('#\.js#', $filename_only))  $file_type = '<span class="badge badge-important">js</span> ';
+						else if (preg_match('#\.xml#', $filename_only)) $file_type = '<span class="badge badge-info">xml</span> ';
+						else if (preg_match('#\.css#', $filename_only)) $file_type = '<span class="badge badge-warning">css</span> ';
+						else if (preg_match('#\.js#', $filename_only))  $file_type = '<span class="badge badge-important">&nbsp;js</span> ';
+						else if (preg_match('#\.ini#', $filename_only))  $file_type = '<span class="badge badge-info">ini</span> ';
+						else $file_type = '<span class="badge">---</span> ';
 						echo
 						'
 						<img src="components/com_flexicontent/assets/images/layout_edit.png" align="center" />
@@ -523,10 +538,18 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				echo $txtarea;
 				?>
 				<?php echo str_replace('<input', '<input form="layout_file_editor_form"', JHTML::_( 'form.token' )); ?>
+				<input type="hidden" name="load_mode" id="editor__load_mode" form="layout_file_editor_form"/>
 				<input type="hidden" name="layout_name" id="editor__layout_name" form="layout_file_editor_form"/>
 				<input type="hidden" name="file_subpath" id="editor__file_subpath" form="layout_file_editor_form"/>
-				<input type="button" name="save_file_btn" id="editor__save_file_btn" class="btn btn-success" onclick="save_layout_file('layout_file_editor_form'); return false;" value="Save File" form="layout_file_editor_form"/>
-				<input type="button" name="load_file_btn" id="editor__load_common_file_btn" class="btn btn-info" onclick="load_layout_file('', '', 1); return false;" value="Load & customize common code" form="layout_file_editor_form"/>
+				<input type="button" name="save_file_btn" id="editor__save_file_btn" class="<?php echo $btn_class; ?> btn-success <?php echo $tip_class; ?>" onclick="save_layout_file('layout_file_editor_form'); return false;" style="display:none;" value="Save" form="layout_file_editor_form"
+				title="<?php echo flexicontent_html::getToolTip('Save file', 'You may want to download a copy in your local disk before saving changes', 0, 1); ?>"
+				/>
+				<input type="button" name="download_file_btn" id="editor__download_file_btn" class="<?php echo $btn_class; ?> btn-info <?php echo $tip_class; ?>" onclick="load_layout_file('', '', 2); return false;" style="display:none;" value="Download" form="layout_file_editor_form"
+				title="<?php echo flexicontent_html::getToolTip('Download file', 'This will download the current file from server and not the text currently in the editor, if you want the text in the editor then just copy paste it in a local text file', 0, 1); ?>"
+				/>
+				<input type="button" name="load_file_btn" id="editor__load_common_file_btn" class="<?php echo $btn_class; ?> btn-info <?php echo $tip_class; ?>" onclick="load_layout_file('', '', 1); return false;" style="display:none;" value="Load/customize system's default" form="layout_file_editor_form"
+				title="<?php echo flexicontent_html::getToolTip('System\'s default code', 'Please note that this loads the <b>system\'s default</b> for the current file, which maybe different than <b>template\'s default</b> code', 0, 1); ?>"
+				/>
 			</div>
 			
 		</div>
@@ -545,6 +568,6 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
 
-<form id="layout_file_editor_form" name="layout_file_editor_form"></form>
+<form id="layout_file_editor_form" name="layout_file_editor_form" action="index.php?option=com_flexicontent&task=templates.loadlayoutfile&format=raw" method="POST"></form>
 
 </div>

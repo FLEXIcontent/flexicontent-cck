@@ -212,6 +212,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		
 		$var['sysmssg'] = '';
 		$var['content'] = '';
+		$var['default_exists'] = '0';
 		
 		// Check for request forgeries
 		if (!JRequest::checkToken()) {
@@ -227,7 +228,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		);
 		
 		//get vars
-		$load_common  = JRequest::getVar( 'load_common', '0' );
+		$load_mode  = JRequest::getVar( 'load_mode', '0' );
 		$layout_name  = JRequest::getVar( 'layout_name', 'default' );
 		$file_subpath = JRequest::getVar( 'file_subpath', '' );
 		$layout_name  = preg_replace("/\.\.\//", "", $layout_name);
@@ -258,18 +259,36 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			exit();
 		}
 		
-		if ($load_common) {
-			$path = JPath::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common');
-			if (isset($common[$file_subpath])) $file_subpath = $common[$file_subpath];  // Some files do not have the same name
-			$default_code_path = JPath::clean($path.DS.$file_subpath);
-			if (!file_exists($default_code_path)) {
+		// CASE of downloading instead of loading the file
+		if ($load_mode == 2) {
+			header("Pragma: public"); // required
+			header("Expires: 0");
+			header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+			header("Cache-Control: private", false); // required for certain browsers
+			header("Content-Type: text/plain");
+			header("Content-Disposition: attachment; filename=\"".basename($file_subpath)."\";" );
+			header("Content-Transfer-Encoding: binary");
+			header("Content-Length: ".filesize($file_path));
+			readfile($file_path);
+		}
+		
+		// Check if default file path exists
+		$default_path = JPath::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common');
+		$default_file = isset($common[$file_subpath]) ? $common[$file_subpath] : $file_subpath;    // Some files do not have the same name as default file
+		$default_file_path = JPath::clean($default_path.DS.$default_file);
+		$default_file_exists = file_exists($default_file_path) ? 1 : 0;
+		
+		// CASE LOADING system's default, set a different path to be read
+		if ($load_mode) {
+			if (!$default_file_exists) {
 				$app->enqueueMessage( 'No default file for: '.$file_subpath.' exists, current file was --reloaded--', 'notice');
 			} else {
-				$file_path = $default_code_path;
+				$file_path = $default_file_path;
 			}
 		}
 		
 		$var['sysmssg'] = flexicontent_html::get_system_messages_html();
+		$var['default_exists'] = (string) $default_file_exists;
 		$var['content'] = file_get_contents($file_path);
 		echo json_encode($var);
 	}
@@ -325,6 +344,10 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		
 		if (file_put_contents($file_path, $file_contents)) {
 			$app->enqueueMessage( 'File: '.$file_path.' was saved ', 'message');
+			if (preg_match('#\.xml#', $file_path)) {
+				$tmplcache = JFactory::getCache('com_flexicontent_tmpl');
+				$tmplcache->clean();
+			}
 		} else {
 			$app->enqueueMessage( 'Failed to save file: '.$layout_name, 'warning');
 		}
