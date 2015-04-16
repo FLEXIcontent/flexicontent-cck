@@ -22,6 +22,22 @@ defined('_JEXEC') or die('Restricted access');
 $this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
 $this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+
+$app = JFactory::getApplication();
+$db = JFactory::getDbo();
+
+// Codemirror should be enabled
+$query = $db->getQuery(true)
+	->select('COUNT(*)')
+	->from('#__extensions as a')
+	->where(
+		'(a.name =' . $db->quote('plg_editors_codemirror') . ' AND a.enabled = 1) '
+		//' OR (a.name =' . $db->quote('plg_editors_none')   . ' AND a.enabled = 1) '
+	);
+$db->setQuery($query);
+$use_editor = (boolean)$db->loadResult();
+if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please enable, simple textarea will be used for editting files'), 'warning');
+
 ?>
 
 <script language="javascript" type="text/javascript">
@@ -87,13 +103,13 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		});
 	}
 	
-	function load_layout_file(layout_name, file_subpath)
+	function load_layout_file(layout_name, file_subpath, load_common)
 	{
-		<?php
-		if (in_array($this->layout->name, array('blog','default','faq','items-tabbed','presentation'))) {
-			echo 'if (!confirm("This is a built-in template files will be RESET on upgrade. Please duplicate template and edit files of new template. Continue ?")) return false;';
-		}
-		?>
+		var load_common = (typeof load_common != "undefined") ? load_common : 0;
+		
+		var layout_name  = (typeof layout_name != "undefined"  && layout_name!='')  ? layout_name  : jQuery('#editor__layout_name').val();
+		var file_subpath = (typeof file_subpath != "undefined" && file_subpath!='') ? file_subpath : jQuery('#editor__file_subpath').val();
+		
 		jQuery('#editor__layout_name').val(layout_name);
 		jQuery('#editor__file_subpath').val(file_subpath);
 		
@@ -105,7 +121,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		jQuery.ajax({
 			type: "POST",
 			url: "index.php?option=com_flexicontent&task=templates.loadlayoutfile&format=raw",
-			data: { layout_name: layout_name, file_subpath: file_subpath },
+			data: { layout_name: layout_name, file_subpath: file_subpath, load_common: load_common, '<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>': 1 },
 			success: function (data) {
 				jQuery('#fc_doajax_loading').remove();
 				var theData = jQuery.parseJSON(data);
@@ -443,9 +459,12 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_EDIT_LAYOUT_FILES' ); ?></h3>
 			
 			<div id="layout-filelist-container" class="span3">
+				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
+					<span class="badge"><?php echo JText::_( 'Template files' ); ?></span>
+				</span>
 				<?php
 				$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$this->layout->name;
-				$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir)), '#'.$this->layout->view.'.*\.(php|css)#i');
+				$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir)), '#'.$this->layout->view.'(_.*\.|\.)(php|xml|css|js)#i');
 				//$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir));
 				$it->rewind();
 				while($it->valid())
@@ -455,15 +474,21 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 						echo ' -- <span class="label">SubPath</span> '. $it->getSubPath();
 						echo ' -- <span class="label">Key</span> '. $it->key();*/
 						$subpath = $it->getSubPath();
-						$subpath_highlighted = '<span class="badge badge-success">'.$subpath.'</span>';
+						$subpath_highlighted = $subpath;//'<span class="badge badge-success">'.$subpath.'</span>';
+						
 						$subpath_file = $it->getSubPathName();
 						$filename_only = preg_replace('#^'.$subpath.'#', '', $subpath_file);
-						$filename_only = preg_replace('#'.$this->layout->view.'_#', '<span class="badge">'.$this->layout->view.'</span>_', $filename_only, 1);
+						//$filename_only = preg_replace('#'.$this->layout->view.'_#', '<span class="badge">'.$this->layout->view.'</span>_', $filename_only, 1);
+						
+						if (preg_match('#\.php#', $filename_only)) $file_type = '<span class="badge badge-success">php</span> ';
+						if (preg_match('#\.xml#', $filename_only)) $file_type = '<span class="badge badge-info">xml</span> ';
+						if (preg_match('#\.css#', $filename_only)) $file_type = '<span class="badge badge-warning">css</span> ';
+						if (preg_match('#\.js#', $filename_only))  $file_type = '<span class="badge badge-important">js</span> ';
 						echo
 						'
 						<img src="components/com_flexicontent/assets/images/layout_edit.png" align="center" />
 						<a href="javascript:;" onclick="load_layout_file(\''.addslashes($this->layout->name).'\', \''.addslashes($it->getSubPathName()).'\'); return false;">'
-							.$subpath_highlighted.$filename_only.
+							.$file_type.$subpath_highlighted.$filename_only.
 						'</a>';
 						echo "<br/>";
 					}
@@ -474,31 +499,34 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 			</div>
 
 			<div id="layout-fileeditor-container" class="span9">
-				<div id="ajax-system-message-container">
-				</div>
-				<div class="fcclear"></div>
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
 					<span id="layout_edit_name_container" class="badge badge-info"><?php echo JText::_( 'FLEXI_NO_FILE_LOADED' ); ?></span>
 				</span>
+				<div class="fcclear"></div>
+				<div id="ajax-system-message-container">
+				</div>
+				<div class="fcclear"></div>
 				
 				<?php
-				$editor = JFactory::getEditor('codemirror');
-				$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
+				if ($use_editor) {
+					$editor = JFactory::getEditor('codemirror');
+					$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
+				}
 				
 				$elementid_n = "editor__file_contents";  $fieldname_n = "file_contents";
 				$cols=""; $rows="16";   $width = '100%'; $height='400px';
 				$class="fcfield_textval";
 				$show_buttons = false; // true/false, or this can be skip button array
-				$use_editor = true;
-				$txtarea = $use_editor ? '
+				$txtarea = !$use_editor ? '
 					<textarea id="'.$elementid_n.'" name="'.$fieldname_n.'" style="width: 100%;" cols="'.$cols.'" rows="'.$rows.'" class="'.$class.'" form="layout_file_editor_form"></textarea>' :
 					$editor->display( $fieldname_n, '', $width, $height, $_cols='', $_rows='', $show_buttons, $elementid_n, $_asset_ = null, $_author_ = null, $editor_plg_params );
 				echo $txtarea;
 				?>
-				
+				<?php echo str_replace('<input', '<input form="layout_file_editor_form"', JHTML::_( 'form.token' )); ?>
 				<input type="hidden" name="layout_name" id="editor__layout_name" form="layout_file_editor_form"/>
 				<input type="hidden" name="file_subpath" id="editor__file_subpath" form="layout_file_editor_form"/>
 				<input type="button" name="save_file_btn" id="editor__save_file_btn" class="btn btn-success" onclick="save_layout_file('layout_file_editor_form'); return false;" value="Save File" form="layout_file_editor_form"/>
+				<input type="button" name="load_file_btn" id="editor__load_common_file_btn" class="btn btn-info" onclick="load_layout_file('', '', 1); return false;" value="Load & customize common code" form="layout_file_editor_form"/>
 			</div>
 			
 		</div>

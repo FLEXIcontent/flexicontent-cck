@@ -78,7 +78,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 	function __construct()
 	{
 		parent::__construct();
-
+		
 		$type 	= JRequest::getVar('type',  'items', '', 'word');
 		$folder = JRequest::getVar('folder',  'default', '', 'cmd');
 		$cfgname = JRequest::getVar('cfgname',  '', '', 'cmd');

@@ -106,7 +106,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 	function getlayoutparams()
 	{
 		jimport('joomla.filesystem.file');
-		$mainframe = JFactory::getApplication();
+		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		
 		//get vars
@@ -209,17 +209,32 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		jimport('joomla.filesystem.file');
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+		
 		$var['sysmssg'] = '';
 		$var['content'] = '';
 		
+		// Check for request forgeries
+		if (!JRequest::checkToken()) {
+			$app->enqueueMessage( 'Invalid Token', 'error');
+			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
+			echo json_encode($var);
+			exit;
+		}
+		
+		$common = array(
+			'item.php' => 'item_layouts/modular.php',
+			'item_html5.php' => 'item_layouts/modular_html5.php',
+		);
+		
 		//get vars
+		$load_common  = JRequest::getVar( 'load_common', '0' );
 		$layout_name  = JRequest::getVar( 'layout_name', 'default' );
 		$file_subpath = JRequest::getVar( 'file_subpath', '' );
 		$layout_name  = preg_replace("/\.\.\//", "", $layout_name);
 		$file_subpath = preg_replace("/\.\.\//", "", $file_subpath);
 		//$file_subpath = preg_replace("#\\#", DS, $file_subpath);
-		if (!$layout_name) JFactory::getApplication()->enqueueMessage( 'Layout name is empty / invalid', 'warning');
-		if (!$file_subpath) JFactory::getApplication()->enqueueMessage( 'File path is empty / invalid', 'warning');
+		if (!$layout_name) $app->enqueueMessage( 'Layout name is empty / invalid', 'warning');
+		if (!$file_subpath) $app->enqueueMessage( 'File path is empty / invalid', 'warning');
 		
 		if (!$layout_name || !$file_subpath) {
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
@@ -229,7 +244,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		
 		$path = JPath::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$layout_name);
 		if (!is_dir($path)) {
-			JFactory::getApplication()->enqueueMessage( 'Path: '.$path.' was not found', 'warning');
+			$app->enqueueMessage( 'Path: '.$path.' was not found', 'warning');
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
 			echo json_encode($var);
 			exit();
@@ -237,12 +252,24 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		
 		$file_path = JPath::clean($path.DS.$file_subpath);
 		if (!file_exists($file_path)) {
-			JFactory::getApplication()->enqueueMessage( 'File: '.$file_path.' was not found', 'warning');
+			$app->enqueueMessage( 'File: '.$file_path.' was not found', 'warning');
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
 			echo json_encode($var);
 			exit();
 		}
 		
+		if ($load_common) {
+			$path = JPath::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common');
+			if (isset($common[$file_subpath])) $file_subpath = $common[$file_subpath];  // Some files do not have the same name
+			$default_code_path = JPath::clean($path.DS.$file_subpath);
+			if (!file_exists($default_code_path)) {
+				$app->enqueueMessage( 'No default file for: '.$file_subpath.' exists, current file was --reloaded--', 'notice');
+			} else {
+				$file_path = $default_code_path;
+			}
+		}
+		
+		$var['sysmssg'] = flexicontent_html::get_system_messages_html();
 		$var['content'] = file_get_contents($file_path);
 		echo json_encode($var);
 	}
@@ -253,8 +280,17 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		jimport('joomla.filesystem.file');
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+		
 		$var['sysmssg'] = '';
 		$var['content'] = '';
+		
+		// Check for request forgeries
+		if (!JRequest::checkToken()) {
+			$app->enqueueMessage( 'Invalid Token', 'error');
+			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
+			echo json_encode($var);
+			exit;
+		}
 		
 		//get vars
 		$file_contents = $_POST['file_contents'];
@@ -262,8 +298,8 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		$file_subpath = JRequest::getVar( 'file_subpath', '' );
 		$layout_name  = preg_replace("/\.\.\//", "", $layout_name);
 		$file_subpath = preg_replace("/\.\.\//", "", $file_subpath);
-		if (!$layout_name) JFactory::getApplication()->enqueueMessage( 'Layout name is empty / invalid', 'warning');
-		if (!$file_subpath) JFactory::getApplication()->enqueueMessage( 'File path is empty / invalid', 'warning');
+		if (!$layout_name) $app->enqueueMessage( 'Layout name is empty / invalid', 'warning');
+		if (!$file_subpath) $app->enqueueMessage( 'File path is empty / invalid', 'warning');
 		
 		if (!$layout_name || !$file_subpath) {
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
@@ -273,7 +309,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		
 		$path = JPath::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$layout_name);
 		if (!is_dir($path)) {
-			JFactory::getApplication()->enqueueMessage( 'Layout: '.$layout_name.' was not found', 'warning');
+			$app->enqueueMessage( 'Layout: '.$layout_name.' was not found', 'warning');
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
 			echo json_encode($var);
 			exit();
@@ -281,17 +317,18 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		
 		$file_path = JPath::clean($path.DS.$file_subpath);
 		if (!file_exists($file_path)) {
-			JFactory::getApplication()->enqueueMessage( 'Layout: '.$layout_name.' was not found', 'warning');
+			$app->enqueueMessage( 'Layout: '.$layout_name.' was not found', 'warning');
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
 			echo json_encode($var);
 			exit();
 		}
 		
 		if (file_put_contents($file_path, $file_contents)) {
-			JFactory::getApplication()->enqueueMessage( 'File: '.$file_path.' was saved ', 'message');
+			$app->enqueueMessage( 'File: '.$file_path.' was saved ', 'message');
 		} else {
-			JFactory::getApplication()->enqueueMessage( 'Failed to save file: '.$layout_name, 'warning');
+			$app->enqueueMessage( 'Failed to save file: '.$layout_name, 'warning');
 		}
+		
 		$var['sysmssg'] = flexicontent_html::get_system_messages_html();
 		$var['content'] = file_get_contents($file_path);
 		echo json_encode($var);
