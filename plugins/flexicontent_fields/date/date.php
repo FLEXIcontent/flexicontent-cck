@@ -377,8 +377,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
-		$customdate     = $field->parameters->get( 'custom_date', FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ) ;
-		$dateformat     = $field->parameters->get( 'date_format', $customdate ) ;
+		$customdate     = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;
+		$dateformat     = $field->parameters->get( 'date_format', '' ) ;
+		$dateformat = $dateformat ? JText::_($dateformat) :
+			($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
 		
 		$display_tz_logged   = $field->parameters->get( 'display_tz_logged', 2) ;
 		$display_tz_guests   = $field->parameters->get( 'display_tz_guests', 2) ;
@@ -488,7 +490,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			if ( empty($date) ) continue;
 			
 			try {
-				$date = JHTML::_('date', $date, JText::_($dateformat), $timezone ).$tz_info;
+				$date = JHTML::_('date', $date, $dateformat, $timezone ).$tz_info;
 			} catch ( Exception $e ) {
 				$date = '';
 			}

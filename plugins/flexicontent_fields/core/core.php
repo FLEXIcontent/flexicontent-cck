@@ -119,10 +119,11 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			{
 				case 'created': // created
 					$field->value[] = $item->created;
+					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;		
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
-					$customdate = $field->parameters->get( 'custom_date', '' ) ;		
-					$dateformat = $dateformat ? $dateformat : $customdate;
-					$field->{$prop} = $pretext.JHTML::_( 'date', $item->created, JText::_($dateformat) ).$posttext;
+					$dateformat = $dateformat ? JText::_($dateformat) :
+						($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
+					$field->{$prop} = $pretext.JHTML::_( 'date', $item->created, $dateformat ).$posttext;
 					break;
 				
 				case 'createdby': // created by
@@ -132,10 +133,11 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	
 				case 'modified': // modified
 					$field->value[] = $item->modified;
+					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;		
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
-					$customdate = $field->parameters->get( 'custom_date', '' ) ;		
-					$dateformat = $dateformat ? $dateformat : $customdate;
-					$field->{$prop} = $pretext.JHTML::_( 'date', $item->modified, JText::_($dateformat) ).$posttext;
+					$dateformat = $dateformat ? JText::_($dateformat) :
+						($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
+					$field->{$prop} = $pretext.JHTML::_( 'date', $item->modified, $dateformat ).$posttext;
 					break;
 				
 				case 'modifiedby': // modified by
