@@ -461,8 +461,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			// Create JOIN for ordering items by a most commented
 			if ( in_array('commented', $order) ) {
-				$orderby_col   = ', count(com.object_id) AS comments_total';
-				$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
+				$orderby_col   = ', COUNT(DISTINCT com.object_id) AS comments_total';
+				$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id AND com.object_group="com_flexicontent" AND com.published="1"';
 			}
 			
 			// Create JOIN for ordering items by a most rated
