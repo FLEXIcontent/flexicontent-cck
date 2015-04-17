@@ -29,6 +29,41 @@ $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 $app = JFactory::getApplication();
 $db = JFactory::getDbo();
 
+//snapshot code
+$itempositionxml ='<group>myposition</group>';
+$itempositionhtml = '<?php if (isset($item->positions["myposition"])) : ?>
+					<!-- BOF myposition block -->
+					<div class="flexi lineinfo myposition group">
+					<?php foreach ($item->positions["myposition"] as $field) : ?>
+					<div class="flexi element">
+					<?php if ($field->label) : ?>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<?php endif; ?>
+					<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+					</div>
+					<?php endforeach; ?>
+					</div>
+					<!-- EOF myposition block -->
+					<?php endif; ?>
+					';
+$catpositionhtml = '<?php if (isset($item->positions["myposition"])) : ?>
+					<!-- BOF myposition block -->
+					<div class="flexi lineinfo myposition group">
+					<?php foreach ($item->positions["myposition"] as $field) : ?>
+					<div class="flexi element">
+					<?php if ($field->label) : ?>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<?php endif; ?>
+					<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+					</div>
+					<?php endforeach; ?>
+					</div>
+					<!-- EOF myposition block -->
+					<?php endif; ?>
+					';					
+$itemfieldhtml = '<?php echo $item->fields["fieldname"]->display; ?>';
+$catfieldhtml = '<?php echo $item[$i]->fields["fieldname"]->display; ?>';
+
 // Codemirror should be enabled
 $query = $db->getQuery(true)
 	->select('COUNT(*)')
@@ -511,6 +546,15 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					$it->next();
 				}
 				?>
+				<hr>
+				<div class="code-info">
+					<div class="alert alert-success"><?php echo JText::_( 'FLEXI_COPY_CODE' ); ?></div>
+						<input type="text" size="5" onClick="this.setSelectionRange(0, this.value.length)" value="<?php echo htmlspecialchars($itempositionxml); ?>"><span class="label"><?php echo JText::_( 'FLEXI_XML_POSITION' ); ?></span>
+						<input type="text" size="5" onClick="this.setSelectionRange(0, this.value.length)" class="automarkup" value="<?php echo htmlspecialchars($itempositionhtml); ?>""><span class="label"><?php echo JText::_( 'FLEXI_ITEM_POSITION' ); ?></span>
+						<input type="text" size="5" onClick="this.setSelectionRange(0, this.value.length)" class="automarkup" value="<?php echo htmlspecialchars($catpositionhtml); ?>""><span class="label"><?php echo JText::_( 'FLEXI_CATEGORIE_POSITION' ); ?></span>
+						<input type="text" size="5" onClick="this.setSelectionRange(0, this.value.length)" class="automarkup" value="<?php echo htmlspecialchars($itemfieldhtml); ?>""><span class="label"><?php echo JText::_( 'FLEXI_ITEM_FIELD' ); ?></span>
+						<input type="text" size="5" onClick="this.setSelectionRange(0, this.value.length)" class="automarkup"value="<?php echo htmlspecialchars($catfieldhtml); ?>""><span class="label"><?php echo JText::_( 'FLEXI_CATEGORIE_FIELD' ); ?></span>
+					</div>
 			</div>
 
 			<div id="layout-fileeditor-container" class="span9">
