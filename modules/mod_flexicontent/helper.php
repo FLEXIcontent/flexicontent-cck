@@ -1552,10 +1552,10 @@ class modFlexicontentHelper
 		$add_comments = ($display_comments_feat || $display_comments || in_array('commented', $ordering)) && $jcomments_exist;
 		
 		// Additional select and joins for comments
-		$select_comments     = $add_comments ? ', count(com.object_id) AS comments_total' : '';
+		$select_comments     = $add_comments ? ', COUNT(DISTINCT com.object_id) AS comments_total' : '';
 		$join_comments_type  = $ordering[1]=='commented' ? ' INNER JOIN' : ' LEFT JOIN';   // Do not require most commented for 2nd level ordering
 		$join_comments       = $add_comments ?
-			$join_comments_type .' #__jcomments AS com ON com.object_id = i.id AND com.object_group="com_flexicontent"' : '' ;
+			$join_comments_type .' #__jcomments AS com ON com.object_id = i.id AND com.object_group="com_flexicontent" AND com.published="1"' : '' ;
 		
 		
 		// **********************************************************
@@ -1998,7 +1998,7 @@ class modFlexicontentHelper
 		
 		// Get comment ids ordered
 		$query = 'SELECT id FROM #__jcomments AS com '
-			.' WHERE com.object_id IN (' . implode($item_ids, ",") .') AND com.object_group="com_flexicontent" '
+			.' WHERE com.object_id IN (' . implode($item_ids, ",") .') AND com.object_group="com_flexicontent" AND com.published="1"'
 			.' ORDER BY com.object_id, com.date DESC';
 		$db->setQuery($query);
 		$comment_ids = FLEXI_J16GE ? $db->loadColumn(0) : $db->loadResultArray(0);

@@ -236,9 +236,9 @@
 		</fieldset>
 		<fieldset name="editing" label="FLEXI_AUTHORING" icon_class="icon-lock">
 			
-			<field name="" type="separator" default="FLEXI_AUTHORING" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_AUTHORING" level="level1" />
 			
-			<field name="" type="separator" default="Main category" level="level2" menu="hide" />
+			<field name="" type="separator" default="Main category" level="level2" />
 			<field name="catid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
 				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be used for selecting main category" labelclass="label-success" />
@@ -250,7 +250,7 @@
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
 				default="" label="Default category" description="Select the category subtree that will be allowed to be used as main category" />
 			
-			<field name="" type="separator" default="Secondary categories" level="level2" menu="hide" />
+			<field name="" type="separator" default="Secondary categories" level="level2" />
 			<field name="cid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
 				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be allowed to be used for selecting secondary categories" labelclass="label-success" />
@@ -262,15 +262,21 @@
 				published_only="1" parent_id=""	depth_limit="0" multiple="true"
 				default="" label="Default categories" description="Select the default secondary categories" />
 			
-			<field name="" type="separator" default="Item layout" level="level2" menu="hide" />
+			<field name="" type="separator" default="Item layout" level="level2" />
 			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" labelclass="label-success"/>
 			
 		</fieldset>
 		<fieldset name="viewing" label="FLEXI_ITEM_VIEW" icon_class="icon-eye-open">
 			
-			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level0" menu="hide" />
+			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level0" />
 			
-			<field name="" type="separator" default="Menu Item" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_EXPERIMENTAL" description="FLEXI_EXPERIMENTAL_DESC" level="level3" />
+			<field name="allow_jview" type="radio" default="0" label="FLEXI_REDIRECT_ARTICLE_VIEW" description="FLEXI_REDIRECT_ARTICLE_VIEW_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_REDIRECT_TO_ITEM_VIEW</option>
+				<option value="1">FLEXI_ALLOW</option>
+			</field>
+			
+			<field name="" type="separator" default="Menu Item" level="level1" />
 			<field name="type_menu_itemid" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_TYPE_MENU_ITEM_FOR_URLS" description="FLEXI_TYPE_MENU_ITEM_FOR_URLS_DESC" />
 			<field name="type_menu_itemid_usage" type="radio" default="0" label="FLEXI_TYPE_MENU_ITEM_USAGE" description="FLEXI_TYPE_MENU_ITEM_USAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NONE</option>
@@ -289,7 +295,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="comments" type="radio" default="" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="comments" type="radio" default="" label="FLEXI_ENABLE_COMMENTS_INTEGRATION" description="FLEXI_ENABLE_COMMENTS_INTEGRATION_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE_OR_INTEGRATE_MANUALLY</option>
 				<option value="1">FLEXI_JCOMMENTS_INTEGRATION</option>
@@ -365,7 +371,7 @@
 		<fieldset name="search_view" label="FLEXI_SEARCH_VIEW_CONF" icon_class="icon-search">
 			
 			<field name="" type="separator" default="FLEXI_SEARCH_VIEW_CONF" level="level1" />
-			<field name="" type="separator" default="Search view can do &lt;b&gt;text search&lt;/b&gt; and &lt;b&gt;filtering&lt;/b&gt;, differently per content type, &lt;br/&gt; -- you may set search behaviour here. &lt;br/&gt; &lt;b&gt;NOTE:&lt;/b&gt; these are not used in category-like views (content lists), for these views configure in component / category / menu items" level="level4" menu="hide" />
+			<field name="" type="separator" default="Search view can do &lt;b&gt;text search&lt;/b&gt; and &lt;b&gt;filtering&lt;/b&gt;, differently per content type, &lt;br/&gt; -- you may set search behaviour here. &lt;br/&gt; &lt;b&gt;NOTE:&lt;/b&gt; these are not used in category-like views (content lists), for these views configure in component / category / menu items" level="level4" />
 			<field name="searchable" type="filters" isadvsearch="1" fieldnameasvalue="1" multiple="false" type_id_variable="cid" default="" label="FLEXI_TYPE_SEARCHABLE_FIELDS" description="FLEXI_TYPE_SEARCHABLE_FIELDS_DESC" />
 			<field name="filters" type="filters" isadvfilter="1" fieldnameasvalue="1" multiple="false" type_id_variable="cid" default="" label="FLEXI_TYPE_FILTERS" description="FLEXI_TYPE_FILTERS_DESC" />
 			
@@ -436,7 +442,7 @@
 			<field name="default_language_fe" type="fclanguage" default="" use_global="1" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_DEFAULT_LANGUAGE_DESC" />
 			<field name="disable_languages_fe" type="fclanguage" default="" use_global="1" multiple="multiple" class="use_select2_lib" label="FLEXI_MENU_DISABLE_LANGUAGES" description="FLEXI_MENU_DISABLE_LANGUAGES_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_MENU_LANG_SELECTOR" label="" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_MENU_LANG_SELECTOR" label="" level="level3" />
 			<field name="langdisplay_fe" type="radio" default="" label="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS" description="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="2">FLEXI_LANG_AS_DROP_DOWN</option>
@@ -501,13 +507,13 @@
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_TEMPLATE</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_ITEM_FORM_LAYOUT" label="" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_ITEM_FORM_LAYOUT" label="" level="level1" />
 			<field name="form_tab_titles" type="textarea" rows="3" cols="36" label="FLEXI_FORM_TAB_TITLES" description="FLEXI_FORM_TAB_TITLES_DESC" default="" />
 			<field name="form_tab_icons" type="textarea" rows="3" cols="36" label="FLEXI_FORM_TAB_ICONS" description="FLEXI_FORM_TAB_ICONS_DESC" default="" />
 			
-			<field name="" type="separator" default="FLEXI_FORM_CORE_FIELDS_N_PROPS" label="" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_FORM_CORE_FIELDS_N_PROPS" label="" level="level2" />
 			<field name="" type="separator" default="FLEXI_PLACEMENT_INSIDE_DEFAULT_TABS" label="" level="level3" />
-			<field name="" type="separator" default="FLEXI_NOT_PLACED_FIELDS_AND_DISABLING" label="" level="level4" menu="hide" />
+			<field name="" type="separator" default="FLEXI_NOT_PLACED_FIELDS_AND_DISABLING" label="" level="level4" />
 			
 			<field name="form_tabs_above"   type="textarea" default="" rows="1" cols="60" label="FLEXI_ABOVE_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
 			<field name="form_tabs_below"   type="textarea" default="" rows="1" cols="60" label="FLEXI_BELOW_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />

@@ -144,11 +144,11 @@ function delAllFilters() {
 		echo '
 		<span class="fc-fileman-upload-limits-box">
 			<span class="label label-info">'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span>
-			<span class="fc-php-upload-limit-box">
+			<span class="fc-sys-upload-limit-box">
 				<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip('FLEXI_CONF_UPLOAD_MAX_LIMIT', 'FLEXI_CONF_UPLOAD_MAX_LIMIT_DESC', 1, 1).'">'.$conf_lim_image.'</span>
 				<span class="badge '.$conf_limit_class.'" style="'.$conf_limit_style.'">'.round($upload_maxsize / (1024*1024), 2).' M </span>
 			</span>
-			<span class="fc-sys-upload-limit-box">
+			<span class="fc-php-upload-limit-box">
 				<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SERVER_UPLOAD_MAX_LIMIT'), JText::sprintf('FLEXI_SERVER_UPLOAD_MAX_LIMIT_DESC', $phpUploadLimit['name']), 0, 1).'">'.$hint_image.'</span>
 				<span class="badge '.$sys_limit_class.'">'.round($phpUploadLimit['value'] / (1024*1024), 2).' M </span>
 			</span>

@@ -30,6 +30,7 @@ $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;
 $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 $session = JFactory::getSession();
 $document = JFactory::getDocument();
+$cparams = JComponentHelper::getComponent('com_flexicontent')->params;
 
 $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
@@ -76,6 +77,7 @@ $plupload_mode = 'runtime';  // 'runtime,ui'
 flexicontent_html::loadFramework('plupload', $plupload_mode);
 
 // Initialize a plupload Queue
+$upload_maxsize = (int)$cparams->get('upload_maxsize', '10000000');
 $js ='
 var uploader = 0;
 function showUploader() {
@@ -89,9 +91,8 @@ function showUploader() {
 			runtimes : "html5,flash,silverlight,html4",
 			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1",
 			
-			// Maximum file size
-			max_file_size : "2mb",
-			
+			// Set maximum file size and chunking to 1 MB
+			max_file_size : "'.$upload_maxsize.'",
 			chunk_size: "1mb",
 			
 			// Resize images on clientside if we can
@@ -99,7 +100,7 @@ function showUploader() {
 			
 			// Specify what files to browse for
 			filters : [
-				{title : "Image files", extensions : "jpg,gif,png"},
+				{title : "Image files", extensions : "jpg,jpeg,gif,png"},
 				{title : "Zip files", extensions : "zip,avi"}
 			],
 			
@@ -138,13 +139,14 @@ function showUploader() {
 			// General settings
 			runtimes : "html5,flash,silverlight,html4",
 			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1",
-			chunk_size : "1mb",
 			unique_names : true,
 			
+			// Set maximum file size and chunking to 1 MB
+			chunk_size : "1mb",
 			filters : {
-				max_file_size : "10mb",
+				max_file_size : "'.$upload_maxsize.'",
 				mime_types: [
-					{title : "Image files", extensions : "jpg,gif,png"},
+					{title : "Image files", extensions : "jpg,jpeg,gif,png"},
 					{title : "Zip files", extensions : "zip,avi"}
 				]
 			},
@@ -228,11 +230,11 @@ flexicontent_html::loadFramework('flexi-lib');
 		echo '
 		<span class="fc-fileman-upload-limits-box">
 			<span class="label label-info">'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span>
-			<span class="fc-php-upload-limit-box">
+			<span class="fc-sys-upload-limit-box">
 				<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip('FLEXI_CONF_UPLOAD_MAX_LIMIT', 'FLEXI_CONF_UPLOAD_MAX_LIMIT_DESC', 1, 1).'">'.$conf_lim_image.'</span>
 				<span class="badge '.$conf_limit_class.'" style="'.$conf_limit_style.'">'.round($upload_maxsize / (1024*1024), 2).' M </span>
 			</span>
-			<span class="fc-sys-upload-limit-box">
+			<span class="fc-php-upload-limit-box">
 				<span class="'.$tip_class.'" style="margin-left:24px;" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SERVER_UPLOAD_MAX_LIMIT'), JText::sprintf('FLEXI_SERVER_UPLOAD_MAX_LIMIT_DESC', $phpUploadLimit['name']), 0, 1).'">'.$hint_image.'</span>
 				<span class="badge '.$sys_limit_class.'">'.round($phpUploadLimit['value'] / (1024*1024), 2).' M </span>
 			</span>
