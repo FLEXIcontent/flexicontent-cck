@@ -88,7 +88,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		if ($filter_item) $count_filters++;
 		
 		$u_item_id 	      = $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id',        'u_item_id',        0,           'string' );
-		if ($u_item_id && (int)$u_item_id = $u_item_id) $filter_item = $u_item_id;   // set it if integer
+		//if ($u_item_id && (int)$u_item_id = $u_item_id) $filter_item = $u_item_id;   // DO NOT SET it prevents listing and selecting files !!
 		if (!$u_item_id && $filter_item)   $u_item_id   = $filter_item;
 		$autoselect       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoselect',       'autoselect',       0, 				  'int' );
 		$autoassign       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoassign',       'autoassign',       0, 				  'int' );
