@@ -119,6 +119,7 @@ $items	= & $this->items;
 	$_read_more_about = JText::_( 'FLEXI_READ_MORE_ABOUT' );
 	$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 	
+	unset($item);  // just in case there is reference
 	if ($use_fields && count($fields)) {
 		foreach ($items as $i => $item) {
 			foreach ($fields as $fieldname) {

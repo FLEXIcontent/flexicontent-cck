@@ -671,3 +671,9 @@ legend .fc_legend_text {
     position: relative;
     top: 0;
 }
+
+/* Some tooltips customization */
+body .tooltip.in {
+    opacity: 0.90;
+    filter:alpha(opacity=90);
+}

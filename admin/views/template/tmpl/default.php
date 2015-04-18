@@ -29,40 +29,89 @@ $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 $app = JFactory::getApplication();
 $db = JFactory::getDbo();
 
-//snapshot code
-$itempositionxml ='<group>myposition</group>';
-$itempositionhtml = '<?php if (isset($item->positions["myposition"])) : ?>
-					<!-- BOF myposition block -->
-					<div class="flexi lineinfo myposition group">
-					<?php foreach ($item->positions["myposition"] as $field) : ?>
-					<div class="flexi element">
-					<?php if ($field->label) : ?>
-					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-					<?php endif; ?>
-					<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
-					</div>
-					<?php endforeach; ?>
-					</div>
-					<!-- EOF myposition block -->
-					<?php endif; ?>
-					';
-$catpositionhtml = '<?php if (isset($item->positions["myposition"])) : ?>
-					<!-- BOF myposition block -->
-					<div class="flexi lineinfo myposition group">
-					<?php foreach ($item->positions["myposition"] as $field) : ?>
-					<div class="flexi element">
-					<?php if ($field->label) : ?>
-					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-					<?php endif; ?>
-					<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
-					</div>
-					<?php endforeach; ?>
-					</div>
-					<!-- EOF myposition block -->
-					<?php endif; ?>
-					';					
-$itemfieldhtml = '<?php echo $item->fields["fieldname"]->display; ?>';
-$catfieldhtml = '<?php echo $item[$i]->fields["fieldname"]->display; ?>';
+$code_btn_lbls = array(
+	'fieldPosXML'=>'FLEXI_ADD_FIELD_POSITION_XML',
+	'paramTextXML'=>'FLEXI_ADD_PARAMETER_TEXT_XML',
+	'paramRadioXML'=>'FLEXI_ADD_PARAMETER_RADIO_XML',
+	'paramSelectXML'=>'FLEXI_ADD_PARAMETER_SELECT_XML',
+	'itemPosHTML'=>'FLEXI_ADD_FIELD_POSITION_PHP',
+	'catPosHTML'=>'FLEXI_ADD_FIELD_POSITION_PHP',
+	'itemFieldDisplay'=>'FLEXI_ADD_FIELD_DISPLAY',
+	'catFieldDisplay'=>'FLEXI_ADD_FIELD_DISPLAY'
+);
+$code_btn_tips = array(
+	'fieldPosXML'=>'Please <br/>- place new position <b>inside &lt;fieldgroup&gt; &lt;/fieldgroup&gt;</b>, <br/>- <b>set a name</b> for the field position and remember to use same name inside your item.php or category_items.php',
+	'paramTextXML'=>'Please <br/>- place new parameter <b>inside &lt;fields ...&gt; &lt;/fields&gt;</b>, <br/>- <b>set the name</b> for the parameter and customize it, <br/>- make sure you prefix it with e.g. my_ to have a unique name <br/>- to use it add inside PHP files: <br/>if ( $item->parameters->get(\'my_param01\')) { /* do ... */ }',
+	'paramRadioXML'=>'Please <br/>- place new parameter <b>inside &lt;fields ...&gt; &lt;/fields&gt;</b>, <br/>- <b>set the name</b> for the parameter and customize it, <br/>- make sure you prefix it with e.g. my_ to have a unique name <br/>- to use it add inside PHP files: <br/>if ( $item->parameters->get(\'my_param01\')) { /* do ... */ }',
+	'paramSelectXML'=>'Please <br/>- place new parameter <b>inside &lt;fields ...&gt; &lt;/fields&gt;</b>, <br/>- <b>set the name</b> for the parameter and customize it, <br/>- make sure you prefix it with e.g. my_ to have a unique name <br/>- to use it add inside PHP files: <br/>if ( $item->parameters->get(\'my_param01\')) { /* do ... */ }',
+	'itemPosHTML'=>'This code will <b>loop through a set</b> of fields added to a field position place and display them<br/>- place it outside the code of other position <br/>- be careful not break PHP or HTML',
+	'catPosHTML'=>'This code will <b>loop through a set</b> of fields added to a field position place and display them<br/>- place it outside the code of other position <br/>- be careful not break PHP or HTML',
+	'itemFieldDisplay'=>'This code will display a single field manually, NOTE:<br/>- You need to add this field to the renderonly position, in the "Field\'s placement" TAB<br/>- be careful not break PHP or HTML',
+	'catFieldDisplay'=>'This code will display a single field manually, NOTE:<br/>- You need to add this field to the renderonly position, in the "Field\'s placement" TAB<br/>- be careful not break PHP or HTML'
+);
+
+$code_btn_rawcode = array(
+'fieldPosXML' => '
+<group>myposition</group>
+',
+
+'paramTextXML' => '
+<field name="my_param01" type="text" size="10" default="Default value of parameter" label="Label of parameter" description="Description of parameter" />
+',
+
+'paramRadioXML' => '
+<field name="my_param01" type="radio" default="two" label="Label of parameter" description="Description of parameter" class="btn-group btn-group-yesno">
+	<option value="one">Label of first value</option>
+	<option value="two">Label of second value</option>
+</field>
+',
+'paramSelectXML' => '
+<field name="my_param01" type="list" default="2" label="Label of parameter" description="Description of parameter" class="btn-group btn-group-yesno">
+	<option value="1">Case 1</option>
+	<option value="2">Case 2</option>
+	<option value="3">Case 3</option>
+	<option value="4">Case 4</option>
+</field>
+',
+
+'itemPosHTML' => '
+<!-- BOF myposition block -->
+<?php $_position_name = "myposition";
+
+<?php if (isset($item->positions[$_position_name])) : /* IF position has fields */ ?>
+<div class="flexi lineinfo <?php echo $_position_name; ?> group">
+	
+		<?php foreach ($item->positions[$_position_name] as $field) : /* LOOP through fields of the position */?>
+		<div class="flexi element">
+		
+			<?php if ($field->label) : /* Display label according to configuration */ ?>
+				<span class="flexi label field_<?php echo $field->name; ?>">
+					<?php echo $field->label; ?>
+				</span>
+			<?php endif; ?>
+			
+			<div class="flexi value field_<?php echo $field->name; ?>">
+				<?php echo $field->display; ?>
+			</div>
+			
+		</div>
+	<?php endforeach; ?>
+		
+</div>
+<?php endif; ?>
+
+<!-- EOF myposition block -->
+',
+
+'itemFieldDisplay' => '
+<?php echo $item->fields["fieldname"]->display; ?>
+');
+
+// Case similar to above
+$code_btn_rawcode['catPosHTML'] = $code_btn_rawcode['itemPosHTML'];  // Currently same as item
+$code_btn_rawcode['catFieldDisplay'] = $code_btn_rawcode['itemFieldDisplay'];    // Currently same as item
+
+
 
 // Codemirror should be enabled
 $query = $db->getQuery(true)
@@ -78,9 +127,30 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 
 ?>
 
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 	function <?php echo $this->use_jquery_sortable ? 'initordering' : 'storeordering'; ?>() {
 	<?php echo $this->jssort . ';' ; ?>
+	}
+	
+	var code_box_cnt = 0;
+	function toggle_code_inputbox(btn)
+	{
+		var _btn = jQuery(btn);
+		var el=jQuery(btn).next().next();
+		
+		var becomes_visible = ! el.is(':visible');
+		el.toggle();
+		becomes_visible ? code_box_cnt++ : code_box_cnt--;
+		if (code_box_cnt<0) code_box_cnt = 0;
+		
+		if (becomes_visible) {
+			_btn.addClass('btn-warning');
+			el.get(0).select();
+			el.prev().show(400);
+		} else {
+			_btn.removeClass('btn-warning');
+			el.prev().hide(400);
+		}
 	}
 	
 	function set_editor_contents(txtarea, theData)
@@ -141,16 +211,26 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		});
 	}
 	
-	function load_layout_file(layout_name, file_subpath, load_mode)
+	function load_layout_file(layout_name, file_subpath, load_mode, btn_classes)
 	{
 		var layout_name  = (typeof layout_name != "undefined"  && layout_name!='')  ? layout_name  : jQuery('#editor__layout_name').val();
 		var file_subpath = (typeof file_subpath != "undefined" && file_subpath!='') ? file_subpath : jQuery('#editor__file_subpath').val();
+		var btn_classes = (typeof btn_classes != "undefined") ? btn_classes : '';
+		if (btn_classes=='-1') btn_classes = jQuery('#editor__btn_classes').val();
+		
 		var load_mode = (typeof load_mode != "undefined") ? load_mode : 0;
 		var form = jQuery('#layout_file_editor_form');
 		
 		jQuery('#editor__layout_name').val(layout_name);
 		jQuery('#editor__file_subpath').val(file_subpath);
 		jQuery('#editor__load_mode').val(load_mode);
+		jQuery('#editor__btn_classes').val(btn_classes);
+		
+		jQuery('.code_box').hide();
+		btn_classes = btn_classes!='' ? btn_classes.split(" ") : Array();
+		jQuery.each( btn_classes, function( cname, val ) {
+			jQuery('.'+val).show();
+		});
 		
 		if (load_mode == '2') {
 			form.submit();
@@ -192,10 +272,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 	
 	<table>
 		<tr>
-			<td valign="top">
+			<td style="vertical-align:top;">
 				<img src="../<?php echo $this->layout->thumb; ?>" alt="<?php echo JText::_( 'FLEXI_TEMPLATE_THUMBNAIL' ); ?>" style="max-width:none;" />
 			</td>
-			<td valign="top">
+			<td style="vertical-align:top;">
 				<table class="admintable" id="lay-desc-table">
 					<tr>
 						<td style="text-align:right;">
@@ -295,7 +375,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 	
 	<div class="fctabber tabset_layout" id="tabset_layout" style="margin:32px 0 !important;">
 		
-		<div class="tabbertab" id="tabset_cat_props_desc_tab" data-icon-class="icon-signup" >
+		<div class="tabbertab" id="tabset_layout_fields_placement_tab" data-icon-class="icon-signup" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
 				
 				<div class="fcclear"></div>
@@ -304,9 +384,9 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					<?php echo JText::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?>
 				</span>
 				
-				<table cellpadding="4" cellspacing="0" width="100%">
+				<table style="width:100%;">
 					<tr>
-						<td width="50%" valign="top">
+						<td style="width:50%; vertical-align:top;">
 							
 							<fieldset id="available_fields_container">
 								<legend style="margin:0 0 12px 0; font-size:14px; padding:6px 12px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_FIELDS') ?></legend>
@@ -370,7 +450,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							</fieldset>
 						</td>
 						
-						<td width="50%" valign="top">
+						<td style="width:50%; vertical-align:top;">
 							<fieldset id="layout_positions_container">
 								<legend style="margin:0 0 12px 0; font-size:14px; padding:6px 12px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_POS') ?></legend>
 								<div class="fcclear"></div>
@@ -405,7 +485,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 										
 										if ($posrow) {
 											// we are inside field group row, start it or continue with next field group
-											echo ($posrow_prev != $posrow)  ?  "<table width='100%' cellpadding='0' cellspacing='0'><tr class='fieldgrprow' ><td class='fieldgrprow_cell' >\n"  :  "</td><td class='fieldgrprow_cell'>\n";
+											echo ($posrow_prev != $posrow)  ?  "<table style='width:100%;'><tr class='fieldgrprow' ><td class='fieldgrprow_cell' >\n"  :  "</td><td class='fieldgrprow_cell'>\n";
 										}
 										
 									?>
@@ -460,7 +540,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		
 		</div>
 		
-		<div class="tabbertab" id="tabset_layout_fields_tab" data-icon-class="icon-options" >	
+		<div class="tabbertab" id="tabset_layout_disp_params_tab" data-icon-class="icon-options" >	
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_DISPLAY_PARAMETERS' ); ?> </h3>
 			
 			<div class="fcclear"></div>
@@ -472,7 +552,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				);?>
 				<br/>
 				<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
-				<?php echo JText::_( 'Setting any parameter below to <b>"Use global"</b>, will use default</b> value inside the <b>template\'s PHP code</b>');?>
+				<?php echo JText::_( 'Setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
 			</span>
 			
 			<div style="max-width:1024px; margin-top:16px;">
@@ -503,10 +583,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			</div>
 		</div>
 		
-		<div class="tabbertab" id="tabset_cat_props_desc_tab" data-icon-class="icon-signup" >
+		<div class="tabbertab" id="tabset_layout_edit_files_tab" data-icon-class="icon-signup" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_EDIT_LAYOUT_FILES' ); ?></h3>
 			
-			<div id="layout-filelist-container" class="span3">
+			<div id="layout-filelist-container" class="span4" style="margin:0.5%;">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
 					<span class="badge"><?php echo JText::_( 'FLEXI_LAYOUT_FILES' ); ?></span>
 				</span>
@@ -515,49 +595,90 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir)), '#'.$this->layout->view.'(_.*\.|\.)(php|xml|css|js)#i');
 				//$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir));
 				$it->rewind();
+				$ext_badge = array('php'=>'success', 'xml'=>'info', 'css'=>'warning', 'js'=>'important', 'ini'=>'info');
+				$file_tip = array(
+					'item.css'=>'Contains CSS specific to this item layout',
+					'category.css'=>'Contains CSS specific to this category layout',
+					'item.xml'=>'Display parameters and field positions',
+					'category.xml'=>'Display parameters and field positions',
+					'item.php'=>'PHP/HTML to display item\'s fields',
+					'category_items.php'=>'ITEM list filters, and ITEM loop (displaying every item)',
+					'category.php'=>'Top-level container of the layout',
+					'category_category.php'=>'Displays category information: title, description, image, etc',
+					'category_category_html5.php'=>'Displays category information: title, description, image, etc',
+					'category_alpha.php'=>'Displays the alphanumerical index of the item list',
+					'category_peercategories.php'=>'Displays the peer categories list',
+					'category_subcategories.php'=>'Display the sub-categories list',
+				);
+				$file_tip['item_html5.php'] = $file_tip['item.php'].' (HTML5 version)';
+				$file_tip['category_items_html5.php'] = $file_tip['category_items.php'].' (HTML5 version)';
+				
+				$file_tip['category_html5.php'] = $file_tip['category.php'].' (HTML5 version)';
+				$file_tip['category_category_html5.php'] = $file_tip['category_category.php'].' (HTML5 version)';
+				$file_tip['category_alpha_html5.php'] = $file_tip['category_alpha.php'].' (HTML5 version)';
+				$file_tip['category_peercategories_html5.php'] = $file_tip['category_peercategories.php'].' (HTML5 version)';
+				$file_tip['category_subcategories_html5.php'] = $file_tip['category_subcategories.php'].' (HTML5 version)';
+				
+				
+				$file_tip_extra = array(
+					'item.xml'=>'This file contains layout\' structure, including <br/> - <b>display parameters and field positions</b>, <br/> - you can add extra parameters/positions, <br/>-- if you add a new position, you will need to also add the dispay -LOOP- of the new position inside files: <br/><b>item.php</b> <br/><b>item_html5.php</b> <br/><br/>(click to edit file and then use the code button)',
+					'category.xml'=>'This file contains layout\' structure, including <br/> - <b>display parameters and field positions</b>, <br/> - you can add extra parameters/positions, <br/>-- if you add a new position, you will need to also add the dispay -LOOP- of the new position inside files: <br/><b>category_items.php</b> <br/><b>category_items_html5.php</b> <br/><br/>(click to edit file and then use the code button)',
+					'item.php'=>'This file display the item, thus has display LOOPs of for every position to show each position fields, if you add new position in the XML file, then make sure that you ADD the display loop here <br/><br/>(click to edit file and then use the code button)',
+					'category_items.php'=>'This file includes: <br/><br/>- ITEM list filtering form, <br/>- ITEM loop (that displays every item\'s fields), <br/><br/>if you add new field position in the XML file, then make sure that you ADD here, the display loop that displays the fields of the position <br/><br/>(click to edit file and then use the code button)'
+				);
+				$file_tip_extra['item_html5.php'] = $file_tip_extra['item.php'];
+				$file_tip_extra['category_items_html5.php'] = $file_tip_extra['category_items.php'];
+				
+				$file_code_btns = array(
+					'item.xml'=>array('fieldPosXML'=>1, 'paramTextXML'=>1, 'paramRadioXML'=>1, 'paramSelectXML'=>1),
+					'category.xml'=>array('fieldPosXML'=>1, 'paramTextXML'=>1, 'paramRadioXML'=>1, 'paramSelectXML'=>1),
+					'item.php'=>array('itemPosHTML'=>1, 'itemFieldDisplay'=>1),
+					'category_items.php'=>array('catPosHTML'=>1, 'catFieldDisplay'=>1)
+				);
+				$file_code_btns['item_html5.php'] = $file_code_btns['item.php'];
+				$file_code_btns['category_items_html5.php'] = $file_code_btns['category_items.php'];
+				
+				
 				while($it->valid())
 				{
 					if (!$it->isDot()) {
-						/*echo '<span class="label">SubPathName</span> '. $it->getSubPathName();
-						echo ' -- <span class="label">SubPath</span> '. $it->getSubPath();
-						echo ' -- <span class="label">Key</span> '. $it->key();*/
+						//echo '<span class="label">SubPathName</span> '. $it->getSubPathName();
+						//echo ' -- <span class="label">SubPath</span> '. $it->getSubPath();
+						//echo ' -- <span class="label">Key</span> '. $it->key();
 						$subpath = $it->getSubPath();
-						$subpath_highlighted = $subpath;//'<span class="badge badge-success">'.$subpath.'</span>';
+						$subpath_highlighted = $subpath ? '<span class="label">'.$subpath.'/</span>' : '';
 						
 						$subpath_file = $it->getSubPathName();
-						$filename_only = preg_replace('#^'.$subpath.'#', '', $subpath_file);
-						//$filename_only = preg_replace('#'.$this->layout->view.'_#', '<span class="badge">'.$this->layout->view.'</span>_', $filename_only, 1);
+						$filename = preg_replace('#^'.$subpath.'\\'.DS.'#', '', $subpath_file);
 						
-						if (preg_match('#\.php#', $filename_only)) $file_type = '<span class="badge badge-success">php</span> ';
-						else if (preg_match('#\.xml#', $filename_only)) $file_type = '<span class="badge badge-info">xml</span> ';
-						else if (preg_match('#\.css#', $filename_only)) $file_type = '<span class="badge badge-warning">css</span> ';
-						else if (preg_match('#\.js#', $filename_only))  $file_type = '<span class="badge badge-important">&nbsp;js</span> ';
-						else if (preg_match('#\.ini#', $filename_only))  $file_type = '<span class="badge badge-info">ini</span> ';
-						else $file_type = '<span class="badge">---</span> ';
-						echo
-						'
-						<img src="components/com_flexicontent/assets/images/layout_edit.png" align="center" />
-						<a href="javascript:;" onclick="load_layout_file(\''.addslashes($this->layout->name).'\', \''.addslashes($it->getSubPathName()).'\'); return false;">'
-							.$file_type.$subpath_highlighted.$filename_only.
-						'</a>';
+						$pi = pathinfo($it->key());
+						$ext = $pi['extension'];
+						$file_type = isset($ext_badge[$ext]) ?
+							'<span class="badge badge-'.$ext_badge[$ext].'">'.$ext.'</span> ' :
+							'<span class="badge">---</span> ' ;
+						$btns_handle_class = isset($ext_badge[$ext]) ?
+							'<span class="badge badge-'.$ext_badge[$ext].'">'.$ext.'</span> ' :
+							'<span class="badge">---</span> ' ;
+						$btn_allowed = isset($file_code_btns[$filename]) ? array_keys($file_code_btns[$filename]) : array();
+						echo '
+						'.$file_type.
+						(!isset($file_tip_extra[$filename]) ? '<img src="components/com_flexicontent/assets/images/tick_f2.png" alt="Edit file">' :
+							'<img src="components/com_flexicontent/assets/images/comment.png" data-placement="bottom" class="'.$tip_class.'" title="'.$file_tip_extra[$filename].'" alt="Edit file"/>'
+						).'
+						<a href="javascript:;" class="'.$tip_class.'" data-placement="right" onclick="load_layout_file(\''.addslashes($this->layout->name).'\', \''.addslashes($it->getSubPathName()).'\', \'0\', \''.implode($btn_allowed, ' ').'\'); return false;"
+						title="'.(isset($file_tip[$filename]) ? $file_tip[$filename] : $ext.' file').'">'
+							.$subpath_highlighted.$filename.
+						'</a>'
+						;
 						echo "<br/>";
 					}
 					
 					$it->next();
 				}
 				?>
-				<hr>
-				<div class="code-info">
-					<div class="alert alert-success"><?php echo JText::_( 'FLEXI_COPY_CODE' ); ?></div>
-						<input type="text" size="5" onClick="this.setSelectionRange(0, this.value.length)" value="<?php echo htmlspecialchars($itempositionxml); ?>"><span class="label"><?php echo JText::_( 'FLEXI_XML_POSITION' ); ?></span>
-						<input type="text" size="5" onClick="this.setSelectionRange(0, this.value.length)" class="automarkup" value="<?php echo htmlspecialchars($itempositionhtml); ?>""><span class="label"><?php echo JText::_( 'FLEXI_ITEM_POSITION' ); ?></span>
-						<input type="text" size="5" onClick="this.setSelectionRange(0, this.value.length)" class="automarkup" value="<?php echo htmlspecialchars($catpositionhtml); ?>""><span class="label"><?php echo JText::_( 'FLEXI_CATEGORIE_POSITION' ); ?></span>
-						<input type="text" size="5" onClick="this.setSelectionRange(0, this.value.length)" class="automarkup" value="<?php echo htmlspecialchars($itemfieldhtml); ?>""><span class="label"><?php echo JText::_( 'FLEXI_ITEM_FIELD' ); ?></span>
-						<input type="text" size="5" onClick="this.setSelectionRange(0, this.value.length)" class="automarkup"value="<?php echo htmlspecialchars($catfieldhtml); ?>""><span class="label"><?php echo JText::_( 'FLEXI_CATEGORIE_FIELD' ); ?></span>
-					</div>
 			</div>
 
-			<div id="layout-fileeditor-container" class="span9">
+			<div id="layout-fileeditor-container" class="span8" style="margin:0.5%;">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
 					<span id="layout_edit_name_container" class="badge badge-info"><?php echo JText::_( 'FLEXI_NO_FILE_LOADED' ); ?></span>
 				</span>
@@ -573,27 +694,49 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				}
 				
 				$elementid_n = "editor__file_contents";  $fieldname_n = "file_contents";
-				$cols=""; $rows="16";   $width = '100%'; $height='400px';
+				$cols="80"; $rows="16";   $width = '100%'; $height='400px';
 				$class="fcfield_textval";
 				$show_buttons = false; // true/false, or this can be skip button array
 				$txtarea = !$use_editor ? '
 					<textarea id="'.$elementid_n.'" name="'.$fieldname_n.'" style="width: 100%;" cols="'.$cols.'" rows="'.$rows.'" class="'.$class.'" form="layout_file_editor_form"></textarea>' :
-					$editor->display( $fieldname_n, '', $width, $height, $_cols='', $_rows='', $show_buttons, $elementid_n, $_asset_ = null, $_author_ = null, $editor_plg_params );
+					$editor->display( $fieldname_n, '', $width, $height, $cols, $rows, $show_buttons, $elementid_n, $_asset_ = null, $_author_ = null, $editor_plg_params );
 				echo $txtarea;
 				?>
+				
+				<br/>
+				
 				<?php echo str_replace('<input', '<input form="layout_file_editor_form"', JHTML::_( 'form.token' )); ?>
 				<input type="hidden" name="load_mode" id="editor__load_mode" form="layout_file_editor_form"/>
 				<input type="hidden" name="layout_name" id="editor__layout_name" form="layout_file_editor_form"/>
 				<input type="hidden" name="file_subpath" id="editor__file_subpath" form="layout_file_editor_form"/>
+				<input type="hidden" name="btn_classes" id="editor__btn_classes" form="layout_file_editor_form"/>
+				
 				<input type="button" name="save_file_btn" id="editor__save_file_btn" class="<?php echo $btn_class; ?> btn-success <?php echo $tip_class; ?>" onclick="save_layout_file('layout_file_editor_form'); return false;" style="display:none;" value="Save" form="layout_file_editor_form"
 				title="<?php echo flexicontent_html::getToolTip('Save file', 'You may want to download a copy in your local disk before saving changes', 0, 1); ?>"
 				/>
-				<input type="button" name="download_file_btn" id="editor__download_file_btn" class="<?php echo $btn_class; ?> btn-info <?php echo $tip_class; ?>" onclick="load_layout_file('', '', 2); return false;" style="display:none;" value="Download" form="layout_file_editor_form"
+				<input type="button" name="download_file_btn" id="editor__download_file_btn" class="<?php echo $btn_class; ?> btn-info <?php echo $tip_class; ?>" onclick="load_layout_file('', '', 2, -1); return false;" style="display:none;" value="Download" form="layout_file_editor_form"
 				title="<?php echo flexicontent_html::getToolTip('Download file', 'This will download the current file from server and not the text currently in the editor, if you want the text in the editor then just copy paste it in a local text file', 0, 1); ?>"
 				/>
-				<input type="button" name="load_file_btn" id="editor__load_common_file_btn" class="<?php echo $btn_class; ?> btn-info <?php echo $tip_class; ?>" onclick="load_layout_file('', '', 1); return false;" style="display:none;" value="Load/customize system's default" form="layout_file_editor_form"
+				<input type="button" name="load_file_btn" id="editor__load_common_file_btn" class="<?php echo $btn_class; ?> btn-info <?php echo $tip_class; ?>" onclick="load_layout_file('', '', 1, -1); return false;" style="display:none;" value="Load/customize system's default" form="layout_file_editor_form"
 				title="<?php echo flexicontent_html::getToolTip('System\'s default code', 'Please note that this loads the <b>system\'s default</b> for the current file, which maybe different than <b>template\'s default</b> code', 0, 1); ?>"
 				/>
+				
+				
+				<?php foreach ($code_btn_lbls as $_posname => $btn_lbl) : ?>
+				<span class="code_box <?php echo $_posname; ?> nowrap_box" style="display:none;" >
+					<span class="btn <?php echo $tip_class; ?>"
+						title="<?php echo flexicontent_html::getToolTip('Insert code', $code_btn_tips[$_posname], 0, 1); ?>"
+						onclick="toggle_code_inputbox(this);"><span class="icon-new"></span><?php echo JText::_( $code_btn_lbls[$_posname] ); ?></span>
+					<span class="nowrap_box" style="display:none; float:left; clear:both; margin:2px 0px 0px 0px;">
+						<div class="alert alert-warning" style="clear:both; margin:2px 0px 2px 0px;"><?php echo JText::_( 'FLEXI_COPY_CODE' ); ?></div>
+						<div class="alert alert-info" style="clear:both; margin:2px 0px 2px 0px;">
+							<?php echo $code_btn_tips[$_posname]; ?>
+						</div>
+					</span>
+					<textarea style="float:left; clear:both; display:none; width:100%;" rows="6" form="code_insertion_form"><?php echo htmlspecialchars($code_btn_rawcode[$_posname]); ?></textarea>
+				</span>
+				<?php endforeach; ?>
+				
 			</div>
 			
 		</div>
@@ -613,5 +756,6 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 </form>
 
 <form id="layout_file_editor_form" name="layout_file_editor_form" action="index.php?option=com_flexicontent&task=templates.loadlayoutfile&format=raw" method="POST"></form>
+<form id="code_insertion_form" name="code_insertion_form" action="#" method="POST"></form>
 
 </div>
