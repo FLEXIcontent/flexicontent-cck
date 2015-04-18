@@ -1552,7 +1552,7 @@ class modFlexicontentHelper
 		$add_comments = ($display_comments_feat || $display_comments || in_array('commented', $ordering)) && $jcomments_exist;
 		
 		// Additional select and joins for comments
-		$select_comments     = $add_comments ? ', COUNT(DISTINCT com.object_id) AS comments_total' : '';
+		$select_comments     = $add_comments ? ', COUNT(DISTINCT com.id) AS comments_total' : '';
 		$join_comments_type  = $ordering[1]=='commented' ? ' INNER JOIN' : ' LEFT JOIN';   // Do not require most commented for 2nd level ordering
 		$join_comments       = $add_comments ?
 			$join_comments_type .' #__jcomments AS com ON com.object_id = i.id AND com.object_group="com_flexicontent" AND com.published="1"' : '' ;

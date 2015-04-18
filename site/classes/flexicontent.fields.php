@@ -3404,7 +3404,7 @@ class FlexicontentFields
 		
 		// Create JOIN for ordering items by a most commented
 		if ( in_array('commented', $order) ) {
-			$orderby_col   = ', COUNT(DISTINCT com.object_id) AS comments_total';
+			$orderby_col   = ', COUNT(DISTINCT com.id) AS comments_total';
 			$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id AND com.object_group="com_flexicontent" AND com.published="1"';
 		}
 		
