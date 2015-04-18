@@ -599,10 +599,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				$file_tip = array(
 					'item.css'=>'Contains CSS specific to this item layout',
 					'category.css'=>'Contains CSS specific to this category layout',
-					'item.xml'=>'Display parameters and field positions',
-					'category.xml'=>'Display parameters and field positions',
+					'item.xml'=>'Layout\'s structure: including display parameters, field positions, file list, etc',
+					'category.xml'=>'Layout\'s structure: including display parameters, field positions, file list, etc',
 					'item.php'=>'PHP/HTML to display item\'s fields',
-					'category_items.php'=>'ITEM list filters, and ITEM loop (displaying every item)',
+					'category_items.php'=>'Item list filtering form, and Item loop (displaying every item)',
 					'category.php'=>'Top-level container of the layout',
 					'category_category.php'=>'Displays category information: title, description, image, etc',
 					'category_category_html5.php'=>'Displays category information: title, description, image, etc',
@@ -621,10 +621,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				
 				
 				$file_tip_extra = array(
-					'item.xml'=>'This file contains layout\' structure, including <br/> - <b>display parameters and field positions</b>, <br/> - you can add extra parameters/positions, <br/>-- if you add a new position, you will need to also add the dispay -LOOP- of the new position inside files: <br/><b>item.php</b> <br/><b>item_html5.php</b> <br/><br/>(click to edit file and then use the code button)',
-					'category.xml'=>'This file contains layout\' structure, including <br/> - <b>display parameters and field positions</b>, <br/> - you can add extra parameters/positions, <br/>-- if you add a new position, you will need to also add the dispay -LOOP- of the new position inside files: <br/><b>category_items.php</b> <br/><b>category_items_html5.php</b> <br/><br/>(click to edit file and then use the code button)',
-					'item.php'=>'This file display the item, thus has display LOOPs of for every position to show each position fields, if you add new position in the XML file, then make sure that you ADD the display loop here <br/><br/>(click to edit file and then use the code button)',
-					'category_items.php'=>'This file includes: <br/><br/>- ITEM list filtering form, <br/>- ITEM loop (that displays every item\'s fields), <br/><br/>if you add new field position in the XML file, then make sure that you ADD here, the display loop that displays the fields of the position <br/><br/>(click to edit file and then use the code button)'
+					'item.xml'=>'This file contains layout\' s structure: including <br/> - <b>display parameters, field positions, file list, etc</b>, <br/> - you can add extra parameters/positions, <br/>-- if you add a new position, you will need to also add the dispay -LOOP- of the new position inside files: <br/><b>item.php</b> <br/><b>item_html5.php</b> <br/><br/>(click to edit file and then use the code button)',
+					'category.xml'=>'This file contains layout\' s structure: including <br/> - <b>display parameters, field positions, file list, etc</b>, <br/> - you can add extra parameters/positions, <br/>-- if you add a new position, you will need to also add the dispay -LOOP- of the new position inside files: <br/><b>category_items.php</b> <br/><b>category_items_html5.php</b> <br/><br/>(click to edit file and then use the code button)',
+					'item.php'=>'This file display the item, thus has display LOOPs of for every position to show fields of every position, if you add new position in the XML file, then make sure that you ADD the display loop here <br/><br/>(click to edit file and then use the code button)',
+					'category_items.php'=>'This file includes: <br/><br/>- Item list filtering form, <br/>- Item loop (that displays every item\'s fields), <br/><br/>if you add new field position in the XML file, then make sure that you ADD here, the display loop that displays the fields of the position <br/><br/>(click to edit file and then use the code button)'
 				);
 				$file_tip_extra['item_html5.php'] = $file_tip_extra['item.php'];
 				$file_tip_extra['category_items_html5.php'] = $file_tip_extra['category_items.php'];
