@@ -274,14 +274,13 @@ class FlexicontentController extends JControllerLegacy
 		//printf('<br/>-- [getItemCountingDataOK: %.2f s] ', $fc_run_times['getItemCountingDataOK']/1000000);
 	
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$initialpermission = FLEXI_J16GE ? $model->checkInitialPermission() : true;
+		$initialpermission = $model->checkInitialPermission();
 		if ( $print_logging_info ) @$fc_run_times['checkInitialPermission'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		//printf('<br/>-- [checkInitialPermission: %.2f s] ', $fc_run_times['checkInitialPermission']/1000000);
-	
-		// This will check and add custom FLEXI_ACCESS privileges
-		if (!FLEXI_J16GE)
-		$model->checkExtraAclRules();  // For J1.5
-	
+		
+		// Check if old field positions were converted
+		$model->convertOldFieldsPositions();
+		
 		//echo "(!$existtype) || (!$existmenuitems) || (!$existfields) ||<br>";
 		//echo "     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
 		//echo "     (!$existcats)  || (!$existlang) || (!$existdbindexes) || (!$itemcountingdok) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
@@ -385,8 +384,10 @@ class FlexicontentController extends JControllerLegacy
 		$db = JFactory::getDBO();
 
 		$query 	=	"INSERT INTO `#__flexicontent_types` "
-			." (id, ".(FLEXI_J16GE ? "asset_id, " : "")."name, alias, published, checked_out, checked_out_time, access, attribs) "
-			." VALUES(1, ".(FLEXI_J16GE ? "0, " : "")."'Article', 'article', 1, 0, '0000-00-00 00:00:00', ".(FLEXI_J16GE ? 1 : 0).", 'ilayout=default\nhide_maintext=0\nhide_html=0\nmaintext_label=\nmaintext_desc=\ncomments=\ntop_cols=two\nbottom_cols=two')"
+			." (id, asset_id, name, alias, published, checked_out, checked_out_time, access, attribs) "
+			." VALUES(1, 0, 'Article', 'article', 1, 0, '0000-00-00 00:00:00', 1, "
+			."  'ilayout=default\nhide_maintext=0\nhide_html=0\nmaintext_label=\nmaintext_desc=\ncomments=\ntop_cols=two\nbottom_cols=two\nallow_jview=1'"
+			." )"
 			;
 		$db->setQuery($query);
 		

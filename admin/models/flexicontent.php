@@ -746,26 +746,27 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getCacheThumbChmod()
 	{
 		static $return;
-		if ($return === null) {
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.jpath');
-			
-			$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
-			
-			// CHECK phpThumb cache exists and create the folder
-			if ( !JFolder::exists($phpthumbcache) && !JFolder::create($phpthumbcache) ) {
-				JError::raiseWarning(100, 'Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly' );
-				return true;  // Cancel task !! to allow user to continue
-			}
-			
-			// CHECK phpThumb cache permissions
-			$return = preg_match('/rwxr.xr.x/i', JPath::getPermissions($phpthumbcache) ) ? true : false;
-			// If permissions not good check if we can change them
-			if ( !$return && !JPath::canChmod($phpthumbcache) ) {
-				JError::raiseWarning(100, 'Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-' );
-				return true;  // Cancel task !! to allow user to continue
-			}
+		if ($return!==null) return $return;
+		
+		jimport('joomla.filesystem.folder');
+		jimport('joomla.filesystem.jpath');
+		
+		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
+		
+		// CHECK phpThumb cache exists and create the folder
+		if ( !JFolder::exists($phpthumbcache) && !JFolder::create($phpthumbcache) ) {
+			JError::raiseWarning(100, 'Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly' );
+			return true;  // Cancel task !! to allow user to continue
 		}
+		
+		// CHECK phpThumb cache permissions
+		$return = preg_match('/rwxr.xr.x/i', JPath::getPermissions($phpthumbcache) ) ? true : false;
+		// If permissions not good check if we can change them
+		if ( !$return && !JPath::canChmod($phpthumbcache) ) {
+			JError::raiseWarning(100, 'Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-' );
+			return true;  // Cancel task !! to allow user to continue
+		}
+		
 		return $return;
 	}
 
@@ -812,8 +813,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getFieldsPositions()
+	function convertOldFieldsPositions()
 	{
+		static $return;
+		if ($return!==null) return $return;
+		$return = true;  // only call once
+		
 		$query 	= "SELECT name, positions"
 				. " FROM #__flexicontent_fields"
 				. " WHERE positions <> ''"
@@ -821,83 +826,84 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$this->_db->setQuery( $query );
 		$fields = $this->_db->loadObjectList();
 		
-		if ($fields) {
-			// create a temporary table to store the positions
-			$this->_db->setQuery( "DROP TABLE IF EXISTS #__flexicontent_positions_tmp" );
-			$this->_db->query();
-			$query = "
-					CREATE TABLE #__flexicontent_positions_tmp (
-					  `field` varchar(100) NOT NULL default '',
-					  `view` varchar(30) NOT NULL default '',
-					  `folder` varchar(100) NOT NULL default '',
-					  `position` varchar(255) NOT NULL default ''
-					) ENGINE=MyISAM DEFAULT CHARSET=utf8
-					";
-			$this->_db->setQuery( $query );
-			$this->_db->query();
+		if (empty($fields)) return $return;
+		
+		// create a temporary table to store the positions
+		$this->_db->setQuery( "DROP TABLE IF EXISTS #__flexicontent_positions_tmp" );
+		$this->_db->query();
+		$query = "
+				CREATE TABLE #__flexicontent_positions_tmp (
+				  `field` varchar(100) NOT NULL default '',
+				  `view` varchar(30) NOT NULL default '',
+				  `folder` varchar(100) NOT NULL default '',
+				  `position` varchar(255) NOT NULL default ''
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8
+				";
+		$this->_db->setQuery( $query );
+		$this->_db->query();
 
-			foreach ($fields as $field) {			
-				$field->positions = explode("\n", $field->positions);	
-				foreach ($field->positions as $pos) {
-					$pos = explode('.', $pos);
-					$query = 'INSERT INTO #__flexicontent_positions_tmp (`field`, `view`, `folder`, `position`) VALUES(' . $this->_db->Quote($field->name) . ',' . $this->_db->Quote($pos[1]) . ',' . $this->_db->Quote($pos[2]) . ',' . $this->_db->Quote($pos[0]) . ')';
-					$this->_db->setQuery($query);
-					$this->_db->query();
-				}
+		foreach ($fields as $field) {			
+			$field->positions = explode("\n", $field->positions);	
+			foreach ($field->positions as $pos) {
+				$pos = explode('.', $pos);
+				$query = 'INSERT INTO #__flexicontent_positions_tmp (`field`, `view`, `folder`, `position`) VALUES(' . $this->_db->Quote($field->name) . ',' . $this->_db->Quote($pos[1]) . ',' . $this->_db->Quote($pos[2]) . ',' . $this->_db->Quote($pos[0]) . ')';
+				$this->_db->setQuery($query);
+				$this->_db->query();
 			}
+		}
 
-			$templates	= flexicontent_tmpl::getTemplates();
-			$folders 	= flexicontent_tmpl::getThemes();
-			$views		= array('items', 'category');
-			
-			foreach ($folders as $folder) {
-				foreach ($views as $view) {
-					$groups = @$templates->{$view}->{$folder}->positions;
-					if ($groups) {
-						foreach ($groups as $group) {
-							$query 	= 'SELECT field'
-									. ' FROM #__flexicontent_positions_tmp'
-									. ' WHERE view = ' . $this->_db->Quote($view)
-									. ' AND folder = ' . $this->_db->Quote($folder)
-									. ' AND position = ' . $this->_db->Quote($group)
-									;
-							$this->_db->setQuery( $query );
-							$fieldstopos = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-							
-							if ($fieldstopos) {
-								$field = implode(',', $fieldstopos);
+		$templates	= flexicontent_tmpl::getTemplates();
+		$folders 	= flexicontent_tmpl::getThemes();
+		$views		= array('items', 'category');
+		
+		foreach ($folders as $folder) {
+			foreach ($views as $view) {
+				$groups = @$templates->{$view}->{$folder}->positions;
+				if ($groups) {
+					foreach ($groups as $group) {
+						$query 	= 'SELECT field'
+								. ' FROM #__flexicontent_positions_tmp'
+								. ' WHERE view = ' . $this->_db->Quote($view)
+								. ' AND folder = ' . $this->_db->Quote($folder)
+								. ' AND position = ' . $this->_db->Quote($group)
+								;
+						$this->_db->setQuery( $query );
+						$fieldstopos = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+						
+						if ($fieldstopos) {
+							$field = implode(',', $fieldstopos);
 
-								$query = 'INSERT INTO #__flexicontent_templates (`template`, `layout`, `position`, `fields`) VALUES(' . $this->_db->Quote($folder) . ',' . $this->_db->Quote($view) . ',' . $this->_db->Quote($group) . ',' . $this->_db->Quote($field) . ')';
-								$this->_db->setQuery($query);
-								// By catching SQL error (e.g. layout configuration of template already exists),
-								// we will allow execution to continue, thus clearing "positions" column in fields table
-								try { $this->_db->query(); } catch (Exception $e) { }
-								if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
-							}
+							$query = 'INSERT INTO #__flexicontent_templates (`template`, `layout`, `position`, `fields`) VALUES(' . $this->_db->Quote($folder) . ',' . $this->_db->Quote($view) . ',' . $this->_db->Quote($group) . ',' . $this->_db->Quote($field) . ')';
+							$this->_db->setQuery($query);
+							// By catching SQL error (e.g. layout configuration of template already exists),
+							// we will allow execution to continue, thus clearing "positions" column in fields table
+							try { $this->_db->query(); } catch (Exception $e) { }
+							if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
 						}
 					}
-				}				
-			}
-			
-			// delete the temporary table
-			$query = 'DROP TABLE #__flexicontent_positions_tmp';
-			$this->_db->setQuery( $query );
-			$this->_db->query();
-			
-			// delete the old positions
-			$query 	= "UPDATE #__flexicontent_fields SET positions = ''";
-			$this->_db->setQuery( $query );
-			$this->_db->query();
-			
-			// alter ordering field for releases prior to beta5
-			$query 	= "ALTER TABLE #__flexicontent_cats_item_relations MODIFY `ordering` int(11) NOT NULL default '0'";
-			$this->_db->setQuery( $query );
-			$this->_db->query();
-			$query 	= "ALTER TABLE #__flexicontent_fields_type_relations MODIFY `ordering` int(11) NOT NULL default '0'";
-			$this->_db->setQuery( $query );
-			$this->_db->query();
+				}
+			}				
 		}
-		return $fields;
+		
+		// delete the temporary table
+		$query = 'DROP TABLE #__flexicontent_positions_tmp';
+		$this->_db->setQuery( $query );
+		$this->_db->query();
+		
+		// delete the old positions
+		$query 	= "UPDATE #__flexicontent_fields SET positions = ''";
+		$this->_db->setQuery( $query );
+		$this->_db->query();
+		
+		// alter ordering field for releases prior to beta5
+		$query 	= "ALTER TABLE #__flexicontent_cats_item_relations MODIFY `ordering` int(11) NOT NULL default '0'";
+		$this->_db->setQuery( $query );
+		$this->_db->query();
+		$query 	= "ALTER TABLE #__flexicontent_fields_type_relations MODIFY `ordering` int(11) NOT NULL default '0'";
+		$this->_db->setQuery( $query );
+		$this->_db->query();
+		
+		return $return;
 	}
 
 
@@ -1008,95 +1014,6 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * Method to check and add some extra FLEXIcontent specific ACL rules
-	 *
-	 * @access public
-	 * @return	boolean	True on success
-	 */
-	function checkExtraAclRules()
-	{
-		if (FLEXI_ACCESS)
-		{
-			$db = $this->_db;
-			
-			// COMMENTED out, instead we will use field's 'submit' privilege
-			/*$query = "SELECT count(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='editvalue' AND axosection='fields'";
-			$db->setQuery($query);
-			$editvalue_rule = $db->loadResult();
-			
-			if (!$editvalue_rule)
-			{
-				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
-					." VALUES ('com_flexicontent', '', 'editvalue', 'fields', '', 'Edit Field Values', '', '')";
-				$db->setQuery($query);
-				$db->query();
-				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_EDIT_FIELD_VALUE'), 'message' );
-			}*/
-			
-			// Delete wrong rule names
-			$query = "DELETE FROM #__flexiaccess_rules WHERE acosection='com_flexicontent' AND aco='associateanyitem'";
-			$db->setQuery($query);
-			$db->query();
-			
-			// Check for assocanytrans : Allow users to associate translations (items) authored by any user
-			$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='assocanytrans'";
-			$db->setQuery($query);
-			$assocanytrans_rule = $db->loadResult();
-			
-			if (!$assocanytrans_rule)
-			{
-				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
-					." VALUES ('com_flexicontent', '', 'assocanytrans', '', '', 'Associate any translation (items)', '', '')";
-				$db->setQuery($query);
-				$db->query();
-				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_ASSOCIATE_ANY_TRANSLATION'), 'message' );
-			}
-			
-			// Check for editcreationdate : Allow users to edit creation date of an item
-			/*$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='editcreationdate'";
-			$db->setQuery($query);
-			$editcreationdate_rule = $db->loadResult();
-			
-			if (!$editcreationdate_rule)
-			{
-				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
-					." VALUES ('com_flexicontent', '', 'editcreationdate', '', '', 'Edit creation date (items)', '', '')";
-				$db->setQuery($query);
-				$db->query();
-				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_EDIT_CREATION_DATE'), 'message' );
-			}*/
-			
-			// Check for ignoreviewstate : Allow users to view unpublished, archived, trashed, scheduled, expired items in frontend content lists e.g. category view
-			$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='ignoreviewstate'";
-			$db->setQuery($query);
-			$ignoreviewstate_rule = $db->loadResult();
-			
-			if (!$ignoreviewstate_rule)
-			{
-				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
-					." VALUES ('com_flexicontent', '', 'ignoreviewstate', '', '', 'Ignore view state (items)', '', '')";
-				$db->setQuery($query);
-				$db->query();
-				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_IGNORE_VIEW_STATE'), 'message' );
-			}
-			
-			// Check for import : Allow management of (Content) Import
-			$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='import'";
-			$db->setQuery($query);
-			$import_rule = $db->loadResult();
-			
-			if (!$import_rule)
-			{
-				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
-					." VALUES ('com_flexicontent', '', 'import', '', '', 'Manage (Content) Import', '', '')";
-				$db->setQuery($query);
-				$db->query();
-				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_MANAGE_CONTENT_IMPORT'), 'message' );
-			}
-		}
 	}
 	
 	

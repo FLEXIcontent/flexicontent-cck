@@ -170,8 +170,6 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$itemcountingdok   = $model->getItemCountingDataOK();
 			$initialpermission = $model->checkInitialPermission();
 			
-			// Check if old field positions were converted
-			$model->getFieldsPositions();
 		} else if ($optional_tasks) {  // IF optional tasks do not recheck instead just set the FLAGS to true
 			$existtype = $existmenuitems = $existfields = true;
 			$existfplg = $existseplg = $existsyplg = true;
