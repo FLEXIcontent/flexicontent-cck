@@ -107,6 +107,36 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
   KEY `type_id` (`type_id`)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
+ `id` int(10) unsigned NOT NULL,
+ `title` varchar(255) NOT NULL,
+ `state` tinyint(3) NOT NULL DEFAULT '0',
+ `catid` int(10) unsigned NOT NULL DEFAULT '0',
+ `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `created_by` int(10) unsigned NOT NULL DEFAULT '0',
+ `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
+ `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `version` int(10) unsigned NOT NULL DEFAULT '1',
+ `ordering` int(11) NOT NULL DEFAULT '0',
+ `access` int(10) unsigned NOT NULL DEFAULT '0',
+ `hits` int(10) unsigned NOT NULL DEFAULT '0',
+ `featured` tinyint(3) unsigned NOT NULL DEFAULT '0',
+ `language` char(7) NOT NULL,
+ `type_id` int(11) NOT NULL DEFAULT '0',
+ `lang_parent_id` int(11) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`id`),
+ KEY `state` (`state`),
+ KEY `catid` (`catid`),
+ KEY `created_by` (`created_by`),
+ KEY `access` (`access`),
+ KEY `language` (`language`),
+ KEY `featured` (`featured`),
+ KEY `type_id` (`type_id`),
+ KEY `lang_parent_id` (`lang_parent_id`)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_extravote` (
   `content_id` int(11) NOT NULL,
   `field_id` int(11) NOT NULL,
@@ -184,6 +214,14 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
   PRIMARY KEY  (`template`,`cfgname`,`layout`,`position`)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS `#__flexicontent_layouts_conf` (
+  `template` varchar(50) NOT NULL default '',
+  `cfgname` varchar(50) NOT NULL default '',
+  `layout` varchar(20) NOT NULL default '',
+  `attribs` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  PRIMARY KEY  (`template`,`cfgname`,`layout`)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS `#__flexicontent_advsearch_index` (
   `sid` int(11) NOT NULL auto_increment,
   `field_id` int(11) NOT NULL,
@@ -204,14 +242,6 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
   `author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY  (`user_id`)
-) ENGINE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS `#__flexicontent_layouts_conf` (
-  `template` varchar(50) NOT NULL default '',
-  `cfgname` varchar(50) NOT NULL default '',
-  `layout` varchar(20) NOT NULL default '',
-  `attribs` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  PRIMARY KEY  (`template`,`cfgname`,`layout`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_download_history` (
@@ -240,32 +270,3 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_download_coupons` (
   KEY `expire_on` (`expire_on`)
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
- `id` int(10) unsigned NOT NULL,
- `title` varchar(255) NOT NULL,
- `state` tinyint(3) NOT NULL DEFAULT '0',
- `catid` int(10) unsigned NOT NULL DEFAULT '0',
- `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
- `created_by` int(10) unsigned NOT NULL DEFAULT '0',
- `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
- `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
- `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
- `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
- `version` int(10) unsigned NOT NULL DEFAULT '1',
- `ordering` int(11) NOT NULL DEFAULT '0',
- `access` int(10) unsigned NOT NULL DEFAULT '0',
- `hits` int(10) unsigned NOT NULL DEFAULT '0',
- `featured` tinyint(3) unsigned NOT NULL DEFAULT '0',
- `language` char(7) NOT NULL,
- `type_id` int(11) NOT NULL DEFAULT '0',
- `lang_parent_id` int(11) NOT NULL DEFAULT '0',
- PRIMARY KEY (`id`),
- KEY `state` (`state`),
- KEY `catid` (`catid`),
- KEY `created_by` (`created_by`),
- KEY `access` (`access`),
- KEY `language` (`language`),
- KEY `featured` (`featured`),
- KEY `type_id` (`type_id`),
- KEY `lang_parent_id` (`lang_parent_id`)
-) ENGINE=MyISAM;

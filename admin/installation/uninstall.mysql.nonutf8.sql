@@ -1,5 +1,4 @@
 DROP TABLE IF EXISTS 
-`#__flexicontent_templates`,
 `#__flexicontent_cats_item_relations`,
 `#__flexicontent_favourites`,
 `#__flexicontent_fields`,
@@ -14,6 +13,8 @@ DROP TABLE IF EXISTS
 `#__flexicontent_tags_item_relations`,
 `#__flexicontent_types`,
 `#__flexicontent_versions`,
+`#__flexicontent_templates`,
+`#__flexicontent_layouts_conf`,
 `#__flexicontent_advsearch_index`,
 `#__flexicontent_authors_ext`,
 `#__flexicontent_download_coupons`,

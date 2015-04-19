@@ -42,7 +42,7 @@ class com_flexicontentInstallerScript
 		
 		// Try to increment some limits
 		
-		@set_time_limit( 240 );    // execution time 5 minutes
+		@set_time_limit( 120 );    // try to set execution time 2 minutes
 		ignore_user_abort( true ); // continue execution if client disconnects
 		
 		// Try to increment memory limits
@@ -84,13 +84,19 @@ class com_flexicontentInstallerScript
 		$jversion = new JVersion();
 		
 		// File version of new manifest file
-		$this->release = FLEXI_J16GE ?  $parent->get( "manifest" )->version : $this->manifest->getElementByPath('version')->data();
+		$this->release = $parent->get( "manifest" )->version;
 		
 		// File version of existing manifest file
-		$this->release_existing = FLEXI_J16GE ? $this->getParam('version') : 0;
+		$this->release_existing = $this->getParam('version');
 		
 		// Manifest file minimum Joomla version
-		$this->minimum_joomla_release = FLEXI_J16GE ? $parent->get( "manifest" )->attributes()->version : $this->manifest->attributes('version');
+		$this->minimum_joomla_release = $parent->get( "manifest" )->attributes()->version;
+		
+		// For J2.5 require other minimum
+		if( version_compare( $jversion->getShortVersion(), '3.0', 'lt' ) )
+		{
+			$this->minimum_joomla_release = '2.5.0';
+		}
 		
 		// Show the essential information at the install/update back-end
 		if ($this->release_existing) {
@@ -177,69 +183,62 @@ class com_flexicontentInstallerScript
 		$session->set('unbounded_noext', false, 'flexicontent');
 		$session->set('unbounded_badcat', false, 'flexicontent');
 		
-		// fix joomla 1.5 bug
-		if ( !FLEXI_J16GE ) {
-			$this->parent->getDBO = $this->parent->getDBO();
-		}
 		$db = JFactory::getDBO();
 		
 		// Parse XML file to identify additional extensions,
-		// This code part (for installing additional extensions) originates from Zoo Component:
+		// This code part (for installing additional extensions) originates from Zoo J1.5 Component:
 		// Original install.php file
 		// @package   Zoo Component
 		// @author    YOOtheme http://www.yootheme.com
 		// @copyright Copyright (C) 2007 - 2009 YOOtheme GmbH
 		// @license   http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 only
-		if (FLEXI_J16GE) {
-			$manifest = isset($parent) ? $parent->getParent()->manifest : $this->manifest;
-			$source = isset($parent) ? $parent->getParent()->getPath('source') : $this->parent->getPath('source');
-			$add_array =& $manifest->xpath('additional');
-			$add = NULL;
-			if(count($add_array)) $add = $add_array[0];
-		} else {
-			$source = $this->parent->getPath('source');
-			$add =& $this->manifest->getElementByPath('additional');
-		}
+		$manifest = isset($parent) ? $parent->getParent()->manifest : $this->manifest;
+		$source   = isset($parent) ? $parent->getParent()->getPath('source') : $this->parent->getPath('source');
+		$additional = & $manifest->xpath('additional');
+		$additional = count($additional) ? reset($additional) : NULL;
 		
-		if ( is_object($add) && count( $add->children() ) ) {
-		    $exts =& $add->children();
-		    foreach ($exts as $ext) {
-					$extensions[] = array(
-						'name' => strip_tags(FLEXI_J16GE ? $ext->asXml() : $ext->data()),
-						'type' => (FLEXI_J16GE ? $ext->getName() : $ext->name()),
-						'folder' => $source.'/'.(FLEXI_J16GE ? $ext->attributes()->folder : $ext->attributes('folder')),
-						'ext_name' => ''.(FLEXI_J16GE ? $ext->attributes()->name : $ext->attributes('name')),  // concat to empty string to convert to string
-						'ext_folder' => ''.(FLEXI_J16GE ? $ext->attributes()->instfolder : $ext->attributes('instfolder')),  // concat to empty string to convert to string
-						'installer' => new JInstaller(),
-						'status' => null);
-		    }
-				//echo "<pre>"; print_r($extensions); echo "</pre>"; exit;
+		if ( is_object($additional) && count( $additional->children() ) ) {
+	    $exts = & $additional->children();
+	    foreach ($exts as $ext) {
+				$extensions[] = array(
+					'name' => strip_tags( $ext->asXml() ),
+					'type' => $ext->getName(),
+					'folder' => $source.'/' . $ext->attributes()->folder,
+					'ext_name' => ((string) $ext->attributes()->name),  // needs to be converted to string
+					'ext_folder' => ((string) $ext->attributes()->instfolder),  // needs to be converted to string
+					'installer' => new JInstaller(),
+					'status' => null
+				);
+	    }
+			//echo "<pre>"; print_r($extensions); echo "</pre>"; exit;
 		}
 		
 		// Install discovered extensions
-		foreach ($extensions as $i => $extension) {
-			//$jinstaller = new JInstaller();
-			$jinstaller = & $extensions[$i]['installer'];
-			if (FLEXI_J16GE) {  // J1.6+ installer requires that we explicit set override/upgrade options
-				$jinstaller->setOverwrite(true);
-				$jinstaller->setUpgrade(true);
-			}
+		foreach ($extensions as $i => $extension)
+		{
+			$jinstaller = & $extensions[$i]['installer'];    // new JInstaller();
+			
+			// J1.6+ installer requires that we explicit set override/upgrade options
+			$jinstaller->setOverwrite(true);
+			$jinstaller->setUpgrade(true);
+			
 			if ($jinstaller->install($extensions[$i]['folder'])) {
 				$extensions[$i]['status'] = true;
 				
 				$ext_manifest = $jinstaller->getManifest();
-				$ext_manifest_name = FLEXI_J16GE ? $ext_manifest->name : $ext_manifest->document->getElementByPath('name')->data();
+				$ext_manifest_name = $ext_manifest->name;
 				//if ($ext_manifest_name!=$extensions[$i]['name'])  echo $ext_manifest_name." - ".$extensions[$i]['name'] . "<br/>";
 				
 				// Force existing plugins/modules to use name found in each extension's manifest.xml file
-				if (FLEXI_J16GE || $extensions[$i]['ext_folder'] == 'flexicontent_fields') {
-					$ext_tbl   = FLEXI_J16GE ? '#__extensions' : '#__plugins';
+				if ( $extensions[$i]['ext_folder'] == 'flexicontent_fields' )
+				{
+					$ext_tbl = '#__extensions';
 					$query = 'UPDATE '.$ext_tbl
 						//.' SET name = '.$db->Quote($extensions[$i]['name'])
 						.' SET name = '.$db->Quote($ext_manifest_name)
 						.' WHERE element = '.$db->Quote($extensions[$i]['ext_name'])
 						.'  AND folder = '.$db->Quote($extensions[$i]['ext_folder'])
-						.(FLEXI_J16GE ? '  AND type = '.$db->Quote($extensions[$i]['type']) : '')
+						.'  AND type = '.$db->Quote($extensions[$i]['type'])
 						;
 					$db->setQuery($query);
 					$db->query();
@@ -520,8 +519,8 @@ class com_flexicontentInstallerScript
 						$msg[] = $db->getAffectedRows($result)." deprecated fields '".$old_type."' were converted.";
 						
 						$query = 'SELECT *, extension_id AS id '
-							. ' FROM '.( FLEXI_J16GE ? '#__extensions' : '#__plugins' )
-							.' WHERE '. (FLEXI_J16GE ? 'type="plugin"' : '1')
+							.' FROM #__extensions'
+							.' WHERE type="plugin"'
 							.'  AND element='.$db->Quote( $old_type )
 							.'  AND folder='.$db->Quote( 'flexicontent_fields' );
 						$db->setQuery($query);
@@ -627,13 +626,13 @@ class com_flexicontentInstallerScript
 					if ( $fields_tbl_exists && !array_key_exists('edithelp', $tbl_fields['#__flexicontent_fields'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `edithelp` SMALLINT(8) NOT NULL DEFAULT '2' AFTER `formhidden`";
 					}
-					if ( $fields_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_fields']) && FLEXI_J16GE) {
+					if ( $fields_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_fields']) ) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
 					$queries[] = "ALTER TABLE #__flexicontent_fields MODIFY description TEXT NOT NULL default ''";
 					
 					// Types TABLE
-					if ( $types_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_types']) && FLEXI_J16GE) {
+					if ( $types_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_types']) ) {
 						$queries[] = "ALTER TABLE `#__flexicontent_types` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
 					if ( $types_tbl_exists && !array_key_exists('itemscreatable', $tbl_fields['#__flexicontent_types'])) {
@@ -794,9 +793,8 @@ class com_flexicontentInstallerScript
 							 `ordering` int(11) NOT NULL DEFAULT '0',
 							 `access` int(10) unsigned NOT NULL DEFAULT '0',
 							 `hits` int(10) unsigned NOT NULL DEFAULT '0',
-							 ".(FLEXI_J16GE ? "`featured` tinyint(3) unsigned NOT NULL DEFAULT '0'," : "")."
+							 `featured` tinyint(3) unsigned NOT NULL DEFAULT '0',
 							 `language` char(7) NOT NULL,
-							 ".(!FLEXI_J16GE ? "`sectionid` int(10) unsigned NOT NULL DEFAULT '0'," : "")."
 							 `type_id` int(11) NOT NULL DEFAULT '0',
 							 `lang_parent_id` int(11) NOT NULL DEFAULT '0',
 							 PRIMARY KEY (`id`)
@@ -804,9 +802,7 @@ class com_flexicontentInstallerScript
 						";
 					} else {
 						$_querycols = array();
-						if (FLEXI_J16GE) {
-							if (array_key_exists('sectionid', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " DROP `sectionid`";
-						}
+						if (array_key_exists('sectionid', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " DROP `sectionid`";  // Drop J1.5 sectionid
 						if (!array_key_exists('type_id', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " ADD `type_id` INT(11) NOT NULL DEFAULT '0' AFTER `language`";
 						if (!array_key_exists('lang_parent_id', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " ADD `lang_parent_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `type_id`";
 						if (!empty($_querycols)) $queries[] = "ALTER TABLE `#__flexicontent_items_tmp` " . implode(",", $_querycols);
@@ -942,7 +938,7 @@ class com_flexicontentInstallerScript
 		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 		
 		// Installed component manifest file version
-		$this->release = FLEXI_J16GE ? $parent->get( "manifest" )->version : $this->manifest->getElementByPath('version')->data();
+		$this->release = $parent->get( "manifest" )->version;
 		echo '<p>' . JText::_('Uninstalling FLEXIcontent ' . $this->release) . '</p>';
 		
 		// init vars
@@ -951,63 +947,60 @@ class com_flexicontentInstallerScript
 		$db = JFactory::getDBO();
 		
 		// Uninstall additional flexicontent modules/plugins found in Joomla DB,
-		// This code part (for uninstalling additional extensions) originates from Zoo Component:
+		// This code part (for uninstalling additional extensions) originates from Zoo J1.5 Component:
 		// Original uninstall.php file
 		// @package   Zoo Component
 		// @author    YOOtheme http://www.yootheme.com
 		// @copyright Copyright (C) 2007 - 2009 YOOtheme GmbH
 		// @license   http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 only
-		if (FLEXI_J16GE) {
-			$manifest = isset($parent) ? $parent->getParent()->manifest : $this->manifest;
-			$add_array = $manifest->xpath('additional');
-			$add = NULL;
-			if(count($add_array)) $add = $add_array[0];
-		} else {
-			$add =& $this->manifest->getElementByPath('additional');
-		}
+		$manifest = isset($parent) ? $parent->getParent()->manifest : $this->manifest;
+		$additional = & $manifest->xpath('additional');
+		$additional = count($additional) ? reset($additional) : NULL;
 		
-		if ( is_object($add) && count( $add->children() ) )
+		if ( is_object($additional) && count( $additional->children() ) )
 		{
-			$exts = $add->children();
+			$exts = & $additional->children();
 			foreach ($exts as $ext)
 			{
 				// set query
-				switch ( FLEXI_J16GE ? $ext->getName() : $ext->name() ) {
+				switch ( $ext->getName() )
+				{
 					case 'plugin':
-						if( FLEXI_J16GE ? $ext->attributes()->instfolder : $ext->attributes('instfolder') )
+						if( $ext->attributes()->instfolder )
 						{
-							$query = 'SELECT * FROM '. ( FLEXI_J16GE ? '#__extensions' : '#__plugins' )
-								.' WHERE '. (FLEXI_J16GE ? 'type='.$db->Quote($ext->getName()) : '1')
-								.'  AND element='.$db->Quote( FLEXI_J16GE ? $ext->attributes()->name : $ext->attributes('name') )
-								.'  AND folder='.$db->Quote( FLEXI_J16GE ? $ext->attributes()->instfolder : $ext->attributes('instfolder') )
+							$query = 'SELECT * FROM #__extensions'
+								.' WHERE type='.$db->Quote($ext->getName())
+								.'  AND element='.$db->Quote( $ext->attributes()->name )
+								.'  AND folder='.$db->Quote( $ext->attributes()->instfolder )
 								;
 							// query extension id and client id
 							$db->setQuery($query);
 							$res = $db->loadObject();
 		
-							$res_id = (int)(FLEXI_J16GE ? @$res->extension_id : @$res->id);
+							$res_id = (int)( @$res->extension_id );
 							$extensions[] = array(
-								'name' => (FLEXI_J16GE ? $ext->asXml() : $ext->data()),
-								'type' => (FLEXI_J16GE ? $ext->getName() : $ext->name()),
+								'name' => strip_tags( $ext->asXml() ),
+								'type' => $ext->getName(),
 								'id' => $res_id,
 								'client_id' => isset($res->client_id) ? $res->client_id : 0,
 								'installer' => new JInstaller(),
-								'status' => false);
+								'status' => false
+							);
 						}
 						break;
 					case 'module':
-						$query = 'SELECT * FROM '. ( FLEXI_J16GE ? '#__extensions' : '#__modules' )
-							.' WHERE '. (FLEXI_J16GE ? 'type='.$db->Quote($ext->getName()) : '1')
-							.'  AND '. ( FLEXI_J16GE ? 'element='.$db->Quote($ext->attributes()->name) : 'module='.$db->Quote($ext->attributes('name')) )
+						$query = 'SELECT * FROM #__extensions'
+							.' WHERE type='.$db->Quote($ext->getName())
+							.'  AND element='.$db->Quote($ext->attributes()->name)
 							;
 						// query extension id and client id
 						$db->setQuery($query);
 						$res = $db->loadObject();
 						
-						$res_id = (int)(FLEXI_J16GE ? @$res->extension_id : @$res->id);
+						$res_id = (int)( @$res->extension_id );
 						$extensions[] = array(
-							'name' => (FLEXI_J16GE ? $ext->asXml() : $ext->data()),
-							'type' => (FLEXI_J16GE ? $ext->getName() : $ext->name()),
+							'name' => $ext->asXml(),
+							'type' => $ext->getName(),
 							'id' => $res_id,
 							'client_id' => isset($res->client_id) ? $res->client_id : 0,
 							'installer' => new JInstaller(),
@@ -1043,7 +1036,7 @@ class com_flexicontentInstallerScript
 			<tbody>
 				<?php foreach ($extensions as $i => $ext) : ?>
 					<tr class="row<?php echo $i % 2; ?>">
-						<td class="key"><?php echo $ext['name']; ?> (<?php echo JText::_($ext['type']); ?>)</td>
+						<td class="key">[<?php echo JText::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
 						<td>
 							<?php $style = $ext['status'] ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
 							<span style="<?php echo $style; ?>"><?php echo $ext['status'] ? JText::_('Uninstalled successfully') : JText::_('Uninstall FAILED'); ?></span>

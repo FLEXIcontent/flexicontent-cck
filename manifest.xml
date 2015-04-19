@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="component" version="2.5.0" method="upgrade">
+<extension type="component" version="3.3.0" method="upgrade">
 	<name>FLEXIcontent</name>
 	<creationDate>9 February 2015</creationDate>
 	<author>Emmanuel Danan, Georgios Papadakis</author>
