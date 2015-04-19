@@ -16,7 +16,7 @@ VALUES
 	(13,'categories','categories','Categories','Categories this item is assigned to',0,1,1,0,0,0,0,2,'top.items.default\nunder-description-line1.category.blog',1,'display_label=1\nseparatorf=2',0,'0000-00-00 00:00:00',1,13),
 	(14,'tags','tags','Tags','Tags assigned to this item',0,1,1,0,0,0,0,2,'top.items.default\nunder-description-line2.category.blog',1,'display_label=1\nseparatorf=2',0,'0000-00-00 00:00:00',1,14);
 
-INSERT INTO `#__flexicontent_types` VALUES(1, 'Article', 'article', 1, 0, '0000-00-00 00:00:00', 0, 'ilayout=default\nhide_maintext=0\nhide_html=0\nmaintext_label=\nmaintext_desc=\ncomments=\ntop_cols=two\nbottom_cols=two');
+INSERT INTO `#__flexicontent_types` VALUES(1, 'Article', 'article', 1, 0, '0000-00-00 00:00:00', 0, 'ilayout=default\nhide_maintext=0\nhide_html=0\nmaintext_label=\nmaintext_desc=\ncomments=\ntop_cols=two\nbottom_cols=two\nallow_jview=1');
 
 INSERT INTO `#__flexicontent_fields_type_relations` (`field_id`,`type_id`,`ordering`)
 VALUES

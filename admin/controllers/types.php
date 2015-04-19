@@ -350,5 +350,49 @@ class FlexicontentControllerTypes extends FlexicontentController
 		
 		$this->setRedirect('index.php?option=com_flexicontent&view=types', $msg );
 	}
-
+	
+	
+	function toggle_jview()
+	{
+		$cid  = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		
+		$toggle_count = 0;
+		if (!is_array( $cid ) || count( $cid ) < 1) {
+			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_PUBLISH' ) );
+		} else {
+			$model = $this->getModel('type');
+			
+			foreach($cid as $id) {
+				if (!$id) continue;
+				//$type = $model->getItem($id);
+				// Initialise variables.
+				$type	= JTable::getInstance('flexicontent_types', '');
+				
+				// Attempt to load the row.
+				$type->load($id);
+				
+				// Check for a table object error.
+				if ($type->getError()) {
+					JError::raiseWarning(500, $type->getError() );
+					break;
+				}
+				
+				$attribs = json_decode($type->get('attribs'));
+				$attribs->allow_jview = $attribs->allow_jview ? '0' : '1';  // toggle
+				$attribs = json_encode($attribs);
+				
+				$db = JFactory::getDBO();
+				$query = "UPDATE #__flexicontent_types SET attribs=".$db->Quote($attribs) ." WHERE id = ".$id;
+				$db->setQuery($query);
+				$result = $db->query();
+				if ($db->getErrorNum())
+					JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+				else
+					$toggle_count++;
+			}
+		}
+		
+		$msg = $toggle_count ? 'Toggle view method for '.$toggle_count.' types' : '';
+		$this->setRedirect( 'index.php?option=com_flexicontent&view=types', $msg);
+	}
 }

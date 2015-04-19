@@ -31,6 +31,9 @@ $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 $list_total_cols = 10;
+
+$article_viewing_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-padded-image '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_REDIRECT_ARTICLE_VIEW').'" title="'.flexicontent_html::getToolTip('FLEXI_REDIRECT_ARTICLE_VIEW', 'FLEXI_REDIRECT_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
+$default_template_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-padded-image '.$tip_class.'" data-placement="bottom" alt="'.JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
 ?>
 <script type="text/javascript">
 
@@ -130,7 +133,8 @@ function delAllFilters() {
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
+			<th class="hideOnDemandClass"><?php echo $article_viewing_tip . JText::_( 'FLEXI_REDIRECT_ARTICLE_VIEW' )."<br/><small>(".JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REDIRECTED' ).")</small>"; ?></th>
+			<th class="hideOnDemandClass"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -193,7 +197,7 @@ function delAllFilters() {
 					$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
 					if ($canCheckin) {
 						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
-						$task_str = FLEXI_J16GE ? 'types.checkin' : 'checkin';
+						$task_str = 'types.checkin';
 						if ($row->checked_out == $user->id) {
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time);
 						} else {
@@ -223,6 +227,14 @@ function delAllFilters() {
 				<?php
 				}
 				?>
+			</td>
+			<td align="center">
+				<span style="cursor:pointer;"
+					<?php
+					echo ' class="'.$btn_class.' btn-small" onclick="return listItemTask(\'cb'.$i.'\',\'types.toggle_jview\');">';
+					echo JText::_($row->config->get("allow_jview") ? 'FLEXI_ALLOWED' : 'FLEXI_REDIRECT_TO_ITEM_VIEW');
+					?>
+				</span>
 			</td>
 			<td align="center">
 				<?php echo $row->config->get("ilayout"); ?>
