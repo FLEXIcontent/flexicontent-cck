@@ -295,7 +295,7 @@ window.addEvent('domready', function() {
 						$types = $this->get( 'Typeslist' );
 						echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"', 'typeid');
 					?>
-					<input id="button-bind" type="button" class="fc_button" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_BIND' ); ?>"
+					<input id="button-bind" type="button" class="<?php echo $btn_class; ?> btn-primary" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_BIND' ); ?>"
 					onclick="jQuery(this.form).hide(); bindItems();" />
 				</form>
 			</td>

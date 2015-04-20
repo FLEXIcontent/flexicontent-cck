@@ -121,7 +121,7 @@ IF EXIST  %joomlasite_path%\language\en-GB\en-GB.com_flexicontent.ini_  (
 		del  %joomlasite_path%\language\en-GB\en-GB.com_flexicontent.ini
 	)
 )
-mklink %joomlasite_path%\language\en-GB\en-GB.com_flexicontent.ini  %repository_path%\site\language\en-GB.com_flexicontent.ini
+mklink %joomlasite_path%\language\en-GB\en-GB.com_flexicontent.ini  %repository_path%\site\language\en-GB\en-GB.com_flexicontent.ini
 
 
 
@@ -136,7 +136,7 @@ IF EXIST  %joomlasite_path%\administrator\language\en-GB\en-GB.com_flexicontent.
 		del  %joomlasite_path%\administrator\language\en-GB\en-GB.com_flexicontent.ini
 	)
 )
-mklink %joomlasite_path%\administrator\language\en-GB\en-GB.com_flexicontent.ini  %repository_path%\admin\language\en-GB.com_flexicontent.ini
+mklink %joomlasite_path%\administrator\language\en-GB\en-GB.com_flexicontent.ini  %repository_path%\admin\language\en-GB\en-GB.com_flexicontent.ini
 
 
 
@@ -151,7 +151,7 @@ IF EXIST  %joomlasite_path%\administrator\language\en-GB\en-GB.com_flexicontent.
 		del  %joomlasite_path%\administrator\language\en-GB\en-GB.com_flexicontent.sys.ini
 	)
 )
-mklink %joomlasite_path%\administrator\language\en-GB\en-GB.com_flexicontent.sys.ini  %repository_path%\admin\language\en-GB.com_flexicontent.sys.ini
+mklink %joomlasite_path%\administrator\language\en-GB\en-GB.com_flexicontent.sys.ini  %repository_path%\admin\language\en-GB\en-GB.com_flexicontent.sys.ini
 
 
 

@@ -1,19 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="component" version="3.3.0" method="upgrade">
 	<name>FLEXIcontent</name>
-	<creationDate>9 February 2015</creationDate>
-	<author>Emmanuel Danan, Georgios Papadakis</author>
-	<copyright>(C) 2009-2013 Emmanuel Danan</copyright>
-	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
-	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
+	<!-- The following elements are optional and free of formatting constraints -->
+	<creationDate>19 April 2015</creationDate>
+	<author>Emmanuel Danan, Georgios Papadakis, FLEXIcontent Team</author>
+	<authorEmail>noreply@flexicontent.org</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
+	<copyright>(C) 2009-2015 Emmanuel Danan, Georgios Papadakis</copyright>
+	<copyright>(C) 2009-2015 Emmanuel Danan, Georgios Papadakis</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<!--  The version string is recorded in the components table -->
 	<version>3.0 BETA6</version>
-	<description>A flexible content management system for Joomla! J1.5/J2.5/J3.x</description>
-
-	<languages folder="site/language">
-		<language tag="en-GB">en-GB.com_flexicontent.ini</language>
-	</languages>
-
+	<!-- The description is optional and defaults to the name -->
+	<description>COM_FLEXICONTENT_DESCRIPTION</description>
+	
+	<!-- Runs on install/uninstall/update; New in 2.5 -->
+	<scriptfile>script.php</scriptfile>
+	
+	<install> <!-- Runs on install -->
+		<sql>
+			<file driver="mysql" charset="utf8">installation/install.mysql.utf8.sql</file>
+			<file driver="mysql">installation/install.mysql.nonutf8.sql</file>
+		</sql>
+	</install>
+	
+	<uninstall> <!-- Runs on uninstall -->
+		<sql>
+			<file driver="mysql" charset="utf8">installation/uninstall.mysql.utf8.sql</file>
+			<file driver="mysql">installation/uninstall.mysql.nonutf8.sql</file>
+		</sql>
+	</uninstall>
+	
+	<update> <!-- Runs on update; New in 2.5 -->
+		<schemas>
+		</schemas>
+	</update>
+	
+	<!-- Site Main File Copy Section -->
 	<files folder="site">
 		<filename>index.html</filename>
 		<filename>flexicontent.php</filename>
@@ -37,59 +60,32 @@
 		<folder>views</folder>
 	</files>
 
-	<install>
-		<sql>
-			<file driver="mysql" charset="utf8">installation/install.mysql.utf8.sql</file>
-			<file driver="mysql">installation/install.mysql.nonutf8.sql</file>
-		</sql>
-	</install>
-	<uninstall>
-		<sql>
-			<file driver="mysql" charset="utf8">installation/uninstall.mysql.utf8.sql</file>
-			<file driver="mysql">installation/uninstall.mysql.nonutf8.sql</file>
-		</sql>
-	</uninstall>
-
+	<!-- Site Language files Copy Section -->
+	<languages folder="site/language">
+		<language tag="en-GB">en-GB/en-GB.com_flexicontent.ini</language>
+	</languages>
+	
+	
 	<administration>
+		
+		<!-- Administration Menu Section -->
 		<menu img="components/com_flexicontent/assets/images/flexicontent.png">FLEXIcontent</menu>
 		<submenu>
-			<menu link="option=com_flexicontent">
-				FLEXI_DASHBOARD
-			</menu>
-			<menu link="option=com_flexicontent&amp;view=items">
-				FLEXI_ITEMS
-			</menu>
-			<menu link="option=com_flexicontent&amp;view=categories">
-				FLEXI_CATEGORIES
-			</menu>
-			<menu link="option=com_flexicontent&amp;view=types">
-				FLEXI_TYPES
-			</menu>
-			<menu link="option=com_flexicontent&amp;view=fields">
-				FLEXI_FIELDS
-			</menu>
-			<menu link="option=com_flexicontent&amp;view=tags">
-				FLEXI_TAGS
-			</menu>
-			<menu link="option=com_flexicontent&amp;view=templates">
-				FLEXI_TEMPLATES
-			</menu>
-			<menu link="option=com_flexicontent&amp;view=users">
-				FLEXI_USERS
-			</menu>
-			<menu link="option=com_flexicontent&amp;view=filemanager">
-				FLEXI_FILEMANAGER
-			</menu>
-			<menu link="option=com_flexicontent&amp;view=import">
-				FLEXI_IMPORT
-			</menu>
-			<menu link="option=com_flexicontent&amp;view=stats">
-				FLEXI_STATISTICS
-			</menu>
-			<menu link="option=com_config&amp;view=component&amp;component=com_flexicontent">
-				FLEXI_CONFIG
-			</menu>
+			<menu link="option=com_flexicontent">FLEXI_DASHBOARD</menu>
+			<menu link="option=com_flexicontent&amp;view=items">FLEXI_ITEMS</menu>
+			<menu link="option=com_flexicontent&amp;view=categories">FLEXI_CATEGORIES</menu>
+			<menu link="option=com_flexicontent&amp;view=types">FLEXI_TYPES</menu>
+			<menu link="option=com_flexicontent&amp;view=fields">FLEXI_FIELDS</menu>
+			<menu link="option=com_flexicontent&amp;view=tags">FLEXI_TAGS</menu>
+			<menu link="option=com_flexicontent&amp;view=templates">FLEXI_TEMPLATES</menu>
+			<menu link="option=com_flexicontent&amp;view=users">FLEXI_USERS</menu>
+			<menu link="option=com_flexicontent&amp;view=filemanager">FLEXI_FILEMANAGER</menu>
+			<menu link="option=com_flexicontent&amp;view=import">FLEXI_IMPORT</menu>
+			<menu link="option=com_flexicontent&amp;view=stats">FLEXI_STATISTICS</menu>
+			<menu link="option=com_config&amp;view=component&amp;component=com_flexicontent">FLEXI_CONFIG</menu>
 		</submenu>
+		
+		<!-- Admin Main File Copy Section -->
 		<files folder="admin">
 			<filename>index.html</filename>
 			<filename>admin.flexicontent.php</filename>
@@ -107,10 +103,13 @@
 			<folder>tables</folder>
 			<folder>elements</folder>
 		</files>
+		
+		<!-- Admin Language files Copy Section -->
 		<languages folder="admin/language">
-			<language tag="en-GB">en-GB.com_flexicontent.ini</language>
-			<language tag="en-GB">en-GB.com_flexicontent.sys.ini</language>
+			<language tag="en-GB">en-GB/en-GB.com_flexicontent.ini</language>
+			<language tag="en-GB">en-GB/en-GB.com_flexicontent.sys.ini</language>
 		</languages>
+		
 		<params>
 			<param name="flexi_category" default="com_content" />
 			<param name="comments" default="0" />
@@ -162,60 +161,64 @@
 			<param name="advcache_time" default="3600" />
 			<param name="purge_gc" default="1" />
 		</params>
+		
 	</administration>
-
-<additional>
-	<plugin name="account_via_submit" folder="plugins/flexicontent_fields/account_via_submit" instfolder="flexicontent_fields">FLEXIcontent - Account via submit (Creates new user accounts via submit form)</plugin>
-	<plugin name="addressint"         folder="plugins/flexicontent_fields/addressint"         instfolder="flexicontent_fields">FLEXIcontent - International Address / Google Maps</plugin>
-	<plugin name="checkbox"           folder="plugins/flexicontent_fields/checkbox"           instfolder="flexicontent_fields">FLEXIcontent - Checkbox</plugin>
-	<plugin name="checkboximage"      folder="plugins/flexicontent_fields/checkboximage"      instfolder="flexicontent_fields">FLEXIcontent - Checkbox Image</plugin>
-	<plugin name="core"               folder="plugins/flexicontent_fields/core"               instfolder="flexicontent_fields">FLEXIcontent - Core Fields (Joomla article properties)</plugin>
-	<plugin name="coreprops"          folder="plugins/flexicontent_fields/coreprops"          instfolder="flexicontent_fields">FLEXIcontent - Item Form CORE property placer</plugin>
-	<plugin name="date"               folder="plugins/flexicontent_fields/date"               instfolder="flexicontent_fields">FLEXIcontent - Date / Publish Up-Down Dates</plugin>
-	<plugin name="email"              folder="plugins/flexicontent_fields/email"              instfolder="flexicontent_fields">FLEXIcontent - Email</plugin>
-	<plugin name="extendedweblink"    folder="plugins/flexicontent_fields/extendedweblink"    instfolder="flexicontent_fields">FLEXIcontent - Extended Weblink</plugin>
-	<plugin name="fcloadmodule"       folder="plugins/flexicontent_fields/fcloadmodule"       instfolder="flexicontent_fields">FLEXIcontent - Load Module / Module position</plugin>
-	<plugin name="fcpagenav"          folder="plugins/flexicontent_fields/fcpagenav"          instfolder="flexicontent_fields">FLEXIcontent - Navigation (Next/Previous Item)</plugin>
-	<plugin name="fieldgroup"         folder="plugins/flexicontent_fields/fieldgroup"         instfolder="flexicontent_fields">FLEXIcontent - Fieldgroup (Multivalued field that groups other fields)</plugin>
-	<plugin name="file"               folder="plugins/flexicontent_fields/file"               instfolder="flexicontent_fields">FLEXIcontent - File (Download/View/Share/Download cart)</plugin>
-	<plugin name="groupmarker"        folder="plugins/flexicontent_fields/groupmarker"        instfolder="flexicontent_fields">FLEXIcontent - Item Form Tab / Fieldset / Custom HTML</plugin>
-	<plugin name="image"              folder="plugins/flexicontent_fields/image"              instfolder="flexicontent_fields">FLEXIcontent - Image or Gallery (image + details)</plugin>
-	<plugin name="linkslist"          folder="plugins/flexicontent_fields/linkslist"          instfolder="flexicontent_fields">FLEXIcontent - HTML list of URLs/Anchors/JS links</plugin>
-	<plugin name="minigallery"        folder="plugins/flexicontent_fields/minigallery"        instfolder="flexicontent_fields">FLEXIcontent - Mini-Gallery (image-only slideshow)</plugin>
-	<plugin name="phonenumbers"       folder="plugins/flexicontent_fields/phonenumbers"       instfolder="flexicontent_fields">FLEXIcontent - International Phone Numbers</plugin>
-	<plugin name="radio"              folder="plugins/flexicontent_fields/radio"              instfolder="flexicontent_fields">FLEXIcontent - Radio</plugin>
-	<plugin name="radioimage"         folder="plugins/flexicontent_fields/radioimage"         instfolder="flexicontent_fields">FLEXIcontent - Radio Image</plugin>
-	<plugin name="relation"           folder="plugins/flexicontent_fields/relation"           instfolder="flexicontent_fields">FLEXIcontent - Relation (List of related items)</plugin>
-	<plugin name="relation_reverse"   folder="plugins/flexicontent_fields/relation_reverse" instfolder="flexicontent_fields">FLEXIcontent - Relation - Reverse</plugin>
-	<plugin name="select"             folder="plugins/flexicontent_fields/select"             instfolder="flexicontent_fields">FLEXIcontent - Select</plugin>
-	<plugin name="selectmultiple"     folder="plugins/flexicontent_fields/selectmultiple"     instfolder="flexicontent_fields">FLEXIcontent - Select Multiple</plugin>
-	<plugin name="sharedaudio"        folder="plugins/flexicontent_fields/sharedaudio"        instfolder="flexicontent_fields">FLEXIcontent - Shared Audio (SoundCloud,Spotify,Last.fm,etc)</plugin>
-	<plugin name="sharedvideo"        folder="plugins/flexicontent_fields/sharedvideo"        instfolder="flexicontent_fields">FLEXIcontent - Shared Video (YouTube,Vimeo,DailyMotion,etc)</plugin>
-	<plugin name="termlist"           folder="plugins/flexicontent_fields/termlist"           instfolder="flexicontent_fields">FLEXIcontent - List of terms</plugin>
-	<plugin name="text"               folder="plugins/flexicontent_fields/text"               instfolder="flexicontent_fields">FLEXIcontent - Text (number/time/etc/custom validation)</plugin>
-	<plugin name="textarea"           folder="plugins/flexicontent_fields/textarea"           instfolder="flexicontent_fields">FLEXIcontent - Textarea</plugin>
-	<plugin name="textselect"         folder="plugins/flexicontent_fields/textselect"         instfolder="flexicontent_fields">FLEXIcontent - TextSelect (Text with existing value selection)</plugin>
-	<plugin name="toolbar"            folder="plugins/flexicontent_fields/toolbar"            instfolder="flexicontent_fields">FLEXIcontent - Toolbar (social share/other tools)</plugin>
-	<plugin name="weblink"            folder="plugins/flexicontent_fields/weblink"            instfolder="flexicontent_fields">FLEXIcontent - Weblink</plugin>
 	
-	<plugin name="flexinotify"        folder="plugins/flexicontent/flexinotify" instfolder="flexicontent">Flexicontent - Notifications for favoured content</plugin>
-	<plugin name="flexibreak"         folder="plugins/content/flexibreak"       instfolder="content">Content - Flexibreak, pagination for multi-paged articles</plugin>
 	
-	<plugin name="flexicontent"       folder="plugins/finder/flexicontent"      instfolder="finder">Finder - Flexicontent, indexer for Smart Search view</plugin>
-	<plugin name="flexisearch"        folder="plugins/search/flexisearch"       instfolder="search">Search - Flexisearch, for Joomla standard search view</plugin>
-	<plugin name="flexiadvsearch"     folder="plugins/search/flexiadvsearch"    instfolder="search">Search - Flexiadvsearch, for FLEXIcontent search view</plugin>
-	
-	<plugin name="flexisystem"        folder="plugins/system/flexisystem"       instfolder="system">System - Flexisystem, core functions</plugin>
-	<plugin name="flexiadvroute"      folder="plugins/system/flexiadvroute"     instfolder="system">System - Flexiadvroute, advanced routing functions</plugin>
-	
-	<module name="mod_flexicontent"   folder="modules/mod_flexicontent">Universal Content for FLEXIcontent</module>
-	<module name="mod_flexifilter"    folder="modules/mod_flexifilter">Content Lists Filter for FLEXIcontent</module>
-	<module name="mod_flexitagcloud"  folder="modules/mod_flexitagcloud">Tag Cloud for FLEXIcontent</module>
-	<module name="mod_flexiadvsearch" folder="modules/mod_flexiadvsearch">Advanced Search for FLEXIcontent</module>
-</additional>
-
-	<!--installfile>install.php</installfile-->
-	<!--uninstallfile>uninstall.php</uninstallfile-->
-	<scriptfile>script.php</scriptfile>
-
+	<!-- Additional extensions (plugins/modules) to install that were packaged together with the component inside the current archive -->
+	<additional>
+		<!-- Plugins: flexicontent_fields -->
+		<plugin name="account_via_submit" folder="plugins/flexicontent_fields/account_via_submit" instfolder="flexicontent_fields">FLEXIcontent - Account via submit (Creates new user accounts via submit form)</plugin>
+		<plugin name="addressint"         folder="plugins/flexicontent_fields/addressint"         instfolder="flexicontent_fields">FLEXIcontent - International Address / Google Maps</plugin>
+		<plugin name="checkbox"           folder="plugins/flexicontent_fields/checkbox"           instfolder="flexicontent_fields">FLEXIcontent - Checkbox</plugin>
+		<plugin name="checkboximage"      folder="plugins/flexicontent_fields/checkboximage"      instfolder="flexicontent_fields">FLEXIcontent - Checkbox Image</plugin>
+		<plugin name="core"               folder="plugins/flexicontent_fields/core"               instfolder="flexicontent_fields">FLEXIcontent - Core Fields (Joomla article properties)</plugin>
+		<plugin name="coreprops"          folder="plugins/flexicontent_fields/coreprops"          instfolder="flexicontent_fields">FLEXIcontent - Item Form CORE property placer</plugin>
+		<plugin name="date"               folder="plugins/flexicontent_fields/date"               instfolder="flexicontent_fields">FLEXIcontent - Date / Publish Up-Down Dates</plugin>
+		<plugin name="email"              folder="plugins/flexicontent_fields/email"              instfolder="flexicontent_fields">FLEXIcontent - Email</plugin>
+		<plugin name="extendedweblink"    folder="plugins/flexicontent_fields/extendedweblink"    instfolder="flexicontent_fields">FLEXIcontent - Extended Weblink</plugin>
+		<plugin name="fcloadmodule"       folder="plugins/flexicontent_fields/fcloadmodule"       instfolder="flexicontent_fields">FLEXIcontent - Load Module / Module position</plugin>
+		<plugin name="fcpagenav"          folder="plugins/flexicontent_fields/fcpagenav"          instfolder="flexicontent_fields">FLEXIcontent - Navigation (Next/Previous Item)</plugin>
+		<plugin name="fieldgroup"         folder="plugins/flexicontent_fields/fieldgroup"         instfolder="flexicontent_fields">FLEXIcontent - Fieldgroup (Multivalued field that groups other fields)</plugin>
+		<plugin name="file"               folder="plugins/flexicontent_fields/file"               instfolder="flexicontent_fields">FLEXIcontent - File (Download/View/Share/Download cart)</plugin>
+		<plugin name="groupmarker"        folder="plugins/flexicontent_fields/groupmarker"        instfolder="flexicontent_fields">FLEXIcontent - Item Form Tab / Fieldset / Custom HTML</plugin>
+		<plugin name="image"              folder="plugins/flexicontent_fields/image"              instfolder="flexicontent_fields">FLEXIcontent - Image or Gallery (image + details)</plugin>
+		<plugin name="linkslist"          folder="plugins/flexicontent_fields/linkslist"          instfolder="flexicontent_fields">FLEXIcontent - HTML list of URLs/Anchors/JS links</plugin>
+		<plugin name="minigallery"        folder="plugins/flexicontent_fields/minigallery"        instfolder="flexicontent_fields">FLEXIcontent - Mini-Gallery (image-only slideshow)</plugin>
+		<plugin name="phonenumbers"       folder="plugins/flexicontent_fields/phonenumbers"       instfolder="flexicontent_fields">FLEXIcontent - International Phone Numbers</plugin>
+		<plugin name="radio"              folder="plugins/flexicontent_fields/radio"              instfolder="flexicontent_fields">FLEXIcontent - Radio</plugin>
+		<plugin name="radioimage"         folder="plugins/flexicontent_fields/radioimage"         instfolder="flexicontent_fields">FLEXIcontent - Radio Image</plugin>
+		<plugin name="relation"           folder="plugins/flexicontent_fields/relation"           instfolder="flexicontent_fields">FLEXIcontent - Relation (List of related items)</plugin>
+		<plugin name="relation_reverse"   folder="plugins/flexicontent_fields/relation_reverse" instfolder="flexicontent_fields">FLEXIcontent - Relation - Reverse</plugin>
+		<plugin name="select"             folder="plugins/flexicontent_fields/select"             instfolder="flexicontent_fields">FLEXIcontent - Select</plugin>
+		<plugin name="selectmultiple"     folder="plugins/flexicontent_fields/selectmultiple"     instfolder="flexicontent_fields">FLEXIcontent - Select Multiple</plugin>
+		<plugin name="sharedaudio"        folder="plugins/flexicontent_fields/sharedaudio"        instfolder="flexicontent_fields">FLEXIcontent - Shared Audio (SoundCloud,Spotify,Last.fm,etc)</plugin>
+		<plugin name="sharedvideo"        folder="plugins/flexicontent_fields/sharedvideo"        instfolder="flexicontent_fields">FLEXIcontent - Shared Video (YouTube,Vimeo,DailyMotion,etc)</plugin>
+		<plugin name="termlist"           folder="plugins/flexicontent_fields/termlist"           instfolder="flexicontent_fields">FLEXIcontent - List of terms</plugin>
+		<plugin name="text"               folder="plugins/flexicontent_fields/text"               instfolder="flexicontent_fields">FLEXIcontent - Text (number/time/etc/custom validation)</plugin>
+		<plugin name="textarea"           folder="plugins/flexicontent_fields/textarea"           instfolder="flexicontent_fields">FLEXIcontent - Textarea</plugin>
+		<plugin name="textselect"         folder="plugins/flexicontent_fields/textselect"         instfolder="flexicontent_fields">FLEXIcontent - TextSelect (Text with existing value selection)</plugin>
+		<plugin name="toolbar"            folder="plugins/flexicontent_fields/toolbar"            instfolder="flexicontent_fields">FLEXIcontent - Toolbar (social share/other tools)</plugin>
+		<plugin name="weblink"            folder="plugins/flexicontent_fields/weblink"            instfolder="flexicontent_fields">FLEXIcontent - Weblink</plugin>
+		
+		<!-- Plugins: fincontent/content -->
+		<plugin name="flexinotify"        folder="plugins/flexicontent/flexinotify" instfolder="flexicontent">Flexicontent - Notifications for favoured content</plugin>
+		<plugin name="flexibreak"         folder="plugins/content/flexibreak"       instfolder="content">Content - Flexibreak, pagination for multi-paged articles</plugin>
+		
+		<!-- Plugins: finder/search -->
+		<plugin name="flexicontent"       folder="plugins/finder/flexicontent"      instfolder="finder">Finder - Flexicontent, indexer for Smart Search view</plugin>
+		<plugin name="flexisearch"        folder="plugins/search/flexisearch"       instfolder="search">Search - Flexisearch, for Joomla standard search view</plugin>
+		<plugin name="flexiadvsearch"     folder="plugins/search/flexiadvsearch"    instfolder="search">Search - Flexiadvsearch, for FLEXIcontent search view</plugin>
+		
+		<!-- Plugins: system -->
+		<plugin name="flexisystem"        folder="plugins/system/flexisystem"       instfolder="system">System - Flexisystem, core functions</plugin>
+		<plugin name="flexiadvroute"      folder="plugins/system/flexiadvroute"     instfolder="system">System - Flexiadvroute, advanced routing functions</plugin>
+		
+		<!-- Modules -->
+		<module name="mod_flexicontent"   folder="modules/mod_flexicontent">Universal Content for FLEXIcontent</module>
+		<module name="mod_flexifilter"    folder="modules/mod_flexifilter">Content Lists Filter for FLEXIcontent</module>
+		<module name="mod_flexitagcloud"  folder="modules/mod_flexitagcloud">Tag Cloud for FLEXIcontent</module>
+		<module name="mod_flexiadvsearch" folder="modules/mod_flexiadvsearch">Advanced Search for FLEXIcontent</module>
+	</additional>
+		
 </extension>

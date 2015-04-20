@@ -42,7 +42,7 @@ class com_flexicontentInstallerScript
 		
 		// Try to increment some limits
 		
-		@set_time_limit( 120 );    // try to set execution time 2 minutes
+		@set_time_limit( 150 );    // try to set execution time 2.5 minutes
 		ignore_user_abort( true ); // continue execution if client disconnects
 		
 		// Try to increment memory limits
@@ -97,37 +97,88 @@ class com_flexicontentInstallerScript
 		{
 			$this->minimum_joomla_release = '2.5.0';
 		}
+		?>
 		
-		// Show the essential information at the install/update back-end
-		if ($this->release_existing) {
-			echo '<br /> &nbsp; Updating FLEXIcontent from '.$this->release_existing.' to version ' . $this->release;
-		} else {
-			echo '<br /> &nbsp; Installing FLEXIcontent version '.$this->release;
-		}
-		echo '<br /> &nbsp; Minimum Joomla version = ' . $this->minimum_joomla_release .' &nbsp Current is ' . $jversion->getShortVersion();
-		echo '<p> -- ' . JText::_('Performing PRE-installation Tasks/Checks') .'</p>';
+		<table cellpadding="4" cellspacing="0" border="0" width="100%" class="adminlist">
+			<tr>
+				<td valign="top">
+		    	<img src="<?php echo 'components/com_flexicontent/assets/images/logo.png'; ?>" style="width:300px; margin: 0px 48px 0px 0px;" alt="FLEXIcontent Logo" />
+				</td>
+				<td valign="top" width="100%">
+	     	 	<span><?php echo JText::_('COM_FLEXICONTENT_DESCRIPTION'); ?></></span><br />
+	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Emmanuel Danan</a>,
+	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Georgios Papadakis</a>,
+	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Berges Yannick</a>,
+					<br/>
+	      	<font class="small">and <a href="http://www.marvelic.co.th" target="_blank">Marvelic Engine Co.,Ltd.</a><br/>
+				</td>
+			</tr>
+		<!--
+			<tr>
+				<td valign="top" style="font-weight: bold;">
+		    		<?php // echo JText::_('Choose an option to finish the install :'); ?>
+				</td>
+				<td valign="top" width="100%" style="font-weight: bold; color: red; font-size: 14px;">
+					<a href="index.php?option=com_flexicontent&task=finishinstall&action=newinstall" style="font-weight: bold; color: red; font-size: 14px;">
+		    		<?php // echo JText::_('New install'); ?>
+		    		</a>&nbsp;&nbsp;|&nbsp;&nbsp; 
+					<a href="index.php?option=com_flexicontent&task=finishinstall&action=update" style="font-weight: bold; color: red; font-size: 14px;">
+		    		<?php // echo JText::_('Update an existing install'); ?>
+		    		</a>
+				</td>
+			</tr>
+		-->
+		</table>
 		
-		// Abort if the current Joomla release is older
+		<?php		
+		echo '
+		<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' .JText::_('Performing prior to installation tasks ... '). '</div>
+		<ul>
+			<li>
+				'.JText::_('COM_FLEXICONTENT_REQUIRED_PHPVER').':
+				'.JText::_('COM_FLEXICONTENT_MIN').' <span class="badge">' .$PHP_VERSION_NEEDED. '</span>
+				'.JText::_('COM_FLEXICONTENT_CURRENT').' <span class="badge badge-success">' .PHP_VERSION. '</span>
+			</li>
+		';
+		
+		// Check that current Joomla release is not older than minimum required
 		if( version_compare( $jversion->getShortVersion(), $this->minimum_joomla_release, 'lt' ) ) {
+			echo '</ul>';
 			Jerror::raiseWarning(null, 'Cannot install com_flexicontent in a Joomla release prior to '.$this->minimum_joomla_release);
 			return false;
+		} else {
+			echo '
+				<li>
+					'.JText::_('COM_FLEXICONTENT_REQUIRED_JVER').':
+					'.JText::_('COM_FLEXICONTENT_MIN').' <span class="badge">' .$this->minimum_joomla_release. '</span>
+					'.JText::_('COM_FLEXICONTENT_CURRENT').' <span class="badge badge-success">' .$jversion->getShortVersion(). '</span>
+				</li>';
 		}
-
-		// Abort if the component being installed is not newer than the currently installed version
-		if ( $type == 'update' ) {
-			$oldRelease = $this->getParam('version');
-			$rel = $this->release_existing . ' to ' . $this->release;
-			if ( version_compare( $this->release, $oldRelease, 'l' ) ) {
-				Jerror::raiseNotice(null, 'Downgrading component from ' . $rel);
-				//return false;  // Returning false here would abort
+		
+		// Print message about installing / updating / downgrading FLEXIcontent
+		$downgrade_allowed = true;
+		if ($type=='update')
+		{
+			if ( !$downgrade_allowed && version_compare( $this->release, $this->release_existing, 'l' ) )
+			{
+				$from_to = ''
+					.JText::_('COM_FLEXICONTENT_FROM'). ' <span class="badge">' .$this->release_existing. '</span> '
+					.JText::_('COM_FLEXICONTENT_TO'). ' <span class="badge badge-warning">' .$this->release. '</span> ';
+				// ?? Abort if the component being installed is not newer than the currently installed version
+				//echo '</ul>';
+				Jerror::raiseWarning(null, 'Refusing to downgrade installation of com_flexicontent '.$from_to);
+				return false;
+				echo '</ul>';
+				return false;  // Returning false here would abort
 			}
 		}
 		
-		// Detect FLEXIcontent installed
-		if (FLEXI_J16GE)
-			define('FLEXI_INSTALLED', $this->release_existing ? 1 : 0); 
-		else
-			define('FLEXI_INSTALLED', JPluginHelper::isEnabled('system', 'flexisystem') );
+		echo '
+		</ul>
+		';
+		
+		// Set a flag about FLEXIcontent being installed (1) or upgraded (0)
+		define('FLEXI_NEW_INSTALL', $type=='install' ? 1 : 0);
 	}
 
 	/*
@@ -136,8 +187,12 @@ class com_flexicontentInstallerScript
 	* If the extension is new, the install method is run.
 	* If install returns false, Joomla will abort the install and undo everything already done.
 	*/
-	function install( $parent ) {
-		echo '<p> -- ' . JText::_('Installing ' . $this->release) . '</p>';
+	function install( $parent )
+	{
+		echo '
+		<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' . JText::_('COM_FLEXICONTENT_INSTALLING')
+			.' '.JText::_('COM_FLEXICONTENT_VERSION').'  <span class="badge badge-info">'.$this->release.'</span>
+		</div>';
 		if ( ! $this->do_extra( $parent ) ) return false;
 		
 		// You can have the backend jump directly to the newly installed component configuration page
@@ -151,8 +206,22 @@ class com_flexicontentInstallerScript
 	* If the extension exists, then the update method is run.
 	* If this returns false, Joomla will abort the update and undo everything already done.
 	*/
-	function update( $parent ) {
-		echo '<p> -- ' . JText::_('Updating to ' . $this->release) . '</p>';
+	function update( $parent )
+	{
+		echo '<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' . JText::_('COM_FLEXICONTENT_UPDATING_INSTALLATION')
+			.' '.JText::_('COM_FLEXICONTENT_VERSION').': ';
+		if ( version_compare( $this->release, $this->release_existing, 'ge' ) ) {
+			echo '
+				'.JText::_('COM_FLEXICONTENT_FROM').' <span class="badge">'.$this->release_existing.'</span>
+				'.JText::_('COM_FLEXICONTENT_TO').' <span class="badge badge-info">'.$this->release.'</span>';
+		} else {
+			echo '
+				<span class="badge badge-info">'.JText::_('COM_FLEXICONTENT_DOWNGRADING').'</span>
+				'.JText::_('COM_FLEXICONTENT_FROM'). ' <span class="badge">' .$this->release_existing. '</span>
+				'.JText::_('COM_FLEXICONTENT_TO'). ' <span class="badge badge-info">' .$this->release. '</span>';
+		}
+		echo '</div>';
+		
 		if ( ! $this->do_extra( $parent ) ) return false;
 		
 		// You can have the backend jump directly to the newly updated component configuration page
@@ -160,8 +229,8 @@ class com_flexicontentInstallerScript
 	}
 	
 	
-	function do_extra( $parent ) {
-		
+	function do_extra( $parent )
+	{
 		// init vars
 		$error = false;
 		$extensions = array();
@@ -245,7 +314,7 @@ class com_flexicontentInstallerScript
 				}
 			} else {
 				$extensions[$i]['status'] = false;
-				if ( !FLEXI_INSTALLED ) {
+				if ( !FLEXI_NEW_INSTALL ) {
 					$error = true;
 					break;
 				}
@@ -253,43 +322,18 @@ class com_flexicontentInstallerScript
 		}
 		
 		?>
-		<table cellpadding="4" cellspacing="0" border="0" width="100%" class="adminlist">
-			<tr>
-				<td valign="top">
-		    		<img src="<?php echo 'components/com_flexicontent/assets/images/logo.png'; ?>" height="96" width="300" alt="FLEXIcontent Logo" align="left" />
-				</td>
-				<td valign="top" width="100%">
-		       	 	<strong>FLEXIcontent</strong><br/>
-		       	 	<span>Flexible content management system for Joomla! J2.5/J3.x</span><br />
-		        	<font class="small">by <a href="http://www.vistamedia.fr" target="_blank">Emmanuel Danan</a>,
-							Georgios Papadakis<br/>
-		        	<font class="small">and <a href="http://www.marvelic.co.th" target="_blank">Marvelic Engine Co.,Ltd.</a><br/>
-		       	 	<span>Logo and icons</span><br />
-		        	<font class="small">by <a href="http://www.artefact-design.com" target="_blank">Greg Berthelot</a><br/>
-				</td>
-			</tr>
-		<!--
-			<tr>
-				<td valign="top" style="font-weight: bold;">
-		    		<?php // echo JText::_('Choose an option to finish the install :'); ?>
-				</td>
-				<td valign="top" width="100%" style="font-weight: bold; color: red; font-size: 14px;">
-					<a href="index.php?option=com_flexicontent&task=finishinstall&action=newinstall" style="font-weight: bold; color: red; font-size: 14px;">
-		    		<?php // echo JText::_('New install'); ?>
-		    		</a>&nbsp;&nbsp;|&nbsp;&nbsp; 
-					<a href="index.php?option=com_flexicontent&task=finishinstall&action=update" style="font-weight: bold; color: red; font-size: 14px;">
-		    		<?php // echo JText::_('Update an existing install'); ?>
-		    		</a>
-				</td>
-			</tr>
-		-->
-		</table>
-		<h3><?php echo JText::_('Additional Extensions'); ?></h3>
+				
+		<div class="alert alert-warning" style="margin:24px 0px 12px 0px; width:240px;"><?php echo JText::_('COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS'); ?></div>
+		
 		<table class="adminlist">
 			<thead>
 				<tr>
-					<th class="title"><?php echo JText::_('Extension'); ?></th>
-					<th width="60%"><?php echo JText::_('Status'); ?></th>
+					<th style="text-align:left; width:500px;">
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_EXTENSION'); ?></span>
+					</th>
+					<th style="text-align:left">
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_STATUS'); ?></span>
+					</th>
 				</tr>
 			</thead>
 			<tfoot>
@@ -300,23 +344,25 @@ class com_flexicontentInstallerScript
 			<tbody>
 				<?php foreach ($extensions as $i => $ext) : ?>
 					<tr class="row<?php echo $i % 2; ?>">
-						<td class="key">[<?php echo JText::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
+						<td class="key" style="font-size:11px;">[<?php echo JText::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
 						<td>
 							<?php
-							if ($ext['status']===null) $status_color = 'black';
-							else if ($ext['status']) $status_color = 'green';
-							else $status_color = 'red';
-							$style = 'font-weight: bold; color: '.$status_color.';';
+							if ($ext['status']===null)
+								$status_class = 'badge';
+							else if ($ext['status'])
+								$status_class = 'badge badge-success';
+							else
+								$status_class = 'badge badge-error';
 							?>
-							<span style="<?php echo $style; ?>">
+							<span class="<?php echo $status_class; ?>">
 								<?php
 									if ( $ext['status'] === null ) {
-										echo JText::_('Installation skipped');
+										echo JText::_('COM_FLEXICONTENT_SKIPPED');
 									} else if ($ext['status']) {
-										echo JText::_('Installation successful');
+										echo JText::_('COM_FLEXICONTENT_INSTALLED');
 									} else {
-										$msg = JText::_(FLEXI_INSTALLED ? 'Upgrade ERROR (extension removed)' : 'Installation -- FAILED --' ) ."<br/>";
-										if (FLEXI_INSTALLED) $msg .= "FLEXIcontent may not work properly, please install an older or newer FLEXIcontent package";
+										$msg = JText::_(FLEXI_NEW_INSTALL ? 'Upgrade ERROR (extension removed)' : 'Installation -- FAILED --' ) ."<br/>";
+										if (FLEXI_NEW_INSTALL) $msg .= "FLEXIcontent may not work properly, please install an older or newer FLEXIcontent package";
 										echo $msg;
 										Jerror::raiseWarning(null, '<br/>'.$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .': '. $msg);
 									}
@@ -334,8 +380,8 @@ class com_flexicontentInstallerScript
 			for ($i = 0; $i < count($extensions); $i++) {
 				if ( $extensions[$i]['status'] ) {
 					$extensions[$i]['installer']->abort('<span style="color:black">'.
-						$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('Install') .':</span>'.
-						' <span style="color:green">'. JText::_('rolling back').'</span>',
+						$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('COM_FLEXICONTENT_INSTALLED') .':</span>'.
+						' <span class="badge badge-warning">'. JText::_('rolling back').'</span>',
 						$extensions[$i]['type']
 					);
 					//$extensions[$i]['status'] = false;
@@ -363,7 +409,11 @@ class com_flexicontentInstallerScript
 	* $type is the type of change (install, update or discover_install, not uninstall).
 	* postflight is run after the extension is registered in the database.
 	*/
-	function postflight( $type, $parent ) {
+	function postflight( $type, $parent )
+	{
+		$app = JFactory::getApplication();
+		$db = JFactory::getDBO();
+		
 		/*
 		// always create or modify these parameters
 		$params['my_param0'] = 'Component version ' . $this->release;
@@ -378,32 +428,21 @@ class com_flexicontentInstallerScript
 		$this->setParams( $params );*/
 		
 		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
-		echo '<p> -- ' . JText::_('Performing POST-installation Task/Checks') .'</p>';
-		
-		$db = JFactory::getDBO();
-		
-		// Delete orphan entries ?
-		$query="DELETE FROM `#__extensions` WHERE folder='flexicontent_fields' AND element IN ('flexisystem', 'flexiadvroute', 'flexisearch', 'flexiadvsearch', 'flexinotify')";
-		$db->setQuery($query);
-		$result = $db->query();
-		
-		if (FLEXI_J30GE) {
-			// System plugins must be enabled
-			$query = "UPDATE #__extensions SET enabled=1 WHERE type='plugin' AND element=".$db->Quote('flexisystem')." AND folder=".$db->Quote('system');
-			$db->setQuery($query);
-			$db->query();
-			$query = "UPDATE #__extensions SET enabled=1 WHERE type='plugin' AND element=".$db->Quote('flexiadvroute')." AND folder=".$db->Quote('system');
-			$db->setQuery($query);
-			$db->query();
-		}
+		echo '
+		<link type="text/css" href="components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">
+		<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' .JText::_('Performing after installation tasks ... '). '</div>
+		';
 		?>
 		
-		<h3><?php echo JText::_('Actions'); ?></h3>
 		<table class="adminlist">
 			<thead>
 				<tr>
-					<th class="title"><?php echo JText::_('Actions'); ?></th>
-					<th width="60%"><?php echo JText::_('Status'); ?></th>
+					<th style="text-align:left; width:500px;">
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_TASKS'); ?></span>
+					</th>
+					<th style="text-align:left">
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_STATUS'); ?></span>
+					</th>
 				</tr>
 			</thead>
 			<tfoot>
@@ -412,32 +451,9 @@ class com_flexicontentInstallerScript
 				</tr>
 			</tfoot>
 			<tbody>
-				
-		<?php
-		// Set phpThumb Cache folder permissions
-		?>
-				<tr class="row1">
-					<td class="key">Setting phpThumb Cache folder permissions</td>
-					<td>
-						<?php
-						if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
-						$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
-						$success = JPath::setPermissions($phpthumbcache, '0644', '0755');
-						$style = $success ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;';
-						?>
-						<span style="<?php echo $style; ?>"><?php
-						if($success) {
-							echo JText::_("Task <b>SUCCESSFUL</b>");
-						} else {
-							echo JText::_("Setting phpThumb Cache folder permissions UNSUCCESSFUL.");
-						}
-						?></span>
-					</td>
-				</tr>
-
+			
 		<?php
 		$deprecated_fields = array('hidden'=>'text', 'relateditems'=>'relation', 'relateditems_backlinks'=>'relation_reverse');
-		$app = JFactory::getApplication();
 		
 		// Get DB table information
 		
@@ -493,15 +509,70 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$dl_coupons_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$failure_style = 'display:block; width:100%; font-weight: bold; color: red;';
-		$success_style = 'font-weight: bold; color: green;';
 		?>
+		
+		
+		<?php
+		// Delete orphan plugin entries
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Delete orphan plugin entries</td>
+					<td>
+					<?php
+					$queries = array();
+					$queries[] ="DELETE FROM `#__extensions` WHERE folder='flexicontent_fields' AND element IN ('flexisystem', 'flexiadvroute', 'flexisearch', 'flexiadvsearch', 'flexinotify')";
+					
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) {
+								$result = false;
+								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							}
+						}
+						if ( $result !== false ) {
+							echo "<span class='badge badge-success'>tables altered</span>";
+						}
+					}
+					else echo "<span class='badge badge-info'>nothing to do</span>";
+					?>
+					</td>
+					<td> <?php echo implode("<br/>\n", $msg); ?> </td>
+				</tr>
+		
+		<?php
+		// Enable FLEXIcontent system plugins
+		?>
+				<tr class="row1">
+					<td class="key" style="font-size:11px;">Enable FLEXIcontent system plugins</td>
+					<td>
+					<?php
+					$queries = array();
+					if (FLEXI_J30GE) $queries[] = "UPDATE #__extensions SET enabled=1 WHERE type='plugin' AND (element=".$db->Quote('flexisystem')." OR element=".$db->Quote('flexiadvroute').") AND folder=".$db->Quote('system');
+					
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) {
+								$result = false;
+								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							}
+						}
+						if ( $result !== false ) {
+							echo "<span class='badge badge-success'>tables altered</span>";
+						}
+					}
+					else echo "<span class='badge badge-info'>nothing to do</span>";
+					?>
+					</td>
+					<td> <?php echo implode("<br/>\n", $msg); ?> </td>
+				</tr>
 		
 		<?php
 		// Update DB table flexicontent_fields: Convert deprecated fields types to 'text' field type
 		?>
 				<tr class="row0">
-					<td class="key">Converting deprecated fields
+					<td class="key" style="font-size:11px;">Converting deprecated fields
 					<?php
 					$msg = array();
 					if ($fields_tbl_exists) foreach ($deprecated_fields as $old_type => $new_type)
@@ -512,7 +583,7 @@ class com_flexicontentInstallerScript
 						$db->setQuery($query);
 						$result = $db->query();
 						if( !$result ) {
-							$msg[] = "<span style='$failure_style'>UPDATE TABLE failed: ". $query ."</span>";
+							$msg[] = "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
 							continue;
 						}
 						
@@ -529,9 +600,9 @@ class com_flexicontentInstallerScript
 						if ($ext && $ext['id'] > 0) {
 							$installer = new JInstaller();
 							if ( $installer->uninstall($ext['type'], $ext['id'], (int)$ext['client_id']) )
-								$msg[] = " -- Uninstalled deprecated plugin: '".$old_type."'";
+								$msg[] = "Uninstalling deprecated plugin: '".$old_type."' <span class='badge badge-success'>success</span>";
 							else
-								$msg[] = "<span style='$failure_style'> -- Failed to uninstalled deprecated plugin: '".$old_type."'";
+								$msg[] = "Uninstalling deprecated plugin: '".$old_type."' <span class='badge badge-error'>failed</span>";
 						}
 					}
 					?>
@@ -543,7 +614,7 @@ class com_flexicontentInstallerScript
 		// Upgrade DB tables: ADD new columns
 		?>
 				<tr class="row1">
-					<td class="key">Upgrading DB tables (adding/dropping columns): </td>
+					<td class="key" style="font-size:11px;">Upgrading DB tables (adding/dropping columns): </td>
 					<td>
 					<?php
 					$tbls = array();
@@ -649,14 +720,14 @@ class com_flexicontentInstallerScript
 							$db->setQuery($query);
 							if ( !($result = $db->query()) ) {
 								$result = false;
-								echo "<span style='$failure_style'>ALTER TABLE failed: ". $query ."</span>";
+								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
 							}
 						}
 						if ( $result !== false ) {
-							echo "<span style='$success_style'>tables altered</span>";
+							echo "<span class='badge badge-success'>tables altered</span>";
 						}
 					}
-					else echo "<span style='$success_style'>nothing to do</span>";
+					else echo "<span class='badge badge-info'>nothing to do</span>";
 					?>
 					</td>
 				</tr>
@@ -666,7 +737,7 @@ class com_flexicontentInstallerScript
 		// Because Adding indexes can be heavy to the SQL server (if not done asychronously ??) we truncate table OR drop it and recreate it
 		?>
 				<tr class="row0">
-					<td class="key">Create/Upgrade advanced search index table: </td>
+					<td class="key" style="font-size:11px;">Create/Upgrade advanced search index table: </td>
 					<td>
 					<?php
 					
@@ -719,14 +790,14 @@ class com_flexicontentInstallerScript
 							$db->setQuery($query);
 							if ( !($result = $db->query()) ) {
 								$result = false;
-								echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>";
+								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
 							}
 						}
 						if ( $result !== false ) {
-							echo "<span style='$success_style'>table was truncated/updated or recreated, please re-index your content</span>";
+							echo "<span class='badge badge-success'>table altered</span> please re-index your content</span>";
 						}
 					}
-					else echo "<span style='$success_style'>nothing to do</span>";
+					else echo "<span class='badge badge-info'>nothing to do</span>";
 					?>
 					</td>
 				</tr>
@@ -735,7 +806,7 @@ class com_flexicontentInstallerScript
 		// Create authors_ext table if it does not exist
 		?>
 				<tr class="row1">
-					<td class="key">Create/Upgrade authors extended DB table: </td>
+					<td class="key" style="font-size:11px;">Create/Upgrade authors extended DB table: </td>
 					<td>
 					<?php
 					
@@ -755,14 +826,14 @@ class com_flexicontentInstallerScript
 							$db->setQuery($query);
 							if ( !($result = $db->query()) ) {
 								$result = false;
-								echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>";
+								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
 							}
 						}
 						if ( $result !== false ) {
-							echo "<span style='$success_style'>table created</span>";
+							echo "<span class='badge badge-success'>table created / upgraded</span>";
 						}
 					}
-					else echo "<span style='$success_style'>nothing to do</span>";
+					else echo "<span class='badge badge-info'>nothing to do</span>";
 					?>
 					</td>
 				</tr>
@@ -771,7 +842,7 @@ class com_flexicontentInstallerScript
 		// Create content_cache table if it does not exist
 		?>
 				<tr class="row0">
-					<td class="key">Create/Upgrade content cache DB table: </td>
+					<td class="key" style="font-size:11px;">Create/Upgrade content cache DB table: </td>
 					<td>
 					<?php
 					
@@ -813,14 +884,14 @@ class com_flexicontentInstallerScript
 							$db->setQuery($query);
 							if ( !($result = $db->query()) ) {
 								$result = false;
-								echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>";
+								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
 							}
 						}
 						if ( $result !== false ) {
-							echo "<span style='$success_style'>table created or upgraded</span>";
+							echo "<span class='badge badge-success'>table created / upgraded</span>";
 						}
 					}
-					else echo "<span style='$success_style'>nothing to do</span>";
+					else echo "<span class='badge badge-info'>nothing to do</span>";
 					?>
 					</td>
 				</tr>
@@ -829,7 +900,7 @@ class com_flexicontentInstallerScript
 		// Create/Upgrade DB tables for downloads enhancements
 		?>
 				<tr class="row1">
-					<td class="key">Create/Upgrade DB tables for downloads enhancements: </td>
+					<td class="key" style="font-size:11px;">Create/Upgrade DB tables for downloads enhancements: </td>
 					<td>
 					<?php
 					
@@ -871,14 +942,14 @@ class com_flexicontentInstallerScript
 							$db->setQuery($query);
 							if ( !($result = $db->query()) ) {
 								$result = false;
-								echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>";
+								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
 							}
 						}
 						if ( $result !== false ) {
-							echo "<span style='$success_style'>table(s) created or upgraded</span>";
+							echo "<span class='badge badge-success'>table(s) created or upgraded</span>";
 						}
 					}
-					else echo "<span style='$success_style'>nothing to do</span>";
+					else echo "<span class='badge badge-info'>nothing to do</span>";
 					?>
 					</td>
 				</tr>
@@ -887,7 +958,7 @@ class com_flexicontentInstallerScript
 		// Create layouts_conf table if it does not exist
 		?>
 				<tr class="row0">
-					<td class="key">Create/Upgrade layouts configuration DB table: </td>
+					<td class="key" style="font-size:11px;">Create/Upgrade layouts configuration DB table: </td>
 					<td>
 					<?php
 					
@@ -908,14 +979,14 @@ class com_flexicontentInstallerScript
 							$db->setQuery($query);
 							if ( !($result = $db->query()) ) {
 								$result = false;
-								echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>";
+								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
 							}
 						}
 						if ( $result !== false ) {
-							echo "<span style='$success_style'>table created</span>";
+							echo "<span class='badge badge-success'>table created</span>";
 						}
 					}
-					else echo "<span style='$success_style'>nothing to do</span>";
+					else echo "<span class='badge badge-info'>nothing to do</span>";
 					?>
 					</td>
 				</tr>
@@ -939,7 +1010,7 @@ class com_flexicontentInstallerScript
 		
 		// Installed component manifest file version
 		$this->release = $parent->get( "manifest" )->version;
-		echo '<p>' . JText::_('Uninstalling FLEXIcontent ' . $this->release) . '</p>';
+		echo '<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' .'Uninstalling FLEXIcontent '.$this->release. '</div>';
 		
 		// init vars
 		$error = false;
@@ -1020,12 +1091,16 @@ class com_flexicontentInstallerScript
 		}
 		
 		?>
-		<h3><?php echo JText::_('Additional Extensions'); ?></h3>
+		<div class="alert alert-warning" style="margin:24px 0px 12px 0px; width:240px;"><?php echo JText::_('COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS'); ?></div>
 		<table class="adminlist">
 			<thead>
 				<tr>
-					<th class="title"><?php echo JText::_('Extension'); ?></th>
-					<th width="60%"><?php echo JText::_('Status'); ?></th>
+					<th style="text-align:left; width:500px;">
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_EXTENSION'); ?></span>
+					</th>
+					<th style="text-align:left">
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_STATUS'); ?></span>
+					</th>
 				</tr>
 			</thead>
 			<tfoot>
@@ -1036,22 +1111,26 @@ class com_flexicontentInstallerScript
 			<tbody>
 				<?php foreach ($extensions as $i => $ext) : ?>
 					<tr class="row<?php echo $i % 2; ?>">
-						<td class="key">[<?php echo JText::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
+						<td class="key" style="font-size:11px;">[<?php echo JText::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
 						<td>
-							<?php $style = $ext['status'] ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
-							<span style="<?php echo $style; ?>"><?php echo $ext['status'] ? JText::_('Uninstalled successfully') : JText::_('Uninstall FAILED'); ?></span>
+							<?php $status_class = $ext['status'] ? 'badge badge-success' : 'badge badge-error'; ?>
+							<span class="<?php echo $status_class; ?>"><?php echo $ext['status'] ? JText::_('COM_FLEXICONTENT_UNINSTALLED') : JText::_('uninstall FAILED'); ?></span>
 						</td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
 		</table>
 
-		<h3><?php echo JText::_('Actions'); ?></h3>
+		<br/>
 		<table class="adminlist">
 			<thead>
 				<tr>
-					<th class="title"><?php echo JText::_('Actions'); ?></th>
-					<th width="60%"><?php echo JText::_('Status'); ?></th>
+					<th style="text-align:left; width:500px;">
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_TASKS'); ?></span>
+					</th>
+					<th style="text-align:left">
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_STATUS'); ?></span>
+					</th>
 				</tr>
 			</thead>
 			<tfoot>
@@ -1065,7 +1144,7 @@ class com_flexicontentInstallerScript
 		// Alter com_flexicontent jcomments comments to be com_content comments
 		?>
 				<tr class="row0">
-					<td class="key">Restore jComments comment to be of com_content Type</td>
+					<td class="key" style="font-size:11px;">Restore jComments comment to be of com_content Type</td>
 					<td>
 						<?php
 						$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'jcomments"';
@@ -1088,9 +1167,9 @@ class com_flexicontentInstallerScript
 							}
 						}
 						
-						$style = ($result==2 || $result==0) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;';
+						$status_class = ($result==2 || $result==0) ? 'badge badge-success' : 'badge badge-error';
 						?>
-						<span style="<?php echo $style; ?>"><?php
+						<span class="<?php echo $status_class; ?>"><?php
 						if ($result==2) {
 							echo JText::_("Comments restored");
 						} else if ($result==1) {
@@ -1106,7 +1185,7 @@ class com_flexicontentInstallerScript
 		// Restore com_content component asset, as asset parent_id, for the top-level 'com_content' categories
 		?>
 				<tr class="row1">
-					<td class="key">Restore com_content top-level category assets</td>
+					<td class="key" style="font-size:11px;">Restore com_content top-level category assets</td>
 					<td>
 						<?php
 						$asset	= JTable::getInstance('asset');
@@ -1141,9 +1220,9 @@ class com_flexicontentInstallerScript
 							}
 						}
 						
-						$style = $result==2 ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;';
+						$status_class = $result==2 ? 'badge badge-success' : 'badge badge-error';
 						?>
-						<span style="<?php echo $style; ?>"><?php
+						<span class="<?php echo $status_class; ?>"><?php
 						if ($result==2) {
 							echo JText::_("Assets restored");
 						} else if ($result==1) {
