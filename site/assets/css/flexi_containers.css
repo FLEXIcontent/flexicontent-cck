@@ -125,10 +125,7 @@
 	line-height: 140%;
 
 }
-.fc-padded-image {
-	padding:4px 6px 4px 4px;
-	margin:-4px -6px -4px -4px;
-	display:inline-block;
+.fc-tooltip-img {
 }
 
 

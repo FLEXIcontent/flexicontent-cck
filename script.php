@@ -80,6 +80,9 @@ class com_flexicontentInstallerScript
 			return false;
 		}
 		
+		// Get existing manifest data
+		$existing_manifest = $this->getExistingManifest();
+		
 		// Get Joomla version
 		$jversion = new JVersion();
 		
@@ -87,7 +90,7 @@ class com_flexicontentInstallerScript
 		$this->release = $parent->get( "manifest" )->version;
 		
 		// File version of existing manifest file
-		$this->release_existing = $this->getParam('version');
+		$this->release_existing = $existing_manifest[ 'version' ];
 		
 		// Manifest file minimum Joomla version
 		$this->minimum_joomla_release = $parent->get( "manifest" )->attributes()->version;
@@ -994,7 +997,6 @@ class com_flexicontentInstallerScript
 			</tbody>
 		</table>
 		<?php
-		
 	}
 
 	/*
@@ -1243,12 +1245,16 @@ class com_flexicontentInstallerScript
 	/*
 	* get a variable from the manifest file (actually, from the manifest cache).
 	*/
-	function getParam( $name ) {
+	function getExistingManifest( $name ) {
+		static $paramsArr = null;
+		if ($paramsArr !== null) return $paramsArr;
+		
 		$db = JFactory::getDBO();
-		$db->setQuery('SELECT manifest_cache FROM #__extensions WHERE element = "com_flexicontent"');
-		$str =  $db->loadResult();
-		$manifest = json_decode($str, true );
-		return $manifest[ $name ];
+		$db->setQuery('SELECT manifest_cache FROM #__extensions WHERE element = "com_flexicontent" AND type="component"');
+		$manifest_cache =  $db->loadResult();
+		
+		$paramsArr = json_decode($manifest_cache, true );
+		return $paramsArr;
 	}
 
 	/*

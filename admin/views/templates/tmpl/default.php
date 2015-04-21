@@ -18,7 +18,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$commentimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ), ' class="fc-padded-image" style="vertical-align:top;" ');
+$commentimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ), ' class="fc-tooltip-img" style="vertical-align:top;" ');
 
 $basetemplates = array('default', 'blog', 'faq', 'items-tabbed', 'presentation');
 $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
