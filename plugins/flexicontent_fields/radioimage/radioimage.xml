@@ -64,8 +64,8 @@
 			<field name="field_elements" type="textarea" default="1::Information::information.png%% 0::Warning::warning.png%% " class="required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" />
 			<field name="imagedir" type="text" default="images/stories/" class="required" label="FLEXI_FIELD_IMAGEDIR" description="FLEXI_FIELD_IMAGEDIR_DESC" />
 			
-			<field name="cascade_after" type="fields" field_type="select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="Cascade after field" description="Load values when another field is changed" 
-				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of cascade-after field will filter the values of this field, by requiring that: VALUE_cascade-after-field=VALGRP_this-field" tip_class="" tip_img="comment.png"  preview_img="relationships.png" 
+			<field name="cascade_after" type="fields" field_type="select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="Cascade after master" description="Load values when another field is changed" 
+				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of -master- field will filter the values of -this- field, by requiring that:&lt;br/&gt;&lt;br/&gt; value master-field == valgrp this-field" tip_class="" tip_img="comment.png"  preview_img="relationships.png" 
 				labelclass="" custom_prompt="FLEXI_NO" />
 			<field name="cascade_prompt" type="text" default="" label="Cascade prompt" description="A prompt to ask user to select a value in the cascade-after field, so that this field loads dependent values" />
 			

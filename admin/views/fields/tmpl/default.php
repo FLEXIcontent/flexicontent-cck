@@ -57,6 +57,39 @@ if ($this->filter_type == '' || $this->filter_type == 0) {
 }
 $ord_grp = 1;
 $list_total_cols = 13;
+
+
+// Parse parameter and find fieldgroup
+$f2g_map = array();
+$grouped_fields = array();
+$grouping_fields = array();
+$fields_byid = array();
+foreach ($this->rows as $row)
+{
+	if ( in_array($row->field_type, array('groupmarker', 'coreprops', 'fieldgroup', 'select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage')) ) {
+		$row->parameters = new JRegistry($row->attribs);
+	}
+	if ($row->field_type=='fieldgroup') {
+		$row->grouped_fields = preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields'));
+		$grouping_fields[$row->id] = $row;
+		foreach($row->grouped_fields as $_fid) $f2g_map[$_fid] = $row;
+	}
+	if ( in_array($row->field_type, array('select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage')) ) {
+		$row->parameters = new JRegistry($row->attribs);
+		$row->cascade_after = $row->parameters->get('cascade_after');
+	}
+	$fields_byid[$row->id] = $row;
+}
+if (count($f2g_map)) $list_total_cols++;
+
+foreach ($this->rows as $row)
+{
+	if (isset($f2g_map[$row->id])) {
+		$grouping_field = $f2g_map[$row->id];
+		$grouped_fields[ $grouping_field->id ][ $row->id ] = $row;
+		$row->grouping_field = $grouping_field;
+	}
+}
 ?>
 <script type="text/javascript">
 
@@ -112,7 +145,7 @@ function delAllFilters() {
 		<span class="fc-filter nowrap_box">
 			<span class="limit nowrap_box" style="display: inline-block;">
 				<label class="label">
-					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
+					<?php echo JText::_('JGLOBAL_DISPLAY_NUM'); ?>
 				</label>
 				<?php
 				$pagination_footer = $this->pagination->getListFooter();
@@ -223,13 +256,7 @@ function delAllFilters() {
 
 	<tbody <?php echo $ordering_draggable && $this->permission->CanOrderFields && $this->ordering ? 'id="sortable_fcitems"' : ''; ?> >
 		<?php
-		if (FLEXI_J16GE) {
-			$canCheckinRecords = $user->authorise('core.admin', 'checkin');
-		} else if (FLEXI_ACCESS) {
-			$canCheckinRecords = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
-		} else {
-			$canCheckinRecords = $user->gid >= 24;
-		}
+		$canCheckinRecords = $user->authorise('core.admin', 'checkin');
 		$_desc_label = JText::_('FLEXI_FIELD_DESCRIPTION', true);
 		
 		$k = 0;
@@ -244,19 +271,16 @@ function delAllFilters() {
 			$padspacer = '';
 			$row_css = '';
 			
-			if ($row->field_type=='groupmarker' || $row->field_type=='coreprops') {
-				$fld_params = FLEXI_J16GE ? new JRegistry($row->attribs) : new JParameter($row->attribs);
-			}
 			if ( $this->filter_type ) // Create coloring and padding for groupmarker fields if filtering by specific type is enabled
 			{
 				if ($row->field_type=='groupmarker') {
-					if ( in_array ($fld_params->get('marker_type'), array( 'tabset_start', 'tabset_end' ) ) ) {
+					if ( in_array ($row->parameters->get('marker_type'), array( 'tabset_start', 'tabset_end' ) ) ) {
 						$row_css = 'color:black;';
-					} else if ( in_array ($fld_params->get('marker_type'), array( 'tab_open', 'fieldset_open' ) ) ) {
+					} else if ( in_array ($row->parameters->get('marker_type'), array( 'tab_open', 'fieldset_open' ) ) ) {
 						$row_css = 'color:darkgreen;';
 						for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
 						$padcount++;
-					} else if ( in_array ($fld_params->get('marker_type'), array( 'tab_close', 'fieldset_close' ) ) ) {
+					} else if ( in_array ($row->parameters->get('marker_type'), array( 'tab_close', 'fieldset_close' ) ) ) {
 						$row_css = 'color:darkred;';
 						$padcount--;
 						for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
@@ -267,20 +291,10 @@ function delAllFilters() {
 				}
 			}
 			
-			if (FLEXI_J16GE) {
-				$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'field', $row->id);
-				$canEdit			= in_array('editfield', $rights);
-				$canPublish		= in_array('publishfield', $rights);
-				$canDelete		= in_array('deletefield', $rights);
-			} else if (FLEXI_ACCESS) {
-				$canEdit		= $user->gid==25 ? 1 : FAccess::checkAllContentAccess('com_content','edit','users', $user->gmid, 'field', $row->id);
-				$canPublish	= $user->gid==25 ? 1 : FAccess::checkAllContentAccess('com_content','publish','users', $user->gmid, 'field', $row->id);
-				$canDelete	= $user->gid==25 ? 1 : FAccess::checkAllContentAccess('com_content','delete','users', $user->gmid, 'field', $row->id);
-			} else {
-				$canEdit			= $user->gid >= 24;
-				$canPublish		= $user->gid >= 24;
-				$canDelete		= $user->gid >= 24;
-			}
+			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'field', $row->id);
+			$canEdit			= in_array('editfield', $rights);
+			$canPublish		= in_array('publishfield', $rights);
+			$canDelete		= in_array('deletefield', $rights);
 			
 			$link 		= 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $row->id;
 			if ($row->id < 7) {  // First 6 core field are not unpublishable
@@ -290,10 +304,7 @@ function delAllFilters() {
 			} else if (!$canPublish && !$row->published) {   // No privilige unpublished
 				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/publish_x_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
 			} else {
-				if (FLEXI_J16GE)
-					$published 	= JHTML::_('jgrid.published', $row->published, $i, $ctrl );
-				else
-					$published 	= JHTML::_('grid.published', $row, $i );
+				$published 	= JHTML::_('jgrid.published', $row->published, $i, $ctrl );
 			}
 			
 			//check which properties are supported by current field
@@ -337,16 +348,10 @@ function delAllFilters() {
 				$isadvfilter_tip = ($row->isadvfilter==2 ? $flexi_yes : $flexi_no) .", ". $flexi_rebuild;
 			}
 			
-			if (FLEXI_J16GE) {
-				if ($canPublish) {
-					$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"');
-				} else {
-					$access = $this->escape($row->access_level);
-				}
-			} else if (FLEXI_ACCESS) {
-				$access 	= FAccess::accessswitch('field', $row, $i);
+			if ($canPublish) {
+				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"');
 			} else {
-				$access 	= JHTML::_('grid.access', $row, $i );
+				$access = $this->escape($row->access_level);
 			}
 			
 			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
@@ -413,6 +418,15 @@ function delAllFilters() {
 
 			<td align="left">
 				<?php
+				if (isset($row->grouping_field)) {
+					$_r = $row->grouping_field;
+					$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $_r->id;
+					echo '
+					<a style="padding:2px;" href="'.$_link.'" title="'.$edit_entry.'">
+						<img align="left" style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/insert_merge_field.png" title="Grouped inside: '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="'.$tip_class.'" />
+					</a>';
+				}
+				
 				echo $padspacer;
 				
 				// Display an icon with checkin link, if current user has checked out current item
@@ -421,7 +435,7 @@ function delAllFilters() {
 					$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
 					if ($canCheckin) {
 						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
-						$task_str = FLEXI_J16GE ? 'fields.checkin' : 'checkin';
+						$task_str = 'fields.checkin';
 						if ($row->checked_out == $user->id) {
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time);
 						} else {
@@ -451,6 +465,14 @@ function delAllFilters() {
 					</a>
 					<?php echo $original_label_text;?>
 				<?php
+					if (!empty($row->cascade_after)) {
+						$_r = $fields_byid[$row->cascade_after];
+						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $_r->id;
+						echo '
+						<a style="padding:2px;" href="'.$_link.'" title="'.$edit_entry.'">
+							<img align="left" style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/relationships.png" title="Cascade after (master field): '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="'.$tip_class.'" />
+						</a>';
+					}
 				}
 				?>
 			</td>
@@ -459,15 +481,32 @@ function delAllFilters() {
 			</td>
 			<td align="left">
 				<?php
-				echo "<strong>".$row->type."</strong><br/><small>-&nbsp;";
-				if ($row->field_type=='groupmarker') {
-					echo $fld_params->get('marker_type');
-				} else if ($row->field_type=='coreprops') {
-					echo $fld_params->get('props_type');
-				} else {
-					echo $row->iscore? "[Core]" : $row->friendly;
+				switch ($row->field_type) {
+				case 'fieldgroup':
+					echo '<span class="badge" style="display:inline-block; margin:0; border-radius:3px; width:80%;">
+					'.$row->type."</span><br/>";
+					echo '<span class="alert alert-success" style="display:inline-block; margin:0; padding:2px;">';
+					$_lbls = array();
+					foreach($grouped_fields[$row->id] as $_r) {
+						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $_r->id;
+						$_lbls[] = '<a class="badge" class="border-radius:3px;" href="'.$_link.'" title="'.$edit_entry.'">'.htmlspecialchars(JText::_($_r->label), ENT_QUOTES, 'UTF-8').'</a>';
+					}
+					echo implode(' ', $_lbls);
+					echo '</span>';
+					break;
+				case 'groupmarker':
+					echo "<strong>".$row->type."</strong><br/>";
+					echo "<small>-&nbsp;". $row->parameters->get('marker_type') ."&nbsp;-</small>";
+					break;
+				case 'coreprops':
+					echo "<strong>".$row->type."</strong><br/>";
+					echo "<small>-&nbsp;". $row->parameters->get('props_type') ."&nbsp;-</small>";
+					break;
+				default:
+					echo "<strong>".$row->type."</strong><br/>";
+					echo "<small>-&nbsp;". ($row->iscore? "[Core]" : $row->friendly) ."&nbsp;-</small>";
 				}
-				echo "&nbsp;-</small>";
+				
 				?>
 			</td>
 			<td align="center">
