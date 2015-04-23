@@ -538,6 +538,7 @@ var JFormValidator = new Class({
 			jqEL.addClass('invalid').attr('aria-invalid', 'true');
 			if (el.labelref) {
 				var labelref = jQuery(el.labelref);
+				labelref.addClass('invalid');
 				// Increment error count for multi-value field or set FLAG for others
 				if (!isInvalid)
 					fcflabels_errcnt[el.labelfor] = jqEL.attr('type') == 'checkbox'  ?  ++fcflabels_errcnt[el.labelfor]  :  1;

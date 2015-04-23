@@ -205,6 +205,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				").
 			"
 			
+				newField.find('input.hasvalue').val('');
+				newField.find('input.hasvalue').attr('name','".$elementid."_'+uniqueRowNum".$field->id."+'_hasvalue');
+				newField.find('input.hasvalue').attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
+				
 				newField.find('input.newfile').val('');
 				newField.find('input.newfile').attr('name','".$field->name."['+uniqueRowNum".$field->id."+']');
 				newField.find('input.newfile').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_newfile');
@@ -395,15 +399,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var elementid = tagid.replace(ff_suffix,'');
 				
 				// Get current value of new / existing filename fields
+				var hasvalue_obj = jQuery('#' + elementid );
 				var original_obj = jQuery('#' + elementid + '_originalname' );
 				var existing_obj = jQuery('#' + elementid + '_existingname' );
-				var _existing = existing_obj.length != 0;
+				var existingAllowed = existing_obj.length != 0;
 				
 				var originalname = original_obj.val();
-				var existingname = _existing ? existing_obj.val() : '';
+				var existingname = existingAllowed ? existing_obj.val() : '';
 				
 				// Get counter
 				var valcounter = document.getElementById('".$field->name."');
+				
+				// a flag if file URL was given
+				var fileUrlGiven = file_url!='';
 				
 				if (file=='')  // DB-mode
 				{
@@ -421,16 +429,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						} else {
 							var modify = 0;
 						}
-						if (_existing) existing_obj.addClass('no_value_selected').val('');
+						if (existingAllowed) existing_obj.addClass('no_value_selected').val('');
 					}
 					
 					// Assigning existingfile
 					else
 					{
-						if ( _existing && existingname!='' && existing_obj.hasClass('no_value_selected') ) {
-							var modify = ( originalname=='' && existingname=='' ) ? 1 : 0;
+						//alert('existingAllowed: ' + existingAllowed + ', existingname: ' + existingname + ', no_value_selected: ' + (existing_obj.hasClass('no_value_selected') ? 'yes' : 'no'));
+						if ( existingAllowed && existingname!='' && existing_obj.hasClass('no_value_selected') ) {
+							var modify = ( originalname=='' ) ? 1 : 0;
 							existing_obj.removeClass('no_value_selected');
-						} else if ( _existing && existingname=='' && !existing_obj.hasClass('no_value_selected') ) {
+						} else if ( existingAllowed && existingname=='' && !existing_obj.hasClass('no_value_selected') ) {
 							var modify = -1;
 							existing_obj.addClass('no_value_selected');
 						} else {
@@ -443,9 +452,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					if (modify>0) {
 						if ( typeof valcounter.value === 'undefined' || valcounter.value=='' ) valcounter.value = '1';
 						else valcounter.value = parseInt(valcounter.value) + modify;
+						
+						hasvalue_obj.val('1');  // value assigned
 					} else if (modify<0) {
 						if ( valcounter.value=='1' ) valcounter.value = '';
 						else valcounter.value = parseInt(valcounter.value) + modify;
+						
+						hasvalue_obj.val('');  // value de-assigned, (or ? fieldgroup is being deleted)
 					}
 					
 				} else {  // Folder mode
@@ -454,6 +467,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						if ( valcounter.value=='' ) valcounter.value = '1';
 						else valcounter.value = parseInt(valcounter.value) + 1;
 					}
+					hasvalue_obj.val('1');  // value assigned
 				}
 				
 				//if(window.console) window.console.log(valcounter.value);
@@ -472,12 +486,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				
 				// Folder-Mode
-				if (file != '' && _existing)  existing_obj.val(file);
+				if (file != '' && existingAllowed)  existing_obj.val(file);
+				
+				// DB-Mode, Folder-Mode empty original value
 				original_obj.val('');
 				
 				if (prv_obj) {
 					preview_msg = '<span id=\"'+elementid+'_preview_msg\"></span>';
-					if (file || (file_url && _existing && !existing_obj.hasClass('no_value_selected')) ) {
+					if (file || (fileUrlGiven && existingAllowed && !existing_obj.hasClass('no_value_selected')) ) {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" alt=\"Preview image\" />';
 					} else if (action!='0') {
 						var preview_container = '<div class=\"empty_image empty_image".$field->id."\" id=\"'+elementid+'_preview_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\">';
@@ -491,7 +507,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					tmpDiv.insertAfter( prv_obj );
 					prv_obj.remove();
 					
-					if (file || (file_url && _existing && !existing_obj.hasClass('no_value_selected')) || action!='0') {
+					if (file || (fileUrlGiven && existingAllowed && !existing_obj.hasClass('no_value_selected')) || action!='0') {
 					} else {
 						fc_loadImagePreview(tagid, elementid+'_preview_image', elementid+'_preview_msg', ".$thumb_w_s.", "./*$thumb_h_s*/'0'.");
 					}
@@ -583,9 +599,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
 				
 				$_prompt_txt = JText::_( 'FLEXI_SELECT_IMAGE' );
-				$select = "
-				<input class='existingname fcfield_textval' id='".$elementid_n."_existingname' name='".$fieldname_n."[existingname]' value='".$image_name."' readonly='readonly' style='float:none;' />
-				".($none_props ? '<br/>' : '').'
+				$select = '
+				<input class="existingname fcfield_textval" id="'.$elementid_n.'_existingname" name="'.$fieldname_n.'[existingname]" value="'.$image_name.'" readonly="readonly" style="float:none;" />
+				'.($none_props ? '<br/>' : '').'
 				<span class="fcfield-button-add">
 					<a class="addfile_'.$field->id.'" id="'.$elementid_n.'_addfile" title="'.$_prompt_txt.'" href="'.$linkfsel.'" >'
 						.$_prompt_txt.'
@@ -617,6 +633,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				
 				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
+				if ($use_ingroup) $originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required : '').'" value="'.$value['originalname'].'" />';
 				
 				if (!empty($image_name)) {
 					$img_link  = JURI::root(true).'/'.$dir_url;
@@ -634,6 +651,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			} else {
 				
 				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="" />';
+				if ($use_ingroup) $originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required : '').'" value="" />';
 				$imgpreview = '<div class="empty_image empty_image'.$field->id.'" id="'.$elementid_n.'_preview_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>';
 			}
 			
@@ -681,9 +699,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			'.($multiple ? '
 				'.(!$none_props ? '<div class="fcclear"></div>' : '').'
 				<div class="nowrap_box">
-				'.$move2.'
-				'.$remove_button.'
-				'.($add_position ? $add_here : '').'
+				'.($use_ingroup ? '' : $move2).'
+				'.($use_ingroup ? '' : $remove_button).'
+				'.($use_ingroup || !$add_position ? '' : $add_here).'
 				</div>
 				<div class="fcclear"></div>
 				' : '').'
@@ -717,7 +735,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					<tr class="img_newfile_row">
 						'.($curr_select ? '<td class="key fckey_high">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>' : '').'
 						<td style="white-space: normal;">'.
-							'<input name="'.$field->name.'['.$n.']" id="'.$elementid_n.'_newfile"  class="newfile no_value_selected" '.$onchange.' type="file" /><br/>' .
+							'<input name="'.$field->name.'['.$n.']" id="'.$elementid_n.'_newfile" class="newfile no_value_selected" '.$onchange.' type="file" /><br/>' .
 							$uploadLimitsTxt.
 							'<br/><span class="label label-info">'.JText::_( 'FLEXI_FIELD_ALLOWEDEXT' ).'</span>'.
 							'<span style="margin-left:12px;">'.str_replace(",", ", ", $field->parameters->get('upload_extensions')) .'</span>
@@ -751,7 +769,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// This is field HTML that is created regardless of values
-		$non_value_html = '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
+		$non_value_html = '<input id="'.$field->name.'" class="'.($use_ingroup ? '' : $required).'" type="hidden" ="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
 		if ($use_ingroup) {
 			$field->html[-1] = $non_value_html;
 		} else {
@@ -2703,7 +2721,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Create attributes of the drop down field for selecting existing images
 		$onchange  = ' onchange="';
-		$onchange .= ($required) ? '' : '';
 		$onchange .= " qmAssignFile".$field->id."(this.id, '', fc_db_img_path+'/s_'+this.value);";
 		$onchange .= ' "';
 		$classes = ' existingname no_value_selected ';
@@ -2762,7 +2779,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			JHTML::_('select.genericlist', $options, $formfldname, $attribs, 'value', 'text', '', $formfldid) ;
 		if ($use_imgpicker) {
 			$btn_name = JText::_( 'FLEXI_TOGGLE_ALL_THUMBS' )." (". $images_count .")";
-			$list	= "<input class=\"fcfield-button\" type=\"button\" value=\"".$btn_name."\" onclick=\"fcimgfld_toggle_image_picker(this);\" /> " .$list;
+			$list	= '<input class="fcfield-button" type="button" value="'.$btn_name.'" onclick="fcimgfld_toggle_image_picker(this);" /> ' .$list;
 		}
 		
 		return $list;

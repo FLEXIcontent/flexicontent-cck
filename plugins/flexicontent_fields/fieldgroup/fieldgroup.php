@@ -20,7 +20,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 {
 	static $field_types = array('fieldgroup');
 	static $extra_props = array();
-	static $prior_to_version = "3.0 rc";
+	static $prior_to_version = "3.1";
 	
 	
 	// ***********
