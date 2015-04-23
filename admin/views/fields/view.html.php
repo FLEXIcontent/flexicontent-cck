@@ -67,7 +67,7 @@ class FlexicontentViewFields extends JViewLegacy
 		}
 		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
-		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search = $db->escape( trim(JString::strtolower( $search ) ) );
 		
 		if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
 		{
@@ -103,7 +103,7 @@ class FlexicontentViewFields extends JViewLegacy
 		JToolBarHelper::title( $doc_title, 'fields' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
-		$contrl = FLEXI_J16GE ? "fields." : "";
+		$contrl = "fields.";
 		if ($perms->CanCopyFields) {
 			JToolBarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
 			JToolBarHelper::custom( $contrl.'copy_wvalues', 'copy_wvalues.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
@@ -131,28 +131,28 @@ class FlexicontentViewFields extends JViewLegacy
 		
 		JToolBarHelper::divider(); JToolBarHelper::spacer();
 		$btn_name = 'basicindex';
-		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
+		$btn_task    = 'fields.toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='issearch';";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_TEXT_SEARCHABLE', $btn_name, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
 		
 		$btn_name = 'basicfilter';
-		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
+		$btn_task    = 'fields.toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isfilter';";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_FILTERABLE', $btn_name, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
 		
 		$btn_name = 'advindex';
-		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
+		$btn_task    = 'fields.toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isadvsearch';";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_ADV_TEXT_SEARCHABLE', $btn_name, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
 		
 		$btn_name = 'advfilter';
-		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
+		$btn_task    = 'fields.toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isadvfilter';";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_ADV_FILTERABLE', $btn_name, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
@@ -170,7 +170,8 @@ class FlexicontentViewFields extends JViewLegacy
 		
 		// Get data from the model
 		$model = $this->getModel();
-		$rows       = $this->get( FLEXI_J16GE ? 'Items' : 'Data' );
+		$rows       = $this->get( 'Items' );
+		$allrows    = $this->get( 'AllItems' );
 		$pagination = $this->get( 'Pagination' );
 		$types      = $this->get( 'Typeslist' );  // Content types
 		$fieldtypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
@@ -253,6 +254,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$this->assignRef('filter_type'  , $filter_type);
 		$this->assignRef('lists'	, $lists);
 		$this->assignRef('rows'		, $rows);
+		$this->assignRef('allrows'		, $allrows);
 		$this->assignRef('ordering'		, $ordering);
 		$this->assignRef('pagination'	, $pagination);
 		

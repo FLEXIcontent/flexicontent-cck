@@ -113,7 +113,38 @@ class FlexicontentModelFields extends JModelList
 
 		return $this->_pagination;
 	}
-
+	
+	
+	/**
+	 * Method to get All fields by clear the where clause
+	 *
+	 * @access public
+	 * @return array
+	 * @since 3.0
+	 */
+	public function getAllItems()
+	{
+		// Load the list all data
+		try
+		{
+			$query = $this->getListQuery()->clear('where');  // clear where clause
+			$this->_db->setQuery($query/*, $limitstart=0, $limit=0*/);
+			
+			$items = $this->_db->loadObjectList();
+		}
+		catch (RuntimeException $e)
+		{
+			JFactory::getApplication()->enqueueMessage( $e->getMessage() ,'error');
+			return array();
+			//$this->setError($e->getMessage());
+			//return false;
+		}
+		
+		// Return data
+		return $items;
+	}
+	
+	
 	/**
 	 * Method to build the query for the fields
 	 *
@@ -121,35 +152,31 @@ class FlexicontentModelFields extends JModelList
 	 * @return integer
 	 * @since 1.0
 	 */
-	function getListQuery()
+	protected function getListQuery($query = null)
 	{
-		static $query;
+		if ($query instanceof JDatabaseQuery) return $query;
 		
-		if(!isset($query)) {
-			
-			// Get the WHERE, HAVING and ORDER BY clauses for the query
-			$where		= trim($this->_buildContentWhere());
-			$orderby	= trim($this->_buildContentOrderBy());
-			$having		= trim($this->_buildContentHaving());
-	
-			$db =  JFactory::getDBO();
-			$query = $db->getQuery(true);
-			$query->select(
-				$this->getState( 'list.select',
-					't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, level.title AS access_level, rel.ordering as typeordering, t.field_type as type, plg.name as friendly'
-				)
-			);
-			$query->from('#__flexicontent_fields AS t');
-			$query->join('LEFT', '#__extensions AS plg ON (plg.element = t.field_type AND plg.`type`=\'plugin\' AND plg.folder=\'flexicontent_fields\')');
-			$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id');
-			$query->join('LEFT', '#__viewlevels AS level ON level.id=t.access');
-			$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
-			if ($where) $query->where($where);
-			$query->group('t.id');
-			if ($having) $query->having($having);
-			if ($orderby) $query->order($orderby);
-			
-		}//end if(!isset($query))
+		// Get the WHERE, HAVING and ORDER BY clauses for the query
+		$where		= trim($this->_buildContentWhere());
+		$orderby	= trim($this->_buildContentOrderBy());
+		$having		= trim($this->_buildContentHaving());
+		
+		$db =  JFactory::getDBO();
+		$query = $db->getQuery(true);
+		$query->select(
+			$this->getState( 'list.select',
+				't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, level.title AS access_level, rel.ordering as typeordering, t.field_type as type, plg.name as friendly'
+			)
+		);
+		$query->from('#__flexicontent_fields AS t');
+		$query->join('LEFT', '#__extensions AS plg ON (plg.element = t.field_type AND plg.`type`=\'plugin\' AND plg.folder=\'flexicontent_fields\')');
+		$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id');
+		$query->join('LEFT', '#__viewlevels AS level ON level.id=t.access');
+		$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
+		if ($where) $query->where($where);
+		$query->group('t.id');
+		if ($having) $query->having($having);
+		if ($orderby) $query->order($orderby);
 		
 		return $query;
 	}

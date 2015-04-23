@@ -62,32 +62,38 @@ $list_total_cols = 13;
 // Parse parameter and find fieldgroup
 $f2g_map = array();
 $grouped_fields = array();
-$grouping_fields = array();
-$fields_byid = array();
+$rows_byid = array();
 foreach ($this->rows as $row)
 {
+	// Parse parameters, limited to some types, but maybe parse for all
 	if ( in_array($row->field_type, array('groupmarker', 'coreprops', 'fieldgroup', 'select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage')) ) {
 		$row->parameters = new JRegistry($row->attribs);
 	}
-	if ($row->field_type=='fieldgroup') {
-		$row->grouped_fields = preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields'));
-		$grouping_fields[$row->id] = $row;
-		foreach($row->grouped_fields as $_fid) $f2g_map[$_fid] = $row;
-	}
-	if ( in_array($row->field_type, array('select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage')) ) {
-		$row->parameters = new JRegistry($row->attribs);
-		$row->cascade_after = $row->parameters->get('cascade_after');
-	}
-	$fields_byid[$row->id] = $row;
+	$rows_byid[$row->id] = $row;
 }
-if (count($f2g_map)) $list_total_cols++;
 
-foreach ($this->rows as $row)
+// Iterate thtrough all fields and create information needed by field
+$allrows_byid = array();
+foreach ($this->allrows as $row)
+{
+	// Handle displaying information: FIELDGROUP feature
+	if ($row->field_type=='fieldgroup') {
+		$row->parameters = new JRegistry($row->attribs);
+		$fid_arr = preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields'));
+		foreach($fid_arr as $_fid) $f2g_map[$_fid] = $row;
+	}
+	$allrows_byid[$row->id] = $row;  // used to display information for: CASCADE-after-master feature (and in future for more cases)
+}
+foreach ($this->allrows as $row)
 {
 	if (isset($f2g_map[$row->id])) {
 		$grouping_field = $f2g_map[$row->id];
-		$grouped_fields[ $grouping_field->id ][ $row->id ] = $row;
-		$row->grouping_field = $grouping_field;
+		$grouped_fields[ $grouping_field->id ][ $row->id ] = $row;    // used to display information for: FIELDGROUP feature (and in future for more cases)
+		
+		if ( isset($rows_byid[$row->id]) ) {
+			// field of group is included in current list add info to it
+			$rows_byid[$row->id]->grouping_field = $grouping_field;
+		}
 	}
 }
 ?>
@@ -465,8 +471,10 @@ function delAllFilters() {
 					</a>
 					<?php echo $original_label_text;?>
 				<?php
-					if (!empty($row->cascade_after)) {
-						$_r = $fields_byid[$row->cascade_after];
+					// Handle displaying information: CASCADE-after-master field
+					if (!empty($row->parameters) && $row->parameters->get('cascade_after'))
+					{
+						$_r = $allrows_byid[ $row->parameters->get('cascade_after') ];
 						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $_r->id;
 						echo '
 						<a style="padding:2px;" href="'.$_link.'" title="'.$edit_entry.'">
@@ -483,13 +491,13 @@ function delAllFilters() {
 				<?php
 				switch ($row->field_type) {
 				case 'fieldgroup':
-					echo '<span class="badge" style="display:inline-block; margin:0; border-radius:3px; width:80%;">
+					echo '<span class="badge" style="display:display: inline-block; margin: 0px 0px 1px; border-radius: 3px; width: 94%; padding: 2px 3%;">
 					'.$row->type."</span><br/>";
-					echo '<span class="alert alert-success" style="display:inline-block; margin:0; padding:2px;">';
+					echo '<span class="alert alert-info" style="display: inline-block; margin: 0px 0px 1px; border-radius: 3px; width: 98%; padding: 4px 1%;">';
 					$_lbls = array();
 					foreach($grouped_fields[$row->id] as $_r) {
 						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $_r->id;
-						$_lbls[] = '<a class="badge" class="border-radius:3px;" href="'.$_link.'" title="'.$edit_entry.'">'.htmlspecialchars(JText::_($_r->label), ENT_QUOTES, 'UTF-8').'</a>';
+						$_lbls[] = '<a class="badge" style="border-radius:3px;" href="'.$_link.'" title="'.$edit_entry.'">'.htmlspecialchars(JText::_($_r->label), ENT_QUOTES, 'UTF-8').'</a>';
 					}
 					echo implode(' ', $_lbls);
 					echo '</span>';
