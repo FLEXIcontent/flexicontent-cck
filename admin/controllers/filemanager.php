@@ -37,11 +37,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	function __construct()
 	{
 		parent::__construct();
-		if (!FLEXI_J16GE) {
-			$this->registerTask( 'accesspublic', 	'access' );
-			$this->registerTask( 'accessregistered','access' );
-			$this->registerTask( 'accessspecial', 	'access' );
-		}
 		$this->registerTask( 'uploads', 	'upload' );
 	}
 	
@@ -95,7 +90,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			if (strlen($fname_level3))  $file = $file[$fname_level3];
 		}
 		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
-		$secure		= JRequest::getVar( 'secure', 1, '', 'int');
+		$secure		= JRequest::getInt( 'secure', 1, 'post' );
+		$secure		= $secure ? 1 : 0;
 		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filetitle= JRequest::getVar( 'file-title', '');
 		$filedesc	= JRequest::getVar( 'file-desc', '');
@@ -105,6 +101,14 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$file_mode= JRequest::getVar( 'folder_mode', 0) ? 'folder_mode' : 'db_mode';
 		$err		= null;
 		
+		$model = $this->getModel('filemanager');
+		if ($file_mode != 'folder_mode' && $fieldid) {
+			$field_params = $model->getFieldParams($fieldid);
+			$target_dir = $field_params->get('target_dir', 2);
+			if ($target_dir!=2) {
+				$secure = $target_dir ? 1 : 0; // force secure / media
+			}
+		}
 		
 		// *****************************************
 		// Check that a file was provided / uploaded
@@ -378,6 +382,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$filesdir	=  JRequest::getVar( 'file-dir-path', '', 'post' );
 		$regexp		=  JRequest::getVar( 'file-filter-re', '.', 'post' );
 		$secure		=  JRequest::getInt( 'secure', 1, 'post' );
+		$secure		= $secure ? 1 : 0;
 		$keep			=  JRequest::getInt( 'keep', 1, 'post' );
 		$params 	= JComponentHelper::getParams( 'com_flexicontent' );
 		$destpath = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;

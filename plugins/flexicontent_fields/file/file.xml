@@ -55,6 +55,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="target_dir" type="radio" default="1" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="db-popup-mode" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_MEDIA</option>
+				<option value="1">FLEXI_SECURE</option>
+				<option value="2">FLEXI_ALLOW_SELECTION</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_INLINE" description="" level="level2" depend_class="db-inline-mode" />
 			<field name="iform_title" type="radio" default="1" label="FLEXI_FILE_DISPLAY_TITLE" description="FLEXI_FILE_DISPLAY_TITLE_DESC" depend_class="db-inline-mode" class="btn-group btn-group-yesno">

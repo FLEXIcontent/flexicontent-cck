@@ -54,6 +54,7 @@ function delFilter(name)
 	//if(window.console) window.console.log('Clearing filter:'+name);
 	var myForm = jQuery('#adminForm');
 	var filter = jQuery('#'+name);
+	if (filter.length==0) return;
 	if (filter.attr('type')=='checkbox')
 		filter.checked = '';
 	else
@@ -61,8 +62,12 @@ function delFilter(name)
 }
 
 function delAllFilters() {
-	delFilter('search'); delFilter('filter_lang');  delFilter('filter_uploader');
-	delFilter('filter_url'); delFilter('filter_secure');  delFilter('filter_ext');
+	delFilter('search');
+	delFilter('filter_lang');
+	delFilter('filter_uploader');
+	delFilter('filter_url');
+	delFilter('filter_secure');
+	delFilter('filter_ext');
 	delFilter('item_id');
 }
 
@@ -166,6 +171,7 @@ function delAllFilters() {
 						</td>
 					</tr>
 					
+		<?php if ($this->target_dir==2) : ?>
 					<tr>
 						<td id="secure-lbl-container" class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
 							<label class="label" id="secure-lbl">
@@ -182,6 +188,7 @@ function delAllFilters() {
 							?>
 						</td>
 					</tr>
+		<?php endif; ?>
 	<?php } ?>
 				</table>
 				
@@ -311,8 +318,9 @@ function delAllFilters() {
 			<input type="button" id="fc_upload_box_btn" class="<?php echo $_class; ?> btn-success" onclick="fc_toggle_box_via_btn('uploader_tabset', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_UPLOAD' ); ?>" />
 		</div>
 		
-<?php if (!$this->folder_mode) : ?>
 		<div class="fcclear"></div>
+		
+	<?php if (!$this->folder_mode) : ?>
 		<span class="fc-filter nowrap_box">
 			<span class="limit nowrap_box" style="display: inline-block;">
 				<label class="label">
@@ -334,8 +342,15 @@ function delAllFilters() {
 			</span>
 			<?php endif; ?>
 		</span>
+	<?php endif; ?>
+		
+	<?php if ($this->CanViewAllFiles) : ?>
+		<span class="fc-filter nowrap_box fc-mssg-inline">
+			<?php echo $this->lists['uploader']; ?>
+		</span>
+	<?php endif; ?>
+		
 	</div>
-<?php endif; ?>
 	
 	
 	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
@@ -349,17 +364,17 @@ function delAllFilters() {
 			<?php echo $this->lists['url']; ?>
 		</span>
 		
+		<?php if ($this->target_dir==2) : ?>
 		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['secure']; ?>
 		</span>
+		<?php endif; ?>
 		
 		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['ext']; ?>
 		</span>
 		
 		<span class="fc-filter nowrap_box">
-			<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
-			&nbsp; &nbsp; &nbsp;
 			<label class="label">Item ID</label> <?php echo $this->lists['item_id']; ?>
 		</span>
 		

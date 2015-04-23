@@ -55,6 +55,7 @@ function delFilter(name)
 	//if(window.console) window.console.log('Clearing filter:'+name);
 	var myForm = jQuery('#adminForm');
 	var filter = jQuery('#'+name);
+	if (filter.length==0) return;
 	if (filter.attr('type')=='checkbox')
 		filter.checked = '';
 	else
@@ -291,6 +292,7 @@ flexicontent_html::loadFramework('flexi-lib');
 						</td>
 					</tr>
 					
+		<?php if ($this->target_dir==2) : ?>
 					<tr>
 						<td id="secure-lbl-container" class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
 							<label class="label" id="secure-lbl">
@@ -307,6 +309,7 @@ flexicontent_html::loadFramework('flexi-lib');
 							?>
 						</td>
 					</tr>
+		<?php endif; ?>
 	<?php } ?>
 				</table>
 				
@@ -369,6 +372,8 @@ flexicontent_html::loadFramework('flexi-lib');
 		</div>
 		
 		<div class="fcclear"></div>
+		
+	<?php if (!$this->folder_mode) : ?>
 		<span class="fc-filter nowrap_box">
 			<span class="limit nowrap_box" style="display: inline-block;">
 				<label class="label">
@@ -390,7 +395,16 @@ flexicontent_html::loadFramework('flexi-lib');
 			</span>
 			<?php endif; ?>
 		</span>
+	<?php endif; ?>
+		
+	<?php if ($this->CanViewAllFiles) : ?>
+		<span class="fc-filter nowrap_box fc-mssg-inline">
+			<?php echo $this->lists['uploader']; ?>
+		</span>
+	<?php endif; ?>
+		
 	</div>
+	
 	
 	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
 		<!--<span class="label"><?php echo JText::_( 'FLEXI_FILTERS' ); ?></span>-->
@@ -400,8 +414,6 @@ flexicontent_html::loadFramework('flexi-lib');
 		</span>
 		
 		<span class="fc-filter nowrap_box">
-			<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
-			&nbsp; &nbsp; &nbsp;
 			<label class="label">Item ID</label> <?php echo $this->lists['item_id']; ?>
 		</span>
 		

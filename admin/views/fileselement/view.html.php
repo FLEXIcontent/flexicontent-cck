@@ -64,15 +64,30 @@ class FlexicontentViewFileselement extends JViewLegacy
 		JHTML::_('behavior.formvalidation');
 
 		// Get filters
-		$count_filters = 0;
 		$_view = $view.$fieldid;
+		$folder_mode			= $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode',      'folder_mode',      0,           'int' );
+		
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
+		// Get model
+		$model = $this->getModel();
+		
+		$count_filters = 0;
 		
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_order',     'filter_order',    'f.filename', 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_order_Dir', 'filter_order_Dir', '',          'word' );
 		
 		$filter_lang			= $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_lang',      'filter_lang',      '',          'string' );
 		$filter_url       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_url',       'filter_url',       '',          'word' );
+		
 		$filter_secure    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_secure',    'filter_secure',    '',          'word' );
+		$target_dir = 2;
+		if (!$folder_mode)
+		{
+			$field_params = $model->getFieldParams();
+			$target_dir = $field_params->get('target_dir', 2);
+			if ($target_dir!=2) $filter_secure = '';
+		}
 		
 		$filter_ext       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_ext',       'filter_ext',       '',          'alnum' );
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_uploader',  'filter_uploader',  '',           'int' );
@@ -84,7 +99,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 			if ($filter_secure) $count_filters++;
 		}
 		if ($filter_ext) $count_filters++;
-		if ($filter_uploader) $count_filters++;
+		//if ($perms->CanViewAllFiles && $filter_uploader) $count_filters++;
 		if ($filter_item) $count_filters++;
 		
 		$u_item_id 	      = $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id',        'u_item_id',        0,           'string' );
@@ -93,7 +108,6 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$autoselect       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoselect',       'autoselect',       0, 				  'int' );
 		$autoassign       = $app->getUserStateFromRequest( $option.'.'.$_view.'.autoassign',       'autoassign',       0, 				  'int' );
 		
-		$folder_mode			= $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode',      'folder_mode',      0,           'int' );
 		$folder_param			= $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_param',     'folder_param',		 'dir',				'string' );
 		$append_item			= $app->getUserStateFromRequest( $option.'.'.$_view.'.append_item',      'append_item',      1, 				  'int' );
 		$append_field			= $app->getUserStateFromRequest( $option.'.'.$_view.'.append_field',     'append_field',     1, 				  'int' );
@@ -137,18 +151,16 @@ class FlexicontentViewFileselement extends JViewLegacy
 		';
 		$document->addStyleDeclaration($css);
 		
-		// Get User's Global Permissions
-		$perms = FlexicontentHelperPerm::getPerm();
-		
-		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_FILE' );
 		$site_title = $document->getTitle();
 		$document->setTitle($doc_title .' - '. $site_title);
+		
+		
 		// ***********************
 		// Get data from the model
 		// ***********************
-		$model   = $this->getModel();
+		
 		if ( !$folder_mode ) {
 			$rows  = $this->get('Data');
 			$img_folder = '';
@@ -359,6 +371,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$files .= $file;
 		
 		//assign data to template
+		$this->assignRef('target_dir', $target_dir);
 		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('params'     , $cparams);
 		$this->assignRef('client'     , $client);

@@ -65,7 +65,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		// Input field configuration
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;
-		if ($inputmode==0 && $multiple) echo "Multi-value mode is not implenent for inline mode in current version, it will be in a future version";
+		$top_notice = ($inputmode==0 && $multiple) ?'<div class="alert alert-warning">Multi-value mode is not implenent for inline mode in current version, please disable</div>' : '';
 		$multiple  = !$inputmode ? 0 : $multiple;
 		if ($inputmode==0) {
 			$iform_title = $field->parameters->get('iform_title', 1);
@@ -91,13 +91,18 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		}
 		
 		// Inline mode needs an default value
+		$has_values = count($field->value);
 		if ($inputmode==0 && empty($field->value))
 		{
 			// Create fake value, to allow the inline form fields to work
 			$field->value = array(0=>0);
 			$files_data = array(0 => (object)array(
 				'id'=>'', 'filename'=>'', 'filename_original'=>'', 'altname'=>'', 'description'=>'',
-				'url'=>'', 'secure'=>1, 'ext'=>'', 'published'=>1, 'language'=>'*', 'hits'=>0,
+				'url'=>'',
+				'secure'=>$field->parameters->get('iform_dir_default', '1'),
+				'ext'=>'', 'published'=>1,
+				'language'=>$field->parameters->get('iform_lang_default', '*'),
+				'hits'=>0,
 				'uploaded'=>'', 'uploaded_by'=>0, 'checked_out'=>false, 'checked_out_time'=>'', 'access'=>0,
 			) );
 		}
@@ -282,7 +287,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					</label>
 					<span class="inlinefile-file-data">
 						<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.$file_id.'" />'.'
-						<input type="file" id="'.$elementid_n.'_file-data" name="'.$fieldname_n.'[file-data]" value="'.$file_data->id.'" class="'.$required.'" />
+						<input type="file" id="'.$elementid_n.'_file-data" name="'.$fieldname_n.'[file-data]" value="'.$file_data->id.'" class="'.$required.'" onchange="var file_box = jQuery(this).parent().parent().parent(); file_box.find(\'.inlinefile-secure-data\').show(400);  file_box.find(\'.inlinefile-secure-info\').hide(400);" />
 					</span>
 				</div>'.
 				
@@ -317,11 +322,15 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				</div>' : '').
 				
 				( $iform_dir ? '
-				<div class="inlinefile-secure-box">
+				<div class="nowrap_box inlinefile-secure-box">
 					<label class="label inlinefile-secure-lbl '.$tip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
 						'.JText::_( 'FLEXI_TARGET_DIRECTORY' ).'
 					</label>
-					<span class="inlinefile-secure-data">
+					'.($has_values ? '
+					<span class="inlinefile-secure-info">
+						<span class="badge badge-info">'.JText::_($file_data->secure ?  'FLEXI_SECURE' : 'FLEXI_MEDIA').'</span>
+					</span>' : '').'
+					<span class="inlinefile-secure-data" style="'.($has_values ? 'display:none;' : '').'">
 						'.flexicontent_html::buildradiochecklist( array(0=> JText::_( 'FLEXI_MEDIA' ), 1=> JText::_( 'FLEXI_SECURE' )) , $fieldname_n.'[secure]', 1, 1, '', $elementid_n.'_secure').'
 					</span>
 				</div>' : '').
@@ -382,6 +391,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
 		}
+		if ($top_notice) $field->html = $top_notice.$field->html;
 	}
 	
 	
@@ -963,6 +973,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$iform_desc  = $field->parameters->get('iform_desc',  1);
 			$iform_lang  = $field->parameters->get('iform_lang',  0);
 			$iform_dir   = $field->parameters->get('iform_dir',   0);
+		} else {
+			$target_dir = $field->parameters->get('target_dir', 1);
 		}
 		
 		// Execute once
@@ -1002,13 +1014,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			}
 			
 			else if ( $inputmode==0 ) {
-				$dbdata = array();
-				$file_id = $dbdata['id'] = (int) $v['file-id'];
-				
-				if ($iform_title)  $dbdata['altname'] = flexicontent_html::dataFilter($v['file-title'],  1000,  'STRING', 0);
-				if ($iform_desc)   $dbdata['description'] = flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
-				if ($iform_lang)   $dbdata['language'] = flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
-				if ($iform_dir)    $dbdata['secure'] = (int) $v['secure'];
+				$file_id = (int) $v['file-id'];
 				
 				$err_code = $_FILES["custom"]["error"][$field->name][$n]['file-data'];
 				$new_file = $err_code == 0;
@@ -1027,12 +1033,27 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					continue;
 				}
 				
+				// validate data or empty/set default values
+				$v['file-title'] = !$iform_title ? '' : flexicontent_html::dataFilter($v['file-title'],  1000,  'STRING', 0);
+				$v['file-desc']  = !$iform_desc  ? '' : flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
+				$v['file-lang']  = !$iform_lang  ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
+				$v['secure']     = !$iform_dir   ? $field->parameters->get('iform_dir_default', '1') : ((int) $v['secure'] ? 1 : 0);
+				
 				// UPDATE existing file
 				if( !$new_file && $file_id ) {
-				
+					$dbdata = array();
+					
+					$dbdata['id'] = $file_id;
+					if ($iform_title)  $dbdata['altname'] = $v['file-title'];
+					if ($iform_desc)   $dbdata['description'] = $v['file-desc'];
+					if ($iform_lang)   $dbdata['language'] = $v['file-lang'];
+					// !! Do not change folder for existing files
+					//if ($iform_dir) {  $dbdata['secure'] = $v['secure'];
+					
 					// Load file data from DB
 					$row = JTable::getInstance('flexicontent_files', '');
 					$row->load( $dbdata['id'] );
+					$dbdata['secure'] = $row->secure ? 1 : 0;  // !! Do not change media/secure -folder- for existing files
 					
 					// Set the changed data into the object
 					foreach ($dbdata as $index => $data) $row->{$index} = $data;
@@ -1049,9 +1070,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				
 				//INSERT new file
 				else if( $new_file ) {
-					$fman = new FlexicontentControllerFilemanager();
+					$fman = new FlexicontentControllerFilemanager();   // Controller will do the data filter too
 					JRequest::setVar( 'return-url', null, 'post' );  // needed !
-					JRequest::setVar( 'secure', $v['file-id'], 'post' );
+					JRequest::setVar( 'secure', $v['secure'], 'post' );
 					JRequest::setVar( 'file-title', $v['file-title'], 'post' );
 					JRequest::setVar( 'file-desc', $v['file-desc'], 'post' );
 					JRequest::setVar( 'file-lang', $v['file-lang'], 'post' );

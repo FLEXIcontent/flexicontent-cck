@@ -97,7 +97,25 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$this->_id	 = $id;
 		$this->_data = null;
 	}
-
+	
+	
+	function & getFieldParams($fieldid)
+	{
+		static $field_params = array();
+		
+		if (isset($field_params[$fieldid])) return $field_params[$fieldid];
+		
+		$db = JFactory::getDBO();
+		$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE id='".$fieldid."'";
+		$db->setQuery($query);
+		$data = $db->loadObject();
+		if ($db->getErrorNum())  echo $query."<br /><br />".$db->getErrorMsg()."<br />";
+		
+		$field_params[$fieldid] = new JRegistry($data->attribs);
+		return $field_params[$fieldid];
+	}
+	
+	
 	/**
 	 * Method to get files data
 	 *

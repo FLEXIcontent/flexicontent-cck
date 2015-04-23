@@ -252,12 +252,14 @@ class FlexicontentModelFileselement extends JModelLegacy
 	 * @access	public
 	 * @param	int file identifier
 	 */
-	function & getFieldParams($fieldid)
+	function & getFieldParams($fieldid=0)
 	{
-		static $field_params = null;
-		if ($field_params) return $field_params;
+		static $field_params = array();
 		
-		$field_name = $this->getFieldName($fieldid);
+		$fieldid = $fieldid ? $fieldid : $this->fieldid;
+		if (isset($field_params[$fieldid])) return $field_params[$fieldid];
+		
+		$field_name = $this->getFieldName($this->fieldid);
 		
 		$db = JFactory::getDBO();
 		$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name='".$field_name."'";
@@ -265,8 +267,8 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$data = $db->loadObject();
 		if ($db->getErrorNum())  echo $query."<br /><br />".$db->getErrorMsg()."<br />";
 		
-		$field_params = new JRegistry($data->attribs);
-		return $field_params;
+		$field_params[$fieldid] = new JRegistry($data->attribs);
+		return $field_params[$fieldid];
 	}
 	
 	
@@ -421,7 +423,9 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
-
+		$params = $this->getFieldParams();
+		$target_dir = $params->get('target_dir', 2);
+		
 		$scope		= $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.scope',            'scope',            1,           'int' );
 		$search   = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.search',           'search',           '',          'string' );
 		$search 	= trim( JString::strtolower( $search ) );
@@ -436,6 +440,12 @@ class FlexicontentModelFileselement extends JModelLegacy
 		
 		$permission = FlexicontentHelperPerm::getPerm();
 		$CanViewAllFiles = $permission->CanViewAllFiles;
+		
+		if ($target_dir!=2) {  // Limit to secure:1 or media:0, if 2 then both allowed
+			$filter_secure = $target_dir ? 'S' : 'M';
+		} else {
+			// allow filter secure via form/URL variable
+		}
 		
 		if ( !$CanViewAllFiles ) {
 			$where[] = ' uploaded_by = ' . (int)$user->id;
