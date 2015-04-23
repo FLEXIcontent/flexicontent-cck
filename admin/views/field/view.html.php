@@ -33,6 +33,7 @@ class FlexicontentViewField extends JViewLegacy
 	{
 		//initialise variables
 		$app      = JFactory::getApplication();
+		$option   = JRequest::getVar('option');
 		$document	= JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
@@ -89,17 +90,27 @@ class FlexicontentViewField extends JViewLegacy
 		
 		// Check max allowed version
 		if ( property_exists ($classname, 'prior_to_version') ) {
-			$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
-			$com_xml = JApplicationHelper::parseXMLInstallFile( $manifest_path );
-			$ver_exceeded = version_compare( str_replace(' ', '.', $com_xml['version']), str_replace(' ', '.', $classname::$prior_to_version), '>=');
-			if ($ver_exceeded) echo '
-				<span class="fc-note fc-mssg">
-					Warning: installed version of Field: \'<b>'.$extname.'</b>\' was meant for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.' <br/> It may or may not work properly in later versions
-				</span>';
-			else echo '
-				<span class="fc-note fc-mssg">
-					Note: installed version of Field: \'<b>'.$extname.'</b>\' is meant for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.', &nbsp; and it is given freely in BETA versions prior to: '.$classname::$prior_to_version.', &nbsp; nevertheless it will continue to function after FLEXIcontent is upgraded.
-				</span>';
+			// Set a system message with warning of failed PHP limits
+			$prior_to_version = $app->getUserStateFromRequest( $option.'.flexicontent.prior_to_version_'.$row->field_type,	'prior_to_version_'.$row->field_type,	0, 'int' );
+			$app->setUserState( $option.'.flexicontent.prior_to_version_'.$row->field_type, $prior_to_version+1 );
+			if ($prior_to_version < 2)
+			{
+				$close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
+				
+				$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
+				$com_xml = JApplicationHelper::parseXMLInstallFile( $manifest_path );
+				$ver_exceeded = version_compare( str_replace(' ', '.', $com_xml['version']), str_replace(' ', '.', $classname::$prior_to_version), '>=');
+				if ($ver_exceeded) echo '
+					<span class="fc-note fc-mssg-inline">
+						'.$close_btn.'
+						Warning: installed version of Field: \'<b>'.$extname.'</b>\' was given to be free for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.' <br/> It may or may not work properly in later versions
+					</span>';
+				else echo '
+					<span class="fc-info fc-mssg-inline">
+						'.$close_btn.'
+						Note: installed version of Field: \'<b>'.$extname.'</b>\' is given free for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.', &nbsp; and it is given freely in BETA versions prior to: '.$classname::$prior_to_version.', &nbsp; nevertheless it will continue to function after FLEXIcontent is upgraded.
+					</span>';
+			}
 		}
 		
 		// load plugin's english language file then override with current language file

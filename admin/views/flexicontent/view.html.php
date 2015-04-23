@@ -205,7 +205,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
-			$js = "window.addEvent('domready', function(){";
+			$js = "jQuery(document).ready(function(){";
 			
 			if($perms->CanConfig)  {
 				$toolbar = JToolBar::getInstance('toolbar');

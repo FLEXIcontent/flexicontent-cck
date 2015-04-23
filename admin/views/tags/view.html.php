@@ -84,7 +84,7 @@ class FlexicontentViewTags extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
-		$js = "window.addEvent('domready', function(){";
+		$js = "jQuery(document).ready(function(){";
 		
 		$contrl = FLEXI_J16GE ? "tags." : "";
 		$toolbar = JToolBar::getInstance('toolbar');

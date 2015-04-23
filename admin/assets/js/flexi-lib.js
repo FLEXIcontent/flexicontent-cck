@@ -30,8 +30,8 @@ function updateDragImg( index ) {
 	}
 }
 
-window.addEvent('domready', function(){
-
+jQuery(document).ready(function(){
+	
 	var moved_row_order;
 	var next_row_order;
 

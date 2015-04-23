@@ -91,7 +91,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		JToolBarHelper::title( $doc_title, 'fc_categories' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
-		$js = "window.addEvent('domready', function(){";
+		$js = "jQuery(document).ready(function(){";
 		
 		$contrl = FLEXI_J16GE ? "categories." : "";
 		$contrl_singular = FLEXI_J16GE ? "category." : "";

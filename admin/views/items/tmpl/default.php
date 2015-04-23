@@ -237,7 +237,7 @@ var move_within_ordering_groups_limits = <?php echo '"'.JText::_('FLEXI_MOVE_WIT
 <?php endif; ?>
 
 <?php if ($this->badcatitems) : ?>
-window.addEvent('domready', function() {
+jQuery(document).ready(function(){
 	$('fixcatForm').addEvent('submit', function(e) {
 		if ( !$('fixcatForm').elements['default_cat'].options[$('fixcatForm').elements['default_cat'].selectedIndex].value ) {
 			alert('Please select a category');

@@ -89,7 +89,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
 		
-		$js = "window.addEvent('domready', function(){";
+		$js = "jQuery(document).ready(function(){";
 		if ($filter_usergrp) {
 			$js .= "jQuery('.col_usergrp').each(function(){ jQuery(this).addClass('yellow'); });";
 		}

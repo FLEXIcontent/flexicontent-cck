@@ -160,7 +160,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$pagination = $this->get('Pagination');
 		$limitstart = $this->get('LimitStart');
 
-		$js = "window.addEvent('domready', function(){";
+		$js = "jQuery(document).ready(function(){";
 		if ($filter_fieldtype) {
 			$js .= "jQuery('.col_fieldtype').each(function(){ jQuery(this).addClass('yellow'); });";
 		}		
@@ -208,7 +208,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 	 */
 	function setToolbar() {
 		$document = JFactory::getDocument();
-		$js = "window.addEvent('domready', function(){";
+		$js = "jQuery(document).ready(function(){";
 		$toolbar = JToolBar::getInstance('toolbar');
 
 		$btn_task = '';
