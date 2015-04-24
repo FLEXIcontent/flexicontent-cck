@@ -235,7 +235,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		</div>
 		<div id="flexi_form_submit_btns" class="flexi_buttons">
 			
-			<?php if ( $this->perms['canedit'] || in_array( 'apply', $allowbuttons_fe) || !$typeid ) : ?>
+			<?php if ( (in_array( 'apply', $allowbuttons_fe) && $this->perms['canedit']) || !$typeid ) : ?>
 				<button class="<?php echo $btn_class;?> btn-success" type="button" onclick="return flexi_submit('<?php echo !$typeid ? 'apply_type' : 'apply'; ?>', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 					<span class="fcbutton_apply"><?php echo JText::_( !$isnew ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
 				</button>

@@ -17,6 +17,68 @@ $field_suffix = $field->parameters->get('field_suffix','');
 // get view
 $view = JRequest::getVar('view');
 
+$list_states = array(
+	''=>JText::_('FLEXI_PLEASE_SELECT'),
+	'AL'=>'Alabama',
+	'AK'=>'Alaska',
+	'AS'=>'American Samoa',
+	'AZ'=>'Arizona',
+	'AR'=>'Arkansas',
+	'CA'=>'California',
+	'CO'=>'Colorado',
+	'CT'=>'Connecticut',
+	'DE'=>'Delaware',
+	'DC'=>'District of Columbia',
+	'FL'=>'Florida',
+	'GA'=>'Georgia',
+	'GU'=>'Guam',
+	'HI'=>'Hawaii',
+	'ID'=>'Idaho',
+	'IL'=>'Illinois',
+	'IN'=>'Indiana',
+	'IA'=>'Iowa',
+	'KS'=>'Kansas',
+	'KY'=>'Kentucky',
+	'LA'=>'Louisiana',
+	'ME'=>'Maine',
+	'MH'=>'Marshall Islands',
+	'MD'=>'Maryland',
+	'MA'=>'Massachusetts',
+	'MI'=>'Michigan',
+	'MN'=>'Minnesota',
+	'MS'=>'Mississippi',
+	'MO'=>'Missouri',
+	'MT'=>'Montana',
+	'NE'=>'Nebraska',
+	'NV'=>'Nevada',
+	'NH'=>'New Hampshire',
+	'NJ'=>'New Jersey',
+	'NM'=>'New Mexico',
+	'NY'=>'New York',
+	'NC'=>'North Carolina',
+	'ND'=>'North Dakota',
+	'MP'=>'Northern Mariana Islands',
+	'OH'=>'Ohio',
+	'OK'=>'Oklahoma',
+	'OR'=>'Oregon',
+	'PW'=>'Palau',
+	'PA'=>'Pennsylvania',
+	'PR'=>'Puerto Rico',
+	'RI'=>'Rhode Island',
+	'SC'=>'South Carolina',
+	'SD'=>'South Dakota',
+	'TN'=>'Tennessee',
+	'TX'=>'Texas',
+	'UT'=>'Utah',
+	'VT'=>'Vermont',
+	'VI'=>'Virgin Islands',
+	'VA'=>'Virginia',
+	'WA'=>'Washington',
+	'WV'=>'West Virginia',
+	'WI'=>'Wisconsin',
+	'WY'=>'Wyoming'
+);
+
 $n = 0;
 $_add_map = ($view!='item' && ($show_map=='category' || $show_map=='both')) || ($view=='item' && ($show_map=='item' || $show_map=='both'));
 foreach ($values as $value)
@@ -50,7 +112,7 @@ foreach ($values as $value)
 		$field->{$prop}[$n] .= '
 		<div class="city-state-zip">'
 			.($value['city'] ? '<span class="city">'.$value['city'].'</span>, ' : '')
-			.($value['state'] ? '<span class="state">'.$value['state'].'</span> ' : '')
+			.($value['state'] ? '<span class="state">'.$list_states[$value['state']].'</span> ' : '')
 			.($value['province'] ? '<span class="province">'.$value['province'].'</span> ' : '')
 			.($value['zip'] ? '<span class="zip">'.$value['zip'].'</span>' : '').'
 		 </div>
@@ -58,7 +120,7 @@ foreach ($values as $value)
 	}
 	
 	$field->{$prop}[$n] .= ''
-	 	.($value['country'] ? '<div class="country">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CC_'.$value['country']).'</div>' : '')
+	 	.($value['country'] ? '<div class="country">'.JText::_('PLG_FC_ADDRESSINT_CC_'.$value['country']).'</div>' : '')
 		.($map_position==1 ? $map : '')
 		.$field_suffix
 		;
