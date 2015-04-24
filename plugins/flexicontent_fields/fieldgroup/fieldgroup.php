@@ -80,22 +80,22 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		// **************
 		
 		// Get fields belonging to this field group
-		$grpfields = $this->getGroupFields($field);
+		$grouped_fields = $this->getGroupFields($field);
 		
 		// Get values of fields making sure that also empty values are created too
 		$max_count = 1;
-		$this->getGroupFieldsValues($grpfields, $item, $max_count);
+		$this->getGroupFieldsValues($grouped_fields, $item, $max_count);
 		
 		// Render Form HTML of the field
-		foreach($grpfields as $field_id => $grpfield)
+		foreach($grouped_fields as $field_id => $grouped_field)
 		{
-			for($n=count($grpfield->value); $n < $max_count; $n++) {
-				$grpfield->value[$n] = null;
+			for($n=count($grouped_field->value); $n < $max_count; $n++) {
+				$grouped_field->value[$n] = null;
 			}
-			$grpfield->ingroup = 1;
-			$grpfield->item_id = $item->id;
-			FLEXIUtilities::call_FC_Field_Func($grpfield->field_type, 'onDisplayField', array(&$grpfield, &$item));
-			unset($grpfield->ingroup);
+			$grouped_field->ingroup = 1;
+			$grouped_field->item_id = $item->id;
+			FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayField', array(&$grouped_field, &$item));
+			unset($grouped_field->ingroup);
 		}
 		
 		
@@ -150,9 +150,9 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				deleteField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'));
 				";
 			$addField_funcs = $delField_funcs = '';
-			foreach($grpfields as $field_id => $grpfield) {
-				$addField_funcs .= str_replace("_GRP_FID_",  $grpfield->id,  sprintf($addField_pattern, $grpfield->name)  );
-				$delField_funcs .= str_replace("_GRP_FID_",  $grpfield->id,  sprintf($delField_pattern, $grpfield->name)  );
+			foreach($grouped_fields as $field_id => $grouped_field) {
+				$addField_funcs .= str_replace("_GRP_FID_",  $grouped_field->id,  sprintf($addField_pattern, $grouped_field->name)  );
+				$delField_funcs .= str_replace("_GRP_FID_",  $grouped_field->id,  sprintf($delField_pattern, $grouped_field->name)  );
 			}
 		
 			$js .= "
@@ -291,21 +291,21 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				';
 			
 			// Append item-form display HTML of the every field in the group
-			foreach($grpfields as $field_id => $grpfield) {
+			foreach($grouped_fields as $field_id => $grouped_field) {
 				$lbl_class = 'flexi label sub_label';
 				$lbl_title = '';
 				// field has tooltip
-				$edithelp = $grpfield->edithelp ? $grpfield->edithelp : 1;
-				if ( $grpfield->description && ($edithelp==1 || $edithelp==2) ) {
+				$edithelp = $grouped_field->edithelp ? $grouped_field->edithelp : 1;
+				if ( $grouped_field->description && ($edithelp==1 || $edithelp==2) ) {
 					 $lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon ' : ' ') .$tooltip_class;
-					 $lbl_title = flexicontent_html::getToolTip(trim($field->label, ':'), $grpfield->description, 0, 1);
+					 $lbl_title = flexicontent_html::getToolTip(trim($field->label, ':'), $grouped_field->description, 0, 1);
 				}
 				
 				$field->html[$n] .= '<div class="fcclear"></div>'
-				.'<label class="'.$lbl_class.'" title="'.$lbl_title.'" for="custom_'.$grpfield->name.'_'.$n.'" for_bck="custom_'.$grpfield->name.'_'.$n.'">'.$grpfield->label.'</label>'
-				.'<div class="fcfieldval_container valuebox fcfieldval_container_'.$grpfield->id.' container_fcfield_name_'.$grpfield->name.'" >'
-					.($grpfield->description && $edithelp==3 ? sprintf( $alert_box, '', 'info', 'fc-nobgimage', $grpfield->description ) : '')
-					.@ $grpfield->html[$n]
+				.'<label class="'.$lbl_class.'" title="'.$lbl_title.'" for="custom_'.$grouped_field->name.'_'.$n.'" for_bck="custom_'.$grouped_field->name.'_'.$n.'">'.$grouped_field->label.'</label>'
+				.'<div class="fcfieldval_container valuebox fcfieldval_container_'.$grouped_field->id.' container_fcfield_name_'.$grouped_field->name.'" >'
+					.($grouped_field->description && $edithelp==3 ? sprintf( $alert_box, '', 'info', 'fc-nobgimage', $grouped_field->description ) : '')
+					.@ $grouped_field->html[$n]
 				.'</div>
 				';
 			}
@@ -315,8 +315,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		// Non value HTML
 		$non_value_html = '';
-		foreach($grpfields as $field_id => $grpfield) {
-			$non_value_html .= @$grpfield->html[-1];
+		foreach($grouped_fields as $field_id => $grouped_field) {
+			$non_value_html .= @$grouped_field->html[-1];
 		}
 		
 		// Implode form HTML as a list
@@ -389,11 +389,11 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		
 		// Get fields belonging to this field group
-		$grpfields = $this->getGroupFields($field);
+		$grouped_fields = $this->getGroupFields($field);
 		
 		// Get values of fields making sure that also empty values are created too
 		$max_count = 0;
-		$this->getGroupFieldsValues($grpfields, $item, $max_count);
+		$this->getGroupFieldsValues($grouped_fields, $item, $max_count);
 		
 		
 		// **********************************************
@@ -403,8 +403,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$display_mode = (int) $field->parameters->get( 'display_mode', 0 ) ;
 		if ( $display_mode )
 		{
-			$per_group_html = trim($field->parameters->get( 'per_group_html', '' )) ;
-			$field->{$prop} = $this->_createDisplayHTML($field, $item, $grpfields, $per_group_html);
+			$custom_html = trim($field->parameters->get( 'custom_html', '' )) ;
+			$field->{$prop} = $this->_createDisplayHTML($field, $item, $grouped_fields, $custom_html, $max_count, $pretext, $posttext);
 		}
 		
 		
@@ -414,101 +414,123 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		else {
 			// Render HTML of fields in the group
-			foreach($grpfields as $grpfield) {
+			foreach($grouped_fields as $grouped_field) {
 				$_values = null;
-				$grpfield->ingroup = 1;
+				$grouped_field->ingroup = 1;
 				$method = 'display';
-				FLEXIUtilities::call_FC_Field_Func($grpfield->field_type, 'onDisplayFieldValue', array(&$grpfield, $item, $_values, $method));
-				unset($grpfield->ingroup);
+				FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayFieldValue', array(&$grouped_field, $item, $_values, $method));
+				unset($grouped_field->ingroup);
 			}
 			
 			// Render the list of groups
 			$field->{$prop} = array();
 			for($n=0; $n < $max_count; $n++) {
-				$group_html = array();
-				foreach($grpfields as $grpfield) {
+				$default_html = array();
+				foreach($grouped_fields as $grouped_field) {
 					$_values = null;
-					$group_html[] =
-						($grpfield->parameters->get('display_label') ? '<span class="flexi label">'.$grpfield->label.'</span>' : '').
-						(isset($grpfield->{$prop}[$n]) ? $grpfield->{$prop}[$n] : '')
+					$default_html[] =
+						($grouped_field->parameters->get('display_label') ? '<span class="flexi label">'.$grouped_field->label.'</span>' : '').
+						(isset($grouped_field->{$prop}[$n]) ? $grouped_field->{$prop}[$n] : '')
 					;
 				}
-				$field->{$prop}[] = $pretext . implode('<div class="clear"></div>', $group_html).'<div class="clear"></div>' . $posttext;
+				$field->{$prop}[] = $pretext . implode('<div class="clear"></div>', $default_html).'<div class="clear"></div>' . $posttext;
 			}
 			
 			// Unset display of fields in case they need to be rendered again
-			foreach($grpfields as $grpfield)  unset($grpfield->$prop);
+			//foreach($grouped_fields as $grouped_field)  unset($grouped_field->$prop);
 		}
 		
-		$field->{$prop}  = implode($separatorf, $field->{$prop});
-		$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+		if (count($field->{$prop})) {
+			$field->{$prop}  = implode($separatorf, $field->{$prop});
+			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+		} else {
+			$field->{$prop} = '';
+		}
 	}
 	
 	
 	
 	// Helper method to create HTML display of an item list according to replacements
-	function _createDisplayHTML(&$field, &$item, &$grpfields, $per_group_html)
+	private function _createDisplayHTML(&$field, &$item, &$grouped_fields, $custom_html, $max_count, $pretext, $posttext)
 	{
 		// ********************************
 		// Parse and identify custom fields
 		// ********************************
-		return '"<b>Custom HTML</b>" display for fieldgroup field, is not implemented yet, please use default HTML';
+		//return array('"<b>Custom HTML</b>" display for fieldgroup field, is not implemented yet, please use default HTML');
 		
-		$group_html = trim($field->parameters->get( 'group_html', '' )) ;  // Get custom HTML
-		if (!$group_html) return "Empty custom HTML variable for group field: ". $field->label;
-		$result = preg_match_all("/\{\{([a-zA-Z_0-9]+)(##)?([a-zA-Z_0-9]+)?\}\}/", $group_html, $field_matches);
-		$grouped_field_reps    = $result ? $field_matches[0] : array();
-		$grouped_field_names   = $result ? $field_matches[1] : array();
-		$grouped_field_methods = $result ? $field_matches[3] : array();
+		if (!$custom_html) return "Empty custom HTML variable for group field: ". $field->label;
+		$result = preg_match_all("/\{\{([a-zA-Z_0-9]+)(##)?([a-zA-Z_0-9]+)?\}\}/", $custom_html, $field_matches);
+		$gf_reps    = $result ? $field_matches[0] : array();
+		$gf_names   = $result ? $field_matches[1] : array();
+		$gf_methods = $result ? $field_matches[3] : array();
 		
-		/*foreach ($grouped_field_names as $i => $grouped_field_name)
-			$parsed_fields[] = $grouped_field_names[$i] . ($grouped_field_methods[$i] ? "->". $grouped_field_methods[$i] : "");
-		echo "$group_html :: Fields for Related Items List: ". implode(", ", $parsed_fields ? $parsed_fields : array() ) ."<br/>\n";*/
+		//foreach ($gf_names as $i => $gf_name)
+		//	$parsed_fields[] = $gf_names[$i] . ($gf_methods[$i] ? "->". $gf_methods[$i] : "");
+		//echo "$custom_html :: Fields for Related Items List: ". implode(", ", $parsed_fields ? $parsed_fields : array() ) ."<br/>\n";
 		
 		
 		// ***********************************************************************
 		// Parse and identify language strings and then make language replacements
 		// ***********************************************************************
 		
-		$result = preg_match_all("/\%\%([^%]+)\%\%/", $group_html, $translate_matches);
+		$result = preg_match_all("/\%\%([^%]+)\%\%/", $custom_html, $translate_matches);
 		$translate_strings = $result ? $translate_matches[1] : array('FLEXI_READ_MORE_ABOUT');
 		foreach ($translate_strings as $translate_string)
-			$group_html = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $group_html);
+			$custom_html = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $custom_html);
 		
 		
-		// *****************
-		// Render the fields
-		// *****************
+		// **************************************************************
+		// Render HTML of grouped fields mentioned inside the custom HTML
+		// **************************************************************
 		
-		foreach($grouped_field_names as $i => $grouped_field_name)
+		$_rendered_fields = array();
+		$found_names = array_flip($gf_names);
+		//print_r($gf_names);
+		if ( count($gf_names) )
 		{
-			if ( $grouped_field_methods[$i] == 'label' ) continue;
-			
-			$display_var = $grouped_field_methods[$i] ? $grouped_field_methods[$i] : 'display';
-			FlexicontentFields::getFieldDisplay($item, $grouped_field_name, $grouped_field_values=null, $display_var);
+			$gf_props = array();
+			foreach($grouped_fields as $grouped_field) {
+				if ( ! isset($found_names[ $grouped_field->name ]) ) continue;
+				
+				$pos = $found_names[ $grouped_field->name ];
+				$_rendered_fields[$pos] = $grouped_field;
+				
+				// Check if display method is 'label' aka nothing to render
+				if ( $gf_methods[$pos] == 'label' ) continue;
+				
+				// Check if display method of the field has been created already
+				$method = $gf_methods[$pos] ? $custom_field_methods[$pos] : 'display';
+				if ( isset($grouped_field->{$method}) && is_array($grouped_field->{$method}) ) continue;
+				
+				// Render the display method for the given field
+				$_values = null;
+				$grouped_field->ingroup = 1;  // render as array
+				//echo 'Rendering: '. $grouped_field->name . ', method: ' . $method . '<br/>';
+				FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayFieldValue', array(&$grouped_field, $item, $_values, $method));
+				unset($grouped_field->ingroup);
+			}
 		}
 		
 		
-		$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-		$display = $group_html;
+		// *******************************************************************
+		// Render the value list of the fieldgroup, using custom HTML for each
+		// value-set of the fieldgroup, and performing the field replacements
+		// *******************************************************************
 		
-		
-		// ************************************
-		// Perform field's display replacements
-		// ************************************
-		
-		foreach($grouped_field_names as $i => $grouped_field_name)
-		{
-			$_field = @ $item->fields[$grouped_field_name];
-			$grouped_field_display = '';
-			
-			$display_var = $grouped_field_methods[$i] ? $grouped_field_methods[$i] : 'display';
-			$grouped_field_display .= @ $_field->{$display_var};
-			
-			$display = str_replace($grouped_field_reps[$i], $grouped_field_display, $display);
+		$custom_display = array();
+		for($n=0; $n < $max_count; $n++) {
+			$rendered_html = $custom_html;
+			foreach($_rendered_fields as $pos => $_rendered_field) {
+				$pos = $found_names[ $_rendered_field->name ];
+				$method = $gf_methods[$pos] ? $gf_methods[$pos] : 'display';
+				//echo 'Replacing: '. $_rendered_field->name . ', method: ' . $method . ', index: ' .$n. '<br/>';
+				$rendered_html = str_replace($gf_reps[$pos], @ $_rendered_field->{$method}[$n], $rendered_html);
+				//unset($_rendered_field->{$method});  // Unset display of fields in case they need to be rendered again
+			}
+			$custom_display[$n] = $pretext . $rendered_html . $posttext;
 		}
 		
-		return $display;
+		return $custom_display;
 	}
 	
 
@@ -554,8 +576,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	
 	function getGroupFields(&$field)
 	{
-		static $grpfields = array();
-		if (isset($grpfields[$field->id])) return $grpfields[$field->id];
+		static $grouped_fields = array();
+		if (isset($grouped_fields[$field->id])) return $grouped_fields[$field->id];
 		
 		$fieldids = $field->parameters->get('fields', array());
 		if ( empty($fieldids) ) {
@@ -573,13 +595,13 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			. ' ORDER BY FIELD(f.id, '.implode(',',$fieldids).')'
 			;
 		$db->setQuery($query);
-		$grpfields[$field->id] = $db->loadObjectList('id');
+		$grouped_fields[$field->id] = $db->loadObjectList('id');
 		
-		return $grpfields[$field->id];
+		return $grouped_fields[$field->id];
 	}
 	
 	
-	function getGroupFieldsValues(&$grpfields, &$item, &$max_count)
+	function getGroupFieldsValues(&$grouped_fields, &$item, &$max_count)
 	{
 		// Retrieve values of fields in the group if not already retrieved
 		if (!isset($item->fieldvalues)) {
@@ -587,35 +609,35 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$item->fieldvalues = $itemmodel->getCustomFieldsValues($item->id);
 		}
 		
-		$_grpfields = array();
-		foreach($grpfields as $field_id => $grpfield)
+		$_grouped_fields = array();
+		foreach($grouped_fields as $field_id => $grouped_field)
 		{
 			// Set field values
 			if ( isset($item->fieldvalues[$field_id]) ) {
-				$grpfield->value = is_array($item->fieldvalues[$field_id])  ?  $item->fieldvalues[$field_id]  :  array($item->fieldvalues[$field_id]);
+				$grouped_field->value = is_array($item->fieldvalues[$field_id])  ?  $item->fieldvalues[$field_id]  :  array($item->fieldvalues[$field_id]);
 			} else {
-				$grpfield->value = null;
+				$grouped_field->value = null;
 			}
 			
 			// Update max value count
-			$value_count = is_array($grpfield->value) ? count($grpfield->value) : 0;
+			$value_count = is_array($grouped_field->value) ? count($grouped_field->value) : 0;
 			$max_count = $value_count > $max_count ? $value_count : $max_count;
 			
 			// Create field parameters, if not already created, NOTEL: for 'custom' fields loadFieldConfig() is optional
-			if (empty($grpfield->parameters)) {
-				$grpfield->parameters = new JRegistry($grpfield->attribs);
+			if (empty($grouped_field->parameters)) {
+				$grouped_field->parameters = new JRegistry($grouped_field->attribs);
 			}
 			
 			// Check if field is set to participate in a field group and include it
-			if ( $grpfield->parameters->get('use_ingroup') ) $_grpfields[] = $grpfield;
+			if ( $grouped_field->parameters->get('use_ingroup') ) $_grouped_fields[] = $grouped_field;
 		}
-		$grpfields = $_grpfields;
+		$grouped_fields = $_grouped_fields;
 		
 		// Add empty values the the fields not having enough values
-		foreach($grpfields as $field_id => $grpfield)
+		foreach($grouped_fields as $field_id => $grouped_field)
 		{
-			for($n=count($grpfield->value); $n < $max_count; $n++) {
-				$grpfield->value[$n] = null;
+			for($n=count($grouped_field->value); $n < $max_count; $n++) {
+				$grouped_field->value[$n] = null;
 			}
 		}
 	}
