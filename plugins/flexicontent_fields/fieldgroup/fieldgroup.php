@@ -345,6 +345,49 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
+		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
+		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
+		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
+		
+		switch($separatorf)
+		{
+			case 0:
+			$separatorf = '&nbsp;';
+			break;
+
+			case 1:
+			$separatorf = '<br />';
+			break;
+
+			case 2:
+			$separatorf = '&nbsp;|&nbsp;';
+			break;
+
+			case 3:
+			$separatorf = ',&nbsp;';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
+			break;
+
+			case 5:
+			$separatorf = '';
+			break;
+
+			default:
+			$separatorf = '&nbsp;';
+			break;
+		}
+		
+		
 		// Get fields belonging to this field group
 		$grpfields = $this->getGroupFields($field);
 		
@@ -352,33 +395,123 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$max_count = 0;
 		$this->getGroupFieldsValues($grpfields, $item, $max_count);
 		
-		// Render fields display
-		foreach($grpfields as $grpfield) {
-			$_values = null;
-			$grpfield->ingroup = 1;
-			FLEXIUtilities::call_FC_Field_Func($grpfield->field_type, 'onDisplayFieldValue', array(&$grpfield, $item, $_values, $prop));
-			unset($grpfield->ingroup);
+		
+		// **********************************************
+		// Create a CUSTOMIZED display of the field group
+		// **********************************************
+		
+		$display_mode = (int) $field->parameters->get( 'display_mode', 0 ) ;
+		if ( $display_mode )
+		{
+			$per_group_html = trim($field->parameters->get( 'per_group_html', '' )) ;
+			$field->{$prop} = $this->_createDisplayHTML($field, $item, $grpfields, $per_group_html);
 		}
 		
-		// Create a basic display for the field group
-		$method = array();
-		for($n=0; $n < $max_count; $n++) {
+		
+		// *********************************************
+		// Create the DEFAULT display of the field group
+		// *********************************************
+		
+		else {
+			// Render HTML of fields in the group
 			foreach($grpfields as $grpfield) {
 				$_values = null;
-				$method[] = '
-					<span class="flexi label">'.$grpfield->label.'</span>
-						'.(isset($grpfield->{$prop}[$n]) ? $grpfield->{$prop}[$n] : '').'
-					<div class="clear"></div>
-				';
+				$grpfield->ingroup = 1;
+				$method = 'display';
+				FLEXIUtilities::call_FC_Field_Func($grpfield->field_type, 'onDisplayFieldValue', array(&$grpfield, $item, $_values, $method));
+				unset($grpfield->ingroup);
 			}
-		}
-		foreach($grpfields as $grpfield) {
-			unset($grpfield->$prop);
+			
+			// Render the list of groups
+			$field->{$prop} = array();
+			for($n=0; $n < $max_count; $n++) {
+				$group_html = array();
+				foreach($grpfields as $grpfield) {
+					$_values = null;
+					$group_html[] =
+						($grpfield->parameters->get('display_label') ? '<span class="flexi label">'.$grpfield->label.'</span>' : '').
+						(isset($grpfield->{$prop}[$n]) ? $grpfield->{$prop}[$n] : '')
+					;
+				}
+				$field->{$prop}[] = $pretext . implode('<div class="clear"></div>', $group_html).'<div class="clear"></div>' . $posttext;
+			}
+			
+			// Unset display of fields in case they need to be rendered again
+			foreach($grpfields as $grpfield)  unset($grpfield->$prop);
 		}
 		
-		$field->$prop = implode("<div class='clear'></div>", $method);
+		$field->{$prop}  = implode($separatorf, $field->{$prop});
+		$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
 	}
 	
+	
+	
+	// Helper method to create HTML display of an item list according to replacements
+	function _createDisplayHTML(&$field, &$item, &$grpfields, $per_group_html)
+	{
+		// ********************************
+		// Parse and identify custom fields
+		// ********************************
+		return '"<b>Custom HTML</b>" display for fieldgroup field, is not implemented yet, please use default HTML';
+		
+		$group_html = trim($field->parameters->get( 'group_html', '' )) ;  // Get custom HTML
+		if (!$group_html) return "Empty custom HTML variable for group field: ". $field->label;
+		$result = preg_match_all("/\{\{([a-zA-Z_0-9]+)(##)?([a-zA-Z_0-9]+)?\}\}/", $group_html, $field_matches);
+		$grouped_field_reps    = $result ? $field_matches[0] : array();
+		$grouped_field_names   = $result ? $field_matches[1] : array();
+		$grouped_field_methods = $result ? $field_matches[3] : array();
+		
+		/*foreach ($grouped_field_names as $i => $grouped_field_name)
+			$parsed_fields[] = $grouped_field_names[$i] . ($grouped_field_methods[$i] ? "->". $grouped_field_methods[$i] : "");
+		echo "$group_html :: Fields for Related Items List: ". implode(", ", $parsed_fields ? $parsed_fields : array() ) ."<br/>\n";*/
+		
+		
+		// ***********************************************************************
+		// Parse and identify language strings and then make language replacements
+		// ***********************************************************************
+		
+		$result = preg_match_all("/\%\%([^%]+)\%\%/", $group_html, $translate_matches);
+		$translate_strings = $result ? $translate_matches[1] : array('FLEXI_READ_MORE_ABOUT');
+		foreach ($translate_strings as $translate_string)
+			$group_html = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $group_html);
+		
+		
+		// *****************
+		// Render the fields
+		// *****************
+		
+		foreach($grouped_field_names as $i => $grouped_field_name)
+		{
+			if ( $grouped_field_methods[$i] == 'label' ) continue;
+			
+			$display_var = $grouped_field_methods[$i] ? $grouped_field_methods[$i] : 'display';
+			FlexicontentFields::getFieldDisplay($item, $grouped_field_name, $grouped_field_values=null, $display_var);
+		}
+		
+		
+		$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$display = $group_html;
+		
+		
+		// ************************************
+		// Perform field's display replacements
+		// ************************************
+		
+		foreach($grouped_field_names as $i => $grouped_field_name)
+		{
+			$_field = @ $item->fields[$grouped_field_name];
+			$grouped_field_display = '';
+			
+			$display_var = $grouped_field_methods[$i] ? $grouped_field_methods[$i] : 'display';
+			$grouped_field_display .= @ $_field->{$display_var};
+			
+			$display = str_replace($grouped_field_reps[$i], $grouped_field_display, $display);
+		}
+		
+		return $display;
+	}
+	
+
 	
 	
 	// **************************************************************
@@ -448,6 +581,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	
 	function getGroupFieldsValues(&$grpfields, &$item, &$max_count)
 	{
+		// Retrieve values of fields in the group if not already retrieved
 		if (!isset($item->fieldvalues)) {
 			$itemmodel = new FlexicontentModelItem();
 			$item->fieldvalues = $itemmodel->getCustomFieldsValues($item->id);
@@ -467,15 +601,17 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$value_count = is_array($grpfield->value) ? count($grpfield->value) : 0;
 			$max_count = $value_count > $max_count ? $value_count : $max_count;
 			
-			// Create field parameters (for 'custom' fields loadFieldConfig() is optional)
-			$grpfield->parameters = new JRegistry($grpfield->attribs);
+			// Create field parameters, if not already created, NOTEL: for 'custom' fields loadFieldConfig() is optional
+			if (empty($grpfield->parameters)) {
+				$grpfield->parameters = new JRegistry($grpfield->attribs);
+			}
 			
-			// Check if field is set to participate in a group
+			// Check if field is set to participate in a field group and include it
 			if ( $grpfield->parameters->get('use_ingroup') ) $_grpfields[] = $grpfield;
 		}
 		$grpfields = $_grpfields;
 		
-		// Prepare empty values for the field
+		// Add empty values the the fields not having enough values
 		foreach($grpfields as $field_id => $grpfield)
 		{
 			for($n=count($grpfield->value); $n < $max_count; $n++) {
