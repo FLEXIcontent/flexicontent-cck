@@ -31,6 +31,7 @@ $newly_submitted = $session->get('newly_submitted', array(), 'flexicontent');
 $newly_submitted_item = @ $newly_submitted[$this->item->id];
 $submit_redirect_url_fe = $this->params->get('submit_redirect_url_fe');
 $isredirected_after_submit = $newly_submitted_item && $submit_redirect_url_fe;
+$disable_langs = $this->params->get('disable_languages_fe', array());
 
 // Parameter configured to be displayed
 if (FLEXI_J16GE) $fieldSets = $this->form->getFieldsets('attribs');
@@ -375,7 +376,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				<?php echo $this->form->getInput('title');?>
 			</div>
 			<?php foreach ($this->item->item_translations as $t): ?>
-				<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
+				<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 						<?php
@@ -425,7 +426,7 @@ if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 				<?php echo $this->form->getInput('alias');?>
 			</div>
 			<?php foreach ($this->item->item_translations as $t): ?>
-				<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
+				<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 						<?php
@@ -934,7 +935,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 							<?php echo $this->form->getInput('metadesc'); ?>
 						</div>
 						<?php foreach ($this->item->item_translations as $t): ?>
-							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
+							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 								<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 									<?php
@@ -972,7 +973,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 							<?php echo $this->form->getInput('metakey'); ?>
 						</div>
 						<?php foreach ($this->item->item_translations as $t): ?>
-							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
+							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 								<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 									<?php
@@ -1254,7 +1255,7 @@ if ($this->fields && $typeid) :
 						?>
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
-						<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
+						<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 							<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 								<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 								<?php
