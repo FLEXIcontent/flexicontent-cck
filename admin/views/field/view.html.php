@@ -77,8 +77,26 @@ class FlexicontentViewField extends JViewLegacy
 		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel( $ctrl.'cancel' );
 		
-		JToolBarHelper::custom( $ctrl.'exportcsv', 'download.png', 'download.png', 'Export CSV', false );
-		JToolBarHelper::custom( $ctrl.'exportsql', 'download.png', 'download.png', 'Export SQL', false );
+		//JToolBarHelper::spacer();  JToolBarHelper::divider();  JToolBarHelper::spacer();
+		//JToolBarHelper::custom( $ctrl.'exportcsv', 'download.png', 'download.png', 'Export CSV', false );
+		//JToolBarHelper::custom( $ctrl.'exportsql', 'download.png', 'download.png', 'Export SQL', false );
+		
+		$btn_icon = 'icon-download';
+		$btn_name = 'download';
+		$btn_task    = $ctrl.'exportcsv';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
+			
+		$btn_icon = 'icon-download';
+		$btn_name = 'download';
+		$btn_task    = $ctrl.'exportsql';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
+			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
+
 		
 		// Import Joomla plugin that implements the type of current flexi field
 		$extfolder = 'flexicontent_fields';
@@ -108,7 +126,7 @@ class FlexicontentViewField extends JViewLegacy
 				else echo '
 					<span class="fc-info fc-mssg-inline">
 						'.$close_btn.'
-						Note: installed version of Field: \'<b>'.$extname.'</b>\' is given free for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.', &nbsp; and it is given freely in BETA versions prior to: '.$classname::$prior_to_version.', &nbsp; nevertheless it will continue to function after FLEXIcontent is upgraded.
+						Note: installed version of Field: \'<b>'.$extname.'</b>\' is given free for FLEXIcontent versions prior to: v'.$classname::$prior_to_version.', &nbsp; &nbsp; nevertheless it will continue to function after FLEXIcontent is upgraded.
 					</span>';
 			}
 		}

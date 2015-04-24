@@ -44,7 +44,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
-		$use_ingroup = 0; // $field->parameters->get('use_ingroup', 0);
+		$use_ingroup = 0;  // Not supported  //$field->parameters->get('use_ingroup', 0);
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 		

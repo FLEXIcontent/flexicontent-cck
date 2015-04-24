@@ -213,7 +213,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data" >
 	
-	<div class="container-fluid">
+	<div class="container-fluid" style="padding:0px!important;">
 	<?php /*<fieldset class="basicfields_set">
 		<legend>
 			<span class="fc_legend_text"><?php echo JText::_( 'FLEXI_BASIC' ); ?></span>
@@ -384,7 +384,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 		</div>
 		
 		
-		<div class="span6 full_width_980">
+		<div class="span6 full_width_980 padded_wrap_box">
 			
 			<?php
 				$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;

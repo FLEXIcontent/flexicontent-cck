@@ -378,166 +378,167 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		<div class="tabbertab" id="tabset_layout_fields_placement_tab" data-icon-class="icon-signup" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
 				
-				<div class="fcclear"></div>
-				<span class="fc-mssg-inline fc-success" style="font-size:100%; margin: 12px 0 0 0!important;">
-					<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
-					<?php echo JText::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?>
-				</span>
-				
-				<table style="width:100%;">
-					<tr>
-						<td style="width:50%; vertical-align:top;">
-							
-							<fieldset id="available_fields_container">
-								<legend style="margin:0 0 12px 0; font-size:14px; padding:6px 12px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_FIELDS') ?></legend>
-								<div class="fcclear"></div>
-								
-								<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 0px;">
-									<div style="float:left; margin-right:32px;">
-										<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
-										<div style="float:left; clear:both;">
-											<?php echo sprintf(str_replace('__au__', '_available', $this->content_type_select), 'available_fields_container', 'hide', 'available'); ?>
-										</div>
-									</div>
-									<div style="float:left;">
-										<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
-										<div style="float:left; clear:both;">
-											<?php echo sprintf(str_replace('__au__', '_available', $this->field_type_select), 'available_fields_container', 'hide', 'available'); ?>
-										</div>
-									</div>
-								</div>
-								
-								
-								<div class="postitle badge badge-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CORE_FIELDS'); ?></div>
-							
-								<div class="positions_container">
-									<ul id="sortablecorefields" class="positions">
-									<?php
-									foreach ($this->fields as $field) :
-										if ($field->iscore && (!in_array($field->name, $this->used))) :
-											$class_list  = "fields core";
-											$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
-											$class_list .= " field_type_".$field->field_type;
-									?>
-									<li class="<?php echo $class_list; ?>" id="field_<?php echo $field->name; ?>"><?php echo $field->label; ?></li>
-									<?php
-										endif;
-									endforeach;
-									?>
-									</ul>
-								</div>
-								
-								
-								<div class="postitle badge badge-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_NON_CORE_FIELDS'); ?></div>
-								
-								<div class="positions_container">
-									<ul id="sortableuserfields" class="positions">
-									<?php
-									foreach ($this->fields as $field) :
-										if (!$field->iscore && (!in_array($field->name, $this->used))) :
-											$class_list  = "fields user";
-											$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
-											$class_list .= " field_type_".$field->field_type;
-									?>
-									<li class="<?php echo $class_list; ?>" id="field_<?php echo $field->name; ?>"><?php echo $field->label.' #'.$field->id; ?></li>
-									<?php
-										endif;
-									endforeach;
-									?>
-									</ul>
-								</div>
-							
-							</fieldset>
-						</td>
+			<div class="fcclear"></div>
+			<span class="fc-mssg-inline fc-success" style="font-size:100%; margin: 12px 0 0 0!important;">
+				<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
+				<?php echo JText::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?>
+			</span>
+			
+			<div class="container-fluid" style="padding:0px!important;">
+				<div class="span6 full_width_980">
+					
+					<fieldset id="available_fields_container">
+						<legend style="margin:0 0 12px 0; font-size:14px; padding-top:6px; padding-bottom:6px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_FIELDS') ?></legend>
+						<div class="fcclear"></div>
 						
-						<td style="width:50%; vertical-align:top;">
-							<fieldset id="layout_positions_container">
-								<legend style="margin:0 0 12px 0; font-size:14px; padding:6px 12px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_POS') ?></legend>
-								<div class="fcclear"></div>
-								
-								<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 0px;">
-									<div style="float:left; margin-right:32px;">
-										<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
-										<div style="float:left; clear:both;">
-											<?php echo sprintf(str_replace('__au__', '_used',$this->content_type_select), 'layout_positions_container', 'highlight', 'used'); ?>
-										</div>
-									</div>
-									<div style="float:left;">
-										<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
-										<div style="float:left; clear:both;">
-											<?php echo sprintf(str_replace('__au__', '_used',$this->field_type_select), 'layout_positions_container', 'highlight', 'used'); ?>
-										</div>
-									</div>
+						<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 0px;">
+							<div style="float:left; margin-right:32px;">
+								<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
+								<div style="float:left; clear:both;">
+									<?php echo sprintf(str_replace('__au__', '_available', $this->content_type_select), 'available_fields_container', 'hide', 'available'); ?>
 								</div>
-								
-								<?php
-								if (isset($this->layout->positions)) :
-									$count=-1;
-									foreach ($this->layout->positions as $pos) :
-										$count++;
-										
-										$pos_css = "";
-										$posrow_prev = @$posrow;
-										$posrow = isset($this->layout->attributes[$count]['posrow'] )  ?  $this->layout->attributes[$count]['posrow'] : '';
-										
-										// Detect field group row change and close previous row if open
-										echo ($posrow_prev && $posrow_prev != $posrow)  ?  "</td></tr></table>\n"  :  "";
-										
-										if ($posrow) {
-											// we are inside field group row, start it or continue with next field group
-											echo ($posrow_prev != $posrow)  ?  "<table style='width:100%;'><tr class='fieldgrprow' ><td class='fieldgrprow_cell' >\n"  :  "</td><td class='fieldgrprow_cell'>\n";
-										}
-										
-									?>
-									
-									<div class="postitle badge badge-success" style="margin:10px 0 2px"><?php echo $pos; ?></div>
-									
-									<?php
-									if ( isset($this->layout->attributes[$count]['readonly']) ) {
-										switch ($this->layout->view) {
-											case FLEXI_ITEMVIEW: $msg='in the <b>Item Type</b> configuration and/or in each individual <b>Item</b>'; break;
-											case 'category': $msg='in each individual <b>Category</b>'; break;
-											default: $msg='in each <b>'.$this->layout->view.'</b>'; break;
-										}
-										echo "<div class='positions_readonly'>NON-editable position.<br/> To customize edit TEMPLATE parameters ".$msg."</div>";
-										continue;
-									}
-									?>
-								<div class="positions_container">
-									<ul id="sortable-<?php echo $pos; ?>" class="positions" >
-									<?php
-									if (isset($this->fbypos[$pos])) :
-										foreach ($this->fbypos[$pos]->fields as $f) :
-											if (isset($this->fields[$f])) : // this check is in case a field was deleted
-												$field = $this->fields[$f];
-												$class_list  = "fields ". ($this->fields[$f]->iscore ? 'core' : 'user');
-												$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
-												$class_list .= " field_type_".$field->field_type;
-									?>
-										<li class="<?php echo $class_list; ?>" id="field_<?php echo $this->fields[$f]->name; ?>">
-										<?php echo $this->fields[$f]->label . ($this->fields[$f]->iscore ? '' : ' #'.$this->fields[$f]->id); ?>
-										</li>
-									<?php
-											endif;
-										endforeach;
-									endif;	
-									?>
-									</ul>
+							</div>
+							<div style="float:left;">
+								<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
+								<div style="float:left; clear:both;">
+									<?php echo sprintf(str_replace('__au__', '_available', $this->field_type_select), 'available_fields_container', 'hide', 'available'); ?>
 								</div>
-									<input type="hidden" name="<?php echo $pos; ?>" id="<?php echo $pos; ?>" value="" />
-								<?php 
-									endforeach;
-									// Close any field group line that it is still open
-									echo @$posrow ? "</td></tr></table>\n" : "";
-								else :
-									echo JText::_('FLEXI_NO_GROUPS_AVAILABLE');
+							</div>
+						</div>
+						
+						
+						<div class="postitle label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CORE_FIELDS'); ?></div>
+					
+						<div class="positions_container">
+							<ul id="sortablecorefields" class="positions">
+							<?php
+							foreach ($this->fields as $field) :
+								if ($field->iscore && (!in_array($field->name, $this->used))) :
+									$class_list  = "fields core";
+									$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
+									$class_list .= " field_type_".$field->field_type;
+							?>
+							<li class="<?php echo $class_list; ?>" id="field_<?php echo $field->name; ?>"><?php echo $field->label; ?></li>
+							<?php
 								endif;
-								?>
-							</fieldset>
-						</td>
-					</tr>
-				</table>
-		
+							endforeach;
+							?>
+							</ul>
+						</div>
+						
+						
+						<div class="postitle label label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_NON_CORE_FIELDS'); ?></div>
+						
+						<div class="positions_container">
+							<ul id="sortableuserfields" class="positions">
+							<?php
+							foreach ($this->fields as $field) :
+								if (!$field->iscore && (!in_array($field->name, $this->used))) :
+									$class_list  = "fields user";
+									$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
+									$class_list .= " field_type_".$field->field_type;
+							?>
+							<li class="<?php echo $class_list; ?>" id="field_<?php echo $field->name; ?>"><?php echo $field->label.' #'.$field->id; ?></li>
+							<?php
+								endif;
+							endforeach;
+							?>
+							</ul>
+						</div>
+					
+					</fieldset>
+					
+				</div>	
+				
+				<div class="span6 full_width_980 padded_wrap_box">
+					
+					<fieldset id="layout_positions_container">
+						<legend style="margin:0 0 12px 0; font-size:14px; padding-top:6px; padding-bottom:6px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_POS') ?></legend>
+						<div class="fcclear"></div>
+						
+						<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 0px;">
+							<div style="float:left; margin-right:32px;">
+								<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
+								<div style="float:left; clear:both;">
+									<?php echo sprintf(str_replace('__au__', '_used',$this->content_type_select), 'layout_positions_container', 'highlight', 'used'); ?>
+								</div>
+							</div>
+							<div style="float:left;">
+								<div style="float:left;" class="postitle label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
+								<div style="float:left; clear:both;">
+									<?php echo sprintf(str_replace('__au__', '_used',$this->field_type_select), 'layout_positions_container', 'highlight', 'used'); ?>
+								</div>
+							</div>
+						</div>
+						
+						<?php
+						if (isset($this->layout->positions)) :
+							$count=-1;
+							foreach ($this->layout->positions as $pos) :
+								$count++;
+								
+								$pos_css = "";
+								$posrow_prev = @$posrow;
+								$posrow = isset($this->layout->attributes[$count]['posrow'] )  ?  $this->layout->attributes[$count]['posrow'] : '';
+								
+								// Detect field group row change and close previous row if open
+								echo ($posrow_prev && $posrow_prev != $posrow)  ?  "</td></tr></table>\n"  :  "";
+								
+								if ($posrow) {
+									// we are inside field group row, start it or continue with next field group
+									echo ($posrow_prev != $posrow)  ?  "<table style='width:100%;'><tr class='fieldgrprow' ><td class='fieldgrprow_cell' >\n"  :  "</td><td class='fieldgrprow_cell'>\n";
+								}
+								
+							?>
+							
+							<div class="postitle label label-success" style="margin:10px 0 2px"><?php echo $pos; ?></div>
+							
+							<?php
+							if ( isset($this->layout->attributes[$count]['readonly']) ) {
+								switch ($this->layout->view) {
+									case FLEXI_ITEMVIEW: $msg='in the <b>Item Type</b> configuration and/or in each individual <b>Item</b>'; break;
+									case 'category': $msg='in each individual <b>Category</b>'; break;
+									default: $msg='in each <b>'.$this->layout->view.'</b>'; break;
+								}
+								echo "<div class='positions_readonly'>NON-editable position.<br/> To customize edit TEMPLATE parameters ".$msg."</div>";
+								continue;
+							}
+							?>
+						<div class="positions_container">
+							<ul id="sortable-<?php echo $pos; ?>" class="positions" >
+							<?php
+							if (isset($this->fbypos[$pos])) :
+								foreach ($this->fbypos[$pos]->fields as $f) :
+									if (isset($this->fields[$f])) : // this check is in case a field was deleted
+										$field = $this->fields[$f];
+										$class_list  = "fields ". ($this->fields[$f]->iscore ? 'core' : 'user');
+										$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
+										$class_list .= " field_type_".$field->field_type;
+							?>
+								<li class="<?php echo $class_list; ?>" id="field_<?php echo $this->fields[$f]->name; ?>">
+								<?php echo $this->fields[$f]->label . ($this->fields[$f]->iscore ? '' : ' #'.$this->fields[$f]->id); ?>
+								</li>
+							<?php
+									endif;
+								endforeach;
+							endif;	
+							?>
+							</ul>
+						</div>
+							<input type="hidden" name="<?php echo $pos; ?>" id="<?php echo $pos; ?>" value="" />
+						<?php 
+							endforeach;
+							// Close any field group line that it is still open
+							echo @$posrow ? "</td></tr></table>\n" : "";
+						else :
+							echo JText::_('FLEXI_NO_GROUPS_AVAILABLE');
+						endif;
+						?>
+					</fieldset>
+					
+				</div>
+			</div>
+			
 		</div>
 		
 		<div class="tabbertab" id="tabset_layout_disp_params_tab" data-icon-class="icon-options" >	
@@ -680,7 +681,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 
 			<div id="layout-fileeditor-container" class="span8" style="margin:0.5%;">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
-					<span id="layout_edit_name_container" class="badge badge-info"><?php echo JText::_( 'FLEXI_NO_FILE_LOADED' ); ?></span>
+					<span id="layout_edit_name_container" class="label label-info"><?php echo JText::_( 'FLEXI_NO_FILE_LOADED' ); ?></span>
 				</span>
 				<div class="fcclear"></div>
 				<div id="ajax-system-message-container">

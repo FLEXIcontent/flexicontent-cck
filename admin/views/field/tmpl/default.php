@@ -39,7 +39,7 @@ $this->document->addScriptDeclaration($js);
 <div class="flexicontent" id="flexicontent">
 <form action="index.php" method="post" class="form-validate" name="adminForm" id="adminForm">
 
-<div class="container-fluid">
+<div class="container-fluid" style="padding:0px!important;">
 
 	<div class="span6 full_width_980">
 	
@@ -340,7 +340,7 @@ $this->document->addScriptDeclaration($js);
 		</div>
 
 	</div>
-	<div class="span6 full_width_980 padded_wrap_box" style="padding: 0px 0 0 24px">
+	<div class="span6 full_width_980 padded_wrap_box">
 			
 			<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; "><?php echo JText::_( /*'FLEXI_THIS_FIELDTYPE_PROPERTIES'*/'FIELD TYPE specific configuration' ); ?></span>
 			

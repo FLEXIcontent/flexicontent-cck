@@ -352,15 +352,19 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$max_count = 0;
 		$this->getGroupFieldsValues($grpfields, $item, $max_count);
 		
+		// Render fields display
 		foreach($grpfields as $grpfield) {
 			$_values = null;
+			$grpfield->ingroup = 1;
 			FLEXIUtilities::call_FC_Field_Func($grpfield->field_type, 'onDisplayFieldValue', array(&$grpfield, $item, $_values, $prop));
+			unset($grpfield->ingroup);
 		}
+		
+		// Create a basic display for the field group
 		$method = array();
 		for($n=0; $n < $max_count; $n++) {
 			foreach($grpfields as $grpfield) {
 				$_values = null;
-				FLEXIUtilities::call_FC_Field_Func($grpfield->field_type, 'onDisplayFieldValue', array(&$grpfield, $item, $_values, $prop));
 				$method[] = '
 					<span class="flexi label">'.$grpfield->label.'</span>
 						'.(isset($grpfield->{$prop}[$n]) ? $grpfield->{$prop}[$n] : '').'
@@ -371,6 +375,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		foreach($grpfields as $grpfield) {
 			unset($grpfield->$prop);
 		}
+		
 		$field->$prop = implode("<div class='clear'></div>", $method);
 	}
 	

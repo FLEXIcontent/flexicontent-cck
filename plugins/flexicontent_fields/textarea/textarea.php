@@ -371,7 +371,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// Some variables
-		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$use_ingroup = !empty($field->ingroup);  //$field->parameters->get('use_ingroup', 0);
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Value handling parameters

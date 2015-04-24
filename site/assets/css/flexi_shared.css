@@ -1382,6 +1382,14 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 #flexicontent .nowrap_box .container_fcfield {
 	float: none !important;
 }
+#flexicontent .span6.full_width_980 {
+	width: 50%;
+	padding: 0 32px 0 0;
+	margin: 0%;
+}
+#flexicontent .span6.full_width_980.padded_wrap_box {
+	padding: 0;
+}
 @media (max-width: 979px) {
 	#flexicontent .full_width_980 {
 		width: 100% !important;
