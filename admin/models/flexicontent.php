@@ -756,7 +756,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// CHECK phpThumb cache exists and create the folder
 		if ( !JFolder::exists($phpthumbcache) && !JFolder::create($phpthumbcache) ) {
 			JError::raiseWarning(100, 'Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly' );
-			return true;  // Cancel task !! to allow user to continue
+			$return = true;  // Cancel task !! to allow user to continue
+			return;
 		}
 		
 		// CHECK phpThumb cache permissions
@@ -764,7 +765,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// If permissions not good check if we can change them
 		if ( !$return && !JPath::canChmod($phpthumbcache) ) {
 			JError::raiseWarning(100, 'Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-' );
-			return true;  // Cancel task !! to allow user to continue
+			$return = true;  // Cancel task !! to allow user to continue
+			return;
 		}
 		
 		return $return;

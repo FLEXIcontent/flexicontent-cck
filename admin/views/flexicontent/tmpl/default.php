@@ -321,6 +321,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				//$link = 'index.php?option=com_content&amp;view=featured';
 				//if (!isset($sbtns['featured'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-featured.png', JText::_( 'FLEXI_FEATURED' ), 1 );
 			}
+			?></div></fieldset><?php endif; ?><?php if ($this->params->get('support_url')): ?><fieldset class="fc-board-set"><legend class="fc-board-header"><?php echo JText::_( 'FLEXI_HELP' );?></legend><div class="fc-board-set-inner"><?php
 			if ($this->params->get('support_url'))
 			{
 				$link = $this->params->get('support_url');
