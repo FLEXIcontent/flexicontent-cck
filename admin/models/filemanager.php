@@ -637,7 +637,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 				. (isset($ignored['lang_parent_id']) ? ' JOIN #__flexicontent_items_ext as ie ON ie.item_id = i.id' : '')
 				. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $this->_db->Quote( $field_type ) .')' . $field_ids_list
-				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE '. $like_str . $file_ids_list
+				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE ' . $like_str . ' AND f.'.$value_prop.'<>""' . $file_ids_list
 				//. ' JOIN #__users AS u ON u.id = f.uploaded_by'
 				. $where
 				. $groupby
@@ -762,7 +762,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$items = array();
 		
 		foreach ($rows as $row) $row_ids[] = $row->id;
-		$file_id_list = "'". implode("','", $row_ids) . "'";
+		$file_ids_list = "'". implode("','", $row_ids) . "'";
 		
 		// Serialized values are like : "__field_propname__";s:33:"__value__"
 		$format_str = 'CONCAT("%%","\"%s\";s:%%:%%\"",%s,"\"%%")';
@@ -774,8 +774,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$query	= 'SELECT f.id as id, COUNT(rel.item_id) as count, GROUP_CONCAT(DISTINCT rel.item_id SEPARATOR  ",") AS item_list'
 				. ' FROM #__flexicontent_fields_item_relations AS rel'
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote($field_type) . $field_ids_list
-				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE '. $like_str .' AND f.'.$value_prop.'<>""'
-				. ' WHERE f.id IN('. $file_id_list .')'
+				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE ' . $like_str . ' AND f.'.$value_prop.'<>""'
+				. ' WHERE f.id IN('. $file_ids_list .')'
 				. ' GROUP BY f.id'
 				;
 		$this->_db->setQuery($query);
