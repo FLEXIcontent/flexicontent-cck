@@ -515,7 +515,7 @@ table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level0,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level1,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
-.fcsep_level0:first-child, .fcsep_level1:first-child, .fcsep_level2:first-child,
+/*.fcsep_level0:first-child, .fcsep_level1:first-child, .fcsep_level2:first-child,*/
 .fc-nomargin > .fcsep_level0,  .fc-nomargin > .fcsep_level1,  .fc-nomargin > .fcsep_level2
 {
 	margin-top: 8px !important;
