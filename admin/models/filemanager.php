@@ -774,7 +774,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$query	= 'SELECT f.id as id, COUNT(rel.item_id) as count, GROUP_CONCAT(DISTINCT rel.item_id SEPARATOR  ",") AS item_list'
 				. ' FROM #__flexicontent_fields_item_relations AS rel'
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote($field_type) . $field_ids_list
-				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE '. $like_str
+				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE '. $like_str .' AND f.'.$value_prop.'<>""'
 				. ' WHERE f.id IN('. $file_id_list .')'
 				. ' GROUP BY f.id'
 				;

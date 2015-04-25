@@ -533,9 +533,10 @@ class com_flexicontentInstallerScript
 								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
 							}
 						}
-						if ( $result !== false ) {
-							echo "<span class='badge badge-success'>tables altered</span>";
-						}
+						$count_rows = $db->getAffectedRows($result);
+						if ( $count_rows ) {
+							echo "<span class='badge badge-success'>".$count_rows." effected rows </span>";
+						} else echo "<span class='badge badge-info'>no changes</span>";
 					}
 					else echo "<span class='badge badge-info'>nothing to do</span>";
 					?>
@@ -561,9 +562,10 @@ class com_flexicontentInstallerScript
 								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
 							}
 						}
-						if ( $result !== false ) {
-							echo "<span class='badge badge-success'>tables altered</span>";
-						}
+						$count_rows = $db->getAffectedRows($result);
+						if ( $count_rows ) {
+							echo "<span class='badge badge-success'>".$count_rows." effected rows </span>";
+						} else echo "<span class='badge badge-info'>no changes</span>";
 					}
 					else echo "<span class='badge badge-info'>nothing to do</span>";
 					?>
@@ -575,9 +577,11 @@ class com_flexicontentInstallerScript
 		// Update DB table flexicontent_fields: Convert deprecated fields types to 'text' field type
 		?>
 				<tr class="row0">
-					<td class="key" style="font-size:11px;">Converting deprecated fields
+					<td class="key" style="font-size:11px;">Converting deprecated fields types:
 					<?php
+					//echo '<br/><span class="label">' . implode('</span><span class="label">', array_keys($deprecated_fields)) . '</span>';
 					$msg = array();
+					$n = 0;
 					if ($fields_tbl_exists) foreach ($deprecated_fields as $old_type => $new_type)
 					{
 						$query = 'UPDATE #__flexicontent_fields'
@@ -590,7 +594,8 @@ class com_flexicontentInstallerScript
 							continue;
 						}
 						
-						$msg[] = $db->getAffectedRows($result)." deprecated fields '".$old_type."' were converted.";
+						$count_rows = $db->getAffectedRows($result);
+						$msg[$n] = '<span class="label label-'.($count_rows ? 'warning' : 'info').'">'.$count_rows.'</span><span class="label">'.$old_type.'</span> &nbsp; ';
 						
 						$query = 'SELECT *, extension_id AS id '
 							.' FROM #__extensions'
@@ -603,14 +608,15 @@ class com_flexicontentInstallerScript
 						if ($ext && $ext['id'] > 0) {
 							$installer = new JInstaller();
 							if ( $installer->uninstall($ext['type'], $ext['id'], (int)$ext['client_id']) )
-								$msg[] = "Uninstalling deprecated plugin: '".$old_type."' <span class='badge badge-success'>success</span>";
+								$msg[$n] = "<br/>".$msg[$n].", uninstalling plugin: <span class='badge badge-success'>success</span> <br/>";
 							else
-								$msg[] = "Uninstalling deprecated plugin: '".$old_type."' <span class='badge badge-error'>failed</span>";
+								$msg[$n] = "<br/>".$msg[$n].", uninstalling plugin: <span class='badge badge-error'>failed</span> <br/>";
 						}
+						$n++;
 					}
 					?>
 					</td>
-					<td> <?php echo implode("<br/>\n", $msg); ?> </td>
+					<td> <?php echo implode("\n", $msg); ?> </td>
 				</tr>
 				
 		<?php
@@ -703,7 +709,6 @@ class com_flexicontentInstallerScript
 					if ( $fields_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_fields']) ) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
-					$queries[] = "ALTER TABLE #__flexicontent_fields MODIFY description TEXT NOT NULL default ''";
 					
 					// Types TABLE
 					if ( $types_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_types']) ) {
@@ -719,6 +724,7 @@ class com_flexicontentInstallerScript
 					}
 					
 					if ( !empty($queries) ) {
+						print_r($queries);
 						foreach ($queries as $query) {
 							$db->setQuery($query);
 							if ( !($result = $db->query()) ) {
@@ -988,6 +994,37 @@ class com_flexicontentInstallerScript
 						if ( $result !== false ) {
 							echo "<span class='badge badge-success'>table created</span>";
 						}
+					}
+					else echo "<span class='badge badge-info'>nothing to do</span>";
+					?>
+					</td>
+				</tr>
+				
+		<?php
+		// Create fields table if it does not exist
+		?>
+				<tr class="row1">
+					<td class="key" style="font-size:11px;">Create/Upgrade fields DB table: </td>
+					<td>
+					<?php
+					
+			    $queries = array();
+					if ( !$layouts_conf_tbl_exists ) {
+						$queries[] = "ALTER TABLE #__flexicontent_fields MODIFY description TEXT NOT NULL default ''";
+					}
+					
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) {
+								$result = false;
+								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							}
+						}
+						$count_rows = $db->getAffectedRows($result);
+						if ( $count_rows ) {
+							echo "<span class='badge badge-success'>".$count_rows." effected rows </span>";
+						} else echo "<span class='badge badge-info'>no changes</span>";
 					}
 					else echo "<span class='badge badge-info'>nothing to do</span>";
 					?>
