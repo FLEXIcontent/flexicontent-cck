@@ -724,7 +724,6 @@ class com_flexicontentInstallerScript
 					}
 					
 					if ( !empty($queries) ) {
-						print_r($queries);
 						foreach ($queries as $query) {
 							$db->setQuery($query);
 							if ( !($result = $db->query()) ) {
@@ -1009,7 +1008,7 @@ class com_flexicontentInstallerScript
 					<?php
 					
 			    $queries = array();
-					if ( !$layouts_conf_tbl_exists ) {
+					if ( !$fields_tbl_exists ) {
 						$queries[] = "ALTER TABLE #__flexicontent_fields MODIFY description TEXT NOT NULL default ''";
 					}
 					
