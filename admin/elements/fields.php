@@ -48,13 +48,9 @@ class JFormFieldFields extends JFormField
 		$db		= JFactory::getDBO();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		
 		// *******************************************************************
@@ -128,9 +124,13 @@ class JFormFieldFields extends JFormField
 		// Values, form field name and id, etc
 		// ***********************************
 		
-		$values			= FLEXI_J16GE ? $this->value : $value;
-		if ( empty($values) )							$values = array();
-		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		$values = $this->value;
+		if ( empty($values) ) {
+			$values = array();
+		}
+		if ( !is_array($values) ) {
+			$values = preg_split("/[\|,]/", $values);
+		}
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;

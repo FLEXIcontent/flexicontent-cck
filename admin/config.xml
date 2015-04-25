@@ -208,6 +208,44 @@
 			</field>
 			
 	</fieldset>
+	<fieldset name="views_all_views_fset" label="FLEXI_ALL_VIEWS_CONF" description="" >
+		
+		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level1" menu="hide" />
+			<field name="show_icons" type="radio" default="2" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_TEXT</option>
+				<option value="1">FLEXI_ICONS</option>
+				<option value="2">FLEXI_BOTH</option>
+			</field>
+			<!--field name="show_pdf_icon" type="radio" default="1" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field-->
+			<field name="show_print_icon" type="radio" default="1" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_email_icon" type="radio" default="1" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_editbutton" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_LINK_TO_FE</option>
+				<option value="2">FLEXI_LINK_TO_BE</option>
+			</field>
+
+			<field name="show_state_icon" type="radio" default="1" label="FLEXI_STATE_ICON" description="FLEXI_STATE_ICON_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_PRINT" label="" level="level3" menu="hide" />
+			<field name="print_behaviour" type="radio" default="auto" label="FLEXI_PRINT_METHOD" description="FLEXI_PRINT_METHOD_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="auto">FLEXI_AUTO</option>
+				<option value="button">FLEXI_BUTTON</option>
+			</field>
+			
+	</fieldset>
 	<fieldset name="item_view_fset" label="FLEXI_ITEM_VIEW" description="" >
 		
 		<field name="" type="separator" default="FLEXI_BASIC_DISPLAY" description="" level="level1" menu="hide" />
@@ -250,6 +288,23 @@
 				<option value="1" show_list="botlist_hits" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" menu="hide" class="count_unique_hits botlist_hits" />
+			
+	</fieldset>
+	<fieldset name="lists_fset" label="FLEXI_ITEM_LISTS_CONF" description="" >
+		
+		<field name="" type="separator" default="FLEXI_CATEGORY_VIEW_CONF" level="level1" menu="hide" />
+			<field name="" type="separator" default="Content lists &lt;br/&gt;&lt;small&gt;(configuration via: template parameters + MENU item)&lt;/small&gt;" label="" level="level0" />
+			<field name="" type="separator" default="- Category, multi-category, &lt;br/&gt; - author items, my items, &lt;br/&gt; - tags (*), favourites (*)" label="" level="level4" menu="hide" />
+		
+			<field name="" type="separator" default="FLEXI_PARAMETERS_HANDLING" label="" level="level2" menu="hide" />
+			<field name="inheritcid" type="radio" default="-1" label="FLEXI_CATS_INHERIT_PARAMS" description="FLEXI_CATS_INHERIT_PARAMS_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_COMPONENT_ONLY</option>
+				<option value="-1">FLEXI_PARENT_CAT_MULTI_LEVEL</option>
+			</field>
+			<field name="debug_inheritcid" type="radio" default="0" label="FLEXI_CATS_INHERIT_PARAMS_DEBUG" description="FLEXI_CATS_INHERIT_PARAMS_DEBUG_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 	</fieldset>
 	<fieldset name="lists_catdata_fset" label="FLEXI_LISTS_CATDATA_CONF" description="" >
@@ -963,58 +1018,10 @@
 			</field>
 
 	</fieldset>
-	<fieldset name="views_common_fset" label="FLEXI_VIEWS_COMMON_CONF" description="" >
+	<fieldset name="views_other_views_fset" label="FLEXI_OTHER_VIEWS_CONF" description="" >
 		
-		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level1" menu="hide" />
-			<field name="show_icons" type="radio" default="2" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_TEXT</option>
-				<option value="1">FLEXI_ICONS</option>
-				<option value="2">FLEXI_BOTH</option>
-			</field>
-			<!--field name="show_pdf_icon" type="radio" default="1" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field-->
-			<field name="show_print_icon" type="radio" default="1" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			<field name="show_email_icon" type="radio" default="1" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			<field name="show_editbutton" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_LINK_TO_FE</option>
-				<option value="2">FLEXI_LINK_TO_BE</option>
-			</field>
-
-			<field name="show_state_icon" type="radio" default="1" label="FLEXI_STATE_ICON" description="FLEXI_STATE_ICON_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_PRINT" label="" level="level3" menu="hide" />
-			<field name="print_behaviour" type="radio" default="auto" label="FLEXI_PRINT_METHOD" description="FLEXI_PRINT_METHOD_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="auto">FLEXI_AUTO</option>
-				<option value="button">FLEXI_BUTTON</option>
-			</field>
-			
-	</fieldset>
-	<fieldset name="views_specific_fset" label="FLEXI_VIEWS_SPECIFIC_CONF" description="" >
+		<field name="" type="separator" default="Configuration via: MENU item only" label="" level="level4" />
 		
-		<field name="" type="separator" default="FLEXI_CATEGORY_VIEW_CONF" level="level1" menu="hide" />
-		
-			<field name="" type="separator" default="FLEXI_PARAMETERS_HANDLING" label="" level="level3" menu="hide" />
-			<field name="inheritcid" type="radio" default="-1" label="FLEXI_CATS_INHERIT_PARAMS" description="FLEXI_CATS_INHERIT_PARAMS_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_COMPONENT_ONLY</option>
-				<option value="-1">FLEXI_PARENT_CAT_MULTI_LEVEL</option>
-			</field>
-			<field name="debug_inheritcid" type="radio" default="0" label="FLEXI_CATS_INHERIT_PARAMS_DEBUG" description="FLEXI_CATS_INHERIT_PARAMS_DEBUG_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
 		<field name="" type="separator" default="FLEXI_DIRECTORY_VIEW_CONF" level="level1" menu="hide" />
 		
 			<field name="cat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC" menu="hide" >

@@ -18,7 +18,6 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-// Load the helper classes
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('joomla.html.html');
@@ -27,13 +26,13 @@ jimport('joomla.form.helper');
 JFormHelper::loadFieldClass('list');
 
 /**
- * Renders an ilayoutlist element
+ * Renders an clayoutlist element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
  * @since		1.0
  */
-class JFormFieldIlayoutlist extends JFormFieldList
+class JFormFieldClayoutlist extends JFormFieldList
 {
 	/**
 	 * The form field type.
@@ -41,7 +40,7 @@ class JFormFieldIlayoutlist extends JFormFieldList
 	 * @var		string
 	 * @since	1.6
 	 */
-	protected $type = 'Ilayoutlist';
+	protected $type = 'Clayoutlist';
 
 	protected function getInput()
 	{
@@ -50,7 +49,7 @@ class JFormFieldIlayoutlist extends JFormFieldList
 		$attributes = $attributes['@attributes'];
 		
 		$themes	= flexicontent_tmpl::getTemplates();
-		$tmpls	= $themes->items ? $themes->items : array();
+		$tmpls	= $themes->category ? $themes->category : array();
 		
 		$values = $this->value;
 		if ( empty($values) ) {
@@ -99,5 +98,6 @@ class JFormFieldIlayoutlist extends JFormFieldList
 		
 		return JHTML::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
+	
 }
 ?>

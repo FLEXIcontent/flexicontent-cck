@@ -169,11 +169,8 @@ $this->document->addScriptDeclaration($js);
 			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 		
 			<div class="fc_tabset_inner">
-			<fieldset id="templates_set" class="templates_set basicfields_set" style="margin:0px 0px 24px 0px; padding:0 16px 16px 16px !important;">
-				<legend><?php echo JText::_( 'FLEXI_DISPLAYING' ); ?></legend>
-				
 				<?php
-				echo '<span class="fc-warning fc-nobgimage fc-mssg-inline" style="margin: 0px 0px 0px 0px !important; font-size:12px; min-width:100%; box-sizing:border-box;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
+				echo '<span class="fc-info fc-nobgimage fc-mssg-inline" style="margin: 0px 0px 24px 0px !important; font-size:12px; min-width:100%; box-sizing:border-box;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
 				?>
 				<br/>
 				<ol style="margin:0 0 0 16px; padding:0;">
@@ -181,8 +178,6 @@ $this->document->addScriptDeclaration($js);
 					<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
 				</ol>
 				<br/>
-				</span>
-				<span class="fc-note fc-nobgimage fc-mssg-inline" style="margin: 8px 0px 0px 0px !important; font-size:12px; min-width:100%; box-sizing:border-box;">
 				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
 				</span>
 				<div class="clear"></div>
@@ -229,7 +224,7 @@ $this->document->addScriptDeclaration($js);
 				<?php endforeach; //tmpls ?>
 				
 				<?php echo JHtml::_('sliders.end'); ?>
-			</fieldset>
+				
 		</div>	
 	</div>
 	
