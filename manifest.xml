@@ -138,7 +138,10 @@
 			<param name="show_print_icon" default="1" />
 			<param name="show_email_icon" default="1" />
 			<param name="show_state_icon" default="1" />
-
+			
+			<param name="tags_using_catview" default="1" />
+			<param name="favs_using_catview" default="1" />
+			
 			<param name="catlimit" default="100" />
 			<param name="limit" default="10" />
 			<param name="feed_summary" default="0" />

@@ -164,86 +164,29 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
 		
-		$level = $attributes['level'];
+		$level = @$attributes['level'];
 		$description = @$attributes['description'];
 		$initial_tbl_hidden = @$attributes['initial_tbl_hidden'];
-		$value = FLEXI_J16GE ? $this->element['default'] : $value;
+		$value = $this->element['default'];
 		
-		if (FLEXI_J16GE && in_array($level, array('tblbreak','tabs_start','tab_open','tab_close','tabs_end')) ) return 'do no use type "'.$level.'" in J1.6+';
+		if (in_array($level, array('tblbreak','tabs_start','tab_open','tab_close','tabs_end')) ) return 'do no use type "'.$level.'" in J1.6+';
 		
 		static $tab_js_css_added = false;
 		
-		if ($level == 'tblbreak') {
-			$style = '';
-/*
-		} else if ($level == 'level1') {
-			$style = '';
-		} else if ($level == 'level2') {
-			$pos_left   = FLEXI_J16GE ? 'left:4%;' : 'left:2%;';
-			$width_vals = FLEXI_J16GE ? 'width:86%;' : 'width:91%;';
-			$style = ''.$pos_left.$width_vals;
-		} else if ($level == 'level3') {
-			$pos_left = FLEXI_J16GE ? 'left:144px;' : 'left:4%;';
-			$style = ''.$pos_left;
-*/
-		} else {
-			$style = '';
-		}
-		
-		$class = 'fcsep_'.$level; $title = "";
+		$class = $level ? 'fcsep_'.$level : '';
+		$title = "";
 		if ($_class = @$attributes['class']) {
 			$class .= ' '.$_class;
+		}
+		$style = '';
+		if ($_style = @$attributes['style']) {
+			$style .= ' '.$_style;
 		}
 		if ($description) {
 			$class .= FLEXI_J30GE ? " hasTooltip" : " hasTip";
 			$title = flexicontent_html::getToolTip($value, $description, 1, 1);
 		}
 		
-		if ($level == 'tabs_start') {
-			$html = '';
-			if (!empty($initial_tbl_hidden)) {
-				$initial_tbl_hidden = true;
-				$html = '<style> table.paramlist.admintable {display:none;} table.paramlist.admintable.flexi {display:table;} div.tabberlive {margin-top:0px;}</style>';
-			}
-			return $html.'
-			</td></tr>
-			</table>
-			<div class="fctabber">
-				<div class="tabbertab">
-					<h3 class="tabberheading">'.str_replace('&', ' - ', JText::_($value)).'</h3>
-					<table width="100%" cellspacing="1" class="paramlist admintable flexi">
-					<tr><td>
-			';
-		} else if ($level == 'tab_close_open') {
-			return '
-					</td></tr>
-					</table>
-				</div>
-				<div class="tabbertab">
-					<h3 class="tabberheading">'.str_replace('&', ' - ', JText::_($value)).'</h3>
-					<table width="100%" cellspacing="1" class="paramlist admintable flexi">
-					<tr><td>
-				';
-		} else if ($level == 'tabs_end') {
-			return'
-					</td></tr>
-					</table>
-				</div>
-			</div>
-				<table width="100%" cellspacing="1" class="paramlist admintable flexi">
-				<tr><td>
-			';
-		} else if ($level == 'tblbreak') {
-			return '
-			</td></tr>
-			</table>
-			'
-			.'<span style="'.$style.'" class="'.$class.'" title="'.$title.'" >'.JText::_($value).'</span>'.
-			'
-			<table width="100%" cellspacing="1" class="paramlist admintable flexi">
-			<tr><td>
-			';
-		}
 		$pad = '';
 		if ($level=='level0') $pad .= ' ';
 		else if ($level=='level1') $pad .= ' &nbsp; ';
