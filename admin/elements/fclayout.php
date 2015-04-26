@@ -11,9 +11,7 @@ defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.filesystem.folder');
 jimport('joomla.filesystem.file');
-if (FLEXI_J16GE) {
-	JFormHelper::loadFieldClass('list');
-}
+JFormHelper::loadFieldClass('list');
 
 /**
  * Renders an HTML select list of FLEXIcontent layouts
@@ -45,21 +43,22 @@ class JFormFieldFclayout extends JFormFieldList
 	protected function getInput()
 	{
 		// element params
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+		
 		// value
-		$value = FLEXI_J16GE ? $this->value : $value;
+		$value = $this->value;
 		$value = $value ? $value : $attributes['default'];
 		
 		// Get current extension and id being edited
 		$view   = JRequest::getVar('view');
 		$option = JRequest::getVar('option');
-		if ($option == 'com_modules' || $option == 'com_advancedmodules') $view = 'module';
+		if (
+			$option == 'com_modules' ||
+			$option == 'com_advancedmodules' ||
+			($option == 'com_falang' && JRequest::getVar('catid')=='modules')
+		) $view = 'module';
 		
 		$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
 		JArrayHelper::toInteger($cid, array(0));
@@ -236,16 +235,15 @@ class JFormFieldFclayout extends JFormFieldList
 		
 		
 		// Element name and id
-		$_name	= FLEXI_J16GE ? $this->fieldname : $name;
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$_name	= $this->fieldname;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
 		// Add tag attributes
-		$attribs = !FLEXI_J16GE ? ' style="float:left;" ' : '';
+		$attribs = '';
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 		} else {
 			$attribs .= 'class="inputbox"';
 		}
