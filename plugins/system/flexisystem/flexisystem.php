@@ -1263,12 +1263,19 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function onExtensionBeforeSave($context, $table, $isNew)
 	{
+		// *******************************
+		// TODO: add support for com_menus
+		// *******************************
+		
 		// Check for com_modules context
-		if ($context=='com_modules.module' || $context=='com_advancedmodules.module')
+		if ($context=='com_modules.module' || $context=='com_advancedmodules.module' || substr($context, 0, 10) === "com_falang")
 		{
 			// Check for non-empty layout parameter
 			$layout = $_POST['jform']['params']['layout'];
 			if (empty($layout)) return;
+			
+			// Check for currently supported cases, !!! TODO add case of MENUS
+			if (empty($table->module)) return;
 			
 			// Check if layout XML parameter file exists
 			$client = JApplicationHelper::getClientInfo($table->client_id);

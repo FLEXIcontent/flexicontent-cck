@@ -29,7 +29,7 @@
 
 		<fieldset name="basic">
 			
-			<field name="" type="separator" default="FLEXI_UMOD_BASIC_PARAMETERS_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_UMOD_BASIC_PARAMETERS_DESC" level="level4" />
 			<field name="" type="separator" default="FLEXI_UMOD_FEATURED_STANDARD_ITEMS" level="level1" />
 			<field name="count" type="text" default="5" size="3" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
 			<field name="count_feat" type="text" default="1" size="3" label="FLEXI_COUNT_FEAT" description="FLEXI_COUNT_FEAT_DESC" />

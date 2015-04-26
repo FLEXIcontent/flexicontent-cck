@@ -13,12 +13,10 @@ and override them with customized code
 
 
 TO also override module HEADER and FOOTER for this template, e.g.
-  news_header.php, news_footer.php
+  /tmpl/news/header.php
+  /tmpl/news/footer.php
   
-copy the above to your Joomla template folder
-   /tmpl/news/header.php
-   /tmpl/news/footer.php
-to
+copy them to your Joomla template folder as:
    /templates/JOOMLA_TEMPLATE_NAME/modules/mod_flexicontent/tmpl/news/header.php
    /templates/JOOMLA_TEMPLATE_NAME/modules/mod_flexicontent/tmpl/news/footer.php
 
