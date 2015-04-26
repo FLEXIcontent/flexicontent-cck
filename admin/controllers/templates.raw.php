@@ -110,6 +110,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		$user = JFactory::getUser();
 		
 		//get vars
+		$ext_option = JRequest::getVar( 'ext_option', '');
 		$ext_view = JRequest::getVar( 'ext_view', '');
 		$ext_id   = JRequest::getInt ( 'ext_id', 0 );
 		$layout_name = JRequest::getVar( 'layout_name', 0 );
@@ -129,6 +130,10 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			echo "not supported extension/view: ".$ext_view;
 			return;
 		}
+		if ($ext_option!='com_flexicontent' && $ext_option!='com_modules' && $ext_option!='com_advancedmodules' && && $ext_option!='com_menus') {
+			echo '<div class="alert alert-warning" style="margin:16px 0 -24px 0">You are editing module via extension: <span class="label label-warning">'.$ext_option.'</span><br/> - If extension does not call Joomla event <span class="label label-warning">onExtensionBeforeSave</span> then custom layout parameters may not be saved</div>';
+		}
+		
 		$db->setQuery( $query );
 		$ext_params_str = $db->loadResult();
 		
