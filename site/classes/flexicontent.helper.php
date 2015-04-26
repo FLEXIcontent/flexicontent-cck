@@ -361,16 +361,25 @@ class flexicontent_html
 		$orderby_options = $params->get('orderby_options'.$sfx, array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','id','rid','order'));
 		$orderby_options = FLEXIUtilities::paramToArray($orderby_options);
 
-		$orderby_names =array('_preconfigured_'=>'FLEXI_ORDER_DEFAULT_INITIAL',
-		'date'=>'FLEXI_ORDER_OLDEST_FIRST','rdate'=>'FLEXI_ORDER_MOST_RECENT_FIRST',
-		'modified'=>'FLEXI_ORDER_LAST_MODIFIED_FIRST', 'published'=>'FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST',
-		'alpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL','ralpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE',
-		'author'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL','rauthor'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE',
-		'hits'=>'FLEXI_ORDER_MOST_HITS','rhits'=>'FLEXI_ORDER_LEAST_HITS',
-		'id'=>'FLEXI_ORDER_HIGHEST_ITEM_ID','rid'=>'FLEXI_ORDER_LOWEST_ITEM_ID',
-		'commented'=>'FLEXI_ORDER_MOST_COMMENTED', 'rated'=>'FLEXI_ORDER_BEST_RATED',
-		'order'=>'FLEXI_ORDER_CONFIGURED_ORDER');
-
+		$orderby_names =array(
+			'_preconfigured_'=>'FLEXI_ORDER_DEFAULT_INITIAL',
+			'date'=>'FLEXI_ORDER_OLDEST_FIRST',
+			'rdate'=>'FLEXI_ORDER_MOST_RECENT_FIRST',
+			'modified'=>'FLEXI_ORDER_LAST_MODIFIED_FIRST',
+			'published'=>'FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST',
+			'alpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL',
+			'ralpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE',
+			'author'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL',
+			'rauthor'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE',
+			'hits'=>'FLEXI_ORDER_MOST_HITS',
+			'rhits'=>'FLEXI_ORDER_LEAST_HITS',
+			'id'=>'FLEXI_ORDER_HIGHEST_ITEM_ID',
+			'rid'=>'FLEXI_ORDER_LOWEST_ITEM_ID',
+			'commented'=>'FLEXI_ORDER_MOST_COMMENTED',
+			'rated'=>'FLEXI_ORDER_BEST_RATED',
+			'order'=>'FLEXI_ORDER_CONFIGURED_ORDER'
+		);
+		
 		$ordering = array();
 		foreach ($extra_order_types as $value => $text) {
 			$text = JText::_( $text );
@@ -382,7 +391,36 @@ class flexicontent_html
 			$text = JText::_( $orderby_names[$orderby_option] );
 			$ordering[] = JHTML::_('select.option',  $value,  $text);
 		}
-
+		
+		
+		// Add custom field orderings
+		$orderby_custom = $params->get('orderby_custom'.$sfx, '');
+		$orderby_custom = preg_split("/\s*,\s*/u", $orderby_custom);
+		
+		$custom_ops = array();
+		$_p = array();
+		$n = 0;
+		foreach ($orderby_custom as $custom_option) {
+			$order_parts = preg_split("/:/", $custom_option);
+			if (count($order_parts)!=3 && count($order_parts)!=4) continue;
+			$_field_id = (int) @ $order_parts[0];
+			if (!$_field_id) continue;
+			$custom_ops[$_field_id] = $custom_option;
+			$_p[$_field_id] = $order_parts;
+		}
+		
+		$fields = FlexicontentFields::getFieldsByIds(array_keys($custom_ops));
+		foreach($fields as $id => $field)
+		{
+			$value = 'custom:'.$_p[$id][0].':'.$_p[$id][1].':'.$_p[$id][2];
+			if (count($_p[$id])==4) {
+				$text = JText::_( $_p[$id][3] );
+			} else {
+				$text = JText::_( $field->label ) .' '. JText::_(strtolower($_p[$id][2])=='asc' ? 'FLEXI_INCREASING' : 'FLEXI_DECREASING');
+			}
+			$ordering[] = JHTML::_('select.option', $value,  $text);
+		}
+		
 		return JHTML::_('select.genericlist', $ordering, 'orderby', $attribs, 'value', 'text', $orderby );
 	}
 	
@@ -5111,7 +5149,7 @@ class FLEXIUtilities
 			array_map($filterfunc, $value);
 		}
 
-		if (FLEXI_J16GE && !is_array($value)) {
+		if (!is_array($value)) {
 			$value = explode("|", $value);
 			$value = ($value[0]=='') ? array() : $value;
 		} else {
@@ -5436,7 +5474,7 @@ class flexicontent_db
 			// SPECIAL case custom field
 			case 'field':
 				$cf = $sfx == '_2nd' ? 'f2' : 'f';
-				$order_col	= $params->get('orderbycustomfieldint'.$sfx, 0) ? 'CAST('.$cf.'.value AS UNSIGNED)' : $cf.'.value';
+				$order_col	= $params->get('orderbycustomfieldint'.$sfx, 0) ? 'CAST('.$cf.'.value AS SIGNED)' : $cf.'.value';
 				$order_dir	= $params->get('orderbycustomfielddir'.$sfx, 'ASC');
 				break;
 
@@ -5464,8 +5502,23 @@ class flexicontent_db
 
 			case 'default':
 			default:
-				$order_col	= $order_col ? $order_col : $i_as.'.title';
-				$order_dir	= $order_dir ? $order_dir : 'ASC';
+				if (substr($order, 0, 7)=='custom:') {
+					$order_parts = preg_split("/:/", $order);
+					$_field_id = (int) @ $order_parts[1];
+				}
+				if (!empty($_field_id) && count($order_parts)==4) {
+					$cf = $sfx == '_2nd' ? 'f2' : 'f';
+					switch(strtolower($order_parts[2])) {
+						case 'int':     $order_col = 'CAST('.$cf.'.value AS SIGNED)';  break;
+						case 'decimal': $order_col = 'CAST('.$cf.'.value AS DECIMAL)'; break;
+						case 'date':    $order_col = 'CAST('.$cf.'.value AS DATE)'; break;
+						default:        $order_col = $cf.'.value'; break;
+					}
+					$order_dir = strtolower($order_parts[3])=='desc' ? 'DESC' : 'ASC';
+				} else {
+					$order_col	= $order_col ? $order_col : $i_as.'.title';
+					$order_dir	= $order_dir ? $order_dir : 'ASC';
+				}
 				break;
 		}
 	}

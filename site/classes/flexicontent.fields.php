@@ -227,6 +227,12 @@ class FlexicontentFields
 	 */
 	static function & getFieldsByIds($field_ids) 
 	{
+		if (!count($field_ids))
+		{
+			$fields = array();
+			return $fields;
+		}
+		
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
 		JArrayHelper::toInteger($field_ids);
@@ -3378,7 +3384,7 @@ class FlexicontentFields
 		// item IDs via reversing a relation field
 		if ($reverse_field) {
 			$item_join  = ' JOIN #__flexicontent_fields_item_relations AS fi_rel'
-				.'  ON i.id=fi_rel.item_id AND fi_rel.field_id=' .$reverse_field .' AND CAST(fi_rel.value AS UNSIGNED)=' .$parentitem->id;
+				.'  ON i.id=fi_rel.item_id AND fi_rel.field_id=' .$reverse_field .' AND CAST(fi_rel.value AS SIGNED)=' .$parentitem->id;
 		}
 		// item IDs via a given list (relation field and ... maybe other cases too)
 		else {

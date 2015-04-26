@@ -291,11 +291,21 @@ class FlexicontentModelFavourites extends JModelLegacy
 			$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
 			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
 		}
+		if ( 'custom:' == substr($order[1], 0, 7) ) {
+			$order_parts = preg_split("/:/", $order[1]);
+			$_field_id = (int) @ $order_parts[1];
+			if ($_field_id && count($order_parts)==4) $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$_field_id;
+		}
 		
 		// Create JOIN for ordering items by a custom field (Level 2)
 		if ( 'field' == $order[2] ) {
 			$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
 			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
+		}
+		if ( 'custom:' == substr($order[2], 0, 7) ) {
+			$order_parts = preg_split("/:/", $order[2]);
+			$_field_id = (int) @ $order_parts[1];
+			if ($_field_id && count($order_parts)==4) $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$_field_id;
 		}
 		
 		// Create JOIN for ordering items by author's name
