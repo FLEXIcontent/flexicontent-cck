@@ -42,7 +42,7 @@ class JFormFieldItemlayout extends JFormFieldList
 	 */
 	protected $type = 'Itemlayout';
 
-	function getInput()
+	protected function getInput()
 	{
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -51,6 +51,7 @@ class JFormFieldItemlayout extends JFormFieldList
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls_all	= $themes->items ? $themes->items : array();
 		$value = $this->value;
+		//$value = $value ? $value : @$attributes['default'];
 		
 		$view	= JRequest::getVar('view');
 		$controller	= JRequest::getVar('controller');
@@ -63,7 +64,7 @@ class JFormFieldItemlayout extends JFormFieldList
 		$all_tmpl_allowed = true;
 		$type_default_layout = '';
 		$type_default_layout_mobile = '';
-		if ( $view==FLEXI_ITEMVIEW || ($app->isAdmin() && 'items'==$controller) )
+		if ( $view==FLEXI_ITEMVIEW || ($app->isAdmin() && $controller=='items') )
 		{
 			// Get item id
 			if (!$app->isAdmin()) {
@@ -126,7 +127,7 @@ class JFormFieldItemlayout extends JFormFieldList
 if ( ! @$attributes['skipparams'] ) {
 		$doc 	= JFactory::getDocument();
 		$js 	= "
-var tmpl = ['".$lays."'];	
+var tmpl = ['".$lays."'];
 
 function disablePanel(element) {
 	if ( ! jQuery('#'+element+'-attribs-options') ) return;
@@ -189,11 +190,12 @@ jQuery(document).ready(function() {
 			$type_layout = ($attributes['name'] == 'ilayout_mobile') ? $type_default_layout_mobile : $type_default_layout;
 			$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_TYPE_DEFAULT' ) .' :: '. $type_layout .' ::' );
 		}
-		else if (  @$attributes['firstoption'] ) {
+		else
+		if (  @$attributes['firstoption'] ) {
 			$layouts[] = JHTMLSelect::option('', JText::_( $attributes['firstoption'] ));
 		}
 		foreach ($tmpls as $tmpl) {
-			$layouts[] = JHTMLSelect::option( $tmpl->name, ':: ' . $tmpl->name . ' ::');
+			$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name);
 		}
 		
 		$fieldname	= $this->name;

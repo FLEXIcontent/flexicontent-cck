@@ -42,21 +42,36 @@ class JFormFieldCategorylayout extends JFormFieldList
 	 */
 	protected $type = 'Categorylayout';
 
-	function getInput()
+	protected function getInput()
 	{
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
 		
 		$themes	= flexicontent_tmpl::getTemplates();
-		$tmpls	= $themes->category;
-		$view	= JRequest::getVar('view');
+		$tmpls_all	= $themes->category ? $themes->category : array();
 		$value = $this->value;
-		//$value = $value ? $value : $attributes['default'];
+		//$value = $value ? $value : @$attributes['default'];
 		
+		$view	= JRequest::getVar('view');
+		$controller	= JRequest::getVar('controller');
+		$app = JFactory::getApplication();
+		$db  = JFactory::getDBO();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		
+		// GET LIMITING to specific templates according to item's type, or according to type of new item
+		$allowed_tmpls = array();
+		$all_tmpl_allowed = true;
+		$conf_default_layout = '';
+		$conf_default_layout_mobile = '';
+		
+		$tmpls = array();
 		$lays = array();
-		foreach ($tmpls as $tmpl) {
-			$lays[] = $tmpl->name;
+		foreach ($tmpls_all as $tmpl) {
+			if ( $all_tmpl_allowed || in_array($tmpl->name, $allowed_tmpls) ) {
+				$tmpls[] = $tmpl;
+				$lays[] = $tmpl->name;
+			}
 		}
 		$lays = implode("','", $lays);
 		
@@ -126,14 +141,11 @@ jQuery(document).ready(function() {
 		$layouts = array();
 		if (  @$attributes['firstoption'] ) {
 			$layouts[] = JHTMLSelect::option('', JText::_( $attributes['firstoption'] ));
-		}
-		if ($tmpls !== false) {
-			//if ($view != 'category' && $view != 'user') {
+		} else {
 				$layouts[] = JHTMLSelect::option('', '-- '.JText::_( 'FLEXI_USE_GLOBAL' ). ' --');
-			//}
-			foreach ($tmpls as $tmpl) {
-				$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name); 
-			}
+		}
+		foreach ($tmpls as $tmpl) {
+			$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name);
 		}
 		
 		$fieldname	= $this->name;

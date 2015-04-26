@@ -262,7 +262,7 @@ $js = "
 		<div class="tabbertab" id="tabset_cat_props_tmpl_tab" data-icon-class="icon-palette" >
 			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 			
-			<?php echo '<span class="fc-info fc-nobgimage fc-mssg-inline" style="margin: 8px 0px 48px 0px !important; font-size:12px; min-width:50%;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
+			<?php echo '<span class="fc-info fc-nobgimage fc-mssg-inline" style="margin: 8px 0px 24px 0px !important; font-size:12px; min-width:50%;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
 			<br/><br/>
 			<ol style="margin:0 0 0 16px; padding:0;">
 				<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>

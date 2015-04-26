@@ -2266,6 +2266,12 @@ class ParentClassItem extends JModelAdmin
 					$field_type = $field->iscore ? 'core' : $field->field_type;
 					$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item ));
 					
+					if ($result===false) {
+						// Field requested to abort item saving
+						$this->setError( JText::sprintf('FLEXI_FIELD_VALUE_IS_INVALID', $field->label) );
+						return 'abort';
+					}
+					
 					// For CORE field get the modified data, which will be used for storing in DB (these will be re-bind later)
 					if ( isset($core_via_post[$field->name]) ) {
 						$core_data_via_events[$field->name] = isset($postdata[$field->name][0]) ? $postdata[$field->name][0] : '';  // The validation may have skipped it !!
@@ -2277,12 +2283,7 @@ class ParentClassItem extends JModelAdmin
 				
 				//$qindex[$field->name] = NULL;
 				//$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item, &$qindex[$field->name] ));
-				
-				if ($result===false) {
-					// Field requested to abort item saving
-					$this->setError( JText::sprintf('FLEXI_FIELD_VALUE_IS_INVALID', $field->label) );
-					return 'abort';
-				}
+				//if ($result===false) { ... }
 				
 				// Get vstate property from the field object back to the data array ... in case it was modified, since some field may decide to prevent approval !
 				$data['vstate'] = $field->item_vstate;
