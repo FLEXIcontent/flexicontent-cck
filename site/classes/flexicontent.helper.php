@@ -423,6 +423,53 @@ class flexicontent_html
 		
 		return JHTML::_('select.genericlist', $ordering, 'orderby', $attribs, 'value', 'text', $orderby );
 	}
+
+
+	static function layout_selector(&$params, $formname='adminForm', $autosubmit=1, $type='clayout')
+	{
+		$_default_layout = $params->get($type, $type=='clayout' ? 'blog' : 'default');
+		
+		if ($type=='clayout') {
+			$displayed_tmpls = $params->get('displayed_'.$type.'s');
+			if ( empty($displayed_tmpls) )							$displayed_tmpls = array();
+			else if ( ! is_array($displayed_tmpls) )		$displayed_tmpls = explode("|", $displayed_tmpls);
+		}
+		
+		$allowed_tmpls = $params->get('allowed_'.$type.'s');
+		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
+		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = explode("|", $allowed_tmpls);
+		
+		$_options = $type=='clayout' ? $displayed_tmpls : $allowed_tmpls;
+		if (!count($_options)) {
+			return '<input type="hidden" name="clayout" value="'.JRequest::getVar($type).'" />';
+		}
+		
+		$app    = JFactory::getApplication();
+		$option = JRequest::getCmd('option');
+		$layout = JRequest::getCmd('layout');
+		$svar = $layout ? '.'.$layout : '.category';
+		/*if (!$layout) $svar .= JRequest::getInt('cid');
+		else if ($layout=='tags') $svar .= JRequest::getInt('tagid');
+		else if ($layout=='author') $svar .= JRequest::getInt('authorid');
+		if ($layout) $svar .= '.category'.JRequest::getInt('cid');*/
+		
+		$layout = $app->getUserStateFromRequest( $option.$svar.'.'.$type, $type, $_default_layout, 'string' );
+		
+		flexicontent_html::loadFramework('select2');
+		$classes  = "fc_field_filter use_select2_lib";
+		$onchange = !$autosubmit ? '' : ' onchange="document.getElementById(\''.$formname.'\').submit();" ';
+		$attribs  = ' class="'.$classes.'" ' . $onchange;
+		
+		$_switcher_label = $params->get($type.'_switcher_label', 0);
+		$inside_label  = $_switcher_label==2 ? ' '.JText::_('FLEXI_LAYOUT') : '';
+		$outside_label = $_switcher_label==1 ? '<span class="flexi label limit_override_label">'.JText::_('FLEXI_LAYOUT').'</span>' : '';
+		
+		$options = array();
+		foreach($_options as $_option) {
+			$options[] = JHTML::_('select.option', $_option, $_option .$inside_label);
+		}
+		return $outside_label.JHTML::_('select.genericlist', $options, 'clayout', $attribs, 'value', 'text', $layout );
+	}
 	
 	
 	static function searchphrase_selector(&$params, $formname='adminForm') {

@@ -921,16 +921,24 @@
 		<!-- Please do not change default category layout 'blog', as currently, it is hard coded in (a) the frontend category's view.html.php and (b) in the backend category manager listing -->
 		<field name="clayout" type="categorylayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
 		<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
-
+			
 		<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="..." level="level2" />
 		<field name="" type="separator" default="FLEXI_CATEGORY_LAYOUT_SWITCHER" description="" level="level3" />
-		<field name="clayout_switcher" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_DISPLAY" description="FLEXI_CATEGORY_LAYOUT_SWITCHER_DESC" class="btn-group btn-group-yesno">
+		<field name="clayout_switcher" type="multilist" subtype="radio" default="" toggle_related="0" label="FLEXI_DISPLAY" description="FLEXI_CATEGORY_LAYOUT_SWITCHER_DESC" class="btn-group btn-group-yesno">
+			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0" show_list="" hide_list="clayout_selector_on">FLEXI_NO</option>
 			<option value="1" show_list="clayout_selector_on" hide_list="">FLEXI_YES</option>
 		</field>
-		<field name="clayout_switcher_display_mode" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_CATEGORY_LAYOUT_SWITCHER_DISPLAY_MODE" description="FLEXI_CATEGORY_LAYOUT_SWITCHER_DISPLAY_MODE_DESC" class="btn-group btn-group-yesno">
+		<field name="clayout_switcher_display_mode" type="multilist" subtype="radio" default="" toggle_related="0" label="FLEXI_CATEGORY_LAYOUT_SWITCHER_DISPLAY_MODE" description="FLEXI_CATEGORY_LAYOUT_SWITCHER_DISPLAY_MODE_DESC" class="btn-group btn-group-yesno">
+			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">Drop-down select</option>
 			<option value="1">Radio-image</option>
+		</field>
+		<field name="clayout_switcher_label" type="radio" default="" label="FLEXI_LABEL" description="" class="limit_override_display btn-group btn-group-yesno">
+			<option value="">FLEXI_USE_GLOBAL</option>
+			<option value="0">FLEXI_NO</option>
+			<option value="1">FLEXI_OUTSIDE</option>
+			<option value="2">FLEXI_INSIDE</option>
 		</field>
 		<field name="displayed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_DISPLAYED_CATEGORY_LAYOUTS" description="FLEXI_DISPLAYED_CATEGORY_LAYOUTS_DESC" labelclass="label-success" class="clayout_selector_on"/>
 		<field name="" type="separator" default="URL / Links" description="" level="level3" />

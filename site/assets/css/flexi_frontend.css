@@ -880,8 +880,9 @@ ul.fc_field_filter.fc_checkradio_group label {
 }
 
 /* Containers of per page limit selector and order by selector */
-#flexicontent .item_total .fc_limit_label,
-#flexicontent .item_total .fc_orderby_label {
+#flexicontent .item_total .fc_limit_box,
+#flexicontent .item_total .fc_orderby_box,
+#flexicontent .item_total .fc_clayout_box, {
 	display:inline-block;
 	float:left;
 	margin-top:4px;

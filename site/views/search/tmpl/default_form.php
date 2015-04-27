@@ -346,13 +346,13 @@ $r = 0;
 		<?php endif; ?>
 		
 		<?php if ( @$this->lists['limit'] ) : ?>
-			<span class="fc_limit_label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_PAGINATION', 'FLEXI_PAGINATION_INFO', 1); ?>">
+			<span class="fc_limit_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_PAGINATION', 'FLEXI_PAGINATION_INFO', 1); ?>">
 				<span class="fc_limit_selector"><?php echo $this->lists['limit']; ?></span>
 			</span>
 		<?php endif; ?>
 		
 		<?php if ( @$this->lists['orderby'] ) : ?>
-			<span class="fc_orderby_label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY', 'FLEXI_ORDERBY_INFO', 1); ?>">
+			<span class="fc_orderby_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY', 'FLEXI_ORDERBY_INFO', 1); ?>">
 				<span class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></span>
 			</span>
 		<?php endif; ?>

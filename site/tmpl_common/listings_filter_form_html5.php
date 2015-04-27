@@ -33,10 +33,6 @@ if ($ff_placement){
 
 <?php echo $filter_form_body; ?>
 
-<?php if ( JRequest::getVar('clayout') == $this->params->get('clayout', 'blog') ) :?>
-	<input type="hidden" name="clayout" value="<?php echo JRequest::getVar('clayout'); ?>" />
-<?php endif; ?>
-
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['filter_order_Dir']; ?>" />
