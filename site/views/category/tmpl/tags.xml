@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
 	
-	<layout title="FLEXICONTENT_MYITEMS">
-		<help key="FLEXICONTENT_MYITEMS_DESC" />
+	<layout title="FLEXICONTENT_TAGS_CATVIEW">
+		<help key="FLEXICONTENT_TAGS_CATVIEW_DESC" />
 		<message>
-			<![CDATA[FLEXICONTENT_MYITEMS_TIP]]>
+			<![CDATA[FLEXICONTENT_TAGS_CATVIEW_TIP]]>
 		</message>
 	</layout>
 	
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
-			<field name="layout" type="hidden" default="myitems" label="Layout" description="" />
-			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_MYITEMS_CATEGORY" description="FLEXI_SELECT_MYITEMS_CATEGORY_DESC" />
+			<field name="layout" type="hidden" default="tags" label="Layout" description="" />
+			<field name="tagid" type="fctag" default="0" label="FLEXI_SELECT_TAG" description="FLEXI_SELECT_TAG_DESC" />
+			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_TAGS_CATEGORY" required="required" description="FLEXI_SELECT_TAGS_CATEGORY_DESC" />
 		</fieldset> 
 	</fields>
 	
 	<fields name="params" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
-		<fieldset name="basic">
+		<fieldset name="basic" label="FLEXI_PARAMETERS_CAT_BASIC_OVERRIDE_CONF">
 			<field name="item_depth" type="list" default="0" label="FLEXI_START_ADDING_PARENTS_AT_DEPTH" description="FLEXI_START_ADDING_PARENTS_AT_DEPTH_DESC">
 				<option value="0">FLEXI_ROOT</option>
 				<option value="1">FLEXI_LEVEL_1</option>
@@ -26,10 +27,21 @@
 				<option value="4">FLEXI_LEVEL_4</option>
 				<option value="5">FLEXI_LEVEL_5</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_CONFIGURATION_CATEGORY" description="FLEXI_CONFIGURATION_CATEGORY_DESC" level="level2" />
+			
+			<field name="override_defaultconf" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_OVERRIDE_CATEGORY" description="FLEXI_ENABLE_OVERRIDE_CATEGORY_DESC" class="btn-group btn-group-yesno">
+				<option value="0" seton_list="" setoff_list="[href=#attrib-cat_info_options], [href=#attrib-subcats_info_options],[href=#attrib-peercats_info_options], [href=#attrib-cat_items_list], [href=#attrib-cat_item_markups], [href=#attrib-cat_item_filtering], [href=#attrib-cat_rss_feeds], [href=#attrib-layout_themes]">
+					FLEXI_OVERRIDE_CONF_NO
+				</option>
+				<option value="1" setoff_list="" seton_list="[href=#attrib-cat_info_options], [href=#attrib-subcats_info_options],[href=#attrib-peercats_info_options], [href=#attrib-cat_items_list], [href=#attrib-cat_item_markups], [href=#attrib-cat_item_filtering], [href=#attrib-cat_rss_feeds], [href=#attrib-layout_themes]">
+					FLEXI_OVERRIDE_CONF_YES
+				</option>
+			</field>
 		
 		</fieldset>
 		
-		<fieldset name="cat_info_options" label="FLEXI_PARAMETERS_CAT_INFO_OPTIONS" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="cat_info_options" label="FLEXI_PARAMETERS_CAT_INFO_OPTIONS_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<!--field name="language" type="languages" client="site" label="FLEXI_CATEGORY_LANGUAGE" description="FLEXI_CATEGORY_LANGUAGE_DESC" /-->
 			<field name="" type="separator" default="FLEXI_CATEGORY_EXTRA" level="level2" />
@@ -129,7 +141,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="subcats_info_options" label="FLEXI_PARAMETERS_CAT_SUBCATS_INFO_OPTIONS" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="subcats_info_options" label="FLEXI_PARAMETERS_CAT_SUBCATS_INFO_OPTIONS_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="show_subcategories" type="radio" default="" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -224,7 +236,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="peercats_info_options" label="FLEXI_PARAMETERS_CAT_PEERCATS_INFO_OPTIONS" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="peercats_info_options" label="FLEXI_PARAMETERS_CAT_PEERCATS_INFO_OPTIONS_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="show_peercategories" type="radio" default="" label="FLEXI_SHOW_PEERCATS" description="FLEXI_SHOW_PEERCATS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -319,7 +331,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="cat_items_list" label="FLEXI_PARAMETERS_CAT_ITEMS_LIST" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="cat_items_list" label="FLEXI_PARAMETERS_CAT_ITEMS_LIST_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_LIST" description="FLEXI_ITEMS_LIST_DESC" level="level2" />
 			<field name="show_addbutton" type="radio" default="" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_LIST_BUTTON_DESC" class="btn-group btn-group-yesno">
@@ -372,8 +384,8 @@
 				<option value="published">FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST</option>
 				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
 				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
-				<!--option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option-->
-				<!--option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option-->
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
 				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
 				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
 				<option value="id">FLEXI_ORDER_HIGHEST_ITEM_ID</option>
@@ -410,8 +422,8 @@
 				<option value="published">FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST</option>
 				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
 				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
-				<!--option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option-->
-				<!--option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option-->
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
 				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
 				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
 				<option value="id">FLEXI_ORDER_HIGHEST_ITEM_ID</option>
@@ -533,7 +545,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="cat_item_markups" label="FLEXI_PARAMETERS_CAT_ITEM_MARKUPS" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="cat_item_markups" label="FLEXI_PARAMETERS_CAT_ITEM_MARKUPS_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_MU_CATEGORY" description="FLEXI_MU_CATEGORY_DESC" level="level2" />
 			<field name="mu_addcss_cats" type="fccheckbox" default="" display_useglobal="1" label="FLEXI_MU_ADD_MARKUP" description="FLEXI_MU_ADD_MARKUP_DESC"
@@ -594,7 +606,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="cat_item_filtering" label="FLEXI_PARAMETERS_CAT_ITEM_FILTERING" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="cat_item_filtering" label="FLEXI_PARAMETERS_CAT_ITEM_FILTERING_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level2" hr="false" />
 			<field name="ff_placement" type="multilist" subtype="radio" default="" label="FLEXI_SEARCH_FILTER_FORM_PLACEMENT" description="FLEXI_SEARCH_FILTER_FORM_PLACEMENT_DESC" class="btn-group group-fcsuccess">
@@ -745,7 +757,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="cat_rss_feeds" label="FLEXI_PARAMETERS_CAT_RSS_FEEDS" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="cat_rss_feeds" label="FLEXI_PARAMETERS_CAT_RSS_FEEDS_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="feed_limit" type="text" size="4" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" />
 			<field name="feed_summary" type="radio" default="" label="FLEXI_SHOW_FEED" description="FLEXI_SHOW_FEED_DESC" class="btn-group btn-group-yesno">
@@ -798,8 +810,8 @@
 				<option value="published">FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST</option>
 				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
 				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
-				<!--option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option-->
-				<!--option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option-->
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
 				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
 				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
 				<option value="id">FLEXI_ORDER_HIGHEST_ITEM_ID</option>
@@ -836,8 +848,8 @@
 				<option value="published">FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST</option>
 				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
 				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
-				<!--option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option-->
-				<!--option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option-->
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
 				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
 				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
 				<option value="id">FLEXI_ORDER_HIGHEST_ITEM_ID</option>
@@ -867,11 +879,11 @@
 		
 		</fieldset>
 		
-		<fieldset name="layout_themes" label="FLEXI_PARAMETERS_CAT_LAYOUT" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="layout_themes" label="FLEXI_PARAMETERS_CAT_LAYOUT_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="clayout" type="categorylayout" skipparams="1" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
 			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
-			<field name="" type="separator" default="Template parameters ..." description="Please note you cannot set template parameters here. &lt;br&gt;&lt;br&gt; Default template parameters will be used for the choosen template. &lt;br&gt;&lt;br&gt;For fields shown, please add your fields in layout positions in template configuration management tab" level="level2"/>
+			<field name="" type="separator" default="Template parameters ..." description="Please note you cannot set template parameters here. &lt;br&gt;&lt;br&gt; Template parameters for the choosen template will be retrieved from the category configuration. &lt;br&gt;&lt;br&gt;For fields shown, please add your fields in layout positions in template configuration management tab" level="level2"/>
 			
 		</fieldset>
 	

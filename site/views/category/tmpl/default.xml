@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
+	
 	<layout title="FLEXICONTENT_CATEGORY">
+		<help key="FLEXICONTENT_CATEGORY_DESC" />
 		<message>
 			<![CDATA[FLEXICONTENT_CATEGORY_TIP]]>
 		</message>
 	</layout>
+	
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
 			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_ONE_CATEGORY" required="required" description="FLEXI_SELECT_ONE_CATEGORY_DESC" />

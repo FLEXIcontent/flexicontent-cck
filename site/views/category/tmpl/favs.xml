@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
 	
-	<layout title="FLEXICONTENT_MYITEMS">
-		<help key="FLEXICONTENT_MYITEMS_DESC" />
+	<layout title="FLEXICONTENT_FAVOURITES_CATVIEW">
+		<help key="FLEXICONTENT_FAVOURITES_CATVIEW_DESC" />
 		<message>
-			<![CDATA[FLEXICONTENT_MYITEMS_TIP]]>
+			<![CDATA[FLEXICONTENT_FAVOURITES_CATVIEW_TIP]]>
 		</message>
 	</layout>
 	
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
-			<field name="layout" type="hidden" default="myitems" label="Layout" description="" />
-			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_MYITEMS_CATEGORY" description="FLEXI_SELECT_MYITEMS_CATEGORY_DESC" />
+			<field name="layout" type="hidden" default="favs" label="Layout" description="" />
+			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_FAVS_CATEGORY" description="FLEXI_SELECT_FAVS_CATEGORY_DESC" />
 		</fieldset> 
 	</fields>
 	

@@ -241,7 +241,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Use the page heading as document title, (already calculated above via 'appropriate' logic ...)
 		// or the overriden custom <title> ... set via parameter
-		$doc_title  =  !$meta_params  ?  $params->get( 'page_title' )  :  $meta_params->get('page_title', $params->get( 'page_title' ));
+		$doc_title  =  empty($meta_params)  ?  $params->get( 'page_title' )  :  $meta_params->get('page_title', $params->get( 'page_title' ));
 		
 		// Check and prepend or append site name
 		// Add Site Name to page title

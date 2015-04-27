@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
+	
 	<layout title="FLEXICONTENT_MCATS">
+		<help key="FLEXICONTENT_MCATS_DESC" />
 		<message>
-			<![CDATA[FLEXICONTENT_MCATS_DESC]]>
+			<![CDATA[FLEXICONTENT_MCATS_TIP]]>
 		</message>
 	</layout>
+	
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
+			<field name="layout" type="hidden" default="mcats" label="Layout" description="" />
 			<field name="cids" type="flexicategories" multiple="true" default="0" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
 		</fieldset> 
 	</fields>

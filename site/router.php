@@ -150,7 +150,45 @@ function FLEXIcontentBuildRoute(&$query)
 	case 'category':
 		$mcid = @$menu->query['cid']; // not set returns null
 		$cid  = !isset($query['cid']) ? null : (int)$query['cid'];
-		if ( $mview!=$view || $mcid!=$cid) {
+
+		// Handle layout variables, for links of various views using the category model/view/templating
+		foreach ($catVars as $i => $var)
+		{
+			if ( !isset($query[$var]) )  continue;  // URL variable does not exist in given URL
+			
+			// URL variable does not exist in the menu item
+			if ( !isset($menu->query[$var]) )
+			{
+				if ( !count($segments) && ($var=='tagid' || $var=='authorid') ) {
+					$segments[] = $var=='tagid' ? 'tagged' : 'authored';  // add 'layout' segment
+					$segments[] = $query[$var];  // add 'tagid' segment
+					if (!empty($query['cid']) && $mcid!=$cid) {
+						$segments[] = $query['cid'];
+					}
+					unset($query['layout']);
+					unset($query[$var]);
+					unset($query['view']);
+					unset($query['cid']);
+				}
+				if ( !count($segments) && $var=='layout' && ($query[$var]=='favs' || $query[$var]=='myitems') ) {
+					$segments[] = $query[$var]=='favs' ? 'favoured' : 'myitems';  // add 'layout' segment
+					if (!empty($query['cid']) && $mcid!=$cid) {
+						$segments[] = $query['cid'];
+					}
+					unset($query[$var]);
+					unset($query['view']);
+					unset($query['cid']);
+				}
+				continue;
+			}
+			$m_var = is_array($menu->query[$var]) ?
+				implode($menu->query[$var], ",") : $menu->query[$var];
+			if ( $m_var == $query[$var])
+				unset($query[$var]);
+		}
+		
+		// Handle adding category ID and view if not already handled above
+		if ( !count($segments) && ($mview!=$view || $mcid!=$cid) ) {
 			if (!$add_item_sef_segment) {
 				// Adding explicit view /item/ is disabled for no-cid item URLs (thus they are 1-segment URLs),
 				// or the given menu item is not of category view, so ... we need to explicitly declare
@@ -158,18 +196,9 @@ function FLEXIcontentBuildRoute(&$query)
 				$segments[] = 'category';
 			}
 			// IMPLY view = 'category' when count($segments) == 1
-			$segments[] = @$query['cid'];  // it is optional, some category view layouts do not use category id
+			if (!empty($query['cid'])) $segments[] = $query['cid'];  // it is optional, some category view layouts do not use category id
 		}
-		// Handle layout variables, for links of various views using the category model/view/templating
-		foreach ($catVars as $i => $var)
-		{
-			if ( !isset($menu->query[$var]) || !isset($query[$var]) )
-				continue;
-			$m_var = is_array($menu->query[$var]) ?
-				implode($menu->query[$var], ",") : $menu->query[$var];
-			if ( $m_var == $query[$var])
-				unset($query[$var]);
-		}
+		
 		unset($query['view']);
 		unset($query['cid']);
 		break;
@@ -300,6 +329,36 @@ function FLEXIcontentParseRoute($segments)
 	if ($segments[0] == 'tag' || $segments[0] == 'tags') {
 		$vars['view'] = 'tags';
 		$vars['id'] = $segments[1];
+		return $vars;
+	}
+	
+	// 'tags' via category view
+	if ($segments[0] == 'tagged') {
+		$vars['view'] = 'category';
+		$vars['layout'] = 'tags';
+		$vars['tagid'] = $segments[1];
+		return $vars;
+	}
+	
+	// 'author' via category view
+	if ($segments[0] == 'authored') {
+		$vars['view'] = 'category';
+		$vars['layout'] = 'author';
+		$vars['authorid'] = $segments[1];
+		return $vars;
+	}
+	
+	// 'favourites' via category view
+	if ($segments[0] == 'favoured') {
+		$vars['view'] = 'category';
+		$vars['layout'] = 'favs';
+		return $vars;
+	}
+	
+	// 'favourites' via category view
+	if ($segments[0] == 'myitems') {
+		$vars['view'] = 'category';
+		$vars['layout'] = 'myitems';
 		return $vars;
 	}
 	

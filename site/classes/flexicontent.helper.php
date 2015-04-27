@@ -1294,6 +1294,7 @@ class flexicontent_html
 		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
 		if($view == 'category')
 		{
+			$non_sef_link = null;
 			flexicontent_html::createCatLink($slug, $non_sef_link);
 			$link = $base . JRoute::_($non_sef_link.'&format=feed&type=rss');
 			//$link = $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
@@ -1423,7 +1424,9 @@ class flexicontent_html
 
 		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
 		if($view == 'category') {
-			$link = $base . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($slug));
+			$non_sef_link = null;
+			flexicontent_html::createCatLink($slug, $non_sef_link);
+			$link = $base . JRoute::_($non_sef_link);
 			//$link = $base . JRoute::_( 'index.php?view='.$view.'&cid='.$slug, false );
 		} elseif($view == FLEXI_ITEMVIEW) {
 			$link = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $slug, 0, $item));

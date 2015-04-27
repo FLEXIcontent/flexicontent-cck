@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
+	
 	<layout title="FLEXICONTENT_AUTHOR">
+		<help key="FLEXICONTENT_AUTHOR_DESC" />
 		<message>
 			<![CDATA[FLEXICONTENT_AUTHOR_TIP]]>
 		</message>
 	</layout>
+	
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
+			<field name="layout" type="hidden" default="author" label="Layout" description="" />
 			<field name="authorid" type="author" default="0" label="FLEXI_SELECT_ONE_AUTHOR" description="FLEXI_SELECT_ONE_AUTHOR_DESC" />
 			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_AUTHOR_CATEGORY" description="FLEXI_SELECT_AUTHOR_CATEGORY_DESC" />
 		</fieldset> 

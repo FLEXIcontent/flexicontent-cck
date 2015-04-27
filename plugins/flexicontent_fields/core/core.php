@@ -38,11 +38,13 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayCoreFieldValue( &$_field, & $_item, &$params, $_tags=null, $_categories=null, $_favourites=null, $_favoured=null, $_vote=null, $values=null, $prop='display' )
 	{
-		// this function is a mess and need complete refactoring
 		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		static $cat_links = array();
 		static $tag_links = array();
+		static $cparams = null;
+		if ($cparams===null)
+			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
 		if ( !is_array($_item) ) 
 			$items = array( & $_item );
@@ -226,8 +228,10 @@ class plgFlexicontent_fieldsCore extends JPlugin
 							$cat_id = $category->id;
 							if ( in_array($cat_id, @$globalnoroute) )  continue;
 							
-							if ( !isset($cat_links[$cat_id]) )   $cat_links[$cat_id] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
-							$cat_link = $cat_links[$cat_id];
+							if ( !isset($cat_links[$cat_id]) ) {
+								$cat_links[$cat_id] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
+							}
+							$cat_link = & $cat_links[$cat_id];
 							$display = '<a class="fc_categories fc_category_' .$cat_id. ' link_' .$field->name. '" href="' . $cat_link . '">' . $category->title . '</a>';
 							$field->{$prop}[] = $pretext. $display .$posttext;
 							$field->value[] = $category->title;
@@ -238,6 +242,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					break;
 	
 				case 'tags': // assigned tags
+					$use_catlinks = $cparams->get('tags_using_catview', 0);
 					$field->{$prop} = '';
 					
 					if ($_tags===false) $tags = & $item->tags;
@@ -248,8 +253,12 @@ class plgFlexicontent_fieldsCore extends JPlugin
 						$field->{$prop} = array();
 						foreach ($tags as $tag) :
 							$tag_id = $tag->id;
-							if ( !isset($tag_links[$tag_id]) )   $tag_links[$tag_id] = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug));
-							$tag_link = $tag_links[$tag_id];
+							if ( !isset($tag_links[$tag_id]) ) {
+								$tag_links[$tag_id] = $use_catlinks ?
+									JRoute::_( FlexicontentHelperRoute::getCategoryRoute(0, 0, array('layout'=>'tags','tagid'=>$tag->slug)) ) :
+									JRoute::_( FlexicontentHelperRoute::getTagRoute($tag->slug) ) ;
+							}
+							$tag_link = & $tag_links[$tag_id];
 							$display = '<a class="fc_tags fc_tag_' .$tag->id. ' link_' .$field->name. '" href="' . $tag_link . '">' . $tag->name . '</a>';
 							$field->{$prop}[] = $pretext. $display .$posttext;
 							$field->value[] = $tag->name; 
