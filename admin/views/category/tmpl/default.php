@@ -292,7 +292,7 @@ $js = "
 			
 			<div class="clear" style=""></div>
 			
-			<div style="max-width:1024px;">
+			<div style="max-width:1024px; margin-top:32px;">
 				
 				<?php echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1,'show'=>1)); ?>
 				

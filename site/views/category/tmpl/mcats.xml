@@ -873,6 +873,20 @@
 			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 			<field name="" type="separator" default="Template parameters ..." description="Please note you cannot set template parameters here. &lt;br&gt;&lt;br&gt; Default template parameters will be used for the choosen template. &lt;br&gt;&lt;br&gt;For fields shown, please add your fields in layout positions in template configuration management tab" level="level2"/>
 			
+			<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="..." level="level2" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_LAYOUT_SWITCHER" description="" level="level3" />
+			<field name="clayout_switcher" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_DISPLAY" description="FLEXI_CATEGORY_LAYOUT_SWITCHER_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="clayout_selector_on">FLEXI_NO</option>
+				<option value="1" show_list="clayout_selector_on" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="clayout_switcher_display_mode" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_CATEGORY_LAYOUT_SWITCHER_DISPLAY_MODE" description="FLEXI_CATEGORY_LAYOUT_SWITCHER_DISPLAY_MODE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">Drop-down select</option>
+				<option value="1">Radio-image</option>
+			</field>
+			<field name="displayed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_DISPLAYED_CATEGORY_LAYOUTS" description="FLEXI_DISPLAYED_CATEGORY_LAYOUTS_DESC" labelclass="label-success" class="clayout_selector_on"/>
+			<field name="" type="separator" default="URL / Links" description="" level="level3" />
+			<field name="allowed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_ALLOWED_CATEGORY_LAYOUTS" description="FLEXI_ALLOWED_CATEGORY_LAYOUTS_DESC" labelclass="label-success" class="" />
+			
 		</fieldset>
 	
 	</fields>
