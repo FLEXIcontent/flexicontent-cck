@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="component" version="3.3.0" method="upgrade">
+<extension type="component" version="3.2.0" method="upgrade">
 	<name>FLEXIcontent</name>
 	<!-- The following elements are optional and free of formatting constraints -->
 	<creationDate>25 April 2015</creationDate>

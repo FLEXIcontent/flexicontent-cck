@@ -345,7 +345,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 				<?php ob_start(); ?>
 				<?php if ($display_title_feat) : ?>
 				<div class="fc_block" >
-					<div class="fc_inline_block fcitem_title">
+					<div class="fc_inline fcitem_title">
 						<?php if ($link_title_feat) : ?>
 						<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
 						<?php else : ?>	
@@ -527,7 +527,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 				<?php ob_start(); ?>
 				<?php if ($display_title || $item_handle_title==2) : ?>
 				<div class="fc_block" <?php echo !$display_title ? 'style="display:none!important;"' : ''; ?> >
-					<div class="fc_inline_block fcitem_title">
+					<div class="fc_inline fcitem_title">
 						<?php if ($link_title) : ?>
 							<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
 						<?php else : ?>	
