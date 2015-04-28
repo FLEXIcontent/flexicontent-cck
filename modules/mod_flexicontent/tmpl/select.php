@@ -1,8 +1,10 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access');
+
+$container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata->id : '');
 ?>
 
-<div class="select mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_select<?php echo $module->id ?>">
+<div class="select mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_select<?php echo $container_id; ?>">
 	
 	<?php
 	// Display FavList Information (if enabled)

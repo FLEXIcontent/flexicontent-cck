@@ -48,8 +48,7 @@
 			<span class='catdescr'><?php echo $catdata->description; ?></span>
 		<?php endif; ?>
 		
-		<span class='modclear'></span>
-		
 	</div>
 
+	<span class='modclear'></span>
 <?php endif; ?>

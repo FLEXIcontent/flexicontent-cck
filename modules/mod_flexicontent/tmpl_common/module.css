@@ -5,17 +5,18 @@
 	position: relative;
 	top: 0;
 	left: 0;
+	margin:0 0 24px 0;
 }
 
 /* ITEM (AND OTHER DATA) SEPARATOR */
 .mod_flexicontent_wrapper .modclear {
 	display:block;  float:none;  clear:both;
-	width:100%;  overflow:hidden;  height:4px;  line-height:0px;
+	width:100%;  overflow:hidden;  height:0px;  line-height:0px;
 	border-width:0px;  margin:0px;
 }
 
 /* ORDERING GROUPs SEPERATOR */
-.mod_flexicontent_wrapper ordering_seperator {
+.mod_flexicontent_wrapper ordering_separator {
 	display:block;  float:none;  clear:both;
 	width:100%;  overflow:hidden;  height:0px;  line-height:0px;
 	border-width:1px 0px 0px 0px;  border:dashed #dddddd;  margin:8px 12px 12px 8px;
@@ -34,22 +35,21 @@
 
 /* THE (OPTIONAL) CURRENT CATEGORY INFORMATION */
 .mod_flexicontent_wrapper .catdata {   /* external container */
-	border-bottom: 1px dashed darkgray;
-	margin: 0px 0px 6px 0px;
+	margin: 0px 0px 16px 0px;
 }
 
 .mod_flexicontent_wrapper .catdata .cattitle {  /* the category title */
-	padding:1px 16px 1px 16px;  margin:2px 0px 8px 0px;  border:1px dashed #bbbbbb;
-	background-color:#dddddd; color:black;
-	font-size:12px;  font-weight:bold;  text-align:left;
+	padding:1px 16px 1px 16px;
+	margin:2px 0px 8px 0px;
+	font-size:16px;
+	background: #d0d0d0;
+	border-radius: 3px;
 }
 .mod_flexicontent_wrapper .catdata.fccat_active .cattitle,  /* title of active category */
 .mod_flexicontent_wrapper .catdata.fcitemcat_active .cattitle {  /* title of category of active item */
-	background-color:#aaa; 
 	color:darkred;
 }
 .mod_flexicontent_wrapper .catdata .cattitle:hover {  /* the category title hover */
-	border: 1px dashed #444444;
 }
 .mod_flexicontent_wrapper .catdata .cattitle a.cattitle_link {  /* the link to category title */
 	background-color: transparent; color: black;
@@ -57,7 +57,6 @@
 }
 .mod_flexicontent_wrapper .catdata.fccat_active .cattitle a.cattitle_link,        /* the link of active category */
 .mod_flexicontent_wrapper .catdata.fcitemcat_active .cattitle a.cattitle_link {   /* the link of category of active item */
-	background-color:#aaa; 
 	color: darkred;
 }
 .mod_flexicontent_wrapper .catdata .cattitle:hover a.cattitle_link,

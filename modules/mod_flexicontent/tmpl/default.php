@@ -2,9 +2,10 @@
 defined('_JEXEC') or die('Restricted access');
 
 $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
+$container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata->id : '');
 ?>
 
-<div class="default mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_default<?php echo $module->id ?>">
+<div class="default mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_default<?php echo $container_id; ?>">
 	
 	<?php
 	// Display FavList Information (if enabled)
@@ -34,7 +35,7 @@ $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 	foreach ($ordering as $ord) :
   	echo $separator;
 	  if (isset($list[$ord]['featured']) || isset($list[$ord]['standard'])) {
-  	  $separator = "<div class='ordering_seperator' ></div>";
+  	  $separator = "<div class='ordering_separator' ></div>";
     } else {
   	  $separator = "";
   	  continue;

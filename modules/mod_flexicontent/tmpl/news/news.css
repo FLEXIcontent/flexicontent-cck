@@ -60,7 +60,7 @@
 	
 	/* can be overriden via user 's CSS */
 	margin: 4px;
-	padding: 4px;
+	padding: 0;
 	border-width: 1px;
 	border-style: solid;
 	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
@@ -167,7 +167,7 @@
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_fc_activeitem:hover .mod_flexicontent_standard_wrapper_innerbox,
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover .mod_flexicontent_standard_wrapper_innerbox {
 	background-color: #D0D0D0;
-	border-color: #888 #555 #555 #888;
+	/*border-color: #888 #555 #555 #888;*/
 	/*box-shadow: 4px 4px 2px darkgray;*/
 }
 
@@ -199,15 +199,17 @@
 /* ITEM BASIC FIELDS STYLES (FOR CUSTOM FIELDS see below, FOR IMAGE AND DATE see more below) */
 /*********************************************************************************************/
 
-.news.mod_flexicontent_wrapper .content_standard {}  /* container of basic elements of standard items excluding title & image */
-.news.mod_flexicontent_wrapper .content_featured {}  /* container of basic elements of featured items excluding title & image */
+.news.mod_flexicontent_wrapper .content_standard {padding: 4px 12px;}  /* container of basic elements of standard items excluding title & image */
+.news.mod_flexicontent_wrapper .content_featured {padding: 4px 12px;}  /* container of basic elements of featured items excluding title & image */
 
 
 /* CONTAINER of item title */
 .news.mod_flexicontent_wrapper .fcitem_title {
-	padding:1px 4px 1px 4px;  margin: 2px 0px 2px 0px;
+	padding:1px 4px 1px 4px;
+	margin: 2px 0px 2px 0px;
 	/*border: 1px dashed #bbbbbb;*/
-	font-size: 120%;  font-weight:bold;	text-align:left;
+	font-size: 120%;
+	text-align:left;
 }
 .news.mod_flexicontent_wrapper .fcitem_title:hover {
 	/*border: 1px dashed black;*/
@@ -269,7 +271,7 @@
 .news.mod_flexicontent_wrapper .image_featured,
 .news.mod_flexicontent_wrapper .image_standard {
 	float: left;
-	margin: 0 6px 6px 0;
+	margin: 0;
 }
 
 /* item image styling (link, image, etc) */
@@ -426,12 +428,12 @@
 }
 .news.mod_flexicontent_wrapper .fc_float_left {
 	float: left !important;
-	margin: 6px 6px 6px 0;
+	margin: 0px 6px 6px 0;
 	display: block;
 }
 .news.mod_flexicontent_wrapper .fc_float_right {
 	float: right !important;
-	margin: 6px 0 6px 6px;
+	margin: 0px 0 6px 6px;
 	display: block;
 }
 .news.mod_flexicontent_wrapper .fc_floated {}
@@ -439,11 +441,11 @@
 .news.mod_flexicontent_wrapper .image_featured.fc_float_left img,
 .news.mod_flexicontent_wrapper .image_featured.fc_float_right img,
 .news.mod_flexicontent_wrapper .image_standard.fc_float_left img,
-.news.mod_flexicontent_wrapper .image_standard.fc_float_right img { border-radius: 8px; }
+.news.mod_flexicontent_wrapper .image_standard.fc_float_right img { }
 .news.mod_flexicontent_wrapper .image_featured.fc_float_left img,
 .news.mod_flexicontent_wrapper .image_featured.fc_float_right img,
 .news.mod_flexicontent_wrapper .image_standard.fc_float_left img,
-.news.mod_flexicontent_wrapper .image_standard.fc_float_right img { border-radius: 8px; }
+.news.mod_flexicontent_wrapper .image_standard.fc_float_right img { }
 
 .news.mod_flexicontent_wrapper .fc_clear { clear: both !important; }
 

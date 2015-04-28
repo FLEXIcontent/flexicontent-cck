@@ -171,14 +171,16 @@ $item_placement_std = $params->get($layout.'_item_placement', 0);  // -1: other,
 $item_columns_std = $params->get('item_columns', 2);
 $cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
 
-if ( ($item_placement_feat == 1 && $item_columns_feat > 1) || ($item_placement_std == 1 && $item_columns_std > 1) ) {
+$document = JFactory::getDocument();
+if ( ($item_placement_feat == 1 && $item_columns_feat > 1) || ($item_placement_std == 1 && $item_columns_std > 1) )
+{
 	flexicontent_html::loadFramework('masonry');
 	flexicontent_html::loadFramework('imagesLoaded');
 }
-$document = JFactory::getDocument();
+$container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata->id : '');
 ?>
 
-<div class="news mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_news<?php echo $module->id; ?>">
+<div class="news mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_news<?php echo $container_id; ?>">
 	
 	<?php
 	// Display FavList Information (if enabled)
@@ -209,16 +211,16 @@ $document = JFactory::getDocument();
 	foreach ($ordering as $ord) :
   	echo $separator;
 	  if (isset($list[$ord]['featured']) || isset($list[$ord]['standard'])) {
-  	  $separator = "<div class='ordering_seperator' ></div>";
+  	  $separator = "<div class='ordering_separator' ></div>";
     } else {
   	  $separator = "";
   	  continue;
   	}
   	// PREPEND ORDER if using more than 1 orderings ...
   	$order_name = $ord ? $ord : 'default';
-		$uniq_ord_id = (count($list)>1 ? $order_name : '').$module->id;
+		$uniq_ord_id = (count($list)>1 ? $order_name : '').$container_id;
 	?>
-	<div id="<?php echo 'order_'.$order_name.$module->id; ?>" class="mod_flexicontent">
+	<div id="<?php echo 'order_'.$order_name.$container_id; ?>" class="mod_flexicontent">
 		
 		<?php	if ($ordering_addtitle && $ord) : ?>
 		<div class='order_group_title'><?php echo $ord_titles[$ord]; ?></div>
@@ -267,7 +269,7 @@ $document = JFactory::getDocument();
 				<?php ob_start(); ?>
 				<?php if ($mod_use_image_feat && $item->image_rendered) : ?>
 
-				<div class="image_featured">
+				<div class="image_featured" <?php echo $img_container_class_feat;?>">
 					<?php if ($mod_link_image_feat) : ?>
 						<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
 					<?php else : ?>
@@ -436,7 +438,7 @@ $document = JFactory::getDocument();
 				<!-- BOF current item's image -->	
 				<?php ob_start(); ?>
 				<?php if ($mod_use_image && $item->image_rendered) : ?>
-				<div class="image_standard">
+				<div class="image_standard" <?php echo $img_container_class;?>">
 					<?php if ($mod_link_image) : ?>
 						<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
 					<?php else : ?>
