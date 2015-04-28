@@ -93,10 +93,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		$_run_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Get item parameters as VIEW's parameters (item parameters are merged parameters in order: component/category/layout/type/item/menu/access)
-		$params = $item->parameters;
+		$params = & $item->parameters;
 		
 		// Get item 's layout as this may have been altered
-		$ilayout = $item->parameters->get('ilayout');
+		$ilayout = $params->get('ilayout');
 		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
@@ -560,13 +560,19 @@ class FlexicontentViewItem  extends JViewLegacy
 		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
 		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
 		
-		// most core field are created via calling methods of the form (J2.5)
-		$form = $this->get('Form');
+		// Replace component/menu 'params' with thee merged component/category/type/item/menu ETC ... parameters
+		$params = & $item->parameters;
 		
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
-		// Replace component/menu 'params' with thee merged component/category/type/item/menu ETC ... parameters
-		$params = $item->parameters;
+		// Load permissions (used by form template)
+		$perms = $this->_getItemPerms($item);
+		
+		// Create submit configuration (for new items) into the session, this is needed before creating the item form
+		$submitConf = $this->_createSubmitConf($item, $perms);
+		
+		// Most core field are created via calling methods of the form (J2.5)
+		$form = $this->get('Form');
 		
 		// is new item and ownership Flags
 		$isnew = !$item->id;
@@ -585,9 +591,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		// *********************************************************************************************************
 		// Get language stuff, and also load Template-Specific language file to override or add new language strings
 		// *********************************************************************************************************
-		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
+		if ($enable_translation_groups)  $langAssocs = $params->get('uselang_fe')==1 ? $this->get( 'LangAssocs' ) : false;
 		$langs = FLEXIUtilities::getLanguages('code');
-		FLEXIUtilities::loadTemplateLanguageFile( $item->parameters->get('ilayout', 'default') );
+		FLEXIUtilities::loadTemplateLanguageFile( $params->get('ilayout', 'default') );
 		
 		
 		
@@ -868,9 +874,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		$usedtagsids  = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
 		$usedtagsdata = $model->getUsedtagsData($usedtagsids);
 		
-		// Load permissions (used by form template)
-		$perms = $this->_getItemPerms($item);
-
 		// Get the edit lists
 		$lists = $this->_buildEditLists($perms, $params, $authorparams);
 
@@ -878,13 +881,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		$subscribers = $this->get( 'SubscribersCount' );
 
 		// Get menu overridden categories/main category fields
-		$menuCats = $this->_getMenuCats($item, $perms, $params);
+		$menuCats = $this->_getMenuCats($item, $perms);
 
-		// Create submit configuration (for new items) into the session
-		$submitConf = $this->_createSubmitConf($item, $perms, $params);
-		
 		// Create placement configuration for CORE properties
-		$placementConf = $this->_createPlacementConf($fields, $params, $item);
+		$placementConf = $this->_createPlacementConf($item, $fields);
 		
 		// Item language related vars
 		$languages = FLEXIUtilities::getLanguages();
@@ -1014,8 +1014,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		// (b) Get Content Type allowed templates
 		$allowed_tmpls = $tparams->get('allowed_ilayouts');
 		$type_default_layout = $tparams->get('ilayout', 'default');
-		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
-		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
+		if ( empty($allowed_tmpls) ) {
+			$allowed_tmpls = array();
+		}
+		if ( ! is_array($allowed_tmpls) ) {
+			$allowed_tmpls = explode("|", $allowed_tmpls);
+		}
 
 		// (c) Add default layout, unless all templates allowed (=array is empty)
 		if ( count ($allowed_tmpls) && !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
@@ -1247,7 +1251,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
 			$attribs .= $enable_featured_cid_selector ? '' : ' disabled="disabled"';
 			
-			$fieldname = FLEXI_J16GE ? 'jform[featured_cid][]' : 'featured_cid[]';
+			$fieldname = 'jform[featured_cid][]';
 			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
 				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed,
 					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
@@ -1286,7 +1290,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="20"';
 			$attribs .= $enable_cid_selector ? '' : ' disabled="disabled"';
 			
-			$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
+			$fieldname = 'jform[cid][]';
 			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
 			$lists['cid'] = ($enable_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
 				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $selectedcats, false, $attribs, true, true, $actions_allowed,
@@ -1313,7 +1317,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			$class .= ' required';
 		}
 		$attribs = 'class="'.$class.'"';
-		$fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
+		$fieldname = 'jform[catid]';
 		
 		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && empty($item->catid)) || $perms['canchange_cat'];
 		
@@ -1331,7 +1335,8 @@ class FlexicontentViewItem  extends JViewLegacy
 			$attribs .= $disabled;
 			$lists['catid'] = ($enable_catid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
 				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed,
-					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
+					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats,
+					$empty_errmsg=JText::_('FLEXI_FORM_NO_MAIN_CAT_ALLOWED')
 				);
 		} else if ( !$isnew && $item->catid ) {
 			$lists['catid'] = $globalcats[$item->catid]->title;
@@ -1397,7 +1402,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			$langconf['flags'] = $params->get('langdisplay_flags_fe', 1);
 			$langconf['texts'] = $params->get('langdisplay_texts_fe', 1);
 			$field_attribs = $langdisplay==2 ? 'class="use_select2_lib"' : '';
-			$lists['languages'] = flexicontent_html::buildlanguageslist( (FLEXI_J16GE ? 'jform[language]' : 'language') , $field_attribs, $item->language, $langdisplay, $allowed_langs, $published_only=1, $disable_langs, $add_all=true, $langconf);
+			$lists['languages'] = flexicontent_html::buildlanguageslist( 'jform[language]', $field_attribs, $item->language, $langdisplay, $allowed_langs, $published_only=1, $disable_langs, $add_all=true, $langconf);
 		}
 
 		return $lists;
@@ -1462,10 +1467,11 @@ class FlexicontentViewItem  extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function _getMenuCats(&$item, $perms, $params)  // menu
+	function _getMenuCats( &$item, &$perms )
 	{
 		global $globalcats;
-
+		$params = & $item->parameters;
+		
 		$isnew = !$item->id;
 
 		// Get menu parameters related to category overriding
@@ -1494,9 +1500,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 
 		// Field names for (a) multi-categories field and (b) main category field
-		$cid_form_fieldname   = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
-		$catid_form_fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
-		$catid_form_tagid   = FLEXI_J16GE ? 'jform_catid' : 'catid';
+		$cid_form_fieldname   = 'jform[cid][]';
+		$catid_form_fieldname = 'jform[catid]';
+		$catid_form_tagid     = 'jform_catid';
 
 		// Create form field HTML for the menu-overridden categories fields
 		switch($postcats)
@@ -1539,9 +1545,10 @@ class FlexicontentViewItem  extends JViewLegacy
 	}
 
 
-	function _createSubmitConf( &$item, $perms, $params)
+	function _createSubmitConf( &$item, &$perms )
 	{
 		if ( $item->id ) return '';
+		$params = & $item->parameters;
 
 		// Overriden categories list
 		$cid = $params->get("cid");
@@ -1571,15 +1578,16 @@ class FlexicontentViewItem  extends JViewLegacy
 		$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 		$item_submit_conf[$submit_conf_hash] = $submit_conf;
 		$session->set('item_submit_conf', $item_submit_conf, 'flexicontent');
-
-		if (FLEXI_J16GE)
-			return '<input type="hidden" name="jform[submit_conf]" value="'.$submit_conf_hash.'" >';
-		else
-			return '<input type="hidden" name="submit_conf" value="'.$submit_conf_hash.'" >';
+		$item->submit_conf = $submit_conf;
+		
+		return '<input type="hidden" name="jform[submit_conf]" value="'.$submit_conf_hash.'" >';
 	}
 
 
-	function _createPlacementConf(&$fields, &$params, &$item) {
+	function _createPlacementConf( &$item, &$fields )
+	{
+		$params = & $item->parameters;
+		
 		// 1. Find core placer fields (of type 'coreprops')
 		$core_placers = array();
 		foreach($fields as $field) {
@@ -1594,18 +1602,16 @@ class FlexicontentViewItem  extends JViewLegacy
 		$via_core_field  = array(
 			'title'=>1, 'type_id'=>1, 'state'=>1, 'cats'=>1, 'tags'=>1, 'text'=>1
 		);
-		$via_core_field = array_merge($via_core_field, FLEXI_J16GE ?
-			array('created'=>1, 'created_by'=>1, 'modified'=>1, 'modified_by'=>1) :
-			array()
+		$via_core_field = array_merge($via_core_field,
+			array('created'=>1, 'created_by'=>1, 'modified'=>1, 'modified_by'=>1)
 		);
 		
 		$via_core_prop = array(
 			'alias'=>1, 'disable_comments'=>1, 'notify_subscribers'=>1, 'language'=>1, 'perms'=>1,
 			'metadata'=>1, 'seoconf'=>1, 'display_params'=>1, 'layout_selection'=>1, 'layout_params'=>1
 		);
-		$via_core_prop = array_merge($via_core_prop, FLEXI_J16GE ?
-			array('timezone_info'=>1, 'created_by_alias'=>1, 'publish_up'=>1, 'publish_down'=>1, 'access'=>1) :
-			array('timezone_info'=>1, 'publication_details'=>1)
+		$via_core_prop = array_merge($via_core_prop,
+			array('timezone_info'=>1, 'created_by_alias'=>1, 'publish_up'=>1, 'publish_down'=>1, 'access'=>1)
 		);
 		
 		$placeable_fields = array_merge($via_core_field, $via_core_prop);

@@ -437,6 +437,7 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="3">FLEXI_YES_WITHOUT_ASSOCS</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
 			</field>
 			<field name="default_language_fe" type="fclanguage" default="" use_global="1" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_DEFAULT_LANGUAGE_DESC" />

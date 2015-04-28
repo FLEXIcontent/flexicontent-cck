@@ -341,7 +341,7 @@
 				<option value="0">Drop-down select</option>
 				<option value="1">Radio-image</option>
 			</field>
-			<field name="clayout_switcher_label" type="radio" default="0" label="FLEXI_LABEL" description="" class="limit_override_display btn-group btn-group-yesno">
+			<field name="clayout_switcher_label" type="radio" default="0" label="FLEXI_LABEL" description="..." class="limit_override_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_OUTSIDE</option>
 				<option value="2">FLEXI_INSIDE</option>
@@ -1202,6 +1202,7 @@
 			<field name="uselang_fe" type="radio" default="1" label="FLEXI_MENU_USE_LANGUAGE" description="FLEXI_MENU_USE_LANGUAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="3">FLEXI_YES_WITHOUT_ASSOCS</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
 			</field>
 			<field name="default_language_fe" type="fclanguage" default="*" use_global="0" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_DEFAULT_LANGUAGE_DESC" />

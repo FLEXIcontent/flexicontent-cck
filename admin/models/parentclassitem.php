@@ -115,8 +115,8 @@ class ParentClassItem extends JModelAdmin
 			$data = JRequest::get( 'post' );
 			
 			// Must check if id is SET and if it is non-ZERO !
-			if ( FLEXI_J16GE ? isset($data['jform']['id']) : isset($data['id']) ) {
-				$pk = FLEXI_J16GE ? $data['jform']['id'] : $data['id'];
+			if ( isset($data['jform']['id']) ) {
+				$pk = $data['jform']['id'];
 			} else {
 				$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
 				JArrayHelper::toInteger($cid, array(0));
@@ -456,7 +456,7 @@ class ParentClassItem extends JModelAdmin
 				$select_access .= ', CASE WHEN  i.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_item_access';
 				
 				// SQL date strings, current date and null date
-				$nowDate = $db->Quote( FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL() );
+				$nowDate = $db->Quote( JFactory::getDate()->toSql() );
 				$nullDate	= $db->Quote($db->getNullDate());
 				
 				// Decide to limit to CURRENT CATEGORY
@@ -756,7 +756,7 @@ class ParentClassItem extends JModelAdmin
 			
 			// Typecast some properties in case LEFT JOIN produced nulls
 			if ( !isset($item->type_access) ) {
-				$public_acclevel = !FLEXI_J16GE ? 0 : 1;
+				$public_acclevel = 1;
 				$item->type_access = $public_acclevel;
 			}
 			if ( !isset($item->rating_count) ) {
@@ -954,7 +954,7 @@ class ParentClassItem extends JModelAdmin
 		}
 
 		// Modify the form based on Edit State access controls.
-		if ( !$this->canEditState( (object)$data ) )
+		if ( empty($this->_item->submit_conf['autopublished']) && !$this->canEditState( (object)$data ) )
 		{
 			$frontend_new = !$id && $app->isSite();
 			
@@ -1312,8 +1312,8 @@ class ParentClassItem extends JModelAdmin
 			// Load default empty item
 			$item = JTable::getInstance('flexicontent_items', ''); 
 			
-			$public_accesslevel  = !FLEXI_J16GE ? 0 : 1;
-			$default_accesslevel = FLEXI_J16GE ? $app->getCfg( 'access', $public_accesslevel ) : $public_accesslevel;
+			$public_accesslevel  = 1;
+			$default_accesslevel = $app->getCfg( 'access', $public_accesslevel );
 			
 			// Decide default publication state. NOTE this will only be used if user has publish privilege, otherwise items
 			// will be forced to (a) pending_approval state for NEW ITEMS and (b) to item's current state for EXISTING ITEMS
@@ -1373,6 +1373,10 @@ class ParentClassItem extends JModelAdmin
 			$item->lang_parent_id = 0;
 			$item->search_index = null;
 			$item->parameters   = clone ($cparams);   // Assign component parameters, merge with menu item (for frontend)
+			
+			$query = 'SELECT title FROM #__viewlevels WHERE id = '. (int) $item->access;
+			$this->_db->setQuery($query);
+			$item->access_level = $this->_db->loadResult();
 			
 			$this->_item				= $item;
 		}
@@ -2682,7 +2686,7 @@ class ParentClassItem extends JModelAdmin
 			. ' WHERE itemid = '.$item->id
 			;
 		$this->_db->setQuery($query);
-		$used = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$used = $this->_db->loadColumn();
 
 		foreach($cats as $cat) {
 			// insert only the new records
@@ -2807,7 +2811,7 @@ class ParentClassItem extends JModelAdmin
 			// Not current item, or current item's tags are not set
 			$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid ='".$item_id."'";
 			$this->_db->setQuery($query);
-			$tags = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+			$tags = $this->_db->loadColumn();
 			if ($this->_id == $item_id) {
 				// Retrieved tags of current item, set them
 				$this->_item->tags = $tags;
@@ -2912,7 +2916,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function gettags($mask="")
 	{
-		$escaped_mask = FLEXI_J16GE ? $this->_db->escape( $mask, true ) : $this->_db->getEscaped( $mask, true );
+		$escaped_mask = $this->_db->escape( $mask, true );
 		$where = ($mask!="")?" name like ".$this->_db->Quote( '%'.$escaped_mask.'%', false )." AND":"";
 		$query = 'SELECT * FROM #__flexicontent_tags WHERE '.$where.' published = 1 ORDER BY name';
 		$this->_db->setQuery($query);
@@ -3085,7 +3089,7 @@ class ParentClassItem extends JModelAdmin
 			// Not current item, or current item's categories are not set
 			$query = "SELECT tid FROM #__flexicontent_cats_item_relations WHERE itemid ='".$item_id."'";
 			$this->_db->setQuery($query);
-			$categories = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+			$categories = $this->_db->loadColumn();
 			if ($this->_id == $item_id) {
 				// Retrieved categories of current item, set them
 				$this->_item->categories = & $categories;
@@ -3656,7 +3660,7 @@ class ParentClassItem extends JModelAdmin
 			$cats = $this->get('categories');
 			$query = "SELECT params FROM #__categories WHERE id IN (".implode(',',$cats).")";
 			$db->setQuery( $query );
-			$mcats_params = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$mcats_params = $db->loadColumn();
 			
 			foreach ($mcats_params as $cat_params) {
 				$cat_params = new JRegistry($cat_params);
@@ -3729,7 +3733,7 @@ class ParentClassItem extends JModelAdmin
 				}
 				$query .= " WHERE " . implode (' OR ', $where_clauses);
 				$db->setQuery( $query );
-				$user_emails_ulist = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$user_emails_ulist = $db->loadColumn();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { echo "<pre>"; print_r($user_emails_ulist); exit; }
 			}
 			
@@ -3744,7 +3748,7 @@ class ParentClassItem extends JModelAdmin
 						." JOIN #__user_usergroup_map ugm ON u.id=ugm.user_id AND ugm.group_id IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
 				}
 				$db->setQuery( $query );
-				$user_emails_ugrps = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$user_emails_ugrps = $db->loadColumn();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { print_r($user_emails_ugrps); exit; }
 			}
 			
@@ -3762,7 +3766,7 @@ class ParentClassItem extends JModelAdmin
 				$query = "SELECT DISTINCT email FROM #__users as u"
 					." JOIN #__flexiaccess_groups ugm ON u.username=ugm.name AND ugm.type=2 AND ugm.id IN (".implode(",",$final_groups).")";
 				$db->setQuery( $query );
-				$user_emails_ugrps_fa_individual = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$user_emails_ugrps_fa_individual = $db->loadColumn();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();
 				
 				
@@ -3770,7 +3774,7 @@ class ParentClassItem extends JModelAdmin
 				$query = "SELECT DISTINCT email FROM #__users as u"
 					." JOIN #__flexiaccess_members ugm ON u.id=ugm.member_id AND ugm.group_id IN (".implode(",",$final_groups).")";
 				$db->setQuery( $query );
-				$user_emails_ugrps_fa_collective = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$user_emails_ugrps_fa_collective = $db->loadColumn();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();
 				
 				$user_emails_ugrps_fa = array_unique( array_merge ($user_emails_ugrps_fa_individual, $user_emails_ugrps_fa_collective) );

@@ -10,7 +10,7 @@
 	<fields name="request">
 		<fieldset name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="typeid" type="types" default="" label="FLEXI_MENU_FORM_TYPE" description="FLEXI_MENU_FORM_TYPE_DESC" user_selection="1" /> 
-			<field name="" type="separator" default="FLEXI_MENU_OVERRIDE_FORM_CONFIG_ACL_DESC" level="level3" />
+			<field name="" type="separator" default="FLEXI_MENU_OVERRIDE_FORM_CONFIG_ACL_DESC" level="" class="alert alert-info" />
 		</fieldset>
 	</fields>
 		
@@ -74,6 +74,7 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="3">FLEXI_YES_WITHOUT_ASSOCS</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
 			</field>
 			<field name="default_language_fe" type="fclanguage" default="" use_global="1" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_DEFAULT_LANGUAGE_DESC" />

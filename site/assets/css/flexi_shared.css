@@ -1465,7 +1465,6 @@ input.invalid + .fccheckradio_lbl {
 #flexicontent .flexi_label.invalid,
 #flexicontent .flexi_label.invalid.required {
 	color: #CC0000 !important;
-	border: 1px dotted #CC0000 !important;
 }
 #flexicontent .flexi_label.required:after {
 	content:"*";

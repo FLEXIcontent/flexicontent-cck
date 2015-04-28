@@ -711,7 +711,9 @@ if ($tags_displayed) : ob_start();  // tags ?>
 
 
 
-if ($this->params->get('uselang_fe', 1)) : ob_start(); // language ?>
+if ( !isset($all_tab_fields['lang']) ||
+	( $this->params->get('enable_translation_groups') && $this->params->get('uselang_fe', 1)==1 )
+) : ob_start(); // language ?>
 	<fieldset class="basicfields_set" id="fcform_language_container">
 		<legend>
 			<?php echo !isset($all_tab_fields['lang']) ? JText::_( 'FLEXI_LANGUAGE' ) : JText::_( 'FLEXI_LANGUAGE' ) . ' '. JText::_( 'FLEXI_ASSOCIATONS' ) ; ?>
@@ -719,7 +721,7 @@ if ($this->params->get('uselang_fe', 1)) : ob_start(); // language ?>
 		
 		<?php if (!isset($all_tab_fields['lang'])) { echo $captured['lang']; unset($captured['lang']); } ?>
 		
-		<?php if ( $this->params->get('enable_translation_groups') ) : ?>
+		<?php if ( $this->params->get('enable_translation_groups') && $this->params->get('uselang_fe', 1)==1 ) : ?>
 
 			<div class="fcclear"></div>
 			<?php
@@ -841,7 +843,7 @@ if ( $this->perms['canright'] ) : ob_start(); // perms ?>
 
 
 
-if ($typeid && $this->params->get('usepublicationdetails_fe', 1) && (!FLEXI_J16GE || $this->perms[$publication_priv]) ) : // timezone_info, publication_details ?>
+if ($typeid && $this->params->get('usepublicationdetails_fe', 1)) : // timezone_info, publication_details ?>
 
 	<?php ob_start(); ?>
 		<?php
@@ -1470,7 +1472,6 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	// PUBLISHING TAB
 	// **************
 	// J2.5 requires Edit State privilege while J1.5 requires Edit privilege
-	$publication_priv = FLEXI_J16GE ? 'canpublish' : 'canedit';
 	if ( count($tab_fields['tab04']) ) : ?>
 		<?php
 		$tab_lbl = isset($tab_titles['tab04']) ? $tab_titles['tab04'] : JText::_( 'FLEXI_PUBLISHING' );

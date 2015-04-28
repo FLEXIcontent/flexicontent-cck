@@ -274,7 +274,7 @@ class flexicontent_cats
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'),   // For item edit this should be array('core.create')
 		$require_all=true,   // Require (or not) all privileges present to accept a category
 		$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(),
-		$disable_specific_cats = array()
+		$disable_specific_cats = array(), $empty_errmsg = false
 	) {
 		
 		// ***************************
@@ -304,14 +304,12 @@ class flexicontent_cats
 		// **************************************************************
 		
 		if ($check_perms) {
-			if (FLEXI_J16GE || FLEXI_ACCESS) {
-				// Get user allowed categories, NOTE: if user (a) (J2.5) has 'core.admin' or (b) (J1.5) user is super admin (gid==25) then all cats are allowed
-				$usercats 	= FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed, $require_all, $check_published);
-				// NOTE: already selected categories will be allowed to the user, add them to the category list
-				$selectedcats = !is_array($selected) ? array($selected) : $selected;
-				$usercats_indexed = array_flip($usercats);
-				foreach ($selectedcats as $selectedcat) if ($selectedcat) $usercats_indexed[$selectedcat] = 1;
-			}
+			// Get user allowed categories, NOTE: if user (a) (J2.5) has 'core.admin' or (b) (J1.5) user is super admin (gid==25) then all cats are allowed
+			$usercats 	= FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed, $require_all, $check_published);
+			// NOTE: already selected categories will be allowed to the user, add them to the category list
+			$selectedcats = !is_array($selected) ? array($selected) : $selected;
+			$usercats_indexed = array_flip($usercats);
+			foreach ($selectedcats as $selectedcat) if ($selectedcat) $usercats_indexed[$selectedcat] = 1;
 		}
 		
 		
@@ -350,6 +348,7 @@ class flexicontent_cats
 		// TOP parameter: defines the APPROPRIATE PROMPT option at top of select list
 		// **************************************************************************
 		
+		$cats_count = 0;
 		$catlist 	= array();
 		// A tree to select: e.g. a parent category
 		if (!is_numeric($top) && strlen($top)) {
@@ -398,21 +397,23 @@ class flexicontent_cats
 				else if ($check_perms)
 				{
 					// a. Category NOT ALLOWED
-					if (	( FLEXI_J16GE || FLEXI_ACCESS) && !isset($usercats_indexed[$cat->id]) )
+					if ( !isset($usercats_indexed[$cat->id]) )
 					{
 						// Add current category to the select list as disabled if user can view all categories, OTHERWISE DO NOT ADD IT
 						if ($viewallcats)
 							$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, 'value', 'text', $disabled = true );
 					}
-										
+					
 					// b. Category ALLOWED, but check if adding as disabled
 					else
 					{
 						// CASE: DISABLED categories e.g. existing children subtree when selecting category's parent
-						if ( isset($disable_cats_arr[$cat->id]) )
+						if ( isset($disable_cats_arr[$cat->id]) ) {
 							$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, 'value', 'text', $disabled = true );
-						else
+						} else {
 							$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title );
+							$cats_count++;
+						}
 					}
 				}
 				
@@ -420,6 +421,7 @@ class flexicontent_cats
 				else
 				{
 					$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title );
+					$cats_count++;
 				}
 				
 			}
@@ -433,7 +435,10 @@ class flexicontent_cats
 		$replace_char = FLEXI_J16GE ? '_' : '';
 		$idtag = preg_replace('/(\]|\[)+/', $replace_char, $name);
 		$idtag = preg_replace('/_$/', '', $idtag);
-		$html = JHTML::_('select.genericlist', $catlist, $name, $attribs, 'value', 'text', $selected, $idtag );
+		$html = $empty_errmsg && $cats_count==0 ? 
+			'<div class="alert alert-error">'.$empty_errmsg.'</div>' :
+			JHTML::_('select.genericlist', $catlist, $name, $attribs, 'value', 'text', $selected, $idtag )
+			;
 		
 		if ($top == 3) { // Restore first category element
 			$first_item = reset($list); 
