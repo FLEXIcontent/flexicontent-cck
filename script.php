@@ -266,11 +266,11 @@ class com_flexicontentInstallerScript
 		// @license   http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 only
 		$manifest = isset($parent) ? $parent->getParent()->manifest : $this->manifest;
 		$source   = isset($parent) ? $parent->getParent()->getPath('source') : $this->parent->getPath('source');
-		$additional = & $manifest->xpath('additional');
+		$additional = $manifest->xpath('additional');
 		$additional = count($additional) ? reset($additional) : NULL;
 		
 		if ( is_object($additional) && count( $additional->children() ) ) {
-	    $exts = & $additional->children();
+	    $exts = $additional->children();
 	    foreach ($exts as $ext) {
 				$extensions[] = array(
 					'name' => strip_tags( $ext->asXml() ),
@@ -541,7 +541,6 @@ class com_flexicontentInstallerScript
 					else echo "<span class='badge badge-info'>nothing to do</span>";
 					?>
 					</td>
-					<td> <?php echo implode("<br/>\n", $msg); ?> </td>
 				</tr>
 		
 		<?php
@@ -570,7 +569,6 @@ class com_flexicontentInstallerScript
 					else echo "<span class='badge badge-info'>nothing to do</span>";
 					?>
 					</td>
-					<td> <?php echo implode("<br/>\n", $msg); ?> </td>
 				</tr>
 		
 		<?php
@@ -1281,12 +1279,12 @@ class com_flexicontentInstallerScript
 	/*
 	* get a variable from the manifest file (actually, from the manifest cache).
 	*/
-	function getExistingManifest( $name ) {
+	function getExistingManifest( $name='com_flexicontent', $type='component' ) {
 		static $paramsArr = null;
 		if ($paramsArr !== null) return $paramsArr;
 		
 		$db = JFactory::getDBO();
-		$db->setQuery('SELECT manifest_cache FROM #__extensions WHERE element = "com_flexicontent" AND type="component"');
+		$db->setQuery( 'SELECT manifest_cache FROM #__extensions WHERE element = '. $db->quote($name) .' AND type= '. $db->quote($type) );
 		$manifest_cache =  $db->loadResult();
 		
 		$paramsArr = json_decode($manifest_cache, true );
