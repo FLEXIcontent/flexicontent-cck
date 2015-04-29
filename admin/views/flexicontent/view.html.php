@@ -161,7 +161,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$existversionsdata	= !$use_versioning || $model->getExistVersionsPopulated();
 			$existauthors			= $model->getExistAuthorsTable();
 
-			$oldbetafiles			= true; //$model->getOldBetaFiles();
+			$deprecatedfiles	= $model->getDeprecatedFiles();
 			$nooldfieldsdata	= $model->getNoOldFieldsData();
 			$missingversion		= true; //!$use_versioning || !$model->checkCurrentVersionData();
 			$cachethumb				= $model->getCacheThumbChmod();
@@ -174,7 +174,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$existtype = $existmenuitems = $existfields = true;
 			$existfplg = $existseplg = $existsyplg = true;
 		  $existcats = $existlang = $existversions = $existversionsdata = $existauthors = true;
-		  $oldbetafiles = $nooldfieldsdata = $missingversion = $cachethumb = true;
+		  $deprecatedfiles = $nooldfieldsdata = $missingversion = $cachethumb = true;
 		  $existdbindexes = $itemcountingdok = $initialpermission = true;
 		  $missingindexes = array();
 		}
@@ -311,7 +311,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$this->assignRef('existversionsdata', $existversionsdata);
 		$this->assignRef('existauthors'			, $existauthors);
 		
-		$this->assignRef('oldbetafiles'			, $oldbetafiles);
+		$this->assignRef('deprecatedfiles'	, $deprecatedfiles);
 		$this->assignRef('nooldfieldsdata'	, $nooldfieldsdata);
 		$this->assignRef('missingversion'		, $missingversion);
 		$this->assignRef('cachethumb'				, $cachethumb);

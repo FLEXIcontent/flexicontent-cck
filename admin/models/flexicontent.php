@@ -778,9 +778,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getOldBetaFiles() {
+	function getDeprecatedFiles(&$deprecated=null)
+	{
+		$deprecated = array();
+		return true;  // Do not execute
+		
 		static $return;
-		if ($return!==null) return $return;
+		if ($return===true) return $return;
 		
 		jimport('joomla.filesystem.folder');
 		$files 	= array (
@@ -792,19 +796,34 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'mcats.php',
 			'default.xml',
 			'default.php',
-			'index.html',
-			'form.php',
-			'form.xml'
+			'tags.xml',
+			'tags.php',
+			'favs.xml',
+			'favs.php',
+			'index.html'
 			);
 		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
 		$cattmpl 	= JFolder::files($catdir);		
 		$ctmpl 		= array_diff($cattmpl,$files);
+		foreach ($ctmpl as $c) {
+			$deprecated[$catdir][] = $c;
+		}
 		
+		$files 	= array (
+			'default.xml',
+			'default.php',
+			'form.php',
+			'form.xml',
+			'index.html'
+			);
 		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
-		$itemtmpl 	= JFolder::files($itemdir);		
+		$itemtmpl	= JFolder::files($itemdir);		
 		$itmpl 		= array_diff($itemtmpl,$files);
+		foreach ($itmpl as $c) {
+			$deprecated[$itemdir][] = $c;
+		}
 		
-		$return = ($ctmpl || $itmpl) ? false : true;
+		$return = count($deprecated) ? false : true;
 		return $return;
 	}
 

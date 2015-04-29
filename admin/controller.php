@@ -114,7 +114,7 @@ class FlexicontentController extends JControllerLegacy
 		$this->registerTask( 'populateversionstbl'	, 'populateVersionsTable' );
 		$this->registerTask( 'createauthorstbl'			, 'createauthorstable' );
 		$this->registerTask( 'updateitemcounting'   , 'updateItemCountingData' );
-		$this->registerTask( 'deleteoldfiles'				, 'deleteOldBetaFiles' );
+		$this->registerTask( 'deletedeprecatedfiles', 'deleteDeprecatedFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
 		$this->registerTask( 'addcurrentversiondata', 'addCurrentVersionData' );
 		$this->registerTask( 'langfiles'						, 'processLanguageFiles' );
@@ -249,9 +249,9 @@ class FlexicontentController extends JControllerLegacy
 		//printf('<br/>-- [getCacheThumbChmod: %.2f s] ', $fc_run_times['getCacheThumbChmod']/1000000);
 	
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$oldbetafiles			= true; //$model->getOldBetaFiles();
-		if ( $print_logging_info ) @$fc_run_times['getOldBetaFiles'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		//printf('<br/>-- [getOldBetaFiles: %.2f s] ', $fc_run_times['getOldBetaFiles']/1000000);
+		$deprecatedfiles	= $model->getDeprecatedFiles();
+		if ( $print_logging_info ) @$fc_run_times['getDeprecatedFiles'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		//printf('<br/>-- [getDeprecatedFiles: %.2f s] ', $fc_run_times['getDeprecatedFiles']/1000000);
 	
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$nooldfieldsdata	= $model->getNoOldFieldsData();
@@ -284,7 +284,7 @@ class FlexicontentController extends JControllerLegacy
 		//echo "(!$existtype) || (!$existmenuitems) || (!$existfields) ||<br>";
 		//echo "     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
 		//echo "     (!$existcats)  || (!$existlang) || (!$existdbindexes) || (!$itemcountingdok) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
-		//echo "     (!$oldbetafiles) || (!$nooldfieldsdata) || (!$missingversion) ||<br>";
+		//echo "     (!$deprecatedfiles) || (!$nooldfieldsdata) || (!$missingversion) ||<br>";
 		//echo "     (!$initialpermission)<br>";
 	
 		// Display POST installation tasks if any task-check fails (returns false)
@@ -293,7 +293,7 @@ class FlexicontentController extends JControllerLegacy
 			!$existtype || !$existmenuitems || !$existfields ||
 			//!$existfplg || !$existseplg || existsyplg ||
 			!$existcats || !$existlang || !$existversions || !$existversionsdata || !$existauthors ||
-			!$oldbetafiles || !$nooldfieldsdata || !$missingversion || !$cachethumb ||
+			!$deprecatedfiles || !$nooldfieldsdata || !$missingversion || !$cachethumb ||
 			!$existdbindexes || !$itemcountingdok || !$initialpermission
 		) {
 			$postinst_integrity_ok = false;
@@ -1066,48 +1066,30 @@ class FlexicontentController extends JControllerLegacy
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function deleteOldBetaFiles()
+	function deleteDeprecatedFiles()
 	{
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
+		$model = $this->getModel('flexicontent');
+		$deprecated = null;
+		$model->getDeprecatedFiles($deprecated);
+		
 		jimport('joomla.filesystem.file');
-
-		$files 	= array (
-			'author.xml',
-			'author.php',
-			'myitems.xml',
-			'myitems.php',
-			'mcats.xml',
-			'mcats.php',
-			'default.xml',
-			'default.php',
-			'index.html',
-			'form.php',
-			'form.xml'
-			);
-		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
-		$cattmpl 	= JFolder::files($catdir);		
-		$ctmpl 		= array_diff($cattmpl,$files);
-		foreach ($ctmpl as $c) {
-			JFile::delete($catdir.DS.$c);
+		foreach ($deprecated as $dir => $dirfiles) {
+			foreach ($dirfiles as $file) {
+				JFile::delete($dir.DS.$file);
+			}
 		}
 		
-		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
-		$itemtmpl 	= JFolder::files($itemdir);		
-		$itmpl 		= array_diff($itemtmpl,$files);
-		foreach ($itmpl as $i) {
-			JFile::delete($itemdir.DS.$i);
-		}
-
-		$model = $this->getModel('flexicontent');
-		if ($model->getOldBetaFiles()) {
+		if ($model->getDeprecatedFiles()) {
 			echo '<span class="install-ok"></span>';
 		} else {
 			echo '<span class="install-notok"></span>';
 		}
 	}
-
+	
+	
 	/**
 	 * Method to delete old core fields data in the fields_items_relations table
 	 * Delete also old versions fields data

@@ -1282,6 +1282,10 @@ class plgSystemFlexisystem extends JPlugin
 			$layoutpath = JPath::clean($client->path . '/modules/' . $table->module . '/tmpl/' . $layout .'.xml');
 			if (!file_exists($layoutpath)) return;
 			
+			$layout = 'custom.xml';
+			$layoutpath = JPath::clean($client->path . '/modules/' . $table->module . '/tmpl/' . $layout .'.xml');
+			if (!file_exists($layoutpath)) return;
+			
 			// Load XML file
 			if (FLEXI_J30GE) {
 				$xml = simplexml_load_file($layoutpath);
