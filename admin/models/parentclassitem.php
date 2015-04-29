@@ -2555,7 +2555,7 @@ class ParentClassItem extends JModelAdmin
 			}
 			
 			// b. Finally save a version of the posted JoomFish translated data for J1.5, if such data are editted inside the item edit form
-			if ( FLEXI_FISH && !empty($data['jfdata']) && $record_versioned_data )
+			/*if ( FLEXI_FISH && !empty($data['jfdata']) && $record_versioned_data )
 			{
 				$obj = new stdClass();
 				$obj->field_id 		= -1;  // ID of Fake Field used to contain the Joomfish translated item data
@@ -2565,12 +2565,14 @@ class ParentClassItem extends JModelAdmin
 				$obj->version			= (int)$last_version+1;
 				
 				$item_lang = substr($item->language ,0,2);
+				$data['jfdata'][$item_lang]['title'] = $item->title;
 				$data['jfdata'][$item_lang]['alias'] = $item->alias;
+				$data['jfdata'][$item_lang]['text'] = $item->text;
 				$data['jfdata'][$item_lang]['metadesc'] = $item->metadesc;
 				$data['jfdata'][$item_lang]['metakey'] = $item->metakey;
 				$obj->value = serialize($data['jfdata']);
 				$this->_db->insertObject('#__flexicontent_items_versions', $obj);
-			}
+			}*/
 		}
 		
 		if ( $print_logging_info ) @$fc_run_times['fields_value_saving'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -2736,12 +2738,12 @@ class ParentClassItem extends JModelAdmin
 			
 			if ($dbtype == 'mysqli') {
 				$result = mysqli_query( $db_connection , $query );
-				if ($result===false) return JError::raiseError( 500, "error _saveJFdata():: ".mysqli_error($db_connection));
+				if ($result===false) return JError::raiseError( 500, 'error '.__FUNCTION__.'():: '.mysqli_error($db_connection));
 			} else if ($dbtype == 'mysql') {
 				$result = mysql_query( $query, $db_connection  );
-				if ($result===false) return JError::raiseError( 500, "error _saveJFdata():: ".mysql_error($db_connection));
+				if ($result===false) return JError::raiseError( 500, 'error '.__FUNCTION__.'():: '.mysql_error($db_connection));
 			} else {
-				$msg = 'unreachable code in _saveJFdata(): direct db query, unsupported DB TYPE';
+				$msg = 'unreachable code in '.__FUNCTION__.'(): direct db query, unsupported DB TYPE';
 				throw new Exception($msg, 500);
 			}
 		}
@@ -2763,6 +2765,9 @@ class ParentClassItem extends JModelAdmin
 			} else if ( empty($jfdata['text']) ) {
 				$jfdata['text'] = '';
 			}
+			
+			$jfdata['title'] = trim($jfdata['title']);
+			$jfdata['alias'] = $jfdata['title'] ? $this->verifyAlias($jfdata['alias'], $jfdata['title'], $item) : '';
 			
 			// Search for the {readmore} tag and split the text up accordingly.
 			$this->splitText($jfdata);
@@ -4408,5 +4413,38 @@ class ParentClassItem extends JModelAdmin
 		}
 	}
 	
+	
+	function verifyAlias($alias, $title, &$item)
+	{
+		if ( empty($alias) )
+		{
+			$alias = $title;
+		}
+		$alias = JApplication::stringURLSafe($alias);
+		
+		if(trim(str_replace('-','',$alias)) == '')
+		{
+			$alias = JFactory::getDate()->format($format = 'Y-M-d-H-i-s', $local = true);
+		}
+		
+		// Check for unique Alias
+		$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='.(int)$item->id;
+		$query = 'SELECT COUNT(*) FROM #__content AS i '
+			.' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
+			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
+			.' WHERE i.alias='.$this->_db->Quote($alias)
+			.'  AND (i.catid='.(int)$item->id.' OR rel.catid IN ('.$sub_q.') )'
+			.'  AND e.language = '.$this->_db->Quote($item->language)
+			.'  AND i.id <> '.(int)$item->id
+			;
+		$this->_db->setQuery($query);
+		$duplicate_aliases = (boolean) $this->_db->loadResult();
+		
+		if ($duplicate_aliases)
+		{
+			$alias = $alias.'_'.$item->id;
+		}
+		return $alias;
+	}
 }
 ?>
