@@ -1280,11 +1280,11 @@ class plgSystemFlexisystem extends JPlugin
 			// Check if layout XML parameter file exists
 			$client = JApplicationHelper::getClientInfo($table->client_id);
 			$layoutpath = JPath::clean($client->path . '/modules/' . $table->module . '/tmpl/' . $layout .'.xml');
-			if (!file_exists($layoutpath)) return;
-			
-			$layout = 'custom.xml';
-			$layoutpath = JPath::clean($client->path . '/modules/' . $table->module . '/tmpl/' . $layout .'.xml');
-			if (!file_exists($layoutpath)) return;
+			if (!file_exists($layoutpath))
+			{
+				$layoutpath = JPath::clean($client->path . '/modules/' . $table->module . '/tmpl/_fallback/_fallback.xml');
+				if (!file_exists($layoutpath)) return;
+			}
 			
 			// Load XML file
 			if (FLEXI_J30GE) {
