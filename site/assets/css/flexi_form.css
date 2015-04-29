@@ -515,7 +515,7 @@ table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level0,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level1,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
-/*.fcsep_level0:first-child, .fcsep_level1:first-child, .fcsep_level2:first-child,*/
+li:first-child .fcsep_level0, li:first-child .fcsep_level1, li:first-child .fcsep_level2,
 .fc-nomargin > .fcsep_level0,  .fc-nomargin > .fcsep_level1,  .fc-nomargin > .fcsep_level2
 {
 	margin-top: 8px !important;
@@ -553,6 +553,13 @@ div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-o
 	border-radius: 5px;
 	clear: both;
 	max-width:60%;
+}
+body .alert.fcpadded {
+	margin: 0px 48px;
+	box-sizing: border-box;
+}
+body .alert.fcinlineblock {
+	display: inline-block;
 }
 
 #flexicontent div.input-append > input { margin-right:0px !important; border-top-right-radius:0px !important;  border-bottom-right-radius:0px !important; }

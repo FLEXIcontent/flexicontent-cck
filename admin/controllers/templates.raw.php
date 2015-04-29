@@ -131,7 +131,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			return;
 		}
 		if ($ext_option!='com_flexicontent' && $ext_option!='com_modules' && $ext_option!='com_advancedmodules' && $ext_option!='com_menus') {
-			echo '<div class="alert alert-warning" style="margin:16px 0 -24px 0">You are editing module via extension: <span class="label label-warning">'.$ext_option.'</span><br/> - If extension does not call Joomla event <span class="label label-warning">onExtensionBeforeSave</span> then custom layout parameters may not be saved</div>';
+			echo '<div class="alert fcpadded fcinlineblock" style="">You are editing module via extension: <span class="label label-warning">'.$ext_option.'</span><br/> - If extension does not call Joomla event <span class="label label-warning">onExtensionBeforeSave</span> then custom layout parameters may not be saved</div>';
 		}
 		
 		$db->setQuery( $query );
@@ -141,7 +141,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		if (!file_exists($layoutpath)) {
 			if (file_exists($path.DS.'_fallback'.DS.'_fallback.xml')) {
 				$layoutpath = $path.DS.'_fallback'.DS.'_fallback.xml';
-				echo '<div class="fcsep_level3">Currently selected layout: <b>"'.$layout_name.'"</b> does not have a parameters XML file, using general defaults</div><div class="clear"></div>';
+				echo '<div class="alert fcpadded fcinlineblock">Currently selected layout: <b>"'.$layout_name.'"</b> does not have a parameters XML file, using general defaults. if this is an old template then these parameters will allow to continue using it, but we recommend that you create parameter file: '.$layout_name.'.xml</div><div class="clear"></div>';
 			}
 			else {
 				echo !FLEXI_J16GE ? '<div style="font-size: 11px; color: gray; background-color: lightyellow; border: 1px solid lightgray; width: auto; padding: 4px 2%; margin: 1px 8px; height: auto;">' : '<p class="tip">';

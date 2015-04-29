@@ -1564,7 +1564,7 @@ class ParentClassItem extends JModelAdmin
 		unset($data['tag']);  unset($data['cid']);  unset($data['featured_cid']);
 		
 		// Make tags unique
-		$tags = array_unique($tags);
+		$tags = array_keys(array_flip($tags));
 		
 		// Auto-assign a not set main category, to be the first out of secondary categories, 
 		if ( empty($data['catid']) && !empty($cats[0]) ) {
@@ -1574,13 +1574,16 @@ class ParentClassItem extends JModelAdmin
 		$cats_indexed = array_flip($cats);
 		// Add the primary cat to the array if it's not already in
 		if ( @ $data['catid'] && !isset($cats_indexed[$data['catid']]) ) {
-			$cats[] = $data['catid'];
+			$cats_indexed[$data['catid']] = 1;
 		}
 		
-		// Add the primary cat to the array if it's not already in
+		// Add the featured cats to the array if it's not already in
 		if ( !empty($featured_cats) ) foreach ( $featured_cats as $featured_cat ) {
-			if (@ $featured_cat && !isset($cats_indexed[$featured_cat]) )  $cats[] = $featured_cat;
+			if (@ $featured_cat && !isset($cats_indexed[$featured_cat]) )  $cats_indexed[$featured_cat] = 1;
 		}
+		
+		// Reassign (unique) categories back to the cats array
+		$cats = array_keys($cats_indexed);
 		
 		
 		// *****************************
@@ -1718,6 +1721,8 @@ class ParentClassItem extends JModelAdmin
 				$data['categories'] = $allowed_cid;
 			else if ( $postcats==1 )
 				$data['categories'] = array($data['catid']);
+			// Make sure values are unique
+			$data['categories'] = array_keys(array_flip($data['categories']));
 		}
 		
 		
@@ -2689,16 +2694,19 @@ class ParentClassItem extends JModelAdmin
 			;
 		$this->_db->setQuery($query);
 		$used = $this->_db->loadColumn();
-
-		foreach($cats as $cat) {
-			// insert only the new records
-			if (!in_array($cat, $used)) {
-				$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
-					.' VALUES(' . $cat . ',' . $item->id . ')'
-					;
-				$this->_db->setQuery($query);
-				$this->_db->query();
-			}
+		
+		// Insert only the new records
+		$cat_vals = array();
+		foreach($cats as $cat)
+		{
+			if (!in_array($cat, $used))  $cat_vals[] = '('. $cat .','. $item->id .')';
+		}
+		if ( !empty($cat_vals) )
+		{
+			$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) VALUES ' . implode(",", $cat_vals);
+			$this->_db->setQuery($query);
+			$this->_db->query();
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		}
 		
 		return true;
