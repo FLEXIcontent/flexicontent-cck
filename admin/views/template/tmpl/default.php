@@ -76,7 +76,7 @@ $code_btn_rawcode = array(
 
 'itemPosHTML' => '
 <!-- BOF myposition block -->
-<?php $_position_name = "myposition";
+<?php $_position_name = "myposition"; ?>
 
 <?php if (isset($item->positions[$_position_name])) : /* IF position has fields */ ?>
 <div class="flexi lineinfo <?php echo $_position_name; ?> group">
