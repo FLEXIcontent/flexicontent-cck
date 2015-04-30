@@ -216,31 +216,28 @@ class FlexicontentViewItem  extends JViewLegacy
 		// or the overriden custom <title> ... set via parameter
 		$doc_title  =  !$params->get('override_title', 0)  ?  $params->get( 'page_title' )  :  $params->get( 'custom_ititle', $item->title);
 		
-                // Check and prepend category title
-                if ( $params->get('addcat_title', 1) && count($parents) ) {
-                        $parentcat = end($parents);
-                        if ( isset($parentcat->title) ) {
-                                if ( $params->get('addcat_title', 1) == 1) { // On Left
-                                        $doc_title = JText::sprintf('FLEXI_PAGETITLE_SEPARATOR', $parentcat->title, $doc_title);
-                                }
-                                else { // On Right
-                                        $doc_title = JText::sprintf('FLEXI_PAGETITLE_SEPARATOR', $doc_title, $parentcat->title);
-                                }
-                        }
-                }
+		// Check and prepend category title
+		if ( $params->get('addcat_title', 1) && count($parents) ) {
+			$parentcat = end($parents);
+			if ( isset($item->category_title) ) {
+				if ( $params->get('addcat_title', 1) == 1) { // On Left
+					$doc_title = JText::sprintf('FLEXI_PAGETITLE_SEPARATOR', $item->category_title, $doc_title);
+				}
+				else { // On Right
+					$doc_title = JText::sprintf('FLEXI_PAGETITLE_SEPARATOR', $doc_title, $item->category_title);
+				}
+			}
+		}
 		
-                // Check and prepend or append site name
-                // Add Site Name to page title
-                if (FLEXI_J16GE && $doc_title != $app->getCfg('sitename') ) {  // Not available in J1.5
-                        if ($app->getCfg('sitename_pagetitles', 0) == 1) {
-                                //$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
-                                $doc_title = JText::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
-                        }
-                        elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
-                                //$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
-                                $doc_title = JText::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
-                        }
-                }
+		// Check and prepend or append site name to page title
+		if ( $doc_title != $app->getCfg('sitename') ) {
+			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
+				$doc_title = JText::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
+			}
+			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
+				$doc_title = JText::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
+			}
+		}
 		
 		// Finally, set document title
 		$document->setTitle($doc_title);
