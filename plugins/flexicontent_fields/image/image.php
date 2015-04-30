@@ -1070,6 +1070,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Hovering ToolTip configuration
 		// ******************************
 		$uselegend  = $field->parameters->get( 'uselegend', 1 ) ;
+		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		
 		// Enable/disable according to current view
 		$legendinview = $field->parameters->get('legendinview', array(FLEXI_ITEMVIEW,'category'));
@@ -1404,7 +1405,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// Create a popup tooltip (legend)
 			$class = 'fc_field_image';
 			if ($uselegend && (!empty($title) || !empty($desc) ) ) {
-				$class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+				$class .= $tip_class;
 				$legend = ' title="'.flexicontent_html::getToolTip($title, $desc, 0, 1).'"';
 			} else {
 				$legend = '';
@@ -1526,7 +1527,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			{
 				// Add inline display of title/desc
 				if ( ($showtitle && $title ) || ($showdesc && $desc) )
-					$inline_info = '<div class="fc_img_tooltip_data" style="float:left; margin-right:8px;'.$style.'" >';
+					$inline_info = '<div class="fc_img_tooltip_data alert alert-info" style="'.$style.'" >';
 				
 				if ( $showtitle && $title )
 					$inline_info .= '<div class="fc_img_tooltip_title" style="line-height:1em; font-weight:bold;">'.$title.'</div>';
@@ -1582,7 +1583,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					// CASE: Link to URL that opens inside a popup via fancybox
 					$field->{$prop}[] = $pretext.'
 					<span class="fc_image_thumb" style="'.$style.'; cursor: pointer;" '.
-						'onclick="jQuery.fancybox.open([{ type: \'iframe\', href: \''.$urllink.'\', topRatio: 0.9, leftRatio: 0.9, title: \''.($desc ? $desc : $title).'\' }], { padding : 0});"
+						'onclick="jQuery.fancybox.open([{ type: \'iframe\', href: \''.$urllink.'\', topRatio: 0.9, leftRatio: 0.9, title: \''.($desc ? $title.': '.$desc : $title).'\' }], { padding : 0});"
 					>
 						'.$img_legend.'
 					</span>
@@ -1653,7 +1654,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						'<a style="'.$style.'" href="'.$srcl.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb" '.$group_str.' >
 							'.$img_legend.'
 						</a>
-						<div class="multiBoxDesc mb'.$uniqueid.'">'.($desc ? $desc : $title).'</div>'
+						<div class="multiBoxDesc mb'.$uniqueid.'">'.($desc ? '<span class="badge">'.$title.'</span> '.$desc : $title).'</div>'
 						.$inline_info.$posttext;
 					break;
 				case 2:   // Rokbox image popup
@@ -1661,12 +1662,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$group_str = '';   // no support for image grouping
 					$field->{$prop}[] = $pretext.
 						'<a style="'.$style.'" href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.$title_attr.'" class="fc_image_thumb" data-rokbox data-rokbox-caption="'.$title_attr.'">
-							'.$img_nolegend.'
+							'.$img_legend.'
 						</a>'
 						.$inline_info.$posttext;
 					break;
 				case 3:   // JCE popup image popup
-					$title_attr = $desc ? $desc : $title;
+					$title_attr = $desc ? $title.': '.$desc : $title;  // does not support HTML
 					$group_str = $group_name ? 'rel="group['.$group_name.']"' : '';
 					$field->{$prop}[] = $pretext.
 						'<a style="'.$style.'" href="'.$srcl.'"  class="fc_image_thumb jcepopup" '.$group_str.' title="'.$title_attr.'">
@@ -1675,11 +1676,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						.$inline_info.$posttext;
 					break;
 				case 4:   // Fancybox image popup
-					$title_attr = $desc ? $desc : $title;
+					$title_attr = $desc ? '<span class=\'badge\'>'.$title.'</span> '.$desc : $title;
 					$group_str = $group_name ? 'data-fancybox-group="'.$group_name.'"' : '';
 					$field->{$prop}[] = $pretext.
 						'<a style="'.$style.'" href="'.$srcl.'"  class="fc_image_thumb fancybox" '.$group_str.' title="'.$title_attr.'">
-							'.$img_nolegend.'
+							'.$img_legend.'
 						</a>'
 						.$inline_info.$posttext;
 					break;
@@ -1688,7 +1689,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$group_str = $group_name ? 'data-spotlight-group="'.$group_name.'"' : '';
 					$field->{$prop}[] = $pretext.
 						'<a style="'.$style.'" href="'.$srcl.'" class="fc_image_thumb" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title_attr.'">
-							'.$img_nolegend.'
+							'.$img_legend.'
 							<div class="overlay">
 								'.'<b>'.$title.'</b>: '.$desc.'
 							</div>

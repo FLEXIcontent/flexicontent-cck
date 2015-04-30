@@ -597,6 +597,19 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$db->setQuery($query);
 		$grouped_fields[$field->id] = $db->loadObjectList('id');
 		
+		$_grouped_fields = array();
+		foreach($grouped_fields[$field->id] as $field_id => $grouped_field) {
+			// Create field parameters, if not already created, NOTEL: for 'custom' fields loadFieldConfig() is optional
+			if (empty($grouped_field->parameters)) {
+				$grouped_field->parameters = new JRegistry($grouped_field->attribs);
+			}
+			
+			// Check if field is not set to participate in a field group and skip it
+			if ( !$grouped_field->parameters->get('use_ingroup') ) continue;
+			$_grouped_fields[$field_id] = $grouped_field;
+		}
+		$grouped_fields[$field->id] = $_grouped_fields;
+		
 		return $grouped_fields[$field->id];
 	}
 	
@@ -609,7 +622,6 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$item->fieldvalues = $itemmodel->getCustomFieldsValues($item->id);
 		}
 		
-		$_grouped_fields = array();
 		foreach($grouped_fields as $field_id => $grouped_field)
 		{
 			// Set field values
@@ -622,16 +634,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			// Update max value count
 			$value_count = is_array($grouped_field->value) ? count($grouped_field->value) : 0;
 			$max_count = $value_count > $max_count ? $value_count : $max_count;
-			
-			// Create field parameters, if not already created, NOTEL: for 'custom' fields loadFieldConfig() is optional
-			if (empty($grouped_field->parameters)) {
-				$grouped_field->parameters = new JRegistry($grouped_field->attribs);
-			}
-			
-			// Check if field is set to participate in a field group and include it
-			if ( $grouped_field->parameters->get('use_ingroup') ) $_grouped_fields[] = $grouped_field;
 		}
-		$grouped_fields = $_grouped_fields;
 		
 		// Add empty values the the fields not having enough values
 		foreach($grouped_fields as $field_id => $grouped_field)

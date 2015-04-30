@@ -118,8 +118,8 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LINKTO_URL" description="FLEXI_FIELD_LINKTO_URL_DESC" level="level3" />
 			<field name="linkto_url" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="img-link-url-mode">FLEXI_NO</option>
-				<option value="1" show_list="img-link-url-mode" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="img-link-nourl-mode" hide_list="img-link-url-mode">FLEXI_NO</option>
+				<option value="1" show_list="img-link-url-mode" hide_list="img-link-nourl-mode">FLEXI_YES</option>
 			</field>
 			<field name="url_target" type="list" default="_self" label="FLEXI_FIELD_URL_TARGET" description="FLEXI_FIELD_URL_TARGET_DESC" depend_class="img-link-url-mode" >
 				<option value="_self">FLEXI_FIELD_SAME_FRM_WIN_TAB</option>
@@ -215,10 +215,12 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" level="level3" />
-			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC" class="btn-group btn-group-yesno">
+			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC" class="btn-group btn-group-yesno" depend_class="img-link-nourl-mode">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="usepopup_disabled" type="separator" label="" default="Gallery navigation JS has been disabled, because parameter 'Link to URL' was enabled" description="..." class="alert fcpadded" depend_class="img-link-url-mode" />
+				
 			<field name="popupinview" type="fccheckbox" default=""
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
