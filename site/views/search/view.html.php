@@ -161,16 +161,17 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Use the page heading as document title, (already calculated above via 'appropriate' logic ...)
 		$doc_title = $params->get( 'page_title' );
 		
-		// Check and prepend or append site name
-		if (FLEXI_J16GE) {  // Not available in J1.5
-			// Add Site Name to page title
-			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
-			}
-			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
-			}
-		}
+                // Check and prepend or append site name
+                // Add Site Name to page title
+                if (FLEXI_J16GE && $doc_title != $app->getCfg('sitename') ) {  // Not available in J1.5
+                        // Add Site Name to page title
+                        if ($app->getCfg('sitename_pagetitles', 0) == 1) {
+                                $doc_title = JText::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
+                        }
+                        elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
+                                $doc_title = JText::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
+                        }
+                }
 		
 		// Finally, set document title
 		$document->setTitle($doc_title);
