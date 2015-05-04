@@ -677,3 +677,17 @@ body .tooltip.in {
     opacity: 0.90;
     filter:alpha(opacity=90);
 }
+
+
+/****************************
+ * FLEXIcontent Layout editor
+ ****************************/
+.code_box {
+	width: 100%;
+	margin-bottom: 8px;
+}
+
+.code_box > .btn {
+	min-width: 300px;
+	text-align: left;
+}

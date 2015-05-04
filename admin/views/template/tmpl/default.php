@@ -28,6 +28,7 @@ $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
 $app = JFactory::getApplication();
 $db = JFactory::getDbo();
+JFactory::getApplication()->setUserState('editor.source.syntax', 'css');
 
 $code_btn_lbls = array(
 	'fieldPosXML'=>'FLEXI_ADD_FIELD_POSITION_XML',
@@ -144,11 +145,11 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		if (code_box_cnt<0) code_box_cnt = 0;
 		
 		if (becomes_visible) {
-			_btn.addClass('btn-warning');
+			_btn.addClass('btn-info').find('span').removeClass('icon-eye').addClass('icon-eye-close');
 			el.get(0).select();
 			el.prev().show(400);
 		} else {
-			_btn.removeClass('btn-warning');
+			_btn.removeClass('btn-info').find('span').removeClass('icon-eye-close').addClass('icon-eye');
 			el.prev().hide(400);
 		}
 	}
@@ -163,6 +164,8 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			txtarea.show();
 			CM = CodeMirror.fromTextArea(txtarea.get(0),
 			{
+				mode: "application/x-httpd-php",
+				indentUnit: 2,
 				lineNumbers: true,
 				matchBrackets: true,
 				lineWrapping: true,
@@ -231,6 +234,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		jQuery.each( btn_classes, function( cname, val ) {
 			jQuery('.'+val).show();
 		});
+		if (btn_classes.length)
+			jQuery('#code_box_header').css('display', '');
+		else
+			jQuery('#code_box_header').css('display', 'none');
 		
 		if (load_mode == '2') {
 			form.submit();
@@ -265,6 +272,11 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 	
+	<div class="fctabber tabset_layout" id="tabset_layout" style="margin:16px 0 !important;">
+
+		<div class="tabbertab" id="tabset_layout_information_tab" data-icon-class="icon-info" >
+			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_INFORMATION' ); ?></h3>
+
 	<!--div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 0px 0px 16px 0px !important; padding: 16px 32px !important">
 		<?php echo !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $this->layout->name; ?>
 	</div-->
@@ -371,9 +383,8 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			</td>
 		</tr>
 	</table>
-	
-	
-	<div class="fctabber tabset_layout" id="tabset_layout" style="margin:32px 0 !important;">
+		
+		</div>
 		
 		<div class="tabbertab" id="tabset_layout_fields_placement_tab" data-icon-class="icon-signup" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
@@ -677,28 +688,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					$it->next();
 				}
 				?>
-				
-				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
-					<span id="layout_edit_" class="label label-info"><?php echo JText::_( 'FLEXI_TEMPLATE_CODE' ); ?></span>
-				</span>
-				<div class="fcclear"></div>
-			
-			<?php foreach ($code_btn_lbls as $_posname => $btn_lbl) : ?>
-				<span class="code_box <?php echo $_posname; ?> nowrap_box" style="display:none;" >
-					<span class="btn <?php echo $tip_class; ?>"
-						title="<?php echo flexicontent_html::getToolTip('Insert code', $code_btn_tips[$_posname], 0, 1); ?>"
-						onclick="toggle_code_inputbox(this);"><span class="icon-new"></span><?php echo JText::_( $code_btn_lbls[$_posname] ); ?></span>
-					<span class="nowrap_box" style="display:none; float:left; clear:both; margin:2px 0px 0px 0px;">
-						<div class="alert alert-warning" style="clear:both; margin:2px 0px 2px 0px;"><?php echo JText::_( 'FLEXI_COPY_CODE' ); ?></div>
-						<div class="alert alert-info" style="clear:both; margin:2px 0px 2px 0px;">
-							<?php echo $code_btn_tips[$_posname]; ?>
-						</div>
-					</span>
-					<textarea style="float:left; clear:both; display:none; width:100%;" rows="6" form="code_insertion_form"><?php echo htmlspecialchars($code_btn_rawcode[$_posname]); ?></textarea>
-				</span>
-				<?php endforeach; ?>
 			</div>
-			
 
 			<div id="layout-fileeditor-container" class="span8" style="margin:0.5%;">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
@@ -712,7 +702,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				<?php
 				if ($use_editor) {
 					$editor = JFactory::getEditor('codemirror');
-					$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
+					$editor_plg_params = array('mode'=>'php');  // Override parameters of the editor plugin, ignored by most editors !!
 				}
 				
 				$elementid_n = "editor__file_contents";  $fieldname_n = "file_contents";
@@ -743,6 +733,26 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				title="<?php echo flexicontent_html::getToolTip('System\'s default code', 'Please note that this loads the <b>system\'s default</b> for the current file, which maybe different than <b>template\'s default</b> code', 0, 1); ?>"
 				/>
 				
+				
+				<span class="fcsep_level0" id="code_box_header" style="display:none; margin:16px 0 12px 0; background-color:#333; ">
+					<span id="layout_edit_" class="label label-info"><?php echo JText::_( 'FLEXI_INSERT_TEMPLATE_CODE' ); ?></span>
+				</span>
+				<div class="fcclear"></div>
+				
+				<?php foreach ($code_btn_lbls as $_posname => $btn_lbl) : ?>
+				<span class="code_box <?php echo $_posname; ?> nowrap_box" style="display:none;" >
+					<span class="btn <?php echo $tip_class; ?>"
+						title="<?php echo flexicontent_html::getToolTip('Insert code', $code_btn_tips[$_posname], 0, 1); ?>"
+						onclick="toggle_code_inputbox(this);"><span class="icon-eye"></span><?php echo JText::_( $code_btn_lbls[$_posname] ); ?></span>
+					<span class="nowrap_box" style="display:none; float:left; clear:both; margin:2px 0px 0px 0px;">
+						<div class="alert alert-warning" style="clear:both; margin:2px 0px 2px 0px;"><?php echo JText::_( 'FLEXI_COPY_CODE' ); ?></div>
+						<div class="alert alert-info" style="clear:both; margin:2px 0px 2px 0px;">
+							<?php echo $code_btn_tips[$_posname]; ?>
+						</div>
+					</span>
+					<textarea style="float:left; clear:both; display:none; width:100%;" rows="24" form="code_insertion_form"><?php echo htmlspecialchars($code_btn_rawcode[$_posname]); ?></textarea>
+				</span>
+				<?php endforeach; ?>
 				
 			</div>
 			
