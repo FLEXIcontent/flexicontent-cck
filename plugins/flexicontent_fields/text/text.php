@@ -344,7 +344,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Value handling parameters
-		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
+		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 0);
 		$clean_output = $field->parameters->get('clean_output', 0);
 		$encode_output = $field->parameters->get('encode_output', 0);
 		$multiple = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
@@ -660,7 +660,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$field_prompt = $field->parameters->get('select_field_prompt', $default_prompt);
 		$options[] = JHTML::_('select.option', '', '-'.JText::_($field_prompt).'-');
 		
-		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
+		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 0);
 		if ($results) foreach($results as $result) {
 			if ( !strlen($result->value) ) continue;
 			$options[] = JHTML::_('select.option', $result->value, ($lang_filter_values ? JText::_($result->text) : $result->text));
