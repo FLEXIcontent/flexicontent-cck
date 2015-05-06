@@ -344,7 +344,7 @@ class FlexicontentFields
 				$query 	= 'SELECT fi.*'
 					. $select_access
 					. ' FROM #__flexicontent_fields AS fi'
-					. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = '.$item->type_id
+					. ' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = '.$item->type_id
 					. ' WHERE fi.published = 1'
 					. ' GROUP BY fi.id'
 					. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
