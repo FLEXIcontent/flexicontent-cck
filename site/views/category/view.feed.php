@@ -109,7 +109,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 			// url link to article
 			// & used instead of &amp; as this is converted by feed creator
-			$link = $domain . JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $category->slug, 0, $row));
+			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $category->slug, 0, $row));
 
 			// strip html from feed item description text
 			$description	= $feed_summary ? $row->introtext.$row->fulltext : $row->introtext;
