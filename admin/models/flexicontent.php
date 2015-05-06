@@ -1263,6 +1263,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 		
 		/*$map = array(
+			'account_via_submit'=>'FLEXIcontent - User account via submit',
+			'authoritems'=>'FLEXIcontent - Author Items (More items by this Author)',
 			'addressint'=>'FLEXIcontent - Address International / Google Maps',
 			'checkbox'=>'FLEXIcontent - Checkbox',
 			'checkboximage'=>'FLEXIcontent - Checkbox Image',

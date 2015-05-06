@@ -5739,7 +5739,7 @@ class flexicontent_db
 			JText::_('FLEXI_MULTIPLE_PROP_FIELDS')      => array('weblink', 'email', 'extendedweblink', 'phonenumbers', 'termlist'),
 			JText::_('FLEXI_MEDIA_MINI_APPS_FIELDS')    => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
 			JText::_('FLEXI_ITEM_FORM_FIELDS')          => array('fieldgroup', 'account_via_submit', 'groupmarker', 'coreprops'),
-			JText::_('FLEXI_DISPLAY_MANAGEMENT_FIELDS') => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist'),
+			JText::_('FLEXI_DISPLAY_MANAGEMENT_FIELDS') => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist', 'authoritems'),
 			JText::_('FLEXI_ITEM_RELATION_FIELDS')      => array('relation', 'relation_reverse', 'autorelationfilters')
 		);
 		foreach($grps as $grpname => $field_type_arr)
