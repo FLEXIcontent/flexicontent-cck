@@ -120,6 +120,11 @@ if ($lead_catblock || $intro_catblock) {
 // ONLY FIRST PAGE has leading content items
 if ($this->limitstart != 0) $leadnum = 0;
 
+$lead_cut_text  = $this->params->get('lead_cut_text', 400);
+$intro_cut_text = $this->params->get('intro_cut_text', 200);
+$uncut_length = 0;
+FlexicontentFields::getFieldDisplay($items, 'text', $values=null, $method='display'); // Render 'text' (description) field for all items
+
 if ($leadnum) :
 	//added to intercept more columns (see also css changes)
 	$lead_cols = $this->params->get('lead_cols', 2);
@@ -331,9 +336,9 @@ if ($leadnum) :
 			<?php endif; ?>
 			<p>
 			<?php
-				FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
+				//FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
 				if ($this->params->get('lead_strip_html', 1)) :
-					echo flexicontent_html::striptagsandcut( $item->fields['text']->display, $this->params->get('lead_cut_text', 400) );
+					echo flexicontent_html::striptagsandcut( $item->fields['text']->display, $lead_cut_text, $uncut_length );
 				else :
 					echo $item->fields['text']->display;
 				endif;
@@ -397,7 +402,7 @@ if ($leadnum) :
 
 			<?php
 				$readmore_forced = $this->params->get('show_readmore', 1) == -1 || $this->params->get('lead_strip_html', 1) == 1 ;
-				$readmore_shown  = $this->params->get('show_readmore', 1) && strlen(trim($item->fulltext)) >= 1;
+				$readmore_shown  = $this->params->get('show_readmore', 1) && ($uncut_length > $lead_cut_text || strlen(trim($item->fulltext)) >= 1);
 				$readmore_shown  = $readmore_shown || $readmore_forced;
 				$footer_shown = $readmore_shown || $item->event->afterDisplayContent;
 			?>
@@ -646,9 +651,9 @@ if ($count > $leadnum) :
 			<?php endif; ?>
 			<p>
 			<?php
-				FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
+				//FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
 				if ($this->params->get('intro_strip_html', 1)) :
-					echo flexicontent_html::striptagsandcut( $item->fields['text']->display, $this->params->get('intro_cut_text', 200) );
+					echo flexicontent_html::striptagsandcut( $item->fields['text']->display, $intro_cut_text, $uncut_length );
 				else :
 					echo $item->fields['text']->display;
 				endif;
@@ -713,7 +718,7 @@ if ($count > $leadnum) :
 
 			<?php
 				$readmore_forced = $this->params->get('show_readmore', 1) == -1 || $this->params->get('intro_strip_html', 1) == 1 ;
-				$readmore_shown  = $this->params->get('show_readmore', 1) && strlen(trim($item->fulltext)) >= 1;
+				$readmore_shown  = $this->params->get('show_readmore', 1) && ($uncut_length > $intro_cut_text || strlen(trim($item->fulltext)) >= 1);
 				$readmore_shown  = $readmore_shown || $readmore_forced;
 				$footer_shown = $readmore_shown || $item->event->afterDisplayContent;
 			?>

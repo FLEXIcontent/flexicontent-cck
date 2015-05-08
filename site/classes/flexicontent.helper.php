@@ -1165,7 +1165,7 @@ class flexicontent_html
 	 * @return 	string
 	 * @since 1.5
 	 */
-	static function striptagsandcut( $text, $chars=null )
+	static function striptagsandcut( $text, $chars=null, &$uncut_length=0 )
 	{
 		// Convert html entities to characters so that they will not be removed ... by strip_tags
 		$text = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8');
@@ -1194,11 +1194,11 @@ class flexicontent_html
 		$cleantext = preg_replace('/[\p{Z}\s]{2,}/u', ' ', $cleantext);  // Unicode safe whitespace replacing
 		
 		// Calculate length according to UTF-8 encoding
-		$length = JString::strlen($cleantext);
+		$uncut_length = JString::strlen($cleantext);
 		
 		// Cut off the text if required but reencode html entities before doing so
 		if ($chars) {
-			if ($length > $chars) {
+			if ($uncut_length > $chars) {
 				$cleantext = JString::substr( $cleantext, 0, $chars ).'...';
 			}
 		}

@@ -43,7 +43,7 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_FORCE_READ_MORE</option>
-				<option value="2">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_IF_NEEDED</option>
 			</field>
 			<field name="lead_cut_text" type="text" size="4" default="" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
 			<field name="leadingitems_img_sep" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
@@ -115,7 +115,7 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_FORCE_READ_MORE</option>
-				<option value="2">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_IF_NEEDED</option>
 			</field>
 			<field name="intro_cut_text" type="text" size="4" default="" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
 			<field name="introitems_img_sep" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />

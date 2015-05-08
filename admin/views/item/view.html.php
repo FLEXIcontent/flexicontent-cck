@@ -182,6 +182,7 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 
 		// Add a preview button for LATEST version of the item
+		$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef');
 		if ( $cid )
 		{
 			// Domain URL and autologin vars
@@ -194,7 +195,8 @@ class FlexicontentViewItem extends JViewLegacy
 			if ( $isAdmin ) JFactory::$application = JApplication::getInstance('site');
 			
 			// Create the URL
-			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug) . $autologin );
+			$item_url = FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug) . $autologin;
+			$item_url = $_sh404sef ? $item_url : JRoute::_($item_url);  // Non SEF url if SH404SEF is installed
 			
 			// Check if we are in the backend again
 			// In backend we need to remove administrator from URL as it is added even though we've set the application to the site app
