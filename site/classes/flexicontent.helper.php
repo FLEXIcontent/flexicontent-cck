@@ -440,9 +440,8 @@ class flexicontent_html
 		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = explode("|", $allowed_tmpls);
 		
 		$_options = $type=='clayout' ? $displayed_tmpls : $allowed_tmpls;
-		if (!count($_options)) {
-			return '<input type="hidden" name="clayout" value="'.JRequest::getVar($type).'" />';
-		}
+		// Return if none allowed clayout(s) were configured
+		if (!count($_options))  return false;
 		
 		$app    = JFactory::getApplication();
 		$option = JRequest::getCmd('option');

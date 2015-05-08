@@ -425,14 +425,19 @@ class plgSystemFlexisystem extends JPlugin
 		global $globalcats;
 		$db = JFactory::getDBO();
 		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 : 0;
-
+		$_nowDate = 'UTC_TIMESTAMP()';
+		$nullDate	= $db->getNullDate();
+		
 		// get the category tree and append the ancestors to each node
 		$query	= 'SELECT c.id, c.parent_id, c.published, c.access, c.title, c.level, c.lft, c.rgt, c.language,'
 			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS slug,'
 			. '  COUNT(rel.itemid) AS numitems'
 			. ' FROM #__categories as c'
 			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
-			. ' LEFT JOIN #__content AS i ON rel.itemid=i.id AND i.state IN (1,-5)'
+			. ' LEFT JOIN #__content AS i ON rel.itemid=i.id '
+			. '  AND i.state IN (1,-5) '
+			. '  AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
+			. '  AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )'
 			. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.lft > ' . FLEXI_LFT_CATEGORY . ' AND c.rgt < ' . FLEXI_RGT_CATEGORY
 			. ' GROUP BY rel.catid'
 			. ' ORDER BY c.parent_id, c.lft'

@@ -17,8 +17,8 @@ foreach ($list as $cat) :
 		<h<?php echo $params->get('item_heading') + $levelup; ?>>
 		<a href="<?php echo $cat_link; ?>">
 		<?php echo $cat->title;?>
-			<?php if ($params->get('numitems')) : ?>
-				(<?php echo $cat->numitems; ?>)
+			<?php if ($params->get('numitems') && isset($globalcats[$cat->id])) : ?>
+				(<?php echo /*$cat->numitems*/ (int)(@$globalcats[$cat->id]->totalitems); ?>)
 			<?php endif; ?>
 		</a>
    		</h<?php echo $params->get('item_heading') + $levelup; ?>>

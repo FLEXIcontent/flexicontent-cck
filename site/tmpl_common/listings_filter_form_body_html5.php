@@ -69,7 +69,11 @@ $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 	
 	</div>
 	<!-- BOF items total-->
+	
+<?php endif; ?>
 
+<?php if (!$clayout_selector) : ?>
+	<input type="hidden" name="clayout" value="<?php JRequest::getVar('clayout'); ?>" />
 <?php endif; ?>
 
 <?php if (JRequest::getCmd('print')) : ?>
