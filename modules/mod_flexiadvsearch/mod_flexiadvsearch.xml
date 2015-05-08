@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6" client="site" method="upgrade">
-	<name>Advanced Search Module for FLEXIcontent</name>
+	<name>MOD_FLEXIADVSEARCH_NAME</name>
 	<author>Suriya Kaewmungmuang, ggppdk</author>
 	<creationDate>29/06/2011</creationDate>
 	<copyright>(C) 2011 flexicontent.org</copyright>
@@ -8,7 +8,7 @@
 	<authorEmail>enjoyman@gmail.com</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>1.0</version>
-	<description>Advanced Search Module for FLEXIcontent</description>
+	<description>MOD_FLEXIADVSEARCH_XML_DESCRIPTION</description>
 	
 	<files>
 		<filename module="mod_flexiadvsearch">mod_flexiadvsearch.php</filename>
@@ -21,6 +21,7 @@
 	
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexiadvsearch.ini</language>
+		<language tag="en-GB">languages/en-GB.mod_flexiadvsearch.sys.ini</language>
 	</languages>
 	
 	<config>

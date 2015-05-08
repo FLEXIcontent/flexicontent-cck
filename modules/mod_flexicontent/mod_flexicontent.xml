@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6" client="site" method="upgrade">
-	<name>Universal Content Module for FLEXIcontent</name>
+	<name>MOD_FLEXICONTENT_NAME</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>12/04/2011</creationDate>
 	<copyright>(C) 2009 Emmanuel Danan</copyright>
@@ -8,7 +8,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>1.3</version>
-	<description>Universal Content Module for FLEXIcontent</description>
+	<description>MOD_FLEXICONTENT_XML_DESCRIPTION</description>
 	
 	<files>
 		<filename module="mod_flexicontent">mod_flexicontent.php</filename>
@@ -22,11 +22,12 @@
 	
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexicontent.ini</language>
+		<language tag="en-GB">languages/en-GB.mod_flexicontent.sys.ini</language>
 	</languages>
 	
 	<config>
 	<fields name="params" addfieldpath="/modules/mod_flexicontent/elements">
-
+		
 		<fieldset name="basic">
 			
 			<field name="" type="separator" default="FLEXI_UMOD_BASIC_PARAMETERS_DESC" level="level4" />

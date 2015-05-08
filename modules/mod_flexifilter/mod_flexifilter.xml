@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6" client="site" method="upgrade">
-	<name>Content Lists Filter Module for FLEXIcontent</name>
+	<name>MOD_FLEXIFILTER_NAME</name>
 	<author>George Papadakis</author>
 	<creationDate>November 2012</creationDate>
 	<copyright>Copyright © 2012 George Papadakis</copyright>
@@ -8,7 +8,7 @@
 	<authorEmail></authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>1.0</version>
-	<description>Content Lists Filter Module for FLEXIcontent</description>
+	<description>MOD_FLEXIFILTER_XML_DESCRIPTION</description>
 	
 	<files>
 		<filename module="mod_flexifilter">mod_flexifilter.php</filename>
@@ -21,6 +21,7 @@
 	
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexifilter.ini</language>
+		<language tag="en-GB">languages/en-GB.mod_flexifilter.sys.ini</language>
 	</languages>
 	
 	<config>

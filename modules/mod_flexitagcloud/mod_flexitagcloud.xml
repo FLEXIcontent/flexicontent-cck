@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6" client="site" method="upgrade">
-	<name>Tag Cloud Module for FLEXIcontent</name>
+	<name>MOD_FLEXITAGSCLOUD_NAME</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>09/11/2009</creationDate>
 	<copyright>(C) 2008 - 2009 Christoph Lukes</copyright>
@@ -9,7 +9,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>1.1</version>
-	<description>Tag Cloud Module for FLEXIcontent</description>
+	<description>MOD_FLEXITAGSCLOUD_XML_DESCRIPTION</description>
 	
 	<files>
 		<filename module="mod_flexitagcloud">mod_flexitagcloud.php</filename>
@@ -21,6 +21,7 @@
 	
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexitagcloud.ini</language>
+		<language tag="en-GB">languages/en-GB.mod_flexitagcloud.sys.ini</language>
 	</languages>
 	
 	<config>

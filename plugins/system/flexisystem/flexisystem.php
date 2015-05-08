@@ -427,21 +427,16 @@ class plgSystemFlexisystem extends JPlugin
 		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 : 0;
 
 		// get the category tree and append the ancestors to each node
-		if (FLEXI_J16GE) {
-			$query	= 'SELECT id, parent_id, published, access, title, level, lft, rgt, language,'
-				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
-				. ' FROM #__categories as c'
-				. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND lft > ' . FLEXI_LFT_CATEGORY . ' AND rgt < ' . FLEXI_RGT_CATEGORY
-				. ' ORDER BY parent_id, lft'
-				;
-		} else {
-			$query	= 'SELECT id, parent_id, published, access, title,'
-				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
-				. ' FROM #__categories'
-				. ' WHERE section = ' . FLEXI_SECTION
-				. ' ORDER BY parent_id, ordering'
-				;
-		}
+		$query	= 'SELECT c.id, c.parent_id, c.published, c.access, c.title, c.level, c.lft, c.rgt, c.language,'
+			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS slug,'
+			. '  COUNT(rel.itemid) AS numitems'
+			. ' FROM #__categories as c'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.catid'
+			. ' LEFT JOIN #__content AS i ON rel.itemid=i.id AND i.state IN (1,-5)'
+			. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.lft > ' . FLEXI_LFT_CATEGORY . ' AND c.rgt < ' . FLEXI_RGT_CATEGORY
+			. ' GROUP BY rel.catid'
+			. ' ORDER BY c.parent_id, c.lft'
+			;
 		$db->setQuery($query);
 		$cats = $db->loadObjectList();
 
@@ -472,6 +467,7 @@ class plgSystemFlexisystem extends JPlugin
 			$cat->ancestorsarray     = $cat->ancestors;
 			$cat->ancestors          = implode(',', $cat->ancestors);
 			$cat->descendantsarray   = plgSystemFlexisystem::_getDescendants($cat);
+			$cat->totalitems         = plgSystemFlexisystem::_getItemCounts($cat);
 			$cat->descendants        = implode(',', $cat->descendantsarray);
 			$cat->language           = isset($cat->language) ? $cat->language : '';
 		}
@@ -560,6 +556,30 @@ class plgSystemFlexisystem extends JPlugin
 			foreach( $v->childrenarray as $child ) $stack[] = $child;
 		}
 		return $descendants;
+	}
+	
+	
+	/**
+	 * Utility Function:
+	 * Get the total number of items of each category node
+	 *
+	 * @access private
+	 * @return array
+	 */
+	static private function _getItemCounts($cat)
+	{
+		$totalItems = 0;
+		$stack = array();
+		$stack[] = $cat;
+		
+		while( count($stack) ) {
+			$v = array_pop($stack);
+			$totalItems += $v->numitems;
+			
+			if ( empty($v->childrenarray) ) continue;
+			foreach( $v->childrenarray as $child ) $stack[] = $child;
+		}
+		return $totalItems;
 	}
 	
 	
