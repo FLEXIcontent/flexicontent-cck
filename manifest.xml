@@ -218,10 +218,11 @@
 		<plugin name="flexiadvroute"      folder="plugins/system/flexiadvroute"     instfolder="system">System - Flexiadvroute, advanced routing functions</plugin>
 		
 		<!-- Modules -->
-		<module name="mod_flexicontent"   folder="modules/mod_flexicontent">Universal Content for FLEXIcontent</module>
-		<module name="mod_flexifilter"    folder="modules/mod_flexifilter">Content Lists Filter for FLEXIcontent</module>
-		<module name="mod_flexitagcloud"  folder="modules/mod_flexitagcloud">Tag Cloud for FLEXIcontent</module>
-		<module name="mod_flexiadvsearch" folder="modules/mod_flexiadvsearch">Advanced Search for FLEXIcontent</module>
+		<module name="mod_flexicategories" folder="modules/mod_flexicategories">FLEXIcontent - Categories</module>
+		<module name="mod_flexicontent"    folder="modules/mod_flexicontent">FLEXIcontent - Universal Content</module>
+		<module name="mod_flexifilter"     folder="modules/mod_flexifilter">FLEXIcontent - Content Lists Filtering</module>
+		<module name="mod_flexitagcloud"   folder="modules/mod_flexitagcloud">FLEXIcontent - Tags Cloud</module>
+		<module name="mod_flexiadvsearch"  folder="modules/mod_flexiadvsearch">FLEXIcontent - Search</module>
 	</additional>
 		
 </extension>
