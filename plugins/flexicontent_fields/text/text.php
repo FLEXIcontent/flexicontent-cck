@@ -347,6 +347,12 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 0);
 		$clean_output = $field->parameters->get('clean_output', 0);
 		$encode_output = $field->parameters->get('encode_output', 0);
+		$format_output = $field->parameters->get('format_output', 0);
+		if ($format_output==1) {
+			$decimal_digits_displayed = (int)$field->parameters->get('decimal_digits_displayed', 2);
+			$decimal_digits_sep    = $field->parameters->get('decimal_digits_sep', '.');
+			$decimal_thousands_sep = $field->parameters->get('decimal_thousands_sep', ',');
+		}
 		$multiple = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
 		
 		
@@ -371,7 +377,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ($clean_output) {
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
-		if ($lang_filter_values || $clean_output || $encode_output)
+		if ($lang_filter_values || $clean_output || $encode_output || $format_output)
 		{
 			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
@@ -386,6 +392,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 				}
 				if ($encode_output) {
 					$value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+				}
+				if ($format_output==1) {
+					$value = number_format($value, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
 				}
 			}
 			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!

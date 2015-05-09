@@ -94,7 +94,7 @@ class FlexicontentViewField extends JViewLegacy
 		$btn_task    = $ctrl.'exportsql';
 		$extra_js    = "";
 		flexicontent_html::addToolBarButton(
-			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
+			'Export SQL', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
 			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 
 		

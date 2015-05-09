@@ -1703,7 +1703,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$cat_default_layout = 'blog';  // Layout default
 			$fixed_clayout = isset($themes->category->{$cat_default_layout}) ? $cat_default_layout : 'default';
-			$app->enqueueMessage("<small>Current category Layout (template) is '$clayout' does not exist<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
+			JFactory::getApplication()->enqueueMessage("<small>Current category Layout (template) is '$clayout' does not exist<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
 			$clayout = $fixed_clayout;
 			FLEXIUtilities::loadTemplateLanguageFile( $clayout ); // Manually load Template-Specific language file of back fall clayout
 		}

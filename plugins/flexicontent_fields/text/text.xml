@@ -140,6 +140,16 @@
 				<option value="2">FLEXI_ALL_HTML</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_FIELD_TEXT_CUSTOM_OUTPUT" description="" level="level3"  />
+			<field name="format_output" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_TEXT_FORMAT_AS" description="FLEXI_FIELD_TEXT_FORMAT_AS_DESC" toggle_related="1" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="output-as-decimal">FLEXI_FIELD_TEXT_UNFORMATED</option>
+				<option value="1" show_list="output-as-decimal" hide_list="">FLEXI_FIELD_TEXT_DECIMAL</option>
+			</field>
+			<field name="decimal_digits_displayed" type="text" default="2" label="FLEXI_FIELD_TEXT_DECIMAL_DIGITS" description="FLEXI_FIELD_TEXT_DECIMAL_DIGITS_DESC" depend_class="output-as-decimal"/>
+			<field name="decimal_digits_sep" type="text" default="." label="FLEXI_FIELD_TEXT_DECIMAL_POINT_CHARACTER" description="FLEXI_FIELD_TEXT_DECIMAL_POINT_CHARACTER_DESC" depend_class="output-as-decimal"/>
+			<field name="decimal_thousands_sep" type="text" default="," label="FLEXI_FIELD_TEXT_DECIMAL_THOUSANDS_SEP" description="FLEXI_FIELD_TEXT_DECIMAL_THOUSANDS_SEP_DESC" depend_class="output-as-decimal"/>
+			
+			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>

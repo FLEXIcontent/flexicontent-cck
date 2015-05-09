@@ -192,22 +192,24 @@ class FlexicontentViewItem extends JViewLegacy
 			// Check if we are in the backend, in the back end we need to set the application to the site app instead
 			// we do not remove 'isAdmin' check so that we can copy later without change, e.g. to a plugin
 			$isAdmin = JFactory::getApplication()->isAdmin();
-			if ( $isAdmin ) JFactory::$application = JApplication::getInstance('site');
+			if ( $isAdmin && !defined('SH404SEF_IS_RUNNING') ) JFactory::$application = JApplication::getInstance('site');
 			
 			// Create the URL
-			$item_url = FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug) . $autologin;
-			$item_url = $_sh404sef ? $item_url : JRoute::_($item_url);  // Non SEF url if SH404SEF is installed
+			$item_url = FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug);
+			$item_url = defined('SH404SEF_IS_RUNNING') ?
+				Sh404sefHelperGeneral::getSefFromNonSef($item_url, $fullyQualified = true, $xhtml = false, $ssl = null) :
+				JRoute::_($item_url);
 			
 			// Check if we are in the backend again
 			// In backend we need to remove administrator from URL as it is added even though we've set the application to the site app
-			if( $isAdmin ) {
+			if( $isAdmin && !defined('SH404SEF_IS_RUNNING') ) {
 				$admin_folder = str_replace(JURI::root(true),'',JURI::base(true));
-				$item_url = str_replace($admin_folder, '', $item_url);
+				$item_url = str_replace($admin_folder.'/', '/', $item_url);
 				// Restore application
 				JFactory::$application = JApplication::getInstance('administrator');
 			}
 			
-			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? '&' : '?') .'preview=1';
+			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? '&' : '?') .'preview=1' . $autologin;
 			//$previewlink     = str_replace('&amp;', '&', $previewlink);
 			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)) .$autologin;
 
