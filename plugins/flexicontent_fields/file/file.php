@@ -154,6 +154,15 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					return 'cancel';
 				}
 				
+				if (1)
+				{
+					// A non-empty container is being removed ... get counter (which is optionally used as 'required' form element and empty it if is 1, or decrement if 2 or more)
+					var valcounter = document.getElementById('".$field->name."');
+					if ( typeof valcounter.value === 'undefined' || valcounter.value=='' ) valcounter.value = '1';
+					else valcounter.value = parseInt(valcounter.value) + 1;
+					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
+				}
+				
 				var lastField = null;
 				var newField = jQuery('\
 				<li class=\"".$value_classes."\">\
@@ -205,6 +214,14 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			{
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				if ( 1 )
+				{
+					// A deleted container always has a value, thus decrement (or empty) the counter value in the 'required' form element
+					var valcounter = document.getElementById('".$field->name."');
+					valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
+					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
+				}
 				
 				// Add empty container if last element, instantly removing the given field value container
 				if(rowCount".$field->id." == 0)

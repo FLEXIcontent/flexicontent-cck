@@ -334,7 +334,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var existingfftag = '".($image_source ? "input" :"select")."' + '.existingname';
 				var originalname = row.find( originalfftag ).val();
 				var existingname = row.find( existingfftag ).val();
-				if ( originalname != '' || existingname != '' ) {
+				
+				if ( originalname != '' || existingname != '' )
+				{
+					// A non-empty container is being removed ... get counter (which is optionally used as 'required' form element and empty it if is 1, or decrement if 2 or more)
 					var valcounter = document.getElementById('".$field->name."');
 					valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
@@ -407,9 +410,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var originalname = original_obj.val();
 				var existingname = existingAllowed ? existing_obj.val() : '';
 				
-				// Get counter
-				var valcounter = document.getElementById('".$field->name."');
-				
 				// a flag if file URL was given
 				var fileUrlGiven = file_url!='';
 				
@@ -448,22 +448,27 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						jQuery('#' + elementid + '_newfile' ).addClass('no_value_selected').val('');
 					}
 					
-					// Update value counter, we do not use ZERO, instead we set to empty string, so that is-required validation works
-					if (modify>0) {
+					// Increment/decrement the form field used as value counter, we do not use ZERO in case of decrement, instead we set to empty string, so that is-required validation works
+					var valcounter = document.getElementById('".$field->name."');
+					if (modify>0)
+					{
 						if ( typeof valcounter.value === 'undefined' || valcounter.value=='' ) valcounter.value = '1';
 						else valcounter.value = parseInt(valcounter.value) + modify;
-						
 						hasvalue_obj.val('1');  // value assigned
-					} else if (modify<0) {
+					}
+					
+					else if (modify<0)
+					{
 						if ( valcounter.value=='1' ) valcounter.value = '';
 						else valcounter.value = parseInt(valcounter.value) + modify;
-						
 						hasvalue_obj.val('');  // value de-assigned, (or ? fieldgroup is being deleted)
 					}
 					
 				} else {  // Folder mode
-				
+					
 					if ( originalname=='' && existingname=='' ) {
+						// Increment/Make non-empty the form field used as value counter, so that is-required validation works
+						var valcounter = document.getElementById('".$field->name."');
 						if ( valcounter.value=='' ) valcounter.value = '1';
 						else valcounter.value = parseInt(valcounter.value) + 1;
 					}

@@ -118,6 +118,15 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					return 'cancel';
 				}
 				
+				if (1)
+				{
+					// A non-empty container is being removed ... get counter (which is optionally used as 'required' form element and empty it if is 1, or decrement if 2 or more)
+					var valcounter = document.getElementById('".$field->name."');
+					if ( typeof valcounter.value === 'undefined' || valcounter.value=='' ) valcounter.value = '1';
+					else valcounter.value = parseInt(valcounter.value) + 1;
+					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
+				}
+				
 				if (file.substring(0,7)!='http://' || file.substring(0,8)!='https://') {
 					file = '".str_replace('\\','/', JPATH_ROOT)."/".$mediapath."/'+file;
 				}
@@ -165,6 +174,14 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			{
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				if ( 1 )
+				{
+					// A deleted container always has a value, thus decrement (or empty) the counter value in the 'required' form element
+					var valcounter = document.getElementById('".$field->name."');
+					valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
+					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
+				}
 				
 				// Add empty container if last element, instantly removing the given field value container
 				if(rowCount".$field->id." == 0)
