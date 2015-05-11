@@ -161,16 +161,18 @@ $r = 0;
 						
 						<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 						
-						<button class="fc_button button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
+						<?php $button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple'; ?>
+						<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
 						
 						<?php if ($autodisplayadvoptions) {
 							$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
 							$checked_class = $use_advsearch_options ? 'highlight' : '';
-							$use_advsearch_options_ff = '';
-							$use_advsearch_options_ff .= '<label id="use_advsearch_options_lbl" class="flexi_radiotab rc5 '.$checked_class.'" style="float:none!important; display:inline-block!important; white-space:nowrap;" for="use_advsearch_options">';
-							$use_advsearch_options_ff .= ' <input  href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" id="use_advsearch_options" type="checkbox" name="use_advsearch_options" style="" value="1" '.$checked_attr.' />';
-							$use_advsearch_options_ff .= ' &nbsp;'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS');
+							$use_advsearch_options_ff = '&nbsp;<span class="nowrap_box">';
+							$use_advsearch_options_ff .= '<input  href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" id="use_advsearch_options" type="checkbox" name="use_advsearch_options" style="" value="1" '.$checked_attr.' />';
+							$use_advsearch_options_ff .= '<label id="use_advsearch_options_lbl" class="'.$checked_class.'" style="float:none!important; display:inline-block; white-space:nowrap;" for="use_advsearch_options">';
+							$use_advsearch_options_ff .= JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS');
 							$use_advsearch_options_ff .= '</label>';
+							$use_advsearch_options_ff .= '</span>';
 							echo $use_advsearch_options_ff;
 						} ?>
 					</span>

@@ -423,13 +423,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// Get FROM and JOIN SQL CLAUSES
 			$fromjoin = $this->_buildItemFromJoin($counting=true);
 			
-			// Create JOIN (and select column) of image field used as item image in RSS feed
-			$feed_image_source = JRequest::getCmd("type", "") == "rss"  ?  (int) $params->get('feed_image_source', 0)  :  0;
-			if ($feed_image_source) {
-				$feed_img_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS img ON img.item_id = i.id AND img.field_id='.$feed_image_source;
-				$feed_img_col = ', img.value as image';
-			}
-			
 			// Create sql WHERE clause
 			$where = $this->_buildItemWhere('where', $counting=true);
 			
@@ -486,6 +479,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			// SELECT sub-clause to calculate details of the access level items in regards to current user
 			$select_access = $this->_buildAccessSelect();
+			
+			// Create JOIN (and select column) of image field used as item image in RSS feed
+			$feed_image_source = JRequest::getCmd("type", "") == "rss"  ?  (int) $params->get('feed_image_source', 0)  :  0;
+			if ($feed_image_source) {
+				$feed_img_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS img ON img.item_id = i.id AND img.field_id='.$feed_image_source;
+				$feed_img_col = ', img.value as image';
+			}
 		}
 		
 		if ( $query_ids==-1 ) {
@@ -546,7 +546,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$ordering = 'c.lft ASC';
 
 		$show_noauth = $cparams->get('show_noauth', 0);   // show unauthorized items
-		$display_subcats = $cparams->get('display_subcategories_items', 0);   // include subcategory items
+		$display_subcats = $cparams->get('display_subcategories_items', 2);   // include subcategory items
 		
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';
@@ -1661,6 +1661,32 @@ class FlexicontentModelCategory extends JModelLegacy {
 	
 	
 	/**
+	 * Method to load the Tags Data, when layout is 'tags'
+	 *
+	 * @access public
+	 * @return array
+	 */
+	function getTag()
+	{
+		//get categories
+		$query = 'SELECT t.name, t.id,'
+				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
+				. ' FROM #__flexicontent_tags AS t'
+				. ' WHERE t.id = '.(int)$this->_tagid
+				//. ' AND t.published = 1'
+				;
+		
+		$this->_db->setQuery($query);
+		$this->_tag = $this->_db->loadObject();       // Execute query to load tag properties
+		if ( $this->_tag ) {
+			$this->_tag->parameters = $this->_params;   // Assign tag parameters ( already load by setId() )
+    }
+    
+		return $this->_tag;
+	}
+	
+	
+	/**
 	 * Method to decide which item layout to use
 	 *
 	 * @access	public
@@ -1962,7 +1988,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				//$filter_query = ' AND rel.catid IN ('. implode(",", $values) .')';
 				global $globalcats;
 				$cparams  = $this->_params;
-				$display_subcats = $cparams->get('display_subcategories_items', 0);   // include subcategory items
+				$display_subcats = $cparams->get('display_subcategories_items', 2);   // include subcategory items
 				$query_catids = array();
 				foreach ($values as $id)
 				{

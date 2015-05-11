@@ -2560,7 +2560,7 @@ class FlexicontentFields
 				$options[] = JHTML::_('select.option', $result->value, $result->text, 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
 			}
 			if ($display_filter_as==6 && $combine_tip) {
-				$filter->html	.= ' <span class="fc_filter_tip_inline">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
+				$filter->html	.= ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
 			}
 			if ($display_filter_as==0 || $display_filter_as==6) {
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
@@ -2635,7 +2635,7 @@ class FlexicontentFields
 				.($checked ? ' style="display:none!important;" ' : 'style="background:none!important; padding-left:0px!important;"').'>'.
 				'<span class="fc_delall_filters"></span>';
 			$filter->html .= '</label> '
-				.($combine_tip ? ' <span class="fc_filter_tip_inline">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ' : '')
+				.($combine_tip ? ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ' : '')
 				.' </li>';
 			$i++;
 			

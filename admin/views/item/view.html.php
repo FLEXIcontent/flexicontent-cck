@@ -47,6 +47,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$app        = JFactory::getApplication();
 		$dispatcher = JDispatcher::getInstance();
 		$document   = JFactory::getDocument();
+		$config     = JFactory::getConfig();
 		$session    = JFactory::getSession();
 		$user       = JFactory::getUser();
 		$db         = JFactory::getDBO();
@@ -182,7 +183,8 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 
 		// Add a preview button for LATEST version of the item
-		$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef');
+		//$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef') && $config->get('sef');
+		$_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
 		if ( $cid )
 		{
 			// Domain URL and autologin vars
@@ -192,17 +194,17 @@ class FlexicontentViewItem extends JViewLegacy
 			// Check if we are in the backend, in the back end we need to set the application to the site app instead
 			// we do not remove 'isAdmin' check so that we can copy later without change, e.g. to a plugin
 			$isAdmin = JFactory::getApplication()->isAdmin();
-			if ( $isAdmin && !defined('SH404SEF_IS_RUNNING') ) JFactory::$application = JApplication::getInstance('site');
+			if ( $isAdmin && !$_sh404sef ) JFactory::$application = JApplication::getInstance('site');
 			
 			// Create the URL
 			$item_url = FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug);
-			$item_url = defined('SH404SEF_IS_RUNNING') ?
+			$item_url = $_sh404sef ?
 				Sh404sefHelperGeneral::getSefFromNonSef($item_url, $fullyQualified = true, $xhtml = false, $ssl = null) :
 				JRoute::_($item_url);
 			
 			// Check if we are in the backend again
 			// In backend we need to remove administrator from URL as it is added even though we've set the application to the site app
-			if( $isAdmin && !defined('SH404SEF_IS_RUNNING') ) {
+			if( $isAdmin && !$_sh404sef ) {
 				$admin_folder = str_replace(JURI::root(true),'',JURI::base(true));
 				$item_url = str_replace($admin_folder.'/', '/', $item_url);
 				// Restore application

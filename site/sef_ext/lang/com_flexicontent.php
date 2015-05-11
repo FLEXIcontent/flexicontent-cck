@@ -29,6 +29,12 @@ $sh_LANG ['en'] ['_SH404SEF_FLEXICONTENT_ADD'] = 'Add';
 $sh_LANG ['en'] ['_SH404SEF_FLEXICONTENT_DOWNLOAD'] = 'Download';
 $sh_LANG ['en'] ['_SH404SEF_FLEXICONTENT_WEBLINK'] = 'Weblink';
 
+$sh_LANG ['en'] ['_SH404SEF_FLEXICONTENT_TAGGED'] = 'Tagged';
+$sh_LANG ['en'] ['_SH404SEF_FLEXICONTENT_AUTHORED'] = 'Authored';
+$sh_LANG ['en'] ['_SH404SEF_FLEXICONTENT_FAVOURED'] = 'Favoured';
+$sh_LANG ['en'] ['_SH404SEF_FLEXICONTENT_MYITEMS'] = 'MyItems';
+
+
 // french
 $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_FAVOURITES'] = 'Mes favoris';
 $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_SEARCH'] = 'Recherche';
@@ -39,6 +45,12 @@ $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_ADD'] = 'Ajouter';
 $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_DOWNLOAD'] = 'Télécharger';
 $sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_WEBLINK'] = 'Lien web';
 
+$sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_TAGGED'] = 'Tagged';
+$sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_AUTHORED'] = 'Authored';
+$sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_FAVOURED'] = 'Favoured';
+$sh_LANG ['fr'] ['_SH404SEF_FLEXICONTENT_MYITEMS'] = 'MyItems';
+
+
 // greek
 $sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_FAVOURITES'] = 'Τα αγαπημένα μου';
 $sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_SEARCH'] = 'Αναζήτηση';
@@ -48,5 +60,10 @@ $sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_EDIT'] = 'Επεξεργασία';
 $sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_ADD'] = 'Προσθήκη';
 $sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_DOWNLOAD'] = 'Μεταφόρτωση';
 $sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_WEBLINK'] = 'Ιστοσύνδεσμος';
+
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_TAGGED'] = 'Tagged';
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_AUTHORED'] = 'Authored';
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_FAVOURED'] = 'Favoured';
+$sh_LANG ['el'] ['_SH404SEF_FLEXICONTENT_MYITEMS'] = 'MyItems';
 
 ?>

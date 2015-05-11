@@ -3678,7 +3678,7 @@ class flexicontent_html
 				
 				$item->css_markups['itemcats'][] = '_itemcat_'.$item_cat->id;
 				$item->ecss_markups['itemcats'][] = ($is_featured_cat ? ' mu_featured_cat' : ' mu_normal_cat') . ($mu_addtext_cats ? ' mu_has_text' : '');
-				$item->title_markups['itemcats'][] = $mu_addtext_cats  ?  ($is_featured_cat ? $featured_cats_titles[$item_cat->id] : $globalcats[$item_cat->id]->title)  :  '';
+				$item->title_markups['itemcats'][] = $mu_addtext_cats  ?  ($is_featured_cat ? $featured_cats_titles[$item_cat->id] : (isset($globalcats[$item_cat->id]) ? $globalcats[$item_cat->id]->title : ''))  :  '';
 			}
 			
 			

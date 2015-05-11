@@ -37,10 +37,10 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
 global $globalcats, $globalnopath, $globalnoroute;
 
 // Get some needed HTTP Request variable
-$layout	= JRequest::getVar('layout', null);
-$typeid	= JRequest::getInt('typeid', null);
-$fcu	= JRequest::getVar('fcu', null);
-$fcp	= JRequest::getInt('fcp', null);
+$_layout	= JRequest::getVar('layout', null);
+$_typeid	= JRequest::getInt('typeid', null);
+$_fcu	= JRequest::getVar('fcu', null);
+$_fcp	= JRequest::getInt('fcp', null);
 
 // Insure that the global vars are array
 if (!is_array($globalnopath))	$globalnopath	= array();
@@ -82,10 +82,10 @@ if (!empty($limit))       shRemoveFromGETVarsList('limit');
 if (isset($limitstart))   shRemoveFromGETVarsList('limitstart');
 
 // Added for the preview feature in FLEXIcontent 1.5.5 
-if (!empty($fcu)) {
+if (!empty($_fcu)) {
 	shRemoveFromGETVarsList('fcu');
 	$dosef = false;
-} else if (!empty($fcp)) {
+} else if (!empty($_fcp)) {
 	shRemoveFromGETVarsList('fcp');
 	$dosef = false;
 }
@@ -103,7 +103,7 @@ if (FLEXI_J16GE) {
 
 // Some FLEXIcontent views may only set task variable ... in this case set task variable as view
 if ( !$view && $task == 'search' ) {
-	$view == 'search';
+	$view = 'search';
 }
 
 // Do not convert to SEF urls, the urls for vote and favourites
@@ -116,7 +116,7 @@ switch ($view) {
 	case 'items' : 	case 'item' :
 
 		// Do not convert to SEF urls, the urls for item form
-		if ($layout == 'form' || $task == 'edit' || $task == 'add') return;
+		if ($_layout == 'form' || $task == 'edit' || $task == 'add') return;
 		
 		if (!empty($id)) {
 		
@@ -214,7 +214,7 @@ switch ($view) {
 			}
 			
 		} else {
-			return;
+			return;   // SKIP !!! new item URLs, TODO this case
 			//echo $Itemid."<br>";
 			//echo $shCurrentItemid."<br>";
 			//$shCurrentItemid = $Itemid;
@@ -232,7 +232,8 @@ switch ($view) {
 			shRemoveFromGETVarsList ( 'layout' );
 			shRemoveFromGETVarsList ( 'typeid' );
 		}
-
+		
+		shRemoveFromGETVarsList ( 'view' );
 	break;
 	
 	case 'category' :
@@ -273,9 +274,82 @@ switch ($view) {
 		}
 
 		// Remove the vars from the url
-		if (!empty($cid))
+		if (!empty($cid)) {
 			shRemoveFromGETVarsList ( 'cid' );
-
+			shRemoveFromGETVarsList ( 'view' );  // only unset view if category ID was set
+		}
+		
+		
+		// HANDLE 'tags' layout of category view
+		if (! empty ( $tagid )) {
+			$query 	= 'SELECT id, name FROM #__flexicontent_tags'
+					.' WHERE id = ' . ( int ) $tagid;
+			$database->setQuery ( $query );
+			
+			if (shTranslateURL ( $option, $shLangName ) || !FLEXI_FISH) {
+				$row = $database->loadObject ();
+			} else {
+				$row = $database->loadObject ( null, false );
+			}
+			
+			if ($database->getErrorNum ()) {
+				die ( $database->stderr () );
+			} elseif ($row) {
+				if ($row->name) {
+					$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_TAGGED'] . '/';
+					$title [] = $row->name;
+				}
+			}
+			
+			shRemoveFromGETVarsList ( 'tagid' );
+			shRemoveFromGETVarsList ( 'layout' );
+			shRemoveFromGETVarsList ( 'view' );
+		}
+		
+		
+		// HANDLE 'author' layout of category view
+		if (! empty ( $authorid )) {
+			$query 	= 'SELECT id, name FROM #__users'
+					.' WHERE id = ' . ( int ) $authorid;
+			$database->setQuery ( $query );
+			
+			if (shTranslateURL ( $option, $shLangName ) || !FLEXI_FISH) {
+				$row = $database->loadObject ();
+			} else {
+				$row = $database->loadObject ( null, false );
+			}
+			
+			if ($database->getErrorNum ()) {
+				die ( $database->stderr () );
+			} elseif ($row) {
+				if ($row->name) {
+					$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_AUTHORED'] . '/';
+					$title [] = $row->name;
+				}
+			}
+			
+			shRemoveFromGETVarsList ( 'authorid' );
+			shRemoveFromGETVarsList ( 'layout' );
+			shRemoveFromGETVarsList ( 'view' );
+		}
+		
+		
+		// HANDLE 'myitems' layout of category view
+		if ( !empty ( $layout ) && $layout=='myitems' )
+		{
+			$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_MYITEMS'];
+			shRemoveFromGETVarsList ( 'layout' );
+			shRemoveFromGETVarsList ( 'view' );
+		}
+		
+		
+		// HANDLE 'favs' layout of category view
+		if ( !empty ( $layout ) && $layout=='favs' )
+		{
+			$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_FAVOURED'];
+			shRemoveFromGETVarsList ( 'layout' );
+			shRemoveFromGETVarsList ( 'view' );
+		}
 	break;
 	
 	case 'tags' :
@@ -305,19 +379,22 @@ switch ($view) {
 		// Remove the vars from the url
 		if (!empty($id))
 			shRemoveFromGETVarsList ( 'id' );
-
+		shRemoveFromGETVarsList ( 'view' );
 	break;
 	
 	case 'search' :
 		$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_SEARCH'] . '/';
+		shRemoveFromGETVarsList ( 'view' );
 	break;
 	
 	case 'favourites' :
 		$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_FAVOURITES'] .  '/';
+		shRemoveFromGETVarsList ( 'view' );
 	break;
 
 	case 'flexicontent' :
 		$title [] = $sh_LANG [$shLangIso] ['_SH404SEF_FLEXICONTENT'] . '/';
+		shRemoveFromGETVarsList ( 'view' );
 	break;
 
 	case 'fileselement' :
@@ -355,8 +432,9 @@ if (!empty($task))
 if (!empty($lang))
 	shRemoveFromGETVarsList ( 'lang' );
 
-if (!empty($view))
-	shRemoveFromGETVarsList ( 'view' );
+// This is done per view, to make sure that non-handled views will not unset the view variable, and thus breaking the URL !!
+//if (!empty($view))
+//	shRemoveFromGETVarsList ( 'view' );
 
 if (!empty($Itemid))
 	shRemoveFromGETVarsList ( 'Itemid' );

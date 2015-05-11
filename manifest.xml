@@ -142,6 +142,7 @@
 			<param name="tags_using_catview" default="1" />
 			<param name="favs_using_catview" default="1" />
 			
+			<param name="display_subcategories_items" default="2" />
 			<param name="catlimit" default="100" />
 			<param name="limit" default="10" />
 			<param name="feed_summary" default="0" />

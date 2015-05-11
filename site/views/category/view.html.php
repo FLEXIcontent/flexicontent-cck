@@ -144,6 +144,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		$cids = $layout_vars['cids'];
 		$cid  = $layout_vars['cid'];
 		
+		// Get Tag data if current layout is 'tags'
+		if ($tagid) $tag = $this->get('Tag');
+		
 		$authordescr_item = false;
 		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed') {
 			$authordescr_itemid = $params->get('authordescr_itemid');
@@ -211,6 +214,8 @@ class FlexicontentViewCategory extends JViewLegacy
 				case ''        :  $default_heading = $category->title;  break;
 				case 'myitems' :  $default_heading = JText::_('FLEXICONTENT_MYITEMS');  break;
 				case 'author'  :  $default_heading = JText::_('FLEXICONTENT_AUTHOR')  .': '. JFactory::getUser($authorid)->get('name');  break;
+				case 'tags'    :  $default_heading = JText::_('FLEXI_ITEMS_WITH_TAG') .': '. $tag->name;  break;
+				case 'favs'    :  $default_heading = JText::_('FLEXI_YOUR_FAVOURED_ITEMS');  break;
 				default        :  $default_heading = JText::_('FLEXICONTENT_CATEGORY');
 			}
 			if ($layout && $cid) { // Non-single category listings, limited to a specific category
