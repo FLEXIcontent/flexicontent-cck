@@ -2531,7 +2531,12 @@ class FlexicontentFields
 			$options = array();
 			// MULTI-select does not has an internal label a drop-down list option
 			if ($display_filter_as != 6) {
-				$first_option_txt = $label_filter==2  ?  $filter->label  :  JText::_('FLEXI_ANY');
+				if ($label_filter==2) {
+					$first_option_txt = $filter->label;
+				} else {
+					$first_option_txt = $filter->parameters->get( 'filter_usefirstoption'.$_s, 0) ? $filter->parameters->get( 'filter_firstoptiontext'.$_s, 'FLEXI_ALL') : 'FLEXI_ANY';
+					$first_option_txt = JText::_($first_option_txt);
+				}
 				$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
 			}
 			

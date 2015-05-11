@@ -179,7 +179,6 @@
 			<field name="ns_posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT_NONSELECTED" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_NONSELECTED_DESC" />
 			
 		</fieldset>
-
 		<fieldset name="group-checkboximage-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
@@ -187,17 +186,11 @@
 			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_CONF" description="" level="level2"/>
 			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_WARNING" description="" level="level3"/>
 			<field name="filter_customize_options" type="multilist" subtype="list" default="0" label="FLEXI_CUSTOM_FILTER_VALUES" toggle_related="1" description="FLEXI_CUSTOM_FILTER_VALUES_DESC">
-				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_USE_ALL_VALUES_DEFAULT</option>
-				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_USE_CUSTOM_QUERY</option>
-				<option value="2" show_list="multivalue-mode" hide_list="">FLEXI_USE_CUSTOM_ELEMENTS</option>
+				<option value="0" show_list="" hide_list="filtervalue-mode">FLEXI_USE_ALL_VALUES_DEFAULT</option>
+				<option value="1" show_list="filtervalue-mode" hide_list="">FLEXI_USE_CUSTOM_QUERY</option>
+				<option value="2" show_list="filtervalue-mode" hide_list="">FLEXI_USE_CUSTOM_ELEMENTS</option>
 			</field>
-			<field name="filter_custom_options" type="textarea" rows="6" cols="25" label="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY" depend_class="multivalue-mode" description="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY_DESC" default="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field_id}' AND value != '' GROUP BY value" />
-			<field name="filter_default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
-			<field name="filter_usefirstoption" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="multivalue-mode2">FLEXI_NO</option>
-				<option value="1" show_list="multivalue-mode2" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="filter_firstoptiontext" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="multivalue-mode2" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
+			<field name="filter_custom_options" type="textarea" rows="6" cols="25" label="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY" depend_class="filtervalue-mode" description="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY_DESC" default="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field_id}' AND value != '' GROUP BY value" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
 			
@@ -224,15 +217,21 @@
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
-			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
-				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
-				<option value="2">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
-				<option value="3">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
-				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
-				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
-				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
+			<field name="display_filter_as" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="0" show_list="filt-drop-down" hide_list="">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="1" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
+				<option value="2" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
+				<option value="3" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
+				<option value="4" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
+			<field name="filter_usefirstoption" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="displaydefauttext-mode">FLEXI_NO</option>
+				<option value="1" show_list="displaydefauttext-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="filter_firstoptiontext" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="filt-drop-down displaydefauttext-mode" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
+			
 			<field name="filter_vals_display" type="radio" default="0" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC">
 				<option value="0">FLEXI_LABEL</option>
 				<option value="1">FLEXI_IMAGE</option>
@@ -260,15 +259,21 @@
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
-			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
-				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
-				<option value="2">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
-				<option value="3">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
-				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
-				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
-				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
+			<field name="display_filter_as_s" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="0" show_list="filt-drop-down-s" hide_list="">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="1" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
+				<option value="2" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
+				<option value="3" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
+				<option value="4" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
+			<field name="filter_usefirstoption_s" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down-s" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="displaydefauttext-mode-s">FLEXI_NO</option>
+				<option value="1" show_list="displaydefauttext-mode-s" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="filter_firstoptiontext_s" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="filt-drop-down-s displaydefauttext-mode-s" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
+			
 			<field name="filter_vals_display_s" type="radio" default="0" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC">
 				<option value="0">FLEXI_LABEL</option>
 				<option value="1">FLEXI_IMAGE</option>

@@ -84,6 +84,14 @@
 				<option value="" show_list="" hide_list="regexmask-mode,custommask-mode">FLEXI_NO_MASK</option>
 				<option value="__regex__" show_list="regexmask-mode"  hide_list="custommask-mode">- REGULAR EXPRESSION (regex) -</option>
 				<option value="__custom__" show_list="custommask-mode"  hide_list="regexmask-mode">- CUSTOM MASK (property list)</option>
+				<!-- Various aliases -->
+				<option value="url" show_list="" hide_list="regexmask-mode,custommask-mode">URL</option>
+				<option value="ip" show_list="" hide_list="regexmask-mode,custommask-mode">IP (i.i.i.i)</option>
+				<option value="email" show_list="" hide_list="regexmask-mode,custommask-mode">Email</option>
+				<option value="currency" show_list="" hide_list="regexmask-mode,custommask-mode">Currency ($)</option>
+				<option value="decimal" show_list="" hide_list="regexmask-mode,custommask-mode">Decimal</option>
+				<option value="integer" show_list="" hide_list="regexmask-mode,custommask-mode">Integer</option>
+				<!-- Date aliases -->
 				<option value="dd/mm/yyyy" show_list="" hide_list="regexmask-mode,custommask-mode">Date (dd/mm/yyyy)</option>
 				<option value="mm/dd/yyyy" show_list="" hide_list="regexmask-mode,custommask-mode">Date (mm/dd/yyyy)</option>
 				<option value="yyyy/mm/dd" show_list="" hide_list="regexmask-mode,custommask-mode">Date (yyyy/mm/dd)</option>
@@ -95,16 +103,11 @@
 				<option value="yyyy-mm-dd" show_list="" hide_list="regexmask-mode,custommask-mode">Date (yyyy-mm-dd)</option>
 				<option value="datetime" show_list="" hide_list="regexmask-mode,custommask-mode">Date Time 24h (dd/mm/yyyy hh:mm)</option>
 				<option value="datetime12" show_list="" hide_list="regexmask-mode,custommask-mode">Date Time 12h (dd/mm/yyyy hh:mm xm)</option>
-				<option value="hh:mm t" show_list="" hide_list="regexmask-mode,custommask-mode">Time (hh:mm xm)</option>
-				<!--option value="h:s t">Time (h:s t)</option-->
+				<option value="hh:mm t" show_list="" hide_list="regexmask-mode,custommask-mode">Time (hh:mm t)</option>
+				<option value="h:s t" show_list="" hide_list="regexmask-mode,custommask-mode">Time (h:s t)</option>
 				<option value="hh:mm:ss" show_list="" hide_list="regexmask-mode,custommask-mode">Time (hh:mm:ss)</option>
 				<option value="hh:mm" show_list="" hide_list="regexmask-mode,custommask-mode">Time (hh:mm)</option>
 				<option value="mm/yyyy" show_list="" hide_list="regexmask-mode,custommask-mode">Month/Year (mm/yyyy)</option>
-				<option value="url" show_list="" hide_list="regexmask-mode,custommask-mode">URL</option>
-				<option value="ip" show_list="" hide_list="regexmask-mode,custommask-mode">IP (i.i.i.i)</option>
-				<option value="decimal" show_list="" hide_list="regexmask-mode,custommask-mode">Decimal</option>
-				<!--option value="non-negative-decimal">Non-negative Decimal</option-->
-				<option value="integer" show_list="" hide_list="regexmask-mode,custommask-mode">Integer</option>
 			</field>
 			<field name="regexmask" type="text" default="" label="Regular Expression" depend_class="regexmask-mode" description="See PERL regular expression e.g. [0-9]{0-10}"  />
 			<field name="custommask" type="text" default="" label="FLEXI_VALUE_VALIDATION_CUSTOM_MASK" depend_class="custommask-mode" description="FLEXI_VALUE_VALIDATION_CUSTOM_MASK_DESC" />
@@ -148,6 +151,16 @@
 				<option value="1">FLEXI_UNSAFE_HTML</option>
 				<option value="2">FLEXI_ALL_HTML</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_TEXT_CUSTOM_OUTPUT" description="" level="level3"  />
+			<field name="format_output" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_TEXT_FORMAT_AS" description="FLEXI_FIELD_TEXT_FORMAT_AS_DESC" toggle_related="1" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="output-as-decimal">FLEXI_FIELD_TEXT_UNFORMATED</option>
+				<option value="1" show_list="output-as-decimal" hide_list="">FLEXI_FIELD_TEXT_DECIMAL</option>
+			</field>
+			<field name="decimal_digits_displayed" type="text" default="2" label="FLEXI_FIELD_TEXT_DECIMAL_DIGITS" description="FLEXI_FIELD_TEXT_DECIMAL_DIGITS_DESC" depend_class="output-as-decimal"/>
+			<field name="decimal_digits_sep" type="text" default="." label="FLEXI_FIELD_TEXT_DECIMAL_POINT_CHARACTER" description="FLEXI_FIELD_TEXT_DECIMAL_POINT_CHARACTER_DESC" depend_class="output-as-decimal"/>
+			<field name="decimal_thousands_sep" type="text" default="," label="FLEXI_FIELD_TEXT_DECIMAL_THOUSANDS_SEP" description="FLEXI_FIELD_TEXT_DECIMAL_THOUSANDS_SEP_DESC" depend_class="output-as-decimal"/>
+			
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
@@ -208,12 +221,6 @@
 				<option value="2" show_list="filtervalue-mode" hide_list="">FLEXI_USE_CUSTOM_ELEMENTS</option>
 			</field>
 			<field name="filter_custom_options" type="textarea" rows="6" cols="25" label="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY" depend_class="filtervalue-mode" description="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY_DESC" default="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field_id}' AND value != '' GROUP BY value" />
-			<field name="filter_default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
-			<field name="filter_usefirstoption" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_ADD_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="displaydefauttext-mode">FLEXI_NO</option>
-				<option value="1" show_list="displaydefauttext-mode" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="filter_firstoptiontext" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="displaydefauttext-mode" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
 			
@@ -240,15 +247,21 @@
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
-			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
-				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
-				<option value="2">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
-				<option value="3">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
-				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
-				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
-				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
+			<field name="display_filter_as" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="0" show_list="filt-drop-down" hide_list="">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="1" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
+				<option value="2" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
+				<option value="3" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
+				<option value="4" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
+			<field name="filter_usefirstoption" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="displaydefauttext-mode">FLEXI_NO</option>
+				<option value="1" show_list="displaydefauttext-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="filter_firstoptiontext" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="filt-drop-down displaydefauttext-mode" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
+			
 			<field name="faceted_filter" type="multilist" subtype="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC" toggle_related="1">
 				<option value="0" show_list="" hide_list="active-filts-mode">FLEXI_FS_NONE</option>
 				<option value="1" show_list="" hide_list="active-filts-mode">FLEXI_FS_PAGE_CONFIGURATION</option>
@@ -271,15 +284,21 @@
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
-			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
-				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
-				<option value="2">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
-				<option value="3">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
-				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
-				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
-				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
+			<field name="display_filter_as_s" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="0" show_list="filt-drop-down-s" hide_list="">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="1" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
+				<option value="2" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
+				<option value="3" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
+				<option value="4" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
+			<field name="filter_usefirstoption_s" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down-s" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="displaydefauttext-mode-s">FLEXI_NO</option>
+				<option value="1" show_list="displaydefauttext-mode-s" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="filter_firstoptiontext_s" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="filt-drop-down-s displaydefauttext-mode-s" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
+			
 			<field name="faceted_filter_s" type="multilist" subtype="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC" toggle_related="1">
 				<option value="0" show_list="" hide_list="active-filts-mode-s">FLEXI_FS_NONE</option>
 				<option value="1" show_list="" hide_list="active-filts-mode-s">FLEXI_FS_PAGE_CONFIGURATION</option>
@@ -296,14 +315,6 @@
 				<option value="1">FLEXI_HIDE</option>
 			</field>
 			
-		</fieldset>
-		
-		<fieldset name="group-textselect-fieldgrp" repeat="1" icon_class="icon-menu-3" label="FLEXI_FIELD_GROUPING" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" default="FLEXI_REQUIRES_FIELDGROUP_FIELD" level="level2" />
-			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 		</fieldset>
 		
 	</fields>
