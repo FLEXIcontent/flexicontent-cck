@@ -846,16 +846,22 @@ ul.fc_field_filter.fc_checkradio_group label {
 #flexicontent .item_total {
 	border: 1px solid lightgray;
 	margin: 0px 0px 12px 0px;
-	padding: 1px 1%;
-	width: 98%;
+	padding: 4px 8px;
+	width: 100%;
 	clear: both;
 	float: left;
+	box-sizing: border-box;
 }
+
+#flexicontent .item_total .fc_clayout_box { margin: 0px 12px 0px 0px; }
+#flexicontent .item_total .fc_clayout_box img { height: 24px; }
+#flexicontent .item_total .fc_clayout_box label { padding: 1px 2px; }
+#flexicontent .item_total .fc_clayout_box fieldset { margin-top: 0px; }
 
 #flexicontent .item_total .fc_item_total_data {
 	display:inline-block;
 	float:left;
-	padding: 8px 0px 5px;
+	padding: 6px 0px 5px;
 }
 
 #flexicontent .item_total .flexi.item_total_label {

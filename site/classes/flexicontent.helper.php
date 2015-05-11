@@ -321,7 +321,7 @@ class flexicontent_html
 
 		flexicontent_html::loadFramework('select2');
 		$classes  = "fc_field_filter use_select2_lib";
-		$onchange = !$autosubmit ? '' : ' onchange="document.getElementById(\''.$formname.'\').submit();" ';
+		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(this.form, 2);" ';
 		$attribs  = ' class="'.$classes.'" ' . $onchange;
 		
 		$limit_options = $params->get('limit_options', '5,10,20,30,50,100,150,200');
@@ -355,7 +355,7 @@ class flexicontent_html
 
 		flexicontent_html::loadFramework('select2');
 		$classes  = "fc_field_filter use_select2_lib";
-		$onchange = !$autosubmit ? '' : ' onchange="document.getElementById(\''.$formname.'\').submit();" ';
+		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(this.form, 2);" ';
 		$attribs  = ' class="'.$classes.'" ' . $onchange;
 		
 		$orderby_options = $params->get('orderby_options'.$sfx, array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','id','rid','order'));
@@ -425,21 +425,22 @@ class flexicontent_html
 	}
 
 
-	static function layout_selector(&$params, $formname='adminForm', $autosubmit=1, $type='clayout')
+	static function layout_selector(&$params, $formname='adminForm', $autosubmit=1, $layout_type='clayout')
 	{
-		$_default_layout = $params->get($type, $type=='clayout' ? 'blog' : 'default');
+		if ( !$params->get('clayout_switcher') ) return '';
+		$_default_layout = $params->get($layout_type, $layout_type=='clayout' ? 'blog' : 'default');
 		
-		if ($type=='clayout') {
-			$displayed_tmpls = $params->get('displayed_'.$type.'s');
+		if ($layout_type=='clayout') {
+			$displayed_tmpls = $params->get('displayed_'.$layout_type.'s');
 			if ( empty($displayed_tmpls) )							$displayed_tmpls = array();
 			else if ( ! is_array($displayed_tmpls) )		$displayed_tmpls = explode("|", $displayed_tmpls);
 		}
 		
-		$allowed_tmpls = $params->get('allowed_'.$type.'s');
+		$allowed_tmpls = $params->get('allowed_'.$layout_type.'s');
 		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
 		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = explode("|", $allowed_tmpls);
 		
-		$_options = $type=='clayout' ? $displayed_tmpls : $allowed_tmpls;
+		$_options = $layout_type=='clayout' ? $displayed_tmpls : $allowed_tmpls;
 		// Return if none allowed clayout(s) were configured
 		if (!count($_options))  return false;
 		
@@ -452,22 +453,43 @@ class flexicontent_html
 		else if ($layout=='author') $svar .= JRequest::getInt('authorid');
 		if ($layout) $svar .= '.category'.JRequest::getInt('cid');*/
 		
-		$layout = $app->getUserStateFromRequest( $option.$svar.'.'.$type, $type, $_default_layout, 'string' );
+		$layout = $app->getUserStateFromRequest( $option.$svar.'.'.$layout_type, $layout_type, $_default_layout, 'string' );
 		
-		flexicontent_html::loadFramework('select2');
-		$classes  = "fc_field_filter use_select2_lib";
-		$onchange = !$autosubmit ? '' : ' onchange="document.getElementById(\''.$formname.'\').submit();" ';
-		$attribs  = ' class="'.$classes.'" ' . $onchange;
-		
-		$_switcher_label = $params->get($type.'_switcher_label', 0);
+		$_switcher_label = $params->get($layout_type.'_switcher_label', 0);
 		$inside_label  = $_switcher_label==2 ? ' '.JText::_('FLEXI_LAYOUT') : '';
 		$outside_label = $_switcher_label==1 ? '<span class="flexi label limit_override_label">'.JText::_('FLEXI_LAYOUT').'</span>' : '';
 		
-		$options = array();
-		foreach($_options as $_option) {
-			$options[] = JHTML::_('select.option', $_option, $_option .$inside_label);
+		if ( $params->get('clayout_switcher_display_mode', 1) == 0 )
+		{
+			flexicontent_html::loadFramework('select2');
+			$classes  = "fc_field_filter use_select2_lib";
+			$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(this.form, 2);" ';
+			$attribs  = ' class="'.$classes.'" ' . $onchange;
+			
+			$options = array();
+			foreach($_options as $_option) {
+				$options[] = JHTML::_('select.option', $_option, $_option .$inside_label);
+			}
+			$html = JHTML::_('select.genericlist', $options, $layout_type, $attribs, 'value', 'text', $layout );
 		}
-		return $outside_label.JHTML::_('select.genericlist', $options, 'clayout', $attribs, 'value', 'text', $layout );
+		else
+		{
+			$tmplurl = 'components/com_flexicontent/templates/';
+			$n = 0;
+			$options = array();
+			foreach($_options as $_option) {
+				$checked_attr = $layout==$_option ? ' checked=checked ' : '';
+				$options[] =
+					'<input type="radio" name="'.$layout_type.'" value="'.$_option.'" id="'.$layout_type.$n.'" onchange="adminFormPrepare(this.form, 2);" '.$checked_attr.'>'.
+					'<label for="'.$layout_type.$n.'" class="btn"><img alt="'.$_option.'" src="'.$tmplurl.$_option.'/clayout.png"></label>'
+					;
+				$n++;
+			}
+			$html =
+				'<fieldset class="radio btn-group group-fcinfo">'.implode('', $options).'</fieldset>'.
+				'<script> jQuery(\'input[name="'.$layout_type.'"]\').click( function() { adminFormPrepare(this.form, 2); }); </script>';
+		}
+		return $outside_label.$html;
 	}
 	
 	
