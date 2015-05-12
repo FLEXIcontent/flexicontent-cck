@@ -191,11 +191,12 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				// Update the new term description
 				var boxClass = 'termtext';
 				var container = newField.find('.fc_'+boxClass);
-				var editor = typeof tinyMCE === 'undefined' ? false : tinyMCE.get( container.find('textarea').first().attr('id') );
+				var hasTinyMCE = typeof tinyMCE === 'undefined' ? false : tinyMCE.get( container.find('textarea').first().attr('id') );
+				var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : container.find('textarea').next().hasClass('CodeMirror');
 				
-				container.after('<div class=\"nowrap_box fc_'+boxClass+'\"></div>');  // Append a new container box
+				container.after('<div class=\"nowrap_box fc_'+boxClass+'\" style=\"min-width: 50%;\"></div>');  // Append a new container box
 				container.find('label.labeltext').show().appendTo(container.next()); // Copy the label
-				container.find('textarea').show().css('visibility', 'visible').appendTo(container.next()); // Copy only the textarea (first make it visible) into the new container
+				container.find('textarea').first().show().css('visibility', 'visible').appendTo(container.next()); // Copy only the textarea (first make it visible) into the new container
 				container.remove(); // Remove old (cloned) container box along with all the contents
 				
 				// Prepare the new textarea for attaching the HTML editor
@@ -220,7 +221,22 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			
 			// Attach a new JS HTML editor object
 			if ($use_html) $js .= "
-				if (editor)
+				if (hasCodeMirror) {
+					var CM = CodeMirror.fromTextArea(theArea.get(0),
+					{
+						mode: 'application/x-httpd-php',
+						indentUnit: 2,
+						lineNumbers: true,
+						matchBrackets: true,
+						lineWrapping: true,
+						onCursorActivity: function() 
+						{
+							CM.setLineClass(hlLine, null);
+							hlLine = CM.setLineClass(CM.getCursor().line, 'activeline');
+						}
+					});
+				}
+				if (hasTinyMCE)
 				{
           if(tinyMCE.majorVersion >= 4) {
           	//var ed = new tinymce.Editor('textareaid', { mode : 'exact' }, tinymce.EditorManager);
@@ -276,8 +292,10 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 						var txtareas = jQuery(this).find('textarea');
 						txtareas.each(function( i, txtarea) {
 							var areaid = jQuery(txtarea).attr('id');
-							var editor = typeof tinyMCE === 'undefined' ? false : tinyMCE.get(areaid);
-							if (editor) tinymce.EditorManager.execCommand('mceRemoveEditor', false, areaid);
+							var hasTinyMCE = typeof tinyMCE === 'undefined' ? false : tinyMCE.get(areaid);
+							if (hasTinyMCE) tinymce.EditorManager.execCommand('mceRemoveEditor', false, areaid);
+							var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : jQuery(txtarea).first().next().hasClass('CodeMirror');
+							if (hasCodeMirror) jQuery(txtarea).first().next().get(0).CodeMirror.toTextArea();
 						});
 						this.remove();
 					});
@@ -343,7 +361,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				);
 			
 			$text = '
-				<div class="nowrap_box fc_termtext">
+				<div class="nowrap_box fc_termtext" style="min-width: 50%;">
 					<label class="label label-info labeltext" for="'.$elementid_n.'_text">'.$value_label.' './*($multiple?($n+1):'').*/'</label>
 					'.$text.'
 				</div>';
