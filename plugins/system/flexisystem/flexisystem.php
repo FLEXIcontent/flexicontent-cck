@@ -439,7 +439,7 @@ class plgSystemFlexisystem extends JPlugin
 			. '  AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
 			. '  AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )'
 			. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.lft > ' . FLEXI_LFT_CATEGORY . ' AND c.rgt < ' . FLEXI_RGT_CATEGORY
-			. ' GROUP BY rel.catid'
+			. ' GROUP BY c.id'
 			. ' ORDER BY c.parent_id, c.lft'
 			;
 		$db->setQuery($query);
