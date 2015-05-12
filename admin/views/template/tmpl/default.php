@@ -200,6 +200,13 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		txtarea = jQuery('#editor__file_contents');
 		txtarea.before('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... <?php echo JText::_("FLEXI_SAVING");?><br/></span>');
 		
+		// Set the current codemirror data into the textarea before serializing and submit the form via AJAX
+		var CM = txtarea.next();//.get(0).CodeMirror;
+		if (CM.hasClass('CodeMirror')) {
+			var file_contents = CM.get(0).CodeMirror.getValue();
+			txtarea.val(file_contents);
+		}
+		
 		jQuery.ajax({
 			type: "POST",
 			url: "index.php?option=com_flexicontent&task=templates.savelayoutfile&format=raw",
