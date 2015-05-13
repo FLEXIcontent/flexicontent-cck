@@ -34,7 +34,7 @@ $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 	<div id="item_total" class="item_total group">
 	
 		<?php if ($this->params->get('show_item_total', 1)) : ?>
-			<span class="fc_item_total_data">
+			<span class="fc_item_total_data<?php echo $clayout_selector ? ' labelclear' : '';?>">
 				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pageNav->getResultsCounter(); // custom Results Counter ?>
 			</span>
 		<?php endif; ?>

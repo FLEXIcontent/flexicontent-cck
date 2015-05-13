@@ -606,7 +606,7 @@ if ($this->params->get('uselang_fe', 1)) : ob_start();  // lang ?>
 	</span>
 	
 	<div class="container_fcfield container_fcfield_name_language">
-		<?php if ( (in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew) && $this->params->get('uselang_fe', 1)==1 ) : ?>
+		<?php if ( (in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew) && in_array($this->params->get('uselang_fe', 1), array(1,3)) ) : ?>
 			<?php echo $this->lists['languages']; ?>
 		<?php else: ?>
 			<?php echo $this->itemlang->image.' ['.$this->itemlang->name.']'; ?>

@@ -1327,6 +1327,7 @@ class ParentClassItem extends JModelAdmin
 			// Decide default language
 			$default_lang = FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang();
 			$default_lang = $app->isSite() ? $cparams->get('default_language_fe', $default_lang) : $default_lang;
+			if ($default_lang=='_author_lang_') $default_lang = $user->getParam('language', '*');
 			
 			// Override defaults values, we assigned all properties, 
 			// despite many of them having the correct value already
@@ -1808,7 +1809,7 @@ class ParentClassItem extends JModelAdmin
 			if ($isnew) return false;
 		}
 		
-		if ( $app->isSite() && $cparams->get('uselang_fe', 1)!=1 && isset($data['language']) ) {
+		if ( $app->isSite() && !in_array($cparams->get('uselang_fe', 1), array(1,3)) && isset($data['language']) ) {
 			$app->enqueueMessage('You are not allowed to set language to this content items', 'warning');
 			unset($data['language']);
 			if ($isnew) return false;

@@ -77,7 +77,9 @@
 				<option value="3">FLEXI_YES_WITHOUT_ASSOCS</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
 			</field>
-			<field name="default_language_fe" type="fclanguage" default="" use_global="1" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_DEFAULT_LANGUAGE_DESC" />
+			<field name="default_language_fe" type="fclanguage" default="" use_global="1" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_MENU_DEFAULT_LANGUAGE_DESC">
+				<option value="_author_lang_">FLEXI_USE_AUTHOR_LANGUAGE</option>
+			</field>
 			<field name="disable_languages_fe" type="fclanguage" default="" use_global="1" multiple="multiple" class="use_select2_lib" label="FLEXI_MENU_DISABLE_LANGUAGES" description="FLEXI_MENU_DISABLE_LANGUAGES_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_MENU_LANG_SELECTOR" label="" level="level3" />

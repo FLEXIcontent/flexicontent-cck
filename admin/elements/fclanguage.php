@@ -18,12 +18,10 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('list');
-}
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
+jimport('joomla.form.helper');
+JFormHelper::loadFieldClass('list');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 /**
@@ -48,22 +46,18 @@ class JFormFieldFclanguage extends JFormField
 		$db		= JFactory::getDBO();
 		
 		// Get field configuration
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		// Get values
-		$values			= FLEXI_J16GE ? $this->value : $value;
+		$values			= $this->value;
 		if ( empty($values) )							$values = array();
-		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		else if ( ! is_array($values) )		$values = explode("|", $values);
 		
 		// Field name and HTML tag id
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
 		// Create options
 		$langs = array();
@@ -78,6 +72,13 @@ class JFormFieldFclanguage extends JFormField
 			$langs[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT') );
 		}
 		
+		foreach ($node->children() as $option)
+		{
+			$val  = $option->attributes()->value;
+			$text = JText::_( FLEXI_J30GE ? $option->__toString() : $option->data() );
+			$langs[] = JHTML::_('select.option', $val, $text );
+		}
+		
 		$languages = FLEXIUtilities::getlanguageslist();
 		foreach($languages as $lang) {
 			$langs[] = JHTML::_('select.option', $lang->code, $lang->name );
@@ -89,8 +90,6 @@ class JFormFieldFclanguage extends JFormField
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-		} else {
 		}
 		if ($onchange = @$attributes['onchange']) {
 			$attribs .= ' onchange="'.$onchange.'"';

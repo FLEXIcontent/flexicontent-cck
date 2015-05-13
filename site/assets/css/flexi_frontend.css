@@ -853,36 +853,38 @@ ul.fc_field_filter.fc_checkradio_group label {
 	box-sizing: border-box;
 }
 
-#flexicontent .item_total .fc_clayout_box { margin: 0px 12px 0px 0px; }
-#flexicontent .item_total .fc_clayout_box img { height: 24px; }
+#flexicontent .fc_item_total_data.labelclear .flexi.label { clear:left; }
+#flexicontent .item_total .fc_clayout_box { margin: 0px 12px 0px 0px; float:left; }
+#flexicontent .item_total .fc_clayout_box img { height: 48px; }
 #flexicontent .item_total .fc_clayout_box label { padding: 1px 2px; }
 #flexicontent .item_total .fc_clayout_box fieldset { margin-top: 0px; }
 
 #flexicontent .item_total .fc_item_total_data {
-	display:inline-block;
-	float:left;
-	padding: 6px 0px 5px;
+	display: inline-block;
+	float: left;
+	padding: 6px 0px 5px 0px;
+	margin: 0px 12px 0px 0px;
 }
 
 #flexicontent .item_total .flexi.item_total_label {
-	display: inline-block !important;
-	float:left !important;
-	font-weight: bold !important;
-	margin-right: 6px !important;
-	margin-top: 0px !important;
+	display: inline-block;
+	float: left;
+	font-weight: bold;
+	margin-right: 6px;
+	margin-top: 0px;
 }
 #flexicontent .fc_limit_selector .flexi.limit_override_label {
-	display: inline-block !important;
-	float:left !important;
-	font-weight: bold !important;
-	margin-right: 4px !important;
-	margin-top: 8px !important;
+	display: inline-block;
+	float: left;
+	font-weight: bold;
+	margin-right: 4px;
+	margin-top: 8px;
 }
 
 #flexicontent .item_total .flexi.item_total_value {
-	display: inline-block !important;
-	float:left !important;
-	margin-right: 24px !important;
+	display: inline-block;
+	float: left;
+	margin-right: 24px;
 }
 
 /* Containers of per page limit selector and order by selector */
