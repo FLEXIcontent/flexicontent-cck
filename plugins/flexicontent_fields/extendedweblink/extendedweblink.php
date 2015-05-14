@@ -53,7 +53,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		// ****************
 		// Number of values
 		// ****************
-		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
@@ -473,12 +473,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// Some variables
-		$use_ingroup = !empty($field->ingroup);  //$field->parameters->get('use_ingroup', 0);
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Value handling parameters
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
-		$multiple = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
 		
 		// some parameter shortcuts
 		$target         = $field->parameters->get( 'target', '' );
@@ -520,7 +521,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		// Load default value
 		if ( empty($values) ) {
 			if (!strlen($default_link)) {
-				$field->{$prop} = $use_ingroup ? array() : '';
+				$field->{$prop} = $is_ingroup ? array() : '';
 				return;
 			}
 			$values = array();
@@ -604,7 +605,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$n = 0;
 		foreach ($values as $value)
 		{
-			if ( empty($value['link']) && !$use_ingroup ) continue;  // no link ...
+			if ( empty($value['link']) && !$is_ingroup ) continue; // Skip empty if not in field group
 			if ( empty($value['link']) ) {
 				$field->{$prop}[$n++]	= '';
 				continue;
@@ -663,7 +664,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		if (!$use_ingroup)  // do not convert the array to string if field is in a group
+		if (!$is_ingroup)  // do not convert the array to string if field is in a group
 		{
 			// Apply separator and open/close tags
 			$field->{$prop} = implode($separatorf, $field->{$prop});

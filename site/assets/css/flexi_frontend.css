@@ -855,9 +855,10 @@ ul.fc_field_filter.fc_checkradio_group label {
 
 #flexicontent .fc_item_total_data.labelclear .flexi.label { clear:left; }
 #flexicontent .item_total .fc_clayout_box { margin: 0px 12px 0px 0px; float:left; }
-#flexicontent .item_total .fc_clayout_box img { height: 48px; }
-#flexicontent .item_total .fc_clayout_box label { padding: 1px 2px; }
 #flexicontent .item_total .fc_clayout_box fieldset { margin-top: 0px; }
+#flexicontent .item_total .fc_clayout_box label { padding: 1px 2px; opacity:0.8; }
+#flexicontent .item_total .fc_clayout_box label:hover { opacity:1; }
+#flexicontent .item_total .fc_clayout_box img { height: 48px; }
 
 #flexicontent .item_total .fc_item_total_data {
 	display: inline-block;
@@ -1482,11 +1483,11 @@ table.admintable td {
 
 /* PANELs */
 #flexicontent .pane-sliders .pane-toggler span {
-    background: url("../../../../administrator/templates/bluestork/images/j_arrow.png") no-repeat scroll 5px 50% transparent;
+    /*background: url("../../../../administrator/templates/bluestork/images/j_arrow.png") no-repeat scroll 5px 50% transparent;*/
     padding-left: 20px;
 }
 #flexicontent .pane-sliders .pane-toggler-down span {
-    background: url("../../../../administrator/templates/bluestork/images/j_arrow_down.png") no-repeat scroll 5px 50% transparent;
+    /*background: url("../../../../administrator/templates/bluestork/images/j_arrow_down.png") no-repeat scroll 5px 50% transparent;*/
     padding-left: 20px;
 }
 

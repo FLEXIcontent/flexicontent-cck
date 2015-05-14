@@ -65,7 +65,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// ****************
 		// Number of values
 		// ****************
-		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
@@ -794,7 +794,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// Some variables
-		$use_ingroup = !empty($field->ingroup);  //$field->parameters->get('use_ingroup', 0);
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$image_source = $field->parameters->get('image_source', 0);
 		
 		
 		// ***********************
@@ -850,12 +853,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$isSite = $app->isSite();
 		
 		
-		// ***********************
-		// Some parameter shorcuts
-		// ***********************
-		
-		$multiple     = $field->parameters->get('allow_multiple', 0 ) ;
-		$image_source = $field->parameters->get('image_source', 0);
 		
 		// *************************************************
 		// TODO:  implement MODES >= 2, and remove this CODE
@@ -1018,7 +1015,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// assign (possibly) altered value array to back to the field
 		// **********************************************************
 		if ( !count($values) ) {
-			$field->{$prop} = $use_ingroup ? array() : '';
+			$field->{$prop} = $is_ingroup ? array() : '';
 			return;
 		}
 		$field->value = $values;
@@ -1060,7 +1057,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Displays that need special container are not allowed when field in a group, force fancybox
 		$no_container_needed = array(1,2,3,4,6);
-		if ( $use_ingroup && !in_array($popuptype, $no_container_needed) ) $popuptype = 4;
+		if ( $is_ingroup && !in_array($popuptype, $no_container_needed) ) $popuptype = 4;
 		
 		// Optionally group images from all image fields of current item ... or of all items in view too
 		$grouptype  = $field->parameters->get( 'grouptype', 1 ) ;
@@ -1128,7 +1125,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// **********************************************
 		
 		// Do not load JS, for value only displays
-		if ( !in_array($prop, $value_only_displays ) )
+		if ( !in_array($prop, $value_only_displays) )
 		{
 			// MultiBox maybe added in extra cases besides popup
 			// (a) in Item manager, (b) When linking to URL in popup target
@@ -1372,7 +1369,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$value	= unserialize($val);
 			$image_name = trim(@$value['originalname']);
 			if ( !strlen($image_name) ) {
-				if ($use_ingroup) $field->{$prop}[] = '';  // add empty position to the display array
+				if ($is_ingroup) $field->{$prop}[] = '';  // add empty position to the display array
 				continue;
 			}
 			$i++;
@@ -1444,7 +1441,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			
 			// ADD some extra (display) properties that point to all sizes, currently SINGLE IMAGE only
-			if ($i==0) {
+			if ($is_ingroup) {
+				// In case of field displayed via in fieldgroup, this is an array
+				$field->{"display_backend_src"}[] = JURI::root(true).'/'.$srcb;
+				$field->{"display_small_src"}[] = JURI::root(true).'/'.$srcs;
+				$field->{"display_medium_src"}[] = JURI::root(true).'/'.$srcm;
+				$field->{"display_large_src"}[] = JURI::root(true).'/'.$srcl;
+				$field->{"display_original_src"}[] = JURI::root(true).'/'.$srco;
+			}
+			else if ($i==0) {
+				// Field displayed not via fieldgroup return only the 1st value
 				$field->{"display_backend_src"} = JURI::root(true).'/'.$srcb;
 				$field->{"display_small_src"} = JURI::root(true).'/'.$srcs;
 				$field->{"display_medium_src"} = JURI::root(true).'/'.$srcm;
@@ -1464,15 +1470,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$field->thumbs_path['original'][] = JPATH_SITE.DS.$srco;
 			
 			// Suggest image for external use, e.g. for Facebook etc
-			if ( ($isSite && !$isFeedView) && $useogp) {
+			if ( ($isSite && !$isFeedView) && $useogp ) {
 				if ( in_array($view, $ogpinview) ) {
 					switch ($ogpthumbsize)
 					{
-						case 1: $ogp_src = $field->{"display_small_src"}; break;   // this maybe problematic, since it maybe too small or not accepted by social website
-						case 2: $ogp_src = $field->{"display_medium_src"}; break;
-						case 3: $ogp_src = $field->{"display_large_src"}; break;
-						case 4: $ogp_src = $field->{"display_original_src"}; break;
-						default: $ogp_src = $field->{"display_medium_src"}; break;
+						case 1: $ogp_src = $field->thumbs_src['small'][$i]; break;   // this maybe problematic, since it maybe too small or not accepted by social website
+						case 2: $ogp_src = $field->thumbs_src['medium'][$i]; break;
+						case 3: $ogp_src = $field->thumbs_src['large'][$i]; break;
+						case 4: $ogp_src =  $field->thumbs_src['original'][$i]; break;
+						default: $ogp_src = $field->thumbs_src['medium'][$i]; break;
 					}
 					$document->addCustomTag('<link rel="image_src" href="'.$ogp_src.'" />');
 					$document->addCustomTag('<meta property="og:image" content="'.$ogp_src.'" />');
@@ -1485,7 +1491,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// if so, return it and terminate from further execution
 			// ****************************************************************
 			
-			if (in_array($prop, $value_only_displays )) 	return $field->{$prop};
+			if ( in_array($prop, $value_only_displays) ) {
+				// we create single (1st value) if not in a field group, otherwise we continue the loop,
+				// so as to create an array of values since the fieldgroup field can use this array properly
+				if ($is_ingroup)
+					continue;
+				else
+					return;
+			}
 			
 			
 			// *********************************************************
@@ -1723,7 +1736,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// **************************************************************
 		
 		// Using in field group, return array
-		if ( $use_ingroup ) {
+		if ( $is_ingroup ) {
 			return;
 		}
 		

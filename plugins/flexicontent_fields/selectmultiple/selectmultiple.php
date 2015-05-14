@@ -196,6 +196,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 					return 'cancel';
 				}
 				
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				
@@ -572,7 +573,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// Some variables
-		$is_ingroup  = !empty($field->ingroup);  //$field->parameters->get('use_ingroup', 0);
+		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
@@ -682,7 +683,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 				$value = strlen($value) ? array($value) : array();
 			
 			// Skip empty if not in field group
-			if ( !count($value) && !$use_ingroup )
+			if ( !count($value) && !$is_ingroup )
 				continue;
 			
 			$html  = array();

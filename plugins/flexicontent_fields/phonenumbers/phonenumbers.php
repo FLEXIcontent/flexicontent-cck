@@ -40,7 +40,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		// ****************
 		// Number of values
 		// ****************
-		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
@@ -327,7 +327,9 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// Some variables
-		$use_ingroup = !empty($field->ingroup);  //$field->parameters->get('use_ingroup', 0);
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Get field values
@@ -364,6 +366,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		foreach ($values as $value)
 		{
 			$value = unserialize($value);
+			if (empty($value['phone1']) && empty($value['phone2']) && empty($value['phone3']) && !$is_ingroup ) continue;  // Skip empty values if not in field group
 			$field->{$prop}[] = ''
 				.$opentag
 				.($display_phone_label  ? $label_prefix.$value['label'].$label_suffix : '')
@@ -373,9 +376,10 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 				.$closetag
 				;
 			$n++;
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		if (!$use_ingroup)  // do not convert the array to string if field is in a group
+		if (!$is_ingroup)  // do not convert the array to string if field is in a group
 		{
 			// Apply separator and open/close tags
 			if(count($field->{$prop})) {

@@ -499,7 +499,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				if ( $gf_methods[$pos] == 'label' ) continue;
 				
 				// Check if display method of the field has been created already
-				$method = $gf_methods[$pos] ? $custom_field_methods[$pos] : 'display';
+				$method = $gf_methods[$pos] ? $gf_methods[$pos] : 'display';
 				if ( isset($grouped_field->{$method}) && is_array($grouped_field->{$method}) ) continue;
 				
 				// Render the display method for the given field

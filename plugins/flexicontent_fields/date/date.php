@@ -69,7 +69,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// ****************
 		// Number of values
 		// ****************
-		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
@@ -339,14 +339,15 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// Some variables
-		$use_ingroup = !empty($field->ingroup);  //$field->parameters->get('use_ingroup', 0);
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		$config = JFactory::getConfig();
 		$user = JFactory::getUser();
 		
 		// Value handling parameters
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
-		$multiple = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
 		$date_source = $field->parameters->get('date_source', 0);
 		$show_no_value  = $field->parameters->get( 'show_no_value', 0) ;
 		$no_value_msg   = $field->parameters->get( 'no_value_msg', 'FLEXI_NO_VALUE') ;
@@ -477,7 +478,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$n = 0;
 		foreach ($values as $value)
 		{
-			if ( !strlen($value) && !$use_ingroup ) continue;
+			if ( !strlen($value) && !$is_ingroup ) continue; // Skip empty if not in field group
 			if ( !strlen($value) ) {
 				$field->{$prop}[$n++]	= $no_value_msg;
 				continue;
@@ -502,7 +503,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		if (!$use_ingroup)  // do not convert the array to string if field is in a group
+		if (!$is_ingroup)  // do not convert the array to string if field is in a group
 		{
 			// Apply separator and open/close tags
 			$field->{$prop} = implode($separatorf, $field->{$prop});
