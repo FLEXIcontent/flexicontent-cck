@@ -934,6 +934,12 @@ class FlexicontentController extends JControllerLegacy
 				$safeurlparams['__fc_user_id__'] = 'STRING';
 			}
 			
+			// Try to avoid browser warning message "Page has expired or similar"
+			//if (!$cachable) ini_set('session.cache_limiter', 'private');
+			//session_cache_limiter('nocache');
+			//header('Expires: Thu, 1 Jan 2000 00:00:00 GMT');
+			//if (!$cachable) session_cache_limiter('private_no_expire, cache');
+			
 			//echo "cacheable: ".(int)$cachable." - " . print_r($safeurlparams, true) ."<br/>";
 			parent::display($cachable, $safeurlparams);
 		}

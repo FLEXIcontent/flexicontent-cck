@@ -33,7 +33,10 @@ class plgFlexicontent_fieldsAddressint extends FCField {
 		$this->values = & $values;
 		
 		// Render form field
-		$this->displayField();
+		$formlayout = $field->parameters->get('formlayout', '');
+		$formlayout = $formlayout ? 'field_'.$formlayout : 'field';
+		
+		$this->displayField( $formlayout );
 		
 		// Add needed JS/CSS
 		static $js_added = null;
@@ -116,6 +119,6 @@ class plgFlexicontent_fieldsAddressint extends FCField {
 		$this->setField($field);
 		$this->setItem($item);
 
-		$this->display($values, $prop);
+		$this->displayFieldValue($values, $prop);
 	}*/
 }

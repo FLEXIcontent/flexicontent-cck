@@ -238,7 +238,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			</span>
 			<?php /*echo $this->form->getLabel('title');*/ ?>
 	
-			<div class="container_fcfield container_fcfield_id_1 container_fcfield_name_title input-fcmax" id="container_fcfield_1">
+			<div class="container_fcfield container_fcfield_id_6 container_fcfield_name_title input-fcmax" id="container_fcfield_6">
 			<?php	if ( isset($this->row->item_translations) ) :?>
 				<?php
 				array_push($tabSetStack, $tabSetCnt);
@@ -361,7 +361,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				</div>
 				<?php endif; ?>
 				
-				<div class="qf_tagbox" id="qf_tagbox" class="span9">
+				<div class="qf_tagbox" id="qf_tagbox">
 					<ul id="ultagbox">
 					<?php
 						$nused = count($this->usedtags);
@@ -419,9 +419,9 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 		
 			<div class="fcclear"></div>
 			<span class="label-fcouter">
-			<span id="jform_language-lbl" for="jform_language" class="label pull-left label-fcinner label-toplevel" >
+			<label id="jform_language-lbl" for="jform_language" class="label pull-left label-fcinner label-toplevel" >
 				<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
-			</span>
+			</label>
 			</span>
 			<?php /*echo $this->form->getLabel('language');*/ ?>
 		
@@ -574,9 +574,9 @@ $tabCnt[$tabSetCnt] = 0;
 			
 			<?php /*if ($display_label_form): ?>
 				<span class="label-fcouter">
-				<span id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" <?php echo $label_tooltip;?> >
+				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" <?php echo $label_tooltip;?> >
 					<?php echo $field->label; ?>
-				</span>
+				</label>
 				</span>
 				<?php if($display_label_form==2):  ?>
 					<div class='fcclear'></div>
@@ -721,16 +721,16 @@ if ($this->row->type_id) {
 				<div class='fcclear'></div>
 				<?php if($display_label_form): ?>
 					<span class="label-fcouter">
-					<span id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" <?php echo $label_tooltip;?> >
+					<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" <?php echo $label_tooltip;?> >
 						<?php echo $field->label; ?>
-					</span>
+					</label>
 					</span>
 					<?php if($display_label_form==2):  ?>
 						<div class='fcclear'></div>
 					<?php endif; ?>
 				<?php endif; ?>
 								
-				<div style="<?php echo $container_width; ?>;" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
+				<div style="<?php echo $container_width; ?>" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
 					<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>
 				
 				<?php if ( !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
@@ -842,10 +842,10 @@ if ($this->row->type_id) {
 
 			<div class="fcclear"></div>
 			<span class="label-fcouter">
-			<span class="label pull-left label-fcinner label-toplevel">
+			<label class="label pull-left label-fcinner label-toplevel">
 				<?php echo JText::_( 'FLEXI_FEATURED' ); ?>
 				<small style="float:right; clear:both;"><?php echo JText::_( 'FLEXI_JOOMLA_FEATURED_VIEW' ); ?></small>
-			</span>
+			</label>
 			</span>
 			<div class="container_fcfield container_fcfield_name_featured">
 				<?php echo $this->lists['featured']; ?>
@@ -903,9 +903,9 @@ if ($this->row->type_id) {
 
 				<div class="fcclear"></div>
 				<span class="label-fcouter">
-				<span id="langassocs-lbl" for="langassocs" class="label pull-left label-fcinner label-toplevel" >
+				<label id="langassocs-lbl" for="langassocs" class="label pull-left label-fcinner label-toplevel" >
 					<?php echo JText::_( 'FLEXI_ASSOC_TRANSLATIONS' );?>
-				</span>
+				</label>
 				</span>
 				<div class="container_fcfield container_fcfield_name_langassocs">
 				<?php

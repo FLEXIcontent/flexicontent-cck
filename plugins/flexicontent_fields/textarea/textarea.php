@@ -342,7 +342,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 			$txtarea = !$use_html ? '
-				<textarea class="fcfield_textval txtarea" id="'.$elementid_n.'" name="'.$fieldname_n.'" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
+				<textarea class="fcfield_textval txtarea '.$required.'" id="'.$elementid_n.'" name="'.$fieldname_n.'" cols="'.$cols.'" rows="'.$rows.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
 					.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : $editor->display(

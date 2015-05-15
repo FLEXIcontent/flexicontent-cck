@@ -361,7 +361,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	</span>
 	<?php /*echo $this->form->getLabel('title');*/ ?>
 	
-	<div class="container_fcfield container_fcfield_id_1 container_fcfield_name_title" id="container_fcfield_1">
+	<div class="container_fcfield container_fcfield_id_6 container_fcfield_name_title" id="container_fcfield_6">
 	<?php	if ( isset($this->item->item_translations) ) :?>
 		
 		<?php

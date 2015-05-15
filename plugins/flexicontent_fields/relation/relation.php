@@ -373,7 +373,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$_cat_selector = flexicontent_cats::buildcatselect(
 			$allowedtree, $ri_field_name.'_fccats', $catvals="",
 			$top=2, // (adds first option "please select") Important otherwise single entry in select cannot initiate onchange event
-			' class="use_select2_lib inputbox '.$ri_field_name.'_fccats" ',
+			' class="use_select2_lib '.$ri_field_name.'_fccats" ',
 			$check_published = true, $check_perms = true,
 			$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false,
 			$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array('__ALL__'=>'FLEXI_RIFLD_FILTER_LIST_ALL')

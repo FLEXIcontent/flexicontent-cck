@@ -1753,10 +1753,13 @@ table.fc-form-tbl td.key {
 }
 table.fc-form-tbl td.key label.label {
 	display: inline-block;
-	padding: 8px 4% !important;
-	width: 84% !important;
-	margin: 0px 4% !important;
-	white-space: normal !important;
+	padding: 8px 4%;
+	width: 84%;
+	margin: 0px 4%;
+	white-space: normal;
+}
+table.fc-form-tbl.fcinner td.key label.label {
+	padding: 2px;
 }
 table.fc-form-tbl fieldset {
 	margin:0px;

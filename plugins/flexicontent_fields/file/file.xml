@@ -62,6 +62,14 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_INLINE" description="" level="level2" depend_class="db-inline-mode" />
+			
+			<field name="formlayout" type="fcfilelist" default="" label="Fields Layout" description="" directory="plugins/flexicontent_fields/file/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" depend_class="db-inline-mode" />
+			<field name="iform_allowdel" type="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_FILE_REMOVAL" description="FLEXI_FIELD_FILE_ALLOW_FILE_REMOVAL_DESC" depend_class="db-inline-mode" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="Optional Properties" description="" level="level3" depend_class="db-inline-mode" />
 			<field name="iform_title" type="radio" default="1" label="FLEXI_FILE_DISPLAY_TITLE" description="FLEXI_FILE_DISPLAY_TITLE_DESC" depend_class="db-inline-mode" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -87,7 +95,6 @@
 				<option value="0">FLEXI_MEDIA</option>
 				<option value="1">FLEXI_SECURE</option>
 			</field>
-			
 			
 		</fieldset>
 		<fieldset name="group-file-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">

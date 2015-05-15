@@ -36,6 +36,9 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
+			<field name="" type="separator" default="Form Field Layout" description="" level="level1" />
+			<field name="formlayout" type="fcfilelist" default="" label="Select layout" description="" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="field*" exclude="field.php" stripext="1" hide_none="1" hide_default="" defaultlabel="Table" />
+			
 		</fieldset>
 		<fieldset name="group-addressint-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
@@ -51,6 +54,9 @@
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 
+			<field name="" type="separator" default="Values Layout" description="" level="level1" />
+			<field name="viewlayout" type="fcfilelist" default="" label="Select layout" description="" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="value*" exclude="value.php" stripext="1" hide_none="1" hide_default="" />
+			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />

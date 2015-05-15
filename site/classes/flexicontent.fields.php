@@ -2636,8 +2636,8 @@ class FlexicontentFields
 			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 			$tooltip_title = flexicontent_html::getToolTip('FLEXI_REMOVE_ALL', '', $translate=1, $escape=1);
 			$filter->html .= '<label class="'.$checked_class.$tooltip_class.'" for="'.$filter_ffid.$i.'" '
-				.' title="'.$tooltip_title.'"'
-				.($checked ? ' style="display:none!important;" ' : 'style="background:none!important; padding-left:0px!important;"').'>'.
+				.' title="'.$tooltip_title.'" '
+				.($checked ? ' style="display:none!important;" ' : ' style="background:none!important; padding-left:0px!important;" ').'>'.
 				'<span class="fc_delall_filters"></span>';
 			$filter->html .= '</label> '
 				.($combine_tip ? ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ' : '')

@@ -259,7 +259,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 		
-		$classes  = 'fcfield_textval inputbox'.$required;
+		$classes  = 'fcfield_textval'.$required;
 		
 		// Create attributes for JS inputmask validation
 		$validate_mask = '';

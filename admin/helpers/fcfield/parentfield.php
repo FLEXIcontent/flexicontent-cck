@@ -126,7 +126,7 @@ class FCField extends JPlugin{
 		$this->setItem($item);
 		$this->values = $this->parseValues($this->field->value);
 		
-		$this->display($values, $prop);
+		$this->displayFieldValue($values, $prop);
 	}
 	
 	
@@ -204,6 +204,12 @@ class FCField extends JPlugin{
 	 */
 	public static function getLayoutPath($plg, $layout = 'field')
 	{
+		static $paths = array();
+		if ( isset($paths[$plg][$layout]) )  // return cached
+		{
+			return $paths[$plg][$layout];
+		}
+		
 		$template = JFactory::getApplication('site')->getTemplate();
 		$defaultLayout = $layout;
 
@@ -216,31 +222,31 @@ class FCField extends JPlugin{
 		}
 
 		// Build the template and base path for the layout
-		$tPath = JPATH_ROOT . '/templates/' . $template . '/html/fcfields/' . $plg . '/' . $layout . '.php';
-		$bPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . $defaultLayout . '.php';
+		$tPath = JPATH_ROOT . '/templates/' . $template . '/html/flexicontent_fields/' . $plg . '/' . $layout . '.php';
+		$fPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . $defaultLayout . '.php';
 		$dPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/field.php';
 
-		// If the template has a layout override use it
-		/*if (file_exists($tPath)) {
-			return $tPath;
-		} elseif (file_exists($bPath)) {
-			return $bPath;
-		} else {
-			return $dPath;
-		}*/
+		if (file_exists($tPath))
+			// Layout via Joomla template override, in /templates/ folder
+			$return = $tPath;
 		
-		if (file_exists($bPath)) {
-			return $bPath;
-		} else {
-			return $dPath;
-		}
+		elseif (file_exists($fPath))
+			// Layout inside field folder
+			$return = $fPath;
+		
+		else
+			// Default fallback
+			$return = $dPath;
+		
+		$paths[$plg][$layout] = $return;  // Cache result
+		return $return;
 	}
 	
-	public function getFormPath($plg, $layout = 'field') {
+	public function getFormPath($plg, $layout) {
 		return $this->getLayoutPath($plg, $layout);
 	}
 	
-	public function getViewPath($plg, $layout = 'value') {
+	public function getViewPath($plg, $layout) {
 		return $this->getLayoutPath($plg, $layout);
 	}
 	
@@ -252,7 +258,7 @@ class FCField extends JPlugin{
 		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'closetag', '' ), 'closetag' );
 	}
 	
-	public function displayField()
+	public function displayField($layout = 'field')
 	{
 		// Prepare variables
 		$use_ingroup = 0;
@@ -264,7 +270,7 @@ class FCField extends JPlugin{
 		$field->html = array();
 		
 		// Include template file: EDIT LAYOUT 
-		include(self::getLayoutPath($this->fieldtypes[0]));
+		include(self::getFormPath($this->fieldtypes[0], $layout));
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
@@ -279,7 +285,7 @@ class FCField extends JPlugin{
 		}
 	}
 	
-	public function display(&$values=null, $prop='display')
+	public function displayFieldValue(&$values=null, $prop='display', $layout = 'value')
 	{
 		// Prepare variables
 		$use_ingroup = 0;
@@ -294,7 +300,7 @@ class FCField extends JPlugin{
 		$this->field->{$prop} = array();
 		
 		// Execute template file: VALUE VIEWING
-		include(self::getViewPath($this->fieldtypes[0]));
+		include(self::getViewPath($this->fieldtypes[0], $layout));
 		
 		// Apply separator and open/close tags
 		if (!$use_ingroup)  // do not convert the array to string if field is in a group
