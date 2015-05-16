@@ -93,8 +93,8 @@
 			
 			<field name="" type="separator" default="FLEXI_SIMPLE_TEXTAREA" description="FLEXI_SIMPLE_TEXTAREA_DESC" level="level2" depend_class="using-plain-area" />
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" depend_class="using-plain-area" />
-			<field name="rows" type="text" default="3" size="3" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" depend_class="using-plain-area" />
-			<field name="cols" type="text" default="80" size="3" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" depend_class="using-plain-area" />
+			<field name="rows" type="text" default="3" size="3" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" />
+			<field name="cols" type="text" default="80" size="3" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" depend_class="using-html-editor" />
 			<field name="" type="separator" default= "NOTE: for multi-value, only editors based on: &lt;b&gt;tinyMCE&lt;/b&gt; are supported, otherwise then the editor on new values will appear only after saving" description="" level="level4" depend_class="using-html-editor" />

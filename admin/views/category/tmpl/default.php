@@ -311,7 +311,8 @@ $js = "
 							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
 								$fieldname =  $field->__get('fieldname');
 								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->params[$fieldname]);
-								echo $tmpl->params->getLabel($fieldname, $groupname);
+								echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+									$tmpl->params->getLabel($fieldname, $groupname));
 								echo
 									str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
 										str_replace('[attribs]', '[layouts]['.$tmpl->name.']',

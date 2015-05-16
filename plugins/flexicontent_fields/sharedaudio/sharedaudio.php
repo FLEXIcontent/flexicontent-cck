@@ -64,7 +64,7 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 		
 		$field->html  = '';
 		$field->html .= '
-		<table class="admintable" border="0" cellspacing="0" cellpadding="5">
+		<table class="admintable"><tbody>
 			<tr>
 				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_URL').'</td>
 				<td>
@@ -145,7 +145,7 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 			$field->html .= $iframecode;
 		}
 		$field->html	.= '</div></td></tr>';
-		$field->html	.= '</table>';
+		$field->html	.= '</tbody></table>';
 		$field->html 	.= '
 		<script type="text/javascript">
 		function fetchAudio_'.$field->name.'() {

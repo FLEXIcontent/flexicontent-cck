@@ -128,11 +128,11 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 					return row.name;
 				}
 			}).result(function(e, row) {
-				jQuery('#input-tags').attr('tagid',row.id);
-				jQuery('#input-tags').attr('tagname',row.name);
+				jQuery('#input-tags').attr('data-tagid',row.id);
+				jQuery('#input-tags').attr('data-tagname',row.name);
 				addToList(row.id, row.name);
 			}).keydown(function(event) {
-				if((event.keyCode==13)&&(jQuery('#input-tags').attr('tagid')=='0') ) {//press enter button
+				if((event.keyCode==13)&&(jQuery('#input-tags').attr('data-tagid')=='0') ) {//press enter button
 					addtag(0, jQuery('#input-tags').attr('value'));
 					resetField();
 					return false;
@@ -142,8 +142,8 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 				}
 			});
 			function resetField() {
-				jQuery('#input-tags').attr('tagid',0);
-				jQuery('#input-tags').attr('tagname','');
+				jQuery('#input-tags').attr('data-tagid',0);
+				jQuery('#input-tags').attr('data-tagname','');
 				jQuery('#input-tags').attr('value','');
 			}
 			jQuery('.deletetag').click(function(e){
@@ -698,7 +698,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 				<label for="input-tags">
 					<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 				</label>
-				<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
+				<input type="text" id="input-tags" name="tagname" data-tagid="0" data-tagname="" />
 				<span id='input_new_tag' ></span>
 				<span class="editlinktip <?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" style="display:inline-block;" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_NOTES'), ':'), htmlspecialchars(JText::_( 'FLEXI_TAG_EDDITING_FULL' ), ENT_COMPAT, 'UTF-8'), 0):htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_TAG_EDDITING_FULL' ), ENT_COMPAT, 'UTF-8'); ?>">
 					<?php echo $infoimage; ?>
@@ -1120,7 +1120,8 @@ if ( $typeid && $this->perms['cantemplates'] && $this->params->get('selecttheme_
 					<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
 						$fieldname =  $field->__get('fieldname');
 						$value = $tmpl->params->getValue($fieldname, $groupname, $this->item->itemparams->get($fieldname));
-						echo $tmpl->params->getLabel($fieldname, $groupname);
+						echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+							$tmpl->params->getLabel($fieldname, $groupname));
 						echo
 							str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
 								str_replace('[attribs]', '[layouts]['.$tmpl->name.']',

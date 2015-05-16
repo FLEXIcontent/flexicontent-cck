@@ -117,7 +117,7 @@ $this->document->addScriptDeclaration($js);
 					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 						'.($field->label ? '
 							<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-							<span class="container_fcfield">'.$field->input.'</span>
+							<div class="container_fcfield">'.$field->input.'</div>
 						' : $field->input).'
 					</fieldset>
 					';
@@ -151,7 +151,7 @@ $this->document->addScriptDeclaration($js);
 				<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 					'.($field->label ? '
 						<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-						<span class="container_fcfield">'.$field->input.'</span>
+						<div class="container_fcfield">'.$field->input.'</div>
 					' : $field->input).'
 				</fieldset>
 				';
@@ -190,7 +190,7 @@ $this->document->addScriptDeclaration($js);
 					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 						'.($field->label && empty($field->hidden) ? '
 							<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-							<span class="container_fcfield">'.$field->input.'</span>
+							<div class="container_fcfield">'.$field->input.'</div>
 						' : $field->input).'
 					</fieldset>
 					';
@@ -211,7 +211,8 @@ $this->document->addScriptDeclaration($js);
 							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
 								$fieldname =  $field->__get('fieldname');
 								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->attribs[$fieldname]);
-								echo $tmpl->params->getLabel($fieldname, $groupname);
+								echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+									$tmpl->params->getLabel($fieldname, $groupname));
 								echo
 									str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
 										str_replace('[attribs]', '[layouts]['.$tmpl->name.']',

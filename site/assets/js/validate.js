@@ -219,16 +219,16 @@ var JFormValidator = new Class({
 					if (nl[i].selected) count++;
 				}
 				
-				min_values = el.getAttribute("min_values");
+				min_values = el.getAttribute("data-min_values");
 				min_values = min_values ? parseInt( min_values, 10 ) : 0;
 				
-				max_values = el.getAttribute("max_values");
+				max_values = el.getAttribute("data-max_values");
 				max_values = max_values ? parseInt( max_values, 10 ) : 0;
 				
-				exact_values = el.getAttribute("exact_values");
+				exact_values = el.getAttribute("data-exact_values");
 				exact_values = exact_values ? parseInt( exact_values, 10 ) : 0;
 				
-				js_popup_err = el.getAttribute("js_popup_err");
+				js_popup_err = el.getAttribute("data-js_popup_err");
 				js_popup_err = js_popup_err ? parseInt( js_popup_err, 10 ) : 0;
 				
 				// Check maximum number of selected options
@@ -260,16 +260,16 @@ var JFormValidator = new Class({
 					if (nl[i].checked) count++;
 				}
 				
-				min_values = el.getAttribute("min_values");
+				min_values = el.getAttribute("data-min_values");
 				min_values = min_values ? parseInt( min_values, 10 ) : 0;
 				
-				max_values = el.getAttribute("max_values");
+				max_values = el.getAttribute("data-max_values");
 				max_values = max_values ? parseInt( max_values, 10 ) : 0;
 				
-				exact_values = el.getAttribute("exact_values");
+				exact_values = el.getAttribute("data-exact_values");
 				exact_values = exact_values ? parseInt( exact_values, 10 ) : 0;
 				
-				js_popup_err = el.getAttribute("js_popup_err");
+				js_popup_err = el.getAttribute("data-js_popup_err");
 				js_popup_err = js_popup_err ? parseInt( js_popup_err, 10 ) : 0;
 				
 				// Check maximum number of selected options

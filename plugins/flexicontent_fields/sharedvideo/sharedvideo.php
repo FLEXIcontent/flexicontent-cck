@@ -64,7 +64,7 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 		
 		$field->html  = '';
 		$field->html .= '
-		<table class="admintable" border="0" cellspacing="0" cellpadding="5">
+		<table class="admintable">
 			<tr>
 				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_URL').'</td>
 				<td>
@@ -145,7 +145,7 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 			$field->html .= $iframecode;
 		}
 		$field->html	.= '</div></td></tr>';
-		$field->html	.= '</table>';
+		$field->html	.= '</tbody></table>';
 		$field->html 	.= '
 		<script type="text/javascript">
 		function fetchVideo_'.$field->name.'() {

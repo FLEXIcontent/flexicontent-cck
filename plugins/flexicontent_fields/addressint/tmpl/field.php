@@ -326,7 +326,7 @@ $n = 0;
 foreach ($values as $value)
 {
 	$field->html[$n] = '
-	<table class="admintable" border="0" cellspacing="0" cellpadding="5">
+	<table class="admintable"><tbody>
 		<tr>
 			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').':</td>
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][addr1]" value="'.$value['addr1'].'" size="50" maxlength="100"'.$required.' /></td>
@@ -354,7 +354,7 @@ foreach ($values as $value)
 		</tr><tr>
 			<td></td><td><input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GEOLOCATE').'" onclick="geolocateAddr(\'custom['.$field->name.']\', \''.$field->name.'\');" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lat]" value="'.$value['lat'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lon]" value="'.$value['lon'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <div id="'.$field->name.'_map"><img src="http://maps.google.com/maps/api/staticmap?center='.$value['lat'].','.$value['lon'].'&zoom=12&size=320x240&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|'.$value['lat'].','.$value['lon'].'&sensor=false" alt="" /></div></td>
 		</tr>
-	</table>
+	</tbody></table>
 	';
 	
 	$n++;

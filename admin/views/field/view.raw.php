@@ -110,7 +110,7 @@ class FlexicontentViewField extends JViewLegacy
 								<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 								'.($field->label ? '
 									<span class="label-fcouter">'.str_replace((FLEXI_J30GE ? 'hasTooltip' : 'hasTip'), (FLEXI_J30GE ? 'hasTooltip label' : 'hasTip label'), $field->label).'</span>
-									<span class="container_fcfield">'.$field->input.'</span>
+									<div class="container_fcfield">'.$field->input.'</div>
 								' : $field->input).'
 							</fieldset>
 							';

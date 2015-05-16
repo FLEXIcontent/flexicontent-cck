@@ -346,7 +346,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : $editor->display(
-					$fieldname_n, htmlspecialchars( $field->value[$n], ENT_COMPAT, 'UTF-8' ), $width, $height, $_cols='', $_rows='',
+					$fieldname_n, htmlspecialchars( $field->value[$n], ENT_COMPAT, 'UTF-8' ), $width, $height, $cols, $rows,
 					$skip_buttons_arr, $elementid_n, $_asset_ = null, $_author_ = null, $editor_plg_params
 				);
 			
@@ -848,7 +848,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				';
 			} else {
 				$field->html[$ta_count] = $editor->display(
-					$fieldname_t, htmlspecialchars( $ti->beforetabs, ENT_COMPAT, 'UTF-8' ), $width, $height, $_cols='', $_rows='',
+					$fieldname_t, htmlspecialchars( $ti->beforetabs, ENT_COMPAT, 'UTF-8' ), $width, $height, $cols, $rows,
 					$skip_buttons_arr, $elementid_t, $_asset_, $_author_, $editor_plg_params
 				);
 			}
@@ -895,7 +895,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				';
 			} else {
 				$field->html[$ta_count] = $editor->display(
-					$fieldname_t, htmlspecialchars( $tab_content, ENT_COMPAT, 'UTF-8' ), $width, $height, $_cols='', $_rows='',
+					$fieldname_t, htmlspecialchars( $tab_content, ENT_COMPAT, 'UTF-8' ), $width, $height, $cols, $rows,
 					$skip_buttons_arr, $elementid_t, $_asset_, $_author_, $editor_plg_params
 				);
 			}
@@ -944,7 +944,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				';
 			} else {
 				$field->html[$ta_count] = $editor->display(
-					$fieldname_t, htmlspecialchars( $ti->aftertabs, ENT_COMPAT, 'UTF-8' ), $width, $height, $_cols='', $_rows='',
+					$fieldname_t, htmlspecialchars( $ti->aftertabs, ENT_COMPAT, 'UTF-8' ), $width, $height, $cols, $rows,
 					$skip_buttons_arr, $elementid_t, $_asset_, $_author_, $editor_plg_params
 				);
 			}

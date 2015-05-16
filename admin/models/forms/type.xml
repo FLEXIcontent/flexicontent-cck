@@ -270,7 +270,6 @@
 			
 			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level0" />
 			
-			<field name="" type="separator" default="FLEXI_EXPERIMENTAL" description="FLEXI_EXPERIMENTAL_DESC" level="level3" />
 			<field name="allow_jview" type="radio" default="0" label="FLEXI_REDIRECT_ARTICLE_VIEW" description="FLEXI_REDIRECT_ARTICLE_VIEW_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_REDIRECT_TO_ITEM_VIEW</option>
 				<option value="1">FLEXI_ALLOW</option>

@@ -596,7 +596,8 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				foreach ($tmpl->params->getFieldset($name) as $field) :
 					$fieldname =  $field->fieldname;
 					$value = $tmpl->params->getValue($fieldname, $name, $this->params_authorcat->get($field->fieldname));
-					echo $tmpl->params->getLabel($fieldname, $name);
+					echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+						$tmpl->params->getLabel($fieldname, $name));
 					echo
 						str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
 							str_replace('[attribs]', '[layouts]['.$tmpl->name.']',

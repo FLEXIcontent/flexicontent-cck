@@ -327,12 +327,12 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			// Extra properties
 			$attribs = 'multiple="multiple" '.$size;
 			if ($exact_values)  {
-				$attribs .= ' exact_values="'.$exact_values.'" ';
+				$attribs .= ' data-exact_values="'.$exact_values.'" ';
 			} else {
-				if ($max_values)    $attribs .= ' max_values="'.$max_values.'" ';
-				if ($min_values)    $attribs .= ' min_values="'.$min_values.'" ';
+				if ($max_values)    $attribs .= ' data-max_values="'.$max_values.'" ';
+				if ($min_values)    $attribs .= ' data-min_values="'.$min_values.'" ';
 			}
-			if ($js_popup_err)  $attribs .= ' js_popup_err="'.$js_popup_err.'" ';
+			if ($js_popup_err)  $attribs .= ' data-js_popup_err="'.$js_popup_err.'" ';
 			if ($max_values || $min_values || $exact_values)  $classes .= ' validate-sellimitations ';
 			if ($classes)  $attribs .= ' class="'.$classes.'" ';
 			if ($onchange) $attribs .= ' onchange="'.$onchange.'" ';

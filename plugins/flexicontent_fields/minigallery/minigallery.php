@@ -258,7 +258,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			</span>
 				";
 		
-		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
+		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
 	}
 	
 	

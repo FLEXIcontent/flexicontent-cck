@@ -356,7 +356,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 					.htmlspecialchars( $value['text'], ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : $editor->display(
-						$fieldname_n.'[text]', htmlspecialchars( $value['text'], ENT_COMPAT, 'UTF-8' ), $width='100%', $height='100%', $_cols='', $_rows='',
+						$fieldname_n.'[text]', htmlspecialchars( $value['text'], ENT_COMPAT, 'UTF-8' ), $width='100%', $height='100%', $cols, $rows,
 						$show_buttons, $elementid_n.'_text'
 				);
 			

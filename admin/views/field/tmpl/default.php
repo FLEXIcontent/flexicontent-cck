@@ -372,7 +372,7 @@ $this->document->addScriptDeclaration($js);
 							<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 								'.($field->label ? '
 									<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-									<span class="container_fcfield">'.$field->input.'</span>
+									<div class="container_fcfield">'.$field->input.'</div>
 								' : $field->input).'
 							</fieldset>
 							';

@@ -77,11 +77,11 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 					return row.name;
 				}
 			}).result(function(e, row) {
-				jQuery('#input-tags').attr('tagid',row.id);
-				jQuery('#input-tags').attr('tagname',row.name);
+				jQuery('#input-tags').attr('data-tagid',row.id);
+				jQuery('#input-tags').attr('data-tagname',row.name);
 				addToList(row.id, row.name);
 			}).keydown(function(event) {
-				if((event.keyCode==13)&&(jQuery('#input-tags').attr('tagid')=='0') ) {//press enter button
+				if((event.keyCode==13)&&(jQuery('#input-tags').attr('data-tagid')=='0') ) {//press enter button
 					addtag(0, jQuery('#input-tags').attr('value'));
 					resetField();
 					return false;
@@ -91,8 +91,8 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 				}
 			});
 			function resetField() {
-				jQuery('#input-tags').attr('tagid',0);
-				jQuery('#input-tags').attr('tagname','');
+				jQuery('#input-tags').attr('data-tagid',0);
+				jQuery('#input-tags').attr('data-tagname','');
 				jQuery('#input-tags').attr('value','');
 			}
 		});
@@ -353,7 +353,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					<?php /*<label for="input-tags">
 						<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 					</label> */ ?> 
-					<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
+					<input type="text" id="input-tags" name="tagname" data-tagid="0" data-tagname="" />
 					<span id='input_new_tag' ></span>
 					<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_TAG_EDDITING_FULL', 1, 1);?>">
 						<?php echo $infoimage; ?>
@@ -1127,7 +1127,7 @@ if ($this->perms['canparams']) : ?>
 				<fieldset class="panelform">
 					<?php echo ($field->label ? '
 						<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-						<span class="container_fcfield">'.$field->input.'</span>
+						<div class="container_fcfield">'.$field->input.'</div>
 					' : $field->input); ?>
 				</fieldset>
 			<?php endif; ?>
@@ -1146,7 +1146,7 @@ if ($this->perms['canparams']) : ?>
 				<fieldset class="panelform">
 					<?php echo ($field->label ? '
 						<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-						<span class="container_fcfield">'.$field->input.'</span>
+						<div class="container_fcfield">'.$field->input.'</div>
 					' : $field->input); ?>
 				</fieldset>
 			<?php endif; ?>
@@ -1179,7 +1179,7 @@ if ($this->perms['canparams']) : ?>
 						<fieldset class="panelform">
 							<?php echo ($field->label ? '
 								<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-								<span class="container_fcfield">'.$field->input.'</span>
+								<div class="container_fcfield">'.$field->input.'</div>
 							' : $field->input); ?>
 						</fieldset>
 					<?php endif; ?>
@@ -1292,7 +1292,8 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
 								$fieldname =  $field->__get('fieldname');
 								$value = $tmpl->params->getValue($fieldname, $groupname, $this->row->itemparams->get($fieldname));
-								echo $tmpl->params->getLabel($fieldname, $groupname); ?>
+								echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+									$tmpl->params->getLabel($fieldname, $groupname)); ?>
 								<div class="container_fcfield">
 								<?php echo
 									str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
@@ -1345,7 +1346,7 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 		if ( $this->row->id ) {
 		?>
 		<tr>
-			<td width="150" align="right">
+			<td style="width:150px; text-align:right;">
 				<span class="label"><?php echo JText::_( 'FLEXI_ITEM_ID' ); ?></span>
 			</td>
 			<td>
