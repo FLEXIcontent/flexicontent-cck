@@ -203,18 +203,29 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
-			<field name="default_method_cat" type="list" default="display_single_total" label="Category view &lt;br/&gt; (item listings)" description="Default display method for the view">
-				<option value="display">All thumbs</option>
-				<option value="display_single">Single image</option>
-				<option value="display_single_total">Single image + total count</option>
-			</field>
-			<field name="default_method_item" type="list" default="display" label="Item view" description="Default display method for the view">
-				<option value="display">All thumbs</option>
-				<option value="display_single">Single image</option>
-				<option value="display_single_total">Single image + total count</option>
+			
+			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level3" />
+			<field name="default_method_item" type="multilist" subtype="radio" default="display" label="FLEXI_FIELD_IMAGE_ITEM_VIEW_DISPLAY_METHOD" description="FLEXI_FIELD_IMAGE_ITEM_VIEW_DISPLAY_DESC"
+				inline_tip="Single Thumb, will only allow popup galleries" tip_class="" tip_img="comment.png" class="btn-group group-fcinfo">
+				<option value="display">All thumbnails</option>
+				<option value="display_single">Single</option>
+				<option value="display_single_total">Single + total</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" level="level3" />
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_CAT_CONTENT_LISTS" level="level3" />
+			<field name="default_method_cat" type="multilist" subtype="radio" default="display_single_total" label="FLEXI_FIELD_IMAGE_CAT_VIEW_DISPLAY_METHOD" description="FLEXI_FIELD_IMAGE_CAT_VIEW_DISPLAY_DESC"
+					inline_tip="Single Thumb, will link to the item details view, instead of linking to a gallery" tip_class="" tip_img="comment.png" toggle_related="1" class="btn-group group-fcinfo">
+				<option value="display" show_list="" hide_list="single_mode_cat">All thumbnails</option>
+				<option value="display_single" show_list="single_mode_cat" hide_list="">Single</option>
+				<option value="display_single_total" show_list="single_mode_cat" hide_list="">Single + total</option>
+			</field>
+			<field name="cat_link_single_to" type="radio" default="1" label="FLEXI_FIELD_IMAGE_SINGLE_MODE_LINK_TO_ITEM" description="FLEXI_FIELD_IMAGE_SINGLE_MODE_LINK_TO_ITEM_DESC"
+					inline_tip="Single Thumb, will link to the item details view, instead of linking to a gallery" tip_class="" tip_img="comment.png" depend_class="single_mode_cat" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" level="level2" />
 			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC" class="btn-group btn-group-yesno" depend_class="img-link-nourl-mode">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -224,7 +235,7 @@
 			<field name="popupinview" type="fccheckbox" default=""
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
-			<field name="popuptype" type="list" default="4" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC">
+			<field name="popuptype" type="list" default="4" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC" labelclass="label-warning">
 				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
 				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
 				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
@@ -251,7 +262,7 @@
 				<option value="2">FLEXI_FIELD_GROUP_PER_VIEW</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level3" />
+			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level2" />
 			<field name="thumbincatview" type="list" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC">
 				<option value="1">FLEXI_SMALL</option>
 				<option value="2">FLEXI_MEDIUM</option>
@@ -265,7 +276,7 @@
 				<option value="4">FLEXI_ORIGINAL</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level3" />
+			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level2" />
 			<field name="showtitle" type="radio" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -275,7 +286,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_IMGFIELD_HOVERING_LEGEND" level="level3" />
+			<field name="" type="separator" default="FLEXI_IMGFIELD_HOVERING_LEGEND" level="level2" />
 			<field name="uselegend" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_LEGEND" description="FLEXI_FIELD_IMAGE_USE_LEGEND_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

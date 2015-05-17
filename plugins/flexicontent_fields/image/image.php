@@ -1025,13 +1025,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Default display method depends on view
 		// **************************************
 		
-		if ($prop=='display' && $multiple) {
+		if ($prop=='display') {
 			$_method = $view==FLEXI_ITEMVIEW ?
 				$field->parameters->get( 'default_method_item',  'display' ) :
-				$field->parameters->get( 'default_method_cat',  $multiple ? 'display_single_total' : 'display' ) ;
+				$field->parameters->get( 'default_method_cat',  'display_single_total') ;
 		} else {
 			$_method = $prop;
 		}
+		$cat_link_single_to = $field->parameters->get( 'cat_link_single_to', 1) ;
 		
 		
 		// ************************
@@ -1561,7 +1562,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// FINALLY CREATE the field display variable ...
 			// *********************************************
 			
-			if ( $view!='item' && in_array($_method, array('display_single', 'display_single_total')) ) {
+			if ( $view!='item' && $cat_link_single_to &&in_array($_method, array('display_single', 'display_single_total')) ) {
 				
 				// CASE 0: Add single image display information (e.g. image count)
 				
