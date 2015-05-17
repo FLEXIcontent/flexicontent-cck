@@ -90,9 +90,9 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$default_searchphrase = $params->get('default_searchphrase', 'all');
 		
 		// Set the search parameters
-		$keyword		= urldecode(JRequest::getString('searchword'));
-		$match			= JRequest::getWord('searchphrase', $default_searchphrase);
-		$ordering		= JRequest::getWord('ordering', 'newest');
+		$keyword  = urldecode( JRequest::getString('searchword', JRequest::getString('q')) );
+		$match    = JRequest::getWord('searchphrase', JRequest::getWord('p', $default_searchphrase));
+		$ordering = JRequest::getWord('ordering', JRequest::getWord('o', 'newest'));
 		$this->setSearch($keyword, $match, $ordering);
 
 		//Set the search areas

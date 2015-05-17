@@ -947,9 +947,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Check for LIKE %word% search, for languages without spaces
 		$filter_word_like_any = $cparams->get('filter_word_like_any', 0);
 		if ($filter_word_like_any) {
-			$phrase = JRequest::getVar('searchphrase', 'any', 'default');
+			$phrase = JRequest::getWord('searchphrase', JRequest::getWord('p', 'any'), 'default');
 		} else {
-			$phrase = JRequest::getVar('searchphrase', 'exact', 'default');
+			$phrase = JRequest::getWord('searchphrase', JRequest::getWord('p', 'exact'), 'default');
 		}
 		$si_tbl = 'flexicontent_items_ext';
 		

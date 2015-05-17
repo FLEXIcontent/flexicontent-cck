@@ -453,15 +453,15 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$orders[] = JHTML::_('select.option',  'popular', JText::_( 'FLEXI_ADV_MOST_POP' ) );
 			$orders[] = JHTML::_('select.option',  'alpha', JText::_( 'FLEXI_ADV_ALPHA' ) );
 			$orders[] = JHTML::_('select.option',  'category', JText::_( 'FLEXI_ADV_SEARCH_SEC_CAT' ) );
-			$lists['ordering'] = JHTML::_('select.genericlist', $orders, 'ordering',
-				'class="fc_field_filter use_select2_lib"', 'value', 'text', $state->get('ordering', $default_searchordering) );
+			$lists['ordering'] = JHTML::_('select.genericlist', $orders, 'o',
+				'class="fc_field_filter use_select2_lib"', 'value', 'text', $state->get('ordering', $default_searchordering), 'ordering' );
 		}		
 		
 		
 		// *** Selector for usage of Search Text
 		if($show_searchphrase = $params->get('show_searchphrase', 1)) {
 			$default_searchphrase = $params->get('default_searchphrase', 'all');
-			$searchphrase = JRequest::getVar('searchphrase', $default_searchphrase);
+			$searchphrase = JRequest::getWord('searchphrase', JRequest::getWord('p', $default_searchphrase));
 			$searchphrase_names = array('natural'=>'FLEXI_NATURAL_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT', 
 				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'exact'=>'FLEXI_EXACT_PHRASE');
 
@@ -472,7 +472,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$_obj->text  = $searchphrase_name;
 				$searchphrases[] = $_obj;
 			}
-			$lists['searchphrase'] = JHTML::_('select.genericlist', $searchphrases, 'searchphrase',
+			$lists['searchphrase'] = JHTML::_('select.genericlist', $searchphrases, 'p',
 				'class="fc_field_filter use_select2_lib"', 'value', 'text', $searchphrase, 'searchphrase', $_translate=true);
 			
 			/*$lists['searchphrase']  = '<ul class="fc_field_filter fc_checkradio_group">';
@@ -481,7 +481,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$checked = $searchphrase_value == $searchphrase;
 				$checked_attr = $checked ? 'checked=checked' : '';
 				$checked_class = $checked ? 'fc_highlight' : '';
-				$lists['searchphrase'] .= '  <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode, \'fc_highlight\');" id="searchphrase_'.$searchphrase_value.'" type="radio" name="searchphrase" value="'.$searchphrase_value.'" '.$checked_attr.' />';
+				$lists['searchphrase'] .= '  <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode, \'fc_highlight\');" id="searchphrase_'.$searchphrase_value.'" type="radio" name="p" value="'.$searchphrase_value.'" '.$checked_attr.' />';
 				$lists['searchphrase'] .= '  <label class="'.$checked_class.'" style="display:inline-block; white-space:nowrap;" for="searchphrase_'.$searchphrase_value.'">';
 				$lists['searchphrase'] .=     JText::_($searchphrase_name);
 				$lists['searchphrase'] .= '  </label>';

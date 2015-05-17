@@ -2422,14 +2422,16 @@ class FlexicontentController extends JControllerLegacy
 	
 	function search()
 	{
-		// Strip characteres that will cause errors
+		// Strip characters that will cause errors
 		$badchars = array('#','>','<','\\'); 
-		$searchword = trim(str_replace($badchars, '', JRequest::getString('searchword', null, 'post')));
+		$searchword = trim(str_replace($badchars, '', JRequest::getString('searchword', JRequest::getString('q'))));
 		
 		// If searchword is enclosed in double quotes, then strip quotes and do exact phrase matching
 		if (substr($searchword,0,1) == '"' && substr($searchword, -1) == '"') { 
 			$searchword = substr($searchword,1,-1);
+			JRequest::setVar('p', 'exact');
 			JRequest::setVar('searchphrase', 'exact');
+			JRequest::setVar('q', $searchword);
 			JRequest::setVar('searchword', $searchword);
 		}
 		

@@ -497,7 +497,7 @@ class flexicontent_html
 		$searchphrase = '';
 		if($show_searchphrase = $params->get('show_searchphrase', 1)) {
 			$default_searchphrase = $params->get('default_searchphrase', 'all');
-			$searchphrase = JRequest::getVar('searchphrase', $default_searchphrase);
+			$searchphrase = JRequest::getWord('searchphrase', JRequest::getWord('p', $default_searchphrase));
 			$searchphrase_names = array('natural'=>'FLEXI_NATURAL_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT', 
 				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'exact'=>'FLEXI_EXACT_PHRASE');
 		
@@ -508,7 +508,7 @@ class flexicontent_html
 				$_obj->text  = $searchphrase_name;
 				$searchphrases[] = $_obj;
 			}
-			$searchphrase = JHTML::_('select.genericlist', $searchphrases, 'searchphrase',
+			$searchphrase = JHTML::_('select.genericlist', $searchphrases, 'p',
 				'class="fc_field_filter use_select2_lib"', 'value', 'text', $searchphrase, 'searchphrase', $_translate=true);
 		}
 		return $searchphrase;

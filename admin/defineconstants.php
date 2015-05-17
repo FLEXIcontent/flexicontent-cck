@@ -136,6 +136,6 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/
 // Version constants
 define('FLEXI_PHP_NEEDED',	'5.3.0');
 define('FLEXI_PHP_RECOMMENDED',	'5.4.0');
-define('FLEXI_VERSION',	FLEXI_J16GE ? '3.0' : '3.0');
-define('FLEXI_RELEASE',	'BETA7b');
+define('FLEXI_VERSION', '3.0.0');
+define('FLEXI_RELEASE',	'BETA7c');
 ?>

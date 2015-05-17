@@ -431,7 +431,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		
 		$text = JRequest::getString('filter', '', 'default');
 		//$text = $this->_params->get('use_search') ? $text : '';
-		$phrase = JRequest::getVar('searchphrase', 'exact', 'default');
+		$phrase = JRequest::getWord('searchphrase', JRequest::getWord('p', 'exact'), 'default');
 		$si_tbl = 'flexicontent_items_ext';
 		
 		$text = trim( $text );

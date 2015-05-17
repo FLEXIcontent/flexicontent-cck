@@ -45,7 +45,7 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		<input name="view" type="hidden" value="search" />
 		<span class="fc_filter_html fc_text_search">
 		<?php
-		//$output = '<input name="searchword" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
+		//$output = '<input name="q" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
 		
 		$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
 		$text_search_class  = 'fc_text_filter';
@@ -55,7 +55,7 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		$search_inner_prompt = JText::_($params->get('search_inner_prompt', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
 		$maxchars = $params->get('maxchars', 200);
 		$output = '<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'" class="'.$text_search_class.'"
-			data-fc_label_text="'.$search_inner_prompt.'" name="searchword" width="'.$search_inner_width.'" size="" maxlength="'.$maxchars.'"
+			data-fc_label_text="'.$search_inner_prompt.'" name="q" width="'.$search_inner_width.'" size="" maxlength="'.$maxchars.'"
 			id="search_searchword" value="" />';
 		
 		
