@@ -5,15 +5,13 @@
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"] {
 	font-size:11px;
 	display: inline-block;
-	/*float: none;*/ /* problem with ... */
 	margin: 1px 2px 1px 3px;
 	padding: 4px 2px 5px;
 	border-radius: 4px;
 }
 .flexicontent select {
 	font-size: 12px;
-	display: inline-block;  /* important causes problem hidden elements */
-	/*float: none;*/ /* problem with ... */
+	display: inline-block;
 	margin: 1px 2px 1px 3px;
 	padding: 2px 2px;
 	border-radius: 4px;
@@ -27,26 +25,12 @@
 	padding: 0px;
 }
 
-/********************************
- * Label and property field boxes
- ********************************/
-/*#flexicontent .label, .flexicontent .label {
-	display: inline-block;
-	margin-right: 12px;
-}*/
 
-#flexicontent .nowrap_box, .flexicontent .nowrap_box {
-	white-space: nowrap !important;
-	display: inline-block;
-	float: none;
-	vertical-align: top !important;
-}
-#flexicontent .nowrap_box .label, .flexicontent .nowrap_box .label {
-	vertical-align: top !important;
-}
-#flexicontent .filterbuttons_head .nowrap_box .label, .flexicontent .filterbuttons_head .nowrap_box .label {
-	vertical-align: middle !important;
-}
+
+/********
+ * Labels
+ ********/
+
 
 
 
@@ -88,14 +72,15 @@ span.fcselect_lbl {
 }
 
 
-/* !! Negation selector :not(...) is that in browsers (ie8) that do not support these CSS rules, we will have a good fallback appearance */
 
-/* Hide input field, but exclude input inside labels (Graceful fallback) */
+/* Hide input field, but exclude input inside labels (graceful fallback for older browsers) */
 
 input[type="checkbox"].fc_checkradio,
 input[type="radio"].fc_checkradio,
+
 [name="adminForm"] input[type="checkbox"]:not(.skip_fccr),
 [name="adminForm"] input[type="radio"]:not(.skip_fccr),
+
 .flexicontent input[type="checkbox"]:not(.skip_fccr),
 .flexicontent input[type="radio"]:not(.skip_fccr) {
 	width: 24px !important;
@@ -105,12 +90,16 @@ input[type="radio"].fc_checkradio,
 	opacity: 0 !important;
 	display: none !important;
 }
-[name="adminForm"] input[type="checkbox"][name^="cid"],
-[name="adminForm"] input[type="checkbox"]:only-child,
+
+
 label input[type="checkbox"].fc_checkradio,
 label input[type="radio"].fc_checkradio,
+
+[name="adminForm"] input[type="checkbox"][name^="cid"],
+[name="adminForm"] input[type="checkbox"]:only-child,
 [name="adminForm"] label input[type="checkbox"]:not(.skip_fccr),
 [name="adminForm"] label input[type="radio"]:not(.skip_fccr),
+
 .flexicontent label input[type="checkbox"]:not(.skip_fccr),
 .flexicontent label input[type="radio"]:not(.skip_fccr) {
 	width: auto !important;
@@ -122,12 +111,15 @@ label input[type="radio"].fc_checkradio,
 }
 
 
-/* Style the label to also include the nice checkbox, radio */
+
+/* Style the label to also include the checkbox, radio */
 
 input[type="checkbox"].fc_checkradio + label:not(.plupload_button):not(.btn),
 input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
+
 [name="adminForm"] input[type="checkbox"] + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="radio"] + label:not(.plupload_button):not(.btn),
+
 .flexicontent input[type="checkbox"] + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="radio"] + label:not(.plupload_button):not(.btn) {
 	display: inline-block !important;
@@ -144,10 +136,14 @@ input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 	line-height: 19px !important;
 	height: 19px !important;*/
 }
+
+
 input[type="checkbox"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
 input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
+
 [name="adminForm"] input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="radio"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
+
 .flexicontent input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="radio"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn) {
 	background-position: 0 -72px !important;
@@ -156,18 +152,23 @@ input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.bt
 	cursor: normal !important;
 	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
 }
+
+
 input[type="checkbox"].fc_checkradio + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="checkbox"] + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="checkbox"] + label:not(.plupload_button):not(.btn) {
 	background: url(../images/checks.png) no-repeat 0 0 !important;
 	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
 }
+
+
 input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="radio"] + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="radio"] + label:not(.plupload_button):not(.btn) {
 	background: url(../images/checks.png) no-repeat 0 0 !important;
 	/*background: url(../images/checks2.png) no-repeat 0 -38px !important;*/
 }
+
 
 
 /* Style the checked versions of checkbox,radio */
@@ -178,6 +179,7 @@ input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn),
 	background-position: 0 -24px !important;
 	/*background-position: 0 -19px !important;*/
 }
+
 input[type="radio"]:checked + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="radio"]:checked + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="radio"]:checked + label:not(.plupload_button):not(.btn) {
@@ -192,6 +194,7 @@ input[type="checkbox"].fc_checkradio, input[type="checkbox"].fc_checkradio:focus
 }
 
 
+
 /* Styling for radio/checkboxes , for browser not supporting above, e.g. ie8,ie9) */
 
 input.fc_checkradio {
@@ -202,7 +205,9 @@ input.fc_checkradio {
 	top: -1px;
 }
 
+
 /* Styling for radio/checkboxes lists */
+
 span.fc_checkradio_group_wrapper {
 	display: inline-block;
 	float: left; clear: both; 
@@ -237,7 +242,7 @@ li.fc_checkradio_option {
  * ALTERNATIVE display like a bar (use 'fc_checkradio_bar')
 /**********************************************************/
 
-/* Style the label to also include the nice checkbox, radio */
+/* Style the label to also include the checkbox, radio */
 
 input[type="checkbox"].fc_checkradio_bar + label,
 input[type="radio"].fc_checkradio_bar + label {

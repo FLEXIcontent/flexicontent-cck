@@ -427,13 +427,15 @@ class flexicontent_html
 
 	static function layout_selector(&$params, $formname='adminForm', $autosubmit=1, $layout_type='clayout')
 	{
-		if ( !$params->get('clayout_switcher') ) return '';
+		if ( !$params->get($layout_type.'_switcher') ) return '';
 		$_default_layout = $params->get($layout_type, $layout_type=='clayout' ? 'blog' : 'default');
 		
 		if ($layout_type=='clayout') {
 			$displayed_tmpls = $params->get('displayed_'.$layout_type.'s');
 			if ( empty($displayed_tmpls) )							$displayed_tmpls = array();
 			else if ( ! is_array($displayed_tmpls) )		$displayed_tmpls = explode("|", $displayed_tmpls);
+			$current_layout = $params->get('clayout');
+			if ($current_layout && !in_array($current_layout, $displayed_tmpls)) $displayed_tmpls[] = $current_layout;
 		}
 		
 		$allowed_tmpls = $params->get('allowed_'.$layout_type.'s');

@@ -65,6 +65,7 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// ********************************
 		// Load needed JS libs & CSS styles
 		// ********************************
+		
 		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('flexi_tmpl_common');
@@ -162,16 +163,17 @@ class FlexicontentViewFavourites extends JViewLegacy
 		if (($_mp=$app_params->get('robots')))    $document->setMetadata('robots', $_mp);
 		
 		// Overwrite with menu META data if menu matched
-		if (FLEXI_J16GE) {
-			if ($menu_matches) {
-				if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
-				if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
-				if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
-				if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
-			}
+		if ($menu_matches) {
+			if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
+			if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
+			if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
+			if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
 		}
 		
-		
+		// Disable features, that are not supported by the view
+		$params->set('use_filters',0);
+		$params->set('show_alpha',0);
+		$params->set('clayout_switcher',0);
 		
 		//ordering
 		$filter_order		= JRequest::getCmd('filter_order', 'i.title');

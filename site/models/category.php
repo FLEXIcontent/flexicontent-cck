@@ -245,6 +245,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function setCatLayout($name=null)
 	{
 		$this->_clayout = $name;
+		$this->setState('clayout', $this->_clayout);
 	}
 	
 	

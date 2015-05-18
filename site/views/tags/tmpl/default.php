@@ -134,8 +134,8 @@ $items	= & $this->items;
 <form action="<?php echo $this->action; ?>" method="POST" id="adminForm" name="adminForm" onsubmit="">
 
 <?php
-	$this->params->set('use_filters',0);  // Currently not supported by the view, disable it
-	$this->params->set('show_alpha',0);   // Currently not supported by the view, disable it
+	// Filtering form features not supported, will have been disabled in the view.htmnl.php
+	// this is needed since some of these, when parameter is not set, are defaulting to 'yes'
 	
 	// Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
 	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too

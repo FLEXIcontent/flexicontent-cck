@@ -110,25 +110,6 @@ ul.import-failed li {
 	padding: 1px 0 1px 20px;
 }
 
-/** state toggler (backend specific CSS) **/
-ul.statetoggler {
-	float: none !important;
-	margin: 0 !important;
-}
-
-/** rating bar **/
-.qf_ratingbarcontainer {
-	border: 1px solid #999999;
-	height: 10px;
-	width: 60px;
-	margin: 2px 2px;
-	display: block;
-}
-.qf_ratingbar {
-	background-color: silver;
-	height: 10px;
-	display: block;
-}
 
 /**
  * Upload Widget CSS

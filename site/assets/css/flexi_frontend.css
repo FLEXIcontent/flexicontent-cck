@@ -1680,7 +1680,7 @@ div.fancybox-wrap a { background: none!important;}
 
 #flexicontent .fc_mublock {
 	display:block;
-	float:left;
+	float:right;
 	clear:none;
 	margin-bottom:6px;
 }
@@ -1688,8 +1688,6 @@ div.fancybox-wrap a { background: none!important;}
 #flexicontent .fc_markup {
 	float: right;
 	display: block;
-	background-color: #F2F2F2;
-	border-width: 0px;
 	font-style: normal;
 	font-size: 11px;
 	font-family: arial;
@@ -1697,10 +1695,14 @@ div.fancybox-wrap a { background: none!important;}
 	text-align: right;
 	max-width: 150px;
 	min-width: auto;
-	margin: 0px;
-	padding: 0px;
 	border-radius: 6px;
 	line-height: 100%;
+	
+	border-width: 0px;
+	margin: 0px;
+	padding: 0px;
+	background-color: #F2F2F2;
+	color: #555;
 }
 
 #flexicontent .fc_markup.mu_has_text {
@@ -1713,25 +1715,21 @@ div.fancybox-wrap a { background: none!important;}
 #flexicontent .fc_markup.mu_featured_cat.mu_has_text {
 	padding-left: 24px;
 	background: url(../images/star.png) 4px 50% no-repeat lightgoldenrodyellow;
-	color: black;
 }
 
 #flexicontent .fc_markup.mu_normal_cat.mu_has_text {
 	padding-left: 24px;
 	background: url(../images/star-empty.png) 4px 50% no-repeat lightgoldenrodyellow;
-	color: #888;
 }
 
 #flexicontent .fc_markup.mu_item_no_access.mu_has_text {
 	padding-left: 24px;
 	background: url(../images/eye-half.png) 4px 50% no-repeat #FFD700;
-	color: #555;
 }
 
 #flexicontent .fc_markup.mu_item_free_access.mu_has_text {
 	padding-left: 24px;
 	background: url(../images/eye.png) 4px 50% no-repeat #50EE90;
-	color: #777;
 }
 
 #flexicontent .fc_markup.mu_needed_acclvl.mu_has_text {
@@ -1750,11 +1748,9 @@ div.fancybox-wrap a { background: none!important;}
 #flexicontent .fc_markup.mu_ra_timeframe.mu_has_text {
 	padding-left: 24px;
 	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat lightskyblue;
-	color: #333;
 }
 
 #flexicontent .fc_markup.mu_ru_timeframe.mu_has_text {
 	padding-left: 24px;
 	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat lightskyblue;
-	color: #333;
 }
