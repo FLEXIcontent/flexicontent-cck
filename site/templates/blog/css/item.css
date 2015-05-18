@@ -5,7 +5,6 @@
 /********************************************************************/
 
 .iteminfo .createdline {
-	font-family:tahoma;
 	font-size:9px;
 	display:block;
 }
@@ -19,7 +18,6 @@
 }
 
 .iteminfo .modifiedline {
-	font-family:tahoma;
 	font-size:9px;
 	display:block;
 }

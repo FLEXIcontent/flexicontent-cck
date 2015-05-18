@@ -168,7 +168,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
 		$viewtree			= FlexicontentHelperPerm::getPerm()->ViewTree;
 		if (!$viewtree) {
-			$field->html = '<div class="fc_mini_note_box">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_VIEW_CATEGORY_TREE') . '</div>';
+			$field->html = '<div class="alert fc-small fc-iblock">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_VIEW_CATEGORY_TREE') . '</div>';
 			return;
 		}
 		

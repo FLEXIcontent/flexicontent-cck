@@ -6,7 +6,7 @@
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
 
-<div class="fc_mini_note_box" style="padding:4px;">
+<div class="alert fc-small fc-iblock">
 	<span class="fcimport_field_prop_list fcimport_field_prop_mainlist">
 		
 		<span class="fc-mssg-inline-box nowrap_box"><span class="label">Content type</span>

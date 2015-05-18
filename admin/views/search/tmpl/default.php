@@ -151,7 +151,7 @@ function delAllFilters() {
 		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 	
-	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>
+	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 	
 	<div class="fcclear"></div>
 	<?php echo '<span class="label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_indextype']; ?>

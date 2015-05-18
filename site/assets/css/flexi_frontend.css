@@ -457,14 +457,20 @@ fieldset.fc_filter_set {
 /*******************/
 /* (a) TEXT SEARCH */
 /*******************/
+
+/* the container */
 .fc_filter_text_search {}
+
+/* the label */
+.fc_filter.fc_filter_text_search .fc_filter_label,
+.fc_filter_line.fc_filter_text_search .fc_filter_label {
+}
+
 
 
 /*********************/
 /* (b) FIELD FILTERs */
 /*********************/
-
-/* */
 
 /* displayed between ranges */
 .fc_range {
@@ -499,15 +505,15 @@ fieldset.fc_filter_set {
 }
 
 /* removing filter choices */
-.fc_delall_filters {
-	background: url("../images/delete.png") no-repeat scroll 0px 0px transparent !important;
-	width: 16px !important;
-	height: 16px !important;
-	border: 0px solid !important;
-	padding: 0px !important;
-	margin: 4px 0px -4px 0px !important;
-	display: inline-block !important;
-	vertical-align: baseline !important;
+.fc_field_filter .fc_delall_filters {
+	background: url("../images/delete.png") no-repeat scroll 0px 0px transparent;
+	width: 16px;
+	height: 16px;
+	border: 0px solid;
+	padding: 0px;
+	margin: 4px 0px -4px 0px;
+	display: inline-block;
+	vertical-align: baseline;
 }
 
 /* Container of each individual field filter (both label and html) */
@@ -532,6 +538,9 @@ fieldset.fc_filter_set {
 	padding: 0px 1%;
 	width: 98%;
 }
+.fc_filter.fc_even, .fc_filter_line.fc_even { /*background: #E0E0E0;*/ }
+.fc_filter.fc_odd,  .fc_filter_line.fc_odd { /*background: #EEEEEE;*/ }
+
 form > .fc_filter_line {  /* filters placed directly inside form aka outside the filter_box */
 	margin: 0px 1% 0px 1%;
 	width: 96%;
@@ -578,10 +587,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
 }
 
-.fc_filter.fc_filter_text_search .fc_filter_label,
-.fc_filter_line.fc_filter_text_search .fc_filter_label {
-	margin: 5px 8px 0px 8px !important;
-}
+
 .fc_filter .fc_filter_label {
 	clear: both;
 	width: auto !important;
@@ -597,11 +603,6 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	margin: 2px 2px 0px 0px !important;
 	text-align:left !important;
 }
-
-.fc_filter.fc_even,
-.fc_filter_line.fc_even { background: #E0E0E0 !important; display:block; }
-.fc_filter.fc_odd,
-.fc_filter_line.fc_odd { background: #EEEEEE !important; display:block; }
 
 /* Container of each individual field filter HTML, either compact view (floating with separator element) or per line */
 .fc_filter .fc_filter_html,
@@ -1198,7 +1199,6 @@ div.current dd {
 	font-weight:bold;
 	background-color:#eeeeee;
 	font-size: 11px !important;
-	font-family: tahoma;
 	white-space: nowrap;
 	width: 5%;
 }
@@ -1207,7 +1207,6 @@ div.current dd {
 .fc_search_option_cell {
 	padding: 4px 4px 4px 6px;
 	font-size: 11px !important;
-	font-family: tahoma;
 }
 
 /* Search Filter ROW */

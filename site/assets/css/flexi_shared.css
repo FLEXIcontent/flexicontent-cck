@@ -44,7 +44,6 @@
 	margin: 10px 10px 15px 10px;
 	font-size: 12px;
 	line-height: 140%;
-	font-family: tahoma;
 	white-space: normal;
 }
 .alert-modalbox {
@@ -658,7 +657,7 @@ div#result table.versionlist th {
 .fc_select_button {
 	display:block;  float:left;  padding:6px;  margin: 12px; 
 	background-color:#eeeeee;  border:1px solid #dddddd;  border-radius:6px;
-	font-weight:bold;  font-size:11px;  font-family:tahoma;
+	font-weight:bold;  font-size:11px;
 	text-align:left;  text-decoration:none;
 }
 .fc_select_button:hover {
@@ -736,7 +735,6 @@ div label.lang_box img {
 }
 .fcimport_sampleline {
 	font-size:12px;
-	font-familiy:tahoma;
 	line-height:1.6em;
 	display: inline-block;
 	margin-top: 4px;
@@ -941,7 +939,6 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	
 	/* style these */
 	color: #444;
-	font-family: tahoma;
 	font-size: 11px;
 	line-height: 100%;
 	font-weight: bold;
@@ -1288,7 +1285,6 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	color:auto; 
 	font-size: 12px;
 	font-style: normal;
-/* 	font-family: georgia, tahoma; */
 }
 #flexicontent span.flexi_label label label { float:right; margin:auto; padding:auto; }
 
@@ -1539,21 +1535,6 @@ div.flexi_box_right {
 	margin: 6px 6px 4px 0;
 }
 
-.fc_mini_note_box {
-	font-size: 11px;
-	background-color: lightyellow;
-	border: 1px solid lightgray;
-	border-radius: 6px;
-	width: auto;
-	padding: 2px 8px;
-	margin: 2px 8px;
-	float: none;
-	display: inline-block;
-}
-.fc_mini_note_box.floated {
-	float: left;
-}
-
 .fieldgrprow_cell {
 	padding-right: 6px;
 }
@@ -1626,8 +1607,6 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 .container_fcfield { float:left!important; padding:0px!important;  margin: 2px 0% 3px 0%!important; width: 79% !important; display:inline-block; vertical-align: top; }
 .container_fcfield.fcfield_row0 {}
 .container_fcfield.fcfield_row1 {}
-.container_fcfield .fc_mini_note_box,
-.customfields_set .fc_mini_note_box {margin: 0px 0px 6px 0px !important;}
 .container_fcfield.fcdualline { width:auto !important; }
 .container_fcfield .editlinktip img { margin:4px 4px -4px 0px !important; padding:0px !important; vertical-align:baseline; }
 

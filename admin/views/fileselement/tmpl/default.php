@@ -384,7 +384,7 @@ function delAllFilters() {
 <?php endif; ?>
 
 	<div class="fcclear"></div>
-	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>
+	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 	<div class="fcclear"></div>
 	
 	<table id="adminListTableFCfileselement_default<?php echo $this->fieldid; ?>" class="adminlist fcmanlist">

@@ -29,7 +29,6 @@ body .fc-mssg-inline {
 	margin: 0 0 5px 0;
 	padding: 8px 10px 12px 36px;
 	border-radius: 6px;
-	font-family: tahoma;
 	font-size:11px;
 	white-space: normal;
 	line-height: 140%;
@@ -100,6 +99,14 @@ body .alert.fc-info {
 	padding-left: 36px;
 }
 
+body .alert.fc-small {
+	padding: 2px 8px;
+	margin: 2px 8px;
+}
+body .alert.fc-iblock {
+	display: inline-block;
+}
+
 body .fc-noauth {
 	display: inline-block;
 	background: #FCF8CA url(../images/warning.png) no-repeat 10px 50%;
@@ -108,7 +115,6 @@ body .fc-noauth {
 	border-radius: 6px;
 	padding: 3px 6px 4px 36px;
 	margin: 0 0 5px 0;
-	font-family: tahoma;
 	font-size:11px;
 	white-space: normal;
 	line-height: 140%;
@@ -121,7 +127,6 @@ body .fc-caption {
 	border-radius: 6px;
 	padding: 3px 6px 4px 36px;
 	margin: 0 0 5px 0;
-	font-family: tahoma;
 	font-size:11px;
 	white-space: normal;
 	line-height: 140%;

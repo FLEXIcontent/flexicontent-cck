@@ -198,9 +198,9 @@ function delAllFilters() {
 		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
 	
-	<div id="mainChooseColBox" class="fc_mini_note_box well well-small" style="display:none;"></div>
+	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 	
-	<span style="display:none; color:darkred;" class="fc_mini_note_box" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
+	<span style="display:none;" class="alert fc-small fc-iblock" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
 	
 	<table id="adminListTableFCfields" class="adminlist fcmanlist">
 	<thead>

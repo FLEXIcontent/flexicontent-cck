@@ -53,7 +53,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$_value = ($date_source == 1) ? $item->publish_up : $item->publish_down;
 			$field->html =
 				 '<div style="float:left">'
-				.' <div class="fc_mini_note_box">'.$date_source_str.'</div>'
+				.' <div class="alert fc-small fc-iblock">'.$date_source_str.'</div>'
 				. $_value
 				.'</div>';
 			return;
@@ -322,7 +322,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		if (!$use_ingroup) $field->html =
 			 '<div style="float:left">'
-			.(($show_usage && $append_str) ? ' <div class="fc_mini_note_box">'.$append_str.'</div>' : '')
+			.(($show_usage && $append_str) ? ' <div class="alert fc-small fc-iblock">'.$append_str.'</div>' : '')
 			.  $field->html
 			.'</div>';
 			
