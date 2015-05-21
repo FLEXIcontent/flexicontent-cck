@@ -2619,7 +2619,7 @@ class FlexicontentFields
 			$checked_attr = $checked ? 'checked="checked"' : '';
 			$checked_class = $checked ? 'fc_highlight' : '';
 			$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
-			$filter->html .= '<span class="fc_checkradio_group_wrapper fc_add_scroller'.($add_lf ? ' fc_list_filter_wrapper':'').'">';
+			$filter->html .= '<div class="fc_checkradio_group_wrapper fc_add_scroller'.($add_lf ? ' fc_list_filter_wrapper':'').'">';
 			$filter->html .= '<ul class="fc_field_filter fc_checkradio_group'.($add_lf ? ' fc_list_filter':'').'">';
 			$filter->html .= '<li class="fc_checkradio_option fc_checkradio_special'.$checked_class_li.'" style="'.$value_style.'">';
 			$filter->html	.= ($label_filter==2  ? ' <span class="fc_filter_label_inline">'.$filter->label.'</span> ' : '');
@@ -2685,7 +2685,7 @@ class FlexicontentFields
 				$i++;
 			}
 			$filter->html .= '</ul>';
-			$filter->html .= '</span>';
+			$filter->html .= '</div>';
 			break;
 		}
 		

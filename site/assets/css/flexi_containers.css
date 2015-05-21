@@ -29,7 +29,7 @@ body .fc-mssg-inline {
 	margin: 0 0 5px 0;
 	padding: 8px 10px 12px 36px;
 	border-radius: 6px;
-	font-size:11px;
+	font-size:12px;
 	white-space: normal;
 	line-height: 140%;
 }
@@ -115,7 +115,7 @@ body .fc-noauth {
 	border-radius: 6px;
 	padding: 3px 6px 4px 36px;
 	margin: 0 0 5px 0;
-	font-size:11px;
+	font-size:12px;
 	white-space: normal;
 	line-height: 140%;
 }
@@ -127,7 +127,7 @@ body .fc-caption {
 	border-radius: 6px;
 	padding: 3px 6px 4px 36px;
 	margin: 0 0 5px 0;
-	font-size:11px;
+	font-size:12px;
 	white-space: normal;
 	line-height: 140%;
 }

@@ -45,19 +45,18 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		<input name="view" type="hidden" value="search" />
 		<span class="fc_filter_html fc_text_search">
 		<?php
-		//$output = '<input name="q" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
-		
 		$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
 		$text_search_class  = 'fc_text_filter';
 		$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' fc_label_internal') : ' fc_label_internal';
 		//$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
 		$search_inner_width = JText::_($params->get('search_inner_width', 20));
 		$search_inner_prompt = JText::_($params->get('search_inner_prompt', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
+		$width = $params->get('width', 10);
 		$maxchars = $params->get('maxchars', 200);
-		$output = '<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'" class="'.$text_search_class.'"
-			data-fc_label_text="'.$search_inner_prompt.'" name="q" width="'.$search_inner_width.'" size="" maxlength="'.$maxchars.'"
-			id="search_searchword" value="" />';
-		
+		//$output = '<input name="q" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
+		$output = '<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
+			id="mod_search_searchword-'.$module->id.'" class="'.$text_search_class.'"
+			data-fc_label_text="'.$search_inner_prompt.'" name="q" size="'.$search_inner_width.'" maxlength="'.$maxchars.'" value="" />';
 		
 		// Search GO button
 		if ($button) :

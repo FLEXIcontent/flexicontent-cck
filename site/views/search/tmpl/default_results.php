@@ -56,10 +56,11 @@ if ( $use_infoflds && count($infoflds) ) {
 ?>
 
 
-<table class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" width="100%"><tr><td>
+<div class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
 
 <?php $count = -1; ?>
 <?php foreach($this->results as $i => $result) : ?>
+	<div class="fcclear"></div>
 	<?php
 		$count++;
 		$fc_item_classes = 'fc_search_result '.($count%2 ? 'fcodd' : 'fceven');
@@ -89,7 +90,7 @@ if ( $use_infoflds && count($infoflds) ) {
 	<fieldset id="searchlist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
 	 <div class="search-results<?php echo $this->pageclass_sfx; ?>">
 	 	
-		<div class="fc_search_result_title">
+		<h2 class="fc_search_result_title">
 			<?php echo $this->pageNav->limitstart + $result->count.'. ';?>
 			<?php if ($result->href) :?>
 				<a href="<?php echo $item_link; ?>"<?php if ($result->browsernav == 1) :?> target="_blank"<?php endif;?>>
@@ -98,7 +99,7 @@ if ( $use_infoflds && count($infoflds) ) {
 			<?php else:?>
 				<?php echo $this->escape($result->title);?>
 			<?php endif; ?>
-		</div>
+		</h2>
 		
 		
 		<?php if ( @ $result->fc_item_id ) echo $markup_tags; ?>
@@ -106,21 +107,21 @@ if ( $use_infoflds && count($infoflds) ) {
 		
 		
 		<?php if ($this->params->get('show_date', 1)) : ?>
-		<div class="fc_search_result_date">
-			<span class="small<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
-			<?php echo JText::sprintf('FLEXI_CREATED_ON', $result->created); ?>
+		<span class="fc_search_result_date">
+			<span class="badge badge-success">
+			<?php echo $result->created; ?>
 			</span>
-		</div>
+		</span>
 		<?php endif; ?>
 		
 		
 		
 		<?php if ( $this->params->get( 'show_section', 1 ) && $result->section ) : ?>
-		<div class="fc_search_result_category">
-			<span class="small<?php echo $this->pageclass_sfx; ?>">
-				(<?php echo $this->escape($result->section); ?>)
+		<span class="fc_search_result_category">
+			<span class="badge badge-info">
+				<?php echo $this->escape($result->section); ?>
 			</span>
-		</div>
+		</span>
 		<?php endif; ?>
 		
 		
@@ -189,9 +190,13 @@ if ( $use_infoflds && count($infoflds) ) {
 	
 		<?php foreach ($infoflds as $fieldname) : ?>
 			<?php if ( @$fcitems[$i]->fields[$fieldname]->display ) : ?>
-			<span class="fc_field_container">
-				<span class="fc_field_label"><?php echo $fcitems[$i]->fields[$fieldname]->label; ?></span>
-				<span class="fc_field_value"><?php echo $fcitems[$i]->fields[$fieldname]->display; ?></span>
+			<span class="fc_search_field_container">
+				<span class="fc_search_field_label label">
+					<?php echo $fcitems[$i]->fields[$fieldname]->label; ?>
+				</span>
+				<span class="fc_search_field_value">
+					<?php echo $fcitems[$i]->fields[$fieldname]->display; ?>
+				</span>
 			</span>
 			<?php endif; ?>
 		<?php endforeach; ?>
@@ -203,9 +208,11 @@ if ( $use_infoflds && count($infoflds) ) {
 		
 	 </div>
 	</fieldset>
+	
 	<?php endforeach; ?>
 
-</td></tr></table>
+</div>
+<div class="fcclear"></div>
 
 
 <!-- BOF pagination (After Results) -->

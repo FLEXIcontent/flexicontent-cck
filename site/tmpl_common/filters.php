@@ -79,7 +79,7 @@ if ($filter_instructions == 1) {
 		<?php if ($filter_instructions == 1) : ?>
 		<legend>
 			<span class="<?php echo $legend_class; ?>" title="<?php echo $legend_tip; ?>">
-				<span class=""><?php echo JText::_('FLEXI_SEARCH_FILTERING'); ?></span>
+				<span><?php echo JText::_('FLEXI_SEARCH_FILTERING'); ?></span>
 			</span>
 		</legend>
 		<?php endif; ?>

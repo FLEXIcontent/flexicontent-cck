@@ -126,16 +126,11 @@
 /**********************************
  * FLEXIcontent headlines and title
  **********************************/
-#flexicontent h2 {
-	margin: 0 0 0.5em;
-}
-
-#flexicontent h2 img {
-	border: none;
-}
-
 #flexicontent .fc_item_title {
 	text-decoration: none;
+}
+#flexicontent .fc_item_title img {
+	border: none;
 }
 
 
@@ -326,17 +321,6 @@ div table.adminform td {
 	width: 100%;
 }
 
-/* Used for inner containers of (a) text search, (b) field filters */
-fieldset.fc_filter_set {
-	border: 1px solid #cccccc;
-	margin: 0px;
-	padding: 1%;
-	width: 100%;
-	box-sizing: border-box;
-	min-width: inherit !important; /* workaround for chrome fieldset width bug */
-	display: block;
-}
-
 /* Blocking overlay during form being applied and page reloading */
 #fc_filter_form_blocker {
 	display: none;
@@ -408,45 +392,64 @@ fieldset.fc_filter_set {
 	background-color: #0099ff;
 }
 
-.fc_filter_set legend {
-	width: auto !important;
-	border: 0px solid !important;
-	padding: 0px !important;
-	margin: 0px !important;
+
+/* CONTAINER of text-search  & field filters */
+fieldset.fc_search_set,
+fieldset.fc_filter_set {
+	border: 1px solid #cccccc;
+	margin: 0px;
+	padding: 1%;
+	width: 100%;
+	box-sizing: border-box;
+	min-width: inherit !important; /* workaround for chrome fieldset width bug */
+	display: block;
 }
-.fc_filter_set legend .fc_legend_text {
+/* TITLE OF CONTAINER of search (field) filters */
+fieldset.fc_search_set legend,
+fieldset.fc_filter_set legend {
+	width: auto;
+	border: 0px solid;
+	padding: 0px;
+	margin: 0px;
+}
+fieldset.fc_search_set legend .fc_legend_text,
+fieldset.fc_filter_set legend .fc_legend_text {
 	background: transparent;
-	border:1px solid lightgray !important;
-	color:gray !important;
+	border:1px solid lightgray;
+	color:gray;
 	display:block;
-	margin:0 0 5px 0 !important;
-	padding:8px 10px 8px 10px !important;
-	border-radius: 6px !important;
-	display: inline-block !important;
-	line-height: 0.5em !important;
-	position: relative !important;
-	top: 0px !important;
+	margin:0 0 5px 0;
+	padding:8px 10px 8px 10px;
+	border-radius: 6px;
+	display: inline-block;
+	line-height: 0.5em;
+	position: relative;
+	top: 0px;
 }
-.fc_filter_set legend .fc_legend_text.hasTip {
+fieldset.fc_search_set legend .fc_legend_text.hasTip,
+fieldset.fc_filter_set legend .fc_legend_text.hasTip {
 	background: lightyellow url(../images/note.gif) no-repeat 10px 50%;
-	border:1px solid lightgray !important;
-	color:gray !important;
+	border:1px solid lightgray;
+	color:gray;
 	display:block;
-	margin:0 0 5px 0 !important;
-	padding-left: 36px !important;
-	border-radius: 6px !important;
+	margin:0 0 5px 0;
+	padding-left: 36px;
+	border-radius: 6px;
 }
-.fc_filter_set legend .fc_legend_text span {
-	font-weight: bold !important;
-	font-size: 12px !important;
-	padding: 0px !important;
-	margin: 0px !important;
-	display: inline-block !important;
-	line-height: 1em !important;
+fieldset.fc_search_set legend .fc_legend_text span,
+fieldset.fc_filter_set legend .fc_legend_text span {
+	font-weight: bold;
+	font-size: 12px;
+	padding: 0px;
+	margin: 0px;
+	display: inline-block;
+	line-height: 1em;
 }
 
-.fc_filter_set .fc-mssg.fc-info {
-	margin: 4px 16px 16px 16px !important; font-size: 12px;
+fieldset.fc_search_set .fc-mssg.fc-info,
+fieldset.fc_filter_set .fc-mssg.fc-info {
+	margin: 4px 16px 16px 16px;
+	font-size: 12px;
 }
 .ui-autocomplete-loading {
 	background: #eee url('../images/ajax-loader.gif') no-repeat 96% center !important;
@@ -910,22 +913,18 @@ ul.fc_field_filter.fc_checkradio_group label {
 /* (e) Generic Display of Rendered Field Values, used e.g. by search results */
 /*****************************************************************************/
 
-#flexicontent .fc_field_container {
+#flexicontent .fc_search_field_container {
 	display: block;
 	white-space: nowrap;
 	float: left;
 }
-
-#flexicontent .fc_field_label {
-	float: left;
-	border-bottom: 1px solid silver;
+#flexicontent .fc_search_field_label {
+	display: inline-block;
+	vertical-align: top;
 	font-size: 90%;
-	margin-right: 8px;
-	display:block;
 }
-
-#flexicontent .fc_field_value {
-	float: left;
+#flexicontent .fc_search_field_value {
+	display: inline-block;
 }
 
 
@@ -1195,6 +1194,7 @@ div.current dd {
 /* Container of TEXT search label */
 .fc_search_label_cell {
 	text-align:right;
+	vertical-align:middle;
 	padding: 4px 6px 4px 4px;
 	font-weight:bold;
 	background-color:#eeeeee;
@@ -1219,22 +1219,6 @@ div.current dd {
 	background-color: #e7e7e7;
 }
 
-/* CONTAINER of search (field) filters */
-fieldset.fc_search_set {
-	border: 1px solid #cccccc;
-	margin: 0px 0px 12px 0px;
-	padding: 1%;
-	width: 98%;
-	min-width: inherit !important; /* workaround for chrome fieldset width bug */
-	display: block;
-}
-
-/* TITLE of CONTAINER of search (field) filters */
-fieldset.fc_search_set legend {
-	margin-left: 6px;
-	padding-left: 4px;
-}
-
 /* Search (field) filters TABLE */
 table.fc_search_tbl {
 	border-collapse: separate !important;
@@ -1246,10 +1230,6 @@ table.fc_search_tbl {
 table.fc_search_tbl td {
 	border-width: 0px !important;
 	border-spacing: 1px !important;
-}
-
-/* CONTAINER of form fields related Search View BEHAVIOR */
-fieldset#fc_search_set_search_behavior legend {
 }
 
 div.flexicontent.fcsearch .inputbox {
@@ -1694,7 +1674,7 @@ div.fancybox-wrap a { background: none!important;}
 	text-align: right;
 	max-width: 150px;
 	min-width: auto;
-	border-radius: 6px;
+	border-radius: 4px;
 	line-height: 100%;
 	
 	border-width: 0px;
