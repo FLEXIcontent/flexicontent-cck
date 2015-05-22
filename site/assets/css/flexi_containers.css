@@ -39,12 +39,6 @@ body .fc-mssg-inline {
 	max-width: 62%;
 }
 
-body .fc-mssg-inline.fc-nobgimage,
-body .fc-mssg.fc-nobgimage {
-	background-image: none;
-	padding: 2px 8px;
-}
-
 body .fc-mssg-inline.fc-note,
 body .fc-mssg.fc-note {
 	background: #FCF8E3 url(../images/note.gif) no-repeat 10px 50%;
@@ -75,13 +69,8 @@ body .fc-mssg.fc-info {
 	color: #3A87AD;
 	border-color: #BCE8F1;
 }
-body .fc-mssg-inline-box {
-	display: inline-block;
-	border-width: 0;
-	padding: 2px;
-	margin: 0 6px 2px 0;
-}
 
+/* modified backgrounds for alerts */
 body .alert.fc-error {
 	background: #F2DEDE url(../images/error.png) no-repeat 10px 50%;
 	padding-left: 36px;
@@ -99,6 +88,7 @@ body .alert.fc-info {
 	padding-left: 36px;
 }
 
+/* modified styling for alerts */
 body .alert.fc-small {
 	padding: 2px 8px;
 	margin: 2px 8px;
@@ -107,6 +97,7 @@ body .alert.fc-iblock {
 	display: inline-block;
 }
 
+/* some special cases */
 body .fc-noauth {
 	display: inline-block;
 	background: #FCF8CA url(../images/warning.png) no-repeat 10px 50%;
@@ -131,6 +122,18 @@ body .fc-caption {
 	white-space: normal;
 	line-height: 140%;
 }
+
+/* place last since it is of same importance */
+body .fc-mssg-inline.fc-nobgimage,
+body .fc-mssg.fc-nobgimage {
+	background-image: none;
+	padding: 2px 8px;
+}
+body .fc-mssg-inline.fc-noborder,
+body .fc-mssg.fc-noborder  {
+	border-width: 0;
+}
+
 
 
 

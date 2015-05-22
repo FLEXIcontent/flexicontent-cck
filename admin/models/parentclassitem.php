@@ -954,7 +954,7 @@ class ParentClassItem extends JModelAdmin
 		}
 
 		// Modify the form based on Edit State access controls.
-		if ( empty($this->_item->submit_conf['autopublished']) && !$this->canEditState( (object)$data ) )
+		if ( empty($this->_item->submit_conf['autopublished']) && !$this->canEditState( empty($data) ? null : (object)$data ) )
 		{
 			$frontend_new = !$id && $app->isSite();
 			
@@ -1246,7 +1246,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function canEditState($item=null, $check_cat_perm=true)
 	{
-		if ( empty($item) || !isset($item->id) ) $item = & $this->_item;
+		if ( empty($item) ) $item = & $this->_item;
 		$user = JFactory::getUser();
 		$session = JFactory::getSession();
 		
@@ -1258,8 +1258,8 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		// get "edit items state" permission on the type of the item
-		$hasTypeEditState    = $item->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit.state');
-		$hasTypeEditStateOwn = $item->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit.state.own');
+		$hasTypeEditState    = !$item->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit.state');
+		$hasTypeEditStateOwn = !$item->type_id ? true : FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit.state.own');
 		if (!$hasTypeEditState && !$hasTypeEditStateOwn) return false;
 		
 		if ( !empty($item->id) )
@@ -1738,6 +1738,7 @@ class ParentClassItem extends JModelAdmin
 		// New or Existing item must use the current user + new main category to calculate 'Edit State' privelege
 		$item->created_by = $user->get('id');
 		$item->catid      = $data['catid'];
+		$item->type_id    = $data['type_id'];
 		$canEditState = $this->canEditState( $item, $check_cat_perm=true );
 		
 		// Restore old main category & creator (owner) (in case following code chooses to keep them)

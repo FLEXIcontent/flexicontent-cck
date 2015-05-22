@@ -638,31 +638,31 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2015
 				</span><br/><br/>
 				<span id="fc-dash-devs" class="nowrap_box">
-					<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box" style="text-align:center;" >
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
 						<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span>
 						<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span><br/><br/>
 						<a class="<?php echo $btn_class.(FLEXI_J16GE ? ' btn-primary ' : ' ').$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
 					</span>
 					
-					<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 						<span class="label label-info <?php echo $tooltip_class;?>" title="Core Developer">Marvelic Engine</span><br/><br/>
 						<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
 							marvelic.co.th
 						</a>
 					</span>
 					
-					<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 						<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Suriya Kaewmungmuang</span>
 					</span>
 					
-					<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 						<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Yannick Berges</span><br/><br/>
 						<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://com3elles.com/" target="_blank" title="<?php echo flexicontent_html::getToolTip("Com'3Elles", "Com'3Elles, agence de communication, conseil et formations", 0, 1); ?>">
 							com3elles.com
 						</a>
 					</span>
 					
-					<span class="fc-mssg-inline fc-nobgimage fc-mssg-inline-box nowrap_box">
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 						<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">Ruben Reyes</span><br/><br/>
 						<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
 							lyquix.com

@@ -694,7 +694,6 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		$host = JURI::getInstance('SERVER')->gethost();
 		
-		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
 		

@@ -374,14 +374,27 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
+		$is_importcsv = JRequest::getVar('task') == 'importcsv';
+		
 		// Currently post is an array of properties, TODO: make field multi-value
-		$post = array(0=>$post);
+		if ( empty($post) ) $post = array();
+		else if ( !isset($post[0]) ) $post = array( $post );
 		
 		// Reformat the posted data
 		$newpost = array();
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
+			// support for basic CSV import / export
+			if ( $is_importcsv && !is_array($post[$n]) ) {
+				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
+					$post[$n] = unserialize($post[$n]);
+				} else {
+					$post[$n] = array('url' => $post[$n]);
+				}
+			}
+			
+			
 			// ***********************************************************
 			// Validate URL, skipping URLs that are empty after validation
 			// ***********************************************************

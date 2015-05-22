@@ -313,8 +313,9 @@ jQuery(document).ready(function() {
 	var fc_select_pageSize = 10;
 	
 	// add Simple text search autocomplete
-	if (typeof jQuery.fn.autocomplete==='function') {
-		jQuery( "input.fc_index_complete_simple" ).autocomplete({
+	if (typeof jQuery.ui.autocomplete==='function') {
+		var theElements = jQuery("input.fc_index_complete_simple");
+		if (theElements.length) jQuery.ui.autocomplete( {
 			source: function( request, response ) {
 				el = jQuery(this.element);
 				jQuery.ajax({
@@ -359,7 +360,7 @@ jQuery(document).ready(function() {
 				//console.log( 'quering ... ' );
 				jQuery(this).addClass('working');
 			}
-		});
+		}, theElements );
 	}
 
 
