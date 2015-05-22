@@ -14,7 +14,7 @@ $default_searchordering = $this->params->get('default_searchordering', 'newest')
 
 // Whether to show advanced options,  (a) the filters, (b) the text search fields, which these depend on content types selected/configured
 $autodisplayadvoptions = $this->params->get('autodisplayadvoptions', 1);
-if (empty($this->contenttypes)) $autodisplayadvoptions = 0;
+if (empty($this->contenttypes) && !count($this->filters)) $autodisplayadvoptions = 0;
 
 // Whether to show advanced options or hide them, initial behaviour depends on $autodisplayadvoptions, which is calculated above
 $use_advsearch_options = JRequest::getInt('use_advsearch_options', $autodisplayadvoptions==2);
@@ -159,8 +159,6 @@ $r = 0;
 						?>
 						<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>					
 						
-						<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
-						
 						<?php $button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple'; ?>
 						<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
 						
@@ -174,6 +172,8 @@ $r = 0;
 							$use_advsearch_options_ff .= '</label>';
 							echo $use_advsearch_options_ff;
 						} ?>
+						
+						<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 					</span>
 				</td>
 			</tr>

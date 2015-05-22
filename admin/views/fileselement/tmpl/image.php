@@ -94,7 +94,7 @@ function showUploader() {
 			
 			// Set maximum file size and chunking to 1 MB
 			max_file_size : "'.$upload_maxsize.'",
-			chunk_size: "1mb",
+			chunk_size: 0,
 			
 			// Resize images on clientside if we can
 			/*resize : {width : 320, height : 240, quality : 90, crop: true},*/
@@ -143,7 +143,7 @@ function showUploader() {
 			unique_names : true,
 			
 			// Set maximum file size and chunking to 1 MB
-			chunk_size : "1mb",
+			chunk_size : 0,
 			filters : {
 				max_file_size : "'.$upload_maxsize.'",
 				mime_types: [

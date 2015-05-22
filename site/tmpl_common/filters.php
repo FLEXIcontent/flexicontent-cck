@@ -117,7 +117,6 @@ if ($filter_instructions == 1) {
 					<?php echo $searchphrase_selector; ?>
 					
 					<?php if ( $filter_placement && ($show_search_go || $show_search_reset) ) : ?>
-					<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 					<span class="fc_buttons">
 						<?php if ($show_search_go) : ?>
 						<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;">
@@ -132,6 +131,7 @@ if ($filter_instructions == 1) {
 						<?php endif; ?>
 						
 					</span>
+					<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 					<?php endif; ?>
 				
 					<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>
@@ -146,7 +146,7 @@ if ($filter_instructions == 1) {
 			$msg = '';
 			$msg = implode(' <br/> ', $filter_messages);
 			if ( $msg ) :
-				?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php
+				?><div class="fcclear"></div><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php
 			endif;
 		?>
 		
@@ -240,7 +240,6 @@ if ($filter_instructions == 1) {
 			
 			<?php if ($show_search_go && !$buttons_added_already) : ?>
 			<span class="fc_filter">
-				<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 				<span class="fc_buttons">
 					<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;">
 						<span title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>"><?php echo JText::_( 'FLEXI_GO' ); ?></span>
@@ -253,6 +252,7 @@ if ($filter_instructions == 1) {
 					<?php endif; ?>
 					
 				</span>
+				<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 			</span>
 			<?php endif; ?>
 			

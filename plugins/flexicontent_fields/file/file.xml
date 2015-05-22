@@ -13,6 +13,7 @@
 		<filename plugin="file">file.php</filename>
 		<filename>index.html</filename>
 		<folder>file</folder>
+		<folder>tmpl</folder>
 	</files>
 	
 	<config>

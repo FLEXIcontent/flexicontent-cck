@@ -656,7 +656,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
-	function getFiltered(&$filter, $value)
+	function getFiltered(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
@@ -677,23 +677,23 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$filter->filter_colname    = sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat);
 		$filter->filter_valuesjoin = null;   // use default
 		$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);
-		return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
+		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
 	
 	
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$field, $value)
+	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		$date_source = $field->parameters->get('date_source', 0);
+		$date_source = $filter->parameters->get('date_source', 0);
 		if ( $date_source ) {
-			JFactory::getApplication()->enqueueMessage( "Field: '".$field->label."' is using start/end publication dates and cannot be used as filter in search view" , 'notice' );
+			JFactory::getApplication()->enqueueMessage( "Field: '".$filter->label."' is using start/end publication dates and cannot be used as filter in search view" , 'notice' );
 			return;
 		}
 		
-		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
+		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}
 	
 	

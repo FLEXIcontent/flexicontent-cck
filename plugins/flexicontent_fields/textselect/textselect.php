@@ -127,21 +127,21 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	
 	
 	// Get item ids having the value(s) of filter
-	function getFiltered(&$filter, $value)
+	function getFiltered(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
+		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
 	
 		
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$field, $value)
+	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
-		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
+		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}
 	
 	

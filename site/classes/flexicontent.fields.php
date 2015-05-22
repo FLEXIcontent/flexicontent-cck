@@ -1715,8 +1715,8 @@ class FlexicontentFields
 	static function getSearchFields($key='name', $indexer='advanced', $search_fields=null, $content_types=null, $load_params=true, $item_id=0, $search_type='all-search')
 	{
 		$db = JFactory::getDBO();
+		static $sp, $nsp;
 		
-
 		if ($search_type=='search') {   // All fields marked as text-searchable (also are published)
 			$where = $indexer=='basic' ? ' f.issearch IN (1,2)' : ' f.isadvsearch IN (1,2) ';
 			$where = '('.$where.' AND f.published = 1)';
@@ -1749,40 +1749,47 @@ class FlexicontentFields
 			.' GROUP BY f.id'
 			.' ORDER BY '.(($content_types && count($content_types)==1) ? ' ftr.ordering, f.name' : ' f.ordering, f.name') // if single type given then retrieve ordering for fields of this type
 		;
-		$db->setQuery($query);
-		$fields = $db->loadObjectList($key);
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
-		$sp_fields = array();
-		$nsp_fields = array();
-		foreach ($fields as $field_id => $field)
+		if (! isset($sp[$query]) )
 		{
-			// Skip fields not being capable of advanced/basic search
-			if ( $indexer=='basic' ) {
-				if ( ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, $search_type=='filter' ? 'supportfilter' : 'supportsearch') ) {
-					$nsp_fields[$field_id] = $field;
-					continue;
+			$db->setQuery($query);
+			$fields = $db->loadObjectList($key);
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			
+			$sp_fields = array();
+			$nsp_fields = array();
+			foreach ($fields as $field_id => $field)
+			{
+				// Skip fields not being capable of advanced/basic search
+				if ( $indexer=='basic' ) {
+					if ( ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, $search_type=='filter' ? 'supportfilter' : 'supportsearch') ) {
+						$nsp_fields[$field_id] = $field;
+						continue;
+					}
+				} else if ($search_type != 'non-search') {
+					$no_supportadvsearch = ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, 'supportadvsearch');
+					$no_supportadvfilter = ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, 'supportadvfilter');
+					$skip_field = ($no_supportadvsearch && $search_type=='search')  ||  ($no_supportadvfilter && $search_type=='filter') ||
+						($no_supportadvsearch && $no_supportadvfilter && in_array($search_type, array('all-search', 'dirty-nosupport') ) );
+					if ($skip_field) {
+						$nsp_fields[$field_id] = $field;
+						continue;
+					}
 				}
-			} else if ($search_type != 'non-search') {
-				$no_supportadvsearch = ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, 'supportadvsearch');
-				$no_supportadvfilter = ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, 'supportadvfilter');
-				$skip_field = ($no_supportadvsearch && $search_type=='search')  ||  ($no_supportadvfilter && $search_type=='filter') ||
-					($no_supportadvsearch && $no_supportadvfilter && in_array($search_type, array('all-search', 'dirty-nosupport') ) );
-				if ($skip_field) {
-					$nsp_fields[$field_id] = $field;
-					continue;
-				}
+				$field->item_id		= $item_id;
+				$field->value     = !$item_id ? false : $this->getExtrafieldvalue($field->id, $version=0, $item_id);  // WARNING: getExtrafieldvalue() is Frontend method
+				if ($load_params) $field->parameters = new JRegistry($field->attribs);
+				$sp_fields[$field_id] = $field;
 			}
-			$field->item_id		= $item_id;
-			$field->value     = !$item_id ? false : $this->getExtrafieldvalue($field->id, $version=0, $item_id);  // WARNING: getExtrafieldvalue() is Frontend method
-			if ($load_params) $field->parameters = new JRegistry($field->attribs);
-			$sp_fields[$field_id] = $field;
+			
+			$sp[$query]  = $sp_fields;
+			$nsp[$query] = $nsp_fields;
 		}
 		
 		if ($indexer=='advanced' && $search_type=='dirty-nosupport')
-			return $nsp_fields;
+			return $nsp[$query];
 		else
-			return $sp_fields;
+			return $sp[$query];
 	}
 	
 		
@@ -2328,9 +2335,10 @@ class FlexicontentFields
 				' GROUP BY fs.item_id ' .' HAVING COUNT(*) >= '.count($value).
 				' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
 		}
+		//echo 'Filter ['. $filter->label .']: '. $query."<br/><br/>\n";
 		
 		if ( !$return_sql ) {
-			//echo "<br>FlexicontentFields::getFiltered() ".$filter->name." appying  query :<br>". $query."<br>\n";
+			//echo "<br>FlexicontentFields::getFiltered() -- [".$filter->name."]  doing: <br>". $query."<br><br>\n";
 			$db->setQuery($query);
 			$filtered = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
@@ -2457,24 +2465,27 @@ class FlexicontentFields
 			}
 
 			// Get filter values considering PAGE configuration (regardless of ACTIVE filters)
-			if ( $apply_cache ) {
+			if ( $apply_cache )
 				$results_page = $itemcache->call(array('FlexicontentFields', $createFilterValues), $filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
-			} else {
-				if (!$isSearchView)
-					$results_page = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
-				else
-					$results_page = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
-			}
+			else if (!$isSearchView)
+				$results_page = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
+			else
+				$results_page = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
 			
 			// Get filter values considering ACTIVE filters, but only if there is at least ONE filter active
 			$faceted_max_item_limit = 10000;
 			if ( $faceted_filter==2 && count($filters_where) ) {
 				if ($view_total <= $faceted_max_item_limit) {
+					
 					// DO NOT cache at this point the filter combinations are endless, so they will produce big amounts of cached data, that will be rarely used ...
-					if (!$isSearchView)
+					// but if only a single filter is active we can get the cached result of it ... because its own filter_where is not used for the filter itself
+					if ( $apply_cache && count($filters_where)==1 && isset($filters_where[$filter->id]) )
+						$results_active = $results_page;
+					else if (!$isSearchView)
 						$results_active = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
 					else
 						$results_active = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
+						
 				} else if ($faceted_overlimit_msg === null) {
 					// Set a notice message about not counting item per filter values and instead showing item TOTAL of current category / view
 					$faceted_overlimit_msg = 1;

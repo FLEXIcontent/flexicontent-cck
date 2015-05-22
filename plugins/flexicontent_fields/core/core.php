@@ -622,7 +622,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
-	function getFiltered(&$filter, $value)
+	function getFiltered(&$filter, $value, $return_sql=true)
 	{
 		if ( !$filter->iscore ) return;
 		//echo __FUNCTION__ ." of CORE field type: ".$filter->field_type;
@@ -639,18 +639,16 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);
 			
 			// Dates are given in user calendar convert them to valid SQL dates
-			$sql = FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
-			//echo "<br/>\n" .print_r($sql,true). "<br/>\n";
-			return $sql;
+			return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 		} else {
-			return array(0);
+			return $return_sql ? ' AND i.id IN (0) ' : array(0);
 		}
 	}	
 	
 	
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value)
+	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
 		if($filter->iscore != 1) return;
 		
@@ -659,7 +657,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		}
 		
 		$filter->isindexed = in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
-		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql=true);
+		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}	
 	
 	

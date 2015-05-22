@@ -175,7 +175,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 	
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for content lists e.g. category view, and not for search view
-	function getFiltered(&$filter, $value)
+	function getFiltered(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
@@ -188,37 +188,53 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 				$filter->filter_valueformat = ' ';
 				
 				// Dates are given in user calendar convert them to valid SQL dates
-				$sql = FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
+				$query = FlexicontentFields::getFiltered($filter, $value, $return_sql);
 				break;
 			default:
-				$sql = '';
+				return $return_sql ? ' AND i.id IN (0) ' : array(0);
 				break;
 		}
-		return $sql;
+		if ( !$return_sql ) {
+			//echo "<br>plgFlexicontent_fieldsCoreprops::getFiltered() -- [".$filter->name."]  doing: <br>". $query."<br><br>\n";
+			$db = JFactory::getDBO();
+			$db->setQuery($query);
+			$filtered = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			return $filtered;
+		} else {
+			return ' AND i.id IN ('. $query .')';
+		}
 	}
 	
 	
 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
-	function getFilteredSearch(&$filter, $value)
+	function getFilteredSearch(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
-	
+		
 		$props_type = $filter->parameters->get('props_type');
 		switch ($props_type)
 		{
 			case 'language':
-				$sql = "AND i.id IN "
-					." ( "
-					." SELECT DISTINCT c.id FROM ". (FLEXI_J16GE ? '#__content' : '#__flexicontent_items_ext') ." AS c "
-					." WHERE c.language='".implode('',$value)."' "
-					." ) ";
+				$query = " SELECT DISTINCT c.id "
+					." FROM ". (FLEXI_J16GE ? '#__content' : '#__flexicontent_items_ext') ." AS c "
+					." WHERE c.language='".implode('',$value)."' ";
 				break;
 			default:
-				$sql = '';
+				return $return_sql ? ' AND i.id IN (0) ' : array(0);
 				break;
 		}
-		return $sql;
+		if ( !$return_sql ) {
+			//echo "<br>plgFlexicontent_fieldsCoreprops::getFiltered() -- [".$filter->name."]  doing: <br>". $query."<br><br>\n";
+			$db = JFactory::getDBO();
+			$db->setQuery($query);
+			$filtered = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			return $filtered;
+		} else {
+			return ' AND i.id IN ('. $query .')';
+		}
 	}
 }
 ?>

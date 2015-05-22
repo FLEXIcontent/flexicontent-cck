@@ -271,7 +271,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// **********************
 		
 		$plugin = JPluginHelper::getPlugin('search', 'flexiadvsearch');
-		$pluginParams = FLEXI_J16GE ? new JRegistry($plugin->params) : new JParameter($plugin->params);
+		$pluginParams = new JRegistry($plugin->params);
 		
 		// Shortcuts for plugin parameters
 		$search_limit    = $params->get( 'search_limit', $pluginParams->get( 'search_limit', 20 ) );      // Limits the returned results of this seach plugin
@@ -313,7 +313,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$text = trim( $text );
 		if( strlen($text) )
 		{
-			$ts = 'ts';
+			$ts = !$txtmode ? 'ie' : 'ts';
 			$escaped_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
 			$quoted_text = $db->Quote( $escaped_text, false );
 			
@@ -389,9 +389,18 @@ class plgSearchFlexiadvsearch extends JPlugin
 			if (!$txtmode)
 				$_text_SQL = ' SELECT item_id FROM #__flexicontent_items_ext AS '.$ts.' WHERE %s ';
 			else
-				$_text_SQL = ' SELECT item_id FROM #__flexicontent_advsearch_index AS '.$ts.' WHERE %s AND field_id IN ('. implode(',',array_keys($fields_text)) .')';
+				$_text_SQL = ' SELECT item_id FROM #__flexicontent_advsearch_index AS '.$ts.' WHERE %s AND '.$ts.'.field_id IN ('. implode(',',array_keys($fields_text)) .')';
 			
-			$text_where = ' AND i.id IN ( '. sprintf($_text_SQL, $_text_match) .')';
+			if (!$txtmode)
+				$_text_SQL_2 = ' JOIN #__flexicontent_items_ext AS '.$ts.' ON %s ';
+			else
+				$_text_SQL_2 = ' JOIN #__flexicontent_advsearch_index AS '.$ts.' ON %s AND '.$ts.'.field_id IN ('. implode(',',array_keys($fields_text)) .')';
+			
+			$text_where_filters = ' AND i.id IN ( '. sprintf($_text_SQL, $_text_match) .')';
+			
+			$text_join_filters = ' AND i.id IN ( '. sprintf($_text_SQL_2, $_text_match) .')';
+			
+			$text_where = ' AND '. $_text_match;
 		} else {
 			$text_where = '';
 		}
@@ -558,7 +567,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Create the AND-WHERE clause parts for the currentl active Field Filters
 		// ***********************************************************************
 		
-		$return_sql = true;
+		$return_sql = false;
 		$filters_where = array();
 		foreach($filters as $field)
 		{
@@ -570,12 +579,22 @@ class plgSearchFlexiadvsearch extends JPlugin
 			
 			// Call field filtering of advanced search to find items matching the field filter (an SQL SUB-QUERY is returned)
 			$field_filename = $field->iscore ? 'core' : $field->field_type;
-			$filters_where[$field->id] = FLEXIUtilities::call_FC_Field_Func($field_filename, 'getFilteredSearch', array( &$field, &$filtervalue, &$return_sql ));
+			$filtered = FLEXIUtilities::call_FC_Field_Func($field_filename, 'getFilteredSearch', array( &$field, &$filtervalue, &$return_sql ));
 			
-			//echo "\n<br/>Field name:". $field->name ." : ";   print_r($filtervalue);
-			//if ($filters_where[$field->id]) echo "<br>".$filters_where[$field->id]."<br/>";
+			// An empty return value means no matching values were found
+			$filtered = empty($filtered) ? ' AND 0 ' : $filtered;
+			
+			// A string mean a subquery was returned, while an array means that item ids we returned
+			$filters_where[$field->id] = is_array($filtered) ?  ' AND i.id IN ('. implode(',', $filtered) .')' : $filtered;
+			
+			/*if ($filters_where[$field->id]) {
+				echo "\n<br/>Filter:". $field->name ." : ";   print_r($filtervalue);
+				echo "<br>".$filters_where[$field->id]."<br/>";
+			}*/
 		}
 		//echo "\n<br/><br/>Filters Active: ". count($filters_where)."<br/>";
+		//echo "<pre>"; print_r($filters_where);
+		//exit;
 		
 		
 		
@@ -583,12 +602,23 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Create Filters JOIN clauses and AND-WHERE clause parts
 		// ******************************************************
 		
+		// JOIN clause - USED - to limit returned 'text' to the text of TEXT-SEARCHABLE only fields ... (NOT shared with filters)
+		if ( !$txtmode ) {
+			$onbasic_textsearch = ' '.$text_where;
+			$join_textsearch = '';
+		} else {
+			$onbasic_textsearch = '';
+			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id AND ts.field_id IN ('. implode(',',array_keys($fields_text)) .')'
+			.$text_where;
+		}
+		
 		// JOIN clauses ... (shared with filters)
 		$join_clauses =  ''
 			. ' JOIN #__categories AS c ON c.id = i.catid'
-			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' . $onbasic_textsearch
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			. ( $txtmode ? ' JOIN #__flexicontent_fields as f ON f.id=ai.field_id' : '' )
+			. $join_textsearch
+			. ( $txtmode ? ' JOIN #__flexicontent_fields as f ON f.id=ts.field_id' : '' )
 			. $orderby_join
 			;
 		
@@ -604,14 +634,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 			;
 		
 		// AND-WHERE sub-clauses for text search ... (shared with filters)
-		$and_where_text_n_filters  = $text_where;
+		$and_where_text_n_filters  = '';//!$txtmode ? $text_where : '';
 		$and_where_text_n_filters .= count($filters_where) ? implode( " ", $filters_where) : '';
-		
-		// JOIN clause - USED - to limit returned 'text' to the text of TEXT-SEARCHABLE only fields ... (NOT shared with filters)
-		if ( !$txtmode )
-			$join_textsearch = '';
-		else
-			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ai ON ai.item_id = i.id AND ai.field_id IN ('. implode(',',array_keys($fields_text)) .')';
 		
 		
 		// ************************************************
@@ -622,7 +646,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$fc_searchview['join_clauses'] = $join_clauses;
 		$fc_searchview['where_conf_only'] = $conf_where;    // WHERE of the view (mainly configuration dependent)
 		$fc_searchview['filters_where'] = $filters_where;  // WHERE of the filters
-		if ($text_where) $fc_searchview['filters_where']['txtsearch'] = $text_where;      // WHERE of text search
+		//if ($text_where) $fc_searchview['filters_where']['txtsearch'] = $text_where_filters;
+		//if ($text_where) $fc_searchview['filters_join']['txtsearch'] = $text_join_filters;
 		$fc_searchview['params'] = $params; // view's parameters
 		
 		
@@ -644,15 +669,13 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. $orderby_col
 			. ( !$txtmode ?
 				', ie.search_index AS text' :
-				//', GROUP_CONCAT(\'[[[b]]]\', f.label, \'[[[/b]]]: \', ai.search_index ORDER BY f.ordering ASC SEPARATOR \' [[[br/]]]\') AS text'
-				', GROUP_CONCAT(ai.search_index ORDER BY f.ordering ASC SEPARATOR \' \') AS text'
+				', GROUP_CONCAT(ts.search_index ORDER BY f.ordering ASC SEPARATOR \' \') AS text'
 				)
 			. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 			. ', CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, i.title ) AS section'
 			. $select_access
 			. ' FROM #__content AS i'
-			. $join_textsearch
 			. $join_clauses
 			. $joinaccess
 			. $conf_where

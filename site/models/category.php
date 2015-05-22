@@ -1039,6 +1039,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($locked_filters) foreach($locked_filters as $_filter) $filters[] = $_filter;
 		
 		// Get SQL clause for filtering via each field
+		$return_sql = true;
 		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
@@ -1067,7 +1068,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ( !$allow_filtering_empty && ($empty_filt_vals_array || $empty_filt_vals_string) ) continue;
 			
 			//echo "category model found filters: "; print_r($filt_vals);
-			$filters_where[ $filter->id ] = $this->_getFiltered($filter, $filt_vals);
+			$filters_where[ $filter->id ] = $this->_getFiltered($filter, $filt_vals, $return_sql);
 		}
 		
 		return $filters_where;
@@ -1948,7 +1949,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @return string
 	 * @since 1.5
 	 */
-	function _getFiltered( &$filter, $value )
+	function _getFiltered( &$filter, $value, $return_sql=true )
 	{
 		$field_type = $filter->field_type;
 		
@@ -1982,7 +1983,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$values = is_array($value) ? $value : array($value);
 				$filt_states = array();
 				foreach ($values as $i => $v) if (isset($stateids[$v])) $filt_states[] = $stateids[$v];
-				$filter_query = !count($values) ? ' AND 1=0 ' : ' AND i.state IN ('. implode(",", $filt_states) .')';   // no db quoting needed since these were typecasted to ints
+				$filter_query = !count($values) ? ' AND 0 ' : ' AND i.state IN ('. implode(",", $filt_states) .')';   // no db quoting needed since these were typecasted to ints
 			break;
 			
 			case 'categories':
@@ -2025,15 +2026,39 @@ class FlexicontentModelCategory extends JModelLegacy {
 				
 				// Use custom field filtering if 'getFiltered' plugin method exists, otherwise try to use our default filtering function
 				$filtered = ! @ $method_exists ?
-					FlexicontentFields::getFiltered($filter, $value, $return_sql=true) :
-					FLEXIUtilities::call_FC_Field_Func($field_type_file, 'getFiltered', array( &$filter, &$value ));
+					FlexicontentFields::getFiltered($filter, $value, $return_sql) :
+					FLEXIUtilities::call_FC_Field_Func($field_type_file, 'getFiltered', array( &$filter, &$value, &$return_sql ));
 				
-				// An empty return value means no matching values we found
-				$filtered = empty($filtered) ? ' AND 1=0' : $filtered;
+				// An empty return value means no matching values were found
+				$filtered = empty($filtered) ? ' AND 0 ' : $filtered;
 				
 				// A string mean a subquery was returned, while an array means that item ids we returned
 				$filter_query = is_array($filtered) ?  ' AND i.id IN ('. implode(',', $filtered) .')' : $filtered;
 			break; 
+		}
+		
+		if ( !isset($filter_query) )
+		{
+			if ( isset($filtered) ) {
+				// nothing to do
+			} else if ( !isset($query) ) {
+				$filtered = false;
+				echo "Filter: ". $field->name ." has empty 'getFiltered' query<br/>\n";
+			} else if ( !$return_sql ) {
+				//echo "<br>FlexicontentFields::getFiltered() ".$filter->name." appying  query :<br>". $query."<br>\n";
+				$db = JFactory::getDBO();
+				$db->setQuery($query);
+				$filtered = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			} else {
+				$filter = $query;
+			}
+			
+			// An empty return value means no matching values were found
+			$filtered = empty($filtered) ? ' AND 0 ' : $filtered;
+			
+			// A string mean a subquery was returned, while an array means that item ids we returned
+			$filter_query = is_array($filtered) ?  ' AND i.id IN ('. implode(',', $filtered) .')' : $filtered;
 		}
 		//echo "<br/>".$filter_query."<br/>";
 		

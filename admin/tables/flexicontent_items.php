@@ -165,67 +165,77 @@ class flexicontent_items extends _flexicontent_items {
 	/** @var string */
 	var $search_index		= null;
 
-    /**
-     * Name of the the items ext table
-     *
-     * @var    string
-     * @access protected
-     */
-    var $_tbl_join_ext			= '#__flexicontent_items_ext';
-    /**
-     * Name of the foreign key in the link table
-     * $_tbl_key property maps to this property
-     *
-     * @var		string
-     * @access	protected
-     */
-    var $_frn_key_ext			= 'item_id';
-    /**
-     * Array of all properties from the join table added to this object
-     *
-     * @var    array
-     * @access protected
-     */
-    var $_join_prop_ext		= array('item_id',
-    								'type_id',
-    								'language',
-    								'lang_parent_id',
-    								'sub_items',
-    								'sub_categories',
-    								'related_items',
-    								'search_index');
-
-    /**
-     * Name of the the items ext table
-     *
-     * @var    string
-     * @access protected
-     */
-    var $_tbl_join_tmp			= '#__flexicontent_items_tmp';
-    /**
-     * Name of the foreign key in the link table
-     * $_tbl_key property maps to this property
-     *
-     * @var		string
-     * @access	protected
-     */
-    var $_frn_key_tmp			= 'id';
-    /**
-     * Array of all properties from the join table added to this object
-     *
-     * @var    array
-     * @access protected
-     */
-    var $_join_prop_tmp		= array();
-
+	/**
+	 * Name of the the items ext table
+	 *
+	 * @var	string
+	 * @access protected
+	 */
+	var $_tbl_join_ext			= '#__flexicontent_items_ext';
+	
+	/**
+	 * Name of the foreign key in the link table
+	 * $_tbl_key property maps to this property
+	 *
+	 * @var		string
+	 * @access	protected
+	 */
+	var $_frn_key_ext			= 'item_id';
+	
+	/**
+	 * Array of all properties from the join table added to this object
+	 *
+	 * @var	array
+	 * @access protected
+	 */
+	var $_join_prop_ext   = array(
+		'item_id',
+		'type_id',
+		'language',
+		'lang_parent_id',
+		'sub_items',
+		'sub_categories',
+		'related_items',
+		'search_index'
+	);
+	
+	/**
+	 * Name of the the items ext table
+	 *
+	 * @var	string
+	 * @access protected
+	 */
+	var $_tbl_join_tmp			= '#__flexicontent_items_tmp';
+	
+	/**
+	 * Name of the foreign key in the link table
+	 * $_tbl_key property maps to this property
+	 *
+	 * @var		string
+	 * @access	protected
+	 */
+	var $_frn_key_tmp			= 'id';
+	
+	/**
+	 * Array of all properties from the join table added to this object
+	 *
+	 * @var	array
+	 * @access protected
+	 */
+	var $_join_prop_tmp		= array();
+	
+	
 	/**
 	* @param database A database connector object
 	*/
-	function flexicontent_items(& $db) {
-		$tbls = array($this->_tbl_join_tmp);
-		if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
-		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
-		
+	function flexicontent_items(&$db) {
+		static $tbl_fields = null;
+		if (!isset($tbl_fields))
+		{
+			$tbls = array($this->_tbl_join_tmp);
+			if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
+			else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
+		}
 		$this->_join_prop_tmp = array_keys($tbl_fields[$this->_tbl_join_tmp]);
 		
 		parent::__construct('#__content', 'id', $db);

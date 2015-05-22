@@ -435,7 +435,7 @@ class flexicontent_html
 			if ( empty($displayed_tmpls) )							$displayed_tmpls = array();
 			else if ( ! is_array($displayed_tmpls) )		$displayed_tmpls = explode("|", $displayed_tmpls);
 			$current_layout = $params->get('clayout');
-			if ($current_layout && !in_array($current_layout, $displayed_tmpls)) $displayed_tmpls[] = $current_layout;
+			if (count($displayed_tmpls) && $current_layout && !in_array($current_layout, $displayed_tmpls)) $displayed_tmpls[] = $current_layout;
 		}
 		
 		$allowed_tmpls = $params->get('allowed_'.$layout_type.'s');
