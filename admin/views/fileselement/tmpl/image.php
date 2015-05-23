@@ -94,7 +94,7 @@ function showUploader() {
 			
 			// Set maximum file size and chunking to 1 MB
 			max_file_size : "'.$upload_maxsize.'",
-			chunk_size: 0,
+			chunk_size: "1mb",
 			
 			// Resize images on clientside if we can
 			/*resize : {width : 320, height : 240, quality : 90, crop: true},*/
@@ -125,7 +125,21 @@ function showUploader() {
 			flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf",
 			
 			// Flash settings
-			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap"
+			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap",
+			
+			init: {
+				BeforeUpload: function (up, file) {
+					// Called right before the upload for a given file starts, can be used to cancel it if required
+					up.settings.multipart_params = {
+						filename: file.name
+					};
+				},
+				
+				UploadComplete: function (up, files) {
+					// Called when all files are either uploaded or failed
+					//log("[UploadComplete]");
+				}
+			}
     });
     
 
@@ -143,7 +157,7 @@ function showUploader() {
 			unique_names : true,
 			
 			// Set maximum file size and chunking to 1 MB
-			chunk_size : 0,
+			chunk_size: "1mb",
 			filters : {
 				max_file_size : "'.$upload_maxsize.'",
 				mime_types: [
@@ -165,7 +179,24 @@ function showUploader() {
 			flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf",
 			
 			// Flash settings
-			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap"
+			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap",
+			
+			// Flash settings
+			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap",
+			
+			init: {
+				BeforeUpload: function (up, file) {
+					// Called right before the upload for a given file starts, can be used to cancel it if required
+					up.settings.multipart_params = {
+						filename: file.name
+					};
+				},
+				
+				UploadComplete: function (up, files) {
+					// Called when all files are either uploaded or failed
+					//log("[UploadComplete]");
+				}
+			}
 		});
 		
 		uploader = jQuery("#flash_uploader").pluploadQueue();

@@ -71,7 +71,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$option		= JRequest::getVar( 'option');
 		if ($task=='uploads') {
-			$file 	= JRequest::getVar( 'file', '', 'files', 'array' );
+			$file = JRequest::getVar( 'file', '', 'files', 'array' );
 		} else {
 			// Default field <input type="file" is name="Filedata" ... get the file
 			$ffname = JRequest::getCmd( 'file-ffname', 'Filedata', 'post' );
@@ -122,6 +122,73 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$this->setRedirect( $_SERVER['HTTP_REFERER'], '' );
 			}
 			return;
+		}
+		
+		// Chunking might be enabled
+		$chunks = JRequest::getInt('chunks');
+		if ($chunks)
+		{
+			$chunk = JRequest::getInt('chunk');
+			
+			// Get / Create target directory
+			$targetDir = ini_get("upload_tmp_dir") . DIRECTORY_SEPARATOR . "fc_fileselement";
+			if (!file_exists($targetDir))  @mkdir($targetDir);
+			
+			// Create name of the unique temporary filename to use for concatenation of the chunks, or get the filename from session
+			$fileName = JRequest::getVar( 'filename' );
+			$fileName_tmp = $app->getUserState( $fileName, date('Y_m_d_').uniqid() );
+			$app->setUserState( $fileName, $fileName_tmp );
+			
+			$filePath_tmp = $targetDir . DIRECTORY_SEPARATOR . $fileName_tmp;
+			
+			// Open temp file
+			if (!$out = @fopen("{$filePath_tmp}", "ab")) {
+				die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+			}
+			
+			if (!empty($_FILES)) {
+				if ($_FILES["file"]["error"] || !is_uploaded_file($_FILES["file"]["tmp_name"]))
+					die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
+				if (!$in = @fopen($_FILES["file"]["tmp_name"], "rb"))
+					die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+			} else {	
+				if (!$in = @fopen("php://input", "rb"))
+					die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+			}
+			// Read binary input stream and append it to temp file
+			while ($buff = fread($in, 4096)) {
+				fwrite($out, $buff);
+			}
+			
+			@fclose($out);
+			@fclose($in);
+			
+			// If not last chunk terminate further execution
+			if ($chunk < $chunks - 1) {
+				// Return Success JSON-RPC response
+				die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+			}
+			$app->setUserState( $fileName, null );
+			
+			// Cleanup left-over files
+			if (file_exists($targetDir)) {
+				foreach (new DirectoryIterator($targetDir) as $fileInfo) {
+					if ($fileInfo->isDot()) {
+						continue;
+					}
+					if (time() - $fileInfo->getCTime() >= 60) {
+						unlink($fileInfo->getRealPath());
+					}
+				}
+			}
+			
+			//echo "-- chunk: $chunk \n-- chunks: $chunks \n-- targetDir: $targetDir \n--filePath_tmp: $filePath_tmp \n--fileName: $fileName";
+			//echo "\n"; print_r($_REQUEST);
+			$file['name'] = $fileName;
+			$file['tmp_name'] = $filePath_tmp;
+			$file['size'] = filesize($filePath_tmp);
+			$file['error'] = 0;
+			//echo "\n"; print_r($file);
 		}
 		
 		if ($file_mode == 'folder_mode') {
@@ -178,7 +245,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$ext = strtolower(flexicontent_upload::getExt($filename));
 
 		// Upload Failed
-		if (!JFile::upload($file['tmp_name'], $filepath)) {
+		//echo "\n". $file['tmp_name'] ." => ". $filepath ."\n";
+		$move_success = $chunks ? rename($file['tmp_name'], $filepath) : JFile::upload($file['tmp_name'], $filepath);
+		if (!$move_success) {
 			if ($format == 'json') {
 				jimport('joomla.error.log');
 				$log = JLog::getInstance('com_flexicontent.error.php');
@@ -204,7 +273,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				
 		// Upload Successful
 		} else {
-				
+			
 			// a. Database mode
 			if ($file_mode == 'db_mode')
 			{
