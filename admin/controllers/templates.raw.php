@@ -137,7 +137,13 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		$db->setQuery( $query );
 		$ext_params_str = $db->loadResult();
 		
-		$layoutpath = $path.DS.$layout_name.'.xml';
+		$layout_names = explode(':', $layout_name);
+		if(count($layout_names)>1) {
+			$layout_name = $layout_names[1];
+			$layoutpath = JPATH_ROOT.DS.'templates'.DS.$layout_names[0].DS.'html'.DS.'mod_flexicontent/'.$layout_name.'.xml';
+		}else{
+			$layoutpath = $path.DS.$layout_name.'.xml';
+		}
 		if (!file_exists($layoutpath)) {
 			if (file_exists($path.DS.'_fallback'.DS.'_fallback.xml')) {
 				$layoutpath = $path.DS.'_fallback'.DS.'_fallback.xml';
