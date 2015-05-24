@@ -23,7 +23,7 @@ $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
 $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
-flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCsearch', $start_text, $end_text);
+flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCsearch'.($this->isADV ? '_advanced' : '_basic'), $start_text, $end_text);
 
 $edit_entry = JText::_('FLEXI_EDIT_TYPE', true);
 ?>
@@ -144,9 +144,11 @@ function delAllFilters() {
 			<?php echo $this->lists['filter_itemstate']; ?>
 		</span>
 		
+		<?php if ($this->isADV) : ?>
 		<span class="fc-filter nowrap_box">
 			<?php echo $this->lists['filter_fieldtype']; ?>
 		</span>
+		<?php endif; ?>
 		
 		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
@@ -157,18 +159,22 @@ function delAllFilters() {
 	<?php echo '<span class="label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_indextype']; ?>
 	<div class="fcclear"></div>
 	
-	<table id="adminListTableFCsearch" class="adminlist fcmanlist">
+	<table id="adminListTableFCsearch<?php echo $this->isADV ? '_advanced' : '_basic'; ?>" class="adminlist fcmanlist">
 	<thead>
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEM_ID'), 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEMS'), 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_LABEL'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_NAME'), 'f.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_TYPE'), 'f.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_COUNT'), 'ai.extraid', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_SEARCH_INDEX'), 'ai.search_index', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_ID'), 'ai.value_id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_SEARCH_INDEX'), ($this->isADV ? 'ai' : 'ext').'.search_index', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			
+			<?php if ($this->isADV) : ?>
+			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_LABEL'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_NAME'), 'f.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_TYPE'), 'f.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_COUNT'), 'ai.extraid', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_ID'), 'ai.value_id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<?php endif; ?>
 		</tr>
 	</thead>
 		
@@ -205,22 +211,13 @@ function delAllFilters() {
 				<?php echo $this->pagination->getRowOffset( $n ); ?>
 			</td>
 			<td align="center">
-				<?php echo JHTML::_('grid.id', $n, $row->field_id.'|'.$row->item_id); ?>
+				<?php echo JHTML::_('grid.id', $n, ($this->isADV ? $row->field_id.'|' : '').$row->item_id); ?>
+			</td>
+			<td>
+				<?php echo $row->item_id; ?>
 			</td>
 			<td>
 				<?php echo '<a target="_blank" href="index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='.$row->id.'" title="'.$edit_entry.'">'.$this->escape($row->title).'</a>'; ?>
-			</td>
-			<td>
-				<?php echo $this->escape($row->label); ?>
-			</td>
-			<td>
-				<?php echo $this->escape($row->name); ?>
-			</td>
-			<td nowrap="nowrap" style="text-align: center" class="col_fieldtype">
-				<?php echo $row->field_type; ?>
-			</td>
-			<td nowrap="nowrap" style="text-align: center;">
-				<?php echo $row->extraid; ?>
 			</td>
 			<td style="text-align: left;" class="col_search_index">
 				<?php
@@ -230,9 +227,25 @@ function delAllFilters() {
 						echo $row->search_index;
 				?>
 			</td>
-			<td nowrap="nowrap" style="text-align: center;">
-				<?php echo $row->value_id; ?>
-			</td>
+			
+			<?php if ($this->isADV) : ?>
+				<td>
+					<?php echo $this->escape($row->label); ?>
+				</td>
+				<td>
+					<?php echo $this->escape($row->name); ?>
+				</td>
+				<td nowrap="nowrap" style="text-align: center" class="col_fieldtype">
+					<?php echo $row->field_type; ?>
+				</td>
+				<td nowrap="nowrap" style="text-align: center;">
+					<?php echo $row->extraid; ?>
+				</td>
+				<td nowrap="nowrap" style="text-align: center;">
+					<?php echo $row->value_id; ?>
+				</td>
+			<?php endif; ?>
+		
 			<?php /*<td nowrap="nowrap" style="text-align: center;">
 				<?php //echo JHtml::date($row->indexdate, '%Y-%m-%d %H:%M:%S'); ?>
 			</td>*/ ?>

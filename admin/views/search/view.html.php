@@ -56,6 +56,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     'a.title', 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', '', 'word' );
 		
+		$filter_indextype = $app->getUserStateFromRequest( $option.'.search.filter_indextype', 'filter_indextype', 'advanced', 'word' );
+		$isADV = $filter_indextype=='advanced';
+		
 		$filter_fieldtype	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
 		$filter_itemtype	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_itemtype', 	'filter_itemtype', 		'', 'int' );
 		$filter_itemstate	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_itemstate', 'filter_itemstate', 	'', 'word' );
@@ -109,16 +112,18 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$lists = array();
 		
 		//build backend visible filter
-		$fftypes = array();
-		$fftypes[] = JHTML::_('select.option',  '', '-' /*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
-		$fftypes[] = JHTML::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
-		$fftypes[] = JHTML::_('select.option',  'NC', JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
-		foreach ($fieldtypes as $field_type => $ftdata) {
-			$fftypes[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
+		if ($isADV) {
+			$fftypes = array();
+			$fftypes[] = JHTML::_('select.option',  '', '-' /*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
+			$fftypes[] = JHTML::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
+			$fftypes[] = JHTML::_('select.option',  'NC', JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
+			foreach ($fieldtypes as $field_type => $ftdata) {
+				$fftypes[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
+			}
+			
+			$lists['filter_fieldtype'] = ($filter_fieldtype || 1 ? '<label class="label">'.JText::_('FLEXI_FIELD_TYPE').'</label>' : '').
+				JHTML::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
 		}
-		
-		$lists['filter_fieldtype'] = ($filter_fieldtype || 1 ? '<label class="label">'.JText::_('FLEXI_FIELD_TYPE').'</label>' : '').
-			JHTML::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
 		
 		//build type select list
 		$lists['filter_itemtype'] = ($filter_itemtype|| 1 ? '<label class="label">'.JText::_('FLEXI_TYPE').'</label>' : '').
@@ -134,7 +139,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			JHTML::_('select.genericlist', $ffstates, 'filter_itemstate', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_itemstate );
 		
 		// build filter index type record listing
-		//$itn['basic'] = JText::_( 'FLEXI_INDEX_BASIC' );
+		$itn['basic'] = JText::_( 'FLEXI_INDEX_BASIC' );
 		$itn['advanced'] = JText::_( 'FLEXI_INDEX_ADVANCED' );
 		$indextypes = array();
 		//foreach ($itn as $i => $v) $indextypes[] = JHTML::_('select.option', $i, $v);
@@ -194,6 +199,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		$this->assignRef('option', $option);
 		$this->assignRef('view', $view);
+		$this->assignRef('isADV', $isADV);
 		
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);

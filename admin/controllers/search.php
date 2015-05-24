@@ -151,7 +151,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$items_per_query = 50;
 		$items_per_query = $items_per_query > $items_per_call ? $items_per_call : $items_per_query;
 		$cnt = $itemcnt;
-		while($cnt < $itemcnt+$items_per_call)
+		while($cnt < count($itemids) && $cnt < $itemcnt+$items_per_call)
 		{
 			$query_itemids = array_slice($itemids, $cnt, $items_per_query);
 			$cnt += $items_per_query;
@@ -161,7 +161,6 @@ class FlexicontentControllerSearch extends FlexicontentController
 			
 			$lang_query = "SELECT id, language"
 				." FROM #__content AS i "
-				.(!FLEXI_J16GE ? " LEFT JOIN #__flexicontent_items_ext AS ie ON i.id=ie.item_id" : "")
 				." WHERE id IN (".implode(', ',$query_itemids).")"
 				;
 			$db->setQuery($lang_query);
@@ -260,13 +259,13 @@ class FlexicontentControllerSearch extends FlexicontentController
 		}
 		
 		if ( !count($fieldids) ) {
-			echo 'fail|Index was only cleaned-up, since no field(s) were marked as: '.'<br> -- ' .
+			echo 'fail|Index was only cleaned-up, <br/>since no <b>fields</b> were marked as: '.'<br> -- ' .
 				($indexer=='basic' ? 'Text Searchable (CONTENT LISTS)' :	'Text Searchable OR filterable (SEARCH VIEW)');
 			exit;
 		}
 		
 		if ( !count($itemids) ) {
-			echo 'fail|Index was only cleaned-up, since no items were found to have value for fields marked as: '.'<br> -- ' .
+			echo 'fail|Index was only cleaned-up, <br/>since no <b>items</b> were found to have value for fields marked as: '.'<br> -- ' .
 				($indexer=='basic' ? 'Text Searchable (CONTENT LISTS)' :	'Text Searchable OR filterable (SEARCH VIEW)');
 			exit;
 		}

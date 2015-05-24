@@ -69,6 +69,9 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	function getData() {
 		if (!empty($this->_data)) return $this->_data;
 		
+		$app = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
@@ -86,10 +89,13 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$this->_db->setQuery("SELECT FOUND_ROWS()");
 		$this->_total = $this->_db->loadResult();
 		
+		$filter_indextype = $app->getUserStateFromRequest( $option.'.search.filter_indextype', 'filter_indextype', 'advanced', 'word' );
+		$isADV = $filter_indextype=='advanced';
+		
 		// 3, get item ids
 		$query_ids = array();
 		foreach ($rows as $row) {
-			$query_ids[] = $row->sid;
+			$query_ids[] = $isADV ? $row->sid : $row->item_id;
 		}
 		
 		// 4, get item data
@@ -98,15 +104,15 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$_data = array();
 		if (count($query_ids)) {
 			$this->_db->setQuery($query);
-			$_data = $this->_db->loadObjectList('sid');
+			$_data = $this->_db->loadObjectList($isADV ? 'sid' : 'item_id');
 		}
 		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		// 5, reorder items and get cat ids
 		$this->_data = array();
-		foreach($query_ids as $sid) {
-			$this->_data[] = $_data[$sid];
+		foreach($query_ids as $query_id) {
+			$this->_data[] = $_data[$query_id];
 		}
 		
 		return $this->_data;
@@ -137,12 +143,12 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 */
 	function _buildQuery( $query_ids=false )
 	{
+		$app = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		
 		if ( !$query_ids ) {
 			$where		= $this->_buildWhere();
 			$orderby	= $this->_buildOrderBy();
-			
-			$app = JFactory::getApplication();
-			$option = JRequest::getVar('option');
 			
 			$filter_order = $app->getUserStateFromRequest( $option.'.search.filter_order', 'filter_order', 'a.title', 'cmd' );
 			$filter_order = $filter_order ? $filter_order : 'a.title';  // this is default
@@ -154,36 +160,46 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$search_itemtitle	= $app->getUserStateFromRequest( $option.'.search.search_itemtitle', 'search_itemtitle', '', 'string' );
 			$search_itemid		= $app->getUserStateFromRequest( $option.'.search.search_itemid', 'search_itemid', '', 'int' );
 		}
+		$filter_indextype = $app->getUserStateFromRequest( $option.'.search.filter_indextype', 'filter_indextype', 'advanced', 'word' );
+		$isADV = $filter_indextype=='advanced';
 		
 		$query = !$query_ids ?
-			'SELECT SQL_CALC_FOUND_ROWS ai.sid '."\n" :
-			'SELECT f.label, f.name, f.field_type, ai.*, a.title, a.id '."\n";
-		$query .= ' FROM #__flexicontent_advsearch_index as ai'."\n";
+			'SELECT SQL_CALC_FOUND_ROWS '.($isADV ? 'ai.sid' : 'ext.item_id') :
+			($isADV ?
+				'SELECT f.label, f.name, f.field_type, ai.*, a.title, a.id ' :
+				'SELECT ext.*, a.title, a.id '
+			);
+		$query .= $isADV ? ' FROM #__flexicontent_advsearch_index as ai' : ' FROM #__flexicontent_items_ext as ext';
 		if ($query_ids) {
 			$query .= ''
-				.' JOIN #__content as a ON ai.item_id=a.id'."\n"
-				.' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'."\n"
-				.' JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=ai.field_id AND rel.type_id=ext.type_id'."\n"
-				.' JOIN #__flexicontent_fields as f ON ai.field_id=f.id'."\n"
+				.' JOIN #__content as a ON ' .($isADV ? 'ai' : 'ext'). '.item_id=a.id'
+				.(!$isADV ? '' : ''
+					.' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'
+					.' JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=ai.field_id AND rel.type_id=ext.type_id'
+					.' JOIN #__flexicontent_fields as f ON ai.field_id=f.id'
+				)
 				;
 		} else {
-			if ( in_array($filter_order, array('f.label','f.name','f.field_type')) || $filter_fieldtype )
+			if ( $isADV && (in_array($filter_order, array('f.label','f.name','f.field_type')) || $filter_fieldtype) )
 				$query .= ''
-					.' JOIN #__content as a ON ai.item_id=a.id'."\n"
-					.' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'."\n"
-					.' JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=ai.field_id AND rel.type_id=ext.type_id'."\n"
-					.' JOIN #__flexicontent_fields as f ON ai.field_id=f.id'."\n"
+					.' JOIN #__content as a ON ai.item_id=a.id'
+					.' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'
+					.' JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=ai.field_id AND rel.type_id=ext.type_id'
+					.' JOIN #__flexicontent_fields as f ON ai.field_id=f.id'
 					;
 			else {
 				if ($filter_order == 'a.title' || $filter_itemstate || $filter_itemtype || $search_itemtitle || $search_itemid)
-					$query .= ' JOIN #__content as a ON ai.item_id=a.id'."\n";
-				if ($filter_itemtype)
-					$query .= ' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'."\n";
+					$query .= ' JOIN #__content as a ON ' .($isADV ? 'ai' : 'ext'). '.item_id=a.id';
+				if ($isADV && $filter_itemtype)
+					$query .= ' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id';
 			}
 		}
 		$query .= !$query_ids ?
 			$where.$orderby :
-			' WHERE ai.sid IN ('. implode(',', $query_ids) .')';
+			($isADV ?
+				' WHERE ai.sid IN ('. implode(',', $query_ids) .')' :
+				' WHERE ext.item_id IN ('. implode(',', $query_ids) .')'
+			);
 		
 		//debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 		//echo "<pre>". $query ."</pre>";
@@ -236,10 +252,13 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$search  = trim( JString::strtolower( $search ) );
 		$search_itemtitle	= $app->getUserStateFromRequest( $option.'.search.search_itemtitle', 'search_itemtitle', '', 'string' );
 		$search_itemid		= $app->getUserStateFromRequest( $option.'.search.search_itemid', 'search_itemid', '', 'int' );
-
+		
+		$filter_indextype = $app->getUserStateFromRequest( $option.'.search.filter_indextype', 'filter_indextype', 'advanced', 'word' );
+		$isADV = $filter_indextype=='advanced';
+		
 		$where = array();
 
-		if ( $filter_fieldtype ) {
+		if ( $isADV && $filter_fieldtype ) {
 			if ( $filter_fieldtype == 'C' ) {
 				$where[] = 'f.iscore = 1';
 			} else if ($filter_fieldtype == 'NC' ) {
@@ -262,12 +281,12 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		}
 
 		if ($search) {
-			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
-			$where[] = ' LOWER(ai.search_index) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
+			$search_escaped = $this->_db->escape( $search, true );
+			$where[] = ' LOWER(' .($isADV ? 'ai' : 'ext'). '.search_index) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
 		}
 		
 		if ($search_itemtitle) {
-			$search_itemtitle_escaped = FLEXI_J16GE ? $this->_db->escape( $search_itemtitle, true ) : $this->_db->getEscaped( $search_itemtitle, true );
+			$search_itemtitle_escaped = $this->_db->escape( $search_itemtitle, true );
 			$where[] = ' LOWER(a.title) LIKE '.$this->_db->Quote( '%'.$search_itemtitle_escaped.'%', false );
 		}
 		
