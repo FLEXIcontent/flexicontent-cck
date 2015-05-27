@@ -62,7 +62,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 1 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = (int)$field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
+		$required_class = $required ? ' required' : '';
 		
 		// Input field configuration
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;
@@ -356,7 +356,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					</a>
 				</span>';
 			
-			$field->html .= '<input id="'.$field->name.'" class="'.$required.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
+			$field->html .= '<input id="'.$field->name.'" class="'.$required_class.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
 		}
 		if ($top_notice) $field->html = $top_notice.$field->html;
 	}

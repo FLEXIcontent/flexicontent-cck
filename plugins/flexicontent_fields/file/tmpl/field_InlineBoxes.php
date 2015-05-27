@@ -17,10 +17,12 @@ foreach($files_data as $file_id => $file_data)
 				.($file_data->url ? ' ['.$file_data->altname.']' : '')
 			).'
 			
+			'.(!$required ? '
 			<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-file-del" name="'.$fieldname_n.'[file-del]" value="1" onclick="file_fcfield_del_existing_value'.$field->id.'(this);" />
 			<label class="label inlinefile-file-clear-lbl '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_FILE_ABOUT_REMOVE_FILE', 'FLEXI_FIELD_FILE_ABOUT_REMOVE_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-del-lbl" for="'.$elementid_n.'_file-del" >
 				'.JText::_( 'Remove file' ).'
 			</label>
+			' : ($has_values > $n ? '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_FILE_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
 		</div>
 	
 		<div class="nowrap_box inlinefile-upload-box">
@@ -29,7 +31,7 @@ foreach($files_data as $file_id => $file_data)
 			</label>
 			<span class="inlinefile-file-data">
 				<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.$file_id.'" />'.'
-				<input type="file" id="'.$elementid_n.'_file-data" name="'.$fieldname_n.'[file-data]" class="'.$required.'" onchange="var file_box = jQuery(this).parent().parent().parent(); file_box.find(\'.inlinefile-secure-data\').show(400);  file_box.find(\'.inlinefile-secure-info\').hide(400);" />
+				<input type="file" id="'.$elementid_n.'_file-data" name="'.$fieldname_n.'[file-data]" class="'.($has_values ? '' : $required_class).'" onchange="var file_box = jQuery(this).parent().parent().parent(); file_box.find(\'.inlinefile-secure-data\').show(400);  file_box.find(\'.inlinefile-secure-info\').hide(400);" />
 			</span>
 		</div>'.
 	
@@ -39,7 +41,7 @@ foreach($files_data as $file_id => $file_data)
 				'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'
 			</label>
 			<span class="inlinefile-title-data">
-				<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.$file_data->altname.'" class="'.$required.'" />
+				<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.$file_data->altname.'" class="'.$required_class.'" />
 			</span>
 		</div>' : '').
 	
