@@ -1738,7 +1738,7 @@ class ParentClassItem extends JModelAdmin
 		// New or Existing item must use the current user + new main category to calculate 'Edit State' privelege
 		$item->created_by = $user->get('id');
 		$item->catid      = $data['catid'];
-		$item->type_id    = $data['type_id'];
+		$item->type_id    = isset($data['type_id']) ? $data['type_id'] : $item->type_id;
 		$canEditState = $this->canEditState( $item, $check_cat_perm=true );
 		
 		// Restore old main category & creator (owner) (in case following code chooses to keep them)
