@@ -57,19 +57,46 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$indexer = JRequest::getVar('indexer','advanced');
 		$rebuildmode = JRequest::getVar('rebuildmode','');
 		$session = JFactory::getSession();
+		$db  = JFactory::getDBO();
+		$app = JFactory::getApplication();
+		$model = $this->getModel('search');
 		
 		// Retrieve fields, that are assigned as (advanced/basic) searchable/filterable
 		if ($rebuildmode=='quick' && $indexer=='advanced') {
 			$nse_fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='non-search');
 			$nsp_fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='dirty-nosupport');
+			$fields     = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=true,  0, $search_type='dirty-search');
+			
+			// Get the field ids of the fields removed from searching
+			$del_fieldids = array_unique( array_merge(array_keys($nse_fields), array_keys($nsp_fields), array_keys($fields)) ) ;
+			
 			$session->set($indexer.'_nse_fields', $nse_fields, 'flexicontent');
 			$session->set($indexer.'_nsp_fields', $nsp_fields, 'flexicontent');
-			$fields     = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=true,  0, $search_type='dirty-search');
-		} else {
+		} else {  // INDEX: basic or advanced fully rebuilt
 			$fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=true, 0, $search_type='all-search');
+			$del_fieldids = null;
 		}
-		// Get the field ids of the searchable fields
+		
+		// Set field information into session to avoid recalculation ...
+		$session->set($indexer.'_fields', $fields, 'flexicontent');
+		
+		// Get the field ids of the searchable fields that will be re-indexed, These are all ones ('all-search') or just the new ones ('dirty-search')
 		$fieldids = array_keys($fields);
+		
+		
+		// For advanced search index remove old search values from the DB, also creating missing per field tables
+		if ($indexer=='advanced')
+		{
+			$model->purge( $del_fieldids );
+		}
+		
+		// For basic index, clear records if no fields marked as text searchable
+		else if ( !count($fields) )
+		{
+			$db->setQuery("UPDATE #__flexicontent_items_ext SET search_index = '' ");
+			$db->query();
+		}
+		
 		
 		// Get ids of searchable and ids of item having values for these fields
 		$itemsmodel = $this->getModel('items');          // Get items model to call needed methods
@@ -77,8 +104,6 @@ class FlexicontentControllerSearch extends FlexicontentController
 		
 		// Set item ids into session to avoid recalculation ...
 		$session->set($indexer.'_items_to_index', $itemids, 'flexicontent');
-		// Set field information into session to avoid recalculation ...
-		$session->set($indexer.'_fields', $fields, 'flexicontent');
 		
 		echo 'success';  //echo count($fieldids)*count($itemids).'|';
 		// WARNING: json_encode will output object if given an array with gaps in the indexing
@@ -123,30 +148,17 @@ class FlexicontentControllerSearch extends FlexicontentController
 		// Get the field ids of the searchable fields
 		$fieldids = array_keys($fields);
 		
+		// Get fields that will have atomic search tables, (current for advanced index only)
+		if ($indexer=='advanced')
+		{
+			$filterables = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=true, 0, $search_type='filter');
+			$filterables = array_keys($filterables);
+			$filterables = array_flip($filterables);
+		} else $filterables = array();
+		
 		// Get items ids that have value for any of the searchable fields, but use session to avoid recalculation
 		$itemids = $session->get($indexer.'_items_to_index', array(),'flexicontent');
 		
-		// For advanced search index Remove old search values from the DB
-		if ($itemcnt==0) {
-			if ($indexer=='advanced') {
-				if ($rebuildmode!='quick') {
-					$clear_query = "TRUNCATE TABLE #__flexicontent_advsearch_index";
-				} else if (count($del_fieldids)) {
-					$del_fieldids_list = implode( ',' , $del_fieldids);
-					$clear_query = "DELETE FROM #__flexicontent_advsearch_index "
-						." WHERE field_id IN (". $del_fieldids_list. ")";
-				}
-			} else { // INDEX: basic 
-				if ( !count($fields) ) {
-					// (all items) Clear basic index records no fields marked as text searchable
-					$clear_query = "UPDATE #__flexicontent_items_ext SET search_index = '' ";
-				}
-			}
-			if ( !empty($clear_query) ) {
-				$db->setQuery($clear_query);
-				$db->query();
-			}
-		}
 		
 		$items_per_query = 50;
 		$items_per_query = $items_per_query > $items_per_call ? $items_per_call : $items_per_query;
@@ -159,6 +171,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 			// Item is not needed, later and only if field uses item replacements then it will be loaded
 			$item = null;
 			
+			// Items language is needed to do (if needed) special per language handling
 			$lang_query = "SELECT id, language"
 				." FROM #__content AS i "
 				." WHERE id IN (".implode(', ',$query_itemids).")"
@@ -173,6 +186,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 			} else {
 				// This will hold the SQL inserting new advanced search records for multiple item/values
 				$ai_query_vals = array();
+				$ai_query_vals_f = array();  // Current for advanced index only
 			}
 			
 			// For current item: Loop though all searchable fields according to their type
@@ -184,7 +198,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 				// Indicate multiple items per query
 				$field->item_id = 0;
 				$field->query_itemids = $query_itemids;
-				$field->items_data = $items_data;
+				$field->items_data = $items_data;   // Includes item langyage, which may be used for special per language handling
 				
 				// Indicate that the indexing fuction should retrieve the values
 				$values = null;
@@ -196,17 +210,22 @@ class FlexicontentControllerSearch extends FlexicontentController
 					//print_r($field->ai_query_vals);
 					if ( isset($field->ai_query_vals) ) {
 						foreach ($field->ai_query_vals as $query_val) $ai_query_vals[] = $query_val;
+						if ( isset($filterables[$field->id]) ) {  // Current for advanced index only
+							foreach ($field->ai_query_vals as $query_val) $ai_query_vals_f[$field->id][] = $query_val;
+						}
 					} //else echo "Not set for : ". $field->name;
 					
 				} else if ($indexer == 'basic') {
 					FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexSearch', array( &$field, &$values, &$item ));
-					foreach ($query_itemids as $query_itemid)
+					foreach ($query_itemids as $query_itemid) {
 						if ( @$field->search[$query_itemid] ) $searchindex[$query_itemid][] = /*$field->name.': '.*/$field->search[$query_itemid];
+					}
 				}
 			}
 			
 			// Create query that will update/insert data into the DB
-			unset($query);  // make sure it is not set above
+			unset($queries);  // make sure it is not set above
+			$queries = array();
 			if ($indexer == 'basic') {
 				if (count($searchindex)) {  // check for zero search index records
 					$query = "UPDATE #__flexicontent_items_ext SET search_index = CASE item_id ";
@@ -218,14 +237,20 @@ class FlexicontentControllerSearch extends FlexicontentController
 					$query .= " END ";
 					$query .= " WHERE item_id IN (". implode(',', array_keys($searchindex)) .")";
 				}
+				$queries[] = $query;
 			} else {
 				if ( count($ai_query_vals) ) {  // check for zero search index records
-					$query = "INSERT INTO #__flexicontent_advsearch_index "
+					$queries[] = "INSERT INTO #__flexicontent_advsearch_index "
 						." (field_id,item_id,extraid,search_index,value_id) VALUES "
 						.implode(",", $ai_query_vals);
 				}
+				foreach( $ai_query_vals_f as $_field_id => $_query_vals) {  // Current for advanced index only
+					$queries[] = "INSERT INTO #__flexicontent_advsearch_index_field_".$_field_id
+						." (field_id,item_id,extraid,search_index,value_id) VALUES "
+						.implode(",", $_query_vals);
+				}
 			}
-			if ( !empty($query) ) {
+			foreach( $queries as $query) {
 				$db->setQuery($query);
 				$db->query();
 				if ($db->getErrorNum()) {

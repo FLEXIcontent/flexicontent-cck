@@ -227,6 +227,16 @@ $r = 0;
 					</span>
 				</legend>
 				
+			<?php	
+			$filter_messages = JRequest::getVar('filter_messages', array());
+			$msg = '';
+			$msg = implode(' <br/> ', $filter_messages);
+			if ( $msg ) :
+				?><div class="fcclear"></div><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php
+			endif;
+			?>
+			<div class="fcclear"></div>
+			
 				<table id="fc_fieldfilters_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">		
 				
 				<?php /*if($show_operator = $this->params->get('show_filtersop', 1)) : ?>

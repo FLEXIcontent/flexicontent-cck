@@ -96,6 +96,10 @@ body .alert.fc-small {
 body .alert.fc-iblock {
 	display: inline-block;
 }
+body .alert.fc-small.fc-iblock {
+	display: inline-block;
+	margin: 0px 4px;
+}
 
 /* some special cases */
 body .fc-noauth {

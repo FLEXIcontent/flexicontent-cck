@@ -133,22 +133,20 @@ function showUploader() {
 					up.settings.multipart_params = {
 						filename: file.name
 					};
-				},
-				
-				UploadComplete: function (up, files) {
-					// Called when all files are either uploaded or failed
-					//log("[UploadComplete]");
 				}
+				/*,
+				UploadComplete: function (up, files) {
+					if(window.console) window.console.log("All Files Uploaded");
+					window.location.reload();
+				}*/
 			}
-    });
+    })
     
-
-		uploader = jQuery("#flash_uploader").plupload();
-		
-		uploader.bind(\'complete\',function(){
+		.bind(\'complete\',function(){
 			if(window.console) window.console.log("All Files Uploaded");
 			window.location.reload();
 		});
+		
 	} else {
 		uploader = jQuery("#flash_uploader").pluploadQueue({
 			// General settings
@@ -190,12 +188,12 @@ function showUploader() {
 					up.settings.multipart_params = {
 						filename: file.name
 					};
-				},
-				
-				UploadComplete: function (up, files) {
-					// Called when all files are either uploaded or failed
-					//log("[UploadComplete]");
 				}
+				/*,
+				UploadComplete: function (up, files) {
+					if(window.console) window.console.log("All Files Uploaded");
+					window.location.reload();
+				}*/
 			}
 		});
 		

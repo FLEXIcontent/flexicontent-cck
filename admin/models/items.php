@@ -2598,6 +2598,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// Get field data, so that we can identify the fields and take special action for each of them
 		$field_list = "'".implode("','", $fields)."'";
 		$query = "SELECT * FROM #__flexicontent_fields WHERE id IN ({$field_list})";
+		$this->_db->setQuery($query);
 		$field_data = $this->_db->loadObjectList();
 		
 		// Check the type of fields

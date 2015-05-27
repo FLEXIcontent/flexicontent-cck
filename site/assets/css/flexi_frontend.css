@@ -397,7 +397,7 @@ div table.adminform td {
 fieldset.fc_search_set,
 fieldset.fc_filter_set {
 	border: 1px solid #cccccc;
-	margin: 0px;
+	margin: 12px 0 0 0;
 	padding: 1%;
 	width: 100%;
 	box-sizing: border-box;
@@ -855,6 +855,9 @@ ul.fc_field_filter.fc_checkradio_group label {
 	clear: both;
 	float: left;
 	box-sizing: border-box;
+}
+#flexicontent #searchForm .item_total {
+	margin-top: 24px;
 }
 
 #flexicontent .fc_item_total_data.labelclear .flexi.label { clear:left; }
@@ -1621,12 +1624,12 @@ div.fancybox-wrap a { background: none!important;}
 	background-color: #999 !important;
 }
 #flexicontent .flexi.label, .flexi.label {
-	float: left !important;
-	display: inline-block !important;
-	vertical-align: baseline !important;
-	border-width: 0px !important;
-	max-width: 120px !important;
-	min-width: auto !important;
+	float: left;
+	display: inline-block;
+	vertical-align: baseline;
+	border-width: 0px;
+	max-width: 120px;
+	min-width: auto;
 	
 	width: auto;
 	white-space: normal;
@@ -1646,10 +1649,8 @@ div.fancybox-wrap a { background: none!important;}
 }
 
 #flexicontent .flexi.value, .flexi.value {
-	/*float: left !important;*/
-	/*width: 79%;*/
-	padding: 0px !important;
-	margin: 2px 0% 2px 0% !important;
+	padding: 0px;
+	margin: 2px 0% 2px 0%;
 }
 
 
