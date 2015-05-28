@@ -63,8 +63,7 @@ class FlexicontentFields
 			. ' GROUP BY i.id';
 		$db->setQuery($query);
 		$items = $db->loadObjectList();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-		if (!$items) return false;
+		if (empty($items)) return false;
 		
 		foreach ($items as $i => $item) $_item_id_map[$item->id] = & $items[$i];
 		
@@ -277,7 +276,6 @@ class FlexicontentFields
 				;
 		$db->setQuery($query);
 		$values = $db->loadObjectList();
-		//if ($db->getErrorNum()) echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 		
 		$fieldvalues = array();
 		if ($values) foreach ($values as $v) {
@@ -1330,7 +1328,7 @@ class FlexicontentFields
 			//echo $query;
 			$db = JFactory::getDBO();
 			$db->setQuery($query);
-			$core_field_names = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$core_field_names = $db->loadColumn();
 			
 			$core_field_names[] = 'maintext';
 			$core_field_names = array_flip($core_field_names);
@@ -1754,7 +1752,6 @@ class FlexicontentFields
 		{
 			$db->setQuery($query);
 			$fields = $db->loadObjectList($key);
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			
 			$sp_fields = array();
 			$nsp_fields = array();
@@ -2274,7 +2271,7 @@ class FlexicontentFields
 		} else {
 			$query = 'SELECT '.($require_all ? 'rel.item_id' : 'DISTINCT rel.item_id')
 				.' FROM #__flexicontent_fields_item_relations as rel'
-				.' WHERE rel.field_id = ' . $filter->id
+				.' WHERE rel.field_id=' . $filter->id
 				. $valueswhere ;
 				if ($require_all) {
 					// Do not use distinct on column, it makes it is very slow, despite column having an index !!
@@ -2288,21 +2285,51 @@ class FlexicontentFields
 		//$query .= ' GROUP BY id';   // BAD PERFORMANCE ?
 		
 		if ( !$return_sql ) {
-			//echo "<br>FlexicontentFields::getFiltered() ".$filter->name." appying  query :<br>". $query."<br>\n";
+			//echo "<br>GET FILTERED Items (helper func) -- [".$filter->name."] using in-query ids :<br>". $query."<br>\n";
 			$db->setQuery($query);
-			$filtered = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			$filtered = $db->loadColumn();
 			return $filtered;
-		} else {
-			return ' AND i.id IN ('. $query .')';
 		}
+		else if ($return_sql===2) {
+			static $iids_tblname  = array();
+			if ( !isset($iids_tblname[$filter->id]) ) {
+				$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
+			}
+			$tmp_tbl = $iids_tblname[$filter->id];
+			
+			try {
+				// Use sub-query on temporary table
+				$db->setQuery('CREATE TEMPORARY TABLE IF NOT EXISTS '.$tmp_tbl.' (id INT, KEY(`id`))');
+				$db->query();
+				$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
+				$db->query();
+				$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$query);
+				$db->query();
+				$_query = $query;
+				$query = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using temporary table: ".$query." for :".$_query ." <br/><br/>";
+				/*$db->setQuery($query);
+				$data = $db->loadObjectList();
+				echo "<pre>";
+				print_r($data);
+				exit;*/
+			}
+			catch (Exception $e) {
+				// Ignore table creation error
+				//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+				//echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
+			}
+		} else {
+			//echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
+		}
+		return ' AND i.id IN ('. $query .')';
 	}
 	
 	
 	// Method to get the active filter result Search View (an SQL where clause part OR an array of item ids, matching field filter)
 	static function getFilteredSearch( &$filter, $value, $return_sql=true )
 	{
-		$db = JFactory::getDBO();
+		$app = JFactory::getApplication();
+		$db  = JFactory::getDBO();
 		
 		// Check if field type supports advanced search
 		$support = FlexicontentFields::getPropertySupport($filter->field_type, $filter->iscore);
@@ -2322,10 +2349,16 @@ class FlexicontentFields
 		
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
 		
+		$field_tbl = 'flexicontent_advsearch_index_field_'.$filter->id;
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . $field_tbl . '"';
+		$db->setQuery($query);
+		$tbl_exists = (boolean) count($db->loadObjectList());
+		$field_tbl = $tbl_exists ? $field_tbl : 'flexicontent_advsearch_index';
+		
 		// Get ALL items that have such values for the given field
-		$query = "SELECT ".($require_all ? 'fs.item_id' : 'DISTINCT fs.item_id')
-			." FROM #__flexicontent_advsearch_index AS fs"
-			." WHERE fs.field_id='".$filter->id."' "
+		$query = 'SELECT '.($require_all ? 'fs.item_id' : 'DISTINCT fs.item_id')
+			.' FROM #__'.$field_tbl.' AS fs'
+			.' WHERE fs.field_id=' . $filter->id
 			. $valueswhere ;
 		if ($require_all) {
 			// Do not use distinct on column, it makes it is very slow, despite column having an index !!
@@ -2338,17 +2371,44 @@ class FlexicontentFields
 		//echo 'Filter ['. $filter->label .']: '. $query."<br/><br/>\n";
 		
 		if ( !$return_sql ) {
-			//echo "<br>FlexicontentFields::getFiltered() -- [".$filter->name."]  doing: <br>". $query."<br><br>\n";
+			//echo "<br>GET FILTERED Items (helper func) -- [".$filter->name."] using in-query ids : ". $query."<br>\n";
 			$db->setQuery($query);
-			$filtered = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			$filtered = $db->loadColumn();
 			return $filtered;
-		} else {
-			return ' AND i.id IN ('. $query .')';
 		}
+		else if ($return_sql===2) {
+			static $iids_tblname  = array();
+			if ( !isset($iids_tblname[$filter->id]) ) {
+				$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
+			}
+			$tmp_tbl = $iids_tblname[$filter->id];
+			
+			try {
+				// Use sub-query on temporary table
+				$db->setQuery('CREATE TEMPORARY TABLE IF NOT EXISTS '.$tmp_tbl.' (id INT, KEY(`id`))');
+				$db->query();
+				$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
+				$db->query();
+				$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$query);
+				$db->query();
+				$_query = $query;
+				$query = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using temporary table: ".$query." for :".$_query ." <br/><br/>";
+				/*$db->setQuery($query);
+				$data = $db->loadObjectList();
+				echo "<pre>";
+				print_r($data);
+				exit;*/
+			}
+			catch (Exception $e) {
+				// Ignore table creation error
+				//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+				//echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
+			}
+		} else {
+			//echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
+		}
+		return ' AND i.id IN ('. $query .')';
 	}
-	
-	
 	
 	
 	
@@ -2431,8 +2491,11 @@ class FlexicontentFields
 		if ( $get_filter_vals )
 		{
 			$view_join = '';
+			$view_join_n_text = '';
 			$view_where = '';
 			$filters_where = array();
+			$text_search = '';
+			$view_total=0;
 			
 			// *** Limiting of displayed filter values according to current category filtering, but show all field values if filter is active
 			if ( $isCategoryView ) {
@@ -2440,10 +2503,11 @@ class FlexicontentFields
 				global $fc_catview;
 				if ( $faceted_filter ) {
 					$view_join = @ $fc_catview['join_clauses'];
-					$view_where = $fc_catview['where_conf_only'];
-					$filters_where = $fc_catview['filters_where'];
+					$view_join_n_text = @ $fc_catview['join_clauses_with_text'];
+					$view_where = @ $fc_catview['where_conf_only'];
+					$filters_where = @ $fc_catview['filters_where'];
+					$text_search = $fc_catview['search'];
 					$view_total = isset($fc_catview['view_total']) ? $fc_catview['view_total'] : 0;
-					if ($fc_catview['alpha_where']) $filters_where['alpha'] = $fc_catview['alpha_where'];  // we use count bellow ... so add it only if it is non-empty
 				}
 			} else if ( $isSearchView ) {
 				// search view, use parameter to decide if limitting filter values
@@ -2451,8 +2515,10 @@ class FlexicontentFields
 				if ( empty($fc_searchview) ) return array();  // search view plugin disabled ?
 				if ( $faceted_filter ) {
 					$view_join = $fc_searchview['join_clauses'];
+					$view_join_n_text = $fc_searchview['join_clauses_with_text'];
 					$view_where = $fc_searchview['where_conf_only'];
 					$filters_where = $fc_searchview['filters_where'];
+					$text_search = $fc_searchview['search'];
 					$view_total = isset($fc_searchview['view_total']) ? $fc_searchview['view_total'] : 0;
 				}
 			}
@@ -2474,17 +2540,18 @@ class FlexicontentFields
 			
 			// Get filter values considering ACTIVE filters, but only if there is at least ONE filter active
 			$faceted_max_item_limit = 10000;
-			if ( $faceted_filter==2 && count($filters_where) ) {
-				if ($view_total <= $faceted_max_item_limit) {
-					
+			if ( $faceted_filter==2 ) {
+				if ($view_total <= $faceted_max_item_limit)
+				{
 					// DO NOT cache at this point the filter combinations are endless, so they will produce big amounts of cached data, that will be rarely used ...
 					// but if only a single filter is active we can get the cached result of it ... because its own filter_where is not used for the filter itself
-					if ( $apply_cache && count($filters_where)==1 && isset($filters_where[$filter->id]) )
+					if ( !$text_search && (count($filters_where)==0 || (count($filters_where)==1 && isset($filters_where[$filter->id]))) ) {
 						$results_active = $results_page;
-					else if (!$isSearchView)
-						$results_active = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
-					else
-						$results_active = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
+					} else if (!$isSearchView)
+						$results_active = FlexicontentFields::createFilterValues($filter, $view_join_n_text, $view_where, $filters_where, $indexed_elements, $search_prop);
+					else {
+						$results_active = FlexicontentFields::createFilterValuesSearch($filter, $view_join_n_text, $view_where, $filters_where, $indexed_elements, $search_prop);
+					}
 						
 				} else if ($faceted_overlimit_msg === null) {
 					// Set a notice message about not counting item per filter values and instead showing item TOTAL of current category / view
@@ -2705,10 +2772,10 @@ class FlexicontentFields
 			$flt_active_count = isset($filters_where) ? count($filters_where) : 0;
 			$faceted_str = array(0=>'non-FACETED ', 1=>'FACETED: current view &nbsp; (cacheable) ', 2=>'FACETED: current filters:'." (".$flt_active_count.' active) ');
 			
-			$fc_run_times['create_filter'][$filter->name] = $current_filter_creation;
+			$fc_run_times['create_filter'][$filter->name] = $current_filter_creation + (!empty($fc_run_times['create_filter'][$filter->name]) ? $fc_run_times['create_filter'][$filter->name] : 0);
 			if ( isset($fc_run_times['_create_filter_init']) ) {
 				$fc_run_times['create_filter'][$filter->name] -= $fc_run_times['_create_filter_init'];
-				$fc_run_times['create_filter_init'] = $fc_run_times['_create_filter_init'];
+				$fc_run_times['create_filter_init'] = $fc_run_times['_create_filter_init'] + (!empty($fc_run_times['create_filter_init']) ? $fc_run_times['create_filter_init'] : 0);
 				unset($fc_run_times['_create_filter_init']);
 			}
 			
@@ -2916,77 +2983,76 @@ class FlexicontentFields
 		$show_matching_items = $filter->parameters->get( 'show_matching_items', 1 );
 		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
 		
-		static $item_ids_list = null;
-		static $item_ids_sub_query = null;
+		$use_tmp = true;
+		static $iids_subquery = null;
+		static $iids_tblname  = array();
+		$view_n_text = 'SELECT DISTINCT i.id '."\n"
+			. ' FROM #__'.($use_tmp ? 'flexicontent_items_tmp' : 'content').' AS i'."\n"
+			. $view_join."\n"
+			. $view_where."\n"
+			;
+		if ( !isset($iids_tblname[$view_n_text]) ) {
+			$iids_tblname[$view_n_text] = 'fc_view_iids_'.count($iids_tblname);
+		}
+		$tmp_tbl = $iids_tblname[$view_n_text];
 		
-		if ( $faceted_filter ) {
-			
+		if ( $faceted_filter > 1 )
+		{
 			// Find items belonging to current view
-			if ($item_ids_list === null && empty($view_where) )  $item_ids_list = '';
+			if ( !isset($iids_subquery[$view_n_text]) && empty($view_where) )  $iids_subquery[$view_n_text] = '';  // current view has not limits in where clause
 			
-			if ($item_ids_list === null || $item_ids_sub_query === null) {
-				$sub_query = 'SELECT DISTINCT i.id '."\n"
-					//. ' FROM #__content AS i'."\n"
-					. ' FROM #__flexicontent_items_tmp AS i'."\n"
-					. $view_join."\n"
-					. $view_where."\n"
-					;
-				
+			if ( !isset($iids_subquery[$view_n_text]) )
+			{
 				global $fc_run_times, $fc_jprof, $fc_catview;
 				$start_microtime = microtime(true);
-				$view_total = (int) @ $fc_catview['view_total'];
-				$use_item_list_below = 0;
 				
-				if ($view_total >= $use_item_list_below) {
-					// Use sub-query only if current view has more than 0 items
-					$item_ids_sub_query = $sub_query;
-				} else {
-					// If current view has less than nnn items, then pre-calculate an item_id list ... ??? this is may or may not be benfitial ...
-					try {
-						// 1, try to bypass joomla SQL layer, including Falang (slow in large sites, not needed in this query ?) !!
-						$rows = flexicontent_db::directQuery($sub_query, false, true);
-						$item_ids = array();
-						foreach ($rows as $row) $item_ids[] = $row->id;
-					}
-					
-					catch (Exception $e) {
-						// 2, get items via normal joomla SQL layer
-						$db->setQuery($sub_query);
-						$item_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-						if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-					}
-					
-					$item_ids_list = implode(',', $item_ids);
-					unset($item_ids);
+				try {
+					// Use sub-query on temporary table
+					$db->setQuery('CREATE TEMPORARY TABLE IF NOT EXISTS '.$tmp_tbl.' (id INT, KEY(`id`))');
+					$db->query();
+					$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
+					$db->query();
+					$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$view_n_text);
+					$db->query();
+					$iids_subquery[$view_n_text] = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/> FILTER INITIALIZATION - using temporary table: ".$iids_subquery[$view_n_text]." for :".$view_n_text ." <br/><br/>";
+				}
+				catch (Exception $e) {
+					// Repeat sub-query if creating temporary table failed
+					//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+					$iids_subquery[$view_n_text] = $view_n_text;   //echo "<br/><br/> FILTER INITIALIZATION - using subquery: ".$iids_subquery[$view_n_text]." <br/><br/>";
+					/*if ($fc_catview['search']) {
+						$db->setQuery($view_n_text);
+						$item_ids = $db->loadColumn();
+						$iids_subquery[$view_n_text] = implode(',', $item_ids);   //echo "<br/><br/> FILTER INITIALIZATION - using item ID list: ".$iids_subquery[$view_n_text]." <br/><br/>";
+					}*/
 				}
 				$fc_run_times['_create_filter_init'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
 			
 			$item_id_col = $filter->iscore ? 'i.id' : 'fi.item_id';
+			$filter_where_curr = $filter->iscore ? $filter_where_curr : str_replace('i.id', 'fi.item_id', $filter_where_curr);
 			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT '.$item_id_col.') as found ' : '')."\n"
 				. $valuesfrom."\n"
-				.(!$filter->iscore ? ' JOIN #__content AS i ON fi.item_id = i.id ' : '')    // CUSTOM fields only, content table is not already JOINED, join it
-				.(@ $filters_where['search'] ? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' : '')   // extended data TABLE, needs to be joined when doing TEXT search
 				. $valuesjoin."\n"
 				. ' WHERE 1 '."\n"
-				. (!$item_ids_list ? '' : ' AND '.$item_id_col.' IN('.$item_ids_list.')'."\n")
-				. (!$item_ids_sub_query ? '' : ' AND '.$item_id_col.' IN('.$item_ids_sub_query.')'."\n")
-				.  ($filter->iscore ? $filter_where_curr : str_replace('i.id', 'fi.item_id', $filter_where_curr))."\n"
+				. (empty($iids_subquery[$view_n_text]) ? '' : ' AND '.$item_id_col.' IN('.$iids_subquery[$view_n_text].')'."\n")
+				. $filter_where_curr."\n"
 				. $valueswhere."\n"
 				. $groupby."\n"
 				. $having."\n"
 				. $orderby
 				;
+			//echo $query."<br/><br/>";
 		}
 		
-		// NON-FACETED filter
+		// Non FACETED filter (according to view but without acounting for filtering and without counting items)
 		else {
 			$query = 'SELECT DISTINCT '. $valuesselect ."\n"
 				. $valuesfrom."\n"
 				. $valuesjoin."\n"
 				. ' WHERE 1 '."\n"
 				. $valueswhere."\n"
-				//. $groupby."\n"
+				//. $groupby."\n"  // replaced by distinct, when not counting items
 				. $having."\n"
 				. $orderby
 				;
@@ -2994,9 +3060,12 @@ class FlexicontentFields
 		//if ( in_array($filter->field_type, array('tags','created','modified')) ) echo nl2br($query);
 		
 		$db->setQuery($query);
-		$results = $db->loadObjectList('value');
-		if ($db->getErrorNum()) {
-			$filter->html	 = "Filter for : {$filter->label} cannot be displayed, error during db query :<br />" .$query ."<br/>" .__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+		try {
+			$results = $db->loadObjectList('value');
+		}
+		catch (Exception $e) {
+			$filter->html = "Filter for : {$filter->label} cannot be displayed, error during db query :<br />" .$query ."<br/>" .__FUNCTION__.'()';
+			if ($db->getErrorNum())  $filter->html .= ' : SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 			return array();
 		}
 		
@@ -3008,7 +3077,8 @@ class FlexicontentFields
 	static function getFilterValuesSearch(&$filter, &$view_join, &$view_where, &$filters_where)
 	{
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
-		$db = JFactory::getDBO();
+		$app = JFactory::getApplication();
+		$db  = JFactory::getDBO();
 		
 		$filter_where_curr = '';
 		foreach ($filters_where as $filter_id => $filter_where) {
@@ -3024,91 +3094,88 @@ class FlexicontentFields
 		$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
 		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
 		
-		static $item_ids_list = null;
-		static $item_ids_sub_query = null;
+		$field_tbl = 'flexicontent_advsearch_index_field_'.$filter->id;
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . $field_tbl . '"';
+		$db->setQuery($query);
+		$tbl_exists = (boolean) count($db->loadObjectList());
+		$field_tbl = $tbl_exists ? $field_tbl : 'flexicontent_advsearch_index';
 		
-		if ( $faceted_filter )
+		
+		static $iids_subquery = null;
+		static $iids_tblname  = array();
+		
+		$view_n_text = 'SELECT DISTINCT i.id '."\n"
+			.' FROM #__content i '."\n"
+			. $view_join."\n"
+			. $view_where."\n"
+			;
+		if ( !isset($iids_tblname[$view_n_text]) ) {
+			$iids_tblname[$view_n_text] = 'fc_view_iids_'.count($iids_tblname);
+		}
+		$tmp_tbl = $iids_tblname[$view_n_text];
+		
+		if ( $faceted_filter > 1 )
 		{
 			// Find items belonging to current view
-			if ($item_ids_list === null && empty($view_where) )  $item_ids_list = '';
+			if ( !isset($iids_subquery[$view_n_text]) && empty($view_where) )  $iids_subquery[$view_n_text] = '';  // current view has not limits in where clause
 			
-			if ($item_ids_list === null || $item_ids_sub_query === null) {
-				$sub_query = 'SELECT DISTINCT ai.item_id '."\n"
-					.' FROM #__flexicontent_advsearch_index AS ai'."\n"
-					.' JOIN #__content i ON ai.item_id = i.id'."\n"
-					. $view_join."\n"
-					. $view_where."\n"
-					;
-				$db->setQuery($sub_query);
-				
+			if ( !isset($iids_subquery[$view_n_text]) )
+			{
 				global $fc_run_times, $fc_jprof, $fc_searchview;
-				$start_microtime = microtime(true);
-				$view_total = 1; //(int) @ $fc_searchview['view_total'];
-				$use_item_list_below = 0;
 				
-				if ($view_total >= $use_item_list_below) {
-					// Use sub-query only if current view has more than 0 items
-					$item_ids_sub_query = $sub_query;
-				} else {
-					// If current view has less than nnn items, then pre-calculate an item_id list ... ??? this is may or may not be benfitial ...
-					try {
-						// 1, try to bypass joomla SQL layer, including Falang (slow in large sites, not needed in this query ?) !!
-						$rows = flexicontent_db::directQuery($sub_query, false, true);
-						$item_ids = array();
-						foreach ($rows as $row) $item_ids[] = $row->id;
-					}
-					
-					catch (Exception $e) {
-						// 2, get items via normal joomla SQL layer
-						$db->setQuery($sub_query);
-						$item_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-						if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-					}
-					
-					$item_ids_list = implode(',', $item_ids);
-					unset($item_ids);
+				$start_microtime = microtime(true);
+				try {
+					// Use sub-query on temporary table
+					$db->setQuery('CREATE TEMPORARY TABLE IF NOT EXISTS '.$tmp_tbl.' (id INT, KEY(`id`))');
+					$db->query();
+					$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
+					$db->query();
+					$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$view_n_text);
+					$db->query();
+					$iids_subquery[$view_n_text] = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/> FILTER INITIALIZATION - using temporary table: ".$iids_subquery[$view_n_text]." for :".$view_n_text ." <br/><br/>";
+				}
+				catch (Exception $e) {
+					// Repeat sub-query if creating temporary table failed
+					//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+					$iids_subquery[$view_n_text] = $view_n_text;   //echo "<br/><br/> FILTER INITIALIZATION - using subquery: ".$iids_subquery[$view_n_text]." <br/><br/>";
+					/*if ($fc_searchview['search']) {
+						$db->setQuery($view_n_text);
+						$item_ids = $db->loadColumn();
+						$iids_subquery[$view_n_text] = implode(',', $item_ids);   //echo "<br/><br/> FILTER INITIALIZATION - using item ID list: ".$iids_subquery[$view_n_text]." <br/><br/>";
+					}*/
 				}
 				$fc_run_times['_create_filter_init'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
 			
 			// Get ALL records that have such values for the given field
 			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT ai.item_id) as found ' : '')."\n"
-				. ' FROM #__flexicontent_advsearch_index AS ai'."\n"
-				. ' WHERE 1 '."\n"
-				. (!$item_ids_list ? '' : ' AND ai.item_id IN('.$item_ids_list.')'."\n")
-				. (!$item_ids_sub_query ? '' : ' AND ai.item_id IN('.$item_ids_sub_query.')'."\n")
-				. ' AND ai.field_id='.(int)$filter->id."\n"
+				. ' FROM #__'.$field_tbl.' AS ai'."\n"
+				. ' WHERE ai.field_id='.(int)$filter->id."\n"
+				. (empty($iids_subquery[$view_n_text]) ? '' : ' AND ai.item_id IN('.$iids_subquery[$view_n_text].')'."\n")
 				.  str_replace('i.id', 'ai.item_id', $filter_where_curr)."\n"
 				. ' GROUP BY ai.search_index, ai.value_id'."\n"
 				;
-		} else {
-			
-			// Get ALL records that have such values for the given field
-			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT i.id) as found ' : '')."\n"
-				.' FROM #__flexicontent_advsearch_index AS ai'."\n"
-				.' JOIN #__content i ON ai.item_id = i.id'."\n"
-				. $view_join."\n"
-				.' WHERE '."\n"
-				. ($view_where ? $view_where.' AND ' : '')."\n"
-				.' ai.field_id='.(int)$filter->id."\n"
-				. $filter_where_curr
-				.' GROUP BY ai.search_index, ai.value_id'."\n"
-				;
-				
-			/*$query = 'SELECT DISTINCT '. $valuesselect ."\n"
-				.' FROM #__flexicontent_advsearch_index AS ai'."\n"
-				.' WHERE ai.field_id='.(int)$filter->id."\n"
-				//.' GROUP BY ai.search_index, ai.value_id'."\n"
-				;*/
 		}
 		
-		$db->setQuery($query);
-		$results = $db->loadObjectList('value');
-		//echo "<br/>". count($results) ."<br/>";
-		//echo nl2br($query) ."<br/><br/>";
+		// Non FACETED filter (according to view but without acounting for filtering and without counting items)
+		else {
+			$query = 'SELECT DISTINCT '. $valuesselect."\n"
+				. ' FROM #__'.$field_tbl.' AS ai'."\n"
+				. ' WHERE ai.field_id='.(int)$filter->id."\n"
+				. (empty($iids_subquery[$view_n_text]) ? '' : ' AND ai.item_id IN('.$iids_subquery[$view_n_text].')'."\n")
+				.  str_replace('i.id', 'ai.item_id', $filter_where_curr)."\n"
+				//. ' GROUP BY ai.search_index, ai.value_id'."\n"  // replaced by distinct, when not counting items
+				;
+		}
+		//echo $query."<br/><br/>";
 		
-		if ($db->getErrorNum()) {
-			$filter->html	 = "Filter for : {$filter->label} cannot be displayed, error during db query :<br />" .$query ."<br/>" .__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+		$db->setQuery($query);
+		try {
+			$results = $db->loadObjectList('value');
+		}
+		catch (Exception $e) {
+			$filter->html = "Filter for : {$filter->label} cannot be displayed, error during db query :<br />" .$query ."<br/>" .__FUNCTION__.'()';
+			if ($db->getErrorNum())  $filter->html .= ' : SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 			return array();
 		}
 		
@@ -3476,7 +3543,7 @@ class FlexicontentFields
 		if ($disallowed_fieldnames===null) {
 			$query = "SELECT name FROM #__flexicontent_fields WHERE field_type IN ('". implode("','", $disallowed_fields) ."')";
 			$db->setQuery($query);
-			$field_name_col = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$field_name_col = $db->loadColumn();
 			$disallowed_fieldnames = !$field_name_col ? array() : array_flip($field_name_col);
 		}
 		

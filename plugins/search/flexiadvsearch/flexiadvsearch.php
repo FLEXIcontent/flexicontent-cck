@@ -89,11 +89,15 @@ class plgSearchFlexiadvsearch extends JPlugin
 	 */
 	function onContentSearch( $text, $phrase='', $ordering='', $areas=null )
 	{
+		$app  = JFactory::getApplication();
+		$view = JRequest::getCMD('view');
+		$app->setUserState('fc_view_total_'.$view, 0);
+		$app->setUserState('fc_view_limit_max_'.$view, 0);
+		
 		// Check if not search inside this search plugin areas
 		if ( is_array($areas) && !array_intersect( $areas, array_keys($this->onContentSearchAreas()) ) )  return array();
 		
 		// Initialize some variables
-		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
 		$menu  = $app->getMenu()->getActive();
@@ -314,7 +318,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		if( strlen($text) )
 		{
 			$ts = !$txtmode ? 'ie' : 'ts';
-			$escaped_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
+			$escaped_text = $db->escape($text, true);
 			$quoted_text = $db->Quote( $escaped_text, false );
 			
 			switch ($phrase)
@@ -344,7 +348,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 					} else {
 						// speed optimization ... 2-level searching: first require ALL words, then require exact text
 						$newtext = '+' . implode( ' +', $words );
-						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+						$quoted_text = $db->escape($newtext, true);
 						$quoted_text = $db->Quote( $quoted_text, false );
 						$exact_text  = $db->Quote( '%'. $escaped_text .'%', false );
 						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
@@ -360,7 +364,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
 					$newtext = '+' . implode( '* +', $words ) . '*';
-					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+					$quoted_text = $db->escape($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
 					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
@@ -378,7 +382,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 						JRequest::setVar('shortwords', implode(' ', $shortwords));
 						
 						$newtext = implode( '* ', $words ) . '*';
-						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+						$quoted_text = $db->escape($newtext, true);
 						$quoted_text = $db->Quote( $quoted_text, false );
 						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					}
@@ -386,20 +390,6 @@ class plgSearchFlexiadvsearch extends JPlugin
 			}
 			
 			// Construct TEXT SEARCH limitation SUB-QUERY (contained in a AND-WHERE clause)
-			if (!$txtmode)
-				$_text_SQL = ' SELECT item_id FROM #__flexicontent_items_ext AS '.$ts.' WHERE %s ';
-			else
-				$_text_SQL = ' SELECT item_id FROM #__flexicontent_advsearch_index AS '.$ts.' WHERE %s AND '.$ts.'.field_id IN ('. implode(',',array_keys($fields_text)) .')';
-			
-			if (!$txtmode)
-				$_text_SQL_2 = ' JOIN #__flexicontent_items_ext AS '.$ts.' ON %s ';
-			else
-				$_text_SQL_2 = ' JOIN #__flexicontent_advsearch_index AS '.$ts.' ON %s AND '.$ts.'.field_id IN ('. implode(',',array_keys($fields_text)) .')';
-			
-			$text_where_filters = ' AND i.id IN ( '. sprintf($_text_SQL, $_text_match) .')';
-			
-			$text_join_filters = ' AND i.id IN ( '. sprintf($_text_SQL_2, $_text_match) .')';
-			
 			$text_where = ' AND '. $_text_match;
 		} else {
 			$text_where = '';
@@ -487,61 +477,23 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$select_access .= ',  c.access as category_access, ty.access as type_access';
 		
 		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
-				$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
-				$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$andaccess	.= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
-					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
-				} else {
-					$andaccess  .= ' AND ty.access <= '.$aid;
-					$andaccess  .= ' AND  c.access <= '.$aid;
-					$andaccess  .= ' AND  i.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
+			$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
+			$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
 			$select_access .= ', 1 AS has_access';
 		}
 		else {
 			// Access Flags for: content type, main category, item
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$select_access .= ', '
-					.' CASE WHEN '
-					.'  ty.access IN ('.$aid_list.') AND '
-					.'   c.access IN ('.$aid_list.') AND '
-					.'   i.access IN ('.$aid_list.') '
-					.' THEN 1 ELSE 0 END AS has_access';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$select_access .= ', '
-						.' CASE WHEN '
-						.'  (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') AND '
-						.'  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ') AND '
-						.'  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') '
-						.' THEN 1 ELSE 0 END AS has_access';
-				} else {
-					$select_access .= ', '
-						.' CASE WHEN '
-						.'  (ty.access <= '. (int) $aid . ') AND '
-						.'  ( c.access <= '. (int) $aid . ') AND '
-						.'  ( i.access <= '. (int) $aid . ') '
-						.' THEN 1 ELSE 0 END AS has_access';
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$select_access .= ', '
+				.' CASE WHEN '
+				.'  ty.access IN ('.$aid_list.') AND '
+				.'   c.access IN ('.$aid_list.') AND '
+				.'   i.access IN ('.$aid_list.') '
+				.' THEN 1 ELSE 0 END AS has_access';
 		}
 		
 		
@@ -567,7 +519,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Create the AND-WHERE clause parts for the currentl active Field Filters
 		// ***********************************************************************
 		
-		$return_sql = false;
+		$return_sql = 2;
 		$filters_where = array();
 		foreach($filters as $field)
 		{
@@ -604,26 +556,34 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// JOIN clause - USED - to limit returned 'text' to the text of TEXT-SEARCHABLE only fields ... (NOT shared with filters)
 		if ( !$txtmode ) {
-			$onbasic_textsearch = ' '.$text_where;
+			$onBasic_textsearch    = $text_where;
+			$onAdvanced_textsearch = '';
 			$join_textsearch = '';
+			$join_textfields = '';
 		} else {
-			$onbasic_textsearch = '';
-			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id AND ts.field_id IN ('. implode(',',array_keys($fields_text)) .')'
-			.$text_where;
+			$onBasic_textsearch    = '';
+			$onAdvanced_textsearch = $text_where;
+			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id AND ts.field_id IN ('. implode(',',array_keys($fields_text)) .')';
+			$join_textfields = ' JOIN #__flexicontent_fields as f ON f.id=ts.field_id';
 		}
 		
 		// JOIN clauses ... (shared with filters)
 		$join_clauses =  ''
 			. ' JOIN #__categories AS c ON c.id = i.catid'
-			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' . $onbasic_textsearch
+			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			. $join_textsearch
-			. ( $txtmode ? ' JOIN #__flexicontent_fields as f ON f.id=ts.field_id' : '' )
-			. $orderby_join
 			;
 		
+		$join_clauses_with_text =  ''
+			. ' JOIN #__categories AS c ON c.id = i.catid'
+			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' . $onBasic_textsearch
+			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			. ($text_where ?
+				$join_textsearch . $onAdvanced_textsearch .
+				$join_textfields : '');
+		
 		// AND-WHERE sub-clauses ... (shared with filters)
-		$conf_where =  ' WHERE 1 '
+		$where_conf = ' WHERE 1 '
 			. ' AND i.state IN (1,-5'. ($search_archived ? ','.(FLEXI_J16GE ? 2:-1) :'' ) .') '
 			. ' AND c.published = 1 '
 			. ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
@@ -634,8 +594,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			;
 		
 		// AND-WHERE sub-clauses for text search ... (shared with filters)
-		$and_where_text_n_filters  = '';//!$txtmode ? $text_where : '';
-		$and_where_text_n_filters .= count($filters_where) ? implode( " ", $filters_where) : '';
+		$and_where_filters = count($filters_where) ? implode( " ", $filters_where) : '';
 		
 		
 		// ************************************************
@@ -644,10 +603,10 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		global $fc_searchview;
 		$fc_searchview['join_clauses'] = $join_clauses;
-		$fc_searchview['where_conf_only'] = $conf_where;    // WHERE of the view (mainly configuration dependent)
+		$fc_searchview['join_clauses_with_text'] = $join_clauses_with_text;
+		$fc_searchview['where_conf_only'] = $where_conf;   // WHERE of the view (mainly configuration dependent)
 		$fc_searchview['filters_where'] = $filters_where;  // WHERE of the filters
-		//if ($text_where) $fc_searchview['filters_where']['txtsearch'] = $text_where_filters;
-		//if ($text_where) $fc_searchview['filters_join']['txtsearch'] = $text_join_filters;
+		$fc_searchview['search'] = $text_where;  // WHERE for text search
 		$fc_searchview['params'] = $params; // view's parameters
 		
 		
@@ -658,15 +617,56 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		if ( !count($filters_where) & !strlen($text) ) return array();
 		
+		$print_logging_info = $params->get('print_logging_info');
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+		
+		
+		// *****************************************
 		// Overcome possible group concat limitation
+		// *****************************************
+		
 		$query="SET SESSION group_concat_max_len = 9999999";
 		$db->setQuery($query);
 		$db->query();
 		
-		// Construct query's SQL
-		$lta = FLEXI_J16GE ? 'i': 'ie';
-		$query 	= 'SELECT i.id, i.title AS title, '.(FLEXI_J16GE ? '' : 'i.sectionid, ').'i.created, i.id AS fc_item_id, i.access, ie.type_id, '.$lta.'.language'
+		
+		
+		// *************
+		// Get the items
+		// *************
+		
+		$query = 'SELECT SQL_CALC_FOUND_ROWS i.id'
 			. $orderby_col
+			. ' FROM #__content AS i'
+			. $join_clauses_with_text
+			. $orderby_join
+			. $joinaccess
+			. $where_conf
+			. $and_where_filters 
+			. ' GROUP BY i.id '
+			. $orderby
+		;
+		//echo "Adv search plugin main SQL query: ".nl2br($query)."<br/><br/>";
+		
+		
+		// Execute query
+		$db->setQuery( $query, 0, $search_limit ); // NOTE: The plugin will return a PRECONFIGURED limited number of results, the SEARCH VIEW to do the pagination, splicing (appropriately) the data returned by all search plugins
+		$item_ids = $db->loadColumn(0);
+		if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
+		
+		$db->setQuery("SELECT FOUND_ROWS()");
+		$fc_searchview['view_total'] = $db->loadResult();   // $search_limit
+		$app->setUserState('fc_view_total_'.$view, $fc_searchview['view_total']);
+		
+		if ( !count($item_ids) ) return array();  // No items found
+		
+		
+		
+		// *****************
+		// Get the item data
+		// *****************
+		
+		$query_data = 'SELECT i.id, i.title AS title, i.created, i.id AS fc_item_id, i.access, ie.type_id, i.language'
 			. ( !$txtmode ?
 				', ie.search_index AS text' :
 				', GROUP_CONCAT(ts.search_index ORDER BY f.ordering ASC SEPARATOR \' \') AS text'
@@ -676,34 +676,35 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. ', CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, i.title ) AS section'
 			. $select_access
 			. ' FROM #__content AS i'
-			. $join_clauses
-			. $joinaccess
-			. $conf_where
-			. $and_where_text_n_filters 
+			. $join_clauses     // without on-join for basic text search
+			. $join_textsearch  // without on-join for advanced text search
+			. $join_textfields  // we need the text searchable fields to do ordering of text search fields above (minor effect)
+			//. $orderby_join
+			//. $joinaccess
+			. ' WHERE i.id IN ('.implode(',',$item_ids).') '
 			. ' GROUP BY i.id '
-			. $orderby
+			. ' ORDER BY FIELD(i.id, '. implode(',', $item_ids) .')'
 		;
-		//echo nl2br($query);
+		//echo nl2br($query)."<br/><br/>";
 		
-		$print_logging_info = $params->get('print_logging_info');
-		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
-		
-		// Execute query ... NOTE: The plugin will return a PRECONFIGURED limited number of results (more),
-		// it is the responsibility of the SEARCH VIEW to do the pagination, splicing (appropriately) the data returned by all search plugins.
-		$db->setQuery( $query, 0, $search_limit );
+		$db->setQuery( $query_data );
 		$list = $db->loadObjectList();
 		if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
-		$fc_searchview['view_total'] = $search_limit;
 		
 		if ( $print_logging_info ) @$fc_run_times['search_query_runtime'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
-		//echo "<br>".$query."<br><br>\n";
-		//echo "<pre>"; print_r($list); echo "</pre>";
 		
+		
+		
+		// *************************************
 		// Create item links and other variables
-		if( $list ) {
-			if ( count($list) < $search_limit ) $app->setUserState('fc_view_limit_max', 0);
-			else $app->setUserState('fc_view_limit_max', $search_limit);
+		// *************************************
+		
+		//echo "<pre>"; print_r($list); echo "</pre>";
+		if( $list )
+		{
+			if ( count($list) >= $search_limit )
+				$app->setUserState('fc_view_limit_max_'.$view, $search_limit);
 			
 			$item_cats = FlexicontentFields::_getCategories($list);
 			foreach($list as $key => $item)

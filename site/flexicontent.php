@@ -355,6 +355,7 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	
 	if (count($filters_creation_times)) {
 		$msg .= sprintf('<br/>-- [FC Filters Creation: %.2f s] ', $filters_creation_total/1000000);
+		if (isset($fc_run_times['create_filter_init'])) $msg .= sprintf('<br/> &nbsp; Filters Init: %.2f s ', $fc_run_times['create_filter_init']/1000000);
 		
 		$msg .= '<br/>';
 		foreach($filters_creation_times as $i => $_time) {

@@ -1211,13 +1211,12 @@ class com_flexicontentInstallerScript
 						} else if ($result==1) {
 							echo JText::_("Failed to set comments as com_content comments");
 						} else {
-							echo JText::_("No jcomments table found");
+							echo JText::_("No jcomments table found, nothing to do");
 						}
 						?></span>
 					</td>
 				</tr>
 		<?php
-		if (FLEXI_J16GE) :
 		// Restore com_content component asset, as asset parent_id, for the top-level 'com_content' categories
 		?>
 				<tr class="row1">
@@ -1269,8 +1268,49 @@ class com_flexicontentInstallerScript
 						?></span>
 					</td>
 				</tr>
-				
-			<?php endif; /* if FLEXI_J16GE */?>
+		<?php
+		// Drop search tables
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Remove search tables</td>
+					<td>
+						<?php
+						$tbl_prefix = $app->getCfg('dbprefix').'flexicontent_advsearch_index_field_';
+						$query = "SELECT TABLE_NAME
+							FROM INFORMATION_SCHEMA.TABLES
+							WHERE TABLE_NAME LIKE '".$tbl_prefix."%'
+							";
+						$db->setQuery($query);
+						$tbl_names = $db->loadColumn();
+						
+						if (!count($tbl_names)) {
+							$result = 0;
+						} else {
+							foreach($tbl_names as $tbl_name) {
+								$db->setQuery( 'DROP TABLE '.$tbl_name );
+								$db->query();
+							}
+							if ($db->getErrorNum()) {
+								echo $db->getErrorMsg();
+								$result = 1;
+							} else {
+								$result = 2;
+							}
+						}
+						
+						$status_class = ($result==2 || $result==0) ? 'badge badge-success' : 'badge badge-error';
+						?>
+						<span class="<?php echo $status_class; ?>"><?php
+						if ($result==2) {
+							echo JText::_("Search tables removed");
+						} else if ($result==1) {
+							echo JText::_("Failed to remove all search tables");
+						} else {
+							echo JText::_("No search tables found, nothing to do");
+						}
+						?></span>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 			<?php

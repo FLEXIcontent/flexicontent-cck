@@ -188,7 +188,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 					.' JOIN #__flexicontent_fields as f ON ai.field_id=f.id'
 					;
 			else {
-				if ($filter_order == 'a.title' || $filter_itemstate || $filter_itemtype || $search_itemtitle || $search_itemid)
+				if ($filter_order == 'a.id' || $filter_order == 'a.title' || $filter_itemstate || $filter_itemtype || $search_itemtitle || $search_itemid)
 					$query .= ' JOIN #__content as a ON ' .($isADV ? 'ai' : 'ext'). '.item_id=a.id';
 				if ($isADV && $filter_itemtype)
 					$query .= ' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id';
@@ -340,10 +340,85 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$app = JFactory::getApplication();
 		return $this->getState('limitstart', $app->getCfg('list_limit'));
 	}
-	function purge() {
-		$db = JFactory::getDBO();
-		$query = "TRUNCATE TABLE `#__flexicontent_advsearch_index`;";
+	
+	/**
+	 * Method to empty search indexes
+	 *
+	 * @access	public
+	 * @return	null
+	 * @since	1.0
+	 */
+	function purge( $del_fieldids=null )
+	{
+		$app = JFactory::getApplication();
+		$db  = JFactory::getDBO();
+		
+		// ******************************
+		// Empty Common text-search index
+		// ******************************
+		
+		if ( empty($del_fieldids) ) {
+			$query = "TRUNCATE TABLE `#__flexicontent_advsearch_index`;";
+		} else {
+			$del_fieldids_list = implode( ',' , $del_fieldids);
+			$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id IN (". $del_fieldids_list. ")";
+		}
 		$db->setQuery($query);
 		$db->query();
+		
+		
+		// **********************
+		// Empty per field TABLES
+		// **********************
+		
+		$filterables = FlexicontentFields::getSearchFields('id', $indexer='advanced', null, null, $_load_params=true, 0, $search_type='filter');
+		$filterables = array_keys($filterables);
+		$filterables = array_flip($filterables);
+		
+		$tbl_prefix = $app->getCfg('dbprefix').'flexicontent_advsearch_index_field_';
+		$query = "SELECT TABLE_NAME
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE TABLE_NAME LIKE '".$tbl_prefix."%'
+			";
+		$db->setQuery($query);
+		$tbl_names = $db->loadColumn();
+		
+		foreach($tbl_names as $tbl_name)
+		{
+			$_field_id = str_replace($tbl_prefix, '', $tbl_name);
+			
+			// Drop the table of no longer filterable field 
+			if ( !isset($filterables[$_field_id]) )
+				$db->setQuery( 'DROP TABLE '.$tbl_name );
+			
+			// Truncate (or drop/recreate) tables of fields that are still filterable. Any dropped but needed tables will be recreated below
+			else if ( empty($del_fieldids) || isset($del_fieldids[$_field_id]) )
+				$db->setQuery( /*TRUNCATE*/ 'DROP TABLE '.$tbl_name );
+			
+			$db->query();
+		}
+		
+		// VERIFY all search tables exist
+		foreach ($filterables as $_field_id => $_ignored) {
+			$query = '
+			CREATE TABLE IF NOT EXISTS `' .$app->getCfg('dbprefix').'flexicontent_advsearch_index_field_'.$_field_id. '` (
+			  `sid` int(11) NOT NULL auto_increment,
+			  `field_id` int(11) NOT NULL,
+			  `item_id` int(11) NOT NULL,
+			  `extraid` int(11) NOT NULL,
+			  `search_index` longtext NOT NULL,
+			  `value_id` varchar(255) NULL,
+			  PRIMARY KEY (`field_id`,`item_id`,`extraid`),
+			  KEY `sid` (`sid`),
+			  KEY `field_id` (`field_id`),
+			  KEY `item_id` (`item_id`),
+			  FULLTEXT `search_index` (`search_index`),
+			  KEY `value_id` (`value_id`)
+			) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`
+			';
+			$db->setQuery($query);
+			$db->query();
+		}
+		
 	}
 }
