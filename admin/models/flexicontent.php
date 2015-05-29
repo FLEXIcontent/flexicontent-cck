@@ -761,7 +761,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 		
 		// CHECK phpThumb cache permissions
-		$return = preg_match('/rwxr.xr.x/i', JPath::getPermissions($phpthumbcache) ) ? true : false;
+		$perms = JPath::getPermissions($phpthumbcache);
+		$return = preg_match('/rwx....../i', $perms) ? true : false;  //'/rwxr.xr.x/i'
+		if ( $return && preg_match('/....w..w./i', $perms) ) {
+			JPath::setPermissions($phpthumbcache, '0600', '0700');
+		}
 		// If permissions not good check if we can change them
 		if ( !$return && !JPath::canChmod($phpthumbcache) ) {
 			JError::raiseWarning(100, 'Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-' );

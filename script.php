@@ -1040,7 +1040,8 @@ class com_flexicontentInstallerScript
 	function uninstall( $parent ) {
 		//error_reporting(E_ALL & ~E_STRICT);
 		//ini_set('display_errors',1);
-
+		$app = JFactory::getApplication();
+		
 		// Extra CSS needed for J3.x+
 		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 		
