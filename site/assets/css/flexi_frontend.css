@@ -918,7 +918,6 @@ ul.fc_field_filter.fc_checkradio_group label {
 
 #flexicontent .fc_search_field_container {
 	display: block;
-	white-space: nowrap;
 	float: left;
 }
 #flexicontent .fc_search_field_label {

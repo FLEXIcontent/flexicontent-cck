@@ -1627,12 +1627,13 @@ class plgFlexicontent_fieldsFile extends FCField
 	{
 		// Check file exists in DB
 		$db   = JFactory::getDBO();
-		$query = 'SELECT id '
+		$query = 'SELECT item_id '
 			. ' FROM #__flexicontent_fields_item_relations '
 			. ' WHERE '
 			. '  field_id='. $db->Quote($field->id)
-			. '  item_id='. $db->Quote($item->id)
-			. '  value='. $db->Quote($file_id)
+			. '  AND item_id='. $db->Quote($item->id)
+			. '  AND value='. $db->Quote($file_id)
+			. ' LIMIT 1'
 			;
 		$db->setQuery($query);
 		$db_id = $db->loadResult();
