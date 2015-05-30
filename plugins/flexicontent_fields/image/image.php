@@ -20,6 +20,7 @@ jimport('joomla.event.plugin');
 class plgFlexicontent_fieldsImage extends JPlugin
 {
 	static $field_types = array('image');
+	static $value_only_displays = array("display_backend_src", "display_small_src", "display_medium_src", "display_large_src", "display_original_src");
 	
 	// ***********
 	// CONSTRUCTOR
@@ -806,7 +807,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		static $initialized = null;
 		static $app, $document, $option;
 		static $isMobile, $isTablet, $useMobile;
-		static $value_only_displays;
 		if ($initialized===null)
 		{
 			$app       = JFactory::getApplication();
@@ -826,8 +826,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
 			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			//printf('<br/>-- [Detect Mobile: %.3f s] ', $time_passed/1000000);
-			
-			$value_only_displays = array("display_backend_src", "display_small_src", "display_medium_src", "display_large_src", "display_original_src");
 		}
 		
 		
@@ -1025,7 +1023,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Default display method depends on view
 		// **************************************
 		
-		if ($prop=='display') {
+		if ($prop=='display' && ($view==FLEXI_ITEMVIEW || $view=='category')) {
 			$_method = $view==FLEXI_ITEMVIEW ?
 				$field->parameters->get( 'default_method_item',  'display' ) :
 				$field->parameters->get( 'default_method_cat',  'display_single_total') ;
@@ -1126,7 +1124,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// **********************************************
 		
 		// Do not load JS, for value only displays
-		if ( !in_array($prop, $value_only_displays) )
+		if ( !in_array($prop, self::$value_only_displays) )
 		{
 			// MultiBox maybe added in extra cases besides popup
 			// (a) in Item manager, (b) When linking to URL in popup target
@@ -1488,17 +1486,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			
 			// ****************************************************************
-			// CHECK if we were asked for a single image URL (* the first one),
-			// if so, return it and terminate from further execution
+			// CHECK if we were asked for value only display (e.g. image source)
+			// if so we will not be creating the HTML code for Image / Gallery 
 			// ****************************************************************
 			
-			if ( in_array($prop, $value_only_displays) ) {
-				// we create single (1st value) if not in a field group, otherwise we continue the loop,
-				// so as to create an array of values since the fieldgroup field can use this array properly
-				if ($is_ingroup)
-					continue;
-				else
-					return;
+			if ( in_array($prop, self::$value_only_displays) ) {
+				continue;
 			}
 			
 			
@@ -1738,6 +1731,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Using in field group, return array
 		if ( $is_ingroup ) {
+			return;
+		}
+		
+		// Check for value only displays and return
+		if ( in_array($prop, self::$value_only_displays) ) {
 			return;
 		}
 		
