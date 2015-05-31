@@ -346,6 +346,7 @@ jQuery(document).ready(function() {
 			minLength: 1,
 			select: function( event, ui ) {
 				//console.log( ui.item  ?  "Selected: " + ui.item.label  :  "Nothing selected, input was " + this.value);
+				if ( ui.item ) this.value = ui.item.label.trim();
 				var ele = event.target;
 				jQuery(ele).trigger('change');
 			},
