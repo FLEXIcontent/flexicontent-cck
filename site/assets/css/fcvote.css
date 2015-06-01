@@ -1,29 +1,29 @@
 /* fcvote standard css */
-.fcvote {
+div.fcvote {
 	display: inline-block;
 	vertical-align: middle;
 }
 
-.fcvote ul {
-	margin: 0!important;
-	padding: 0!important;
+div.fcvote > ul {
+	margin: 0;
+	padding: 0;
 }
 
-.fcvote ul li {
-	background-position: 0!important;
-	margin: 0!important;
-	padding: 0!important;
+div.fcvote > ul > li {
+	background-position: 0;
+	margin: 0;
+	padding: 0;
 }
 
-.fcvote ul, 
-.fcvote ul li a:hover, 
-.fcvote ul li.current-rating {
-	background-color: transparent!important;
+div.fcvote > ul, 
+div.fcvote > ul > li a:hover, 
+div.fcvote > ul > li.current-rating {
+	background-color: transparent;
 	background-position: left -1000px;
-	background-repeat: repeat-x!important;
+	background-repeat: repeat-x;
 }
 
-.fcvote ul {
+div.fcvote > ul {
 	background-position: left top;
 	list-style-image: none;
 	list-style-position: outside;
@@ -35,15 +35,15 @@
 	float: left;
 }
 
-.fcvote ul li {
+div.fcvote > ul > li {
 	background-image: none;
 	display: inline;
 	padding: 0pt;
 }
 
-.fcvote ul li a, 
-.fcvote ul li.current-rating {
-	background-color: transparent !important;
+div.fcvote > ul > li a, 
+div.fcvote > ul > li.current-rating {
+	background-color: transparent ;
 	border: medium none;
 	cursor: pointer;
 	left: 0pt;
@@ -56,28 +56,28 @@
 	top: 0pt;
 }
 
-.fcvote ul li a:hover {
-	background-position: left bottom!important;
+div.fcvote > ul > li a:hover {
+	background-position: left bottom;
 }
 
-.fcvote ul li.current-rating {
+div.fcvote > ul > li.current-rating {
 	background-position: left center;
 	z-index: 0;
 }
 
-.fcvote li a {
-	margin: 0 !important;
-	padding: 0 !important;
+div.fcvote li a {
+	margin: 0 ;
+	padding: 0 ;
 }
 /*
-.fcvote li a.one   { width: 20%;  z-index: 6; }
-.fcvote li a.two   { width: 40%;  z-index: 5; }
-.fcvote li a.three { width: 60%;  z-index: 4; }
-.fcvote li a.four  { width: 80%;  z-index: 3; }
-.fcvote li a.five  { width: 100%; z-index: 2; }
+div.fcvote li a.one   { width: 20%;  z-index: 6; }
+div.fcvote li a.two   { width: 40%;  z-index: 5; }
+div.fcvote li a.three { width: 60%;  z-index: 4; }
+div.fcvote li a.four  { width: 80%;  z-index: 3; }
+div.fcvote li a.five  { width: 100%; z-index: 2; }
 */
 
-.fcvote-label {
+div.fcvote-label {
 	float: left;
 	min-width: 80px;
 	padding: 0 4px 0 0;
@@ -87,39 +87,39 @@
 	border-bottom:1px dashed gray;
 	font-style:italic;
 }
-.fcvote-label.xid-main {
+div.fcvote-label.xid-main {
 	font-size:100%;
 	font-style:normal;
 	font-weight:bold;
 }
-.fcvote-count{
+div.fcvote-count{
 	float: left;
 	padding: 0 0 0 4px;
 }
 
 /* fcvote variable css */
-.fcvote {
+div.fcvote {
 	line-height: 25px;
 }
 
-.fcvote ul {
+div.fcvote > ul {
 	height: 25px;
 	width: 125px;
 }
 
-.fcvote ul, 
-.fcvote ul li a:hover, 
-.fcvote ul li.current-rating {
-	background-image: url(../images/star.gif)!important;
+div.fcvote > ul, 
+div.fcvote > ul > li a:hover, 
+div.fcvote > ul > li.current-rating {
+	background-image: url(../images/star.gif);
 }
 
-.fcvote ul li a, 
-.fcvote ul li.current-rating {
+div.fcvote > ul > li a, 
+div.fcvote > ul > li.current-rating {
 	height: 25px;
 	line-height: 25px;
 }
 
-.fcvote .ajax-loader {
+div.fcvote .ajax-loader {
     background: url("../images/ajax-loader.gif") no-repeat scroll left center transparent;
     height: 16px;
     padding: 0 0 0 20px;
