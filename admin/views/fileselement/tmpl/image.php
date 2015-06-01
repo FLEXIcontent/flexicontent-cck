@@ -46,6 +46,8 @@ $flexi_select = JText::_('FLEXI_SELECT');
 <script type="text/javascript">
 
 jQuery(document).ready(function() {
+	showUploader();
+	jQuery('#flash_uploader').height(330);
 	fc_toggle_box_via_btn('uploader_tabset', this, 'btn-primary');
 });
 
@@ -239,7 +241,8 @@ flexicontent_html::loadFramework('flexi-lib');
 	<div class="tabbertab" style="padding: 0px;" id="local_tab" data-icon-class="icon-upload">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ); ?> </h3>
 	
-	<button id="single_multi_uploader" class="<?php echo $btn_class; ?> btn-warning" onclick="jQuery('#filemanager-1').toggle(); jQuery('#filemanager-2').toggle(); jQuery('#flash_uploader').height(330); setTimeout(function(){showUploader()}, 100);">
+	<span class="label"><?php echo JText::_( 'Problem ? use single uploader' ); ?></span>
+	<button id="single_multi_uploader" class="<?php echo $btn_class; ?> btn-info" onclick="jQuery('#filemanager-1').toggle(); jQuery('#filemanager-2').toggle(); jQuery('#flash_uploader').height(330); setTimeout(function(){showUploader()}, 100);">
 		<?php echo JText::_( 'FLEXI_SINGLE_MULTIPLE_UPLOADER' ); ?>
 	</button>
 	<div class="fcclear"></div>
@@ -272,7 +275,7 @@ flexicontent_html::loadFramework('flexi-lib');
 		';
 		?>
 		
-		<fieldset class="actions" id="filemanager-1">
+		<fieldset class="actions" id="filemanager-1" style="display:none;">
 			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
 				
 				<table class="fc-form-tbl" cellspacing="0" cellpadding="0" border="0" id="file-upload-form-container">
@@ -355,7 +358,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			
 		</fieldset>
 		
-		<fieldset class="actions" id="filemanager-2" style="display:none;">
+		<fieldset class="actions" id="filemanager-2">
 			<div id="flash_uploader" style="width: auto; height: 0px;">Your browser doesn't have Flash installed.</div>
 		</fieldset>
 		
@@ -397,7 +400,7 @@ flexicontent_html::loadFramework('flexi-lib');
 		<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
 			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-			<input type="button" id="fc_upload_box_btn" class="<?php echo $_class; ?> btn-success" onclick="fc_toggle_box_via_btn('uploader_tabset', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_UPLOAD' ); ?>" />
+			<input type="button" id="fc_upload_box_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('uploader_tabset', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_UPLOAD' ); ?>" />
 		</div>
 		
 		<div class="fcclear"></div>
@@ -454,7 +457,7 @@ flexicontent_html::loadFramework('flexi-lib');
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
 		<div class="btn-group" style="margin: 2px 32px 6px 24px; display:inline-block;">
 			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-			<input type="button" id="fc_upload_box_btn" class="<?php echo $_class; ?> btn-success" onclick="fc_toggle_box_via_btn('uploader_tabset', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_UPLOAD' ); ?>" />
+			<input type="button" id="fc_upload_box_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('uploader_tabset', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_UPLOAD' ); ?>" />
 		</div>
 
 <?php endif; ?>

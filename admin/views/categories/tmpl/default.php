@@ -46,6 +46,10 @@ $image_rsslist = FLEXI_J16GE ?
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
 $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ) );
 
+$img_path = '../components/com_flexicontent/assets/images/';
+$state_names = array('ALL_P'=>JText::_('FLEXI_PUBLISHED'), 'ALL_U'=>JText::_('FLEXI_UNPUBLISHED'), 'A'=>JText::_('FLEXI_ARCHIVED'), 'T'=>JText::_('FLEXI_TRASHED'));
+$state_imgs = array('ALL_P'=>'tick.png', 'ALL_U'=>'publish_x.png', 'A'=>'archive.png', 'T'=>'trash.png');
+
 $edit_entry = JText::_('FLEXI_EDIT_CATEGORY', true);
 
 $list_total_cols = 13;
@@ -165,7 +169,23 @@ function delAllFilters() {
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'c.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<!--th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
+			<th class="hideOnDemandClass">
+				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_P']; ?></small></span>
+				<?php echo '<img src="'.$img_path.$state_imgs['ALL_P'].'" title="'.$state_names['ALL_P'].'">'; ?>
+			</th>
+			<th class="hideOnDemandClass">
+				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_U']; ?></small></span>
+				<?php echo '<img src="'.$img_path.$state_imgs['ALL_U'].'" title="'.$state_names['ALL_U'].'">'; ?>
+			</th>
+			<th class="hideOnDemandClass">
+				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['A']; ?></small></span>
+				<?php echo '<img src="'.$img_path.$state_imgs['A'].'" title="'.$state_names['A'].'">'; ?>
+			</th>
+			<th class="hideOnDemandClass">
+				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['T']; ?></small></span>
+				<?php echo '<img src="'.$img_path.$state_imgs['T'].'" title="'.$state_names['T'].'">'; ?>
+			</th>
 			<th class="hideOnDemandClass" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass">
@@ -191,18 +211,10 @@ function delAllFilters() {
 
 	<tbody>
 		<?php
-		if (FLEXI_J16GE) {
-			$canCheckinRecords = $user->authorise('core.admin', 'checkin');
-		} else if (FLEXI_ACCESS) {
-			$canCheckinRecords = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
-		} else {
-			$canCheckinRecords = $user->gid >= 24;
-		}
+		$canCheckinRecords = $user->authorise('core.admin', 'checkin');
 		
-		if (FLEXI_J16GE) {
-			$originalOrders = array();
-			$extension	= 'com_content';
-		}
+		$originalOrders = array();
+		$extension	= 'com_content';
 		
 		$k = 0;
 		$i = 0;
@@ -210,34 +222,17 @@ function delAllFilters() {
 		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';  // Collapsed row to allow border styling to apply		$k = 0;
 		foreach ($this->rows as $row)
 		{
-			if (FLEXI_J16GE) {
-				$canEdit		= $user->authorise('core.edit', $extension.'.category.'.$row->id);
-				$canEditOwn	= $user->authorise('core.edit.own', $extension.'.category.'.$row->id) && $row->created_user_id == $user->get('id');
-				$canEditState			= $user->authorise('core.edit.state', $extension.'.category.'.$row->id);
-				$canEditStateOwn	= $user->authorise('core.edit.state.own', $extension.'.category.'.$row->id) && $row->created_user_id==$user->get('id');
-				$recordAvailable	= ($canCheckinRecords && $row->checked_out == $user->id) || !$row->checked_out;
-				$canChange		= ($canEditState || $canEditStateOwn ) && $recordAvailable;
-			} else if (FLEXI_ACCESS) {
-				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, 0,$row->id);
-				$canEdit = ($user->gid < 25) ? (in_array('edit', $rights) || in_array('editown', $rights)) : 1;
-				$canEditOwn	= 0;  // edit.own ACL applies only to items, no category ownership in J1.5
-			} else {
-				$canEdit		= 1;  // No category edit ACL in J1.5
-				$canEditOwn	= 0;  // No category edit.own ACL in J1.5, set to zero because there is no category ownership J1.5
-			}
+			$canEdit		= $user->authorise('core.edit', $extension.'.category.'.$row->id);
+			$canEditOwn	= $user->authorise('core.edit.own', $extension.'.category.'.$row->id) && $row->created_user_id == $user->get('id');
+			$canEditState			= $user->authorise('core.edit.state', $extension.'.category.'.$row->id);
+			$canEditStateOwn	= $user->authorise('core.edit.state.own', $extension.'.category.'.$row->id) && $row->created_user_id==$user->get('id');
+			$recordAvailable	= ($canCheckinRecords && $row->checked_out == $user->id) || !$row->checked_out;
+			$canChange  = ($canEditState || $canEditStateOwn ) && $recordAvailable;
 			
-			if (FLEXI_J16GE) {
-				$published		= JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange );
-			} else {
-				$published 	= JHTML::_('grid.published', $row, $i );
-			}
+			$published = JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange );
 			
-			if (FLEXI_J16GE) {
-				$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
-				$link	= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
-			} else {
-				$link	= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $row->id;
-			}
+			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
+			$link	= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
 			
 			if (FLEXI_J16GE) {
 				if (($canEdit || $canEditOwn) && $this->perms->CanAccLvl) {
@@ -256,7 +251,8 @@ function delAllFilters() {
 			}
 			
 			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
-			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
+			//$items_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
+			$items_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_subcats=0&amp;filter_cats='. $row->id.'&amp;filter_state=';
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
@@ -340,12 +336,34 @@ function delAllFilters() {
 			<td align="center">
 				<?php echo ($row->config->get('clayout') ? $row->config->get('clayout') : "blog <sup>[1]</sup>") ?>
 			</td>
+			
+			<?php /*<td align="center">
+				<a href="<?php echo $items; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset;">
+					<span class="badge badge-info"><?php echo $row->nrassigned; ?></span>
+				</a>
+			</td>*/ ?>
+			
 			<td align="center">
-				<span class="badge badge-info"><?php echo $row->nrassigned; ?></span>
-				<a href="<?php echo $items; ?>">
-				[<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>]
+				<a href="<?php echo $items_link.'ALL_P'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
+					<span class="badge badge-success"><?php $c = (int)@$row->byStateTotals[1] + (int)@$row->byStateTotals[-5]; echo $c ? $c : '.'; ?></span>
 				</a>
 			</td>
+			<td align="center">
+				<a href="<?php echo $items_link.'ALL_U'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
+					<span class="badge badge-warning"><?php $c = (int)@$row->byStateTotals[0] + (int)@$row->byStateTotals[-3] + (int)@$row->byStateTotals[-4]; echo $c ? $c : '.'; ?></span>
+				</a>
+			</td>
+			<td align="center">
+				<a href="<?php echo $items_link.'A'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
+					<span class="badge badge-info"><?php $c = (int)@$row->byStateTotals[2]; echo $c ? $c : '.'; ?></span>
+				</a>
+			</td>
+			<td align="center">
+				<a href="<?php echo $items_link.'T'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
+					<span class="badge"><?php $c = (int)@$row->byStateTotals[-2]; echo $c ? $c : '.'; ?></span>
+				</a>
+			</td>
+			
 			<td align="center">
 				<?php echo $published; ?>
 			</td>

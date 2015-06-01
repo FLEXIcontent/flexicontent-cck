@@ -486,7 +486,7 @@ class FlexicontentViewItems extends JViewLegacy
 			$subcats = array();
 			$subcats[] = JHTML::_('select.option', 0, JText::_( 'FLEXI_NO' ) );
 			$subcats[] = JHTML::_('select.option', 1, JText::_( 'FLEXI_YES' ) );
-			$lists['filter_subcats'] = JHTML::_('select.genericlist', $subcats, 'filter_subcats', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="submitform();"', 'value', 'text', $filter_subcats, 'filter_subcats' );
+			$lists['filter_subcats'] = JHTML::_('select.genericlist', $subcats, 'filter_subcats', 'size="1" class="use_select2_lib" onchange="submitform();"', 'value', 'text', $filter_subcats, 'filter_subcats' );
 		}
 
 		// build the include non-published cats boolean list

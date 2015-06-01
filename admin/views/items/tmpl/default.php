@@ -185,7 +185,7 @@ function delFilter(name)
 function delAllFilters() {
 	delFilter('search'); delFilter('filter_type'); delFilter('filter_state');
 	delFilter('filter_cats'); delFilter('filter_author'); delFilter('filter_id');
-	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');
+	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');  jQuery('#filter_subcats').val('1');
 	delFilter('filter_tag');
 }
 

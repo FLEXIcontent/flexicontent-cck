@@ -135,7 +135,7 @@ class FlexicontentViewCategories extends JViewLegacy
 			$add_divider = true;
 		}
 		
-		if ( FLEXI_J16GE && $user->authorise('core.admin', 'checkin') )
+		if ( $user->authorise('core.admin', 'checkin') )
 		{
 			JToolBarHelper::checkin($contrl.'checkin');
 			$add_divider = true;
@@ -187,11 +187,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		// Get data from the model
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		if (FLEXI_J16GE) {
-			$rows = $this->get( 'Items');
-		} else {
-			$rows = $this->get( 'Data');
-		}
+		$rows = $this->get( 'Items');
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Get assigned items
@@ -199,23 +195,24 @@ class FlexicontentViewCategories extends JViewLegacy
 		$rowids = array();
 		foreach ($rows as $row) $rowids[] = $row->id;
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$rowtotals = $model->getAssignedItems($rowids);
+		//$rowtotals = $model->getAssignedItems($rowids);
+		$byStateTotals = $model->countItemsByState($rowids);
 		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		foreach ($rows as $row) {
-			$row->nrassigned = isset($rowtotals[$row->id]) ? $rowtotals[$row->id]->nrassigned : 0;
+			//$row->nrassigned = isset($rowtotals[$row->id]) ? $rowtotals[$row->id]->nrassigned : 0;
+			$row->byStateTotals = isset($byStateTotals[$row->id]) ? $byStateTotals[$row->id] : array();
 		}
 		
 		// Parse configuration for every category
-   	foreach ($rows as $cat)  $cat->config = FLEXI_J16GE ? new JRegistry($cat->config) : new JParameter($cat->config);
+   	foreach ($rows as $cat)  $cat->config = new JRegistry($cat->config);
 		
-		if (FLEXI_J16GE) {
-			$this->state = $this->get('State');
-			// Preprocess the list of items to find ordering divisions.
-			foreach ($rows as &$item) {
-				$this->ordering[$item->parent_id][] = $item->id;
-			}
-			unset($item);  // unset the variable reference to avoid trouble if variable is reused, thus overwritting last pointed variable
+		$this->state = $this->get('State');
+		// Preprocess the list of items to find ordering divisions.
+		foreach ($rows as &$item) {
+			$this->ordering[$item->parent_id][] = $item->id;
 		}
+		unset($item);  // unset the variable reference to avoid trouble if variable is reused, thus overwritting last pointed variable
+		
 		$pagination 	= $this->get( 'Pagination' );
 		
 		$categories = & $globalcats;

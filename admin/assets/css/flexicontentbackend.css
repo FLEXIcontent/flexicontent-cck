@@ -198,6 +198,9 @@ div.current dd .pane-sliders .panel {
 table.adminlist.fcmanlist {
 	margin-top: 12px;
 }
+.column_toggle_lbl { /* hidden label */
+	display:none;
+}
 
 /* various containers of backend managers */
 .flexicontent #fc-filters-box,

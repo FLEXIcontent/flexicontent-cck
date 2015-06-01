@@ -587,6 +587,7 @@
 			// 5. Get column name
 			var column_toggle_lbl = jQuery(thcells[col]).find('.column_toggle_lbl');
 			var col_display_name = column_toggle_lbl.length ? column_toggle_lbl.html(): jQuery(thcells[col]).text();
+			column_toggle_lbl.remove();
 	
 			// 6. Show / Hide current column
 			if ( ( !firstload && !js_isset(show_col[col]) ) || ( jQuery(thcells[col]).hasClass('initiallyHidden') && !js_isset(show_col[col]) ) ) {
