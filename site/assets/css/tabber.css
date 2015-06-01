@@ -1,5 +1,3 @@
-/* $Id: example.css,v 1.5 2006/03/27 02:44:36 pat Exp $ */
-
 /*--------------------------------------------------
   REQUIRED to hide the non-active tab content.
   But do not hide them in the print stylesheet!
@@ -7,6 +5,7 @@
 .tabberlive .tabbertabhide {
  display:none;
 }
+
 
 /*--------------------------------------------------
   .fctabber = before the tabber interface is set up
@@ -18,28 +17,26 @@
  margin-top:1em;
 }
 
-/*--------------------------------------------------
-  ul.tabbernav = the tab navigation list
-  li.tabberactive = the active tab
-  --------------------------------------------------*/
-ul.tabbernav
-{
+
+
+/* Tab handles list (Tab navigation list) */
+ul.tabbernav {
  margin:0;
  padding: 3px 0;
  border-bottom: 1px solid #778;
  font: bold 12px Verdana, sans-serif;
 }
 
-ul.tabbernav li
-{
+/* Tab handle container */
+ul.tabbernav > li {
  list-style: none;
  margin: 10px 2px 0px 2px;
  display: inline-block;
  white-space: nowrap;
 }
 
-ul.tabbernav li a
-{
+/* Tab handle */
+ul.tabbernav > li > a {
  padding: 3px 0.5em;
  margin-left: 3px;
  border: 1px solid #778;
@@ -48,57 +45,46 @@ ul.tabbernav li a
  text-decoration: none;
  font-size: 11px;
 }
-
-ul.tabbernav li a:link { color: #448; }
-ul.tabbernav li a:visited { color: #667; }
-
-ul.tabbernav li a:hover
-{
+ul.tabbernav > li > a:link { color: #448; }
+ul.tabbernav > li > a:visited { color: #667; }
+ul.tabbernav > li > a:hover {
  color: #000;
  background: #AAE;
  border-color: #227;
 }
 
-ul.tabbernav li.tabberactive a
-{
+
+
+/* Tab handle active */
+ul.tabbernav > li.tabberactive a {
  background-color: #fff;
  border-bottom: 1px solid #fff;
 }
 
-ul.tabbernav li.tabberactive a:hover
-{
+/* Tab active handle (hover) */
+ul.tabbernav > li.tabberactive a:hover {
  color: #000;
  background: white;
  border-bottom: 1px solid white;
 }
 
-/*--------------------------------------------------
-  .tabbertab = the tab content
-  Add style only after the tabber interface is set up (.tabberlive)
-  --------------------------------------------------*/
+
+
+/* Tab contents container */
 .tabberlive .tabbertab {
  padding:5px;
  border:1px solid #aaa;
  border-top:0;
-
- /* If you don't want the tab size changing whenever a tab is changed
-    you can set a fixed height */
-
- /* height:200px; */
-
- /* If you set a fix height set overflow to auto and you will get a
-    scrollbar when necessary */
-
- /* overflow:auto; */
 }
 
-/* If desired, hide the heading since a heading is provided by the tab */
-.tabberlive .tabbertab h2.tabberheading {
- display:none !important;
-}
+
+
+/* Hide the heading since a heading is provided by the tab handle (navigation) */
+.tabberlive .tabbertab h2.tabberheading,
 .tabberlive .tabbertab h3.tabberheading {
- display:none !important;
+ display:none !important; /* strict (FORCED) hidding */
 }
+
 
 /* Example of using an ID to set different styles for the tabs on the page */
 .tabberlive#tab1 {
@@ -106,9 +92,8 @@ ul.tabbernav li.tabberactive a:hover
 .tabberlive#tab2 {
 }
 .tabberlive#tab2 .tabbertab {
- height:200px;
- overflow:auto;
 }
+
 
 
 /***********************************************
@@ -116,54 +101,56 @@ ul.tabbernav li.tabberactive a:hover
  ***********************************************/
  
 #flexicontent .tabberlive {
-	margin: 0px 0px 6px 0px !important;
-	padding: 0px !important;
-	width: 100% !important;
+	margin: 0px 0px 6px 0px;
+	padding: 0px;
+	width: 100%;
 	float: left;
 	border-width: 0px;
 }
 
 #flexicontent .tabbertab {
-	margin: 0px !important;
-	padding: 5px 1% 3px 1% !important;
-	width: 98% !important;
+	margin: 0px;
+	padding: 5px 1% 3px 1%;
+	width: 98%;
 	float: left;
 }
 
 #flexicontent .fctabber { overflow:visible; width:5000px; }
 
 #flexicontent ul.tabbernav {
-	line-height: 100% !important;
-	border-bottom: 1px solid #cccccc !important;
+	line-height: 100%;
+	border-bottom: 1px solid #cccccc;
 	border-left: 1px solid transparent;
 	border-right: 2px solid transparent;
-	font: bold 11px Verdana,sans-serif !important;
-	margin: 0 !important;
-	padding: 0px 1% 0px 1% !important;
-	width: 98% !important;
-	display: inline-block !important;
+	font: bold 11px Verdana,sans-serif;
+	margin: 0;
+	padding: 0px 1% 0px 1%;
+	width: 98%;
+	display: inline-block;
 	float:left;
 }
 
-#flexicontent ul.tabbernav li {
-	line-height: 100% !important;
-	padding: 0px !important;
-	margin: 4px 0px -1px 8px !important;
-	overflow: visible !important;
-	display: inline-block !important;
+#flexicontent ul.tabbernav > li {
+	line-height: 100%;
+	padding: 0px;
+	margin: 4px 0px -1px 8px;
+	overflow: visible;
+	display: inline-block;
 	float:left;
 }
 
-#flexicontent ul.tabbernav li a {
-	line-height: 220% !important;
-	font-size: 11px !important;
-	margin: 0px !important;
+#flexicontent ul.tabbernav > li > a {
+	font-family:arial, helvetica, sans-serif;
+	text-decoration:none;
+	line-height: 220%;
+	font-size: 11px;
+	margin: 0px;
 	padding-left: 5px;
 	padding-right: 5px;
-	padding-top: 4px !important;
-	padding-bottom: 5px !important;
-	display: inline-block !important;
-	border-radius: 4px 4px 0px 0px !important;
+	padding-top: 4px;
+	padding-bottom: 5px;
+	display: inline-block;
+	border-radius: 4px 4px 0px 0px;
 	/*box-shadow: 0px -1px 1px lightgray;*/
 	border-left: 1px solid #D0D0D0;
 	border-top: 1px solid #B0B0B0;
@@ -171,8 +158,11 @@ ul.tabbernav li.tabberactive a:hover
 	border-bottom: 1px solid #808080;
 }
 
-#flexicontent ul.tabbernav li a {
-	border:1px solid #25729a; font-size:12px;font-family:arial, helvetica, sans-serif; padding: 10px 10px 10px 10px; text-decoration:none; display:inline-block;text-shadow: -1px -1px 0 rgba(0,0,0,0.3);font-weight:bold; color: #FFFFFF;
+#flexicontent ul.tabbernav > li > a {
+	border:1px solid #25729a; 
+	text-shadow: -1px -1px 0 rgba(0,0,0,0.3);
+	font-weight:bold;
+	color: #FFFFFF;
 	background-color: #3093c7; background-image: -webkit-gradient(linear, left top, left bottom, from(#3093c7), to(#1c5a85));
 	background-image: -webkit-linear-gradient(top, #3093c7, #1c5a85);
 	background-image: -moz-linear-gradient(top, #3093c7, #1c5a85);
@@ -181,8 +171,7 @@ ul.tabbernav li.tabberactive a:hover
 	background-image: linear-gradient(to bottom, #3093c7, #1c5a85);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#3093c7, endColorstr=#1c5a85);
 	border-bottom-width: 0;
 }
-
-#flexicontent ul.tabbernav li:hover a {
+#flexicontent ul.tabbernav > li:hover a {
 	border:1px solid #1c5675;
 	background-color: #26759e; background-image: -webkit-gradient(linear, left top, left bottom, from(#26759e), to(#133d5b));
 	background-image: -webkit-linear-gradient(top, #26759e, #133d5b);
@@ -192,27 +181,80 @@ ul.tabbernav li.tabberactive a:hover
 	background-image: linear-gradient(to bottom, #26759e, #133d5b);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#26759e, endColorstr=#133d5b);
 	border-bottom-width: 0;
 }
-
-#flexicontent ul.tabbernav li.tabberactive a,
-#flexicontent ul.tabbernav li.tabberactive a:hover
+#flexicontent ul.tabbernav > li.tabberactive a,
+#flexicontent ul.tabbernav > li.tabberactive a:hover
 {
-	color: black !important;
-	background-color: white !important;
+	color: black;
+	background-color: white;
 	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=white);
 	background-image: none;
-	border-bottom: 0px solid white !important;
+	border-bottom: 0px solid white;
 	border-left: 1px solid #D0D0D0;
 	border-top: 1px solid #B0B0B0;
 	border-right: 1px solid #808080;
 	text-shadow: none;
 	position: relative;
 }
-
-#flexicontent ul.tabbernav li.tabberactive a:before {
+#flexicontent ul.tabbernav > li.tabberactive a:before {
 	content: "";
 	position: absolute;
 	height: 1px;
 	border-top: 5px solid #26759e;
+	top: 0;
+	left: 0px;
+	width: 100%;
+	border-radius: 2px;
+}
+
+
+
+/* Inline tabber, e.g. multi-language properties in tabs */
+#flexicontent .tabber-inline ul.tabbernav > li > a {
+	padding-top: 0px;
+	padding-bottom: 1px;
+}
+#flexicontent .tabber-inline ul.tabbernav > li > a {
+	border:1px solid #b7b7b7; 
+	text-shadow: -1px -1px 0 rgba(0,0,0,0.3);
+	font-weight:bold;
+	color: #FFFFFF;
+	background-color: #c0c0c0; background-image: -webkit-gradient(linear, left top, left bottom, from(#c0c0c0), to(#a0a0a0));
+	background-image: -webkit-linear-gradient(top, #c0c0c0, #a0a0a0);
+	background-image: -moz-linear-gradient(top, #c0c0c0, #a0a0a0);
+	background-image: -ms-linear-gradient(top, #c0c0c0, #a0a0a0);
+	background-image: -o-linear-gradient(top, #c0c0c0, #a0a0a0);
+	background-image: linear-gradient(to bottom, #c0c0c0, #a0a0a0);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#c0c0c0, endColorstr=#a0a0a0);
+	border-bottom-width: 0;
+}
+#flexicontent .tabber-inline ul.tabbernav > li:hover a {
+	border:1px solid #878787;
+	background-color: #909090; background-image: -webkit-gradient(linear, left top, left bottom, from(#909090), to(#707070));
+	background-image: -webkit-linear-gradient(top, #909090, #707070);
+	background-image: -moz-linear-gradient(top, #909090, #707070);
+	background-image: -ms-linear-gradient(top, #909090, #707070);
+	background-image: -o-linear-gradient(top, #909090, #707070);
+	background-image: linear-gradient(to bottom, #909090, #707070);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#909090, endColorstr=#707070);
+	border-bottom-width: 0;
+}
+#flexicontent .tabber-inline ul.tabbernav > li.tabberactive a,
+#flexicontent .tabber-inline ul.tabbernav > li.tabberactive a:hover
+{
+	color: black;
+	background-color: white;
+	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=white);
+	background-image: none;
+	border-bottom: 0px solid white;
+	border-left: 1px solid #D0D0D0;
+	border-top: 1px solid #B0B0B0;
+	border-right: 1px solid #808080;
+	text-shadow: none;
+	position: relative;
+}
+#flexicontent .tabber-inline ul.tabbernav > li.tabberactive a:before {
+	content: "";
+	position: absolute;
+	height: 1px;
+	border-top: 5px solid #b7b7b7;
 	top: 0;
 	left: 0px;
 	width: 100%;
