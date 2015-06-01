@@ -131,7 +131,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$chunk = JRequest::getInt('chunk');
 			
 			// Get / Create target directory
-			$targetDir = ini_get("upload_tmp_dir") . DIRECTORY_SEPARATOR . "fc_fileselement";
+			//$targetDir = ini_get("upload_tmp_dir") . DIRECTORY_SEPARATOR . "fc_fileselement";
+			$targetDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "fc_fileselement";
 			if (!file_exists($targetDir))  @mkdir($targetDir);
 			
 			// Create name of the unique temporary filename to use for concatenation of the chunks, or get the filename from session
@@ -143,7 +144,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			
 			// Open temp file
 			if (!$out = @fopen("{$filePath_tmp}", "ab")) {
-				die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+				die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream: '.$fileName_tmp.'."}, "id" : "id"}');
 			}
 			
 			if (!empty($_FILES)) {
