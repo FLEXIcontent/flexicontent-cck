@@ -516,6 +516,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext{zoom:1;}, * html #flexicontent dd { height: 1%; }</style><![endif]-->');
 		
+		// Fields common CSS
+		$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexi_fields.css');
+		
 		// Load backend / frontend shared and Joomla version specific CSS (different for frontend / backend)
 		FLEXI_J30GE ?
 			$document->addStyleSheet( JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css' ) :

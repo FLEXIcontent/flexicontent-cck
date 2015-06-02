@@ -73,6 +73,9 @@ class FlexicontentViewItem extends JViewLegacy
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css') :
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css') ;
 		
+		// Fields common CSS
+		$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_fields.css');
+		
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');

@@ -238,14 +238,8 @@ flexicontent_html::loadFramework('flexi-lib');
 		//	JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
 		//	$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
 	?>
-	<div class="tabbertab" style="padding: 0px;" id="local_tab" data-icon-class="icon-upload">
+	<div class="tabbertab" id="local_tab" data-icon-class="icon-upload">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ); ?> </h3>
-	
-	<span class="label"><?php echo JText::_( 'Problem ? use single uploader' ); ?></span>
-	<button id="single_multi_uploader" class="<?php echo $btn_class; ?> btn-info" onclick="jQuery('#filemanager-1').toggle(); jQuery('#filemanager-2').toggle(); jQuery('#flash_uploader').height(330); setTimeout(function(){showUploader()}, 100);">
-		<?php echo JText::_( 'FLEXI_SINGLE_MULTIPLE_UPLOADER' ); ?>
-	</button>
-	<div class="fcclear"></div>
 	
 	<!-- File Upload Form -->
 	<fieldset class="filemanager-tab" >
@@ -274,6 +268,12 @@ flexicontent_html::loadFramework('flexi-lib');
 		</span>
 		';
 		?>
+		
+		<span class="label label-info" style="margin-left:64px;"><?php echo JText::_( 'Problem ? use single uploader' ); ?></span>
+		<button id="single_multi_uploader" class="<?php echo $btn_class; ?> btn-primary" onclick="jQuery('#filemanager-1').toggle(); jQuery('#filemanager-2').toggle(); jQuery('#flash_uploader').height(330); setTimeout(function(){showUploader()}, 100);">
+			<?php echo JText::_( 'FLEXI_SINGLE_MULTIPLE_UPLOADER' ); ?>
+		</button>
+		<div class="fcclear"></div>
 		
 		<fieldset class="actions" id="filemanager-1" style="display:none;">
 			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">

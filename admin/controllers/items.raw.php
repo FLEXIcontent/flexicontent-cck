@@ -215,7 +215,6 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			if      (FLEXI_J30GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
 			else if (FLEXI_J16GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j25.css';
-			else                  $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j15.css';
 			echo '
 			<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css" />
 			<link rel="stylesheet" href="'.$fc_css.'" />
