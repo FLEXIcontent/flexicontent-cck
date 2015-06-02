@@ -393,9 +393,13 @@ div table.adminform td {
 }
 
 
-/* CONTAINER of text-search  & field filters */
-fieldset.fc_search_set,
-fieldset.fc_filter_set {
+
+/*********************************************/
+/* CONTAINERs of text-search & field filters */
+/*********************************************/
+
+fieldset.fc_search_set,    /* SEARCH view */
+fieldset.fc_filter_set {   /* CATEGORY view */
 	border: 1px solid #cccccc;
 	margin: 12px 0 0 0;
 	padding: 1%;
@@ -451,9 +455,6 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 	margin: 4px 16px 16px 16px;
 	font-size: 12px;
 }
-.ui-autocomplete-loading {
-	background: #eee url('../images/ajax-loader.gif') no-repeat 96% center !important;
-}
 
 
 
@@ -469,6 +470,13 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 .fc_filter_line.fc_filter_text_search .fc_filter_label {
 }
 
+/* text-search autocomplete */
+.ui-autocomplete {
+	z-index:1000 !important;  /* FORCED autocomplete list it to be over elements */
+}
+.ui-autocomplete-loading {
+	background: #eee url('../images/ajax-loader.gif') no-repeat 96% center;
+}
 
 
 /*********************/

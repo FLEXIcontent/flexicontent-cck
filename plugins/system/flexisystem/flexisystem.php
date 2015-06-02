@@ -705,6 +705,8 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	public function onAfterRender()
 	{
+		$this->set_cache_control();  // Avoid expiration messages by the browser when browser's back/forward buttons are clicked
+		
 		$fparams = JComponentHelper::getParams('com_flexicontent');
 		$session = JFactory::getSession();
 		
@@ -713,9 +715,6 @@ class plgSystemFlexisystem extends JPlugin
 			$session->set('screenSizeCookieTried', 1, 'flexicontent');
 			$session->set('screenSizeCookieToBeAdded', 0, 'flexicontent');
 		}
-		
-		// Load language string for javascript usage in J1.5
-		if ( !FLEXI_J16GE && class_exists('fcjsJText') )  fcjsJText::load();
 		
 		// Add performance message at document's end
 		global $fc_performance_msg;
@@ -736,7 +735,6 @@ class plgSystemFlexisystem extends JPlugin
 		return true;
 	}
 	
-		
 	
 	
 	/**
@@ -747,6 +745,21 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	/*public function onBeforeCompileHead() {
 	}*/
+	public function set_cache_control()
+	{
+		$option = JRequest::getVar('option');
+		$fc_cachable = JFactory::getSession()->get('fc_cachable', null, 'flexicontent');
+		if ($option=='com_flexicontent' && $fc_cachable!==null) {
+			// Try to avoid browser warning message "Page has expired or similar"
+			// This should turning off the 'must-revalidate' directive in the 'Cache-Control' header
+			JResponse::allowCache(true);
+			JResponse::setHeader('Pragma', '');
+			
+			// if not cacheable the browser cache should be different per user
+			JResponse::setHeader('Cache-Control', !$fc_cachable ? 'private' : 'public');
+		}
+	}
+
 	
 	
 	/**

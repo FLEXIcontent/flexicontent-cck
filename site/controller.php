@@ -890,6 +890,9 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Compatibility check: Layout is form and task is not set:  this is new item submit ...
 		if ( JRequest::getVar('layout', false) == "form" && !JRequest::getVar('task', false)) {
+			// 0 or 1, will allow browser to store without revalidating, null will let default (Joomla website) HTTP headers, e.g. re-validate
+			JFactory::getSession()->set('fc_cachable', 0, 'flexicontent');
+			
 			JRequest::setVar('task', 'add');
 			$this->add();
 		}
@@ -934,11 +937,9 @@ class FlexicontentController extends JControllerLegacy
 				$safeurlparams['__fc_user_id__'] = 'STRING';
 			}
 			
-			// Try to avoid browser warning message "Page has expired or similar"
-			//if (!$cachable) ini_set('session.cache_limiter', 'private');
-			//session_cache_limiter('nocache');
-			//header('Expires: Thu, 1 Jan 2000 00:00:00 GMT');
-			//if (!$cachable) session_cache_limiter('private_no_expire, cache');
+			// Moved code for browser's cache control to system plugin to do at the latest possible point
+			// 0 or 1, will allow browser to store without revalidating, null will let default (Joomla website) HTTP headers, e.g. re-validate
+			JFactory::getSession()->set('fc_cachable', (int)$cachable, 'flexicontent');
 			
 			//echo "cacheable: ".(int)$cachable." - " . print_r($safeurlparams, true) ."<br/>";
 			parent::display($cachable, $safeurlparams);

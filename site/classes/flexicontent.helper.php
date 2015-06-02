@@ -1056,16 +1056,16 @@ class flexicontent_html
 				//var _FC_REQUEST = ".json_encode($_REQUEST).";
 				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js' );
 				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js' );
-				FLEXI_J16GE ? JText::script("FLEXI_APPLYING_FILTERING", true) : fcjsJText::script("FLEXI_APPLYING_FILTERING", true);
-				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_LIST", true) : fcjsJText::script("FLEXI_TYPE_TO_LIST", true);
-				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_FILTER", true) : fcjsJText::script("FLEXI_TYPE_TO_FILTER", true);
+				JText::script("FLEXI_APPLYING_FILTERING", true);
+				JText::script("FLEXI_TYPE_TO_LIST", true);
+				JText::script("FLEXI_TYPE_TO_FILTER", true);
 				break;
 			
 			case 'flexi-lib':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js' );
-				FLEXI_J16GE ? JText::script("FLEXI_NOT_AN_IMAGE_FILE", true) : fcjsJText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
+				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				break;
 			
 			default:
