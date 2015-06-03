@@ -150,6 +150,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	protected function populateCategoryState($ordering = null, $direction = null) {
 		$this->_layout = JRequest::getCmd('layout', '');  // !! This should be empty for empty for 'category' layout
+		
+		// Force layout to be have proper value
+		if ( $this->_layout && !in_array($this->_layout, array('favs','tags','mcats','myitems','author')) )
+		{
+			$this->_layout = '';
+			JRequest::setVar('layout', '');
+		}
+		
 		$this->_clayout = JRequest::getCmd('clayout', '');  // !! This should be empty for using view's configured clayout (template)
 		
 		if ($this->_layout=='author') {

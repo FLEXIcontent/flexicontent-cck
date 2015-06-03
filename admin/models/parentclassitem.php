@@ -575,7 +575,7 @@ class ParentClassItem extends JModelAdmin
 			// *************************************************************************************************
 			// -- Retrieve all active site languages, and create empty item translation objects for each of them
 			// *************************************************************************************************
-			$nn_content_tbl = FLEXI_J16GE ? 'falang_content' : 'jf_content';
+			$nn_content_tbl = 'falang_content';
 			
 			if ( FLEXI_FISH )
 			{
@@ -1221,12 +1221,7 @@ class ParentClassItem extends JModelAdmin
 		
 		foreach ($types as $type)
 		{
-			if (FLEXI_J16GE)
-				$type->allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
-			else if (FLEXI_ACCESS && $user->gid < 25)
-				$type->allowed = ! $type->itemscreatable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'type', $type->id);
-			else
-				$type->allowed = 1;
+			$type->allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
 			
 			// Require ANY or ALL
 			$canCreate = $any  ?  ($canCreate || $type->allowed)  :  ($canCreate && $type->allowed);
@@ -1325,7 +1320,7 @@ class ParentClassItem extends JModelAdmin
 			}
 			
 			// Decide default language
-			$default_lang = FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang();
+			$default_lang = '*';  //flexicontent_html::getSiteDefaultLang();
 			$default_lang = $app->isSite() ? $cparams->get('default_language_fe', $default_lang) : $default_lang;
 			if ($default_lang=='_author_lang_') $default_lang = $user->getParam('language', '*');
 			
@@ -1468,7 +1463,7 @@ class ParentClassItem extends JModelAdmin
 		if ( $tbl->checkout($uid, $this->_id) ) return true;
 		
 		// Reaching this points means checkout failed
-		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
+		$this->setError( $tbl->getError() /* JText::_("FLEXI_ALERT_CHECKOUT_FAILED")*/ );
 		return false;
 	}
 	
@@ -1887,7 +1882,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// Auto assign the default language if not set, (security of allowing language usage and of language in user's allowed languages was checked above)
 		$item->language   = $item->language ? $item->language :
-			($app->isSite() ? $cparams->get('default_language_fe', '*') : (FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang()));
+			($app->isSite() ? $cparams->get('default_language_fe', '*') : ('*' /*flexicontent_html::getSiteDefaultLang()*/));
 		
 		// Ignore language parent id if item language is site's (content) default language, and for language 'ALL'
 		if ( substr($item->language, 0,2) == substr(flexicontent_html::getSiteDefaultLang(), 0,2) || $item->language=='*' ) {
@@ -1951,8 +1946,7 @@ class ParentClassItem extends JModelAdmin
 	  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
 		
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		if (FLEXI_J16GE) $result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isnew));
-		else             $result = $dispatcher->trigger('onBeforeContentSave', array(&$item, $isnew));
+		$result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isnew));
 		if ( $print_logging_info ) $fc_run_times['onContentBeforeSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Reverse compatibility steps
@@ -2058,8 +2052,7 @@ class ParentClassItem extends JModelAdmin
 		  JRequest::setVar('view', 'article');
 			JRequest::setVar('option', 'com_content');
 		  
-			if (FLEXI_J16GE) $dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isnew));
-			else             $dispatcher->trigger('onAfterContentSave', array(&$item, $isnew));
+			$dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isnew));
 			
 			// Reverse compatibility steps
 			JRequest::setVar('view', $view);
@@ -2639,16 +2632,16 @@ class ParentClassItem extends JModelAdmin
 		$this->_typeid = $item->type_id;
 		
 		
+		// ****************************
+		// Update language Associations
+		// ****************************
+		//$this->saveAssociations($item, $data);
+		
+		
 		// ***********************
 		// Save access information
 		// ***********************
-		if (FLEXI_ACCESS) {
-			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-			$canRight 	= (in_array('right', $rights) || $user->gid > 24);
-			if ($canRight) FAccess::saveaccess( $item, 'item' );
-		} else if (FLEXI_J16GE) {
-			// Rules for J1.6+ are handled in the JTABLE class of the item with overriden JTable functions: bind() and store()
-		}
+		// Rules for J1.6+ are handled in the JTABLE class of the item with overriden JTable functions: bind() and store()
 		
 		
 		// ***************************
@@ -2727,7 +2720,7 @@ class ParentClassItem extends JModelAdmin
 		//$user_currlang = flexicontent_html::getUserCurrentLang();                  // user's -current- language
 		//$default_sitelang = substr(flexicontent_html::getSiteDefaultLang(),0,2);   // site (frontend) -content- language
 		//$item_lang = substr($item->language ,0,2);                                 // item language
-		$nn_content_tbl = FLEXI_J16GE ? 'falang_content' : 'jf_content';
+		$nn_content_tbl = 'falang_content';
 		
 		$db = $this->_db;
 		$app = JFactory::getApplication();
@@ -3657,17 +3650,13 @@ class ParentClassItem extends JModelAdmin
 		// (b) Get Content Type specific notifications (that override global)
 		$nConf->userlist_notify_new            = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 		$nConf->usergrps_notify_new            = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new', array()) );
-		$nConf->usergrps_notify_new_fa         = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_fa', array()) );
 		$nConf->userlist_notify_new_pending    = FLEXIUtilities::paramToArray( $params->get('userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 		$nConf->usergrps_notify_new_pending    = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_pending', array()) );
-		$nConf->usergrps_notify_new_pending_fa = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_pending_fa', array()) );
 		
 		$nConf->userlist_notify_existing             = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 		$nConf->usergrps_notify_existing             = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing', array()) );
-		$nConf->usergrps_notify_existing_fa          = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_fa', array()) );
 		$nConf->userlist_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 		$nConf->usergrps_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal', array()) );
-		$nConf->usergrps_notify_existing_reviewal_fa = FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal_fa', array()) );
 		
 		// (c) Get category specific notifications
 		if ( $params->get('nf_allow_cat_specific') ) 
@@ -3683,31 +3672,23 @@ class ParentClassItem extends JModelAdmin
 				
 				$cats_userlist_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 				$cats_usergrps_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new', array()) );
-				$cats_usergrps_notify_new_fa         = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new_fa', array()) );
 				$cats_userlist_notify_new_pending    = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 				$cats_usergrps_notify_new_pending    = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new_pending', array()) );
-				$cats_usergrps_notify_new_pending_fa = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new_pending_fa', array()) );
 				
 				$cats_userlist_notify_existing             = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 				$cats_usergrps_notify_existing             = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing', array()) );
-				$cats_usergrps_notify_existing_fa          = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing_fa', array()) );
 				$cats_userlist_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
 				$cats_usergrps_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing_reviewal', array()) );
-				$cats_usergrps_notify_existing_reviewal_fa = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing_reviewal_fa', array()) );
 				
 				$nConf->userlist_notify_new            = array_unique(array_merge($nConf->userlist_notify_new,            $cats_userlist_notify_new));
 				$nConf->usergrps_notify_new            = array_unique(array_merge($nConf->usergrps_notify_new,            $cats_usergrps_notify_new));
-				$nConf->usergrps_notify_new_fa         = array_unique(array_merge($nConf->usergrps_notify_new_fa,         $cats_usergrps_notify_new_fa));
 				$nConf->userlist_notify_new_pending    = array_unique(array_merge($nConf->userlist_notify_new_pending,    $cats_userlist_notify_new_pending));
 				$nConf->usergrps_notify_new_pending    = array_unique(array_merge($nConf->usergrps_notify_new_pending,    $cats_usergrps_notify_new_pending));
-				$nConf->usergrps_notify_new_pending_fa = array_unique(array_merge($nConf->usergrps_notify_new_pending_fa, $cats_usergrps_notify_new_pending_fa));
 				
 				$nConf->userlist_notify_existing             = array_unique(array_merge($nConf->userlist_notify_existing,             $cats_userlist_notify_existing));
 				$nConf->usergrps_notify_existing             = array_unique(array_merge($nConf->usergrps_notify_existing,             $cats_usergrps_notify_existing));
-				$nConf->usergrps_notify_existing_fa          = array_unique(array_merge($nConf->usergrps_notify_existing_fa,          $cats_usergrps_notify_existing_fa));
 				$nConf->userlist_notify_existing_reviewal    = array_unique(array_merge($nConf->userlist_notify_existing_reviewal,    $cats_userlist_notify_existing_reviewal));
 				$nConf->usergrps_notify_existing_reviewal    = array_unique(array_merge($nConf->usergrps_notify_existing_reviewal,    $cats_usergrps_notify_existing_reviewal));
-				$nConf->usergrps_notify_existing_reviewal_fa = array_unique(array_merge($nConf->usergrps_notify_existing_reviewal_fa, $cats_usergrps_notify_existing_reviewal_fa));
 			}
 		}
 		//echo "<pre>"; print_r($nConf); exit;
@@ -3716,7 +3697,6 @@ class ParentClassItem extends JModelAdmin
 		$nConf_emails = new stdClass();
 		$notify_types = array('notify_new', 'notify_new_pending', 'notify_existing', 'notify_existing_reviewal');
 		foreach ($notify_types as $ntype) {
-			$ugrps_fa[$ntype] = 'usergrps_'.$ntype.'_fa';
 			$ugrps   [$ntype] = 'usergrps_'.$ntype;
 			$ulist   [$ntype] = 'userlist_'.$ntype;
 		}
@@ -3756,48 +3736,16 @@ class ParentClassItem extends JModelAdmin
 			if ( count( $nConf->{$ugrps[$ntype]} ) )
 			{
 				// emails for user groups
-				if (!FLEXI_J16GE) {
-					$query = "SELECT DISTINCT email FROM #__users WHERE gid IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
-				} else {
-					$query = "SELECT DISTINCT email FROM #__users as u"
-						." JOIN #__user_usergroup_map ugm ON u.id=ugm.user_id AND ugm.group_id IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
-				}
+				$query = "SELECT DISTINCT email FROM #__users as u"
+					." JOIN #__user_usergroup_map ugm ON u.id=ugm.user_id AND ugm.group_id IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
+				
 				$db->setQuery( $query );
 				$user_emails_ugrps = $db->loadColumn();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { print_r($user_emails_ugrps); exit; }
 			}
 			
-			$user_emails_ugrps_fa = array();
-			if ( FLEXI_ACCESS && count( $nConf->{$ugrps_fa[$ntype]} ) )
-			{
-				$final_groups = array();
-				foreach ( $nConf->{$ugrps_fa[$ntype]} as $fagrpid ) {
-					$curr_groups = FAccess::mgenfant( $fagrpid );
-					$final_groups = array_unique( array_merge ($final_groups,$curr_groups) );
-				}
-				//print_r($final_groups); exit;
-				
-				// emails for flexiaccess user groups
-				$query = "SELECT DISTINCT email FROM #__users as u"
-					." JOIN #__flexiaccess_groups ugm ON u.username=ugm.name AND ugm.type=2 AND ugm.id IN (".implode(",",$final_groups).")";
-				$db->setQuery( $query );
-				$user_emails_ugrps_fa_individual = $db->loadColumn();
-				if ( $db->getErrorNum() ) echo $db->getErrorMsg();
-				
-				
-				// emails for flexiaccess user groups
-				$query = "SELECT DISTINCT email FROM #__users as u"
-					." JOIN #__flexiaccess_members ugm ON u.id=ugm.member_id AND ugm.group_id IN (".implode(",",$final_groups).")";
-				$db->setQuery( $query );
-				$user_emails_ugrps_fa_collective = $db->loadColumn();
-				if ( $db->getErrorNum() ) echo $db->getErrorMsg();
-				
-				$user_emails_ugrps_fa = array_unique( array_merge ($user_emails_ugrps_fa_individual, $user_emails_ugrps_fa_collective) );
-				// if ($ntype=='notify_new_pending') { print_r($user_emails_ugrps_fa); exit; }
-			}
-			
 			// merge them
-			$user_emails = array_unique( array_merge($user_emails_ulist, $user_emails_ugrps, $user_emails_ugrps_fa) );
+			$user_emails = array_unique( array_merge($user_emails_ulist, $user_emails_ugrps) );
 			
 			$nConf_emails->{$ntype} = $user_emails;
 		}
@@ -3935,36 +3883,26 @@ class ParentClassItem extends JModelAdmin
 		// (a) set timezone to be site's timezone then
 		// (b) call $date_OBJECT->format()  with s local flag parameter set to true
 		$tz_offset = JFactory::getApplication()->getCfg('offset');
-		if (FLEXI_J16GE) $tz = new DateTimeZone($tz_offset);
-		$tz_offset_str = FLEXI_J16GE ? ($tz->getOffset(new JDate()) / 3600)  :  $tz_offset;
+		$tz = new DateTimeZone($tz_offset);
+		$tz_offset_str = $tz->getOffset(new JDate()) / 3600;
 		$tz_offset_str = ' &nbsp; (UTC+'.$tz_offset_str.') ';
 		
 		if ( in_array('created',$nf_extra_properties) )
 		{
 			$date_created = JFactory::getDate($this->get('created'));
-			if (FLEXI_J16GE) {
-				$date_created->setTimezone($tz);
-			} else {
-				$date_created->setOffset($tz_offset);
-			}
+			$date_created->setTimezone($tz);
+			
 			$body .= '<u>'.JText::_( 'FLEXI_NF_CREATION_TIME' ) . "</u>: ";
-			$body .= FLEXI_J16GE ?
-				$date_created->format($format = 'D, d M Y H:i:s', $local = true) :
-				$date_created->toFormat($format = '%Y-%m-%d %H:%M:%S');
+			$body .= $date_created->format($format = 'D, d M Y H:i:s', $local = true);
 			$body .= $tz_offset_str. "<br/>\r\n";
 		}
 		if ( in_array('modified',$nf_extra_properties) && !$isnew )
 		{
 			$date_modified = JFactory::getDate($this->get('modified'));
-			if (FLEXI_J16GE) {
-				$date_modified->setTimezone($tz);
-			} else {
-				$date_modified->setOffset($tz_offset);
-			}
+			$date_modified->setTimezone($tz);
+			
 			$body .= '<u>'.JText::_( 'FLEXI_NF_MODIFICATION_TIME' ) . "</u>: ";
-			$body .= FLEXI_J16GE ?
-				$date_modified->format($format = 'D, d M Y H:i:s', $local = true) :
-				$date_modified->toFormat($format = '%Y-%m-%d %H:%M:%S');
+			$body .= $date_modified->format($format = 'D, d M Y H:i:s', $local = true);
 			$body .= $tz_offset_str. "<br/>\r\n";
 		}
 		$body .= "<br/>\r\n";
@@ -4456,5 +4394,84 @@ class ParentClassItem extends JModelAdmin
 		}
 		return $alias;
 	}
+	
+	
+	function saveAssociations(&$item, &$data)
+	{
+		$assoc = JLanguageAssociations::isEnabled();
+		if (!$assoc) return true;
+		
+		$item = $item ? $item: $this->_item;
+		$id = $item->id;
+		
+		
+		// **********************************
+		// Prepare / check associations array
+		// **********************************
+		
+		// Unset empty associations from associations array, to avoid save them in the associations table
+		$associations = $data['associations'];
+		foreach ($associations as $tag => $id)
+		{
+			if (empty($id)) unset($associations[$tag]);
+		}
+		
+		// Raise notice that associations should be empty if language of current item is '*' (ALL)
+		$all_language = $item->language == '*';
+		if ($all_language && !empty($associations))
+		{
+			JError::raiseNotice(403, JText::_('COM_CONTACT_ERROR_ALL_LANGUAGE_ASSOCIATED'));
+		}
+		
+		// Make sure that current item id, is the association id of the language of the current item
+		$associations[$item->language] = $item->id;
+		
+		
+		// ***********************
+		// Delete old associations
+		// ***********************
+		
+		$db = JFactory::getDbo();
+		
+		$query = $db->getQuery(true)
+			->delete('#__associations')
+			->where('context=' . $db->quote('com_contact.item'))
+			->where('id IN (' . implode(',', $associations) . ')');
+		$db->setQuery($query);
+		$db->execute();
+		
+		if ($error = $db->getErrorMsg())
+		{
+			$this->setError($error);
+			return false;
+		}
+		
+		
+		// ********************
+		// Add new associations
+		// ********************
+		
+		// Only add language associations if item language is not '*' (ALL)
+		if ($all_language || !count($associations)) return true;
+		
+		$key = md5(json_encode($associations));
+		$query->clear()
+			->insert('#__associations');
+		
+		foreach ($associations as $id)
+		{
+			$query->values($id . ',' . $db->quote('com_content.item') . ',' . $db->quote($key));
+		}
+		
+		$db->setQuery($query);
+		$db->execute();
+
+		if ($error = $db->getErrorMsg())
+		{
+			$this->setError($error);
+			return false;
+		}
+		return true;
+	}
+	
 }
-?>
