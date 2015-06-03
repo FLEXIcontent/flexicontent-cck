@@ -411,13 +411,13 @@ jQuery(document).ready(function() {
 	}
 	
 	jQuery('body').prepend(
-	 	"<span id='fc_filter_form_blocker'>" +
-	    "<span class='fc_blocker_opacity'></span>" +
-	    "<span class='fc_blocker_content'>" +
+	 	'<span id="fc_filter_form_blocker">' +
+	    '<span class="fc_blocker_opacity"></span>' +
+	    '<span class="fc_blocker_content">' +
 	    	Joomla.JText._('FLEXI_APPLYING_FILTERING') +
-	    	"<div class='fc_blocker_bar'><div></div></div>" +
-	    "</span>" +
-	  "</span>");
+	    	'<div class="fc_blocker_bar"><div></div></div>' +
+	    '</span>' +
+	  '</span>');
 		
 		fc_recalculateWindow();
 });
