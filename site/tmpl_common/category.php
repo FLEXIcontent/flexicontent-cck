@@ -39,12 +39,12 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 		<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 	<?php endif; ?>
 <?php elseif ( $this->params->get('show_print_icon') || $this->params->get('show_email_icon') || $this->params->get('show_feed_icon', 1) || $this->params->get('show_addbutton', 1) ) : ?>
-	<p class="buttons">
+	<div class="buttons">
 		<?php echo flexicontent_html::addbutton( $this->params, $this->category ); ?>
 		<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
 		<?php echo flexicontent_html::mailbutton( 'category', $this->params, $this->category->slug ); ?>
 		<?php echo flexicontent_html::feedbutton( 'category', $this->params, $this->category->slug ); ?>
-	</p>
+	</div>
 <?php endif; ?>
 <!-- EOF buttons -->
 

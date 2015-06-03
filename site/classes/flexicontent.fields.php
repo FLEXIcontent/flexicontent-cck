@@ -3774,4 +3774,48 @@ class FlexicontentFields
 		return $filters_creation;
 	}
 	
+	
+	
+	static function & getFieldsPerGroup()
+	{
+		static $ginfo = null;
+		if ( $ginfo!==null ) return $ginfo;
+		
+		$db = JFactory::getDBO();
+		$query = 'SELECT f.* '
+			. ' FROM #__flexicontent_fields AS f '
+			. ' WHERE f.published = 1'
+			. ' AND f.field_type = "fieldgroup" '
+			;
+		$db->setQuery($query);
+		$field_groups = $db->loadObjectList('id');
+		
+		$grp_to_field = array();
+		$field_to_grp = array();
+		foreach($field_groups as $field_id => $field_group) {
+			// Create field parameters, if not already created, NOTEL: for 'custom' fields loadFieldConfig() is optional
+			$field_group->parameters = new JRegistry($field_group->attribs);
+			
+			$fieldids = $field_group->parameters->get('fields', array());
+			if ( empty($fieldids) ) {
+				$fieldids = array();
+			}
+			if ( !is_array($fieldids) ) {
+				$fieldids = preg_split("/[\|,]/", $fieldids);
+			}
+			
+			$field_group->label = JText::_($field_group->label);
+			foreach ($fieldids as $grouped_fieldid) {
+				$grp_to_field[$field_id][] = $grouped_fieldid;
+				$field_to_grp[$grouped_fieldid] = $field_id;
+			}
+		}
+		$ginfo = new stdClass;
+		$ginfo->grps = $field_groups;
+		$ginfo->grp_to_field = $grp_to_field;
+		$ginfo->field_to_grp = $field_to_grp;
+		
+		return $ginfo;
+	}
+	
 }

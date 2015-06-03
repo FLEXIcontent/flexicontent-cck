@@ -154,6 +154,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Force layout to be have proper value
 		if ( $this->_layout && !in_array($this->_layout, array('favs','tags','mcats','myitems','author')) )
 		{
+			//JError::raiseNotice(0, "'layout' variable is ".$this->_layout.", acceptable are: 'favs','tags','mcats','myitems','author', this may be due to some 3rd party plugin");
 			$this->_layout = '';
 			JRequest::setVar('layout', '');
 		}

@@ -137,7 +137,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$params->set('clayout', $clayout);
 		
 		// Get URL variables
-		$layout_vars = flexicontent_html::getCatViewLayoutVars();
+		$layout_vars = flexicontent_html::getCatViewLayoutVars($model);
 		$layout   = $layout_vars['layout'];
 		$authorid = $layout_vars['authorid'];
 		$tagid    = $layout_vars['tagid'];
@@ -309,7 +309,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// *********************************************************************
 		
 		$non_sef_link = null;
-		$category_link = flexicontent_html::createCatLink($category->slug, $non_sef_link);
+		$category_link = flexicontent_html::createCatLink($category->slug, $non_sef_link, $model);
 		
 		
 		// ************************************
@@ -403,6 +403,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			// NOTE: for J2.5, we will trigger the plugins as if description text was an article text, using ... 'com_content.article'
 			$category->text = $category->description;
 			$results = $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$category, &$params, 0));
+			JRequest::setVar('layout', $layout);  // Restore LAYOUT variable should some plugin have modified it
 			
 			$category->description 	= $category->text;
 		}
@@ -439,14 +440,14 @@ class FlexicontentViewCategory extends JViewLegacy
 				// Current category IS a category of the item and ALSO routing (creating links) to this category is allowed
 				$item->categoryslug = $category->slug;
 			} else if (!in_array($item->catid, $globalnoroute)) {
-				// 2. CATEGORY SLUG: ITEM's MAIN category   (alread SET, ... no assignment needed)
+				// 2. CATEGORY SLUG: ITEM's MAIN category   (already SET, ... no assignment needed)
 				// Since we cannot use current category (above), we will use item's MAIN category 
 				// ALSO routing (creating links) to this category is allowed
 			} else {
 				// 3. CATEGORY SLUG: ANY ITEM's category
 				// We will use the first for which routing (creating links) to the category is allowed
 				$allcats = array();
-				$item->cats = $item->cats?$item->cats:array();
+				$item->cats = $item->cats ? $item->cats : array();
 				foreach ($item->cats as $cat) {
 					if (!in_array($cat->id, $globalnoroute)) {
 						$item->categoryslug = $globalcats[$cat->id]->slug;
@@ -475,8 +476,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			$item->event->afterDisplayContent = trim(implode("\n", $results));
 							
 			// Set the option back to 'com_flexicontent'
-		  JRequest::setVar('option', 'com_flexicontent');
-		  
+			JRequest::setVar('option', 'com_flexicontent');
+			
 			// Put text back into the description field, THESE events SHOULD NOT modify the item text, but some plugins may do it anyway... , so we assign text back for compatibility
 			$item->fields['text']->display = & $item->text;
 			
@@ -802,21 +803,21 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Print link ... must include layout and current filtering url vars, etc
 		// **********************************************************************
 		
-    $curr_url = $_SERVER['REQUEST_URI'];
-    $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
-    
+		$curr_url   = $_SERVER['REQUEST_URI'];
+		$print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('action',    $category_link);  // $uri->toString()
-		$this->assignRef('print_link',$print_link);
-		$this->assignRef('category',  $category);
-		$this->assignRef('categories',$categories);
-		$this->assignRef('peercats',  $peercats);
-		$this->assignRef('items',     $items);
+		$this->assignRef('layout_vars',$layout_vars);
+		$this->assignRef('action',     $category_link);
+		$this->assignRef('print_link', $print_link);
+		$this->assignRef('category',   $category);
+		$this->assignRef('categories',  $categories);
+		$this->assignRef('peercats',   $peercats);
+		$this->assignRef('items',      $items);
 		$this->assignRef('authordescr_item_html', $authordescr_item_html);
-		$this->assignRef('lists',     $lists);
-		$this->assignRef('params',    $params);
-		$this->assignRef('pageNav',   $pageNav);
+		$this->assignRef('lists',      $lists);
+		$this->assignRef('params',     $params);
+		$this->assignRef('pageNav',    $pageNav);
 		$this->assignRef('pageclass_sfx', $pageclass_sfx);
 		
 		$this->assignRef('pagination',    $pageNav);  // compatibility Alias for old templates
@@ -851,20 +852,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		// increment the hit counter ONLY once per user visit
 		// **************************************************
 		// MOVED to flexisystem plugin due to ...
-		/*if ($category->id && empty($layout)) {
-			$hit_accounted = false;
-			$hit_arr = array();
-			if ($session->has('cats_hit', 'flexicontent')) {
-				$hit_arr 	= $session->get('cats_hit', array(), 'flexicontent');
-				$hit_accounted = isset($hit_arr[$category->id]);
-			}
-			if (!$hit_accounted) {
-				//add hit to session hit array
-				$hit_arr[$category->id] = $timestamp = time();  // Current time as seconds since Unix epoc;
-				$session->set('cats_hit', $hit_arr, 'flexicontent');
-				$this->getModel()->hit();
-			}
-		}*/
 		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }

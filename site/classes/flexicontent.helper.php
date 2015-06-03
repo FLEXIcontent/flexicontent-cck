@@ -3804,14 +3804,14 @@ class flexicontent_html
 		}
 	}
 	
-	static function createCatLink($slug, &$non_sef_link)
+	static function createCatLink($slug, &$non_sef_link, $catmodel=null)
 	{
 		$menus  = JFactory::getApplication()->getMenu();
 		$menu   = $menus->getActive();
 		$Itemid = $menu ? $menu->id : 0;
 		
 		// Get URL variables
-		$layout_vars = flexicontent_html::getCatViewLayoutVars();
+		$layout_vars = flexicontent_html::getCatViewLayoutVars($catmodel);
 		$cid  = $layout_vars['cid'];
 		
 		$urlvars = array();
@@ -3828,27 +3828,31 @@ class flexicontent_html
 	}
 	
 	
-	static function getCatViewLayoutVars()
+	static function getCatViewLayoutVars($obj=null)
 	{
 		static $layout_vars;
 		if ($layout_vars) return $layout_vars;
 		
 		// Get URL variables
 		$layout_vars = array();
-		$layout_vars['cid'] = JRequest::getInt('cid', 0);
-		$layout_vars['authorid'] = JRequest::getInt('authorid', 0);
-		$layout_vars['tagid']    = JRequest::getInt('tagid', 0);
-		$layout_vars['layout']   = JRequest::getCmd('layout', '');
+		$layout_vars['cid'] = $obj && isset($obj->_id) ? $obj->_id : JRequest::getInt('cid', 0);
+		$layout_vars['authorid'] = $obj && isset($obj->_authorid) ? $obj->_authorid : JRequest::getInt('authorid', 0);
+		$layout_vars['tagid']    = $obj && isset($obj->_tagid) ? $obj->_tagid : JRequest::getInt('tagid', 0);
+		$layout_vars['layout']   = $obj && isset($obj->_layout) ? $obj->_layout : JRequest::getCmd('layout', '');
 		
-		$mcats_list = JRequest::getVar('cids', '');
-		if ( !is_array($mcats_list) ) {
-			$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
-			$mcats_list = explode(',', $mcats_list);
+		if ($obj && isset($obj->_ids)) {
+			$layout_vars['cids'] = $obj->_ids;
+		} else {
+			$mcats_list = JRequest::getVar('cids', '');
+			if ( !is_array($mcats_list) ) {
+				$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
+				$mcats_list = explode(',', $mcats_list);
+			}
+			// make sure given data are integers ... and skipping zero values
+			$cids = array();
+			foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+			$layout_vars['cids'] = implode(',' , $cids);
 		}
-		// make sure given data are integers ... and skipping zero values
-		$cids = array();
-		foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
-		$layout_vars['cids'] = implode(',' , $cids);
 		
 		return $layout_vars;
 	}
