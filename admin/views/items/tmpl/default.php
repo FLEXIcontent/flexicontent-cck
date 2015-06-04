@@ -54,7 +54,7 @@ if ( $enable_translation_groups ) $list_total_cols++;
 $list_total_cols += count($this->extra_fields);
 
 $image_flag_path = "../media/mod_languages/images/";
-$attribs_preview = ' class="fc-tooltip-img '.$tip_class.'" alt="Preview" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_preview = ' class="fc-tooltip-img '.$tip_class.'" alt="Preview" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" style="min-width:16px;"';
 $image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview);
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);

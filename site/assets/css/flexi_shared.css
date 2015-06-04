@@ -1182,10 +1182,10 @@ table.fc-form-tbl fieldset {
 
 /* Upload TABs */
 
-#uploader_tabset {
+#fileman_tabset {
 	margin-bottom: 32px;
 }
-#uploader_tabset div.tabbertab {
+#fileman_tabset div.tabbertab {
 	padding: 8px 16px 16px 16px;
 }
 
