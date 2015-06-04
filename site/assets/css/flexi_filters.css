@@ -3,6 +3,16 @@
 /* CONTAINERs of text-search & field filters */
 /*********************************************/
 
+/* Outer container of (a) text search, (b) field filters */
+#fc_filter_box {
+	display: block;
+	clear: both;
+	border: solid 0px #dddddd;
+	margin: 0px 0px 12px 0px;
+	padding: 0%;
+	width: 100%;
+}
+
 fieldset.fc_search_set,    /* SEARCH view */
 fieldset.fc_filter_set {   /* CATEGORY view */
 	border: 1px solid #cccccc;
@@ -374,4 +384,28 @@ ul.fc_field_filter.fc_checkradio_group {
 ul.fc_field_filter.fc_checkradio_group label {
 	margin: 6px 6px 4px 0px;
 	display: inline-block;
+}
+
+
+/* Inner Labels */
+.fc_has_inner_label, .fc_has_inner_prompt {
+	color: gray;
+	position: absolute;
+	display: block;
+	padding: 0px 0px 0px 4px;
+	font-size:12px;
+}
+
+.fc_has_inner_label.fc_has_inner_label_input,
+.fc_has_inner_prompt.fc_has_inner_prompt_input {
+	left:14px;
+	top:10px;
+	color: black;
+	line-height: 150%;
+	padding: 0px 0px 0px 4px;
+}
+.fc_has_inner_label.fc_has_inner_label_select2,
+.fc_has_inner_prompt.fc_has_inner_prompt_select2 {
+	left:4px;
+	top:8px;
 }

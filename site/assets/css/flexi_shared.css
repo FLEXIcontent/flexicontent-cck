@@ -433,17 +433,17 @@ table.adminlist .pagination {
 }
 
 /* Tags list autocomplete */
-ul#ultagbox{
-	min-height: 26px !important;
-	margin: 0 !important;
-	padding: 0 !important;
+ul#ultagbox {
+	min-height: 26px;
+	margin: 0;
+	padding: 0;
 }
-ul#ultagbox li{
-	list-style-type:none !important;
-	display:block !important;
-	float:left !important;
-	margin: 2px !important;
-	line-height: 100% !important;
+ul#ultagbox li {
+	list-style-type:none;
+	display:block;
+	float:left;
+	margin: 2px;
+	line-height: 100%;
 }
 
 .tagitem.plain {
@@ -467,29 +467,29 @@ ul#ultagbox li{
 }
 /** tag selection */
 div#tags {
-	margin: 0px 48px 0 0 !important;
-	padding:0px !important;
+	margin: 0px 48px 0 0;
+	padding:0px;
 	float: left;
 }
 div#tags #input-tags {
-	margin: 0px !important;
+	margin: 0px;
 	width: auto;
 }
 div#tags #input_new_tag {
-	display:inline-block !important;
-	padding: 0px !important;
+	display:inline-block;
+	padding: 0px;
 	margin: 0px 4px -4px 0px;
-	width: 16px !important;
-	height: 16px !important;
-	background: url(../images/tag_blue_add.png) #f9f9f9 no-repeat  100% 50% !important;
+	width: 16px;
+	height: 16px;
+	background: url(../images/tag_blue_add.png) #f9f9f9 no-repeat  100% 50%;
 }
 #qf_tagbox {
-	display: block !important;
-	max-height: 170px !important;
-	overflow: auto !important;
-	border: 1px dashed silver !important;
-	background: #fff !important;
-	margin: 0px 4px 4px 0px !important;
+	display: block;
+	max-height: 170px;
+	overflow: auto;
+	border: 1px dashed silver;
+	background: #fff;
+	margin: 0px 4px 4px 0px;
 	float: left;
 }
 
@@ -544,12 +544,12 @@ span.fc_select_button:hover {
 
 div label.state_box,
 div label.lang_box {
-	white-space:nowrap !important;
-	display:inline-block !important;
-	margin: 0px 8px 0px 0px !important;
+	white-space:nowrap;
+	display:inline-block;
+	margin: 0px 8px 0px 0px;
 	padding: 0px!important;
-	vertical-align: top !important;
-	font-size: 12px !important;
+	vertical-align: top;
+	font-size: 12px;
 }
 div label.state_box input,
 div label.state_box img,
@@ -557,12 +557,12 @@ div label.state_box .state_lbl,
 div label.lang_box input,
 div label.lang_box img,
 div label.lang_box .lang_lbl {
-	display:inline-block !important;
-	margin: 4px 5px 0px 0px !important;
-	padding: 0px !important;
-	vertical-align: top !important;
-	line-height: 1em !important;
-	font-size: 12px !important;
+	display:inline-block;
+	margin: 4px 5px 0px 0px;
+	padding: 0px;
+	vertical-align: top;
+	line-height: 1em;
+	font-size: 12px;
 }
 div label.lang_box img {
 	border: 1px solid lightgray;
@@ -571,8 +571,8 @@ div label.lang_box img {
 /* language associations */
 .fc_assoc_translation img {
 	border: 1px solid lightgray;
-	padding: 0px !important;
-	margin: 0px !important;
+	padding: 0px;
+	margin: 0px;
 	float:left;
 }
 .fc_assoc_translation {
@@ -949,21 +949,21 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
 #flexicontent form input.invalid,
 #flexicontent form select.invalid,
 select.invalid, input.invalid, textarea.invalid {
-	border: 1px dotted #CC0000 !important;
+	border: 1px dotted #CC0000 !important; /* FORCED styling */
 }
 
 /*.use_prettycheckable.invalid + a + label,
 input.invalid + .fccheckradio_lbl {
-	color: #cc0000 !important;
+	color: #cc0000 !important; /* FORCED styling */
 }
 .use_prettycheckable.invalid + a + label > img {
-	border: 1px dotted #CC0000 !important;
+	border: 1px dotted #CC0000 !important; /* FORCED styling */
 }*/
 #flexicontent .label.invalid,
 #flexicontent .label-fcinner.invalid,
 #flexicontent .flexi_label.invalid,
 #flexicontent .flexi_label.invalid.required {
-	color: #CC0000 !important;
+	color: #CC0000 !important; /* FORCED styling */
 }
 #flexicontent .flexi_label.required:after {
 	content:"*";
@@ -1017,28 +1017,6 @@ div.flexi_box_right {
 
 div.flexi_box_right {
 	float: right;
-}
-
-/** FLEXIcontent radio/checkbox buttons **/
-.flexi_radiotab {
-	display: inline-block !important;
-	padding: 1px 6px !important;
-	margin: 2px 0px 2px 8px !important;
-	border-radius: 4px !important;
-	border: 1px solid darkgray !important;
-	text-decoration: none !important;
-	font-weight: bold;
-}
-
-.flexi_radiotab.highlight {
-	background-color: lightgray !important;
-	color: darkred !important;
-}
-
-.flexi_radiotab.downlight {
-	background-color: white !important;
-	color: black !important;
-	cursor: pointer !important;
 }
 
 .flexi_tabbox_label {
@@ -1240,4 +1218,98 @@ table.fc-form-tbl fieldset {
 	height: 24px;
 	border-radius: 6px;
 	min-width: 40%;
+}
+
+
+
+/*******
+ * Other
+ *******/
+
+/* Highlighting selected choices */
+.fc_filter_html .select2-search-choice div,
+.select2-container .select2-choice.fc_highlight span,
+.fc_highlight {
+	color: darkorange;
+	font-weight: bold;
+}
+
+.select2-container .select2-choice.fc_highlight_disabled span,
+.fc_highlight_disabled {
+	color: gray;
+	font-weight: normal;
+	text-decoration: line-through;
+	font-style: italic;
+}
+
+
+/* Blocking overlay during form being applied and page reloading */
+#fc_filter_form_blocker {
+	display: none;
+	z-index: 1000;
+	
+	position: fixed;
+	top: 0;
+	left: 0;
+	
+	width: 100%;
+	height: 100%;
+}
+#fc_filter_form_blocker .fc_blocker_opacity {
+	display: block;
+	z-index: 1000;
+	
+	position: absolute;
+	top: 0;
+	left: 0;
+	
+	opacity: 0.3;
+	filter:alpha(opacity=30); /* For IE8 and earlier */
+	background-color: #000;
+	
+	width: 100%;
+	height: 100%;
+}
+#fc_filter_form_blocker .fc_blocker_content {
+	display: block;
+	z-index: 1001;
+	position: fixed;
+	top: 200px;
+	left: 40%;
+	
+	color: black;
+	background: white url(../images/ajax-loader.gif) 30px 40px no-repeat;
+	opacity:1;
+	filter:alpha(opacity=100); /* For IE8 and earlier */
+	
+	width: auto;
+	padding: 40px 0px 46px 60px;
+	margin: 0px;
+	
+	font-size: 12px;
+	font-weight: bold;
+	border: 1px solid lightgray;
+	border-radius: 8px;
+	text-align: left;
+}
+
+#fc_filter_form_blocker .fc_blocker_bar {
+	display: block;
+	width: 200px;
+	height: 22px;
+	border: 1px solid #111;
+	background-color: #292929;
+	position: relative;
+	left: -30px;
+	top:6px;
+}
+
+#fc_filter_form_blocker .fc_blocker_bar div {
+	display: block;
+	height: 100%;
+	color: #fff;
+	text-align: right;
+	line-height: 22px; /* same as #progressBar height if we want text middle aligned */
+	width: 0;
+	background-color: #0099ff;
 }
