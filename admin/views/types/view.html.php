@@ -160,6 +160,7 @@ class FlexicontentViewTypes extends JViewLegacy
 		
 		
 		//assign data to template
+		$this->assignRef('CanTemplates', $perms->CanTemplates);
 		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('lists'	, $lists);
 		$this->assignRef('rows'		, $rows);

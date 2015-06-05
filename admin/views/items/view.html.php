@@ -616,6 +616,7 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 		
 		//assign data to template
+		$this->assignRef('CanTemplates', $perms->CanTemplates);
 		$this->assignRef('count_filters', $count_filters);
 		//$this->assignRef('filter_stategrp', $filter_stategrp);
 		$this->assignRef('filter_catsinstate', $filter_catsinstate);

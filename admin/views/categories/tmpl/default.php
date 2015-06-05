@@ -35,13 +35,11 @@ $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username .
 
 $attribs_preview = ' style="float:right;" class="'.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
 $attribs_rsslist = ' style="float:right;" class="'.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_FEED', 'FLEXI_DISPLAY_RSS_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_editlayout = ' style="float:right;" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT', null, 1, 1).'" ';
 
-$image_preview = FLEXI_J16GE ?
-	JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview) :
-	JHTML::_('image.site', 'monitor_go.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_('FLEXI_PREVIEW'), $attribs_preview) ;
-$image_rsslist = FLEXI_J16GE ?
-	JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), $attribs_rsslist ) :
-	JHTML::_('image.site', 'livemarks.png', '../images/M_images/', NULL, NULL, JText::_('FLEXI_FEED'), $attribs_rsslist ) ;
+$image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview);
+$image_rsslist = JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), $attribs_rsslist );
+$image_editlayout = JHTML::image( 'components/com_flexicontent/assets/images/'.'layout_edit.png', JText::_('FLEXI_EDIT_LAYOUT'),  $attribs_editlayout);
 
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
 $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ) );
@@ -51,8 +49,9 @@ $state_names = array('ALL_P'=>JText::_('FLEXI_PUBLISHED'), 'ALL_U'=>JText::_('FL
 $state_imgs = array('ALL_P'=>'tick.png', 'ALL_U'=>'publish_x.png', 'A'=>'archive.png', 'T'=>'trash.png');
 
 $edit_entry = JText::_('FLEXI_EDIT_CATEGORY', true);
+$edit_layout = JText::_('FLEXI_EDIT_LAYOUT', true);
 
-$list_total_cols = 13;
+$list_total_cols = 16;
 ?>
 <script type="text/javascript">
 
@@ -168,7 +167,7 @@ function delAllFilters() {
 			<th nowrap="nowrap">&nbsp;</th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'c.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
+			<th class="hideOnDemandClass left" colspan="2"><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
 			<!--th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
 			<th class="hideOnDemandClass">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_P']; ?></small></span>
@@ -218,6 +217,7 @@ function delAllFilters() {
 		
 		$k = 0;
 		$i = 0;
+		$clayout_bycatid = array();
 		
 		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';  // Collapsed row to allow border styling to apply		$k = 0;
 		foreach ($this->rows as $row)
@@ -234,20 +234,18 @@ function delAllFilters() {
 			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
 			$link	= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
 			
-			if (FLEXI_J16GE) {
-				if (($canEdit || $canEditOwn) && $this->perms->CanAccLvl) {
-					$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'categories.access\')"');
-				} else {
-					$access = $this->escape($row->access_level);
-				}
-			} else if (FLEXI_ACCESS) {
-				if (($canEdit || $canEditOwn) && $this->perms->CanAccLvl) {
-					$access = FAccess::accessswitch('category', $row, $i);
-				} else {
-					$access = FAccess::accessswitch('category', $row, $i, 'content', 1);
-				}
+			$row_clayout =  $row->config->get("clayout") ?  $row->config->get("clayout") : ($row->parent_id==='1' ? $cparams->get("clayout") : '');
+			if (!$row_clayout && isset($clayout_bycatid[$row->parent_id])) {
+				$row_clayout = $clayout_bycatid[$row->parent_id];
+			}
+			if ($row_clayout) $clayout_bycatid[$row->id] = $row_clayout;
+			
+			$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;tmpl=component&amp;ismodal=1&amp;folder='. $row_clayout;
+			
+			if (($canEdit || $canEditOwn) && $this->perms->CanAccLvl) {
+				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'categories.access\')"');
 			} else {
-				$access 	= JHTML::_('grid.access', $row, $i );
+				$access = $this->escape($row->access_level);
 			}
 			
 			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
@@ -273,11 +271,7 @@ function delAllFilters() {
 			</td>
 			<td align="left" class="col_title">
 				<?php
-				if (FLEXI_J16GE) {
-					if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>";
-				} else {
-					echo $row->treename.' ';
-				}
+				if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>";
 				
 				// Display an icon with checkin link, if current user has checked out current item
 				if ($row->checked_out) {
@@ -333,8 +327,15 @@ function delAllFilters() {
 				}
 				?>
 			</td>
-			<td align="center">
-				<?php echo ($row->config->get('clayout') ? $row->config->get('clayout') : "blog <sup>[1]</sup>") ?>
+			<td align="right">
+				<?php if ($this->CanTemplates && $row_clayout) : ?>
+				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;" >
+					<?php echo $image_editlayout;?>
+				</a>
+				<?php endif; ?>
+			</td>
+			<td align="left">
+				<?php echo $row->config->get('clayout') ? $row->config->get('clayout') : ($row_clayout ? $row_clayout : '...').'<span class="badge">inherited</span>'; ?>
 			</td>
 			
 			<?php /*<td align="center">
@@ -406,7 +407,7 @@ function delAllFilters() {
 
 	</table>
 	
-	<?php echo JText::_( 'FLEXI_PARAMS_CAT' );?>
+	<?php /*echo JText::_( 'FLEXI_PARAMS_CAT' );*/ ?>
 	
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />

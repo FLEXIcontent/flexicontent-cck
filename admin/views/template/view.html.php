@@ -40,8 +40,9 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$user     = JFactory::getUser();
 		
 		$use_jquery_sortable = true;
-		$type 	= JRequest::getVar('type',  'items', '', 'word');
-		$folder = JRequest::getVar('folder',  'default', '', 'cmd');
+		$type    = JRequest::getVar('type',  'items', '', 'word');
+		$folder  = JRequest::getVar('folder',  'default', '', 'cmd');
+		$ismodal = JRequest::getVar('ismodal',  'default', '', 'int');
 		
 		FLEXIUtilities::loadTemplateLanguageFile( $folder );
 
@@ -183,10 +184,16 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		FLEXISubmenu('CanTemplates');
 
 		//create the toolbar
+		$bar = JToolBar::getInstance('toolbar');
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TEMPLATE' ), 'templates' );
-		JToolBarHelper::apply('templates.apply');
-		JToolBarHelper::save('templates.save');
-		JToolBarHelper::cancel('templates.cancel');
+		if (!$ismodal) {
+			JToolBarHelper::apply('templates.apply');
+			JToolBarHelper::save('templates.save');
+			JToolBarHelper::cancel('templates.cancel');
+		} else {
+			JToolBarHelper::apply('templates.apply_modal');
+			echo $bar->render();
+		}
 		
 		
 		// **********************************************************************************

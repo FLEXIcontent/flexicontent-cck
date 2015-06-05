@@ -41,6 +41,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		// Register Extra task
 		$this->registerTask( 'add'  ,     'edit' );
 		$this->registerTask( 'apply',     'save' );
+		$this->registerTask( 'apply_modal', 'save' );
 	}
 
 
@@ -78,6 +79,10 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		
 		switch ($task)
 		{
+			case 'apply_modal' :
+				$link = 'index.php?option=com_flexicontent&view=template&type='.$type.'&folder='.$folder.'&tmpl=component&ismodal=1';
+				break;
+
 			case 'apply' :
 				$link = 'index.php?option=com_flexicontent&view=template&type='.$type.'&folder='.$folder;
 				break;

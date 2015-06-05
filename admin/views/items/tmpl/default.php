@@ -48,7 +48,7 @@ $isAdmin = JFactory::getApplication()->isAdmin();
 $enable_translation_groups = $cparams->get("enable_translation_groups");
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
-$list_total_cols = 16;
+$list_total_cols = 18;
 if ( $enable_translation_groups ) $list_total_cols++;
 
 $list_total_cols += count($this->extra_fields);
@@ -56,6 +56,9 @@ $list_total_cols += count($this->extra_fields);
 $image_flag_path = "../media/mod_languages/images/";
 $attribs_preview = ' class="fc-tooltip-img '.$tip_class.'" alt="Preview" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" style="min-width:16px;"';
 $image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview);
+
+$attribs_editlayout = ' style="float:right;" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT', null, 1, 1).'" ';
+$image_editlayout = JHTML::image( 'components/com_flexicontent/assets/images/'.'layout_edit.png', JText::_('FLEXI_EDIT_LAYOUT'),  $attribs_editlayout);
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
@@ -105,6 +108,7 @@ $date_zone_tip   = JHTML::image ( 'administrator/components/com_flexicontent/ass
 // COMMON repeated texts
 $edit_item_title = JText::_('FLEXI_EDIT_ITEM', true);
 $edit_cat_title = JText::_('FLEXI_EDIT_CATEGORY', true);
+$edit_layout = JText::_('FLEXI_EDIT_LAYOUT', true);
 $rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER', true);
 $rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
 $scheduled_for_publication = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION', true );
@@ -534,7 +538,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 			
-			<th class="center hideOnDemandClass">
+			<th class="left hideOnDemandClass" colspan="2">
 				<?php echo JText::_( 'FLEXI_TEMPLATE' ); ?>
 			</th>
 
@@ -718,7 +722,10 @@ jQuery(document).ready(function(){
 				$extra_img = 'pushished_expired.png';
 				$extra_alt = & $publication_expired;
 			}
-
+			
+			$row_ilayout =  $row->config->get('ilayout') ?  $row->config->get('ilayout') : $row->tconfig->get('ilayout');
+			$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder='. $row_ilayout;
+			
 			// Set a row language, even if empty to avoid errors
 			$lang_default = !FLEXI_J16GE ? '' : '*';
 			$row->lang = @$row->lang ? $row->lang : $lang_default;
@@ -796,9 +803,16 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 				<?php echo $row->featured ? $featimg : ''; ?>
 			</td>
-
+			
+			<td align="right">
+				<?php if ($this->CanTemplates && $row_ilayout) : ?>
+				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;" >
+					<?php echo $image_editlayout;?>
+				</a>
+				<?php endif; ?>
+			</td>
 			<td align="center">
-				<?php echo ($row->config->get("ilayout","") ? $row->config->get("ilayout") : $row->tconfig->get("ilayout")."<sup>[1]</sup>") ?>
+				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
 			</td>
 
 		<?php if ( $enable_translation_groups ) : ?>

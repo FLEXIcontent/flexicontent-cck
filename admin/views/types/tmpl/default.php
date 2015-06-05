@@ -25,15 +25,19 @@ $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
 $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCtypes', $start_text, $end_text);
 
-$edit_entry = JText::_('FLEXI_EDIT_TYPE', true);
+$edit_entry  = JText::_('FLEXI_EDIT_TYPE', true);
+$edit_layout = JText::_('FLEXI_EDIT_LAYOUT', true);
+$view_fields = JText::_('FLEXI_VIEW_FIELDS', true);
+$view_items  = JText::_('FLEXI_VIEW_ITEMS', true);
 
 $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
-$list_total_cols = 10;
+$list_total_cols = 12;
 
 $article_viewing_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-tooltip-img '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_REDIRECT_ARTICLE_VIEW').'" title="'.flexicontent_html::getToolTip('FLEXI_REDIRECT_ARTICLE_VIEW', 'FLEXI_REDIRECT_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
 $default_template_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-tooltip-img '.$tip_class.'" data-placement="bottom" alt="'.JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
+$layout_edit_icon = '<img src="components/com_flexicontent/assets/images/layout_edit.png"/> ';
 ?>
 <script type="text/javascript">
 
@@ -134,7 +138,7 @@ function delAllFilters() {
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo $article_viewing_tip . JText::_( 'FLEXI_REDIRECT_ARTICLE_VIEW' )."<br/><small>(".JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REDIRECTED' ).")</small>"; ?></th>
-			<th class="hideOnDemandClass"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
+			<th class="hideOnDemandClass left" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -155,13 +159,7 @@ function delAllFilters() {
 
 	<tbody>
 		<?php
-		if (FLEXI_J16GE) {
-			$canCheckinRecords = $user->authorise('core.admin', 'checkin');
-		} else if (FLEXI_ACCESS) {
-			$canCheckinRecords = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
-		} else {
-			$canCheckinRecords = $user->gid >= 24;
-		}
+		$canCheckinRecords = $user->authorise('core.admin', 'checkin');
 		
 		$k = 0;
 		
@@ -180,8 +178,9 @@ function delAllFilters() {
 			}
 			
 			$checked	= @ JHTML::_('grid.checkedout', $row, $i );
-			$fields		= 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;
-			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_type='. $row->id;
+			$fields_url = 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;
+			$items_url  = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_type='. $row->id;
+			$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder='. $row->config->get("ilayout");
 			$canEdit    = 1;
 			$canEditOwn = 1;
    		?>
@@ -236,9 +235,18 @@ function delAllFilters() {
 					?>
 				</span>
 			</td>
-			<td align="center">
+			
+			<td align="right">
+				<?php if ($this->CanTemplates) : ?>
+				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;" >
+					<?php echo $layout_edit_icon;?>
+				</a>
+				<?php endif; ?>
+			</td>
+			<td align="left">
 				<?php echo $row->config->get("ilayout"); ?>
 			</td>
+			
 			<td>
 				<?php
 				if (JString::strlen($row->alias) > 25) {
@@ -250,14 +258,14 @@ function delAllFilters() {
 			</td>
 			<td align="center">
 				<span class="badge"><?php echo $row->fassigned; ?></span>
-				<a href="<?php echo $fields; ?>">
-				[<?php echo JText::_( 'FLEXI_VIEW_FIELDS' );?>]
+				<a href="<?php echo $fields_url; ?>">
+					[<?php echo $view_fields;?>]
 				</a>
 			</td>
 			<td align="center">
 				<span class="badge badge-info"><?php echo $row->iassigned; ?></span>
-				<a href="<?php echo $items; ?>">
-				[<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>]
+				<a href="<?php echo $items_url; ?>">
+					[<?php echo $view_items;?>]
 				</a>
 			</td>
 			<td align="center">

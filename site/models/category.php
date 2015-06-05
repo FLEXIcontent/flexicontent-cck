@@ -1752,7 +1752,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		global $globalcats;
 		$heritage_stack = array();
 		$inheritcid = $catParams->get('inheritcid', '');
-		$inheritcid_comp = $compParams->get('inheritcid', '');
+		$inheritcid_comp = $compParams->get('inheritcid', -1);
 		$inrerit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
 		
 		// CASE A: inheriting from parent category tree
