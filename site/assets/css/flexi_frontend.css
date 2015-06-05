@@ -1093,28 +1093,8 @@ div.fancybox-wrap a {
 	/*background-color: #999;*/
 }
 .flexi.label {
-	/*float: left;
-	display: inline-block;
-	vertical-align: baseline;
-	border-width: 0px;
-	max-width: 120px;
-	min-width: auto;
-	
-	width: auto;
-	white-space: normal;
-	color: #fff;
-	font-size: 12;
-	font-weight: bold;
-	line-height: 14px;
-	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-	
-	font-size: 11px;
-	font-style: normal;
-	font-family: arial;
-	text-align: right;
-	margin: 2px 6px 2px 2px;
-	padding: 3px 4px;
-	border-radius: 5px;*/
+	margin-top:2px;
+	margin-bottom:2px;
 }
 
 .flexi.value {

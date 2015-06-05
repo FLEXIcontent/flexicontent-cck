@@ -19,6 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 JHTML::_('behavior.tooltip');
 
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 $action = JRoute::_(FlexicontentHelperRoute::getSearchRoute(0, $itemid), false);
 $form_id = "default_form_".$module->id;
 $form_name = "default_form_".$module->id;

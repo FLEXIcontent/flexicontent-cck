@@ -65,23 +65,22 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$lang = in_array($lang, array('en','es','it','th')) ? $lang : 'en';
 		
 		// parameters shortcuts
-		$display_comments	= $field->parameters->get(FLEXI_J16GE ? 'display_comments' : 'display-comments', 1) && $item->parameters->get('comments',0);
-		$display_resizer	= $field->parameters->get(FLEXI_J16GE ? 'display_resizer' : 'display-resizer', 1);
-		$display_print 		= $field->parameters->get(FLEXI_J16GE ? 'display_print' : 'display-print', 1);
-		$display_email 		= $field->parameters->get(FLEXI_J16GE ? 'display_email' : 'display-email', 1);
-		$display_voice 		= $field->parameters->get(FLEXI_J16GE ? 'display_voice' : 'display-voice', 1);
-		//$display_pdf 		= $field->parameters->get(FLEXI_J16GE ? 'display_pdf' : 'display-pdf', 1);
-		$display_pdf 		= FLEXI_J16GE ? 0 : $field->parameters->get('display-pdf', 1);
-		$load_css 			= $field->parameters->get(FLEXI_J16GE ? 'load_css' : 'load-css', 1);
+		$display_comments	= $field->parameters->get('display_comments', 1) && $item->parameters->get('comments',0);
+		$display_resizer	= $field->parameters->get('display_resizer', 1);
+		$display_print 		= $field->parameters->get('display_print', 1);
+		$display_email 		= $field->parameters->get('display_email', 1);
+		$display_voice 		= $field->parameters->get('display_voice', 1);
+		$display_pdf 		= 0; //$field->parameters->get('display_pdf', 1);
+		$load_css 			= $field->parameters->get('load_css', 1);
 		
-		$display_social 	= $field->parameters->get(FLEXI_J16GE ? 'display_social' : 'display-social', 1);
-		$addthis_user		= $field->parameters->get(FLEXI_J16GE ? 'addthis_user' : 'addthis-user', '');
+		$display_social 	= $field->parameters->get('display_social', 1);
+		$addthis_user		= $field->parameters->get('addthis_user', '');
 		$addthis_pubid	= $field->parameters->get('addthis_pubid', $addthis_user);
 		
-		$spacer_size		= $field->parameters->get(FLEXI_J16GE ? 'spacer_size' : 'spacer-size', 21);
+		$spacer_size		= $field->parameters->get('spacer_size', 21);
 		$module_position	= $field->parameters->get('module_position', '');
-		$default_size 		= $field->parameters->get(FLEXI_J16GE ? 'default_size' : 'default-size', 12);
-		$default_line 		= $field->parameters->get(FLEXI_J16GE ? 'default_line' : 'default-line', 16);
+		$default_size 		= $field->parameters->get('default_size', 12);
+		$default_line 		= $field->parameters->get('default_line', 16);
 		$target 			= $field->parameters->get('target', 'flexicontent');
 		$voicetarget 		= $field->parameters->get('voicetarget', 'flexicontent');
 
@@ -90,7 +89,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$addthis		= isset($addthis) ? $addthis : 0;
 		
 		if ($load_css) {
-			$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/toolbar/'.(FLEXI_J16GE ? 'toolbar/' : '').'/toolbar.css');
+			$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
 		}
 		
 		if ($display_social || $display_comments || $display_email || $display_print) {
@@ -185,7 +184,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			<div class=\"flexi-voice toolbar-element\">";
 			if ($lang=='th') {
 				// Special case language case, maybe la=laos, and Bhutan languages in the future (NECTEC support these languages)
-				$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/toolbar'.(FLEXI_J16GE ? '/toolbar' : '').'/th.js');
+				$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/th.js');
 				$display .="
 					<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"openwindow('".$voicetarget."','".$lang."');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
 					";

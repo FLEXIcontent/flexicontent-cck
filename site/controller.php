@@ -222,8 +222,8 @@ class FlexicontentController extends JControllerLegacy
 			if ( $this->isStopWord($_w, $tbl) ) continue;  // stopword or too common
 			
 			$options['Matches'][] = array(
-				'text' => $complete_words.' '.$_w,
-				'id' => $complete_words.' '.$_w
+				'text' => $complete_words.($complete_words ? ' ' : '').$_w,
+				'id' => $complete_words.($complete_words ? ' ' : '').$_w
 			);
 			$n++;
 			if ($n >= $pageSize) break;
