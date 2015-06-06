@@ -456,26 +456,6 @@ div table.adminform td {
 
 
 /*************************
- * FLEXIcontent rating bar
- *************************/
-
-#flexicontent .qf_ratingbarcontainer {
-	border: 1px solid #999999;
-	display: block;
-	height: 10px;
-	margin: 2px 2px;
-	width: 60px;
-}
-
-#flexicontent .qf_ratingbar {
-	background-color: #c0c0c0;
-	display: block;
-	height: 10px;
-}
-
-
-
-/*************************
  * FLEXIcontent Favourites
  *************************/
 
@@ -648,6 +628,11 @@ div.current dd {
 .fcfile_lang .fcicon-lang {
 	vertical-align: middle;
 	margin-bottom: 2px;
+}
+.fcfile_actions {
+	margin: 4px;
+	float:left;
+	clear: both;
 }
 
 

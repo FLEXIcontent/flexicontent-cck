@@ -105,22 +105,10 @@ body .alert.fc-small.fc-iblock {
 body .fc-noauth {
 	display: inline-block;
 	background: #FCF8CA url(../images/warning.png) no-repeat 10px 50%;
+	padding: 3px 6px 4px 36px;
 	color: #C09853;
 	border: 1px solid #FBEED5;
 	border-radius: 6px;
-	padding: 3px 6px 4px 36px;
-	margin: 0 0 5px 0;
-	font-size:12px;
-	white-space: normal;
-	line-height: 140%;
-}
-body .fc-caption {
-	display: inline-block;
-	background: lightgray url(../images/comment.png) no-repeat 10px 50%;
-	color: black;
-	border: 1px solid #ddd;
-	border-radius: 6px;
-	padding: 3px 6px 4px 36px;
 	margin: 0 0 5px 0;
 	font-size:12px;
 	white-space: normal;
@@ -131,7 +119,7 @@ body .fc-caption {
 body .fc-mssg-inline.fc-nobgimage,
 body .fc-mssg.fc-nobgimage {
 	background-image: none;
-	padding: 2px 8px;
+	padding: 4px 8px;
 }
 body .fc-mssg-inline.fc-noborder,
 body .fc-mssg.fc-noborder  {

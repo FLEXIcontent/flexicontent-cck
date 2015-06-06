@@ -156,7 +156,9 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				$html .= '
 				<span class="fc-pagenav-return">
 					<a class="btn btn-info" href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)).'?start='.$start .'">' . htmlspecialchars($category_label, ENT_NOQUOTES, 'UTF-8')
-					.($cat_image ? '<br/><img src="'.$cat_image.'"/>' : '') .'
+						.($cat_image ? '
+						<br/>
+						<img src="'.$cat_image.'"/>' : '') .'
 					</a>
 				</span>';
 			}
@@ -180,12 +182,11 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				<a class="btn" href="'. $field->prevurl .'">
 					<i class="icon-previous"></i>
 					' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8') ).'
+					'.(isset($thumbs[$field->prev->id]) ? '
+						<br/>
+						<img src="'.$thumbs[$field->prev->id].'"/>
+					' : '').'
 				</a>
-				'.(isset($thumbs[$field->prev->id]) ? '
-				<br/>
-				<a href="'. $field->prevurl .'">
-					<img src="'.$thumbs[$field->prev->id].'"/>
-				</a>' : '').'
 			</span>'
 			;
 		} else {
@@ -208,12 +209,11 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				<a class="btn" href="'. $field->nexturl .'">
 					<i class="icon-next"></i>
 					' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8') ).'
+					'.(isset($thumbs[$field->next->id]) ? '
+						<br/>
+						<img src="'.$thumbs[$field->next->id].'"/>
+					' : '').'
 				</a>
-				'.(isset($thumbs[$field->next->id]) ? '
-				<br/>
-				<a href="'. $field->nexturl .'">
-					<img src="'.$thumbs[$field->next->id].'"/>
-				</a>' : '').'
 			</span>'
 			;
 		} else {
@@ -302,7 +302,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		
 		$cat_image_source = $params->get($uprefix.'_image_source');
 		
-		$cat->image = FLEXI_J16GE ? $cat->parameters->get('image') : $cat->image;
+		$cat->image = $cat->parameters->get('image');
 		$image_src = "";
 		$cat->introtext = & $cat->description;
 		$cat->fulltext = "";
