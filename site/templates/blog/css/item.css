@@ -73,13 +73,14 @@
 
 /* Rule for customblock used to display fields via template positions */
 .customblock {
-	width: 98%!important;
-	padding: 3px 1%!important;
-	margin: 8px 0px!important;
+	width: 98% !important;
+	padding: 2px 1% !important;
+	margin: 8px 0px !important;
 	
 	display:block;
 	float:left;
 	border: 1px solid #dddddd;
+	border-radius: 4px;
 }
 
 

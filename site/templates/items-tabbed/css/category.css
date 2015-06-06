@@ -80,7 +80,6 @@
 span.flexi.label, .flexi.label {
 	display: block;
 	float: left;
-	border-bottom: 1px solid silver;
 	font-size: 90%;
 	margin-right: 8px;
 }

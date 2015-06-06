@@ -670,10 +670,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		// *******************************
 		
 		// User Group / Author parameters
-		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-		$authorparams = $db->loadResult();
-		$authorparams = new JRegistry($authorparams);
-		$max_auth_limit = $authorparams->get('max_auth_limit', 0);  // maximum number of content items the user can create
+		$authorparams = flexicontent_db::getUserConfig($user->id);
+		$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // maximum number of content items the user can create
 		
 		$hasTmpEdit = false;
 		$hasCoupon  = false;

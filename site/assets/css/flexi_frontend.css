@@ -642,25 +642,19 @@ div.current dd {
  * File / image Field and other Plugins
  **************************************/
 
-/* File field (item form) */
-.fcfile_mime .icon-mime,
-.fcfile_hits .icon-hits,
-.fcfile_lang .icon-lang {
+/* File field viewing: property icons */
+.fcfile_mime .fcicon-mime,
+.fcfile_hits .fcicon-hits,
+.fcfile_lang .fcicon-lang {
 	vertical-align: middle;
 	margin-bottom: 2px;
 }
 
-/* Image field, empty image container for  (item form) */
-div.empty_image {
-	display: block;
-	background: #F9F9F9 url(../images/image_add.png) no-repeat scroll 50% 50%;
-	border:1px solid silver;
-	margin-bottom:3px;
-	word-wrap:break-word;
-}
 
-/* Image field, thumbnails (value viewing) */
+/* Image field viewing: thumbnails */
 img.fc_field_image {
+	display: inline-block;
+	margin: 0px 4px 6px 0px;
 	padding: 1px;
 	border: 1px solid lightgray;
 	border-radius:5px;
@@ -672,7 +666,19 @@ div .fc_image_thumb {
 	text-decoration: none;
 }
 
-/* Image field, thumbnails tooltips (value viewing) */
+/* Image field viewing: thumbnail container */
+div .fc_img_container {
+	display:inline-block;
+	margin: 2px 8px 2px 0px;
+}
+
+
+/* Image field viewing: inline tooltip */
+div .fc_img_tooltip_data {
+	display:inline-block;
+	vertical-align:top;
+	margin: 2px 12px 6px 4px;
+}
 div .fc_img_tooltip_title {
 	line-height:1em;
 	font-weight:bold;
@@ -681,7 +687,8 @@ div .fc_img_tooltip_desc {
 	line-height:1em;
 }
 
-/* Radio, checkbox, select, etc (indexed fields), the non-selected values */
+
+/* Radio/checkbox/select/etc (indexed fields) viewing: the non-selected values */
 div .fc_field_unsused_val {
  text-decoration: line-through;
 }
@@ -691,21 +698,21 @@ div .fc_field_unsused_val img {
 }
 
 
-/* ADD button used by fields (item form) */
-.button-add a {
-	display: inline-block;
-	padding: 1px 8px;
-	border: 1px solid #ccc;
-	background: #efefef;
+/* fieldgroup viewing: default container for values */
+div.fc-fieldgrp-value-box {
+	border-radius: 4px;
+	border: 1px solid lightgray;
+	display: block;
+	float: left;
+	
+	box-sizing: border-box;
+	/*max-width: 98%;
+	min-width: 48%;*/
+	width: 98%;
+	margin: 4px 1%;
+	padding: 2px;
+	vertical-align: top;
 }
-.button-add a,
-.button-add a:visited,
-.button-add a:link,
-.button-add a:hover {
-	color: black;
-	text-decoration: none;
-}
-
 
 
 
@@ -1092,14 +1099,42 @@ div.fancybox-wrap a {
 .flexi.label:not(.label-success):not(.label-primary):not(.label-warning):not(.label-info) {
 	/*background-color: #999;*/
 }
-.flexi.label {
-	margin-top:2px;
-	margin-bottom:2px;
+/* Field label & values styling */
+span.flexi.label, .flexi.label {
+	display: block;
+	float: left;
+	font-size: 90%;
+	margin: 2px 8px 2px 0px;
+}
+span.flexi.value, .flexi.value {
+	display: block;
+	float: left;
+	max-width: 100% !important;  /* Allow responsive width while floating */
+	padding: 0% !important;  /* Allow responsive width while floating */
 }
 
-.flexi.value {
-	padding: 0px;
-	margin: 2px 0% 2px 0%;
+/* e.g. in Joomla views */
+div.fc-custom-fields-box {
+	border-radius: 4px;
+	border: 1px solid #dddddd;
+	display: block;
+	float:left;
+	clear:both;
+	
+	box-sizing: border-box;
+	width: 100%;
+	margin: 12px 0px;
+	padding: 12px 4px;
+}
+div.fc-field-box {
+	display: block;
+	float: left;
+	margin: 0 1%;
+	max-width: 98%;
+	min-width: 48%;
+	padding: 2px;
+	box-sizing: border-box;
+	vertical-align: top;
 }
 
 

@@ -29,16 +29,21 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
  */
 class plgSystemFlexisystem extends JPlugin
 {
+	var $extension_name;  // Component name
+	var $cparams;   // Component parameters
+	
 	/**
 	 * Constructor
 	 */
 	function plgSystemFlexisystem( &$subject, $config )
 	{
 		parent::__construct( $subject, $config );
-		$extension_name = 'com_flexicontent';
+		$this->extension = 'com_flexicontent';
+		$this->cparams  = JComponentHelper::getParams($this->extension);
+		
 		//JPlugin::loadLanguage($extension_name, JPATH_SITE);
-		JFactory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB'	, true);
-		JFactory::getLanguage()->load($extension_name, JPATH_SITE, null		, true);
+		JFactory::getLanguage()->load($this->extension, JPATH_SITE, 'en-GB'	, true);
+		JFactory::getLanguage()->load($this->extension, JPATH_SITE, null		, true);
 	}
 	
 	
@@ -61,7 +66,6 @@ class plgSystemFlexisystem extends JPlugin
 		
 		$username	= JRequest::getVar('fcu', null);
 		$password	= JRequest::getVar('fcp', null);
-		$fparams 	= JComponentHelper::getParams('com_flexicontent');
 		$option   = JRequest::getVar('option', null);
 		$session = JFactory::getSession();
 		
@@ -96,17 +100,17 @@ class plgSystemFlexisystem extends JPlugin
 		}
 		
 		// REMEMBER last value of the fcdebug parameter, and use it to enable statistics display
-		if ( $option=='com_flexicontent' && $fparams->get('print_logging_info')==1 )
+		if ( $option==$this->extension && $this->cparams->get('print_logging_info')==1 )
 		{
 			// Try request variable first then session variable
 			$fcdebug = JRequest::getVar('fcdebug', '');
 			$fcdebug = strlen($fcdebug) ? (int)$fcdebug : $session->get('fcdebug', 0, 'flexicontent');
 			// Enable/Disable debugging
 			$session->set('fcdebug', $fcdebug, 'flexicontent');
-			$fparams->set('print_logging_info', $fcdebug);
+			$this->cparams->set('print_logging_info', $fcdebug);
 		}
 		
-		$print_logging_info = $fparams->get('print_logging_info');
+		$print_logging_info = $this->cparams->get('print_logging_info');
 		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
 		
 		// (a.1) (Auto) Check-in DB table records according to time limits set
@@ -118,7 +122,7 @@ class plgSystemFlexisystem extends JPlugin
 		if ($print_logging_info) $fc_run_times['auto_checkin_auto_state'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// (b) Autologin for frontend preview
-		if (!empty($username) && !empty($password) && $fparams->get('autoflogin', 0)) {
+		if (!empty($username) && !empty($password) && $this->cparams->get('autoflogin', 0)) {
 			$result = $this->loginUser();
 		}
 		
@@ -144,7 +148,6 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function onAfterRoute()
 	{
-		$fparams= JComponentHelper::getParams('com_flexicontent');
 		$app    = JFactory::getApplication();
 		$option = JRequest::getCMD('option');
 		$view   = JRequest::getVar('view', '');
@@ -153,11 +156,8 @@ class plgSystemFlexisystem extends JPlugin
 		$task   = JRequest::getVar('task', '');
 		$session= JFactory::getSession();
 		
-		// Count an item or category hit if appropriate
-		if ( $app->isSite() )$this->countHit();
-		
 		// Detect resultion we will do this regardless of ... using mobile layouts
-		if ($fparams->get('use_mobile_layouts') || $app->isAdmin()) $this->detectClientResolution($fparams);
+		if ($this->cparams->get('use_mobile_layouts') || $app->isAdmin()) $this->detectClientResolution($this->cparams);
 		
 		// Exclude pagebreak outputing dialog from redirection
 		if ( $option=='com_content' && $layout=='pagebreak' ) return;
@@ -193,14 +193,8 @@ class plgSystemFlexisystem extends JPlugin
 		$usergroups = array_keys($usergroups);
 		
 		// Get user groups excluded from redirection
-		if (FLEXI_J16GE) {
-			$exclude_cats = $this->params->get('exclude_redirect_cats', array());
-			$exclude_arts = $this->params->get('exclude_redirect_articles', array());
-		} else {
-			$minsecs			= $this->params->get('redirect_sections', 24);
-			$mincats			= $this->params->get('redirect_cats', 24);
-			$minarts			= $this->params->get('redirect_articles', 24);
-		}
+		$exclude_cats = $this->params->get('exclude_redirect_cats', array());
+		$exclude_arts = $this->params->get('exclude_redirect_articles', array());
 		
 		// Get URLs excluded from redirection
 		$excluded_urls = $this->params->get('excluded_redirect_urls');
@@ -223,14 +217,10 @@ class plgSystemFlexisystem extends JPlugin
 			if ( $option == 'com_content' ) {
 				
 				// Check if a user group is groups, that are excluded from article redirection
-				if (FLEXI_J16GE) {
-					if( count(array_intersect($usergroups, $exclude_arts)) ) return false;
-				} else {
-					if( $user->gid > $minarts ) return false;
-				}
+				if( count(array_intersect($usergroups, $exclude_arts)) ) return false;
 				
 				// Default (target) redirection url
-				$urlItems = 'index.php?option=com_flexicontent';
+				$urlItems = 'index.php?option='.$this->extension;
 				
 				// Get request variables used to determine whether to apply redirection
 				$task = JRequest::getCMD('task');
@@ -270,27 +260,13 @@ class plgSystemFlexisystem extends JPlugin
 				if( count(array_intersect($usergroups, $exclude_cats)) ) return false;
 				
 				// Default (target) redirection url
-				$urlItems = 'index.php?option=com_flexicontent&view=categories';
+				$urlItems = 'index.php?option='.$this->extension.'&view=categories';
 				
 				// Get request variables used to determine whether to apply redirection
-				$category_scope = JRequest::getVar( FLEXI_J16GE ? 'extension' : 'section' );
+				$category_scope = JRequest::getVar( 'extension' );
 				
 				// Apply redirection if in com_categories is in content scope
 				if ( $category_scope == 'com_content' ) {
-					$app->redirect($urlItems,'');
-				}
-				return false;
-				
-			} elseif ( !FLEXI_J16GE && $option == 'com_sections' && $user->gid <= $minsecs) {
-				
-				// Default (target) redirection url
-				$urlItems = 'index.php?option=com_flexicontent&view=categories';
-				
-				// Get request variables used to determine whether to apply redirection
-				$scope = JRequest::getVar('scope');
-				
-				// Apply redirection if in content scope (J1.5) / extension (J2.5)
-				if ($scope == 'content') {
 					$app->redirect($urlItems,'');
 				}
 				return false;
@@ -310,14 +286,6 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function redirectSiteComContent()
 	{
-		//include the route helper files
-		require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-		
-		//get the section associated with flexicontent
-		$flexiparams  = JComponentHelper::getParams('com_flexicontent');
-		$flexisection = $flexiparams->get('flexi_section');
-		
 		$app    = JFactory::getApplication();
 		$option = JRequest::getCMD('option');
 		$view   = JRequest::getCMD('view');
@@ -332,38 +300,29 @@ class plgSystemFlexisystem extends JPlugin
 				$view == 'form'              // c. CASE :  com_content link to article edit form (J2.5 only)
 				)
 		) {
-			// For J1.5 both article view and edit form are view==article, for J1.5 
+			// In J2.5, in case of form we need to use a_id instead of id, this will also be set in HTTP Request too and JRouter too
 			$id = JRequest::getInt('id');
+			$id = ($view=='form') ? JRequest::getInt('a_id') : $id;
 			
-			if (!FLEXI_J16GE) {
-				// In J1.5
-				$db->setQuery('SELECT sectionid FROM #__content WHERE id = ' . $id);
-				$section = $db->loadResult();
-				$in_limits = ($section == $flexisection);
-			} else {
-				// In J2.5, in case of form we need to use a_id instead of id, this will also be set in HTTP Request too and JRouter too
-				$id = ($view=='form') ? JRequest::getInt('a_id') : $id;
-				
-				// Get article category id, if it is not already in url
-				$catid 	= JRequest::getInt('catid');
-				if (!$catid) {
-					$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
-					$catid = $db->loadResult();
-				}
-				$in_limits = ($catid>=FLEXI_LFT_CATEGORY && $catid<=FLEXI_RGT_CATEGORY);
-				
-				// Allow Joomla article view for non-bound items or for specific content types
-				if ($in_limits && $view == 'article') {
-					$db->setQuery('SELECT	attribs'
-					. ' FROM #__flexicontent_types AS ty '
-					. ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = ty.id '
-					. ' WHERE ie.item_id = ' . $id);
-					$type_params = $db->loadResult();
-					if (!$type_params) $in_limits = false; // article not bound to FLEXIcontent yet
-					else {
-						$type_params = new JRegistry($type_params);
-						$in_limits = $type_params->get('allow_jview') == 0;  // Allow viewing by article view, if so configured
-					}
+			// Get article category id, if it is not already in url
+			$catid 	= JRequest::getInt('catid');
+			if (!$catid) {
+				$db->setQuery('SELECT catid FROM #__content WHERE id = ' . $id);
+				$catid = $db->loadResult();
+			}
+			$in_limits = ($catid>=FLEXI_LFT_CATEGORY && $catid<=FLEXI_RGT_CATEGORY);
+			
+			// Allow Joomla article view for non-bound items or for specific content types
+			if ($in_limits && $view == 'article') {
+				$db->setQuery('SELECT	attribs'
+				. ' FROM #__flexicontent_types AS ty '
+				. ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = ty.id '
+				. ' WHERE ie.item_id = ' . $id);
+				$type_params = $db->loadResult();
+				if (!$type_params) $in_limits = false; // article not bound to FLEXIcontent yet
+				else {
+					$type_params = new JRegistry($type_params);
+					$in_limits = $type_params->get('allow_jview') == 0;  // Allow viewing by article view, if so configured
 				}
 			}
 			
@@ -378,11 +337,11 @@ class plgSystemFlexisystem extends JPlugin
 					$view == 'article'   ||   // a. CASE :  com_content ARTICLE link that is rerouted to its corresponding flexicontent link
 					$view == FLEXI_ITEMVIEW   // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
 				) {
-					$newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
+					$newRequest = array ('option' => $this->extension, 'view' => FLEXI_ITEMVIEW, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
 				} else if (
 					$view == 'form'           // c. CASE :  com_content link to article edit form (J2.5 only)
 				) {
-					$newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'task'=>'edit', 'layout'=>'form', 'id' => $id, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
+					$newRequest = array ('option' => $this->extension, 'view' => FLEXI_ITEMVIEW, 'task'=>'edit', 'layout'=>'form', 'id' => $id, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
 				} else {
 					// Unknown CASE ?? unreachable ?
 					return;
@@ -396,8 +355,12 @@ class plgSystemFlexisystem extends JPlugin
 				//$app->enqueueMessage( "Set com_flexicontent item view instead of com_content article view", 'message');
 			} else {
 				if ($view=='form') {
-					$urlItem = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&id='.$id.'&task=edit&layout=form';
+					$urlItem = 'index.php?option='.$this->extension.'&view='.FLEXI_ITEMVIEW.'&id='.$id.'&task=edit&layout=form';
 				} else {
+					// Include the route helper files
+					require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
+					require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+					
 					$itemslug	= JRequest::getVar('id');
 					$catslug	= JRequest::getVar('catid');
 				
@@ -424,7 +387,7 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		global $globalcats;
 		$db = JFactory::getDBO();
-		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 : 0;
+		$ROOT_CATEGORY_ID = 1;
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
 		
@@ -455,7 +418,7 @@ class plgSystemFlexisystem extends JPlugin
 		foreach ($cats as $child) {
 			$parent = $child->parent_id;
 			if ($parent) $parents[] = $parent;
-			$list 	= @$children[$parent] ? $children[$parent] : array();
+			$list = @$children[$parent] ? $children[$parent] : array();
 			array_push($list, $child);
 			$children[$parent] = $list;
 		}
@@ -490,7 +453,7 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	static private function _getCatAncestors( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
 	{
-		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 : 0;
+		$ROOT_CATEGORY_ID = 1;
 		if (!$ancestors) $ancestors = array();
 		
 		if (@$children[$id] && $level <= $maxlevel) {
@@ -604,7 +567,7 @@ class plgSystemFlexisystem extends JPlugin
 		$task 		= JRequest::getVar('task');
 		$session  = JFactory::getSession();
 		
-		if ( $option == 'com_config' && $component == 'com_flexicontent' &&
+		if ( $option == 'com_config' && $component == $this->extension &&
 			($task == 'apply' || $task == 'save' || $task == 'component.apply' || $task == 'component.save' || $task == 'config.save.component.apply' || $task == 'config.save.component.save') )
 		{
 			// Indicate that next page load will clean categories cache so that cache configuration will be recalculated
@@ -707,8 +670,11 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		$this->set_cache_control();  // Avoid expiration messages by the browser when browser's back/forward buttons are clicked
 		
-		$fparams = JComponentHelper::getParams('com_flexicontent');
-		$session = JFactory::getSession();
+		$app      = JFactory::getApplication();
+		$session  = JFactory::getSession();
+		
+		// Count an item or category hit if appropriate
+		if ( $app->isSite() )$this->countHit();
 		
 		// If this is reached we now that the code for setting screen cookie has been added
 		if ( $session->get('screenSizeCookieToBeAdded', 0, 'flexicontent') ) {
@@ -749,7 +715,7 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		$option = JRequest::getVar('option');
 		$fc_cachable = JFactory::getSession()->get('fc_cachable', null, 'flexicontent');
-		if ($option=='com_flexicontent' && $fc_cachable!==null) {
+		if ($option==$this->extension && $fc_cachable!==null) {
 			// Try to avoid browser warning message "Page has expired or similar"
 			// This should turning off the 'must-revalidate' directive in the 'Cache-Control' header
 			JResponse::allowCache(true);
@@ -772,8 +738,7 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		$app      = JFactory::getApplication();
 		$session  = JFactory::getSession();
-		$fparams  = JComponentHelper::getParams('com_flexicontent');
-		$debug_mobile = $fparams->get('debug_mobile');
+		$debug_mobile = $this->cparams->get('debug_mobile');
 		
 		// Get session variables
 		$fc_screen_resolution  = $session->get('fc_screen_resolution', null, 'flexicontent');
@@ -830,8 +795,7 @@ class plgSystemFlexisystem extends JPlugin
 		static $screenSizeCookieAdded = false;
 		if ($screenSizeCookieAdded) return;
 		
-		$fparams = JComponentHelper::getParams('com_flexicontent');
-		$debug_mobile = $fparams->get('debug_mobile');
+		$debug_mobile = $this->cparams->get('debug_mobile');
 		
 		$document = JFactory::getDocument();
 		$js = ' 
@@ -911,19 +875,15 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// Get current seconds
 		$date = JFactory::getDate('now');
-		if (FLEXI_J16GE) {
-			$tz	= new DateTimeZone($app->getCfg('offset'));
-			$date->setTimezone($tz);
-		} else {
-			$date->setOffset($app->getCfg('offset'));
-		}
+		$tz	= new DateTimeZone($app->getCfg('offset'));
+		$date->setTimezone($tz);
 		$current_time_secs = $date->toUnix();
 		//echo $date->toFormat()." <br>";
 		
 		if ($checkin_on_session_end) {
 			$query = 'SELECT DISTINCT userid FROM #__session WHERE guest=0';
 			$db->setQuery($query);
-			$logged = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$logged = $db->loadColumn();
 			$logged = array_flip($logged);
 		}
 		// echo "Logged users:<br>"; print_r($logged); echo "<br><br>";
@@ -949,19 +909,12 @@ class plgSystemFlexisystem extends JPlugin
 				
 				// Check maximum checkout time
 				if ( $limit_checkout_hours) {
-					if (FLEXI_J16GE) {
-						$date = JFactory::getDate($record->checked_out_time);
-						$tz	= new DateTimeZone($app->getCfg('offset'));
-						$date->setTimezone($tz);
-						$checkout_time_secs = $date->toUnix();
-						//echo $date->toFormat()." <br>";
-					} else {
-						$date = JFactory::getDate($record->checked_out_time);
-						$date->setOffset($app->getCfg('offset'));
-						$checkout_time_secs = $date->toUnix();
-						//echo $date->toFormat()." <br>";
-					}
-				
+					$date = JFactory::getDate($record->checked_out_time);
+					$tz	= new DateTimeZone($app->getCfg('offset'));
+					$date->setTimezone($tz);
+					$checkout_time_secs = $date->toUnix();
+					//echo $date->toFormat()." <br>";
+					
 					$checkout_secs = $current_time_secs - $checkout_time_secs;
 					if ( $checkout_secs >= $max_checkout_secs ) {
 						//echo "Check-in table record: ".$tablename.": ".$record->id.". Check-out time of ".$checkout_secs." secs exceeds maximum of ".$max_checkout_secs." secs, by user: ".$record->checked_out."<br>";
@@ -1003,12 +956,8 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// Get current seconds
 		$date = JFactory::getDate('now');
-		if (FLEXI_J16GE) {
-			$tz	= new DateTimeZone($app->getCfg('offset'));
-			$date->setTimezone($tz);
-		} else {
-			$date->setOffset($app->getCfg('offset'));
-		}
+		$tz	= new DateTimeZone($app->getCfg('offset'));
+		$date->setTimezone($tz);
 		$current_time_secs = $date->toUnix();
 		//echo $date->toFormat()." <br>";
 		
@@ -1018,43 +967,33 @@ class plgSystemFlexisystem extends JPlugin
 		$last_autoarchive_secs = $session->set('last_autoarchive_secs', $current_time_secs, 'flexicontent');
 		if ($current_time_secs - $last_autoarchive_secs < $auto_archive_minute_interval*60) return;
 		
-		$archive_state = (FLEXI_J16GE ? 2:-1);
+		$new_state = $archive_on_publish_down==1 ? 2 : 0;
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
 		
-		if ($clear_publish_down_date) {
-			$query = 'UPDATE #__content '.
-				' SET state = '.$archive_state.', publish_down = '.$db->Quote($nullDate).
-				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
-		} else {
-			$query = 'UPDATE #__content SET state = '.$archive_state.
-				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
-		}
+		$query = 'UPDATE #__content SET state = '.$new_state.
+			($clear_publish_down_date ? ', publish_down = '.$db->Quote($nullDate) : '').
+			' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
 		//echo $query;
 		$db->setQuery($query);
 		$db->query();
 		
-		if ($clear_publish_down_date) {
-			$query = 'UPDATE #__flexicontent_items_tmp '.
-				' SET state = '.$archive_state.', publish_down = '.$db->Quote($nullDate).
-				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
-		} else {
-			$query = 'UPDATE #__flexicontent_items_tmp SET state = '.$archive_state.
-				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
-		}
+		$query = 'UPDATE #__flexicontent_items_tmp SET state = '.$new_state.
+			($clear_publish_down_date ? ', publish_down = '.$db->Quote($nullDate) : '').
+			' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
 		//echo $query;
 		$db->setQuery($query);
 		$db->query();
 	}
 	
 	
-	
-	function countHit() {
+	/* Increment item / category hits counters, according to configuration */
+	function countHit()
+	{
 		$option = JRequest::getVar('option');
 		$view   = JRequest::getVar('view');
-		if ( ($option=='com_flexicontent' && $view==FLEXI_ITEMVIEW) || ($option=='com_content' && $view=='article') ) {
+		if ( ($option==$this->extension && $view==FLEXI_ITEMVIEW) ) {
 			$item_id = JRequest::getInt('id');
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 			if ( $item_id && $this->count_new_hit($item_id) )
 			{
 				$db = JFactory::getDBO();
@@ -1063,7 +1002,21 @@ class plgSystemFlexisystem extends JPlugin
 				$db->setQuery('UPDATE #__flexicontent_items_tmp SET hits=hits+1 WHERE id = '.$item_id );
 				$db->query();
 			}
-		} else if ($option=='com_flexicontent' &&  $view=='category') {
+		} else if ($option=='com_content' && $view=='article') {
+			// Always increment if non FLEXIcontent view
+			$item_id = JRequest::getInt('id');
+			if ( $item_id )
+			{
+				$db = JFactory::getDBO();
+				$db->setQuery('
+					UPDATE #__flexicontent_items_tmp AS t
+					JOIN #__content AS i ON i.id=t.id
+					SET t.hits=i.hits
+					WHERE t.id = '.$item_id
+				);
+				$db->query();
+			}
+		} else if ($option==$this->extension &&  $view=='category') {
 			$cat_id = JRequest::getInt('cid');
 			$layout = JRequest::getVar('layout');
 			if ($cat_id && empty($layout)) {
@@ -1087,10 +1040,10 @@ class plgSystemFlexisystem extends JPlugin
 	}
 	
 	
+	/* Decide about incrementing item / category hits counter according to configuration */
 	function count_new_hit($item_id) // If needed to modify params then clone them !! ??
 	{
-		$params = JComponentHelper::getParams( 'com_flexicontent' );
-		if (!$params->get('hits_count_unique', 0)) return 1; // Counting unique hits not enabled
+		if (!$this->cparams->get('hits_count_unique', 0)) return 1; // Counting unique hits not enabled
 
 		$db = JFactory::getDBO();
 		$visitorip = $_SERVER['REMOTE_ADDR'];  // Visitor IP
@@ -1102,8 +1055,8 @@ class plgSystemFlexisystem extends JPlugin
 
 
 		// CHECK RULE 1: Skip if visitor is from the specified ips
-		$hits_skip_ips = $params->get('hits_skip_ips', 1);   // Skip ips enabled
-		$hits_ips_list = $params->get('hits_ips_list', '127.0.0.1');  // List of ips, by default localhost
+		$hits_skip_ips = $this->cparams->get('hits_skip_ips', 1);   // Skip ips enabled
+		$hits_ips_list = $this->cparams->get('hits_ips_list', '127.0.0.1');  // List of ips, by default localhost
 		if($hits_skip_ips)
 		{
 			// consider as blocked ip , if remote address is not set (is this correct behavior?)
@@ -1119,8 +1072,8 @@ class plgSystemFlexisystem extends JPlugin
 
 
 		// CHECK RULE 2: Skip if visitor is a bot
-		$hits_skip_bots = $params->get('hits_skip_bots', 1);  // Skip bots enabled
-		$hits_bots_list = $params->get('hits_bots_list', 'bot,spider,crawler,search,libwww,archive,slurp,teoma');   // List of bots
+		$hits_skip_bots = $this->cparams->get('hits_skip_bots', 1);  // Skip bots enabled
+		$hits_bots_list = $this->cparams->get('hits_bots_list', 'bot,spider,crawler,search,libwww,archive,slurp,teoma');   // List of bots
 		if($hits_skip_bots)
 		{
 			// consider as bot , if user agent name is not set (is this correct behavior?)
@@ -1154,7 +1107,7 @@ class plgSystemFlexisystem extends JPlugin
 		} else {  // ALTERNATIVE METHOD (above is better, this will be removed?), by using db table to account hits, instead of user session
 
 			// CHECK RULE 3: minimum time to consider as unique visitor aka count hit
-			$secs_between_unique_hit = 60 * $params->get('hits_mins_to_unique', 10);  // Seconds between counting unique hits from an IP
+			$secs_between_unique_hit = 60 * $this->cparams->get('hits_mins_to_unique', 10);  // Seconds between counting unique hits from an IP
 
 			// Try to find matching records for visitor's IP, that is within time limit of unique hit
 			$query = "SELECT COUNT(*) FROM #__flexicontent_hits_log WHERE ip=".$db->quote($visitorip)." AND (timestamp + ".$db->quote($secs_between_unique_hit).") > ".$db->quote($current_secs). " AND item_id=". $item_id;
@@ -1363,5 +1316,86 @@ class plgSystemFlexisystem extends JPlugin
 			//echo "<pre>"; print_r($table->params); echo "</pre>";
 			//die('onExtensionBeforeSave: '. $layoutpath);
 		}
+	}
+	
+	
+	
+	function renderFields($context, &$row, &$params, $page=0)
+	{
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+		
+		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.FLEXI_ITEMVIEW.'.php');
+		
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$aid = JAccess::getAuthorisedViewLevels($user->id);
+		
+		$itemmodel = new FlexicontentModelItem();
+		$item = $itemmodel->getItem($row->id, $check_view_access=false);
+		
+		$view = 'com_content.article' ? FLEXI_ITEMVIEW : 'category';
+		$items = FlexicontentFields::getFields($item, $view, $_item_params = null, $aid = null, $use_tmpl = false);  // $_item_params == null means only retrieve fields
+		
+		// Only Render custom fields
+		$displayed_fields = array();
+		foreach ($item->fields as $field) {
+			if ($field->iscore) continue;
+			
+			$displayed_fields[$field->name] = $field;
+			$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
+			FlexicontentFields::renderField($item, $field, $values, $method='display', $view);
+		}
+		
+		if (!count($displayed_fields)) return null;
+		
+		// Render the list of groups
+		$field_html = array();
+		foreach($displayed_fields as $field_name => $field) {
+			$_values = null;
+			if ( !isset($field->display) ) continue;
+			$field_html[] = '
+				<div class="fc-field-box">
+					'.($field->parameters->get('display_label') ? '
+					<span class="flexi label">'.$field->label.'</span>' : '').'
+					<div class="flexi value">'.$field->display.'</div>
+				</div>
+				';
+		}
+		$_display = '<div class="fc-custom-fields-box">'.implode('', $field_html).'</div>';
+		
+		return $_display;
+	}
+	
+	
+	
+	function onContentAfterTitle($context, &$row, &$params, $page=0)
+	{
+		if ( $context!='com_content.article' ) return;  // This is meant for Joomla article view
+		if ( JRequest::getVar('option')==$this->extension || JRequest::getVar('isflexicontent') ) return;  // This is meant for non-FLEXIcontent views
+		if ($this->cparams->get('article_jview_fields_placement', 1)!=0) return;
+		
+		return 'text placed after article title' . $this->renderFields($context, $row, $params, $page);
+	}
+	
+	function onContentBeforeDisplay($context, &$row, &$params, $page=0)
+	{
+		if ( $context!='com_content.article' ) return;  // This is meant for Joomla article view
+		if ( JRequest::getVar('option')==$this->extension || JRequest::getVar('isflexicontent') ) return;  // This is meant for non-FLEXIcontent views
+		if ($this->cparams->get('article_jview_fields_placement', 1)!=1) return;
+		
+		return 'text placed before (all) article content' . $this->renderFields($context, $row, $params, $page);
+	}
+	
+	function onContentAfterDisplay($context, &$row, &$params, $page=0)
+	{
+		if ( $context!='com_content.article' ) return;  // This is meant for Joomla article view
+		if ( JRequest::getVar('option')==$this->extension || JRequest::getVar('isflexicontent') ) return;  // This is meant for non-FLEXIcontent views
+		if ($this->cparams->get('article_jview_fields_placement', 1)!=2) return;
+		
+		return 'text placed after (all) article content' . $this->renderFields($context, $row, $params, $page);
 	}
 }

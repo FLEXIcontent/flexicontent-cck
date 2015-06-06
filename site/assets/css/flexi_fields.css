@@ -2,16 +2,18 @@
 /* FLEXIContent FIELD */
 /**********************/
 
-/* FIELD: List of orderable value containers */
+/* FIELD: List container of sortable values */
 #flexicontent ul.fcfield-sortables {
 	display: inline-block;
 	list-style: none !important;
 	position: static;
 	width: auto;
 	float: left;
-	padding: 0% !important;
-	margin: 0% !important;
+	padding: 0% !important;  /* FORCED */
+	margin: 0% !important;  /* FORCED */
 }
+
+
 /* FIELD: value containers */
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox, /* multiple values (li, orderable) */
 #flexicontent div.fcfieldval_container.valuebox  /* single value (div) */
@@ -26,11 +28,13 @@
 	padding: 4px;
 	float: left;
 }
-/* FIELD: multiple-value container */
+
+
+/* FIELD: multiple-value (sortable) container */
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox {
 	list-style: none !important;
 }
-/* FIELD: multiple-value container (not cleared) */
+/* FIELD: multiple-value (sortable) container (not cleared) */
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.floated {
 	clear: none;
 }
@@ -38,16 +42,44 @@
 #flexicontent div.fcfieldval_container.valuebox {
 }
 
-/* FIELD: special cases alignment, etc */
-#flexicontent .fcfield-sortables > li .input-append,
-#flexicontent .fcfield-sortables > li .input-prepend { float: left; margin-bottom: 0px; }
-#flexicontent .fcfield-sortables > li .input-append { margin-right: 10px; }
-#flexicontent .fcfield-sortables > li .use_select2_lib { vertical-align: top; }
-#flexicontent .fcfield-sortables > li > * { vertical-align: top; }
-#flexicontent .fcfield-sortables > li > [class^="fcfield-"],
-#flexicontent .fcfield-sortables > li > [class*=" fcfield-"] { cursor: pointer; }
 
-/* FIELD-GROUP: list of value containers */
+/* FIELD: (sortable) special cases alignment, etc */
+#flexicontent ul.fcfield-sortables > li .input-append,
+#flexicontent ul.fcfield-sortables > li .input-prepend { float: left; margin-bottom: 0px; }
+#flexicontent ul.fcfield-sortables > li .input-append { margin-right: 10px; }
+#flexicontent ul.fcfield-sortables > li .use_select2_lib { vertical-align: top; }
+#flexicontent ul.fcfield-sortables > li > * { vertical-align: top; }
+#flexicontent ul.fcfield-sortables > li > [class^="fcfield-"],
+#flexicontent ul.fcfield-sortables > li > [class*=" fcfield-"] { cursor: pointer; }
+
+/* FIELD: (sortable) having multi-property value displayed in a table */
+#flexicontent ul.fcfield-sortables > li table.admintable {
+	text-align: left;
+	width: 100%;
+}
+
+
+/* FIELD: (sortable) value container while dragging */
+#flexicontent ul.fcfield-sortables > li.ui-sortable-helper {
+	background-color: white !important;
+	border-radius: 4px;
+	border: 1px solid #d0d0d0 !important;
+	moz-box-shadow: 10px 10px 5px rgba(0,0,0,.5);
+	-webkit-box-shadow: 10px 10px 5px rgba(0,0,0,.5);
+	box-shadow: 10px 10px 5px rgba(0,0,0,.5);
+}
+
+
+/* FIELD: (sortable) currently having single value, disable drag handle */
+#flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle {
+	cursor: default !important;
+	background: url(../images/move3.png) 4px 4px no-repeat white;
+	border: 1px solid lightgray;
+}
+
+
+
+/* FIELD-GROUP: list container of sortable values */
 #flexicontent ul.fcfield-sortables.fcfield-group {
 	width: 100%;
 }
@@ -89,6 +121,7 @@
 	clear:none;
 	display:inline-block;
 }
+
 
 
 /* FIELDs: various buttons */
@@ -145,6 +178,7 @@
 	background-image: linear-gradient(to bottom, green, darkgreen);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=green, endColorstr=darkgreen);
 }
 
+
 /* FIELDs: ADD link container */
 #flexicontent .fcfield-button-add {
 	/* allow only explicitely coded override, since normally style must be done only at the inner link */
@@ -153,19 +187,19 @@
 	margin: 0px !important;
 	padding: 0px !important;
 }
-/* FIELDs: ADD link (inner) */
+/* FIELDs: ADD link */
 /* we do not want joomla template link styling here !!!, allow only explicitly coded override */
 #flexicontent .fcfield-button-add a { 
 	padding: 6px 8px;
 	margin: 0px 2px 0px 6px;
-	text-decoration: none!important;
-	background-color: white!important;
-	color: gray!important;
+	text-decoration: none !important;
+	background-color: white !important;
+	color: gray !important;
 }
 #flexicontent .fcfield-button-add:hover a { 
-	background-color: darkgreen!important;
-	color: white!important;
-	border: 1px solid transparent;
+	background-color: darkgreen !important;
+	color: white !important;
+	border: 1px solid transparent !important;
 }
 
 
@@ -249,7 +283,45 @@
 	color: white;
 }
 
-/* ... for compatibility, TO BE REMOVED ? */
+
+/* FIELDs: (image field) Empty image container */
+div.empty_image {
+	display: block;
+	background: #F9F9F9 url(../images/image_add.png) no-repeat 50% 50%;
+	border:1px solid silver;
+	margin-bottom:3px;
+	word-wrap: break-word;
+}
+/* FIELDs: (image field) preview image container */
+.fcimg_preview_box {
+	float:left!important;
+	clear:none!important;
+	margin-right:5px!important;
+}
+/* FIELDs: (image field) preview image */
+.fcimg_preview_box img.preview_image {
+	border-radius: 4px;
+	border: 1px solid gray;
+}
+
+
+/* FIELDs: (compatibility) ADD button used by some OLD fields */
+.button-add a {
+	display: inline-block;
+	padding: 1px 8px;
+	border: 1px solid #ccc;
+	background: #efefef;
+}
+.button-add a,
+.button-add a:visited,
+.button-add a:link,
+.button-add a:hover {
+	color: black;
+	text-decoration: none;
+}
+
+
+/* FIELDs: (compatibility) DRAG button used by some OLD fields */
 #flexicontent .fcfield-drag {
 	float:none !important; /* do not override breaks dragging */
 	margin:0px; padding:0px;
@@ -264,28 +336,4 @@
 	float: none !important;
 	display: inline !important;
 	background-color: white;
-}
-
-.fcimg_preview_box img.preview_image {
-	border-radius: 4px;
-	border: 1px solid gray;
-}
-
-
-#flexicontent ul.fcfield-sortables > li table.admintable {
-	text-align: left;
-	width: 100%;
-}
-#flexicontent ul.fcfield-sortables > li.ui-sortable-helper {  /* while dragging */
-	background-color: white !important;
-	border-radius: 4px;
-	border: 1px solid #d0d0d0 !important;
-	moz-box-shadow: 10px 10px 5px rgba(0,0,0,.5);
-	-webkit-box-shadow: 10px 10px 5px rgba(0,0,0,.5);
-	box-shadow: 10px 10px 5px rgba(0,0,0,.5);
-}
-#flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle { /* disable only child */
-	cursor: default !important;
-	background: url(../images/move3.png) 4px 4px no-repeat white;
-	border: 1px solid lightgray;
 }

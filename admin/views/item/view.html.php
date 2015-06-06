@@ -510,12 +510,10 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 		
 		// Retrieve author configuration
-		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-		if ( $authorparams = $db->loadResult() )
-			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
-
+		$authorparams = flexicontent_db::getUserConfig($user->id);
+		
 		// Get author's maximum allowed categories per item and set js limitation
-		$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
+		$max_cat_assign = intval($authorparams->get('max_cat_assign',0));
 		$document->addScriptDeclaration('
 			max_cat_assign_fc = '.$max_cat_assign.';
 			existing_cats_fc  = ["'.implode('","',$selectedcats).'"];

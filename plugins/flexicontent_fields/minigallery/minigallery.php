@@ -252,11 +252,11 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		// Add button for popup file selection
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
 		$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$n.'&amp;autoselect='.$autoselect.'&amp;field='.$field->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
-		$field->html .= "
-			<span class=\"fcfield-button-add\">
-				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
+		$field->html .= '
+			<span class="fcfield-button-add">
+				<a class="modal_'.$field->id.'" title="'.JText::_( 'FLEXI_ADD_FILE' ).'" href="'.$linkfsel.'" rel="{handler: \'iframe\', size: {x:(MooTools.version>=\'1.2.4\' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>=\'1.2.4\' ? window.getSize().y : window.getSize().size.y)-100}}">'.JText::_( 'FLEXI_ADD_FILE' ).'</a>
 			</span>
-				";
+			';
 		
 		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
 	}

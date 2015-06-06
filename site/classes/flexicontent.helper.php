@@ -251,20 +251,21 @@ class flexicontent_html
 	 * @return 	string  : the HTML of the item view, also the CSS / JS file would have been loaded
 	 * @since 1.5
 	 */
-	function renderItem($item_id, $view=FLEXI_ITEMVIEW, $ilayout='') {
-		require_once (JPATH_ADMINISTRATOR.DS.'components/com_flexicontent/defineconstants.php');
+	function renderItem($item_id, $view=FLEXI_ITEMVIEW, $ilayout='')
+	{
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		require_once("components/com_flexicontent/classes/flexicontent.fields.php");
-		//require_once("components/com_flexicontent/classes/flexicontent.helper.php");
-		require_once("components/com_flexicontent/models/".FLEXI_ITEMVIEW.".php");
-
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.FLEXI_ITEMVIEW.'.php');
+		
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		
-		$itemmodel = FLEXI_J16GE ? new FlexicontentModelItem() : new FlexicontentModelItems();
+		$itemmodel = new FlexicontentModelItem();
 		$item = $itemmodel->getItem($item_id, $check_view_access=false);
-
-		$aid = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id) : (int) $user->get('aid');
+		
+		$aid = JAccess::getAuthorisedViewLevels($user->id);
 		list($item) = FlexicontentFields::getFields($item, $view, $item->parameters, $aid);
 		
 		// Get Item's specific ilayout

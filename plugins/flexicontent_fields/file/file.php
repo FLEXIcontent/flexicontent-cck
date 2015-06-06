@@ -544,10 +544,10 @@ class plgFlexicontent_fieldsFile extends FCField
 				$_tooltip_title   = '';
 				$_tooltip_content = '%s '.JText::_( 'FLEXI_HITS', true );
 				$_attribs = FLEXI_J30GE ?
-					'class="hasTooltip icon-hits" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"' :
-					'class="hasTip icon-hits" title="'.$_tooltip_title.'::'.$_tooltip_content.'"';
+					'class="hasTooltip fcicon-hits" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"' :
+					'class="hasTip fcicon-hits" title="'.$_tooltip_title.'::'.$_tooltip_content.'"';
 			} else {
-				$_attribs = ' class="icon-hits"';
+				$_attribs = ' class="fcicon-hits"';
 			}
 			
 			$hits_icon = JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) . ' ';
@@ -595,8 +595,8 @@ class plgFlexicontent_fieldsFile extends FCField
 				$_tooltip_title   = '';
 				$_tooltip_content = JText::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
 				$icon = FLEXI_J30GE ?
-					JHTML::image($file_data->icon, $file_data->ext, 'class="icon-mime hasTooltip" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"'):
-					JHTML::image($file_data->icon, $file_data->ext, 'class="icon-mime hasTip" title="'.$_tooltip_title.'::'.$_tooltip_content.'"');
+					JHTML::image($file_data->icon, $file_data->ext, 'class="fcicon-mime hasTooltip" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"'):
+					JHTML::image($file_data->icon, $file_data->ext, 'class="fcicon-mime hasTip" title="'.$_tooltip_title.'::'.$_tooltip_content.'"');
 				$icon = '<span class="fcfile_mime">'.$icon.'</span>';
 			}
 			
@@ -612,10 +612,10 @@ class plgFlexicontent_fieldsFile extends FCField
 						$_tooltip_title   = JText::_( 'FLEXI_LANGUAGE', true );
 						$_tooltip_content = $file_data->language=='*' ? JText::_("All") : $langs->{$file_data->language}->name;
 						$_attribs = FLEXI_J30GE ?
-							'class="hasTooltip icon-lang" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"' :
-							'class="hasTip icon-lang" title="'.$_tooltip_title.'::'.$_tooltip_content.'"';
+							'class="hasTooltip fcicon-lang" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"' :
+							'class="hasTip fcicon-lang" title="'.$_tooltip_title.'::'.$_tooltip_content.'"';
 					} else {
-						$_attribs = ' class="icon-lang"';
+						$_attribs = ' class="fcicon-lang"';
 					}
 					$lang .= "\n".'<img src="'.$langs->{$file_data->language}->imgsrc.'" '.$_attribs.' /> ';
 				}

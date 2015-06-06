@@ -60,7 +60,8 @@ class FlexicontentFields
 			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
 			. ' WHERE i.id IN ('. $item_ids_list .')'
-			. ' GROUP BY i.id';
+			//. ' GROUP BY i.id'
+			;
 		$db->setQuery($query);
 		$items = $db->loadObjectList();
 		if (empty($items)) return false;
@@ -119,11 +120,7 @@ class FlexicontentFields
 		}
 		
 		// Calculate access for current user if it was not given or if given access is invalid
-		if (FLEXI_J16GE) {
-			$aid = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
-		} else {
-			$aid = $aid!==false ? (int) $aid : (int) $user->get('aid');
-		}
+		$aid = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
 		
 		// Apply cache to public (unlogged) users only 
 		/*$apply_cache = !$user->id && FLEXI_CACHE;
@@ -145,7 +142,6 @@ class FlexicontentFields
 			// ... now retrieved CACHED ... code removed ...
 		}*/
 		
-		// @TODO : move to the constructor
 		// This is optimized regarding the use of SINGLE QUERY to retrieve the core item data
 		$vars['tags']       = FlexicontentFields::_getTags($items, $view);
 		$vars['cats']       = FlexicontentFields::_getCategories($items, $view);
@@ -165,13 +161,13 @@ class FlexicontentFields
 		if ($params)  // NULL/empty parameters mean only retrieve field values
 		{
 			$always_create_fields_display = $cparams->get('always_create_fields_display',0);
-			$flexiview = JRequest::getVar('view');
+			$request_view = JRequest::getVar('view');
 			
 			// CHECK if 'always_create_fields_display' enabled and create the display for all item's fields
 			// *** This should be normally set to ZERO (never), to avoid a serious performance penalty !!!
 			
 			// 0: never, 1: always, 2: only in item view, 3: never unless in a template position,  this effects function:  renderPositions()
-			if ($always_create_fields_display==1 || ($always_create_fields_display==2 && $flexiview==FLEXI_ITEMVIEW && $view==FLEXI_ITEMVIEW) )
+			if ($always_create_fields_display==1 || ($always_create_fields_display==2 && $request_view==FLEXI_ITEMVIEW && $view==FLEXI_ITEMVIEW) )
 			{
 				$field_names = array();
 				foreach ($items as $i => $item)
@@ -309,7 +305,6 @@ class FlexicontentFields
 		
 		static $type_fields = array();
 		
-		$mainframe  = JFactory::getApplication();
 		$dispatcher = JDispatcher::getInstance();
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
@@ -351,9 +346,15 @@ class FlexicontentFields
 				$type_fields[$item->type_id] = $db->loadObjectList('name');
 				//echo "<pre>";  print_r( array_keys($type_fields[$item->type_id]) ); exit;
 			}
+			
 			$item->fields = array();
-			if ($type_fields[$item->type_id]) foreach($type_fields[$item->type_id] as $field_name => $field_data)
-				$item->fields[$field_name]	= clone($field_data);
+			if ($type_fields[$item->type_id])
+			{
+				foreach($type_fields[$item->type_id] as $field_name => $field_data)
+				{
+					$item->fields[$field_name] = clone($field_data);
+				}
+			}
 			$item->fields	= $item->fields	? $item->fields	: array();
 			
 			if (!isset($item->parameters)) $item->parameters = new JRegistry($item->attribs);
@@ -476,18 +477,20 @@ class FlexicontentFields
 	{
 		static $_trigger_plgs_ft = array();
 		static $_created = array();
-		$flexiview = JRequest::getVar('view');
+		$request_view = JRequest::getVar('view');
 		
 		// field's source code, can use this JRequest variable, to detect who rendered the fields (e.g. they can detect rendering from 'module')
 		JRequest::setVar("flexi_callview", $view);
 		
 		static $cparams = null;
-		if ($cparams === null) $cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		if ($cparams === null) {
+			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		}
 		
 		static $aid;
 		if ($aid === null) {
 			$user = JFactory::getUser();
-			$aid = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id) : (int) $user->get('aid');
+			$aid = JAccess::getAuthorisedViewLevels($user->id);
 		}
 		
 		if (is_array($_item) && is_string($_field)) ;  // ok
@@ -613,7 +616,7 @@ class FlexicontentFields
 				$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
 				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array(&$field, $item, null, $method) );
-				if ($field->parameters->get('use_ingroup', 0) && is_array($field->$method)) $field->$method = implode('', $field->$method);
+				if ($field->parameters->get('use_ingroup', 0) && empty($field->ingroup) && is_array($field->$method)) $field->$method = implode('', $field->$method);
 			}
 		}
 		if ($print_logging_info) {
@@ -641,7 +644,7 @@ class FlexicontentFields
 		}
 		if ( !isset($_trigger_plgs_ft[$field_name]) ) {
 			$_t = $field->parameters->get('trigger_onprepare_content', 0);
-			if ($flexiview=='category' && $view=='category') $_t = $_t && $field->parameters->get('trigger_plgs_incatview', 1);
+			if ($request_view=='category' && $view=='category') $_t = $_t && $field->parameters->get('trigger_plgs_incatview', 1);
 			$_trigger_plgs_ft[$field_name] = $_t;
 		}
 		
@@ -805,19 +808,21 @@ class FlexicontentFields
 
 		if ( $use_tmpl && ($view == 'category' || $view == FLEXI_ITEMVIEW) ) {
 		  $fbypos = flexicontent_tmpl::getFieldsByPositions($params->get($layout, 'default'), $view);
+		  //$onDemandOnly = false;
 		} else { // $view == 'module', or other
 			// Create a fake template position, for fields defined via parameters
 		  $fbypos[0] = new stdClass();
 		  $fbypos[0]->fields = explode(',', $params->get('fields'));
 		  $fbypos[0]->methods = explode(',', $params->get('methods'));
 		  $fbypos[0]->position = $view;
+		  //$onDemandOnly = true;
 		}
 		
 		$always_create_fields_display = $params->get('always_create_fields_display',0);
 		
 		// Render some fields by default, this is done for compatibility reasons, but avoid rendering these fields again (2nd time),
 		// since some of them may also be in template positions. NOTE: this is not needed since renderField() should detect this case
-		if ($always_create_fields_display != 3) { // value 3 means never create for any view (blog template incompatible)
+		if ( /*!$onDemandOnly &&*/  $always_create_fields_display != 3) { // value 3 means never create for any view (blog template incompatible)
 			
 			$item = reset($items); // get the first item ... so that we can get the name of CORE fields out of it
 			
@@ -2422,8 +2427,6 @@ class FlexicontentFields
 		static $apply_cache = null;
 		static $faceted_overlimit_msg = null;
 		$user = JFactory::getUser();
-		$mainframe = JFactory::getApplication();
-		//$cparams   = $mainframe->getParams('com_flexicontent');
 		$cparams   = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
 		$print_logging_info = $cparams->get('print_logging_info');
 		
@@ -3310,24 +3313,9 @@ class FlexicontentFields
 		// Use ACCESS Level, usually this is only for shown filters
 		$and_access = '';
 		if ($check_access) {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$and_access = ' AND fi.access IN (0,'.$aid_list.') ';
-			} else {
-				$aid = (int) $user->get('aid');
-				
-				if (FLEXI_ACCESS) {
-					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-					if (isset($readperms['field']) && count($readperms['field']) ) {
-						$and_access = ' AND ( fi.access <= '.$aid.' OR fi.id IN ('.implode(",", $readperms['field']).') )';
-					} else {
-						$and_access = ' AND fi.access <= '.$aid;
-					}
-				} else {
-					$and_access = ' AND fi.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$and_access = ' AND fi.access IN (0,'.$aid_list.') ';
 		}
 		
 		// Create and execute SQL query for retrieving filters

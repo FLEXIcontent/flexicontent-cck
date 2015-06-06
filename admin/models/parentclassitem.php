@@ -1585,9 +1585,7 @@ class ParentClassItem extends JModelAdmin
 		// *****************************
 		// Retrieve author configuration
 		// *****************************
-		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-		if ( $authorparams = $db->loadResult() )
-			$authorparams = new JRegistry($authorparams);
+		$authorparams = flexicontent_db::getUserConfig($user->id);
 		
 		// At least one category needs to be assigned
 		if (!is_array( $cats ) || count( $cats ) < 1) {
@@ -1599,7 +1597,7 @@ class ParentClassItem extends JModelAdmin
 		} else {
 			
 			// Get author's maximum allowed categories per item and set js limitation
-			$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
+			$max_cat_assign = intval($authorparams->get('max_cat_assign',0));
 			
 			// Verify category limitation for current author
 			if ( $max_cat_assign ) {
@@ -1796,7 +1794,7 @@ class ParentClassItem extends JModelAdmin
 		// ***********************************************************
 		// SECURITY concern: Check form tampering of allowed languages
 		// ***********************************************************
-		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		$allowed_langs = $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
 		if ( $allowed_langs && isset($data['language']) && !in_array($data['language'], $allowed_langs) ) {

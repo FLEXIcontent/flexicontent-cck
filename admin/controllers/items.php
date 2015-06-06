@@ -1306,10 +1306,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			// Get User Group / Author parameters
 			$db = JFactory::getDBO();
-			$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-			$authorparams = $db->loadResult();
-			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
-			$max_auth_limit = $authorparams->get('max_auth_limit', 0);  // maximum number of content items the user can create
+			$authorparams = flexicontent_db::getUserConfig($user->id);
+			$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // maximum number of content items the user can create
 			
 			// B. Check if max authored content limit reached
 			if ($max_auth_limit) {

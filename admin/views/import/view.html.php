@@ -171,11 +171,9 @@ class FlexicontentViewImport extends JViewLegacy
 		
 		//build languages list
 		// Retrieve author configuration
-		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-		if ( $authorparams = $db->loadResult() )
-			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
-
-		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		$authorparams = flexicontent_db::getUserConfig($user->id);
+		
+		$allowed_langs = $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags

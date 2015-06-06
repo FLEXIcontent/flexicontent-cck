@@ -1577,7 +1577,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				if (!$urllink) {
 					// CASE: Just image thumbnail since url link is empty
-					$field->{$prop}[] = $pretext.$img_legend.$inline_info.$posttext;
+					$field->{$prop}[] = $pretext.'<div class="fc_img_container">'.$img_legend.$inline_info.'</div>'.$posttext;
 				}
 				
 				else if ($url_target=='multibox') {
