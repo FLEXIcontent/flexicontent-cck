@@ -2142,7 +2142,7 @@ class flexicontent_html
 	{
 		//sql calculation doesn't work with negative values and thus only minus votes will not be taken into account
 		if ($item->votes == 0) {
-			return JText::_( 'FLEXI_NOT_YET_RATED' );
+			return '<span class="badge">'.JText::_( 'FLEXI_NOT_YET_RATED' ).'</span>';
 		}
 
 		//we do the rounding here and not in the query to get better ordering results

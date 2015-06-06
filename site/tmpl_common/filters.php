@@ -9,11 +9,11 @@ $filter_instructions = $params->get('filter_instructions', 1);
 $filter_placement = $params->get( 'filter_placement', 1 );
 
 $flexi_button_class_go =  ($params->get('flexi_button_class_go' ,'') != '-1')  ?
-    $params->get('flexi_button_class_go' , 'btn')   :
+    $params->get('flexi_button_class_go' , 'btn btn-success')   :
     $params->get('flexi_button_class_go_custom', (FLEXI_J30GE ? 'btn btn-success' : 'fc_button'))  ;
 $flexi_button_class_reset =  ($params->get('flexi_button_class_reset','') != '-1')  ?
     $params->get('flexi_button_class_reset', 'btn')   :
-    $params->get('flexi_button_class_reset_custom', (FLEXI_J30GE ? 'btn btn-success' : 'fc_button'))  ;
+    $params->get('flexi_button_class_reset_custom', (FLEXI_J30GE ? 'btn' : 'fc_button'))  ;
 
 $filters_in_lines = $filter_placement==1 || $filter_placement==2;
 $filters_in_tabs  = $filter_placement==3;
@@ -121,14 +121,14 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 					<?php if ( $filter_placement && ($show_search_go || $show_search_reset) ) : ?>
 					<span class="fc_buttons">
 						<?php if ($show_search_go) : ?>
-						<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;">
-							<span title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>"><?php echo JText::_( 'FLEXI_GO' ); ?></span>
+						<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>">
+							<span class="icon-search"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
 						</button>
 						<?php endif; ?>
 						
 						<?php if ($show_search_reset) : ?>
-						<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;">
-							<span title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>"><?php echo JText::_( 'FLEXI_RESET' ); ?></span>
+						<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
+							<span class="icon-remove"></span><?php echo JText::_( 'FLEXI_RESET' ); ?>
 						</button>
 						<?php endif; ?>
 						

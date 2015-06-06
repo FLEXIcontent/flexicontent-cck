@@ -160,7 +160,9 @@ $r = 0;
 						<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>					
 						
 						<?php $button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple'; ?>
-						<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
+						<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
+							<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
+						</button>
 						
 						<?php if ($autodisplayadvoptions) {
 							$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
@@ -168,7 +170,7 @@ $r = 0;
 							$use_advsearch_options_ff = '&nbsp;';
 							$use_advsearch_options_ff .= '<input type="checkbox" id="use_advsearch_options" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="jQuery(this).next().toggleClass(\'btn-primary\');" />';
 							$use_advsearch_options_ff .= '<label id="use_advsearch_options_lbl" class="btn '.$checked_class.'" for="use_advsearch_options">';
-							$use_advsearch_options_ff .= JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS');
+							$use_advsearch_options_ff .= '<span class="icon-list"></span>'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS');
 							$use_advsearch_options_ff .= '</label>';
 							echo $use_advsearch_options_ff;
 						} ?>

@@ -149,7 +149,7 @@ $items	= & $this->items;
 <input type="hidden" name="task" value="" />
 </form>
 
-<table class="flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' ).' '; ?>">
+<table id="flexitable" class="flexitable" summary="<?php echo JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' ).' '; ?>">
 	<thead>
 		<tr>
 			<?php if ($use_image) : ?>

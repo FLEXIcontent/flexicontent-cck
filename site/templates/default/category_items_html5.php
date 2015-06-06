@@ -119,7 +119,7 @@ endif;
 ?>
 
 
-<table id="flexitable" class="flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo @$this->category->name; ?>">
+<table id="flexitable" class="flexitable" summary="<?php echo @$this->category->name; ?>">
 	<?php if ($this->params->get('show_field_labels_row', 1)) : ?>
 	<thead>
 		<tr>
