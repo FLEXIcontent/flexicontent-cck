@@ -111,8 +111,8 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 }
 /* highlight labels of active filters*/
 #flexicontent ul.tabbernav li a.tabberheading.fc_filter_inactive {}
-#flexicontent ul.tabbernav li a.tabberheading.fc_filter_active { color:orange!important; }
-#flexicontent ul.tabbernav li:hover a.tabberheading.fc_filter_active { color:red!important; }
+#flexicontent ul.tabbernav li a.tabberheading.fc_filter_active { color:orange; }
+#flexicontent ul.tabbernav li:hover a.tabberheading.fc_filter_active { color:red; }
 
 /* handle input append / prepend */
 .fc_filter_html .input-append,

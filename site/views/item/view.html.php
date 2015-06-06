@@ -516,7 +516,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		// Fields common CSS
-		$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexi_fields.css');
+		$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexi_form_fields.css');
 		
 		// Load backend / frontend shared and Joomla version specific CSS (different for frontend / backend)
 		FLEXI_J30GE ?
