@@ -29,17 +29,17 @@ class flexicontent_html
 {
 	static function get_system_messages_html($add_containers=false)
 	{
-		$msgList = array();  // Initialise variables.
+		$msgsByType = array();  // Initialise variables.
 		$messages = JFactory::getApplication()->getMessageQueue();  // Get the message queue
 
 		// Build the sorted message list
 		if (is_array($messages) && !empty($messages)) {
 			foreach ($messages as $msg) {
-				if (isset($msg['type']) && isset($msg['message'])) $msgList[$msg['type']][] = $msg['message'];
+				if (isset($msg['type']) && isset($msg['message'])) $msgsByType[$msg['type']][] = $msg['message'];
 			}
 		}
 		
-		$alert = array('error' => 'alert-error', 'warning' => '', 'notice' => 'alert-info', 'message' => 'alert-success');
+		$alert_class = array('error' => 'alert-error', 'warning' => 'alert-warning', 'notice' => 'alert-info', 'message' => 'alert-success');
 		ob_start();
 	?>
 <?php if ($add_containers) : ?>
@@ -48,10 +48,10 @@ class flexicontent_html
 		<div id="system-message-container">
 <?php endif; ?>
 			<div id="fc_ajax_system_messages">
-			<?php if (is_array($msgList) && $msgList) : ?>
+			<?php if (is_array($msgsByType) && $msgsByType) : ?>
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
-				<?php foreach ($msgList as $type => $msgs) : ?>
-					<div class="alert <?php echo $alert[$type]; ?>">
+				<?php foreach ($msgsByType as $type => $msgs) : ?>
+					<div class="alert <?php echo $alert_class[$type]; ?>">
 						<h4 class="alert-heading"><?php echo JText::_($type); ?></h4>
 						<?php if ($msgs) : ?>
 							<?php foreach ($msgs as $msg) : ?>
@@ -2171,12 +2171,8 @@ class flexicontent_html
 			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 			$show_icons = $params->get('show_icons');
 			if ( $show_icons ) {
-				$voteup = FLEXI_J16GE ?
-					JHTML::image('components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ), NULL) :
-					JHTML::_('image.site', 'thumb_up.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_GOOD' ) ) ;
-				$votedown = FLEXI_J16GE ?
-					JHTML::image('components/com_flexicontent/assets/images/'.'thumb_down.png', JText::_( 'FLEXI_BAD' ), NULL) :
-					JHTML::_('image.site', 'thumb_down.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_BAD' ) ) ;
+				$voteup = JHTML::image('components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ), NULL);
+				$votedown = JHTML::image('components/com_flexicontent/assets/images/'.'thumb_down.png', JText::_( 'FLEXI_BAD' ), NULL);
 			} else {
 				$voteup = JText::_( 'FLEXI_GOOD' ). '&nbsp;';
 				$votedown = '&nbsp;'.JText::_( 'FLEXI_BAD' );
@@ -2301,10 +2297,9 @@ class flexicontent_html
 		// Find if user has the ACCESS level required for voting
 		// *****************************************************
 		
-		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
-		else $aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-		$acclvl = (int) $field->parameters->get('submit_acclvl', FLEXI_J16GE ? 1 : 0);
-		$has_acclvl = FLEXI_J16GE ? in_array($acclvl, $aid_arr) : $acclvl <= $aid;
+		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+		$acclvl = (int) $field->parameters->get('submit_acclvl', 1);
+		$has_acclvl = in_array($acclvl, $aid_arr);
 		
 		
 		// *********************************************************
@@ -2327,7 +2322,7 @@ class flexicontent_html
 			
 			// Decide no access Redirect URLs
 			if ($no_acc_doredirect == 2) {
-				$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
+				$com_users = 'com_users';
 				$no_acc_url = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
 			} else if ($no_acc_doredirect == 0) {
 				$no_acc_url = '';
@@ -2339,17 +2334,12 @@ class flexicontent_html
 			if ( !$no_acc_msg )
 			{
 				// Find name of required Access Level
-				if (FLEXI_J16GE) {
-					$acclvl_name = '';
-					if ($acclvl && empty($acclvl_names)) {  // Retrieve this ONCE (static var)
-						$db->setQuery('SELECT title,id FROM #__viewlevels as level');
-						$_lvls = $db->loadObjectList();
-						$acclvl_names = array();
-						if (!empty($_lvls)) foreach ($_lvls as $_lvl) $acclvl_names[$_lvl->id] = $_lvl->title;
-					}
-				} else {
-					$acclvl_names = array(0=>'Public', 1=>'Registered', 2=>'Special');
-					$acclvl_name = $acclvl_names[$acclvl];
+				$acclvl_name = '';
+				if ($acclvl && empty($acclvl_names)) {  // Retrieve this ONCE (static var)
+					$db->setQuery('SELECT title,id FROM #__viewlevels as level');
+					$_lvls = $db->loadObjectList();
+					$acclvl_names = array();
+					if (!empty($_lvls)) foreach ($_lvls as $_lvl) $acclvl_names[$_lvl->id] = $_lvl->title;
 				}
 				$acclvl_name =  !empty($acclvl_names[$acclvl]) ? $acclvl_names[$acclvl] : "Access Level: ".$acclvl." not found/was deleted";
 				$no_acc_msg = JText::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
@@ -2400,11 +2390,10 @@ class flexicontent_html
 			$document->addScriptDeclaration('var fcvote_rfolder = "'.JURI::root(true).'";');
 
 			$css = '
-			.'.$class.' .fcvote {line-height:'.$dim.'px;}
-			.'.$class.' .fcvote-label {margin-right: 6px;}
-			.'.$class.' .fcvote ul {height:'.$dim.'px; position:relative !important; left:0px !important;}
-			.'.$class.' .fcvote ul, .'.$class.' .fcvote ul li a:hover, .'.$class.' .fcvote ul li.current-rating {background-image:url('.$img_path.')!important;}
-			.'.$class.' .fcvote ul li a, .'.$class.' .fcvote ul li.current-rating {height:'.$dim.'px;line-height:'.$dim.'px;}
+			.'.$class.' .fcvote {line-height:'.$dim.'px !important;}
+			.'.$class.' .fcvote > ul.fcvote_list {height:'.$dim.'px !important; position:relative !important; left:0px !important;}
+			.'.$class.' .fcvote > ul.fcvote_list, .'.$class.' .fcvote ul li a:hover, .'.$class.' .fcvote ul li.current-rating {background-image:url('.$img_path.') !important;}
+			.'.$class.' .fcvote > ul.fcvote_list li.voting-links a, .'.$class.' .fcvote > ul.fcvote_list li.current-rating {height:'.$dim.'px; line-height:'.$dim.'px !important;}
 			';
 			
 			$star_tooltips = array();
@@ -2473,7 +2462,7 @@ class flexicontent_html
 			$html_vote_links = '';
 			for ($i=1; $i<=$rating_resolution; $i++) {
 				$html_vote_links .= '
-					<li><a onclick="'.$onclick.'" href="'.$href.'" title="'.$star_tooltips[$i].'" class="'.$dovote_class.' '.$star_classes[$i].'" rel="'.$id.'_'.$xid.'">'.$i.'</a></li>';
+					<li class="voting-links"><a onclick="'.$onclick.'" href="'.$href.'" title="'.$star_tooltips[$i].'" class="'.$dovote_class.' '.$star_classes[$i].'" rel="'.$id.'_'.$xid.'">'.$i.'</a></li>';
 			}
 		}
 		
@@ -2483,7 +2472,7 @@ class flexicontent_html
 		<div class="'.$class.'">
 			<div class="fcvote">'
 	  		.($label ? '<div id="fcvote_lbl'.$id.'_'.$xid.'" class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '')
-				.'<ul style="width:'.$element_width.'px;">
+				.'<ul class="fcvote_list" style="width:'.$element_width.'px;">
     				<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;'.$nocursor.'"></li>'
     		.@ $html_vote_links
 				.'
@@ -2528,7 +2517,7 @@ class flexicontent_html
 			." LEFT JOIN #__users AS u ON u.id=ff.userid "
 			." WHERE ff.itemid=" . $item->id;
 		$db->setQuery($query);
-		$favusers = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+		$favusers = $db->loadColumn();
 		if (!is_array($favusers) || !count($favusers)) return $favuserlist ? $favuserlist.']' : '';
 
 		$seperator = ': ';
@@ -3602,7 +3591,7 @@ class flexicontent_html
 				;
 			$db->setQuery($query);
 			
-			$featured_cats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$featured_cats = $db->loadColumn();
 			$featured_cats = $featured_cats ? array_flip($featured_cats) : array();
 			
 			foreach ($featured_cats as $featured_cat => $i)

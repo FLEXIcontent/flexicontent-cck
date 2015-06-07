@@ -165,7 +165,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		}
 		
 		// Item location and total count
-		$html .= $show_prevnext_count ? '<span class="fc-pagenav-items_cnt badge badge-info">'.($location+1).'/'.count($list).'</span>' : '';
+		$html .= $show_prevnext_count ? '<span class="fc-pagenav-items-cnt badge badge-info">'.($location+1).'/'.count($list).'</span>' : '';
 		
 		// Get images
 		$items_arr = array();

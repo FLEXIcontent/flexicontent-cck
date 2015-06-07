@@ -126,7 +126,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Query CLAUSE for match the given text
 		$db = JFactory::getDBO();
-		$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+		$quoted_text = $db->escape($newtext, true);
 		$quoted_text = $db->Quote( $quoted_text, false );
 		$_text_match  = ' MATCH (si.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 		
@@ -144,27 +144,11 @@ class FlexicontentController extends JControllerLegacy
 		$joinaccess = '';
 		/*if (!$show_noauth) {
 			$user = JFactory::getUser();
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$access_where .= ' AND ty.access IN (0,'.$aid_list.')';
-				$access_where .= ' AND mc.access IN (0,'.$aid_list.')';
-				$access_where .= ' AND  i.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$access_where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					$access_where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
-					$access_where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
-				} else {
-					$access_where .= ' AND ty.access <= '.$aid;
-					$access_where .= ' AND mc.access <= '.$aid;
-					$access_where .= ' AND  i.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$access_where .= ' AND ty.access IN (0,'.$aid_list.')';
+			$access_where .= ' AND mc.access IN (0,'.$aid_list.')';
+			$access_where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}*/
 		
 		
@@ -235,7 +219,7 @@ class FlexicontentController extends JControllerLegacy
 	
 	function isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index') {
 		$db = JFactory::getDBO();
-		$quoted_word = FLEXI_J16GE ? $db->escape($word, true) : $db->getEscaped($word, true);
+		$quoted_word = $db->escape($word, true);
 		$query = 'SELECT '.$col
 			.' FROM #__'.$tbl
 			.' WHERE MATCH ('.$col.') AGAINST ("+'.$quoted_word.'")'
@@ -270,14 +254,14 @@ class FlexicontentController extends JControllerLegacy
 		$isnew   = !$model->getId();
 		$isOwner = $model->get('created_by') == $user->get('id');
 		
-		$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
+		$ctrl_task = 'task=items.';
 		
 		$fc_params  = JComponentHelper::getParams( 'com_flexicontent' );
 		$dolog      = $fc_params->get('print_logging_info');
 		
 		// Get the COMPONENT only parameters
 		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
-		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
+		$params = clone ($comp_params); // clone( JComponentHelper::getParams('com_flexicontent') );
 		
 		// Merge the type parameters
 		$tparams = $model->getTypeparams();
@@ -520,14 +504,14 @@ class FlexicontentController extends JControllerLegacy
 		// Check for new content
 		if ( ($isnew && !$canAdd) || (!$isnew && !$canEdit)) {
 			$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
-			if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
+			JError::raiseWarning(403, $msg);
 		}
 		
 		if ( !$canCreateType ) {
 			$msg = isset($types[$type_id]) ?
 				JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', JText::_($types[$type_id]->name) ) :
 				' Content Type '.$type_id.' was not found OR is not published';
-			if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
+			JError::raiseWarning(403, $msg);
 			return;
 		}
 		
@@ -1029,22 +1013,13 @@ class FlexicontentController extends JControllerLegacy
 		// CHECK-IN the item if user can edit
 		if ($model->get('id') > 1)
 		{
-			if (FLEXI_J16GE) {
-				$asset = 'com_content.article.' . $model->get('id');
-				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
-				// ALTERNATIVE 1
-				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
-				// ALTERNATIVE 2
-				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
-			} else if ($user->gid >= 25) {
-				$canEdit = true;
-			} else if (FLEXI_ACCESS) {
-				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $isOwner) ;
-			} else {
-				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $isOwner);
-			}
+			$asset = 'com_content.article.' . $model->get('id');
+			$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+			// ALTERNATIVE 1
+			//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+			// ALTERNATIVE 2
+			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
+			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
 			
 			if ( !$canEdit ) {
 				// No edit privilege, check if item is editable till logoff
@@ -1188,10 +1163,9 @@ class FlexicontentController extends JControllerLegacy
 		// Find if user has the ACCESS level required for voting
 		// *****************************************************
 		
-		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
-		else $aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-		$acclvl = (int) $field->parameters->get('submit_acclvl', FLEXI_J16GE ? 1 : 0);
-		$has_acclvl = FLEXI_J16GE ? in_array($acclvl, $aid_arr) : $acclvl <= $aid;
+		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+		$acclvl = (int) $field->parameters->get('submit_acclvl', 1);
+		$has_acclvl = in_array($acclvl, $aid_arr);
 		
 		
 		// *********************************
@@ -1209,16 +1183,11 @@ class FlexicontentController extends JControllerLegacy
 			if ( !$no_acc_msg )
 			{
 				// Find name of required Access Level
-				if (FLEXI_J16GE) {
-					$acclvl_name = '';
-					if ($acclvl) {
-						$db->setQuery('SELECT title FROM #__viewlevels as level WHERE level.id='.$acclvl);
-						$acclvl_name = $db->loadResult();
-						if ( !$acclvl_name ) $acclvl_name = "Access Level: ".$acclvl." not found/was deleted";
-					}
-				} else {
-					$acclvl_names = array(0=>'Public', 1=>'Registered', 2=>'Special');
-					$acclvl_name = $acclvl_names[$acclvl];
+				$acclvl_name = '';
+				if ($acclvl) {
+					$db->setQuery('SELECT title FROM #__viewlevels as level WHERE level.id='.$acclvl);
+					$acclvl_name = $db->loadResult();
+					if ( !$acclvl_name ) $acclvl_name = "Access Level: ".$acclvl." not found/was deleted";
 				}
 				$no_acc_msg = JText::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
 			}
@@ -1262,20 +1231,23 @@ class FlexicontentController extends JControllerLegacy
 			. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
 			
 		$db->setQuery( $query );
-		$votesdb = $db->loadObject();
+		$db_itemratings = $db->loadObject();
 		
 		
 		// ********************************************************************************************
 		// Check: item id exists in our voting logging SESSION (array) variable, to avoid double voting
 		// ********************************************************************************************
 		
-		$votestamp = $session->get('votestamp', array(),'flexicontent');
-		if ( !isset($votestamp[$cid]) || !is_array($votestamp[$cid]) )
+		$vote_history = $session->get('vote_history', array(),'flexicontent');
+		if ( !isset($vote_history[$cid]) || !is_array($vote_history[$cid]) )
 		{
-			$votestamp[$cid] = array();
+			$vote_history[$cid] = array();
 		}
-		$votecheck = isset($votestamp[$cid][$xid]);
-			
+		$old_rating = isset($vote_history[$cid][$xid]) ? (int) $vote_history[$cid][$xid] : 0;
+		
+		// For the case that the browser was not close we can get rating from user's session and allow to change the vote
+		$rating_diff = (int) $user_rating - $old_rating;
+		
 		
 		// ***********************************************************
 		// Voting access allowed and valid, but we will need to make
@@ -1284,7 +1256,7 @@ class FlexicontentController extends JControllerLegacy
 		$result	= new stdClass();
 		
 		// Voting record does not exist for this item, accept user's vote and insert new voting record in the db
-		if ( !$votesdb ) {
+		if ( !$db_itemratings ) {
 			$query = ' INSERT '.$dbtbl
 				. ' SET content_id = '.(int)$cid.', '
 				. '  lastip = '.$currip_quoted.', '
@@ -1301,28 +1273,13 @@ class FlexicontentController extends JControllerLegacy
 		// Voting record exists for this item, check if user has already voted
 		else {
 			
-			// NOTE: it is not so good way to check using ip, since 2 users may have same IP,
-			// but for compatibility with standard joomla and for stronger security we will do it
-			if ( !$votecheck && $currip!=$votesdb->lastip ) 
-			{
-				// vote accepted update DB
-				$query = " UPDATE ".$dbtbl
-				. ' SET rating_count = rating_count + 1, '
-				. '  rating_sum = rating_sum + '.(int)$user_rating.', '
-				. '  lastip = '.$currip_quoted
-				. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
-				
-				$db->setQuery( $query );
-				$db->query() or die( $db->stderr() );
-				$result->ratingcount = $votesdb->rating_count + 1;
-				$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTES' ) . ')';
-			} 
-			else 
+			// If item is not in the user's voting history (session), then we check if this IP has voted for this item recently and refuse to accept vote
+			if ( !$old_rating && $currip==$db_itemratings->lastip ) 
 			{
 				// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
+				//$result->percentage = ( $db_itemratings->rating_sum / $db_itemratings->rating_count ) * (100/$rating_resolution);
+				//$result->htmlrating = '(' . $db_itemratings->rating_count .' '. JText::_( 'FLEXI_VOTES' ) . ')';
 				
-				//$result->percentage = ( $votesdb->rating_sum / $votesdb->rating_count ) * (100/$rating_resolution);
-				//$result->htmlrating = '(' . $votesdb->rating_count .' '. JText::_( 'FLEXI_VOTES' ) . ')';
 				$result->html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );
 				if ($no_ajax) {
 					$app->enqueueMessage( $result->html, 'notice' );
@@ -1332,16 +1289,31 @@ class FlexicontentController extends JControllerLegacy
 					jexit();
 				}
 			}
+			
+			// vote accepted update DB
+			$query = " UPDATE ".$dbtbl
+			. ' SET rating_count = rating_count + '.($old_rating ? 0 : 1)
+			. '  , rating_sum = rating_sum + '.$rating_diff
+			. '  , lastip = '.$currip_quoted
+			. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
+			
+			$db->setQuery( $query );
+			$db->query() or die( $db->stderr() );
+			$result->ratingcount = $db_itemratings->rating_count + ($old_rating ? 0 : 1);
+			$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTES' ) . ')';
 		}
 		
 		// Set the current item id, in our voting logging SESSION (array) variable, to avoid future double voting
-		$votestamp[$cid][$xid] = 1;
-		$session->set('votestamp', $votestamp, 'flexicontent');
+		$vote_history[$cid][$xid] = $user_rating;
+		$session->set('vote_history', $vote_history, 'flexicontent');
 		
 		// Prepare responce
-		$rating_sum = (@ $votesdb ? $votesdb->rating_sum : 0) + (int) $user_rating;
+		$rating_sum = (@ $db_itemratings ? $db_itemratings->rating_sum : 0) + $rating_diff;
 		$result->percentage = ($rating_sum / $result->ratingcount) * (100 / $rating_resolution);
-		$result->html = JText::_( 'FLEXI_THANK_YOU_FOR_VOTING' );
+		$result->html = JText::_( $old_rating ? 'FLEXI_YOUR_OLD_VOTING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' );
+		if ($old_rating) {
+			$result->html .= ' ['.$old_rating .'/'. $max_rating .' ==> '. $user_rating .'/'. $max_rating.']';
+		}
 		
 		// Finally set responce
 		if ($no_ajax) {
@@ -1364,7 +1336,7 @@ class FlexicontentController extends JControllerLegacy
 	function getajaxtags()
 	{
 		$user = JFactory::getUser();
-		$authorized = FLEXI_J16GE ? $user->authorise('com_flexicontent', 'newtags') : $user->authorize('com_flexicontent', 'newtags');
+		$authorized = $user->authorise('com_flexicontent', 'newtags');
 
 		if (!$authorized) return;
 		
@@ -1416,7 +1388,7 @@ class FlexicontentController extends JControllerLegacy
 
 		$user = JFactory::getUser();
 		$name = JRequest::getString('name', '');
-		$authorized = FLEXI_J16GE ? $user->authorise('com_flexicontent', 'newtags') : $user->authorize('com_flexicontent', 'newtags');
+		$authorized = $user->authorise('com_flexicontent', 'newtags');
 
 		if (!$authorized) return;
 		
@@ -1469,7 +1441,7 @@ class FlexicontentController extends JControllerLegacy
 			$msg = JText::_( 'FLEXI_FAVOURITE_ADDED' );
 		} else {
 			$msg = JText::_( 'FLEXI_FAVOURITE_NOT_ADDED' ).': '.$model->getError();
-			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
+			JError::raiseWarning(500, $msg);
 		}
 		
 		$cache = JFactory::getCache('com_flexicontent');
@@ -1495,7 +1467,7 @@ class FlexicontentController extends JControllerLegacy
 			$msg = JText::_( 'FLEXI_FAVOURITE_REMOVED' );
 		} else {
 			$msg = JText::_( 'FLEXI_FAVOURITE_NOT_REMOVED' ).': '.$model->getError();
-			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
+			JError::raiseWarning(500, $msg);
 		}
 		
 		$cache = JFactory::getCache('com_flexicontent');
@@ -1719,7 +1691,7 @@ class FlexicontentController extends JControllerLegacy
 				$q = 'SELECT attribs, name, field_type FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
 				$db->setQuery($q);
 				$fld = $db->loadObject();
-				$fields_conf[$field_id] = FLEXI_J16GE ? new JRegistry($fld->attribs) : new JParameter($fld->attribs);
+				$fields_conf[$field_id] = new JRegistry($fld->attribs);
 				$fields_props[$field_id] = $fld;
 			}
 			$field_type = $fields_props[$field_id]->field_type;
@@ -1940,7 +1912,7 @@ class FlexicontentController extends JControllerLegacy
 						.' FROM #__flexicontent_fields_item_relations '
 						.' WHERE field_id = ' . $send_to_email_field .' AND item_id='.$content_id;
 					$db->setQuery($q);
-					$email_values = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+					$email_values = $db->loadColumn();
 					
 					foreach ($email_values as $i => $email_value) {
 						if ( @unserialize($email_value)!== false || $email_value === 'b:0;' ) {
@@ -2047,43 +2019,47 @@ class FlexicontentController extends JControllerLegacy
 			
 			// Get file list recursively, and calculate archive filename
 			$fileslist   = JFolder::files($targetpath, '.', $recurse=true, $fullpath=true);
-			$archivename = $tmp_ffname . (FLEXI_J16GE ? '.zip' : '.tar.gz');
+			$archivename = $tmp_ffname . '.zip';
 			$archivepath = JPath::clean( $app->getCfg('tmp_path').DS.$archivename );
 			
+			
+			// ******************
 			// Create the archive
-			if (!FLEXI_J16GE) {
-				JArchive::create($archivepath, $fileslist, 'gz', '', $targetpath);
-			} else {
-				/*$app = JFactory::getApplication('administrator');
-				$files = array();
-				foreach ($fileslist as $i => $filename) {
-					$files[$i]=array();
-					$files[$i]['name'] = preg_replace("%^(\\\|/)%", "", str_replace($targetpath, "", $filename) );  // STRIP PATH for filename inside zip
-					$files[$i]['data'] = implode('', file($filename));   // READ contents into string, here we use full path
-					$files[$i]['time'] = time();
-				}
-				
-				$packager = JArchive::getAdapter('zip');
-				if (!$packager->create($archivepath, $files)) {
-					$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
-					$app->enqueueMessage($msg, 'notice');
-					$this->setRedirect('index.php', '');
-					return;
-				}*/
-				
-				$za = new flexicontent_zip();
-				$res = $za->open($archivepath, ZipArchive::CREATE);
-				if($res !== true) {
-					$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
-					$app->enqueueMessage($msg, 'notice');
-					$this->setRedirect('index.php', '');
-					return;
-				}
-				$za->addDir($targetpath, "");
-				$za->close();
+			// ******************
+			
+			/*$app = JFactory::getApplication('administrator');
+			$files = array();
+			foreach ($fileslist as $i => $filename) {
+				$files[$i]=array();
+				$files[$i]['name'] = preg_replace("%^(\\\|/)%", "", str_replace($targetpath, "", $filename) );  // STRIP PATH for filename inside zip
+				$files[$i]['data'] = implode('', file($filename));   // READ contents into string, here we use full path
+				$files[$i]['time'] = time();
 			}
 			
+			$packager = JArchive::getAdapter('zip');
+			if (!$packager->create($archivepath, $files)) {
+				$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
+				$app->enqueueMessage($msg, 'notice');
+				$this->setRedirect('index.php', '');
+				return;
+			}*/
+			
+			$za = new flexicontent_zip();
+			$res = $za->open($archivepath, ZipArchive::CREATE);
+			if($res !== true) {
+				$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
+				$app->enqueueMessage($msg, 'notice');
+				$this->setRedirect('index.php', '');
+				return;
+			}
+			$za->addDir($targetpath, "");
+			$za->close();
+			
+			
+			// *********************************
 			// Remove temporary folder structure
+			// *********************************
+			
 			if (!JFolder::delete(($targetpath)) ) {
 				$msg = "Temporary folder ". $targetpath ." could not be deleted";
 				$app->enqueueMessage($msg, 'notice');
@@ -2105,7 +2081,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			
 			$dlfile = new stdClass();
-			$dlfile->filename = 'cart_files_'.date('m-d-Y_H-i-s').(FLEXI_J16GE ? '.zip' : '.tar.gz');   // a friendly name instead of  $archivename
+			$dlfile->filename = 'cart_files_'.date('m-d-Y_H-i-s'). '.zip';   // a friendly name instead of  $archivename
 			$dlfile->abspath  = $archivepath;
 		} else {
 			$dlfile = reset($valid_files);
@@ -2277,8 +2253,12 @@ class FlexicontentController extends JControllerLegacy
 				.' AND valueorder = ' . $order
 				;
 		$db->setQuery($query);
-		if (!$db->query()) {
-			return JError::raiseWarning( 500, $db->getError() );
+		try {
+			$db->query();
+		}
+		catch (Exception $e) {
+			JError::raiseWarning( 500, $e->getMessage() );
+			return;
 		}
 		
 		
@@ -2300,79 +2280,26 @@ class FlexicontentController extends JControllerLegacy
 		// Access Flags for: content item and field
 		if ( $get_select_access ) {
 			$select_access = '';
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				if ($include_file) $select_access .= ', CASE WHEN'.
-					'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
-				$select_access .= ', CASE WHEN'.
-					'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
-				$select_access .= ', CASE WHEN'.
-					'  ty.access IN (0,'.$aid_list.') AND '.
-					'   c.access IN (0,'.$aid_list.') AND '.
-					'   i.access IN (0,'.$aid_list.')'.
-					' THEN 1 ELSE 0 END AS has_content_access';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					if ($include_file) $select_access .= ', CASE WHEN'.
-						'   (gf.aro IN ( '.$user->gmid.' ) OR  f.access <= '. $aid . ')  THEN 1 ELSE 0 END AS has_file_access';
-					$select_access .= ', CASE WHEN'.
-						'  (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')  THEN 1 ELSE 0 END AS has_field_access';
-					$select_access .= ', CASE WHEN'.
-						'   (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ') AND '.
-						'   (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ') AND '.
-						'   (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')'.
-						' THEN 1 ELSE 0 END AS has_content_access';
-				} else {
-					if ($include_file) $select_access .= ', CASE WHEN'.
-						'   f.access <= '. $aid . '  THEN 1 ELSE 0 END AS has_file_access';
-					$select_access .= ', CASE WHEN'.
-						' fi.access <= '. $aid . '  THEN 1 ELSE 0 END AS has_field_access';
-					$select_access .= ', CASE WHEN'.
-						'  ty.access <= '. $aid . ' AND '.
-						'   c.access <= '. $aid . ' AND '.
-						'   i.access <= '. $aid .
-						' THEN 1 ELSE 0 END AS has_content_access';
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			if ($include_file) $select_access .= ', CASE WHEN'.
+				'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
+			$select_access .= ', CASE WHEN'.
+				'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
+			$select_access .= ', CASE WHEN'.
+				'  ty.access IN (0,'.$aid_list.') AND '.
+				'   c.access IN (0,'.$aid_list.') AND '.
+				'   i.access IN (0,'.$aid_list.')'.
+				' THEN 1 ELSE 0 END AS has_content_access';
 		}
 		
 		else {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				if ($include_file)
-					$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
-				$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
-				$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					if ($include_file) $andacc .=
-						' AND  (gf.aro IN ( '.$user->gmid.' ) OR f.access <= '. $aid . ' OR f.access IS NULL)';  // AND file access
-					$andacc   .=
-						' AND (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')';  // AND field access
-					$andacc   .=
-						' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';   // AND content access: type, cat, item
-						' AND  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
-						' AND  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
-				} else {
-					if ($include_file)
-						$andacc .= ' AND (f.access <= '.$aid .' OR f.access IS NULL)';  // AND file access
-					$andacc   .= ' AND fi.access <= '.$aid ;                          // AND field access
-					$andacc   .= ' AND ty.access <= '.$aid . ' AND  c.access <= '.$aid . ' AND  i.access <= '.$aid ;  // AND content access
-				}
-			}
-		}
-		
-		if (FLEXI_ACCESS) {
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
 			if ($include_file)
-				$joinacc .= ' LEFT JOIN #__flexiaccess_acl AS gf ON f.id = gf.axo AND gf.aco = "read" AND gf.axosection = "file"';        // JOIN file access
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gfi ON fi.id = gfi.axo AND gfi.aco = "read" AND gfi.axosection = "field"';  // JOIN field access
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';       // JOIN content access: type, cat, item
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+				$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
+			$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
+			$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
 		}
 		
 		$clauses['select'] = $select_access;
@@ -2392,14 +2319,8 @@ class FlexicontentController extends JControllerLegacy
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 
 		$user = JFactory::getUser();
-		if (FLEXI_J16GE) {
-			$CanUseTags = FlexicontentHelperPerm::getPerm()->CanUseTags;
-		} else if (FLEXI_ACCESS) {
-			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
-		} else {
-			$CanUseTags = 1;
-		}
-
+		$CanUseTags = FlexicontentHelperPerm::getPerm()->CanUseTags;
+		
 		if($CanUseTags) {
 			//header('Content-type: application/json');
 			@ob_end_clean();

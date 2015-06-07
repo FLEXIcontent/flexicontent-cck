@@ -11,17 +11,17 @@
 }
 
 .flexi.fc-pagenav .fc-pagenav-return,
-.flexi.fc-pagenav .fc-pagenav-items-cnt {
-	margin-right: 20px;
+.flexi.fc-pagenav .fc-pagenav-items-cnt,
+.flexi.fc-pagenav .fc-pagenav-prev,
+.flexi.fc-pagenav .fc-pagenav-next {
+	margin: 2px 4px 2px 0px;
 	display: inline-block;
 }
 .flexi.fc-pagenav .fc-pagenav-prev,
 .flexi.fc-pagenav .fc-pagenav-next  {
-	margin: 0px;
-	display: inline-block;
 }
 
-.flexi.fc-pagenav .fc-pagenav_return {
+.flexi.fc-pagenav .fc-pagenav-return {
 	/*background: url(icons/table_multiple.png) no-repeat 0 center !important;
 	padding-left: 20px;*/
 }

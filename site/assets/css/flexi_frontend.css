@@ -1144,7 +1144,7 @@ div.fc-field-box {
 	text-align: right;
 	max-width: 150px;
 	min-width: auto;
-	border-radius: 4px;
+	border-radius: 10px;
 	line-height: 100%;
 	
 	border-width: 0px;
@@ -1158,48 +1158,48 @@ div.fc-field-box {
 	border-bottom: 1px solid #AAA;
 	border-right: 1px solid #AAA;
 	margin: 2px 2px 2px 12px;
-	padding: 8px 4px;
+	padding: 4px 6px;
 }
 
 #flexicontent .fc_markup.mu_featured_cat.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/star.png) 4px 50% no-repeat lightgoldenrodyellow;
+	padding-left: 28px;
+	background: url(../images/star.png) 6px 50% no-repeat lightgoldenrodyellow;
 }
 
 #flexicontent .fc_markup.mu_normal_cat.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/star-empty.png) 4px 50% no-repeat lightgoldenrodyellow;
+	padding-left: 28px;
+	background: url(../images/star-empty.png) 6px 50% no-repeat lightgoldenrodyellow;
 }
 
 #flexicontent .fc_markup.mu_item_no_access.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/eye-half.png) 4px 50% no-repeat #FFD700;
+	padding-left: 28px;
+	background: url(../images/eye-half.png) 6px 50% no-repeat #FFD700;
 }
 
 #flexicontent .fc_markup.mu_item_free_access.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/eye.png) 4px 50% no-repeat #50EE90;
+	padding-left: 28px;
+	background: url(../images/eye.png) 6px 50% no-repeat #50EE90;
 }
 
 #flexicontent .fc_markup.mu_needed_acclvl.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/lock.png) 4px 50% no-repeat darkorange;
+	padding-left: 28px;
+	background: url(../images/lock.png) 6px 50% no-repeat darkorange;
 	color: white;
 }
 
 #flexicontent .fc_markup.mu_obtained_acclvl.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/lock-unlock.png) 4px 50% no-repeat transparent;
+	padding-left: 28px;
+	background: url(../images/lock-unlock.png) 6px 50% no-repeat transparent;
 	background-color: darkgreen;
 	color: white;
 }
 
 #flexicontent .fc_markup.mu_ra_timeframe.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat lightskyblue;
+	padding-left: 28px;
+	background: url(../images/calendar-select-days-span.png) 6px 50% no-repeat lightskyblue;
 }
 
 #flexicontent .fc_markup.mu_ru_timeframe.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat lightskyblue;
+	padding-left: 28px;
+	background: url(../images/calendar-select-days-span.png) 6px 50% no-repeat lightskyblue;
 }
