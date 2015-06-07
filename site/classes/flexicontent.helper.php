@@ -5277,8 +5277,8 @@ class flexicontent_db
 	{
 		$db = JFactory::getDBO();
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user_id);
-		if ( $authorparams = $db->loadResult() )
-			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
+		$authorparams = $db->loadResult();
+		$authorparams = new JRegistry($authorparams);
 		
 		return $authorparams;
 	}
