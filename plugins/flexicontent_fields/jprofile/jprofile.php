@@ -138,6 +138,7 @@ class plgFlexicontent_fieldsJProfile extends JPlugin
 		</dl>
 		';
 		
+		$profile_info = array();
 		if (!empty($user->profile->profile)) foreach($user->profile->profile as $pname => $pval) {
 			$profile_info[] = '
 				<dt><span class="label">'.$pname.'</span></dt>

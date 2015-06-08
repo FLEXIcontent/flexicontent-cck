@@ -1842,15 +1842,23 @@ class FlexicontentController extends JControllerLegacy
 			
 			if ($file->url)
 			{
+				// Check for empty URL
+				$url = $file->filename_original ? $file->filename_original : $file->filename;
+				if (empty($url)) {
+					$msg = "File URL is empty: ".$file->url;
+					$app->enqueueMessage($msg, 'error');
+					return false;
+				}
+				
 				// skip url-based file if downloading multiple files
 				if ($task=='download_tree') {
-					$msg = "Skipped URL based file: ".$file->url;
+					$msg = "Skipped URL based file: ".$file->filename;
 					$app->enqueueMessage($msg, 'notice');
 					continue;
 				}
 				
 				// redirect to the file download link
-				@header("Location: ".$file->filename."");
+				@header("Location: ".$url."");
 				$app->close();
 			}
 			
