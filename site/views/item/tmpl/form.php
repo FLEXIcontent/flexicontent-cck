@@ -1116,7 +1116,7 @@ if ( $typeid && $this->perms['cantemplates'] && $this->params->get('selecttheme_
 					echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
 				endif;
 				?>
-				<fieldset class="panelform">
+				<fieldset class="panelform params_set">
 					<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
 						$fieldname =  $field->__get('fieldname');
 						$value = $tmpl->params->getValue($fieldname, $groupname, $this->item->itemparams->get($fieldname));

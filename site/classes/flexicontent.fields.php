@@ -2887,6 +2887,7 @@ class FlexicontentFields
 		} else {
 			$results = & $_results;
 		}
+		if (empty($results)) $results = array();
 		
 		// Language filter labels
 		if ($lang_filter_values) {
@@ -2971,7 +2972,7 @@ class FlexicontentFields
 		
 		// partial SQL clauses
 		$valuesselect = @$filter->filter_valuesselect ? $filter->filter_valuesselect : ' fi.value AS value, fi.value AS text';
-		$valuesfrom   = @$filter->filter_valuesfrom   ? $filter->filter_valuesfrom   : ($filter->iscore ? ' FROM #__content AS i' : ' FROM #__flexicontent_fields_item_relations AS fi ');
+		$valuesfrom   = @$filter->filter_valuesfrom   ? $filter->filter_valuesfrom   : (($filter->iscore || $filter->field_type=='coreprops') ? ' FROM #__content AS i' : ' FROM #__flexicontent_fields_item_relations AS fi ');
 		$valuesjoin   = @$filter->filter_valuesjoin   ? $filter->filter_valuesjoin   : ' ';
 		$valueswhere  = @$filter->filter_valueswhere  ? $filter->filter_valueswhere  : ' AND fi.field_id ='.$filter->id;
 		// full SQL clauses
@@ -3032,7 +3033,7 @@ class FlexicontentFields
 				$fc_run_times['_create_filter_init'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
 			
-			$item_id_col = $filter->iscore ? 'i.id' : 'fi.item_id';
+			$item_id_col = ($filter->iscore || $filter->field_type=='coreprops') ? 'i.id' : 'fi.item_id';
 			$filter_where_curr = $filter->iscore ? $filter_where_curr : str_replace('i.id', 'fi.item_id', $filter_where_curr);
 			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT '.$item_id_col.') as found ' : '')."\n"
 				. $valuesfrom."\n"
@@ -3065,10 +3066,12 @@ class FlexicontentFields
 		$db->setQuery($query);
 		try {
 			$results = $db->loadObjectList('value');
+			if ($db->getErrorNum()) {
+				$filter->html .= __FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br/>" .nl2br( $db->getErrorMsg() ) ."<br/>";
+			}
 		}
 		catch (Exception $e) {
-			$filter->html = "Filter for : {$filter->label} cannot be displayed, error during db query :<br />" .$query ."<br/>" .__FUNCTION__.'()';
-			if ($db->getErrorNum())  $filter->html .= ' : SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+			$filter->html = __FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br />" .$e->getMessage() ."<br/>";
 			return array();
 		}
 		
@@ -3175,10 +3178,12 @@ class FlexicontentFields
 		$db->setQuery($query);
 		try {
 			$results = $db->loadObjectList('value');
+			if ($db->getErrorNum()) {
+				$filter->html .= __FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br/>" .nl2br( $db->getErrorMsg() ) ."<br/>";
+			}
 		}
 		catch (Exception $e) {
-			$filter->html = "Filter for : {$filter->label} cannot be displayed, error during db query :<br />" .$query ."<br/>" .__FUNCTION__.'()';
-			if ($db->getErrorNum())  $filter->html .= ' : SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+			$filter->html = __FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br />" .$e->getMessage() ."<br/>";
 			return array();
 		}
 		

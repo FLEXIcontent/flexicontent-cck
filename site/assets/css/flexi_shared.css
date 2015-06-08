@@ -626,12 +626,6 @@ div label.lang_box img {
 	border: 0px solid lightgray !important;
 	background: white !important;
 }
-#flexicontent .pane-sliders label.hasTip, #flexicontent .pane-sliders label.hasTooltip {
-	color: black !important;
-  background-color: #eee !important;
-}
-
-
 
 #flexicontent .ui-sortable > li {
 	background-color: white;
@@ -806,11 +800,10 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
   width: auto;
 }
 
-#flexicontent .pane-sliders label.hasTip, #flexicontent .pane-sliders label.hasTooltip,
-#flexicontent .params_set label.hasTip, #flexicontent .params_set label.hasTooltip,
-#flexicontent .flexi_params label.hasTip, #flexicontent .flexi_params label.hasTooltip,
-#flexicontent .panelform > label,
-#flexicontent label.fckey, #flexicontent .flexi_label {
+#flexicontent .flexi_params > label,
+#flexicontent fieldset.panelform > label,
+#flexicontent label.fckey,
+#flexicontent .flexi_label {
 	display: inline-block;
 	color: white;
 	background-color: #999;
@@ -823,13 +816,13 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	width: 18%;
 	max-width:150px;
 	
-	border: 0px solid !important; /* non-zero causes wrapping */
-	float: left !important;
-	clear: left !important;
-	min-width:auto !important;
-	margin: 0px 1% 1px 0% !important;
-	padding: 8px 1% !important;
-	white-space: normal !important;
+	border: 0px solid;
+	float: left;
+	clear: left;
+	min-width:auto;
+	margin: 0px 1% 1px 0%;
+	padding: 8px 1%;
+	white-space: normal;
 }
 #flexicontent .label-fcouter {
 	display: inline-block;
@@ -917,21 +910,6 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 #flexicontent .flexi_params .fcdualline_container .container_fcfield input[type="text"],
 #flexicontent .flexi_params .fcdualline_container .container_fcfield select { max-width: 250px !important; }
 
-.flexicontent td.paramlist_key label { margin-right: 2px !important; }
-#flexicontent .flexi_params td.paramlist_key { vertical-align: top; }
-#flexicontent .flexi_params td.paramlist_key label.hasTip,
-#flexicontent .params_set td.paramlist_key label.hasTip {
-	width: 84% !important;
-  margin: 2px 0 !important;
-  padding: 6px 5% !important;
-}
-td.paramlist_key label#params-lbl.hasTip { display:none; }
-.flexi_params {
-	margin:0 !important;
-	padding:0 !important;
-	width:100% !important;
-	border: 0px !important;
-}
 .flexi_params table.admintable,
 .flexi_params table.admintable td {
 	margin:0 !important;

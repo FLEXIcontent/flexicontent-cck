@@ -112,7 +112,7 @@ $this->document->addScriptDeclaration($js);
 				
 				foreach ($this->form->getFieldset($fsname) as $field) :
 					$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
-						$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+						$this->form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
 					echo '
 					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 						'.($field->label ? '
@@ -146,7 +146,7 @@ $this->document->addScriptDeclaration($js);
 			
 			foreach ($this->form->getFieldset($fsname) as $field) :
 				$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
-					$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+					$this->form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
 				echo '
 				<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 					'.($field->label ? '
@@ -185,7 +185,7 @@ $this->document->addScriptDeclaration($js);
 				<?php
 				foreach ($this->form->getFieldset('themes') as $field) :
 					$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
-						$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+						$this->form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
 					echo '
 					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 						'.($field->label && empty($field->hidden) ? '

@@ -1,67 +1,87 @@
+
+/*
+Tried hard to remove !important rules 
+but too many stupid CSS rules ... exist !!
+
+e.g.  #header ul { ... }
+e.g.  #header li { ... }
+
+- and we cannot always prepend an HTML tag ID to override the above
+- anyone that wants to override this: Please just -copy- the full rule and -prepend- a 'body' ...
+- note the last part of this CSS should not be overriden via CSS,
+instead use voting field parameters !!
+*/
+
+
 /* fcvote standard css */
 div.fcvote {
-	display: inline-block;
-	vertical-align: middle;
+	display: inline-block !important;
+	vertical-align: middle !important;
 }
 
 div.fcvote > ul.fcvote_list, 
 div.fcvote > ul.fcvote_list > li.voting-links a:hover, 
 div.fcvote > ul.fcvote_list > li.current-rating {
-	background-color: transparent;
-	background-position: left -1000px;
-	background-repeat: repeat-x;
+	background-color: transparent !important;
+	background-position: left -1000px !important;
+	background-repeat: repeat-x !important;
 }
 
 div.fcvote > ul.fcvote_list {
-	background-position: left top;
-	list-style-image: none;
-	list-style-position: outside;
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-	overflow: hidden;
-	position: relative;
-	float: left;
+	background-position: left top !important;
+	list-style-image: none !important;
+	list-style-position: outside !important;
+	list-style-type: none !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	overflow: hidden !important;
+	position: relative !important;
+	float: left !important;
 }
 
 div.fcvote > ul.fcvote_list > li.current-rating,
 div.fcvote > ul.fcvote_list > li.voting-links {
-	display: inline;
-	background-image: none;
-	background-position: 0;
-	margin: 0;
-	padding: 0;
+	display: inline !important;
+	background-image: none !important;
+	background-position: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
 }
 
 div.fcvote > ul.fcvote_list > li.voting-links a, 
 div.fcvote > ul.fcvote_list > li.current-rating {
-	background-color: transparent ;
-	border: medium none;
-	cursor: pointer;
-	left: 0pt;
-	outline-color: -moz-use-text-color;
-	outline-style: none;
-	outline-width: medium;
-	overflow: hidden;
-	position: absolute;
-	text-indent: -1000em;
-	top: 0pt;
+	background-color: transparent !important;
+	border: medium none !important;
+	cursor: pointer !important;
+	outline-color: -moz-use-text-color !important;
+	outline-style: none !important;
+	outline-width: medium !important;
+	overflow: hidden !important;
+	position: absolute !important;
+	text-indent: -1000em !important;
+	left: 0pt !important;
+	top: 0pt !important;
+	margin: 0 !important;
+	padding: 0 !important;
 }
 
 div.fcvote > ul.fcvote_list > li.voting-links a:hover {
-	background-position: left bottom;
+	background-position: left bottom !important;
 }
 
 div.fcvote > ul.fcvote_list > li.current-rating {
-	background-position: left center;
-	z-index: 0;
+	background-position: left center !important;
+	z-index: 0 !important;
 }
 
-div.fcvote > ul.fcvote_list > li.voting-links a {
-	margin: 0;
-	padding: 0;
-}
 
+/*
+ * Non-critical part not using !important
+ */
+
+/* Labels: main vote */
+#flexicontent
+div.fcvote-label,
 div.fcvote-label {
 	float: left;
 	min-width: 80px;
@@ -73,40 +93,76 @@ div.fcvote-label {
 	border-bottom:1px dashed gray;
 	font-style:italic;
 }
+
+/* Labels: extra votes */
+#flexicontent
+div.fcvote-label.xid-main,
 div.fcvote-label.xid-main {
 	font-size:100%;
 	font-style:normal;
 	font-weight:bold;
 }
+
+/* Vote counter */
+#flexicontent
+div.fcvote-count,
 div.fcvote-count {
 	float: left;
 	padding: 0 0 0 4px;
 }
 
-/* fcvote variable css */
+/* Vote being submitted */
+#flexicontent
+div.fcvote .ajax-loader,
+div.fcvote .ajax-loader {
+	background: url("../images/ajax-loader.gif") no-repeat scroll left center transparent;
+	height: 16px;
+	padding: 0 0 0 20px;
+}
+
+
+
+/*
+ * fcvote CSS, that is OVERRIDABLE by inline CSS rules (!important)
+ * that are created according to voting field configuration,
+ *
+ * DO NOT OVERRIDE these by using CSS,
+ * instead please use field configuration
+ */
+
+/*****************************************/
+/* overridable voting image and its size */
+/*****************************************/
+
 div.fcvote {
-	line-height: 25px;
+	height: 25px !important;
+	line-height: 25px !important;
 }
 
 div.fcvote > ul.fcvote_list {
-	height: 25px;
-	width: 125px;
+	height: 25px !important;
+	width: 125px !important; /* overridable number of stars */
+}
+
+div.fcvote > ul.fcvote_list > li.voting-links a, 
+div.fcvote > ul.fcvote_list > li.current-rating {
+	height: 25px !important;
+	line-height: 25px !important;
 }
 
 div.fcvote > ul.fcvote_list, 
 div.fcvote > ul.fcvote_list > li.voting-links a:hover, 
 div.fcvote > ul.fcvote_list > li.current-rating {
-	background-image: url(../images/star.gif);
+	background-image: url(../images/star.gif) !important;
 }
 
-div.fcvote > ul.fcvote_list > li.voting-links a, 
-div.fcvote > ul.fcvote_list > li.current-rating {
-	height: 25px;
-	line-height: 25px;
-}
 
-div.fcvote .ajax-loader {
-    background: url("../images/ajax-loader.gif") no-repeat scroll left center transparent;
-    height: 16px;
-    padding: 0 0 0 20px;
-}
+/*********************************************************************/
+/* For overridable number of stars, mouse-over needs to be overriden */
+/*********************************************************************/
+
+div.fcvote > ul.fcvote_list > li.voting-links:nth-child(2) a { width: 20%  !important;  z-index: 6; }
+div.fcvote > ul.fcvote_list > li.voting-links:nth-child(3) a { width: 40%  !important;  z-index: 5; }
+div.fcvote > ul.fcvote_list > li.voting-links:nth-child(4) a { width: 60%  !important;  z-index: 4; }
+div.fcvote > ul.fcvote_list > li.voting-links:nth-child(5) a { width: 80%  !important;  z-index: 3; }
+div.fcvote > ul.fcvote_list > li.voting-links:nth-child(6) a { width: 100% !important;  z-index: 2; }

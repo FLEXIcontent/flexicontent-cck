@@ -1852,7 +1852,7 @@ class FlexicontentController extends JControllerLegacy
 				
 				// skip url-based file if downloading multiple files
 				if ($task=='download_tree') {
-					$msg = "Skipped URL based file: ".$file->filename;
+					$msg = "Skipped URL based file: ".$url;
 					$app->enqueueMessage($msg, 'notice');
 					continue;
 				}

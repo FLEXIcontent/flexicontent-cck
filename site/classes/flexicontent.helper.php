@@ -1290,27 +1290,12 @@ class flexicontent_html
 		$item = $db->loadObject();
 
 		// Determine priveleges of the current user on the given item
-		if (FLEXI_J16GE) {
-			$asset = 'com_content.article.' . $item->id;
-			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
-			$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
-			// ...
-			$permission = FlexicontentHelperPerm::getPerm();
-			$has_archive    = $permission->CanArchives;
-		} else if ($user->gid >= 25) {
-			$has_edit_state = true;
-			$has_delete     = true;
-			$has_archive    = true;
-		} else if (FLEXI_ACCESS) {
-			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
-			$has_delete     = in_array('delete', $rights) || (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) ;
-			$has_archive    = FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid);
-		} else {
-			$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
-			$has_delete     = $user->gid >= 23; // is at least manager
-			$has_archive    = $user->gid >= 23; // is at least manager
-		}
+		$asset = 'com_content.article.' . $item->id;
+		$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
+		$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
+		// ...
+		$permission = FlexicontentHelperPerm::getPerm();
+		$has_archive    = $permission->CanArchives;
 
 		$has_edit_state = $has_edit_state && in_array($state, array(0,1,-3,-4,-5));
 		$has_delete     = $has_delete     && $state == -2;
@@ -1614,21 +1599,9 @@ class flexicontent_html
 		}
 		
 		// Determine edit state, delete privileges of the current user on the given item
-		if (FLEXI_J16GE) {
-			$asset = 'com_content.article.' . $item->id;
-			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
-			$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
-		} else if ($user->gid >= 25) {
-			$has_edit_state = true;
-			$has_delete     = true;
-		} else if (FLEXI_ACCESS) {
-			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
-			$has_delete     = in_array('delete', $rights) || (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) ;
-		} else {
-			$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
-			$has_delete     = $user->gid >= 23; // is at least manager
-		}
+		$asset = 'com_content.article.' . $item->id;
+		$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
+		$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
 		
 		// Display state toggler if it can do any of state change
 		$canChangeState = $has_edit_state || $has_delete || $has_archive;
@@ -1800,20 +1773,11 @@ class flexicontent_html
 		if ( !$requestApproval && $item->created_by != $user->get('id') )  return;
 		
 		// Determine if current user can edit state of the given item
-		if (FLEXI_J16GE) {
-			$asset = 'com_content.article.' . $item->id;
-			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
-			// ALTERNATIVE 1
-			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
-			//$has_edit_state = in_array('edit.state', $rights) || (in_array('edit.state.own', $rights) && $item->created_by == $user->get('id')) ;
-		} else if ($user->gid >= 25) {
-			$has_edit_state = true;
-		} else if (FLEXI_ACCESS) {
-			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
-		} else {
-			$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
-		}
+		$asset = 'com_content.article.' . $item->id;
+		$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
+		// ALTERNATIVE 1
+		//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
+		//$has_edit_state = in_array('edit.state', $rights) || (in_array('edit.state.own', $rights) && $item->created_by == $user->get('id')) ;
 
 		// Create the approval button only if user cannot edit the item (**note check at top of this method)
 		if ( $has_edit_state ) return;
@@ -1865,20 +1829,11 @@ class flexicontent_html
 		
 		// Determine if current user can edit the given item
 		$has_edit_state = false;
-		if (FLEXI_J16GE) {
-			$asset = 'com_content.article.' . $item->id;
-			$has_edit_state = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $item->created_by == $user->get('id'));
-			// ALTERNATIVE 1
-			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
-			//$has_edit_state = in_array('edit', $rights) || (in_array('edit.own', $rights) && $item->created_by == $user->get('id')) ;
-		} else if ($user->gid >= 25) {
-			$has_edit_state = true;
-		} else if (FLEXI_ACCESS) {
-			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-			$has_edit_state = in_array('edit', $rights) || (in_array('editown', $rights) && $item->created_by == $user->get('id')) ;
-		} else {
-			$has_edit_state = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id'));
-		}
+		$asset = 'com_content.article.' . $item->id;
+		$has_edit_state = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $item->created_by == $user->get('id'));
+		// ALTERNATIVE 1
+		//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
+		//$has_edit_state = in_array('edit', $rights) || (in_array('edit.own', $rights) && $item->created_by == $user->get('id')) ;
 
 		// Create the edit button only if user can edit the give item
 		if ( !$has_edit_state ) return;
@@ -1955,30 +1910,14 @@ class flexicontent_html
 		// (a) Given category
 		if ( $submit_cat && $submit_cat->id )
 		{
-			if (FLEXI_J16GE) {
-				$canAdd = $user->authorise('core.create', 'com_content.category.' . $submit_cat->id);
-			} else if (FLEXI_ACCESS) {
-				$canAdd = ($user->gid < 25) ? FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'category', $submit_cat->id) : 1;
-			} else {
-				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
-				//$canAdd = ($user->gid >= 19);  // At least J1.5 Author
-			}
+			$canAdd = $user->authorise('core.create', 'com_content.category.' . $submit_cat->id);
 		}
 		
 		// (b) Any category (or to the CATEGORY IDS of given CATEGORY VIEW OBJECT)
 		else
 		{
 			// Given CATEGORY VIEW OBJECT may limit to specific category ids
-			if (FLEXI_J16GE) {
-				$canAdd = $user->authorise('core.create', 'com_flexicontent');
-			} else if ($user->gid >= 25) {
-				$canAdd = 1;
-			} else if (FLEXI_ACCESS) {
-				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
-				$canAdd = @$canAdd['content'] || @$canAdd['category'];
-			} else {
-				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
-			}
+			$canAdd = $user->authorise('core.create', 'com_flexicontent');
 			
 			if ($canAdd === NULL && $user->id) {
 				// Perfomance concern (NULL for $canAdd) means SOFT DENY, also check for logged user
@@ -2364,6 +2303,9 @@ class flexicontent_html
 		$rating_stars = (int) ($stars_override ? $stars_override : $field->parameters->get('rating_stars', 5));
 		$rating_stars = $rating_stars > $rating_resolution ? $rating_resolution  :  $rating_stars;  // Limit stars to resolution
 		
+		$element_width = $rating_resolution * $dim;
+		if ($rating_stars) $element_width = (int) $element_width * ($rating_stars / $rating_resolution);
+		
 		static $js_and_css_added = false;
 
 	 	if (!$js_and_css_added)
@@ -2392,10 +2334,25 @@ class flexicontent_html
 			$document->addScriptDeclaration('var fcvote_rfolder = "'.JURI::root(true).'";');
 
 			$css = '
-			.'.$class.' .fcvote {line-height:'.$dim.'px !important;}
-			.'.$class.' .fcvote > ul.fcvote_list {height:'.$dim.'px !important; position:relative !important; left:0px !important;}
-			.'.$class.' .fcvote > ul.fcvote_list, .'.$class.' .fcvote ul li a:hover, .'.$class.' .fcvote ul li.current-rating {background-image:url('.$img_path.') !important;}
-			.'.$class.' .fcvote > ul.fcvote_list li.voting-links a, .'.$class.' .fcvote > ul.fcvote_list li.current-rating {height:'.$dim.'px; line-height:'.$dim.'px !important;}
+			/* This is via voting field parameter, please edit field configuration to override them*/
+			.'.$class.' div.fcvote {
+				height:'.$dim.'px!important;
+				line-height:'.$dim.'px!important;
+			}
+			.'.$class.' div.fcvote > ul.fcvote_list {
+				height:'.$dim.'px!important;
+				width:'.$element_width.'px!important;
+			}
+			.'.$class.' div.fcvote > ul.fcvote_list > li.voting-links a,
+			.'.$class.' div.fcvote > ul.fcvote_list > li.current-rating {
+				height:'.$dim.'px!important;
+				line-height:'.$dim.'px!important;
+			}
+			.'.$class.' div.fcvote > ul.fcvote_list,
+			.'.$class.' div.fcvote > ul.fcvote_list > li.voting-links a:hover,
+			.'.$class.' div.fcvote > ul.fcvote_list > li.current-rating {
+				background-image:url('.$img_path.')!important;
+			}
 			';
 			
 			$star_tooltips = array();
@@ -2403,7 +2360,7 @@ class flexicontent_html
 			for ($i=1; $i<=$rating_resolution; $i++) {
 				$star_zindex  = $rating_resolution - $i + 2;
 				$star_percent = (int) round(100 * ($i / $rating_resolution));
-				$css .= '.fcvote li a.star'.$i.' { width: '.$star_percent.'%; z-index: '.$star_zindex.'; }' ."\n";
+				$css .= $class.' div.fcvote ul.fcvote_list > .voting-links a.star'.$i.' { width: '.$star_percent.'%!important; z-index: '.$star_zindex.'; }' ."\n";
 				$star_classes[$i] = 'star'.$i;
 				if ($star_percent < 20)       $star_tooltips[$i] = JText::_( 'FLEXI_VERY_POOR' );
 				else if ($star_percent < 40)  $star_tooltips[$i] = JText::_( 'FLEXI_POOR' );
@@ -2432,7 +2389,7 @@ class flexicontent_html
 			// Disable showing vote counter in main vote
 			if ( $counter == 3 ) $counter = 0;
 		}
-		$nocursor = !$allow_vote ? 'cursor:auto;' : '';
+		$nocursor = !$allow_vote ? 'cursor:unset!important;' : '';
 		
 		if ($allow_vote)
 		{
@@ -2468,13 +2425,11 @@ class flexicontent_html
 			}
 		}
 		
-		$element_width = $rating_resolution * $dim;
-		if ($rating_stars) $element_width = (int) $element_width * ($rating_stars / $rating_resolution);
 	 	$html='
 		<div class="'.$class.'">
 			<div class="fcvote">'
 	  		.($label ? '<div id="fcvote_lbl'.$id.'_'.$xid.'" class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '')
-				.'<ul class="fcvote_list" style="width:'.$element_width.'px;">
+				.'<ul class="fcvote_list">
     				<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;'.$nocursor.'"></li>'
     		.@ $html_vote_links
 				.'
@@ -4947,7 +4902,7 @@ class FLEXIUtilities
 			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($fieldtype).'.php';
 			if(file_exists($path)) require_once($path);
 			else {
-				JFactory::getApplication()->enqueueMessage(nl2br("While calling field method: $func(): cann find field type: $fieldtype. This is internal error or wrong field name"),'error');
+				JFactory::getApplication()->enqueueMessage(nl2br("While calling field method: $func(): cann't find field type: $fieldtype. This is internal error or wrong field name"),'error');
 				return;
 			}
 
@@ -5681,14 +5636,7 @@ class flexicontent_db
 
 		static $canCheckinRecords = null;
 		if ($canCheckinRecords === null) {
-			if (FLEXI_J16GE) {
-				$canCheckinRecords = $user->authorise('core.admin', 'checkin');
-			} else if (FLEXI_ACCESS) {
-				$canCheckinRecords = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
-			} else {
-				// Only admin or super admin can check-in
-				$canCheckinRecords = $user->gid >= 24;
-			}
+			$canCheckinRecords = $user->authorise('core.admin', 'checkin');
 		}
 
 		// Only attempt to check the row in if it exists.

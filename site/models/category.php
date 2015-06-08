@@ -2151,8 +2151,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 			->where('id = ' . (int) $pk);
 		$db->setQuery($query);
 		
-		try { $db->execute(); }
-		catch (RuntimeException $e) { $this->setError($e->getMessage());  return false; }
+		try {
+			$db->execute();
+			if ($db->getErrorNum()) {
+				$this->setError( nl2br($db->getErrorMsg()) );  // In case of error not throwing exception
+				return false;
+			}
+		}
+		catch (RuntimeException $e) {
+			$this->setError( $e->getMessage() );
+			return false;
+		}
 		
 		return true;
 	}
