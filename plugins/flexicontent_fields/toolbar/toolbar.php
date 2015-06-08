@@ -283,8 +283,8 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			
 			$addthis_code = '';
 			if ($addthis_custom_code) {
-				$addthis_code .= str_replace('_item_url_', $item_link, $addthis_custom_code);
-				$addthis_code .= str_replace('_item_title_', htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ), $addthis_code);
+				$addthis_code = str_replace('_item_url_', $item_link, $addthis_custom_code);
+				$addthis_code = str_replace('_item_title_', htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ), $addthis_code);
 			}
 			else {
 				switch ($addthis_custom_predefined) {
