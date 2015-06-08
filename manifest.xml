@@ -187,13 +187,14 @@
 		<plugin name="file"               folder="plugins/flexicontent_fields/file"               instfolder="flexicontent_fields">FLEXIcontent - File (Download/View/Share/Download cart)</plugin>
 		<plugin name="groupmarker"        folder="plugins/flexicontent_fields/groupmarker"        instfolder="flexicontent_fields">FLEXIcontent - Item Form Tab / Fieldset / Custom HTML</plugin>
 		<plugin name="image"              folder="plugins/flexicontent_fields/image"              instfolder="flexicontent_fields">FLEXIcontent - Image or Gallery (image + details)</plugin>
+		<plugin name="jprofile"           folder="plugins/flexicontent_fields/jprofile"           instfolder="flexicontent_fields">FLEXIcontent - User profile</plugin>
 		<plugin name="linkslist"          folder="plugins/flexicontent_fields/linkslist"          instfolder="flexicontent_fields">FLEXIcontent - HTML list of URLs/Anchors/JS links</plugin>
 		<plugin name="minigallery"        folder="plugins/flexicontent_fields/minigallery"        instfolder="flexicontent_fields">FLEXIcontent - Mini-Gallery (image-only slideshow)</plugin>
 		<plugin name="phonenumbers"       folder="plugins/flexicontent_fields/phonenumbers"       instfolder="flexicontent_fields">FLEXIcontent - International Phone Numbers</plugin>
 		<plugin name="radio"              folder="plugins/flexicontent_fields/radio"              instfolder="flexicontent_fields">FLEXIcontent - Radio</plugin>
 		<plugin name="radioimage"         folder="plugins/flexicontent_fields/radioimage"         instfolder="flexicontent_fields">FLEXIcontent - Radio Image</plugin>
 		<plugin name="relation"           folder="plugins/flexicontent_fields/relation"           instfolder="flexicontent_fields">FLEXIcontent - Relation (List of related items)</plugin>
-		<plugin name="relation_reverse"   folder="plugins/flexicontent_fields/relation_reverse" instfolder="flexicontent_fields">FLEXIcontent - Relation - Reverse</plugin>
+		<plugin name="relation_reverse"   folder="plugins/flexicontent_fields/relation_reverse"   instfolder="flexicontent_fields">FLEXIcontent - Relation - Reverse</plugin>
 		<plugin name="select"             folder="plugins/flexicontent_fields/select"             instfolder="flexicontent_fields">FLEXIcontent - Select</plugin>
 		<plugin name="selectmultiple"     folder="plugins/flexicontent_fields/selectmultiple"     instfolder="flexicontent_fields">FLEXIcontent - Select Multiple</plugin>
 		<plugin name="sharedaudio"        folder="plugins/flexicontent_fields/sharedaudio"        instfolder="flexicontent_fields">FLEXIcontent - Shared Audio (SoundCloud,Spotify,Last.fm,etc)</plugin>

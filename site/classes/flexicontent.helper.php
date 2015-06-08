@@ -2368,17 +2368,19 @@ class flexicontent_html
 
 	 	if (!$js_and_css_added)
 	 	{
-			// Make sure mootools are loaded before our js
-			FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-			
 			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 			if ($cparams->get('add_tooltips', 1))
 			{
-				// Load J2.5 (non-bootstrap tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
-				JHTML::_('behavior.tooltip');
-				
 				// J3.0+ tooltips (bootstrap based)
-				if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
+				if (FLEXI_J30GE)
+					JHtml::_('bootstrap.tooltip');
+				else {
+					// Make sure mootools are loaded before our js
+					FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+					
+					// Load J2.5 (non-bootstrap tooltips) tooltips
+					JHTML::_('behavior.tooltip');
+				}
 			}
 			
 			$document = JFactory::getDocument();
@@ -5756,7 +5758,7 @@ class flexicontent_db
 			JText::_('FLEXI_MULTIPLE_PROP_FIELDS')      => array('weblink', 'email', 'extendedweblink', 'phonenumbers', 'termlist'),
 			JText::_('FLEXI_MEDIA_MINI_APPS_FIELDS')    => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
 			JText::_('FLEXI_ITEM_FORM_FIELDS')          => array('fieldgroup', 'account_via_submit', 'groupmarker', 'coreprops'),
-			JText::_('FLEXI_DISPLAY_MANAGEMENT_FIELDS') => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist', 'authoritems'),
+			JText::_('FLEXI_DISPLAY_MANAGEMENT_FIELDS') => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist', 'authoritems', 'jprofile'),
 			JText::_('FLEXI_ITEM_RELATION_FIELDS')      => array('relation', 'relation_reverse', 'autorelationfilters')
 		);
 		foreach($grps as $grpname => $field_type_arr)
