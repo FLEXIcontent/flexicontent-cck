@@ -381,11 +381,4 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 }
 unset ($is_fc_component);
 
-jimport( 'joomla.user.helper' ); 
-$user = JFactory::getUser();
-$userId = $user->id; 
-$userProfile = JUserHelper::getProfile( $userId );
-
-echo "Main Address :" . $userProfile->profile['address1'];
-
 ?>
