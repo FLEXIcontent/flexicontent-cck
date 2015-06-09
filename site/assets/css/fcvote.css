@@ -1,10 +1,14 @@
 
 /*
-Tried hard to remove !important rules 
-but too many stupid CSS rules ... exist !!
+Tried hard to remove !important rules,
+but too many stupid CSS rules ... exist !! that twice as terrible as using !important
 
-e.g.  #header ul { ... }
-e.g.  #header li { ... }
+e.g.  #my_template_box  ul { ... }
+e.g.  #my_template_box  li { ... }
+
+the above should have been (to minimize conflicts):
+e.g.  #header > ul { ... }
+e.g.  #header ul.specificclass { ... }
 
 - and we cannot always prepend an HTML tag ID to override the above
 - anyone that wants to override this: Please just -copy- the full rule and -prepend- a 'body' ...

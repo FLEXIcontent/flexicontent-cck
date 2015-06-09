@@ -9,7 +9,7 @@
 	<field name="level" type="hidden" filter="unset"/>
 	<field name="path" type="text" label="CATEGORIES_PATH_LABEL" description="CATEGORIES_PATH_DESC" class="readonly" size="40" readonly="true" />
 	<field name="extension" type="hidden" />
-	<field name="title" type="text" label="JGLOBAL_TITLE" description="JFIELD_TITLE_DESC" class="inputbox" size="40" required="true" />
+	<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="inputbox" size="40" required="true" />
 	<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" />
 	<field name="description" type="editor" label="JGLOBAL_DESCRIPTION" description="COM_CATEGORIES_DESCRIPTION_DESC" class="inputbox" filter="safehtml" buttons="true" hide="readmore,pagebreak"/>
 	<field name="published" type="list" class="use_select2_lib" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC">

@@ -133,8 +133,8 @@ fieldset.fieldgroups legend span img {
 .versions img {
 	vertical-align: middle;
 }
-table .active-version {
-	background: #FFFFDD !important;
+table #active-version td {
+	background: #FFFFDD;
 }
 #pager {
 	clear:both;
@@ -161,9 +161,13 @@ div.credits {
 #flexicontent fieldset#flexiaccess legend,
 #flexicontent fieldset.flexiaccess legend {
 	padding: 0 6px 0 24px;
-	background: url("../images/toggle_blue.png") no-repeat scroll 4px 50% rgba(0, 0, 0, 0) !important;
+	background: url("../images/toggle_blue.png") no-repeat scroll 4px 50% rgba(0, 0, 0, 0);
 	box-sizing: border-box;
 	cursor: pointer;
+}
+#flexicontent fieldset#flexiaccess legend.open,
+#flexicontent fieldset.flexiaccess legend.open {
+	background: url(../images/toggle_blue.png) no-repeat 98% 50%;
 }
 option[disabled], option[readonly] { color: #bbb; }
 /* Categories in the items view */
@@ -273,16 +277,6 @@ div .positions_readonly {
 #lay-desc-table .key {
 	width: 80px;
 }
-fieldset.tmplprop legend {
-	background: url(../images/toggle_blue_up.png) no-repeat 98% 50%;
-	padding-right: 22px !important;
-	line-height: 18px;
-	cursor: pointer;
-}
-fieldset.tmplprop legend.open {
-	background: url(../images/toggle_blue.png) no-repeat 98% 50%;
-}
-
 
 
 
@@ -309,14 +303,14 @@ table.adminlist thead tr {
 table.adminlist thead th {
 	background: none repeat scroll 0 0 #fff !important; /* forced, combines with table, row, cell borders */
 	border: none;
-	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
+	border-width: 0px !important; /* forced, avoid border of cell overlapping over the border of the row */
 	color: #555;
 	text-align: center;
 	padding: 6px 8px;
 }
 
-table.adminlist thead th.center { text-align: center !important; }
-table.adminlist thead th.left { text-align: left !important; }
+table.adminlist thead th.center { text-align: center !important; } /* forced, apply requested styling */
+table.adminlist thead th.left { text-align: left !important; } /* forced, apply requested styling */
 table.adminlist thead a:hover { text-decoration: none; }
 table.adminlist thead th img { padding-left:3px; vertical-align:middle; }
 
@@ -330,12 +324,12 @@ table.adminlist thead th .filterdel img {
 
 /* Table cell */
 table.adminlist td {
-	padding: 6px 8px; /* allow only specific overrides */
+	padding: 6px 8px;
 }
 table.adminlist input[type="text"] {
-	width: auto !important;  /* enforce to avoid fitting problems */
-	padding-left: 0px !important;
-	padding-right: 0px !important;
+	width: auto !important;  /* forced to avoid fitting problems */
+	padding-left: 0px !important;  /* forced to save space */
+	padding-right: 0px !important;  /* forced to save space */
 }
 /* Highlighted columns, e.g. filtered */
 table.adminlist td.yellow,
@@ -368,7 +362,7 @@ table.adminlist td.order {
 table.adminlist tbody tr td {
 	background: none repeat scroll 0 0 #FFFFFF;
 	border: none;
-	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
+	border-width: 0px !important; /* fored, to avoid border of cell overlapping over the border of the row */
 }
 table.adminlist tbody tr.row1 td {
 	background: none repeat scroll 0 0 #f7f7f7;
@@ -397,7 +391,7 @@ table.adminlist tfoot tr {
 table.adminlist tfoot td, table.adminlist tfoot th {
 	background-color: #fff;
 	border: none;
-	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
+	border-width: 0px !important; /* forced, to avoid border of cell overlapping over the border of the row */
 	text-align: center;
 }
 
@@ -432,7 +426,7 @@ ul#ultagbox {
 	margin: 0;
 	padding: 0;
 }
-ul#ultagbox li {
+ul#ultagbox > li {
 	list-style-type:none;
 	display:block;
 	float:left;
@@ -440,24 +434,24 @@ ul#ultagbox li {
 	line-height: 100%;
 }
 
-.tagitem.plain {
-	background: url(../images/tag_blue.png) #f9f9f9 no-repeat  100% 50% !important;
-	padding-right: 18px!important;
+ul#ultagbox > li.tagitem.plain {
+	background: url(../images/tag_blue.png) #f9f9f9 no-repeat  100% 50%;
+	padding-right: 18px;
 }
-.tagitem {
-	border: 1px solid silver !important;
-	padding: 4px 1px 3px 6px !important;
-	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat  100% 50% !important;
-	margin: 2px !important;
+ul#ultagbox > li.tagitem {
+	border: 1px solid silver;
+	padding: 4px 1px 3px 6px;
+	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat  100% 50%;
+	margin: 2px;
 }
-.deletetag {
-	display: block !important;
-	width: 18px !important;
-	height:14px !important;
-	float: right !important;
-	margin-left: 5px !important;
-	outline: none !important;
-	background-color: transparent !important;
+ul#ultagbox > li.tagitem .deletetag {
+	display: block;
+	width: 18px;
+	height:14px;
+	float: right;
+	margin-left: 5px;
+	outline: none;
+	background-color: transparent;
 }
 /** tag selection */
 div#tags {
@@ -633,7 +627,7 @@ div label.lang_box img {
 
 
 
-/* workaround yes-no forced styling */
+/* Extra buttons style for button groups to override Joomla default YES-NO only styling */
 .btn {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -794,8 +788,6 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 }
 #flexicontent span.flexi_label label label { float:right; margin:auto; padding:auto; }
 
-#flexicontent .flexi_label.fcdualline { width:32%; padding: 6px 2% 6px 2% !important; }
-
 #flexicontent .pane-sliders .group-rules label.hasTip {
   width: auto;
 }
@@ -903,12 +895,6 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 }
 
 
-#flexicontent .flexi_params .fcdualline_container { margin: 0px; padding: 0px; float: left; min-width: 430px; }
-#flexicontent .flexi_params .fcdualline_container label.flexi_label,
-#flexicontent .flexi_params .fcdualline_container label.hasTip,
-#flexicontent .flexi_params .fcdualline_container label.hasTooltip { clear: none !important; width: 32% !important; }
-#flexicontent .flexi_params .fcdualline_container .container_fcfield input[type="text"],
-#flexicontent .flexi_params .fcdualline_container .container_fcfield select { max-width: 250px !important; }
 
 .flexi_params table.admintable,
 .flexi_params table.admintable td {
@@ -918,11 +904,13 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	background: none !important;
 }
 
+
+/* Forced elements to display as INVALID, MUST avoid CSS conflicts here */
 #flexicontent form textarea.invalid,
 #flexicontent form input.invalid,
 #flexicontent form select.invalid,
 select.invalid, input.invalid, textarea.invalid {
-	border: 1px dotted #CC0000 !important; /* FORCED styling */
+	border: 1px dotted #CC0000 !important; /* forced, display as INVALID */
 }
 
 /*.use_prettycheckable.invalid + a + label,
@@ -930,13 +918,13 @@ input.invalid + .fccheckradio_lbl {
 	color: #cc0000 !important; /* FORCED styling */
 }
 .use_prettycheckable.invalid + a + label > img {
-	border: 1px dotted #CC0000 !important; /* FORCED styling */
+	border: 1px dotted #CC0000 !important; /* forced, display as INVALID */
 }*/
 #flexicontent .label.invalid,
 #flexicontent .label-fcinner.invalid,
 #flexicontent .flexi_label.invalid,
 #flexicontent .flexi_label.invalid.required {
-	color: #CC0000 !important; /* FORCED styling */
+	color: #CC0000 !important; /* forced, display as INVALID */
 }
 #flexicontent .flexi_label.required:after {
 	content:"*";

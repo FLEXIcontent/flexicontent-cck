@@ -57,43 +57,53 @@ $js = "
 <div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
-	<div class="flexi_params">
-	
-		<div class="fcdualline_container">
-			<?php echo $this->form->getLabel('title'); ?>
-			<div class="container_fcfield fcdualline">
+	<div class="container-fluid" style="padding:0px!important;">
+		
+		<div class="span6 full_width_980">
+		
+			<span class="label-fcouter">
+				<?php echo str_replace('" class="', '" class="label label-fcinner ', $this->form->getLabel('title')); ?>
+			</span>
+			<div class="container_fcfield">
 				<?php echo $this->form->getInput('title'); ?>
 			</div>
-		</div>
-		<div class="fcdualline_container">
-			<?php echo $this->form->getLabel('published'); ?>
-			<div class="container_fcfield fcdualline">
-					<?php echo $this->form->getInput('published'); ?>
-			</div>
-		</div>
-		<div class="fcclear"></div>
-		
-		<div class="fcdualline_container">
-			<?php echo $this->form->getLabel('alias'); ?>
-			<div class="container_fcfield fcdualline">
+			
+			<div class="fcclear"></div>
+			<span class="label-fcouter">
+				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('alias')); ?>
+			</span>
+			<div class="container_fcfield">
 				<?php echo $this->form->getInput('alias'); ?>
 			</div>
-		</div>
-		<div class="fcdualline_container">
-			<?php echo $this->form->getLabel('parent_id'); ?>
-			<div class="container_fcfield fcdualline">
-				<?php echo $this->Lists['parent_id']; ?>
-			</div>
-		</div>
-		<div class="fcclear"></div>
-		
-		<div class="fcdualline_container">
-			<?php echo $this->form->getLabel('language'); ?>
-			<div class="container_fcfield fcdualline">
+			
+			<div class="fcclear"></div>
+			<span class="label-fcouter">
+				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('language')); ?>
+			</span>
+			<div class="container_fcfield">
 				<?php echo $this->form->getInput('language'); ?>
 			</div>
+			
 		</div>
-		<div class="fcclear"></div>
+		
+		<div class="span6 full_width_980">
+			
+			<span class="label-fcouter">
+				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('published')); ?>
+			</span>
+			<div class="container_fcfield">
+					<?php echo $this->form->getInput('published'); ?>
+			</div>
+
+			<div class="fcclear"></div>
+			<span class="label-fcouter">
+				<?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('parent_id')); ?>
+			</span>
+			<div class="container_fcfield">
+				<?php echo $this->Lists['parent_id']; ?>
+			</div>
+		
+		</div>
 		
 	</div>
 	
@@ -198,7 +208,7 @@ $js = "
 				<?php foreach($this->form->getGroup('special') as $field): ?>
 					<fieldset class="panelform">
 						<?php echo $field->label; ?>
-						<div class="container_fcfield fcdualline">
+						<div class="container_fcfield">
 							<?php echo $this->Lists[$field->fieldname]; ?>
 						</div>
 					</fieldset>
@@ -213,7 +223,7 @@ $js = "
 				
 				<fieldset class="panelform">
 					<?php echo $this->form->getLabel('copycid'); ?>
-					<div class="container_fcfield fcdualline">
+					<div class="container_fcfield">
 						<?php echo $this->Lists['copycid']; ?>
 					</div>
 				</fieldset>

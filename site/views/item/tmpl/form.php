@@ -504,19 +504,17 @@ if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item
 		</div>
 		
 		<?php	if ( $this->params->get('use_versioning', 1) && $this->params->get('allow_unapproved_latest_version', 0) ) : /* PARAMETER MISSING currently disabled */ ?>
-			<div style="float:left; width:50%;">
-				<?php
-					//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
-					$label_tooltip = 'class="'.$tip_class.' flexi_label fcdualline" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
-				?>
-				<span class="label-fcouter">
-					<label id="jform_vstate-lbl" for="jform_vstate" for_bck="jform_vstate" <?php echo $label_tooltip; ?> >
-						<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
-					</label>
-				</span>
-				<div class="container_fcfield container_fcfield_name_vstate fcdualline">
-					<?php echo $this->lists['vstate']; ?>
-				</div>
+			<?php
+				//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
+				$label_tooltip = 'class="'.$tip_class.' flexi_label fcdualline" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
+			?>
+			<span class="label-fcouter">
+				<label id="jform_vstate-lbl" for="jform_vstate" for_bck="jform_vstate" <?php echo $label_tooltip; ?> >
+					<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
+				</label>
+			</span>
+			<div class="container_fcfield container_fcfield_name_vstate fcdualline">
+				<?php echo $this->lists['vstate']; ?>
 			</div>
 		<?php	else : ?>
 	  	<input type="hidden" id="jform_vstate" name="jform[vstate]" value="2" />
@@ -681,11 +679,18 @@ if ($tags_displayed) : ob_start();  // tags ?>
 				<?php
 					foreach($this->usedtagsdata as $tag) {
 						if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
-							echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-							echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+							echo '
+							<li class="tagitem">
+								<span>'.$tag->name.'</span>
+								<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
+								<a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
+							</li>';
 						} else {
-							echo '<li class="tagitem plain"><span>'.$tag->name.'</span>';
-							echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /></li>';
+							echo '
+							<li class="tagitem plain">
+								<span>'.$tag->name.'</span>
+								<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
+							</li>';
 						}
 					}
 				?>

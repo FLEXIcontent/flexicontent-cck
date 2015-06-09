@@ -1366,7 +1366,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	}
 
 	/**
-	 * Method to fetch the tags form
+	 * Method to fetch the tags form, this is currently NOT USED
 	 * 
 	 * @since 1.5
 	 */
@@ -1394,26 +1394,38 @@ class FlexicontentControllerItems extends FlexicontentController
 		$n = count($tags);
 		$rsp = '';
 		if ($n>0) {
-			$rsp .= '<div class="qf_tagbox">';
-			$rsp .= '<ul>';
+			$rsp .= '<div class="qf_tagbox" id="qf_tagbox">';
+			$rsp .= '<ul id="ultagbox">';
 			for( $i = 0, $n; $i < $n; $i++ ){
 				$tag = $tags[$i];
-				$rsp .=  '<li><div><span class="qf_tagidbox"><input type="checkbox" name="tag[]" value="'.$tag->id.'"' . (in_array($tag->id, $used) ? 'checked="checked"' : '') . $CanUseTags . ' /></span>'.$tag->name.'</div></li>';
-				if ($CanUseTags && in_array($tag->id, $used)){
-					$rsp .= '<input type="hidden" name="tag[]" value="'.$tag->id.'" />';
+				if (!in_array($tag->id, $used)) continue; // tag not assigned to item
+				if ( $CanUseTags && in_array($tag->id, $used) ) {
+					$rsp .='
+					<li class="tagitem">
+						<span>'.$tag->name.'</span>
+						<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
+						<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
+					</li>';
+				} else {
+					$rsp .='
+					<li class="tagitem plain">
+						<span>'.$tag->name.'</span>
+						<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
+					</li>';
 				}
 			}
 			$rsp .= '</ul>';
 			$rsp .= '</div>';
 			$rsp .= '<div class="clear"></div>';
-			}
+		}
 		if ($CanNewTags)
 		{
-			$rsp .= '<div class="qf_addtag">';
-			$rsp .= '<label for="addtags">'.JText::_( 'FLEXI_ADD_TAG' ).'</label>';
-			$rsp .= '<input type="text" id="tagname" class="inputbox" size="30" />';
-			$rsp .=	'<input type="button" class="fc_button" value="'.JText::_( 'FLEXI_ADD' ).'" onclick="addtag()" />';
-			$rsp .= '</div>';
+			$rsp .= '
+			<div class="qf_addtag">
+				<label for="addtags">'.JText::_( 'FLEXI_ADD_TAG' ).'</label>
+				<input type="text" id="tagname" class="inputbox" size="30" />
+				<input type="button" class="fc_button" value="'.JText::_( 'FLEXI_ADD' ).'" onclick="addtag()" />
+			</div>';
 		}
 		echo $rsp;
 	}

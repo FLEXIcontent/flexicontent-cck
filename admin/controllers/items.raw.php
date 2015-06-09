@@ -74,7 +74,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$date_format = ( $date_format == $jt_date_format ) ? $df_date_format : $date_format;
 		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
 		foreach($versions as $v) {
-			$class = ($v->nr == $active) ? ' class="active-version"' : '';
+			$class = ($v->nr == $active) ? ' id="active-version"' : '';
 			echo "<tr".$class."><td class='versions'>#".$v->nr."</td>
 				<td class='versions'>".JHTML::_('date', (($v->nr == 1) ? $item->created : $v->date), $date_format )."</td>
 				<td class='versions'>".(($v->nr == 1) ? $item->creator : $v->modifier)."</td>
