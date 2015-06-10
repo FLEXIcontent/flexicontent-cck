@@ -268,6 +268,15 @@ div .positions_readonly {
 	float: left;
 	cursor: move;
 }
+.fields.delfield .delfield_handle {
+	display: block;
+	width: 18px;
+	height: 18px;
+	float: right;
+	margin-left: 5px;
+	outline: none;
+	background-color: transparent;
+}
 .fields.user {
 	background: url(../images/textfield.png) #f9f9f9 no-repeat  3px 50%;
 }
@@ -447,7 +456,7 @@ ul#ultagbox > li.tagitem {
 ul#ultagbox > li.tagitem .deletetag {
 	display: block;
 	width: 18px;
-	height:14px;
+	height: 18px;
 	float: right;
 	margin-left: 5px;
 	outline: none;

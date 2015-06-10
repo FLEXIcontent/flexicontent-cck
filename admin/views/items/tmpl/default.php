@@ -189,8 +189,10 @@ function delFilter(name)
 function delAllFilters() {
 	delFilter('search'); delFilter('filter_type'); delFilter('filter_state');
 	delFilter('filter_cats'); delFilter('filter_author'); delFilter('filter_id');
-	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');  jQuery('#filter_subcats').val('1');
-	delFilter('filter_tag');
+	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');
+	delFilter('filter_tag'); delFilter('filter_access');
+	jQuery('#filter_subcats').val('1');
+	jQuery('.fc_field_filter').val('');
 }
 
 <?php if ($this->ordering) : ?>
@@ -418,6 +420,10 @@ jQuery(document).ready(function(){
 		</span>
 		
 		<span class="fc-filter nowrap_box">
+			<?php echo $this->lists['filter_access']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
 			<?php echo $catsinstate_tip; ?>
 			<?php echo $this->lists['filter_catsinstate']; ?>
 		</span>
@@ -448,6 +454,12 @@ jQuery(document).ready(function(){
 			<label class="label"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
 			<?php echo $this->lists['filter_order_type']; ?>
 		</span>
+		
+		<?php foreach($this->custom_filts as $filt) : ?>
+		<span class="fc-filter nowrap_box">
+			<?php echo $filt->html; ?>
+		</span>
+		<?php endforeach; ?>
 		
 		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
@@ -572,6 +584,11 @@ jQuery(document).ready(function(){
 			
 			<th class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php if ($this->filter_access) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_access');document.adminForm.submit();" />
+				</span>
+				<?php endif; ?>
 			</th>
 			
 			<th class="left hideOnDemandClass">

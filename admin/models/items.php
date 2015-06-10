@@ -59,14 +59,21 @@ class FlexicontentModelItems extends JModelLegacy
 	var $_id = null;
 	
 	/**
-	 * Extra field columns to display in tems listing
+	 * Extra field columns to display for every listed item
 	 *
 	 * @var array
 	 */
 	var $_extra_cols = null;
 	
 	/**
-	 * Category Data of listed items
+	 * Extra (custom) filters to display
+	 *
+	 * @var array
+	 */
+	var $_custom_filters = null;
+	
+	/**
+	 * Category data of listed items
 	 *
 	 * @var array
 	 */
@@ -99,10 +106,10 @@ class FlexicontentModelItems extends JModelLegacy
 		$app     = JFactory::getApplication();
 		$option  = JRequest::getVar('option');
 		$view    = JRequest::getVar('view');
-		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
-		$default_order     = $cparams->get('items_manager_order', 'i.ordering');
-		$default_order_dir = $cparams->get('items_manager_order_dir', 'ASC');
+		$default_order     = $this->cparams->get('items_manager_order', 'i.ordering');
+		$default_order_dir = $this->cparams->get('items_manager_order_dir', 'ASC');
 		
 		$filter_order_type = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_type',	'filter_order_type', 1, 'int' );
 		$filter_order      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 'filter_order', $default_order, 'cmd' );
@@ -131,7 +138,6 @@ class FlexicontentModelItems extends JModelLegacy
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
 		$this->setId((int)$array[0]);
-
 	}
 
 	/**
@@ -160,8 +166,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$task = JRequest::getCmd('task');
 		$cid  = JRequest::getVar('cid', array());
-		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$print_logging_info = $cparams->get('print_logging_info');
+		$print_logging_info = $this->cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		// Lets load the Items if it doesn't already exist
@@ -292,14 +297,12 @@ class FlexicontentModelItems extends JModelLegacy
 		$view   = JRequest::getVar('view');
 		$user   = JFactory::getUser();
 		$fcform = JRequest::getInt('fcform', 0);
-		$flexiparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
 		$filter_type = $fcform ? JRequest::getVar('filter_type')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',		'filter_type',   false, 'array' );
 		
 		if ( $this->_extra_cols !== null) return $this->_extra_cols;
 		
-		// Retrieve the custom field of the items list
-		// STEP 1: Get the field properties
+		// Get the extra fields from COMPONENT OR per type if TYPE FILTER is active
 		if ( !empty($filter_type) )
 		{
 			JArrayHelper::toInteger($filter_type, null);
@@ -313,8 +316,11 @@ class FlexicontentModelItems extends JModelLegacy
 			$item_instance = new stdClass();
 		} else {
 			$item_instance = null;
-			$im_extra_fields = $flexiparams->get("items_manager_extra_fields");
+			$im_extra_fields = $this->cparams->get("items_manager_extra_fields");
 		}
+		
+		$im_extra_fields = trim($im_extra_fields);
+		if (!$im_extra_fields) return array();
 		$im_extra_fields = preg_split("/[\s]*,[\s]*/", $im_extra_fields);
 		
 		foreach($im_extra_fields as $im_extra_field) {
@@ -336,16 +342,138 @@ class FlexicontentModelItems extends JModelLegacy
 			.' ORDER BY FIELD(fi.name, "'. implode('","',array_keys($methodnames)) . '" )';
 		$this->_db->setQuery($query);
 		$extra_fields = $this->_db->loadObjectList('id');
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
-		foreach($extra_fields as $field) {
+		$not_found_fields = $methodnames;
+		foreach($extra_fields as $field)
+		{
 			$field->methodname = $methodnames[$field->name];
 			FlexicontentFields::loadFieldConfig($field, $item_instance);
+			unset($not_found_fields[$field->name]);
+		}
+		if ( count($not_found_fields) ) {
+			JFactory::getApplication()->enqueueMessage('Extra column fieldnames: '. implode(', ',array_keys($not_found_fields)) .(!empty($filter_type) ? ' for current type ' : ''). ' were not found, please remove from '.(!empty($filter_type) ? ' type ' : ' component ').' configuration', 'warning');
 		}
 		
 		$this->_extra_cols = & $extra_fields;
 		$this->getExtraColValues();
 		return $this->_extra_cols;
+	}
+	
+	
+	function getCustomFilts()
+	{
+		$app    = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		$user   = JFactory::getUser();
+		$fcform = JRequest::getInt('fcform', 0);
+		
+		$filter_type = $fcform ? JRequest::getVar('filter_type')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',		'filter_type',   false, 'array' );
+		
+		if ( $this->_custom_filters !== null) {
+			return $this->_custom_filters;
+		}
+		
+		// Get the extra filters from COMPONENT OR per type if TYPE FILTER is active
+		if ( !empty($filter_type) )
+		{
+			JArrayHelper::toInteger($filter_type, null);
+			$query = 'SELECT t.attribs FROM #__flexicontent_types AS t WHERE t.id IN (' . implode( ',', $filter_type) .')';
+			$this->_db->setQuery($query);
+			$type_attribs = $this->_db->loadResult();
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+			
+			$tparams = new JRegistry($type_attribs);
+			$im_custom_filters = $tparams->get("items_manager_custom_filters");
+			$item_instance = new stdClass();
+		} else {
+			$item_instance = null;
+			$im_custom_filters = $this->cparams->get("items_manager_custom_filters");
+		}
+		
+		$im_custom_filters = trim($im_custom_filters);
+		if (!$im_custom_filters) return array();
+		$im_custom_filters = preg_split("/[\s]*,[\s]*/", $im_custom_filters);
+		JArrayHelper::toInteger($im_custom_filters, null);
+		
+		// Field's has_access flag
+		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+		$aid_list = implode(",", $aid_arr);
+		
+		// Column of has_access flag
+		$select_access = ', CASE WHEN fi.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_access';
+		
+		$query = ' SELECT fi.*'
+			. $select_access
+			.' FROM #__flexicontent_fields AS fi'
+			.' WHERE fi.id IN ("' . implode('","', $im_custom_filters) . '")'
+			.' ORDER BY FIELD(fi.id, "'. implode('","', $im_custom_filters) . '")';
+		$this->_db->setQuery($query);
+		$custom_filters = $this->_db->loadObjectList('id');
+		
+		$allowed_field_types = array_flip(array('select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage'));
+		foreach($custom_filters as $filter)
+		{
+			if ( !isset($allowed_field_types[$filter->field_type]) ) {
+				continue;
+			}
+			FlexicontentFields::loadFieldConfig($filter, $item_instance);
+			$filter->value = $app->getUserStateFromRequest( $option.'.'.$view.'filter_'.$filter->id,	'filter_'.$filter->id, false, 'array' );
+			if ( count($filter->value)==1 && !strlen(reset($filter->value)) ) $filter->value = array();
+		}
+		
+		$this->_custom_filters = & $custom_filters;
+		$this->renderFiltersHTML();
+		return $this->_custom_filters;
+	}
+	
+	
+	/**
+	 * Method to get fields values of the fields used as extra columns of the item list
+	 *
+	 * @access public
+	 * @return object
+	 */
+	function renderFiltersHTML()
+	{
+		$allowed_field_types = array_flip(array('select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage'));
+		$formName ='adminForm';
+		
+		foreach($this->_custom_filters as $filter)
+		{
+			if ( !isset($allowed_field_types[$filter->field_type]) ) {
+				JFactory::getApplication()->enqueueMessage('Filter: '. $field->name .' is of type '. $field->field_type .' , allowed types for backend custom filters are: '. implode(', ', array_keys($allowed_field_types)), 'warning');
+				$filter->html = '';
+				continue;
+			}
+			
+			$item_pros = false;
+			$extra_props = ($filter->field_type == 'radioimage' || $filter->field_type == 'checkboximage') ? array('image', 'valgroup') : array();
+			$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, $extra_props, $item_pros, $create_filter=true);
+			
+			$filter->parameters->set( 'faceted_filter', 0 );
+			$filter->parameters->set( 'display_filter_as', 0 );
+			$filter->parameters->set( 'display_label_filter', -1 );
+			$filter->parameters->set( 'label_filter_css', 'label label-info' );
+			$filter->parameters->set( 'filter_extra_attribs', ' onchange="Joomla.submitform()" ' );
+			
+			// Check for error during getting indexed field elements
+			if ( !$elements ) {
+				$filter->html = '';
+				$sql_mode = $filter->parameters->get( 'sql_mode', 0 );  // must retrieve variable here, and not before retrieving elements !
+				if ($sql_mode && $item_pros > 0)
+					$filter->html = sprintf( JText::_('FLEXI_FIELD_ITEM_SPECIFIC_AS_FILTERABLE'), $filter->label );
+				else if ($sql_mode)
+					$filter->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+				else
+					$filter->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+				continue;
+			}
+			
+			JRequest::setVar('view', 'category');
+			FlexicontentFields::createFilter($filter, $filter->value, $formName, $elements);
+			JRequest::setVar('view', 'items');
+		}
 	}
 	
 	
@@ -427,8 +555,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$configured = FLEXI_J16GE ? FLEXI_CAT_EXTENSION : FLEXI_SECTION;
 		if ( !$configured ) return null;
 		
-		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$print_logging_info = $cparams->get('print_logging_info');
+		$print_logging_info = $this->cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		
@@ -595,14 +722,13 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$cache_tbl = "#__flexicontent_items_tmp";
 		$tbls = array($cache_tbl);
-		if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
-		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
+		foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
 		
 		// Get the column names
 		$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
 		$tbl_fields_sel = array();
 		foreach ($tbl_fields as $tbl_field) {
-			if ( (!FLEXI_J16GE && $tbl_field=='language') || $tbl_field=='type_id' || $tbl_field=='lang_parent_id')
+			if ( $tbl_field=='language' || $tbl_field=='type_id' || $tbl_field=='lang_parent_id')
 				$tbl_fields_sel[] = 'ie.'.$tbl_field;
 			else
 				$tbl_fields_sel[] = 'c.'.$tbl_field;
@@ -701,7 +827,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$filter_order   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',   'filter_order',    '',  'cmd' );
 		
 		$nullDate = $this->_db->Quote($this->_db->getNullDate());
-		$nowDate = $this->_db->Quote( JFactory::getDate()->toSql() );
+		$nowDate  = $this->_db->Quote( JFactory::getDate()->toSql() );
 		
 		JArrayHelper::toInteger($filter_tag, null);
 		$filter_state = empty($filter_state) ? array() :
@@ -709,9 +835,20 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
+		
+		if (!$query_ids) {
+			$customFilts = $this->getCustomFilts();
+			$customFiltsActive = array();
+			foreach($customFilts as $filter) {
+				if (!count($filter->value)) continue;
+				$customFiltsActive[$filter->id] = $filter->value;
+			}
+		}
+		
 		if ( !$query_ids ) {
 			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id '
 				. ', t.name AS type_name, rel.ordering as catsordering '
+				. ( count($customFiltsActive) ? ', COUNT(DISTINCT fi.field_id) AS matched_custom ' : '' )
 				. ( in_array('RV', $filter_state) ? ', i.version' : '' )
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
 					', CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN (2) THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order ' : ''
@@ -740,6 +877,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. ($use_tmp ? ' FROM #__flexicontent_items_tmp AS i' :' FROM #__content AS i')
 				. ($tmp_only ? '' : ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id')
 				. ' JOIN #__categories AS c ON c.id = i.catid'
+				. ((!$query_ids && count($customFiltsActive)) ? ' JOIN #__flexicontent_fields_item_relations as fi ON i.id=fi.item_id' : '')
 				. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON i.id=tg.itemid'
 				. (in_array('RV', $filter_state)  ? ' JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
@@ -750,11 +888,15 @@ class FlexicontentModelItems extends JModelLegacy
 				//. ' LEFT JOIN #__categories AS cat ON i.catid=cat.id AND cat.extension='.$this->_db->Quote(FLEXI_CAT_EXTENSION)  // Detect items not included in FC Management, see WHERE too
 				. $extra_joins
 				;
+		
 		if ( !$query_ids ) {
+			$having = array();
+			if ( in_array('RV', $filter_state) ) $having[] = ' i.version<>MAX(fv.version_id) ';
+			if ( count($customFiltsActive) ) $having[] = ' matched_custom = '.count($customFiltsActive);
 			$query .= ""
 				. $where
 				. ' GROUP BY i.id'
-				. (in_array('RV', $filter_state) ? ' HAVING i.version<>MAX(fv.version_id)' : '')
+				. ( count($having) ? ' HAVING '.implode(' AND ', $having) : '' )
 				. $orderby
 				;
 		} else {
@@ -780,7 +922,6 @@ class FlexicontentModelItems extends JModelLegacy
 		$app     = JFactory::getApplication();
 		$option  = JRequest::getVar('option');
 		$view    = JRequest::getVar('view');
-		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
 		$filter_order_type= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_type',	'filter_order_type', 0, 'int' );
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 'filter_order', '', 'cmd' );
@@ -813,7 +954,6 @@ class FlexicontentModelItems extends JModelLegacy
 		$view    = JRequest::getVar('view');
 		$session = JFactory::getSession();
 		$user    = JFactory::getUser();
-		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		$perms   = FlexicontentHelperPerm::getPerm();
 		$fcform   = JRequest::getInt('fcform', 0);
 		
@@ -823,8 +963,8 @@ class FlexicontentModelItems extends JModelLegacy
 		// ***********************************
 		
 		$allitems	= $perms->DisplayAllItems;
-		$viewable_items = $cparams->get('iman_viewable_items', 1);
-		$editable_items = $cparams->get('iman_editable_items', 0);
+		$viewable_items = $this->cparams->get('iman_viewable_items', 1);
+		$editable_items = $this->cparams->get('iman_editable_items', 0);
 		
 		
 		// ************************************************************************
@@ -850,11 +990,12 @@ class FlexicontentModelItems extends JModelLegacy
 		// Get item list filters
 		// *********************
 		
-		$filter_tag 		= $fcform ? JRequest::getVar('filter_tag')   : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_tag',		'filter_tag',    false, 'array' );
-		$filter_lang    = $fcform ? JRequest::getVar('filter_lang')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',		'filter_lang',   false, 'array' );
-		$filter_type 		= $fcform ? JRequest::getVar('filter_type')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',		'filter_type',   false, 'array' );
-		$filter_author	= $fcform ? JRequest::getVar('filter_author'): $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author',	'filter_author', false, 'array' );
-		$filter_state   = $fcform ? JRequest::getVar('filter_state') : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',	'filter_state',  false, 'array' );
+		$filter_tag 		= $fcform ? JRequest::getVar('filter_tag')    : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_tag',    'filter_tag',    false, 'array' );
+		$filter_lang    = $fcform ? JRequest::getVar('filter_lang')   : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',   false, 'array' );
+		$filter_type 		= $fcform ? JRequest::getVar('filter_type')   : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',   'filter_type',   false, 'array' );
+		$filter_author	= $fcform ? JRequest::getVar('filter_author') : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author', false, 'array' );
+		$filter_state   = $fcform ? JRequest::getVar('filter_state')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',  'filter_state',  false, 'array' );
+		$filter_access  = $fcform ? JRequest::getVar('filter_access') : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access', 'filter_access', '',    'string' );
 		
 		$filter_cats 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',	'filter_cats', '', 'int' );
 		$filter_subcats	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_subcats',	'filter_subcats', 1, 'int' );
@@ -993,9 +1134,9 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 		
 		
-		// ***********************************************************************
-		// Limit using simpler filtering, (item) type, author, (item) id, language
-		// ***********************************************************************
+		// *******************************************************************************
+		// Limit using simpler filtering, (item) type, author, (item) id, language, access
+		// *******************************************************************************
 		
 		if ( !empty($filter_tag) )
 		{
@@ -1009,7 +1150,8 @@ class FlexicontentModelItems extends JModelLegacy
 			$where[] = 'i.type_id IN (' . implode( ',', $filter_type) .')';
 		}
 		
-		if ( !empty($filter_author) ) {
+		if ( !empty($filter_author) )
+		{
 			JArrayHelper::toInteger($filter_author, null);
 			$where[] = 'i.created_by IN (' . implode( ',', $filter_author) .')';
 		}
@@ -1024,6 +1166,28 @@ class FlexicontentModelItems extends JModelLegacy
 				$filter_langs[] = $this->_db->Quote($val);
 			
 			$where[] = 'i.language IN (' . implode( ',', $filter_langs) .')';
+		}
+		
+		if ( !empty($filter_access) )
+		{
+			JArrayHelper::toInteger($filter_access, null);
+			$where[] = 'i.access IN (' . implode( ',', $filter_access) .')';
+		}
+		
+		
+		// **************
+		// CUSTON filters
+		// **************
+		
+		$customFilts = $this->getCustomFilts();
+		$_filts_vals_clause =  array();
+		foreach($customFilts as $filter) {
+			if (!count($filter->value)) continue;
+			$_filts_vals_clause[] = ' (fi.field_id='.$filter->id.' AND fi.value='.$this->_db->Quote($filter->value[0]).')';
+		}
+		if ( count($_filts_vals_clause) )
+		{
+			$where[] = ' (' . implode(' OR ', $_filts_vals_clause).' )';
 		}
 		
 		
@@ -1099,8 +1263,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$app = JFactory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		
-		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		$use_versioning = $cparams->get('use_versioning', 1);
+		$use_versioning = $this->cparams->get('use_versioning', 1);
 		
 		require_once("components/com_flexicontent/models/item.php");
 		
@@ -1656,7 +1819,6 @@ class FlexicontentModelItems extends JModelLegacy
 		$app     = JFactory::getApplication();
 		$option  = JRequest::getVar('option');
 		$view    = JRequest::getVar('view');
-		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
 		// Every state group has different ordering
 		$row = JTable::getInstance('flexicontent_items', '');
@@ -2053,18 +2215,9 @@ class FlexicontentModelItems extends JModelLegacy
 			//}
 			foreach ($items as $item)
 			{
-				if (FLEXI_J16GE) {
-					$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
-					$canDelete 		= in_array('delete', $rights);
-					$canDeleteOwn = in_array('delete.own', $rights) && $item->created_by == $user->id;
-				} else if (FLEXI_ACCESS) {
-					$rights 		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-					$canDelete 		= in_array('delete', $rights) /*|| $canDeleteAll	*/;
-					$canDeleteOwn	= (in_array('deleteown', $rights) /*|| $canDeleteOwnAll*/) && $item->created_by == $user->id;
-				} else {
-					// This should be unreachable
-					return true;
-				}
+				$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
+				$canDelete 		= in_array('delete', $rights);
+				$canDeleteOwn = in_array('delete.own', $rights) && $item->created_by == $user->id;
 				if (!$canDelete && !$canDeleteOwn) return false;
 			}
 			return true;
@@ -2080,11 +2233,9 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function delete($cid, &$itemmodel=null)
 	{
-		if (FLEXI_J16GE) {
-			$dispatcher = JDispatcher::getInstance();  // Get event dispatcher and load all content plugins for triggering their delete events
-			JPluginHelper::importPlugin('content');      // Load all content plugins for triggering their delete events
-			$item_arr = array();                         // We need an array of items to use for calling the 'onContentAfterDelete' Event
-		}
+		$dispatcher = JDispatcher::getInstance();  // Get event dispatcher and load all content plugins for triggering their delete events
+		JPluginHelper::importPlugin('content');    // Load all content plugins for triggering their delete events
+		$item_arr = array();                       // We need an array of items to use for calling the 'onContentAfterDelete' Event
 		
 		if ( !count( $cid ) ) return false;
 		
@@ -2099,11 +2250,9 @@ class FlexicontentModelItems extends JModelLegacy
 				// *****************************************************************
 				// Trigger Event 'onContentBeforeDelete' of Joomla's Content plugins
 				// *****************************************************************
-				if (FLEXI_J16GE) {
-					$event_before_delete = 'onContentBeforeDelete';  // NOTE: $itemmodel->event_before_delete is protected property
-					$dispatcher->trigger($event_before_delete, array('com_content.article', $item));
-					$item_arr[] = clone($item);  // store object so that we can call after delete event
-				}
+				$event_before_delete = 'onContentBeforeDelete';  // NOTE: $itemmodel->event_before_delete is protected property
+				$dispatcher->trigger($event_before_delete, array('com_content.article', $item));
+				$item_arr[] = clone($item);  // store object so that we can call after delete event
 				
 				// **********************************************************************************
 				// Trigger onBeforeDeleteField field event to allow fields to cleanup any custom data
@@ -2120,19 +2269,16 @@ class FlexicontentModelItems extends JModelLegacy
 		// *********************************************
 		// Retrieve J2.5 asset before deleting the items
 		// *********************************************
-		if (FLEXI_J16GE) {
-			$query = 'SELECT asset_id FROM #__content'
-					. ' WHERE id IN ('. $cids .')'
-					;
-			$this->_db->setQuery( $query );
-			
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			$assetids = $this->_db->loadColumn();
-			$assetidslist = implode(',', $assetids );
+		$query = 'SELECT asset_id FROM #__content'
+				. ' WHERE id IN ('. $cids .')';
+		$this->_db->setQuery( $query );
+		
+		if(!$this->_db->query()) {
+			$this->setError($this->_db->getErrorMsg());
+			return false;
 		}
+		$assetids = $this->_db->loadColumn();
+		$assetidslist = implode(',', $assetids );
 		
 		
 		// **********************
@@ -2384,9 +2530,7 @@ class FlexicontentModelItems extends JModelLegacy
 	
 		$this->_db->setQuery( $query );
 
-		$this->_author = $this->_db->loadResult();
-
-		return $this->_author;
+		return $this->_db->loadResult();
 	}
 
 	/**
@@ -2403,8 +2547,8 @@ class FlexicontentModelItems extends JModelLegacy
 				. ' ORDER BY name ASC'
 				;
 		$this->_db->setQuery($query);
-		$types = $this->_db->loadObjectList();
-		return $types;	
+		
+		return $this->_db->loadObjectList();
 	}
 
 	/**
@@ -2423,9 +2567,7 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		$this->_db->setQuery($query);
 
-		$authors = $this->_db->loadObjectList();
-
-		return $authors;	
+		return $this->_db->loadObjectList();
 	}
 	
 	
@@ -2572,13 +2714,12 @@ class FlexicontentModelItems extends JModelLegacy
 		unset($map_old_new);
 		
 		// Save the created top category as the flexi_top_category for the component
-		$fparams = JComponentHelper::getParams('com_flexicontent');
-		$fparams->set('flexi_top_category', $topcat->id);
-		$fparams_str = $fparams->toString();
+		$this->cparams->set('flexi_top_category', $topcat->id);
+		$cparams_str = $this->cparams->toString();
 		
 		$flexi = JComponentHelper::getComponent('com_flexicontent');
 		$query = 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__components')
-			. ' SET params = ' . $this->_db->Quote($fparams_str)
+			. ' SET params = ' . $this->_db->Quote($cparams_str)
 			. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .'='. $flexi->id
 			;
 		$this->_db->setQuery($query);
@@ -2712,7 +2853,7 @@ class FlexicontentModelItems extends JModelLegacy
 				}
 			} else {
 				$jAp= JFactory::getApplication();
-				$jAp->enqueueMessage( JText::_('FLEXI_CANNOT_VIEW_EDIT_ANY_ITEMS'), 'notice' );
+				$jAp->enqueueMessage( JText::_('FLEXI_CANNOT_VIEW_EDIT_ANY_ITEMS'), 'warning' );
 				$where[] = ' 0 ';
 			}
 		}

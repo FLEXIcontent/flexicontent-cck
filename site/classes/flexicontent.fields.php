@@ -2612,13 +2612,16 @@ class FlexicontentFields
 			$options = array();
 			// MULTI-select does not has an internal label a drop-down list option
 			if ($display_filter_as != 6) {
-				if ($label_filter==2) {
+				if ($label_filter==-1) {  // *** e.g. BACKEND ITEMS MANAGER custom filter
+					$filter->html = '<span class="'.$filter->parameters->get( 'label_filter_css'.$_s, 'label' ).'">'.$filter->label.'</span>';
+					$first_option_txt = '';
+				} else if ($label_filter==2) {
 					$first_option_txt = $filter->label;
 				} else {
 					$first_option_txt = $filter->parameters->get( 'filter_usefirstoption'.$_s, 0) ? $filter->parameters->get( 'filter_firstoptiontext'.$_s, 'FLEXI_ALL') : 'FLEXI_ANY';
 					$first_option_txt = JText::_($first_option_txt);
 				}
-				$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
+				$options[] = JHTML::_('select.option', '', !$first_option_txt ? '-' : '- '.$first_option_txt.' -');
 			}
 			
 			// Make use of select2 lib
@@ -2639,6 +2642,10 @@ class FlexicontentFields
 			// Create HTML tag attributes
 			$attribs_str  = ' class="fc_field_filter'.$classes.'" '.$extra_param;
 			$attribs_str .= $display_filter_as==6 ? ' multiple="multiple" size="20" ' : '';
+			if ( $extra_attribs = $filter->parameters->get( 'filter_extra_attribs'.$_s, '' ) )
+			{
+				$attribs_str .= $extra_attribs;
+			}
 			//$attribs_str .= ($display_filter_as==0 || $display_filter_as==6) ? ' onchange="document.getElementById(\''.$formName.'\').submit();"' : '';
 			
 			foreach($results as $result) {

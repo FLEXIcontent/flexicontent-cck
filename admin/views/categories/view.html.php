@@ -226,14 +226,14 @@ class FlexicontentViewCategories extends JViewLegacy
 		// filter by a category (it's subtree will be displayed)
 		$categories = $globalcats;
 		$lists['cats'] = ($filter_cats || 1 ? '<label class="label">'.JText::_('FLEXI_CATEGORY').'</label>' : '').
-			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-', 'class="use_select2_lib" onchange="this.form.submit();"', $check_published=true, $check_perms=false);
+			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-', 'class="use_select2_lib" onchange="Joomla.submitform()"', $check_published=true, $check_perms=false);
 		
 		// filter depth level
 		$options	= array();
 		$options[]	= JHtml::_('select.option', '', '-'/*JText::_('FLEXI_SELECT_MAX_DEPTH')*/);
 		for($i=1; $i<=10; $i++) $options[]	= JHtml::_('select.option', $i, $i);
 		$fieldname =  $elementid = 'filter_level';
-		$attribs = 'class="use_select2_lib" onchange="this.form.submit();"';
+		$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
 		$lists['level']	= ($filter_level || 1 ? '<label class="label">'.JText::_('FLEXI_MAX_DEPTH').'</label>' : '').
 			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid, $translate=true );
 		
@@ -261,7 +261,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		// filter language
 		$lists['language'] = ($filter_language || 1 ? '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>' : '').
-			flexicontent_html::buildlanguageslist('filter_language', 'class="use_select2_lib" onchange="submitform();"', $filter_language, '-'/*2*/);
+			flexicontent_html::buildlanguageslist('filter_language', 'class="use_select2_lib" onchange="Joomla.submitform()"', $filter_language, '-'/*2*/);
 		
 		// filter search word
 		$lists['search']= $search;
