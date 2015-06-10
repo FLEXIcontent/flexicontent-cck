@@ -464,12 +464,15 @@ class plgSystemFlexisystem extends JPlugin
 					$ancestors[] 	= $v->parent_id;
 				} 
 				
-				if ( $type ) {
+				if ($v->parent_id==1) {  // Top level category ( a child of ROOT)
+					$pre    = '';
+					$spacer = '&nbsp;.&nbsp;';
+				} else if ( $type ) {
 					$pre    = '<sup>|_</sup>&nbsp;';
-					$spacer = '.&nbsp;&nbsp;&nbsp;';
+					$spacer = '&nbsp;.&nbsp;';
 				} else {
-					$pre    = '- ';
-					$spacer = '&nbsp;&nbsp;';
+					$pre    = '-&nbsp;';
+					$spacer = '&nbsp;.&nbsp;';
 				}
 
 				if ($title) {

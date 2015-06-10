@@ -28,11 +28,11 @@ $txtmode = $params->get('txtmode', 0);
 $show_search_label = $params->get('show_search_label', 1);
 $search_autocomplete = $params->get( 'search_autocomplete', 1 );
 $flexi_button_class_go =  ($params->get('flexi_button_class_go' ,'') != '-1')  ?
-    $params->get('flexi_button_class_go' ,'')   :
-    $params->get('flexi_button_class_go_custom', 'fc_button')  ;
+    $params->get('flexi_button_class_go', (FLEXI_J30GE ? 'btn btn-info' : 'fc_button'))   :
+    $params->get('flexi_button_class_go_custom', (FLEXI_J30GE ? 'btn btn-info' : 'fc_button'))  ;
 $flexi_button_class_direct =  ($params->get('flexi_button_class_direct' ,'') != '-1')  ?
-    $params->get('flexi_button_class_direct' ,'')   :
-    $params->get('flexi_button_class_direct_custom', 'fc_button')  ;
+    $params->get('flexi_button_class_direct', (FLEXI_J30GE ? 'btn btn-info' : 'fc_button'))   :
+    $params->get('flexi_button_class_direct_custom', (FLEXI_J30GE ? 'btn btn-info' : 'fc_button'))  ;
 $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'') != '-1')  ?
     $params->get('flexi_button_class_advanced' ,'')   :
     $params->get('flexi_button_class_advanced_custom', 'fc_button fcsimple flexiadvsearchlink')  
@@ -62,9 +62,9 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		// Search GO button
 		if ($button) :
 			if ($button_as) :
-				$button = '<input type="image" value="'.$button_text.'" class="'.$flexi_button_class_go.'" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
+				$button = '<input type="image" value="'.$button_text.'" class="fc_filter_button '.$flexi_button_class_go.'" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
 			else :
-				$button = '<input type="submit" value="'.$button_text.'" class="'.$flexi_button_class_go.'" onclick="this.form.searchword.focus();"/>';
+				$button = '<input type="submit" value="'.$button_text.'" class="fc_filter_button '.$flexi_button_class_go.'" onclick="this.form.searchword.focus();"/>';
 			endif;
 		else :
 			/* Hidden submit button so that pressing Enter will work */
@@ -74,41 +74,37 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		switch ($button_pos) :
 			case 'top'   : $output = $button.'<br />'.$output;  break;
 			case 'bottom': $output = $output.'<br />'.$button;  break;
-			case 'right' : $output = $output.$button;  break;
+			case 'right' : $output = $output.' '.$button;  break;
 			case 'left'  :
-			default      : $output = $button.$output; break;
+			default      : $output = $button.' '.$output; break;
 		endswitch;
 		
 		
 		// Search DIRECT (lucky) button
 		if ($direct) :
 			if ($direct_as) :
-				$direct = '<input type="image" value="'.$direct_text.'" class="'.$flexi_button_class_direct.'" src="'.JURI::base().$direct_image.'" onclick="this.form.direct.value=1; this.form.searchword.focus();"/>';
+				$direct = '<input type="image" value="'.$direct_text.'" class="fc_filter_button '.$flexi_button_class_direct.'" src="'.JURI::base().$direct_image.'" onclick="this.form.direct.value=1; this.form.searchword.focus();"/>';
 				$direct .= '<input type="hidden" name="direct" value="" />'; // workaround for image button not being able to submit a value
 			else :
-			 $direct = '<input type="submit" name="direct" value="'.$direct_text.'" class="'.$flexi_button_class_direct.'" onclick="this.form.searchword.focus();"/>';
+			 $direct = '<input type="submit" name="direct" value="'.$direct_text.'" class="fc_filter_button '.$flexi_button_class_direct.'" onclick="this.form.searchword.focus();"/>';
 			endif;
 			
 			switch ($direct_pos) :
 				case 'top'   : $output = $direct.'<br />'.$output;  break;
 				case 'bottom': $output = $output.'<br />'.$direct;  break;
-				case 'right' : $output = $output.$direct;  break;
+				case 'right' : $output = $output.' '.$direct;  break;
 				case 'left'  :
-				default      : $output = $direct.$output; break;
+				default      : $output = $direct.' '.$output; break;
 			endswitch;
 		endif;
 		
 		
-		// Display search box and the optional buttons
-		echo $output;
-		
-		
-		// Display advanced search link
+		// Display the optional buttons and advanced search box
 		?>
-		<?php if ($linkadvsearch) : ?>
-		<a href="<?php echo $action; ?>" class="<?php echo $flexi_button_class_advanced;?>"><?php echo $linkadvsearch_txt;?></a>
-		<?php endif; ?>
-		
+			<?php	echo $output; ?>
+			<?php if ($linkadvsearch) : /* Display advanced search link*/ ?>
+				<a href="<?php echo $action; ?>" class="<?php echo $flexi_button_class_advanced;?>"><?php echo $linkadvsearch_txt;?></a>
+			<?php endif; ?>
 		</span>
 	</div>
 	

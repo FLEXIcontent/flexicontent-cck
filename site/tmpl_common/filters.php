@@ -112,7 +112,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 					<span class="fc_filter_label"><?php echo JText::_('FLEXI_TEXT_SEARCH'); ?></span>
 				<?php endif; ?>
 				
-				<span class="fc_filter_html">
+				<span class="fc_filter_html fc_text_search">
 					<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
 						data-fc_label_text="<?php echo $text_search_label; ?>" name="filter"
 						id="<?php echo $form_id; ?>_filter" value="<?php echo htmlspecialchars($text_search_val, ENT_COMPAT, 'UTF-8');?>" />

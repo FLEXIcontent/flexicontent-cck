@@ -418,7 +418,7 @@ class FlexicontentModelItems extends JModelLegacy
 				continue;
 			}
 			FlexicontentFields::loadFieldConfig($filter, $item_instance);
-			$filter->value = $app->getUserStateFromRequest( $option.'.'.$view.'filter_'.$filter->id,	'filter_'.$filter->id, false, 'array' );
+			$filter->value = $app->getUserStateFromRequest( $option.'.'.$view.'filter_'.$filter->id,	'filter_'.$filter->id, array(), 'array' );
 			if ( count($filter->value)==1 && !strlen(reset($filter->value)) ) $filter->value = array();
 		}
 		

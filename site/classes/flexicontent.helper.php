@@ -3788,7 +3788,7 @@ class flexicontent_html
 		$layout_vars['layout']   = $obj && isset($obj->_layout) ? $obj->_layout : JRequest::getCmd('layout', '');
 		
 		if ($obj && isset($obj->_ids)) {
-			$layout_vars['cids'] = $obj->_ids;
+			$layout_vars['cids'] = !is_array($obj->_ids) ? $obj->_ids : implode(',' , $obj->_ids);
 		} else {
 			$mcats_list = JRequest::getVar('cids', '');
 			if ( !is_array($mcats_list) ) {

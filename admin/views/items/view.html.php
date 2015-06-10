@@ -611,7 +611,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// build access level filter
 		$access_levels = JHtml::_('access.assetgroups');
-		if ( $cparams->get('iman_viewable_items', 1) )  // only viewable items is enabled, skip the non available levels to avoid user confusion
+		/*if ( $cparams->get('iman_viewable_items', 1) )  // only viewable items is enabled, skip the non available levels to avoid user confusion
 		{
 			$_aid_arr = array_flip(JAccess::getAuthorisedViewLevels($user->id));
 			$_levels = array();
@@ -622,7 +622,7 @@ class FlexicontentViewItems extends JViewLegacy
 				//else $access_levels[$i]->disable = 1;
 			}
 			$access_levels = $_levels;
-		}
+		}*/  // Above code is maybe problematic (e.g. in multi-sites), need to test more
 		array_unshift($access_levels, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
 		$fieldname = 'filter_access[]';  // make multivalue
 		$elementid = 'filter_access';

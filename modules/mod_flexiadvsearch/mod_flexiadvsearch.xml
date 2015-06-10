@@ -54,6 +54,7 @@
 				<option value="1" show_list="disp_gobtn" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="flexi_button_class_go" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="disp_gobtn">
+				<option value="" show_list="" hide_list="custom_gobtn_class">FLEXI_DEFAULT</option>
 				<option value="fc_button" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_FCBUTTON</option>
 				<option value="btn btn-primary" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_SUCCESS</option>
@@ -83,6 +84,7 @@
 				<option value="1" show_list="disp_directbtn" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="flexi_button_class_direct" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="disp_directbtn">
+				<option value="" show_list="" hide_list="custom_gobtn_class">FLEXI_DEFAULT</option>
 				<option value="fc_button" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_FCBUTTON</option>
 				<option value="btn btn-primary" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_SUCCESS</option>

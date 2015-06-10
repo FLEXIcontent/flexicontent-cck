@@ -386,6 +386,13 @@ ul.fc_field_filter.fc_checkradio_group label {
 	display: inline-block;
 }
 
+/* Text search box (in component OR filtering module) */
+.fc_filter_html.fc_text_search * { vertical-align: top; }
+.fc_filter_html.fc_text_search .fc_field_filter { padding-top: 0px; }
+.fc_filter_html.fc_text_search input.fc_text_filter { margin: 3px 0px; }
+.fc_filter_html.fc_text_search .fc_filter_button { margin: 3px 0px; }
+.fc_filter_html input.fc_text_filter  { margin: 3px 0px; }
+
 
 /* Inner Labels */
 .fc_has_inner_label, .fc_has_inner_prompt {

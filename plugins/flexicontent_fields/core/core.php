@@ -394,6 +394,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		
 		$_s = $isSearchView ? '_s' : '';
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
+		$faceted_filter = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$disable_keyboardinput = $filter->parameters->get('disable_keyboardinput', 0);
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
@@ -491,19 +492,58 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				$option = JRequest::getVar('option', '');
 				$view   = JRequest::getVar('view', '');
 				$cid    = JFactory::getApplication()->isSite() ? JRequest::getInt('cid', '') : 0;
-				/*$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
-				JArrayHelper::toInteger($cid, array(0));*/
+				$cids   = JRequest::getVar( 'cids', array(), $hash='default', 'array' );
+				JArrayHelper::toInteger($cids, array());
+				$cats = array();
 				
-				if ($option=='com_flexicontent' && $view=='category' && $cid) {   // Current view is category view limit to descendants
-					$options[] = JHTML::_('select.option', $globalcats[$cid]->id, $globalcats[$cid]->treename);
-					$cats = $globalcats[$cid]->childrenarray;
-				} else if ( $rootcatid ) {     // If configured ... limit to subcategory tree of a specified category
-					$options[] = JHTML::_('select.option', $globalcats[$rootcatid]->id, $globalcats[$rootcatid]->treename);
-					$cats = $globalcats[$rootcatid]->childrenarray;
-				} else {
+				if ($option=='com_flexicontent' && $view=='category' && count($cids))
+				{
+					// Current view is category view limit to descendants
+				}
+				else if ($option=='com_flexicontent' && $view=='category' && $cid)
+				{
+					// Current view is category view limit to descendants
+					$cids = array($cid);
+					//$options[] = JHTML::_('select.option', $globalcats[$cid]->id, $globalcats[$cid]->treename);
+					//$cats = $globalcats[$cid]->childrenarray;
+				}
+				else if ( $rootcatid )
+				{
+					// If configured ... limit to subcategory tree of a specified category
+					$cids = array($rootcatid);
+					//$options[] = JHTML::_('select.option', $globalcats[$rootcatid]->id, $globalcats[$rootcatid]->treename);
+					//$cats = $globalcats[$rootcatid]->childrenarray;
+				}
+				
+				if ( count($cids) )
+				{
+					foreach($cids as $_cid)
+					{
+						if ( !isset($globalcats[$_cid]) ) continue;
+						if ( count($cids)>1 )
+						{
+							$cat_obj = new stdClass();
+							$cat_obj->id = $globalcats[$_cid]->id;
+							$cat_obj->treename = $globalcats[$_cid]->title;  // $globalcats[$_cid]->treename;
+							$cat_obj->totalitems = $globalcats[$_cid]->totalitems;
+							$cats[] = $cat_obj;
+						}
+						if ( empty($globalcats[$_cid]->childrenarray)) continue;
+						foreach($globalcats[$_cid]->childrenarray as $child) {
+							$_child = clone($child);
+							$_child->treename = '&nbsp; '.str_replace('<sup>|_</sup>&nbsp;', '', str_replace('&nbsp;.&nbsp;', '', $_child->treename));
+							$cats[] = $_child;
+						}
+					}
+				}
+				else {
 					$cats = $globalcats;  // All categories by default
 				}
-				if (!empty($cats) ) foreach ($cats as $k => $list) $options[] = JHTML::_('select.option', $list->id, $list->treename);
+				
+				if (!empty($cats) ) foreach ($cats as $k => $list)
+				{
+					$options[] = JHTML::_('select.option', $list->id, $list->treename . ($faceted_filter ? '&nbsp; (<'. $list->totalitems.')' : ''));
+				}
 				
 				$extra_classes = ' select2_list_selected';
 			break;
