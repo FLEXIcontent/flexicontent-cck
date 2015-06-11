@@ -1220,6 +1220,7 @@ class FlexicontentController extends JControllerLegacy
 				$app->enqueueMessage( $result->html, 'notice' );
 				return;
 			} else {
+				$result->html = '<div class="fc-mssg-inline fc-error fc-iblock fc-nobgimage" style="z-index:1000; position: relative;">'.$result->html.'</div>';
 				echo json_encode($result);
 				jexit();
 			}
@@ -1288,12 +1289,13 @@ class FlexicontentController extends JControllerLegacy
 				// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
 				//$result->percentage = ( $db_itemratings->rating_sum / $db_itemratings->rating_count ) * (100/$rating_resolution);
 				//$result->htmlrating = '(' . $db_itemratings->rating_count .' '. JText::_( 'FLEXI_VOTES' ) . ')';
-				
 				$result->html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );
+				
 				if ($no_ajax) {
 					$app->enqueueMessage( $result->html, 'notice' );
 					return;
 				} else {
+					$result->html = '<div class="fc-mssg-inline fc-note fc-iblock fc-nobgimage" style="z-index:1000; position: relative;">'.$result->html.'</div>';
 					echo json_encode($result);
 					jexit();
 				}
@@ -1319,19 +1321,17 @@ class FlexicontentController extends JControllerLegacy
 		// Prepare responce
 		$rating_sum = (@ $db_itemratings ? $db_itemratings->rating_sum : 0) + $rating_diff;
 		$result->percentage = ($rating_sum / $result->ratingcount) * (100 / $rating_resolution);
-		$result->html = '
-		<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage" style="z-index:1000; position: relative;">'.
-			($old_rating ?
+		$result->html = ($old_rating ?
 				'<b>'.(100*($old_rating / $max_rating)) .'% => '. (100*($user_rating / $max_rating)).'%</b>,&nbsp;' :
 				'<b>'.(100*($user_rating / $max_rating)).'%</b>,&nbsp;').
-			JText::_( $old_rating ? 'FLEXI_YOUR_OLD_VOTING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' ).'
-		</div>';
+			JText::_( $old_rating ? 'FLEXI_YOUR_OLD_VOTING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' );
 		
 		// Finally set responce
 		if ($no_ajax) {
 			$app->enqueueMessage( $result->html, 'notice' );
 			return;
 		} else {
+			$result->html = '<div class="fc-mssg-inline fc-success fc-iblock fc-nobgimage" style="z-index:1000; position: relative;">'.$result->html.'</div>';
 			echo json_encode($result);
 			jexit();
 		}
