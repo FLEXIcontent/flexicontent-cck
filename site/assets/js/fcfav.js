@@ -9,16 +9,14 @@ function FCFav(id, type) {
 	var favurl = live_site+"/index.php?option=com_flexicontent&format=raw&task=ajaxfav&id="+id+'&type='+type
 
 	var onote_msg_box_start = '<div class="fc-mssg-inline fc-note fc-iblock fc-nobgimage" style="position: relative; margin: 1px 2px;">';
-	var oinfo_msg_box_start = '<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage" style="z-index:1000; position: relative; margin: 1px 2px;">';
 	var osucc_msg_box_start = '<div class="fc-mssg-inline fc-success fc-iblock fc-nobgimage" style="z-index:1000; position: relative; margin: 1px 2px;">';
+	var _box_start = '<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage';
 	
-	var info_msg_box_start = '<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage" style="position: relative; margin: 1px 2px;">';
-	var succ_msg_box_start = '<div class="fc-mssg-inline fc-success fc-iblock fc-nobgimage" style="position: relative; margin: 1px 2px;">';
 	
 	var div = document.getElementById('fcfav-reponse_'+type+'_'+id);
 	if (div)
 	{
-		div.innerHTML = oinfo_msg_box_start + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + fcfav_text[1] + '</div>';
+		div.innerHTML = _box_start + ' fcfavs-loading">' + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + fcfav_text[1] + '</div>';
 	}
 	
 	jQuery.ajax({
@@ -38,7 +36,7 @@ function FCFav(id, type) {
 						var newtotal = Math.abs(response);
 						link.innerHTML='<img alt="'+fcfav_text[7]+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
 						var newfavs=newtotal+' '+fcfav_text[5];
-						div.innerHTML = info_msg_box_start+fcfav_text[8]+'</div>' +' '+ info_msg_box_start +'Total: ' + newfavs + '</div>';
+						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + fcfav_text[8] + '</div>' +' '+ _box_start + ' fcfavs-subscribers-count">' + fcfav_text[10] + ': ' + newfavs + '</div>';
 					}
 				}
 				else if(response<0){
@@ -46,19 +44,19 @@ function FCFav(id, type) {
 						var newtotal = Math.abs(response);
 						link.innerHTML='<img alt="'+fcfav_text[7]+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
 						var newfavs=newtotal+' '+fcfav_text[5];
-						div.innerHTML = info_msg_box_start+fcfav_text[9]+'</div>' +' '+ info_msg_box_start +'Total: ' + newfavs + '</div>';
+						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + fcfav_text[9] + '</div>' +' '+ _box_start + ' fcfavs-subscribers-count">' + fcfav_text[10] +': ' + newfavs + '</div>';
 					}
 				} 
 				else if(response=='added'){
 					if (div) {
 						link.innerHTML='<img src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
-						div.innerHTML = info_msg_box_start+fcfav_text[8]+'</div>';
+						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + fcfav_text[8] + '</div>';
 					}
 				}
 				else if(response=='removed'){
 					if (div) {
 						link.innerHTML='<img src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
-						div.innerHTML = info_msg_box_start+fcfav_text[9]+'</div>';
+						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + fcfav_text[9] + '</div>';
 					}
 				}
 			},2000);

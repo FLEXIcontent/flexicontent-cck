@@ -184,10 +184,10 @@ $itemTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this-
 	<!-- BOF item rating, favourites -->
 	<aside class="itemactions group">
 		<?php if ($this->params->get('show_vote', 1)) : ?>
-		<span class="voting">
+		<div class="voting">
 		<?php FlexicontentFields::getFieldDisplay($item, 'voting', $values=null, $method='display'); ?>
 		<?php echo $this->fields['voting']->display; ?>
-		</span>
+		</div>
 		<?php endif; ?>
 
 		<?php if ($this->params->get('show_favs', 1)) : ?>

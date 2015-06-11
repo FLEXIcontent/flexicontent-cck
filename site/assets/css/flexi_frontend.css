@@ -683,7 +683,7 @@ div .fc_field_unsused_val img {
 }
 
 
-/* fieldgroup viewing: default container for values */
+/* fieldgroup field viewing: default container for values */
 div.fc-fieldgrp-value-box {
 	border-radius: 4px;
 	border: 1px solid lightgray;
@@ -699,6 +699,11 @@ div.fc-fieldgrp-value-box {
 	vertical-align: top;
 }
 
+/* favourites field viewing: information containers */
+[class*="fcfavs-"].fc-mssg-inline {
+	position: relative;
+	margin: 1px 2px;
+}
 
 
 /************************************

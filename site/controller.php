@@ -1220,7 +1220,6 @@ class FlexicontentController extends JControllerLegacy
 				$app->enqueueMessage( $result->html, 'notice' );
 				return;
 			} else {
-				$result->html = '<div class="fc-mssg-inline fc-error fc-iblock fc-nobgimage" style="z-index:1000; position: relative;">'.$result->html.'</div>';
 				echo json_encode($result);
 				jexit();
 			}
@@ -1277,7 +1276,7 @@ class FlexicontentController extends JControllerLegacy
 			$db->setQuery( $query );
 			$db->query() or die( $db->stderr() );
 			$result->ratingcount = 1;
-			$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTE' ) . ')';
+			$result->htmlrating = $result->ratingcount .' '. JText::_( 'FLEXI_VOTE' );
 		}
 		
 		// Voting record exists for this item, check if user has already voted
@@ -1288,14 +1287,13 @@ class FlexicontentController extends JControllerLegacy
 			{
 				// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
 				//$result->percentage = ( $db_itemratings->rating_sum / $db_itemratings->rating_count ) * (100/$rating_resolution);
-				//$result->htmlrating = '(' . $db_itemratings->rating_count .' '. JText::_( 'FLEXI_VOTES' ) . ')';
+				//$result->htmlrating = $db_itemratings->rating_count .' '. JText::_( 'FLEXI_VOTES' );
 				$result->html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );
 				
 				if ($no_ajax) {
 					$app->enqueueMessage( $result->html, 'notice' );
 					return;
 				} else {
-					$result->html = '<div class="fc-mssg-inline fc-note fc-iblock fc-nobgimage" style="z-index:1000; position: relative;">'.$result->html.'</div>';
 					echo json_encode($result);
 					jexit();
 				}
@@ -1311,7 +1309,7 @@ class FlexicontentController extends JControllerLegacy
 			$db->setQuery( $query );
 			$db->query() or die( $db->stderr() );
 			$result->ratingcount = $db_itemratings->rating_count + ($old_rating ? 0 : 1);
-			$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTES' ) . ')';
+			$result->htmlrating = $result->ratingcount .' '. JText::_( 'FLEXI_VOTES' );
 		}
 		
 		// Set the current item id, in our voting logging SESSION (array) variable, to avoid future double voting
@@ -1331,7 +1329,6 @@ class FlexicontentController extends JControllerLegacy
 			$app->enqueueMessage( $result->html, 'notice' );
 			return;
 		} else {
-			$result->html = '<div class="fc-mssg-inline fc-success fc-iblock fc-nobgimage" style="z-index:1000; position: relative;">'.$result->html.'</div>';
 			echo json_encode($result);
 			jexit();
 		}

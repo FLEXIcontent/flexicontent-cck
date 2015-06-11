@@ -16,11 +16,28 @@ e.g.  #header ul.specificclass { ... }
 instead use voting field parameters !!
 */
 
-
 /* fcvote standard css */
+
+/* container of all voting types */
+div.voting-group {
+	display: inline-block;
+	float: none;
+	margin: 0;
+	padding: 0;
+}
+/* outer container of 1 vote type: main or extra */
+div.voting-row {
+	display: inline-block;
+	float: left;
+	margin: 2px 6px 2px 6px;
+	padding: 0;
+}
+/* inner container of 1 vote type: main or extra */
 div.fcvote {
-	display: inline-block !important;
-	vertical-align: middle !important;
+	display: inline-block;
+	vertical-align: unset;
+	margin: 0;
+	padding: 0;
 }
 
 div.fcvote > ul.fcvote_list, 
@@ -111,8 +128,9 @@ div.fcvote-label.xid-main {
 #flexicontent
 div.fcvote-count,
 div.fcvote-count {
+	margin: 0 0 0 2px;
 	float: left;
-	padding: 0 0 0 4px;
+	padding: 0 2px 0 2px;
 }
 
 /* Vote being submitted */

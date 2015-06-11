@@ -2192,10 +2192,11 @@ class flexicontent_html
 				}
 			}
 		}
-
-		return $html;
+		
+		return '<div class="'.$field->name.'-group">' .$html. '</div>';
  	}
-
+ 	
+ 	
 	/**
 	 * Method that creates the stars
 	 *
@@ -2275,7 +2276,7 @@ class flexicontent_html
 		$unrated 	= $field->parameters->get( 'unrated', 1 );
 		$dim			= $field->parameters->get( 'dimension', 16 );
 		$image		= $field->parameters->get( 'image', 'components/com_flexicontent/assets/images/star-small.png' );
-		$class 		= $field->name;
+		$class 		= $field->name.'-row';
 		$img_path	= JURI::root(true).'/'.$image;
 		
 		// Get number of displayed stars, configuration
@@ -2375,6 +2376,7 @@ class flexicontent_html
 		}
 		$nocursor = !$allow_vote ? 'cursor:unset!important;' : '';
 		
+		$html_vote_links = '';
 		if ($allow_vote)
 		{
 			// HAS Voting ACCESS
@@ -2402,38 +2404,30 @@ class flexicontent_html
 			}
 			
 			$dovote_class = $has_acclvl ? 'fc_dovote' : '';
-			$html_vote_links = '';
 			for ($i=1; $i<=$rating_resolution; $i++) {
 				$html_vote_links .= '
 					<li class="voting-links"><a onclick="'.$onclick.'" href="'.$href.'" title="'.$star_tooltips[$i].'" class="'.$dovote_class.' '.$star_classes[$i].'" rel="'.$id.'_'.$xid.'">'.$i.'</a></li>';
 			}
 		}
 		
-	 	$html='
+	 	return '
 		<div class="'.$class.'">
 			<div class="fcvote">'
 	  		.($label ? '<div id="fcvote_lbl'.$id.'_'.$xid.'" class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '')
 				.'<ul class="fcvote_list">
     				<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;'.$nocursor.'"></li>'
-    		.@ $html_vote_links
+    		.$html_vote_links
 				.'
 				</ul>
-	  		<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fcvote-count">';
-		  		if ( $counter != -1 ) {
-	  				if ( $counter != 0 ) {
-							$html .= "(";
-							$html .= $rating_count ? $rating_count : "0";
-							if ($show_counter_label) $html .= " ".JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' );
-		 	 				$html .= ")";
-						}
-					}
-	 	 	$html .='
+	  		<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fc-mssg-inline fc-info fc-iblock fc-nobgimage fcvote-count">'.
+	  			( $counter==-1 || $counter==0 ? '' :
+						($rating_count ? $rating_count : '0').
+						($show_counter_label ? ' '.JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '')
+					).'
 	 	 		</div>
  	 			<div class="clear"></div>
  	 		</div>
  	 	</div>';
-
-	 	return $html;
  	}
 
 	/**
@@ -2447,7 +2441,7 @@ class flexicontent_html
 		$userlisttype = $field->parameters->get('display_favoured_userlist', 0);
 		$maxusercount = $field->parameters->get('display_favoured_max', 12);
 
-		$favuserlist = $favourites ? '<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage" style="z-index:1000; position: relative; margin: 1px 2px;">'.$favourites.' '.JText::_('FLEXI_USERS') : '';
+		$favuserlist = $favourites ? '<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage fcfavs-subscribers-count">'.JText::_('FLEXI_TOTAL').': '.$favourites.' '.JText::_('FLEXI_USERS') : '';
 
 		if ( !$userlisttype ) return $favuserlist ? $favuserlist.'</div>' : '';
 		else if ($userlisttype==1) $uname="u.username";
@@ -2524,7 +2518,8 @@ class flexicontent_html
 					'".JText::_( 'FLEXI_FAVOURE',true )."',
 					'".JText::_( 'FLEXI_REMOVE_FAVOURITE',true )."',
 					'".JText::_( 'FLEXI_FAVS_YOU_HAVE_SUBSCRIBED',true )."',
-					'".JText::_( 'FLEXI_FAVS_CLICK_TO_SUBSCRIBE',true )."'
+					'".JText::_( 'FLEXI_FAVS_CLICK_TO_SUBSCRIBE',true )."',
+					'".JText::_( 'FLEXI_TOTAL',true )."'
 					);
 				";
 			$document->addScriptDeclaration($js);
@@ -2569,7 +2564,7 @@ class flexicontent_html
 		}
 		else
 		{
-			$attribs = 'class="'.$tooltip_class.'" title="'.$addremove_tip.'"';
+			$attribs = 'class="btn '.$tooltip_class.'" title="'.$addremove_tip.'" onclick="alert(\''.JText::_( 'FLEXI_FAVOURE_LOGIN_TIP' ).'\')"';
 			$image = JHTML::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), $attribs);
 
 			$output		= $image;
