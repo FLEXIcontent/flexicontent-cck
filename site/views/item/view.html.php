@@ -560,7 +560,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Verify type is allowed to the user
 		if ( !$new_typeid )
 		{
-			$types = $model->getTypeslist($type_ids_arr = false, $check_perms = true);
+			$types = $model->getTypeslist($type_ids_arr = false, $check_perms = true, $_published=true);
 			if ( $types && count($types)==1 ) $new_typeid = $types[0]->id;
 			JRequest::setVar('typeid', $new_typeid);
 			$canCreateType = true;

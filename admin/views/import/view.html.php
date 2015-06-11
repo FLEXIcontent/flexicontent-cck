@@ -117,13 +117,7 @@ class FlexicontentViewImport extends JViewLegacy
 		}
 		
 		// Get types
-		$query = 'SELECT id, name'
-			. ' FROM #__flexicontent_types'
-			. ' WHERE published = 1'
-			. ' ORDER BY name ASC'
-			;
-		$db->setQuery($query);
-		$types = $db->loadObjectList('id');
+		$types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 		
 		// Get Languages
 		$languages = (FLEXI_FISH || FLEXI_J16GE) ? FLEXIUtilities::getLanguages('code') : array();

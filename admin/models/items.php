@@ -1258,7 +1258,7 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function copyitems($cid, $keeptags = 1, $prefix, $suffix, $copynr = 1, $lang = null, $state = null, $method = 1, $maincat = null, $seccats = null)
+	function copyitems($cid, $keeptags = 1, $prefix, $suffix, $copynr = 1, $lang = null, $state = null, $method = 1, $maincat = null, $seccats = null, $type_id = null, $access = null)
 	{
 		$app = JFactory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
@@ -1353,10 +1353,12 @@ class FlexicontentModelItems extends JModelLegacy
 				$row->created 		= $datenow->toSql();
 				$row->publish_up	= $datenow->toSql();
 				$row->modified 		= $nullDate = $this->_db->getNullDate();
-				$row->state			= $state ? $state : $row->state;
 				$lang_from			= substr($row->language,0,2);
 				$row->language	= $lang ? $lang : $row->language;
 				$lang_to				= substr($row->language,0,2);
+				$row->state			= strlen($state) ? $state : $row->state;
+				$row->type_id		= $type_id ? $type_id : $row->type_id;
+				$row->access		= $access ? $access : $row->access;
 				
 				$doauto['title'] = $doauto['introtext'] = $doauto['fulltext'] = $doauto['metakey'] = $doauto['metadesc'] = true;    // In case JF data is missing
 				if ($translate_method == 2 || $translate_method == 4) {
@@ -1712,13 +1714,15 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function moveitem($itemid, $maincat, $seccats = null)
+	function moveitem($itemid, $maincat, $seccats = null, $lang, $state, $type_id, $access)
 	{
-		if (!$maincat) return true;
-		
 		$item = JTable::getInstance('flexicontent_items', '');
 		$item->load($itemid);
-		$item->catid = $maincat;
+		$item->catid    = $maincat ? $maincat : $item->catid;
+		$item->language = $lang ? $lang : $item->language;
+		$item->state    = strlen($state) ? $state : $item->state;
+		$item->type_id  = $type_id ? $type_id : $item->type_id;
+		$item->access   = $access ? $access : $item->access;
 		$item->store();
 		
 		if ($seccats === null)
@@ -2532,25 +2536,20 @@ class FlexicontentModelItems extends JModelLegacy
 
 		return $this->_db->loadResult();
 	}
-
+	
+	
 	/**
-	 * Method to get types list for filtering
+	 * Method to get types list
 	 * 
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeslist ()
+	function getTypeslist ( $type_ids=false, $check_perms = false, $published=true )
 	{
-		$query = 'SELECT id, name'
-				. ' FROM #__flexicontent_types'
-				. ' WHERE published = 1'
-				. ' ORDER BY name ASC'
-				;
-		$this->_db->setQuery($query);
-		
-		return $this->_db->loadObjectList();
+		return flexicontent_html::getTypesList( $type_ids, $check_perms, $published);
 	}
-
+	
+	
 	/**
 	 * Method to get author list for filtering
 	 * 

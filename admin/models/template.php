@@ -228,21 +228,14 @@ class FlexicontentModelTemplate extends JModelLegacy
 	
 	
 	/**
-	 * Method to get types list when performing an edit action
+	 * Method to get types list
 	 * 
 	 * @return array
 	 * @since 1.5
 	 */
-	function getContentTypesList()
+	function getTypeslist ( $type_ids=false, $check_perms = false, $published=true )
 	{
-		$query = 'SELECT id, name'
-			. ' FROM #__flexicontent_types'
-			. ' WHERE published = 1'
-			. ' ORDER BY name ASC'
-			;
-		$this->_db->setQuery($query);
-		$types = $this->_db->loadObjectList();
-		return $types;	
+		return flexicontent_html::getTypesList( $type_ids, $check_perms, $published);
 	}
 	
 	

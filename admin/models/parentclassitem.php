@@ -3170,44 +3170,14 @@ class ParentClassItem extends JModelAdmin
 	
 	
 	/**
-	 * Method to get types list when performing an edit action or e.g. checking 'create' ACCESS for the types
+	 * Method to get types list
 	 * 
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeslist ( $type_ids=false, $check_perms = false )
+	function getTypeslist ( $type_ids=false, $check_perms = false, $published=true )
 	{
-		static $all_types;
-		// Return cached result
-		if ( empty( $type_ids ) && isset( $all_types[$check_perms] ) )   return $all_types[$check_perms];
-		
-		// Custom type_ids array given, do the query
-		if ( !empty($type_ids) && is_array($type_ids) ) {
-			foreach ($type_ids as $i => $type_id)
-				$type_ids[$i] = (int) $type_id;
-			$type_ids_list = implode(',', $type_ids);
-		}
-		$query = 'SELECT * '
-				. ' FROM #__flexicontent_types'
-				. ' WHERE published = 1 '. ( @ $type_ids_list ? ' AND id IN ('. $type_ids_list .' ) ' : '' )
-				. ' ORDER BY name ASC'
-				;
-		$this->_db->setQuery($query);
-		$types = $this->_db->loadObjectList('id');
-		if ($check_perms)
-		{
-			$user = JFactory::getUser();
-			$_types = array();
-			foreach ($types as $type) {
-				$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
-				if ( $allowed ) $_types[] = $type;
-			}
-			$types = $_types;
-		}
-		
-		// Cache function result
-		if ( empty($type_ids ) )  $all_types[$check_perms] = $types;
-		return $types;
+		return flexicontent_html::getTypesList( $type_ids, $check_perms, $published);
 	}
 	
 	

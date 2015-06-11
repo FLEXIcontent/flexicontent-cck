@@ -111,8 +111,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		} else {
 			$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), str_replace('&', '&amp;', $popup_load_url), 600, 440);
 		}
-		//if (FLEXI_J16GE)
-		//	$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_COPY_MOVE'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
+		//$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_BATCH'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
 		JToolBarHelper::divider();
 		
 		$add_divider = false;

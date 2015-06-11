@@ -769,6 +769,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		$keepseccats = JRequest::getVar( 'keepseccats', 0, 'post', 'int' );
 		$lang    = JRequest::getVar( 'language', '', 'post' );
 		$state   = JRequest::getInt( 'state', '');
+		$type_id = JRequest::getInt( 'type_id', '');
+		$access  = JRequest::getInt( 'access', '');
 		
 		// Set $seccats to --null-- to indicate that we will maintain secondary categories
 		$seccats = $keepseccats ? null : $seccats;
@@ -830,7 +832,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Try to copy/move items
 		if ($task == 'copymove')
 		{
-			if ($method == 1) // copy only
+			if ($method == 1) // copy
 			{
 				if ( $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state) )
 				{
@@ -844,13 +846,13 @@ class FlexicontentControllerItems extends FlexicontentController
 					$msg = '';
 				}
 			}
-			else if ($method == 2) // move only
+			else if ($method == 2) // update (optionally moving)
 			{
 				$msg = JText::sprintf( 'FLEXI_ITEMS_MOVE_SUCCESS', count($auth_cid) );
 				
 				foreach ($auth_cid as $itemid)
 				{
-					if ( !$model->moveitem($itemid, $maincat, $seccats) )
+					if ( !$model->moveitem($itemid, $maincat, $seccats, $lang, $state, $type_id, $access) )
 					{
 						$msg = JText::_( 'FLEXI_ERROR_MOVE_ITEMS' );
 						JError::raiseWarning( 500, $msg ." " . $model->getError() );
@@ -860,9 +862,9 @@ class FlexicontentControllerItems extends FlexicontentController
 				
 				$clean_cache_flag = true;
 			}
-			else // copy and move
+			else // copy and update (optionally moving)
 			{
-				if ( $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state, $method, $maincat, $seccats) )
+				if ( $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state, $method, $maincat, $seccats, $type_id, $access) )
 				{
 					$msg = JText::sprintf( 'FLEXI_ITEMS_COPYMOVE_SUCCESS', count($auth_cid) );
 					$clean_cache_flag = true;

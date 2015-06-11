@@ -34,14 +34,9 @@ class FlexicontentViewTypes extends JViewLegacy{
 		';
 		
 		$user = JFactory::getUser();
-		$db = JFactory::getDBO();
-		$query = 'SELECT id, name, itemscreatable'
-				. ' FROM #__flexicontent_types'
-				. ' WHERE published = 1'
-				. ' ORDER BY name ASC'
-				;
-		$db->setQuery($query);
-		$types = $db->loadObjectList();
+		
+		// Get types
+		$types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 		$types = is_array($types) ? $types : array();
 		
 		$ctrl_task = FLEXI_J16GE ? 'items.add' : 'add';

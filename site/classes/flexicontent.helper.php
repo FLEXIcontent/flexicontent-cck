@@ -2958,7 +2958,7 @@ class flexicontent_html
 					} else {
 						$list 	.= $lang->name;
 					}
-					$list 	.= '</label><div class="clear"></div>';
+					$list 	.= '</label>';
 				}
 				break;
 			case 6:   // CHECK-BOX selection of ALL languages, with empty option "Use language column", e.g. used in CSV import view
@@ -3335,23 +3335,53 @@ class flexicontent_html
 		if($jfield===NULL) return $flexifields;
 		return isset($flexifields[$jfield])?$flexifields[$jfield]:0;
 	}
-
-	static function getTypesList()
+	
+	
+	/**
+	 * Method to get types list e.g. when performing an edit action optionally checking 'create' ACCESS for the types
+	 * 
+	 * @return array
+	 * @since 1.5
+	 */
+	static function getTypeslist ( $type_ids=false, $check_perms = false, $published=true )
 	{
+		// Return cached result
+		static $all_types;
+		if ( empty( $type_ids ) && isset( $all_types[$check_perms] ) )   return $all_types[$check_perms];
+		
+		// Custom type_ids array given, do the query
+		$type_ids_list = false;
+		if ( !empty($type_ids) && is_array($type_ids) )
+		{
+			foreach ($type_ids as $i => $type_id)
+				$type_ids[$i] = (int) $type_id;
+			$type_ids_list = implode(',', $type_ids);
+		}
 		$db = JFactory::getDBO();
-
-		$query = 'SELECT *'
-		. ' FROM #__flexicontent_types'
-		. ' WHERE published = 1'
-		;
-
+		$query = 'SELECT * '
+				. ' FROM #__flexicontent_types'
+				. ' WHERE published = ' . ($published ? 1 : 0) . ( $type_ids_list ? ' AND id IN ('. $type_ids_list .' ) ' : '' )
+				. ' ORDER BY name ASC'
+				;
 		$db->setQuery($query);
-		$types = $db->loadAssocList('id');
-
+		$types = $db->loadObjectList('id');
+		if ($check_perms)
+		{
+			$user = JFactory::getUser();
+			$_types = array();
+			foreach ($types as $type) {
+				$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
+				if ( $allowed ) $_types[] = $type;
+			}
+			$types = $_types;
+		}
+		
+		// Cache function result
+		if ( empty($type_ids ) )  $all_types[$check_perms] = $types;
 		return $types;
 	}
-
-
+	
+	
 	/**
 	 * Displays a list of the available access view levels
 	 *
