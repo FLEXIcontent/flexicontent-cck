@@ -204,8 +204,11 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$field->{$prop} = $pretext.'
 					<span class="fav-block">
 						'.flexicontent_html::favicon( $field, $favoured, $item ).'
-						<span id="fcfav-reponse_'.$item->id.'" class="fcfav-reponse">
-							<small>'.$favs.'</small>
+						<span id="fcfav-reponse_item_'.$item->id.'" class="fcfav-reponse">
+							<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage" style="z-index:1000; position: relative; margin: 1px 2px;">
+								'.JText::_($favoured ? 'FLEXI_FAVS_YOU_HAVE_SUBSCRIBED' : 'FLEXI_FAVS_CLICK_TO_SUBSCRIBE').'
+							</div>
+							'.$favs.'
 						</span>
 					</span>
 						'.$posttext;

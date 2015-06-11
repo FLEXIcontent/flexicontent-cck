@@ -468,6 +468,10 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$fi_vers_tbl_exists = (boolean) count($db->loadObjectList());
 		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_favourites"';
+		$db->setQuery($query);
+		$favs_tbl_exists = (boolean) count($db->loadObjectList());
+		
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_files"';
 		$db->setQuery($query);
 		$files_tbl_exists = (boolean) count($db->loadObjectList());
@@ -627,6 +631,7 @@ class com_flexicontentInstallerScript
 					$tbls = array();
 					if ($fi_rels_tbl_exists) $tbls[] = "#__flexicontent_fields_item_relations";
 					if ($fi_vers_tbl_exists) $tbls[] = "#__flexicontent_items_versions";
+					if ($favs_tbl_exists)    $tbls[] = "#__flexicontent_favourites";
 					if ($files_tbl_exists)   $tbls[] = "#__flexicontent_files";
 					if ($fields_tbl_exists)  $tbls[] = "#__flexicontent_fields";
 					if ($types_tbl_exists)   $tbls[] = "#__flexicontent_types";
@@ -676,6 +681,10 @@ class com_flexicontentInstallerScript
 						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `qindex03` MEDIUMTEXT NULL DEFAULT NULL AFTER `qindex02`";
 					}*/
 					
+					// Favourites TABLE
+					if ( $favs_tbl_exists && !array_key_exists('type', $tbl_fields['#__flexicontent_favourites'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_favourites` ADD `type` INT(11) NOT NULL DEFAULT '0' AFTER `notify`";
+					}
 					
 					// Files TABLE
 					if ( $files_tbl_exists && !array_key_exists('filename_original', $tbl_fields['#__flexicontent_files'])) {

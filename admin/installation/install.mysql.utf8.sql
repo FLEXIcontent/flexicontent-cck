@@ -12,10 +12,12 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_favourites` (
   `itemid` int(11) NOT NULL default '0',
   `userid` int(11) NOT NULL default '0',
   `notify` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`id`,`itemid`,`userid`),
+  `type` INT(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY  (`id`,`itemid`,`userid`, `type`),
   KEY `id` (`id`),
   KEY `itemid` (`itemid`),
-  KEY `userid` (`userid`)
+  KEY `userid` (`userid`),
+  KEY `type` (`type`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (

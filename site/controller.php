@@ -1069,7 +1069,8 @@ class FlexicontentController extends JControllerLegacy
 		$msg = '';
 		$this->setRedirect($url, $msg );
 	}
-
+	
+	
 	/**
 	 *  Ajax favourites
 	 *
@@ -1080,21 +1081,27 @@ class FlexicontentController extends JControllerLegacy
 	{
 		$user  = JFactory::getUser();
 		$db    = JFactory::getDBO();
-		$model = $this->getModel(FLEXI_ITEMVIEW);
 		$id    = JRequest::getInt('id', 0);
+		$type  = JRequest::getCMD('type', 'item');
+		if ($type!='item' && $type!='category') {
+			echo 'Type: '. $type .' not supported';
+			jexit();
+		}
+		$model = $this->getModel($type);
 		
 		if (!$user->get('id'))
 		{
 			echo 'login';
+			jexit();
 		}
 		else
 		{
 			$isfav = $model->getFavoured();
-
+			
 			if ($isfav)
 			{
 				$model->removefav();
-				$favs 	= $model->getFavourites();
+				$favs = $model->getFavourites();
 				if ($favs == 0) {
 					echo 'removed';
 				} else {
@@ -1104,7 +1111,7 @@ class FlexicontentController extends JControllerLegacy
 			else
 			{
 				$model->addfav();
-				$favs 	= $model->getFavourites();
+				$favs = $model->getFavourites();
 				if ($favs == 0) {
 					echo 'added';
 				} else {
@@ -1112,8 +1119,10 @@ class FlexicontentController extends JControllerLegacy
 				}
 			}
 		}
+		jexit();
 	}
-
+	
+	
 	/**
 	 *  Method for voting (ajax)
 	 *
@@ -1310,10 +1319,13 @@ class FlexicontentController extends JControllerLegacy
 		// Prepare responce
 		$rating_sum = (@ $db_itemratings ? $db_itemratings->rating_sum : 0) + $rating_diff;
 		$result->percentage = ($rating_sum / $result->ratingcount) * (100 / $rating_resolution);
-		$result->html = JText::_( $old_rating ? 'FLEXI_YOUR_OLD_VOTING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' );
-		if ($old_rating) {
-			$result->html .= ' ['.$old_rating .'/'. $max_rating .' ==> '. $user_rating .'/'. $max_rating.']';
-		}
+		$result->html = '
+		<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage" style="z-index:1000; position: relative;">'.
+			($old_rating ?
+				'<b>'.(100*($old_rating / $max_rating)) .'% => '. (100*($user_rating / $max_rating)).'%</b>,&nbsp;' :
+				'<b>'.(100*($user_rating / $max_rating)).'%</b>,&nbsp;').
+			JText::_( $old_rating ? 'FLEXI_YOUR_OLD_VOTING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' ).'
+		</div>';
 		
 		// Finally set responce
 		if ($no_ajax) {

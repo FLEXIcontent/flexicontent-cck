@@ -124,7 +124,7 @@ class flexicontent_html
 		$plugin = JPluginHelper::getPlugin('system', 'sef');
 		$domain = null;
 		if (!empty($plugin)) {
-			$pluginParams = FLEXI_J16GE ? new JRegistry($plugin->params) : new JParameter($plugin->params);
+			$pluginParams = new JRegistry($plugin->params);
 			$domain = $pluginParams->get('domain');
 		}
 
@@ -277,7 +277,7 @@ class flexicontent_html
 			$type = JTable::getInstance('flexicontent_types', '');
 			$type->id = $item->type_id;
 			$type->load();
-			$type->params = FLEXI_J16GE ? new JRegistry($type->attribs) : new JParameter($type->attribs);
+			$type->params = new JRegistry($type->attribs);
 			$ilayout = $type->params->get('ilayout', 'default');
 		}
 
@@ -1299,7 +1299,7 @@ class flexicontent_html
 
 		$has_edit_state = $has_edit_state && in_array($state, array(0,1,-3,-4,-5));
 		$has_delete     = $has_delete     && $state == -2;
-		$has_archive    = $has_archive    && $state == (FLEXI_J16GE ? 2:-1);
+		$has_archive    = $has_archive    && $state == 2;
 
 		// check if user can edit.state of the item
 		$access_msg = '';
@@ -1325,7 +1325,7 @@ class flexicontent_html
 		$cache->clean('com_flexicontent_filters');
 
 		// Output new state icon and terminate
-		$tmpparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+		$tmpparams = new JRegistry();
 		$tmpparams->set('stateicon_popup', 'basic');
 		$stateicon = flexicontent_html::stateicon( $state, $tmpparams );
 		echo $stateicon;
@@ -1371,9 +1371,7 @@ class flexicontent_html
 		$show_icons = $params->get('show_icons');
 		if ( $show_icons ) {
 			$attribs = '';
-			$image = FLEXI_J16GE ?
-				JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), $attribs) :
-				JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_FEED' ), $attribs);
+			$image = JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -1424,9 +1422,7 @@ class flexicontent_html
 		$show_icons = $params->get('show_icons');
 		if ( $show_icons ) {
 			$attribs = '';
-			$image = FLEXI_J16GE ?
-				JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), $attribs) :
-				JHTML::_('image.site', 'printButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_PRINT' ), $attribs);
+			$image = JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -1502,9 +1498,7 @@ class flexicontent_html
 		$show_icons = $params->get('show_icons');
 		if ( $show_icons ) {
 			$attribs = '';
-			$image = FLEXI_J16GE ?
-				JHTML::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), $attribs) :
-				JHTML::_('image.site', 'emailButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EMAIL' ), $attribs);
+			$image = JHTML::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -1544,9 +1538,7 @@ class flexicontent_html
 		$show_icons = $params->get('show_icons');
 		if ( $show_icons ) {
 			$attribs = '';
-			$image = FLEXI_J16GE ?
-				JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), $attribs) :
-				JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ), $attribs);
+			$image = JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -1631,15 +1623,15 @@ class flexicontent_html
 	 	static $state_descrs = null;
 	 	static $state_imgs = null;
 	 	if ( !$state_names ) {
-			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>'FLEXI_UNKNOWN');
-			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_ITEM_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_ITEM_PENDING'), -4=>JText::_('FLEXI_SET_ITEM_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
-			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>'FLEXI_UNKNOWN');
+			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_ITEM_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_ITEM_PENDING'), -4=>JText::_('FLEXI_SET_ITEM_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
+			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
 		}
 		
 		// Create state icon
 		$state = $item->state;
 		$state_text ='';
-		$tmpparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+		$tmpparams = new JRegistry();
 		$tmpparams->set('stateicon_popup', 'none');
 		$stateicon = flexicontent_html::stateicon( $state, $tmpparams, $state_text );
 
@@ -1672,14 +1664,14 @@ class flexicontent_html
 			if ($item->publish_up == $nullDate) {
 				$publish_info .= JText::_( 'FLEXI_START_ALWAYS' );
 			} else {
-				$publish_info .= JText::_( 'FLEXI_START' ) .": ". JHTML::_('date', FLEXI_J16GE ? $publish_up->toSql() : $publish_up->toMySQL(), FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S');
+				$publish_info .= JText::_( 'FLEXI_START' ) .": ". JHTML::_('date', $publish_up->toSql(), 'Y-m-d H:i:s');
 			}
 		}
 		if (isset($item->publish_down)) {
 			if ($item->publish_down == $nullDate) {
 				$publish_info .= "<br />". JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
 			} else {
-				$publish_info .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". JHTML::_('date', FLEXI_J16GE ? $publish_down->toSql() : $publish_down->toMySQL(), FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S');
+				$publish_info .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". JHTML::_('date', $publish_down->toSql(), 'Y-m-d H:i:s');
 			}
 		}
 		$publish_info = $state_text.'<br /><br />'.$publish_info;
@@ -1691,8 +1683,8 @@ class flexicontent_html
 			$separators_at = array(-5,-4);
 			// Only add user's permitted states on the current item
 			if ($has_edit_state) $state_ids   = array(1, -5, 0, -3, -4);
-			if ($has_archive)    $state_ids[] = FLEXI_J16GE ? 2:-1;
-			if ($has_delete)     $state_ids[]  = -2;
+			if ($has_archive)    $state_ids[] = 2;
+			if ($has_delete)     $state_ids[] = -2;
 
 			$box_css = ''; //$app->isSite() ? 'width:182px; left:-100px;' : '';
 			$publish_info .= '<br><br>'.JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
@@ -1763,7 +1755,7 @@ class flexicontent_html
 		static $user = null, $requestApproval = null;
 		if ($user === null) {
 			$user	= JFactory::getUser();
-			$requestApproval = FLEXI_J16GE ? $user->authorise('flexicontent.requestapproval',	'com_flexicontent') : ($user->gid >= 20);
+			$requestApproval = $user->authorise('flexicontent.requestapproval',	'com_flexicontent');
 		}
 
 		// Skip items not in draft state
@@ -1785,9 +1777,7 @@ class flexicontent_html
 		$show_icons = 2; //$params->get('show_icons');
 		if ( $show_icons ) {
 			$attribs = '';
-			$image = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'key_add.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) :
-				JHTML::_('image.site', 'key_add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) ;
+			$image = JHTML::image('components/com_flexicontent/assets/images/'.'key_add.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -1841,9 +1831,7 @@ class flexicontent_html
 		$show_icons = $params->get('show_icons');
 		if ( $show_icons ) {
 			$attribs = '';
-			$image = FLEXI_J16GE ?
-				JHTML::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), $attribs) :
-				JHTML::_('image.site', 'edit.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EDIT' ), $attribs) ;
+			$image = JHTML::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), $attribs);
 		} else {
 			$image = '';
 		}
@@ -1973,9 +1961,7 @@ class flexicontent_html
 		$show_icons = 2; //$params->get('show_icons');
 		if ( $show_icons && !$auto_relations ) {
 			$attribs = '';
-			$image = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'plus-button.png', $submit_lbl, $attribs) :
-				JHTML::_('image.site', 'plus-button.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $submit_lbl, $attribs) ;
+			$image = JHTML::image('components/com_flexicontent/assets/images/'.'plus-button.png', $submit_lbl, $attribs);
 		} else {
 			$image = '';
 		}
@@ -2016,9 +2002,9 @@ class flexicontent_html
 	 	static $state_basictips = null;
 	 	static $state_fulltips = null;
 	 	if ( !$state_names ) {
-			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>'FLEXI_UNKNOWN');
-			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_ITEM_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_ITEM_PENDING'), -4=>JText::_('FLEXI_SET_ITEM_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
-			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>'FLEXI_UNKNOWN');
+			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_ITEM_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_ITEM_PENDING'), -4=>JText::_('FLEXI_SET_ITEM_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
+			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
 		}
 		
 	 	if ( !$state_fulltips ) {
@@ -2059,9 +2045,7 @@ class flexicontent_html
 		$path = (!FLEXI_J16GE && $app->isAdmin() ? '../' : '').'components/com_flexicontent/assets/images/';
 		if ( $params->get('show_icons', 1) ) {
 			$img = $state_imgs[$state];
-			$icon = FLEXI_J16GE ?
-				JHTML::image($path.$img, $state_names[$state], $attribs) :
-				JHTML::_('image.site', $img, $path, NULL, NULL, $state_names[$state], $attribs) ;
+			$icon = JHTML::image($path.$img, $state_names[$state], $attribs);
 		} else {
 			$icon = $state_names[$state];
 		}
@@ -2360,7 +2344,7 @@ class flexicontent_html
 			for ($i=1; $i<=$rating_resolution; $i++) {
 				$star_zindex  = $rating_resolution - $i + 2;
 				$star_percent = (int) round(100 * ($i / $rating_resolution));
-				$css .= $class.' div.fcvote ul.fcvote_list > .voting-links a.star'.$i.' { width: '.$star_percent.'%!important; z-index: '.$star_zindex.'; }' ."\n";
+				$css .= '.'.$class.' div.fcvote ul.fcvote_list > .voting-links a.star'.$i.' { width: '.$star_percent.'%!important; z-index: '.$star_zindex.'; }' ."\n";
 				$star_classes[$i] = 'star'.$i;
 				if ($star_percent < 20)       $star_tooltips[$i] = JText::_( 'FLEXI_VERY_POOR' );
 				else if ($star_percent < 40)  $star_tooltips[$i] = JText::_( 'FLEXI_POOR' );
@@ -2458,14 +2442,14 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function favoured_userlist( &$field, &$item,  $favourites)
+	static function favoured_userlist(&$field, &$item,  $favourites)
 	{
 		$userlisttype = $field->parameters->get('display_favoured_userlist', 0);
 		$maxusercount = $field->parameters->get('display_favoured_max', 12);
 
-		$favuserlist = $favourites ? '('.$favourites.' '.JText::_('FLEXI_USERS') : '';
+		$favuserlist = $favourites ? '<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage" style="z-index:1000; position: relative; margin: 1px 2px;">'.$favourites.' '.JText::_('FLEXI_USERS') : '';
 
-		if ( !$userlisttype ) return $favuserlist ? $favuserlist.')' : '';
+		if ( !$userlisttype ) return $favuserlist ? $favuserlist.'</div>' : '';
 		else if ($userlisttype==1) $uname="u.username";
 		else /*if ($userlisttype==2)*/ $uname="u.name";
 
@@ -2475,7 +2459,7 @@ class flexicontent_html
 			." WHERE ff.itemid=" . $item->id;
 		$db->setQuery($query);
 		$favusers = $db->loadColumn();
-		if (!is_array($favusers) || !count($favusers)) return $favuserlist ? $favuserlist.']' : '';
+		if (!is_array($favusers) || !count($favusers)) return $favuserlist ? $favuserlist.'</div>' : '';
 
 		$seperator = ': ';
 		$count = 0;
@@ -2486,7 +2470,7 @@ class flexicontent_html
 			if ($count >= $maxusercount) break;
 		}
 		if (count($favusers) > $maxusercount) $favuserlist .=" ...";
-		if (!empty($favuserlist)) $favuserlist .=")";
+		if (!empty($favuserlist)) $favuserlist .= '</div>';
 		return $favuserlist;
 	}
 
@@ -2496,9 +2480,11 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function favicon($field, $favoured, & $item=false)
+	static function favicon($field, $favoured, $item, $type='item')
 	{
 		$user = JFactory::getUser();
+		$item_id = $item->id;  // avoid using $field, we also support favoured categories
+		$item_title = $item->title;
 
 		static $js_and_css_added = false;
 		static $tooltip_class, $addremove_tip, $img_fav_add, $img_fav_delete;
@@ -2536,7 +2522,9 @@ class flexicontent_html
 					'".JText::_( 'FLEXI_REMOVED_FROM_YOUR_FAVOURITES',true )."',
 					'".JText::_( 'FLEXI_USERS',true )."',
 					'".JText::_( 'FLEXI_FAVOURE',true )."',
-					'".JText::_( 'FLEXI_REMOVE_FAVOURITE',true )."'
+					'".JText::_( 'FLEXI_REMOVE_FAVOURITE',true )."',
+					'".JText::_( 'FLEXI_FAVS_YOU_HAVE_SUBSCRIBED',true )."',
+					'".JText::_( 'FLEXI_FAVS_CLICK_TO_SUBSCRIBE',true )."'
 					);
 				";
 			$document->addScriptDeclaration($js);
@@ -2550,18 +2538,16 @@ class flexicontent_html
 		{
 			$alt_text = JText::_( 'FLEXI_REMOVE_FAVOURITE' );
 			if (!$img_fav_delete) {
-				$img_fav_delete = FLEXI_J16GE ?
-					JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', $alt_text, NULL) :
-					JHTML::_('image.site', 'heart_delete.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $alt_text) ;
+				$img_fav_delete = JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', $alt_text, NULL);
 			}
-			$onclick 	= 'javascript:FCFav('.$field->item_id.');';
-			$link 		= 'javascript:void(null)';
+			$onclick 	= "javascript:FCFav(".$item_id.", '".$type."')";
+			$link 		= "javascript:void(null)";
 
 			$output		.=
 				 '<span class="fcfav_delete">'
-				.' <a id="favlink'.$field->item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="fcfav-reponse'.$tooltip_class.'" title="'.$addremove_tip.'">'.$img_fav_delete.'</a>'
-				.' <span class="fav_item_id" style="display:none;">'.$item->id.'</span>'
-				.' <span class="fav_item_title" style="display:none;">'.$item->title.'</span>'
+				.' <a id="favlink_'.$type.'_'.$item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="btn fcfav-reponse'.$tooltip_class.'" title="'.$addremove_tip.'">'.$img_fav_delete.'</a>'
+				.' <span class="fav_item_id" style="display:none;">'.$item_id.'</span>'
+				.' <span class="fav_item_title" style="display:none;">'.$item_title.'</span>'
 				.'</span>';
 
 		}
@@ -2569,26 +2555,22 @@ class flexicontent_html
 		{
 			$alt_text = JText::_( 'FLEXI_FAVOURE' );
 			if (!$img_fav_add) {
-				$img_fav_add = FLEXI_J16GE ?
-					JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', $alt_text, NULL) :
-					JHTML::_('image.site', 'heart_add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $alt_text) ;
+				$img_fav_add = JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', $alt_text, NULL);
 			}
-			$onclick 	= 'javascript:FCFav('.$field->item_id.');';
-			$link 		= 'javascript:void(null)';
+			$onclick 	= "javascript:FCFav(".$item_id.", '".$type."')";
+			$link 		= "javascript:void(null)";
 
 			$output		.=
 				 '<span class="fcfav_add">'
-				.' <a id="favlink'.$field->item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="fcfav-reponse'.$tooltip_class.'" title="'.$addremove_tip.'">'.$img_fav_add.'</a>'
-				.' <span class="fav_item_id" style="display:none;">'.$item->id.'</span>'
-				.' <span class="fav_item_title" style="display:none;">'.$item->title.'</span>'
+				.' <a id="favlink_'.$type.'_'.$item_id.'" href="'.$link.'" onclick="'.$onclick.'" class="btn fcfav-reponse'.$tooltip_class.'" title="'.$addremove_tip.'">'.$img_fav_add.'</a>'
+				.' <span class="fav_item_id" style="display:none;">'.$item_id.'</span>'
+				.' <span class="fav_item_title" style="display:none;">'.$item_title.'</span>'
 				.'</span>';
 		}
 		else
 		{
 			$attribs = 'class="'.$tooltip_class.'" title="'.$addremove_tip.'"';
-			$image = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), $attribs) :
-				JHTML::_('image.site', 'heart_login.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_FAVOURE' ), $attribs) ;
+			$image = JHTML::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), $attribs);
 
 			$output		= $image;
 		}
@@ -3000,9 +2982,9 @@ class flexicontent_html
 	 	static $state_descrs = null;
 	 	static $state_imgs = null;
 	 	if ( !$state_names ) {
-			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>'FLEXI_UNKNOWN');
-			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_ITEM_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_ITEM_PENDING'), -4=>JText::_('FLEXI_SET_ITEM_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
-			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>'FLEXI_UNKNOWN');
+			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_ITEM_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_ITEM_PENDING'), -4=>JText::_('FLEXI_SET_ITEM_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
+			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
 		}
 		
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_DO_NOT_CHANGE' ) );
@@ -3011,7 +2993,7 @@ class flexicontent_html
 		$state[] = JHTML::_('select.option',  -5, $state_names[-5] );
 		$state[] = JHTML::_('select.option',   1, $state_names[1] );
 		$state[] = JHTML::_('select.option',   0, $state_names[0] );
-		$state[] = JHTML::_('select.option',  (FLEXI_J16GE ? 2:-1), $state_names[(FLEXI_J16GE ? 2:-1)] );
+		$state[] = JHTML::_('select.option',   2, $state_names[2] );
 		$state[] = JHTML::_('select.option',  -2, $state_names[-2] );
 		
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
@@ -3022,8 +3004,8 @@ class flexicontent_html
 		else if ($displaytype==2)
 		{
 			$state_ids   = array(1, -5, 0, -3, -4);
-			$state_ids[] = FLEXI_J16GE ? 2:-1;
-			$state_ids[]  = -2;
+			$state_ids[] = 2;
+			$state_ids[] = -2;
 
 			$img_path = JURI::root(true)."/components/com_flexicontent/assets/images/";
 
@@ -3515,7 +3497,7 @@ class flexicontent_html
 		
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
-		$aids = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id) : array((int) $user->get('aid'));
+		$aids = JAccess::getAuthorisedViewLevels($user->id);
 		
 		
 		// **************************************
@@ -3663,7 +3645,7 @@ class flexicontent_html
 		// **********************************
 		// Create CSS markup classes per item
 		// **********************************
-		$public_acclvl = FLEXI_J16GE ? 1 : 0;
+		$public_acclvl = 1;
 		foreach ($items as $item) 
 		{
 			$item->css_markups = array();
@@ -3763,7 +3745,7 @@ class flexicontent_html
 				{
 					if ($public_acclvl == $all_acc_lvl) continue;  // handled separately above
 					
-					$has_acclvl = FLEXI_J16GE ? in_array($all_acc_lvl, $aids) : $all_acc_lvl <= $aids;
+					$has_acclvl = in_array($all_acc_lvl, $aids);
 					if (!$has_acclvl) {
 						if (!$add_needed_acc) continue;   // not adding needed levels
 						$item->css_markups['access'][] = '_acclvl_'.$all_acc_lvl;
@@ -4828,7 +4810,7 @@ class FLEXIUtilities
 			$db = JFactory::getDBO();
 			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c "
 				." LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version"
-				.(FLEXI_J16GE ? " JOIN #__categories as cat ON c.catid=cat.id" : "")
+				." JOIN #__categories as cat ON c.catid=cat.id"
 				." WHERE c.version > '1' AND iv.version IS NULL"
 				.(!FLEXI_J16GE ? " AND sectionid='".FLEXI_SECTION."'" : " AND cat.extension='".FLEXI_CAT_EXTENSION."'")
 				." LIMIT 0,1";
@@ -4893,7 +4875,7 @@ class FLEXIUtilities
 		$plg = JRequest::getVar('plg');
 		$act = JRequest::getVar('act');
 		if($plg && $act) {
-			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($plg);
+			$plgfolder = DS.strtolower($plg);
 			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($plg).'.php';
 			if(file_exists($path)) require_once($path);
 			$class = "plgFlexicontent_fields{$plg}";
@@ -4928,7 +4910,7 @@ class FLEXIUtilities
 
 		if ( !isset( $fc_plgs[$fieldtype] ) ) {
 			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
-			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($fieldtype);
+			$plgfolder = DS.strtolower($fieldtype);
 			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($fieldtype).'.php';
 			if(file_exists($path)) require_once($path);
 			else {
@@ -4946,7 +4928,7 @@ class FLEXIUtilities
 				$fc_plgs[$fieldtype] =  new $className($dispatcher, array());
 				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters), CHECKING if parameters exist
 				$plugin_db_data = JPluginHelper::getPlugin('flexicontent_fields',$fieldtype);
-				$fc_plgs[$fieldtype]->params = FLEXI_J16GE ? new JRegistry( @$plugin_db_data->params ) : new JParameter( @$plugin_db_data->params );
+				$fc_plgs[$fieldtype]->params = new JRegistry( @$plugin_db_data->params );
 			} else {
 				JFactory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
 				return;
@@ -4969,7 +4951,7 @@ class FLEXIUtilities
 
 		if ( !isset( $content_plgs[$plgname] ) ) {
 			// 1. Load Flexicontent Field (the Plugin file) if not already loaded
-			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($plgname);
+			$plgfolder = DS.strtolower($plgname);
 			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.$plgfolder.DS.strtolower($plgname).'.php';
 			if(file_exists($path)) require_once($path);
 			else {
@@ -4987,7 +4969,7 @@ class FLEXIUtilities
 				$content_plgs[$plgname] =  new $className($dispatcher, array());
 				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters)
 				$plugin_db_data = JPluginHelper::getPlugin('content',$plgname);
-				$content_plgs[$plgname]->params = FLEXI_J16GE ? new JRegistry( @$plugin_db_data->params ) : new JParameter( @$plugin_db_data->params );
+				$content_plgs[$plgname]->params = new JRegistry( @$plugin_db_data->params );
 			} else {
 				JFactory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
 				return;
@@ -5243,6 +5225,92 @@ class FLEXIUtilities
  */
 class flexicontent_db
 {
+	/**
+	 * Method to get the nr of favourites of anitem
+	 *
+	 * @access	public
+	 * @return	integer on success
+	 * @since	1.0
+	 */
+	static function getFavourites($type, $item_id)
+	{
+		$db = JFactory::getDBO();
+		
+		$query = '
+			SELECT COUNT(id) AS favs
+			FROM #__flexicontent_favourites
+			WHERE itemid = '.(int)$item_id.'
+				AND type = '.(int)$type;
+		$db->setQuery($query);
+		
+		return $db->loadResult();
+	}
+	
+	
+	/**
+	 * Method to get the nr of favourites of an user
+	 *
+	 * @access	public
+	 * @since	1.0
+	 */
+	static function getFavoured($type, $item_id, $user_id)
+	{
+		$db = JFactory::getDBO();
+		
+		$query = '
+			SELECT COUNT(id) AS fav
+			FROM #__flexicontent_favourites
+			WHERE itemid = '.(int)$item_id.'
+				AND userid = '.(int)$user_id.'
+				AND type = '.(int)$type;
+		$db->setQuery($query);
+		
+		return $db->loadResult();
+	}
+	
+	
+	/**
+	 * Method to remove a favourite
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	static function removefav($type, $item_id, $user_id)
+	{
+		$db = JFactory::getDBO();
+		
+		$query = '
+			DELETE FROM #__flexicontent_favourites
+			WHERE itemid = '.(int)$item_id.'
+				AND userid = '.(int)$user_id.'
+				AND type = '.(int)$type;
+		$db->setQuery($query);
+		
+		return $db->query();
+	}
+	
+	
+	/**
+	 * Method to add a favourite
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	static function addfav($type, $item_id, $user_id)
+	{
+		$db = JFactory::getDBO();
+		
+		$obj = new stdClass();
+		$obj->itemid = (int)$item_id;
+		$obj->userid = (int)$user_id;
+		$obj->type   = (int)$type;
+		
+		return $db->insertObject('#__flexicontent_favourites', $obj);
+	}
+	
+	
 	/*
 	 * Retrieve author/user configuration
 	 *
@@ -5252,6 +5320,7 @@ class flexicontent_db
 	static function getUserConfig($user_id)
 	{
 		$db = JFactory::getDBO();
+		
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user_id);
 		$authorparams = $db->loadResult();
 		$authorparams = new JRegistry($authorparams);
@@ -5279,7 +5348,7 @@ class flexicontent_db
 			.' LIMIT 1';
 		$_words = array();
 		foreach ($words as $word) {
-			$quoted_word = FLEXI_J16GE ? $db->escape($word, true) : $db->getEscaped($word, true);
+			$quoted_word = $db->escape($word, true);
 			$q = sprintf($query, $quoted_word);
 			$db->setQuery($q);
 			$result = $db->loadAssocList();
@@ -5635,7 +5704,7 @@ class flexicontent_db
 				$order_dir = 'ASC';
 				break;
 			case 'order' :
-				$order_col = !FLEXI_J16GE ? $c_as.'.ordering' : $c_as.'.lft';
+				$order_col = $c_as.'.lft';
 				$order_dir = 'ASC';
 				break;
 			case 'default' :
@@ -5776,7 +5845,7 @@ class flexicontent_db
 				;
 		$db->setQuery($query);
 		$types = $db->loadObjectList('id');
-		foreach ($types as $type) $type->params = FLEXI_J16GE ? new JRegistry($type->attribs) : new JParameter($type->attribs);
+		foreach ($types as $type) $type->params = new JRegistry($type->attribs);
 		
 		$cached[$contenttypes_list] = $types;
 		return $types;
@@ -5908,7 +5977,7 @@ class flexicontent_ajax
 		
 		else {  // exttype is 'plugins'
 			// Load Flexicontent Field (the Plugin file) if not already loaded
-			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($extname);
+			$plgfolder = DS.strtolower($extname);
 			$path = JPATH_ROOT.DS.'plugins'.DS.$extfolder.$plgfolder.DS.strtolower($extname).'.php';
 			if ( !file_exists($path) ) { echo "no plugin file found at expected path, filepath is ".$path; jexit(); }
 			require_once ($path);
@@ -5923,7 +5992,7 @@ class flexicontent_ajax
 			
 			// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters), CHECKING if parameters exist
 			$plugin_db_data = JPluginHelper::getPlugin($extfolder,$extname);
-			$obj->params = FLEXI_J16GE ? new JRegistry( @ $plugin_db_data->params ) : new JParameter( @ $plugin_db_data->params );
+			$obj->params = new JRegistry( @ $plugin_db_data->params );
 		}
 		
 		// Security concern, only 'confirmed' methods will be callable

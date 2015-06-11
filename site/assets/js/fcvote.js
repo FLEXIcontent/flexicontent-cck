@@ -39,6 +39,9 @@ window.addEvent('domready', function() {
 					setTimeout(function() {
 						jQuery('#fcvote_cnt_' + itemID + '_' + xid).html(_htmlrating);
 					}, 4000);
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 				}
 			});
 			

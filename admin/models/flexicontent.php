@@ -666,6 +666,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					'custom_add'=>'ADD PRIMARY KEY',
 					'cols'=>array('template'=>0, 'cfgname'=>0, 'layout'=>0, 'position'=>0)
 				)
+			),
+			'flexicontent_favourites'=>array(
+				'PRIMARY'=>array(
+					'custom_drop'=>'DROP PRIMARY KEY',
+					'custom_add'=>'ADD PRIMARY KEY',
+					'cols'=>array('id'=>0,'itemid'=>0, 'userid'=>0, 'type'=>0)
+				)
 			)
 		);
 		

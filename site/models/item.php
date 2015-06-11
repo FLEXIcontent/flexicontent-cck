@@ -505,33 +505,27 @@ class FlexicontentModelItem extends ParentClassItem
 	 * Method to get the nr of favourites of anitem
 	 *
 	 * @access	public
-	 * @return	boolean	True on success
+	 * @return	integer on success
 	 * @since	1.0
 	 */
 	function getFavourites()
 	{
-		$query = 'SELECT COUNT(id) AS favs FROM #__flexicontent_favourites WHERE itemid = '.(int)$this->_id;
-		$this->_db->setQuery($query);
-		$favs = $this->_db->loadResult();
-		return $favs;
+		return flexicontent_db::getFavourites($type=0, $this->_id);
 	}
-
+	
+	
 	/**
 	 * Method to get the nr of favourites of an user
 	 *
 	 * @access	public
-	 * @return	boolean	True on success
+	 * @return	integer on success
 	 * @since	1.0
 	 */
 	function getFavoured()
 	{
-		$user = JFactory::getUser();
-
-		$query = 'SELECT COUNT(id) AS fav FROM #__flexicontent_favourites WHERE itemid = '.(int)$this->_id.' AND userid= '.(int)$user->id;
-		$this->_db->setQuery($query);
-		$fav = $this->_db->loadResult();
-		return $fav;
+		return flexicontent_db::getFavoured($type=0, $this->_id, JFactory::getUser()->id);
 	}
+	
 	
 	
 	/**
@@ -543,12 +537,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function removefav()
 	{
-		$user = JFactory::getUser();
-
-		$query = 'DELETE FROM #__flexicontent_favourites WHERE itemid = '.(int)$this->_id.' AND userid = '.(int)$user->id;
-		$this->_db->setQuery($query);
-		$remfav = $this->_db->query();
-		return $remfav;
+		return flexicontent_db::removefav($type=0, $this->_id, JFactory::getUser()->id);
 	}
 	
 	
@@ -561,14 +550,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function addfav()
 	{
-		$user = JFactory::getUser();
-
-		$obj = new stdClass();
-		$obj->itemid 	= $this->_id;
-		$obj->userid	= $user->id;
-
-		$addfav = $this->_db->insertObject('#__flexicontent_favourites', $obj);
-		return $addfav;
+		return flexicontent_db::addfav($type=0, $this->_id, JFactory::getUser()->id);
 	}
 	
 }

@@ -2166,5 +2166,56 @@ class FlexicontentModelCategory extends JModelLegacy {
 		return true;
 	}
 	
+	
+	/**
+	 * Method to get the nr of favourites of anitem
+	 *
+	 * @access	public
+	 * @return	integer on success
+	 * @since	1.0
+	 */
+	function getFavourites()
+	{
+		return flexicontent_db::getFavourites($type=1, $this->_id);
+	}
+	
+	
+	/**
+	 * Method to get the nr of favourites of an user
+	 *
+	 * @access	public
+	 * @return	integer on success
+	 * @since	1.0
+	 */
+	function getFavoured()
+	{
+		return flexicontent_db::getFavoured($type=1, $this->_id, JFactory::getUser()->id);
+	}
+	
+	
+	/**
+	 * Method to remove a favourite
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function removefav()
+	{
+		return flexicontent_db::removefav($type=1, $this->_id, JFactory::getUser()->id);
+	}
+	
+	
+	/**
+	 * Method to add a favourite
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function addfav()
+	{
+		return flexicontent_db::addfav($type=1, $this->_id, JFactory::getUser()->id);
+	}
 }
 ?>
