@@ -1248,7 +1248,7 @@ class FlexicontentController extends JControllerLegacy
 		if ( !$has_acclvl  ||  ($user_rating < $min_rating && $user_rating > $max_rating) )
 		{
 			// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
-			$error = !$has_acclvl ? $no_acc_msg : JText::sprintf( 'FLEXI_VOTING_OUT_OF_RANGE', $min_rating, $max_rating);
+			$error = !$has_acclvl ? $no_acc_msg : JText::sprintf( 'FLEXI_VOTE_OUT_OF_RANGE', $min_rating, $max_rating);
 			
 			// Set responce
 			if ($no_ajax) {
@@ -1295,13 +1295,13 @@ class FlexicontentController extends JControllerLegacy
 		
 		if ( !$int_xid && count($xids) )
 		{
-			$error = JText::_('FLEXI_VOTING_AVERAGE_RATING_CALCULATED_AUTOMATICALLY');
+			$error = JText::_('FLEXI_VOTE_AVERAGE_RATING_CALCULATED_AUTOMATICALLY');
 		}
 		
 		if ( $int_xid && !isset($xids[$int_xid]) )
 		{
 			// Rare/unreachable voting ERROR
-			$error = !$enable_extra_votes ? JText::_('FLEXI_VOTING_COMPOSITE_VOTING_IS_DISABLED') : 'Voting characteristic with id: '.$int_xid .' was not found';
+			$error = !$enable_extra_votes ? JText::_('FLEXI_VOTE_COMPOSITE_VOTING_IS_DISABLED') : 'Voting characteristic with id: '.$int_xid .' was not found';
 		}
 		
 		if ( isset($error) ) {
@@ -1431,13 +1431,22 @@ class FlexicontentController extends JControllerLegacy
 					// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
 					//$result->percentage = ( $db_itemratings->rating_sum / $db_itemratings->rating_count ) * (100/$rating_resolution);
 					//$result->htmlrating = $db_itemratings->rating_count .' '. JText::_( 'FLEXI_VOTES' );
-					$html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' ).$db_itemratings->lastip;
+					$error = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' ).', IP: '.$db_itemratings->lastip;
 					if ($int_xid) $result->message = $error;  else $result->message_main = $error;
 					
 					if ($no_ajax) {
 						$app->enqueueMessage( $int_xid ? $result->html : $result->html_main, 'notice' );
 						return;
 					} else {
+						$result	= new stdClass();
+						$result->percentage = '';
+						$result->htmlrating = '';
+						$error = '
+						<div class="fc-mssg fc-warning fc-nobgimage">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							'.$error.'
+						</div>';
+						if ($int_xid) $result->message = $error;  else $result->message_main = $error;
 						echo json_encode($result);
 						jexit();
 					}
@@ -1491,20 +1500,20 @@ class FlexicontentController extends JControllerLegacy
 			$result->message = '
 				<div class="fc-mssg fc-warning fc-nobgimage">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
-					'.JText::_('FLEXI_VOTING_YOUR_RATING').': '.(100*($user_rating / $max_rating)).'%
+					'.JText::_('FLEXI_VOTE_YOUR_RATING').': '.(100*($user_rating / $max_rating)).'%
 				</div>';
 			if ( ! $voteIsComplete ) {
 				$result->message_main = '
 					<div class="fc-mssg fc-warning fc-nobgimage">
 						<button type="button" class="close" data-dismiss="alert">&times;</button>
-						'.JText::sprintf('FLEXI_VOTING_PLEASE_COMPLETE_VOTING', $rating_completed, count($xids)).'
+						'.JText::sprintf('FLEXI_VOTE_PLEASE_COMPLETE_VOTING', $rating_completed, count($xids)).'
 					</div>';
 			} else {
-				$result->html_main = JText::_($old_main_rating ? 'FLEXI_VOTING_AVERAGE_RATING_UPDATED' : 'FLEXI_VOTING_AVERAGE_RATING_SUBMITTED');
+				$result->html_main = JText::_($old_main_rating ? 'FLEXI_VOTE_AVERAGE_RATING_UPDATED' : 'FLEXI_VOTE_AVERAGE_RATING_SUBMITTED');
 				$result->message_main = '
 				<div class="fc-mssg fc-success fc-nobgimage">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
-					'.JText::_( $old_rating ? 'FLEXI_VOTING_YOUR_OLD_AVERAGE_RATING_WAS_UPDATED' : 'FLEXI_VOTING_YOUR_AVERAGE_RATING_STORED' ).':
+					'.JText::_( $old_rating ? 'FLEXI_VOTE_YOUR_OLD_AVERAGE_RATING_WAS_UPDATED' : 'FLEXI_VOTE_YOUR_AVERAGE_RATING_STORED' ).':
 					<b>'.($old_main_rating ? (100*($old_main_rating / $max_rating)) .'% => ' : '').  (100*($main_rating / $max_rating)).'%</b>
 				</div>';
 			}
@@ -1512,7 +1521,7 @@ class FlexicontentController extends JControllerLegacy
 			$result->message_main ='
 				<div class="fc-mssg fc-success fc-nobgimage">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
-					'.JText::_( $old_rating ? 'FLEXI_VOTING_YOUR_OLD_RATING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' ).'
+					'.JText::_( $old_rating ? 'FLEXI_VOTE_YOUR_OLD_RATING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' ).'
 				</div>';
 		}
 		
