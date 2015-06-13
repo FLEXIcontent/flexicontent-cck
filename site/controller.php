@@ -1431,7 +1431,7 @@ class FlexicontentController extends JControllerLegacy
 					// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
 					//$result->percentage = ( $db_itemratings->rating_sum / $db_itemratings->rating_count ) * (100/$rating_resolution);
 					//$result->htmlrating = $db_itemratings->rating_count .' '. JText::_( 'FLEXI_VOTES' );
-					$error = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' ).', IP: '.$db_itemratings->lastip;
+					$error = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );//.', IP: '.$db_itemratings->lastip;
 					if ($int_xid) $result->message = $error;  else $result->message_main = $error;
 					
 					if ($no_ajax) {

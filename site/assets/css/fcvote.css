@@ -133,7 +133,7 @@ div.fcvote-label {
 div.fcvote-label.xid-main,
 div.fcvote-label.xid-main {
 	color: darkorange;
-	font-size: 16px;
+	font-size: 14px;
 	font-style:normal;
 	font-weight:bold;
 }
@@ -151,7 +151,7 @@ div.fcvote_message {
 div.fcvote-count,
 div.fcvote-count {
 	float: left;
-	margin: 0 0 0 2px;
+	margin: 4px 0 0 2px;
 	padding: 0 2px 0 2px;
 	text-align: center;
 	position: relative;

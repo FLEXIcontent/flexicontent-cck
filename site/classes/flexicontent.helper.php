@@ -2303,7 +2303,7 @@ class flexicontent_html
 			$counter = $vote_counter ? 1 : 0;
 		else
 			$counter = $field->parameters->get( ($int_xid ? 'extra_counter' : 'main_counter'), 1 );
-		$show_unrated = $field->parameters->get( 'unrated', 0 );  // Display info e.g. counter if unrated, TODO add parameter
+		$show_unrated = $field->parameters->get( 'show_unrated', 0 );  // Display info e.g. counter if unrated, TODO add parameter
 		$show_percentage = $field->parameters->get( ($int_xid ? 'extra_counter_show_percentage' : 'main_counter_show_percentage'), 0 );
 		$class   = $field->name.'-row';
 		
@@ -2421,7 +2421,7 @@ class flexicontent_html
 		$factor = (int) round(100/$rating_resolution);
 		if ($rating_count != 0) {
 			$percent = number_format((intval($rating_sum) / intval( $rating_count ))*$factor,2);
-		} elseif ($unrated == 0) {
+		} elseif ($show_unrated == 0) {
 			$counter = -1;
 		}
 
