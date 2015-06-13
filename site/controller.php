@@ -1144,9 +1144,40 @@ class FlexicontentController extends JControllerLegacy
 		$xid 			= JRequest::getVar('xid');
 		
 		// Compatibility in case the voting originates from joomla's voting plugin
-		if ($no_ajax) {
-			// Joomla 's content plugin uses 'id' HTTP request variable
-			$cid = JRequest::getInt('id');
+		if ($no_ajax && !$cid)
+		{
+			$cid = JRequest::getInt('id'); // Joomla 's content plugin uses 'id' HTTP request variable
+		}
+		
+		
+		// *******************************************************************
+		// Check for invalid xid (according to voting field/type configuration
+		// *******************************************************************
+		
+		$xid = empty($xid) ? 'main' : $xid;
+		$int_xid  = (int)$xid;
+		if ($xid!='main' && !$int_xid)
+		{
+			// Rare/unreachable voting ERROR
+			$error = "ajaxvote(): invalid xid '".$xid."' was given";
+			
+			// Set responce
+			if ($no_ajax) {
+				$app->enqueueMessage( $error, 'notice' );
+				return;
+			} else {
+				$result	= new stdClass();
+				$result->percentage = '';
+				$result->htmlrating = '';
+				$error = '
+				<div class="fc-mssg fc-warning fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.$error.'
+				</div>';
+				if ($int_xid) $result->message = $error;  else $result->message_main = $error;
+				echo json_encode($result);
+				jexit();
+			}
 		}
 		
 		
@@ -1166,6 +1197,13 @@ class FlexicontentController extends JControllerLegacy
 		
 		$min_rating = 1;
 		$max_rating = $rating_resolution;
+		
+		$main_counter  = (int)$field->parameters->get('main_counter', 1);
+		$extra_counter = (int)$field->parameters->get('extra_counter', 1);
+		$main_counter_show_label  = (int)$field->parameters->get('main_counter_show_label', 1);
+		$extra_counter_show_label = (int)$field->parameters->get('extra_counter_show_label', 1);
+		$main_counter_show_percentage  = (int)$field->parameters->get('main_counter_show_percentage', 0);
+		$extra_counter_show_percentage = (int)$field->parameters->get('extra_counter_show_percentage', 0);
 		
 		
 		// *****************************************************
@@ -1210,37 +1248,81 @@ class FlexicontentController extends JControllerLegacy
 		if ( !$has_acclvl  ||  ($user_rating < $min_rating && $user_rating > $max_rating) )
 		{
 			// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
-			$result	= new stdClass();
-			$result->percentage = '';
-			$result->htmlrating = '';
-			$result->html = !$has_acclvl ? $no_acc_msg : JText::sprintf( 'FLEXI_VOTING_OUT_OF_RANGE', $min_rating, $max_rating);
+			$error = !$has_acclvl ? $no_acc_msg : JText::sprintf( 'FLEXI_VOTING_OUT_OF_RANGE', $min_rating, $max_rating);
 			
 			// Set responce
 			if ($no_ajax) {
-				$app->enqueueMessage( $result->html, 'notice' );
+				$app->enqueueMessage( $error, 'notice' );
 				return;
 			} else {
+				$result	= new stdClass();
+				$result->percentage = '';
+				$result->htmlrating = '';
+				$error = '
+				<div class="fc-mssg fc-warning fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.$error.'
+				</div>';
+				if ($int_xid) $result->message = $error;  else $result->message_main = $error;
 				echo json_encode($result);
 				jexit();
 			}
 		}
 		
 		
-		// *************************************
-		// Retreive last vote for the given item
-		// *************************************
+		// *************************************************
+		// Check extra vote exists and get extra votes types
+		// *************************************************
 		
-		$currip = ( phpversion() <= '4.2.1' ? @getenv( 'REMOTE_ADDR' ) : $_SERVER['REMOTE_ADDR'] );
-		$currip_quoted = $db->Quote( $currip );
-		$dbtbl = !(int)$xid ? '#__content_rating' : '#__flexicontent_items_extravote';  // Choose db table to store vote (normal or extra)
-		$and_extra_id = (int)$xid ? ' AND field_id = '.(int)$xid : '';     // second part is for defining the vote type in case of extra vote
+		$xids = array();
+		$enable_extra_votes = $field->parameters->get('enable_extra_votes', '');
+		if ($enable_extra_votes)
+		{
+			// Retrieve and split-up extra vote types, (removing last one if empty)
+			$extra_votes = $field->parameters->get('extra_votes', '');
+			$extra_votes = preg_split( "/[\s]*%%[\s]*/", $field->parameters->get('extra_votes', '') );
+			if ( empty($extra_votes[count($extra_votes)-1]) )
+			{
+				unset( $extra_votes[count($extra_votes)-1] );
+			}
 			
-		$query = ' SELECT *'
-			. ' FROM '.$dbtbl.' AS a '
-			. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
-			
-		$db->setQuery( $query );
-		$db_itemratings = $db->loadObject();
+			// Split extra voting ids (xid) and their titles
+			foreach ($extra_votes as $extra_vote) {
+				@list($extra_id, $extra_title, $extra_desc) = explode("##", $extra_vote);
+				$xids[$extra_id] = 1;
+			}
+		}
+		
+		if ( !$int_xid && count($xids) )
+		{
+			$error = JText::_('FLEXI_VOTING_AVERAGE_RATING_CALCULATED_AUTOMATICALLY');
+		}
+		
+		if ( $int_xid && !isset($xids[$int_xid]) )
+		{
+			// Rare/unreachable voting ERROR
+			$error = !$enable_extra_votes ? JText::_('FLEXI_VOTING_COMPOSITE_VOTING_IS_DISABLED') : 'Voting characteristic with id: '.$int_xid .' was not found';
+		}
+		
+		if ( isset($error) ) {
+			// Set responce
+			if ($no_ajax) {
+				$app->enqueueMessage( $error, 'notice' );
+				return;
+			} else {
+				$result	= new stdClass();
+				$result->percentage = '';
+				$result->htmlrating = '';
+				$error = '
+				<div class="fc-mssg fc-warning fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.$error.'
+				</div>';
+				if ($int_xid) $result->message = $error;  else $result->message_main = $error;
+				echo json_encode($result);
+				jexit();
+			}
+		}
 		
 		
 		// ********************************************************************************************
@@ -1252,81 +1334,194 @@ class FlexicontentController extends JControllerLegacy
 		{
 			$vote_history[$cid] = array();
 		}
+		
+		// Allow user to change his vote
 		$old_rating = isset($vote_history[$cid][$xid]) ? (int) $vote_history[$cid][$xid] : 0;
+		$old_main_rating = isset($vote_history[$cid]['main']) ? (int) $vote_history[$cid]['main'] : 0;
 		
 		// For the case that the browser was not close we can get rating from user's session and allow to change the vote
-		$rating_diff = (int) $user_rating - $old_rating;
+		$rating_diff = $user_rating - $old_rating;
 		
-		
-		// ***********************************************************
-		// Voting access allowed and valid, but we will need to make
-		// some more checks (IF voting record exists AND double voting)
-		// ***********************************************************
-		$result	= new stdClass();
-		
-		// Voting record does not exist for this item, accept user's vote and insert new voting record in the db
-		if ( !$db_itemratings ) {
-			$query = ' INSERT '.$dbtbl
-				. ' SET content_id = '.(int)$cid.', '
-				. '  lastip = '.$currip_quoted.', '
-				. '  rating_sum = '.(int)$user_rating.', '
-				. '  rating_count = 1 '
-				. ( (int)$xid ? ', field_id = '.(int)$xid : '' );
-				
-			$db->setQuery( $query );
-			$db->query() or die( $db->stderr() );
-			$result->ratingcount = 1;
-			$result->htmlrating = $result->ratingcount .' '. JText::_( 'FLEXI_VOTE' );
+		// Accept votes only if user has voted for all cases, but do not store session yet
+		$main_rating = 0;
+		if (!count($xids))
+		{
+			$voteIsComplete = true;
+			$main_rating = $user_rating;
+			$vote_history[$cid]['main'] = $main_rating;
 		}
-		
-		// Voting record exists for this item, check if user has already voted
-		else {
+		else
+		{
+			if (!$int_xid) die('unreachable int_xid is zero');
 			
-			// If item is not in the user's voting history (session), then we check if this IP has voted for this item recently and refuse to accept vote
-			if ( !$old_rating && $currip==$db_itemratings->lastip ) 
-			{
-				// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
-				//$result->percentage = ( $db_itemratings->rating_sum / $db_itemratings->rating_count ) * (100/$rating_resolution);
-				//$result->htmlrating = $db_itemratings->rating_count .' '. JText::_( 'FLEXI_VOTES' );
-				$result->html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );
-				
-				if ($no_ajax) {
-					$app->enqueueMessage( $result->html, 'notice' );
-					return;
-				} else {
-					echo json_encode($result);
-					jexit();
+			$voteIsComplete = true;
+			$main_rating = 0;
+			$rating_completed = 0;
+			
+			// Add current vote
+			$vote_history[$cid][$int_xid] = $user_rating;
+			
+			foreach($xids as $_xid => $i) {
+				if ( !isset($vote_history[$cid][$_xid]) ) {
+					$voteIsComplete = false;
+					continue;
+				}
+				$rating_completed++;
+				$main_rating += (int)$vote_history[$cid][$_xid];
+			}
+			if ($voteIsComplete) {
+				$main_rating = (int)($main_rating / count($xids));
+				$vote_history[$cid]['main'] = $main_rating;
+			}
+		}
+		$main_rating_diff = $main_rating - $old_main_rating;
+		
+		
+		// *************************************
+		// Retreive last vote for the given item
+		// *************************************
+		
+		$currip = $_SERVER['REMOTE_ADDR'];
+		$currip_quoted = $db->Quote( $currip );
+		$result	= new stdClass();
+		foreach($vote_history[$cid] as $_xid => $_rating)
+		{
+			if (!$voteIsComplete && $_xid!=$xid) continue; // nothing todo
+			//echo $_xid."\n";
+			
+			$dbtbl = !(int)$_xid ? '#__content_rating' : '#__flexicontent_items_extravote';  // Choose db table to store vote (normal or extra)
+			$and_extra_id = (int)$_xid ? ' AND field_id = '.(int)$_xid : '';     // second part is for defining the vote type in case of extra vote
+			
+			$query = ' SELECT *'
+				. ' FROM '.$dbtbl.' AS a '
+				. ' WHERE content_id = '.(int)$cid
+				. ' '.$and_extra_id;
+			$db->setQuery( $query );
+			$db_itemratings = $db->loadObject();
+			
+			
+			// ***********************************************************
+			// Voting access allowed and valid, but we will need to make
+			// some more checks (IF voting record exists AND double voting)
+			// ***********************************************************
+			
+			// Voting record does not exist for this item, accept user's vote and insert new voting record in the db
+			if ( !$db_itemratings ) {
+				if ($voteIsComplete) {
+					$query = ' INSERT '.$dbtbl
+						. ' SET content_id = '.(int)$cid.', '
+						. '  lastip = '.$currip_quoted.', '
+						. '  rating_sum = '.(int)$user_rating.', '
+						. '  rating_count = 1 '
+						. ( (int)$_xid ? ', field_id = '.(int)$_xid : '' );
+						
+					$db->setQuery( $query );
+					$db->query() or die( $db->stderr() );
 				}
 			}
 			
-			// vote accepted update DB
-			$query = " UPDATE ".$dbtbl
-			. ' SET rating_count = rating_count + '.($old_rating ? 0 : 1)
-			. '  , rating_sum = rating_sum + '.$rating_diff
-			. '  , lastip = '.$currip_quoted
-			. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
+			// Voting record exists for this item, check if user has already voted
+			else {
+				if ( (int)$_xid && !isset($xids[$_xid]) && $_xid!='main' ) continue;  // just in case there are some old records in session table 'vote_history'
+				//echo $db_itemratings->rating_sum. " - ".$rating_diff. "\n";
+				
+				// If item is not in the user's voting history (session), then we check if this IP has voted for this item recently and refuse to accept vote
+				if ( $_xid==$xid && !$old_rating && $currip==$db_itemratings->lastip ) 
+				{
+					// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
+					//$result->percentage = ( $db_itemratings->rating_sum / $db_itemratings->rating_count ) * (100/$rating_resolution);
+					//$result->htmlrating = $db_itemratings->rating_count .' '. JText::_( 'FLEXI_VOTES' );
+					$html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' ).$db_itemratings->lastip;
+					if ($int_xid) $result->message = $error;  else $result->message_main = $error;
+					
+					if ($no_ajax) {
+						$app->enqueueMessage( $int_xid ? $result->html : $result->html_main, 'notice' );
+						return;
+					} else {
+						echo json_encode($result);
+						jexit();
+					}
+				}
+				
+				// If voting is completed, add all rating into DB -OR- if user has updated existing vote (update in DB only the current sub-vote and the main vote)
+				if ( $voteIsComplete && (!$old_main_rating || $_xid=='main' || (int)$_xid==$xid) )
+				{
+					// vote accepted update DB
+					$query = " UPDATE ".$dbtbl
+					. ' SET rating_count = rating_count + '.($old_rating ? 0 : 1)
+					. '  , rating_sum = rating_sum + '.( $_xid=='main'  ?  ($old_main_rating ? $main_rating_diff : $main_rating)  :  ($_xid==$xid && $old_main_rating ? $rating_diff : $_rating) )
+					. '  , lastip = '.$currip_quoted
+					. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
+					
+					$db->setQuery( $query );
+					$db->query() or die( $db->stderr() );
+				}
+			}
 			
-			$db->setQuery( $query );
-			$db->query() or die( $db->stderr() );
-			$result->ratingcount = $db_itemratings->rating_count + ($old_rating ? 0 : 1);
-			$result->htmlrating = $result->ratingcount .' '. JText::_( 'FLEXI_VOTES' );
+			if ($_xid=='main') {
+				$result->rating_sum_main  = (@ (int) $db_itemratings->rating_sum)   + ($old_main_rating ? $main_rating_diff : $main_rating);
+				$result->ratingcount_main = (@ (int) $db_itemratings->rating_count) + ($old_main_rating ? 0 : 1);
+				$result->percentage_main  = ($result->rating_sum_main / $result->ratingcount_main) * (100 / $rating_resolution);
+				$result->htmlrating_main  = ($main_counter ?
+					$result->ratingcount_main .($main_counter_show_label ? ' '. JText::_( @ $db_itemratings ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '') .($main_counter_show_percentage ? ' - ' : '')
+					: '')
+					.($main_counter_show_percentage ? (int)$result->percentage_main.'%' : '');
+			}
+			// In case of composite voting being OFF only the above will be added
+			else if ($_xid==$xid) {
+				$result->rating_sum  = (@ (int) $db_itemratings->rating_sum)   + ($old_main_rating ? $rating_diff : $_rating);
+				$result->ratingcount = (@ (int) $db_itemratings->rating_count) + ($old_main_rating ? 0 : 1);
+				$result->percentage  = ($result->rating_sum / $result->ratingcount) * (100 / $rating_resolution);
+				$result->htmlrating  = ($extra_counter ?
+					$result->ratingcount . ($extra_counter_show_label ? ' '. JText::_( @ $db_itemratings ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '')	.($extra_counter_show_percentage ? ' - ' : '')
+					: '')
+					.($extra_counter_show_percentage ? (int)$result->percentage.'%' : '');
+			}
 		}
 		
-		// Set the current item id, in our voting logging SESSION (array) variable, to avoid future double voting
-		$vote_history[$cid][$xid] = $user_rating;
-		$session->set('vote_history', $vote_history, 'flexicontent');
 		
 		// Prepare responce
-		$rating_sum = (@ $db_itemratings ? $db_itemratings->rating_sum : 0) + $rating_diff;
-		$result->percentage = ($rating_sum / $result->ratingcount) * (100 / $rating_resolution);
-		$result->html = ($old_rating ?
-				'<b>'.(100*($old_rating / $max_rating)) .'% => '. (100*($user_rating / $max_rating)).'%</b>,&nbsp;' :
-				'<b>'.(100*($user_rating / $max_rating)).'%</b>,&nbsp;').
-			JText::_( $old_rating ? 'FLEXI_YOUR_OLD_VOTING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' );
+		$html = ($old_rating ?
+			''.(100*($old_rating / $max_rating)) .'% => '. (100*($user_rating / $max_rating)).'%' :
+			''.(100*($user_rating / $max_rating)).'%');
+		if ($xid=='main') $result->html_main = $html;
+		else $result->html = $html;
+		
+		if ($int_xid) {
+			$result->message = '
+				<div class="fc-mssg fc-warning fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.JText::_('FLEXI_VOTING_YOUR_RATING').': '.(100*($user_rating / $max_rating)).'%
+				</div>';
+			if ( ! $voteIsComplete ) {
+				$result->message_main = '
+					<div class="fc-mssg fc-warning fc-nobgimage">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+						'.JText::sprintf('FLEXI_VOTING_PLEASE_COMPLETE_VOTING', $rating_completed, count($xids)).'
+					</div>';
+			} else {
+				$result->html_main = JText::_($old_main_rating ? 'FLEXI_VOTING_AVERAGE_RATING_UPDATED' : 'FLEXI_VOTING_AVERAGE_RATING_SUBMITTED');
+				$result->message_main = '
+				<div class="fc-mssg fc-success fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.JText::_( $old_rating ? 'FLEXI_VOTING_YOUR_OLD_AVERAGE_RATING_WAS_UPDATED' : 'FLEXI_VOTING_YOUR_AVERAGE_RATING_STORED' ).':
+					<b>'.($old_main_rating ? (100*($old_main_rating / $max_rating)) .'% => ' : '').  (100*($main_rating / $max_rating)).'%</b>
+				</div>';
+			}
+		} else {
+			$result->message_main ='
+				<div class="fc-mssg fc-success fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.JText::_( $old_rating ? 'FLEXI_VOTING_YOUR_OLD_RATING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' ).'
+				</div>';
+		}
+		
+		// Set the voting data, into SESSION
+		$session->set('vote_history', $vote_history, 'flexicontent');
 		
 		// Finally set responce
 		if ($no_ajax) {
-			$app->enqueueMessage( $result->html, 'notice' );
+			$app->enqueueMessage( $int_xid ? $result->message_main.'<br/>'.$result->message : $result->message_main, 'notice' );
 			return;
 		} else {
 			echo json_encode($result);

@@ -1352,13 +1352,6 @@ class FlexicontentFields
 			$_tparams = $tparams->toArray();
 			$tinfo['params'] = array();
 			
-			// Extra voting parameters of --voting-- field parameters are overriden contiditionally
-			if ( $tparams->get('voting_override_extra_votes', 0) ) {
-				$tinfo['params']['voting']['voting_extra_votes'] = $tparams->get('voting_extra_votes', '');
-				$main_label = $tparams->get('voting_main_label', '') ? $tparams->get('voting_main_label', '') : JText::_('FLEXI_OVERALL');  // Set default label in case of empty
-				$tinfo['params']['voting']['main_label'] = $main_label;
-			}
-			
 			foreach ($_tparams as $param_name => $param_value) {
 				$res = preg_split('/_/', $param_name, 2);
 				if ( count($res) < 2 ) continue;
@@ -1370,15 +1363,10 @@ class FlexicontentFields
 				$skipparam = false;
 				
 				if ( strlen($param_value) ) {
-					if ($o_field_type=='voting') {
-						$skipparam = in_array($o_param_name, array('override_extra_votes','voting_extra_votes','voting_main_label'));
-					} else if ( in_array($o_param_name, array('label','desc','viewdesc')) ) {
-						$skipparam = true;
-					}
-					if (!$skipparam) {
-						$tinfo['params'][$o_field_type][$o_param_name] = $param_value;
-						//echo "$o_field_type _ $o_param_name = $param_value <br>\n";
-					}
+					/*$skipparam = in_array($o_param_name, array('label','desc','viewdesc'));
+					if ($skipparam) continue;*/
+					$tinfo['params'][$o_field_type][$o_param_name] = $param_value;
+					//echo "$o_field_type _ $o_param_name = $param_value <br>\n";
 				}
 			}
 			//echo "<pre>"; print_r($tinfo['params']); echo "</pre>";

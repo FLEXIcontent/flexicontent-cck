@@ -109,7 +109,7 @@ $this->document->addScriptDeclaration($js);
 		<div class="fctabber fields_tabset" id="field_specific_props_tabset">
 			
 			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-home-2" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
+				<h3 class="tabberheading hasTooltip"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
 				
 				<table class="fc-form-tbl">
 					<tr>
@@ -342,7 +342,7 @@ $this->document->addScriptDeclaration($js);
 	</div>
 	<div class="span6 full_width_980 padded_wrap_box">
 			
-			<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; "><?php echo JText::_( /*'FLEXI_THIS_FIELDTYPE_PROPERTIES'*/'FIELD TYPE specific configuration' ); ?></span>
+			<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#777; "><?php echo JText::_( /*'FLEXI_THIS_FIELDTYPE_PROPERTIES'*/'FIELD TYPE specific configuration' ); ?></span>
 			
 			<div id="fieldspecificproperties">
 				<div class="fctabber fields_tabset" id="field_specific_props_tabset" >
@@ -363,7 +363,7 @@ $this->document->addScriptDeclaration($js);
 					$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
 					?>
 					<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
-						<h3 class="tabberheading" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
+						<h3 class="tabberheading hasTooltip" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
 						<?php $i = 0; ?>
 						<?php foreach ($form->getFieldset($name) as $field) {
 							$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :

@@ -29,9 +29,15 @@ div.voting-group {
 div.voting-row {
 	display: inline-block;
 	float: left;
-	margin: 2px 6px 2px 6px;
+	margin: 2px 1%;
 	padding: 0;
+ 	box-sizing: border-box;
 }
+div.voting-row.voting-row_main {
+	box-sizing: border-box;
+	width: 98%;
+}
+
 /* inner container of 1 vote type: main or extra */
 div.fcvote {
 	display: inline-block;
@@ -53,11 +59,12 @@ div.fcvote > ul.fcvote_list {
 	list-style-image: none !important;
 	list-style-position: outside !important;
 	list-style-type: none !important;
-	margin: 0 !important;
+	margin: 4px 0 !important;
 	padding: 0 !important;
 	overflow: hidden !important;
 	position: relative !important;
 	float: left !important;
+	clear: both !important;
 }
 
 div.fcvote > ul.fcvote_list > li.current-rating,
@@ -102,14 +109,20 @@ div.fcvote > ul.fcvote_list > li.current-rating {
 
 /* Labels: main vote */
 #flexicontent
+div.fcvote-label-outer,
+div.fcvote-label-outer {
+	float: left;
+	clear:both;
+}
+
+#flexicontent
 div.fcvote-label,
 div.fcvote-label {
 	float: left;
-	min-width: 80px;
 	padding: 0 4px 0 0;
 	margin-right: 6px;
 	font-weight:normal;
-	font-size:90%;
+	font-size: 100%;
 	text-align:right;
 	border-bottom:1px dashed gray;
 	font-style:italic;
@@ -119,18 +132,37 @@ div.fcvote-label {
 #flexicontent
 div.fcvote-label.xid-main,
 div.fcvote-label.xid-main {
-	font-size:100%;
+	color: darkorange;
+	font-size: 16px;
 	font-style:normal;
 	font-weight:bold;
 }
 
-/* Vote counter */
+/* Vote message, desc, counter */
+#flexicontent
+div.fcvote_message,
+div.fcvote_message {
+	float: left;
+	margin: 0 0 0 2px;
+	padding: 0 2px 0 2px;
+	clear:both;
+}
 #flexicontent
 div.fcvote-count,
 div.fcvote-count {
-	margin: 0 0 0 2px;
 	float: left;
+	margin: 0 0 0 2px;
 	padding: 0 2px 0 2px;
+	text-align: center;
+	position: relative;
+}
+#flexicontent
+div.fcvote-desc,
+div.fcvote-desc {
+	margin: 2px 4px 4px 4px;
+	padding: 0px 4px;
+	float:left;
+	clear:both;
 }
 
 /* Vote being submitted */
@@ -155,11 +187,6 @@ div.fcvote .ajax-loader {
 /*****************************************/
 /* overridable voting image and its size */
 /*****************************************/
-
-div.fcvote {
-	height: 25px !important;
-	line-height: 25px !important;
-}
 
 div.fcvote > ul.fcvote_list {
 	height: 25px !important;

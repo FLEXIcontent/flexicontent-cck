@@ -20,7 +20,8 @@ jimport('joomla.event.plugin');
 class plgFlexicontent_fieldsImage extends JPlugin
 {
 	static $field_types = array('image');
-	static $value_only_displays = array("display_backend_src", "display_small_src", "display_medium_src", "display_large_src", "display_original_src");
+	static $value_only_displays = array("display_backend_src"=>0, "display_small_src"=>1, "display_medium_src"=>2, "display_large_src"=>3, "display_original_src"=>4);
+	static $single_displays = array('display_single'=>0, 'display_single_total'=>1, 'display_single_link'=>2, 'display_single_total_link'=>3);
 	
 	// ***********
 	// CONSTRUCTOR
@@ -1123,7 +1124,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// **********************************************
 		
 		// Do not load JS, for value only displays
-		if ( !in_array($prop, self::$value_only_displays) )
+		if ( !isset(self::$value_only_displays[$prop]) )
 		{
 			// MultiBox maybe added in extra cases besides popup
 			// (a) in Item manager, (b) When linking to URL in popup target
@@ -1361,6 +1362,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// The values loop
 		// ***************
 		
+		$isSingle = isset(self::$single_displays[$_method]);
+		$linkSingleToItem = $_method == 'display_single_link' || $_method == 'display_single_total_link' || ($view!='item' && $cat_link_single_to && $isSingle);
 		foreach ($values as $val)
 		{
 			// Unserialize value's properties and check for empty original name property
@@ -1392,11 +1395,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$alt	= htmlspecialchars($alt, ENT_COMPAT, 'UTF-8');
 			$desc	= htmlspecialchars($desc, ENT_COMPAT, 'UTF-8');
 			
-			$srcb	= $thumb_urlpath . '/b_' .$extra_prefix. $image_name;  // backend
-			$srcs	= $thumb_urlpath . '/s_' .$extra_prefix. $image_name;  // small
-			$srcm	= $thumb_urlpath . '/m_' .$extra_prefix. $image_name;  // medium
-			$srcl	= $thumb_urlpath . '/l_' .$extra_prefix. $image_name;  // large
-			$srco	= $orig_urlpath  . '/'   .$image_name;  // original image
+			$srcb = $thumb_urlpath . '/b_' .$extra_prefix. $image_name;  // backend
+			$srcs = $thumb_urlpath . '/s_' .$extra_prefix. $image_name;  // small
+			$srcm = $thumb_urlpath . '/m_' .$extra_prefix. $image_name;  // medium
+			$srcl = $thumb_urlpath . '/l_' .$extra_prefix. $image_name;  // large
+			$srco = $orig_urlpath  . '/'   .$image_name;  // original image
 			
 			// Create a popup url link
 			$urllink = @$value['urllink'] ? $value['urllink'] : '';
@@ -1412,7 +1415,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			
 			// Handle single image display, with/without total, TODO: verify all JS handle & ignore display none on the img TAG
-			$style = ($i!=0 && in_array($_method, array('display_single', 'display_single_total'))) ? 'display:none;' : '';
+			$style = ($i!=0 && $isSingle) ? 'display:none;' : '';
 			
 			// Create a unique id for the link tags, and a class name for image tags
 			$uniqueid = $item->id . '_' . $field->id . '_' . $i;
@@ -1489,7 +1492,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// if so we will not be creating the HTML code for Image / Gallery 
 			// ****************************************************************
 			
-			if ( in_array($prop, self::$value_only_displays) ) {
+			if ( isset(self::$value_only_displays[$prop]) )
+			{
 				continue;
 			}
 			
@@ -1554,7 +1558,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// FINALLY CREATE the field display variable ...
 			// *********************************************
 			
-			if ( $view!='item' && $cat_link_single_to &&in_array($_method, array('display_single', 'display_single_total')) ) {
+			if ( $linkSingleToItem ) {
 				
 				// CASE 0: Add single image display information (e.g. image count)
 				
@@ -1564,7 +1568,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					<a href="'.$item_link.'" style="display: inline-block;">
 					'.$img_nolegend.'
 					</a><br/>'
-					.($_method == 'display_single_total' ? '
+					.($_method == 'display_single_total' || $_method == 'display_single_total_link' ? '
 					<span class="fc_img_total_data badge badge-info" style="display: inline-block;" >
 						'.count($values).' '.JText::_('FLEXI_IMAGES').'
 					</span>' : '').'
@@ -1734,7 +1738,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// Check for value only displays and return
-		if ( in_array($prop, self::$value_only_displays) ) {
+		if ( isset(self::$value_only_displays[$prop]) )
+		{
 			return;
 		}
 		

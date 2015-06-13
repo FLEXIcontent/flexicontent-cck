@@ -34,7 +34,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -122,7 +122,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -246,7 +246,7 @@
 				<option value="2">FLEXI_DISPLAY_USERNAME</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -359,7 +359,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -482,7 +482,7 @@
 				<option value="2">FLEXI_DISPLAY_USERNAME</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -587,7 +587,7 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -654,7 +654,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -690,7 +690,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -789,7 +789,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -825,7 +825,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -845,19 +845,18 @@
 			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			
 		</fieldset>
-		<fieldset name="group-voting-submission" repeat="1" icon_class="icon-unlock" label="FLEXI_FIELD_VOTE_SUBMISSION" description="FLEXI_FIELD_VOTE_SUBMISSION_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-voting-submission" repeat="1" icon_class="icon-unlock" label="FLEXI_FIELD_VOTE_PERMISSIONS" description="FLEXI_FIELD_VOTE_PERMISSIONS_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="submit_acclvl" type="accesslevel" default="1" size="1" label="FLEXI_FIELD_VOTE_SUBMIT_ACCESS" description="FLEXI_FIELD_VOTE_SUBMIT_ACCESS_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_NO_ACCESS_HANDLING" description="FLEXI_NO_ACCESS_HANDLING_DESC" level="level2" />
-			
+			<field name="" type="separator" default="FLEXI_NO_ACCESS_HANDLING" description="FLEXI_NO_ACCESS_HANDLING_DESC" level="level1" />
 			<field name="" type="separator" default="FLEXI_LOGGED_USERS_CONFIGURATION" description="FLEXI_LOGGED_USERS_CONFIGURATION_DESC" level="level3" />
 			<field name="logged_no_acc_msg" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_NO_ACCESS_MSG" description="FLEXI_FIELD_VOTE_NO_ACCESS_MSG_DESC" />
-			<field name="logged_no_acc_doredirect" type="radio" default="0" size="1" label="FLEXI_NO_ACCESS_DO_REDIRECT" description="FLEXI_NO_ACCESS_DO_REDIRECT_DESC" >
+			<field name="logged_no_acc_doredirect" type="radio" default="0" size="1" label="FLEXI_NO_ACCESS_DO_REDIRECT" description="FLEXI_NO_ACCESS_DO_REDIRECT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_NO_ACCESS_REDIRECT_URL</option>
 			</field>
-			<field name="logged_no_acc_askredirect" type="radio" default="1" size="1" label="FLEXI_NO_ACCESS_ASK_REDIRECT" description="FLEXI_NO_ACCESS_ASK_REDIRECT_DESC" >
+			<field name="logged_no_acc_askredirect" type="radio" default="1" size="1" label="FLEXI_NO_ACCESS_ASK_REDIRECT" description="FLEXI_NO_ACCESS_ASK_REDIRECT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_NO_INFORM_ONLY</option>
 				<option value="2">FLEXI_YES_ASK_USER</option>
@@ -866,12 +865,12 @@
 			
 			<field name="" type="separator" default="FLEXI_GUEST_USERS_CONFIGURATION" description="FLEXI_GUEST_USERS_CONFIGURATION_DESC" level="level3" />
 			<field name="guest_no_acc_msg" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_NO_ACCESS_MSG" description="FLEXI_FIELD_VOTE_NO_ACCESS_MSG_DESC" />
-			<field name="guest_no_acc_doredirect" type="radio" default="2" size="1" label="FLEXI_NO_ACCESS_DO_REDIRECT" description="FLEXI_NO_ACCESS_DO_REDIRECT_DESC" >
+			<field name="guest_no_acc_doredirect" type="radio" default="2" size="1" label="FLEXI_NO_ACCESS_DO_REDIRECT" description="FLEXI_NO_ACCESS_DO_REDIRECT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_NO_ACCESS_REDIRECT_URL</option>
 				<option value="2">FLEXI_NO_ACCESS_LOGIN_REGISTER</option>
 			</field>
-			<field name="guest_no_acc_askredirect" type="radio" default="1" size="1" label="FLEXI_NO_ACCESS_ASK_REDIRECT" description="FLEXI_NO_ACCESS_ASK_REDIRECT_DESC" >
+			<field name="guest_no_acc_askredirect" type="radio" default="1" size="1" label="FLEXI_NO_ACCESS_ASK_REDIRECT" description="FLEXI_NO_ACCESS_ASK_REDIRECT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_NO_INFORM_ONLY</option>
 				<option value="2">FLEXI_YES_ASK_USER</option>
@@ -879,29 +878,54 @@
 			<field name="guest_no_acc_url" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_NO_ACCESS_URL" description="FLEXI_FIELD_VOTE_NO_ACCESS_URL_DESC" />
 			
 		</fieldset>
-		<fieldset name="group-voting-config" repeat="1" icon_class="icon-star-2" label="FLEXI_VOTE_TYPES" description="Types of votes" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-voting-config" repeat="1" icon_class="icon-star-2" label="FLEXI_FIELD_VOTE_RESOLUTION_N_DISPLAY" description="FLEXI_FIELD_VOTE_RESOLUTION_N_DISPLAY_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_BASIC" description="" level="level1" />
 			<field name="rating_resolution" type="text" default="5" size="10" label="FLEXI_FIELD_VOTE_RATING_RESOLUTION" description="FLEXI_FIELD_VOTE_RATING_RESOLUTION_DESC" />
 			<field name="rating_stars" type="text" default="5" size="10" label="FLEXI_FIELD_VOTE_RATING_STARS" description="FLEXI_FIELD_VOTE_RATING_STARS_DESC" />
-			<field name="counter" type="list" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" >
+			
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_AVERAGE_RATING" description="FLEXI_FIELD_VOTE_AVERAGE_RATING_DESC" level="level1" />
+			<field name="main_label" type="text" default="FLEXI_VOTE_AVERAGE_RATING" size="30" label="FLEXI_FIELD_VOTE_AVERAGE_RATING_LABEL" description="FLEXI_FIELD_VOTE_AVERAGE_RATING_LABEL_DESC" />		
+			<field name="main_counter" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
-				<option value="2">FLEXI_FIELD_VOTE_DISABLE_IN_EXTRA_VOTES</option>
-				<option value="3">FLEXI_FIELD_VOTE_DISABLE_IN_MAIN_VOTE</option>
 			</field>
+			<field name="main_counter_show_label" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="main_counter_show_percentage" type="radio" default="0" label="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE" description="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_VOTE_STAR_IMAGE" description="FLEXI_VOTE_STAR_IMAGE_DESC" level="level3" />
+			<field name="main_image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
+			<field name="main_dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_VOTE_STAR_IMAGE" description="FLEXI_VOTE_STAR_IMAGE_DESC" level="level1" />
-			<field name="image" type="text" default="components/com_flexicontent/assets/images/star-small.png" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
-			<field name="dimension" type="text" default="16" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
+		</fieldset>
+		<fieldset name="group-voting-composite" repeat="1" icon_class="icon-list-2" label="FLEXI_FIELD_VOTE_COMPOSITE_VOTING" description="FLEXI_FIELD_VOTE_COMPOSITE_VOTING_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_EXTRA_VOTES" level="level1"/>
-			<field name="enable_extra_votes" type="radio" default="0" label="FLEXI_ENABLE_VOTE_EXTRA" description="FLEXI_ENABLE_VOTE_EXTRA_DESC" class="btn-group btn-group-yesno">
+			<field name="enable_extra_votes" type="radio" default="0" label="FLEXI_FIELD_VOTE_ENABLE_COMPOSITE" description="FLEXI_FIELD_VOTE_ENABLE_COMPOSITE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_EXTRA" description="FLEXI_FIELD_VOTE_EXTRA_DESC" />
-			<field name="main_label" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
+			<field name="extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_CHARACTERISTICS" description="FLEXI_FIELD_VOTE_CHARACTERISTICS_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_CHARACTERISTIC" description="FLEXI_FIELD_VOTE_CHARACTERISTIC_DESC" level="level1" />
+			<field name="extra_counter" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="extra_counter_show_label" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="extra_counter_show_percentage" type="radio" default="0" label="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE" description="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_VOTE_STAR_IMAGE" description="FLEXI_VOTE_STAR_IMAGE_DESC" level="level3" />
+			<field name="extra_image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
+			<field name="extra_dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 			
 		</fieldset>
 		
@@ -928,7 +952,7 @@
 			</field>
 			<field name="display_favoured_max" type="text" default="12" label="FLEXI_FAVOURED_MAXUSERS" description="FLEXI_FAVOURED_MAXUSERS_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -964,7 +988,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -1047,7 +1071,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
@@ -1213,7 +1237,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
-			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="1" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
