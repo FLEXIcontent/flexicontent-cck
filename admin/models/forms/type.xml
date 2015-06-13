@@ -195,6 +195,16 @@
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
+			<field name="voting_main_counter_show_label" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="voting_main_counter_show_percentage" type="radio" default="0" label="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE" description="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VOTE_AVERAGE_RATING" description="FLEXI_FIELD_VOTE_AVERAGE_RATING_DESC" level="level3" />
 			<field name="voting_main_label" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_AVERAGE_RATING_LABEL" description="FLEXI_FIELD_VOTE_AVERAGE_RATING_LABEL_DESC" />		
@@ -207,6 +217,16 @@
 			</field>
 			<field name="voting_extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_CHARACTERISTICS" description="FLEXI_FIELD_VOTE_CHARACTERISTICS_DESC" />
 			<field name="voting_extra_counter" type="radio" default="" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="voting_extra_counter_show_label" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_ENABLE</option>
+			</field>
+			<field name="voting_extra_counter_show_percentage" type="radio" default="0" label="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE" description="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>

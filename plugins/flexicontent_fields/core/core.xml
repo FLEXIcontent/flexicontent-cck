@@ -898,8 +898,8 @@
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_VOTE_STAR_IMAGE" description="FLEXI_VOTE_STAR_IMAGE_DESC" level="level3" />
-			<field name="main_image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
-			<field name="main_dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
+			<field name="main_image" type="text" default="components/com_flexicontent/assets/images/star-medium.png" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
+			<field name="main_dimension" type="text" default="24" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 			
 		</fieldset>
 		<fieldset name="group-voting-composite" repeat="1" icon_class="icon-list-2" label="FLEXI_FIELD_VOTE_COMPOSITE_VOTING" description="FLEXI_FIELD_VOTE_COMPOSITE_VOTING_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -924,8 +924,8 @@
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_VOTE_STAR_IMAGE" description="FLEXI_VOTE_STAR_IMAGE_DESC" level="level3" />
-			<field name="extra_image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
-			<field name="extra_dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
+			<field name="extra_image" type="text" default="components/com_flexicontent/assets/images/star-medium.png" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
+			<field name="extra_dimension" type="text" default="24" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 			
 		</fieldset>
 		

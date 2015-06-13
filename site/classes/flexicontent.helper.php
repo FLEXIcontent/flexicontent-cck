@@ -2344,10 +2344,10 @@ class flexicontent_html
 
 			$document->addScriptDeclaration('var fcvote_rfolder = "'.JURI::root(true).'";');
 
-			$image = $field->parameters->get( 'main_image', 'components/com_flexicontent/assets/images/star.gif' );
+			$image = $field->parameters->get( 'main_image', 'components/com_flexicontent/assets/images/star-medium.png' );
 			$img_path	= JURI::root(true).'/'.$image;
 			
-			$dim = $field->parameters->get( 'main_dimension', 25 );
+			$dim = $field->parameters->get( 'main_dimension', 24 );
 			$element_width = $rating_resolution * $dim;
 			if ($rating_stars) $element_width = (int) $element_width * ($rating_stars / $rating_resolution);
 			
@@ -2373,10 +2373,10 @@ class flexicontent_html
 			';
 			
 			// Always add image configuration for composite (extra) votes in case some type is using them
-			$image = $field->parameters->get( 'extra_image', 'components/com_flexicontent/assets/images/star.gif' );
+			$image = $field->parameters->get( 'extra_image', 'components/com_flexicontent/assets/images/star-medium.png' );
 			$img_path	= JURI::root(true).'/'.$image;
 			
-			$dim = $field->parameters->get( 'extra_dimension', 25 );
+			$dim = $field->parameters->get( 'extra_dimension', 24 );
 			$element_width = $rating_resolution * $dim;
 			if ($rating_stars) $element_width = (int) $element_width * ($rating_stars / $rating_resolution);
 			
