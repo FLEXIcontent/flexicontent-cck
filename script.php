@@ -302,7 +302,7 @@ class com_flexicontentInstallerScript
 				//if ($ext_manifest_name!=$extensions[$i]['name'])  echo $ext_manifest_name." - ".$extensions[$i]['name'] . "<br/>";
 				
 				// Force existing plugins/modules to use name found in each extension's manifest.xml file
-				if ( $extensions[$i]['ext_folder'] == 'flexicontent_fields' )
+				if (1) //if ( in_array($extensions[$i]['ext_folder'], array('flexicontent_fields', 'flexicontent', 'search', 'content', 'system')) || $extensions[$i]['type']=='module' )
 				{
 					$ext_tbl = '#__extensions';
 					$query = 'UPDATE '.$ext_tbl
@@ -429,6 +429,7 @@ class com_flexicontentInstallerScript
 		}
 		
 		$this->setParams( $params );*/
+		JFactory::getApplication()->enqueueMessage('Please clear your browser cache or press CTRL+F5 (windows) or F5 (Linux) or command+R (Safari) in flexicontent views to make sure that latest FLEXIcontent JS/CSS is retrieved', 'warning');
 		
 		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 		echo '
@@ -821,7 +822,7 @@ class com_flexicontentInstallerScript
 		// Create authors_ext table if it does not exist
 		?>
 				<tr class="row1">
-					<td class="key" style="font-size:11px;">Create/Upgrade authors extended DB table: </td>
+					<td class="key" style="font-size:11px;">Create/Upgrade authors configuration DB table: </td>
 					<td>
 					<?php
 					
@@ -856,7 +857,7 @@ class com_flexicontentInstallerScript
 		<?php
 		// Create content_cache table if it does not exist
 		?>
-				<tr class="row0">
+				<tr class="row1">
 					<td class="key" style="font-size:11px;">Create/Upgrade content cache DB table: </td>
 					<td>
 					<?php
@@ -914,7 +915,7 @@ class com_flexicontentInstallerScript
 		<?php
 		// Create/Upgrade DB tables for downloads enhancements
 		?>
-				<tr class="row1">
+				<tr class="row0">
 					<td class="key" style="font-size:11px;">Create/Upgrade DB tables for downloads enhancements: </td>
 					<td>
 					<?php
@@ -972,7 +973,7 @@ class com_flexicontentInstallerScript
 		<?php
 		// Create layouts_conf table if it does not exist
 		?>
-				<tr class="row0">
+				<tr class="row1">
 					<td class="key" style="font-size:11px;">Create/Upgrade layouts configuration DB table: </td>
 					<td>
 					<?php
@@ -1009,7 +1010,7 @@ class com_flexicontentInstallerScript
 		<?php
 		// Create fields table if it does not exist
 		?>
-				<tr class="row1">
+				<tr class="row0">
 					<td class="key" style="font-size:11px;">Create/Upgrade fields DB table: </td>
 					<td>
 					<?php
@@ -1156,7 +1157,7 @@ class com_flexicontentInstallerScript
 			</tfoot>
 			<tbody>
 				<?php foreach ($extensions as $i => $ext) : ?>
-					<tr class="row<?php echo $i % 2; ?>">
+					<tr class="row<?php echo ($i+1) % 2; ?>">
 						<td class="key" style="font-size:11px;">[<?php echo JText::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
 						<td>
 							<?php $status_class = $ext['status'] ? 'badge badge-success' : 'badge badge-error'; ?>

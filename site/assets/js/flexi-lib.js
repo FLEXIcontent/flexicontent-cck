@@ -126,11 +126,13 @@
 	function toggleDepentParams(el, toggleParent, toggleParentSelector)
 	{
 		var seton_list = el.data('seton_list');
-		var setoff_list = el.data('setoff_list');
-		var show_list = el.data('show_list');
-		var hide_list = el.data('hide_list');
+		var setoff_list= el.data('setoff_list');
+		var show_list  = el.data('show_list');
+		var hide_list  = el.data('hide_list');
 		var force_list = el.data('force_list');
 		var refsh_list = el.data('refsh_list');
+		var fcreadonly = el.data('fcreadonly');
+		var fcconfigs  = el.data('fcconfigs');
 		
 		var _d;
 		if (!seton_list) {
@@ -143,6 +145,24 @@
 			setoff_list[0] = el.attr('setoff_list')  ? el.attr('setoff_list')  : null;
 			el.data('setoff_list', setoff_list);
 		}
+		
+		if (!fcreadonly) {
+			var fcreadonly = el.attr('fcreadonly');
+			if (fcreadonly) {
+				fcreadonly = fcreadonly.replace(/\'/g, '"');
+				fcreadonly = jQuery.parseJSON(fcreadonly);
+			}
+			el.data('fcconfigs', fcconfigs);
+		}
+		if (!fcconfigs) {
+			var fcconfigs = el.attr('fcconfigs');
+			if (fcconfigs) {
+				fcconfigs = fcconfigs.replace(/\'/g, '"');
+				fcconfigs = jQuery.parseJSON(fcconfigs);
+			}
+			el.data('fcconfigs', fcconfigs);
+		}
+		
 		if (!show_list) {
 			_d  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
 			show_list = {};
@@ -199,6 +219,21 @@
 				});
 			}
 		});
+		
+		if (fcreadonly) for (var fieldname in fcreadonly) {
+			if (fcreadonly.hasOwnProperty(fieldname)) {
+				if (fcreadonly[fieldname])
+					jQuery('#'+'jform_attribs_'+fieldname).attr('readonly', 'readonly');
+				else
+					jQuery('#'+'jform_attribs_'+fieldname).removeAttr('readonly');
+			}
+		}
+		if (fcconfigs) for (var fieldname in fcconfigs) {
+			if (fcconfigs.hasOwnProperty(fieldname)) {
+				jQuery('#'+'jform_attribs_'+fieldname).val(fcconfigs[fieldname]);
+			}
+		}
+		
 		jQuery.each( show_list, function( cname, val ) {
 			if (!fc_dependent_params.hasOwnProperty(cname))  fc_dependent_params[cname] = Array();
 			fc_dependent_params[cname][fc_dependent_params[cname].length] = el;

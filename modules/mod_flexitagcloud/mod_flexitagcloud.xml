@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6" client="site" method="upgrade">
-	<name>MOD_FLEXITAGSCLOUD_NAME</name>
+	<name>mod_flexitagscloud</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>09/11/2009</creationDate>
 	<copyright>(C) 2008 - 2009 Christoph Lukes</copyright>

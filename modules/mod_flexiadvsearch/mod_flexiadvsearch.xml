@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6" client="site" method="upgrade">
-	<name>MOD_FLEXIADVSEARCH_NAME</name>
+	<name>mod_flexiadvsearch</name>
 	<author>Suriya Kaewmungmuang, ggppdk</author>
 	<creationDate>29/06/2011</creationDate>
 	<copyright>(C) 2011 flexicontent.org</copyright>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6" client="site" method="upgrade">
-	<name>MOD_FLEXIFILTER_NAME</name>
+	<name>mod_flexifilter</name>
 	<author>George Papadakis</author>
 	<creationDate>November 2012</creationDate>
 	<copyright>Copyright © 2012 George Papadakis</copyright>

@@ -898,6 +898,12 @@
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_VOTE_STAR_IMAGE" description="FLEXI_VOTE_STAR_IMAGE_DESC" level="level3" />
+			<field name="main_image_configs" type="multilist" subtype="radio" default="" label="Preset configurations" description="This is a list of preset configurations, after loding them, you can click custom again to customize them" toggle_related="1" class="btn-group group-fcmethod">
+				<option value=""  fcreadonly="{'main_image':0,'main_dimension':0}" >FLEXI_CUSTOM</option>
+				<option value="1" fcreadonly="{'main_image':1,'main_dimension':1}" fcconfigs="{'main_image':'components/com_flexicontent/assets/images/star-small.png','main_dimension':'16'}">Small star</option>
+				<option value="2" fcreadonly="{'main_image':1,'main_dimension':1}" fcconfigs="{'main_image':'components/com_flexicontent/assets/images/star-medium.png','main_dimension':'24'}">Medium star</option>
+				<option value="3" fcreadonly="{'main_image':1,'main_dimension':1}" fcconfigs="{'main_image':'components/com_flexicontent/assets/images/star-large.png','main_dimension':'32'}">Large star</option>
+			</field>
 			<field name="main_image" type="text" default="components/com_flexicontent/assets/images/star-medium.png" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
 			<field name="main_dimension" type="text" default="24" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 			
@@ -924,6 +930,12 @@
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_VOTE_STAR_IMAGE" description="FLEXI_VOTE_STAR_IMAGE_DESC" level="level3" />
+			<field name="extra_image_configs" type="multilist" subtype="radio" default="" label="Preset configurations" description="This is a list of preset configurations, after loding them, you can click custom again to customize them" toggle_related="1" class="btn-group group-fcmethod">
+				<option value=""  fcreadonly="{'extra_image':0,'extra_dimension':0}" >FLEXI_CUSTOM</option>
+				<option value="1" fcreadonly="{'extra_image':1,'extra_dimension':1}" fcconfigs="{'extra_image':'components/com_flexicontent/assets/images/star-small.png','extra_dimension':'16'}">Small star</option>
+				<option value="2" fcreadonly="{'extra_image':1,'extra_dimension':1}" fcconfigs="{'extra_image':'components/com_flexicontent/assets/images/star-medium.png','extra_dimension':'24'}">Medium star</option>
+				<option value="3" fcreadonly="{'extra_image':1,'extra_dimension':1}" fcconfigs="{'extra_image':'components/com_flexicontent/assets/images/star-large.png','extra_dimension':'32'}">Large star</option>
+			</field>
 			<field name="extra_image" type="text" default="components/com_flexicontent/assets/images/star-medium.png" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
 			<field name="extra_dimension" type="text" default="24" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 			

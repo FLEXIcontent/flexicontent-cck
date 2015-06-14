@@ -21,38 +21,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //include constants file
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
-// Try re-appling Joomla configuration of error reporting (some installed plugins may disable it)
-$config = new JConfig();  // System configuration
-switch ($config->error_reporting)  // Set the error_reporting
-{
-	case 'default': case '-1':
-		break;
-		
-	case 'none': case '0':
-		error_reporting(0);
-		break;
-		
-	case 'simple':
-		error_reporting(E_ERROR | E_WARNING | E_PARSE);
-		ini_set('display_errors', 1);
-		break;
-		
-	case 'maximum':
-		error_reporting(E_ALL);
-		ini_set('display_errors', 1);
-		break;
-		
-	case 'development':
-		error_reporting(-1);
-		ini_set('display_errors', 1);
-		break;
-		
-	default:
-		error_reporting($config->error_reporting);
-		ini_set('display_errors', 1);
-		break;
-}
-
 if (!function_exists('json_encode')) { // PHP < 5.2 lack support for json
 	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'json'.DS.'jsonwrapper_inner.php');
 } 
@@ -2194,14 +2162,12 @@ class flexicontent_html
 			}
 		}
 		
-		
 		// Get user current history so that it is reflected on the voting
 		$vote_history = JFactory::getSession()->get('vote_history', array(),'flexicontent');
 		if ( !isset($vote_history[$item_id]) || !is_array($vote_history[$item_id]) )
 		{
 			$vote_history[$item_id] = array();
 		}
-		
 		
 		// Add main vote option
 		if ($xid=='main' || $xid=='all')
@@ -2211,7 +2177,7 @@ class flexicontent_html
 			$html .= flexicontent_html::ItemVoteDisplay( $field, $item_id, $vote->rating_sum, $vote->rating_count, 'main', $vote_label,
 				$stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label );
 		}
-				
+		
 		if ( $xid=='all' || $xid=='extra' || ($int_xid && isset($xids[$xid])) )
 		{
 			if ( $int_xid )

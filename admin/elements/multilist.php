@@ -43,13 +43,13 @@ class JFormFieldMultiList extends JFormField
 		$attributes = $attributes['@attributes'];
 		
 		$values = $this->value;
-		if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		if ( ! is_array($values) )		$values = explode("|", $values);
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
-		$name = FLEXI_J16GE ? $attributes['name'] : $name;
-		$control_name = FLEXI_J16GE ? str_replace($name, '', $element_id) : $control_name;
+		$name = $attributes['name'];
+		$control_name = str_replace($name, '', $element_id);
 		
 		//$attribs = ' style="float:left;" ';
 		$attribs = array(
@@ -66,10 +66,6 @@ class JFormFieldMultiList extends JFormField
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs['list.attr']['multiple'] = 'multiple';
 			$attribs['list.attr']['size'] = @$attributes['size'] ? $attributes['size'] : "6";
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
-		} else {
-			$maximize_link = '';
 		}
 		
 		
@@ -104,7 +100,7 @@ class JFormFieldMultiList extends JFormField
 			$name = FLEXI_J30GE ? $option->getName() : $option->name();
 			//echo "<pre>"; print_r($option); echo "</pre>"; exit;
 			if ($name=="group") {
-				$group_label = FLEXI_J16GE ? $option->attributes()->label : $option->attributes('label');
+				$group_label = $option->attributes()->label;
 				$options[] = JHTML::_('select.optgroup', JText::_($group_label) );
 				foreach ($option->children() as $sub_option)
 				{
@@ -115,6 +111,8 @@ class JFormFieldMultiList extends JFormField
 					if (isset($sub_option->attributes()->force_list))  $attr_arr['force_list']  = $sub_option->attributes()->force_list;
 					if (isset($sub_option->attributes()->show_list))   $attr_arr['show_list']   = $sub_option->attributes()->show_list;
 					if (isset($sub_option->attributes()->hide_list))   $attr_arr['hide_list']   = $sub_option->attributes()->hide_list;
+					if (isset($sub_option->attributes()->fcconfigs))   $attr_arr['fcconfigs']   = $sub_option->attributes()->fcconfigs;
+					if (isset($sub_option->attributes()->fcreadonly))  $attr_arr['fcreadonly']  = $sub_option->attributes()->fcreadonly;
 					if (isset($sub_option->attributes()->class))  $attr_arr['class'] = $sub_option->attributes()->class;
 					
 					$val    = $sub_option->attributes()->value;
@@ -135,6 +133,8 @@ class JFormFieldMultiList extends JFormField
 				if (isset($option->attributes()->force_list))  $attr_arr['force_list']  = $option->attributes()->force_list;
 				if (isset($option->attributes()->show_list))   $attr_arr['show_list']   = $option->attributes()->show_list;
 				if (isset($option->attributes()->hide_list))   $attr_arr['hide_list']   = $option->attributes()->hide_list;
+				if (isset($option->attributes()->fcconfigs))   $attr_arr['fcconfigs']   = $option->attributes()->fcconfigs;
+				if (isset($option->attributes()->fcreadonly))  $attr_arr['fcreadonly']  = $option->attributes()->fcreadonly;
 				if (isset($option->attributes()->class))  $attr_arr['class'] = $option->attributes()->class;
 				
 				//print_r($attr_arr['hide_list']);
@@ -216,6 +216,6 @@ class JFormFieldMultiList extends JFormField
 			$previewimage = $preview_img ? JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' align="left" style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
 			$tip_text2 = '<span class="'.$tip_class.'" style="float:left;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
 		}
-		return $html.@$tip_text.@$tip_text2.$maximize_link;
+		return $html.@$tip_text.@$tip_text2;
 	}
 }
