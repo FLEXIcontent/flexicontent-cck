@@ -86,6 +86,10 @@ class JFormFieldMultiList extends JFormField
 			$attribs['list.attr']['class'][] = $class;
 		}
 		
+		if (@$attributes['fccustom_revert']) {
+			$attribs['list.attr']['class'][] = 'fccustom_revert';
+		}
+		
 		if (@$attributes['toggle_related']) {
 			$attribs['list.attr']['class'][] = 'fcform_toggler_element';
 		}

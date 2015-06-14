@@ -125,7 +125,7 @@ $this->document->addScriptDeclaration($js);
 									jQuery( document ).ready(function() {
 										setTimeout(function(){ 
 											jQuery('#jform_published input').attr('disabled', 'disabled').off('click');
-											jQuery('#jform_published label').attr('disabled', true).off('click');
+											jQuery('#jform_published label').attr('disabled', true).css('pointer-events', 'none').off('click');
 										}, 1);
 									});
 								");

@@ -123,7 +123,7 @@
 	}
 	
 	
-	function toggleDepentParams(el, toggleParent, toggleParentSelector)
+	function toggleDepentParams(el, toggleParent, toggleParentSelector, field)
 	{
 		var seton_list = el.data('seton_list');
 		var setoff_list= el.data('setoff_list');
@@ -220,17 +220,44 @@
 			}
 		});
 		
-		if (fcreadonly) for (var fieldname in fcreadonly) {
-			if (fcreadonly.hasOwnProperty(fieldname)) {
-				if (fcreadonly[fieldname])
-					jQuery('#'+'jform_attribs_'+fieldname).attr('readonly', 'readonly');
-				else
-					jQuery('#'+'jform_attribs_'+fieldname).removeAttr('readonly');
-			}
-		}
 		if (fcconfigs) for (var fieldname in fcconfigs) {
 			if (fcconfigs.hasOwnProperty(fieldname)) {
-				jQuery('#'+'jform_attribs_'+fieldname).val(fcconfigs[fieldname]);
+				var jf_field = jQuery('#'+'jform_attribs_'+fieldname).first();
+				if (!jf_field.length) continue;
+				
+				if (jf_field.is('fieldset')) {
+					jf_field.find('input').removeAttr('disabled').removeAttr('readonly');
+					jf_field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
+					jf_field.find(':input[value="'+fcconfigs[fieldname]+'"]').next().trigger('click');
+				} else {
+					jf_field.removeAttr('disabled').removeAttr('readonly').val(fcconfigs[fieldname]).trigger('click');
+				}
+			}
+		}
+		
+		if (fcreadonly) for (var fieldname in fcreadonly) {
+			if (fcreadonly.hasOwnProperty(fieldname)) {
+				var jf_field = jQuery('#'+'jform_attribs_'+fieldname).first();
+				if (!jf_field.length) continue;
+				
+				if (fcreadonly[fieldname] && !field.hasClass('fccustom_revert')) {
+					if (jf_field.is('fieldset')) {
+						jf_field.find('input').attr('readonly', 'readonly');
+						jf_field.find('label').attr('disabled', true).css('pointer-events', 'none').css('opacity', '0.65');
+					} else if (jf_field.is('select')) {
+						jf_field.attr('readonly', 'readonly').css('pointer-events', 'none').css('opacity', '0.85');
+					} else {
+						jf_field.attr('readonly', 'readonly').css('opacity', '0.85')
+					}
+				} else {
+					if (jf_field.is('fieldset')) {
+						jf_field.find('input').removeAttr('disabled');
+						jf_field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
+					}
+					else {
+						jf_field.removeAttr('readonly').css('pointer-events', 'auto').css('opacity', '1');
+					}
+				}
 			}
 		}
 		
@@ -291,6 +318,33 @@
 			}
 			fc_refreshing_dependent = 0;
 		}
+		
+		// Restore the form to select the element with value ''
+		if ( field.hasClass('fccustom_revert') && el.value!='' ) {
+			
+			var currVal;
+			if ( field.is('fieldset') ) {
+				currVal = field.find('input[type="radio"]:checked').val();
+				if (currVal!='') {
+					field.find('input').attr('disabled', 'disabled');
+					field.find('label').attr('disabled', true).css('pointer-events', 'none').css('opacity', '0.65');
+				}
+			} else {
+				currVal = field.val();
+				if (currVal!='') field.attr('disabled', 'disabled').css('pointer-events', 'none').css('opacity', '0.85');
+			}
+			
+			if (currVal!='') setTimeout(function(){
+				if (field.is('fieldset')) {
+					field.find('input').removeAttr('disabled').removeAttr('readonly');
+					field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
+					field.find(':input[value=""]').next().trigger('click');
+				} else {
+					field.removeAttr('disabled').removeAttr('readonly').val('').trigger('click');
+				}
+			}, 200);
+		}
+		
 		return toBeUpdated;
 	}
 	
@@ -303,7 +357,7 @@
 		
 		// Bind select elements
 		jQuery(container+' select.fcform_toggler_element').change(function() {
-			var toBeUpdated = toggleDepentParams( jQuery('option:selected', this), toggleParent, toggleParentSelector );
+			var toBeUpdated = toggleDepentParams( jQuery('option:selected', this), toggleParent, toggleParentSelector, jQuery(this) );
 			for (var i = 0; i < toBeUpdated.length; i++) {
 				toBeUpdated_ALL[k++] = toBeUpdated[i];
 			}
@@ -311,7 +365,7 @@
 		
 		// Bind radio elements
 		jQuery(document).on('click', container+' .fcform_toggler_element input:radio', function(event) {
-			var toBeUpdated = toggleDepentParams( jQuery(this), toggleParent, toggleParentSelector );
+			var toBeUpdated = toggleDepentParams( jQuery(this), toggleParent, toggleParentSelector, jQuery(this).parent('.fcform_toggler_element') );
 			for (var i = 0; i < toBeUpdated.length; i++) {
 				toBeUpdated_ALL[k++] = toBeUpdated[i];
 			}
