@@ -195,12 +195,12 @@
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
-			<field name="voting_main_counter_show_label" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL_DESC" class="btn-group btn-group-yesno">
+			<field name="voting_main_counter_show_label" type="radio" default="" label="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
-			<field name="voting_main_counter_show_percentage" type="radio" default="0" label="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE" description="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE_DESC" class="btn-group btn-group-yesno">
+			<field name="voting_main_counter_show_percentage" type="radio" default="" label="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE" description="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
@@ -221,12 +221,12 @@
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
-			<field name="voting_extra_counter_show_label" type="radio" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL_DESC" class="btn-group btn-group-yesno">
+			<field name="voting_extra_counter_show_label" type="radio" default="" label="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
-			<field name="voting_extra_counter_show_percentage" type="radio" default="0" label="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE" description="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE_DESC" class="btn-group btn-group-yesno">
+			<field name="voting_extra_counter_show_percentage" type="radio" default="" label="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE" description="FLEXI_FIELD_VOTE_SHOW_PERCENTAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>

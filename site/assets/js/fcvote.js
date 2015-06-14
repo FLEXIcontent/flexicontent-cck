@@ -52,7 +52,13 @@ window.addEvent('domready', function() {
 					if (typeof(data.html) && data.html) {
 						cnt.html(data.html).removeClass('ajax-loader');
 						setTimeout(function() { cnt.animate({opacity: "0.5"}, 900);  }, 2000);
-						setTimeout(function() { cnt.css('opacity', 1).html(_htmlrating);  }, 3000);
+						setTimeout(function() {
+							cnt.css('opacity', 'unset');
+							if(_htmlrating.trim())
+								cnt.css('opacity', 1).html(_htmlrating);
+							else
+								cnt.html('').hide();
+						}, 3000);
 					} else {
 						cnt.html(_htmlrating).removeClass('ajax-loader');
 					}
@@ -61,7 +67,13 @@ window.addEvent('domready', function() {
 						if (typeof(data.html_main) && data.html_main) {
 							main_cnt.html(data.html_main).removeClass('ajax-loader');
 							setTimeout(function() { main_cnt.animate({opacity: "0.5"}, 900);  }, 2000);
-							setTimeout(function() { main_cnt.css('opacity', 1).html(_htmlrating_main);  }, 3000);
+							setTimeout(function() {
+								main_cnt.css('opacity', 'unset');
+								if(_htmlrating_main.trim())
+									main_cnt.css('opacity', 1).html(_htmlrating_main);
+								else
+									main_cnt.html('').hide();
+							}, 3000);
 						} else {
 							main_cnt.html(_htmlrating_main).removeClass('ajax-loader');
 						}

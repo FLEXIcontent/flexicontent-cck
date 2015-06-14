@@ -19,23 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// Do nothing if site is offline
-if ( !FLEXI_J16GE && JFactory::getApplication()->getCfg('offline') ) {
-	$user = JFactory::getUser();
-	if (!$user->id) {
-		return;
-	} else {
-		if (!defined('FLEXI_J16GE')) {
-			jimport( 'joomla.version' );  $jversion = new JVersion;
-			define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
-			define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
-		}
-		$isAdmin = FLEXI_J16GE ? JAccess::check($user->id, 'core.admin', 'root.1') : $user->gid >= 24;
-		if (!$isAdmin) return;
-	}
-}
-
-
 // *************************
 // Initialize some variables
 // *************************
@@ -68,12 +51,6 @@ if ( $print_logging_info ) {
 //include constants file
 require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
 
-// Enable printing of notices,etc, except strict if error_reporting is enabled
-if( !FLEXI_J16GE && error_reporting() && ini_get('display_errors') /*&& in_array($_SERVER['HTTP_HOST'], array('localhost', '127.0.0.1'))*/ ) { 
-	error_reporting(E_ALL & ~E_STRICT);
-	//ini_set('display_errors',1);  // ... check above that this is enabled already
-}
-
 //include the needed classes and helpers
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
@@ -91,7 +68,7 @@ if (!FLEXI_ONDEMAND)
 JPluginHelper::importPlugin('flexicontent');
 
 // No PDF support in J2.5
-if ( FLEXI_J16GE && JRequest::getVar('format') == 'pdf' ) JRequest::setVar('format', 'html');
+//if ( JRequest::getVar('format') == 'pdf' ) JRequest::setVar('format', 'html');
 
 
 // *****************
@@ -103,11 +80,11 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
 JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
-$overrideDir = JPATH_SITE .DS. 'languages' .DS. 'overrides' .DS;
-if (!FLEXI_J16GE) {
+/*if (!FLEXI_J16GE) {
+	$overrideDir = JPATH_SITE .DS. 'languages' .DS. 'overrides' .DS;
 	JFactory::getLanguage()->load('override', $overrideDir, 'en-GB', true);
 	JFactory::getLanguage()->load('override', $overrideDir, null, true);
-}
+}*/
 
 
 // ********************************
