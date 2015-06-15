@@ -1341,10 +1341,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$i = -1;
 		$field->{$prop} = array();
 		$field->thumbs_src['backend'] = array();
-		$field->thumbs_src['small'] = array();
-		$field->thumbs_src['medium'] = array();
-		$field->thumbs_src['large'] = array();
-		$field->thumbs_src['original'] = array();
+		$field->thumbs_src['small']   = array();
+		$field->thumbs_src['medium']  = array();
+		$field->thumbs_src['large']   = array();
+		$field->thumbs_src['original']= array();
+		$field->{"display_backend_src"} = array();
+		$field->{"display_small_src"}   = array();
+		$field->{"display_medium_src"}  = array();
+		$field->{"display_large_src"}   = array();
+		$field->{"display_original_src"}= array();
+		
 		$cust1_label = JText::_('FLEXI_FIELD_IMG_CUST1');
 		$cust2_label = JText::_('FLEXI_FIELD_IMG_CUST2');
 		

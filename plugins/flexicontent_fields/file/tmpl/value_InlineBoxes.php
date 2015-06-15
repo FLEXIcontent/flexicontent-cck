@@ -1,4 +1,7 @@
 <?php
+$field->url = array();
+$field->abspath = array();
+$field->file_data = array();
 foreach($files_data as $file_id => $file_data)
 {
 	// Check if it exists and get file size

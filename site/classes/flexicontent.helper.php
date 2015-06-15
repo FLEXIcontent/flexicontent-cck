@@ -21,6 +21,38 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //include constants file
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
+// Try re-appling Joomla configuration of error reporting (some installed plugins may disable it)
+$config = new JConfig();  // System configuration
+switch ($config->error_reporting)  // Set the error_reporting
+{
+	case 'default': case '-1':
+		break;
+		
+	case 'none': case '0':
+		error_reporting(0);
+		break;
+		
+	case 'simple':
+		error_reporting(E_ERROR | E_WARNING | E_PARSE);
+		ini_set('display_errors', 1);
+		break;
+		
+	case 'maximum':
+		error_reporting(E_ALL);
+		ini_set('display_errors', 1);
+		break;
+		
+	case 'development':
+		error_reporting(-1);
+		ini_set('display_errors', 1);
+		break;
+		
+	default:
+		error_reporting($config->error_reporting);
+		ini_set('display_errors', 1);
+		break;
+}
+
 if (!function_exists('json_encode')) { // PHP < 5.2 lack support for json
 	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'json'.DS.'jsonwrapper_inner.php');
 } 
@@ -2175,7 +2207,7 @@ class flexicontent_html
 			$vote_label = JText::_($field->parameters->get('main_label', 'FLEXI_VOTE_AVERAGE_RATING'));
 			$counter_show_label = $field->parameters->get('main_counter_show_label', 1);
 			$html .= flexicontent_html::ItemVoteDisplay( $field, $item_id, $vote->rating_sum, $vote->rating_count, 'main', $vote_label,
-				$stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label );
+				$stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label, $add_review_form=0, $xids );
 		}
 		
 		if ( $xid=='all' || $xid=='extra' || ($int_xid && isset($xids[$xid])) )
@@ -2223,7 +2255,7 @@ class flexicontent_html
 	 * @param int or string 	$xid
 	 * @since 1.0
 	 */
-	static function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $xiddata='', $stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label=true )
+	static function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $xiddata='', $stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label=true, $add_review_form=0, $xids=array() )
 	{
 		static $acclvl_names  = null;
 		static $star_tooltips = null;
@@ -2476,7 +2508,7 @@ class flexicontent_html
 			<div class="fcvote fcvote-box-'.$xid.'">
 				<div class="nowrap_box fcvote-label-outer">
 					'.($label ? '<div id="fcvote_lbl'.$id.'_'.$xid.'" class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '').'
-					<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fc-mssg-inline fc-info fc-iblock fc-nobgimage fcvote-count" '.( $counter==-1 || $counter==0 ? 'style="display:none;"' : '' ).'>'.
+					<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fc-mssg-inline fc-info fc-iblock fc-nobgimage fcvote-count" '.( ($counter==-1 || $counter==0) && !$show_percentage ? 'style="display:none;"' : '' ).'>'.
 						( $counter==-1 || $counter==0 ? '' :
 							($rating_count ? $rating_count : '0').
 							($counter_show_label ? ' '.JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '').
@@ -2493,6 +2525,35 @@ class flexicontent_html
 				<div id="fcvote_message_'.$id.'_'.$xid.'" class="fcvote_message" ></div>
 				'.( $desc ? '<div class="fcvote-desc">'.$desc.'</div>' :'' ).'
 			</div>
+			'.($add_review_form ? '
+			<input type="button" class="btn fcvote_toggle_review_form" style="vertical-align:top;" onclick="jQuery(\'#fcvote_review_form_box_'.$id.'\').slideToggle();" value="'.JText::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
+			<span class="fcclear"></span>
+			<div id="fcvote_review_form_box_'.$id.'" class="fcvote_review_form_box" style="display:none;">
+				<form id="fcvote_review_form_'.$id.'" name="fcvote_form_'.$id.'">
+					<table class="fc-form-tbl">
+						<tr class="fcvote_review_form_rating">
+							<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_AVERAGE_RATING').'</label></td>
+							<td><div class="fc-mssg fc-info fc-nobgimage" style="margin-left:0px;">'.JText::_(count($xids) ? 'FLEXI_VOTE_AVERAGE_RATING_CALCULATED_AUTOMATICALLY' : 'Please submit a vote, before writting a review').'</div></td>
+						</tr>
+						<tr class="fcvote_review_form_title">
+							<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TITLE').'</label></td>
+							<td><input type="text" name="title" size="120"/></td>
+						</tr>
+						<tr class="fcvote_review_form_email">
+							<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_EMAIL').'</label></td>
+							<td><input type="email" name="email" size="120"/></td>
+						</tr>
+						<tr class="fcvote_review_form_text">
+							<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TEXT').'</label></td>
+							<td class="top"><textarea name="text"></textarea></td>
+						</tr>
+						<tr class="fcvote_review_form_text">
+							<td colspan="2"><input type="submit" class="btn btn-primary fcvote_review_form_submit_btn" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/></td>
+						</tr>
+
+					</table>
+				</form>
+			</div>' : '').'
 		</div>';
 	}
 

@@ -880,16 +880,15 @@ jQuery(document).ready(function(){
 		<?php endif ; ?>
 
 
-    <?php foreach($this->extra_fields as $field) :?>
+    <?php foreach($this->extra_fields as $_field) :?>
 
 			<td align="center">
 		    <?php
 		    // Clear display HTML just in case
-		    if (isset($field->{$field->methodname}))
-		    	unset( $field->{$field->methodname} );
-
+		    $field = clone($_field);  // quickly make a shallow copy of the fields object to avoid assignments of various member variables being persistent
+		    
 		    // Field value for current item
-		    $field_value = & $row->extra_field_value[$field->name];
+		    $field_value = isset($row->fieldvalues[$field->id]) ? $row->fieldvalues[$field->id] : false;
 		    
 				// Create field's display HTML, via calling FlexicontentFields::renderField() for the given method name
 				FlexicontentFields::renderField($row, $field, $field_value, $method=$field->methodname);

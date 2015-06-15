@@ -503,21 +503,25 @@ class FlexicontentModelItems extends JModelLegacy
 		$db->setQuery($query);
 		$values = $db->loadObjectList();
 		
+		$fieldvalues = array();
 		foreach ($values as $v) {
-			$field_name = $this->_extra_cols[$v->field_id]->name;
-			$this->_data[$v->item_id]->extra_field_value[ $field_name ][$v->valueorder - 1][$v->suborder - 1] = $v->value;
+			//$field_name = $this->_extra_cols[$v->field_id]->name;
+			$fieldvalues[$v->item_id][ $v->field_id ][$v->valueorder - 1][$v->suborder - 1] = $v->value;
 		}
-		foreach ($this->_data as & $iv) {
-			if (!isset($iv->extra_field_value)) continue;
-			foreach ($iv->extra_field_value as & $fv) {
-				foreach ($fv as & $ov) {
-					if (count($ov) == 1) $ov = reset($ov);
+		
+		// Rearrange and assign the field values
+		foreach ($this->_data as & $item) {
+			if (!isset($fieldvalues[$item->id])) continue;
+			foreach ($fieldvalues[$item->id] as & $fieldvalue) {
+				foreach ($fieldvalue as & $mainordered_value) {
+					if (count($mainordered_value) == 1) $mainordered_value = reset($mainordered_value);
 				}
-				unset($ov);
+				unset($mainordered_value);
 			}
-			unset($fv);
+			unset($fieldvalue);
+			$item->fieldvalues = $fieldvalues[$item->id];
 		}
-		unset($iv);
+		unset($item);
 	}
 	
 	
