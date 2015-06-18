@@ -2526,15 +2526,14 @@ class flexicontent_html
 				'.( $desc ? '<div class="fcvote-desc">'.$desc.'</div>' :'' ).'
 			</div>
 			'.($add_review_form ? '
-			<input type="button" class="btn fcvote_toggle_review_form" style="vertical-align:top;" onclick="jQuery(\'#fcvote_review_form_box_'.$id.'\').slideToggle();" value="'.JText::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
+			<input type="button" class="btn fcvote_toggle_review_form" style="vertical-align:top;"
+				onclick="fcvote_open_review_form(jQuery(\'#fcvote_review_form_box_'.$id.'\').attr(\'id\'), '.$id.', 0)"
+				value="'.JText::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
 			<span class="fcclear"></span>
-			<div id="fcvote_review_form_box_'.$id.'" class="fcvote_review_form_box" style="display:none;">
-				<form id="fcvote_review_form_'.$id.'" name="fcvote_form_'.$id.'">
+			<div id="fcvote_review_form_box_'.$id.'" class="fcvote_review_form_box" style="display:none;">'.
+			/*
+				<form id="fcvote_review_form_'.$id.'" name="fcvote_review_form_'.$id.'">
 					<table class="fc-form-tbl">
-						<tr class="fcvote_review_form_rating">
-							<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_AVERAGE_RATING').'</label></td>
-							<td><div class="fc-mssg fc-info fc-nobgimage" style="margin-left:0px;">'.JText::_(count($xids) ? 'FLEXI_VOTE_AVERAGE_RATING_CALCULATED_AUTOMATICALLY' : 'Please submit a vote, before writting a review').'</div></td>
-						</tr>
 						<tr class="fcvote_review_form_title">
 							<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TITLE').'</label></td>
 							<td><input type="text" name="title" size="120"/></td>
@@ -2545,18 +2544,19 @@ class flexicontent_html
 						</tr>
 						<tr class="fcvote_review_form_text">
 							<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TEXT').'</label></td>
-							<td class="top"><textarea name="text"></textarea></td>
+							<td class="top"><textarea name="text" rows="12" cols="120"></textarea></td>
 						</tr>
 						<tr class="fcvote_review_form_text">
 							<td colspan="2"><input type="submit" class="btn btn-primary fcvote_review_form_submit_btn" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/></td>
 						</tr>
-
 					</table>
-				</form>
-			</div>' : '').'
+					<input type="hidden" name="content_id" value="'.$id.'"/>
+				</form>*/
+			'</div>' : '').'
 		</div>';
 	}
-
+	
+	
 	/**
 	 * Creates the favourited by user list
 	 *
@@ -2575,7 +2575,7 @@ class flexicontent_html
 		else /*if ($userlisttype==2)*/ $uname="u.name";
 
 		$db	= JFactory::getDBO();
-		$query = "SELECT $uname FROM #__flexicontent_favourites as ff"
+		$query = "SELECT $uname FROM #__flexicontent_favourites AS ff"
 			." LEFT JOIN #__users AS u ON u.id=ff.userid "
 			." WHERE ff.itemid=" . $item->id;
 		$db->setQuery($query);

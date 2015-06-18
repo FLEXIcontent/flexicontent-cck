@@ -97,5 +97,30 @@ window.addEvent('domready', function() {
 			
 		});
 	}
-
 });
+
+	function fcvote_open_review_form(tagid, content_id, review_type)
+	{
+		var box = jQuery('#'+tagid)
+		box.empty().css('display', '').addClass('ajax-loader');
+		
+		var currentURL = window.location;
+		var live_site = currentURL.protocol + '//' + currentURL.host + fcvote_rfolder;
+		var url = live_site + "/index.php?option=com_flexicontent&format=raw&task=getreviewform&content_id=" + content_id + "&review_type=" + review_type;
+
+		jQuery.ajax({
+			url: url,
+			dataType: "json",
+			success: function( data )
+			{
+				box.removeClass('ajax-loader');
+				if (typeof(data.html) && data.html) {
+					box.html(data.html).show();
+				}
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+			}
+		});
+	}
+

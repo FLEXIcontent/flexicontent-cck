@@ -1042,7 +1042,8 @@ class FlexicontentController extends JControllerLegacy
 		
 		$this->setRedirect($referer);
 	}
-
+	
+	
 	/**
 	 * Method of the voting without AJAX. Exists for compatibility reasons, since it can be called by Joomla's content vote plugin.
 	 *
@@ -1119,6 +1120,90 @@ class FlexicontentController extends JControllerLegacy
 				}
 			}
 		}
+		jexit();
+	}
+	
+	
+	/**
+	 *  Ajax review form
+	 *
+	 * @access public
+	 * @since 3.0
+	 */
+	function getreviewform()
+	{
+		$content_id = JRequest::getInt('content_id', '' );
+		$type    = JRequest::getInt('review_type', '' );
+		$user_id = $user = JFactory::getUser()->id;
+		
+		$db	= JFactory::getDBO();
+		
+		
+		// ******************************
+		// Get voting field configuration
+		// ******************************
+		
+		if (!$content_id) {
+			$error = "Content_id is zero";
+		}
+		else {
+			$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
+			$field = $db->loadObject();
+			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+			$item->load( $content_id );
+			FlexicontentFields::loadFieldConfig($field, $item);
+			$allow_reviews = (int)$field->parameters->get('allow_reviews', 1);
+			if (!$allow_reviews) {
+				$error = "Reviews are disabled";
+			}
+		}
+		
+		if (!empty($error)) {
+			$result	= new stdClass();
+			$error = '
+			<div class="fc-mssg fc-warning fc-nobgimage">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				'.$error.'
+			</div>';
+			$result->html = $error;
+			echo json_encode($result);
+			jexit();
+		}
+		
+		if ($user_id)
+		{
+			$query = "SELECT * "
+				." FROM #__flexicontent_review AS r"
+				." WHERE r.content_id=" . $content_id
+				."  AND r.type=". $type
+				."  AND r.user_id=". $user_id;				
+			$db->setQuery($query);
+			$review = $db->loadColumn();
+		}
+		
+		$result	= new stdClass();
+		$result->html = '
+		<form id="fcvote_review_form_'.$content_id.'" name="fcvote_form_'.$content_id.'">
+			<table class="fc-form-tbl">
+				<tr class="fcvote_review_form_title">
+					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TITLE').'</label></td>
+					<td><input type="text" name="title" size="120"/></td>
+				</tr>
+				<tr class="fcvote_review_form_email">
+					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_EMAIL').'</label></td>
+					<td><input type="email" name="email" size="120"/></td>
+				</tr>
+				<tr class="fcvote_review_form_text">
+					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TEXT').'</label></td>
+					<td class="top"><textarea name="text" rows="12" cols="120"></textarea></td>
+				</tr>
+				<tr class="fcvote_review_form_text">
+					<td colspan="2"><input type="submit" class="btn btn-primary fcvote_review_form_submit_btn" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/></td>
+				</tr>
+			</table>
+		</form>';
+		
+		echo json_encode($result);
 		jexit();
 	}
 	

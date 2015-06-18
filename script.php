@@ -497,6 +497,10 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
 		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_reviews"';
+		$db->setQuery($query);
+		$reviews_tbl_exists = (boolean) count($db->loadObjectList());
+		
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_templates"';
 		$db->setQuery($query);
 		$templates_tbl_exists = (boolean) count($db->loadObjectList());
@@ -835,6 +839,53 @@ class com_flexicontentInstallerScript
 						  `author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
 						  PRIMARY KEY  (`user_id`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					}
+					
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) {
+								$result = false;
+								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							}
+						}
+						if ( $result !== false ) {
+							echo "<span class='badge badge-success'>table created / upgraded</span>";
+						}
+					}
+					else echo "<span class='badge badge-info'>nothing to do</span>";
+					?>
+					</td>
+				</tr>
+				
+		<?php
+		// Create flexicontent_reviews table if it does not exist
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Create/Upgrade reviews DB table: </td>
+					<td>
+					<?php
+					
+			    $queries = array();
+					if ( !$reviews_tbl_exists ) {
+						$queries[] = "
+						CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
+							`content_id` int(11) NOT NULL,
+							`type` int(11) NOT NULL DEFAULT '1',
+							`average_rating` mediumtext NOT NULL,
+							`custom_ratings` mediumtext NOT NULL DEFAULT '',
+							`user_id` int(11) NOT NULL DEFAULT '0',
+							`email` varchar(255) NOT NULL DEFAULT '',
+							`title` varchar(255) NOT NULL,
+							`text` mediumtext NOT NULL,
+							`state` int(11) NOT NULL,
+							`confirmed` int(11) NOT NULL,
+							`submit_date` datetime NOT NULL,
+							`update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+							`custom_fields` mediumtext NULL,
+							PRIMARY KEY (`content_id`, `type`),
+							KEY `user_id` (`user_id`)
+						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
 					}
 					
 					if ( !empty($queries) ) {
