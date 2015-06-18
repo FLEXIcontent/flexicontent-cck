@@ -220,6 +220,7 @@
 			}
 		});
 		
+		// Display fields / enable input on them ( removeAttr + css ),  force them to update display ( trigger:click ), and to validate new value ( trigger:blur )
 		if (fcconfigs) for (var fieldname in fcconfigs) {
 			if (fcconfigs.hasOwnProperty(fieldname)) {
 				var jf_field = jQuery('#'+'jform_attribs_'+fieldname).first();
@@ -228,9 +229,9 @@
 				if (jf_field.is('fieldset')) {
 					jf_field.find('input').removeAttr('disabled').removeAttr('readonly');
 					jf_field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
-					jf_field.find(':input[value="'+fcconfigs[fieldname]+'"]').next().trigger('click');
+					jf_field.find(':input[value="'+fcconfigs[fieldname]+'"]').next().trigger('click').trigger('blur');
 				} else {
-					jf_field.removeAttr('disabled').removeAttr('readonly').val(fcconfigs[fieldname]).trigger('click');
+					jf_field.removeAttr('disabled').removeAttr('readonly').val(fcconfigs[fieldname]).trigger('click').trigger('blur');
 				}
 			}
 		}
