@@ -397,7 +397,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
 				
 			<div class="fcclear"></div>
-			<span class="fc-mssg-inline fc-success" style="font-size:100%; margin: 12px 0 0 0!important;">
+			<span class="fc-mssg fc-note fc-nobgimage" style="font-size:100%; margin: 4px 0;">
 				<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
 				<?php echo JText::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?>
 			</span>
@@ -518,7 +518,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 									case 'category': $msg='in each individual <b>Category</b>'; break;
 									default: $msg='in each <b>'.$this->layout->view.'</b>'; break;
 								}
-								echo "<div class='positions_readonly'>NON-editable position.<br/> To customize edit TEMPLATE parameters ".$msg."</div>";
+								echo "<div class='positions_readonly_info fc-mssg fc-info fc-nobgimage'>NON-editable position.<br/> To customize edit TEMPLATE parameters ".$msg."</div>";
 								continue;
 							}
 							?>

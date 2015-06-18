@@ -602,7 +602,7 @@ jQuery(document).ready(function(){
 			</th>
 			
 			<th nowrap="nowrap" class="center hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_TAGS', 'tg.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JText::_( 'FLEXI_TAGS' ); ?>
 				<?php if ($this->filter_tag) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_tag');document.adminForm.submit();" />

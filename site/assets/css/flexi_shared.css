@@ -236,7 +236,7 @@ span.editlinktip.hasTip.tags img {
 	margin: 0;
 	width: 100%;
 }
-.positions_readonly, .positions {
+.positions {
 	list-style: none;
 	padding: 5px 0px 0px 0px;
 	margin: 0;
@@ -246,11 +246,6 @@ span.editlinktip.hasTip.tags img {
 	border: 0px dashed silver;
 	overflow: visible;  /* hidden, CAUSES annoying jumps with jQuery sortable */
 	width: 100%;
-}
-div .positions_readonly {
-	padding: 2px 1%;
-	width: 98%;
-	display: inline;
 }
 
 .fields {

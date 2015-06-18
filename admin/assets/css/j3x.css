@@ -291,7 +291,6 @@ div.width-20 fieldset, div.width-30 fieldset, div.width-35 fieldset, div.width-4
 }
 
 div fieldset.panelform textarea {
-	width:auto !important;
 }
 
 div fieldset.panelform :not(.label-fcouter) label {

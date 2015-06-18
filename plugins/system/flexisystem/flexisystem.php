@@ -1381,7 +1381,7 @@ class plgSystemFlexisystem extends JPlugin
 		if ( JRequest::getVar('option')==$this->extension || JRequest::getVar('isflexicontent') ) return;  // This is meant for non-FLEXIcontent views
 		if ($this->cparams->get('article_jview_fields_placement', 1)!=0) return;
 		
-		return 'text placed after article title' . $this->renderFields($context, $row, $params, $page);
+		return $this->renderFields($context, $row, $params, $page);
 	}
 	
 	function onContentBeforeDisplay($context, &$row, &$params, $page=0)
@@ -1390,7 +1390,7 @@ class plgSystemFlexisystem extends JPlugin
 		if ( JRequest::getVar('option')==$this->extension || JRequest::getVar('isflexicontent') ) return;  // This is meant for non-FLEXIcontent views
 		if ($this->cparams->get('article_jview_fields_placement', 1)!=1) return;
 		
-		return 'text placed before (all) article content' . $this->renderFields($context, $row, $params, $page);
+		return $this->renderFields($context, $row, $params, $page);
 	}
 	
 	function onContentAfterDisplay($context, &$row, &$params, $page=0)
@@ -1399,6 +1399,6 @@ class plgSystemFlexisystem extends JPlugin
 		if ( JRequest::getVar('option')==$this->extension || JRequest::getVar('isflexicontent') ) return;  // This is meant for non-FLEXIcontent views
 		if ($this->cparams->get('article_jview_fields_placement', 1)!=2) return;
 		
-		return 'text placed after (all) article content' . $this->renderFields($context, $row, $params, $page);
+		return $this->renderFields($context, $row, $params, $page);
 	}
 }

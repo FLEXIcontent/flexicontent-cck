@@ -173,7 +173,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$allrows    = $this->get( 'AllItems' );
 		$pagination = $this->get( 'Pagination' );
 		$types      = $this->get( 'Typeslist' );  // Content types
-		$fieldtypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
+		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
 		
 		
 		$lists = array();
@@ -200,7 +200,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$fftypes[] = array('value'=>'BV', 'text'=>$ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
 		$fftypes[] = array('value'=>'C',  'text'=>$ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
 		$fftypes[] = array('value'=>'NC', 'text'=>$ALL . JText::_( 'FLEXI_NON_CORE_FIELDS' ));
-		foreach ($fieldtypes as $field_group => $ft_types) {
+		foreach ($fieldTypes as $field_group => $ft_types) {
 			$fftypes[] = $field_group;
 			foreach ($ft_types as $field_type => $ftdata) {
 				$fftypes[] = array('value'=>$ftdata->field_type, 'text'=>'-'.$ftdata->assigned.'- '. $ftdata->friendly);
