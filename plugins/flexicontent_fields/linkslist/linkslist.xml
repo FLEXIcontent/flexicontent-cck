@@ -33,9 +33,20 @@
 			
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
 			<field name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
-			<field name="field_elements" type="textarea" default="Title1[id=&quot;tagid1&quot; class=&quot;cssclass1&quot; link=&quot;#link1&quot;] :: &#13; Title2[id=&quot;tagid2&quot; class=&quot;cssclass2&quot; link=&quot;#link2&quot;] :: &#13; Title3[id=&quot;tagid3&quot; class=&quot;cssclass3&quot; link=&quot;#link3&quot;]" class="required" rows="5" cols="40" label="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS_DESC" />
+			<field name="extra_votes_configs" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod">
+				<option value="">FLEXI_CUSTOMIZE</option>
+				<option value="1" fcconfigs="{'list_class': 'list-group', 'field_elements':'Title1[id=\&amp;quot;tagid1\&amp;quot; class=\&amp;quot;list-group-item\&amp;quot; link=\&amp;quot;#link1\&amp;quot;] :: \nTitle2[id=\&amp;quot;tagid2\&amp;quot; class=\&amp;quot;list-group-item\&amp;quot; link=\&amp;quot;#link2\&amp;quot;] :: \nTitle3[id=\&amp;quot;tagid3\&amp;quot; class=\&amp;quot;list-group-item\&amp;quot; link=\&amp;quot;#link3\&amp;quot;]'}">FLEXI_LOAD_EXAMPLE</option>
+			</field>
+			<field name="field_elements" type="textarea" default="" class="required" rows="5" label="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
+			
+			<!--field name="" type="separator" default="FLEXI_FIELD_ALTERNATIVE_DISPLAY" description="" level="level2" /-->
+			<field name="editform_field_type" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_AS" description="FLEXI_FIELD_DISPLAY_AS_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="2">FLEXI_DISPLAY_AS_TAG_LIKE</option>
+			</field>
+			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
 			<field name="pretext_form" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext_form" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />

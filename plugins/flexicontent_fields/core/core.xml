@@ -916,9 +916,9 @@
 			</field>
 			<field name="extra_votes_configs" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod" depend_class="composite-voting-mode">
 				<option value="">FLEXI_CUSTOMIZE</option>
-				<option value="1" fcconfigs="{'extra_counter':'0', 'extra_votes':'1##Quality##\nIf it is hard to break down%%\n\n2##Speed##\nHow fast it travels%%\n\n3##Accuracy##\nIf descripton was correct and complete%%\n\n4##Appearance##\nHow good it looks%%'}">FLEXI_LOAD_EXAMPLE</option>
+				<option value="1" fcconfigs="{'extra_votes':'1##Quality##\nIf it is hard to break down%%\n\n2##Speed##\nHow fast it travels%%\n\n3##Accuracy##\nIf descripton was correct and complete%%\n\n4##Appearance##\nHow good it looks%%'}">FLEXI_LOAD_EXAMPLE</option>
 			</field>
-			<field name="extra_votes" type="textarea" default="" rows="11" cols="30" label="FLEXI_FIELD_VOTE_CHARACTERISTICS" description="FLEXI_FIELD_VOTE_CHARACTERISTICS_DESC" depend_class="composite-voting-mode"/>
+			<field name="extra_votes" type="textarea" default="" rows="11" cols="30" label="FLEXI_FIELD_VOTE_CHARACTERISTICS" description="FLEXI_FIELD_VOTE_CHARACTERISTICS_DESC" class="required" depend_class="composite-voting-mode"/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VOTE_CHARACTERISTIC" description="FLEXI_FIELD_VOTE_CHARACTERISTIC_DESC" level="level1" depend_class="composite-voting-mode" />
 			<field name="extra_counter" type="list" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" class="btn-group btn-group-yesno" depend_class="composite-voting-mode">

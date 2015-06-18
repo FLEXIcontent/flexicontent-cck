@@ -373,13 +373,13 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		// Create field's HTML display for item form
 		// *****************************************
 		
-		// Create form field options
-		$options = array();
-		foreach ($elements as $element) {
-			$options[] = JHTML::_('select.option', $element->value, $element->text);
-		}
+		// Alternative form field display as drop-down select to save space
 		if ( $field->parameters->get( 'display_as_select', 0 ) ) {
+			$options = array();
 			if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
+			foreach ($elements as $element) {
+				$options[] = JHTML::_('select.option', $element->value, $element->text);
+			}
 			$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value, $elementid);
 			return;
 		}

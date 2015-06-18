@@ -367,12 +367,6 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		// Create field's HTML display for item form
 		// *****************************************
 		
-		// Create form field options
-		$options = array();
-		foreach ($elements as $element) {
-			$options[] = JHTML::_('select.option', $element->value, $element->text);
-		}
-		
 		// Create the attributes of the form field
 		$fftype = 'checkbox';
 		$display_as_checkbox = 1;

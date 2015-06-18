@@ -224,7 +224,6 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 					return 'cancel';
 				}
 				
-				
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
@@ -366,13 +365,13 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		// Create field's HTML display for item form
 		// *****************************************
 		
-		// Create form field options
-		$options = array();
-		foreach ($elements as $element) {
-			$options[] = JHTML::_('select.option', $element->value, $element->text);
-		}
+		// Alternative form field display as drop-down select to save space
 		if ( $field->parameters->get( 'display_as_select', 0 ) ) {
+			$options = array();
 			if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
+			foreach ($elements as $element) {
+				$options[] = JHTML::_('select.option', $element->value, $element->text);
+			}
 			$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'class="'.$required.'"', 'value', 'text', $field->value, $elementid);
 			return;
 		}
