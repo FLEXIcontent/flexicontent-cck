@@ -173,7 +173,7 @@ $this->document->addScriptDeclaration($js);
 			</div>
 			
 			
-			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-pencil" >
+			<div class="tabbertab" id="fcform_tabset_common_item_form_tab" data-icon-class="icon-pencil" >
 				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?> </h3>
 				<table class="fc-form-tbl">
 					
@@ -227,7 +227,7 @@ $this->document->addScriptDeclaration($js);
 			
 			
 			<?php if ($this->supportsearch || $this->supportfilter || $this->supportadvsearch || $this->supportadvfilter) : ?>
-			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-search" >
+			<div class="tabbertab" id="fcform_tabset_common_search_filtering_tab" data-icon-class="icon-search" >
 				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELD_SEARCH_FILTERING' ); ?> </h3>
 				
 				<?php if ($this->supportsearch || $this->supportfilter) : ?>
@@ -317,7 +317,7 @@ $this->document->addScriptDeclaration($js);
 					});
 				");*/
 			?>
-			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-power-cord" >
+			<div class="tabbertab" id="fcform_tabset_common_perms_tab" data-icon-class="icon-power-cord" >
 				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
 				
 				<?php /*

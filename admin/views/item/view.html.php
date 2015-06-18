@@ -184,8 +184,28 @@ class FlexicontentViewItem extends JViewLegacy
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );     // Creating new item
 		}
-
-		// Add a preview button for LATEST version of the item
+		
+		
+		// **************
+		// Common Buttons
+		// **************
+		
+		// Applying new item type is a special case that has not loaded custom fieds yet
+		JToolBarHelper::apply($item->type_id ? 'items.apply' : 'items.apply_type', !$isnew ? 'FLEXI_APPLY' : ($typesselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ), false);
+		if (!$isnew || $item->version) flexicontent_html::addToolBarButton(
+			'FLEXI_FAST_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('items.apply_ajax')", $msg_alert='', $msg_confirm='',
+			$btn_task='items.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
+			'data-placement="bottom" title="Fast saving, without reloading the form. <br/><br/>Note: new files will not be uploaded, <br/>- in such a case please use \'Apply\'"');
+		
+		if (!$isnew || $item->version) JToolBarHelper::save('items.save');
+		if (!$isnew || $item->version) JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::cancel('items.cancel');
+		
+		
+		// ***********************
+		// Add a preview button(s)
+		// ***********************
+		
 		//$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef') && $config->get('sef');
 		$_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
 		if ( $cid )
@@ -217,11 +237,15 @@ class FlexicontentViewItem extends JViewLegacy
 			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? '&' : '?') .'preview=1' . $autologin;
 			//$previewlink     = str_replace('&amp;', '&', $previewlink);
 			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)) .$autologin;
-
+			
+			// PREVIEW for latest version
 			if ( !$params->get('use_versioning', 1) || ($item->version == $item->current_version && $item->version == $item->last_version) )
 			{
-				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small" onClick="window.open(\''.$previewlink.'\');" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</button>', 'preview' );
-			} else {
+				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small btn-info" style="margin-left:32px;" onClick="window.open(\''.$previewlink.'\');" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</button>', 'preview' );
+			}
+			
+			// PREVIEW for non-approved versions of the item, if they exist
+			else {
 				// Add a preview button for (currently) LOADED version of the item
 				$previewlink_loaded_ver = $previewlink .'&version='.$item->version;
 				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small" onClick="window.open(\''.$previewlink_loaded_ver.'\');" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION').' ['.$item->version.']</button>', 'preview' );
@@ -238,19 +262,22 @@ class FlexicontentViewItem extends JViewLegacy
 			JToolBarHelper::divider();
 			JToolBarHelper::spacer();
 		}
-
-		// Common Buttons
 		
-		// Applying new item type is a special case that has not loaded custom fieds yet
-		JToolBarHelper::apply($item->type_id ? 'items.apply' : 'items.apply_type', !$isnew ? 'FLEXI_APPLY' : ($typesselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ), false);
-		if (!$isnew || $item->version) flexicontent_html::addToolBarButton(
-			'FLEXI_FAST_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('items.apply_ajax')", $msg_alert='', $msg_confirm='',
-			$btn_task='items.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info".$tip_class, $btn_icon="icon-loop",
-			'data-placement="bottom" title="Fast saving, without reloading the form. <br/><br/>Note: new files will not be uploaded, <br/>- in such a case please use \'Apply\'"');
 		
-		if (!$isnew || $item->version) JToolBarHelper::save('items.save');
-		if (!$isnew || $item->version) JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-		JToolBarHelper::cancel('items.cancel');
+		// ************************
+		// Add modal layout editing
+		// ************************
+		
+		if ($perms['cantemplates'])
+		{
+			JToolBarHelper::divider();
+			if (!$isnew || $item->version) flexicontent_html::addToolBarButton(
+				'FLEXI_EDIT_LAYOUT', $btn_name='apply_ajax', $full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;", $msg_alert='', $msg_confirm='',
+				$btn_task='items.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info".$tip_class, $btn_icon="icon-pencil",
+				'data-placement="bottom" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder='.$item->itemparams->get('ilayout', $tparams->get('ilayout', 'default')).
+				'" title="Edit the display layout of this item. <br/><br/>Note: this layout maybe assigned to content types or other items, thus changing it will effect them too"'
+			);
+		}
 		
 		
 		// Check if saving an item that translates an original content in site's default language
@@ -416,8 +443,8 @@ class FlexicontentViewItem extends JViewLegacy
 		if ($non_publishers_stategrp || $special_privelege_stategrp)
 			$state[] = JHTML::_('select.optgroup', '');
 		
-		$fieldname = FLEXI_J16GE ? 'jform[state]' : 'state';
-		$elementid = FLEXI_J16GE ? 'jform_state'  : 'state';
+		$fieldname = 'jform[state]';
+		$elementid = 'jform_state';
 		$class = 'use_select2_lib';
 		$attribs = 'class="'.$class.'"';
 		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
@@ -455,8 +482,8 @@ class FlexicontentViewItem extends JViewLegacy
 		// *** EOF: J1.5 SPECIFIC SELECT LISTS
 		
 		// build version approval list
-		$fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
-		$elementid = FLEXI_J16GE ? 'jform_vstate' : 'vstate';
+		$fieldname = 'jform[vstate]';
+		$elementid = 'jform_vstate';
 		/*
 		$options = array();
 		$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
@@ -492,8 +519,8 @@ class FlexicontentViewItem extends JViewLegacy
 				$lists['notify'] = JText::_('FLEXI_SUBSCRIBERS_ALREADY_NOTIFIED');
 			} else {
 				// build favs notify field
-				$fieldname = FLEXI_J16GE ? 'jform[notify]' : 'notify';
-				$elementid = FLEXI_J16GE ? 'jform_notify' : 'notify';
+				$fieldname = 'jform[notify]';
+				$elementid = 'jform_notify';
 				/*
 				$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
 				$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
@@ -540,7 +567,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
 			$attribs .= $enable_featured_cid_selector ? '' : ' disabled="disabled"';
 			
-			$fieldname = FLEXI_J16GE ? 'jform[featured_cid][]' : 'featured_cid[]';
+			$fieldname = 'jform[featured_cid][]';
 			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
 				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed,
 					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
@@ -579,7 +606,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="20"';
 			$attribs .= $enable_cid_selector ? '' : ' disabled="disabled"';
 			
-			$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
+			$fieldname = 'jform[cid][]';
 			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
 			$lists['cid'] = ($enable_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
 				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $selectedcats, false, $attribs, true, true, $actions_allowed,
@@ -606,7 +633,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$class .= ' required';
 		}
 		$attribs = 'class="'.$class.'"';
-		$fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
+		$fieldname = 'jform[catid]';
 		
 		$enable_catid_selector = ($isnew && !$tparams->get('catid_default')) || (!$isnew && empty($item->catid)) || $perms['canchange_cat'];
 		
@@ -634,8 +661,8 @@ class FlexicontentViewItem extends JViewLegacy
 		//buid types selectlist
 		$class   = 'required use_select2_lib';
 		$attribs = 'class="'.$class.'"';
-		$fieldname = FLEXI_J16GE ? 'jform[type_id]' : 'type_id';
-		$elementid = FLEXI_J16GE ? 'jform_type_id'  : 'type_id';
+		$fieldname = 'jform[type_id]';
+		$elementid = 'jform_type_id';
 		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected->id, 1, $attribs, $elementid, $check_perms=true );
 		
 		
@@ -734,7 +761,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$allowed_tmpls = $tparams->get('allowed_ilayouts');
 		$type_default_layout = $tparams->get('ilayout', 'default');
 		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
-		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
+		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = explode("|", $allowed_tmpls);
 
 		// (c) Add default layout, unless all templates allowed (=array is empty)
 		if ( count ($allowed_tmpls) && !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
@@ -752,17 +779,13 @@ class FlexicontentViewItem extends JViewLegacy
 
 		// (e) Apply Template Parameters values into the form fields structures
 		foreach ($tmpls as $tmpl) {
-			if (FLEXI_J16GE) {
-				$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
-				$jform->load($tmpl->params);
-				$tmpl->params = $jform;
-				foreach ($tmpl->params->getGroup('attribs') as $field) {
-					$fieldname =  $field->__get('fieldname');
-					$value = $item->itemparams->get($fieldname);
-					if (strlen($value)) $tmpl->params->setValue($fieldname, 'attribs', $value);
-				}
-			} else {
-				$tmpl->params->loadINI($item->attribs);
+			$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+			$jform->load($tmpl->params);
+			$tmpl->params = $jform;
+			foreach ($tmpl->params->getGroup('attribs') as $field) {
+				$fieldname =  $field->__get('fieldname');
+				$value = $item->itemparams->get($fieldname);
+				if (strlen($value)) $tmpl->params->setValue($fieldname, 'attribs', $value);
 			}
 		}
 

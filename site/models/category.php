@@ -1753,10 +1753,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$heritage_stack = array();
 		$inheritcid = $catParams->get('inheritcid', '');
 		$inheritcid_comp = $compParams->get('inheritcid', -1);
-		$inrerit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
+		$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
 		
 		// CASE A: inheriting from parent category tree
-		if ( $id && $inrerit_parent && !empty($globalcats[$id]->ancestorsonly) ) {
+		if ( $id && $inherit_parent && !empty($globalcats[$id]->ancestorsonly) ) {
 			$order_clause = 'level';  // 'FIELD(id, ' . $globalcats[$id]->ancestorsonly . ')';
 			$query = 'SELECT title, id, params FROM #__categories'
 				.' WHERE id IN ( ' . $globalcats[$id]->ancestorsonly . ')'
@@ -1768,8 +1768,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$parentcat->params = new JRegistry($parentcat->params);
 					array_push($heritage_stack, $parentcat);
 					$inheritcid = $parentcat->params->get('inheritcid', '');
-					$inrerit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
-					if ( !$inrerit_parent ) break; // Stop inheriting from further parent categories
+					$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
+					if ( !$inherit_parent ) break; // Stop inheriting from further parent categories
 				}
 			}
 		}

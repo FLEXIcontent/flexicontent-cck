@@ -218,6 +218,8 @@ function delAllFilters() {
 		$k = 0;
 		$i = 0;
 		$clayout_bycatid = array();
+		$cat_ancestors = array();
+		$inheritcid_comp = $cparams->get('inheritcid', -1);
 		
 		if (!count($this->rows)) echo '<tr class="collapsed_row"><td colspan="'.$list_total_cols.'"></td></tr>';  // Collapsed row to allow border styling to apply		$k = 0;
 		foreach ($this->rows as $row)
@@ -234,11 +236,36 @@ function delAllFilters() {
 			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
 			$link	= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
 			
-			$row_clayout =  $row->config->get("clayout") ?  $row->config->get("clayout") : ($row->parent_id==='1' ? $cparams->get("clayout") : '');
-			if (!$row_clayout && isset($clayout_bycatid[$row->parent_id])) {
-				$row_clayout = $clayout_bycatid[$row->parent_id];
+			$inheritcid = $row->config->get('inheritcid', '');
+			$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
+			
+			if (!$inherit_parent || $row->parent_id==='1')
+				$row_clayout = $row->config->get('clayout', $cparams->get('clayout', 'blog'));
+			else {
+				$row_clayout = $row->config->get('clayout', '');
+				
+				if (!$row_clayout)
+				{
+					if (isset($clayout_bycatid[$row->parent_id])) {
+						$row_clayout = $clayout_bycatid[$row->parent_id];
+					}
+					else
+					{
+						$_ancestors = $this->getModel()->getParentParams($row->id);  // This is ordered by level ASC
+						$row_clayout = $cparams->get('clayout', 'blog');
+						foreach($_ancestors as $_cid => $_cat)
+						{
+							if (!isset($cats_params[$_cid]))
+							{
+								$cats_params[$_cid] = new JRegistry($_cat->params);
+							}
+							$row_clayout = $cats_params[$_cid]->get('clayout', '') ? $cats_params[$_cid]->get('clayout', '') : $row_clayout;
+							$clayout_bycatid[$_cid] = $row_clayout;
+						}
+					}
+				}
 			}
-			if ($row_clayout) $clayout_bycatid[$row->id] = $row_clayout;
+			$clayout_bycatid[$row->id] = $row_clayout;
 			
 			$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;tmpl=component&amp;ismodal=1&amp;folder='. $row_clayout;
 			

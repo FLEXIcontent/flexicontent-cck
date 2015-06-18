@@ -156,10 +156,12 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ********************
 		
 		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
-		$editor 	   = JFactory::getEditor($editor_name);
+		$editor  = JFactory::getEditor($editor_name);
 		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$bar     = JToolBar::getInstance('toolbar');
 		$categories = $globalcats;
+		
+		$bar     = JToolBar::getInstance('toolbar');
+		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		
 		
 		// ******************
@@ -169,10 +171,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Create Toolbar title and add the preview button
 		if ( !$isnew ) {
 			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_CATEGORY' ), 'fc_categoryedit' );
-			$autologin		= ''; //$cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
-			$previewlink 	= JRoute::_(JURI::root(). FlexicontentHelperRoute::getCategoryRoute($categories[$cid]->slug)) . $autologin;
-			// Add a preview button
-			$bar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_NEW_CATEGORY' ), 'fc_categoryadd' );
 		}
@@ -181,7 +179,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		JToolBarHelper::apply('category.apply', 'FLEXI_APPLY');
 		if ( !$isnew ) flexicontent_html::addToolBarButton(
 			'FLEXI_FAST_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('category.apply_ajax')", $msg_alert='', $msg_confirm='',
-			$btn_task='category.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info", $btn_icon="icon-loop");
+			$btn_task='category.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="", $btn_icon="icon-loop");
 		JToolBarHelper::save('category.save');
 		
 		// Add a save and new button, if user can create inside at least one (com_content) category
@@ -199,6 +197,57 @@ class FlexicontentViewCategory extends JViewLegacy
 			JToolBarHelper::cancel('category.cancel');
 		} else {
 			JToolBarHelper::cancel('category.cancel', 'JTOOLBAR_CLOSE');
+		}
+		
+		
+		// ******************
+		// Add preview button
+		// ******************
+		
+		if ( !$isnew ) {
+			JToolBarHelper::divider();
+			
+			$autologin		= ''; //$cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+			$previewlink 	= JRoute::_(JURI::root(). FlexicontentHelperRoute::getCategoryRoute($categories[$cid]->slug)) . $autologin;
+			// Add a preview button
+			$bar->appendButton( 'Custom', '<a class="preview btn btn-small btn-info" href="'.$previewlink.'" target="_blank" style="margin-left:32px;" ><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
+		}
+					
+		// ************************
+		// Add modal layout editing
+		// ************************
+		
+		if (!$isnew && $perms->CanTemplates)
+		{
+			$inheritcid_comp = $cparams->get('inheritcid', -1);
+			$inheritcid = $catparams->get('inheritcid', '');
+			$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
+			
+
+			if (!$inherit_parent || $row->parent_id==='1')
+				$row_clayout = $catparams->get('clayout', $cparams->get('clayout', 'blog'));
+			else {
+				$row_clayout = $catparams->get('clayout', '');
+
+				if (!$row_clayout)
+				{
+					$_ancestors = $this->getModel()->getParentParams($row->id);  // This is ordered by level ASC
+					$row_clayout = $cparams->get('clayout', 'blog');
+					$cats_params = array();
+					foreach($_ancestors as $_cid => $_cat)
+					{
+						$cats_params = new JRegistry($_cat->params);
+						$row_clayout = $cats_params->get('clayout', '') ? $cats_params->get('clayout', '') : $row_clayout;
+					}
+				}
+			}
+			
+			flexicontent_html::addToolBarButton(
+				'FLEXI_EDIT_LAYOUT', $btn_name='apply_ajax', $full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;", $msg_alert='', $msg_confirm='',
+				$btn_task='items.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info".$tip_class, $btn_icon="icon-pencil",
+				'data-placement="bottom" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;tmpl=component&amp;ismodal=1&amp;folder='.$row_clayout.
+				'" title="Edit the display layout of this category. <br/><br/>Note: this layout maybe assigned to other categories, thus changing it will effect them too"'
+			);
 		}
 		
 		

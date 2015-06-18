@@ -51,7 +51,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$count_filters = 0;
 		
 		//get vars
-		$order_property = !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
+		$order_property = 'c.lft';
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     $order_property, 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', '', 'word' );
 		
@@ -66,7 +66,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		if ($filter_language) $count_filters++;
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
-		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search = $db->escape( trim(JString::strtolower( $search ) ) );
 		
 		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -92,8 +92,8 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		$js = "jQuery(document).ready(function(){";
 		
-		$contrl = FLEXI_J16GE ? "categories." : "";
-		$contrl_singular = FLEXI_J16GE ? "category." : "";
+		$contrl = "categories.";
+		$contrl_singular = "category.";
 		$toolbar = JToolBar::getInstance('toolbar');
 		
 		// Copy Parameters
@@ -115,7 +115,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		JToolBarHelper::divider();
 		
 		$add_divider = false;
-		if ( !FLEXI_J16GE || $user->authorise('core.create', 'com_flexicontent') ) {
+		if ( $user->authorise('core.create', 'com_flexicontent') ) {
 			$cancreate_cat = true;
 		} else {
 			$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
@@ -128,7 +128,7 @@ class FlexicontentViewCategories extends JViewLegacy
 			JToolBarHelper::addNew($contrl_singular.'add');
 			$add_divider = true;
 		}
-		if ( !FLEXI_J16GE || ( $user->authorise('core.edit', 'com_flexicontent') || $user->authorise('core.edit.own', 'com_flexicontent') ) ) {
+		if ( $user->authorise('core.edit', 'com_flexicontent') || $user->authorise('core.edit.own', 'com_flexicontent') ) {
 			JToolBarHelper::editList($contrl_singular.'edit');
 			$add_divider = true;
 		}
@@ -237,18 +237,12 @@ class FlexicontentViewCategories extends JViewLegacy
 			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid, $translate=true );
 		
 		// filter publication state
-		if (FLEXI_J16GE)
-		{
-			$options = JHtml::_('jgrid.publishedOptions');
-			array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_PUBLISHED')*/) );
-			$fieldname =  $elementid = 'filter_state';
-			$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
-			$lists['state']	= ($filter_state || 1 ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
-				JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
-		} else {
-			$lists['state']	= ($filter_state ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
-				JHTML::_('grid.state', $filter_state );
-		}
+		$options = JHtml::_('jgrid.publishedOptions');
+		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_PUBLISHED')*/) );
+		$fieldname =  $elementid = 'filter_state';
+		$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
+		$lists['state']	= ($filter_state || 1 ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
+			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
 		
 		// filter access level
 		$options = JHtml::_('access.assetgroups');
