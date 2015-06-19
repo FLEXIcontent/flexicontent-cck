@@ -151,58 +151,73 @@ body .fc-mssg.fc-noborder  {
 	font-size:14px;
 	width: auto;
 	height: 0;
+	z-index: 1;
 }
 
 #flexicontent ul.statetoggler > li.topLevel > .options > div {
 	display: inline-block;
-	padding:0px 4px;
+	padding:0px;
 }
 
 #flexicontent ul.statetoggler > li.topLevel > .options ul {
-	display: inline-block;
-	padding: 0;
-	margin: 0;
+	display: none;
+	padding: 24px;
+	margin: 2px 0px;
 	background: white;
-	border: 1px solid silver;
+	border: 1px solid lightgray;
+	border-radius:4px;
 	width: auto;
 }
 
-#flexicontent ul.statetoggler > li.topLevel, .statetoggler > li.topLevel ul > li {
+#flexicontent ul.statetoggler > li.topLevel,
+#flexicontent ul.statetoggler > li.topLevel ul > li {
 	background: none repeat scroll 0 0 transparent;
 	overflow: visible;
 	min-height: 20px;
 	width: auto;
-	display: -moz-inline-stack;
 	display: inline-block;
 	vertical-align: top;
 	padding: 0;
 	margin: 0;
-	zoom: 1;
-	*display: inline;
-	_height: 20px;
 }
 
-#flexicontent ul.statetoggler > li.topLevel span.btn, ul.statetoggler > li.topLevel span.fcbutton  {
+#flexicontent ul.statetoggler > li.topLevel span.btn,
+#flexicontent ul.statetoggler > li.topLevel span.fcbutton  {
 	padding-left:4px;
 	padding-right:4px;
 }
 
-#flexicontent ul.statetoggler > li.topLevel, .statetoggler > li.topLevel ul > li a {
-	padding: 0;
-	margin: 0;
+#flexicontent ul.statetoggler > li.topLevel ul > li a {
+	margin: 2px;
+	display: inline-block;
 }
+/*
+#flexicontent ul.statetoggler > li.topLevel ul > li a:hover {
+	background-image: linear-gradient(to bottom, #f0f0f0, #d7d7d7);
+	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0, endColorstr=#d7d7d7);
+}*/
 
 #flexicontent ul.statetoggler > li.topLevel ul > li img {
-	padding: 2px;
+	padding: 4px 6px;
 	margin: 0;
+	border: none;
 }
 
-#flexicontent ul.statetoggler > li.topLevel > a.opener {
+#flexicontent ul.statetoggler > li.topLevel > a.stateopener {
+	outline:none;
+	text-decoration: none;
 }
 
-#flexicontent ul.statetoggler > li.topLevel > a.opener img {
+#flexicontent ul.statetoggler > li.topLevel > a.stateopener img {
 	padding: 2px 0px;
 	margin: 0;
+	border: none;
+}
+
+#flexicontent ul.statetoggler .ajax-loader {
+	background: url("../images/ajax-loader.gif") no-repeat scroll center center transparent;
+	height: 20px;
+	width: 16px;
 }
 
 

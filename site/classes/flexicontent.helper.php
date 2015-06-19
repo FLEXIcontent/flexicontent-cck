@@ -1428,7 +1428,8 @@ class flexicontent_html
 
 		return $output;
 	}
-
+	
+	
 	/**
 	 * Creates the print button
 	 *
@@ -1479,7 +1480,8 @@ class flexicontent_html
 
 		return $output;
 	}
-
+	
+	
 	/**
 	 * Creates the email button
 	 *
@@ -1555,7 +1557,8 @@ class flexicontent_html
 		
 		return $output;
 	}
-
+	
+	
 	/**
 	 * Creates the pdf button
 	 *
@@ -1595,8 +1598,8 @@ class flexicontent_html
 
 		return $output;
 	}
-
-
+	
+	
 	/**
 	 * Creates the state selector button
 	 *
@@ -1635,17 +1638,13 @@ class flexicontent_html
 		if (!$js_and_css_added && $canChangeState && $addToggler )
 		{
 			// File exists both in frontend & backend (and is different), so we will use 'base' method and not 'root'
-			$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/stateselector.js' );
-			$js ='
-				if(MooTools.version>="1.2.4") {
-					window.addEvent("domready", function() {stateselector.init()});
-				}else{
-					window.onDomReady(stateselector.init.bind(stateselector));
-				}
-				function dostate(state, id)
+			$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/stateselector.js' );
+			$js ='				
+				function fc_setitemstate(state, id)
 				{
-					var change = new processstate();
-					change.dostate( state, id );
+					var handler = new fc_statehandler();
+					handler.initialize({task: "'. ($app->isAdmin() ? 'items.setitemstate' : 'setitemstate') .'"});
+					handler.setstate( state, id );
 				}';
 			$document->addScriptDeclaration($js);
 			$js_and_css_added = true;
@@ -1654,10 +1653,28 @@ class flexicontent_html
 		static $state_names = null;
 		static $state_descrs = null;
 		static $state_imgs = null;
-		if ( !$state_names ) {
+		static $tooltip_class = null;
+		static $state_tips = null;
+		static $button_classes = null;
+		static $icon_sep = null;
+		
+		if ( !$state_names )
+		{
 			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>'FLEXI_UNKNOWN');
 			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_ITEM_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_ITEM_PENDING'), -4=>JText::_('FLEXI_SET_ITEM_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
 			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+			
+			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$state_tips = array();
+			$title_header = '';//JText::_( 'FLEXI_ACTION' );
+			foreach ($state_names as $state_id => $i) {
+				$state_tips[$state_id] = flexicontent_html::getToolTip($title_header, $state_descrs[$state_id], 0);
+			}
+			
+			$button_classes = 'fc_statebutton';
+			$button_classes .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			$button_classes .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$icon_sep = JText::_( 'FLEXI_ICON_SEP' );
 		}
 		
 		// Create state icon
@@ -1669,23 +1686,14 @@ class flexicontent_html
 
 
 		$tz_string = JFactory::getApplication()->getCfg('offset');
-		if (FLEXI_J16GE) {
-			$tz = new DateTimeZone( $tz_string );
-			$tz_offset = $tz->getOffset(new JDate()) / 3600;
-		} else {
-			$tz_offset = $tz_string;
-		}
+		$tz = new DateTimeZone( $tz_string );
+		$tz_offset = $tz->getOffset(new JDate()) / 3600;
 
 		// Calculate common variables used to produce output
 		$publish_up = JFactory::getDate($item->publish_up);
 		$publish_down = JFactory::getDate($item->publish_down);
-		if (FLEXI_J16GE) {
-			$publish_up->setTimezone($tz);
-			$publish_down->setTimezone($tz);
-		} else {
-			$publish_up->setOffset($tz_offset);
-			$publish_down->setOffset($tz_offset);
-		}
+		$publish_up->setTimezone($tz);
+		$publish_down->setTimezone($tz);
 
 		$img_path = JURI::root(true)."/components/com_flexicontent/assets/images/";
 
@@ -1701,78 +1709,73 @@ class flexicontent_html
 		}
 		if (isset($item->publish_down)) {
 			if ($item->publish_down == $nullDate) {
-				$publish_info .= "<br />". JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
+				$publish_info .= ($publish_info ? '<br/>' : ''). JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
 			} else {
-				$publish_info .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". JHTML::_('date', $publish_down->toSql(), 'Y-m-d H:i:s');
+				$publish_info .= ($publish_info ? '<br/>' : ''). JText::_( 'FLEXI_FINISH' ) .": ". JHTML::_('date', $publish_down->toSql(), 'Y-m-d H:i:s');
 			}
 		}
-		$publish_info = $state_text.'<br /><br />'.$publish_info;
+		$publish_info = $state_text.'<br/>'.$publish_info;
 
 
 		// Create the state selector button and return it
 		if ( $canChangeState && $addToggler )
 		{
-			$separators_at = array(-5,-4);
 			// Only add user's permitted states on the current item
 			if ($has_edit_state) $state_ids   = array(1, -5, 0, -3, -4);
 			if ($has_archive)    $state_ids[] = 2;
 			if ($has_delete)     $state_ids[] = -2;
 
 			$box_css = ''; //$app->isSite() ? 'width:182px; left:-100px;' : '';
-			$publish_info .= '<br><br>'.JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
+			$publish_info .= '<br/><br/>'.JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
 			
-			$button_classes = 'fc_statebutton';
-			$button_classes .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$button_classes .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$allowed_states = array();
+			foreach ($state_ids as $i => $state_id) {
+				$allowed_states[] ='
+						<li>
+							<a href="javascript:void(0);" onclick="fc_setitemstate(\''.$state_id.'\', \''.$item->id.'\')" class="btn setstate_btn '.$tooltip_class.'" title="'.$state_tips[$state_id].'">
+								<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="'.$state_names[$state_id].'" />
+							</a>
+						</li>';
+			}
 			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
 			$output ='
 			<ul class="statetoggler">
 				<li class="topLevel">
-					<a href="javascript:void(0);" style="outline:none;" id="row'.$item->id.'" class="opener '.$button_classes.'" title="'.$tooltip_title.'">
+					<a href="javascript:void(0);" onclick="fc_toggleStateSelector(this)" id="row'.$item->id.'" class="stateopener '.$button_classes.'" title="'.$tooltip_title.'">
 						'.$stateicon.'
 					</a>
-					<div class="options" style="'.$box_css.'">
-						<ul>';
-				
-				$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-				$title_header = JText::_( 'FLEXI_ACTION' );
-				foreach ($state_ids as $i => $state_id) {
-					$tooltip_title = flexicontent_html::getToolTip($title_header, $state_descrs[$state_id], 0);
-					$spacer = in_array($state_id,$separators_at) ? '' : '';
-					$output .='
-							<li>
-								<a href="javascript:void(0);" onclick="dostate(\''.$state_id.'\', \''.$item->id.'\')" class="closer '.$tooltip_class.'" title="'.$tooltip_title.'">
-									<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="'.$state_names[$state_id].'" />
-								</a>
-							</li>';
-				}
-				$output .='
+					<div class="options" style="'.$box_css.'" onclick="fc_toggleStateSelector(this)">
+						<ul>
+						'.implode('', $allowed_states).'
 						</ul>
 					</div>
 				</li>
 			</ul>';
-
-		} else if ($app->isAdmin()) {
-			if ($canChangeState) $publish_info .= '<br><br>'.JText::_('FLEXI_STATE_CHANGER_DISABLED');
-
-			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
+		}
+		
+		else if ($app->isAdmin())  // Backend, possibly with state selector disabled
+		{
+			if ($canChangeState) $publish_info .= '<br/><br/>'.JText::_('FLEXI_STATE_CHANGER_DISABLED');
 			
+			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
 			$output = '
 				<div id="row'.$item->id.'">
 					<span class="'.$tooltip_class.'" title="'.$tooltip_title.'">
 						'.$stateicon.'
 					</span>
 				</div>';
-			$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
-		} else {
+			$output	= $icon_sep .$output. $icon_sep;
+		}
+		
+		else
+		{
 			$output = '';  // frontend with no permissions to edit / delete / archive
 		}
 
 		return $output;
 	}
-
-
+	
+	
 	/**
 	 * Creates the approval button
 	 *
@@ -1898,7 +1901,8 @@ class flexicontent_html
 		
 		return $output;
 	}
-
+	
+	
 	/**
 	 * Creates the add button
 	 *
@@ -2018,7 +2022,8 @@ class flexicontent_html
 		
 		return $output;
 	}
-
+	
+	
 	/**
 	 * Creates the stateicon
 	 *
@@ -2084,8 +2089,8 @@ class flexicontent_html
 		
 		return $icon;
 	}
-
-
+	
+	
 	/**
 	 * Creates the ratingbar
 	 *
@@ -3338,11 +3343,11 @@ class flexicontent_html
 		$html2 = array();
 		foreach($t1 as $k=>$o) {
 			if(in_array($k, $out[0])) $html1[] = "<s>".($mode?htmlspecialchars($o, ENT_QUOTES):$o)."</s>";
-			else $html1[] = ($mode?htmlspecialchars($o, ENT_QUOTES)."<br />":$o);
+			else $html1[] = ($mode?htmlspecialchars($o, ENT_QUOTES)."<br/>":$o);
 		}
 		foreach($t2 as $k=>$n) {
 			if(in_array($k, $out[1])) $html2[] = "<u>".($mode?htmlspecialchars($n, ENT_QUOTES):$n)."</u>";
-			else $html2[] = ($mode?htmlspecialchars($n, ENT_QUOTES)."<br />":$n);
+			else $html2[] = ($mode?htmlspecialchars($n, ENT_QUOTES)."<br/>":$n);
 		}
 		$html1 = implode(" ", $html1);
 		$html2 = implode(" ", $html2);
@@ -4042,7 +4047,7 @@ class flexicontent_upload
 		jimport('joomla.filesystem.file');
 		$file['altname'] = $file['name'];
 		if ($file['name'] !== JFile::makesafe($file['name'])) {
-			//$err = JText::_('FLEXI_WARNFILENAME').','.$file['name'].'|'.JFile::makesafe($file['name'])."<br />";
+			//$err = JText::_('FLEXI_WARNFILENAME').','.$file['name'].'|'.JFile::makesafe($file['name'])."<br/>";
 			//return false;
 			$file['name'] = date('Y-m-d-H-i-s').".".flexicontent_upload::getExt($file['name']);
 		}
@@ -5600,7 +5605,7 @@ class flexicontent_db
 		}
 		if ($order=='commented') {
 			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
-				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br>\n";
+				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br/>\n";
 				$order = $order_fallback;
 			} 
 		}
@@ -5645,7 +5650,7 @@ class flexicontent_db
 		}
 		if ($order=='commented') {
 			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
-				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br>\n";
+				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br/>\n";
 				$order = $order_fallback;
 			} 
 		}

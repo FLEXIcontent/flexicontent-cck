@@ -1,67 +1,42 @@
-var stateselector = {
-	makeSlider: function(){
-		this.sliders = $$('ul.statetoggler ul').map(function(ul){
-			return new Fx.Slide(ul, {
-				mode: 'vertical'
-			}).hide();
-		});
-
-		$$('ul.statetoggler a.opener').each(function(lnk, index){
-			lnk.addEvent('click', function(){
-				this.sliders[index].toggle();
-			}.bind(this));
-		}, this);
-		
-		$$('ul.statetoggler .options').each(function(lnk, index){
-			lnk.addEvent('click', function(){
-				this.sliders[index].toggle();
-			}.bind(this));
-		}, this);
-	},
-
-	init: function(){
-		this.makeSlider();
-	}
-};
-
-var processstate = new Class(  
+var fc_statehandler = new Class(  
 {  
 	options:  {
 		id: "",
 		script_url: "index.php?option=com_flexicontent&format=raw",
-		task: "setitemstate",
+		task: "",
 		state: ""
 	},
 
-	initialize: function( name, options ) {  
-		this.setOptions( options );
-		this.name = name;
+	initialize: function( options ) {  
+		for (var key in options) {
+			//console.log(key, options[key]);
+			this.options[key] = options[key];
+		}
 	},
 
-	dostate: function( state, id ) {
-		var url = this.options.script_url + "&task=" + this.options.task + "&id=" + id + "&state=" + state;
-		if (MooTools.version>='1.2.4') {
-			new Request.HTML({
-				url: url,
-				method: 'get',
-				evalScripts: false,
-				update: $('row' + id)
-				//,onComplete: hider
-			}).send();
-		} else {
-			var setstate = new Ajax(url, {
-				method: 'get',
-				evalScripts: false,
-				update: 'row' + id
-				//,onComplete: hider
-			});
-			setstate.request();
-		}
+	setstate: function( state, id ) {
+		var stateurl = this.options.script_url + "&task=" + this.options.task + "&id=" + id + "&state=" + state;
+		jQuery('#row' + id).empty().addClass('ajax-loader');
 		
-		//function hider(response) {
-		//	alert(response);
-		//}
+		jQuery.ajax({
+			url: stateurl,
+			dataType: "html",
+			success: function( data )
+			{
+				jQuery('#row' + id).removeClass('ajax-loader').html(data);
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+			}
+		});
 	}
 });
 
-processstate.implement( new Options, new Events );
+function fc_toggleStateSelector(el){
+	if ( jQuery(el).parent().find("ul").is(":hidden") ) {
+		jQuery(el).closest("ul.statetoggler").find(".stateopener").addClass("btn-warning");
+	} else {
+		jQuery(el).closest("ul.statetoggler").find(".stateopener").removeClass("btn-warning");
+	}
+	jQuery(el).parent().find("ul").slideToggle();
+}
