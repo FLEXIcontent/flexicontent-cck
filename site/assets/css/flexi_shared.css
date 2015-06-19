@@ -2,6 +2,14 @@
 /**
  * Upload Widget CSS
  */
+.fc-sys-upload-limit-box img,
+.fc-php-upload-limit-box img {
+	vertical-align: top;
+	float: none;
+	border: none;
+	margin: 0;
+}
+
 .upload-queue {
 	list-style: none;
 }

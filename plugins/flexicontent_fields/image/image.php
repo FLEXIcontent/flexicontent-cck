@@ -2869,14 +2869,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	
 	function getUploadLimitsTxt(&$field) {
 		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-		$hint_image = JHTML::image ( 'components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+		$hint_image = JHTML::image ( 'components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), '' );
 		
 		$upload_maxsize = $field->parameters->get('upload_maxsize');
 		$phpUploadLimit = flexicontent_upload::getPHPuploadLimit();
 		$server_limit_exceeded = $phpUploadLimit['value'] < $upload_maxsize;
 		
 		if ($server_limit_exceeded) {
-			$warn_image = JHTML::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+			$warn_image = JHTML::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), '' );
 		}
 		
 		$conf_limit_class = $server_limit_exceeded ? '' : 'badge-success';

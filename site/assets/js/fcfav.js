@@ -16,7 +16,7 @@ function FCFav(id, type) {
 	var div = document.getElementById('fcfav-reponse_'+type+'_'+id);
 	if (div)
 	{
-		div.innerHTML = _box_start + ' fcfavs-loading">' + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + fcfav_text[1] + '</div>';
+		div.innerHTML = _box_start + ' fcfavs-loading">' + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + Joomla.JText._('FLEXI_LOADING') + '</div>';
 	}
 	
 	jQuery.ajax({
@@ -25,38 +25,38 @@ function FCFav(id, type) {
 		success: function( response ) {
 			var link = document.getElementById('favlink_'+type+'_'+id);
 			if (div) {
-				if(response=='login')  div.innerHTML = onote_msg_box_start + fcfav_text[3] + '</div>';
-				else if(response>0 || response=='added')   div.innerHTML = osucc_msg_box_start + fcfav_text[2] + '</div>';
-				else if(response<0 || response=='removed') div.innerHTML = osucc_msg_box_start + fcfav_text[4] + '</div>';
+				if(response=='login')  div.innerHTML = onote_msg_box_start + Joomla.JText._('FLEXI_YOU_NEED_TO_LOGIN') + '</div>';
+				else if(response>0 || response=='added')   div.innerHTML = osucc_msg_box_start + Joomla.JText._('FLEXI_ADDED_TO_YOUR_FAVOURITES') + '</div>';
+				else if(response<0 || response=='removed') div.innerHTML = osucc_msg_box_start + Joomla.JText._('FLEXI_REMOVED_FROM_YOUR_FAVOURITES') + '</div>';
 				else if ( isNaN(parseFloat(response)) )    div.innerHTML = onote_msg_box_start + response + '</div>'; // some custom text
 			}
 			setTimeout(function(){
 				if(response>0){
 					if (div) {
 						var newtotal = Math.abs(response);
-						link.innerHTML='<img alt="'+fcfav_text[7]+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
-						var newfavs=newtotal+' '+fcfav_text[5];
-						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + fcfav_text[8] + '</div>' +' '+ _box_start + ' fcfavs-subscribers-count">' + fcfav_text[10] + ': ' + newfavs + '</div>';
+						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
+						var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
+						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>' +' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') + ': ' + newfavs + '</div>';
 					}
 				}
 				else if(response<0){
 					if (div) {
 						var newtotal = Math.abs(response);
-						link.innerHTML='<img alt="'+fcfav_text[7]+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
-						var newfavs=newtotal+' '+fcfav_text[5];
-						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + fcfav_text[9] + '</div>' +' '+ _box_start + ' fcfavs-subscribers-count">' + fcfav_text[10] +': ' + newfavs + '</div>';
+						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
+						var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
+						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>' +' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') +': ' + newfavs + '</div>';
 					}
 				} 
 				else if(response=='added'){
 					if (div) {
-						link.innerHTML='<img src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
-						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + fcfav_text[8] + '</div>';
+						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
+						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>';
 					}
 				}
 				else if(response=='removed'){
 					if (div) {
-						link.innerHTML='<img src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
-						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + fcfav_text[9] + '</div>';
+						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
+						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>';
 					}
 				}
 			},2000);

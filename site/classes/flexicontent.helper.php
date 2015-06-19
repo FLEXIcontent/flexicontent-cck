@@ -2633,24 +2633,22 @@ class flexicontent_html
 			$document	= JFactory::getDocument();
 			$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/fcfav.js' );
 			
+			JText::script('FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX',true);
+			JText::script('FLEXI_LOADING',true);
+			JText::script('FLEXI_ADDED_TO_YOUR_FAVOURITES',true);
+			JText::script('FLEXI_YOU_NEED_TO_LOGIN',true);
+			JText::script('FLEXI_REMOVED_FROM_YOUR_FAVOURITES',true);
+			JText::script('FLEXI_USERS',true);  //5
+			JText::script('FLEXI_FAVOURE',true);
+			JText::script('FLEXI_REMOVE_FAVOURITE',true); //7
+			JText::script('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED',true);
+			JText::script('FLEXI_FAVS_CLICK_TO_SUBSCRIBE',true);
+			JText::script('FLEXI_TOTAL',true);
 			$js = "
 				var fcfav_rfolder = '".JURI::root(true)."';
-				var fcfav_text=Array(
-					'".JText::_( 'FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX',true )."',
-					'".JText::_( 'FLEXI_LOADING',true )."',
-					'".JText::_( 'FLEXI_ADDED_TO_YOUR_FAVOURITES',true )."',
-					'".JText::_( 'FLEXI_YOU_NEED_TO_LOGIN',true )."',
-					'".JText::_( 'FLEXI_REMOVED_FROM_YOUR_FAVOURITES',true )."',
-					'".JText::_( 'FLEXI_USERS',true )."',
-					'".JText::_( 'FLEXI_FAVOURE',true )."',
-					'".JText::_( 'FLEXI_REMOVE_FAVOURITE',true )."',
-					'".JText::_( 'FLEXI_FAVS_YOU_HAVE_SUBSCRIBED',true )."',
-					'".JText::_( 'FLEXI_FAVS_CLICK_TO_SUBSCRIBE',true )."',
-					'".JText::_( 'FLEXI_TOTAL',true )."'
-					);
-				";
+			";
 			$document->addScriptDeclaration($js);
-
+			
 			$js_and_css_added = true;
 		}
 
@@ -3584,6 +3582,7 @@ class flexicontent_html
 			$err_msg = $err_msg ? $err_msg : JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', $btn_name );
 			$err_msg = addslashes($err_msg);
 			$confirm_msg = $confirm_msg ? $confirm_msg : JText::_('FLEXI_ARE_YOU_SURE');
+			$confirm_msg = addslashes($confirm_msg);
 
 			$full_js = $extra_js ."; submitbutton('$task');";
 			if ($confirm) {
