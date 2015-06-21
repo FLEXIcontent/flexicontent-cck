@@ -27,7 +27,6 @@ class FlexicontentViewTypes extends JViewLegacy{
 		
 		if      (FLEXI_J30GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
 		else if (FLEXI_J16GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j25.css';
-		else                  $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j15.css';
 		echo '
 		<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css" />
 		<link rel="stylesheet" href="'.$fc_css.'" />
@@ -35,14 +34,9 @@ class FlexicontentViewTypes extends JViewLegacy{
 		';
 		
 		$user = JFactory::getUser();
-		$db = JFactory::getDBO();
-		$query = 'SELECT id, name, itemscreatable'
-				. ' FROM #__flexicontent_types'
-				. ' WHERE published = 1'
-				. ' ORDER BY name ASC'
-				;
-		$db->setQuery($query);
-		$types = $db->loadObjectList();
+		
+		// Get types
+		$types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 		$types = is_array($types) ? $types : array();
 		
 		$ctrl_task = FLEXI_J16GE ? 'items.add' : 'add';

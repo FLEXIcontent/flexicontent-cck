@@ -1,73 +1,69 @@
-function FCFav(id) {
+function FCFav(id, type) {
 	//var url = location.href;  // entire url including querystring - also: window.location.href;
 	//var live_site = url.substring(0, url.indexOf('/', 14)) + fcfav_rfolder + '/';
+	type = (typeof type === "undefined" || type === null ) ? 'item' : type;
 	
 	var currentURL = window.location;
 	var live_site = currentURL.protocol + '//' + currentURL.host + fcfav_rfolder;
-	var lsXmlHttp;
 	
-	var div = document.getElementById('fcfav-reponse_'+id);
-	if (div) {
-		div.innerHTML='<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> '+'<small>'+fcfav_text[1]+'</small>';
+	var favurl = live_site+"/index.php?option=com_flexicontent&format=raw&task=ajaxfav&id="+id+'&type='+type
+
+	var onote_msg_box_start = '<div class="fc-mssg-inline fc-note fc-iblock fc-nobgimage" style="position: relative; margin: 1px 2px;">';
+	var osucc_msg_box_start = '<div class="fc-mssg-inline fc-success fc-iblock fc-nobgimage" style="z-index:1000; position: relative; margin: 1px 2px;">';
+	var _box_start = '<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage';
+	
+	
+	var div = document.getElementById('fcfav-reponse_'+type+'_'+id);
+	if (div)
+	{
+		div.innerHTML = _box_start + ' fcfavs-loading">' + '<img src="'+live_site+'/components/com_flexicontent/assets/images/ajax-loader.gif" border="0" align="absmiddle" /> ' + Joomla.JText._('FLEXI_LOADING') + '</div>';
 	}
 	
-	try	{
-		lsXmlHttp=new XMLHttpRequest();
-	} catch (e) {
-		try	{ lsXmlHttp=new ActiveXObject("Msxml2.XMLHTTP");
-		} catch (e) {
-			try { lsXmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
-			} catch (e) {
-				alert(fcfav_text[0]);
-				return false;
+	jQuery.ajax({
+		url: favurl,
+		dataType: "text",
+		success: function( response ) {
+			var link = document.getElementById('favlink_'+type+'_'+id);
+			if (div) {
+				if(response=='login')  div.innerHTML = onote_msg_box_start + Joomla.JText._('FLEXI_YOU_NEED_TO_LOGIN') + '</div>';
+				else if(response>0 || response=='added')   div.innerHTML = osucc_msg_box_start + Joomla.JText._('FLEXI_ADDED_TO_YOUR_FAVOURITES') + '</div>';
+				else if(response<0 || response=='removed') div.innerHTML = osucc_msg_box_start + Joomla.JText._('FLEXI_REMOVED_FROM_YOUR_FAVOURITES') + '</div>';
+				else if ( isNaN(parseFloat(response)) )    div.innerHTML = onote_msg_box_start + response + '</div>'; // some custom text
 			}
-		}
-	}
-	lsXmlHttp.onreadystatechange=function() {
-		var response;
-		var link = document.getElementById('favlink'+id);
-		if(lsXmlHttp.readyState==4){
-			setTimeout(function(){ 
-				if (div) {
-					response = lsXmlHttp.responseText; 
-					if(response>0 || response=='added') div.innerHTML='<small>'+fcfav_text[2]+'</small>';
-					if(response=='login') div.innerHTML='<small>'+fcfav_text[3]+'</small>';
-					if(response<0 || response=='removed') div.innerHTML='<small>'+fcfav_text[4]+'</small>';
-				}
-			},500);
 			setTimeout(function(){
 				if(response>0){
 					if (div) {
 						var newtotal = Math.abs(response);
-						link.innerHTML='<img alt="'+fcfav_text[7]+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
-						var newfavs=newtotal+' '+fcfav_text[5];
-						div.innerHTML='<small>['+newfavs+']</small>';
+						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
+						var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
+						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>' +' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') + ': ' + newfavs + '</div>';
 					}
 				}
 				else if(response<0){
 					if (div) {
 						var newtotal = Math.abs(response);
-						link.innerHTML='<img alt="'+fcfav_text[7]+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
-						var newfavs=newtotal+' '+fcfav_text[5];
-						div.innerHTML='<small>['+newfavs+']</small>';
+						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
+						var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
+						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>' +' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') +': ' + newfavs + '</div>';
 					}
 				} 
 				else if(response=='added'){
 					if (div) {
-						link.innerHTML='<img src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
-						div.innerHTML='';
+						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
+						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>';
 					}
 				}
 				else if(response=='removed'){
 					if (div) {
-						link.innerHTML='<img src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
-						div.innerHTML='';
+						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
+						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>';
 					}
 				}
-				
 			},2000);
+		},
+		error: function (xhr, ajaxOptions, thrownError) {
+			alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
 		}
-	}
-	lsXmlHttp.open("GET",live_site+"/index.php?option=com_flexicontent&format=raw&task=ajaxfav&id="+id,true);
-	lsXmlHttp.send(null);
+	});
+
 }

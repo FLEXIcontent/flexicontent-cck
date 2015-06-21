@@ -291,7 +291,6 @@ div.width-20 fieldset, div.width-30 fieldset, div.width-35 fieldset, div.width-4
 }
 
 div fieldset.panelform textarea {
-	width:auto !important;
 }
 
 div fieldset.panelform :not(.label-fcouter) label {
@@ -367,7 +366,8 @@ div table.admintable td {
 	text-align: left;
 	padding: 2px 4px 2px 8px;
 }
-div table.admintable td.key, div table.admintable td.paramlist_key {
+div table.admintable td.key,
+div table.admintable td.paramlist_key {
 	background-color: #F2F2F2;
 	border-bottom: 1px solid #D0D0D0;
 	border-right: 1px solid #D0D0D0;

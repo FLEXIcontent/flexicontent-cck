@@ -126,7 +126,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Query CLAUSE for match the given text
 		$db = JFactory::getDBO();
-		$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+		$quoted_text = $db->escape($newtext, true);
 		$quoted_text = $db->Quote( $quoted_text, false );
 		$_text_match  = ' MATCH (si.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 		
@@ -144,27 +144,11 @@ class FlexicontentController extends JControllerLegacy
 		$joinaccess = '';
 		/*if (!$show_noauth) {
 			$user = JFactory::getUser();
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$access_where .= ' AND ty.access IN (0,'.$aid_list.')';
-				$access_where .= ' AND mc.access IN (0,'.$aid_list.')';
-				$access_where .= ' AND  i.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$access_where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					$access_where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
-					$access_where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
-				} else {
-					$access_where .= ' AND ty.access <= '.$aid;
-					$access_where .= ' AND mc.access <= '.$aid;
-					$access_where .= ' AND  i.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$access_where .= ' AND ty.access IN (0,'.$aid_list.')';
+			$access_where .= ' AND mc.access IN (0,'.$aid_list.')';
+			$access_where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}*/
 		
 		
@@ -222,8 +206,8 @@ class FlexicontentController extends JControllerLegacy
 			if ( $this->isStopWord($_w, $tbl) ) continue;  // stopword or too common
 			
 			$options['Matches'][] = array(
-				'text' => $complete_words.' '.$_w,
-				'id' => $complete_words.' '.$_w
+				'text' => $complete_words.($complete_words ? ' ' : '').$_w,
+				'id' => $complete_words.($complete_words ? ' ' : '').$_w
 			);
 			$n++;
 			if ($n >= $pageSize) break;
@@ -235,7 +219,7 @@ class FlexicontentController extends JControllerLegacy
 	
 	function isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index') {
 		$db = JFactory::getDBO();
-		$quoted_word = FLEXI_J16GE ? $db->escape($word, true) : $db->getEscaped($word, true);
+		$quoted_word = $db->escape($word, true);
 		$query = 'SELECT '.$col
 			.' FROM #__'.$tbl
 			.' WHERE MATCH ('.$col.') AGAINST ("+'.$quoted_word.'")'
@@ -270,14 +254,14 @@ class FlexicontentController extends JControllerLegacy
 		$isnew   = !$model->getId();
 		$isOwner = $model->get('created_by') == $user->get('id');
 		
-		$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
+		$ctrl_task = 'task=items.';
 		
 		$fc_params  = JComponentHelper::getParams( 'com_flexicontent' );
 		$dolog      = $fc_params->get('print_logging_info');
 		
 		// Get the COMPONENT only parameters
 		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
-		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
+		$params = clone ($comp_params); // clone( JComponentHelper::getParams('com_flexicontent') );
 		
 		// Merge the type parameters
 		$tparams = $model->getTypeparams();
@@ -520,14 +504,14 @@ class FlexicontentController extends JControllerLegacy
 		// Check for new content
 		if ( ($isnew && !$canAdd) || (!$isnew && !$canEdit)) {
 			$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
-			if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
+			JError::raiseWarning(403, $msg);
 		}
 		
 		if ( !$canCreateType ) {
 			$msg = isset($types[$type_id]) ?
 				JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', JText::_($types[$type_id]->name) ) :
 				' Content Type '.$type_id.' was not found OR is not published';
-			if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
+			JError::raiseWarning(403, $msg);
 			return;
 		}
 		
@@ -890,6 +874,9 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Compatibility check: Layout is form and task is not set:  this is new item submit ...
 		if ( JRequest::getVar('layout', false) == "form" && !JRequest::getVar('task', false)) {
+			// 0 or 1, will allow browser to store without revalidating, null will let default (Joomla website) HTTP headers, e.g. re-validate
+			JFactory::getSession()->set('fc_cachable', 0, 'flexicontent');
+			
 			JRequest::setVar('task', 'add');
 			$this->add();
 		}
@@ -934,11 +921,9 @@ class FlexicontentController extends JControllerLegacy
 				$safeurlparams['__fc_user_id__'] = 'STRING';
 			}
 			
-			// Try to avoid browser warning message "Page has expired or similar"
-			//if (!$cachable) ini_set('session.cache_limiter', 'private');
-			//session_cache_limiter('nocache');
-			//header('Expires: Thu, 1 Jan 2000 00:00:00 GMT');
-			//if (!$cachable) session_cache_limiter('private_no_expire, cache');
+			// Moved code for browser's cache control to system plugin to do at the latest possible point
+			// 0 or 1, will allow browser to store without revalidating, null will let default (Joomla website) HTTP headers, e.g. re-validate
+			JFactory::getSession()->set('fc_cachable', (int)$cachable, 'flexicontent');
 			
 			//echo "cacheable: ".(int)$cachable." - " . print_r($safeurlparams, true) ."<br/>";
 			parent::display($cachable, $safeurlparams);
@@ -1028,22 +1013,13 @@ class FlexicontentController extends JControllerLegacy
 		// CHECK-IN the item if user can edit
 		if ($model->get('id') > 1)
 		{
-			if (FLEXI_J16GE) {
-				$asset = 'com_content.article.' . $model->get('id');
-				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
-				// ALTERNATIVE 1
-				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
-				// ALTERNATIVE 2
-				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
-			} else if ($user->gid >= 25) {
-				$canEdit = true;
-			} else if (FLEXI_ACCESS) {
-				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $isOwner) ;
-			} else {
-				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $isOwner);
-			}
+			$asset = 'com_content.article.' . $model->get('id');
+			$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+			// ALTERNATIVE 1
+			//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+			// ALTERNATIVE 2
+			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
+			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
 			
 			if ( !$canEdit ) {
 				// No edit privilege, check if item is editable till logoff
@@ -1066,7 +1042,8 @@ class FlexicontentController extends JControllerLegacy
 		
 		$this->setRedirect($referer);
 	}
-
+	
+	
 	/**
 	 * Method of the voting without AJAX. Exists for compatibility reasons, since it can be called by Joomla's content vote plugin.
 	 *
@@ -1093,7 +1070,8 @@ class FlexicontentController extends JControllerLegacy
 		$msg = '';
 		$this->setRedirect($url, $msg );
 	}
-
+	
+	
 	/**
 	 *  Ajax favourites
 	 *
@@ -1104,21 +1082,27 @@ class FlexicontentController extends JControllerLegacy
 	{
 		$user  = JFactory::getUser();
 		$db    = JFactory::getDBO();
-		$model = $this->getModel(FLEXI_ITEMVIEW);
 		$id    = JRequest::getInt('id', 0);
+		$type  = JRequest::getCMD('type', 'item');
+		if ($type!='item' && $type!='category') {
+			echo 'Type: '. $type .' not supported';
+			jexit();
+		}
+		$model = $this->getModel($type);
 		
 		if (!$user->get('id'))
 		{
 			echo 'login';
+			jexit();
 		}
 		else
 		{
 			$isfav = $model->getFavoured();
-
+			
 			if ($isfav)
 			{
 				$model->removefav();
-				$favs 	= $model->getFavourites();
+				$favs = $model->getFavourites();
 				if ($favs == 0) {
 					echo 'removed';
 				} else {
@@ -1128,7 +1112,7 @@ class FlexicontentController extends JControllerLegacy
 			else
 			{
 				$model->addfav();
-				$favs 	= $model->getFavourites();
+				$favs = $model->getFavourites();
 				if ($favs == 0) {
 					echo 'added';
 				} else {
@@ -1136,8 +1120,94 @@ class FlexicontentController extends JControllerLegacy
 				}
 			}
 		}
+		jexit();
 	}
-
+	
+	
+	/**
+	 *  Ajax review form
+	 *
+	 * @access public
+	 * @since 3.0
+	 */
+	function getreviewform()
+	{
+		$content_id = JRequest::getInt('content_id', '' );
+		$type    = JRequest::getInt('review_type', '' );
+		$user_id = $user = JFactory::getUser()->id;
+		
+		$db	= JFactory::getDBO();
+		
+		
+		// ******************************
+		// Get voting field configuration
+		// ******************************
+		
+		if (!$content_id) {
+			$error = "Content_id is zero";
+		}
+		else {
+			$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
+			$field = $db->loadObject();
+			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+			$item->load( $content_id );
+			FlexicontentFields::loadFieldConfig($field, $item);
+			$allow_reviews = (int)$field->parameters->get('allow_reviews', 1);
+			if (!$allow_reviews) {
+				$error = "Reviews are disabled";
+			}
+		}
+		
+		if (!empty($error)) {
+			$result	= new stdClass();
+			$error = '
+			<div class="fc-mssg fc-warning fc-nobgimage">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				'.$error.'
+			</div>';
+			$result->html = $error;
+			echo json_encode($result);
+			jexit();
+		}
+		
+		if ($user_id)
+		{
+			$query = "SELECT * "
+				." FROM #__flexicontent_review AS r"
+				." WHERE r.content_id=" . $content_id
+				."  AND r.type=". $type
+				."  AND r.user_id=". $user_id;				
+			$db->setQuery($query);
+			$review = $db->loadColumn();
+		}
+		
+		$result	= new stdClass();
+		$result->html = '
+		<form id="fcvote_review_form_'.$content_id.'" name="fcvote_form_'.$content_id.'">
+			<table class="fc-form-tbl">
+				<tr class="fcvote_review_form_title">
+					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TITLE').'</label></td>
+					<td><input type="text" name="title" size="120"/></td>
+				</tr>
+				<tr class="fcvote_review_form_email">
+					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_EMAIL').'</label></td>
+					<td><input type="email" name="email" size="120"/></td>
+				</tr>
+				<tr class="fcvote_review_form_text">
+					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TEXT').'</label></td>
+					<td class="top"><textarea name="text" rows="12" cols="120"></textarea></td>
+				</tr>
+				<tr class="fcvote_review_form_text">
+					<td colspan="2"><input type="submit" class="btn btn-primary fcvote_review_form_submit_btn" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/></td>
+				</tr>
+			</table>
+		</form>';
+		
+		echo json_encode($result);
+		jexit();
+	}
+	
+	
 	/**
 	 *  Method for voting (ajax)
 	 *
@@ -1159,9 +1229,40 @@ class FlexicontentController extends JControllerLegacy
 		$xid 			= JRequest::getVar('xid');
 		
 		// Compatibility in case the voting originates from joomla's voting plugin
-		if ($no_ajax) {
-			// Joomla 's content plugin uses 'id' HTTP request variable
-			$cid = JRequest::getInt('id');
+		if ($no_ajax && !$cid)
+		{
+			$cid = JRequest::getInt('id'); // Joomla 's content plugin uses 'id' HTTP request variable
+		}
+		
+		
+		// *******************************************************************
+		// Check for invalid xid (according to voting field/type configuration
+		// *******************************************************************
+		
+		$xid = empty($xid) ? 'main' : $xid;
+		$int_xid  = (int)$xid;
+		if ($xid!='main' && !$int_xid)
+		{
+			// Rare/unreachable voting ERROR
+			$error = "ajaxvote(): invalid xid '".$xid."' was given";
+			
+			// Set responce
+			if ($no_ajax) {
+				$app->enqueueMessage( $error, 'notice' );
+				return;
+			} else {
+				$result	= new stdClass();
+				$result->percentage = '';
+				$result->htmlrating = '';
+				$error = '
+				<div class="fc-mssg fc-warning fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.$error.'
+				</div>';
+				if ($int_xid) $result->message = $error;  else $result->message_main = $error;
+				echo json_encode($result);
+				jexit();
+			}
 		}
 		
 		
@@ -1182,15 +1283,21 @@ class FlexicontentController extends JControllerLegacy
 		$min_rating = 1;
 		$max_rating = $rating_resolution;
 		
+		$main_counter  = (int)$field->parameters->get('main_counter', 1);
+		$extra_counter = (int)$field->parameters->get('extra_counter', 1);
+		$main_counter_show_label  = (int)$field->parameters->get('main_counter_show_label', 1);
+		$extra_counter_show_label = (int)$field->parameters->get('extra_counter_show_label', 1);
+		$main_counter_show_percentage  = (int)$field->parameters->get('main_counter_show_percentage', 0);
+		$extra_counter_show_percentage = (int)$field->parameters->get('extra_counter_show_percentage', 0);
+		
 		
 		// *****************************************************
 		// Find if user has the ACCESS level required for voting
 		// *****************************************************
 		
-		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
-		else $aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-		$acclvl = (int) $field->parameters->get('submit_acclvl', FLEXI_J16GE ? 1 : 0);
-		$has_acclvl = FLEXI_J16GE ? in_array($acclvl, $aid_arr) : $acclvl <= $aid;
+		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+		$acclvl = (int) $field->parameters->get('submit_acclvl', 1);
+		$has_acclvl = in_array($acclvl, $aid_arr);
 		
 		
 		// *********************************
@@ -1208,16 +1315,11 @@ class FlexicontentController extends JControllerLegacy
 			if ( !$no_acc_msg )
 			{
 				// Find name of required Access Level
-				if (FLEXI_J16GE) {
-					$acclvl_name = '';
-					if ($acclvl) {
-						$db->setQuery('SELECT title FROM #__viewlevels as level WHERE level.id='.$acclvl);
-						$acclvl_name = $db->loadResult();
-						if ( !$acclvl_name ) $acclvl_name = "Access Level: ".$acclvl." not found/was deleted";
-					}
-				} else {
-					$acclvl_names = array(0=>'Public', 1=>'Registered', 2=>'Special');
-					$acclvl_name = $acclvl_names[$acclvl];
+				$acclvl_name = '';
+				if ($acclvl) {
+					$db->setQuery('SELECT title FROM #__viewlevels as level WHERE level.id='.$acclvl);
+					$acclvl_name = $db->loadResult();
+					if ( !$acclvl_name ) $acclvl_name = "Access Level: ".$acclvl." not found/was deleted";
 				}
 				$no_acc_msg = JText::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
 			}
@@ -1231,120 +1333,289 @@ class FlexicontentController extends JControllerLegacy
 		if ( !$has_acclvl  ||  ($user_rating < $min_rating && $user_rating > $max_rating) )
 		{
 			// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
-			$result	= new stdClass();
-			$result->percentage = '';
-			$result->htmlrating = '';
-			$result->html = !$has_acclvl ? $no_acc_msg : JText::sprintf( 'FLEXI_VOTING_OUT_OF_RANGE', $min_rating, $max_rating);
+			$error = !$has_acclvl ? $no_acc_msg : JText::sprintf( 'FLEXI_VOTE_OUT_OF_RANGE', $min_rating, $max_rating);
 			
 			// Set responce
 			if ($no_ajax) {
-				$app->enqueueMessage( $result->html, 'notice' );
+				$app->enqueueMessage( $error, 'notice' );
 				return;
 			} else {
+				$result	= new stdClass();
+				$result->percentage = '';
+				$result->htmlrating = '';
+				$error = '
+				<div class="fc-mssg fc-warning fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.$error.'
+				</div>';
+				if ($int_xid) $result->message = $error;  else $result->message_main = $error;
 				echo json_encode($result);
 				jexit();
 			}
 		}
 		
 		
-		// *************************************
-		// Retreive last vote for the given item
-		// *************************************
+		// *************************************************
+		// Check extra vote exists and get extra votes types
+		// *************************************************
 		
-		$currip = ( phpversion() <= '4.2.1' ? @getenv( 'REMOTE_ADDR' ) : $_SERVER['REMOTE_ADDR'] );
-		$currip_quoted = $db->Quote( $currip );
-		$dbtbl = !(int)$xid ? '#__content_rating' : '#__flexicontent_items_extravote';  // Choose db table to store vote (normal or extra)
-		$and_extra_id = (int)$xid ? ' AND field_id = '.(int)$xid : '';     // second part is for defining the vote type in case of extra vote
+		$xids = array();
+		$enable_extra_votes = $field->parameters->get('enable_extra_votes', '');
+		if ($enable_extra_votes)
+		{
+			// Retrieve and split-up extra vote types, (removing last one if empty)
+			$extra_votes = $field->parameters->get('extra_votes', '');
+			$extra_votes = preg_split( "/[\s]*%%[\s]*/", $field->parameters->get('extra_votes', '') );
+			if ( empty($extra_votes[count($extra_votes)-1]) )
+			{
+				unset( $extra_votes[count($extra_votes)-1] );
+			}
 			
-		$query = ' SELECT *'
-			. ' FROM '.$dbtbl.' AS a '
-			. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
-			
-		$db->setQuery( $query );
-		$votesdb = $db->loadObject();
+			// Split extra voting ids (xid) and their titles
+			foreach ($extra_votes as $extra_vote) {
+				@list($extra_id, $extra_title, $extra_desc) = explode("##", $extra_vote);
+				$xids[$extra_id] = 1;
+			}
+		}
+		
+		if ( !$int_xid && count($xids) )
+		{
+			$error = JText::_('FLEXI_VOTE_AVERAGE_RATING_CALCULATED_AUTOMATICALLY');
+		}
+		
+		if ( $int_xid && !isset($xids[$int_xid]) )
+		{
+			// Rare/unreachable voting ERROR
+			$error = !$enable_extra_votes ? JText::_('FLEXI_VOTE_COMPOSITE_VOTING_IS_DISABLED') : 'Voting characteristic with id: '.$int_xid .' was not found';
+		}
+		
+		if ( isset($error) ) {
+			// Set responce
+			if ($no_ajax) {
+				$app->enqueueMessage( $error, 'notice' );
+				return;
+			} else {
+				$result	= new stdClass();
+				$result->percentage = '';
+				$result->htmlrating = '';
+				$error = '
+				<div class="fc-mssg fc-warning fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.$error.'
+				</div>';
+				if ($int_xid) $result->message = $error;  else $result->message_main = $error;
+				echo json_encode($result);
+				jexit();
+			}
+		}
 		
 		
 		// ********************************************************************************************
 		// Check: item id exists in our voting logging SESSION (array) variable, to avoid double voting
 		// ********************************************************************************************
 		
-		$votestamp = $session->get('votestamp', array(),'flexicontent');
-		if ( !isset($votestamp[$cid]) || !is_array($votestamp[$cid]) )
+		$vote_history = $session->get('vote_history', array(),'flexicontent');
+		if ( !isset($vote_history[$cid]) || !is_array($vote_history[$cid]) )
 		{
-			$votestamp[$cid] = array();
-		}
-		$votecheck = isset($votestamp[$cid][$xid]);
-			
-		
-		// ***********************************************************
-		// Voting access allowed and valid, but we will need to make
-		// some more checks (IF voting record exists AND double voting)
-		// ***********************************************************
-		$result	= new stdClass();
-		
-		// Voting record does not exist for this item, accept user's vote and insert new voting record in the db
-		if ( !$votesdb ) {
-			$query = ' INSERT '.$dbtbl
-				. ' SET content_id = '.(int)$cid.', '
-				. '  lastip = '.$currip_quoted.', '
-				. '  rating_sum = '.(int)$user_rating.', '
-				. '  rating_count = 1 '
-				. ( (int)$xid ? ', field_id = '.(int)$xid : '' );
-				
-			$db->setQuery( $query );
-			$db->query() or die( $db->stderr() );
-			$result->ratingcount = 1;
-			$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTE' ) . ')';
+			$vote_history[$cid] = array();
 		}
 		
-		// Voting record exists for this item, check if user has already voted
-		else {
+		// Allow user to change his vote
+		$old_rating = isset($vote_history[$cid][$xid]) ? (int) $vote_history[$cid][$xid] : 0;
+		$old_main_rating = isset($vote_history[$cid]['main']) ? (int) $vote_history[$cid]['main'] : 0;
+		
+		// For the case that the browser was not close we can get rating from user's session and allow to change the vote
+		$rating_diff = $user_rating - $old_rating;
+		
+		// Accept votes only if user has voted for all cases, but do not store session yet
+		$main_rating = 0;
+		if (!count($xids))
+		{
+			$voteIsComplete = true;
+			$main_rating = $user_rating;
+			$vote_history[$cid]['main'] = $main_rating;
+		}
+		else
+		{
+			if (!$int_xid) die('unreachable int_xid is zero');
 			
-			// NOTE: it is not so good way to check using ip, since 2 users may have same IP,
-			// but for compatibility with standard joomla and for stronger security we will do it
-			if ( !$votecheck && $currip!=$votesdb->lastip ) 
-			{
-				// vote accepted update DB
-				$query = " UPDATE ".$dbtbl
-				. ' SET rating_count = rating_count + 1, '
-				. '  rating_sum = rating_sum + '.(int)$user_rating.', '
-				. '  lastip = '.$currip_quoted
-				. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
-				
-				$db->setQuery( $query );
-				$db->query() or die( $db->stderr() );
-				$result->ratingcount = $votesdb->rating_count + 1;
-				$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTES' ) . ')';
-			} 
-			else 
-			{
-				// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
-				
-				//$result->percentage = ( $votesdb->rating_sum / $votesdb->rating_count ) * (100/$rating_resolution);
-				//$result->htmlrating = '(' . $votesdb->rating_count .' '. JText::_( 'FLEXI_VOTES' ) . ')';
-				$result->html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );
-				if ($no_ajax) {
-					$app->enqueueMessage( $result->html, 'notice' );
-					return;
-				} else {
-					echo json_encode($result);
-					jexit();
+			$voteIsComplete = true;
+			$main_rating = 0;
+			$rating_completed = 0;
+			
+			// Add current vote
+			$vote_history[$cid][$int_xid] = $user_rating;
+			
+			foreach($xids as $_xid => $i) {
+				if ( !isset($vote_history[$cid][$_xid]) ) {
+					$voteIsComplete = false;
+					continue;
 				}
+				$rating_completed++;
+				$main_rating += (int)$vote_history[$cid][$_xid];
+			}
+			if ($voteIsComplete) {
+				$main_rating = (int)($main_rating / count($xids));
+				$vote_history[$cid]['main'] = $main_rating;
+			}
+		}
+		$main_rating_diff = $main_rating - $old_main_rating;
+		
+		
+		// *************************************
+		// Retreive last vote for the given item
+		// *************************************
+		
+		$currip = $_SERVER['REMOTE_ADDR'];
+		$currip_quoted = $db->Quote( $currip );
+		$result	= new stdClass();
+		foreach($vote_history[$cid] as $_xid => $_rating)
+		{
+			if (!$voteIsComplete && $_xid!=$xid) continue; // nothing todo
+			//echo $_xid."\n";
+			
+			$dbtbl = !(int)$_xid ? '#__content_rating' : '#__flexicontent_items_extravote';  // Choose db table to store vote (normal or extra)
+			$and_extra_id = (int)$_xid ? ' AND field_id = '.(int)$_xid : '';     // second part is for defining the vote type in case of extra vote
+			
+			$query = ' SELECT *'
+				. ' FROM '.$dbtbl.' AS a '
+				. ' WHERE content_id = '.(int)$cid
+				. ' '.$and_extra_id;
+			$db->setQuery( $query );
+			$db_itemratings = $db->loadObject();
+			
+			
+			// ***********************************************************
+			// Voting access allowed and valid, but we will need to make
+			// some more checks (IF voting record exists AND double voting)
+			// ***********************************************************
+			
+			// Voting record does not exist for this item, accept user's vote and insert new voting record in the db
+			if ( !$db_itemratings ) {
+				if ($voteIsComplete) {
+					$query = ' INSERT '.$dbtbl
+						. ' SET content_id = '.(int)$cid.', '
+						. '  lastip = '.$currip_quoted.', '
+						. '  rating_sum = '.(int)$user_rating.', '
+						. '  rating_count = 1 '
+						. ( (int)$_xid ? ', field_id = '.(int)$_xid : '' );
+						
+					$db->setQuery( $query );
+					$db->query() or die( $db->stderr() );
+				}
+			}
+			
+			// Voting record exists for this item, check if user has already voted
+			else {
+				if ( (int)$_xid && !isset($xids[$_xid]) && $_xid!='main' ) continue;  // just in case there are some old records in session table 'vote_history'
+				//echo $db_itemratings->rating_sum. " - ".$rating_diff. "\n";
+				
+				// If item is not in the user's voting history (session), then we check if this IP has voted for this item recently and refuse to accept vote
+				if ( $_xid==$xid && !$old_rating && $currip==$db_itemratings->lastip ) 
+				{
+					// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
+					//$result->percentage = ( $db_itemratings->rating_sum / $db_itemratings->rating_count ) * (100/$rating_resolution);
+					//$result->htmlrating = $db_itemratings->rating_count .' '. JText::_( 'FLEXI_VOTES' );
+					$error = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );//.', IP: '.$db_itemratings->lastip;
+					if ($int_xid) $result->message = $error;  else $result->message_main = $error;
+					
+					if ($no_ajax) {
+						$app->enqueueMessage( $int_xid ? $result->html : $result->html_main, 'notice' );
+						return;
+					} else {
+						$result	= new stdClass();
+						$result->percentage = '';
+						$result->htmlrating = '';
+						$error = '
+						<div class="fc-mssg fc-warning fc-nobgimage">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							'.$error.'
+						</div>';
+						if ($int_xid) $result->message = $error;  else $result->message_main = $error;
+						echo json_encode($result);
+						jexit();
+					}
+				}
+				
+				// If voting is completed, add all rating into DB -OR- if user has updated existing vote (update in DB only the current sub-vote and the main vote)
+				if ( $voteIsComplete && (!$old_main_rating || $_xid=='main' || (int)$_xid==$xid) )
+				{
+					// vote accepted update DB
+					$query = " UPDATE ".$dbtbl
+					. ' SET rating_count = rating_count + '.($old_rating ? 0 : 1)
+					. '  , rating_sum = rating_sum + '.( $_xid=='main'  ?  ($old_main_rating ? $main_rating_diff : $main_rating)  :  ($_xid==$xid && $old_main_rating ? $rating_diff : $_rating) )
+					. '  , lastip = '.$currip_quoted
+					. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
+					
+					$db->setQuery( $query );
+					$db->query() or die( $db->stderr() );
+				}
+			}
+			
+			if ($_xid=='main') {
+				$result->rating_sum_main  = (@ (int) $db_itemratings->rating_sum)   + ($old_main_rating ? $main_rating_diff : $main_rating);
+				$result->ratingcount_main = (@ (int) $db_itemratings->rating_count) + ($old_main_rating ? 0 : 1);
+				$result->percentage_main  = ($result->rating_sum_main / $result->ratingcount_main) * (100 / $rating_resolution);
+				$result->htmlrating_main  = ($main_counter ?
+					$result->ratingcount_main .($main_counter_show_label ? ' '. JText::_( @ $db_itemratings ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '') .($main_counter_show_percentage ? ' - ' : '')
+					: '')
+					.($main_counter_show_percentage ? (int)$result->percentage_main.'%' : '');
+			}
+			// In case of composite voting being OFF only the above will be added
+			else if ($_xid==$xid) {
+				$result->rating_sum  = (@ (int) $db_itemratings->rating_sum)   + ($old_main_rating ? $rating_diff : $_rating);
+				$result->ratingcount = (@ (int) $db_itemratings->rating_count) + ($old_main_rating ? 0 : 1);
+				$result->percentage  = ($result->rating_sum / $result->ratingcount) * (100 / $rating_resolution);
+				$result->htmlrating  = ($extra_counter ?
+					$result->ratingcount . ($extra_counter_show_label ? ' '. JText::_( @ $db_itemratings ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '')	.($extra_counter_show_percentage ? ' - ' : '')
+					: '')
+					.($extra_counter_show_percentage ? (int)$result->percentage.'%' : '');
 			}
 		}
 		
-		// Set the current item id, in our voting logging SESSION (array) variable, to avoid future double voting
-		$votestamp[$cid][$xid] = 1;
-		$session->set('votestamp', $votestamp, 'flexicontent');
 		
 		// Prepare responce
-		$rating_sum = (@ $votesdb ? $votesdb->rating_sum : 0) + (int) $user_rating;
-		$result->percentage = ($rating_sum / $result->ratingcount) * (100 / $rating_resolution);
-		$result->html = JText::_( 'FLEXI_THANK_YOU_FOR_VOTING' );
+		$html = ($old_rating ?
+			''.(100*($old_rating / $max_rating)) .'% => '. (100*($user_rating / $max_rating)).'%' :
+			''.(100*($user_rating / $max_rating)).'%');
+		if ($xid=='main') $result->html_main = $html;
+		else $result->html = $html;
+		
+		if ($int_xid) {
+			$result->message = '
+				<div class="fc-mssg fc-warning fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.JText::_('FLEXI_VOTE_YOUR_RATING').': '.(100*($user_rating / $max_rating)).'%
+				</div>';
+			if ( ! $voteIsComplete ) {
+				$result->message_main = '
+					<div class="fc-mssg fc-warning fc-nobgimage">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+						'.JText::sprintf('FLEXI_VOTE_PLEASE_COMPLETE_VOTING', $rating_completed, count($xids)).'
+					</div>';
+			} else {
+				$result->html_main = JText::_($old_main_rating ? 'FLEXI_VOTE_AVERAGE_RATING_UPDATED' : 'FLEXI_VOTE_AVERAGE_RATING_SUBMITTED');
+				$result->message_main = '
+				<div class="fc-mssg fc-success fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.JText::_( $old_rating ? 'FLEXI_VOTE_YOUR_OLD_AVERAGE_RATING_WAS_UPDATED' : 'FLEXI_VOTE_YOUR_AVERAGE_RATING_STORED' ).':
+					<b>'.($old_main_rating ? (100*($old_main_rating / $max_rating)) .'% => ' : '').  (100*($main_rating / $max_rating)).'%</b>
+				</div>';
+			}
+		} else {
+			$result->message_main ='
+				<div class="fc-mssg fc-success fc-nobgimage">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					'.JText::_( $old_rating ? 'FLEXI_VOTE_YOUR_OLD_RATING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' ).'
+				</div>';
+		}
+		
+		// Set the voting data, into SESSION
+		$session->set('vote_history', $vote_history, 'flexicontent');
 		
 		// Finally set responce
 		if ($no_ajax) {
-			$app->enqueueMessage( $result->html, 'notice' );
+			$app->enqueueMessage( $int_xid ? $result->message_main.'<br/>'.$result->message : $result->message_main, 'notice' );
 			return;
 		} else {
 			echo json_encode($result);
@@ -1363,7 +1634,7 @@ class FlexicontentController extends JControllerLegacy
 	function getajaxtags()
 	{
 		$user = JFactory::getUser();
-		$authorized = FLEXI_J16GE ? $user->authorise('com_flexicontent', 'newtags') : $user->authorize('com_flexicontent', 'newtags');
+		$authorized = $user->authorise('com_flexicontent', 'newtags');
 
 		if (!$authorized) return;
 		
@@ -1415,7 +1686,7 @@ class FlexicontentController extends JControllerLegacy
 
 		$user = JFactory::getUser();
 		$name = JRequest::getString('name', '');
-		$authorized = FLEXI_J16GE ? $user->authorise('com_flexicontent', 'newtags') : $user->authorize('com_flexicontent', 'newtags');
+		$authorized = $user->authorise('com_flexicontent', 'newtags');
 
 		if (!$authorized) return;
 		
@@ -1468,7 +1739,7 @@ class FlexicontentController extends JControllerLegacy
 			$msg = JText::_( 'FLEXI_FAVOURITE_ADDED' );
 		} else {
 			$msg = JText::_( 'FLEXI_FAVOURITE_NOT_ADDED' ).': '.$model->getError();
-			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
+			JError::raiseWarning(500, $msg);
 		}
 		
 		$cache = JFactory::getCache('com_flexicontent');
@@ -1494,7 +1765,7 @@ class FlexicontentController extends JControllerLegacy
 			$msg = JText::_( 'FLEXI_FAVOURITE_REMOVED' );
 		} else {
 			$msg = JText::_( 'FLEXI_FAVOURITE_NOT_REMOVED' ).': '.$model->getError();
-			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
+			JError::raiseWarning(500, $msg);
 		}
 		
 		$cache = JFactory::getCache('com_flexicontent');
@@ -1718,7 +1989,7 @@ class FlexicontentController extends JControllerLegacy
 				$q = 'SELECT attribs, name, field_type FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
 				$db->setQuery($q);
 				$fld = $db->loadObject();
-				$fields_conf[$field_id] = FLEXI_J16GE ? new JRegistry($fld->attribs) : new JParameter($fld->attribs);
+				$fields_conf[$field_id] = new JRegistry($fld->attribs);
 				$fields_props[$field_id] = $fld;
 			}
 			$field_type = $fields_props[$field_id]->field_type;
@@ -1869,15 +2140,23 @@ class FlexicontentController extends JControllerLegacy
 			
 			if ($file->url)
 			{
+				// Check for empty URL
+				$url = $file->filename_original ? $file->filename_original : $file->filename;
+				if (empty($url)) {
+					$msg = "File URL is empty: ".$file->url;
+					$app->enqueueMessage($msg, 'error');
+					return false;
+				}
+				
 				// skip url-based file if downloading multiple files
 				if ($task=='download_tree') {
-					$msg = "Skipped URL based file: ".$file->url;
+					$msg = "Skipped URL based file: ".$url;
 					$app->enqueueMessage($msg, 'notice');
 					continue;
 				}
 				
 				// redirect to the file download link
-				@header("Location: ".$file->filename."");
+				@header("Location: ".$url."");
 				$app->close();
 			}
 			
@@ -1939,7 +2218,7 @@ class FlexicontentController extends JControllerLegacy
 						.' FROM #__flexicontent_fields_item_relations '
 						.' WHERE field_id = ' . $send_to_email_field .' AND item_id='.$content_id;
 					$db->setQuery($q);
-					$email_values = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+					$email_values = $db->loadColumn();
 					
 					foreach ($email_values as $i => $email_value) {
 						if ( @unserialize($email_value)!== false || $email_value === 'b:0;' ) {
@@ -2046,43 +2325,47 @@ class FlexicontentController extends JControllerLegacy
 			
 			// Get file list recursively, and calculate archive filename
 			$fileslist   = JFolder::files($targetpath, '.', $recurse=true, $fullpath=true);
-			$archivename = $tmp_ffname . (FLEXI_J16GE ? '.zip' : '.tar.gz');
+			$archivename = $tmp_ffname . '.zip';
 			$archivepath = JPath::clean( $app->getCfg('tmp_path').DS.$archivename );
 			
+			
+			// ******************
 			// Create the archive
-			if (!FLEXI_J16GE) {
-				JArchive::create($archivepath, $fileslist, 'gz', '', $targetpath);
-			} else {
-				/*$app = JFactory::getApplication('administrator');
-				$files = array();
-				foreach ($fileslist as $i => $filename) {
-					$files[$i]=array();
-					$files[$i]['name'] = preg_replace("%^(\\\|/)%", "", str_replace($targetpath, "", $filename) );  // STRIP PATH for filename inside zip
-					$files[$i]['data'] = implode('', file($filename));   // READ contents into string, here we use full path
-					$files[$i]['time'] = time();
-				}
-				
-				$packager = JArchive::getAdapter('zip');
-				if (!$packager->create($archivepath, $files)) {
-					$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
-					$app->enqueueMessage($msg, 'notice');
-					$this->setRedirect('index.php', '');
-					return;
-				}*/
-				
-				$za = new flexicontent_zip();
-				$res = $za->open($archivepath, ZipArchive::CREATE);
-				if($res !== true) {
-					$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
-					$app->enqueueMessage($msg, 'notice');
-					$this->setRedirect('index.php', '');
-					return;
-				}
-				$za->addDir($targetpath, "");
-				$za->close();
+			// ******************
+			
+			/*$app = JFactory::getApplication('administrator');
+			$files = array();
+			foreach ($fileslist as $i => $filename) {
+				$files[$i]=array();
+				$files[$i]['name'] = preg_replace("%^(\\\|/)%", "", str_replace($targetpath, "", $filename) );  // STRIP PATH for filename inside zip
+				$files[$i]['data'] = implode('', file($filename));   // READ contents into string, here we use full path
+				$files[$i]['time'] = time();
 			}
 			
+			$packager = JArchive::getAdapter('zip');
+			if (!$packager->create($archivepath, $files)) {
+				$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
+				$app->enqueueMessage($msg, 'notice');
+				$this->setRedirect('index.php', '');
+				return;
+			}*/
+			
+			$za = new flexicontent_zip();
+			$res = $za->open($archivepath, ZipArchive::CREATE);
+			if($res !== true) {
+				$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
+				$app->enqueueMessage($msg, 'notice');
+				$this->setRedirect('index.php', '');
+				return;
+			}
+			$za->addDir($targetpath, "");
+			$za->close();
+			
+			
+			// *********************************
 			// Remove temporary folder structure
+			// *********************************
+			
 			if (!JFolder::delete(($targetpath)) ) {
 				$msg = "Temporary folder ". $targetpath ." could not be deleted";
 				$app->enqueueMessage($msg, 'notice');
@@ -2104,7 +2387,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			
 			$dlfile = new stdClass();
-			$dlfile->filename = 'cart_files_'.date('m-d-Y_H-i-s').(FLEXI_J16GE ? '.zip' : '.tar.gz');   // a friendly name instead of  $archivename
+			$dlfile->filename = 'cart_files_'.date('m-d-Y_H-i-s'). '.zip';   // a friendly name instead of  $archivename
 			$dlfile->abspath  = $archivepath;
 		} else {
 			$dlfile = reset($valid_files);
@@ -2276,8 +2559,12 @@ class FlexicontentController extends JControllerLegacy
 				.' AND valueorder = ' . $order
 				;
 		$db->setQuery($query);
-		if (!$db->query()) {
-			return JError::raiseWarning( 500, $db->getError() );
+		try {
+			$db->query();
+		}
+		catch (Exception $e) {
+			JError::raiseWarning( 500, $e->getMessage() );
+			return;
 		}
 		
 		
@@ -2299,79 +2586,26 @@ class FlexicontentController extends JControllerLegacy
 		// Access Flags for: content item and field
 		if ( $get_select_access ) {
 			$select_access = '';
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				if ($include_file) $select_access .= ', CASE WHEN'.
-					'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
-				$select_access .= ', CASE WHEN'.
-					'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
-				$select_access .= ', CASE WHEN'.
-					'  ty.access IN (0,'.$aid_list.') AND '.
-					'   c.access IN (0,'.$aid_list.') AND '.
-					'   i.access IN (0,'.$aid_list.')'.
-					' THEN 1 ELSE 0 END AS has_content_access';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					if ($include_file) $select_access .= ', CASE WHEN'.
-						'   (gf.aro IN ( '.$user->gmid.' ) OR  f.access <= '. $aid . ')  THEN 1 ELSE 0 END AS has_file_access';
-					$select_access .= ', CASE WHEN'.
-						'  (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')  THEN 1 ELSE 0 END AS has_field_access';
-					$select_access .= ', CASE WHEN'.
-						'   (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ') AND '.
-						'   (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ') AND '.
-						'   (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')'.
-						' THEN 1 ELSE 0 END AS has_content_access';
-				} else {
-					if ($include_file) $select_access .= ', CASE WHEN'.
-						'   f.access <= '. $aid . '  THEN 1 ELSE 0 END AS has_file_access';
-					$select_access .= ', CASE WHEN'.
-						' fi.access <= '. $aid . '  THEN 1 ELSE 0 END AS has_field_access';
-					$select_access .= ', CASE WHEN'.
-						'  ty.access <= '. $aid . ' AND '.
-						'   c.access <= '. $aid . ' AND '.
-						'   i.access <= '. $aid .
-						' THEN 1 ELSE 0 END AS has_content_access';
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			if ($include_file) $select_access .= ', CASE WHEN'.
+				'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
+			$select_access .= ', CASE WHEN'.
+				'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
+			$select_access .= ', CASE WHEN'.
+				'  ty.access IN (0,'.$aid_list.') AND '.
+				'   c.access IN (0,'.$aid_list.') AND '.
+				'   i.access IN (0,'.$aid_list.')'.
+				' THEN 1 ELSE 0 END AS has_content_access';
 		}
 		
 		else {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				if ($include_file)
-					$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
-				$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
-				$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					if ($include_file) $andacc .=
-						' AND  (gf.aro IN ( '.$user->gmid.' ) OR f.access <= '. $aid . ' OR f.access IS NULL)';  // AND file access
-					$andacc   .=
-						' AND (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')';  // AND field access
-					$andacc   .=
-						' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';   // AND content access: type, cat, item
-						' AND  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
-						' AND  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
-				} else {
-					if ($include_file)
-						$andacc .= ' AND (f.access <= '.$aid .' OR f.access IS NULL)';  // AND file access
-					$andacc   .= ' AND fi.access <= '.$aid ;                          // AND field access
-					$andacc   .= ' AND ty.access <= '.$aid . ' AND  c.access <= '.$aid . ' AND  i.access <= '.$aid ;  // AND content access
-				}
-			}
-		}
-		
-		if (FLEXI_ACCESS) {
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
 			if ($include_file)
-				$joinacc .= ' LEFT JOIN #__flexiaccess_acl AS gf ON f.id = gf.axo AND gf.aco = "read" AND gf.axosection = "file"';        // JOIN file access
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gfi ON fi.id = gfi.axo AND gfi.aco = "read" AND gfi.axosection = "field"';  // JOIN field access
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';       // JOIN content access: type, cat, item
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+				$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
+			$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
+			$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
 		}
 		
 		$clauses['select'] = $select_access;
@@ -2391,14 +2625,8 @@ class FlexicontentController extends JControllerLegacy
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 
 		$user = JFactory::getUser();
-		if (FLEXI_J16GE) {
-			$CanUseTags = FlexicontentHelperPerm::getPerm()->CanUseTags;
-		} else if (FLEXI_ACCESS) {
-			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
-		} else {
-			$CanUseTags = 1;
-		}
-
+		$CanUseTags = FlexicontentHelperPerm::getPerm()->CanUseTags;
+		
 		if($CanUseTags) {
 			//header('Content-type: application/json');
 			@ob_end_clean();

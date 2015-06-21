@@ -43,13 +43,13 @@ class JFormFieldMultiList extends JFormField
 		$attributes = $attributes['@attributes'];
 		
 		$values = $this->value;
-		if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		if ( ! is_array($values) )		$values = explode("|", $values);
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
-		$name = FLEXI_J16GE ? $attributes['name'] : $name;
-		$control_name = FLEXI_J16GE ? str_replace($name, '', $element_id) : $control_name;
+		$name = $attributes['name'];
+		$control_name = str_replace($name, '', $element_id);
 		
 		//$attribs = ' style="float:left;" ';
 		$attribs = array(
@@ -66,10 +66,6 @@ class JFormFieldMultiList extends JFormField
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs['list.attr']['multiple'] = 'multiple';
 			$attribs['list.attr']['size'] = @$attributes['size'] ? $attributes['size'] : "6";
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
-		} else {
-			$maximize_link = '';
 		}
 		
 		
@@ -90,6 +86,10 @@ class JFormFieldMultiList extends JFormField
 			$attribs['list.attr']['class'][] = $class;
 		}
 		
+		if (@$attributes['fccustom_revert']) {
+			$attribs['list.attr']['class'][] = 'fccustom_revert';
+		}
+		
 		if (@$attributes['toggle_related']) {
 			$attribs['list.attr']['class'][] = 'fcform_toggler_element';
 		}
@@ -99,51 +99,41 @@ class JFormFieldMultiList extends JFormField
 		$options = array ();
 		foreach ($node->children() as $option)
 		{
-			$val  = $option->attributes()->value;
-			$text = FLEXI_J30GE ? $option->__toString() : $option->data();
 			$name = FLEXI_J30GE ? $option->getName() : $option->name();
 			//echo "<pre>"; print_r($option); echo "</pre>"; exit;
-			if ($name=="group") {
-				$group_label = FLEXI_J16GE ? $option->attributes()->label : $option->attributes('label');
-				$options[] = JHTML::_('select.optgroup', JText::_($group_label) );
-				foreach ($option->children() as $sub_option)
-				{
-					$attr_arr = array();
-					if (isset($sub_option->attributes()->seton_list))  $attr_arr['seton_list']  = $sub_option->attributes()->seton_list;
-					if (isset($sub_option->attributes()->setoff_list)) $attr_arr['setoff_list'] = $sub_option->attributes()->setoff_list;
-					if (isset($sub_option->attributes()->refsh_list))  $attr_arr['refsh_list']  = $sub_option->attributes()->refsh_list;
-					if (isset($sub_option->attributes()->force_list))  $attr_arr['force_list']  = $sub_option->attributes()->force_list;
-					if (isset($sub_option->attributes()->show_list))   $attr_arr['show_list']   = $sub_option->attributes()->show_list;
-					if (isset($sub_option->attributes()->hide_list))   $attr_arr['hide_list']   = $sub_option->attributes()->hide_list;
-					if (isset($sub_option->attributes()->class))  $attr_arr['class'] = $sub_option->attributes()->class;
-					
-					$val    = $sub_option->attributes()->value;
-					$text   = FLEXI_J30GE ? $sub_option->__toString() : $sub_option->data();
-					//$options[] = JHTML::_('select.option', $val, JText::_($text));
-					$options[] = array(
-						'value' => $val, 'text' => JText::_($text),
-						'attr' => $attr_arr
-					);
-				}
-				$options[] = JHTML::_('select.optgroup', '' );
-			}
-			else {
+			
+			// Check for current option is a GROUP and add its START
+			if ($name=="group")  $options[] = JHTML::_('select.optgroup', JText::_( $option->attributes()->label ) );
+			
+			// If current option is group then iterrate through its children, otherwise create single value array
+			$children = $name=="group" ? $option->children() : array( & $option );
+			
+			foreach ($children as $sub_option)
+			{
 				$attr_arr = array();
-				if (isset($option->attributes()->seton_list))  $attr_arr['seton_list']  = $option->attributes()->seton_list;
-				if (isset($option->attributes()->setoff_list)) $attr_arr['setoff_list'] = $option->attributes()->setoff_list;
-				if (isset($option->attributes()->refsh_list))  $attr_arr['refsh_list']  = $option->attributes()->refsh_list;
-				if (isset($option->attributes()->force_list))  $attr_arr['force_list']  = $option->attributes()->force_list;
-				if (isset($option->attributes()->show_list))   $attr_arr['show_list']   = $option->attributes()->show_list;
-				if (isset($option->attributes()->hide_list))   $attr_arr['hide_list']   = $option->attributes()->hide_list;
-				if (isset($option->attributes()->class))  $attr_arr['class'] = $option->attributes()->class;
+				if (isset($sub_option->attributes()->seton_list))  $attr_arr['seton_list']  = $sub_option->attributes()->seton_list;
+				if (isset($sub_option->attributes()->setoff_list)) $attr_arr['setoff_list'] = $sub_option->attributes()->setoff_list;
+				if (isset($sub_option->attributes()->refsh_list))  $attr_arr['refsh_list']  = $sub_option->attributes()->refsh_list;
+				if (isset($sub_option->attributes()->force_list))  $attr_arr['force_list']  = $sub_option->attributes()->force_list;
+				if (isset($sub_option->attributes()->show_list))   $attr_arr['show_list']   = $sub_option->attributes()->show_list;
+				if (isset($sub_option->attributes()->hide_list))   $attr_arr['hide_list']   = $sub_option->attributes()->hide_list;
+				if (isset($sub_option->attributes()->fcconfigs))   $attr_arr['fcconfigs']   = $sub_option->attributes()->fcconfigs;
+				if (isset($sub_option->attributes()->fcreadonly))  $attr_arr['fcreadonly']  = $sub_option->attributes()->fcreadonly;
 				
-				//print_r($attr_arr['hide_list']);
+				if (isset($sub_option->attributes()->class))  $attr_arr['class'] = $sub_option->attributes()->class;
+				
+				$val  = $sub_option->attributes()->value;
+				$text = FLEXI_J30GE ? $sub_option->__toString() : $sub_option->data();
 				//$options[] = JHTML::_('select.option', $val, JText::_($text));
 				$options[] = array(
-					'value' => $val, 'text' => JText::_($text),
-					'attr' => $attr_arr
+					'value' => $val,
+					'text'  => JText::_($text),
+					'attr'  => $attr_arr
 				);
 			}
+			
+			// Check for current option is a GROUP and add its END
+			if ($name=="group") $options[] = JHTML::_('select.optgroup', '' );
 		}
 		
 		/* support for parameter multi-value, multi-parameter dependencies in non-FLEXIcontent views */
@@ -216,6 +206,6 @@ class JFormFieldMultiList extends JFormField
 			$previewimage = $preview_img ? JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' align="left" style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
 			$tip_text2 = '<span class="'.$tip_class.'" style="float:left;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
 		}
-		return $html.@$tip_text.@$tip_text2.$maximize_link;
+		return $html.@$tip_text.@$tip_text2;
 	}
 }

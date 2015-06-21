@@ -79,7 +79,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$default_value = $default_value ? JText::_($default_value) : '';
 		
 		// Editing method, text editor or HTML editor
-		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 );
+		$use_html = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 );
 		
 		// *** Simple Textarea ***
 		$rows  = $field->parameters->get( 'rows', ($field->field_type == 'maintext') ? 6 : 3 ) ;
@@ -398,7 +398,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
 		$clean_output = $field->parameters->get('clean_output', 0);
 		$encode_output = $field->parameters->get('encode_output', 0);
-		
+		$use_html = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 );
 		
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
@@ -425,7 +425,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		if ($clean_output) {
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
-		if ($lang_filter_values || $clean_output || $encode_output)
+		if ($lang_filter_values || $clean_output || $encode_output || !$use_html)
 		{
 			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
@@ -440,6 +440,9 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				}
 				if ($encode_output) {
 					$value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+				}
+				if (!$use_html) {
+					$value = nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $value));
 				}
 			}
 			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!

@@ -78,13 +78,68 @@ class FlexicontentModelCategories extends JModelList
 		$db = JFactory::getDBO();
 		
 		// Select the required fields from the table.
-		$query  = " SELECT rel.catid, COUNT(rel.itemid) AS nrassigned";
-		$query .= " FROM #__flexicontent_cats_item_relations AS rel";
-		$query .= " WHERE rel.catid IN (".implode(",", $cids).") ";
-		$query .= " GROUP BY rel.catid";
+		$query = " SELECT rel.catid, COUNT(rel.itemid) AS nrassigned"
+			." FROM #__flexicontent_cats_item_relations AS rel"
+			." WHERE rel.catid IN (".implode(",", $cids).") "
+			." GROUP BY rel.catid";
 		
 		$db->setQuery( $query );
 		$assigned = $db->loadObjectList('catid');
+		return $assigned;
+	}
+	
+	
+	/**
+	 * Method to get parameters of parent categories
+	 *
+	 * @access public
+	 * @return	string
+	 * @since	1.6
+	 */
+	function getParentParams($cid) {
+		if (empty($cid)) return array();
+		
+		global $globalcats;
+		$db = JFactory::getDBO();
+		
+		// Select the required fields from the table.
+		$query = " SELECT id, params"
+			." FROM #__categories"
+			." WHERE id IN (".$globalcats[$cid]->ancestors.") "
+			." ORDER BY level ASC";
+		
+		$db->setQuery( $query );
+		$data = $db->loadObjectList('id');
+		return $data;
+	}
+	
+	
+	/**
+	 * Method to count assigned items for the given categories
+	 *
+	 * @access public
+	 * @return	string
+	 * @since	1.6
+	 */
+	function countItemsByState($cids) {
+		if (empty($cids)) return array();
+		
+		$db = JFactory::getDBO();
+		
+		// Select the required fields from the table.
+		$query  = " SELECT rel.catid, i.state, COUNT(rel.itemid) AS nrassigned";
+		$query .= " FROM #__flexicontent_cats_item_relations AS rel";
+		$query .= " JOIN #__content AS i ON i.id=rel.itemid ";
+		$query .= " WHERE rel.catid IN (".implode(",", $cids).") ";
+		$query .= " GROUP BY rel.catid, i.state";
+		
+		$db->setQuery( $query );
+		$data = $db->loadObjectList();
+		$assigned = array();
+		foreach($data as $catid => $d) {
+			$assigned[$d->catid][$d->state] = $d->nrassigned;
+			//if ($d==1 || $d==-5) $assigned[$d->catid][$d->state] = $d->nrassigned;
+		}
 		return $assigned;
 	}
 	

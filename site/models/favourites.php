@@ -523,7 +523,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		
 		// Get the COMPONENT only parameters, then merge the menu parameters
 		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
-		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
+		$params = clone ($comp_params); // clone( JComponentHelper::getParams('com_flexicontent') );
 		if ($menu) {
 			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
 			$params->merge($menu_params);

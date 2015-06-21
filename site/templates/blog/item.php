@@ -173,10 +173,10 @@ $page_classes .= ' fcmaincat'.$item->catid;
 	<!-- BOF item rating, favourites -->
 	<div class="itemactions  group">
 		<?php if ($this->params->get('show_vote', 1)) : ?>
-		<span class="voting">
+		<div class="voting">
 		<?php FlexicontentFields::getFieldDisplay($item, 'voting', $values=null, $method='display'); ?>
 		<?php echo $this->fields['voting']->display; ?>
-		</span>
+		</div>
 		<?php endif; ?>
 
 		<?php if ($this->params->get('show_favs', 1)) : ?>

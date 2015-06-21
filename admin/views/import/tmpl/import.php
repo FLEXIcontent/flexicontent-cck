@@ -116,9 +116,6 @@ jQuery(document).ready(function () {
 		
 		<tr>
 			<td valign="top">
-			<div style="width:95%; text-align:right; clear:both; float:right;">
-				<a href="#tools_3rd_party" ><?php echo JText::_( 'FLEXI_3RD_PARTY_DEV_IMPORT_EXPORT_TOOLS' ); ?></a>
-			</div>
 			<fieldset style="width:99%">
 				<legend><?php echo JText::_( 'FLEXI_IMPORT_TYPE_AND_CORE_PROPS_LEGEND' ); ?></legend>
 				<table class="fcimporttbl" >
@@ -497,16 +494,6 @@ jQuery(document).ready(function () {
 
 <br/>
 			</fieldset>
-			</td>
-		</tr>
-		
-		<tr>
-			<td valign="top" width="">
-				<fieldset class="fleximport" style="min-height:220px; background-color:white;">
-					<legend style="color:darkred; background-color:white;" ><?php echo JText::_( 'FLEXI_3RD_PARTY_DEV_IMPORT_EXPORT_TOOLS' ); ?></legend>
-					<a id="tools_3rd_party"></a>
-					<?php echo $this->fleximport; ?>
-				</fieldset>
 			</td>
 		</tr>
 		

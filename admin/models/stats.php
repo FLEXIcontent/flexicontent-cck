@@ -58,7 +58,6 @@ class FlexicontentModelStats extends JModelLegacy
 	{
 		$_items = array();
 		
-		
 		// Get total nr of items
 		$query = 'SELECT count(i.id)'
 			. ' FROM #__content as i'
@@ -95,11 +94,7 @@ class FlexicontentModelStats extends JModelLegacy
 		$_items[] = $this->_db->loadResult();
 
 		// Get nr of authors
-		$query = 'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
-					' FROM #__usergroups AS a' .
-					' LEFT JOIN '.$this->_db->quoteName('#__usergroups').' AS b ON a.lft > b.lft AND a.rgt < b.rgt' .
-					' GROUP BY a.id, a.title, a.lft, a.rgt' .
-					' ORDER BY a.lft ASC';
+		$query = 'SELECT COUNT(id) FROM #__users';
 		$this->_db->SetQuery($query);
 		$_items[] = $this->_db->loadResult();
 		

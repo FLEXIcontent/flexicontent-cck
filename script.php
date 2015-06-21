@@ -302,7 +302,7 @@ class com_flexicontentInstallerScript
 				//if ($ext_manifest_name!=$extensions[$i]['name'])  echo $ext_manifest_name." - ".$extensions[$i]['name'] . "<br/>";
 				
 				// Force existing plugins/modules to use name found in each extension's manifest.xml file
-				if ( $extensions[$i]['ext_folder'] == 'flexicontent_fields' )
+				if (1) //if ( in_array($extensions[$i]['ext_folder'], array('flexicontent_fields', 'flexicontent', 'search', 'content', 'system')) || $extensions[$i]['type']=='module' )
 				{
 					$ext_tbl = '#__extensions';
 					$query = 'UPDATE '.$ext_tbl
@@ -429,6 +429,7 @@ class com_flexicontentInstallerScript
 		}
 		
 		$this->setParams( $params );*/
+		JFactory::getApplication()->enqueueMessage('Please clear your browser cache or press CTRL+F5 (windows) or F5 (Linux) or command+R (Safari) in flexicontent views to make sure that latest FLEXIcontent JS/CSS is retrieved', 'warning');
 		
 		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 		echo '
@@ -468,6 +469,10 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$fi_vers_tbl_exists = (boolean) count($db->loadObjectList());
 		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_favourites"';
+		$db->setQuery($query);
+		$favs_tbl_exists = (boolean) count($db->loadObjectList());
+		
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_files"';
 		$db->setQuery($query);
 		$files_tbl_exists = (boolean) count($db->loadObjectList());
@@ -491,6 +496,10 @@ class com_flexicontentInstallerScript
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_authors_ext"';
 		$db->setQuery($query);
 		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
+		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_reviews"';
+		$db->setQuery($query);
+		$reviews_tbl_exists = (boolean) count($db->loadObjectList());
 		
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_templates"';
 		$db->setQuery($query);
@@ -627,6 +636,7 @@ class com_flexicontentInstallerScript
 					$tbls = array();
 					if ($fi_rels_tbl_exists) $tbls[] = "#__flexicontent_fields_item_relations";
 					if ($fi_vers_tbl_exists) $tbls[] = "#__flexicontent_items_versions";
+					if ($favs_tbl_exists)    $tbls[] = "#__flexicontent_favourites";
 					if ($files_tbl_exists)   $tbls[] = "#__flexicontent_files";
 					if ($fields_tbl_exists)  $tbls[] = "#__flexicontent_fields";
 					if ($types_tbl_exists)   $tbls[] = "#__flexicontent_types";
@@ -676,6 +686,10 @@ class com_flexicontentInstallerScript
 						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `qindex03` MEDIUMTEXT NULL DEFAULT NULL AFTER `qindex02`";
 					}*/
 					
+					// Favourites TABLE
+					if ( $favs_tbl_exists && !array_key_exists('type', $tbl_fields['#__flexicontent_favourites'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_favourites` ADD `type` INT(11) NOT NULL DEFAULT '0' AFTER `notify`";
+					}
 					
 					// Files TABLE
 					if ( $files_tbl_exists && !array_key_exists('filename_original', $tbl_fields['#__flexicontent_files'])) {
@@ -812,7 +826,7 @@ class com_flexicontentInstallerScript
 		// Create authors_ext table if it does not exist
 		?>
 				<tr class="row1">
-					<td class="key" style="font-size:11px;">Create/Upgrade authors extended DB table: </td>
+					<td class="key" style="font-size:11px;">Create/Upgrade authors configuration DB table: </td>
 					<td>
 					<?php
 					
@@ -845,9 +859,56 @@ class com_flexicontentInstallerScript
 				</tr>
 				
 		<?php
-		// Create content_cache table if it does not exist
+		// Create flexicontent_reviews table if it does not exist
 		?>
 				<tr class="row0">
+					<td class="key" style="font-size:11px;">Create/Upgrade reviews DB table: </td>
+					<td>
+					<?php
+					
+			    $queries = array();
+					if ( !$reviews_tbl_exists ) {
+						$queries[] = "
+						CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
+							`content_id` int(11) NOT NULL,
+							`type` int(11) NOT NULL DEFAULT '1',
+							`average_rating` mediumtext NOT NULL,
+							`custom_ratings` mediumtext NOT NULL DEFAULT '',
+							`user_id` int(11) NOT NULL DEFAULT '0',
+							`email` varchar(255) NOT NULL DEFAULT '',
+							`title` varchar(255) NOT NULL,
+							`text` mediumtext NOT NULL,
+							`state` int(11) NOT NULL,
+							`confirmed` int(11) NOT NULL,
+							`submit_date` datetime NOT NULL,
+							`update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+							`custom_fields` mediumtext NULL,
+							PRIMARY KEY (`content_id`, `type`),
+							KEY `user_id` (`user_id`)
+						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+					}
+					
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) {
+								$result = false;
+								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							}
+						}
+						if ( $result !== false ) {
+							echo "<span class='badge badge-success'>table created / upgraded</span>";
+						}
+					}
+					else echo "<span class='badge badge-info'>nothing to do</span>";
+					?>
+					</td>
+				</tr>
+				
+		<?php
+		// Create content_cache table if it does not exist
+		?>
+				<tr class="row1">
 					<td class="key" style="font-size:11px;">Create/Upgrade content cache DB table: </td>
 					<td>
 					<?php
@@ -905,7 +966,7 @@ class com_flexicontentInstallerScript
 		<?php
 		// Create/Upgrade DB tables for downloads enhancements
 		?>
-				<tr class="row1">
+				<tr class="row0">
 					<td class="key" style="font-size:11px;">Create/Upgrade DB tables for downloads enhancements: </td>
 					<td>
 					<?php
@@ -963,7 +1024,7 @@ class com_flexicontentInstallerScript
 		<?php
 		// Create layouts_conf table if it does not exist
 		?>
-				<tr class="row0">
+				<tr class="row1">
 					<td class="key" style="font-size:11px;">Create/Upgrade layouts configuration DB table: </td>
 					<td>
 					<?php
@@ -1000,7 +1061,7 @@ class com_flexicontentInstallerScript
 		<?php
 		// Create fields table if it does not exist
 		?>
-				<tr class="row1">
+				<tr class="row0">
 					<td class="key" style="font-size:11px;">Create/Upgrade fields DB table: </td>
 					<td>
 					<?php
@@ -1040,7 +1101,8 @@ class com_flexicontentInstallerScript
 	function uninstall( $parent ) {
 		//error_reporting(E_ALL & ~E_STRICT);
 		//ini_set('display_errors',1);
-
+		$app = JFactory::getApplication();
+		
 		// Extra CSS needed for J3.x+
 		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 		
@@ -1146,7 +1208,7 @@ class com_flexicontentInstallerScript
 			</tfoot>
 			<tbody>
 				<?php foreach ($extensions as $i => $ext) : ?>
-					<tr class="row<?php echo $i % 2; ?>">
+					<tr class="row<?php echo ($i+1) % 2; ?>">
 						<td class="key" style="font-size:11px;">[<?php echo JText::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
 						<td>
 							<?php $status_class = $ext['status'] ? 'badge badge-success' : 'badge badge-error'; ?>
@@ -1211,13 +1273,12 @@ class com_flexicontentInstallerScript
 						} else if ($result==1) {
 							echo JText::_("Failed to set comments as com_content comments");
 						} else {
-							echo JText::_("No jcomments table found");
+							echo JText::_("No jcomments table found, nothing to do");
 						}
 						?></span>
 					</td>
 				</tr>
 		<?php
-		if (FLEXI_J16GE) :
 		// Restore com_content component asset, as asset parent_id, for the top-level 'com_content' categories
 		?>
 				<tr class="row1">
@@ -1269,8 +1330,49 @@ class com_flexicontentInstallerScript
 						?></span>
 					</td>
 				</tr>
-				
-			<?php endif; /* if FLEXI_J16GE */?>
+		<?php
+		// Drop search tables
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Remove search tables</td>
+					<td>
+						<?php
+						$tbl_prefix = $app->getCfg('dbprefix').'flexicontent_advsearch_index_field_';
+						$query = "SELECT TABLE_NAME
+							FROM INFORMATION_SCHEMA.TABLES
+							WHERE TABLE_NAME LIKE '".$tbl_prefix."%'
+							";
+						$db->setQuery($query);
+						$tbl_names = $db->loadColumn();
+						
+						if (!count($tbl_names)) {
+							$result = 0;
+						} else {
+							foreach($tbl_names as $tbl_name) {
+								$db->setQuery( 'DROP TABLE '.$tbl_name );
+								$db->query();
+							}
+							if ($db->getErrorNum()) {
+								echo $db->getErrorMsg();
+								$result = 1;
+							} else {
+								$result = 2;
+							}
+						}
+						
+						$status_class = ($result==2 || $result==0) ? 'badge badge-success' : 'badge badge-error';
+						?>
+						<span class="<?php echo $status_class; ?>"><?php
+						if ($result==2) {
+							echo JText::_("Search tables removed");
+						} else if ($result==1) {
+							echo JText::_("Failed to remove all search tables");
+						} else {
+							echo JText::_("No search tables found, nothing to do");
+						}
+						?></span>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 			<?php

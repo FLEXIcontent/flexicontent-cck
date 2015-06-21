@@ -184,6 +184,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					var elem = jQuery(this);
 					elem.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][autoprefix]');
 					elem.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_autoprefix_'+nr);
+					elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_autoprefix_'+nr);
+					nr++;
 				});
 				";
 			
@@ -350,9 +352,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				$autoprefix = '
 				<tr><td class="key '.$_tip_class.'" title="'.$_tip_title.'">'.JText::_( 'FLEXI_EXTWL_IS_RELATIVE' ). ' *</td><td>
 					<input class="autoprefix" id="'.$elementid_n.'_autoprefix_0" name="'.$fieldname_n.'[autoprefix]" type="radio" value="0" '.( !$is_absolute ? 'checked="checked"' : '' ).'/>
-					<label for="'.$elementid.'_autoprefix_0">'.JText::_('FLEXI_YES').'</label>
+					<label for="'.$elementid_n.'_autoprefix_0">'.JText::_('FLEXI_YES').'</label>
 					<input class="autoprefix" id="'.$elementid_n.'_autoprefix_1" name="'.$fieldname_n.'[autoprefix]" type="radio" value="1" '.( $is_absolute ? 'checked="checked"' : '' ).'/>
-					<label for="'.$elementid.'_autoprefix_1">'.JText::_('FLEXI_NO').'</label>
+					<label for="'.$elementid_n.'_autoprefix_1">'.JText::_('FLEXI_NO').'</label>
 				</td></tr>';
 			}
 			

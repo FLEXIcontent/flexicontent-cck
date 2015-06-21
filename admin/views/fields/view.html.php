@@ -74,8 +74,8 @@ class FlexicontentViewFields extends JViewLegacy
 			$notice_content_type_order = $app->getUserStateFromRequest( $option.'.'.$view.'.notice_content_type_order',	'notice_content_type_order',	0, 'int' );
 			if (!$notice_content_type_order) {
 				$app->setUserState( $option.'.'.$view.'.notice_content_type_order', 1 );
-				$app->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_BY_TYPE'), 'notice');
-				$app->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_WITHOUT_TYPE'), 'notice');
+				$app->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_BY_TYPE'), 'message');
+				$app->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_WITHOUT_TYPE'), 'message');
 				$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'message');
 			}
 		}
@@ -84,7 +84,6 @@ class FlexicontentViewFields extends JViewLegacy
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
 		
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
@@ -174,7 +173,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$allrows    = $this->get( 'AllItems' );
 		$pagination = $this->get( 'Pagination' );
 		$types      = $this->get( 'Typeslist' );  // Content types
-		$fieldtypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
+		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
 		
 		
 		$lists = array();
@@ -201,7 +200,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$fftypes[] = array('value'=>'BV', 'text'=>$ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
 		$fftypes[] = array('value'=>'C',  'text'=>$ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
 		$fftypes[] = array('value'=>'NC', 'text'=>$ALL . JText::_( 'FLEXI_NON_CORE_FIELDS' ));
-		foreach ($fieldtypes as $field_group => $ft_types) {
+		foreach ($fieldTypes as $field_group => $ft_types) {
 			$fftypes[] = $field_group;
 			foreach ($ft_types as $field_type => $ftdata) {
 				$fftypes[] = array('value'=>$ftdata->field_type, 'text'=>'-'.$ftdata->assigned.'- '. $ftdata->friendly);

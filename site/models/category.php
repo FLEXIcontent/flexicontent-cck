@@ -150,6 +150,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	protected function populateCategoryState($ordering = null, $direction = null) {
 		$this->_layout = JRequest::getCmd('layout', '');  // !! This should be empty for empty for 'category' layout
+		
+		// Force layout to be have proper value
+		if ( $this->_layout && !in_array($this->_layout, array('favs','tags','mcats','myitems','author')) )
+		{
+			//JError::raiseNotice(0, "'layout' variable is ".$this->_layout.", acceptable are: 'favs','tags','mcats','myitems','author', this may be due to some 3rd party plugin");
+			$this->_layout = '';
+			JRequest::setVar('layout', '');
+		}
+		
 		$this->_clayout = JRequest::getCmd('clayout', '');  // !! This should be empty for using view's configured clayout (template)
 		
 		if ($this->_layout=='author') {
@@ -553,23 +562,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$joinaccess = '';
 		$andaccess = '';
 		if (!$show_noauth) {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					//$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-					//$andaccess .= ( isset($readperms['category']) && count($readperms['category']) ) ?
-					//	' AND ( c.access <= '.$aid.' OR c.id IN ('.implode(",", $readperms['category']).') )' :
-					//	' AND c.access <= '.$aid ;
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$andaccess  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
-				} else {
-					$andaccess  .= ' AND c.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 		}
 		
 		// Calculate categories to use for retrieving items
@@ -641,35 +636,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$select_access .= ', c.access as category_access, ty.access as type_access';
 		
 		if ($show_noauth) {
-			
 			// Access Flags for: content type, main category, item
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$select_access .= ', '
-					.' CASE WHEN '
-					.'  ty.access IN (0,'.$aid_list.') AND '
-					.'   c.access IN (0,'.$aid_list.') AND '
-					.'   i.access IN (0,'.$aid_list.') '
-					.' THEN 1 ELSE 0 END AS has_access';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$select_access .= ', '
-						.' CASE WHEN '
-						.'  (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') AND '
-						.'  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ') AND '
-						.'  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') '
-						.' THEN 1 ELSE 0 END AS has_access';
-				} else {
-					$select_access .= ', '
-						.' CASE WHEN '
-						.'  (ty.access <= '. (int) $aid . ') AND '
-						.'  ( c.access <= '. (int) $aid . ') AND '
-						.'  ( i.access <= '. (int) $aid . ') '
-						.' THEN 1 ELSE 0 END AS has_access';
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$select_access .= ', '
+				.' CASE WHEN '
+				.'  ty.access IN (0,'.$aid_list.') AND '
+				.'   c.access IN (0,'.$aid_list.') AND '
+				.'   i.access IN (0,'.$aid_list.') '
+				.' THEN 1 ELSE 0 END AS has_access';
 		} else {
 			$select_access .= ', 1 AS has_access';
 		}
@@ -734,25 +709,33 @@ class FlexicontentModelCategory extends JModelLegacy {
 		static $fromjoin = null;
 		if (!empty($fromjoin[$counting])) return $fromjoin[$counting];
 		
-		$tmp_only = $counting && !JRequest::getVar('filter');
-		$from_clause  = !$counting ? ' FROM #__content AS i' : ' FROM #__flexicontent_items_tmp AS i';
-		$join_clauses = ''
-			. (!$tmp_only ? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' : '')
+		$text_search = $this->_buildTextSearch();
+		
+		$tmp_only = $counting && !$text_search;
+		$from_clause = $counting ? ' FROM #__flexicontent_items_tmp AS i ' : ' FROM #__content AS i ';
+		
+		$_join_clauses = ''
 			. ($this->_layout=='favs' ? ' JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id' : '')
 			. ($this->_layout=='tags' ? ' JOIN #__flexicontent_tags_item_relations AS tag ON tag.itemid = i.id' : '')
-			. ' JOIN #__flexicontent_types AS ty ON '. (!$tmp_only ? 'ie.' : 'i.') .'type_id = ty.id'
+			. ' JOIN #__flexicontent_types AS ty ON '. ($counting ? 'i.' : 'ie.') .'type_id = ty.id'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' JOIN #__categories AS c ON c.id = i.catid'
-			. (!$counting ? ' LEFT JOIN #__users AS u ON u.id = i.created_by' : '')
-			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"' : '')
-			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '')
-			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '')
+			. ($counting ? '' : ' LEFT JOIN #__users AS u ON u.id = i.created_by')
 			;
+		$join_clauses =
+			($counting ? '' : ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id ')
+			.$_join_clauses;
+		$join_clauses_with_text =
+			($counting && !$text_search ? '' : ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id '.$text_search)
+			.$_join_clauses;
 		
 		global $fc_catview;
-		if ($counting) $fc_catview['join_clauses'] = $join_clauses;
+		if ($counting) {
+			$fc_catview['join_clauses'] = $join_clauses;
+			$fc_catview['join_clauses_with_text'] = $join_clauses_with_text;
+		}
 		
-		$fromjoin[$counting] = $from_clause.$join_clauses;
+		$fromjoin[$counting] = $from_clause.$join_clauses_with_text;
 		return $fromjoin[$counting];
 	}
 	
@@ -815,12 +798,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
-		if ( FLEXI_J16GE )
-			$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
-		else if (FLEXI_ACCESS)
-			$ignoreState = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'ignoreviewstate', 'users', $user->gmid) : 1;
-		else
-			$ignoreState = $user->gid  > 19;  // author has 19 and editor has 20
+		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
 		
 		if (!$ignoreState && $this->_layout!='myitems') {
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
@@ -842,37 +820,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		// Checking item, category, content type access levels
 		if (!$show_noauth && $this->_layout!='myitems') {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$where .= ' AND ty.access IN (0,'.$aid_list.')';
-				$where .= ' AND  c.access IN (0,'.$aid_list.')';
-				$where .= ' AND  i.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				$where   .= ' AND ( i.created_by = '.$user->id.' OR ( 1 ';
-				//$where .= ' AND ( i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) OR ( 1 ';
-				if (FLEXI_ACCESS) {
-					//$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-					//$where .= ( isset($readperms['type']) && count($readperms['type']) ) ?
-					//	' AND ( ty.access <= '.$aid.' OR ty.id IN ('.implode(",", $readperms['type']).') )';
-					//	' AND ty.access <= '.$aid;
-					//$where .= ( isset($readperms['category']) && count($readperms['category']) ) ?
-					//	' AND (  c.access <= '.$aid.' OR  c.id IN ('.implode(",", $readperms['category']).') )';
-					//	' AND  c.access <= '.$aid;
-					//$where .= ( isset($readperms['item']) && count($readperms['item']) ) ?
-					//	' AND ( i.access <= '.$aid.' OR i.id IN ('.implode(",", $readperms['item']).') )' :
-					//	' AND i.access <= '.$aid ;
-					$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
-					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
-				} else {
-					$where .= ' AND ty.access <= '.$aid;
-					$where .= ' AND  c.access <= '.$aid;
-					$where .= ' AND  i.access <= '.$aid;
-				}
-				$where .= ') )';
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$where .= ' AND ty.access IN (0,'.$aid_list.')';
+			$where .= ' AND  c.access IN (0,'.$aid_list.')';
+			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}
 		
 		// Get session
@@ -910,7 +862,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access private
 	 * @return array
 	 */
-	function _buildFiltersWhere()
+	function _buildTextSearch()
 	{
 		global $fc_catview;
 		$app      = JFactory::getApplication();
@@ -918,7 +870,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$cparams  = $this->_params;
 		$db = $this->_db;
 		
-		$filters_where = array();
+		static $text_search = null;
+		if ($text_search !== null) return $text_search;
+		$text_search = '';
 		
 		// Get value of search text ('filter') from URL or SESSION (which is set new value if not already set)
 		// *** Commented out to get variable only by HTTP GET or POST
@@ -1026,9 +980,29 @@ class FlexicontentModelCategory extends JModelLegacy {
 					break;
 			}
 			
-			$filters_where[ 'search' ] = ' AND '. $_text_match;
+			$text_search = ' AND '. $_text_match;
 		}
+		$fc_catview['search'] = $text_search;
 		
+		return $text_search;
+	}
+	
+	
+	/**
+	 * Method to build the part of WHERE clause related to Alpha Index
+	 *
+	 * @access private
+	 * @return array
+	 */
+	function _buildFiltersWhere()
+	{
+		global $fc_catview;
+		$app      = JFactory::getApplication();
+		$option   = JRequest::getVar('option');
+		$cparams  = $this->_params;
+		$db = $this->_db;
+		
+		$filters_where = array();
 		
 		// Get filters these are EITHER (a) all filters (to do active only) OR (b) Locked filters
 		// USING all filters here to allow filtering via module, thus category view can be filtered even if 'use_filters' is OFF
@@ -1039,7 +1013,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($locked_filters) foreach($locked_filters as $_filter) $filters[] = $_filter;
 		
 		// Get SQL clause for filtering via each field
-		$return_sql = true;
+		$return_sql = 2;
 		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
@@ -1192,23 +1166,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$joinaccess = '';
 		$andaccess = '';
 		if (!$show_noauth) {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					//$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-					//$andaccess .= ( isset($readperms['category']) && count($readperms['category']) ) ?
-					//	' AND ( c.access <= '.$aid.' OR c.id IN ('.implode(",", $readperms['category']).') )' :
-					//	' AND c.access <= '.$aid ;
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$andaccess  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
-				} else {
-					$andaccess  .= ' AND c.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 		}
 		
 		// AND-WHERE clause : filter by parent category (-ies)
@@ -1346,23 +1306,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$joinaccess = '';
 		$andaccess = '';
 		if (!$show_noauth) {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					//$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-					//$andaccess .= ( isset($readperms['category']) && count($readperms['category']) ) ?
-					//	' AND ( c.access <= '.$aid.' OR c.id IN ('.implode(",", $readperms['category']).') )' :
-					//	' AND c.access <= '.$aid ;
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$andaccess  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
-				} else {
-					$andaccess  .= ' AND c.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 		}
 		
 		// *** Removed : (a) Retrieving all category columns and (b) ordering categories,
@@ -1625,13 +1571,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$canread = true;
 		if ($this->_id) {
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$canread = in_array($this->_category->access, $aid_arr);
-			} else {
-				$aid = (int) $user->get('aid');
-				$canread 	= FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_category->id) : $this->_category->access <= $aid;
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$canread = in_array($this->_category->access, $aid_arr);
 		}
 		
 		if (!$canread && $this->_id!=0)
@@ -1811,11 +1752,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		global $globalcats;
 		$heritage_stack = array();
 		$inheritcid = $catParams->get('inheritcid', '');
-		$inheritcid_comp = $compParams->get('inheritcid', '');
-		$inrerit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
+		$inheritcid_comp = $compParams->get('inheritcid', -1);
+		$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
 		
 		// CASE A: inheriting from parent category tree
-		if ( $id && $inrerit_parent && !empty($globalcats[$id]->ancestorsonly) ) {
+		if ( $id && $inherit_parent && !empty($globalcats[$id]->ancestorsonly) ) {
 			$order_clause = 'level';  // 'FIELD(id, ' . $globalcats[$id]->ancestorsonly . ')';
 			$query = 'SELECT title, id, params FROM #__categories'
 				.' WHERE id IN ( ' . $globalcats[$id]->ancestorsonly . ')'
@@ -1827,8 +1768,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$parentcat->params = new JRegistry($parentcat->params);
 					array_push($heritage_stack, $parentcat);
 					$inheritcid = $parentcat->params->get('inheritcid', '');
-					$inrerit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
-					if ( !$inrerit_parent ) break; // Stop inheriting from further parent categories
+					$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
+					if ( !$inherit_parent ) break; // Stop inheriting from further parent categories
 				}
 			}
 		}
@@ -1975,7 +1916,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						. ' FROM #__flexicontent_items_ext'
 						. ' WHERE type_id IN ('. implode(",", $values) .')';
 						;
-				$filter_query = ' AND i.id IN (' . $query . ')';
+				//$filter_query = ' AND i.id IN (' . $query . ')';
 			break;
 			
 			case 'state':
@@ -2004,7 +1945,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						. ' FROM #__flexicontent_cats_item_relations'
 						. ' WHERE catid IN ('. implode(",", $query_catids) .')';
 						;
-				$filter_query = ' AND i.id IN (' . $query . ')';
+				//$filter_query = ' AND i.id IN (' . $query . ')';
 			break;
 			
 			case 'tags':
@@ -2012,7 +1953,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 						. ' FROM #__flexicontent_tags_item_relations'
 						. ' WHERE tid IN ('. implode(",", $values) .')';
 						;
-				$filter_query = ' AND i.id IN (' . $query . ')';
+				//$filter_query = ' AND i.id IN (' . $query . ')';
 			break;
 			
 			default:
@@ -2028,12 +1969,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$filtered = ! @ $method_exists ?
 					FlexicontentFields::getFiltered($filter, $value, $return_sql) :
 					FLEXIUtilities::call_FC_Field_Func($field_type_file, 'getFiltered', array( &$filter, &$value, &$return_sql ));
-				
-				// An empty return value means no matching values were found
-				$filtered = empty($filtered) ? ' AND 0 ' : $filtered;
-				
-				// A string mean a subquery was returned, while an array means that item ids we returned
-				$filter_query = is_array($filtered) ?  ' AND i.id IN ('. implode(',', $filtered) .')' : $filtered;
 			break; 
 		}
 		
@@ -2042,17 +1977,49 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ( isset($filtered) ) {
 				// nothing to do
 			} else if ( !isset($query) ) {
-				$filtered = false;
-				echo "Filter: ". $field->name ." has empty 'getFiltered' query<br/>\n";
+				$filtered = '';
+				echo "Unhandled case for filter: ". $field->name ." in 'FlexicontentModelCategory::getFiltered()', query variable not set<br/>\n";
 			} else if ( !$return_sql ) {
-				//echo "<br>FlexicontentFields::getFiltered() ".$filter->name." appying  query :<br>". $query."<br>\n";
+				//echo "<br>GET FILTERED Items (cat model) -- [".$filter->name."] using in-query ids :<br>". $query."<br>\n";
 				$db = JFactory::getDBO();
 				$db->setQuery($query);
-				$filtered = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$filtered = $db->loadColumn();
 				if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-			} else {
-				$filter = $query;
 			}
+			else if ($return_sql===2) {
+				$db = JFactory::getDBO();
+				static $iids_tblname  = array();
+				if ( !isset($iids_tblname[$filter->id]) ) {
+					$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
+				}
+				$tmp_tbl = $iids_tblname[$filter->id];
+				
+				try {
+					// Use sub-query on temporary table
+					$db->setQuery('CREATE TEMPORARY TABLE IF NOT EXISTS '.$tmp_tbl.' (id INT, KEY(`id`))');
+					$db->query();
+					$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
+					$db->query();
+					$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$query);
+					$db->query();
+					$_query = $query;
+					$query = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/>GET FILTERED Items (cat model) -- [".$filter->name."] using temporary table: ".$query." for :".$_query ." <br/><br/>";
+					/*$db->setQuery($query);
+					$data = $db->loadObjectList();
+					echo "<pre>";
+					print_r($data);
+					exit;*/
+				}
+				catch (Exception $e) {
+					// Ignore table creation error
+					//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+					//echo "<br/><br/>GET FILTERED Items (cat model) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
+				}
+			} else {
+				//echo "<br/><br/>GET FILTERED Items (cat model) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
+			}
+			
+			if ( !isset($filtered) && isset($query) )  $filtered = ' AND i.id IN (' . $query . ')';
 			
 			// An empty return value means no matching values were found
 			$filtered = empty($filtered) ? ' AND 0 ' : $filtered;
@@ -2184,11 +2151,71 @@ class FlexicontentModelCategory extends JModelLegacy {
 			->where('id = ' . (int) $pk);
 		$db->setQuery($query);
 		
-		try { $db->execute(); }
-		catch (RuntimeException $e) { $this->setError($e->getMessage());  return false; }
+		try {
+			$db->execute();
+			if ($db->getErrorNum()) {
+				$this->setError( nl2br($db->getErrorMsg()) );  // In case of error not throwing exception
+				return false;
+			}
+		}
+		catch (RuntimeException $e) {
+			$this->setError( $e->getMessage() );
+			return false;
+		}
 		
 		return true;
 	}
 	
+	
+	/**
+	 * Method to get the nr of favourites of anitem
+	 *
+	 * @access	public
+	 * @return	integer on success
+	 * @since	1.0
+	 */
+	function getFavourites()
+	{
+		return flexicontent_db::getFavourites($type=1, $this->_id);
+	}
+	
+	
+	/**
+	 * Method to get the nr of favourites of an user
+	 *
+	 * @access	public
+	 * @return	integer on success
+	 * @since	1.0
+	 */
+	function getFavoured()
+	{
+		return flexicontent_db::getFavoured($type=1, $this->_id, JFactory::getUser()->id);
+	}
+	
+	
+	/**
+	 * Method to remove a favourite
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function removefav()
+	{
+		return flexicontent_db::removefav($type=1, $this->_id, JFactory::getUser()->id);
+	}
+	
+	
+	/**
+	 * Method to add a favourite
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function addfav()
+	{
+		return flexicontent_db::addfav($type=1, $this->_id, JFactory::getUser()->id);
+	}
 }
 ?>

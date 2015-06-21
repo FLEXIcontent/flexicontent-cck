@@ -413,7 +413,7 @@ $('missingversion').addEvent('click', function(e) {
 			<?php echo JText::_( 'FLEXI_CREATE_DB_INDEXES' ); ?>
 			<?php
 				if (!$this->existdbindexes) {
-					echo "<br/><span class='fc-mssg-inline fc-mssg fc-note'>this may take a long time on big web-sites, if it timeouts (or takes >5 min) then please refresh, and click to create remaining indexes</span>";
+					echo "<br/><span class='fc-mssg-inline fc-mssg fc-note'>this may take a long time on big web-sites, if it timeouts (or takes >2 min) then please refresh, and click to create remaining indexes</span>";
 					echo "<br># tables: ". count($this->missingindexes) ." : ";
 					foreach($this->missingindexes as $tblname => $indexes) {
 						if ( isset($indexes['__indexing_started__']) ) {

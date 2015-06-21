@@ -78,7 +78,7 @@
 			if (element.name=='filter_order' && element.value=='i.title') continue;
 			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
 			
-			var matches = element.name.match(/^(filter[.]*|cids|letter|clayout|limit|orderby|q|searchword|p|searchphrase|areas|contenttypes|txtflds|o|ordering)$/);
+			var matches = element.name.match(/^(filter.*|cids|letter|clayout|limit|orderby|q|searchword|p|searchphrase|areas|contenttypes|txtflds|o|ordering)$/);
 			if (!matches || element.value == '') continue;
 			if ((element.type=='radio' || element.type=='checkbox') && !element.checked) continue;
 			
@@ -411,13 +411,13 @@ jQuery(document).ready(function() {
 	}
 	
 	jQuery('body').prepend(
-	 	"<span id='fc_filter_form_blocker'>" +
-	    "<span class='fc_blocker_opacity'></span>" +
-	    "<span class='fc_blocker_content'>" +
+	 	'<span id="fc_filter_form_blocker">' +
+	    '<span class="fc_blocker_opacity"></span>' +
+	    '<span class="fc_blocker_content">' +
 	    	Joomla.JText._('FLEXI_APPLYING_FILTERING') +
-	    	"<div class='fc_blocker_bar'><div></div></div>" +
-	    "</span>" +
-	  "</span>");
+	    	'<div class="fc_blocker_bar"><div></div></div>' +
+	    '</span>' +
+	  '</span>');
 		
 		fc_recalculateWindow();
 });

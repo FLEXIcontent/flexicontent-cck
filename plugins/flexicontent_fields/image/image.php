@@ -20,6 +20,8 @@ jimport('joomla.event.plugin');
 class plgFlexicontent_fieldsImage extends JPlugin
 {
 	static $field_types = array('image');
+	static $value_only_displays = array("display_backend_src"=>0, "display_small_src"=>1, "display_medium_src"=>2, "display_large_src"=>3, "display_original_src"=>4);
+	static $single_displays = array('display_single'=>0, 'display_single_total'=>1, 'display_single_link'=>2, 'display_single_total_link'=>3);
 	
 	// ***********
 	// CONSTRUCTOR
@@ -523,7 +525,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 		";
 		$css .='
-			.empty_image'.$field->id.' { word-wrap:break-word !important; }
 			table.fcfield'.$field->id.'.img_upload_select { float:left; clear:none; border:1px dashed gray; margin-bottom:16px; }
 			table.fcfield'.$field->id.'.img_upload_select li { min-height:'.($thumb_h_s+56).'px; }
 			table.fcfield'.$field->id.'.img_upload_select ul { height:'.($thumb_h_s+96).'px; }
@@ -806,7 +807,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		static $initialized = null;
 		static $app, $document, $option;
 		static $isMobile, $isTablet, $useMobile;
-		static $value_only_displays;
 		if ($initialized===null)
 		{
 			$app       = JFactory::getApplication();
@@ -826,8 +826,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
 			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			//printf('<br/>-- [Detect Mobile: %.3f s] ', $time_passed/1000000);
-			
-			$value_only_displays = array("display_backend_src", "display_small_src", "display_medium_src", "display_large_src", "display_original_src");
 		}
 		
 		
@@ -1025,7 +1023,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Default display method depends on view
 		// **************************************
 		
-		if ($prop=='display') {
+		if ($prop=='display' && ($view==FLEXI_ITEMVIEW || $view=='category')) {
 			$_method = $view==FLEXI_ITEMVIEW ?
 				$field->parameters->get( 'default_method_item',  'display' ) :
 				$field->parameters->get( 'default_method_cat',  'display_single_total') ;
@@ -1126,7 +1124,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// **********************************************
 		
 		// Do not load JS, for value only displays
-		if ( !in_array($prop, $value_only_displays) )
+		if ( !isset(self::$value_only_displays[$prop]) )
 		{
 			// MultiBox maybe added in extra cases besides popup
 			// (a) in Item manager, (b) When linking to URL in popup target
@@ -1343,10 +1341,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$i = -1;
 		$field->{$prop} = array();
 		$field->thumbs_src['backend'] = array();
-		$field->thumbs_src['small'] = array();
-		$field->thumbs_src['medium'] = array();
-		$field->thumbs_src['large'] = array();
-		$field->thumbs_src['original'] = array();
+		$field->thumbs_src['small']   = array();
+		$field->thumbs_src['medium']  = array();
+		$field->thumbs_src['large']   = array();
+		$field->thumbs_src['original']= array();
+		$field->{"display_backend_src"} = array();
+		$field->{"display_small_src"}   = array();
+		$field->{"display_medium_src"}  = array();
+		$field->{"display_large_src"}   = array();
+		$field->{"display_original_src"}= array();
+		
 		$cust1_label = JText::_('FLEXI_FIELD_IMG_CUST1');
 		$cust2_label = JText::_('FLEXI_FIELD_IMG_CUST2');
 		
@@ -1364,6 +1368,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// The values loop
 		// ***************
 		
+		$isSingle = isset(self::$single_displays[$_method]);
+		$linkSingleToItem = $_method == 'display_single_link' || $_method == 'display_single_total_link' || ($view!='item' && $cat_link_single_to && $isSingle);
 		foreach ($values as $val)
 		{
 			// Unserialize value's properties and check for empty original name property
@@ -1395,11 +1401,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$alt	= htmlspecialchars($alt, ENT_COMPAT, 'UTF-8');
 			$desc	= htmlspecialchars($desc, ENT_COMPAT, 'UTF-8');
 			
-			$srcb	= $thumb_urlpath . '/b_' .$extra_prefix. $image_name;  // backend
-			$srcs	= $thumb_urlpath . '/s_' .$extra_prefix. $image_name;  // small
-			$srcm	= $thumb_urlpath . '/m_' .$extra_prefix. $image_name;  // medium
-			$srcl	= $thumb_urlpath . '/l_' .$extra_prefix. $image_name;  // large
-			$srco	= $orig_urlpath  . '/'   .$image_name;  // original image
+			$srcb = $thumb_urlpath . '/b_' .$extra_prefix. $image_name;  // backend
+			$srcs = $thumb_urlpath . '/s_' .$extra_prefix. $image_name;  // small
+			$srcm = $thumb_urlpath . '/m_' .$extra_prefix. $image_name;  // medium
+			$srcl = $thumb_urlpath . '/l_' .$extra_prefix. $image_name;  // large
+			$srco = $orig_urlpath  . '/'   .$image_name;  // original image
 			
 			// Create a popup url link
 			$urllink = @$value['urllink'] ? $value['urllink'] : '';
@@ -1415,7 +1421,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			
 			// Handle single image display, with/without total, TODO: verify all JS handle & ignore display none on the img TAG
-			$style = ($i!=0 && in_array($_method, array('display_single', 'display_single_total'))) ? 'display:none;' : '';
+			$style = ($i!=0 && $isSingle) ? 'display:none;' : '';
 			
 			// Create a unique id for the link tags, and a class name for image tags
 			$uniqueid = $item->id . '_' . $field->id . '_' . $i;
@@ -1488,17 +1494,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			
 			// ****************************************************************
-			// CHECK if we were asked for a single image URL (* the first one),
-			// if so, return it and terminate from further execution
+			// CHECK if we were asked for value only display (e.g. image source)
+			// if so we will not be creating the HTML code for Image / Gallery 
 			// ****************************************************************
 			
-			if ( in_array($prop, $value_only_displays) ) {
-				// we create single (1st value) if not in a field group, otherwise we continue the loop,
-				// so as to create an array of values since the fieldgroup field can use this array properly
-				if ($is_ingroup)
-					continue;
-				else
-					return;
+			if ( isset(self::$value_only_displays[$prop]) )
+			{
+				continue;
 			}
 			
 			
@@ -1562,7 +1564,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// FINALLY CREATE the field display variable ...
 			// *********************************************
 			
-			if ( $view!='item' && $cat_link_single_to &&in_array($_method, array('display_single', 'display_single_total')) ) {
+			if ( $linkSingleToItem ) {
 				
 				// CASE 0: Add single image display information (e.g. image count)
 				
@@ -1572,7 +1574,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					<a href="'.$item_link.'" style="display: inline-block;">
 					'.$img_nolegend.'
 					</a><br/>'
-					.($_method == 'display_single_total' ? '
+					.($_method == 'display_single_total' || $_method == 'display_single_total_link' ? '
 					<span class="fc_img_total_data badge badge-info" style="display: inline-block;" >
 						'.count($values).' '.JText::_('FLEXI_IMAGES').'
 					</span>' : '').'
@@ -1585,7 +1587,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				if (!$urllink) {
 					// CASE: Just image thumbnail since url link is empty
-					$field->{$prop}[] = $pretext.$img_legend.$inline_info.$posttext;
+					$field->{$prop}[] = $pretext.'<div class="fc_img_container">'.$img_legend.$inline_info.'</div>'.$posttext;
 				}
 				
 				else if ($url_target=='multibox') {
@@ -1738,6 +1740,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Using in field group, return array
 		if ( $is_ingroup ) {
+			return;
+		}
+		
+		// Check for value only displays and return
+		if ( isset(self::$value_only_displays[$prop]) )
+		{
 			return;
 		}
 		
@@ -2861,14 +2869,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	
 	function getUploadLimitsTxt(&$field) {
 		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-		$hint_image = JHTML::image ( 'components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+		$hint_image = JHTML::image ( 'components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), '' );
 		
 		$upload_maxsize = $field->parameters->get('upload_maxsize');
 		$phpUploadLimit = flexicontent_upload::getPHPuploadLimit();
 		$server_limit_exceeded = $phpUploadLimit['value'] < $upload_maxsize;
 		
 		if ($server_limit_exceeded) {
-			$warn_image = JHTML::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+			$warn_image = JHTML::image ( 'components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), '' );
 		}
 		
 		$conf_limit_class = $server_limit_exceeded ? '' : 'badge-success';

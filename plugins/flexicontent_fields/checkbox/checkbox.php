@@ -367,12 +367,6 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		// Create field's HTML display for item form
 		// *****************************************
 		
-		// Create form field options
-		$options = array();
-		foreach ($elements as $element) {
-			$options[] = JHTML::_('select.option', $element->value, $element->text);
-		}
-		
 		// Create the attributes of the form field
 		$fftype = 'checkbox';
 		$display_as_checkbox = 1;
@@ -511,9 +505,9 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		
 		// Add message box about allowed # values
 		if ($exact_values) {
-			$field->html = '<div class="alert fc-small fc-iblock">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_EXACTLY', $exact_values) .'</div><div class="clear"></div>'. $field->html;
+			$field->html = '<div class="alert alert-info fc-small fc-iblock">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_EXACTLY', $exact_values) .'</div><div class="clear"></div>'. $field->html;
 		} else if ($max_values || $min_values > 1) {
-			$field->html = '<div class="alert fc-small fc-iblock">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_BETWEEN', $min_values, $max_values) .'</div><div class="clear"></div>'. $field->html;
+			$field->html = '<div class="alert alert-info fc-small fc-iblock">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_BETWEEN', $min_values, $max_values) .'</div><div class="clear"></div>'. $field->html;
 		}
 	}
 	

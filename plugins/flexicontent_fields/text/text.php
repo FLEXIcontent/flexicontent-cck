@@ -395,7 +395,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 					$value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
 				}
 				if ($format_output==1) {
-					$value = number_format($value, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
+					$value = @ number_format($value, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
 				}
 			}
 			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!

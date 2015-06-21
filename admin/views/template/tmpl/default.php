@@ -397,7 +397,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
 				
 			<div class="fcclear"></div>
-			<span class="fc-mssg-inline fc-success" style="font-size:100%; margin: 12px 0 0 0!important;">
+			<span class="fc-mssg fc-note fc-nobgimage" style="font-size:100%; margin: 4px 0;">
 				<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
 				<?php echo JText::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?>
 			</span>
@@ -518,7 +518,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 									case 'category': $msg='in each individual <b>Category</b>'; break;
 									default: $msg='in each <b>'.$this->layout->view.'</b>'; break;
 								}
-								echo "<div class='positions_readonly'>NON-editable position.<br/> To customize edit TEMPLATE parameters ".$msg."</div>";
+								echo "<div class='positions_readonly_info fc-mssg fc-info fc-nobgimage'>NON-editable position.<br/> To customize edit TEMPLATE parameters ".$msg."</div>";
 								continue;
 							}
 							?>
@@ -563,15 +563,15 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_DISPLAY_PARAMETERS' ); ?> </h3>
 			
 			<div class="fcclear"></div>
-			<span class="fc-mssg-inline fc-success" style="font-size:100%; margin: 12px 0 0 0!important;">
-				<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
+			<span class="fc-mssg-inline fc-warning" style="font-size:100%; margin: 12px 0 0 0!important;">
+				Parameters specific to the layout, <br/> -
 				<?php echo JText::_( $this->layout->view == 'item' ?
-					'Parameters specific to the layout, your <b>content types</b> will inherit defaults from here' :
-					'Parameters specific to the layout, your <b>content lists</b> (categories, etc) will inherit defaults from here'
+					'your <b>content types / items</b> ' :
+					'your <b>content lists</b> (categories, etc)'
 				);?>
-				<br/>
-				<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
-				<?php echo JText::_( 'Setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
+				will inherit defaults from here, but may <b>override</b> them
+				<br/> -
+				<?php echo JText::_( 'setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
 			</span>
 			
 			<div style="max-width:1024px; margin-top:16px;">

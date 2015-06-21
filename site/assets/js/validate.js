@@ -506,25 +506,7 @@ var JFormValidator = new Class({
 				
 				var tabsetid = tabset.attr('id');
 				var tabid = tab.attr('id');
-				var tabno = (tabid.search(/grpmarker_tabset_([0-9]+)_tab_([0-9]+)/) != -1) ? tabid.match(/grpmarker_tabset_([0-9]+)_tab_([0-9]+)/)[2] :  -1;
-				if ( tabno==-1 ) {
-					break;
-				}
-				fctabber[tabset.attr('id')].tabShow(tabno);
-				
-				tab = jQuery(tab).parent().closest("div.tabbertab");
-				tabset = jQuery(tabset).parent().closest("div.tabberlive");
-			}
-			
-			while(1) {
-				if (tabset.length==0 || tab.length==0) break;
-				
-				var tabsetid = tabset.attr('id');
-				var tabid = tab.attr('id');
-				var tabno = (tabid.search(/fcform_tabset_([0-9]+)_tab_([0-9]+)/) != -1) ? tabid.match(/fcform_tabset_([0-9]+)_tab_([0-9]+)/)[2] :  -1;
-				if ( tabno==-1 ) {
-					break;
-				}
+				var tabno = tab.index() - 1;
 				fctabber[tabset.attr('id')].tabShow(tabno);
 				
 				tab = jQuery(tab).parent().closest("div.tabbertab");

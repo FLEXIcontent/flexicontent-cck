@@ -18,12 +18,10 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('list');
-}
+jimport('joomla.html.html');
+jimport('joomla.form.formfield');
+jimport('joomla.form.helper');
+JFormHelper::loadFieldClass('list');
 
 /**
  * Renders a filter element
@@ -75,7 +73,7 @@ class JFormFieldFilters extends JFormFieldList
 				if (!val) return;
 				var lbl = selobj.find('option:selected').text();
 				jQuery('#'+container).append('<li id=\"field_'+val+'\" class=\"fields delfield\">'+lbl+
-				'<a title=\"".JText::_('FLEXI_REMOVE')."\" align=\"right\" onclick=\"javascript:fcfield_del_sortable_element(this);\" class=\"deletetag\" href=\"javascript:;\"></a>'+
+				'<a title=\"".JText::_('FLEXI_REMOVE')."\" align=\"right\" onclick=\"javascript:fcfield_del_sortable_element(this);\" class=\"delfield_handle\" href=\"javascript:;\"></a>'+
 				'</li>');
 				
 				var field_list = jQuery('#'+tagid).val();
@@ -127,13 +125,9 @@ class JFormFieldFilters extends JFormFieldList
 		
 		$doc	= JFactory::getDocument();
 		$db		= JFactory::getDBO();
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		$and = ((boolean)@$attributes['isnotcore']) ? ' AND iscore = 0' : '';
 		if ((boolean)@$attributes['fieldnameastext']) {
@@ -211,7 +205,7 @@ class JFormFieldFilters extends JFormFieldList
 			$fields = $_fields;
 		}
 		
-		$values = FLEXI_J16GE ? $this->value : $value;
+		$values = $this->value;
 		if ( empty($values) ) {
 			$values = array();
 		}
@@ -254,7 +248,7 @@ class JFormFieldFilters extends JFormFieldList
 				."}"
 				."if (parent.hasClass(\"jpane-slider\")) parent.setStyle(\"height\", \"auto\");"
 			;
-			$style = 'display:inline-block;'.(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px');
+			$style = 'display:inline-block; float:left; margin: 6px 0px 0px 18px;';
 		} else {
 			array_unshift($options, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
@@ -266,7 +260,7 @@ class JFormFieldFilters extends JFormFieldList
 		}
 		
 		else if ($appendtofield = @$attributes['appendtofield']) {
-			$appendtofield = FLEXI_J16GE ? 'jform_attribs_'.$appendtofield : 'params'.$appendtofield;
+			$appendtofield = 'jform_attribs_'.$appendtofield;
 			$onchange = 'fcfield_add2list(\''.$appendtofield.'\', this);';
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
@@ -288,7 +282,7 @@ class JFormFieldFilters extends JFormFieldList
 				if( !isset($fields[$val]) ) continue;
 				$sorter_html .= '<li id="field_'.$val.'" class="fields delfield">';
 				$sorter_html .= $fields[$val]->text;
-				$sorter_html .= '<a title="'.JText::_('FLEXI_REMOVE').'" align="right" onclick="javascript:fcfield_del_sortable_element(this);" class="deletetag" href="javascript:;"></a>';
+				$sorter_html .= '<a title="'.JText::_('FLEXI_REMOVE').'" align="right" onclick="javascript:fcfield_del_sortable_element(this);" class="delfield_handle" href="javascript:;"></a>';
 				$sorter_html .= '</li>';
 			}
 			$sorter_html .= '</ul>';
@@ -308,7 +302,7 @@ class JFormFieldFilters extends JFormFieldList
 		$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', ($issortable ? array() : $values), $element_id);
 		/*if ($ordertip = @$attributes['ordertip']) {
 			if ($ordertip != -1) {
-				$style = 'display:inline-block;'.(FLEXI_J16GE ? 'float:left; margin: 0px 0px 0px 18px;':'margin:0px 0px 6px 12px');
+				$style = 'display:inline-block; float:left; margin: 0px 0px 0px 18px;';
 				$tip = 
 					'<span class="editlinktip hasTip" style="'.$style.'" title="'
 						.htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_SETTING_DEFAULT_FILTER_ORDER' ), ENT_COMPAT, 'UTF-8').'">'

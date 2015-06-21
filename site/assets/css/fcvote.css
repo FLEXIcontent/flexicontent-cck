@@ -1,126 +1,246 @@
+
+/*
+Tried hard to remove !important rules,
+but too many stupid CSS rules ... exist !! that twice as terrible as using !important
+
+e.g.  #my_template_box  ul { ... }
+e.g.  #my_template_box  li { ... }
+
+the above should have been (to minimize conflicts):
+e.g.  #header > ul { ... }
+e.g.  #header ul.specificclass { ... }
+
+- and we cannot always prepend an HTML tag ID to override the above
+- anyone that wants to override this: Please just -copy- the full rule and -prepend- a 'body' ...
+- note the last part of this CSS should not be overriden via CSS,
+instead use voting field parameters !!
+*/
+
 /* fcvote standard css */
-.fcvote {
+
+/* container of all voting types */
+div.voting-group {
 	display: inline-block;
-	vertical-align: middle;
+	float: none;
+	margin: 0;
+	padding: 0;
 }
-
-.fcvote ul {
-	margin: 0!important;
-	padding: 0!important;
-}
-
-.fcvote ul li {
-	background-position: 0!important;
-	margin: 0!important;
-	padding: 0!important;
-}
-
-.fcvote ul, 
-.fcvote ul li a:hover, 
-.fcvote ul li.current-rating {
-	background-color: transparent!important;
-	background-position: left -1000px;
-	background-repeat: repeat-x!important;
-}
-
-.fcvote ul {
-	background-position: left top;
-	list-style-image: none;
-	list-style-position: outside;
-	list-style-type: none;
-	margin: 0pt;
-	overflow: hidden;
-	padding: 0pt;
-	position: relative;
+/* outer container of 1 vote type: main or extra */
+div.voting-row {
+	display: inline-block;
 	float: left;
+	margin: 2px 1%;
+	padding: 0;
+ 	box-sizing: border-box;
+ 	width:48%;
+ 	max-width:600px;
+}
+div.voting-row.voting-row_main {
+	box-sizing: border-box;
+	width: 98%;
 }
 
-.fcvote ul li {
-	background-image: none;
-	display: inline;
-	padding: 0pt;
+/* inner container of 1 vote type: main or extra */
+div.fcvote {
+	display: inline-block;
+	vertical-align: unset;
+	margin: 0;
+	padding: 0;
 }
 
-.fcvote ul li a, 
-.fcvote ul li.current-rating {
+div.fcvote > ul.fcvote_list, 
+div.fcvote > ul.fcvote_list > li.voting-links a:hover, 
+div.fcvote > ul.fcvote_list > li.current-rating {
 	background-color: transparent !important;
-	border: medium none;
-	cursor: pointer;
-	left: 0pt;
-	outline-color: -moz-use-text-color;
-	outline-style: none;
-	outline-width: medium;
-	overflow: hidden;
-	position: absolute;
-	text-indent: -1000em;
-	top: 0pt;
+	background-position: left -1000px !important;
+	background-repeat: repeat-x !important;
 }
 
-.fcvote ul li a:hover {
-	background-position: left bottom!important;
+div.fcvote > ul.fcvote_list {
+	background-position: left top !important;
+	list-style-image: none !important;
+	list-style-position: outside !important;
+	list-style-type: none !important;
+	margin: 4px 0 !important;
+	padding: 0 !important;
+	overflow: hidden !important;
+	position: relative !important;
+	float: left !important;
+	clear: both !important;
 }
 
-.fcvote ul li.current-rating {
-	background-position: left center;
-	z-index: 0;
-}
-
-.fcvote li a {
+div.fcvote > ul.fcvote_list > li.current-rating,
+div.fcvote > ul.fcvote_list > li.voting-links {
+	display: inline !important;
+	background-image: none !important;
+	background-position: 0 !important;
 	margin: 0 !important;
 	padding: 0 !important;
 }
-/*
-.fcvote li a.one   { width: 20%;  z-index: 6; }
-.fcvote li a.two   { width: 40%;  z-index: 5; }
-.fcvote li a.three { width: 60%;  z-index: 4; }
-.fcvote li a.four  { width: 80%;  z-index: 3; }
-.fcvote li a.five  { width: 100%; z-index: 2; }
-*/
 
-.fcvote-label {
+div.fcvote > ul.fcvote_list > li.voting-links a, 
+div.fcvote > ul.fcvote_list > li.current-rating {
+	background-color: transparent !important;
+	border: medium none !important;
+	cursor: pointer !important;
+	outline-color: -moz-use-text-color !important;
+	outline-style: none !important;
+	outline-width: medium !important;
+	overflow: hidden !important;
+	position: absolute !important;
+	text-indent: -1000em !important;
+	left: 0pt !important;
+	top: 0pt !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+div.fcvote > ul.fcvote_list > li.voting-links a:hover {
+	background-position: left bottom !important;
+}
+
+div.fcvote > ul.fcvote_list > li.current-rating {
+	background-position: left center !important;
+	z-index: 0 !important;
+}
+
+
+/*
+ * Non-critical part not using !important
+ */
+
+/* Labels: main vote */
+#flexicontent
+div.fcvote-label-outer,
+div.fcvote-label-outer {
 	float: left;
-	min-width: 80px;
+	clear:both;
+}
+
+#flexicontent
+div.fcvote-label,
+div.fcvote-label {
+	float: left;
 	padding: 0 4px 0 0;
+	margin-right: 6px;
 	font-weight:normal;
-	font-size:90%;
+	font-size: 100%;
 	text-align:right;
 	border-bottom:1px dashed gray;
 	font-style:italic;
 }
-.fcvote-label.xid-main {
-	font-size:100%;
+
+/* Labels: extra votes */
+#flexicontent
+div.fcvote-label.xid-main,
+div.fcvote-label.xid-main {
+	color: darkorange;
+	font-size: 120%;
 	font-style:normal;
 	font-weight:bold;
 }
-.fcvote-count{
+
+/* Vote message, desc, counter */
+#flexicontent
+div.fcvote_message,
+div.fcvote_message {
 	float: left;
-	padding: 0 0 0 4px;
+	margin: 0 0 0 2px;
+	padding: 0 2px 0 2px;
+	clear:both;
+}
+#flexicontent
+div.fcvote-count,
+div.fcvote-count {
+	float: left;
+	margin: 0px 0 0 2px;
+	padding: 0 2px 0 2px;
+	text-align: center;
+	position: relative;
+}
+#flexicontent
+div.fcvote-box-main div.fcvote-count,
+div.fcvote-box-main div.fcvote-count {
+	margin-top: 4px;
+}
+#flexicontent
+div.fcvote-desc,
+div.fcvote-desc {
+	margin: 2px 4px 4px 4px;
+	padding: 0px 4px;
+	float:left;
+	clear:both;
 }
 
-/* fcvote variable css */
-.fcvote {
-	line-height: 25px;
+/* Vote being submitted */
+#flexicontent
+div.fcvote .ajax-loader,
+div.fcvote .ajax-loader {
+	background: url("../images/ajax-loader.gif") no-repeat scroll left center transparent;
+	height: 16px;
+	padding: 0 0 0 20px;
 }
 
-.fcvote ul {
-	height: 25px;
-	width: 125px;
+/* Review form */
+#flexicontent
+.fcvote_toggle_review_form,
+.fcvote_toggle_review_form * {
+	vertical-align:top;
+}
+#flexicontent
+.fcvote_review_form_box label ,
+.fcvote_review_form_box label {
+	font-size:14px;
+}
+#flexicontent
+.fcvote_review_form_box table td,
+.fcvote_review_form_box table td {
+		font-size:120%;
 }
 
-.fcvote ul, 
-.fcvote ul li a:hover, 
-.fcvote ul li.current-rating {
-	background-image: url(../images/star.gif)!important;
+#flexicontent
+table.fc-form-tbl td.key,
+table.fc-form-tbl td.key {
+	max-width: 400px;
 }
 
-.fcvote ul li a, 
-.fcvote ul li.current-rating {
-	height: 25px;
-	line-height: 25px;
+
+/*
+ * fcvote CSS, that is OVERRIDABLE by inline CSS rules (!important)
+ * that are created according to voting field configuration,
+ *
+ * DO NOT OVERRIDE these by using CSS,
+ * instead please use field configuration
+ */
+
+/*****************************************/
+/* overridable voting image and its size */
+/*****************************************/
+
+div.fcvote > ul.fcvote_list {
+	height: 24px !important;
+	width: 120px !important; /* overridable number of stars */
 }
 
-.fcvote .ajax-loader {
-    background: url("../images/ajax-loader.gif") no-repeat scroll left center transparent;
-    height: 16px;
-    padding: 0 0 0 20px;
+div.fcvote > ul.fcvote_list > li.voting-links a, 
+div.fcvote > ul.fcvote_list > li.current-rating {
+	height: 24px !important;
+	line-height: 24px !important;
 }
+
+div.fcvote > ul.fcvote_list, 
+div.fcvote > ul.fcvote_list > li.voting-links a:hover, 
+div.fcvote > ul.fcvote_list > li.current-rating {
+	background-image: url(../images/star-medium.png) !important;
+}
+
+
+/*********************************************************************/
+/* For overridable number of stars, mouse-over needs to be overriden */
+/*********************************************************************/
+
+div.fcvote > ul.fcvote_list > li.voting-links:nth-child(2) a { width: 20%  !important;  z-index: 6; }
+div.fcvote > ul.fcvote_list > li.voting-links:nth-child(3) a { width: 40%  !important;  z-index: 5; }
+div.fcvote > ul.fcvote_list > li.voting-links:nth-child(4) a { width: 60%  !important;  z-index: 4; }
+div.fcvote > ul.fcvote_list > li.voting-links:nth-child(5) a { width: 80%  !important;  z-index: 3; }
+div.fcvote > ul.fcvote_list > li.voting-links:nth-child(6) a { width: 100% !important;  z-index: 2; }

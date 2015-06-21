@@ -370,7 +370,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		$tabCnt[$tabSetCnt] = 0;
 		?>
 		<!-- tabber start -->
-		<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+		<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 			<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 				<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 				<?php echo $this->form->getInput('title');?>
@@ -420,7 +420,7 @@ if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 		$tabCnt[$tabSetCnt] = 0;
 		?>
 		<!-- tabber start -->
-		<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+		<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 			<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 				<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 				<?php echo $this->form->getInput('alias');?>
@@ -504,19 +504,17 @@ if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item
 		</div>
 		
 		<?php	if ( $this->params->get('use_versioning', 1) && $this->params->get('allow_unapproved_latest_version', 0) ) : /* PARAMETER MISSING currently disabled */ ?>
-			<div style="float:left; width:50%;">
-				<?php
-					//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
-					$label_tooltip = 'class="'.$tip_class.' flexi_label fcdualline" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
-				?>
-				<span class="label-fcouter">
-					<label id="jform_vstate-lbl" for="jform_vstate" for_bck="jform_vstate" <?php echo $label_tooltip; ?> >
-						<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
-					</label>
-				</span>
-				<div class="container_fcfield container_fcfield_name_vstate fcdualline">
-					<?php echo $this->lists['vstate']; ?>
-				</div>
+			<?php
+				//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
+				$label_tooltip = 'class="'.$tip_class.' flexi_label fcdualline" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
+			?>
+			<span class="label-fcouter">
+				<label id="jform_vstate-lbl" for="jform_vstate" for_bck="jform_vstate" <?php echo $label_tooltip; ?> >
+					<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
+				</label>
+			</span>
+			<div class="container_fcfield container_fcfield_name_vstate fcdualline">
+				<?php echo $this->lists['vstate']; ?>
 			</div>
 		<?php	else : ?>
 	  	<input type="hidden" id="jform_vstate" name="jform[vstate]" value="2" />
@@ -681,11 +679,18 @@ if ($tags_displayed) : ob_start();  // tags ?>
 				<?php
 					foreach($this->usedtagsdata as $tag) {
 						if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
-							echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-							echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+							echo '
+							<li class="tagitem">
+								<span>'.$tag->name.'</span>
+								<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
+								<a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
+							</li>';
 						} else {
-							echo '<li class="tagitem plain"><span>'.$tag->name.'</span>';
-							echo '<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" /></li>';
+							echo '
+							<li class="tagitem plain">
+								<span>'.$tag->name.'</span>
+								<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
+							</li>';
 						}
 					}
 				?>
@@ -931,7 +936,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 					$tabCnt[$tabSetCnt] = 0;
 					?>
 					<!-- tabber start -->
-					<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+					<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 							<?php echo $this->form->getInput('metadesc'); ?>
@@ -969,7 +974,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 					$tabCnt[$tabSetCnt] = 0;
 					?>
 					<!-- tabber start -->
-					<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+					<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 							<?php echo $this->form->getInput('metakey'); ?>
@@ -1116,7 +1121,7 @@ if ( $typeid && $this->perms['cantemplates'] && $this->params->get('selecttheme_
 					echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
 				endif;
 				?>
-				<fieldset class="panelform">
+				<fieldset class="panelform params_set">
 					<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
 						$fieldname =  $field->__get('fieldname');
 						$value = $tmpl->params->getValue($fieldname, $groupname, $this->item->itemparams->get($fieldname));
@@ -1248,7 +1253,7 @@ if ($this->fields && $typeid) :
 				$tabCnt[$tabSetCnt] = 0;
 				?>
 				<!-- tabber start -->
-				<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+				<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo '- '.$this->itemlang->name.' -'; // $t->name; ?> </h3>
 						<?php

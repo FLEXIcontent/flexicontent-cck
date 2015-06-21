@@ -769,6 +769,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		$keepseccats = JRequest::getVar( 'keepseccats', 0, 'post', 'int' );
 		$lang    = JRequest::getVar( 'language', '', 'post' );
 		$state   = JRequest::getInt( 'state', '');
+		$type_id = JRequest::getInt( 'type_id', '');
+		$access  = JRequest::getInt( 'access', '');
 		
 		// Set $seccats to --null-- to indicate that we will maintain secondary categories
 		$seccats = $keepseccats ? null : $seccats;
@@ -830,7 +832,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Try to copy/move items
 		if ($task == 'copymove')
 		{
-			if ($method == 1) // copy only
+			if ($method == 1) // copy
 			{
 				if ( $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state) )
 				{
@@ -844,13 +846,13 @@ class FlexicontentControllerItems extends FlexicontentController
 					$msg = '';
 				}
 			}
-			else if ($method == 2) // move only
+			else if ($method == 2) // update (optionally moving)
 			{
 				$msg = JText::sprintf( 'FLEXI_ITEMS_MOVE_SUCCESS', count($auth_cid) );
 				
 				foreach ($auth_cid as $itemid)
 				{
-					if ( !$model->moveitem($itemid, $maincat, $seccats) )
+					if ( !$model->moveitem($itemid, $maincat, $seccats, $lang, $state, $type_id, $access) )
 					{
 						$msg = JText::_( 'FLEXI_ERROR_MOVE_ITEMS' );
 						JError::raiseWarning( 500, $msg ." " . $model->getError() );
@@ -860,9 +862,9 @@ class FlexicontentControllerItems extends FlexicontentController
 				
 				$clean_cache_flag = true;
 			}
-			else // copy and move
+			else // copy and update (optionally moving)
 			{
-				if ( $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state, $method, $maincat, $seccats) )
+				if ( $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state, $method, $maincat, $seccats, $type_id, $access) )
 				{
 					$msg = JText::sprintf( 'FLEXI_ITEMS_COPYMOVE_SUCCESS', count($auth_cid) );
 					$clean_cache_flag = true;
@@ -1306,10 +1308,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			// Get User Group / Author parameters
 			$db = JFactory::getDBO();
-			$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-			$authorparams = $db->loadResult();
-			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
-			$max_auth_limit = $authorparams->get('max_auth_limit', 0);  // maximum number of content items the user can create
+			$authorparams = flexicontent_db::getUserConfig($user->id);
+			$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // maximum number of content items the user can create
 			
 			// B. Check if max authored content limit reached
 			if ($max_auth_limit) {
@@ -1368,7 +1368,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	}
 
 	/**
-	 * Method to fetch the tags form
+	 * Method to fetch the tags form, this is currently NOT USED
 	 * 
 	 * @since 1.5
 	 */
@@ -1396,26 +1396,38 @@ class FlexicontentControllerItems extends FlexicontentController
 		$n = count($tags);
 		$rsp = '';
 		if ($n>0) {
-			$rsp .= '<div class="qf_tagbox">';
-			$rsp .= '<ul>';
+			$rsp .= '<div class="qf_tagbox" id="qf_tagbox">';
+			$rsp .= '<ul id="ultagbox">';
 			for( $i = 0, $n; $i < $n; $i++ ){
 				$tag = $tags[$i];
-				$rsp .=  '<li><div><span class="qf_tagidbox"><input type="checkbox" name="tag[]" value="'.$tag->id.'"' . (in_array($tag->id, $used) ? 'checked="checked"' : '') . $CanUseTags . ' /></span>'.$tag->name.'</div></li>';
-				if ($CanUseTags && in_array($tag->id, $used)){
-					$rsp .= '<input type="hidden" name="tag[]" value="'.$tag->id.'" />';
+				if (!in_array($tag->id, $used)) continue; // tag not assigned to item
+				if ( $CanUseTags && in_array($tag->id, $used) ) {
+					$rsp .='
+					<li class="tagitem">
+						<span>'.$tag->name.'</span>
+						<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
+						<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
+					</li>';
+				} else {
+					$rsp .='
+					<li class="tagitem plain">
+						<span>'.$tag->name.'</span>
+						<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
+					</li>';
 				}
 			}
 			$rsp .= '</ul>';
 			$rsp .= '</div>';
 			$rsp .= '<div class="clear"></div>';
-			}
+		}
 		if ($CanNewTags)
 		{
-			$rsp .= '<div class="qf_addtag">';
-			$rsp .= '<label for="addtags">'.JText::_( 'FLEXI_ADD_TAG' ).'</label>';
-			$rsp .= '<input type="text" id="tagname" class="inputbox" size="30" />';
-			$rsp .=	'<input type="button" class="fc_button" value="'.JText::_( 'FLEXI_ADD' ).'" onclick="addtag()" />';
-			$rsp .= '</div>';
+			$rsp .= '
+			<div class="qf_addtag">
+				<label for="addtags">'.JText::_( 'FLEXI_ADD_TAG' ).'</label>
+				<input type="text" id="tagname" class="inputbox" size="30" />
+				<input type="button" class="fc_button" value="'.JText::_( 'FLEXI_ADD' ).'" onclick="addtag()" />
+			</div>';
 		}
 		echo $rsp;
 	}

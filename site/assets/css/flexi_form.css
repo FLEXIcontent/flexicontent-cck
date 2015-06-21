@@ -405,7 +405,7 @@ html button {
 /*
 .fcbutton_apply, .fcbutton_save, .fcbutton_cancel,
 .fcbutton_preview, .fcbutton_preview_save,
-.fcbutton_go, .fcbutton_reset { padding-left: 20px !important }
+.fcbutton_go, .fcbutton_reset { padding-left: 20px !important; }
 .fcbutton_apply { background: url(../images/accept.png) no-repeat !important; }
 .fcbutton_save { background: url(../images/accept.png) no-repeat !important; }
 .fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important; }

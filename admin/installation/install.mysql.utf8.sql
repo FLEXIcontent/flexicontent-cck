@@ -12,10 +12,12 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_favourites` (
   `itemid` int(11) NOT NULL default '0',
   `userid` int(11) NOT NULL default '0',
   `notify` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`id`,`itemid`,`userid`),
+  `type` INT(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY  (`id`,`itemid`,`userid`, `type`),
   KEY `id` (`id`),
   KEY `itemid` (`itemid`),
-  KEY `userid` (`userid`)
+  KEY `userid` (`userid`),
+  KEY `type` (`type`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
@@ -139,6 +141,24 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_extravote` (
   `rating_sum` int(11) NOT NULL,
   `rating_count` int(11) NOT NULL,
   KEY `extravote_idx` (`content_id`)
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+
+CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
+  `content_id` int(11) NOT NULL,
+  `type` int(11) NOT NULL DEFAULT '1',
+  `average_rating` mediumtext NOT NULL,
+  `custom_ratings` mediumtext NOT NULL DEFAULT '',
+  `user_id` int(11) NOT NULL DEFAULT '0',
+  `email` varchar(255) NOT NULL DEFAULT '',
+  `title` varchar(255) NOT NULL,
+  `text` mediumtext NOT NULL,
+  `state` int(11) NOT NULL,
+  `confirmed` int(11) NOT NULL,
+  `submit_date` datetime NOT NULL,
+  `update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `custom_fields` mediumtext NULL,
+  PRIMARY KEY (`content_id`, `type`),
+  KEY `user_id` (`user_id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_versions` (

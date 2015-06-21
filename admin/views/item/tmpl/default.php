@@ -246,7 +246,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				$tabCnt[$tabSetCnt] = 0;
 				?>
 				<!-- tabber start -->
-				<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+				<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo '-'.$itemlangname.'-'; // $itemlang; ?> </h3>
 						<?php echo $this->form->getInput('title');?>
@@ -292,7 +292,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				$tabCnt[$tabSetCnt] = 0;
 				?>
 				<!-- tabber start -->
-				<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+				<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo '-'.$itemlangname.'-'; // $itemlang; ?> </h3>
 						<?php echo $this->form->getInput('alias');?>
@@ -368,11 +368,18 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 						for( $i = 0, $nused; $i < $nused; $i++ ) {
 							$tag = $this->usedtags[$i];
 							if ( $this->perms['cantags'] ) {
-								echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-								echo '<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" /><a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+								echo '
+								<li class="tagitem">
+									<span>'.$tag->name.'</span>
+									<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
+									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
+								</li>';
 							} else {
-								echo '<li class="tagitem plain"><span>'.$tag->name.'</span>';
-								echo '<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" /></li>';
+								echo '
+								<li class="tagitem plain">
+									<span>'.$tag->name.'</span>
+									<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
+								</li>';
 							}
 						}
 					?>
@@ -384,7 +391,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 		</div>
 		
 		
-		<div class="span6 full_width_980 padded_wrap_box">
+		<div class="span6 full_width_980">
 			
 			<?php
 				$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
@@ -593,7 +600,7 @@ $tabCnt[$tabSetCnt] = 0;
 				$tabCnt[$tabSetCnt] = 0;
 				?>
 				<!-- tabber start -->
-				<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+				<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo '- '.$itemlangname.' -'; // $t->name; ?> </h3>
 						<?php
@@ -1051,7 +1058,7 @@ if ($this->perms['canparams']) : ?>
 					$tabCnt[$tabSetCnt] = 0;
 					?>
 					<!-- tabber start -->
-					<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+					<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 							<h3 class="tabberheading"> <?php echo '-'.$itemlangname.'-'; // $itemlang; ?> </h3>
 							<?php echo $this->form->getInput('metadesc');?>
@@ -1090,7 +1097,7 @@ if ($this->perms['canparams']) : ?>
 					$tabCnt[$tabSetCnt] = 0;
 					?>
 					<!-- tabber start -->
-					<div class="fctabber" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+					<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 							<h3 class="tabberheading"> <?php echo '-'.$itemlangname.'-'; // $itemlang; ?> </h3>
 							<?php echo $this->form->getInput('metakey');?>
@@ -1515,7 +1522,7 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 				else :
 				$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
 				foreach ($this->versions as $version) :
-					$class = ($version->nr == $this->row->version) ? ' class="active-version success"' : '';
+					$class = ($version->nr == $this->row->version) ? ' id="active-version" class="success"' : '';
 					if ((int)$version->nr > 0) :
 				?>
 				<tr<?php echo $class; ?>>

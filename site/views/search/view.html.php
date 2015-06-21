@@ -94,6 +94,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		//add css file
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
+			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexi_filters.css');
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
 		

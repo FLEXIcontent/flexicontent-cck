@@ -40,8 +40,9 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$user     = JFactory::getUser();
 		
 		$use_jquery_sortable = true;
-		$type 	= JRequest::getVar('type',  'items', '', 'word');
-		$folder = JRequest::getVar('folder',  'default', '', 'cmd');
+		$type    = JRequest::getVar('type',  'items', '', 'word');
+		$folder  = JRequest::getVar('folder',  'default', '', 'cmd');
+		$ismodal = JRequest::getVar('ismodal',  'default', '', 'int');
 		
 		FLEXIUtilities::loadTemplateLanguageFile( $folder );
 
@@ -53,9 +54,13 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$fbypos  = $this->get( 'FieldsByPositions');
 		$used    = $this->get( 'UsedFields');
 		
-		$contentTypes = $this->get( 'ContentTypesList' );
-		$fieldTypes   = $this->get( 'FieldTypesList' );
+		$contentTypes = $this->get( 'TypesList' );
+		//$fieldTypes = $this->get( 'FieldTypesList' );
+		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=false, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
 		
+		
+		flexicontent_html::loadFramework('select2');
+		JHTML::_('behavior.tooltip');
 		
 		// Create CONTENT TYPE SELECTOR
 		foreach ($fields as $field) {
@@ -66,20 +71,28 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		foreach ($contentTypes as $contentType) {
 			$options[] = JHTML::_('select.option', $contentType->id, JText::_( $contentType->name ) );
 		}
-		$fieldname =  $elementid = 'content_type__au__';
-		$attribs = ' onchange="filterFieldList(\'%s\', \'%s\', \'%s\');" class="fcfield_selectval" ';
+		$fieldname = $elementid = 'content_type__au__';
+		$attribs = ' onchange="filterFieldList(\'%s\', \'%s\', \'%s\');" class="use_select2_lib" ';
 		$content_type_select = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
 		
 		
 		// Create FIELD TYPE SELECTOR
-		$options = array();
-		$options[] = JHTML::_('select.option',  '',  JText::_( 'FLEXI_ALL' ) );
-		foreach ($fieldTypes as $fieldType) {
-			$options[] = JHTML::_('select.option', $fieldType->type_name, $fieldType->field_name );
+		$ALL = mb_strtoupper(JText::_( 'FLEXI_ALL' ), 'UTF-8') . ' : ';
+		$fftypes = array();
+		$fftypes[] = array('value'=>'', 'text'=>JText::_( 'FLEXI_ALL' ) );
+		//$fftypes[] = array('value'=>'BV', 'text'=>$ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
+		//$fftypes[] = array('value'=>'C',  'text'=>$ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
+		//$fftypes[] = array('value'=>'NC', 'text'=>$ALL . JText::_( 'FLEXI_NON_CORE_FIELDS' ));
+		foreach ($fieldTypes as $field_group => $ft_types) {
+			$fftypes[] = $field_group;
+			foreach ($ft_types as $field_type => $ftdata) {
+				$fftypes[] = array('value'=>$ftdata->field_type, 'text'=>$ftdata->friendly);
+			}
+			$fftypes[] = '';
 		}
-		$fieldname =  $elementid = 'field_type__au__';
-		$attribs = ' onchange="filterFieldList(\'%s\', \'%s\', \'%s\');" class="fcfield_selectval" ';
-		$field_type_select = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
+		$fieldname = $elementid = 'field_type__au__';
+		$attribs = ' class="use_select2_lib" onchange="filterFieldList(\'%s\', \'%s\', \'%s\');"';
+		$field_type_select = flexicontent_html::buildfieldtypeslist($fftypes, $fieldname, '', ($_grouped ? 1 : 0), $attribs, $elementid);
 		
 		
 		if (isset($layout->positions)) {
@@ -173,7 +186,6 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
 		
 		$permission = FlexicontentHelperPerm::getPerm();
 		if (!$permission->CanTemplates) {
@@ -184,10 +196,16 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		FLEXISubmenu('CanTemplates');
 
 		//create the toolbar
+		$bar = JToolBar::getInstance('toolbar');
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TEMPLATE' ), 'templates' );
-		JToolBarHelper::apply('templates.apply');
-		JToolBarHelper::save('templates.save');
-		JToolBarHelper::cancel('templates.cancel');
+		if (!$ismodal) {
+			JToolBarHelper::apply('templates.apply');
+			JToolBarHelper::save('templates.save');
+			JToolBarHelper::cancel('templates.cancel');
+		} else {
+			JToolBarHelper::apply('templates.apply_modal');
+			echo $bar->render();
+		}
 		
 		
 		// **********************************************************************************

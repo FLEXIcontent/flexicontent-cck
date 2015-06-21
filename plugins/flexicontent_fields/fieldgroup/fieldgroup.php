@@ -355,6 +355,11 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
+		if (!$pretext && !$posttext)
+		{
+			$pretext = '<div class="fc-fieldgrp-value-box">';
+			$posttext = '</div>';
+		}
 		
 		switch($separatorf)
 		{
@@ -414,11 +419,18 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		else {
 			// Render HTML of fields in the group
+			$method = 'display';
+			$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));;
 			foreach($grouped_fields as $grouped_field) {
-				$_values = null;
-				$grouped_field->ingroup = 1;
-				$method = 'display';
-				FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayFieldValue', array(&$grouped_field, $item, $_values, $method));
+
+				// Render the display method for the given field
+				$_values = $grouped_field->value;
+				$grouped_field->ingroup = 1;  // render as array
+				
+				//echo 'Rendering: '. $grouped_field->name . ', method: ' . $method . '<br/>';
+				//FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayFieldValue', array(&$grouped_field, $item, $_values, $method));
+				FlexicontentFields::renderField($item, $grouped_field, $_values, $method, $view);  // Includes content plugins triggering
+				
 				unset($grouped_field->ingroup);
 			}
 			
@@ -428,10 +440,12 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				$default_html = array();
 				foreach($grouped_fields as $grouped_field) {
 					$_values = null;
-					$default_html[] =
-						($grouped_field->parameters->get('display_label') ? '<span class="flexi label">'.$grouped_field->label.'</span>' : '').
-						(isset($grouped_field->{$prop}[$n]) ? $grouped_field->{$prop}[$n] : '')
-					;
+					$default_html[] = '
+					<div class="fc-field-box">
+						'.($grouped_field->parameters->get('display_label') ? '
+						<span class="flexi label">'.$grouped_field->label.'</span>' : '').
+						(isset($grouped_field->{$prop}[$n]) ? '<div class="flexi value">'.$grouped_field->{$prop}[$n].'</div>' : '').'
+					</div>';
 				}
 				$field->{$prop}[] = $pretext . implode('<div class="clear"></div>', $default_html).'<div class="clear"></div>' . $posttext;
 			}
@@ -488,6 +502,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		//print_r($gf_names);
 		if ( count($gf_names) )
 		{
+			$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));;
 			$gf_props = array();
 			foreach($grouped_fields as $grouped_field) {
 				if ( ! isset($found_names[ $grouped_field->name ]) ) continue;
@@ -503,10 +518,13 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				if ( isset($grouped_field->{$method}) && is_array($grouped_field->{$method}) ) continue;
 				
 				// Render the display method for the given field
-				$_values = null;
+				$_values = $grouped_field->value;
 				$grouped_field->ingroup = 1;  // render as array
+				
 				//echo 'Rendering: '. $grouped_field->name . ', method: ' . $method . '<br/>';
-				FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayFieldValue', array(&$grouped_field, $item, $_values, $method));
+				//FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayFieldValue', array(&$grouped_field, $item, $_values, $method));
+				FlexicontentFields::renderField($item, $grouped_field, $_values, $method, $view);  // Includes content plugins triggering
+				
 				unset($grouped_field->ingroup);
 			}
 		}

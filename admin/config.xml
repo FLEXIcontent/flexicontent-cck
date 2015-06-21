@@ -22,10 +22,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="draggable_reordering" type="radio" default="1" label="FLEXI_DRAG_AND_DROP_ORDERING" description="FLEXI_DRAG_AND_DROP_ORDERING_DESC" class="btn-group btn-group-yesno">
+			<!--field name="draggable_reordering" type="radio" default="1" label="FLEXI_DRAG_AND_DROP_ORDERING" description="FLEXI_DRAG_AND_DROP_ORDERING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</field>
+			</field-->
 			<field name="show_usability_messages" type="radio" default="1" label="FLEXI_SHOW_USABILITY_MESSAGES" description="FLEXI_SHOW_USABILITY_MESSAGES_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -810,10 +810,10 @@
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
-			<field name="filter_placement" type="radio" default="1" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="btn-group btn-group-yesno">
-				<option value="2">FLEXI_YES_BUT_FILTER_BELOW_LABEL</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="filter_placement" type="radio" default="1" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_BUT_FILTER_BELOW_LABEL</option>
 				<option value="3">FLEXI_PLACE_IN_TABS</option>
 			</field>
 			
@@ -1490,6 +1490,7 @@
 			
 		<field name="" type="separator" default="FLEXI_PARAMETERS_APPEARANCE" label="" level="level1" />
 			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" />
+			<field name="items_manager_custom_filters" type="filters" default="" field_type="select,selectmutiple,radio,radioimage,checkbox,checkboximage" label="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST" description="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST_DESC" />
 			<field name="items_manager_order" type="list" default="1" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC">
 				<option value="">FLEXI_ITEMS_MANAGER_ORDER_DEFAULT_UNORDERED</option>
 				<option value="lang">FLEXI_ITEMS_MANAGER_ORDER_LANGUAGE</option>

@@ -195,11 +195,17 @@ div.current dd .pane-sliders .panel {
  ************************************/
 
 /* rows table */
+
 table.adminlist.fcmanlist {
 	margin-top: 12px;
 }
+.column_toggle_lbl { /* hidden label */
+	display:none;
+}
+
 
 /* various containers of backend managers */
+
 .flexicontent #fc-filters-box,
 .flexicontent #mainChooseColBox,
 .flexicontent #stateGroupsBox,
@@ -238,6 +244,11 @@ table.adminlist.fcmanlist {
 
 /* filters line */
 
+#fc-filter-buttons { /* TO BE REMOVED, TODO: replace this in itemselement view */
+	display: inline-block;
+	padding: 0px;
+	margin: 0px;
+}
 .flexicontent #fc-filters-box .fc-filter {
 	border:0px !important;
 	margin: 0px 12px 12px 0;
@@ -279,7 +290,8 @@ table.adminlist.fcmanlist {
 }
 
 
-/* Highlighting selected choices */
+/* highlighting selected choices */
+
 .fc_filter_html .select2-search-choice div,
 .select2-container .select2-choice.fc_highlight span,
 .fc_highlight {
@@ -296,7 +308,9 @@ table.adminlist.fcmanlist {
 	font-style: italic !important;
 }
 
-/* a little larger icons */
+
+/* some icons customization */
+
 .flexicontent [class^="icon-"] {
 	/*font-size: 14px;*/
 }
@@ -304,6 +318,39 @@ table.adminlist.fcmanlist {
 	vertical-align: middle;
 	font-size: 18px;
 }
+
+
+/* sortable rows handles */
+
+ .flexicontent .fc_drag_handle_none,
+.flexicontent .fc_drag_handle {
+	display: block;
+	width: 16px;
+	height: 16px;
+	float: left;
+	margin: 0px;
+	padding: 0px;
+}
+.flexicontent .fc_drag_handle {
+	cursor: move;
+}
+.flexicontent .fc_drag_handle_none {
+	background: url(../images/move2_none.png) 0% 0% no-repeat transparent;
+}
+.flexicontent .fc_drag_handle.fc_drag_handle_disabled {
+	background: url(../images/move3.png) 0% 0% no-repeat transparent;
+	cursor: auto;
+}
+.flexicontent .fc_drag_handle.fc_drag_handle_both {
+	background: url(../images/move2.png) 0% 0% no-repeat transparent;
+}
+.flexicontent .fc_drag_handle.fc_drag_handle_uponly {
+	background: url(../images/move2_uponly.png) 0% 0% no-repeat transparent;
+}
+.flexicontent .fc_drag_handle.fc_drag_handle_downonly {
+	background: url(../images/move2_downonly.png) 0% 0% no-repeat transparent;
+}
+
 
 
 
@@ -691,3 +738,197 @@ body .tooltip.in {
 	min-width: 300px;
 	text-align: left;
 }
+
+
+
+/*************
+ * Import view
+ *************/
+
+#flexicontent table label.fckey {
+	display:inline-block;
+	float:none !important;
+	width:82%;
+	padding:6px 6% !important;
+	margin:1px 6% 0px 1px;
+}
+
+.fcimporttbl {}
+.fcimportdata {
+	padding-top:6px;
+	font-size:12px;
+	white-space:nowrap;
+}
+.fcimportdata label.fcdata {
+	font-weight: normal;
+}
+.fcimport_sampleline {
+	font-size:12px;
+	line-height:1.6em;
+	display: inline-block;
+	margin-top: 4px;
+}
+.fcimport_missingfile {
+	background: url(../images/warning.png) 0 0 no-repeat;
+	padding: 2px 0px 2px 20px;
+	color: red;
+}
+
+ol.fcimport_field_value_list {
+	margin:0px;
+	padding:0px;
+	position: relative;
+	left:0px;
+}
+ul.fcimport_field_value_list {
+	margin:0px;
+	padding:0px;
+	position: relative;
+	left:0px;
+}
+
+dl.fcimport_field_prop_list.fcimport_field_prop_mainlist dt { text-align: right; width:auto; clear:none;}
+dl.fcimport_field_prop_list.fcimport_field_prop_mainlist dd { float:left;  margin-right:48px; }
+
+dl.fcimport_field_prop_list { border: 0px solid; margin: 0px; padding: 0px; }
+dl.fcimport_field_prop_list > dt { float: left; clear: left; width:auto; text-align: left; font-weight: bold; color: green; margin-right:6px; }
+dl.fcimport_field_prop_list > dt:after { content: ":"; }
+dl.fcimport_field_prop_list > dd { margin:0; padding:0; }
+
+ol.fcimport_field_value_list { margin-left:1.5em; padding-left:0px; }
+ul.fcimport_field_value_list { margin-left:0em; padding-left:0.2em; margin-bottom:0; }
+ul.fcimport_field_value_list li {
+	background:url(../images/readon.gif) 0% 50% no-repeat transparent;
+  padding-left: 16px; 
+  list-style: none; 
+}
+ul.fcimport_field_value_list li:first-child { border-top: 0px dashed; width:100% }
+ul.fcimport_field_value_list li { border-top: 1px dashed lightgray; float:left; clear:both; }
+
+ol.fcimport_field_value_list li,
+ul.fcimport_field_value_list li { margin-bottom:0em; }
+.fcimport_field_value_list ul li {
+	/*background-image:url(../images/add.png);*/
+}
+.fcimport_field_value_list ol li { 
+  list-style:decimal; 
+  background-image:none; 
+  padding-left:0em; 
+}
+
+
+
+/****************************************
+ * TASK SCREENS: e.g. post install screen
+ ****************************************/
+
+/* Buttons */
+.button-add a {
+	display: inline-block;
+	padding: 1px 8px;
+	border: 1px solid #ccc;
+	background: #efefef;
+}
+.button-add a,
+.button-add a:visited,
+.button-add a:link,
+.button-add a:hover {
+	color: black;
+	text-decoration: none;
+}
+
+/* Copy parameters */
+.copyok {
+	background: url(../images/accept.png) 0% 50% no-repeat transparent;
+	padding: 1px 0 1px 20px;
+	margin: 5px 15px;
+}
+.copyfailed {
+	background: url(../images/delete.png) 0% 50% no-repeat transparent;
+	padding: 1px 0 1px 20px;
+	margin: 5px 15px;
+}
+.copywarn {
+	background: url(../images/warning.png) 0% 50% no-repeat transparent;
+	padding: 1px 0 1px 20px;
+	margin: 5px 15px;
+}
+.install-ok {
+	background: url(../images/accept.png) 0% 50% no-repeat transparent;
+	padding: 1px 0 1px 20px;
+}
+.install-notok {
+	background: url(../images/delete.png) 0% 50% no-repeat transparent;
+	padding: 1px 0 1px 20px;
+}
+
+/* Import screen */
+#import-log {
+	margin: 10px 10px 15px 10px;
+	font-size: 12px;
+	line-height: 140%;
+	white-space: normal;
+}
+.alert-modalbox {
+	display: block;
+	border-color: #D8000C !important;
+	margin: 0 0 15px 0 !important;
+	padding: 8px 10px 8px 36px !important;
+	
+	border: 1px solid !important;
+	border-radius: 6px !important;
+	border-color: #D8000C !important;
+	
+	background: #f0f0f0 url(../images/error.png) no-repeat 10px 50%;
+  color: black !important;
+}
+.alert-modalbox-title {
+	display: block;
+	margin: 5px 0px;
+	font-weight: bold;
+}
+.centerimg {
+	display: block;
+	text-align: center;
+	margin-top: 20px;
+	margin-bottom: 0px;
+	padding: 0px;
+	height: 30px;
+}
+.spinner {
+	display: block;
+	margin-top: 20px;
+	margin-bottom: 0px;
+	padding: 0px;
+	height: 30px;
+}
+.lang-success {
+	color: green;
+	font-weight: bold;
+}
+.lang-fail {
+	color: red;
+	font-weight: bold;
+}
+#missing {
+	display:none;
+}
+.button-close {
+	text-align: center;
+	margin: 20px 0px;
+	padding: 0px;
+}
+ul.import-ok, ul.import-failed {
+	list-style: none;
+	margin: 5px 0 10px;
+	padding: 0 0 0 10px;
+}
+ul.import-ok li {
+	background: url(../images/accept.png) 0% 50% no-repeat transparent;
+	padding: 1px 0 1px 20px;
+}
+ul.import-failed li {
+	background: url(../images/delete.png) 0% 50% no-repeat transparent;
+	padding: 1px 0 1px 20px;
+}
+

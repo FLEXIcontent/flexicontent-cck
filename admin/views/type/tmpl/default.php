@@ -82,7 +82,7 @@ $this->document->addScriptDeclaration($js);
 			</table>
 		
 		</div>
-		<div class="span6 full_width_980 padded_wrap_box">
+		<div class="span6 full_width_980">
 
 			<span class="fc-info fc-nobgimage fc-mssg" style="display:block; float:left; clear:both; margin: 32px 0px 32px 0px !important; font-size:12px;">
 				<?php echo str_replace('<br/>', ' ', JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS')); ?>
@@ -112,7 +112,7 @@ $this->document->addScriptDeclaration($js);
 				
 				foreach ($this->form->getFieldset($fsname) as $field) :
 					$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
-						$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+						$this->form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
 					echo '
 					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 						'.($field->label ? '
@@ -146,7 +146,7 @@ $this->document->addScriptDeclaration($js);
 			
 			foreach ($this->form->getFieldset($fsname) as $field) :
 				$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
-					$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+					$this->form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
 				echo '
 				<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 					'.($field->label ? '
@@ -185,7 +185,7 @@ $this->document->addScriptDeclaration($js);
 				<?php
 				foreach ($this->form->getFieldset('themes') as $field) :
 					$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
-						$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+						$this->form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
 					echo '
 					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 						'.($field->label && empty($field->hidden) ? '

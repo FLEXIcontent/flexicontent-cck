@@ -66,7 +66,7 @@ $session = JFactory::getSession();
 					</fieldset>
 					<ul class="upload-queue" id="upload-queue">
 						<li style="display: none" />
-						</ul>
+					</ul>
 					</fieldset>
 					<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager&layout=addfiles&tmpl=component'); ?>" />
 				</form>

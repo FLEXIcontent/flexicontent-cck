@@ -618,7 +618,7 @@ class FlexicontentController extends JControllerLegacy
 		$format		= JRequest::getVar('format', '');
 		// PhpThumb cache directory
 		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
-		$success = JPath::setPermissions($phpthumbcache, '0644', '0755');
+		$success = JPath::setPermissions($phpthumbcache, '0600', '0700');
 		if (!$success) {
 			if ($format == 'raw') {
 				echo '<span class="install-notok"></span>';

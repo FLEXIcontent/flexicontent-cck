@@ -9,7 +9,7 @@
 	<field name="level" type="hidden" filter="unset"/>
 	<field name="path" type="text" label="CATEGORIES_PATH_LABEL" description="CATEGORIES_PATH_DESC" class="readonly" size="40" readonly="true" />
 	<field name="extension" type="hidden" />
-	<field name="title" type="text" label="JGLOBAL_TITLE" description="JFIELD_TITLE_DESC" class="inputbox" size="40" required="true" />
+	<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="inputbox" size="40" required="true" />
 	<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" />
 	<field name="description" type="editor" label="JGLOBAL_DESCRIPTION" description="COM_CATEGORIES_DESCRIPTION_DESC" class="inputbox" filter="safehtml" buttons="true" hide="readmore,pagebreak"/>
 	<field name="published" type="list" class="use_select2_lib" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC">
@@ -658,11 +658,11 @@
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
-			<field name="filter_placement" type="radio" default="" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="btn-group btn-group-yesno">
+			<field name="filter_placement" type="radio" default="" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="btn-group group-fcinfo">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="2">FLEXI_YES_BUT_FILTER_BELOW_LABEL</option>
-				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_BUT_FILTER_BELOW_LABEL</option>
 				<option value="3">FLEXI_PLACE_IN_TABS</option>
 			</field>
 			

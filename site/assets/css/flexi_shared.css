@@ -1,118 +1,15 @@
 
-/* Buttons */
-.button-add a {
-	display: inline-block;
-	padding: 1px 8px;
-	border: 1px solid #ccc;
-	background: #efefef;
-}
-.button-add a,
-.button-add a:visited,
-.button-add a:link,
-.button-add a:hover {
-	color: black;
-	text-decoration: none;
-}
-
-/* Copy parameters */
-.copyok {
-	background: url(../images/accept.png) 0% 50% no-repeat transparent;
-	padding: 1px 0 1px 20px;
-	margin: 5px 15px;
-}
-.copyfailed {
-	background: url(../images/delete.png) 0% 50% no-repeat transparent;
-	padding: 1px 0 1px 20px;
-	margin: 5px 15px;
-}
-.copywarn {
-	background: url(../images/warning.png) 0% 50% no-repeat transparent;
-	padding: 1px 0 1px 20px;
-	margin: 5px 15px;
-}
-.install-ok {
-	background: url(../images/accept.png) 0% 50% no-repeat transparent;
-	padding: 1px 0 1px 20px;
-}
-.install-notok {
-	background: url(../images/delete.png) 0% 50% no-repeat transparent;
-	padding: 1px 0 1px 20px;
-}
-
-/* Import screen */
-#import-log {
-	margin: 10px 10px 15px 10px;
-	font-size: 12px;
-	line-height: 140%;
-	white-space: normal;
-}
-.alert-modalbox {
-	display: block;
-	border-color: #D8000C !important;
-	margin: 0 0 15px 0 !important;
-	padding: 8px 10px 8px 36px !important;
-	
-	border: 1px solid !important;
-	border-radius: 6px !important;
-	border-color: #D8000C !important;
-	
-	background: #f0f0f0 url(../images/error.png) no-repeat 10px 50%;
-  color: black !important;
-}
-.alert-modalbox-title {
-	display: block;
-	margin: 5px 0px;
-	font-weight: bold;
-}
-.centerimg {
-	display: block;
-	text-align: center;
-	margin-top: 20px;
-	margin-bottom: 0px;
-	padding: 0px;
-	height: 30px;
-}
-.spinner {
-	display: block;
-	margin-top: 20px;
-	margin-bottom: 0px;
-	padding: 0px;
-	height: 30px;
-}
-.lang-success {
-	color: green;
-	font-weight: bold;
-}
-.lang-fail {
-	color: red;
-	font-weight: bold;
-}
-#missing {
-	display:none;
-}
-.button-close {
-	text-align: center;
-	margin: 20px 0px;
-	padding: 0px;
-}
-ul.import-ok, ul.import-failed {
-	list-style: none;
-	margin: 5px 0 10px;
-	padding: 0 0 0 10px;
-}
-ul.import-ok li {
-	background: url(../images/accept.png) 0% 50% no-repeat transparent;
-	padding: 1px 0 1px 20px;
-}
-ul.import-failed li {
-	background: url(../images/delete.png) 0% 50% no-repeat transparent;
-	padding: 1px 0 1px 20px;
-}
-
-
 /**
  * Upload Widget CSS
  */
+.fc-sys-upload-limit-box img,
+.fc-php-upload-limit-box img {
+	vertical-align: top;
+	float: none;
+	border: none;
+	margin: 0;
+}
+
 .upload-queue {
 	list-style: none;
 }
@@ -207,10 +104,8 @@ ul.import-failed li {
 .calendar {
 	vertical-align: middle;
 }
-/* */
-.hasTip {
-	cursor: help;
-}
+
+
 /**/
 div.fieldgroups {
 	float: left;
@@ -231,14 +126,9 @@ fieldset.fieldgroups legend {
 fieldset.fieldgroups legend span img {
 	vertical-align: middle;
 	padding-left: 5px;
-	}
-/* image field */
-.empty_image {
-	display: block;
-	background: #F9F9F9 url(../images/image_add.png) no-repeat 50% 50%;
-	border:1px solid silver;
-	margin-bottom:3px;
 }
+
+
 /* Versioning */
 .versions-first {
 	border-bottom: 1px dotted silver;
@@ -251,8 +141,8 @@ fieldset.fieldgroups legend span img {
 .versions img {
 	vertical-align: middle;
 }
-table .active-version {
-	background: #FFFFDD !important;
+table #active-version td {
+	background: #FFFFDD;
 }
 #pager {
 	clear:both;
@@ -268,25 +158,7 @@ div.credits {
 	margin-top: 15px;
 	text-align: center;
 }
-/* Filemanager */
-.filemanager img { vertical-align: middle; }
-.filemanager-tab { margin: 0px; padding:4px 0 0 0; border:0; }
-#filemanager-zone fieldset.actions { margin: 0px; padding:0px; }
-#filemanager-zone textarea#file-desc,
-#filemanager-zone textarea#file-url-desc { width:100%; max-width:600px; }
-#file-upload {
-	font-size: 11px;
-	width: 246px;
-	height: 24px;
-	border-radius: 6px;
-	min-width: 40%;
-}
-/* Management filter forms */
-#fc-filter-buttons {
-	display: inline-block;
-	padding: 0px;
-	margin: 0px;
-}
+
 
 /* Access */
 #flexicontent fieldset#flexiaccess,
@@ -297,9 +169,13 @@ div.credits {
 #flexicontent fieldset#flexiaccess legend,
 #flexicontent fieldset.flexiaccess legend {
 	padding: 0 6px 0 24px;
-	background: url("../images/toggle_blue.png") no-repeat scroll 4px 50% rgba(0, 0, 0, 0) !important;
+	background: url("../images/toggle_blue.png") no-repeat scroll 4px 50% rgba(0, 0, 0, 0);
 	box-sizing: border-box;
 	cursor: pointer;
+}
+#flexicontent fieldset#flexiaccess legend.open,
+#flexicontent fieldset.flexiaccess legend.open {
+	background: url(../images/toggle_blue.png) no-repeat 98% 50%;
 }
 option[disabled], option[readonly] { color: #bbb; }
 /* Categories in the items view */
@@ -368,7 +244,7 @@ span.editlinktip.hasTip.tags img {
 	margin: 0;
 	width: 100%;
 }
-.positions_readonly, .positions {
+.positions {
 	list-style: none;
 	padding: 5px 0px 0px 0px;
 	margin: 0;
@@ -378,11 +254,6 @@ span.editlinktip.hasTip.tags img {
 	border: 0px dashed silver;
 	overflow: visible;  /* hidden, CAUSES annoying jumps with jQuery sortable */
 	width: 100%;
-}
-div .positions_readonly {
-	padding: 2px 1%;
-	width: 98%;
-	display: inline;
 }
 
 .fields {
@@ -400,6 +271,15 @@ div .positions_readonly {
 	float: left;
 	cursor: move;
 }
+.fields.delfield .delfield_handle {
+	display: block;
+	width: 18px;
+	height: 18px;
+	float: right;
+	margin-left: 5px;
+	outline: none;
+	background-color: transparent;
+}
 .fields.user {
 	background: url(../images/textfield.png) #f9f9f9 no-repeat  3px 50%;
 }
@@ -409,15 +289,7 @@ div .positions_readonly {
 #lay-desc-table .key {
 	width: 80px;
 }
-fieldset.tmplprop legend {
-	background: url(../images/toggle_blue_up.png) no-repeat 98% 50%;
-	padding-right: 22px !important;
-	line-height: 18px;
-	cursor: pointer;
-}
-fieldset.tmplprop legend.open {
-	background: url(../images/toggle_blue.png) no-repeat 98% 50%;
-}
+
 
 
 /**************
@@ -443,14 +315,14 @@ table.adminlist thead tr {
 table.adminlist thead th {
 	background: none repeat scroll 0 0 #fff !important; /* forced, combines with table, row, cell borders */
 	border: none;
-	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
+	border-width: 0px !important; /* forced, avoid border of cell overlapping over the border of the row */
 	color: #555;
 	text-align: center;
 	padding: 6px 8px;
 }
 
-table.adminlist thead th.center { text-align: center !important; }
-table.adminlist thead th.left { text-align: left !important; }
+table.adminlist thead th.center { text-align: center !important; } /* forced, apply requested styling */
+table.adminlist thead th.left { text-align: left !important; } /* forced, apply requested styling */
 table.adminlist thead a:hover { text-decoration: none; }
 table.adminlist thead th img { padding-left:3px; vertical-align:middle; }
 
@@ -464,12 +336,12 @@ table.adminlist thead th .filterdel img {
 
 /* Table cell */
 table.adminlist td {
-	padding: 6px 8px; /* allow only specific overrides */
+	padding: 6px 8px;
 }
 table.adminlist input[type="text"] {
-	width: auto !important;  /* enforce to avoid fitting problems */
-	padding-left: 0px !important;
-	padding-right: 0px !important;
+	width: auto !important;  /* forced to avoid fitting problems */
+	padding-left: 0px !important;  /* forced to save space */
+	padding-right: 0px !important;  /* forced to save space */
 }
 /* Highlighted columns, e.g. filtered */
 table.adminlist td.yellow,
@@ -502,7 +374,7 @@ table.adminlist td.order {
 table.adminlist tbody tr td {
 	background: none repeat scroll 0 0 #FFFFFF;
 	border: none;
-	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
+	border-width: 0px !important; /* fored, to avoid border of cell overlapping over the border of the row */
 }
 table.adminlist tbody tr.row1 td {
 	background: none repeat scroll 0 0 #f7f7f7;
@@ -531,7 +403,7 @@ table.adminlist tfoot tr {
 table.adminlist tfoot td, table.adminlist tfoot th {
 	background-color: #fff;
 	border: none;
-	border-width: 0px !important; /*avoid border of cell overlapping over the border of the row */
+	border-width: 0px !important; /* forced, to avoid border of cell overlapping over the border of the row */
 	text-align: center;
 }
 
@@ -561,63 +433,63 @@ table.adminlist .pagination {
 }
 
 /* Tags list autocomplete */
-ul#ultagbox{
-	min-height: 26px !important;
-	margin: 0 !important;
-	padding: 0 !important;
+ul#ultagbox {
+	min-height: 26px;
+	margin: 0;
+	padding: 0;
 }
-ul#ultagbox li{
-	list-style-type:none !important;
-	display:block !important;
-	float:left !important;
-	margin: 2px !important;
-	line-height: 100% !important;
+ul#ultagbox > li {
+	list-style-type:none;
+	display:block;
+	float:left;
+	margin: 2px;
+	line-height: 100%;
 }
 
-.tagitem.plain {
-	background: url(../images/tag_blue.png) #f9f9f9 no-repeat  100% 50% !important;
-	padding-right: 18px!important;
+ul#ultagbox > li.tagitem.plain {
+	background: url(../images/tag_blue.png) #f9f9f9 no-repeat  100% 50%;
+	padding-right: 18px;
 }
-.tagitem {
-	border: 1px solid silver !important;
-	padding: 4px 1px 3px 6px !important;
-	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat  100% 50% !important;
-	margin: 2px !important;
+ul#ultagbox > li.tagitem {
+	border: 1px solid silver;
+	padding: 4px 1px 3px 6px;
+	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat  100% 50%;
+	margin: 2px;
 }
-.deletetag {
-	display: block !important;
-	width: 18px !important;
-	height:14px !important;
-	float: right !important;
-	margin-left: 5px !important;
-	outline: none !important;
-	background-color: transparent !important;
+ul#ultagbox > li.tagitem .deletetag {
+	display: block;
+	width: 18px;
+	height: 18px;
+	float: right;
+	margin-left: 5px;
+	outline: none;
+	background-color: transparent;
 }
 /** tag selection */
 div#tags {
-	margin: 0px 48px 0 0 !important;
-	padding:0px !important;
+	margin: 0px 48px 0 0;
+	padding:0px;
 	float: left;
 }
 div#tags #input-tags {
-	margin: 0px !important;
+	margin: 0px;
 	width: auto;
 }
 div#tags #input_new_tag {
-	display:inline-block !important;
-	padding: 0px !important;
+	display:inline-block;
+	padding: 0px;
 	margin: 0px 4px -4px 0px;
-	width: 16px !important;
-	height: 16px !important;
-	background: url(../images/tag_blue_add.png) #f9f9f9 no-repeat  100% 50% !important;
+	width: 16px;
+	height: 16px;
+	background: url(../images/tag_blue_add.png) #f9f9f9 no-repeat  100% 50%;
 }
 #qf_tagbox {
-	display: block !important;
-	max-height: 170px !important;
-	overflow: auto !important;
-	border: 1px dashed silver !important;
-	background: #fff !important;
-	margin: 0px 4px 4px 0px !important;
+	display: block;
+	max-height: 170px;
+	overflow: auto;
+	border: 1px dashed silver;
+	background: #fff;
+	margin: 0px 4px 4px 0px;
 	float: left;
 }
 
@@ -672,12 +544,12 @@ span.fc_select_button:hover {
 
 div label.state_box,
 div label.lang_box {
-	white-space:nowrap !important;
-	display:inline-block !important;
-	margin: 0px 8px 0px 0px !important;
+	white-space:nowrap;
+	display:inline-block;
+	margin: 0px 8px 0px 0px;
 	padding: 0px!important;
-	vertical-align: top !important;
-	font-size: 12px !important;
+	vertical-align: top;
+	font-size: 12px;
 }
 div label.state_box input,
 div label.state_box img,
@@ -685,12 +557,12 @@ div label.state_box .state_lbl,
 div label.lang_box input,
 div label.lang_box img,
 div label.lang_box .lang_lbl {
-	display:inline-block !important;
-	margin: 4px 5px 0px 0px !important;
-	padding: 0px !important;
-	vertical-align: top !important;
-	line-height: 1em !important;
-	font-size: 12px !important;
+	display:inline-block;
+	margin: 4px 5px 0px 0px;
+	padding: 0px;
+	vertical-align: top;
+	line-height: 1em;
+	font-size: 12px;
 }
 div label.lang_box img {
 	border: 1px solid lightgray;
@@ -699,8 +571,8 @@ div label.lang_box img {
 /* language associations */
 .fc_assoc_translation img {
 	border: 1px solid lightgray;
-	padding: 0px !important;
-	margin: 0px !important;
+	padding: 0px;
+	margin: 0px;
 	float:left;
 }
 .fc_assoc_translation {
@@ -716,78 +588,12 @@ div label.lang_box img {
 }
 
 
-/* Import view */
-#flexicontent table label.fckey {
-	display:inline-block;
-	float:none !important;
-	width:82%;
-	padding:6px 6% !important;
-	margin:1px 6% 0px 1px;
-}
-.fcimporttbl {}
-.fcimportdata {
-	padding-top:6px;
-	font-size:12px;
-	white-space:nowrap;
-}
-.fcimportdata label.fcdata {
-	font-weight: normal;
-}
-.fcimport_sampleline {
-	font-size:12px;
-	line-height:1.6em;
-	display: inline-block;
-	margin-top: 4px;
-}
-.fcimport_missingfile {
-	background: url(../images/warning.png) 0 0 no-repeat;
-	padding: 2px 0px 2px 20px;
-	color: red;
-}
 
-ol.fcimport_field_value_list {
-	margin:0px;
-	padding:0px;
-	position: relative;
-	left:0px;
-}
-ul.fcimport_field_value_list {
-	margin:0px;
-	padding:0px;
-	position: relative;
-	left:0px;
-}
 
-dl.fcimport_field_prop_list.fcimport_field_prop_mainlist dt { text-align: right; width:auto; clear:none;}
-dl.fcimport_field_prop_list.fcimport_field_prop_mainlist dd { float:left;  margin-right:48px; }
+/*******
+ * Forms
+ *******/
 
-dl.fcimport_field_prop_list { border: 0px solid; margin: 0px; padding: 0px; }
-dl.fcimport_field_prop_list > dt { float: left; clear: left; width:auto; text-align: left; font-weight: bold; color: green; margin-right:6px; }
-dl.fcimport_field_prop_list > dt:after { content: ":"; }
-dl.fcimport_field_prop_list > dd { margin:0; padding:0; }
-
-ol.fcimport_field_value_list { margin-left:1.5em; padding-left:0px; }
-ul.fcimport_field_value_list { margin-left:0em; padding-left:0.2em; margin-bottom:0; }
-ul.fcimport_field_value_list li {
-	background:url(../images/readon.gif) 0% 50% no-repeat transparent;
-  padding-left: 16px; 
-  list-style: none; 
-}
-ul.fcimport_field_value_list li:first-child { border-top: 0px dashed; width:100% }
-ul.fcimport_field_value_list li { border-top: 1px dashed lightgray; float:left; clear:both; }
-
-ol.fcimport_field_value_list li,
-ul.fcimport_field_value_list li { margin-bottom:0em; }
-.fcimport_field_value_list ul li {
-	/*background-image:url(../images/add.png);*/
-}
-.fcimport_field_value_list ol li { 
-  list-style:decimal; 
-  background-image:none; 
-  padding-left:0em; 
-}
-
-/* Edit form */
 #flexicontent .fc_tabset_inner {
 	float: none;
 	width: 100%;
@@ -826,308 +632,14 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	border: 0px solid lightgray !important;
 	background: white !important;
 }
-#flexicontent .pane-sliders label.hasTip, #flexicontent .pane-sliders label.hasTooltip {
-	color: black !important;
-  background-color: #eee !important;
-}
 
-
-/**********************/
-/* FLEXIContent FIELD */
-/**********************/
-
-/* FIELD: List of orderable value containers */
-#flexicontent ul.fcfield-sortables {
-	display: inline-block;
-	list-style: none !important;
-	position: static;
-	width: auto;
-	float: left;
-	padding: 0% !important;
-	margin: 0% !important;
-}
-/* FIELD: value containers */
-#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox, /* multiple values (li, orderable) */
-#flexicontent div.fcfieldval_container.valuebox  /* single value (div) */
-{
-	clear: both;
-	display: inline-block;
-	height: auto;
-	position: relative;
-	background: transparent;
-	border: 0px solid lightgray;
-	margin: 0 4px 4px 0;
-	padding: 4px;
-	float: left;
-}
-/* FIELD: multiple-value container */
-#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox {
-	list-style: none !important;
-}
-/* FIELD: multiple-value container (not cleared) */
-#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.floated {
-	clear: none;
-}
-/* FIELD: single-value container */
-#flexicontent div.fcfieldval_container.valuebox {
-}
-
-/* FIELD: special cases alignment, etc */
-#flexicontent .fcfield-sortables > li .input-append,
-#flexicontent .fcfield-sortables > li .input-prepend { float: left; margin-bottom: 0px; }
-#flexicontent .fcfield-sortables > li .input-append { margin-right: 10px; }
-#flexicontent .fcfield-sortables > li .use_select2_lib { vertical-align: top; }
-#flexicontent .fcfield-sortables > li > * { vertical-align: top; }
-#flexicontent .fcfield-sortables > li > [class^="fcfield-"],
-#flexicontent .fcfield-sortables > li > [class*=" fcfield-"] { cursor: pointer; }
-
-/* FIELD-GROUP: list of value containers */
-#flexicontent ul.fcfield-sortables.fcfield-group {
-	width: 100%;
-}
-/* FIELD-GROUP: value container (contains grouped fields) */
-#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox {
-	border: 1px dashed gray;
-	border-radius: 8px !important;
-	width: 100%;
-}
-/* FIELD-GROUP: label of grouped field */
-#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label {
-	box-sizing: border-box;
-	max-width: 150px !important;
-	width: 20% !important;
-	padding: 4px 6px 4px 6px !important;
-	margin: 0 1% 0 0 !important;
-	float:none !important;
-	
-	clear:none;
-	display:inline-block;
-	border-width: 0px !important;
-}
-#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label.fc_tooltip_icon {
-	padding: 4px 6px 4px 20px !important;
-	background-image: url(../images/comment.png);
-	background-position: 2px 2px;
-	background-repeat: no-repeat;
-}
-/* FIELD-GROUP: value of grouped field */
-#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-	/* important to allow only specific overrides, (remember to do value label too!) */
-	/* padding, margin, border, width must be percentage and must be a total of 100% (including label) */
-	border-width: 0 !important;
-	width: 79% !important;
-	padding: 0px 0% 6px !important;
-	margin: 0% !important;
-	float: none !important;
-	
-	clear:none;
-	display:inline-block;
-}
-
-
-/* FIELDs: various buttons */
-#flexicontent .fcfield-drag-handle,
-#flexicontent .fcfield-list-add, #flexicontent .fcfield-list-del,
-#flexicontent .fcfield-placement-h, #flexicontent .fcfield-placement-v,
-#flexicontent .fcfield-addvalue, #flexicontent .fcfield-insertvalue,
-#flexicontent .fcfield-delvalue, #flexicontent .fcfield-button,
-#flexicontent .fcfield-button-add a {
-	/* avoid overriding these */
-	float: none ;
-	clear: none ;
-	display: inline-block ;
-	
-	/* style these */
-	color: #444;
-	font-size: 11px;
-	line-height: 100%;
-	font-weight: bold;
-	
-	border-radius: 4px;
-	border: 1px solid lightgray;
-	vertical-align: top;
-	padding: 6px 8px;
-	margin: 0px 2px 0px 6px;
-
-	background-color: white; background-image: -webkit-gradient(linear, left top, left bottom, from(white), to(lightgray));
-	background-image: -webkit-linear-gradient(top, white, lightgray);
-	background-image: -moz-linear-gradient(top, white, lightgray);
-	background-image: -ms-linear-gradient(top, white, lightgray);
-	background-image: -o-linear-gradient(top, white, lightgray);
-	background-image: linear-gradient(to bottom, white, lightgray);/*filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=lightgray);*//*filter prevents background image in ie8/ie9*/
-}
-/* default hover styling which we make more specific below */
-#flexicontent .fcfield-drag-handle:hover,
-#flexicontent .fcfield-list-add:hover, #flexicontent .fcfield-list-del:hover,
-#flexicontent .fcfield-placement-h:hover, #flexicontent .fcfield-placement-v:hover,
-#flexicontent .fcfield-addvalue:hover, #flexicontent .fcfield-insertvalue:hover,
-#flexicontent .fcfield-delvalue:hover,
-#flexicontent .fcfield-button-add:hover a {
-	background-color: lightgray;
-	color: white;
-	border: 1px solid transparent;
-}
-#flexicontent .fcfield-button:hover,
-#flexicontent .fcfield-button-add:hover a { 
-	color: white;
-	border: 1px solid transparent;
-	background-color: green; background-image: -webkit-gradient(linear, left top, left bottom, from(green), to(darkgreen));
-	background-image: -webkit-linear-gradient(top, green, darkgreen);
-	background-image: -moz-linear-gradient(top, green, darkgreen);
-	background-image: -ms-linear-gradient(top, green, darkgreen);
-	background-image: -o-linear-gradient(top, green, darkgreen);
-	background-image: linear-gradient(to bottom, green, darkgreen);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=green, endColorstr=darkgreen);
-}
-
-/* FIELDs: ADD link container */
-#flexicontent .fcfield-button-add {
-	/* allow only explicitely coded override, since normally style must be done only at the inner link */
-	vertical-align: top !important;
-	float: none !important;
-	margin: 0px !important;
-	padding: 0px !important;
-}
-/* FIELDs: ADD link (inner) */
-/* we do not want joomla template link styling here !!!, allow only explicitly coded override */
-#flexicontent .fcfield-button-add a { 
-	padding: 6px 8px;
-	margin: 0px 2px 0px 6px;
-	text-decoration: none!important;
-	background-color: white!important;
-	color: gray!important;
-}
-#flexicontent .fcfield-button-add:hover a { 
-	background-color: darkgreen!important;
-	color: white!important;
-	border: 1px solid transparent;
-}
-
-
-/* FIELDs: ADD (append value) button */
-#flexicontent input.fcfield-addvalue {
-	padding: 5px 12px 6px;
-	margin: 4px 2px 0px 6px;
-}
-#flexicontent span.fcfield-addvalue {
-	margin: 4px 2px 0px 6px;
-	padding: 12px;
-	background: url(../images/plus-button.png) 4px 4px no-repeat white;
-}
-#flexicontent .fcfield-addvalue.fccleared {
-	clear: both !important;
-	float: left !important;
-}
-
-
-/* FIELDs: add/del to/from list */
-#flexicontent .fcfield-list-add, #flexicontent .fcfield-list-del,
-#flexicontent .fcfield-placement-h, #flexicontent .fcfield-placement-v {
-	margin:0px 0px 2px 0px;
-	padding: 12px;
-}
-#flexicontent .fcfield-placement-h { background: url(../images/arrow-resize.png) 4px 4px no-repeat white; }
-#flexicontent .fcfield-placement-v { background: url(../images/arrow-resize-090.png) 4px 4px no-repeat white; }
-#flexicontent .fcfield-placement-h.fc_toggle, #flexicontent .fcfield-placement-v.fc_toggle { background: url(../images/arrow-in-out.png) 4px 4px no-repeat white; }
-
-#flexicontent .fcfield-list-add { background: url(../images/list_add_v.png) 4px 4px no-repeat white; }
-#flexicontent .fcfield-list-del { background: url(../images/list_del_v.png) 4px 4px no-repeat white; }
-#flexicontent .fcfield-list-add.fc_horizontal { background: url(../images/list_add_h.png) 4px 4px no-repeat white; }
-#flexicontent .fcfield-list-del.fc_horizontal { background: url(../images/list_del_h.png) 4px 4px no-repeat white; }
-
-#flexicontent .fcfield-placement-h:hover, #flexicontent .fcfield-placement-v:hover,
-#flexicontent .fcfield-list-add:hover, #flexicontent .fcfield-list-del:hover {
-	background-color: lightgray;
-	color: white;
-}
-
-
-/* FIELDs: Insert value button */
-#flexicontent .fcfield-insertvalue {
-	margin:0px 0px 2px 0px;
-	padding: 12px;
-	background: url(../images/plus-button.png) 4px 4px no-repeat white;
-}
-#flexicontent .fcfield-insertvalue.fc_after {
-	background: url(../images/insert_after_180.png) 4px 4px no-repeat white;
-}
-#flexicontent .fcfield-insertvalue.fc_before {
-	background: url(../images/insert_before_180.png) 4px 4px no-repeat white;
-}
-#flexicontent .fcfield-insertvalue:hover {
-	background-color: lightgray;
-	color: white;
-}
-
-
-/* FIELDs: Delete value button */
-#flexicontent .fcfield-delvalue {
-	margin:0px 0px 2px 0px;
-	padding: 12px;
-	background: url(../images/delete.png) 4px 4px no-repeat white;
-}
-#flexicontent .fcfield-delvalue:hover {
-	background-color: lightgray;
-	color: white;
-}
-/*table.img_upload_select {
-  width: 60% !important;
-}*/
-
-
-/* FIELDs: DRAG (sort) handle */
-#flexicontent .fcfield-drag-handle {
-	cursor: move;
-	margin:0px 0px 2px 0px;
-	padding: 12px;
-	background: url(../images/move2.png) 4px 4px no-repeat white;
-}
-#flexicontent .fcfield-drag-handle:hover {
-	background-color: lightgray;
-	color: white;
-}
-
-/* ... for compatibility, TO BE REMOVED ? */
-#flexicontent .fcfield-drag {
-	float:none !important; /* do not override breaks dragging */
-	margin:0px; padding:0px;
-	vertical-align:top;
-}
-#flexicontent .fcfield-drag img {
-	margin: 0px 1px -3px 1px !important;
-	padding: 4px;
-	border: 1px solid lightgray;
-	border-radius: 4px;
-	cursor: move !important;
-	float: none !important;
-	display: inline !important;
+#flexicontent .ui-sortable > li {
 	background-color: white;
 }
 
-.fcimg_preview_box img.preview_image {
-	border-radius: 4px;
-	border: 1px solid gray;
-}
 
 
-#flexicontent ul.fcfield-sortables > li table.admintable {
-	text-align: left;
-	width: 100%;
-}
-#flexicontent ul.fcfield-sortables > li.ui-sortable-helper {  /* while dragging */
-	background-color: white !important;
-	border-radius: 4px;
-	border: 1px solid #d0d0d0 !important;
-	moz-box-shadow: 10px 10px 5px rgba(0,0,0,.5);
-	-webkit-box-shadow: 10px 10px 5px rgba(0,0,0,.5);
-	box-shadow: 10px 10px 5px rgba(0,0,0,.5);
-}
-#flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle { /* disable only child */
-	cursor: default !important;
-	background: url(../images/move3.png) 4px 4px no-repeat white;
-	border: 1px solid lightgray;
-}
-
-/* workaround yes-no forced styling */
+/* Extra buttons style for button groups to override Joomla default YES-NO only styling */
 .btn {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -1288,17 +800,14 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 }
 #flexicontent span.flexi_label label label { float:right; margin:auto; padding:auto; }
 
-#flexicontent .flexi_label.fcdualline { width:32%; padding: 6px 2% 6px 2% !important; }
-
 #flexicontent .pane-sliders .group-rules label.hasTip {
   width: auto;
 }
 
-#flexicontent .pane-sliders label.hasTip, #flexicontent .pane-sliders label.hasTooltip,
-#flexicontent .params_set label.hasTip, #flexicontent .params_set label.hasTooltip,
-#flexicontent .flexi_params label.hasTip, #flexicontent .flexi_params label.hasTooltip,
-#flexicontent .panelform > label,
-#flexicontent label.fckey, #flexicontent .flexi_label {
+#flexicontent .flexi_params > label,
+#flexicontent fieldset.panelform > label,
+#flexicontent label.fckey,
+#flexicontent .flexi_label {
 	display: inline-block;
 	color: white;
 	background-color: #999;
@@ -1311,13 +820,13 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	width: 18%;
 	max-width:150px;
 	
-	border: 0px solid !important; /* non-zero causes wrapping */
-	float: left !important;
-	clear: left !important;
-	min-width:auto !important;
-	margin: 0px 1% 1px 0% !important;
-	padding: 8px 1% !important;
-	white-space: normal !important;
+	border: 0px solid;
+	float: left;
+	clear: left;
+	min-width:auto;
+	margin: 0px 1% 1px 0%;
+	padding: 8px 1%;
+	white-space: normal;
 }
 #flexicontent .label-fcouter {
 	display: inline-block;
@@ -1367,6 +876,7 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	width: 50%;
 	padding: 0 32px 0 0;
 	margin: 0%;
+	box-sizing: border-box;
 }
 #flexicontent .span6.full_width_980.padded_wrap_box {
 	padding: 0;
@@ -1397,28 +907,7 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 }
 
 
-#flexicontent .flexi_params .fcdualline_container { margin: 0px; padding: 0px; float: left; min-width: 430px; }
-#flexicontent .flexi_params .fcdualline_container label.flexi_label,
-#flexicontent .flexi_params .fcdualline_container label.hasTip,
-#flexicontent .flexi_params .fcdualline_container label.hasTooltip { clear: none !important; width: 32% !important; }
-#flexicontent .flexi_params .fcdualline_container .container_fcfield input[type="text"],
-#flexicontent .flexi_params .fcdualline_container .container_fcfield select { max-width: 250px !important; }
 
-.flexicontent td.paramlist_key label { margin-right: 2px !important; }
-#flexicontent .flexi_params td.paramlist_key { vertical-align: top; }
-#flexicontent .flexi_params td.paramlist_key label.hasTip,
-#flexicontent .params_set td.paramlist_key label.hasTip {
-	width: 84% !important;
-  margin: 2px 0 !important;
-  padding: 6px 5% !important;
-}
-td.paramlist_key label#params-lbl.hasTip { display:none; }
-.flexi_params {
-	margin:0 !important;
-	padding:0 !important;
-	width:100% !important;
-	border: 0px !important;
-}
 .flexi_params table.admintable,
 .flexi_params table.admintable td {
 	margin:0 !important;
@@ -1427,25 +916,27 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
 	background: none !important;
 }
 
+
+/* Forced elements to display as INVALID, MUST avoid CSS conflicts here */
 #flexicontent form textarea.invalid,
 #flexicontent form input.invalid,
 #flexicontent form select.invalid,
 select.invalid, input.invalid, textarea.invalid {
-	border: 1px dotted #CC0000 !important;
+	border: 1px dotted #CC0000 !important; /* forced, display as INVALID */
 }
 
 /*.use_prettycheckable.invalid + a + label,
 input.invalid + .fccheckradio_lbl {
-	color: #cc0000 !important;
+	color: #cc0000 !important; /* FORCED styling */
 }
 .use_prettycheckable.invalid + a + label > img {
-	border: 1px dotted #CC0000 !important;
+	border: 1px dotted #CC0000 !important; /* forced, display as INVALID */
 }*/
 #flexicontent .label.invalid,
 #flexicontent .label-fcinner.invalid,
 #flexicontent .flexi_label.invalid,
 #flexicontent .flexi_label.invalid.required {
-	color: #CC0000 !important;
+	color: #CC0000 !important; /* forced, display as INVALID */
 }
 #flexicontent .flexi_label.required:after {
 	content:"*";
@@ -1501,28 +992,6 @@ div.flexi_box_right {
 	float: right;
 }
 
-/** FLEXIcontent radio/checkbox buttons **/
-.flexi_radiotab {
-	display: inline-block !important;
-	padding: 1px 6px !important;
-	margin: 2px 0px 2px 8px !important;
-	border-radius: 4px !important;
-	border: 1px solid darkgray !important;
-	text-decoration: none !important;
-	font-weight: bold;
-}
-
-.flexi_radiotab.highlight {
-	background-color: lightgray !important;
-	color: darkred !important;
-}
-
-.flexi_radiotab.downlight {
-	background-color: white !important;
-	color: black !important;
-	cursor: pointer !important;
-}
-
 .flexi_tabbox_label {
 	font-weight: bold;
 	color: #444444;
@@ -1543,34 +1012,6 @@ div.flexi_box_right {
 	padding-right: 0px;
 }
 
-.fc_drag_handle_none, .fc_drag_handle {
-	display: block !important;
-	width: 16px;
-	height: 16px;
-	float: left !important;
-	margin: 0px !important;
-	padding: 0px !important;
-}
-.fc_drag_handle {
-	cursor: move;
-}
-.fc_drag_handle_none {
-	background: url(../images/move2_none.png) 0% 0% no-repeat transparent;
-}
-.fc_drag_handle.fc_drag_handle_disabled {
-	background: url(../images/move3.png) 0% 0% no-repeat transparent !important;
-	cursor: auto;
-}
-.fc_drag_handle.fc_drag_handle_both {
-	background: url(../images/move2.png) 0% 0% no-repeat transparent !important;
-}
-.fc_drag_handle.fc_drag_handle_uponly {
-	background: url(../images/move2_uponly.png) 0% 0% no-repeat transparent !important;
-}
-.fc_drag_handle.fc_drag_handle_downonly {
-	background: url(../images/move2_downonly.png) 0% 0% no-repeat transparent !important;
-}
-
 .fc_legend_box {
 	font-weight: bottom;
 	border-bottom: 1px dashed gray;
@@ -1582,10 +1023,6 @@ div.flexi_box_right {
 	border: 1px dashed #bbbbbb !important;
 	font-size: 12px !important;
 	padding: 6px !important;
-}
-
-.fc_small {
-	font-size: 11px;
 }
 
 
@@ -1611,13 +1048,8 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 .container_fcfield .editlinktip img { margin:4px 4px -4px 0px !important; padding:0px !important; vertical-align:baseline; }
 
 
-#flexicontent .fcclear.fcseparator {
-	border-top: 1px dashed gray!important;
-	visibility: visible !important;
-	margin:12px 0px !important;
-	float: left !important;
-	width: 100% !important;
-}
+
+/* clear classes, forcing to wrap */
 
 #flexicontent .fcclear,
 #flexicontent .clear {
@@ -1633,74 +1065,62 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	display: block;
 }
 
-/* Styling for textinput fields*/
-#flexicontent .fcfield_textareaval,
-#flexicontent .fcfield_selectval,
-#flexicontent .fcfield_selectmulval,
-#flexicontent .fcfield_textval {
+
+/* General styling for form fields */
+
+#flexicontent form .fcfield_textareaval,
+#flexicontent form .fcfield_selectval,
+#flexicontent form .fcfield_selectmulval,
+#flexicontent form .fcfield_textval {
 	background-clip: padding-box;
-	/*background-color: #FFFFFF;*/
-	color: #444 !important;
+	color: #444;
 	border: 1px solid #AAAAAA;
 	border-radius: 4px;
 	display: inline-block;
-	padding: 0 6px 0px 6px !important;
-	margin: 0px 6px 2px 0 !important;
+	padding: 0 6px 0px 6px;
+	margin: 0px 6px 2px 0;
 	position: relative;
 	text-decoration: none;
 	font-size: 12px;
 }
 
-#flexicontent select.fcfield_selectval,
-#flexicontent input.fcfield_textval {
-	height: 26px !important;
-	line-height: 26px !important;
+#flexicontent form select.fcfield_selectval,
+#flexicontent form input.fcfield_textval {
+	height: 26px;
+	line-height: 26px;
 	overflow: auto;
 	min-width:24%;
 	vertical-align: top;
 }
-#flexicontent select.fcfield_selectval {
-	padding: 4px 0 2px 4px !important;
+#flexicontent form select.fcfield_selectval {
+	padding: 4px 0 2px 4px;
 }
-#flexicontent select.fcfield_selectmulval,
-#flexicontent textarea.fcfield_textareaval {
-	line-height: 1em !important;
+#flexicontent form select.fcfield_selectmulval,
+#flexicontent form textarea.fcfield_textareaval {
+	line-height: 1em;
 	overflow: auto;
-	padding: 4px 0 2px 4px !important;
+	padding: 4px 0 2px 4px;
 }
-#flexicontent select.fcfield_selectval.inlineval,
-#flexicontent select.fcfield_selectmulval.inlineval,
-#flexicontent input.fcfield_textval.inlineval {
-	margin-left: 0px !important;
-	margin-right: 0px !important;
-	min-width: 0 !important;
-	width: auto !important;
+#flexicontent form select.fcfield_selectval.inlineval,
+#flexicontent form select.fcfield_selectmulval.inlineval,
+#flexicontent form input.fcfield_textval.inlineval {
+	margin-left: 0px;
+	margin-right: 0px;
+	min-width: 0;
+	width: auto;
 }
-
-/* pluploader CSS compatibility fixes */
-#flash_uploader_container {
-	padding:0px!important;
-	margin:0px!important;
-}
-.plupload_filelist_content {
-	overflow: hidden!important;
-}
-.plupload_view_switch .ui-button {
-	min-width:1px !important;
-	display:inline-block !important;
-	margin:0px !important;
-}
-.plupload_filelist_content .plupload_file {
-	padding:0 !important;
+/* fields inside table rows */
+#flexicontent form .admintable input.fcfield_textval {
+	height:22px;
+	line-height:100%;
+	margin-top:0px;
+	margin-bottom:0px;
 }
 
-
-/* Common field CSS for forms */
-#flexicontent .admintable .fcfield_textval { height:22px; line-height:100%; margin-top:0px !important; margin-bottom: 0px!important;  }
-#flexicontent .ui-sortable > li { background-color: white; }
 
 
 /* Table for forms with label styling */
+
 table.fc-form-tbl td {
 	vertical-align: middle;
 	padding: 4px 24px 4px 0px;
@@ -1727,19 +1147,142 @@ table.fc-form-tbl fieldset {
 	border-width:0px;
 }
 
-legend.tab-inner-title {
-	-webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;
-	font-size:12px;
-	font-family:arial, helvetica, sans-serif;
-	font-weight:bold;
-	text-decoration:none;
+
+
+/****************************
+ * Filemanager / Fileselement
+ ****************************/
+
+/* Upload TABs */
+
+#fileman_tabset {
+	margin-bottom: 32px;
+}
+#fileman_tabset div.tabbertab {
+	padding: 8px 16px 16px 16px;
+}
+
+/* plupload (multi-upload script) CSS compatibility fixes */
+#flash_uploader_container {
+	padding:0px;
+	margin:6px 0 0 0;
+}
+#flash_uploader_container .plupload_filelist_content {
+	overflow: hidden;
+}
+#flash_uploader_container .plupload_view_switch .ui-button {
+	min-width:1px;
 	display:inline-block;
-	text-shadow: 1px 1px 1px rgba(0,0,0,0.6);
-	background-color: #9C9D9E;
-	color:#ffffff;
-	width:auto;
-	font-size:12px;
-	line-height:2em;
-	margin:1px 0 0px -1px;
-	padding:0px 24px 0 20px;
+	margin:0px;
+}
+#flash_uploader_container .plupload_filelist_content .plupload_file {
+	padding:0;
+}
+
+/* various */
+.filemanager img { vertical-align: middle; }
+.filemanager-tab { margin: 0px; padding:4px 0 0 0; border:0; }
+#filemanager-zone fieldset.actions { margin: 0px; padding:0px; }
+#filemanager-zone textarea#file-desc,
+#filemanager-zone textarea#file-url-desc { width:100%; max-width:600px; }
+#file-upload {
+	font-size: 11px;
+	width: 246px;
+	height: 24px;
+	border-radius: 6px;
+	min-width: 40%;
+}
+
+
+
+/*******
+ * Other
+ *******/
+
+/* Highlighting selected choices */
+.fc_filter_html .select2-search-choice div,
+.select2-container .select2-choice.fc_highlight span,
+.fc_highlight {
+	color: darkorange;
+	font-weight: bold;
+}
+
+.select2-container .select2-choice.fc_highlight_disabled span,
+.fc_highlight_disabled {
+	color: gray;
+	font-weight: normal;
+	text-decoration: line-through;
+	font-style: italic;
+}
+
+
+/* Blocking overlay during form being applied and page reloading */
+#fc_filter_form_blocker {
+	display: none;
+	z-index: 1000;
+	
+	position: fixed;
+	top: 0;
+	left: 0;
+	
+	width: 100%;
+	height: 100%;
+}
+#fc_filter_form_blocker .fc_blocker_opacity {
+	display: block;
+	z-index: 1000;
+	
+	position: absolute;
+	top: 0;
+	left: 0;
+	
+	opacity: 0.3;
+	filter:alpha(opacity=30); /* For IE8 and earlier */
+	background-color: #000;
+	
+	width: 100%;
+	height: 100%;
+}
+#fc_filter_form_blocker .fc_blocker_content {
+	display: block;
+	z-index: 1001;
+	position: fixed;
+	top: 200px;
+	left: 40%;
+	
+	color: black;
+	background: white url(../images/ajax-loader.gif) 30px 40px no-repeat;
+	opacity:1;
+	filter:alpha(opacity=100); /* For IE8 and earlier */
+	
+	width: auto;
+	padding: 40px 0px 46px 60px;
+	margin: 0px;
+	
+	font-size: 12px;
+	font-weight: bold;
+	border: 1px solid lightgray;
+	border-radius: 8px;
+	text-align: left;
+}
+
+#fc_filter_form_blocker .fc_blocker_bar {
+	display: block;
+	width: 200px;
+	height: 22px;
+	border: 1px solid #111;
+	background-color: #292929;
+	position: relative;
+	left: -30px;
+	top:6px;
+}
+
+#fc_filter_form_blocker .fc_blocker_bar div {
+	display: block;
+	height: 100%;
+	color: #fff;
+	text-align: right;
+	line-height: 22px; /* same as #progressBar height if we want text middle aligned */
+	width: 0;
+	background-color: #0099ff;
 }

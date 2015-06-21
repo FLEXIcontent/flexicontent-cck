@@ -123,14 +123,16 @@
 	}
 	
 	
-	function toggleDepentParams(el, toggleParent, toggleParentSelector)
+	function toggleDepentParams(el, toggleParent, toggleParentSelector, field)
 	{
 		var seton_list = el.data('seton_list');
-		var setoff_list = el.data('setoff_list');
-		var show_list = el.data('show_list');
-		var hide_list = el.data('hide_list');
+		var setoff_list= el.data('setoff_list');
+		var show_list  = el.data('show_list');
+		var hide_list  = el.data('hide_list');
 		var force_list = el.data('force_list');
 		var refsh_list = el.data('refsh_list');
+		var fcreadonly = el.data('fcreadonly');
+		var fcconfigs  = el.data('fcconfigs');
 		
 		var _d;
 		if (!seton_list) {
@@ -143,6 +145,24 @@
 			setoff_list[0] = el.attr('setoff_list')  ? el.attr('setoff_list')  : null;
 			el.data('setoff_list', setoff_list);
 		}
+		
+		if (!fcreadonly) {
+			var fcreadonly = el.attr('fcreadonly');
+			if (fcreadonly) {
+				fcreadonly = fcreadonly.replace(/\'/g, '"');
+				fcreadonly = jQuery.parseJSON(fcreadonly);
+			}
+			el.data('fcconfigs', fcconfigs);
+		}
+		if (!fcconfigs) {
+			var fcconfigs = el.attr('fcconfigs');
+			if (fcconfigs) {
+				fcconfigs = fcconfigs.replace(/\'/g, '"');
+				fcconfigs = jQuery.parseJSON(fcconfigs);
+			}
+			el.data('fcconfigs', fcconfigs);
+		}
+		
 		if (!show_list) {
 			_d  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
 			show_list = {};
@@ -199,6 +219,49 @@
 				});
 			}
 		});
+		
+		// Display fields / enable input on them ( removeAttr + css ),  force them to update display ( trigger:click ), and to validate new value ( trigger:blur )
+		if (fcconfigs) for (var fieldname in fcconfigs) {
+			if (fcconfigs.hasOwnProperty(fieldname)) {
+				var jf_field = jQuery('#'+'jform_attribs_'+fieldname).first();
+				if (!jf_field.length) continue;
+				
+				if (jf_field.is('fieldset')) {
+					jf_field.find('input').removeAttr('disabled').removeAttr('readonly');
+					jf_field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
+					jf_field.find(':input[value="'+fcconfigs[fieldname]+'"]').next().trigger('click').trigger('blur');
+				} else {
+					jf_field.removeAttr('disabled').removeAttr('readonly').val(fcconfigs[fieldname]).trigger('click').trigger('blur');
+				}
+			}
+		}
+		
+		if (fcreadonly) for (var fieldname in fcreadonly) {
+			if (fcreadonly.hasOwnProperty(fieldname)) {
+				var jf_field = jQuery('#'+'jform_attribs_'+fieldname).first();
+				if (!jf_field.length) continue;
+				
+				if (fcreadonly[fieldname] && !field.hasClass('fccustom_revert')) {
+					if (jf_field.is('fieldset')) {
+						jf_field.find('input').attr('readonly', 'readonly');
+						jf_field.find('label').attr('disabled', true).css('pointer-events', 'none').css('opacity', '0.65');
+					} else if (jf_field.is('select')) {
+						jf_field.attr('readonly', 'readonly').css('pointer-events', 'none').css('opacity', '0.85');
+					} else {
+						jf_field.attr('readonly', 'readonly').css('opacity', '0.85')
+					}
+				} else {
+					if (jf_field.is('fieldset')) {
+						jf_field.find('input').removeAttr('disabled');
+						jf_field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
+					}
+					else {
+						jf_field.removeAttr('readonly').css('pointer-events', 'auto').css('opacity', '1');
+					}
+				}
+			}
+		}
+		
 		jQuery.each( show_list, function( cname, val ) {
 			if (!fc_dependent_params.hasOwnProperty(cname))  fc_dependent_params[cname] = Array();
 			fc_dependent_params[cname][fc_dependent_params[cname].length] = el;
@@ -256,6 +319,33 @@
 			}
 			fc_refreshing_dependent = 0;
 		}
+		
+		// Restore the form to select the element with value ''
+		if ( field.hasClass('fccustom_revert') && el.value!='' ) {
+			
+			var currVal;
+			if ( field.is('fieldset') ) {
+				currVal = field.find('input[type="radio"]:checked').val();
+				if (currVal!='') {
+					field.find('input').attr('disabled', 'disabled');
+					field.find('label').attr('disabled', true).css('pointer-events', 'none').css('opacity', '0.65');
+				}
+			} else {
+				currVal = field.val();
+				if (currVal!='') field.attr('disabled', 'disabled').css('pointer-events', 'none').css('opacity', '0.85');
+			}
+			
+			if (currVal!='') setTimeout(function(){
+				if (field.is('fieldset')) {
+					field.find('input').removeAttr('disabled').removeAttr('readonly');
+					field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
+					field.find(':input[value=""]').next().trigger('click');
+				} else {
+					field.removeAttr('disabled').removeAttr('readonly').val('').trigger('click');
+				}
+			}, 200);
+		}
+		
 		return toBeUpdated;
 	}
 	
@@ -268,7 +358,7 @@
 		
 		// Bind select elements
 		jQuery(container+' select.fcform_toggler_element').change(function() {
-			var toBeUpdated = toggleDepentParams( jQuery('option:selected', this), toggleParent, toggleParentSelector );
+			var toBeUpdated = toggleDepentParams( jQuery('option:selected', this), toggleParent, toggleParentSelector, jQuery(this) );
 			for (var i = 0; i < toBeUpdated.length; i++) {
 				toBeUpdated_ALL[k++] = toBeUpdated[i];
 			}
@@ -276,7 +366,7 @@
 		
 		// Bind radio elements
 		jQuery(document).on('click', container+' .fcform_toggler_element input:radio', function(event) {
-			var toBeUpdated = toggleDepentParams( jQuery(this), toggleParent, toggleParentSelector );
+			var toBeUpdated = toggleDepentParams( jQuery(this), toggleParent, toggleParentSelector, jQuery(this).parent('.fcform_toggler_element') );
 			for (var i = 0; i < toBeUpdated.length; i++) {
 				toBeUpdated_ALL[k++] = toBeUpdated[i];
 			}
@@ -587,6 +677,7 @@
 			// 5. Get column name
 			var column_toggle_lbl = jQuery(thcells[col]).find('.column_toggle_lbl');
 			var col_display_name = column_toggle_lbl.length ? column_toggle_lbl.html(): jQuery(thcells[col]).text();
+			column_toggle_lbl.remove();
 	
 			// 6. Show / Hide current column
 			if ( ( !firstload && !js_isset(show_col[col]) ) || ( jQuery(thcells[col]).hasClass('initiallyHidden') && !js_isset(show_col[col]) ) ) {

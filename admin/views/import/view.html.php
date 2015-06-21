@@ -57,7 +57,6 @@ class FlexicontentViewImport extends JViewLegacy
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
 
 		// Get filter vars
 		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.import.filter_order', 		'filter_order', 	'', 	'cmd' );
@@ -118,13 +117,7 @@ class FlexicontentViewImport extends JViewLegacy
 		}
 		
 		// Get types
-		$query = 'SELECT id, name'
-			. ' FROM #__flexicontent_types'
-			. ' WHERE published = 1'
-			. ' ORDER BY name ASC'
-			;
-		$db->setQuery($query);
-		$types = $db->loadObjectList('id');
+		$types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 		
 		// Get Languages
 		$languages = (FLEXI_FISH || FLEXI_J16GE) ? FLEXIUtilities::getLanguages('code') : array();
@@ -172,11 +165,9 @@ class FlexicontentViewImport extends JViewLegacy
 		
 		//build languages list
 		// Retrieve author configuration
-		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-		if ( $authorparams = $db->loadResult() )
-			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
-
-		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		$authorparams = flexicontent_db::getUserConfig($user->id);
+		
+		$allowed_langs = $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags

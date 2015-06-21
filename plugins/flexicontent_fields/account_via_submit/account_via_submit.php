@@ -214,7 +214,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
-		$field->{prop} = $field->label . " : this field is not meant to be used for display, only meant for item form";
+		//$field->{$prop} = $field->label . " : this field is not meant to be used for display, only meant for item form";
 	}
 	
 	

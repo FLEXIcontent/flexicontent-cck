@@ -616,6 +616,31 @@ class FlexicontentModelCategory extends JModelAdmin
 	
 	
 	/**
+	 * Method to get parameters of parent categories
+	 *
+	 * @access public
+	 * @return	string
+	 * @since	1.6
+	 */
+	function getParentParams($cid) {
+		if (empty($cid)) return array();
+		
+		global $globalcats;
+		$db = JFactory::getDBO();
+		
+		// Select the required fields from the table.
+		$query = " SELECT id, params"
+			." FROM #__categories"
+			." WHERE id IN (".$globalcats[$cid]->ancestors.") "
+			." ORDER BY level ASC";
+		
+		$db->setQuery( $query );
+		$data = $db->loadObjectList('id');
+		return $data;
+	}
+	
+	
+	/**
 	 * Method to change the title & alias.
 	 *
 	 * @param   integer  $parent_id  The id of the parent.

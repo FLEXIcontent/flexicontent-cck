@@ -116,14 +116,14 @@ foreach ($items as $i => $item) :
 	
 	<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) : ?>
 		<!-- BOF buttons -->
-		<p class="buttons">
+		<div class="buttons">
 			<?php echo $pdfbutton; ?>
 			<?php echo $mailbutton; ?>
 			<?php echo $printbutton; ?>
 			<?php echo $editbutton; ?>
 			<?php echo $statebutton; ?>
 			<?php echo $approvalbutton; ?>
-		</p>
+		</div>
 		<!-- EOF buttons -->
 	<?php endif; ?>
 	

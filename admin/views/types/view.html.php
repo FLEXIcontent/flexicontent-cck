@@ -63,7 +63,6 @@ class FlexicontentViewTypes extends JViewLegacy
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j15.css');
 		
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
@@ -161,6 +160,7 @@ class FlexicontentViewTypes extends JViewLegacy
 		
 		
 		//assign data to template
+		$this->assignRef('CanTemplates', $perms->CanTemplates);
 		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('lists'	, $lists);
 		$this->assignRef('rows'		, $rows);

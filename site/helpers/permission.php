@@ -340,7 +340,7 @@ class FlexicontentHelperPerm
 					. ($specific_catids ? '  AND axo IN ('.implode(",", $specific_catids).')' : '')
 					;
 			$db->setQuery($query);
-			$allowedcats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$allowedcats = $db->loadColumn();
 			
 			$allowedcats = $allowedcats ? $allowedcats : array();
 			// we add all descendent to the array
@@ -423,7 +423,7 @@ class FlexicontentHelperPerm
 			// Query the assets table to retrieve the asset names for the specified section
 			$query = "SELECT name FROM #__assets WHERE name like '{$asset_partial}.%';";
 			$db->setQuery($query);
-			$names = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$names = $db->loadColumn();
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			
 			// Create an empty array that will contain the sections on which the user can perform the given action

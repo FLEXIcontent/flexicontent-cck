@@ -51,7 +51,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		
 		$view = JRequest::getString('view', FLEXI_ITEMVIEW);
 		
-		if ($view != FLEXI_ITEMVIEW) return;
+		//if ($view != FLEXI_ITEMVIEW) return;
 		if (JRequest::getCmd('print')) return;
 		
 		global $mainframe, $addthis;
@@ -65,23 +65,22 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$lang = in_array($lang, array('en','es','it','th')) ? $lang : 'en';
 		
 		// parameters shortcuts
-		$display_comments	= $field->parameters->get(FLEXI_J16GE ? 'display_comments' : 'display-comments', 1) && $item->parameters->get('comments',0);
-		$display_resizer	= $field->parameters->get(FLEXI_J16GE ? 'display_resizer' : 'display-resizer', 1);
-		$display_print 		= $field->parameters->get(FLEXI_J16GE ? 'display_print' : 'display-print', 1);
-		$display_email 		= $field->parameters->get(FLEXI_J16GE ? 'display_email' : 'display-email', 1);
-		$display_voice 		= $field->parameters->get(FLEXI_J16GE ? 'display_voice' : 'display-voice', 1);
-		//$display_pdf 		= $field->parameters->get(FLEXI_J16GE ? 'display_pdf' : 'display-pdf', 1);
-		$display_pdf 		= FLEXI_J16GE ? 0 : $field->parameters->get('display-pdf', 1);
-		$load_css 			= $field->parameters->get(FLEXI_J16GE ? 'load_css' : 'load-css', 1);
+		$display_comments	= $field->parameters->get('display_comments', 1) && $item->parameters->get('comments',0);
+		$display_resizer	= $field->parameters->get('display_resizer', 1);
+		$display_print 		= $field->parameters->get('display_print', 1);
+		$display_email 		= $field->parameters->get('display_email', 1);
+		$display_voice 		= $field->parameters->get('display_voice', 1);
+		$display_pdf 		= 0; //$field->parameters->get('display_pdf', 1);
+		$load_css 			= $field->parameters->get('load_css', 1);
 		
-		$display_social 	= $field->parameters->get(FLEXI_J16GE ? 'display_social' : 'display-social', 1);
-		$addthis_user		= $field->parameters->get(FLEXI_J16GE ? 'addthis_user' : 'addthis-user', '');
+		$display_social 	= $field->parameters->get('display_social', 1);
+		$addthis_user		= $field->parameters->get('addthis_user', '');
 		$addthis_pubid	= $field->parameters->get('addthis_pubid', $addthis_user);
 		
-		$spacer_size		= $field->parameters->get(FLEXI_J16GE ? 'spacer_size' : 'spacer-size', 21);
+		$spacer_size		= $field->parameters->get('spacer_size', 21);
 		$module_position	= $field->parameters->get('module_position', '');
-		$default_size 		= $field->parameters->get(FLEXI_J16GE ? 'default_size' : 'default-size', 12);
-		$default_line 		= $field->parameters->get(FLEXI_J16GE ? 'default_line' : 'default-line', 16);
+		$default_size 		= $field->parameters->get('default_size', 12);
+		$default_line 		= $field->parameters->get('default_line', 16);
 		$target 			= $field->parameters->get('target', 'flexicontent');
 		$voicetarget 		= $field->parameters->get('voicetarget', 'flexicontent');
 
@@ -90,7 +89,15 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$addthis		= isset($addthis) ? $addthis : 0;
 		
 		if ($load_css) {
-			$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/toolbar/'.(FLEXI_J16GE ? 'toolbar/' : '').'/toolbar.css');
+			$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
+		}
+		
+		if ($display_social || $display_comments || $display_email || $display_print) {
+			$item_url = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug);
+			$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
+			$item_link = $server . JRoute::_($item_url);
+			// NOTE: this uses current SSL setting (e.g menu item), and not URL scheme: http/https 
+			//$item_link = JRoute::_($item_url, true, -1);
 		}
 		
 		$display	 = '<div class="flexitoolbar">'; // begin of the toolbar container
@@ -98,9 +105,8 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// comments button
 		if ($display_comments)
 		{
-			$link = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug) . '#addcomments';
-			$comment_link  = JRoute::_($link);
-
+			$comment_link = $item_link . '#addcomments';
+			
 			$display	.= '
 			<div class="flexi-react toolbar-element">
 				<span class="comments-bubble">'.($module_position ? '<!-- jot '.$module_position.' s -->' : '').$this->_getCommentsCount($item->id).($module_position ? '<!-- jot '.$module_position.' e -->' : '').'</span>
@@ -146,14 +152,8 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		{
 			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 			
-			// NOTE: the following uses current SSL setting (e.g menu item), and not URL scheme: http/https 
-			//$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug), true, -1);
-			
-			$server   = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
-			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
-			$link = $server . $item_url;
-			$url  = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $link );
-			$estatus	 = 'width=400,height=400,menubar=yes,resizable=yes';
+			$url = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $item_link );
+			$estatus = 'width=400,height=400,menubar=yes,resizable=yes';
 			$display	.= '
 			<div class="flexi-email toolbar-element">
 				<span class="email-legend flexi-legend"><a rel="nofollow" href="'. JRoute::_($url) .'" class="editlinktip" onclick="window.open(this.href,\'win2\',\''.$estatus.'\'); return false;" title="'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'">'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'</a></span>
@@ -165,11 +165,10 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// print button
 		if ($display_print)
 		{
-			$pop		 = JRequest::getInt('pop');
-			$pstatus 	 = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
-			$link = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug) . '&pop=1&print=1&tmpl=component';
-			$print_link  = $pop ? '#' : JRoute::_($link);
-			$js_link  	 = $pop ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';
+			$pop = JRequest::getInt('pop');
+			$pstatus = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
+			$print_link = $pop ? '#' : $item_link . '&pop=1&print=1&tmpl=component';
+			$js_link = $pop ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';
 			$display	.= '
 			<div class="flexi-print toolbar-element">
 				<span class="print-legend flexi-legend"><a rel="nofollow" href="'. $print_link .'" '.$js_link.' class="editlinktip"  title="'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'</a></span>
@@ -185,7 +184,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			<div class=\"flexi-voice toolbar-element\">";
 			if ($lang=='th') {
 				// Special case language case, maybe la=laos, and Bhutan languages in the future (NECTEC support these languages)
-				$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/toolbar'.(FLEXI_J16GE ? '/toolbar' : '').'/th.js');
+				$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/th.js');
 				$display .="
 					<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"openwindow('".$voicetarget."','".$lang."');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
 					";
@@ -259,9 +258,11 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 				if ($og_image_field)
 				{
 					$imageurl = FlexicontentFields::getFieldDisplay($item, $og_image_field, null, 'display_'.$og_image_thumbsize.'_src', 'module');
-					$img_field = $item->fields[$og_image_field];
-					if ( (!$imageurl && $og_image_fallback==1) || ($imageurl && $og_image_fallback==2 && $img_field->using_default_value) ) {
-						$imageurl = $this->_extractimageurl($item);
+					if ( $imageurl ) {
+						$img_field = $item->fields[$og_image_field];
+						if ( (!$imageurl && $og_image_fallback==1) || ($imageurl && $og_image_fallback==2 && $img_field->using_default_value) ) {
+							$imageurl = $this->_extractimageurl($item);
+						}
 					}
 				}
 				else
@@ -282,14 +283,15 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			
 			$addthis_code = '';
 			if ($addthis_custom_code) {
-				$addthis_code .= $addthis_custom_code;
+				$addthis_code = str_replace('_item_url_', $item_link, $addthis_custom_code);
+				$addthis_code = str_replace('_item_title_', htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ), $addthis_code);
 			}
 			else {
 				switch ($addthis_custom_predefined) {
 					case 1:
 						$addthis_code .= '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_default_style addthis_counter_style">
+						<div class="addthis_toolbox addthis_default_style addthis_counter_style" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
 						<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
 						<a class="addthis_button_tweet"></a>
 						<a class="addthis_button_pinterest_pinit"></a>
@@ -301,7 +303,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					case 2:
 						$addthis_code .= '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+						<div class="addthis_toolbox addthis_default_style addthis_32x32_style" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
 						<a class="addthis_button_preferred_1"></a>
 						<a class="addthis_button_preferred_2"></a>
 						<a class="addthis_button_preferred_3"></a>
@@ -316,7 +318,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					case 3:
 						$addthis_code .= '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_default_style addthis_16x16_style">
+						<div class="addthis_toolbox addthis_default_style addthis_16x16_style" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
 						<a class="addthis_button_preferred_1"></a>
 						<a class="addthis_button_preferred_2"></a>
 						<a class="addthis_button_preferred_3"></a>
@@ -337,7 +339,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					case 5:
 						$addthis_code .= '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_floating_style addthis_counter_style" style="left:50px;top:50px;">
+						<div class="addthis_toolbox addthis_floating_style addthis_counter_style" style="left:50px;top:50px;" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
 						<a class="addthis_button_facebook_like" fb:like:layout="box_count"></a>
 						<a class="addthis_button_tweet" tw:count="vertical"></a>
 						<a class="addthis_button_google_plusone" g:plusone:size="tall"></a>
@@ -349,7 +351,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					case 6:
 						$addthis_code .= '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_floating_style addthis_32x32_style" style="left:50px;top:50px;">
+						<div class="addthis_toolbox addthis_floating_style addthis_32x32_style" style="left:50px;top:50px;" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
 						<a class="addthis_button_preferred_1"></a>
 						<a class="addthis_button_preferred_2"></a>
 						<a class="addthis_button_preferred_3"></a>
@@ -362,7 +364,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					case 7:
 						$addthis_code .= '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_floating_style addthis_16x16_style" style="left:50px;top:50px;">
+						<div class="addthis_toolbox addthis_floating_style addthis_16x16_style" style="left:50px;top:50px;" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
 						<a class="addthis_button_preferred_1"></a>
 						<a class="addthis_button_preferred_2"></a>
 						<a class="addthis_button_preferred_3"></a>

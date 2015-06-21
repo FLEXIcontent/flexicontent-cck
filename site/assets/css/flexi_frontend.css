@@ -42,10 +42,10 @@
  * FLEXIcontent buttons for links: print, pdf, email, rss, approval etc
  **********************************************************************/
 #flexicontent .buttons {
-	display: block !important;
-	float: right !important;
-	margin: 0px !important;
-	padding: 0px !important;
+	display: block;
+	float: right;
+	margin: 0px;
+	padding: 0px;
 }
 
 #flexicontent .fc_editbutton,
@@ -59,12 +59,12 @@
 }
 #flexicontent .fc_editbutton > img,
 #flexicontent .buttons > a > img {
-	border: none !important;
-	vertical-align:top !important;
-	margin:1px 6px 0px 0px !important;
+	border: none;
+	vertical-align:top;
+	margin:1px 6px 0px 0px;
 }
 #flexicontent .fc_editbutton > img {
-	margin-top: 0px !important;
+	margin-top: 0px;
 }
 #flexicontent .fc_editbutton:not(.btn),
 #flexicontent .buttons > a:not(.btn) {
@@ -73,30 +73,17 @@
 	padding: 0 0 0 5px;
 }
 
-/* Used for approval button and maybe for others */
-.fc_bigbutton {
-	padding: 2px !important;
-	margin-right: 4px !important;
-	border:1px outset gray !important;
-	background: #e0e0e0 !important;
-	text-align: center;
-	display:block;
-}
-
-.fc_bigbutton:hover {
-	border-style: inset !important;
-	text-decoration: none;
-}
-
 .fc_comments_count {
-	background: url(../images/comments.png) no-repeat !important; color: green;
+	background: url(../images/comments.png) no-repeat;
+	color: green;
 	padding-left: 20px;
 	height: 16px;
 	margin: 5px 5px 0px 0px;
 	float:left;
 }
 .fc_comments_count_nopad {
-	background: url(../images/comments.png) no-repeat !important; color: green;
+	background: url(../images/comments.png) no-repeat;
+	color: green;
 	padding-left: 20px;
 	height: 16px;
 	margin: 0px 5px 0px 0px;
@@ -118,7 +105,7 @@
 }
 .fc_state_toggle_link_nopad {
 	float:left;
-	/*margin:5px 0px 0px 0px;*/
+	margin: 0px 0px 0px 0px;
 }
 
 
@@ -191,7 +178,7 @@
 
 #flexicontent .subcategorieslabel,
 #flexicontent .peercategorieslabel {
-	display:inline-block !important;
+	display:inline-block;
 	margin:0px 0px 6px;
 	font-weight:bold;
 	border-bottom:1px dashed gray;
@@ -311,473 +298,11 @@ div table.adminform td {
 	padding: 0px 0px;
 }
 
-/* Outer container of (a) text search, (b) field filters */
-#flexicontent #fc_filter_box {
-	display: block;
-	clear: both;
-	border: solid 0px #dddddd;
-	margin: 0px 0px 12px 0px;
-	padding: 0%;
-	width: 100%;
-}
-
-/* Blocking overlay during form being applied and page reloading */
-#fc_filter_form_blocker {
-	display: none;
-	z-index: 1000;
-	
-	position: fixed;
-	top: 0;
-	left: 0;
-	
-	width: 100%;
-	height: 100%;
-}
-#fc_filter_form_blocker .fc_blocker_opacity {
-	display: block;
-	z-index: 1000;
-	
-	position: absolute;
-	top: 0;
-	left: 0;
-	
-	opacity: 0.3;
-	filter:alpha(opacity=30); /* For IE8 and earlier */
-	background-color: #000;
-	
-	width: 100%;
-	height: 100%;
-}
-#fc_filter_form_blocker .fc_blocker_content {
-	display: block;
-	z-index: 1001;
-	position: fixed;
-	top: 200px;
-	left: 40%;
-	
-	color: black;
-	background: white url(../images/ajax-loader.gif) 30px 40px no-repeat;
-	opacity:1;
-	filter:alpha(opacity=100); /* For IE8 and earlier */
-	
-	width: auto;
-	padding: 40px 0px 46px 60px;
-	margin: 0px;
-	
-	font-size: 12px;
-	font-weight: bold;
-	border: 1px solid lightgray;
-	border-radius: 8px;
-	text-align: left;
-}
-
-#fc_filter_form_blocker .fc_blocker_bar {
-	display: block;
-	width: 200px;
-	height: 22px;
-	border: 1px solid #111;
-	background-color: #292929;
-	position: relative;
-	left: -30px;
-	top:6px;
-}
-
-#fc_filter_form_blocker .fc_blocker_bar div {
-	display: block;
-	height: 100%;
-	color: #fff;
-	text-align: right;
-	line-height: 22px; /* same as #progressBar height if we want text middle aligned */
-	width: 0;
-	background-color: #0099ff;
-}
 
 
-/* CONTAINER of text-search  & field filters */
-fieldset.fc_search_set,
-fieldset.fc_filter_set {
-	border: 1px solid #cccccc;
-	margin: 0px;
-	padding: 1%;
-	width: 100%;
-	box-sizing: border-box;
-	min-width: inherit !important; /* workaround for chrome fieldset width bug */
-	display: block;
-}
-/* TITLE OF CONTAINER of search (field) filters */
-fieldset.fc_search_set legend,
-fieldset.fc_filter_set legend {
-	width: auto;
-	border: 0px solid;
-	padding: 0px;
-	margin: 0px;
-}
-fieldset.fc_search_set legend .fc_legend_text,
-fieldset.fc_filter_set legend .fc_legend_text {
-	background: transparent;
-	border:1px solid lightgray;
-	color:gray;
-	display:block;
-	margin:0 0 5px 0;
-	padding:8px 10px 8px 10px;
-	border-radius: 6px;
-	display: inline-block;
-	line-height: 0.5em;
-	position: relative;
-	top: 0px;
-}
-fieldset.fc_search_set legend .fc_legend_text.hasTip,
-fieldset.fc_filter_set legend .fc_legend_text.hasTip {
-	background: lightyellow url(../images/note.gif) no-repeat 10px 50%;
-	border:1px solid lightgray;
-	color:gray;
-	display:block;
-	margin:0 0 5px 0;
-	padding-left: 36px;
-	border-radius: 6px;
-}
-fieldset.fc_search_set legend .fc_legend_text span,
-fieldset.fc_filter_set legend .fc_legend_text span {
-	font-weight: bold;
-	font-size: 12px;
-	padding: 0px;
-	margin: 0px;
-	display: inline-block;
-	line-height: 1em;
-}
-
-fieldset.fc_search_set .fc-mssg.fc-info,
-fieldset.fc_filter_set .fc-mssg.fc-info {
-	margin: 4px 16px 16px 16px;
-	font-size: 12px;
-}
-.ui-autocomplete-loading {
-	background: #eee url('../images/ajax-loader.gif') no-repeat 96% center !important;
-}
-
-
-
-/*******************/
-/* (a) TEXT SEARCH */
-/*******************/
-
-/* the container */
-.fc_filter_text_search {}
-
-/* the label */
-.fc_filter.fc_filter_text_search .fc_filter_label,
-.fc_filter_line.fc_filter_text_search .fc_filter_label {
-}
-
-
-
-/*********************/
-/* (b) FIELD FILTERs */
-/*********************/
-
-/* displayed between ranges */
-.fc_range {
-	background: url("../images/arrow_double.png") no-repeat scroll 0px 0px transparent !important;
-	width: 16px !important;
-	height: 16px !important;
-	border: 0px solid !important;
-	padding: 0px !important;
-	margin: 0px 0px 0px 2px !important;
-	display: inline-block !important;
-	vertical-align: middle !important;
-}
-// highlight labels of active filters
-#flexicontent ul.tabbernav li a.tabberheading.fc_filter_inactive {}
-#flexicontent ul.tabbernav li a.tabberheading.fc_filter_active { color:orange!important; }
-#flexicontent ul.tabbernav li:hover a.tabberheading.fc_filter_active { color:red!important; }
-
-/* handle input append / prepend */
-.fc_filter_html .input-append,
-.fc_filter_html .input-prepend {
-	margin:0px 4px 0px 0px !important;
-}
-.fc_filter_html .input-append button,
-.fc_filter_html .input-prepend button {
-	margin-top:6px !important;
-	height:29px !important;
-}
-.fc_filter_html .input-append button.btn,
-.fc_filter_html .input-prepend button.btn {
-	margin-top:3px !important;
-	height:29px !important;
-}
-
-/* removing filter choices */
-.fc_field_filter .fc_delall_filters {
-	background: url("../images/delete.png") no-repeat scroll 0px 0px transparent;
-	width: 16px;
-	height: 16px;
-	border: 0px solid;
-	padding: 0px;
-	margin: 4px 0px -4px 0px;
-	display: inline-block;
-	vertical-align: baseline;
-}
-
-/* Container of each individual field filter (both label and html) */
-.fc_filter,
-.fc_filter_line {
-	display: inline-block;
-	float: left;
-	white-space: normal;
-	border: 0px solid lightgray;
-	border-radius: 2px;
-}
-.fc_filter {
-	clear: none;
-	margin: 0px 2px 2px 0px;
-	padding: 1px 0% 1px 0%;
-	width: auto;
-	position: relative;
-}
-.fc_filter_line {
-	clear: both;
-	margin: 0px 0% 1px 0%;
-	padding: 0px 1%;
-	width: 98%;
-}
-.fc_filter.fc_even, .fc_filter_line.fc_even { /*background: #E0E0E0;*/ }
-.fc_filter.fc_odd,  .fc_filter_line.fc_odd { /*background: #EEEEEE;*/ }
-
-form > .fc_filter_line {  /* filters placed directly inside form aka outside the filter_box */
-	margin: 0px 1% 0px 1%;
-	width: 96%;
-}
-
-.fc_filter .fc_filter_tip_inline,
-.fc_filter .fc_filter_label_inline,
-.fc_filter_line .fc_filter_tip_inline,
-.fc_filter_line .fc_filter_label_inline {
-	color: #FFFFFF;
-	display: inline-block;
-	font-size: 10.998px;
-	font-weight: bold;
-	line-height: 14px;
-	padding: 4px 4px;
-	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-	vertical-align: baseline;
-	white-space: nowrap;
-	border-radius: 5px;
-	margin: 0px 2px 0px 4px !important;
-}
-.fc_filter .fc_filter_label_inline,
-.fc_filter_line .fc_filter_label_inline {
-	background-color: #555;
-}
-.fc_filter .fc_filter_tip_inline,
-.fc_filter_line .fc_filter_tip_inline {
-	background-color: darkgray;
-}
-
-/* Container of each individual field filter LABEL */
-.fc_filter .fc_filter_label,
-.fc_filter_line .fc_filter_label {
-	float: left !important;
-	display: inline-block !important;
-	color: white;
-	background-color: #909090;
-	border-width: 0px;
-	font-weight: normal;
-	font-size: 12px;
-	font-family: georgia,arial;
-	text-align: right;
-	border-radius: 3px;
-	text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
-}
-
-
-.fc_filter .fc_filter_label {
-	clear: both;
-	width: auto !important;
-	max-width: 150px !important;
-	padding: 3px 4px !important;
-	margin: 2px 8px 3px 8px !important;
-}
-.fc_filter_line .fc_filter_label {
-	clear: none;
-	width: 15% !important;
-	max-width: 200px !important;
-	padding: 6px 1% !important;
-	margin: 2px 2px 0px 0px !important;
-	text-align:left !important;
-}
-
-/* Container of each individual field filter HTML, either compact view (floating with separator element) or per line */
-.fc_filter .fc_filter_html,
-.fc_filter_line .fc_filter_html {
-	display: inline-block;
-	float: left;
-	font-size: 90%;
-	padding: 0px 0% 0px 0% !important;
-	margin: 0px 0% 0px 0% !important;
-}
-.fc_filter_html {  position: relative !important; display: inline-block !important;  }
-/*.fc_filter .fc_filter_html {  clear: both;  }*/
-.fc_filter_line .fc_filter_html {  clear: none; width: 80% !important;  }
-
-/* Clear filter label from filter html*/
-.fc_filter_line.fc_clear_label .fc_filter_label {  width: auto !important; }
-.fc_filter_line.fc_clear_label .fc_filter_html {  clear: both; width: 100% !important;  }
-
-/* Highlight date calendar inside FC filters */
-.fc_filter_html .calendar { vertical-align: bottom; margin: 0px 6px 9px 2px; cursor: pointer; }
-.fc_filter_html .calendar:hover { border: 1px solid darkred; }
-
-/* Mulitple form field elements inside a filter area */
-.fc_filter_html .fc_filter_element { display:inline-block; white-space: nowrap; position: relative; }
-
-/* The form element(s) of each field filter inside filter's HTML */
-.fc_field_filter label, .flexicontent .fc_field_filter {
-	font-size: 11px !important;
-}
-.fc_filter_html .fc_text_filter,
-.fc_filter_html .fc_field_filter {
-	color: black !important;
-	font-size: 11px !important;
-	font-weight: normal !important;
-	display: inline-block /*!important*/; /*important problematic for hidding*/
-	padding: 2px 0px 2px 4px !important;
-	margin: 2px 0px 2px 4px !important;
-	width: auto !important;
-}
-.fc_filter_html .fc_text_filter.select2-container.select2-container-multi,
-.fc_filter_html .fc_field_filter.select2-container.select2-container-multi {
-	margin: 2px 0px 2px 4px !important;
-}
-.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter,
-.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
-	border-radius: 5px !important;
-	-moz-border-radius: 5px !important;
-	-webkit-border-radius: 5px !important;
-}
-.fc_filter_html input.fc_text_filter,
-.fc_filter_html input.fc_field_filter,
-.fc_filter_html input.fc_text_filter:focus,
-.fc_filter_html input.fc_field_filter:focus {
-	height: auto;
-	line-height: 150%;
-	padding: 5px 4px 6px 4px !important;
-	margin: 3px 4px 3px 8px !important;
-	position: relative;
-	/* background: transparent; ... does not work properly with ie8/9, it causes: */
-	/* any element with less z-index to be placed above this element, */
-	/* e.g. the span element for showing an inner is placed above, thus preventing focusing of the input !! */
-	border: 1px solid gray !important;
-	opacity: 0.5; filter:alpha(opacity=50);
-	min-width: 120px !important;
-	vertical-align: top;
-}
-.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter,
-.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,
-.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus,
-.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
-	padding: 5px 26px 6px 4px !important;
-	background: url(../images/magnifier-left.png) 96% 4px no-repeat white;
-}
-.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_text_filter,
-.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_field_filter,
-.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_text_filter:focus,
-.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_field_filter:focus {
-}
-.fc_filter_html .input-append > input.fc_text_filter,
-.fc_filter_html .input-append > input.fc_field_filter,
-.fc_filter_html .input-append > input.fc_text_filter:focus,
-.fc_filter_html .input-append > input.fc_field_filter:focus {
-	margin-right:0px !important; border-top-right-radius:0px !important;  border-bottom-right-radius:0px !important;
-}
-.fc_filter_html .input-prepend > input.fc_text_filter,
-.fc_filter_html .input-prepend > input.fc_field_filter,
-.fc_filter_html .input-prepend > input.fc_text_filter:focus,
-.fc_filter_html .input-prepend > input.fc_field_filter:focus {
-	margin-left:0px !important; border-top-left-radius:0px !important;  border-bottom-left-radius:0px !important;
-}
-/* enlarge field in views ... (non-module) */
-input.fc_text_filter:not(.fc_iscalendar),  input.fc_text_filter:not(.fc_iscalendar):focus,
-input.fc_field_filter:not(.fc_iscalendar), input.fc_field_filter:not(.fc_iscalendar):focus {
-	min-width: 180px !important;
-}
-input.fc_text_filter.fc_iscalendar,
-input.fc_field_filter.fc_iscalendar {
-	min-width: 60px !important;
-}
-
-label.fc_filter_val.fc_cleared { display:inline-block; float:left !important; clear:both; }
-.fc_filter_val_lbl { }
-.fc_filter_val_img { display:inline-block; float:left !important; }
-/*.fc_filter_val_img:after { content: '\A'; white-space: pre; }*/
-.fc_filter_val_img > img { margin:2px 12px 2px 4px; vertical-align:top; }
-label.fc_filter_val + .fc_filter_val_img > img { margin: 4px 12px 2px -8px; }
-
-
-form.fc_instant_filter { display: block; margin: 0px !important; padding: 0px !important; position: relative !important; }
-select.fc_field_filter { margin: 2px 2px 2px 2px !important; }
-input.fc_text_filter { vertical-align: top; }
-input.fc_field_filter { vertical-align: top; }
-span.fc_field_filter { border-width: 0px !important; }
-ul.fc_field_filter.fc_checkradio_group {
-	margin: 2px 0px 2px 2px !important;
-	padding: 3px 4px 3px 2px !important;
-	height: auto !important;
-	max-height: auto !important;
-	position: static !important;
-	float: left !important;
-	text-align: left !important;
-}
-ul.fc_field_filter.fc_checkradio_group label {
-	margin: 6px 6px 4px 0px !important;
-	display: inline-block;
-}
-
-
-/* Inner Labels */
-.fc_has_inner_label, .fc_has_inner_prompt {
-	color: gray !important;
-	position: absolute !important;
-	display: block;
-	*line-height: 1.5em !important;  /* ie6/ie7 */
-	*height: 1.5em !important;  /* ie6/ie7 */
-	padding: 0px 0px 0px 4px;
-	font-size:12px;
-}
-
-.fc_has_inner_label.fc_has_inner_label_input,
-.fc_has_inner_prompt.fc_has_inner_prompt_input {
-	left:14px !important; top:10px !important;
-	color: black !important;
-	line-height: 150% !important;
-	padding: 0px 0px 0px 4px !important;
-}
-.fc_has_inner_label.fc_has_inner_label_select2,
-.fc_has_inner_prompt.fc_has_inner_prompt_select2 {
-	left:4px !important; top:8px !important;
-	*top:4px !important; 
-}
-
-/* Highlighting selected choices */
-.fc_filter_html .select2-search-choice div,
-.select2-container .select2-choice.fc_highlight span,
-.fc_highlight {
-	color: darkorange !important;
-	font-weight: bold !important;
-}
-
-.select2-container .select2-choice.fc_highlight_disabled span,
-.fc_highlight_disabled {
-	color: gray !important;
-	font-weight: normal !important;
-	text-decoration: line-through !important;
-	font-style: italic !important;
-}
-
-
-/*******************/
-/* (c) Alpha Index */
-/*******************/
+/***************/
+/* Alpha Index */
+/***************/
 
 /* Top Container */
 #fc_alpha {
@@ -842,10 +367,10 @@ ul.fc_field_filter.fc_checkradio_group label {
 
 
 
-/*******************************************************/
-/* (d) ITEMs TOTAL Container, also contains selectors: */
-/* for (a) # pages per limit AND (b) items order by    */
-/*******************************************************/
+/****************************************************/
+/* ITEMs TOTAL Container, also contains selectors:  */
+/* # pages, ordering selector, layout selector, etc */
+/****************************************************/
 
 #flexicontent .item_total {
 	border: 1px solid lightgray;
@@ -855,6 +380,9 @@ ul.fc_field_filter.fc_checkradio_group label {
 	clear: both;
 	float: left;
 	box-sizing: border-box;
+}
+#flexicontent #searchForm .item_total {
+	margin-top: 24px;
 }
 
 #flexicontent .fc_item_total_data.labelclear .flexi.label { clear:left; }
@@ -915,7 +443,6 @@ ul.fc_field_filter.fc_checkradio_group label {
 
 #flexicontent .fc_search_field_container {
 	display: block;
-	white-space: nowrap;
 	float: left;
 }
 #flexicontent .fc_search_field_label {
@@ -926,26 +453,6 @@ ul.fc_field_filter.fc_checkradio_group label {
 #flexicontent .fc_search_field_value {
 	display: inline-block;
 }
-
-
-/*************************
- * FLEXIcontent rating bar
- *************************/
-
-#flexicontent .qf_ratingbarcontainer {
-	border: 1px solid #999999;
-	display: block;
-	height: 10px;
-	margin: 2px 2px;
-	width: 60px;
-}
-
-#flexicontent .qf_ratingbar {
-	background-color: #c0c0c0;
-	display: block;
-	height: 10px;
-}
-
 
 
 /*************************
@@ -1025,7 +532,7 @@ div.comments {
 #comments-form p, 
 #comments-form #comments-form-buttons, 
 #comments-form #comments-form-error {
-	margin-left: 0px !important;
+	margin-left: 0px;
 }
 
 #comments-form #comments-form-message, 
@@ -1086,10 +593,10 @@ dl.tabs dt:hover, .flexicontent dl.tabs dt:hover {
 }
 
 dl.tabs dt a:link, .flexicontent dl.tabs dt a:link {
-	color: black !important;
-	outline: medium none !important;
-	text-decoration: none !important;
-	background: none !important;
+	color: black;
+	outline: medium none;
+	text-decoration: none;
+	background: none;
 }
 
 
@@ -1115,64 +622,88 @@ div.current dd {
  * File / image Field and other Plugins
  **************************************/
 
-/* File field (item form) */
-.fcfile_mime .icon-mime,
-.fcfile_hits .icon-hits,
-.fcfile_lang .icon-lang {
+/* File field viewing: property icons */
+.fcfile_mime .fcicon-mime,
+.fcfile_hits .fcicon-hits,
+.fcfile_lang .fcicon-lang {
 	vertical-align: middle;
 	margin-bottom: 2px;
 }
-
-/* strange property in japurity /-) */
-#flexicontent .hasToolTip img,
-#flexicontent .hasTip img {
-	margin: 0;
+.fcfile_actions {
+	margin: 4px;
+	float:left;
+	clear: both;
 }
 
-/* Empty image container for image field (item form) */
-.empty_image {
-	display: block;
-	background: #F9F9F9 url(../../../../administrator/components/com_flexicontent/assets/images/image_add.png) no-repeat scroll 50% 50%;
-	border:1px solid silver;
-	margin-bottom:3px;
-}
 
-/* Styling for image field (frontend FC templates) */
-.fc_field_image {
-	padding: 1px !important;
-	border: 1px solid lightgray !important;
-	border-radius:5px !important;
-	-moz-border-radius: 5px !important;
-	-webkit-border-radius: 5px !important;
-}
-.fc_image_thumb {
+/* Image field viewing: thumbnails */
+img.fc_field_image {
 	display: inline-block;
+	margin: 0px 4px 6px 0px;
+	padding: 1px;
+	border: 1px solid lightgray;
+	border-radius:5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 }
-
-/* ADD button used by fields (item form) */
-.button-add a {
+div .fc_image_thumb {
 	display: inline-block;
-	padding: 1px 8px;
-	border: 1px solid #ccc;
-	background: #efefef;
-}
-.button-add a,
-.button-add a:visited,
-.button-add a:link,
-.button-add a:hover {
-	color: black;
 	text-decoration: none;
 }
 
-/* Styling for image field tooltips (frontend FC templates) */
-.fc_img_tooltip_title {
+/* Image field viewing: thumbnail container */
+div .fc_img_container {
+	display:inline-block;
+	margin: 2px 8px 2px 0px;
+}
+
+
+/* Image field viewing: inline tooltip */
+div .fc_img_tooltip_data {
+	display:inline-block;
+	vertical-align:top;
+	margin: 2px 12px 6px 4px;
+}
+div .fc_img_tooltip_title {
 	line-height:1em;
 	font-weight:bold;
 }
-.fc_img_tooltip_desc {
+div .fc_img_tooltip_desc {
 	line-height:1em;
 }
 
+
+/* Radio/checkbox/select/etc (indexed fields) viewing: the non-selected values */
+div .fc_field_unsused_val {
+ text-decoration: line-through;
+}
+div .fc_field_unsused_val img {
+ opacity:0.4;
+ filter:alpha(opacity=40); /* For IE8 and earlier */
+}
+
+
+/* fieldgroup field viewing: default container for values */
+div.fc-fieldgrp-value-box {
+	border-radius: 4px;
+	border: 1px solid lightgray;
+	display: block;
+	float: left;
+	
+	box-sizing: border-box;
+	/*max-width: 98%;
+	min-width: 48%;*/
+	width: 98%;
+	margin: 4px 1%;
+	padding: 2px;
+	vertical-align: top;
+}
+
+/* favourites field viewing: information containers */
+[class*="fcfavs-"].fc-mssg-inline {
+	position: relative;
+	margin: 1px 2px;
+}
 
 
 /************************************
@@ -1186,53 +717,54 @@ div.current dd {
 }
 
 /* search form */
-#flexicontent form#searchForm {
+.flexicontent.search form#searchForm {
 	clear: both;
 	float: none;
 }
 
+/* Search (field) filters TABLE */
+.flexicontent.fcsearch table.fc_search_tbl {
+	border-collapse: separate;
+	border-spacing: 1px;
+	width: 100%;
+}
+
 /* Container of TEXT search label */
-.fc_search_label_cell {
+.flexicontent.fcsearch table.fc_search_tbl .fc_search_label_cell {
 	text-align:right;
 	vertical-align:middle;
 	padding: 4px 6px 4px 4px;
 	font-weight:bold;
 	background-color:#eeeeee;
-	font-size: 11px !important;
+	font-size: 11px;
 	white-space: nowrap;
 	width: 5%;
 }
 
 /* Container of TEXT search form field */
-.fc_search_option_cell {
+.flexicontent.fcsearch table.fc_search_tbl .fc_search_option_cell {
 	padding: 2px 4px 2px 6px;
-	font-size: 11px !important;
+	font-size: 11px;
 }
 
 /* Search Filter ROW */
-.fc_search_row_0 td {
+.flexicontent.fcsearch table.fc_search_tbl .fc_search_row_0 td {
 	background-color: #f0f0f0;
 }
 
 /* Search Filter CELL */
-.fc_search_row_1 td {
+.flexicontent.fcsearch table.fc_search_tbl .fc_search_row_1 td {
 	background-color: #e7e7e7;
 }
 
-/* Search (field) filters TABLE */
-table.fc_search_tbl {
-	border-collapse: separate !important;
-	border-spacing: 1px !important;
-	width: 100% !important;
-}
 
 /* Search (field) filters CELLs */
-table.fc_search_tbl td {
-	border-width: 0px !important;
-	border-spacing: 1px !important;
+.flexicontent.fcsearch table.fc_search_tbl td {
+	border-width: 0px;
+	border-spacing: 1px;
 }
 
-div.flexicontent.fcsearch .inputbox {
+.flexicontent.fcsearch .inputbox {
 	border: 1px solid lightgray;
 	border-radius:5px;
 	-moz-border-radius: 5px;
@@ -1241,38 +773,38 @@ div.flexicontent.fcsearch .inputbox {
 	height: auto;
 }
 
-div.flexicontent.fcsearch  fieldset.fc_search_result {
+.flexicontent.fcsearch  fieldset.fc_search_result {
 	padding: 16px 4px 16px 4px;
 	margin: 0px;
 	border: 1px solid transparent;
 }
 
-div.flexicontent.fcsearch  fieldset.fc_search_result.fcodd {
+.flexicontent.fcsearch  fieldset.fc_search_result.fcodd {
 	background-color: #f0f0f0;
 }
 
-div.flexicontent.fcsearch  fieldset.fc_search_result.fceven {
+.flexicontent.fcsearch  fieldset.fc_search_result.fceven {
 	background-color: #f7f7f7;
 }
 
-div.flexicontent.fcsearch  fieldset.fc_search_result:hover {
+.flexicontent.fcsearch fieldset.fc_search_result:hover {
 	border: 1px dashed gray;
 }
 
-div.flexicontent.fcsearch  .fc_search_result_title {
+.flexicontent.fcsearch .fc_search_result_title {
 	float: left;
 }
-div.flexicontent.fcsearch  .fc_search_result_text {
+.flexicontent.fcsearch .fc_search_result_text {
 }
-div.flexicontent.fcsearch  .fc_search_result_image { display: inline-block; }
-div.flexicontent.fcsearch  .fc_search_result_image.fcleft { float: left; margin: 0px 16px 0px 8px; }
-div.flexicontent.fcsearch  .fc_search_result_image.fcright { float: right; margin: 0px 8px 0px 16px; }
-div.flexicontent.fcsearch  .fc_search_result_image img { padding:1px; border:1px solid #aaaaaa; border-radius: 4px; }
-div.flexicontent.fcsearch  .fc_search_result_filters {
+.flexicontent.fcsearch .fc_search_result_image { display: inline-block; }
+.flexicontent.fcsearch .fc_search_result_image.fcleft { float: left; margin: 0px 16px 0px 8px; }
+.flexicontent.fcsearch .fc_search_result_image.fcright { float: right; margin: 0px 8px 0px 16px; }
+.flexicontent.fcsearch .fc_search_result_image img { padding:1px; border:1px solid #aaaaaa; border-radius: 4px; }
+.flexicontent.fcsearch .fc_search_result_filters {
 }
-div.flexicontent.fcsearch  .fc_search_result_fields {
+.flexicontent.fcsearch .fc_search_result_fields {
 }
-div#flexicontent.flexicontent.fcsearch  .highlight {
+.flexicontent.fcsearch .highlight {
 	background: none repeat scroll 0 0 #FFFFAA;
 	border-radius:5px;
 	-moz-border-radius: 5px;
@@ -1281,7 +813,7 @@ div#flexicontent.flexicontent.fcsearch  .highlight {
 	font-weight: normal;
 	padding: 3px 5px;
 }
-div#flexicontent.flexicontent.fcsearch  .fc_mublock {
+.flexicontent.fcsearch  .fc_mublock {
 	display: block;
 	float: right;
 }
@@ -1292,25 +824,22 @@ div#flexicontent.flexicontent.fcsearch  .fc_mublock {
  ************************************************************************/
 
 #flexicontent .fc_inline_block {
-	*display: inline !important; /* Hack for IE 7 and less */
-	_height: 1%; /* Hack for IE6 */
-	display: inline-block !important; /* For modern browsers */
-	float: none !important;
-	vertical-align: top; /* Just makes sure everything is at the top */
-	width: auto !important;
-	zoom: 1; /* Hack for IE */
+	display: inline-block;
+	float: none;
+	vertical-align: top;
+	width: auto;
 }
 
 #flexicontent .fc_block {
-	display: block !important;
+	display: block;
 }
 
 #flexicontent .fc_inline {
-	display: inline !important;
+	display: inline;
 }
 
 #flexicontent .fc_inline_clear {
-	display: inline!important;
+	display: inline;
 }
 
 #flexicontent .fc_inline_clear:after {
@@ -1329,7 +858,7 @@ div#flexicontent.flexicontent.fcsearch  .fc_mublock {
  ****************************/
 
 table.admintable {
-	border-collapse:separate !important;
+	border-collapse:separate;
 	border-spacing:2px;
 }
 
@@ -1366,8 +895,8 @@ table.admintable td {
 
 #flexicontent.fcdirectory .fccatcolumn {
 	float: left;
-	margin: 0% 1% 0% 0% !important;
-	padding: 0px !important;
+	margin: 0% 1% 0% 0%;
+	padding: 0px;
 }
 
 #flexicontent.fcdirectory h2.fccat_title_box {
@@ -1414,15 +943,15 @@ table.admintable td {
 }
 
 #flexicontent.fcdirectory ul.fcsubcats_list {
-	border-top: 1px dashed #dddddd !important;
+	border-top: 1px dashed #dddddd;
 	list-style: none;
 	margin: 3px 0 7px;
 	padding: 0 7px;
 }
 
 #flexicontent.fcdirectory li.fcsubcat {
-	border-bottom: 1px dashed #dddddd !important;
-	margin: 2px 0px 2px 0px !important;
+	border-bottom: 1px dashed #dddddd;
+	margin: 2px 0px 2px 0px;
 }
 
 #flexicontent.fcdirectory li.fcsubcat.odd {
@@ -1512,10 +1041,10 @@ table.admintable td {
 /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_4, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_5, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_6,
 /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_7, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_8, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_9,
 /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_10, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_11, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_12 {
-	/*background-image: url(../images/information.png) !important;*/
-	background-position: 1px 2px !important;
-	background-repeat: no-repeat !important;
-	/*padding-left: 20px !important;*/
+	/*background-image: url(../images/information.png);*/
+	background-position: 1px 2px;
+	background-repeat: no-repeat;
+	/*padding-left: 20px;*/
 }
 
 /*#flexicontent.fctypeNN*/ #fc_bottom_tabset ul.tabbernav li a {  padding-left: 20px;  }
@@ -1523,57 +1052,21 @@ table.admintable td {
 /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_4, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_5, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_6,
 /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_7, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_8, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_9,
 /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_10, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_11, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_12 {
-	/*background-image: url(../images/information.png) !important;*/
-	background-position: 1px 2px !important;
-	background-repeat: no-repeat !important;
-	/*padding-left: 20px !important;*/
+	/*background-image: url(../images/information.png);*/
+	background-position: 1px 2px;
+	background-repeat: no-repeat;
+	/*padding-left: 20px;*/
 }
 
 
-/*************************************
- * FLEXIcontent radio/checkbox buttons
- *************************************/
-
-.flexi_radiotab {
-	display: inline-block !important;
-	padding: 4px 6px !important;
-	margin: 2px 0px 2px 4px !important;
-	border-radius:5px !important;
-	-moz-border-radius: 5px !important;
-	-webkit-border-radius: 5px !important;
-	border: 1px solid #cccccc !important;
-	text-decoration: none !important;
-	font-weight: normal !important;
-	font-size: 12px !important;
-	cursor: pointer !important;
-	float: left !important;
-	white-space:nowrap !important;
-	background-color: white !important;
-	color: black !important;
-}
-
-/* Highlighting selected choice(s) */
-.flexi_radiotab.highlight {
-	color: darkorange !important;
-	font-weight: bold !important;
-}
-
-.flexi_radiotab input {
-	float: left !important;
-	margin: 0px 2px 0px 0px;
-	padding: 0px;
-	/*display:none !important;*/
-}
-
-.flexi_radiotab.fcdisabled {
-	color: #bbbbbb !important;
-}
 
 /***************************
  * Other unsorted CSS Rules
  ***************************/
 
-div.fancybox-wrap a { background: none!important;}
+div.fancybox-wrap a {
+	background: none;
+}
 
 #flexicontent .content {
 	float:none;
@@ -1581,75 +1074,57 @@ div.fancybox-wrap a { background: none!important;}
 }
 
 /* field container inside a tabbed position */
-.tabbertab  .flexi.element {
- /*display: block;
- float: left;
- clear: both;*/
-}
-
-
-#flexicontent .rc5 {
-	border-radius:5px !important;
-	-moz-border-radius: 5px !important;
-	-webkit-border-radius: 5px !important;
-}
-
-
-.fc_field_unsused_val {
- text-decoration: line-through;
-}
-
-.fc_field_unsused_val img {
- opacity:0.4;
- filter:alpha(opacity=40); /* For IE8 and earlier */
+.tabbertab .flexi.element {
 }
 
 .readon, .readon a {
-  *white-space: nowrap !important; /* ie6/ie7 */
 }
+
 
 
 /**********************************************************
  * Common styling (all templates) of field labels and value
  **********************************************************/
 
-#flexicontent .label {
-	font-weight: bold;
+.flexi.label:not(.label-success):not(.label-primary):not(.label-warning):not(.label-info) {
+	/*background-color: #999;*/
+}
+/* Field label & values styling */
+span.flexi.label, .flexi.label {
+	display: block;
+	float: left;
+	font-size: 90%;
+	margin: 2px 8px 2px 0px;
+}
+span.flexi.value, .flexi.value {
+	display: block;
+	float: left;
+	max-width: 100% !important;  /* Allow responsive width while floating */
+	padding: 0% !important;  /* Allow responsive width while floating */
 }
 
-.flexi.label:not(.label-success):not(.label-primary):not(.label-w):not(.label-success):not(.label-success):not(.label-success) {
-	background-color: #999 !important;
-}
-#flexicontent .flexi.label, .flexi.label {
-	float: left !important;
-	display: inline-block !important;
-	vertical-align: baseline !important;
-	border-width: 0px !important;
-	max-width: 120px !important;
-	min-width: auto !important;
+/* e.g. in Joomla views */
+div.fc-custom-fields-box {
+	border-radius: 4px;
+	border: 1px solid #dddddd;
+	display: block;
+	float:left;
+	clear:both;
 	
-	width: auto;
-	white-space: normal;
-	color: #fff;
-	font-size: 12;
-	font-weight: bold;
-	line-height: 14px;
-	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-	
-	font-size: 11px;
-	font-style: normal;
-	font-family: arial;
-	text-align: right;
-	margin: 2px 6px 2px 2px;
-	padding: 3px 4px;
-	border-radius: 5px;
+	box-sizing: border-box;
+	width: 100%;
+	margin: 12px 0px;
+	padding: 12px 4px;
 }
-
-#flexicontent .flexi.value, .flexi.value {
-	/*float: left !important;*/
-	/*width: 79%;*/
-	padding: 0px !important;
-	margin: 2px 0% 2px 0% !important;
+div.fc-field-box {
+	display: block;
+	float: left;
+	margin: 0 1%;
+	max-width: 98%;
+	min-width: 48%;
+	padding: 2px;
+	box-sizing: border-box;
+	vertical-align: top;
 }
 
 
@@ -1674,7 +1149,7 @@ div.fancybox-wrap a { background: none!important;}
 	text-align: right;
 	max-width: 150px;
 	min-width: auto;
-	border-radius: 4px;
+	border-radius: 10px;
 	line-height: 100%;
 	
 	border-width: 0px;
@@ -1688,48 +1163,48 @@ div.fancybox-wrap a { background: none!important;}
 	border-bottom: 1px solid #AAA;
 	border-right: 1px solid #AAA;
 	margin: 2px 2px 2px 12px;
-	padding: 8px 4px;
+	padding: 4px 6px;
 }
 
 #flexicontent .fc_markup.mu_featured_cat.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/star.png) 4px 50% no-repeat lightgoldenrodyellow;
+	padding-left: 28px;
+	background: url(../images/star.png) 6px 50% no-repeat lightgoldenrodyellow;
 }
 
 #flexicontent .fc_markup.mu_normal_cat.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/star-empty.png) 4px 50% no-repeat lightgoldenrodyellow;
+	padding-left: 28px;
+	background: url(../images/star-empty.png) 6px 50% no-repeat lightgoldenrodyellow;
 }
 
 #flexicontent .fc_markup.mu_item_no_access.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/eye-half.png) 4px 50% no-repeat #FFD700;
+	padding-left: 28px;
+	background: url(../images/eye-half.png) 6px 50% no-repeat #FFD700;
 }
 
 #flexicontent .fc_markup.mu_item_free_access.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/eye.png) 4px 50% no-repeat #50EE90;
+	padding-left: 28px;
+	background: url(../images/eye.png) 6px 50% no-repeat #50EE90;
 }
 
 #flexicontent .fc_markup.mu_needed_acclvl.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/lock.png) 4px 50% no-repeat darkorange;
+	padding-left: 28px;
+	background: url(../images/lock.png) 6px 50% no-repeat darkorange;
 	color: white;
 }
 
 #flexicontent .fc_markup.mu_obtained_acclvl.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/lock-unlock.png) 4px 50% no-repeat transparent;
+	padding-left: 28px;
+	background: url(../images/lock-unlock.png) 6px 50% no-repeat transparent;
 	background-color: darkgreen;
 	color: white;
 }
 
 #flexicontent .fc_markup.mu_ra_timeframe.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat lightskyblue;
+	padding-left: 28px;
+	background: url(../images/calendar-select-days-span.png) 6px 50% no-repeat lightskyblue;
 }
 
 #flexicontent .fc_markup.mu_ru_timeframe.mu_has_text {
-	padding-left: 24px;
-	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat lightskyblue;
+	padding-left: 28px;
+	background: url(../images/calendar-select-days-span.png) 6px 50% no-repeat lightskyblue;
 }

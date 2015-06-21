@@ -48,14 +48,17 @@ $isAdmin = JFactory::getApplication()->isAdmin();
 $enable_translation_groups = $cparams->get("enable_translation_groups");
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
-$list_total_cols = 16;
+$list_total_cols = 18;
 if ( $enable_translation_groups ) $list_total_cols++;
 
 $list_total_cols += count($this->extra_fields);
 
 $image_flag_path = "../media/mod_languages/images/";
-$attribs_preview = ' class="fc-tooltip-img '.$tip_class.'" alt="Preview" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_preview = ' class="fc-tooltip-img '.$tip_class.'" alt="Preview" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" style="min-width:16px;"';
 $image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview);
+
+$attribs_editlayout = ' style="float:right;" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT', null, 1, 1).'" ';
+$image_editlayout = JHTML::image( 'components/com_flexicontent/assets/images/'.'layout_edit.png', JText::_('FLEXI_EDIT_LAYOUT'),  $attribs_editlayout);
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
@@ -105,6 +108,7 @@ $date_zone_tip   = JHTML::image ( 'administrator/components/com_flexicontent/ass
 // COMMON repeated texts
 $edit_item_title = JText::_('FLEXI_EDIT_ITEM', true);
 $edit_cat_title = JText::_('FLEXI_EDIT_CATEGORY', true);
+$edit_layout = JText::_('FLEXI_EDIT_LAYOUT', true);
 $rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER', true);
 $rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
 $scheduled_for_publication = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION', true );
@@ -150,7 +154,7 @@ function submitform(pressbutton)
 	form = document.adminForm;
 	// If formvalidator activated
 	/*if( pressbutton == 'remove' ) {
-		var answer = confirm('<?php echo addslashes(JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM__',true )); ?>')
+		var answer = confirm('<?php echo JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM',true ); ?>')
 		if (!answer){
 			new Event(e).stop();
 			return;
@@ -186,7 +190,9 @@ function delAllFilters() {
 	delFilter('search'); delFilter('filter_type'); delFilter('filter_state');
 	delFilter('filter_cats'); delFilter('filter_author'); delFilter('filter_id');
 	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');
-	delFilter('filter_tag');
+	delFilter('filter_tag'); delFilter('filter_access');
+	jQuery('#filter_subcats').val('1');
+	jQuery('.fc_field_filter').val('');
 }
 
 <?php if ($this->ordering) : ?>
@@ -414,6 +420,10 @@ jQuery(document).ready(function(){
 		</span>
 		
 		<span class="fc-filter nowrap_box">
+			<?php echo $this->lists['filter_access']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
 			<?php echo $catsinstate_tip; ?>
 			<?php echo $this->lists['filter_catsinstate']; ?>
 		</span>
@@ -444,6 +454,12 @@ jQuery(document).ready(function(){
 			<label class="label"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
 			<?php echo $this->lists['filter_order_type']; ?>
 		</span>
+		
+		<?php foreach($this->custom_filts as $filt) : ?>
+		<span class="fc-filter nowrap_box">
+			<?php echo $filt->html; ?>
+		</span>
+		<?php endforeach; ?>
 		
 		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
@@ -534,7 +550,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 			
-			<th class="center hideOnDemandClass">
+			<th class="left hideOnDemandClass" colspan="2">
 				<?php echo JText::_( 'FLEXI_TEMPLATE' ); ?>
 			</th>
 
@@ -568,6 +584,11 @@ jQuery(document).ready(function(){
 			
 			<th class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php if ($this->filter_access) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_access');document.adminForm.submit();" />
+				</span>
+				<?php endif; ?>
 			</th>
 			
 			<th class="left hideOnDemandClass">
@@ -581,7 +602,7 @@ jQuery(document).ready(function(){
 			</th>
 			
 			<th nowrap="nowrap" class="center hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_TAGS', 'tg.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JText::_( 'FLEXI_TAGS' ); ?>
 				<?php if ($this->filter_tag) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" onclick="delFilter('filter_tag');document.adminForm.submit();" />
@@ -718,7 +739,10 @@ jQuery(document).ready(function(){
 				$extra_img = 'pushished_expired.png';
 				$extra_alt = & $publication_expired;
 			}
-
+			
+			$row_ilayout =  $row->config->get('ilayout') ?  $row->config->get('ilayout') : $row->tconfig->get('ilayout');
+			$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder='. $row_ilayout;
+			
 			// Set a row language, even if empty to avoid errors
 			$lang_default = !FLEXI_J16GE ? '' : '*';
 			$row->lang = @$row->lang ? $row->lang : $lang_default;
@@ -796,9 +820,16 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 				<?php echo $row->featured ? $featimg : ''; ?>
 			</td>
-
+			
+			<td align="right">
+				<?php if ($this->CanTemplates && $row_ilayout) : ?>
+				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;" >
+					<?php echo $image_editlayout;?>
+				</a>
+				<?php endif; ?>
+			</td>
 			<td align="center">
-				<?php echo ($row->config->get("ilayout","") ? $row->config->get("ilayout") : $row->tconfig->get("ilayout")."<sup>[1]</sup>") ?>
+				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
 			</td>
 
 		<?php if ( $enable_translation_groups ) : ?>
@@ -849,16 +880,15 @@ jQuery(document).ready(function(){
 		<?php endif ; ?>
 
 
-    <?php foreach($this->extra_fields as $field) :?>
+    <?php foreach($this->extra_fields as $_field) :?>
 
 			<td align="center">
 		    <?php
 		    // Clear display HTML just in case
-		    if (isset($field->{$field->methodname}))
-		    	unset( $field->{$field->methodname} );
-
+		    $field = clone($_field);  // quickly make a shallow copy of the fields object to avoid assignments of various member variables being persistent
+		    
 		    // Field value for current item
-		    $field_value = & $row->extra_field_value[$field->name];
+		    $field_value = isset($row->fieldvalues[$field->id]) ? $row->fieldvalues[$field->id] : false;
 		    
 				// Create field's display HTML, via calling FlexicontentFields::renderField() for the given method name
 				FlexicontentFields::renderField($row, $field, $field_value, $method=$field->methodname);

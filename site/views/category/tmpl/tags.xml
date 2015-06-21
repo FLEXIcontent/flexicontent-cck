@@ -649,11 +649,11 @@
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
-			<field name="filter_placement" type="radio" default="" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="btn-group btn-group-yesno">
+			<field name="filter_placement" type="radio" default="" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="btn-group group-fcinfo">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="2">FLEXI_YES_BUT_FILTER_BELOW_LABEL</option>
-				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_BUT_FILTER_BELOW_LABEL</option>
 				<option value="3">FLEXI_PLACE_IN_TABS</option>
 			</field>
 			

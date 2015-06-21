@@ -362,12 +362,6 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		// Create field's HTML display for item form
 		// *****************************************
 		
-		// Create form field options
-		$options = array();
-		foreach ($elements as $element) {
-			$options[] = JHTML::_('select.option', $element->value, $element->text);
-		}
-		
 		// Create the attributes of the form field
 		$fftype = 'radio';
 		$display_as_radioset = 1;

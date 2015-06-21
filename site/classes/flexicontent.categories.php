@@ -102,7 +102,7 @@ class flexicontent_cats
 		 .' ORDER BY cat.level ASC';
 		
 		$db->setQuery( $query );
-		$this->parentcats_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+		$this->parentcats_ids = $db->loadColumn();
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');*/
 		
 		global $globalcats;
@@ -525,7 +525,7 @@ class flexicontent_cats
 			.$andaccess
 			;
 		$db->setQuery($query);
-		$published_cats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+		$published_cats = $db->loadColumn();
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
 		return array_unique($published_cats);

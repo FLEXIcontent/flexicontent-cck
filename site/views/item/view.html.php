@@ -514,7 +514,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
-		//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext{zoom:1;}, * html #flexicontent dd { height: 1%; }</style><![endif]-->');
+		
+		// Fields common CSS
+		$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexi_form_fields.css');
 		
 		// Load backend / frontend shared and Joomla version specific CSS (different for frontend / backend)
 		FLEXI_J30GE ?
@@ -558,7 +560,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Verify type is allowed to the user
 		if ( !$new_typeid )
 		{
-			$types = $model->getTypeslist($type_ids_arr = false, $check_perms = true);
+			$types = $model->getTypeslist($type_ids_arr = false, $check_perms = true, $_published=true);
 			if ( $types && count($types)==1 ) $new_typeid = $types[0]->id;
 			JRequest::setVar('typeid', $new_typeid);
 			$canCreateType = true;
@@ -667,10 +669,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		// *******************************
 		
 		// User Group / Author parameters
-		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-		$authorparams = $db->loadResult();
-		$authorparams = new JRegistry($authorparams);
-		$max_auth_limit = $authorparams->get('max_auth_limit', 0);  // maximum number of content items the user can create
+		$authorparams = flexicontent_db::getUserConfig($user->id);
+		$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // maximum number of content items the user can create
 		
 		$hasTmpEdit = false;
 		$hasCoupon  = false;

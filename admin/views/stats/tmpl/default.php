@@ -56,9 +56,11 @@ else :
     });
 </script>
 
+
+<div id="flexicontent" class="flexicontent">
 	<table class="fc-table-list fc-tbl-short" style="margin:20px 0 20px 0; width:98%;">
 	<tr>
-		<th colspan="2" style="font-size:18px;">
+		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_TOTAL_NUM_OF' ); ?>
 		</th>
 	</tr>
@@ -165,7 +167,7 @@ else :
 	
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
 	<tr>
-		<th colspan="2" style="font-size:18px;">
+		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_ITEMS' ); ?> - <?php echo JText::_( 'FLEXI_CREATION_DATE' ); ?>
 		</th>
 	</tr>
@@ -262,7 +264,7 @@ else :
 	<hr>
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
 	<tr>
-		<th colspan="2" style="font-size:18px;">
+		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_ITEM_STATES_CHART' ); ?>
 		</th>
 	</tr>
@@ -287,7 +289,7 @@ else :
 			}
 		 ?>
 
-	    <script type="text/javascript" language="javascript">
+	    <script type="text/javascript">
 	       
 			var optionpie = {
 			      tooltip : {
@@ -347,7 +349,7 @@ else :
 	<hr>
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
 	<tr>
-		<th colspan="2" style="font-size:18px;">
+		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_GENERAL_STATS' ); ?>
 		</th>
 	</tr>
@@ -365,9 +367,9 @@ else :
 				<table class="adminlist  table table-hover table-striped">
 					<thead>
 						<tr>
-							<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-							<th><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
-							<th><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -375,20 +377,20 @@ else :
 						$k = 0;
 						for ($i=0, $n=count($this->popular); $i < $n; $i++) {
 						$row = $this->popular[$i];
-						$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
+						$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid='. $row->id;
 						?>
 						<tr>
-							<td width="65%">
+							<td style="width:65%">
 								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 									<a href="<?php echo $link; ?>">
 										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 									</a>
 								</span>
 							</td>
-							<td width="1%" align="center">
-								<strong><?php echo $row->hits; ?></strong>
+							<td style="width:1%" align="center">
+								<span class="badge badge-info"><?php echo $row->hits; ?></span>
 							</td>
-							<td width="34%">
+							<td style="width:34%">
 								<strong><?php echo flexicontent_html::ratingbar( $row ); ?></strong>
 							</td>
 						</tr>
@@ -407,9 +409,9 @@ else :
 				<table class="adminlist  table table-hover table-striped">
 					<thead>
 						<tr>
-							<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-							<th><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
-							<th><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -417,20 +419,20 @@ else :
 						$k = 0;
 						for ($i=0, $n=count($this->unpopular); $i < $n; $i++) {
 						$row = $this->unpopular[$i];
-						$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
+						$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid='. $row->id;
 						?>
 						<tr>
-							<td width="65%">
+							<td style="width:65%">
 								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
 									<a href="<?php echo $link; ?>">
 										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 									</a>
 								</span>
 							</td>
-							<td width="1%" align="center">
-								<strong><?php echo $row->hits; ?></strong>
+							<td style="width:1%" align="center">
+								<span class="badge badge-info"><?php echo $row->hits; ?></span>
 							</td>
-							<td width="34%">
+							<td style="width:34%">
 								<strong><?php echo flexicontent_html::ratingbar( $row ); ?></strong>
 							</td>
 						</tr>
@@ -452,8 +454,8 @@ else :
 						<table class="adminlist  table table-hover table-striped">
 					<thead>
 						<tr>
-							<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-							<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -461,7 +463,7 @@ else :
 						$k = 0;
 						for ($i=0, $n=count($this->favoured); $i < $n; $i++) {
 						$row = $this->favoured[$i];
-						$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
+						$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid='. $row->id;
 						?>
 						<tr>
 							<td>
@@ -472,7 +474,7 @@ else :
 								</span>
 							</td>
 							<td align="center">
-								<strong><?php echo $row->favnr; ?></strong>
+								<span class="badge badge-success"><?php echo $row->favnr; ?></span>
 							</td>
 						</tr>
 						<?php $k = 1 - $k; } ?>
@@ -491,7 +493,7 @@ else :
 	
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
 	<tr>
-		<th colspan="2" style="font-size:18px;">
+		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_RATING_STATS' ); ?>
 		</th>
 	</tr>
@@ -508,11 +510,11 @@ else :
 					<div class="well">
 						<h3><?php echo JText::_( 'FLEXI_BEST_RATED' ) ?></h3>
 						<hr>
-						<table class="adminlist  table table-hover table-striped">
+						<table class="adminlist table table-hover table-striped">
 							<thead>
 								<tr>
-									<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-									<th><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
+									<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+									<th class="left"><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -520,7 +522,7 @@ else :
 								$k = 0;
 								for ($i=0, $n=count($this->rating); $i < $n; $i++) {
 								$row = $this->rating[$i];
-								$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
+								$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid='. $row->id;
 								?>
 								<tr>
 									<td>
@@ -546,11 +548,11 @@ else :
 					<div class="well">
 						<h3><?php echo JText::_( 'FLEXI_WORST_RATED' ) ?></h3>
 						<hr>
-								<table class="adminlist  table table-hover table-striped">
+								<table class="adminlist table table-hover table-striped">
 									<thead>
 										<tr>
-											<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-											<th><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
+											<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+											<th class="left"><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
 										</tr>
 									</thead>
 									<tbody>
@@ -558,7 +560,7 @@ else :
 										$k = 0;
 										for ($i=0, $n=count($this->worstrating); $i < $n; $i++) {
 										$row = $this->worstrating[$i];
-										$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
+										$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid='. $row->id;
 										?>
 										<tr>
 											<td>
@@ -604,7 +606,7 @@ else :
 				}
 			 ?>
 
-		    <script type="text/javascript" language="javascript">
+		    <script type="text/javascript">
 		       
 				var optionpie2 = {
 				      tooltip : {
@@ -666,7 +668,7 @@ else :
 	<hr>
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
 	<tr>
-		<th colspan="2" style="font-size:18px;">
+		<th style="font-size:18px;">
 			<?php echo JText::_( 'FLEXI_USER_STATS' ); ?>
 		</th>
 	</tr>
@@ -681,8 +683,8 @@ else :
 							<table class="adminlist  table table-hover table-striped">
 								<thead>
 									<tr>
-										<th><?php echo JText::_( 'FLEXI_USER' ); ?></th>
-										<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+										<th class="left"><?php echo JText::_( 'FLEXI_USER' ); ?></th>
+										<th class="left"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -690,7 +692,7 @@ else :
 									$k = 0;
 									for ($i=0, $n=count($this->creators); $i < $n; $i++) {
 									$row = $this->creators[$i];
-									$link = 'index.php?option=com_flexicontent&amp;view=user&amp;'.$ctrl_users.'edit&amp;cid[]='. $row->id;
+									$link = 'index.php?option=com_flexicontent&amp;view=user&amp;'.$ctrl_users.'edit&amp;cid='. $row->id;
 									?>
 									<tr>
 										<td>
@@ -701,7 +703,7 @@ else :
 											</span>
 										</td>
 										<td align="center">
-											<strong><?php echo $row->counter; ?></strong>
+											<span class="badge badge-success"><?php echo $row->counter; ?></span>
 										</td>
 									</tr>
 									<?php $k = 1 - $k; } ?>
@@ -715,11 +717,11 @@ else :
 					<div class="well">
 						<h3><?php echo JText::_( 'FLEXI_TOP_CONTRIBUTORS' ) ?></h3>
 						<hr>
-							<table class="adminlist  table table-hover table-striped">
+							<table class="adminlist table table-hover table-striped">
 								<thead>
 									<tr>
-										<th><?php echo JText::_( 'FLEXI_USER' ); ?></th>
-										<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+										<th class="left"><?php echo JText::_( 'FLEXI_USER' ); ?></th>
+										<th class="left"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -727,7 +729,7 @@ else :
 									$k = 0;
 									for ($i=0, $n=count($this->editors); $i < $n; $i++) {
 									$row = $this->editors[$i];
-									$link = 'index.php?option=com_flexicontent&amp;view=user&amp;'.$ctrl_users.'edit&amp;cid[]='. $row->id;
+									$link = 'index.php?option=com_flexicontent&amp;view=user&amp;'.$ctrl_users.'edit&amp;cid='. $row->id;
 									?>
 									<tr>
 										<td>
@@ -738,7 +740,7 @@ else :
 											</span>
 										</td>
 										<td align="center">
-											<strong><?php echo $row->counter; ?></strong>
+											<span class="badge badge-success"><?php echo $row->counter; ?></span>
 										</td>
 									</tr>
 									<?php $k = 1 - $k; } ?>
@@ -750,11 +752,10 @@ else :
 			</div>
 		<!-- End of Most and less Popular-->
 
-<?php
-endif;
-// EOF: Load echart 
-?>
+</div>
+
+<?php endif; /* EOF: Load echart  libraries */ ?>
 
 
 <div class="clear clearfix"></div>
-</div>
+</div><!-- BOF j-main-container -->

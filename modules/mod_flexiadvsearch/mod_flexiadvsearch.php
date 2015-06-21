@@ -79,12 +79,12 @@ if ( $show_mod )
 	// Go button
 	$button_as    = $params->get('button_as', '');
 	$button_text  = JText::_($params->get('button_text', 'FLEXI_ADV_MOD_GO'));
-	$button_image = $params->get('button_image', '');
+	$button_image = $params->get('button_image', 'components/com_flexicontent/assets/images/magnifier.png');
 	
 	// Direct button
 	$direct_as    = $params->get('direct_as', '');
 	$direct_text  = JText::_($params->get('direct_text', 'FLEXI_ADV_MOD_DIRECT'));
-	$direct_image = $params->get('direct_image', '');
+	$direct_image = $params->get('direct_image', 'components/com_flexicontent/assets/images/question.png');
 
 	$linkadvsearch     = $params->get('linkadvsearch', 1);
 	$linkadvsearch_txt = JText::_($params->get('linkadvsearch_txt', 'FLEXI_ADV_MOD_ADVANCED_SEARCH'));

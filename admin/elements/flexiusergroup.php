@@ -151,11 +151,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 			$attribs .=' multiple="multiple"';
 			$attribs .= ' size="'.$initial_size.'" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<".$maximize_size.") { ${element_id}_oldsize=$element_id.size; $element_id.size=".$maximize_size.";} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
-		} else {
-			$maximize_link = '';
 		}
-		if ($initial_size >= count($options) || $initial_size>= $maximize_size) $maximize_link = '';
 		
 		// Initialize some field attributes.
 		$attribs .= ((string) @$this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
@@ -168,8 +164,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		$classes .= @$attributes['class'] ? ' '.$attributes['class'] : '';
 		$attribs .= ' class="'.$classes.'"';
 		
-		$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);
-		return $html.$maximize_link;
+		return JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 	
 }

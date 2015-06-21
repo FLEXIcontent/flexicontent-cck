@@ -69,238 +69,73 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 
 <div id="flexicontent">
 <form action="index.php?controller=users" method="post" name="adminForm" autocomplete="off">
-
-	<?php if (FLEXI_J16GE): ?>
-
-		<fieldset id="user-basic_set" class="adminform" style="border:0 !important; margin:0 !important;">
-			<table class="admintable" cellspacing="1">
-				<?php foreach($this->form->getFieldset('user_basic') as $field) :?>
-					<tr>
-						<td width="150" class="key"><?php echo $field->label; ?></td>
-						<td><?php echo $field->input; ?></td>
-					</tr>
-				<?php endforeach; ?>
-			</table>
-		</fieldset>
-		
-		<?php
-			echo JHtml::_('tabs.start','basic-tabs-'.$this->form->getValue("id"), array('useCookie'=>1));
-			echo JHtml::_('tabs.panel',JText::_('FLEXI_ACCOUNT_DETAILS'), 'user-details');
-		?>
-		
-		<fieldset id="user-details_set" class="adminform">
-			<table class="admintable" cellspacing="1">
-				<?php foreach($this->form->getFieldset('user_details') as $field) :?>
-					<tr>
-						<td width="150" class="key"><?php echo $field->label; ?></td>
-						<td><?php echo $field->input; ?></td>
-					</tr>
-				<?php endforeach; ?>
-			</table>
-		</fieldset>
-		
-		<?php
-			echo JHtml::_('tabs.panel',JText::_('FLEXI_ACCOUNT_SETTINGS'), 'user-account');
-		?>
-		
-		<?php
-		echo JHtml::_('sliders.start');
-		foreach ($this->form->getFieldsets() as $fieldset) :
-			if ($fieldset->name == 'user_basic' || $fieldset->name == 'user_details') :
-				continue;
-			endif;
-			echo JHtml::_('sliders.panel', JText::_($fieldset->label), $fieldset->name);
-		?>
-		<fieldset class="panelform">
-		<ul class="adminformlist">
-		<?php foreach($this->form->getFieldset($fieldset->name) as $field): ?>
-			<?php if ($field->hidden): ?>
-				<?php echo $field->input; ?>
-			<?php else: ?>
-				<li><?php echo $field->label; ?>
-				<?php echo $field->input; ?></li>
-			<?php endif; ?>
-		<?php endforeach; ?>
-		</ul>
-		</fieldset>
-		<?php endforeach; ?>
-		<?php echo JHtml::_('sliders.end'); ?>
-
-		<?php
-			echo JHtml::_('tabs.panel',JText::_('FLEXI_ASSIGNED_GROUPS'), 'user-groups');
-		?>
-		
-		<fieldset id="user-groups_set" class="adminform">
-			<legend><?php echo JText::_('FLEXI_ASSIGNED_GROUPS'); ?></legend>
-			<?php JHtml::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_users/helpers/html'); ?>
-			<?php echo JHtml::_('access.usergroups', 'jform[groups]', $this->usergroups, true); ?>
-		</fieldset>
-		
-	<?php else :?>
-
+	
+	<fieldset id="user-basic_set" class="adminform" style="border:0 !important; margin:0 !important;">
 		<table class="admintable" cellspacing="1">
-			<tr>
-				<td width="150" class="key">
-					<label for="name">
-						<?php echo JText::_( 'Name' ); ?>
-					</label>
-				</td>
-				<td>
-					<input type="text" name="name" id="name" class="inputbox" size="40" value="<?php echo $this->user->get('name'); ?>" />
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<label for="username">
-						<?php echo JText::_( 'Username' ); ?>
-					</label>
-				</td>
-				<td>
-					<input type="text" name="username" id="username" class="inputbox" size="40" value="<?php echo $this->user->get('username'); ?>" autocomplete="off" />
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<label for="email">
-						<?php echo JText::_( 'Email' ); ?>
-					</label>
-				</td>
-				<td>
-					<input class="inputbox" type="text" name="email" id="email" size="40" value="<?php echo $this->user->get('email'); ?>" />
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<label for="password">
-						<?php echo JText::_( 'New Password' ); ?>
-					</label>
-				</td>
-				<td>
-					<?php if(0 && !$this->user->get('password')) : ?>
-						<input class="inputbox disabled" type="password" name="password" id="password" size="40" value="" disabled="disabled" />
-					<?php else : ?>
-						<input class="inputbox" type="password" name="password" id="password" size="40" value=""/>
-					<?php endif; ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<label for="password2">
-						<?php echo JText::_( 'Verify Password' ); ?>
-					</label>
-				</td>
-				<td>
-					<?php if(0 && !$this->user->get('password')) : ?>
-						<input class="inputbox disabled" type="password" name="password2" id="password2" size="40" value="" disabled="disabled" />
-					<?php else : ?>
-						<input class="inputbox" type="password" name="password2" id="password2" size="40" value=""/>
-					<?php endif; ?>
-				</td>
-			</tr>
+			<?php foreach($this->form->getFieldset('user_basic') as $field) :?>
+				<tr>
+					<td width="150" class="key"><?php echo $field->label; ?></td>
+					<td><?php echo $field->input; ?></td>
+				</tr>
+			<?php endforeach; ?>
 		</table>
-		
-		<?php
-		echo $this->tpane->startPane( 'author-pane' );
-		echo $this->tpane->startPanel( JText::_( 'User Details' ), 'user-details' );
-		?>
+	</fieldset>
+	
+	<?php
+		echo JHtml::_('tabs.start','basic-tabs-'.$this->form->getValue("id"), array('useCookie'=>1));
+		echo JHtml::_('tabs.panel',JText::_('FLEXI_ACCOUNT_DETAILS'), 'user-details');
+	?>
+	
+	<fieldset id="user-details_set" class="adminform">
 		<table class="admintable" cellspacing="1">
-			<tr>
-				<td valign="top" class="key">
-					<label for="gid">
-						<?php echo JText::_( 'Group' ); ?>
-					</label>
-				</td>
-				<td>
-					<?php echo $this->lists['gid']; ?>
-				</td>
-			</tr>
-			<?php if (FLEXI_J16GE ? $this->me->authorise( 'com_users', 'block user' ) : $this->me->authorize( 'com_users', 'block user' )) { ?>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'Block User' ); ?>
-				</td>
-				<td>
-					<?php echo $this->lists['block']; ?>
-				</td>
-			</tr>
-			<?php } if (FLEXI_J16GE ? $this->me->authorise( 'com_users', 'email_events' ) : $this->me->authorize( 'com_users', 'email_events' )) { ?>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'Receive System Emails' ); ?>
-				</td>
-				<td>
-					<?php echo $this->lists['sendEmail']; ?>
-				</td>
-			</tr>
-			<?php } if( $this->user->get('id') ) { ?>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'Register Date' ); ?>
-				</td>
-				<td>
-					<?php echo JHTML::_('date', $this->user->get('registerDate'), $date_format);?>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
-					<?php echo JText::_( 'Last Visit Date' ); ?>
-				</td>
-				<td>
-					<?php echo $lvisit; ?>
-				</td>
-			</tr>
-			<?php } ?>
+			<?php foreach($this->form->getFieldset('user_details') as $field) :?>
+				<tr>
+					<td width="150" class="key"><?php echo $field->label; ?></td>
+					<td><?php echo $field->input; ?></td>
+				</tr>
+			<?php endforeach; ?>
 		</table>
-		
-		<?php
-		echo $this->tpane->endPanel();
-		echo $this->tpane->startPanel( JText::_( 'FLEXI_ACCOUNT_SETTINGS' ), 'user-account' );
-		?>
-		<table class="admintable">
-			<tr>
-				<td>
-					<?php
-						$params = $this->user->getParameters(true);
-						echo $params->render( 'params' );
-					?>
-				</td>
-			</tr>
-		</table>
-		<?php
-		echo $this->tpane->endPanel();
-		?>
-		
-		<?php
-		if (FLEXI_ACCESS) :
-		$title = JText::_( 'FlexiAccess' ).' - '.JText::_( 'FLEXIACCESS_MGROUPE' );
-		echo $this->tpane->startPanel( $title, 'user-groups' );
-		?>
-		<table class="admintable">
-			<tr>
-				<td class="key" valign="top">
-					<label for="access">
-						<?php echo JText::_( 'FLEXIACCESS_MGROUPE' ); ?>
-					</label>
-				</td>
-				<td>
-					<?php echo $this->lists['access']; ?>
-				</td>
-			</tr>
-		</table>
-		<?php
-		echo $this->tpane->endPanel();
+	</fieldset>
+	
+	<?php
+		echo JHtml::_('tabs.panel',JText::_('FLEXI_ACCOUNT_SETTINGS'), 'user-account');
+	?>
+	
+	<?php
+	echo JHtml::_('sliders.start');
+	foreach ($this->form->getFieldsets() as $fieldset) :
+		if ($fieldset->name == 'user_basic' || $fieldset->name == 'user_details') :
+			continue;
 		endif;
-		?>	
-	<?php endif; ?>
-
+		echo JHtml::_('sliders.panel', JText::_($fieldset->label), $fieldset->name);
+	?>
+	<fieldset class="panelform">
+	<ul class="adminformlist">
+	<?php foreach($this->form->getFieldset($fieldset->name) as $field): ?>
+		<?php if ($field->hidden): ?>
+			<?php echo $field->input; ?>
+		<?php else: ?>
+			<li><?php echo $field->label; ?>
+			<?php echo $field->input; ?></li>
+		<?php endif; ?>
+	<?php endforeach; ?>
+	</ul>
+	</fieldset>
+	<?php endforeach; ?>
+	<?php echo JHtml::_('sliders.end'); ?>
 
 	<?php
-	if (!FLEXI_J16GE) {
-		echo $this->tpane->startPanel( JText::_( 'FLEXI_CONTACT_INFORMATION' ), 'user-contact' );
-	} else {
-		echo JHtml::_('tabs.panel',JText::_('FLEXI_CONTACT_INFORMATION'), 'user-contact');
-	}
+		echo JHtml::_('tabs.panel',JText::_('FLEXI_ASSIGNED_GROUPS'), 'user-groups');
 	?>
+	
+	<fieldset id="user-groups_set" class="adminform">
+		<legend><?php echo JText::_('FLEXI_ASSIGNED_GROUPS'); ?></legend>
+		<?php JHtml::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_users/helpers/html'); ?>
+		<?php echo JHtml::_('access.usergroups', 'jform[groups]', $this->usergroups, true); ?>
+	</fieldset>
+
+
+	<?php echo JHtml::_('tabs.panel',JText::_('FLEXI_CONTACT_INFORMATION'), 'user-contact'); ?>
 	
 	<?php if (!$this->contact) :?>
 		<table class="admintable" style="width:100%">
@@ -394,24 +229,6 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 	<?php endif; /* this->contact */ ?>
 	
 	<?php
-	if (!FLEXI_J16GE) {
-		echo $this->tpane->endPanel();
-	} else {
-	}
-	?>
-	
-	
-	<?php
-	if (!FLEXI_J16GE)
-	{
-		$title = JText::_( 'FLEXI_AUTHORING' );
-		echo $this->tpane->startPanel( $title, 'author_ext_config-options' );
-		echo $this->params_authorbasic->render('authorbasicparams', 'author_ext_config');
-		echo $this->tpane->endPanel();
-	}
-	else
-	{
-	
 		$fieldSets = $this->jform_authorbasic->getFieldsets('authorbasicparams');
 		foreach ($fieldSets as $name => $fieldSet) :
 		
@@ -427,105 +244,10 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 			echo '</fieldset>';
 			
 		endforeach;
-	}
-	?>
 		
-	<?php
-	if (!FLEXI_J16GE)
-	{
-		$title = JText::_( 'FLEXI_AUTHOR_ITEMS_LIST' ) ;
-		echo $this->tpane->startPanel( $title, "author-items-list" );
-		?>
-		<div class="fctabber" style=''>
-			
-			<div class="tabbertab" style="padding: 0px;" >
-				<h3 class="tabberheading"> <?php echo str_replace('&', ' / ', JText::_( 'FLEXI_PARAMS_CAT_INFO_OPTIONS' )); ?> </h3>
-				<?php echo $this->params_authorcat->render('authorcatparams', "cat_info_options" ); ?>
-			</div>
-			
-			<div class="tabbertab" style="padding: 0px;" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_SUBCATS_INFO_OPTIONS' ); ?> </h3>
-				<?php echo $this->params_authorcat->render('authorcatparams', "subcats_info_options" ); ?>
-			</div>
-			
-			<div class="tabbertab" style="padding: 0px;" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_PEERCATS_INFO_OPTIONS' ); ?> </h3>
-				<?php echo $this->params_authorcat->render('authorcatparams', "peercats_info_options" ); ?>
-			</div>
-			
-			<div class="tabbertab" style="padding: 0px;" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_CAT_ITEMS_LIST' ); ?> </h3>
-				<?php echo $this->params_authorcat->render('authorcatparams', 'cat_items_list'); ?>
-			</div>
-			
-			<div class="tabbertab" style="padding: 0px;" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_CAT_ITEM_MARKUPS' ); ?> </h3>
-				<?php echo $this->params_authorcat->render('authorcatparams', 'cat_item_markups'); ?>
-			</div>
-			
-			<div class="tabbertab" style="padding: 0px;" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_CAT_ITEM_FILTERING' ); ?> </h3>
-				<?php echo $this->params_authorcat->render('authorcatparams', 'cat_item_filtering'); ?>
-			</div>
-			
-			<div class="tabbertab" style="padding: 0px;" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_CAT_RSS_FEEDS' ); ?> </h3>
-				<?php echo $this->params_authorcat->render('authorcatparams', 'cat_rss_feeds'); ?>
-			</div>
-			
-			<?php if ( $this->cparams->get('enable_notifications', 0) && $this->cparams->get('nf_allow_cat_specific', 0) ) :?>
-			<div class="tabbertab" style="padding: 0px;" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_EMAIL_NOTIFICATIONS_CONF' ); ?> </h3>
-				<?php echo $this->params_authorcat->render('authorcatparams', 'cat_notifications_conf'); ?>
-			</div>				
-			<?php endif; ?>
-			
-		</div>
 		
-		<?php
-		echo $this->tpane->endPanel();
-			
-
-		$title = JText::_( 'FLEXI_TEMPLATE' ) ;
-		echo $this->tpane->startPanel( $title, "author-template-options" );
-		echo '<span class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
-		?>
-		<br/><br/>
-		<ol style="margin:0 0 0 16px; padding:0;">
-			<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
-			<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
-		</ol>
-		<br/>
-		<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
-		</span>
-		<div class="clear"></div>
 		
-		<?php
-		echo $this->params_authorcat->render('authorcatparams', 'templates')."<br/>";
-			
-		echo $this->pane->startPane( 'themes-pane' );
-		foreach ($this->tmpls as $tmpl) {
-			$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-			echo $this->pane->startPanel( $title, "params-".$tmpl->name );
-			echo
-				str_replace('id="layouts', 'id="layouts_'.$tmpl->name.'_', 
-					str_replace('for="layouts', 'for="layouts_'.$tmpl->name.'_', 
-						str_replace('name="layouts[', 'name="layouts['.$tmpl->name.'][',
-							$tmpl->params->render('layouts')
-						)
-					)
-				);
-			echo $this->pane->endPanel();
-		}
-		echo $this->pane->endPane();
-		
-		echo $this->tpane->endPanel();
-		echo $this->tpane->endPane();
-	}
-	else
-	{
 		echo JHtml::_('tabs.panel',JText::_('FLEXI_AUTHOR_ITEMS_LIST'), 'author-items-list');
-			
 		echo JHtml::_('tabs.start','cat-tabs-'.$this->form->getValue("id"), array('useCookie'=>1));
 		
 		$fieldSets = $this->jform_authorcat->getFieldsets('authorcatparams');
@@ -547,7 +269,6 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		endforeach;
 		
 		echo JHtml::_('tabs.end');
-		
 		echo JHtml::_('tabs.panel',JText::_('FLEXI_TEMPLATE'), 'author-template-options');
 		?>
 		
@@ -613,7 +334,6 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		echo JHtml::_('sliders.end');
 		
 		echo JHtml::_('tabs.end');
-	}
 	?>	
 	
 	<div class="clr"></div>

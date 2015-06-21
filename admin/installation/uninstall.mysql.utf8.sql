@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS
 `#__flexicontent_items_ext`,
 `#__flexicontent_items_tmp`,
 `#__flexicontent_items_extravote`,
+`#__flexicontent_reviews`,
 `#__flexicontent_items_versions`,
 `#__flexicontent_tags`,
 `#__flexicontent_tags_item_relations`,

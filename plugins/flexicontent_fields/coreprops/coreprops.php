@@ -112,8 +112,8 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 			case 'language':     // Authors
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
 				// partial SQL clauses
-				if (!FLEXI_J16GE) break;
 				$filter->filter_valuesselect = ' i.language AS value, CONCAT_WS(\': \', lg.title, lg.title_native) AS text';
+				$filter->filter_valuesfrom   = ' FROM #__content AS i ';
 				$filter->filter_valuesjoin   = ' JOIN #__languages AS lg ON i.language = lg.lang_code';
 				$filter->filter_valueswhere  = ' AND lg.published <> 0';
 				// full SQL clauses
@@ -198,7 +198,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 			//echo "<br>plgFlexicontent_fieldsCoreprops::getFiltered() -- [".$filter->name."]  doing: <br>". $query."<br><br>\n";
 			$db = JFactory::getDBO();
 			$db->setQuery($query);
-			$filtered = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$filtered = $db->loadColumn();
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			return $filtered;
 		} else {
@@ -218,7 +218,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 		{
 			case 'language':
 				$query = " SELECT DISTINCT c.id "
-					." FROM ". (FLEXI_J16GE ? '#__content' : '#__flexicontent_items_ext') ." AS c "
+					." FROM #__content AS c "
 					." WHERE c.language='".implode('',$value)."' ";
 				break;
 			default:
@@ -229,7 +229,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 			//echo "<br>plgFlexicontent_fieldsCoreprops::getFiltered() -- [".$filter->name."]  doing: <br>". $query."<br><br>\n";
 			$db = JFactory::getDBO();
 			$db->setQuery($query);
-			$filtered = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$filtered = $db->loadColumn();
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			return $filtered;
 		} else {

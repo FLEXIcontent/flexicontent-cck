@@ -164,9 +164,8 @@ function delAllFilters() {
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEM_ID'), 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEMS'), 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_SEARCH_INDEX'), ($this->isADV ? 'ai' : 'ext').'.search_index', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEM_ID'), 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass left title"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEM_TITLE'), 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			
 			<?php if ($this->isADV) : ?>
 			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_LABEL'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -175,6 +174,8 @@ function delAllFilters() {
 			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_COUNT'), 'ai.extraid', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_ID'), 'ai.value_id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<?php endif; ?>
+			
+			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', JText::_('FLEXI_SEARCH_INDEX'), ($this->isADV ? 'ai' : 'ext').'.search_index', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 		
@@ -219,14 +220,6 @@ function delAllFilters() {
 			<td>
 				<?php echo '<a target="_blank" href="index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='.$row->id.'" title="'.$edit_entry.'">'.$this->escape($row->title).'</a>'; ?>
 			</td>
-			<td style="text-align: left;" class="col_search_index">
-				<?php
-					if(iconv_strlen($row->search_index, "UTF-8")>400)
-						echo iconv_substr($row->search_index, 0, 400, "UTF-8").'...';
-					else
-						echo $row->search_index;
-				?>
-			</td>
 			
 			<?php if ($this->isADV) : ?>
 				<td>
@@ -246,6 +239,14 @@ function delAllFilters() {
 				</td>
 			<?php endif; ?>
 		
+			<td style="text-align: left;" class="col_search_index">
+				<?php
+					if(iconv_strlen($row->search_index, "UTF-8")>400)
+						echo iconv_substr($row->search_index, 0, 400, "UTF-8").'...';
+					else
+						echo $row->search_index;
+				?>
+			</td>
 			<?php /*<td nowrap="nowrap" style="text-align: center;">
 				<?php //echo JHtml::date($row->indexdate, '%Y-%m-%d %H:%M:%S'); ?>
 			</td>*/ ?>

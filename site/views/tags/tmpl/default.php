@@ -82,11 +82,11 @@ if (JRequest::getCmd('print')) {
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	if ($pdfbutton || $mailbutton || $printbutton) {
 	?>
-	<p class="buttons">
+	<div class="buttons">
 		<?php echo $pdfbutton; ?>
 		<?php echo $mailbutton; ?>
 		<?php echo $printbutton; ?>
-	</p>
+	</div>
 	<?php }
 }
 ?>
@@ -150,7 +150,7 @@ $items	= & $this->items;
 <input type="hidden" name="id" value="<?php echo $this->tag->id; ?>" />
 </form>
 
-<table class="flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo JText::_( 'FLEXI_ITEMS_WITH_TAG' ).' : '.$this->escape($this->tag->name); ?>">
+<table id="flexitable" class="flexitable" summary="<?php echo JText::_( 'FLEXI_ITEMS_WITH_TAG' ).' : '.$this->escape($this->tag->name); ?>">
 	<thead>
 		<tr>
 			<?php if ($use_image) : ?>
