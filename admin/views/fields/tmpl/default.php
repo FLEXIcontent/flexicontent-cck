@@ -42,10 +42,10 @@ $flexi_toggle    = JText::_( 'FLEXI_CLICK_TO_TOGGLE', true );
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/warning.png" class="fc-tooltip-img '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/warning.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1).'" /> ';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 } else {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-tooltip-img '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" alt="Reordering" title="'.flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1).'" /> ';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
 	$image_saveorder    = '';
 }
@@ -304,11 +304,11 @@ function delAllFilters() {
 			
 			$link 		= 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $row->id;
 			if ($row->id < 7) {  // First 6 core field are not unpublishable
-				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
+				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ), ' class="fc-man-icon-s" ' );
 			} else if (!$canPublish && $row->published) {   // No privilige published
-				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
+				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ), ' class="fc-man-icon-s" ' );
 			} else if (!$canPublish && !$row->published) {   // No privilige unpublished
-				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/publish_x_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ) );
+				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/publish_x_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ), ' class="fc-man-icon-s" ' );
 			} else {
 				$published 	= JHTML::_('jgrid.published', $row->published, $i, $ctrl );
 			}
@@ -361,7 +361,10 @@ function delAllFilters() {
 			}
 			
 			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
-			$orphan_warning	= '<span class="'.$tip_class.'" title="'. flexicontent_html::getToolTip('FLEXI_WARNING', 'FLEXI_NO_TYPES_ASSIGNED', 1, 1) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/warning.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
+			$orphan_warning	= '
+				<span class="'.$tip_class.'" title="'. flexicontent_html::getToolTip('FLEXI_WARNING', 'FLEXI_NO_TYPES_ASSIGNED', 1, 1) .'">
+					'.JHTML::image ( 'administrator/components/com_flexicontent/assets/images/warning.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ), ' class="fc-man-icon-s" ' ).'
+				</span>';
    		?>
 		<tr class="<?php echo "row$k"; ?>" style="<?php echo $row_css; ?>">
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
@@ -418,7 +421,7 @@ function delAllFilters() {
 				} else if ($field_desc_len) {
 					$field_desc = htmlspecialchars($row->description, ENT_QUOTES, 'UTF-8');
 				}
-				if ($field_desc) echo ' <img src="components/com_flexicontent/assets/images/comment.png" class="'.$tip_class.'" title="'.flexicontent_html::getToolTip($_desc_label, $field_desc, 0, 0).'" />';
+				if ($field_desc) echo ' <img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip($_desc_label, $field_desc, 0, 0).'" />';
 				?>
 			</td>
 
@@ -429,7 +432,7 @@ function delAllFilters() {
 					$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $_r->id;
 					echo '
 					<a style="padding:2px;" href="'.$_link.'" title="'.$edit_entry.'">
-						<img align="left" style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/insert_merge_field.png" title="Grouped inside: '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="'.$tip_class.'" />
+						<img align="left" style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/insert_merge_field.png" title="Grouped inside: '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="fc-man-icon-s '.$tip_class.'" />
 					</a>';
 				}
 				
@@ -450,7 +453,7 @@ function delAllFilters() {
 						}
 						?>
 						<a class="jgrid <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
-							<img src="components/com_flexicontent/assets/images/lock_delete.png" alt="Check-in" />
+							<img src="components/com_flexicontent/assets/images/lock_delete.png" alt="Check-in" class="fc-man-icon-s" />
 						</a>
 						<?php
 					} else {
@@ -478,7 +481,7 @@ function delAllFilters() {
 						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $_r->id;
 						echo '
 						<a style="padding:2px;" href="'.$_link.'" title="'.$edit_entry.'">
-							<img align="left" style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/relationships.png" title="Cascade after (master field): '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="'.$tip_class.'" />
+							<img align="left" style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/relationships.png" title="Cascade after (master field): '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="fc-man-icon-s '.$tip_class.'" />
 						</a>';
 					}
 				}
@@ -520,14 +523,14 @@ function delAllFilters() {
 			<td align="center">
 				<?php if($supportsearch) :?>
 				<a title="Toggle property" onclick="document.adminForm.propname.value='issearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
-					<img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" style="border-width:0;" title="<?php echo $issearch_tip;?>" alt="<?php echo $issearch_tip;?>" />
+					<img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" style="border-width:0;" class="fc-man-icon-s" title="<?php echo $issearch_tip;?>" alt="<?php echo $issearch_tip;?>" />
 				</a>
 				<?php else: ?>
 				-
 				<?php endif; ?> /
 				<?php if($supportfilter) :?>
 				<a title="Toggle property" onclick="document.adminForm.propname.value='isfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
-					<img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" style="border-width:0;" title="<?php echo $isfilter_tip;?>" alt="<?php echo $isfilter_tip;?>" />
+					<img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" style="border-width:0;" class="fc-man-icon-s" title="<?php echo $isfilter_tip;?>" alt="<?php echo $isfilter_tip;?>" />
 				</a>
 				<?php else: ?>
 				-
@@ -536,14 +539,14 @@ function delAllFilters() {
 			<td align="center">
 				<?php if($supportadvsearch) :?>
 				<a title="Toggle property" onclick="document.adminForm.propname.value='isadvsearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
-					<img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" style="border-width:0;" title="<?php echo $isadvsearch_tip;?>" alt="<?php echo $isadvsearch_tip;?>" />
+					<img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" style="border-width:0;" class="fc-man-icon-s" title="<?php echo $isadvsearch_tip;?>" alt="<?php echo $isadvsearch_tip;?>" />
 				</a>
 				<?php else: ?>
 				-
 				<?php endif; ?> /
 				<?php if($supportadvfilter) :?>
 				<a title="Toggle property" onclick="document.adminForm.propname.value='isadvfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
-					<img src="components/com_flexicontent/assets/images/<?php echo $isadvfilter;?>" width="16" height="16" style="border-width:0;" title="<?php echo $isadvfilter_tip;?>" alt="<?php echo $isadvfilter_tip;?>" />
+					<img src="components/com_flexicontent/assets/images/<?php echo $isadvfilter;?>" width="16" height="16" style="border-width:0;" class="fc-man-icon-s" title="<?php echo $isadvfilter_tip;?>" alt="<?php echo $isadvfilter_tip;?>" />
 				</a>
 				<?php else: ?>
 				-

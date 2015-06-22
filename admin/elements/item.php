@@ -48,6 +48,7 @@ class JFormFieldItem extends JFormField
 		
 		$attributes = get_object_vars($this->element->attributes());
 		$attributes = $attributes['@attributes'];
+		//echo "<pre>"; print_r($attributes); exit;
 		
 		$paramset = isset($attributes['paramset']) ? $attributes['paramset'] : false; // : 'request';
 		$required = isset($attributes['required']) ? $attributes['required'] : false;
@@ -104,13 +105,29 @@ class JFormFieldItem extends JFormField
 			JHTML::_('behavior.modal', 'a.modal');
 		}
 		
-		$langparent_item = (boolean) @$attributes['langparent_item'];
-		$type_id = @$attributes['type_id'];
+		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		
+		$type_id    = @$attributes['type_id'];
 		$created_by = @$attributes['created_by'];
+		$language   = @$attributes['language'];
+		
+		if ($language && $option=='com_flexicontent' && $view=='category')
+		{
+			if (!JFactory::getApplication()->isAdmin()) {
+				// FRONTEND, use "id" from request
+				$assocs_id = JRequest::getVar('id', 0, 'default', 'int');
+			} else {
+				$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
+				JArrayHelper::toInteger($cid, array(0));
+				$assocs_id = $cid[0];
+			}
+		}
 		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component';
-		$link .= '&amp;langparent_item='.($langparent_item ? '1' : '0');
 		$link .= $type_id ? '&amp;type_id='.$type_id : '';
 		$link .= $created_by ? '&amp;created_by='.$created_by : '';
+		$link .= $language ? '&amp;language='.$language : '';
+		$link .= ($language && $assocs_id) ? '&amp;assocs_id='.$assocs_id : '';
 		
 		$rel = '{handler: \'iframe\', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}';
 		return '

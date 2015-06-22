@@ -17,45 +17,114 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+$app = JFactory::getApplication();
+$option = JRequest::getVar('option');
+
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 ?>
+
+<script>
+// delete active filter
+function delFilter(name)
+{
+	//if(window.console) window.console.log('Clearing filter:'+name);
+	var myForm = jQuery('#adminForm');
+	var filter = jQuery('#'+name);
+	if (filter.attr('type')=='checkbox')
+		filter.checked = '';
+	else
+		filter.val('');
+}
+
+function delAllFilters() {
+	delFilter('search'); delFilter('filter_type'); delFilter('filter_state');
+	delFilter('filter_cats'); delFilter('filter_author'); delFilter('filter_id');
+	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');
+	delFilter('filter_tag'); delFilter('filter_access'); delFilter('filter_level');
+	jQuery('#filter_subcats').val('1');
+	jQuery('.fc_field_filter').val('');
+}
+</script>
+
+<div id="flexicontent" class="flexicontent">
+
 <form action="index.php?option=com_flexicontent&amp;view=qfcategoryelement&amp;tmpl=component" method="post" name="adminForm" id="adminForm">
 
-	<table class="adminform">
-		<tr>
-			<td width="100%">
-			  	<?php echo JText::_( 'FLEXI_SEARCH' ); ?>
-				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
-				<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-				<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_CLEAR' ); ?></button>
-			</td>
-		</tr>
-		<tr>
-			<td nowrap="nowrap">
-				<div class="filter-select fltrt">
-					<?php echo $this->lists['cats']; ?>
-					<?php echo $this->lists['level']; ?>
-					<?php echo $this->lists['state']; ?>
-					<?php echo $this->lists['access']; ?>
-				  <?php if (FLEXI_J16GE) echo $this->lists['language']; ?>
-				</div>
-			</td>
-		</tr>
-	</table>
+	<div id="fc-filters-header">
+		<span class="fc-filter nowrap_box">
+			<span class="filter-search btn-group">
+				<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
+			</span>
+			<span class="btn-group hidden-phone">
+				<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
+				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="delAllFilters();this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
+			</span>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
+			<span class="limit nowrap_box" style="display: inline-block;">
+				<label class="label">
+					<?php echo JText::_('JGLOBAL_DISPLAY_NUM'); ?>
+				</label>
+				<?php
+				$pagination_footer = $this->pagination->getListFooter();
+				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
+				?>
+			</span>
+			
+			<span class="fc_item_total_data nowrap_box badge badge-info">
+				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+			</span>
+			
+			<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
+			<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
+				<?php echo $getPagesCounter; ?>
+			</span>
+			<?php endif; ?>
+		</span>
+	</div>
+	
+	<div id="fc-filters-box">
+		
+		<span class="fc-filter nowrap_box">
+		<?php echo $this->lists['filter_lang']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
+		<?php echo $this->lists['filter_author']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
+		<?php echo $this->lists['filter_cats']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
+		<?php echo $this->lists['filter_level']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
+		<?php echo $this->lists['filter_state']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
+		<?php echo $this->lists['filter_access']; ?>
+		</span>
+	</div>
+
+
 
 	<table class="adminlist" cellspacing="1">
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width=""><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
-			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_AUTHOR', 'author', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<?php if (FLEXI_J16GE) : ?>
-				<th width="5%" class="nowrap">
-					<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				</th>
-			<?php endif;?>
+			<th width="5%" class="nowrap">
+				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'c.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
 			<th width="1%" nowrap="nowrap">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'c.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
@@ -64,7 +133,7 @@ defined('_JEXEC') or die('Restricted access');
 
 	<tfoot>
 		<tr>
-			<td colspan="10">
+			<td colspan="7">
 				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
@@ -77,63 +146,41 @@ defined('_JEXEC') or die('Restricted access');
 		$n = count($this->rows);
 		foreach ($this->rows as $row)
 		{
-			if (FLEXI_J16GE) {
-				$access		= $row->access_level;
-			} else {
-				$access 	= $row->groupname;
-			}
-			if (FLEXI_J16GE) {
-				$published		= JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange=0 );
-			} else {
-				$img  = $row->published ? 'tick.png' : 'publish_x.png';
-        $alt    = $row->published ? JText::_('Published') : JText::_('Unpublished');
-				$published 	= JHTML::_('image','admin/'.$img, $alt, array('border' => 0), true);
-				//$published 	= JHTML::_('grid.published', $row, $i );
-			}
-   		?>
+			$published = JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange=0 );
+   	?>
 		<tr class="<?php echo "row$k"; ?>">
+			
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+			
 			<td align="left" class="col_title">
-				<?php
-				if (FLEXI_J16GE) {
-					if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>";
-				} else {
-					echo $row->treename.' ';
-				}
-				?>
+				<?php if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>"; ?>
+				
 				<a style="cursor:pointer" onclick="window.parent.qfSelectCategory('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 				</a>
 			</td>
-			<td align="center">
-				<?php echo ($row->config->get('clayout') ? $row->config->get('clayout') : "blog <sup>[1]</sup>") ?>
+			
+			<td align="center"><?php echo $row->author; ?></td>
+			
+			<td align="center"><?php echo $published; ?></td>
+			
+			<td align="center"><?php echo $row->access_level; ?></td>
+			
+			<td class="center nowrap">
+				<?php
+				echo $row->language=='*' ?
+					JText::alt('JALL', 'language') :
+					$row->language_title ? $this->escape($row->language_title) : JText::_('JUNDEFINED');
+				?>
 			</td>
-			<td align="center">
-				<?php echo $row->nrassigned?>
-			</td>
-			<td align="center">
-				<?php echo $published; ?>
-			</td>
-			<td align="center">
-				<?php echo $access; ?>
-			</td>
-			<?php if (FLEXI_J16GE) : ?>
-				<td class="center nowrap">
-				<?php if ($row->language=='*'):?>
-					<?php echo JText::alt('JALL','language'); ?>
-				<?php else:?>
-					<?php echo $row->language_title ? $this->escape($row->language_title) : JText::_('JUNDEFINED'); ?>
-				<?php endif;?>
-				</td>
-			<?php endif;?>
-			<td align="center">
-				<?php echo $row->id; ?>
-			</td>
+			
+			<td align="center"><?php echo $row->id; ?></td>
+			
 		</tr>
-		<?php 
+		<?php
 			$k = 1 - $k;
 			$i++;
-		} 
+		}
 		?>
 	</tbody>
 
@@ -141,4 +188,8 @@ defined('_JEXEC') or die('Restricted access');
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+	<?php echo $this->assocs_id ? '
+		<input type="hidden" name="assocs_id" value="'.$this->assocs_id.'" />'
+		: ''; ?>
 </form>
+</div>

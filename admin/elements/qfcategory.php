@@ -48,6 +48,7 @@ class JFormFieldQfcategory extends JFormField
 		
 		$attributes = get_object_vars($this->element->attributes());
 		$attributes = $attributes['@attributes'];
+		//echo "<pre>"; print_r($attributes); exit;
 		
 		$paramset = isset($attributes['paramset']) ? $attributes['paramset'] : false; // : 'request';
 		$required = isset($attributes['required']) ? $attributes['required'] : false;
@@ -103,7 +104,27 @@ class JFormFieldQfcategory extends JFormField
 			JHTML::_('behavior.modal', 'a.modal');
 		}
 		
+		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		
+		$created_by = @$attributes['created_by'];
+		$language   = @$attributes['language'];
+		
+		if ($language && $option=='com_flexicontent' && $view=='category')
+		{
+			$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
+			JArrayHelper::toInteger($cid, array(0));
+			$assocs_id = $cid[0];
+			if (!$assocs_id) {
+				$id = JRequest::getVar( 'id', array(0), $hash='default', 'array' );
+				JArrayHelper::toInteger($id, array(0));
+				$assocs_id = $id[0];
+			}
+		}
 		$link = 'index.php?option=com_flexicontent&amp;view=qfcategoryelement&amp;tmpl=component';
+		$link .= $created_by ? '&amp;created_by='.$created_by : '';
+		$link .= $language ? '&amp;language='.$language : '';
+		$link .= ($language && $assocs_id) ? '&amp;assocs_id='.$assocs_id : '';
 		
 		$rel = '{handler: \'iframe\', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}';
 		return '
@@ -113,7 +134,7 @@ class JFormFieldQfcategory extends JFormField
 				'.JText::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '
-			<a id="' .$element_id. '_edit" class="btn ' . ($value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&task=items.edit&cid=' . $value . '" target="_blank" title="'.JText::_( 'FLEXI_EDIT_CATEGORY' ).'">
+			<a id="' .$element_id. '_edit" class="btn ' . ($value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&task=category.edit&cid=' . $value . '" target="_blank" title="'.JText::_( 'FLEXI_EDIT_CATEGORY' ).'">
 				<span class="icon-edit"></span>' . JText::_('FLEXI_FORM_EDIT') . '
 			</a>' : '').'
 			'.($allowClear ? '

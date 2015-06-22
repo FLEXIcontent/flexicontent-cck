@@ -932,3 +932,7 @@ ul.import-failed li {
 	padding: 1px 0 1px 20px;
 }
 
+.fc-man-icon-s {
+	float: none;
+	min-width: 16px;
+}

@@ -35,9 +35,9 @@ $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 $list_total_cols = 12;
 
-$article_viewing_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-tooltip-img '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_REDIRECT_ARTICLE_VIEW').'" title="'.flexicontent_html::getToolTip('FLEXI_REDIRECT_ARTICLE_VIEW', 'FLEXI_REDIRECT_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
-$default_template_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-tooltip-img '.$tip_class.'" data-placement="bottom" alt="'.JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
-$layout_edit_icon = '<img src="components/com_flexicontent/assets/images/layout_edit.png"/> ';
+$article_viewing_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_REDIRECT_ARTICLE_VIEW').'" title="'.flexicontent_html::getToolTip('FLEXI_REDIRECT_ARTICLE_VIEW', 'FLEXI_REDIRECT_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
+$default_template_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
+$layout_edit_icon = '<img src="components/com_flexicontent/assets/images/layout_edit.png" class="fc-man-icon-s" /> ';
 ?>
 <script type="text/javascript">
 
@@ -205,7 +205,7 @@ function delAllFilters() {
 						}
 						?>
 						<a class="jgrid <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
-							<img src="components/com_flexicontent/assets/images/lock_delete.png" alt="Check-in" />
+							<img src="components/com_flexicontent/assets/images/lock_delete.png" alt="Check-in" class="fc-man-icon-s" />
 						</a>
 						<?php
 					} else {

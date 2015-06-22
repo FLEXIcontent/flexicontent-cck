@@ -27,32 +27,51 @@ jimport('joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItemelement extends JViewLegacy {
-
+class FlexicontentViewItemelement extends JViewLegacy
+{
 	function display($tpl = null)
 	{
 		global $globalcats;
-		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
-		//initialise variables
-		$db = JFactory::getDBO();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDBO();
+		$option   = JRequest::getVar('option');
+		$view     = JRequest::getVar('view');
 		$document	= JFactory::getDocument();
+
+		// Get model
+		$model = $this->getModel();
 		
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
 
-		//get var
-		$filter_order     = $app->getUserStateFromRequest( $option.'.itemelement.filter_order', 	'filter_order', 	'i.ordering'	, 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.itemelement.filter_order_Dir',	'filter_order_Dir',	''				, 'word' );
-		$filter_state     = $app->getUserStateFromRequest( $option.'.itemelement.filter_state', 	'filter_state', 	'*'				, 'word' );
-		$filter_cats      = $app->getUserStateFromRequest( $option.'.itemelement.filter_cats', 		'filter_cats', 		0, 				'int' );
-		$filter_type      = $app->getUserStateFromRequest( $option.'.itemelement.filter_type', 		'filter_type', 		0, 				'int' );
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			$filter_lang = $app->getUserStateFromRequest( $option.'.itemelement.filter_lang', 	'filter_lang', 		'', 			'cmd' );
+		$assocs_id   = JRequest::getInt( 'assocs_id', 0 );
+		
+		$language    = !$assocs_id ? JRequest::getCmd('language') : $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
+		$type_id     = !$assocs_id ? JRequest::getCmd('type_id') : $app->getUserStateFromRequest( $option.'.'.$view.'.type_id', 'type_id', 0, 'int' );
+		$created_by  = !$assocs_id ? JRequest::getCmd('created_by') : $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
+		
+		$type_data = $model->getTypeData( $assocs_id, $type_id );
+		
+		if ($assocs_id)
+		{
+			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
+			if (!$assocanytrans && !$created_by)  $created_by = $user->id;
 		}
-		$search = $app->getUserStateFromRequest( $option.'.itemelement.search', 			'search', 			'', 'string' );
-		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		
+		// get filter values
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 	  'filter_order', 	 'i.ordering', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	''				 , 'cmd' );
+		
+		$filter_state  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',  'filter_state',   '',    'cmd' );
+		$filter_cats   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',   'filter_cats',    0,     'int' );
+		$filter_type   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',   'filter_type',    0,     'int' );
+		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access', 'filter_access',  '',    'string' );
+		$filter_lang   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',    '',    'cmd' );
+		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author',  '',    'cmd' );
+		
+		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
+		$search = $db->escape( trim(JString::strtolower( $search ) ) );
 
 		// Prepare the document: set title, add css files, etc
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
@@ -62,6 +81,7 @@ class FlexicontentViewItemelement extends JViewLegacy {
 		} else {
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		}
+		flexicontent_html::loadFramework('select2');
 		
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
@@ -73,55 +93,86 @@ class FlexicontentViewItemelement extends JViewLegacy {
 		//Get data from the model
 		$rows     = $this->get( 'Data');
 		$types		= $this->get( 'Typeslist' );
-		$pageNav 	= $this->get( 'Pagination' );
-
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			$langs = FLEXIUtilities::getLanguages('code');
-		}
+		$authors  = $this->get( 'Authorslist' );
+		$langs    = FLEXIUtilities::getLanguages('code');
+		$pagination = $this->get( 'Pagination' );
 		
-		// build the categories select list for filter
-		$categories = $globalcats;
-		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', $actions_allowed=array('core.create'), true);
-
+		// Ordering active FLAG
+		$ordering = ($filter_order == 'i.ordering');
+		
+		
+		// *******************
+		// Create Form Filters
+		// *******************
+		
+		// filter search word
+		$lists['search']= $search;
+		
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 		
-		$ordering = ($lists['order'] == 'i.ordering');
-
-		//build type select list
-		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="inputbox" size="1" onchange="submitform( );"', 'filter_type');
-
-		// search filter
-		$lists['search']= $search;
+		// build the categories select list
+		$categories = $globalcats;
+		$lists['filter_cats'] =  '<label class="label">'.JText::_('FLEXI_CATEGORY').'</label>'.
+			flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, '-'/*2*/, 'class="use_select2_lib fcfilter_be" size="1" onchange="Joomla.submitform()"', $check_published=true, $check_perms=false);
 		
-		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
-		$state[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
-		$state[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
-		$state[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
-		$state[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
+		
+		// build type select list
+		$lists['filter_type'] = '<label class="label">'.JText::_('FLEXI_TYPE').'</label>'.
+			($assocs_id && !empty($type_data) ?
+				'<span class="badge badge-info">'.$type_data->name.'</span>' :
+				flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*true*/, 'class="use_select2_lib fcfilter_be" size="1" onchange="submitform( );"', 'filter_type')
+			);
+		
+		// build author select list
+		$lists['filter_author'] = '<label class="label">'.JText::_('FLEXI_AUTHOR').'</label>'.
+			($assocs_id && $created_by ?
+				'<span class="badge badge-info">'.JFactory::getUser($created_by)->name.'</span>' :
+				flexicontent_html::buildauthorsselect($authors, 'filter_author', $filter_author, '-'/*true*/, 'class="use_select2_lib fcfilter_be" size="3" onchange="Joomla.submitform()"')
+			);
 
-		$lists['state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
-
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			//build languages filter
-			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
-		}
-
-		//assign data to template
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			$this->assignRef('langs'    , $langs);
-		}
-		$this->assignRef('lists'      	, $lists);
+		// build publication state filter
+		$states[] = JHtml::_('select.option',  '', '-'/*'FLEXI_SELECT_STATE'*/ );
+		$states[] = JHtml::_('select.option',  'P', 'FLEXI_PUBLISHED' );
+		$states[] = JHtml::_('select.option',  'U', 'FLEXI_UNPUBLISHED' );
+		$states[] = JHtml::_('select.option',  'PE','FLEXI_PENDING' );
+		$states[] = JHtml::_('select.option',  'OQ','FLEXI_TO_WRITE' );
+		$states[] = JHtml::_('select.option',  'IP','FLEXI_IN_PROGRESS' );
+		$states[] = JHtml::_('select.option',  'A', 'FLEXI_ARCHIVED' );
+		
+		$fieldname =  $elementid = 'filter_state';
+		$attribs = ' class="use_select2_lib fcfilter_be" onchange="Joomla.submitform()" ';
+		$lists['filter_state'] = '<label class="label">'.JText::_('FLEXI_STATE').'</label>'.
+			JHTML::_('select.genericlist', $states, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid
+		, $translate=true );
+		
+		// build access level filter
+		$levels = JHtml::_('access.assetgroups');
+		array_unshift($levels, JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_ACCESS'*/));
+		$fieldname =  $elementid = 'filter_access';
+		$attribs = ' class="use_select2_lib fcfilter_be" onchange="Joomla.submitform()" ';
+		$lists['filter_access']	= '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>'.
+			JHTML::_('select.genericlist', $levels, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid
+		, $translate=true );
+		
+		// build language filter
+		$lists['filter_lang'] = '<label class="label">'.JText::_('FLEXI_LANGUAGE').'</label>'.
+			($assocs_id && $language ?
+				'<span class="badge badge-info">'.$language.'</span>' :
+				flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib fcfilter_be" onchange="Joomla.submitform()"', $filter_lang, '-'/*2*/)
+			);
+		
+		// assign data to template
+		$this->assignRef('assocs_id'	, $assocs_id);
+		$this->assignRef('langs'    	, $langs);
+		$this->assignRef('filter_cats', $filter_cats);
+		$this->assignRef('lists'     	, $lists);
 		$this->assignRef('rows'      	, $rows);
-		$this->assignRef('pageNav' 		, $pageNav);
 		$this->assignRef('ordering'		, $ordering);
-		$this->assignRef('filter_cats'	, $filter_cats);
+		$this->assignRef('pagination'	, $pagination);
 
 		parent::display($tpl);
 	}
-
 }
 ?>
