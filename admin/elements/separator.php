@@ -54,9 +54,9 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		div.current ul.config-option-list li .fcsep_level3 {
 			left: 232px !important;
 		}
-		div.controls input, div.controls textarea {
+		/*div.controls input, div.controls textarea {
 			min-width: 56%;
-		}
+		}*/
 		div.control-group div.control-label label.hasTooltip,
 		div.current ul.config-option-list li label.hasTooltip,
 		div.current ul.config-option-list li label.hasTip {

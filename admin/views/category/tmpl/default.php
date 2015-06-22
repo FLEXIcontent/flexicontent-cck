@@ -35,6 +35,8 @@ dump($this->row);
 ?>
 
 <?php
+$useAssocs = flexicontent_db::useAssociations();
+
 // Load JS tabber lib
 $this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
 $this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
@@ -339,7 +341,16 @@ $js = "
 			</div>
 			
 		</div>
-		
+
+
+		<?php if ($useAssocs) : ?>
+		<!-- Associations tab -->
+		<div class="tabbertab" id="fcform_tabset_perms_tab" data-icon-class="icon-flag">
+			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ASSOCIATIONS' ); ?> </h3>
+			<?php echo $this->loadTemplate('associations'); ?>
+		</div> <!-- end tab -->
+		<?php endif; ?>
+
 
 		<?php if ( $this->perms->CanRights ) : ?>
 		<!-- Permissions tab -->
@@ -352,6 +363,7 @@ $js = "
 			
 		</div> <!-- end tab -->
 		<?php endif; ?>
+
 		
 	</div><?php /*echo JHtml::_('tabs.end');*/ ?>
 	

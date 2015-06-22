@@ -417,11 +417,11 @@ class flexicontent_items extends _flexicontent_items {
 				}
 			
 				// Catch case of master item for (translation groups) not being set
-				if ($p == "lang_parent_id" && $v==0) {
+				if ($p == "lang_parent_id" /*&& $v==0*/) {
 					//$jAp= JFactory::getApplication();
 					//$jAp->enqueueMessage('Setting default lang_parent_id to '. $type->id,'message');
-					$type_ext->$p = $type->id;
-					$type_tmp->$p = $type->id;
+					$type_ext->$p = 0;//$type->id;
+					$type_tmp->$p = 0;//$type->id;
 				}
 			}
 				
@@ -462,10 +462,10 @@ class flexicontent_items extends _flexicontent_items {
 			}
 			
 			else {
-				if ($type_ext->lang_parent_id == 0) {
+				/*if ($type_ext->lang_parent_id == 0) {
 					// case of new item we need to set lang_parent_id after initial content creation
 					$type_ext->lang_parent_id = $this->id;
-				}
+				}*/
 				$type_tmp->lang_parent_id = $type_ext->lang_parent_id;
 				
 				// insert into #__flexicontent_items_ext table

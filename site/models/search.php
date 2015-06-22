@@ -178,6 +178,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		// Lets load the content if it doesn't already exist
 		if (empty($this->_data))
 		{
+			// Trigger search event to get the content items
 			$areas = $this->getAreas();
 
 			JPluginHelper::importPlugin( 'search');
@@ -200,6 +201,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			} else {
 				$this->_data = $rows;
 			}
+			// Get Original content ids for creating the untranslatable fields
+			flexicontent_db::getOriginalContentItemids($this->_data);
 		}
 		
 		return $this->_data;

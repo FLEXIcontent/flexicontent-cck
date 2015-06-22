@@ -346,6 +346,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$this->_data[] = $_data[$item_id];
 			}
 			
+			// 6 get Original content ids for creating the untranslatable fields
+			flexicontent_db::getOriginalContentItemids($this->_data);
+			
 			if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
 		

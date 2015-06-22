@@ -49,7 +49,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$session = JFactory::getSession();
 		
 		// Some flags
-		$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
+		$enable_translation_groups = flexicontent_db::useAssociations(); //$cparams->get("enable_translation_groups");
 		$print_logging_info = $cparams->get('print_logging_info');
 		
 		if($task == 'copy') {
@@ -657,7 +657,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$this->assignRef('extra_fields'	, $extraCols);
 		$this->assignRef('custom_filts'	, $customFilts);
 		if ($enable_translation_groups)  $this->assignRef('lang_assocs', $langAssocs);
-		if (FLEXI_FISH || FLEXI_J16GE)   $this->assignRef('langs', $langs);
+		$this->assignRef('langs', $langs);
 		$this->assignRef('cid'      	, $cid);
 		$this->assignRef('pagination'	, $pagination);
 		$this->assignRef('ordering'		, $ordering);

@@ -1860,7 +1860,7 @@ class FlexicontentFields
 		}
 		
 		// This property is usable only when Translation Groups are enabled
-		$supportuntranslatable = $supportuntranslatable && $cparams->get('enable_translation_groups');
+		$supportuntranslatable = $supportuntranslatable && flexicontent_db::useAssociations(); //$cparams->get('enable_translation_groups');
 		
 		$support_ft[$field_type] = new stdClass();
 		$support_ft[$field_type]->supportsearch = $supportsearch;

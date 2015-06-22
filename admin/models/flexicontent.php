@@ -426,15 +426,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($return !== NULL) return $return;
 		$return = false;
 		
-		if (FLEXI_J16GE) {
-			$columns = $this->_db->getTableColumns('#__flexicontent_items_ext');
-			$result_lang_col = array_key_exists('language', $columns) ? true : false;
-			$result_tgrp_col = array_key_exists('lang_parent_id', $columns) ? true : false;
-		} else {
-			$fields = $this->_db->getTableFields('#__flexicontent_items_ext');
-			$result_lang_col = array_key_exists('language', $fields['#__flexicontent_items_ext']) ? true : false;
-			$result_tgrp_col = array_key_exists('lang_parent_id', $fields['#__flexicontent_items_ext']) ? true : false;
-		}
+		$columns = $this->_db->getTableColumns('#__flexicontent_items_ext');
+		$result_lang_col = array_key_exists('language', $columns) ? true : false;
+		$result_tgrp_col = array_key_exists('lang_parent_id', $columns) ? true : false;
+		
 		$return = $result_lang_col && $result_tgrp_col;
 		
 		return $return;
@@ -490,19 +485,18 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$return = false;
 		
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH );
+		$enable_translation_groups = flexicontent_db::useAssociations(); //$cparams->get("enable_translation_groups");
 		
+		// Check for emtpy language in flexicontent EXT table
 		$query = "SELECT COUNT(*)"
 			." FROM #__flexicontent_items_ext as ie"
-			." WHERE ie.language='' " . ($enable_translation_groups ? " OR (ie.lang_parent_id=0 AND ie.item_id<>0) " : "")
+			." WHERE ie.language='' "
 			." LIMIT 1";
 		$this->_db->setQuery($query);
 		$cnt = $this->_db->loadResult();
 		if ($cnt) return $return = true;
 		
-		if (!FLEXI_J16GE) return $return;
-		
-		$query = "SELECT COUNT(*)"
+		$query = "SELECT COUNT(*)"  // Check for emtpy language in Joomla content EXT table
 			." FROM #__content as i"
 			." WHERE i.language=''"
 			." LIMIT 1";
@@ -514,6 +508,15 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			." FROM #__content as i"
 			." JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
 			." WHERE i.language<>ie.language"
+			." LIMIT 1";
+		$this->_db->setQuery($query);
+		$cnt = $this->_db->loadResult();
+		if ($cnt) return $return = true;
+		
+		// Check for not yet transfered language associations
+		$query = "SELECT COUNT(*)"
+			." FROM #__flexicontent_items_ext as ie"
+			." WHERE ie.lang_parent_id <> 0"
 			." LIMIT 1";
 		$this->_db->setQuery($query);
 		$cnt = $this->_db->loadResult();
@@ -572,7 +575,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		foreach ($tbl_fields as $col_name) {
 			if ($col_name == "id" || $col_name == "hits")
 				continue;
-			else if ( (!FLEXI_J16GE && $col_name=='language') || $col_name=='type_id' || $col_name=='lang_parent_id')
+			else if ( $col_name=='type_id' || $col_name=='lang_parent_id')
 				$query .= " AND ie.`".$col_name."`=ca.`".$col_name."`";
 			else
 				$query .= " AND i.`".$col_name."`=ca.`".$col_name."`";

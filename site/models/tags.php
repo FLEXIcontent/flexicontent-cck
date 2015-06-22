@@ -160,10 +160,12 @@ class FlexicontentModelTags extends JModelLegacy
 	{
 		// Lets load the content if it doesn't already exist
 		if (empty($this->_data))
-		{		
+		{
+			// Query the content items
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+			// Get Original content ids for creating the untranslatable fields
+			flexicontent_db::getOriginalContentItemids($this->_data);
 		}
 		
 		return $this->_data;

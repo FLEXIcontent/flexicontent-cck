@@ -118,7 +118,7 @@
 			<param name="show_updatecheck" default="1" />
 			<param name="new_item_state" default="-4" />
 			<param name="flexi_fish" default="0" />
-			<param name="enable_translation_groups" default="0" />
+			<!--param name="enable_translation_groups" default="0" /-->
 			<param name="filtercat" default="1" />
 			<param name="filtertag" default="1" />
 			<param name="disable_lang_select" default="1" />

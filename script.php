@@ -95,11 +95,11 @@ class com_flexicontentInstallerScript
 		// Manifest file minimum Joomla version
 		$this->minimum_joomla_release = $parent->get( "manifest" )->attributes()->version;
 		
-		// For J2.5 require other minimum
-		if( version_compare( $jversion->getShortVersion(), '3.0', 'lt' ) )
+		// !!! *** J2.5 no longer supported ***, For J2.5 require other minimum
+		/*if( version_compare( $jversion->getShortVersion(), '3.0', 'lt' ) )
 		{
 			$this->minimum_joomla_release = '2.5.0';
-		}
+		}*/
 		?>
 		
 		<table cellpadding="4" cellspacing="0" border="0" width="100%" class="adminlist">

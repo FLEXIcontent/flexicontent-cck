@@ -34,7 +34,7 @@ $isredirected_after_submit = $newly_submitted_item && $submit_redirect_url_fe;
 $disable_langs = $this->params->get('disable_languages_fe', array());
 
 // Parameter configured to be displayed
-if (FLEXI_J16GE) $fieldSets = $this->form->getFieldsets('attribs');
+$fieldSets = $this->form->getFieldsets('attribs');
 		
 // J2.5+ requires Edit State privilege while J1.5 requires Edit privilege
 $publication_priv = FLEXI_J16GE ? 'canpublish' : 'canedit';
@@ -717,104 +717,106 @@ if ($tags_displayed) : ob_start();  // tags ?>
 
 
 if ( !isset($all_tab_fields['lang']) ||
-	( $this->params->get('enable_translation_groups') && $this->params->get('uselang_fe', 1)==1 )
+	( flexicontent_db::useAssociations() /*$this->params->get('enable_translation_groups')*/ && $this->params->get('uselang_fe', 1)==1 )
 ) : ob_start(); // language ?>
 	<fieldset class="basicfields_set" id="fcform_language_container">
 		<legend>
-			<?php echo !isset($all_tab_fields['lang']) ? JText::_( 'FLEXI_LANGUAGE' ) : JText::_( 'FLEXI_LANGUAGE' ) . ' '. JText::_( 'FLEXI_ASSOCIATONS' ) ; ?>
+			<?php echo !isset($all_tab_fields['lang']) ? JText::_( 'FLEXI_LANGUAGE' ) : JText::_( 'FLEXI_LANGUAGE' ) . ' '. JText::_( 'FLEXI_ASSOCIATIONS' ) ; ?>
 		</legend>
 		
 		<?php if (!isset($all_tab_fields['lang'])) { echo $captured['lang']; unset($captured['lang']); } ?>
 		
-		<?php if ( $this->params->get('enable_translation_groups') && $this->params->get('uselang_fe', 1)==1 ) : ?>
+		<div class="fcclear"></div>
+		<?php echo $this->loadTemplate('associations'); ?>	
+		<?php /*include('development_tmp.php');*/ ?>
 
-			<div class="fcclear"></div>
-			<?php
-			$label_tooltip = 'class="'.$tip_class.' flexi_label" title="'.flexicontent_html::getToolTip('FLEXI_ORIGINAL_CONTENT_ITEM', 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC', 1, 1).'"';
-			?>
-			<span class="label-fcouter">
-				<label id="jform_lang_parent_id-lbl" for="jform_lang_parent_id" <?php echo $label_tooltip; ?> >
-					<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
-				</label>
-			</span>
-			
-			<div class="container_fcfield container_fcfield_name_originalitem">
-			<?php if ( !$isnew  && (substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->item->language, 0,2) || $this->item->language=='*') ) : ?>
-				<br/><?php echo JText::_( $this->item->language=='*' ? 'FLEXI_ORIGINAL_CONTENT_ALL_LANGS' : 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?>
-				<input type="hidden" name="jform[lang_parent_id]" id="jform_lang_parent_id" value="<?php echo $this->item->id; ?>" />
-			<?php else : ?>
-				<?php
-				if ( in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew || $this->item->id==$this->item->lang_parent_id) {
-					$app = JFactory::getApplication();
-					$option = JRequest::getVar('option');
-					$app->setUserState( $option.'.itemelement.langparent_item', 1 );
-					$app->setUserState( $option.'.itemelement.type_id', $typeid);
-					$app->setUserState( $option.'.itemelement.created_by', $this->item->created_by);
-					//echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br/>';
-					echo $this->form->getInput('lang_parent_id');
-				?>
-					<span class="editlinktip <?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" style="display:inline-block;" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_NOTES'), ':'), htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ), ENT_COMPAT, 'UTF-8'), 0):htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ), ENT_COMPAT, 'UTF-8'); ?>">
-						<?php echo $infoimage; ?>
-					</span>
-				<?php
-				} else {
-					echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ALREADY_SET' );
-				}
-				?>
-			<?php endif; ?>
-			</div>
-		
-			<div class="fcclear"></div>
-			<label id="langassocs-lbl" for="langassocs" class="flexi_label" >
-				<?php echo JText::_( 'FLEXI_ASSOC_TRANSLATIONS' );?>
+<?php /*
+		<div class="fcclear"></div>
+		<?php
+		$label_tooltip = 'class="'.$tip_class.' flexi_label" title="'.flexicontent_html::getToolTip('FLEXI_ORIGINAL_CONTENT_ITEM', 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC', 1, 1).'"';
+		?>
+		<span class="label-fcouter">
+			<label id="jform_lang_parent_id-lbl" for="jform_lang_parent_id" <?php echo $label_tooltip; ?> >
+				<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
 			</label>
-			
-			<div class="container_fcfield container_fcfield_name_langassocs">
+		</span>
+		
+		<div class="container_fcfield container_fcfield_name_originalitem">
+		<?php if ( !$isnew  && (substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->item->language, 0,2) || $this->item->language=='*') ) : ?>
+			<br/><?php echo JText::_( $this->item->language=='*' ? 'FLEXI_ORIGINAL_CONTENT_ALL_LANGS' : 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?>
+			<input type="hidden" name="jform[lang_parent_id]" id="jform_lang_parent_id" value="<?php echo $this->item->id; ?>" />
+		<?php else : ?>
 			<?php
-			if ( !empty($this->lang_assocs) )
-			{
-				$row_modified = 0;
-				foreach($this->lang_assocs as $assoc_item) {
-					if ($assoc_item->id == $this->item->lang_parent_id) {
-						$row_modified = strtotime($assoc_item->modified);
-						if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
-					}
-				}
-				
-				foreach($this->lang_assocs as $assoc_item)
-				{
-					if ($assoc_item->id==$this->item->id) continue;
-					
-					$assoc_modified = strtotime($assoc_item->modified);
-					if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
-					$_class = ( $assoc_modified < $row_modified ) ? ' fc_assoc_outdated' : '';
-					
-					$_link  = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='. $assoc_item->id;
-					if(FLEXI_J30GE)
-						$_title = JHtml::tooltipText(trim(JText::_('FLEXI_EDIT_ASSOC_TRANSLATION'), ':'),'['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8') , 0);
-					else
-						$_title = htmlspecialchars(JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
-
-					$_title = flexicontent_html::getToolTip(
-						JText::_( $assoc_modified < $row_modified ? 'FLEXI_OUTDATED' : 'FLEXI_UPTODATE'),
-						//JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION').
-						($assoc_item->lang=='*' ? JText::_("All") : $this->langs->{$assoc_item->lang}->name).' <br/><br/> '.
-						$assoc_item->title, 0, 1
-					);
-					
-					echo '<a class="fc_assoc_translation '.$tip_class.$_class.'" target="_blank" href="'.$_link.'" title="'.$_title.'" >';
-					if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
-						echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
-					} else if( !empty($assoc_item->lang) ) {
-						echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
-					}
-					echo "</a>";
-				}
+			if ( in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew || $this->item->id==$this->item->lang_parent_id) {
+				$app = JFactory::getApplication();
+				$option = JRequest::getVar('option');
+				$app->setUserState( $option.'.itemelement.langparent_item', 1 );
+				$app->setUserState( $option.'.itemelement.type_id', $typeid);
+				$app->setUserState( $option.'.itemelement.created_by', $this->item->created_by);
+				//echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br/>';
+				echo $this->form->getInput('lang_parent_id');
+			?>
+				<span class="editlinktip <?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" style="display:inline-block;" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_NOTES'), ':'), htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ), ENT_COMPAT, 'UTF-8'), 0):htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ), ENT_COMPAT, 'UTF-8'); ?>">
+					<?php echo $infoimage; ?>
+				</span>
+			<?php
+			} else {
+				echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ALREADY_SET' );
 			}
 			?>
-			</div>
-		<?php endif; /* IF enable_translation_groups */ ?>
+		<?php endif; ?>
+		</div>
+	
+		<div class="fcclear"></div>
+		<label id="langassocs-lbl" for="langassocs" class="flexi_label" >
+			<?php echo JText::_( 'FLEXI_ASSOC_TRANSLATIONS' );?>
+		</label>
 		
+		<div class="container_fcfield container_fcfield_name_langassocs">
+		<?php
+		if ( !empty($this->lang_assocs) )
+		{
+			$row_modified = 0;
+			foreach($this->lang_assocs as $assoc_item) {
+				if ($assoc_item->id == $this->item->lang_parent_id) {
+					$row_modified = strtotime($assoc_item->modified);
+					if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
+				}
+			}
+			
+			foreach($this->lang_assocs as $assoc_item)
+			{
+				if ($assoc_item->id==$this->item->id) continue;
+				
+				$assoc_modified = strtotime($assoc_item->modified);
+				if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
+				$_class = ( $assoc_modified < $row_modified ) ? ' fc_assoc_outdated' : '';
+				
+				$_link  = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='. $assoc_item->id;
+				if(FLEXI_J30GE)
+					$_title = JHtml::tooltipText(trim(JText::_('FLEXI_EDIT_ASSOC_TRANSLATION'), ':'),'['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8') , 0);
+				else
+					$_title = htmlspecialchars(JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
+
+				$_title = flexicontent_html::getToolTip(
+					JText::_( $assoc_modified < $row_modified ? 'FLEXI_OUTDATED' : 'FLEXI_UPTODATE'),
+					//JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION').
+					($assoc_item->lang=='*' ? JText::_("All") : $this->langs->{$assoc_item->lang}->name).' <br/><br/> '.
+					$assoc_item->title, 0, 1
+				);
+				
+				echo '<a class="fc_assoc_translation '.$tip_class.$_class.'" target="_blank" href="'.$_link.'" title="'.$_title.'" >';
+				if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
+					echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
+				} else if( !empty($assoc_item->lang) ) {
+					echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
+				}
+				echo "</a>";
+			}
+		}
+		?>
+		</div>
+*/?>
 	</fieldset>
 <?php $captured['language'] = ob_get_clean(); endif;
 

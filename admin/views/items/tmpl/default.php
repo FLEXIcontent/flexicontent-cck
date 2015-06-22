@@ -45,7 +45,7 @@ $user 		= JFactory::getUser();
 //$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef') && $config->get('sef');
 $_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
 $isAdmin = JFactory::getApplication()->isAdmin();
-$enable_translation_groups = $cparams->get("enable_translation_groups");
+$enable_translation_groups = flexicontent_db::useAssociations(); //$cparams->get("enable_translation_groups");
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
 $list_total_cols = 18;
@@ -531,6 +531,12 @@ jQuery(document).ready(function(){
 				</span>
 				<?php endif; ?>
 			</th>
+
+		<?php if ( $enable_translation_groups ) : ?>
+			<th class="center hideOnDemandClass">
+				<?php echo JText::_('FLEXI_ASSOCIATIONS'); /*JHTML::_('grid.sort', 'Translation Group', 'i.lang_parent_id', $this->lists['order_Dir'], $this->lists['order'] );*/ ?>
+			</th>
+		<?php endif; ?>
 			
 			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -553,12 +559,6 @@ jQuery(document).ready(function(){
 			<th class="left hideOnDemandClass" colspan="2">
 				<?php echo JText::_( 'FLEXI_TEMPLATE' ); ?>
 			</th>
-
-		<?php if ( $enable_translation_groups ) : ?>
-			<th class="center hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'Translation Group', 'i.lang_parent_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-			</th>
-		<?php endif; ?>
 		
 		<?php foreach($this->extra_fields as $field) :?>
 			<th class="center hideOnDemandClass">
@@ -791,7 +791,7 @@ jQuery(document).ready(function(){
 				// Display title with edit link ... (row editable and not checked out)
 				} else {
 					if ( $enable_translation_groups ) {
-						if ($this->lists['order']=='i.lang_parent_id'&& $row->id!=$row->lang_parent_id) echo "<sup>|</sup>--";
+						if ($this->lists['order']=='i.lang_parent_id' && $row->lang_parent_id && $row->id!=$row->lang_parent_id) echo "<sup>|</sup>--";
 					}
 					echo '<a href="'.$link.'" title="'.$edit_item_title.'">'.htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8').'</a>';
 				}
@@ -803,34 +803,13 @@ jQuery(document).ready(function(){
 			</td>
 			
 			<td align="center" class="col_lang" title="<?php echo ($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
-				<?php if ( !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
+				<?php if ( 0 && !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
 					<img src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
 				<?php elseif( !empty($row->lang) ) : ?>
 					<?php echo $row->lang=='*' ? JText::_("FLEXI_ALL") : $row->lang;?>
 				<?php endif; ?>
 			</td>
-			
-			<td align="center" class="col_type">
-				<?php echo $row->type_name; ?>
-			</td>
-			<td align="center" class="col_state">
-				<?php echo flexicontent_html::statebutton( $row, $row->params, $addToggler = ($limit <= $this->inline_ss_max) ); ?>
-				<?php if ($extra_img) : ?>
-					<img src="components/com_flexicontent/assets/images/<?php echo $extra_img;?>" width="16" height="16" border="0" class="<?php echo $tip_class; ?>" alt="<?php echo $extra_alt; ?>" title="<?php echo $extra_alt; ?>" />
-				<?php endif; ?>
-				<?php echo $row->featured ? $featimg : ''; ?>
-			</td>
-			
-			<td align="right">
-				<?php if ($this->CanTemplates && $row_ilayout) : ?>
-				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;" >
-					<?php echo $image_editlayout;?>
-				</a>
-				<?php endif; ?>
-			</td>
-			<td align="center">
-				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
-			</td>
+
 
 		<?php if ( $enable_translation_groups ) : ?>
 			<td align="center">
@@ -840,14 +819,13 @@ jQuery(document).ready(function(){
 						else echo "+";
 					}*/// else echo "unsorted<sup>[3]</sup>";
 
-				if ( !empty($this->lang_assocs[$row->lang_parent_id]) )
+				if ( !empty($this->lang_assocs[$row->id]) )
 				{
 					$row_modified = 0;
-					foreach($this->lang_assocs[$row->lang_parent_id] as $assoc_item) {
-						if ($assoc_item->id == $row->lang_parent_id) {
-							$row_modified = strtotime($assoc_item->modified);
-							if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
-						}
+					foreach($this->lang_assocs[$row->id] as $assoc_item) {
+						if ($assoc_item->id == $row->id) continue; // skip current item
+						$row_modified = strtotime($assoc_item->modified);
+						if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
 					}
 
 					foreach($this->lang_assocs[$row->lang_parent_id] as $assoc_item) {
@@ -879,6 +857,28 @@ jQuery(document).ready(function(){
 			</td>
 		<?php endif ; ?>
 
+
+			<td align="center" class="col_type">
+				<?php echo $row->type_name; ?>
+			</td>
+			<td align="center" class="col_state">
+				<?php echo flexicontent_html::statebutton( $row, $row->params, $addToggler = ($limit <= $this->inline_ss_max) ); ?>
+				<?php if ($extra_img) : ?>
+					<img src="components/com_flexicontent/assets/images/<?php echo $extra_img;?>" width="16" height="16" border="0" class="<?php echo $tip_class; ?>" alt="<?php echo $extra_alt; ?>" title="<?php echo $extra_alt; ?>" />
+				<?php endif; ?>
+				<?php echo $row->featured ? $featimg : ''; ?>
+			</td>
+			
+			<td align="right">
+				<?php if ($this->CanTemplates && $row_ilayout) : ?>
+				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;" >
+					<?php echo $image_editlayout;?>
+				</a>
+				<?php endif; ?>
+			</td>
+			<td align="center">
+				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
+			</td>
 
     <?php foreach($this->extra_fields as $_field) :?>
 

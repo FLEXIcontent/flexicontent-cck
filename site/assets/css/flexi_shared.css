@@ -1286,3 +1286,18 @@ table.fc-form-tbl fieldset {
 	width: 0;
 	background-color: #0099ff;
 }
+
+
+/* J3 various */
+.control-label {
+	clear: left;
+	float: left;
+	min-width: 120px;
+	text-align:right;
+	padding: 4px 16px 4px 2px;
+}
+
+.control-label .label {
+	width: auto;
+	display:inline-block;
+}

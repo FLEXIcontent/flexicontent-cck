@@ -3476,9 +3476,9 @@ class flexicontent_html
 		{
 			$user = JFactory::getUser();
 			$_types = array();
-			foreach ($types as $type) {
+			foreach ($types as $type_id => $type) {
 				$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
-				if ( $allowed ) $_types[] = $type;
+				if ( $allowed ) $_types[$type_id] = $type;
 			}
 			$types = $_types;
 		}
@@ -5975,6 +5975,175 @@ class flexicontent_db
 		
 		$cached[$contenttypes_list] = $types;
 		return $types;
+	}
+	
+	
+	static function getOriginalContentItemids($items, $ids=null)
+	{
+		if (empty($ids) && empty($items)) return array();
+		if (empty($ids))
+		{
+			$ids = array();
+			foreach($items as $item) $ids[] = $item->id;
+		}
+		
+		// Get associated translations
+		$db = JFactory::getDBO();
+		$query = 'SELECT a.id as id, k.id as original_id'
+			. ' FROM #__associations AS a'
+			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
+			. ' JOIN #__content AS i ON i.id = k.id AND i.language = '. $db->Quote(flexicontent_html::getSiteDefaultLang())
+			. ' WHERE a.id IN ('. implode(',', $ids) .') AND a.context = "com_content.item"';
+		$db->setQuery($query);
+		$assoc_keys = $db->loadObjectList('id');
+		
+		if (!empty($items))
+		{
+			foreach($items as $item) $item->lang_parent_id = isset($assoc_keys['id']) ? $assoc_keys['id'] : $item->id;
+		}
+		else
+			return $assoc_keys;
+	}
+	
+		
+	static function getLangAssocs($ids)
+	{
+		$db = JFactory::getDBO();
+		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.created, i.modified, i.language as language, i.language as lang'
+			. ' FROM #__associations AS a'
+			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
+			. ' JOIN #__content AS i ON i.id = k.id'
+			. ' WHERE a.id IN ('. implode(',', $ids) .') AND a.context = "com_content.item"';
+		$db->setQuery($query);
+		$associations = $db->loadObjectList();
+		
+		$translations = array();
+		foreach ($associations as $assoc)
+		{
+			$translations[$assoc->item_id][] = $assoc;
+		}
+		
+		return $translations;
+	}
+
+	/**
+	 * Method to save language associations
+	 *
+	 * @return  boolean True if successful
+	 */
+	static function saveAssociations(&$item, &$data, $context)
+	{
+		$assoc = flexicontent_db::useAssociations();
+		if (!$assoc) return true;
+		$id = $item->id;
+		
+		
+		// **********************************
+		// Prepare / check associations array
+		// **********************************
+		
+		// Unset empty associations from associations array, to avoid save them in the associations table
+		$associations = $data['associations'];
+		foreach ($associations as $tag => $id)
+		{
+			if (empty($id)) unset($associations[$tag]);
+		}
+		
+		// Raise notice that associations should be empty if language of current item is '*' (ALL)
+		$all_language = $item->language == '*';
+		if ($all_language && !empty($associations))
+		{
+			JError::raiseNotice(403, JText::_('FLEXI_ERROR_ALL_LANGUAGE_ASSOCIATED'));
+		}
+		
+		// Make sure that current item id, is the association id of the language of the current item
+		$associations[$item->language] = $item->id;
+		
+		// Make sure associations ids are integers
+		JArrayHelper::toInteger($associations);
+		
+		
+		// ***********************
+		// Delete old associations
+		// ***********************
+		
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true)
+			->delete('#__associations')
+			->where($db->quoteName('context') . ' = ' . $db->quote($context.'.item'))
+			->where($db->quoteName('id') . ' IN (' . implode(',', $associations) . ')');
+		$db->setQuery($query);
+		$db->execute();
+		
+		if ($error = $db->getErrorMsg())
+		{
+			$this->setError($error);
+			return false;
+		}
+		
+		
+		// ********************
+		// Add new associations
+		// ********************
+		
+		// Only add language associations if item language is not '*' (ALL)
+		if ($all_language || !count($associations)) return true;
+		
+		$key = md5(json_encode($associations));
+		$query->clear()
+			->insert('#__associations');
+		
+		foreach ($associations as $id)
+		{
+			$query->values($id . ',' . $db->quote($context.'.item') . ',' . $db->quote($key));
+		}
+		
+		$db->setQuery($query);
+		$db->execute();
+
+		if ($error = $db->getErrorMsg())
+		{
+			$this->setError($error);
+			return false;
+		}
+		return true;
+	}
+	
+	
+	/**
+	 * Method to determine if J3.1+ associations should be used
+	 *
+	 * @return  boolean True if using J3 associations; false otherwise.
+	 */
+	static function useAssociations()
+	{
+		static $assoc = null;
+
+		if (!is_null($assoc))
+		{
+			return $assoc;
+		}
+
+		$app = JFactory::getApplication();
+
+		$assoc = FLEXI_J30GE && JLanguageAssociations::isEnabled();
+		$component = 'com_flexicontent';
+		$cname = str_replace('com_', '', $component);
+		$j3x_assocs = true;
+		
+		if (!$assoc || !$component || !$cname || !$j3x_assocs)
+		{
+			$assoc = false;
+		}
+		else
+		{
+			$hname = $cname . 'HelperAssociation';
+			JLoader::register($hname, JPATH_SITE . '/components/' . $component . '/helpers/association.php');
+
+			$assoc = class_exists($hname) && !empty($hname::$category_association);
+		}
+		
+		return $assoc;
 	}
 }
 

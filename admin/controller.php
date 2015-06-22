@@ -705,15 +705,7 @@ class FlexicontentController extends JControllerLegacy
 		$db->setQuery($query);
 		$result2 = $db->query();
 		
-		// Set default translation group for items that don't have one
-		$query 	= 'UPDATE #__flexicontent_items_ext'
-				. ' SET lang_parent_id = item_id '
-				. ' WHERE lang_parent_id = 0'
-				;
-		$db->setQuery($query);
-		$result3 = $db->query();
-		
-		return $result1 && $result1a && $result2 && $result3;
+		return $result1 && $result1a && $result2;
 	}
 		
 	
@@ -783,14 +775,10 @@ class FlexicontentController extends JControllerLegacy
 		$nullDate	= $db->getNullDate();
 		
 		// Add language column
-		if (!FLEXI_J16GE) {
-			$fields = $db->getTableFields(array('#__flexicontent_items_ext'));
-			$columns = $fields['#__flexicontent_items_ext'];
-		} else {
-			$columns = $db->getTableColumns('#__flexicontent_items_ext');
-		}
+		$columns = $db->getTableColumns('#__flexicontent_items_ext');
 		$language_col = array_key_exists('language', $columns) ? true : false;
-		if(!$language_col) {
+		if(!$language_col)
+		{
 			$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `language` VARCHAR( 11 ) NOT NULL DEFAULT '' AFTER `type_id`" ;
 			$db->setQuery($query);
 			$result_lang_col = $db->query();
@@ -799,7 +787,8 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Add translation group column
 		$lang_parent_id_col = array_key_exists('lang_parent_id', $columns) ? true : false;
-		if(!$lang_parent_id_col) {
+		if(!$lang_parent_id_col)
+		{
 			$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `lang_parent_id` INT NOT NULL DEFAULT 0 AFTER `language`" ;
 			$db->setQuery($query);
 			$result_tgrp_col = $db->query();
@@ -808,7 +797,8 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Add default language for items that do not have one, and add translation group to items that do not have one set
 		$model = $this->getModel('flexicontent');
-		if ($model->getItemsNoLang()) {
+		if ($model->getItemsNoLang())
+		{
 			// 1. copy language from __flexicontent_items_ext table into __content
 			$this->syncItemsLang();
 			
@@ -818,9 +808,32 @@ class FlexicontentController extends JControllerLegacy
 			if (!$result_items_default_lang) echo "Cannot set default language or set default translation group<br>";
 		} else $result_items_default_lang = true;
 		
-		if (!$result_lang_col
+		
+		$query 	=	"
+			INSERT INTO `#__associations` (`id`, `context`, `key`)
+				SELECT DISTINCT ie.item_id, 'com_content.item', ie.lang_parent_id
+				FROM `#__flexicontent_items_ext` AS ie
+				JOIN `#__flexicontent_items_ext` AS j ON ie.lang_parent_id = j.lang_parent_id AND ie.item_id<>j.item_id
+				WHERE ie.lang_parent_id <> 0
+			ON DUPLICATE KEY UPDATE id=id";
+		$db->setQuery($query);
+		try {
+			$convert_assocs = $db->query();
+			$query 	=	"UPDATE `#__flexicontent_items_ext` SET lang_parent_id = 0";
+			$db->setQuery($query);
+			$clear_assocs = $db->query();
+		}
+		catch (Exception $e) {
+			echo "Cannot convert FLEXIcontent associations to Joomla associations<br>";
+			JError::raiseWarning( 500, $e->getMessage() );
+			$convert_assocs = $clear_assocs = false;
+		}
+		
+		if ( !$result_lang_col
 			|| !$result_tgrp_col
 			|| !$result_items_default_lang
+			|| !$convert_assocs
+			|| !$clear_assocs
 		) {
 			echo '<span class="install-notok"></span>';
 			jexit();

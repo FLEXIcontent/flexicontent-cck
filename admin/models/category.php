@@ -205,7 +205,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		if ( $tbl->checkout($uid, $this->_id) ) return true;
 		
 		// Reaching this points means checkout failed
-		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
+		$this->setError( JText::_("FLEXI_ALERT_CHECKOUT_FAILED") .': '. $tbl->getError() );
 		return false;
 	}
 	
@@ -353,6 +353,13 @@ class FlexicontentModelCategory extends JModelAdmin
 		$this->_id = $table->id;
 		$this->_category = & $table;  // variable reference instead of assigning object id, this will work even if $table is reassigned a different object
 
+		
+		// ****************************
+		// Update language Associations
+		// ****************************
+		$this->saveAssociations($item, $data);
+		
+		
 		// Trigger the onContentAfterSave event.
 		$dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$table, $isNew));
 
@@ -498,6 +505,8 @@ class FlexicontentModelCategory extends JModelAdmin
 
 		return $form;
 	}
+	
+	
 	/**
 	 * Method to get the data that should be injected in the form.
 	 *
@@ -513,8 +522,125 @@ class FlexicontentModelCategory extends JModelAdmin
 			$data = $this->getItem();
 		}
 
+		//$this->preprocessData('com_categories.category', $data);
+		
 		return $data;
 	}
+	
+	
+	/**
+	 * Method to preprocess the form.
+	 *
+	 * @param   JForm   $form   A JForm object.
+	 * @param   mixed   $data   The data expected for the form.
+	 * @param   string  $group  The name of the plugin group to import.
+	 *
+	 * @return  void
+	 *
+	 * @see     JFormField
+	 * @since   1.6
+	 * @throws  Exception if there is an error in the form event.
+	 */
+	protected function preprocessForm(JForm $form, $data, $group = 'content')
+	{
+		jimport('joomla.filesystem.path');
+
+		$lang = JFactory::getLanguage();
+		$component = $this->getState('com_flexicontent.category.component');
+		$section = $this->getState('com_flexicontent.category.section');
+		$extension = JFactory::getApplication()->input->get('extension', null);
+
+		// Get the component form if it exists
+		$name = 'category' . ($section ? ('.' . $section) : '');
+
+		// Looking first in the component models/forms folder
+		$path = JPath::clean(JPATH_ADMINISTRATOR . "/components/$component/models/forms/$name.xml");
+		
+		if (file_exists($path))
+		{
+			$lang->load($component, JPATH_BASE, null, false, true);
+			$lang->load($component, JPATH_BASE . '/components/' . $component, null, false, true);
+
+			if (!$form->loadFile($path, false))
+			{
+				throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
+			}
+		}
+
+		// Try to find the component helper.
+		$eName = str_replace('com_', '', $component);
+		$path = JPath::clean(JPATH_ADMINISTRATOR . "/components/$component/helpers/category.php");
+
+		if (file_exists($path))
+		{
+			require_once $path;
+			$cName = ucfirst($eName) . ucfirst($section) . 'HelperCategory';
+
+			if (class_exists($cName) && is_callable(array($cName, 'onPrepareForm')))
+			{
+				$lang->load($component, JPATH_BASE, null, false, false)
+					|| $lang->load($component, JPATH_BASE . '/components/' . $component, null, false, false)
+					|| $lang->load($component, JPATH_BASE, $lang->getDefault(), false, false)
+					|| $lang->load($component, JPATH_BASE . '/components/' . $component, $lang->getDefault(), false, false);
+				call_user_func_array(array($cName, 'onPrepareForm'), array(&$form));
+
+				// Check for an error.
+				if ($form instanceof Exception)
+				{
+					$this->setError($form->getMessage());
+
+					return false;
+				}
+			}
+		}
+
+		// Set the access control rules field component value.
+		$form->setFieldAttribute('rules', 'component', $component);
+		$form->setFieldAttribute('rules', 'section', $name);
+
+		// Association category items
+		$useAssocs = $this->useAssociations();
+
+		if ($useAssocs)
+		{
+			$languages = JLanguageHelper::getLanguages('lang_code');
+			$addform = new SimpleXMLElement('<form />');
+			$fields = $addform->addChild('fields');
+			$fields->addAttribute('name', 'associations');
+			$fieldset = $fields->addChild('fieldset');
+			$fieldset->addAttribute('name', 'item_associations');
+			$fieldset->addAttribute('description', 'COM_CATEGORIES_ITEM_ASSOCIATIONS_FIELDSET_DESC');
+			$add = false;
+
+			foreach ($languages as $tag => $language)
+			{
+				if (empty($data->language) || $tag != $data->language)
+				{
+					$add = true;
+					$field = $fieldset->addChild('field');
+					$field->addAttribute('name', $tag);
+					$field->addAttribute('type', 'qfcategory');
+					$field->addAttribute('language', $tag);
+					$field->addAttribute('label', $language->title);
+					$field->addAttribute('class', 'label');
+					$field->addAttribute('translate_label', 'true');
+					$field->addAttribute('extension', $extension);
+					$field->addAttribute('edit', 'true');
+					$field->addAttribute('clear', 'true');
+				}
+			}
+
+			if ($add)
+			{
+				$form->load($addform, false);
+			}
+		}
+
+		// Trigger the default form events.
+		parent::preprocessForm($form, $data, $group);
+	}
+	
+	
 	
 	/**
 	 * Method to get a category.
@@ -544,13 +670,13 @@ class FlexicontentModelCategory extends JModelAdmin
 			
 			$site_zone = JFactory::getApplication()->getCfg('offset');
 			$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
-			$tz_string = FLEXI_J16GE ? $user_zone : $site_zone ;
+			$tz_string = $user_zone;
 			$tz = new DateTimeZone( $tz_string );
 			
 			if (intval($result->created_time)) {
 				$date = new JDate($result->created_time);
 				$date->setTimezone($tz);
-				$result->created_time = FLEXI_J16GE ? $date->toSql(true) : $date->toMySQL(true);
+				$result->created_time = $date->toSql(true);
 			} else {
 				$result->created_time = null;
 			}
@@ -558,13 +684,28 @@ class FlexicontentModelCategory extends JModelAdmin
 			if (intval($result->modified_time)) {
 				$date = new JDate($result->modified_time);
 				$date->setTimezone($tz);
-				$result->modified_time = FLEXI_J16GE ? $date->toSql(true) : $date->toMySQL(true);
+				$result->modified_time = $date->toSql(true);
 			} else {
 				$result->modified_time = null;
 			}
 			$this->_category = $result;
 		}
+		
+		$useAssocs = $this->useAssociations();
 
+		if ($useAssocs)
+		{
+			if ($result->id != null)
+			{
+				$result->associations = CategoriesHelper::getAssociations($result->id, $result->extension);
+				JArrayHelper::toInteger($result->associations);
+			}
+			else
+			{
+				$result->associations = array();
+			}
+		}
+		
 		return $result;
 	}
 	
@@ -584,19 +725,22 @@ class FlexicontentModelCategory extends JModelAdmin
 		}
 		$this->setState('com_flexicontent.category.parent_id', $parentId);
 
-		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
-			$extension = JRequest::getCmd('extension', FLEXI_CAT_EXTENSION);
-		}
 		// Load the User state.
 		if (!($pk = (int) $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id'))) {
 			$cid = JRequest::getVar('cid', array(0));
 			$pk = (int)$cid[0];
 		}
-
+		
+		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
+			$extension = JRequest::getCmd('extension', FLEXI_CAT_EXTENSION);
+		}
+		
 		$this->setState('com_flexicontent.category.extension', $extension);
 		$parts = explode('.',$extension);
+		
 		// extract the component name
 		$this->setState('com_flexicontent.category.component', $parts[0]);
+		
 		// extract the optional section name
 		$this->setState('com_flexicontent.category.section', (count($parts)>1)?$parts[1]:null);
 
@@ -664,5 +808,28 @@ class FlexicontentModelCategory extends JModelAdmin
 		return array($title, $alias);
 	}
 	
+	
+	/**
+	 * Method to save language associations
+	 *
+	 * @return  boolean True if successful
+	 */
+	function saveAssociations(&$item, &$data)
+	{
+		$item = $item ? $item: $this->_category;
+		$context = 'com_categories';
+		
+		return flexicontent_db::saveAssociations($item, $data, $context);
+	}
+	
+	
+	/**
+	 * Method to determine if J3.1+ associations should be used
+	 *
+	 * @return  boolean True if using J3 associations; false otherwise.
+	 */
+	public function useAssociations()
+	{
+		return flexicontent_db::useAssociations();
+	}
 }
-?>

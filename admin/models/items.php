@@ -259,27 +259,13 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( empty($this->_data) )  return $this->_translations;
 		
 		// Get associated translations
-		$lang_parent_ids = array();
+		$ids = array();
 		foreach ($this->_data as $_item_data) {
-			if ($_item_data->lang_parent_id) $lang_parent_ids[] = $_item_data->lang_parent_id;
+			$ids[] = $_item_data->id;
 		}
-		if ( empty($lang_parent_ids) )  return $this->_translations;
 		
-		$query = 'SELECT i.id, i.title, i.created, i.modified, ie.lang_parent_id, ie.language as language, ie.language as lang '
-			//. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug '
-			//. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug '
-		  . ' FROM #__content AS i '
-		  . ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id '
-		  . ' WHERE ie.lang_parent_id IN ('.implode(',', $lang_parent_ids).')'
-		  ;
-		$this->_db->setQuery($query);
-		$translations = $this->_db->loadObjectList();
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+		$this->_translations = flexicontent_db::getLangAssocs($ids);
 		
-		if ( empty($translations) )  return $this->_translations;
-		
-		foreach ($translations as $translation)
-			$this->_translations[$translation->lang_parent_id][] = $translation;
 		return $this->_translations;
 	}
 	
@@ -687,7 +673,7 @@ class FlexicontentModelItems extends JModelLegacy
 		foreach ($rows as $row)
 		{
 			$ilang = $row->language ? $row->language : $default_lang;
-			$itemext[$i] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.$row->text_stripped).', '.(int)$row->id.')';
+			$itemext[$i] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.$row->text_stripped).', 0)';
 			$id_arr[$i] = (int)$row->id;
 			$query_len += strlen($itemext[$i]) + 2;  // Sum of query length so far
 			$n++; $i++;
@@ -1471,7 +1457,7 @@ class FlexicontentModelItems extends JModelLegacy
 				
 				// Not doing a translation, we start a new language group for the new item
 				if ($translate_method == 0) {
-					$row->lang_parent_id = $copyid;
+					$row->lang_parent_id = 0;//$copyid;
 					$row->store();
 				}
 				

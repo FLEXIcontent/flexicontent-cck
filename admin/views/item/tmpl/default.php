@@ -18,9 +18,9 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$task_items = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
-$ctrl_items = FLEXI_J16GE ? 'items.' : '';
-$tags_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&task=';
+$task_items = 'task=items.';
+$ctrl_items = 'items.';
+$tags_task  = 'task=tags.';
 
 // For tabsets/tabs ids (focusing, etc)
 $tabSetCnt = -1;
@@ -28,6 +28,7 @@ $tabSetMax = -1;
 $tabCnt = array();
 $tabSetStack = array();
 
+$useAssocs = flexicontent_db::useAssociations();
 $tags_displayed = $this->row->type_id && ( $this->perms['cantags'] || count(@$this->usedtags) ) ;
 
 $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
@@ -147,7 +148,7 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 }
 
 // version variables
-$tags_fieldname = FLEXI_J16GE ? 'jform[tag][]' : 'tag[]';
+$tags_fieldname = 'jform[tag][]';
 
 $this->document->addScriptDeclaration("
 	jQuery(document).ready(function(){
@@ -225,7 +226,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				$field = isset($this->fields['title']) ? $this->fields['title'] : false;
 				if ($field) {
 					$field_description = $field->description ? $field->description :
-						JText::_(FLEXI_J16GE ? $this->form->getField('title')->__get('description') : 'TIPTITLEFIELD');
+						JText::_($this->form->getField('title')->__get('description'));
 					$label_tooltip = 'class="'.$tip_class.' label pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 				} else {
 					$label_tooltip = 'class="label pull-left label-fcinner label-toplevel"';
@@ -275,7 +276,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			
 			<div class="fcclear"></div>
 			<?php
-				$field_description = JText::_(FLEXI_J16GE ? $this->form->getField('alias')->__get('description') : 'ALIASTIP');
+				$field_description = JText::_($this->form->getField('alias')->__get('description'));
 				$label_tooltip = 'class="'.$tip_class.' label pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 			?>
 			<span class="label-fcouter">
@@ -397,7 +398,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
 				if ($field) {
 					$field_description = $field->description ? $field->description :
-						JText::_(FLEXI_J16GE ? $this->form->getField('type_id')->__get('description') : 'FLEXI_TYPE_DESC');
+						JText::_($this->form->getField('type_id')->__get('description'));
 					$label_tooltip = 'class="'.$tip_class.' label pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 				} else {
 					$label_tooltip = 'class="label pull-left label-fcinner label-toplevel"';
@@ -441,7 +442,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				$field = isset($this->fields['state']) ? $this->fields['state'] : false;
 				if ($field) {
 					$field_description = $field->description ? $field->description :
-						JText::_(FLEXI_J16GE ? $this->form->getField('state')->__get('description') : 'FLEXI_STATE_DESC');
+						JText::_($this->form->getField('state')->__get('description'));
 					$label_tooltip = 'class="'.$tip_class.' label pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 				} else {
 					$label_tooltip = 'class="label pull-left label-fcinner label-toplevel"';
@@ -538,7 +539,7 @@ $tabCnt[$tabSetCnt] = 0;
 	$field = $this->fields['text'];
 	if ($field) {
 		$field_description = $field->description ? $field->description :
-			JText::_(FLEXI_J16GE ? $this->form->getField('state')->__get('description') : 'FLEXI_STATE_DESC');
+			JText::_($this->form->getField('state')->__get('description'));
 		$_desc = flexicontent_html::getToolTip(null, $field_description, 0, 1);
 	} else {
 		$_desc = '';
@@ -581,7 +582,7 @@ $tabCnt[$tabSetCnt] = 0;
 			
 			<?php /*if ($display_label_form): ?>
 				<span class="label-fcouter">
-				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" <?php echo $label_tooltip;?> >
+				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
 					<?php echo $field->label; ?>
 				</label>
 				</span>
@@ -643,7 +644,6 @@ if ($this->row->type_id) {
 	$_str = JText::_('FLEXI_DETAILS');
 	$_str = mb_strtoupper(mb_substr($_str, 0, 1, 'UTF-8')) . mb_substr($_str, 1, NULL, 'UTF-8');
 	
-	$types_arr = flexicontent_html::getTypesList();
 	$type_lbl = $this->typesselected->name;
 	$type_lbl = $type_lbl ? JText::_($type_lbl) : JText::_('FLEXI_CONTENT_TYPE');
 	$type_lbl = $type_lbl .' ('. $_str .')';
@@ -728,7 +728,7 @@ if ($this->row->type_id) {
 				<div class='fcclear'></div>
 				<?php if($display_label_form): ?>
 					<span class="label-fcouter">
-					<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" <?php echo $label_tooltip;?> >
+					<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
 						<?php echo $field->label; ?>
 					</label>
 					</span>
@@ -865,11 +865,17 @@ if ($this->row->type_id) {
 		<div class="fcclear"></div>
 		<fieldset class="basicfields_set" id="fcform_language_container">
 			<legend>
-				<span class="fc_legend_text"><?php echo JText::_('FLEXI_LANGUAGE') .' '. JText::_('FLEXI_ASSOCIATONS'); ?></span>
+				<span class="fc_legend_text"><?php echo JText::_('FLEXI_LANGUAGE') .' '. JText::_('FLEXI_ASSOCIATIONS'); ?></span>
 			</legend>
 			
-			<?php if ( $this->params->get('enable_translation_groups') ) : ?>
+			<!-- BOF of language / language associations section -->
+			<?php if ( $useAssocs/*$this->params->get('enable_translation_groups')*/ ) : ?>
 
+				<div class="fcclear"></div>
+				<?php echo $this->loadTemplate('associations'); ?>	
+				<?php /*include('development_tmp.php');*/ ?>
+
+<?php /*
 				<div class="fcclear"></div>
 				<?php
 					$label_tooltip = 'class="'.$tip_class.' label pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC', 1, 1).'"';
@@ -905,9 +911,6 @@ if ($this->row->type_id) {
 					?>
 				<?php endif; ?>
 				</div>
-
-<?php /*include('development_tmp.php');*/ ?>
-
 				<div class="fcclear"></div>
 				<span class="label-fcouter">
 				<label id="langassocs-lbl" for="langassocs" class="label pull-left label-fcinner label-toplevel" >
@@ -953,7 +956,9 @@ if ($this->row->type_id) {
 				}
 				?>
 				</div>
-			<?php endif; /* IF enable_translation_groups */ ?>
+*/ ?>
+			<?php endif; ?>
+			<!-- EOF of language / language associations section -->
 			
 		</fieldset>
 	
@@ -974,14 +979,10 @@ if ($this->perms['canparams']) : ?>
 				// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
 				$site_zone = JFactory::getApplication()->getCfg('offset');
 				$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
-				if (FLEXI_J16GE) {
-					$tz = new DateTimeZone( $user_zone );
-					$tz_offset = $tz->getOffset(new JDate()) / 3600;
-				} else {
-					$tz_offset = $site_zone;
-				}
+				$tz = new DateTimeZone( $user_zone );
+				$tz_offset = $tz->getOffset(new JDate()) / 3600;
 				$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
-				if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
+				$tz_info .= ' ('.$user_zone.')';
 				echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
 			?>
 			</div>

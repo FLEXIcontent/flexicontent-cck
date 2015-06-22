@@ -58,7 +58,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$params     = clone( JComponentHelper::getParams('com_flexicontent') );
 		
 		// Some flags
-		$enable_translation_groups = $params->get("enable_translation_groups");
+		$enable_translation_groups = flexicontent_db::useAssociations(); //$params->get("enable_translation_groups");
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
@@ -281,8 +281,9 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		
 		// Check if saving an item that translates an original content in site's default language
-		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($item->language, 0,2);
-		$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
+		$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
+		$is_content_default_lang = $site_default == substr($item->language, 0,2);
+		//$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang; // && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
 		
 		// *****************************************************************************
 		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
@@ -313,8 +314,6 @@ class FlexicontentViewItem extends JViewLegacy
 
 				if ( !$is_editable ) {
 					$field->html = '<div class="fc-mssg fc-warning">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
-				} else if ($modify_untraslatable_values && $field->untranslatable) {
-					$field->html = '<div class="fc-mssg fc-note">'. JText::_('FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE') . '</div>';
 				} else {
 					if ( isset($jcustom[$field->name]) ) {
 						$field->value = array();
@@ -323,6 +322,12 @@ class FlexicontentViewItem extends JViewLegacy
 						}
 					}
 					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
+					if (/*$modify_untraslatable_values &&*/ $field->untranslatable)
+					{
+						$field->html = '
+							<div class="alert alert-info fc-small fc-iblock">'. JText::_('FLEXI_FIELD_VALUE_IS_NON_TRANSLATABLE') . '</div>'
+							.$field->html;
+					}
 				}
 			}
 

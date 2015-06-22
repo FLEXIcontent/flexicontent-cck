@@ -90,6 +90,11 @@ class plgSystemFlexiadvroute extends JPlugin
 		// Execute only in frontend
 		if( $app->isAdmin() )  return;
 		
+		// We will use Joomla associations
+		// which is done via links in the language module
+		$this->params->set('switch_langassociated_items', 0);
+		
+		
 		// Execute only if groups enabled and if plugin parameter for switching is enabled
 		if ( !$flexiparams->get('enable_translation_groups') || !$this->params->get('switch_langassociated_items', 1) )  return;
 		

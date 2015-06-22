@@ -43,17 +43,23 @@ class JFormFieldQfcategory extends JFormField
 
 	function getInput()
 	{
-		$node = & $this->element;
-		$attributes = get_object_vars($node->attributes());
+		$allowEdit		= ((string) $this->element['edit'] == 'true') ? true : false;
+		$allowClear		= ((string) $this->element['clear'] != 'false') ? true : false;
+		
+		$attributes = get_object_vars($this->element->attributes());
 		$attributes = $attributes['@attributes'];
 		
-		$paramset = isset($attributes['paramset']) ? $attributes['paramset'] : 'request';
+		$paramset = isset($attributes['paramset']) ? $attributes['paramset'] : false; // : 'request';
 		$required = isset($attributes['required']) ? $attributes['required'] : false;
 		
 		$value = $this->value;
-		$fieldname = "jform[".$paramset."][".$this->element["name"]."]";
-		$element_id = "jform_".$paramset."_".$node["name"];
-		$prompt_str = JText::_( 'FLEXI_SELECT_ONE_CATEGORY', true );
+		if ($paramset) {
+			$fieldname = "jform[".$paramset."][".$this->element["name"]."]";
+			$element_id = "jform_".$paramset."_".$this->element["name"];
+		} else {
+			$fieldname  = $this->name;
+			$element_id = $this->id;
+		}
 		
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		
@@ -61,7 +67,7 @@ class JFormFieldQfcategory extends JFormField
 		if ($value) {
 			$item->load($value);
 		} else {
-			$item->title = JText::_( 'FLEXI_SELECT_ITEM' );
+			$item->title = JText::_( 'FLEXI_FORM_SELECT' );
 		}
 		
 		// J1.6+ does have required field capability, add a HTML tag parameter
@@ -73,8 +79,10 @@ class JFormFieldQfcategory extends JFormField
 			function qfClearSelectedCategory(element_id)
 			{
 				jQuery('#'+element_id+'_name').val('');
-				jQuery('#'+element_id+'_name').attr('placeholder', '".JText::_( 'FLEXI_SELECT_ITEM',true )."');
+				jQuery('#'+element_id+'_name').attr('placeholder', '".JText::_( 'FLEXI_FORM_SELECT',true )."');
 				jQuery('#'+element_id).val('');
+				jQuery('#'+element_id + '_clear').addClass('hidden');
+				jQuery('#'+element_id + '_edit').addClass('hidden');
 				return false;
 			};
 			
@@ -82,7 +90,12 @@ class JFormFieldQfcategory extends JFormField
 			function qfSelectCategory(id, title)
 			{
 				document.getElementById(fc_select_element_id).value = id;
-				document.getElementById(fc_select_element_id+'_name').value = title;
+				document.getElementById(fc_select_element_id+'_name').value = title;"
+			.($allowEdit  ? "
+				jQuery('#'+fc_select_element_id+'_edit').removeClass('hidden');" : '')
+			.($allowClear ? "
+				jQuery('#'+fc_select_element_id+'_clear').removeClass('hidden');" :'')
+			."
 				$('sbox-btn-close').fireEvent('click');
 			}
 			";
@@ -96,15 +109,20 @@ class JFormFieldQfcategory extends JFormField
 		return '
 		<span class="input-append">
 			<input type="text" id="'.$element_id.'_name" value="'.$item->title.'" '.$required_param.' readonly="readonly" />
-			<a class="modal btn hasTooltip" title="'.JText::_( 'FLEXI_SELECT' ).'" onclick="fc_select_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" >
-				'.JText::_( 'FLEXI_SELECT' ).'
+			<a class="modal btn hasTooltip" onclick="fc_select_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.JText::_( 'FLEXI_SELECT_CATEGORY' ).'" >
+				'.JText::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
-			<button id="' .$element_id. '_clear" class="btn" onclick="return qfClearSelectedCategory(\''.$element_id . '\')">
+			'.($allowEdit ? '
+			<a id="' .$element_id. '_edit" class="btn ' . ($value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&task=items.edit&cid=' . $value . '" target="_blank" title="'.JText::_( 'FLEXI_EDIT_CATEGORY' ).'">
+				<span class="icon-edit"></span>' . JText::_('FLEXI_FORM_EDIT') . '
+			</a>' : '').'
+			'.($allowClear ? '
+			<button id="' .$element_id. '_clear" class="btn'.($value ? '' : ' hidden').'" onclick="return qfClearSelectedCategory(\''.$element_id . '\')">
 				<span class="icon-remove"></span>'
 				.JText::_('FLEXI_CLEAR').'
-			</button>
+			</button>' : '').'
 		</span>
-		<input type="hidden" id="'.$element_id.'" name="'.$fieldname.'" '.$required_param.' value="'.$value.'" />
+		<input type="hidden" id="'.$element_id.'" name="'.$fieldname.'" value="'.$value.'" />
 		';
 	}
 }

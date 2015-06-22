@@ -26,7 +26,7 @@
 		<option value="1">FLEXI_YES</option>
 	</field>
 	
-	<field name="untranslatable" type="radio" default="0" label="FLEXI_FIELD_UNTRANSLATABLE" description="FLEXI_FIELD_UNTRANSLATABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
+	<field name="untranslatable" type="radio" default="0" label="FLEXI_FIELD_NON_TRANSLATABLE" description="FLEXI_FIELD_NON_TRANSLATABLE_DESC" class="btn-group btn-group-yesno" labelclass="label">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_YES</option>
 	</field>

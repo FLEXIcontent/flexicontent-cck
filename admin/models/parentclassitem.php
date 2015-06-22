@@ -571,6 +571,24 @@ class ParentClassItem extends JModelAdmin
 			//echo "<br/><b> *** db text:</b> ".$item->text;
 			//echo "<pre>*** item data: "; print_r($item); echo "</pre>"; exit;
 			
+			// Load associated content items
+			$useAssocs = $this->useAssociations();
+	
+			if ($useAssocs)
+			{
+				$item->associations = array();
+	
+				if ($item->id != null)
+				{
+					$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $item->id);
+					
+					foreach ($associations as $tag => $association)
+					{
+						$item->associations[$tag] = $association->id;
+					}
+					JArrayHelper::toInteger($item->associations);
+				}
+			}
 			
 			// *************************************************************************************************
 			// -- Retrieve all active site languages, and create empty item translation objects for each of them
@@ -738,6 +756,26 @@ class ParentClassItem extends JModelAdmin
 			
 			// 'cats' is an alias of categories
 			$item->cats = & $item->categories;
+			
+			// Set original content item id, e.g. maybe used by some fields that are marked as untranslatable
+			$enable_translation_groups = flexicontent_db::useAssociations(); //$cparams->get('enable_translation_groups');
+			if ($enable_translation_groups)
+			{
+				$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
+				$is_content_default_lang = $site_default == substr($item->language, 0,2);
+				if ($is_content_default_lang) {
+					$item->lang_parent_id = $item->id;
+				} else {
+					$item->lang_parent_id = 0;
+					$langAssocs = $this->getLangAssocs($item->id);
+					foreach($langAssocs as $content_id => $_assoc) {
+						if ($site_default == substr($_assoc->language, 0,2)) {
+							$item->lang_parent_id = $content_id;
+							break;
+						}
+					}
+				}
+			}
 			
 			
 			// *********************************************************
@@ -985,8 +1023,80 @@ class ParentClassItem extends JModelAdmin
 			}
 			//$form->setFieldAttribute('vstate', 'filter', 'unset');   // DO not -filter- will cause problems
 		}
+		
+		// Check if article is associated, and disable changing category and language
+		/*$useAssocs = $this->useAssociations();
+		
+		if ($id && $app->isSite() && $useAssocs)
+		{
+			$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $id);
+			
+			// Make fields read only
+			if ($associations)
+			{
+				$form->setFieldAttribute('language', 'readonly', 'true');
+				$form->setFieldAttribute('catid', 'readonly', 'true');
+				$form->setFieldAttribute('language', 'filter', 'unset');
+				$form->setFieldAttribute('catid', 'filter', 'unset');
+			}
+		}*/
 
 		return $form;
+	}
+	
+	
+	/**
+	 * Auto-populate the model state.
+	 *
+	 * Note. Calling getState in this method will result in recursion.
+	 *
+	 * @param   JForm   $form   The form object
+	 * @param   array   $data   The data to be merged into the form object
+	 * @param   string  $group  The plugin group to be executed
+	 *
+	 * @return  void
+	 *
+	 * @since    3.0
+	 */
+	protected function preprocessForm(JForm $form, $data, $group = 'content')
+	{
+		// Association content items
+		$app = JFactory::getApplication();
+		$useAssocs = $this->useAssociations();
+
+		if ($useAssocs)
+		{
+			$languages = JLanguageHelper::getLanguages('lang_code');
+			$addform = new SimpleXMLElement('<form />');
+			$fields = $addform->addChild('fields');
+			$fields->addAttribute('name', 'associations');
+			$fieldset = $fields->addChild('fieldset');
+			$fieldset->addAttribute('name', 'item_associations');
+			$fieldset->addAttribute('description', 'COM_CONTENT_ITEM_ASSOCIATIONS_FIELDSET_DESC');
+			$add = false;
+
+			foreach ($languages as $tag => $language)
+			{
+				if (empty($data->language) || $tag != $data->language)
+				{
+					$add = true;
+					$field = $fieldset->addChild('field');
+					$field->addAttribute('name', $tag);
+					$field->addAttribute('type', 'item');
+					$field->addAttribute('language', $tag);
+					$field->addAttribute('label', $language->title);
+					$field->addAttribute('translate_label', 'false');
+					$field->addAttribute('edit', 'true');
+					$field->addAttribute('clear', 'true');
+				}
+			}
+			if ($add)
+			{
+				$form->load($addform, false);
+			}
+		}
+
+		parent::preprocessForm($form, $data, $group);
 	}
 	
 	
@@ -1882,14 +1992,8 @@ class ParentClassItem extends JModelAdmin
 		$item->language   = $item->language ? $item->language :
 			($app->isSite() ? $cparams->get('default_language_fe', '*') : ('*' /*flexicontent_html::getSiteDefaultLang()*/));
 		
-		// Ignore language parent id if item language is site's (content) default language, and for language 'ALL'
-		if ( substr($item->language, 0,2) == substr(flexicontent_html::getSiteDefaultLang(), 0,2) || $item->language=='*' ) {
-			$lang_parent_id = $item->lang_parent_id;
-			$item->lang_parent_id = $isnew ? 0 : $item->id;
-			if ( $item->lang_parent_id != $lang_parent_id && $lang_parent_id ) {
-				$app->enqueueMessage(JText::_('FLEXI_ORIGINAL_CONTENT_WAS_IGNORED'), 'message' );
-			}
-		}
+		// Ignore language parent id, we are now using J3.x associations
+		$item->lang_parent_id = 0;
 		
 		
 		// ****************************************************************************************************************
@@ -2175,19 +2279,22 @@ class ParentClassItem extends JModelAdmin
 		
 		// CASE 1. Check if saving an item that translates an original content in site's default language
 		// ... Decide whether to retrieve field values of untranslatable fields from the original content item
-		$enable_translation_groups = $cparams->get('enable_translation_groups');
-		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($item->language, 0,2);
-		$get_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
+		$enable_translation_groups = flexicontent_db::useAssociations(); //$cparams->get('enable_translation_groups');
 		
-		// CASE 2. Check if saving an original content item (item's language is site default language)
-		// ... Get item ids of translating items
-		if ($is_content_default_lang && $this->_id) {
-			$query = 'SELECT ie.item_id'
-				.' FROM #__flexicontent_items_ext as ie'
-				.' WHERE ie.lang_parent_id = ' . (int)$this->_id
-				.'  AND ie.item_id <> '.(int)$this->_id; // DO NOT include the item itself in associated translations !!
-			$this->_db->setQuery($query);
-			$assoc_item_ids = $this->_db->loadColumn();
+		$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
+		$is_content_default_lang = $site_default == substr($item->language, 0,2);
+		
+		$get_untraslatable_values = $enable_translation_groups && !$is_content_default_lang;
+		if ($enable_translation_groups)
+		{
+			$langAssocs = $this->getLangAssocs();
+			//}
+			//if ($enable_translation_groups /*&& $is_content_default_lang*/)
+			//{
+			// ... Get item ids of the associated items, so that we save into the untranslatable fields
+			$_langAssocs = $langAssocs;
+			unset($_langAssocs[$this->_id]);
+			$assoc_item_ids = array_keys($_langAssocs);
 		}
 		if (empty($assoc_item_ids)) $assoc_item_ids = array();
 		
@@ -2195,7 +2302,18 @@ class ParentClassItem extends JModelAdmin
 		// ***************************************************************************************************************************
 		// Get item's fields ... and their values (for untranslatable fields the field values from original content item are retrieved
 		// ***************************************************************************************************************************		
-		$fields = $this->getExtrafields($force=true, $get_untraslatable_values ? $item->lang_parent_id : 0, $old_item);
+		$original_content_id = 0;
+		if ($get_untraslatable_values)
+		{
+			foreach($langAssocs as $content_id => $_assoc) {
+				if ($site_default == substr($_assoc->language, 0,2)) {
+					$original_content_id = $content_id;
+					break;
+				}
+			}
+		}
+		JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): '.$original_content_id.' '.print_r($assoc_item_ids, true),'error');
+		$fields = $this->getExtrafields($force=true, $original_content_id, $old_item);
 		
 		
 		// ******************************************************************************************************************
@@ -2226,9 +2344,9 @@ class ParentClassItem extends JModelAdmin
 					$maintain_dbval = true;
 					
 				// UNTRANSLATABLE (CUSTOM) FIELDS: maintain their DB value ...
-				} else if ( $get_untraslatable_values && $field->untranslatable ) {
+				/*} else if ( $get_untraslatable_values && $field->untranslatable ) {
 					$postdata[$field->name] = $field->value;
-					$maintain_dbval = true;
+					$maintain_dbval = true;*/
 					
 				} else if ($field->iscore) {
 					// (posted) CORE FIELDS: if not set maintain their DB value ...
@@ -2484,6 +2602,7 @@ class ParentClassItem extends JModelAdmin
 							// NOTE: item itself is not include in associated translations, no need to check for it and skip it
 							if (count($assoc_item_ids) && $field->untranslatable) {
 								foreach($assoc_item_ids as $t_item_id) {
+									//echo "setting Untranslatable value for item_id: ".$t_item_id ." field_id: ".$field->id."<br/>";
 									$obj->item_id = $t_item_id;
 									if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 									else $rel_query_vals[] = "("
@@ -2633,7 +2752,7 @@ class ParentClassItem extends JModelAdmin
 		// ****************************
 		// Update language Associations
 		// ****************************
-		//$this->saveAssociations($item, $data);
+		$this->saveAssociations($item, $data);
 		
 		
 		// ***********************
@@ -4183,31 +4302,34 @@ class ParentClassItem extends JModelAdmin
 	}
 	
 	
-	function getLangAssocs()
+	function getLangAssocs($id=0)
 	{
-		if ($this->_translations!==null) return $this->_translations;
-		$this->_translations = array();
-		
-		// Make sure we item list is populased and non-empty
-		if ( empty($this->_item) )  return $this->_translations;
+		static $translations = array();
+		if (!$id && !empty($this->_id))
+		{
+			$id = $this->_id;
+		}
+		if (isset($translations[$id])) return $translations[$id];
 		
 		// Get associated translations
-		if ( empty($this->_item->lang_parent_id) )  return $this->_translations;
-		
-		$query = 'SELECT i.id, i.title, i.created, i.modified, ie.lang_parent_id, ie.language as language, ie.language as lang '
-			//. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug '
-			//. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug '
-		  . ' FROM #__content AS i '
-		  . ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id '
-		  . ' WHERE ie.lang_parent_id IN ('.(int)$this->_item->lang_parent_id.')'
-		  ;
+		$query = 'SELECT `key`'
+			. ' FROM #__associations'
+			. ' WHERE id = '. $this->_id .' AND context = "com_content.item"';
 		$this->_db->setQuery($query);
-		$this->_translations = $this->_db->loadObjectList();
+		$assoc_key = $this->_db->loadResult();
+		if (!$assoc_key) return $this->_translations;
+		
+		$query = 'SELECT i.id as id, i.title, i.created, i.modified, i.language as language, i.language as lang '
+			. ' FROM #__content AS i '
+			. ' JOIN #__associations AS a ON i.id=a.id '
+			. ' WHERE a.context = "com_content.item" AND a.`key`= '.$this->_db->Quote($assoc_key);
+		$this->_db->setQuery($query);
+		$translations[$id] = $this->_db->loadObjectList('id');
 		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
-		if ( empty($this->_translations) )  return $this->_translations;
+		if ($id = $this->_id) $this->_translations = $translations[$id];
 		
-		return $this->_translations;
+		return $translations[$id];
 	}
 	
 	
@@ -4364,82 +4486,27 @@ class ParentClassItem extends JModelAdmin
 	}
 	
 	
+	/**
+	 * Method to save language associations
+	 *
+	 * @return  boolean True if successful
+	 */
 	function saveAssociations(&$item, &$data)
 	{
-		$assoc = JLanguageAssociations::isEnabled();
-		if (!$assoc) return true;
-		
 		$item = $item ? $item: $this->_item;
-		$id = $item->id;
+		$context = 'com_content';
 		
-		
-		// **********************************
-		// Prepare / check associations array
-		// **********************************
-		
-		// Unset empty associations from associations array, to avoid save them in the associations table
-		$associations = $data['associations'];
-		foreach ($associations as $tag => $id)
-		{
-			if (empty($id)) unset($associations[$tag]);
-		}
-		
-		// Raise notice that associations should be empty if language of current item is '*' (ALL)
-		$all_language = $item->language == '*';
-		if ($all_language && !empty($associations))
-		{
-			JError::raiseNotice(403, JText::_('COM_CONTACT_ERROR_ALL_LANGUAGE_ASSOCIATED'));
-		}
-		
-		// Make sure that current item id, is the association id of the language of the current item
-		$associations[$item->language] = $item->id;
-		
-		
-		// ***********************
-		// Delete old associations
-		// ***********************
-		
-		$db = JFactory::getDbo();
-		
-		$query = $db->getQuery(true)
-			->delete('#__associations')
-			->where('context=' . $db->quote('com_contact.item'))
-			->where('id IN (' . implode(',', $associations) . ')');
-		$db->setQuery($query);
-		$db->execute();
-		
-		if ($error = $db->getErrorMsg())
-		{
-			$this->setError($error);
-			return false;
-		}
-		
-		
-		// ********************
-		// Add new associations
-		// ********************
-		
-		// Only add language associations if item language is not '*' (ALL)
-		if ($all_language || !count($associations)) return true;
-		
-		$key = md5(json_encode($associations));
-		$query->clear()
-			->insert('#__associations');
-		
-		foreach ($associations as $id)
-		{
-			$query->values($id . ',' . $db->quote('com_content.item') . ',' . $db->quote($key));
-		}
-		
-		$db->setQuery($query);
-		$db->execute();
-
-		if ($error = $db->getErrorMsg())
-		{
-			$this->setError($error);
-			return false;
-		}
-		return true;
+		return flexicontent_db::saveAssociations($item, $data, $context);
 	}
 	
+	
+	/**
+	 * Method to determine if J3.1+ associations should be used
+	 *
+	 * @return  boolean True if using J3 associations; false otherwise.
+	 */
+	public function useAssociations()
+	{
+		return flexicontent_db::useAssociations();
+	}
 }
