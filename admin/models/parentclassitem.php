@@ -4305,11 +4305,16 @@ class ParentClassItem extends JModelAdmin
 	function getLangAssocs($id=0)
 	{
 		static $translations = array();
-		if (!$id && !empty($this->_id))
-		{
-			$id = $this->_id;
-		}
+		
+		$id = !$id ? $this->_id : $id;
+		if (!$id) return array();
+		
+		// Return cached
 		if (isset($translations[$id])) return $translations[$id];
+		
+		// Start with empty array
+		$translations[$id] = array();
+		if ($id = $this->_id) $this->_translations = array();
 		
 		// Get associated translations
 		$query = 'SELECT `key`'
@@ -4317,7 +4322,7 @@ class ParentClassItem extends JModelAdmin
 			. ' WHERE id = '. $this->_id .' AND context = "com_content.item"';
 		$this->_db->setQuery($query);
 		$assoc_key = $this->_db->loadResult();
-		if (!$assoc_key) return $this->_translations;
+		if (!$assoc_key) return $translations[$id];
 		
 		$query = 'SELECT i.id as id, i.title, i.created, i.modified, i.language as language, i.language as lang '
 			. ' FROM #__content AS i '
@@ -4325,8 +4330,8 @@ class ParentClassItem extends JModelAdmin
 			. ' WHERE a.context = "com_content.item" AND a.`key`= '.$this->_db->Quote($assoc_key);
 		$this->_db->setQuery($query);
 		$translations[$id] = $this->_db->loadObjectList('id');
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
+		// Set this object translations if id is same
 		if ($id = $this->_id) $this->_translations = $translations[$id];
 		
 		return $translations[$id];
