@@ -108,11 +108,12 @@ class JFormFieldItem extends JFormField
 		$option = JRequest::getVar('option');
 		$view   = JRequest::getVar('view');
 		
+		$assocs_id  = 0;
 		$type_id    = @$attributes['type_id'];
 		$created_by = @$attributes['created_by'];
 		$language   = @$attributes['language'];
 		
-		if ($language && $option=='com_flexicontent' && $view=='category')
+		if ($language && $option=='com_flexicontent' && $view=='item')
 		{
 			if (!JFactory::getApplication()->isAdmin()) {
 				// FRONTEND, use "id" from request

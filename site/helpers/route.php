@@ -47,21 +47,12 @@ class FlexicontentHelperRoute
 	 */
 	static function _setMenuitems($language = '*')
 	{
-		// J1.5 has no language in menu items
-		if ( !FLEXI_J16GE ) $language = '*';
-		
 		// Return already retrieved data
 		if ( isset(self::$menuitems[$language]) ) return self::$menuitems[$language];
 		
-		// Get user access, this is needed only for J1.5
-		$user_access = null;
-		if (!FLEXI_J16GE && $user_access===null) {
-			$user = JFactory::getUser();
-			$user_access = (int) $user->get('aid');
-		}
-		
 		// Get component
 		$component = JComponentHelper::getComponent('com_flexicontent');
+		
 		
 		// Get menu items pointing to the Flexicontent component
 		// NOTE:
@@ -69,35 +60,27 @@ class FlexicontentHelperRoute
 		//     while JFactory::getApplication('site')->getMenu() will not return the frontend menus
 		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
 		
-		// NOTE:
+		$attribs = array('component_id');
+		$values  = array($component->id);
 		
-		if (!FLEXI_J16GE) {
-			$_menuitems	= $menus->getItems('componentid', $component->id);
+		if ($language != '*') {
+			// Limit to given language and ... to language ALL ('*')
+			$attribs[] = 'language';
+			$values[]  = array($language, '*');
+		} else {
+			// Getting menu items regardless language
+			// A. If language filtering is enabled,  then menu items with currently active language - OR - language '*'
+			// B. If language filtering is disabled, then menu items of any language are returned
 		}
+		$_menuitems = $menus->getItems($attribs, $values);
 		
-		else {
-			$attribs = array('component_id');
-			$values  = array($component->id);
-			
-			if ($language != '*') {
-				// Limit to given language and ... to language ALL ('*')
-				$attribs[] = 'language';
-				$values[]  = array($language, '*');
-			} else {
-				// Getting menu items regardless language
-				// A. If language filtering is enabled,  then menu items with currently active language - OR - language '*'
-				// B. If language filtering is disabled, then menu items of any language are returned
-			}
-			$_menuitems = $menus->getItems($attribs, $values);
-		}
 		
 		// Assign menu item objects to per language array, and also index by menu id
 		self::$menuitems[$language] = array();
 		if ($_menuitems) foreach ($_menuitems as $menuitem)
 		{
-			// In J1.5 filter by access levels of current user
-			// In J2.5+ this is already done by JMenuSite::getItems()
-			if (!FLEXI_J16GE && $menuitem->access > $user_access) continue;
+			// We do not need to check and skip menu items of non-allowed access level, since in J2.5+,
+			// filtering by access levels of current user, is already done by JMenuSite::getItems()
 			
 			// Index by menu id
 			self::$menuitems[$language][$menuitem->id] = $menuitem;
@@ -120,18 +103,8 @@ class FlexicontentHelperRoute
 		$_component_default_menuitem_id = false;
 		$curr_langtag = JFactory::getLanguage()->getTag();  // Current language tag for J2.5+ but not for J1.5
 		
-		
-		//$public_acclevel = !FLEXI_J16GE ? 0 : 1;
-		$user = JFactory::getUser();
-		if (FLEXI_J16GE)
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-		else
-			$aid = (int) $user->get('aid');
-		
-		
 		// NOTE: In J1.5 the static method JSite::getMenu() will give an error, while JFactory::getApplication('site')->getMenu() will not return the frontend menus
 		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-		
 		
 		// Get preference for default menu item
 		$params = JComponentHelper::getParams('com_flexicontent');
@@ -161,14 +134,14 @@ class FlexicontentHelperRoute
 			// Check that (a) it exists and is active (b) points to com_flexicontent
 			if ($menu && @ $menu->query['option']=='com_flexicontent' )
 			{
-				// For J1.5 check access and for J2.5+ check language
-				$item_matches = !FLEXI_J16GE  ?  ($menu->access <= $aid)  :  ($curr_langtag == '*' || in_array($menu->language, array('*', $curr_langtag)) || !JLanguageMultilang::isEnabled());
+				// For J2.5+ check language, for J2.5+ checking access is not needed as it was done already above, by the JMenu::getItem()
+				$item_matches = ($curr_langtag == '*' || in_array($menu->language, array('*', $curr_langtag)) || !JLanguageMultilang::isEnabled());
 				
 				// If matched set default and return it
 				if ($item_matches)  return  $_component_default_menuitem_id = $menu->id;
 				
 				// For J2.5+ we also need to try menu item associations and select the current language item
-				if ( FLEXI_J16GE && $menu->language!='*' && $menu->language!='' && $menu->language!=$curr_langtag )
+				if ( $menu->language!='*' && $menu->language!='' && $menu->language!=$curr_langtag )
 				{
 					require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_menus'.DS.'helpers'.DS.'menus.php');
 					$helper = new MenusHelper();
@@ -210,7 +183,7 @@ class FlexicontentHelperRoute
 		// Get configuration whether to remove SEF language code from URL
 		$plugin = JPluginHelper::getPlugin('system', 'languagefilter');
 		if (!empty($plugin)) {
-			$pluginParams = FLEXI_J16GE ? new JRegistry($plugin->params) : new JParameter($plugin->params);
+			$pluginParams = new JRegistry($plugin->params);
 			self::$add_url_lang = ! $pluginParams->get('remove_default_prefix', 0);
 		} else {
 			self::$add_url_lang = 1;
@@ -266,7 +239,7 @@ class FlexicontentHelperRoute
 				;
 		$db->setQuery($query);
 		$types = $db->loadObjectList('id');
-		foreach ($types as $type) $type->params = FLEXI_J16GE ? new JRegistry($type->attribs) : new JParameter($type->attribs);
+		foreach ($types as $type) $type->params = new JRegistry($type->attribs);
 		
 		return $types;
 	}
@@ -287,7 +260,7 @@ class FlexicontentHelperRoute
 		static $use_language = null;
 		if ($use_language === null)
 		{
-			$use_language = FLEXI_J16GE && JLanguageMultilang::isEnabled();
+			$use_language = JLanguageMultilang::isEnabled();
 			if ($use_language) {
 				self::_buildLanguageLookup();
 			}
@@ -314,7 +287,7 @@ class FlexicontentHelperRoute
 		}
 		
 		// Get language
-		$language = (!FLEXI_J16GE || !$item || @!$item->language) ? $current_language : $item->language;
+		$language = (!$item || @!$item->language) ? $current_language : $item->language;
 		
 		// Get type ID
 		$type_id = ($item && isset($item->type_id))? $item->type_id : 0;
@@ -435,7 +408,7 @@ class FlexicontentHelperRoute
 	/**
 	 * Get routed links for categories
 	 */
-	static function getCategoryRoute($catid, $Itemid = 0, $urlvars = array())
+	static function getCategoryRoute($catid, $Itemid = 0, $urlvars = array(), $category = null)
 	{
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
 		
@@ -447,7 +420,7 @@ class FlexicontentHelperRoute
 		static $use_language = null;
 		if ($use_language === null)
 		{
-			$use_language = FLEXI_J16GE && JLanguageMultilang::isEnabled();
+			$use_language = JLanguageMultilang::isEnabled();
 			if ($use_language) {
 				self::_buildLanguageLookup();
 			}
@@ -463,7 +436,10 @@ class FlexicontentHelperRoute
 		// **************************************
 		
 		// Get language
-		$language = isset($globalcats[$_catid]->language) ? $globalcats[$_catid]->language : $current_language;
+		$language = $category && !empty($category->language) ? $category->language : null;
+		if (!$language) {
+			$language = isset($globalcats[$_catid]->language) ? $globalcats[$_catid]->language : $current_language;
+		}
 		
 		// Get item's parent categores to be used in search a menu item of type category view
 		$parents_ids = array();
@@ -649,7 +625,7 @@ class FlexicontentHelperRoute
 		static $use_language = null;
 		if ($use_language === null)
 		{
-			$use_language = FLEXI_J16GE && JLanguageMultilang::isEnabled();
+			$use_language = JLanguageMultilang::isEnabled();
 			if ($use_language) {
 				self::_buildLanguageLookup();
 			}
@@ -988,7 +964,7 @@ class FlexicontentHelperRoute
 		foreach($component_menuitems as $menuitem)
 		{
 			if ( !isset($menuitem->query) || !isset($menuitem->query['view']) ) continue;  // view not set
-			if ( FLEXI_J16GE && $menuitem->language != $language && $menuitem->language!='*') continue;   // wrong menu item language, neither item's language, nor '*' = ALL
+			if ( $menuitem->language != $language && $menuitem->language!='*') continue;   // wrong menu item language, neither item's language, nor '*' = ALL
 			
 			if ( @$menuitem->query['view'] == 'category' ) {     // CHECK if category menu items ... need to be skipped
 				
@@ -1008,7 +984,7 @@ class FlexicontentHelperRoute
 				// (a) via direct click on the menu item or
 				// (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
 				// (c) they are currently active ...
-				//if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? $menuitem->params : new JParameter($menuitem->params);
+				//if (!isset($menuitem->jparams)) $menuitem->jparams = $menuitem->params;
 				//if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
 			}
 			
@@ -1023,7 +999,7 @@ class FlexicontentHelperRoute
 			$_index_val = $menuitem->query[$_index_name];
 			
 			// Only a specific language menu item can override an existing lookup entry
-			if ( isset(self::$lookup[$language][$view][$_index_val]) && FLEXI_J16GE && $menuitem->language == '*' ) continue;
+			if ( isset(self::$lookup[$language][$view][$_index_val]) && $menuitem->language == '*' ) continue;
 			
 			// Finally set new lookup entry or override existing lookup entry with language specific menu item
 			self::$lookup[$language][$view][$_index_val] = (int) $menuitem->id;

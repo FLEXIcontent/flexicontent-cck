@@ -598,9 +598,6 @@ class FlexicontentModelFileselement extends JModelLegacy
 		if ( isset($ignored['item_id']) ) {
 			$where[] = ' i.id!='. (int)$ignored['item_id'];
 		}
-		if ( isset($ignored['lang_parent_id']) ) {
-			$where[] = ' ie.lang_parent_id!='. (int)$ignored['lang_parent_id'];
-		}
 		
 		$where = ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
 		$groupby = !$count_items  ?  ' GROUP BY i.id'  :  ' GROUP BY f.id';   // file maybe used in more than one fields or ? in more than one values for same field
@@ -609,7 +606,6 @@ class FlexicontentModelFileselement extends JModelLegacy
 		// File field relation sub query
 		$query = 'SELECT '. ($count_items  ?  'f.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
 			. ' FROM #__content AS i'
-			. (isset($ignored['lang_parent_id']) ? ' JOIN #__flexicontent_items_ext as ie ON ie.item_id = i.id' : '')
 			. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $field_type_list .')'
 			. ' JOIN #__flexicontent_files AS f ON f.id=rel.value '. $file_ids_list
@@ -670,9 +666,6 @@ class FlexicontentModelFileselement extends JModelLegacy
 		if ( isset($ignored['item_id']) ) {
 			$where[] = ' i.id!='. (int)$ignored['item_id'];
 		}
-		if ( isset($ignored['lang_parent_id']) ) {
-			$where[] = ' ie.lang_parent_id!='. (int)$ignored['lang_parent_id'];
-		}
 		
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
 		$groupby = !$count_items  ?  ' GROUP BY i.id'  :  ' GROUP BY f.id';   // file maybe used in more than one fields or ? in more than one values for same field
@@ -697,7 +690,6 @@ class FlexicontentModelFileselement extends JModelLegacy
 			// File field relation sub query
 			$query = 'SELECT '. ($count_items  ?  'f.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
 				. ' FROM #__content AS i'
-				. (isset($ignored['lang_parent_id']) ? ' JOIN #__flexicontent_items_ext as ie ON ie.item_id = i.id' : '')
 				. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $this->_db->Quote( $field_type ) .')' . $field_ids_list
 				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE '. $like_str . $file_ids_list

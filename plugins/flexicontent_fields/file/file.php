@@ -1272,8 +1272,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$file_id = $db->loadResult();
 		if (!$file_id)  return true;
 		
-		if ( !$field->untranslatable ) $ignored['item_id'] = $item->id;
-		else $ignored['lang_parent_id'] = $item->lang_parent_id;
+		$ignored['item_id'] = $item->id;
 		
 		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');
 		$fm = new FlexicontentModelFilemanager();

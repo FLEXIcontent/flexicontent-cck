@@ -1770,6 +1770,9 @@ class modFlexicontentHelper
 			$rows = array();
 			foreach($content as $_id) $rows[] = $_rows[$_id];
 			$cat_items_arr[$catid] = $rows;
+			
+			// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
+			flexicontent_db::getOriginalContentItemids($cat_items_arr[$catid]);
 		}
 		
 		

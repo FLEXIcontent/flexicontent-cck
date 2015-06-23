@@ -155,7 +155,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 			// Query the content items
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
-			// Get Original content ids for creating the untranslatable fields
+			// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
 			flexicontent_db::getOriginalContentItemids($this->_data);
 		}
 		

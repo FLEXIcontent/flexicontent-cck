@@ -5978,9 +5978,15 @@ class flexicontent_db
 	}
 	
 	
-	static function getOriginalContentItemids($items, $ids=null)
+	static function getOriginalContentItemids($_items, $ids=null)
 	{
-		if (empty($ids) && empty($items)) return array();
+		if (empty($ids) && empty($_items)) return array();
+		
+		if (is_array($_items))
+			$items = & $_items;
+		else
+			$items = array( & $_items );
+		
 		if (empty($ids))
 		{
 			$ids = array();

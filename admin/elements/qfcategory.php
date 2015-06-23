@@ -107,6 +107,7 @@ class JFormFieldQfcategory extends JFormField
 		$option = JRequest::getVar('option');
 		$view   = JRequest::getVar('view');
 		
+		$assocs_id  = 0;
 		$created_by = @$attributes['created_by'];
 		$language   = @$attributes['language'];
 		
