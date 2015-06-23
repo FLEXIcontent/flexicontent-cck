@@ -869,15 +869,17 @@ class FlexicontentController extends JControllerLegacy
 		// Debuging message
 		//JError::raiseNotice(500, 'IN display()'); // TOREMOVE
 		
+		$jinput = JFactory::getApplication()->input;
+		
 		// Access checking for --items-- viewing, will be handled by the items model, this is because THIS display() TASK is used by other views too
 		// in future it maybe moved here to the controller, e.g. create a special task item_display() for item viewing, or insert some IF bellow
 		
 		// Compatibility check: Layout is form and task is not set:  this is new item submit ...
-		if ( JRequest::getVar('layout', false) == "form" && !JRequest::getVar('task', false)) {
+		if ( $jinput->get('layout', false) == "form" && !$jinput->get('task', false)) {
 			// 0 or 1, will allow browser to store without revalidating, null will let default (Joomla website) HTTP headers, e.g. re-validate
 			JFactory::getSession()->set('fc_cachable', 0, 'flexicontent');
 			
-			JRequest::setVar('task', 'add');
+			$jinput->set('task', 'add');
 			$this->add();
 		}
 		
@@ -885,7 +887,7 @@ class FlexicontentController extends JControllerLegacy
 		else {
 			
 			// AVOID MAKING TOO LARGE: (case 1) SEARCH view or OTHER view with TEXT search active
-			if ( JRequest::getVar('view')=='search' || JRequest::getVar('filter') ) {
+			if ( $jinput->get('view')=='search' || $jinput->get('filter') ) {
 				$cachable = false;
 			}
 			
@@ -913,12 +915,22 @@ class FlexicontentController extends JControllerLegacy
 				foreach($_GET as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
 			}
 			
-			// Workaround user seeing same page after login/logout, pages are still cachable,
-			// just make sure that cache is different after login/logout and per user
-			$user_id = JFactory::getUser()->get('id');
-			if ($user_id) {
-				JRequest::setVar('__fc_user_id__', $user_id);
-				$safeurlparams['__fc_user_id__'] = 'STRING';
+			// If component is serving different pages to logged users, this will avoid
+			// having users seeing same page after login/logout when conservative caching is used
+			if ($userid = JFactory::getUser()->get('id'))
+			{
+				$jinput->set('__user_id__', $userid);
+				$safeurlparams['__user_id__'] = 'STRING';
+			}
+			
+			
+			// If component is serving different pages for mobile devices, this will avoid
+			// having users seeing the same page regardless of being on desktop or mobile
+			$client = JFactory::getApplication()->client;
+			if ($client->mobile)
+			{
+				$jinput->set('__mobile__', 'YES');
+				$safeurlparams['__mobile__'] = 'STRING';
 			}
 			
 			// Moved code for browser's cache control to system plugin to do at the latest possible point
