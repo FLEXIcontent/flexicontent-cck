@@ -201,8 +201,6 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			} else {
 				$this->_data = $rows;
 			}
-			// Get Original content ids for creating some untranslatable fields that have share data (like shared folders)
-			flexicontent_db::getOriginalContentItemids($this->_data);
 		}
 		
 		return $this->_data;
