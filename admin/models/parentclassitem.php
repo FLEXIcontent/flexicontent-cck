@@ -2312,7 +2312,7 @@ class ParentClassItem extends JModelAdmin
 				}
 			}
 		}
-		JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): '.$original_content_id.' '.print_r($assoc_item_ids, true),'error');
+		//JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): '.$original_content_id.' '.print_r($assoc_item_ids, true),'message');
 		$fields = $this->getExtrafields($force=true, $original_content_id, $old_item);
 		
 		

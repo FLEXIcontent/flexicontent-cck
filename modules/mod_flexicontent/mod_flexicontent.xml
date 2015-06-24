@@ -303,9 +303,9 @@
 			<!-- DYNAMIC METHOD -->
 			<field name="" type="separator" default="FLEXI_UMOD_DYNAMIC_SET_TO_STATIC_TO_DISABLE" level="level3" class="dateDynamic" />
 			<field name="behaviour_dates" type="multilist" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE_DESC" toggle_related="1">
-				<option value="0" show_list="dateStatic,dateDataSrc,cDateLims,emptyDates" hide_list="dateDynamic,dynDateOffsets,startOfWeek" refsh_list="date_custom_on,date_custom_fld">FLEXI_STATIC_USE_SPECIFIC_DATES</option>
+				<option value="0" show_list="dateStatic,dateDataSrc,cDateLims,emptyDates" hide_list="dateDynamic,dynDateOffsets,startOfWeek" refsh_list="date_custom_on,date_custom_fld">FLEXI_UMOD_STATIC_USE_SPECIFIC_DATES</option>
 				<group label="FLEXI_DYNAMIC_CMP_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
-					<option value="1" show_list="dateDynamic,dynDateOffsets,date_custom_on" force_list="dateDataSrc,cDateLims,emptyDates" hide_list="dateStatic,startOfWeek">FLEXI_DATE_OFFSET</option>
+					<option value="1" show_list="dateDynamic,dynDateOffsets,date_custom_on" force_list="dateDataSrc,cDateLims,emptyDates" hide_list="dateStatic,startOfWeek">FLEXI_UMOD_DATE_OFFSET_OF_COMPARE_WITH</option>
 				</group>
 				<group label="FLEXI_DYNAMIC_SAME_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
 					<option value="8" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_SAME_DAY</option>
@@ -361,21 +361,17 @@
 			</field>
 			
 			<!-- DYNAMIC BEHAVIOUR -->
-			<field name="date_compare" type="radio" default="0" label="FLEXI_COMPARE_DATE_DATA_WITH" description="FLEXI_COMPARE_DATE_DATA_WITH_DESC" class="dateDynamic btn-group group-fcinfo">
-				<option value="0">FLEXI_CURRENT_SERVER_TIME</option>
-				<option value="1">FLEXI_CURRENT_ITEM_DATE_ABOVE</option>
-			</field>
 			<field name="week_start" type="radio" default="0" label="FLEXI_FIRST_DAY_OF_WEEK" description="FLEXI_FIRST_DAY_OF_WEEK_DESC" class="dateDynamic startOfWeek btn-group group-fcinfo">
 				<option value="0">FLEXI_FIRST_DAY_SUNDAY</option>
 				<option value="5">FLEXI_FIRST_DAY_MONDAY</option>
 			</field>
 			
 			<!-- STATIC BEHAVIOUR or CUSTOM OFFSET FOR DYNAMIC BEHAVIOUR -->
-			<field name="" type="separator" default="Custom offsets added to DATE DATA, e.g. -5 d (minus 5 days)" level="level4" class="dynDateOffsets" />
-			<field name="" type="separator" default="Compare to specific dates (YYYY-MM-DD) e.g. 2015-01-23" level="level4" class="staticCustomDates" />
+			<field name="" type="separator" default="Custom offsets that shift the DYNAMIC date, e.g. -5 d (minus 5 days)" level="level4" class="dynDateOffsets" />
+			<field name="" type="separator" default="Compare to specific dates (YYYY-MM-DD) e.g. 2015-01-23" level="level4" class="staticCustomDates dateStatic" />
 			
-			<field name="bdate" type="fcdate" size="50" label="FLEXI_BDATE" description="FLEXI_BDATE_DESC" class="method_dates_ops dateStatic cDateLims" />
-			<field name="edate" type="fcdate" size="50" label="FLEXI_EDATE" description="FLEXI_EDATE_DESC" class="method_dates_ops dateStatic cDateLims" />
+			<field name="bdate" type="fcdate" size="50" label="FLEXI_UMOD_BDATE_FROM" description="FLEXI_UMOD_BDATE_FROM_DESC" placeholder="No limit" class="method_dates_ops dateStatic cDateLims" />
+			<field name="edate" type="fcdate" size="50" label="FLEXI_UMOD_EDATE_TO" description="FLEXI_UMOD_EDATE_TO_DESC" placeholder="No limit" class="method_dates_ops dateStatic cDateLims" />
 			<field name="raw_bdate" type="radio" default="0" label="FLEXI_TREAT_BDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC" class="method_dates_ops dateStatic btn-group group-fcinfo">
 				<option value="0">FLEXI_SPECIFIC_DATE</option>
 				<option value="1">FLEXI_SQL_DATE_EXPRESSION</option>
@@ -383,6 +379,10 @@
 			<field name="raw_edate" type="radio" default="0" label="FLEXI_TREAT_EDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC" class="method_dates_ops dateStatic btn-group group-fcinfo">
 				<option value="0">FLEXI_SPECIFIC_DATE</option>
 				<option value="1">FLEXI_SQL_DATE_EXPRESSION</option>
+			</field>
+			<field name="date_compare" type="radio" default="0" label="FLEXI_UMOD_COMPARE_DATE_DATA_WITH_DYNAMIC_DATE" description="FLEXI_UMOD_COMPARE_DATE_DATA_WITH_DYNAMIC_DATE_DESC" class="dateDynamic btn-group group-fcinfo">
+				<option value="0">FLEXI_CURRENT_SERVER_TIME</option>
+				<option value="1">FLEXI_CURRENT_ITEM_DATE_ABOVE</option>
 			</field>
 			
 			

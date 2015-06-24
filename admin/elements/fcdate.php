@@ -45,13 +45,10 @@ class JFormFieldFcdate extends JFormField
 	public function getInput()
 	{
 		$document = JFactory::getDocument();
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		$css  = '.calendar { vertical-align:middle; }';
 		$document->addStyleDeclaration($css);
@@ -60,17 +57,28 @@ class JFormFieldFcdate extends JFormField
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		$format = '%Y-%m-%d';
+		
 		$attribs = (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="18" ';
+		
 		if ($class = @$attributes['class']) {
 			$attribs .= 'class="'.$class.'"';
 		}
 		
- 		//return JHTML::_('calendar', $value, $fieldname, $element_id, $format, $attribs);
- 		return $this->calendar($value, $fieldname, $element_id, $format, $attribs);
+		if ($placeholder = @$attributes['placeholder']) {
+			$attribs .= 'placeholder="'.JText::_($placeholder).'"';
+		}
+		
+		$calendar_class = '';
+		if ($calendar_class = @$attributes['calendar_class']) {
+			$attribs .= 'placeholder="'.$calendar_class.'"';
+		}
+		
+		//return JHTML::_('calendar', $value, $fieldname, $element_id, $format, $attribs);
+ 		return $this->calendar($value, $fieldname, $element_id, $format, $attribs, $calendar_class);
 	}
 	
 	
-	function calendar($value, $name, $id, $format = '%Y-%m-%d', $attribs = null)
+	function calendar($value, $name, $id, $format = '%Y-%m-%d', $attribs = null, $calendar_class)
 	{
 		JHTML::_('behavior.calendar'); //load the calendar behavior
 
@@ -87,7 +95,7 @@ class JFormFieldFcdate extends JFormField
     });});');
 
 		return '<input type="text" name="'.$name.'" id="'.$id.'" value="'.htmlspecialchars($value, ENT_COMPAT, 'UTF-8').'" '.$attribs.' />'.
-				 '<img class="calendar" src="'.JURI::root(true).'/templates/system/images/calendar.png" alt="calendar" id="'.$id.'_img" />';
+				 '<img class="calendar '.$calendar_class.'" src="'.JURI::root(true).'/templates/system/images/calendar.png" alt="calendar" id="'.$id.'_img" />';
 	}
 
 }

@@ -135,8 +135,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
-		$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/stateselector.js' );
-
+		
 		$js = "jQuery(document).ready(function(){";
 		if ($filter_cats) {
 			$js .= "jQuery('.col_cats').each(function(){ jQuery(this).addClass('yellow'); });";

@@ -917,20 +917,25 @@ class FlexicontentController extends JControllerLegacy
 			
 			// If component is serving different pages to logged users, this will avoid
 			// having users seeing same page after login/logout when conservative caching is used
-			if ($userid = JFactory::getUser()->get('id'))
+			if ( $userid = JFactory::getUser()->get('id') )
 			{
-				$jinput->set('__user_id__', $userid);
-				$safeurlparams['__user_id__'] = 'STRING';
+				$jinput->set('__fc_user_id__', $userid);
+				$safeurlparams['__fc_user_id__'] = 'STRING';
 			}
 			
+			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+			$use_mobile_layouts  = $cparams->get('use_mobile_layouts', 0);
+			$tabletSameAsDesktop = $cparams->get('force_desktop_layout', 0) == 1;
 			
 			// If component is serving different pages for mobile devices, this will avoid
 			// having users seeing the same page regardless of being on desktop or mobile
-			$client = JFactory::getApplication()->client;
-			if ($client->mobile)
+			$mobileDetector = flexicontent_html::getMobileDetector();  //$client = JFactory::getApplication()->client; $isMobile = $client->mobile;
+			$isMobile = $mobileDetector->isMobile();
+			$isTablet = $mobileDetector->isTablet();
+			if ( $use_mobile_layouts && $isMobile && (!$isTablet || !$tabletSameAsDesktop) )
 			{
-				$jinput->set('__mobile__', 'YES');
-				$safeurlparams['__mobile__'] = 'STRING';
+				$jinput->set('__fc_client__', 'Mobile' );
+				$safeurlparams['__fc_client__'] = 'STRING';
 			}
 			
 			// Moved code for browser's cache control to system plugin to do at the latest possible point

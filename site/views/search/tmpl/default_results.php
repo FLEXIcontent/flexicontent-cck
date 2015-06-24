@@ -25,6 +25,13 @@ foreach ($this->results as $i => $result)
 flexicontent_html::calculateItemMarkups($fcitems, $this->params);
 
 
+// *********************************************************
+// Get Original content ids for creating some untranslatable
+// fields that have share data (like shared folders)
+// *********************************************************
+flexicontent_db::getOriginalContentItemids($fcitems);
+
+
 // *****************************************************
 // Get image configuration for FLEXIcontent result items
 // *****************************************************

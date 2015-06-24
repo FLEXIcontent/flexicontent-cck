@@ -152,8 +152,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field-->
 			
-			<field name="" type="separator" default="FLEXI_NATIVE_TRANSLATIONS" label="" level="level3" />
-		
+			<!--field name="" type="separator" default="FLEXI_NATIVE_TRANSLATIONS" label="" level="level3" /-->
 			<!--field name="enable_translation_groups" type="radio" default="1" label="FLEXI_ENABLE_TRANSLATION_GROUPS" description="FLEXI_ENABLE_TRANSLATION_GROUPS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
