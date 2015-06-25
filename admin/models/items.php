@@ -284,25 +284,22 @@ class FlexicontentModelItems extends JModelLegacy
 		$user   = JFactory::getUser();
 		$fcform = JRequest::getInt('fcform', 0);
 		
-		$filter_type = $fcform ? JRequest::getVar('filter_type')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',		'filter_type',   false, 'array' );
-		
+		// Check if extra columns already calculated
 		if ( $this->_extra_cols !== null) return $this->_extra_cols;
+		$this->_extra_cols = array();
 		
 		// Get the extra fields from COMPONENT OR per type if TYPE FILTER is active
-		if ( !empty($filter_type) )
+		$types = $this->getTypesFromFilter();
+		if ( count($types)==1 ) 
 		{
-			JArrayHelper::toInteger($filter_type, null);
-			$query = 'SELECT t.attribs FROM #__flexicontent_types AS t WHERE t.id IN (' . implode( ',', $filter_type) .')';
-			$this->_db->setQuery($query);
-			$type_attribs = $this->_db->loadResult();
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+			$type = reset($types);
+			$im_extra_fields = $type->params->get("items_manager_extra_fields");
 			
-			$tparams = new JRegistry($type_attribs);
-			$im_extra_fields = $tparams->get("items_manager_extra_fields");
 			$item_instance = new stdClass();
+			$item_instance->type_id = $type->id;
 		} else {
-			$item_instance = null;
 			$im_extra_fields = $this->cparams->get("items_manager_extra_fields");
+			$item_instance = null;
 		}
 		
 		$im_extra_fields = trim($im_extra_fields);
@@ -354,27 +351,22 @@ class FlexicontentModelItems extends JModelLegacy
 		$user   = JFactory::getUser();
 		$fcform = JRequest::getInt('fcform', 0);
 		
-		$filter_type = $fcform ? JRequest::getVar('filter_type')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',		'filter_type',   false, 'array' );
+		// Check if custom filters were already calculated
+		if ( $this->_custom_filters !== null) return $this->_custom_filters;
+		$this->_custom_filters = array();
 		
-		if ( $this->_custom_filters !== null) {
-			return $this->_custom_filters;
-		}
-		
-		// Get the extra filters from COMPONENT OR per type if TYPE FILTER is active
-		if ( !empty($filter_type) )
+		// Get the extra fields from COMPONENT OR per type if TYPE FILTER is active
+		$types = $this->getTypesFromFilter();
+		if ( count($types)==1 ) 
 		{
-			JArrayHelper::toInteger($filter_type, null);
-			$query = 'SELECT t.attribs FROM #__flexicontent_types AS t WHERE t.id IN (' . implode( ',', $filter_type) .')';
-			$this->_db->setQuery($query);
-			$type_attribs = $this->_db->loadResult();
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+			$type = reset($types);
+			$im_custom_filters = $type->params->get("items_manager_custom_filters");
 			
-			$tparams = new JRegistry($type_attribs);
-			$im_custom_filters = $tparams->get("items_manager_custom_filters");
 			$item_instance = new stdClass();
+			$item_instance->type_id = $type->id;
 		} else {
-			$item_instance = null;
 			$im_custom_filters = $this->cparams->get("items_manager_custom_filters");
+			$item_instance = null;
 		}
 		
 		$im_custom_filters = trim($im_custom_filters);
@@ -2538,6 +2530,40 @@ class FlexicontentModelItems extends JModelLegacy
 	{
 		return flexicontent_html::getTypesList( $type_ids, $check_perms, $published);
 	}
+	
+	
+	/**
+	 * Method to get attributes and other data of types in types filter
+	 * 
+	 * @return array
+	 * @since 1.5
+	 */
+	function getTypesFromFilter()
+	{
+		$app    = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		$user   = JFactory::getUser();
+		$fcform = JRequest::getInt('fcform', 0);
+		
+		static $types = null;
+		if ($types !== null) return $types;
+		
+		$filter_type = $fcform ? JRequest::getVar('filter_type')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',		'filter_type',   false, 'array' );
+		JArrayHelper::toInteger($filter_type, null);
+		
+		if ( empty($filter_type) ) return array();
+		
+		// Get the extra fields from COMPONENT OR per type if TYPE FILTER is active
+		$types = flexicontent_html::getTypesList( $filter_type, $check_perms=false, $published=false);
+		foreach($types as $type_id => $type)
+		{
+			$types[$type_id]->params = new JRegistry($type->attribs);
+		}
+		
+		return $types;
+	}	
+	
 	
 	
 	/**

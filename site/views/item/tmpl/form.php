@@ -351,7 +351,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	<?php
 	$field = $this->fields['title'];
 	$field_description = $field->description ? $field->description :
-		JText::_(FLEXI_J16GE ? $this->form->getField('title')->__get('description') : 'TIPTITLEFIELD');
+		JText::_(FLEXI_J16GE ? $this->form->getField('title')->description : 'TIPTITLEFIELD');
 	$label_tooltip = 'class="'.$tip_class.' flexi_label" title="'.flexicontent_html::getToolTip(trim($field->label, ':'), $field_description, 0, 1).'"';
 	?>
 	<span class="label-fcouter">
@@ -402,7 +402,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 
 if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 	<?php
-	$field_description = JText::_(FLEXI_J16GE ? $this->form->getField('alias')->__get('description') : 'ALIASTIP');
+	$field_description = JText::_(FLEXI_J16GE ? $this->form->getField('alias')->description : 'ALIASTIP');
 	$label_tooltip = 'class="'.$tip_class.' flexi_label" title="'.flexicontent_html::getToolTip(trim(JText::_( 'FLEXI_ALIAS' ), ':'), $field_description, 0, 1).'"';
 	?>
 	<span class="label-fcouter">
@@ -454,7 +454,7 @@ if ($typeid==0) : ob_start();  // type ?>
 	<?php
 	$field = $this->fields['document_type'];
 	$field_description = $field->description ? $field->description :
-		JText::_(FLEXI_J16GE ? $this->form->getField('type_id')->__get('description') : 'FLEXI_TYPE_DESC');
+		JText::_(FLEXI_J16GE ? $this->form->getField('type_id')->description : 'FLEXI_TYPE_DESC');
 	$label_tooltip = 'class="'.$tip_class.' flexi_label" title="'.flexicontent_html::getToolTip(trim(@$field->label ? $field->label : JText::_( 'FLEXI_TYPE' ), ':'), $field_description, 0, 1).'"';
 	?>
 	<span class="label-fcouter">
@@ -484,7 +484,7 @@ if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item
 	<?php
 	$field = $this->fields['state'];
 	$field_description = $field->description ? $field->description :
-		JText::_(FLEXI_J16GE ? $this->form->getField('state')->__get('description') : 'FLEXI_STATE_DESC');
+		JText::_(FLEXI_J16GE ? $this->form->getField('state')->description : 'FLEXI_STATE_DESC');
 	$label_tooltip = 'class="'.$tip_class.' flexi_label" title="'.flexicontent_html::getToolTip(trim(@$field->label ? $field->label : JText::_( 'FLEXI_STATE' ), ':'), $field_description, 0, 1).'"';
 	?>
 	<span class="label-fcouter">
@@ -857,14 +857,12 @@ if ($typeid && $this->params->get('usepublicationdetails_fe', 1)) : // timezone_
 		// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
 		$site_zone = JFactory::getApplication()->getCfg('offset');
 		$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
-		if (FLEXI_J16GE) {
-			$tz = new DateTimeZone( $user_zone );
-			$tz_offset = $tz->getOffset(new JDate()) / 3600;
-		} else {
-			$tz_offset = $site_zone;
-		}
+		
+		$tz = new DateTimeZone( $user_zone );
+		$tz_offset = $tz->getOffset(new JDate()) / 3600;
 		$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
-		if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
+		
+		$tz_info .= ' ('.$user_zone.')';
 		$msg = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
 		echo sprintf( $alert_box, '', 'info', 'fc-nobgimage', $msg );
 		?>
@@ -1067,7 +1065,7 @@ if ( $typeid && $this->params->get('usedisplaydetails_fe') ) : ob_start(); ?>
 			<!--legend><?php echo JText::_($label); ?></legend-->
 					
 			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-				<?php if ( $this->params->get('allowdisablingcomments_fe') && $fieldsetname=='advanced' && $field->__get('fieldname')=='comments')  continue; ?>
+				<?php if ( $this->params->get('allowdisablingcomments_fe') && $fieldsetname=='advanced' && $field->fieldname=='comments')  continue; ?>
 				<div class="fcclear"></div>
 				<?php echo $field->label; ?>
 				<div class="container_fcfield">
@@ -1125,7 +1123,7 @@ if ( $typeid && $this->perms['cantemplates'] && $this->params->get('selecttheme_
 				?>
 				<fieldset class="panelform params_set">
 					<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
-						$fieldname =  $field->__get('fieldname');
+						$fieldname =  $field->fieldname;
 						$value = $tmpl->params->getValue($fieldname, $groupname, $this->item->itemparams->get($fieldname));
 						echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 							$tmpl->params->getLabel($fieldname, $groupname));
@@ -1189,10 +1187,6 @@ if ($this->fields && $typeid) :
 				( empty($field->html) && ($field->formhidden==4 || in_array($field->field_type, $hide_ifempty_fields)) )
 			) continue;
 			
-			if ( $field->field_type=='maintext' && isset($all_tab_fields['text']) ) {
-				ob_start();
-			}
-			
 			// check to SKIP (hide) field e.g. description field ('maintext' field type), alias field etc
 			if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
 			
@@ -1208,6 +1202,14 @@ if ($this->fields && $typeid) :
 					echo "\n<div class='fcclear'></div>\n";
 				}
 				continue;
+			}
+			
+			
+			// Check if 'Description' field will NOT be placed via fields manager placement/ordering,
+			// but instead it will be inside a custom TAB or inside the 'Description' TAB (default)
+			if ( $field->field_type=='maintext' && isset($all_tab_fields['text']) )
+			{
+				ob_start();
 			}
 			
 			// Decide label classes, tooltip, etc
@@ -1235,7 +1237,7 @@ if ($this->fields && $typeid) :
 			<div class='fcclear'></div>
 			
 			<?php if($display_label_form): ?>
-				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
+				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
 					<?php echo $field->label; ?>
 				</label>
 				<?php if($display_label_form==2):  ?>
@@ -1320,7 +1322,8 @@ if ($this->fields && $typeid) :
 			</div>
 			
 		<?php
-			if ( $field->field_type=='maintext' && isset($all_tab_fields['text']) ) {
+			if ( $field->field_type=='maintext' && isset($all_tab_fields['text']) )
+			{
 				$captured['text'] = ob_get_clean();
 			}
 		}
@@ -1343,9 +1346,10 @@ $captured['fields_manager'] = ob_get_clean();
 
 
 
-// *******************************************
-// Find fields not congfigured to be displayed
-// *******************************************
+// ***********************************************
+// ANY field not found inside the 'captured' ARRAY,
+// must be a field not configured to be displayed
+// ***********************************************
 $duplicate_display = array();
 $_tmp = $tab_fields;
 foreach($_tmp as $tabname => $fieldnames) {

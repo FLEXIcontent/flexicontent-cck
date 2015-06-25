@@ -1248,7 +1248,7 @@ class FlexicontentFields
 		}
 		
 		// Get Content Type parameters if not already retrieved
-		$type_id = @$item->type_id;
+		$type_id = $item ? $item->type_id : 0;
 		if ($type_id && ( !isset($tinfo[$type_id]) || !isset($tparams[$type_id]) ) )
 		{
 			$tinfo[$type_id] = $tparams[$type_id] = null;

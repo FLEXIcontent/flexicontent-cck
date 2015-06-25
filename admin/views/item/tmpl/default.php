@@ -226,7 +226,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				$field = isset($this->fields['title']) ? $this->fields['title'] : false;
 				if ($field) {
 					$field_description = $field->description ? $field->description :
-						JText::_($this->form->getField('title')->__get('description'));
+						JText::_($this->form->getField('title')->description);
 					$label_tooltip = 'class="'.$tip_class.' label pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 				} else {
 					$label_tooltip = 'class="label pull-left label-fcinner label-toplevel"';
@@ -276,7 +276,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			
 			<div class="fcclear"></div>
 			<?php
-				$field_description = JText::_($this->form->getField('alias')->__get('description'));
+				$field_description = JText::_($this->form->getField('alias')->description);
 				$label_tooltip = 'class="'.$tip_class.' label pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 			?>
 			<span class="label-fcouter">
@@ -398,7 +398,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
 				if ($field) {
 					$field_description = $field->description ? $field->description :
-						JText::_($this->form->getField('type_id')->__get('description'));
+						JText::_($this->form->getField('type_id')->description);
 					$label_tooltip = 'class="'.$tip_class.' label pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 				} else {
 					$label_tooltip = 'class="label pull-left label-fcinner label-toplevel"';
@@ -442,7 +442,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				$field = isset($this->fields['state']) ? $this->fields['state'] : false;
 				if ($field) {
 					$field_description = $field->description ? $field->description :
-						JText::_($this->form->getField('state')->__get('description'));
+						JText::_($this->form->getField('state')->description);
 					$label_tooltip = 'class="'.$tip_class.' label pull-left label-fcinner label-toplevel" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 				} else {
 					$label_tooltip = 'class="label pull-left label-fcinner label-toplevel"';
@@ -539,7 +539,7 @@ $tabCnt[$tabSetCnt] = 0;
 	$field = $this->fields['text'];
 	if ($field) {
 		$field_description = $field->description ? $field->description :
-			JText::_($this->form->getField('state')->__get('description'));
+			JText::_($this->form->getField('text')->description);
 		$_desc = flexicontent_html::getToolTip(null, $field_description, 0, 1);
 	} else {
 		$_desc = '';
@@ -553,7 +553,7 @@ $tabCnt[$tabSetCnt] = 0;
 
 	<!-- Description tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-file-2">
-		<h3 class="tabberheading" title="<?php echo $_desc; ?>"> <?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?> </h3>
+		<h3 class="tabberheading hasTooltip" title="<?php echo $_desc; ?>"> <?php echo $field->label ? $field->label : JText::_( 'FLEXI_DESCRIPTION' ); ?> </h3>
 	
 			<?php
 			// Decide label classes, tooltip, etc
@@ -580,7 +580,8 @@ $tabCnt[$tabSetCnt] = 0;
 			$container_class = "container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
 			?>
 			
-			<?php /*if ($display_label_form): ?>
+			<?php /* description field label will be USED as TAB handle title, with field's description as Tooltip */
+			/*if ($display_label_form): ?>
 				<span class="label-fcouter">
 				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
 					<?php echo $field->label; ?>
@@ -1298,7 +1299,7 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 						?>
 						<fieldset class="panelform">
 							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
-								$fieldname =  $field->__get('fieldname');
+								$fieldname =  $field->fieldname;
 								$value = $tmpl->params->getValue($fieldname, $groupname, $this->row->itemparams->get($fieldname));
 								echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 									$tmpl->params->getLabel($fieldname, $groupname)); ?>

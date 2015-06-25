@@ -3458,16 +3458,21 @@ class flexicontent_html
 		$type_ids_list = false;
 		if ( !empty($type_ids) && is_array($type_ids) )
 		{
-			foreach ($type_ids as $i => $type_id)
-				$type_ids[$i] = (int) $type_id;
+			JArrayHelper::toInteger($type_ids, null);
 			$type_ids_list = implode(',', $type_ids);
 		}
+		
+		$where = array();
+		if ($published)
+			$where[] = 'published = 1';
+		if ($type_ids_list)
+			$where[] = 'id IN ('. $type_ids_list .' ) ';
+		
 		$db = JFactory::getDBO();
 		$query = 'SELECT * '
 				. ' FROM #__flexicontent_types'
-				. ' WHERE published = ' . ($published ? 1 : 0) . ( $type_ids_list ? ' AND id IN ('. $type_ids_list .' ) ' : '' )
-				. ' ORDER BY name ASC'
-				;
+				. ($where ? ' WHERE ' . implode(' AND ', $where) : '')
+				. ' ORDER BY name ASC';
 		$db->setQuery($query);
 		$types = $db->loadObjectList('id');
 		if ($check_perms)
