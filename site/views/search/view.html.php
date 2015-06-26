@@ -62,7 +62,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Get various data from the model
 		$areas	=  $this->get('areas');
 		$state	=  $this->get('state');
-		$searchword = $state->get('keyword');
+		$searchword     = $state->get('keyword');
+		$searchphrase   = $state->get('match');
+		$searchordering = $state->get('ordering');
 		
 		
 		// ***********************************************************
@@ -443,8 +445,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		
 		// *** Selector of non-FLEXIcontent Results Ordering
-		if($show_searchordering = $params->get('show_searchordering', 1)) {
-			$default_searchordering = $params->get('default_searchordering', 'newest');
+		if($show_searchordering = $params->get('show_searchordering', 1))
+		{
 			// built select lists
 			$orders = array();
 			$orders[] = JHTML::_('select.option',  'newest', JText::_( 'FLEXI_ADV_NEWEST_FIRST' ) );
@@ -453,25 +455,24 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$orders[] = JHTML::_('select.option',  'alpha', JText::_( 'FLEXI_ADV_ALPHA' ) );
 			$orders[] = JHTML::_('select.option',  'category', JText::_( 'FLEXI_ADV_SEARCH_SEC_CAT' ) );
 			$lists['ordering'] = JHTML::_('select.genericlist', $orders, 'o',
-				'class="fc_field_filter use_select2_lib"', 'value', 'text', $state->get('ordering', $default_searchordering), 'ordering' );
+				'class="fc_field_filter use_select2_lib"', 'value', 'text', $searchordering, 'ordering' );
 		}		
 		
 		
 		// *** Selector for usage of Search Text
-		if($show_searchphrase = $params->get('show_searchphrase', 1)) {
-			$default_searchphrase = $params->get('default_searchphrase', 'all');
-			$searchphrase = JRequest::getWord('searchphrase', JRequest::getWord('p', $default_searchphrase));
+		if($show_searchphrase = $params->get('show_searchphrase', 1))
+		{
 			$searchphrase_names = array('natural'=>'FLEXI_NATURAL_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT', 
 				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'exact'=>'FLEXI_EXACT_PHRASE');
 
-			$searchphrases = array();
+			$phrases = array();
 			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name) {
 				$_obj = new stdClass();
 				$_obj->value = $searchphrase_value;
 				$_obj->text  = $searchphrase_name;
-				$searchphrases[] = $_obj;
+				$phrases[] = $_obj;
 			}
-			$lists['searchphrase'] = JHTML::_('select.genericlist', $searchphrases, 'p',
+			$lists['searchphrase'] = JHTML::_('select.genericlist', $phrases, 'p',
 				'class="fc_field_filter use_select2_lib"', 'value', 'text', $searchphrase, 'searchphrase', $_translate=true);
 			
 			/*$lists['searchphrase']  = '<ul class="fc_field_filter fc_checkradio_group">';
