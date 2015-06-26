@@ -721,14 +721,13 @@ class plgSystemFlexisystem extends JPlugin
 		if ($option==$this->extension && $fc_cachable!==null) {
 			// Try to avoid browser warning message "Page has expired or similar"
 			// This should turning off the 'must-revalidate' directive in the 'Cache-Control' header
-			JResponse::allowCache(true);
-			JResponse::setHeader('Pragma', '');
+			JResponse::allowCache(false);
+			JResponse::setHeader('Pragma', 'no-cache');
 			
-			// if not cacheable the browser cache should be different per user
-			JResponse::setHeader('Cache-Control', !$fc_cachable ? 'private' : 'public');
+			// Ask intermediary (proxy, etc) caches not to cache the response
+			JResponse::setHeader('Cache-Control', 'private');
 		}
 	}
-
 	
 	
 	/**

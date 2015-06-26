@@ -566,5 +566,5 @@ body .alert.fcinlineblock {
 	display: inline-block;
 }
 
-#flexicontent div.input-append > input { margin-right:0px !important; border-top-right-radius:0px !important;  border-bottom-right-radius:0px !important; }
-#flexicontent div.input-prepend > input { margin-left:0px !important; border-top-left-radius:0px !important;  border-bottom-left-radius:0px !important; }
+#flexicontent div.input-append > input { margin:0px !important; border-top-right-radius:0px !important;  border-bottom-right-radius:0px !important; }
+#flexicontent div.input-prepend > input { margin:0px !important; border-top-left-radius:0px !important;  border-bottom-left-radius:0px !important; }
