@@ -730,7 +730,7 @@ form div fieldset > img {
 	min-width: 60%;
 	width: 72%;
 }
-div fieldset td input[type="text"], div fieldset td textarea {
+div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"], div fieldset td textarea {
 	min-width: 80%;
 }
 #flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input,

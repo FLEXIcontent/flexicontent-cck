@@ -46,25 +46,29 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		<input name="view" type="hidden" value="search" />
 		<span class="fc_filter_html fc_text_search">
 		<?php
+		$append_buttons = ( !$button || (!$button_as && in_array($button_pos, array('left', 'right'))) ) && ( !$direct || (!$direct_as && in_array($direct_pos, array('left', 'right'))) );
+		
 		$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
-		$text_search_class  = 'fc_text_filter';
+		$text_search_class  = !$append_buttons ? 'fc_text_filter' : '';
 		$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' fc_label_internal') : ' fc_label_internal';
 		//$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
 		$search_inner_width = JText::_($params->get('search_inner_width', 20));
 		$search_inner_prompt = JText::_($params->get('search_inner_prompt', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
 		$width = $params->get('width', 10);
 		$maxchars = $params->get('maxchars', 200);
+		
 		//$output = '<input name="q" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
-		$output = '<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
-			id="mod_search_searchword-'.$module->id.'" class="'.$text_search_class.'"
-			data-fc_label_text="'.$search_inner_prompt.'" name="q" size="'.$search_inner_width.'" maxlength="'.$maxchars.'" value="" />';
+		$output = '
+			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
+				id="mod_search_searchword-'.$module->id.'" class="'.$text_search_class.'"
+				data-fc_label_text="'.$search_inner_prompt.'" name="q" size="'.$search_inner_width.'" maxlength="'.$maxchars.'" value="" />';
 		
 		// Search GO button
 		if ($button) :
 			if ($button_as) :
-				$button = '<input type="image" value="'.$button_text.'" class="fc_filter_button '.$flexi_button_class_go.'" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
+				$button = '<input type="image" title="'.$button_text.'" class="'.(!$append_buttons ? 'fc_filter_button' : '').' hasTooltip '.$flexi_button_class_go.'" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
 			else :
-				$button = '<input type="submit" value="'.$button_text.'" class="fc_filter_button '.$flexi_button_class_go.'" onclick="this.form.searchword.focus();"/>';
+				$button = '<input type="submit" value="'.$button_text.'" class="'.(!$append_buttons ? 'fc_filter_button' : '').' '.$flexi_button_class_go.'" onclick="this.form.searchword.focus();"/>';
 			endif;
 		else :
 			/* Hidden submit button so that pressing Enter will work */
@@ -79,14 +83,16 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 			default      : $output = $button.' '.$output; break;
 		endswitch;
 		
-		
 		// Search DIRECT (lucky) button
 		if ($direct) :
 			if ($direct_as) :
-				$direct = '<input type="image" value="'.$direct_text.'" class="fc_filter_button '.$flexi_button_class_direct.'" src="'.JURI::base().$direct_image.'" onclick="this.form.direct.value=1; this.form.searchword.focus();"/>';
-				$direct .= '<input type="hidden" name="direct" value="" />'; // workaround for image button not being able to submit a value
+				// hidden field, is workaround for image button not being able to submit a value
+				$direct = '
+					<input type="hidden" name="direct" value="" />
+					<input type="image" title="'.$direct_text.'" class="'.(!$append_buttons ? 'fc_filter_button' : '').' hasTooltip '.$flexi_button_class_direct.'" src="'.JURI::base().$direct_image.'" onclick="this.form.direct.value=1; this.form.searchword.focus();"/>
+					';
 			else :
-			 $direct = '<input type="submit" name="direct" value="'.$direct_text.'" class="fc_filter_button '.$flexi_button_class_direct.'" onclick="this.form.searchword.focus();"/>';
+			 $direct = '<input type="submit" name="direct" value="'.$direct_text.'" class="'.(!$append_buttons ? 'fc_filter_button' : '').' '.$flexi_button_class_direct.'" onclick="this.form.searchword.focus();"/>';
 			endif;
 			
 			switch ($direct_pos) :
@@ -98,6 +104,8 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 			endswitch;
 		endif;
 		
+		// If using button in same row try to create bootstrap btn input append
+		$output = $append_buttons ? '<span class="btn-wrapper input-append">'.$output.'</span>' : $output;
 		
 		// Display the optional buttons and advanced search box
 		?>

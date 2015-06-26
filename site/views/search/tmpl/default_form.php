@@ -134,46 +134,51 @@ $r = 0;
 				</td>
 				<td class="fc_search_option_cell" style="position:relative;">
 					<?php
+					$append_buttons = true;
+					
 					$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
-					$text_search_class  = 'fc_text_filter';
+					$text_search_class  = !$append_buttons ? 'fc_text_filter' : '';
 					$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' fc_label_internal') : ' fc_label_internal';
 					$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
 					?>
 					<span class="fc_filter_html">
-						<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
-							data-fc_label_text="<?php echo $text_search_label; ?>" name="q" size="30" maxlength="120" 
-							id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" />
-
-						<?php if ( $show_searchphrase ) echo $this->lists['searchphrase']; ?>
-						
-						<?php
-						$ignoredwords = JRequest::getVar('ignoredwords');
-						$shortwords = JRequest::getVar('shortwords');
-						$shortwords_sanitize = JRequest::getVar('shortwords_sanitize');
-						$shortwords .= $shortwords_sanitize ? ' '.$shortwords_sanitize : '';
-						$min_word_len = JFactory::getApplication()->getUserState( JRequest::getVar('option').'.min_word_len', 0 );
-						$msg = '';
-						$msg .= $ignoredwords ? JText::_('FLEXI_WORDS_IGNORED_MISSING_COMMON').': <b>'.$ignoredwords.'</b>' : '';
-						$msg .= $ignoredwords && $shortwords ? ' <br/> ' : '';
-						$msg .= $shortwords ? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) .': <b>'.$shortwords.'</b>' : '';
-						?>
-						<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>					
-						
-						<?php $button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple'; ?>
-						<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
-							<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
-						</button>
+						<?php echo $append_buttons ? '<span class="btn-wrapper input-append">' : ''; ?>
+							<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
+								data-fc_label_text="<?php echo $text_search_label; ?>" name="q" size="30" maxlength="120" 
+								id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" />
+							
+							<?php
+							$ignoredwords = JRequest::getVar('ignoredwords');
+							$shortwords = JRequest::getVar('shortwords');
+							$shortwords_sanitize = JRequest::getVar('shortwords_sanitize');
+							$shortwords .= $shortwords_sanitize ? ' '.$shortwords_sanitize : '';
+							$min_word_len = JFactory::getApplication()->getUserState( JRequest::getVar('option').'.min_word_len', 0 );
+							$msg = '';
+							$msg .= $ignoredwords ? JText::_('FLEXI_WORDS_IGNORED_MISSING_COMMON').': <b>'.$ignoredwords.'</b>' : '';
+							$msg .= $ignoredwords && $shortwords ? ' <br/> ' : '';
+							$msg .= $shortwords ? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) .': <b>'.$shortwords.'</b>' : '';
+							?>
+							<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>					
+							
+							<?php $button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple'; ?>
+							<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
+								<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
+							</button>
+							
+						<?php echo $append_buttons ? '</span>' : ''; ?>
 						
 						<?php if ($autodisplayadvoptions) {
 							$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
 							$checked_class = $use_advsearch_options ? 'btn-primary' : '';
 							$use_advsearch_options_ff = '&nbsp;';
 							$use_advsearch_options_ff .= '<input type="checkbox" id="use_advsearch_options" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="jQuery(this).next().toggleClass(\'btn-primary\');" />';
-							$use_advsearch_options_ff .= '<label id="use_advsearch_options_lbl" class="btn '.$checked_class.'" for="use_advsearch_options">';
-							$use_advsearch_options_ff .= '<span class="icon-list"></span>'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS');
+							$use_advsearch_options_ff .= '<label id="use_advsearch_options_lbl" class="btn '.$checked_class.' hasTooltip" for="use_advsearch_options" title="'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS').'">';
+							$use_advsearch_options_ff .= '<span class="icon-list"></span>'.JText::_('FLEXI_SEARCH_ADVANCED');
 							$use_advsearch_options_ff .= '</label>';
 							echo $use_advsearch_options_ff;
 						} ?>
+						
+						<?php if ( $show_searchphrase ) echo $this->lists['searchphrase']; ?>
 						
 						<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 					</span>

@@ -119,16 +119,6 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 .fc_filter_html .input-prepend {
 	margin:0px 4px 0px 0px;
 }
-.fc_filter_html .input-append button,
-.fc_filter_html .input-prepend button {
-	margin-top:6px;
-	height:29px;
-}
-.fc_filter_html .input-append button.btn,
-.fc_filter_html .input-prepend button.btn {
-	margin-top:3px;
-	height:29px;
-}
 
 /* removing filter choices */
 .fc_field_filter .fc_delall_filters {
@@ -250,6 +240,13 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_line .fc_filter_html {
 	clear: none;
 	width: 80%;
+}
+
+/* defaults for filter's inner elements */
+.fc_filter_html > *,
+.fc_filter_html > * {
+	vertical-align: middle;
+	margin: 2px 0 2px 4px;
 }
 
 /* Clear filter label from filter html*/
