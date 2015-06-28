@@ -993,7 +993,6 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/elastislide';
-				$document->addStyleSheet($framework_path.'/css/demo.css');
 				$document->addStyleSheet($framework_path.'/css/style.css');
 				$document->addStyleSheet($framework_path.'/css/elastislide.css');
 				
@@ -4007,17 +4006,18 @@ class flexicontent_upload
 	 * @return string The file extension
 	 * @since 1.5
 	 */
-	static function getExt($file) {
-		$len = strlen($file);
+	static function getExt($file)
+	{
 		$params = JComponentHelper::getParams( 'com_flexicontent' );
-		$exts = $params->get('upload_extensions');
-		$exts = str_replace(' ', '', $exts);
-		$exts = explode(",", $exts);
-		//$exts = array('pdf', 'odt', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'tar.gz');
+		
+		$allowed_exts = $params->get('upload_extensions', 'bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics');
+		$allowed_exts = preg_split("/[\s]*,[\s]*/", $allowed_exts);
+		
 		$ext = '';
+		$len = strlen($file);
 		for($i=$len-1;$i>=0;$i--) {
 			$c = $file[$i];
-			if($c=='.' && in_array($ext, $exts)) {
+			if($c=='.' && in_array($ext, $allowed_exts)) {
 				return $ext;
 			}
 			$ext = $c . $ext;
@@ -4054,33 +4054,43 @@ class flexicontent_upload
 			//return false;
 			$file['name'] = date('Y-m-d-H-i-s').".".flexicontent_upload::getExt($file['name']);
 		}
+		
+		
+		// ***************************************
+		// Check if the image file type is allowed
+		// ***************************************
+		
+		$format = strtolower(flexicontent_upload::getExt($file['name']));
+		
+		$allowed_exts = $params->get('upload_extensions', 'bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics');
+		$allowed_exts = preg_split("/[\s]*,[\s]*/", $allowed_exts);
 
-		//check if the imagefiletype is valid
-		$format 	= strtolower(flexicontent_upload::getExt($file['name']));
-
-		$allowable = explode( ',', $params->get( 'upload_extensions' ));
-		foreach($allowable as $a => $allowable_ext) $allowable[$a] = strtolower($allowable_ext);
+		foreach($allowed_exts as $a => $allowed_ext) $allowed_exts[$a] = strtolower($allowed_ext);
 		
 		$ignored = explode(',', $params->get( 'ignore_extensions' ));
 		foreach($ignored as $a => $ignored_ext) $ignored[$a] = strtolower($ignored_ext);
-		if (!in_array($format, $allowable) && !in_array($format,$ignored))
+		if (!in_array($format, $allowed_exts) && !in_array($format,$ignored))
 		{
 			$err = 'FLEXI_WARNFILETYPE';
 			return false;
 		}
-
-		//Check filesize
+		
+		
+		// **************
+		// Check filesize
+		// **************
+		
 		$maxSize = (int) $params->get( 'upload_maxsize', 0 );
 		if ($maxSize > 0 && (int) $file['size'] > $maxSize)
 		{
 			$err = 'FLEXI_WARNFILETOOLARGE';
 			return false;
 		}
-
+		
+		
 		$imginfo = null;
-
 		$images = explode( ',', $params->get( 'image_extensions' ));
-
+		
 		if($params->get('restrict_uploads', 1) ) {
 
 			if(in_array($format, $images)) { // if its an image run it through getimagesize
@@ -4118,7 +4128,13 @@ class flexicontent_upload
 				}
 			}
 		}
-		$xss_check =  JFile::read($file['tmp_name'],false,256);
+		
+		
+		// ***************************
+		// Check fof XSS safe contents
+		// ***************************
+		
+		$xss_check = JFile::read($file['tmp_name'], false, 256);
 		$html_tags = array('abbr','acronym','address','applet','area','audioscope','base','basefont',
 			'bdo','bgsound','big','blackface','blink','blockquote','body','bq','br','button','caption',
 			'center','cite','code','col','colgroup','comment','custom','dd','del','dfn','dir','div','dl','dt',
@@ -4128,17 +4144,20 @@ class flexicontent_upload
 			'noscript','nosmartquotes','object','ol','optgroup','option','param','plaintext','pre','rt','ruby','s','samp',
 			'script','select','server','shadow','sidebar','small','spacer','span','strike','strong','style','sub','sup','table',
 			'tbody','td','textarea','tfoot','th','thead','title','tr','tt','ul','var','wbr','xml','xmp','!DOCTYPE', '!--');
-		foreach($html_tags as $tag) {
+		foreach($html_tags as $tag)
+		{
 			// A tag is '<tagname ', so we need to add < and a space or '<tagname>'
-			if(stristr($xss_check, '<'.$tag.' ') || stristr($xss_check, '<'.$tag.'>')) {
+			if(stristr($xss_check, '<'.$tag.' ') || stristr($xss_check, '<'.$tag.'>'))
+			{
 				$err = 'FLEXI_WARNIEXSS';
 				return false;
 			}
 		}
-
+		
 		return true;
 	}
-
+	
+	
 	/**
 	* Sanitize the image file name and return an unique string
 	*

@@ -102,44 +102,164 @@ class FlexicontentModelItems extends JModelLegacy
 	function __construct()
 	{
 		parent::__construct();
-
+		
 		$app     = JFactory::getApplication();
-		$option  = JRequest::getVar('option');
-		$view    = JRequest::getVar('view');
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+		$fcform  = $jinput->get('fcform', 0, 'int');
 		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		
+		$p = $option.'.'.$view.'.';
+		
+		
+		// ***********************************************************
+		// Ordering: filter_order_type, filter_order, filter_order_Dir
+		// ***********************************************************
 		
 		$default_order     = $this->cparams->get('items_manager_order', 'i.ordering');
 		$default_order_dir = $this->cparams->get('items_manager_order_dir', 'ASC');
 		
-		$filter_order_type = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_type',	'filter_order_type', 1, 'int' );
-		$filter_order      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 'filter_order', $default_order, 'cmd' );
-		$filter_order_Dir  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
+		$filter_order_type = $fcform ? $jinput->get('filter_order_type', 1, 'int')  :  $app->getUserStateFromRequest( $p.'filter_order_type',	'filter_order_type', 1, 'int' );
+		$filter_order      = $fcform ? $jinput->get('filter_order', $default_order)         :  $app->getUserStateFromRequest( $p.'filter_order', 'filter_order', $default_order, 'cmd' );
+		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir) :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
 		
 		// Filter order is selected via current setting of filter_order_type selector
 		$filter_order	= ($filter_order_type && ($filter_order == 'i.ordering')) ? 'catsordering' : $filter_order;
 		$filter_order	= (!$filter_order_type && ($filter_order == 'catsordering')) ? 'i.ordering' : $filter_order;
-		JRequest::setVar( 'filter_order', $filter_order );
-		JRequest::setVar( 'filter_order_Dir', $filter_order_Dir );
+		$jinput->set( 'filter_order', $filter_order );
+		$jinput->set( 'filter_order_Dir', $filter_order_Dir );
 		
-		$filter_cats      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',	'filter_cats', '', 'int' );
-		$filter_subcats   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_subcats',	'filter_subcats', 1, 'int' );
-		if ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering')) {
-			JRequest::setVar( 'filter_subcats',	0 );
+		$this->setState('filter_order_type', $filter_order_type);
+		$this->setState('filter_order', $filter_order);
+		$this->setState('filter_order_Dir', $filter_order_Dir);
+		
+		$app->setUserState($p.'filter_order_type', $filter_order_type);
+		$app->setUserState($p.'filter_order', $filter_order);
+		$app->setUserState($p.'filter_order_Dir', $filter_order_Dir);
+		
+		
+		
+		// **************
+		// view's Filters
+		// **************
+		
+		// Category filtering
+		$filter_cats        = $fcform ? $jinput->get('filter_cats',        '', 'int')  :  $app->getUserStateFromRequest( $p.'filter_cats',        'filter_cats',       '',  'int' );
+		$filter_subcats     = $fcform ? $jinput->get('filter_subcats',     1,  'int')  :  $app->getUserStateFromRequest( $p.'filter_subcats',     'filter_subcats',     1,  'int' );
+		$filter_catsinstate = $fcform ? $jinput->get('filter_catsinstate', 1,  'int')  :  $app->getUserStateFromRequest( $p.'filter_catsinstate', 'filter_catsinstate', 1,  'int' );
+		if ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering'))
+		{
+			$jinput->set( 'filter_subcats',	0 );
 		}
 		
-		$limit      = $app->getUserStateFromRequest( $option.'.'.$view.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $app->getUserStateFromRequest( $option.'.'.$view.'.limitstart', 'limitstart', 0, 'int' );
+		$this->setState('filter_cats', $filter_cats);
+		$this->setState('filter_subcats', $filter_subcats);
+		$this->setState('filter_catsinstate', $filter_catsinstate);
+		
+		$app->setUserState($p.'filter_cats', $filter_cats);
+		$app->setUserState($p.'filter_subcats', $filter_subcats);
+		$app->setUserState($p.'filter_catsinstate', $filter_catsinstate);
+		
+		
+		// Various filters
+		$filter_tag    = $fcform ? $jinput->get('filter_tag',    false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_tag',    'filter_tag',    false, 'array');
+		$filter_lang	 = $fcform ? $jinput->get('filter_lang',   false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_lang',   'filter_lang',   false, 'array');
+		$filter_type   = $fcform ? $jinput->get('filter_type',   false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_type',   'filter_type',   false, 'array');
+		$filter_author = $fcform ? $jinput->get('filter_author', false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_author', 'filter_author', false, 'array');
+		$filter_state  = $fcform ? $jinput->get('filter_state',  false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_state',  'filter_state',  false, 'array');
+		$filter_access = $fcform ? $jinput->get('filter_access', false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_access', 'filter_access', false, 'array');
+		
+		if (!is_array($filter_tag))    $filter_tag    = strlen($filter_tag)    ? array($filter_tag)    : array();
+		if (!is_array($filter_lang))   $filter_lang   = strlen($filter_lang)   ? array($filter_lang)   : array();
+		if (!is_array($filter_type))   $filter_type   = strlen($filter_type)   ? array($filter_type)   : array();
+		if (!is_array($filter_author)) $filter_author = strlen($filter_author) ? array($filter_author) : array(); // Support for ZERO author id
+		if (!is_array($filter_state))  $filter_state  = strlen($filter_state)  ? array($filter_state)  : array();
+		if (!is_array($filter_access)) $filter_access = strlen($filter_access) ? array($filter_access) : array();
+		
+		$this->setState('filter_tag', $filter_tag);
+		$this->setState('filter_lang', $filter_lang);
+		$this->setState('filter_type', $filter_type);
+		$this->setState('filter_author', $filter_author);
+		$this->setState('filter_state', $filter_state);
+		$this->setState('filter_access', $filter_access);
+		
+		$app->setUserState($p.'filter_tag', $filter_tag);
+		$app->setUserState($p.'filter_lang', $filter_lang);
+		$app->setUserState($p.'filter_type', $filter_type);
+		$app->setUserState($p.'filter_author', $filter_author);
+		$app->setUserState($p.'filter_state', $filter_state);
+		$app->setUserState($p.'filter_access', $filter_access);
 
+		
+		// Date filters
+		$date	 				= $fcform ? $jinput->get('date',      1,  'int')  :  $app->getUserStateFromRequest( $p.'date',      'date',      1,   'int' );
+		$startdate	 	= $fcform ? $jinput->get('startdate', '', 'cmd')  :  $app->getUserStateFromRequest( $p.'startdate', 'startdate', '',  'cmd' );
+		$enddate	 		= $fcform ? $jinput->get('enddate',   '', 'cmd')  :  $app->getUserStateFromRequest( $p.'enddate',   'enddate',   '',  'cmd' );
+		
+		$this->setState('date', $date);
+		$this->setState('startdate', $startdate);
+		$this->setState('enddate', $enddate);
+		
+		$app->setUserState($p.'date', $date);
+		$app->setUserState($p.'startdate', $startdate);
+		$app->setUserState($p.'enddate', $enddate);
+		
+		
+		// Item ID filter
+		$filter_id  = $fcform ? $jinput->get('filter_id', '', 'int')  :  $app->getUserStateFromRequest( $p.'filter_id',  'filter_id',  '',  'int' );
+		$filter_id  = $filter_id ? $filter_id : '';  // needed to make text input field be empty
+		
+		$this->setState('filter_id', $filter_id);
+		$app->setUserState($p.'filter_id', $filter_id);
+		
+		
+		// File ID filter
+		$filter_fileid  = $fcform ? $jinput->get('filter_fileid', 0, 'int')  :  $app->getUserStateFromRequest( $p.'filter_fileid',  'filter_fileid',  0,  'int' );
+		
+		$this->setState('filter_fileid', $filter_fileid);
+		$app->setUserState($p.'filter_fileid', $filter_fileid);
+		
+		
+		// Text search
+		$scope  = $fcform ? $jinput->get('scope',  1,  'int')     :  $app->getUserStateFromRequest( $p.'scope',   'scope',   1,   'int' );
+		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
+		
+		$this->setState('scope', $scope);
+		$this->setState('search', $search);
+		
+		$app->setUserState($p.'scope', $scope);
+		$app->setUserState($p.'search', $search);
+		
+		// Get custom filters
+		$this->getCustomFilts();
+		
+		
+		
+		// *****************************
+		// Pagination: limit, limitstart
+		// *****************************
+		
+		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
+		
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
+		$jinput->set( 'limitstart',	$limitstart );
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
-
-		$array = JRequest::getVar('cid',  0, '', 'array');
+		
+		$app->setUserState($p.'limit', $limit);
+		$app->setUserState($p.'limitstart', $limitstart);
+		
+		
+		// For some model function that use single id
+		$array = $jinput->get('cid', array(0), 'array');
 		$this->setId((int)$array[0]);
 	}
-
+	
+	
 	/**
 	 * Method to set the Items identifier
 	 *
@@ -151,9 +271,11 @@ class FlexicontentModelItems extends JModelLegacy
 		// Set id and wipe data
 		$this->_id	 = $id;
 		$this->_data = null;
+		$this->_total= null;
 		$this->_extra_cols = null;
 	}
-
+	
+	
 	/**
 	 * Method to get item data
 	 *
@@ -164,8 +286,11 @@ class FlexicontentModelItems extends JModelLegacy
 	{
 		static $tconfig = array();
 		
-		$task = JRequest::getCmd('task');
-		$cid  = JRequest::getVar('cid', array());
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$task    = $jinput->get('task', '', 'cmd');
+		$cid     = $jinput->get('cid', array(), 'array');
+		
 		$print_logging_info = $this->cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
@@ -213,12 +338,12 @@ class FlexicontentModelItems extends JModelLegacy
 			foreach($query_ids as $item_id) {
 				$item = $_data[$item_id];
 				
-				$item->cats = preg_split("/[\s]*,[\s]*/", $item->relcats);
+				$item->cats = $item->relcats ? preg_split("/[\s]*,[\s]*/", $item->relcats) : array();
 				foreach ($item->cats as $item_cat) {
 					if ($item_cat) $this->_catids[$item_cat] = 1;
 				}
 				
-				$item->tags = preg_split("/[\s]*,[\s]*/", $item->taglist);
+				$item->tags = $item->taglist ? preg_split("/[\s]*,[\s]*/", $item->taglist) : array();
 				foreach ($item->tags as $item_tag) {
 					if ($item_tag) $this->_tagids[$item_tag] = 1;
 				}
@@ -278,11 +403,7 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function getExtraCols()
 	{
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
 		$user   = JFactory::getUser();
-		$fcform = JRequest::getInt('fcform', 0);
 		
 		// Check if extra columns already calculated
 		if ( $this->_extra_cols !== null) return $this->_extra_cols;
@@ -345,11 +466,15 @@ class FlexicontentModelItems extends JModelLegacy
 	
 	function getCustomFilts()
 	{
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
-		$user   = JFactory::getUser();
-		$fcform = JRequest::getInt('fcform', 0);
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+		$fcform  = $jinput->get('fcform', 0, 'int');
+		
+		$user= JFactory::getUser();
+		
+		$p = $option.'.'.$view.'.';
 		
 		// Check if custom filters were already calculated
 		if ( $this->_custom_filters !== null) return $this->_custom_filters;
@@ -392,12 +517,22 @@ class FlexicontentModelItems extends JModelLegacy
 		$allowed_field_types = array_flip(array('select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage'));
 		foreach($custom_filters as $filter)
 		{
-			if ( !isset($allowed_field_types[$filter->field_type]) ) {
+			if ( !isset($allowed_field_types[$filter->field_type]) )
+			{
 				continue;
 			}
 			FlexicontentFields::loadFieldConfig($filter, $item_instance);
-			$filter->value = $app->getUserStateFromRequest( $option.'.'.$view.'filter_'.$filter->id,	'filter_'.$filter->id, array(), 'array' );
-			if ( count($filter->value)==1 && !strlen(reset($filter->value)) ) $filter->value = array();
+			
+			// Since the filter values, may or may not be an array, we need to use 'array' as filter
+			$filter->value = $fcform ? $jinput->get('filter_'.$filter->id, null, 'array')  :  $app->getUserStateFromRequest( $p.'filter_'.$filter->id,	'filter_'.$filter->id, null, 'array');
+			
+			// Force value to be array
+			if ( !is_array($filter->value) )  $filter->value = strlen($filter->value) ? array($filter->value) : array();
+			// Convert array having a single zero length string, to array()
+			if ( count($filter->value)==1 && !strlen(reset($filter->value)) )  $filter->value = array();
+			
+			$this->setState('filter_'.$filter->id, $filter->value);
+			$app->setUserState($p.'filter_'.$filter->id, $filter->value);
 		}
 		
 		$this->_custom_filters = & $custom_filters;
@@ -414,8 +549,15 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function renderFiltersHTML()
 	{
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		
 		$allowed_field_types = array_flip(array('select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage'));
 		$formName ='adminForm';
+		
+		// Set view to category before rendering the filters HTML
+		$view   = $jinput->get('view');
+		$jinput->set('view', 'category');
 		
 		foreach($this->_custom_filters as $filter)
 		{
@@ -433,7 +575,7 @@ class FlexicontentModelItems extends JModelLegacy
 			$filter->parameters->set( 'display_filter_as', 0 );
 			$filter->parameters->set( 'display_label_filter', -1 );
 			$filter->parameters->set( 'label_filter_css', 'label label-info' );
-			$filter->parameters->set( 'filter_extra_attribs', ' onchange="Joomla.submitform()" ' );
+			$filter->parameters->set( 'filter_extra_attribs', ' onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" ' );
 			
 			// Check for error during getting indexed field elements
 			if ( !$elements ) {
@@ -448,10 +590,10 @@ class FlexicontentModelItems extends JModelLegacy
 				continue;
 			}
 			
-			JRequest::setVar('view', 'category');
 			FlexicontentFields::createFilter($filter, $filter->value, $formName, $elements);
-			JRequest::setVar('view', 'items');
 		}
+		// Restore view
+		$jinput->set('view', $view);
 	}
 	
 	
@@ -607,9 +749,12 @@ class FlexicontentModelItems extends JModelLegacy
 	{
 		if (!$rows || !count($rows)) return;
 		
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		
+		$typeid       = $jinput->get('typeid', 1, 'int');
+		$default_cat  = $jinput->get('default_cat', 0, 'int');
 		$default_lang = flexicontent_html::getSiteDefaultLang();
-		$typeid = JRequest::getVar('typeid',1);
-		$default_cat = (int)JRequest::getVar('default_cat', '');
 		
 		// Get invalid cats, to avoid using them during binding, this is only done once
 		$session = JFactory::getSession();
@@ -786,14 +931,10 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function _buildQuery( $query_ids=false )
 	{
-		$app     = JFactory::getApplication();
-		$option  = JRequest::getCmd( 'option' );
-		$view    = JRequest::getVar('view');
-		$fcform  = JRequest::getInt('fcform', 0);
-		
 		// Get the WHERE and ORDER BY clauses for the query
 		$extra_joins = "";
-		if ( !$query_ids ) {
+		if ( !$query_ids )
+		{
 			$where		= $this->_buildContentWhere($extra_joins);
 			$orderby	= $this->_buildContentOrderBy();
 		}
@@ -801,12 +942,12 @@ class FlexicontentModelItems extends JModelLegacy
 		$lang  = 'ie.language AS lang, ie.lang_parent_id, ';
 		$lang .= 'CASE WHEN ie.lang_parent_id=0 THEN i.id ELSE ie.lang_parent_id END AS lang_parent_id, ';
 		
-		$filter_tag 		= $fcform ? JRequest::getVar('filter_tag')   : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_tag',		'filter_tag',    false, 'array' );
-		$filter_state   = $fcform ? JRequest::getVar('filter_state') : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',	'filter_state',  false, 'array' );
+		$filter_tag 		= $this->getState( 'filter_tag' );
+		$filter_state   = $this->getState( 'filter_state' );
 		
-		$filter_cats    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',    'filter_cats',     '',  'int' );
-		$filter_subcats = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_subcats', 'filter_subcats',  1,   'int' );
-		$filter_order   = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',   'filter_order',    '',  'cmd' );
+		$filter_cats    = $this->getState( 'filter_cats' );
+		$filter_subcats = $this->getState( 'filter_subcats' );
+		$filter_order   = $this->getState( 'filter_order' );
 		
 		$nullDate = $this->_db->Quote($this->_db->getNullDate());
 		$nowDate  = $this->_db->Quote( JFactory::getDate()->toSql() );
@@ -851,8 +992,9 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		}
 		
-		$scope  = $app->getUserStateFromRequest( $option.'.'.$view.'.scope', 			'scope', '', 'int' );
-		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 		'search', '', 'string' );
+		$scope  = $this->getState( 'scope' );
+		$search = $this->getState( 'search' );
+		
 		$use_tmp = !$query_ids && (!$search || $scope!=2);
 		$tmp_only = $use_tmp && (!$search || $scope!=4);
 		$query .= ""
@@ -901,13 +1043,9 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function _buildContentOrderBy()
 	{
-		$app     = JFactory::getApplication();
-		$option  = JRequest::getVar('option');
-		$view    = JRequest::getVar('view');
-		
-		$filter_order_type= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_type',	'filter_order_type', 0, 'int' );
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 'filter_order', '', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_order_type= $this->getState( 'filter_order_type' );
+		$filter_order     = $this->getState( 'filter_order' );
+		$filter_order_Dir = $this->getState( 'filter_order_Dir' );
 		
 		if ($filter_order == 'ie.lang_parent_id') {
 			$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir .", i.id ASC";
@@ -931,13 +1069,9 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function _buildContentWhere(& $extra_joins = "")
 	{
-		$app     = JFactory::getApplication();
-		$option  = JRequest::getVar('option');
-		$view    = JRequest::getVar('view');
 		$session = JFactory::getSession();
 		$user    = JFactory::getUser();
 		$perms   = FlexicontentHelperPerm::getPerm();
-		$fcform   = JRequest::getInt('fcform', 0);
 		
 		
 		// ***********************************
@@ -955,7 +1089,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// ************************************************************************
 		
 		// CASE 1: listing items using a file
-		$filter_fileid = JRequest::getInt('filter_fileid', 0);
+		$filter_fileid = $this->getState( 'filter_fileid' );
 		if ($filter_fileid)
 		{
 			$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
@@ -972,28 +1106,33 @@ class FlexicontentModelItems extends JModelLegacy
 		// Get item list filters
 		// *********************
 		
-		$filter_tag 		= $fcform ? JRequest::getVar('filter_tag')    : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_tag',    'filter_tag',    false, 'array' );
-		$filter_lang    = $fcform ? JRequest::getVar('filter_lang')   : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_lang',   'filter_lang',   false, 'array' );
-		$filter_type 		= $fcform ? JRequest::getVar('filter_type')   : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',   'filter_type',   false, 'array' );
-		$filter_author	= $fcform ? JRequest::getVar('filter_author') : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author', false, 'array' );
-		$filter_state   = $fcform ? JRequest::getVar('filter_state')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',  'filter_state',  false, 'array' );
-		$filter_access  = $fcform ? JRequest::getVar('filter_access') : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access', 'filter_access', '',    'string' );
+		// various filters (mostly multi-value)
+		$filter_tag 		= $this->getState( 'filter_tag' );
+		$filter_lang    = $this->getState( 'filter_lang' );
+		$filter_type 		= $this->getState( 'filter_type' );
+		$filter_author	= $this->getState( 'filter_author' );
+		$filter_state   = $this->getState( 'filter_state' );
+		$filter_access  = $this->getState( 'filter_access' );
 		
-		$filter_cats 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',	'filter_cats', '', 'int' );
-		$filter_subcats	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_subcats',	'filter_subcats', 1, 'int' );
-		$filter_catsinstate = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_catsinstate',	'filter_catsinstate', 1, 'int' );
-		$filter_id	 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_id', 		'filter_id', '', 'int' );
-		if (!is_array($filter_author) && strlen($filter_author)) $filter_author = array((int)$filter_author); // support for ZERO author id
+		// category related filters
+		$filter_cats        = $this->getState( 'filter_cats' );
+		$filter_subcats     = $this->getState( 'filter_subcats' );
+		$filter_catsinstate = $this->getState( 'filter_catsinstate' );
 		
-		$scope     = $app->getUserStateFromRequest( $option.'.'.$view.'.scope', 			'scope', '', 'int' );
-		$search    = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 		'search', '', 'string' );
+		// filter id
+		$filter_id = $this->getState( 'filter_id' );
+		
+		// text search and search scope
+		$scope     = $this->getState( 'scope' );
+		$search    = $this->getState( 'search' );
 		$search    = trim( JString::strtolower( $search ) );
-		$date      = $app->getUserStateFromRequest( $option.'.'.$view.'.date', 			'date', 	 1, 	'int' );
-		$startdate = $app->getUserStateFromRequest( $option.'.'.$view.'.startdate', 	'startdate', '', 	'cmd' );
-		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $app->setUserState( $option.'.'.$view.'.startdate', '' ); }
+		
+		// date filters
+		$date      = $this->getState( 'date' );
+		$startdate = $this->getState( 'startdate' );
+		$enddate   = $this->getState( 'enddate' );
+		
 		$startdate = trim( JString::strtolower( $startdate ) );
-		$enddate   = $app->getUserStateFromRequest( $option.'.'.$view.'.enddate', 		'enddate',	 '', 	'cmd' );
-		if ($enddate == JText::_('FLEXI_TO')) { $enddate = $app->setUserState( $option.'.'.$view.'.enddate', '' ); }
 		$enddate   = trim( JString::strtolower( $enddate ) );
 		
 		
@@ -1242,7 +1381,9 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function copyitems($cid, $keeptags = 1, $prefix, $suffix, $copynr = 1, $lang = null, $state = null, $method = 1, $maincat = null, $seccats = null, $type_id = null, $access = null)
 	{
-		$app = JFactory::getApplication();
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		
 		$dbprefix = $app->getCfg('dbprefix');
 		
 		$use_versioning = $this->cparams->get('use_versioning', 1);
@@ -1282,8 +1423,8 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		
 		// Get if translation is to be performed, 1: FLEXI_DUPLICATEORIGINAL,  2: FLEXI_USE_JF_DATA,  3: FLEXI_AUTO_TRANSLATION,  4: FLEXI_FIRST_JF_THEN_AUTO
-		if ($method == 99) {   // 
-			$translate_method = JRequest::getVar('translate_method',1);
+		if ($method == 99) {
+			$translate_method = $jinput->get('translate_method', 1, 'int');
 		} else {
 			$translate_method = 0;
 		}
@@ -1802,9 +1943,7 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function move($direction, $ord_catid, $prev_order)
 	{
-		$app     = JFactory::getApplication();
-		$option  = JRequest::getVar('option');
-		$view    = JRequest::getVar('view');
+		$app = JFactory::getApplication();
 		
 		// Every state group has different ordering
 		$row = JTable::getInstance('flexicontent_items', '');
@@ -1839,9 +1978,10 @@ class FlexicontentModelItems extends JModelLegacy
 			break;
 		}
 		
-		$filter_order_type= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_type',	'filter_order_type', 0, 'int' );
+		$filter_order_type= $this->getState( 'filter_order_type' );
+		$filter_order     = $this->getState( 'filter_order' );
+		$filter_order_Dir = $this->getState( 'filter_order_Dir' );
 		
-		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 		$direction = strtolower($filter_order_Dir) == 'desc' ? - $direction : $direction;
 		
 		if ( !$filter_order_type )
@@ -1968,11 +2108,9 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function saveorder($cid = array(), $order, $ord_catid=array(), $prev_order=array())
 	{
-		$app     = JFactory::getApplication();
-		$option  = JRequest::getVar('option');
-		$view    = JRequest::getVar('view');
+		$app = JFactory::getApplication();
 		
-		$filter_order_type= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_type',	'filter_order_type', 0, 'int' );
+		$filter_order_type = $this->getState( 'filter_order_type' );
 		
 		$state_grp_arr   = array(1=>'published', 0=>'unpublished', 2=>'archived', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
 		$state_where_arr = array(
@@ -2540,16 +2678,10 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function getTypesFromFilter()
 	{
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
-		$user   = JFactory::getUser();
-		$fcform = JRequest::getInt('fcform', 0);
-		
 		static $types = null;
 		if ($types !== null) return $types;
 		
-		$filter_type = $fcform ? JRequest::getVar('filter_type')  : $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type',		'filter_type',   false, 'array' );
+		$filter_type = $this->getState( 'filter_type' );
 		JArrayHelper::toInteger($filter_type, null);
 		
 		if ( empty($filter_type) ) return array();
@@ -2832,46 +2964,4 @@ class FlexicontentModelItems extends JModelLegacy
 		return $filedata;
 	}
 	
-	
-	// FLEXIaccess behaviour: GET ALL EDITABLE ITEMS and CATEGORIES, SLOW IN LARGE websites e.g. > 2000 items
-	function faccess_items_editable_where(& $where)
-	{
-		$canEdit    = FAccess::checkUserElementsAccess($user->gmid, 'edit');
-		$canEditOwn = FAccess::checkUserElementsAccess($user->gmid, 'editown');
-		if (!@$canEdit['content']) { // first exclude the users allowed to edit all items
-			if (@$canEditOwn['content']) { // custom rules for users allowed to edit all their own items
-				$allown = array();
-				$allown[] = ' i.created_by = ' . $user->id;
-				if (isset($canEdit['category'])) {
-					if (count($canEdit['category']))		$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
-				}
-				if (isset($canEdit['item'])) {
-					if (count($canEdit['item']))				$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
-				}
-				if (count($allown) > 0) {
-					$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
-				}
-			} else if ( ( isset($canEditOwn['category']) && count($canEditOwn['category']) ) || ( isset($canEditOwn['item']) && count($canEditOwn['item']) ) ) { // standard rules for the other users
-				$allown = array();
-				if (isset($canEditOwn['category'])) {
-					if (count($canEditOwn['category']))	$allown[] = ' (i.catid IN (' . implode(',', $canEditOwn['category']) . ') AND i.created_by = ' . $user->id . ')'; 
-				}
-				
-				if (isset($canEdit['category'])) {
-					if (count($canEdit['category']))	$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
-				}
-				if (isset($canEdit['item']))  {
-					if (count($canEdit['item']))			$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
-				}
-				if (count($allown) > 0) {
-					$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
-				}
-			} else {
-				$jAp= JFactory::getApplication();
-				$jAp->enqueueMessage( JText::_('FLEXI_CANNOT_VIEW_EDIT_ANY_ITEMS'), 'warning' );
-				$where[] = ' 0 ';
-			}
-		}
-	}
-
 }

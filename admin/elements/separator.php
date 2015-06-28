@@ -121,9 +121,9 @@ class JFormFieldSeparator extends JFormFieldSpacer
 				// Make sure chosen JS file is loaded before our code
 				JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
 				// replace chosen function
-				$js .= "
+				/*$js .= "
 					jQuery.fn.chosen = function(){};
-				";
+				";*/
 			}
 			$js .= "
 				jQuery(document).ready(function() {

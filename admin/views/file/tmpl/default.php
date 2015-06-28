@@ -35,7 +35,25 @@ function submitbutton(pressbutton) {
 }
 </script>
 
-<?php $disabled = $this->row->url ? '' : ' disabled="disabled"'; ?>
+<?php
+
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
+$disabled = $this->row->url ? '' : ' disabled="disabled"';
+
+if (!$this->row->url)
+{
+	$path = $this->row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
+	$file_path = $path . DS . $this->row->filename;
+	
+	$file_size = file_exists($file_path) ? filesize($file_path) : 0;
+	$file_size_str = $file_size < 1024 * 1024 ?
+		number_format(filesize($file_path) / (1024), 2) .' KBs' :
+		number_format(filesize($file_path) / (1024 * 1024), 2) .' MBs';
+}
+?>
+
+
 <div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
@@ -48,20 +66,11 @@ function submitbutton(pressbutton) {
 			</td>
 			<td>
 				<input type="text" name="filename_original" value="<?php echo strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename; ?>" style="width:96%; max-width:800px;" maxlength="100" />
-				<?php
-				if (!$this->row->url) {
-					?><br/><span class="label" style="margin-top:6px;"><?php echo JText::_( 'FLEXI_REAL_PATH' ); ?></span><?php
-					$path		= $this->row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-					$file_path = $this->row->filename;
-					$file_path = $path . DS . $this->row->filename;
-					echo $file_path;
-				}
-				?>
 			</td>
 		</tr>
 
 		<tr>
-			<td class="key" title="<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE_DESC' ); ?>">
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
 				<label class="label" for="altname">
 					<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 				</label>
@@ -71,7 +80,7 @@ function submitbutton(pressbutton) {
 			</td>
 		</tr>
 		<tr>
-			<td class="key">
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 				<label class="label" for="file-desc">
 				<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 				</label>
@@ -81,7 +90,7 @@ function submitbutton(pressbutton) {
 			</td>
 		</tr>
 		<tr>
-			<td class="key">
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
 				<label class="label" for="access">
 					<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 				</label>
@@ -104,7 +113,7 @@ function submitbutton(pressbutton) {
 		</tr>
 
 		<tr>
-			<td class="key" title="<?php echo JText::_( 'FLEXI_FILEEXT_MIME_DESC' ); ?>">
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC' ); ?>">
 				<label class="label" for="ext">
 					<?php echo JText::_( 'FLEXI_FILEEXT_MIME' ); ?>
 				</label>
@@ -763,6 +772,17 @@ function submitbutton(pressbutton) {
 			</td>
 		</tr>
 
+		<?php if (!$this->row->url) : ?>
+		<tr>
+			<td colspan="2">
+				<br/><span class="badge badge-info" style="margin-top:6px;"><?php echo JText::_( 'FLEXI_SIZE' ); ?></span>
+				<?php echo file_exists($file_path) ? $file_size_str : JText::_('FLEXI_FILE_NOT_FOUND'); ?>
+				<br/><span class="badge badge-info" style="margin-top:6px;"><?php echo JText::_( 'FLEXI_REAL_PATH' ); ?></span>
+				<?php echo $file_path;?>
+			</td>
+		</tr>
+		<?php endif; ?>
+		
 	</table>
 
 

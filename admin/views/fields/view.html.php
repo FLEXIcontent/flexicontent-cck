@@ -31,45 +31,58 @@ class FlexicontentViewFields extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
-		//initialise variables
-		$app      = JFactory::getApplication();
+		// ********************
+		// Initialise variables
+		// ********************
+		
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+		
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
-		$option   = JRequest::getCmd('option');
-		$view     = JRequest::getVar('view');
 		
+		// Get model
+		$model = $this->getModel();
+
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
-		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.tooltip');
-
+		
+		// ***********
 		// Get filters
+		// ***********
+		
 		$count_filters = 0;
 		
-		//get vars
-		$filter_fieldtype = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
-		$filter_assigned  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_assigned', 	'filter_assigned', 	'', 'word' );
-		$filter_type      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_type', 		'filter_type', 		'', 'int' );
-		$filter_state 		= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 		'filter_state', 	'', 'word' );
-		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
+		// various filters
+		$filter_fieldtype = $model->getState( 'filter_fieldtype' );
+		$filter_assigned  = $model->getState( 'filter_assigned' );
+		$filter_type      = $model->getState( 'filter_type' );
+		$filter_state 		= $model->getState( 'filter_state' );
+		$filter_access    = $model->getState( 'filter_access' );
+		
 		if ($filter_assigned) $count_filters++; if ($filter_fieldtype) $count_filters++;
 		if ($filter_state) $count_filters++; if ($filter_access) $count_filters++;
 		if ($filter_type) $count_filters++;
 		
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order', 	't.ordering', 'cmd' );
-		if ($filter_type && $filter_order == 't.ordering') {
-			$filter_order	= $app->setUserState( $option.'.'.$view.'.filter_order', 'typeordering' );
-		} else if (!$filter_type && $filter_order == 'typeordering') {
-			$filter_order	= $app->setUserState( $option.'.'.$view.'.filter_order', 't.ordering' );
-		}
-		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
-		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
+		// ordering filters
+		$filter_order     = $model->getState( 'filter_order' );
+		$filter_order_Dir	= $model->getState( 'filter_order_Dir' );
+		
+		// text search		
+		$search = $model->getState( 'search' );
 		$search = $db->escape( trim(JString::strtolower( $search ) ) );
 		
-		if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
+		
+		// ****************************
+		// Important usability messages
+		// ****************************
+		
+		if ( $cparams->get('show_usability_messages', 1) )
 		{
 			$notice_content_type_order = $app->getUserStateFromRequest( $option.'.'.$view.'.notice_content_type_order',	'notice_content_type_order',	0, 'int' );
 			if (!$notice_content_type_order) {
@@ -80,10 +93,18 @@ class FlexicontentViewFields extends JViewLegacy
 			}
 		}
 		
-		// Add custom css and js to document
+		
+		// **************************
+		// Add css and js to document
+		// **************************
+		
+		flexicontent_html::loadFramework('select2');
+		JHTML::_('behavior.tooltip');
+		
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+		
 		
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
@@ -168,7 +189,6 @@ class FlexicontentViewFields extends JViewLegacy
 		}
 		
 		// Get data from the model
-		$model = $this->getModel();
 		$rows       = $this->get( 'Items' );
 		$allrows    = $this->get( 'AllItems' );
 		$pagination = $this->get( 'Pagination' );
@@ -180,7 +200,7 @@ class FlexicontentViewFields extends JViewLegacy
 		
 		// build item-type filter
 		$lists['filter_type'] = ($filter_type|| 1 ? '<label class="label">'.JText::_('FLEXI_TYPE').'</label>' : '').
-			flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="submitform( );"', 'filter_type');
+			flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, '-'/*2*/, 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'filter_type');
 		
 		
 		// build orphaned/assigned filter
@@ -190,7 +210,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$assigned[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
 		
 		$lists['assigned'] = ($filter_assigned || 1 ? '<label class="label">'.JText::_('FLEXI_ASSIGNED').'</label>' : '').
-			JHTML::_('select.genericlist', $assigned, 'filter_assigned', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_assigned );
+			JHTML::_('select.genericlist', $assigned, 'filter_assigned', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_assigned );
 		
 		
 		// build field-type filter
@@ -208,7 +228,7 @@ class FlexicontentViewFields extends JViewLegacy
 			$fftypes[] = '';
 		}
 		$lists['fftype'] = ($filter_fieldtype || 1 ? '<label class="label">'.JText::_('FLEXI_FIELD_TYPE').'</label>' : '').
-			flexicontent_html::buildfieldtypeslist($fftypes, 'filter_fieldtype', $filter_fieldtype, ($_grouped ? 1 : 0), 'class="use_select2_lib" size="1" onchange="submitform( );"');
+			flexicontent_html::buildfieldtypeslist($fftypes, 'filter_fieldtype', $filter_fieldtype, ($_grouped ? 1 : 0), 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"');
 		
 		
 		// build publication state filter
@@ -219,7 +239,7 @@ class FlexicontentViewFields extends JViewLegacy
 		//$states[] = JHTML::_('select.option',  '-2', JText::_( 'FLEXI_TRASHED' ) );
 		
 		$lists['state'] = ($filter_state || 1 ? '<label class="label">'.JText::_('FLEXI_STATE').'</label>' : '').
-			JHTML::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
+			JHTML::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_state );
 			//JHTML::_('grid.state', $filter_state );
 		
 		
@@ -227,7 +247,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$options = JHtml::_('access.assetgroups');
 		array_unshift($options, JHtml::_('select.option', '', '-'/*JText::_('JOPTION_SELECT_ACCESS')*/) );
 		$fieldname =  $elementid = 'filter_access';
-		$attribs = 'class="use_select2_lib" onchange="Joomla.submitform()"';
+		$attribs = 'class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"';
 		$lists['access'] = ($filter_access || 1 ? '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>' : '').
 			JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
 		
@@ -250,10 +270,13 @@ class FlexicontentViewFields extends JViewLegacy
 		//assign data to template
 		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('permission'		, $perms);
-		$this->assignRef('filter_type'  , $filter_type);
-		$this->assignRef('lists'	, $lists);
-		$this->assignRef('rows'		, $rows);
+		$this->assignRef('filter_type'	, $filter_type);
+		
+		$this->assignRef('lists'			, $lists);
+		$this->assignRef('rows'				, $rows);
 		$this->assignRef('allrows'		, $allrows);
+		$this->assignRef('types'				, $types);
+		
 		$this->assignRef('ordering'		, $ordering);
 		$this->assignRef('pagination'	, $pagination);
 		

@@ -187,12 +187,14 @@ function delFilter(name)
 }
 
 function delAllFilters() {
+	jQuery('.fc_field_filter').val('');
 	delFilter('search'); delFilter('filter_type'); delFilter('filter_state');
 	delFilter('filter_cats'); delFilter('filter_author'); delFilter('filter_id');
 	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');
 	delFilter('filter_tag'); delFilter('filter_access');
-	jQuery('#filter_subcats').val('1');
-	jQuery('.fc_field_filter').val('');
+	delFilter('filter_fileid');
+	jQuery('#filter_subcats').val('1');  // default: include subcats
+	jQuery('#filter_catsinstate').val('1');	  // default: published categories
 }
 
 <?php if ($this->ordering) : ?>
@@ -355,8 +357,8 @@ jQuery(document).ready(function(){
 				<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
 			</span>
 			<span class="btn-group hidden-phone">
-				<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
-				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="delAllFilters();this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
+				<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
+				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
 			</span>
 		</span>
 		
@@ -433,8 +435,7 @@ jQuery(document).ready(function(){
 		</span>
 		
 		<span class="fc-filter nowrap_box">
-			<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_SUBCATEGORIES' ); ?></label>
-			<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
+			<?php echo $this->lists['filter_subcats']; ?>
 		</span>
 		
 		<span class="fc-filter nowrap_box">
@@ -467,7 +468,9 @@ jQuery(document).ready(function(){
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 
 	<div class="clear"></div>
-	<span style="display:none; margin-bottom:0px!important;" class="fc-mssg-inline fc-note" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
+	<span style="display:none;" class="alert fc-small fc-iblock" id="fcorder_save_warn_box">
+		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' ) : '') ; ?>
+	</span>
 	
 	<?php
 	$order_msg = '';

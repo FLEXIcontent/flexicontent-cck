@@ -32,7 +32,6 @@ div.voting-row {
 	margin: 2px 1%;
 	padding: 0;
  	box-sizing: border-box;
- 	width:48%;
  	max-width:600px;
 }
 div.voting-row.voting-row_main {

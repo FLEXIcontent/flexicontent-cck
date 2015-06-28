@@ -217,7 +217,7 @@ class FlexicontentModelFile extends JModelAdmin
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
 		}
-
+		
 		// Make sure the data is valid
 		if (!$file->check()) {
 			$this->setError( $file->getError() );
@@ -230,7 +230,7 @@ class FlexicontentModelFile extends JModelAdmin
 			return false;
 		}
 		
-		$this->_file	=& $file;
+		$this->_file = & $file;
 
 		return true;
 	}

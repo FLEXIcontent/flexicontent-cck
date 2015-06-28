@@ -9,7 +9,7 @@
 			<field name="flexi_cat_extension" type="hidden" size="1" default="com_content" label="Category Type" description="Please save configuration once" />
 			<field name="fcdata_serialized" type="hidden" size="1" default="" label=".." description="..." />
 			
-			<field name="support_url" type="text" size="50" default="" label="FLEXI_HELP" description="FLEXI_HELP_DESC" />
+			<field name="support_url" type="text" size="50" default="" label="FLEXI_HELP" description="FLEXI_HELP_DESC" class="input-xxlarge" />
 			<field name="add_tooltips" type="radio" default="1" label="FLEXI_LOAD_TOOLTIPS" description="FLEXI_LOAD_TOOLTIPS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -32,8 +32,8 @@
 			</field>
 			<field name="print_logging_info" type="radio" default="0" label="FLEXI_DISPLAY_STATS_INFO" description="FLEXI_DISPLAY_STATS_INFO_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES_VIA_FCDEBUG_URLVAR</option>
 				<option value="2">FLEXI_YES</option>
+				<option value="1">FLEXI_YES_VIA_FCDEBUG_URLVAR</option>
 			</field>
 			<field name="debug_initial_perms" type="radio" default="0" label="FLEXI_DEBUG_INITIAL_PERMS_CREATION" description="FLEXI_DEBUG_INITIAL_PERMS_CREATION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -43,8 +43,8 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<!--field name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="3" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" /-->
-			<field name="non_orderable_types" type="textarea" default="toolbar,file,image,groupmarker,fcpagenav,minigallery,weblink,email" rows="3" cols="60" label="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS" description="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS_DESC" />
+			<!--field name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="2" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" class="input-xxlarge" /-->
+			<field name="non_orderable_types" type="textarea" default="toolbar,file,image,groupmarker,fcpagenav,minigallery,weblink,email" cols="60" rows="2" label="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS" description="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS_DESC" class="input-xxlarge" />
 			
 		<field name="" type="separator" default="FLEXI_BROWSER_FRAMEWORKS" label="" level="level0" />
 			
@@ -170,15 +170,15 @@
 			
 		<field name="" type="separator" default="FLEXI_REDIRECTIONS_CONF" label="" level="level0" />
 			
-			<field name="login_page" type="text" size="50" default="index.php?option=com_users&amp;view=login" label="FLEXI_LOGIN_PAGE" description="FLEXI_LOGIN_PAGE_DESC" />
-			<field name="unauthorized_page" type="text" size="50" default="" label="FLEXI_UNAUTHORIZED_URL" description="FLEXI_UNAUTHORIZED_URL_DESC" />
+			<field name="login_page" type="text" size="50" default="index.php?option=com_users&amp;view=login" label="FLEXI_LOGIN_PAGE" description="FLEXI_LOGIN_PAGE_DESC" class="input-xxlarge" />
+			<field name="unauthorized_page" type="text" size="50" default="" label="FLEXI_UNAUTHORIZED_URL" description="FLEXI_UNAUTHORIZED_URL_DESC" class="input-xxlarge" />
 			
 		<field name="" type="separator" default="FLEXI_FILES_CONF" label="" level="level0" />
 			
-			<field name="upload_extensions" type="text" size="50" default="bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics,BMP,CSV,DOC,GIF,ICO,JPG,JPEG,ODG,ODP,ODS,ODT,PDF,PNG,PPT,SWF,TXT,XCF,XLS,ZIP,ICS" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
+			<field name="upload_extensions" type="textarea" rows="2" default="bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" class="input-xxlarge" />
 			<field name="upload_maxsize" type="text" size="50" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
-			<field name="file_path" type="text" size="50" default="components/com_flexicontent/uploads" label="FLEXI_PATH_TO_FILE_FOLDER" description="FLEXI_TIPFILEFOLDER" />
-			<field name="media_path" type="text" size="50" default="components/com_flexicontent/medias" label="FLEXI_PATH_TO_MEDIA_FOLDER" description="FLEXI_TIPMEDIAFOLDER" />
+			<field name="file_path" type="text" size="50" default="components/com_flexicontent/uploads" label="FLEXI_PATH_TO_FILE_FOLDER" description="FLEXI_TIPFILEFOLDER" class="input-xxlarge" />
+			<field name="media_path" type="text" size="50" default="components/com_flexicontent/medias" label="FLEXI_PATH_TO_MEDIA_FOLDER" description="FLEXI_TIPMEDIAFOLDER" class="input-xxlarge" />
 			<field name="restrict_uploads" type="radio" default="1" label="FLEXI_RESTRICT_UPLOADS" description="FLEXI_RESTRICT_UPLOADS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -187,11 +187,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="image_extensions" type="text" size="50" default="bmp,gif,jpg,png" label="FLEXI_LEGAL_IMAGE_EXTENSIONS_LABEL" description="FLEXI_LEGAL_IMAGE_EXTENSIONS_DESC" />
-			<field name="ignore_extensions" type="text" size="50" default="" label="FLEXI_IGNORED_EXTENSIONS_LABEL" description="FLEXI_IGNORED_EXTENSIONS_DESC" />
+			<field name="image_extensions" type="text" size="50" default="bmp,gif,jpg,png" label="FLEXI_LEGAL_IMAGE_EXTENSIONS_LABEL" description="FLEXI_LEGAL_IMAGE_EXTENSIONS_DESC" class="input-xxlarge" />
+			<field name="ignore_extensions" type="text" size="50" default="" label="FLEXI_IGNORED_EXTENSIONS_LABEL" description="FLEXI_IGNORED_EXTENSIONS_DESC" class="input-xxlarge" />
 			
-			<field name="upload_mime" type="text" size="50" default="image/jpeg,image/gif,image/png,image/bmp,application/x-shockwave-flash,application/msword,application/excel,application/pdf,application/powerpoint,text/plain,application/x-zip" label="FLEXI_LEGAL_MIME_TYPES_LABEL" description="FLEXI_LEGAL_MIME_TYPES_DESC" />
-			<field name="upload_mime_illegal" type="text" size="50" default="text/html" label="FLEXI_ILLEGAL_MIME_TYPES" description="FLEXI_ILLEGAL_MIME_TYPES_DESC" />
+			<field name="upload_mime" type="textarea" rows="2" default="image/jpeg,image/gif,image/png,image/bmp,application/x-shockwave-flash,application/msword,application/excel,application/pdf,application/powerpoint,text/plain,application/x-zip" label="FLEXI_LEGAL_MIME_TYPES_LABEL" description="FLEXI_LEGAL_MIME_TYPES_DESC" class="input-xxlarge" />
+			<field name="upload_mime_illegal" type="text" size="50" default="text/html" label="FLEXI_ILLEGAL_MIME_TYPES" description="FLEXI_ILLEGAL_MIME_TYPES_DESC" class="input-xxlarge" />
 			<field name="enable_flash" type="radio" default="0" label="FLEXI_ENABLE_FLASH_UPLOADER" description="FLEXI_ENABLE_FLASH_UPLOADER_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -268,7 +268,7 @@
 				<option value="1" show_list="" hide_list="comments_manual">FLEXI_JCOMMENTS_INTEGRATION</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_MANUAL_COMMENTS_INTEGRATION" label="" level="level3" class="comments_manual" />
-			<field name="comments_admin_link" type="text" default="" label="FLEXI_COMMENTS_BACKEND_ADMIN_LINK" description="FLEXI_COMMENTS_BACKEND_ADMIN_LINK_DESC" class="comments_manual" />
+			<field name="comments_admin_link" type="text" default="" label="FLEXI_COMMENTS_BACKEND_ADMIN_LINK" description="FLEXI_COMMENTS_BACKEND_ADMIN_LINK_DESC" class="comments_manual input-xxlarge" />
 			
 		<field name="" type="separator" default="FLEXI_HITS_UNIQUE_CONF" label="" level="level1" />
 			
@@ -281,12 +281,12 @@
 				<option value="0" show_list="" hide_list="iplist_hits">FLEXI_NO</option>
 				<option value="1" show_list="iplist_hits" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_ips_list" type="textarea" cols="50" rows="4" default="127.0.0.1" label="FLEXI_HITS_IP_LIST" description="FLEXI_HITS_IP_LIST_DESC" class="count_unique_hits iplist_hits"/>
+			<field name="hits_ips_list" type="textarea" cols="60" rows="2" default="127.0.0.1" label="FLEXI_HITS_IP_LIST" description="FLEXI_HITS_IP_LIST_DESC" class="count_unique_hits iplist_hits input-xxlarge"/>
 			<field name="hits_skip_bots" type="multilist" subtype="radio" default="1" label="FLEXI_HITS_SKIP_BOTS" description="FLEXI_HITS_SKIP_BOTS_DESC" toggle_related="1" class="count_unique_hits btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="botlist_hits">FLEXI_NO</option>
 				<option value="1" show_list="botlist_hits" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="hits_bots_list" type="textarea" cols="50" rows="4" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" class="count_unique_hits botlist_hits" />
+			<field name="hits_bots_list" type="textarea" cols="60" rows="2" default="bot,spider,crawler,search,libwww,archive,slurp,teoma" label="FLEXI_HITS_BOTS_LIST" description="FLEXI_HITS_BOTS_LIST_DESC" class="count_unique_hits botlist_hits input-xxlarge" />
 			
 	</fieldset>
 	<fieldset name="lists_fset" label="FLEXI_LISTS_CONF" description="" >
@@ -301,11 +301,11 @@
 			<field name="myitems_using_catview" type="multilist" subtype="radio" default="1" label="My Items" description="FLEXI_RENDER_VIA_CAT_VIEW_NOTES" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="tags_using_catview" type="multilist" subtype="radio" default="0" label="Tags" description="FLEXI_RENDER_VIA_CAT_VIEW_NOTES" class="btn-group btn-group-yesno" inline_tip="FLEXI_EXPERIMENTAL" tip_class="" tip_img="warning.png" >
+			<field name="tags_using_catview" type="multilist" subtype="radio" default="0" label="Tags" description="FLEXI_RENDER_VIA_CAT_VIEW_NOTES" class="btn-group btn-group-yesno" >
 				<option value="0">FLEXI_NO_USE_MENU_BASED_ONLY</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="favs_using_catview" type="multilist" subtype="radio" default="0" label="Favourites" description="FLEXI_RENDER_VIA_CAT_VIEW_NOTES" class="btn-group btn-group-yesno" inline_tip="FLEXI_EXPERIMENTAL" tip_class="" tip_img="warning.png" >
+			<field name="favs_using_catview" type="multilist" subtype="radio" default="0" label="Favourites" description="FLEXI_RENDER_VIA_CAT_VIEW_NOTES" class="btn-group btn-group-yesno" >
 				<option value="0">FLEXI_NO_USE_MENU_BASED_ONLY</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -877,20 +877,20 @@
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
-			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" class="filter_display" />
+			<field name="initial_filters" default="" type="textarea" rows="5" cols="60" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" class="filter_display" />
 
 			<field name="" type="separator" default="FLEXI_LOCKED_FILTERS" description="" level="level3" />
 			<field name="use_persistent_filters" type="multilist" subtype="radio" default="0" toggle_related="0" label="FLEXI_USE_LOCKED_FILTERS" description="FLEXI_USE_LOCKED_FILTERS_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="locked_filter_display">FLEXI_NO</option>
 				<option value="1" show_list="locked_filter_display" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_LOCKED_FILTER_VALUES" description="FLEXI_LOCKED_FILTER_VALUES_DESC" class="locked_filter_display" />
+			<field name="persistent_filters" default="" type="textarea" rows="5" cols="60" label="FLEXI_LOCKED_FILTER_VALUES" description="FLEXI_LOCKED_FILTER_VALUES_DESC" class="locked_filter_display" />
 			
 			<field name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level1" />
 			
 			<field name="show_alpha" type="alphaindex" default="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
-			<field name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="4" cols="30" />
-			<field name="alphagrpcssclasses" type="textarea" default="letters!!numbers" label="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES" description="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES_DESC" rows="2" cols="30" />
+			<field name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="2" cols="60" />
+			<field name="alphagrpcssclasses" type="textarea" default="letters!!numbers" label="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES" description="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES_DESC" rows="2" cols="60" />
 			<field name="alphacharseparator" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR" description="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR_DESC" />
 			<field name="alphaaliases" type="text" default="" label="FLEXI_CUSTOM_ALPHA_ALIASES" description="FLEXI_CUSTOM_ALPHA_ALIASES_DESC" />
 			<field name="alphaskipempty" type="radio" default="0" label="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY" description="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY_DESC" class="btn-group btn-group-yesno">
@@ -1161,8 +1161,8 @@
 			</field>
 			
 			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level2" />
-			<field name="submit_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" />
-			<field name="submit_redirect_url_fe" type="text" default="" size="106" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" />
+			<field name="submit_message" type="textarea" default="" rows="2" cols="60" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" class="input-xxlarge" />
+			<field name="submit_redirect_url_fe" type="text" default="" size="106" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" class="input-xxlarge" />
 			<field name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level2" />
@@ -1207,7 +1207,7 @@
 			<field name="default_language_fe" type="fclanguage" default="*" use_global="0" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_MENU_DEFAULT_LANGUAGE_DESC">
 				<option value="_author_lang_">FLEXI_USE_AUTHOR_LANGUAGE</option>
 			</field>
-			<field name="disable_languages_fe" type="fclanguage" default="" multiple="multiple" class="use_select2_lib" label="FLEXI_MENU_DISABLE_LANGUAGES" description="FLEXI_MENU_DISABLE_LANGUAGES_DESC" />
+			<field name="disable_languages_fe" type="fclanguage" default="" multiple="multiple" label="FLEXI_MENU_DISABLE_LANGUAGES" description="FLEXI_MENU_DISABLE_LANGUAGES_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_MENU_LANG_SELECTOR" label="" level="level3" />
 			<field name="langdisplay_fe" type="radio" default="2" label="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS" description="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS_DESC" class="btn-group btn-group-yesno">
@@ -1267,46 +1267,46 @@
 			
 			<field name="" type="separator" default="FLEXI_ITEM_FORM_LAYOUT" label="" level="level1" />
 			
-			<field name="form_tab_titles" type="textarea" rows="1" cols="60" label="FLEXI_FORM_TAB_TITLES" description="FLEXI_FORM_TAB_TITLES_DESC"
-				default="1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE" />
-			<field name="form_tab_icons" type="textarea" rows="1" cols="60" label="FLEXI_FORM_TAB_ICONS" description="FLEXI_FORM_TAB_ICONS_DESC"
-				default="1:icon-file-2, 2:icon-signup, 3:icon-tree-2, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette" />
+			<field name="form_tab_titles" type="textarea" rows="2" cols="60" label="FLEXI_FORM_TAB_TITLES" description="FLEXI_FORM_TAB_TITLES_DESC"
+				default="1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE" class="input-xxlarge" />
+			<field name="form_tab_icons" type="textarea" rows="2" cols="60" label="FLEXI_FORM_TAB_ICONS" description="FLEXI_FORM_TAB_ICONS_DESC"
+				default="1:icon-file-2, 2:icon-signup, 3:icon-tree-2, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette" class="input-xxlarge" />
 			
 			<field name="" type="separator" default="FLEXI_FORM_CORE_FIELDS_N_PROPS" label="" level="level2" />
 			<field name="" type="separator" default="FLEXI_PLACEMENT_INSIDE_DEFAULT_TABS" label="" level="level3" />
 			<field name="" type="separator" default="FLEXI_NOT_PLACED_FIELDS_AND_DISABLING" label="" level="level4" />
 			
-			<field name="form_tabs_above"   type="textarea" default="title, alias, category, lang, type, state, disable_comments, notify_subscribers" rows="1" cols="60" label="FLEXI_ABOVE_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
-			<field name="form_tabs_below"   type="textarea" default="_skip_" rows="1" cols="60" label="FLEXI_BELOW_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
+			<field name="form_tabs_above"   type="textarea" default="title, alias, category, lang, type, state, disable_comments, notify_subscribers" rows="1" cols="60" label="FLEXI_ABOVE_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
+			<field name="form_tabs_below"   type="textarea" default="_skip_" rows="1" cols="60" label="FLEXI_BELOW_TABS" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
 			
-			<field name="form_tab01_fields" type="textarea" default="text" rows="1" cols="60" label="TAB 1" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
-			<field name="form_tab02_fields" type="textarea" default="fields_manager" rows="1" cols="60" label="TAB 2" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
-			<field name="form_tab03_fields" type="textarea" default="categories, tags, language, perms" rows="1" cols="60" label="TAB 3" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
-			<field name="form_tab04_fields" type="textarea" default="timezone_info, created, created_by, created_by_alias, publish_up, publish_down, access" rows="1" cols="60" label="TAB 4" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
-			<field name="form_tab05_fields" type="textarea" default="metadata, seoconf" rows="1" cols="60" label="TAB 5" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
-			<field name="form_tab06_fields" type="textarea" default="display_params" rows="1" cols="60" label="TAB 6" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
-			<field name="form_tab07_fields" type="textarea" default="layout_selection, layout_params" rows="1" cols="60" label="TAB 7" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" />
+			<field name="form_tab01_fields" type="textarea" default="text" rows="1" cols="60" label="TAB 1" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
+			<field name="form_tab02_fields" type="textarea" default="fields_manager" rows="1" cols="60" label="TAB 2" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
+			<field name="form_tab03_fields" type="textarea" default="categories, tags, language, perms" rows="1" cols="60" label="TAB 3" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
+			<field name="form_tab04_fields" type="textarea" default="timezone_info, created, created_by, created_by_alias, publish_up, publish_down, access" rows="1" cols="60" label="TAB 4" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
+			<field name="form_tab05_fields" type="textarea" default="metadata, seoconf" rows="1" cols="60" label="TAB 5" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
+			<field name="form_tab06_fields" type="textarea" default="display_params" rows="1" cols="60" label="TAB 6" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
+			<field name="form_tab07_fields" type="textarea" default="layout_selection, layout_params" rows="1" cols="60" label="TAB 7" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
 			
 			<field name="" type="separator" default="FLEXI_PLACEMENT_VIA_FIELDS_MANAGER" label="" level="level3" />
-			<field name="form_tabs_fieldsman" type="textarea" default="" rows="6" cols="60" label="FLEXI_HANDLED_BY_FIELDS_MANAGER" description="FLEXI_HANDLED_BY_FIELDS_MANAGER_DESC" />
+			<field name="form_tabs_fieldsman" type="textarea" default="" rows="2" cols="60" label="FLEXI_HANDLED_BY_FIELDS_MANAGER" description="FLEXI_HANDLED_BY_FIELDS_MANAGER_DESC" class="input-xxlarge" />
 			
 			<field name="" type="separator" default="FLEXI_STYLING" label="" level="level1" />
 			
 			<field name="form_container_css_fe" type="text" default="max-width:800px;" size="106" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" />
-			<field name="form_extra_css_fe" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
-			<field name="form_extra_js_fe" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" />
+			<field name="form_extra_css_fe" type="textarea" default="" rows="2" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" class="input-xxlarge" />
+			<field name="form_extra_js_fe" type="textarea" default="" rows="2" cols="60" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" class="input-xxlarge" />
 			
 		<field name="" type="separator" default="FLEXI_BACKEND_ITEM_FORM" label="" level="level0" />
 		
 			<field name="" type="separator" default="FLEXI_STYLING" label="" level="level1" />
-			<field name="form_extra_css_be" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
-			<field name="form_extra_js_be" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" />
+			<field name="form_extra_css_be" type="textarea" default="" rows="2" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" class="input-xxlarge" />
+			<field name="form_extra_js_be" type="textarea" default="" rows="2" cols="60" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" class="input-xxlarge" />
 			
 		<field name="" type="separator" default="FLEXI_FRONTEND_BACKEND_ITEM_FORM" label="" level="level0" />
 		
 			<field name="" type="separator" default="FLEXI_STYLING" label="" level="level1" />
-			<field name="form_extra_css" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
-			<field name="form_extra_js" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" />
+			<field name="form_extra_css" type="textarea" default="" rows="2" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" class="input-xxlarge" />
+			<field name="form_extra_js" type="textarea" default="" rows="2" cols="60" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" class="input-xxlarge" />
 		
 	</fieldset>
 	<fieldset name="workflow_fset" label="FLEXI_WORKFLOW_CONF" description="" >
@@ -1411,13 +1411,13 @@
 				defaultvals="1,0,2,-3,-4,-5"
 				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" class="disp_notifications" />
 			<field name="usergrps_notify_new" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" class="disp_notifications" />
-			<field name="userlist_notify_new" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" class="disp_notifications" />
-			<field name="text_notify_new" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications" />
+			<field name="userlist_notify_new" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" class="disp_notifications input-xxlarge" />
+			<field name="text_notify_new" type="textarea" rows="2" cols="60" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications input-xxlarge" />
 			
 			<field name="" type="separator" default="FLEXI_NOTIFY_UGRP_NEW_CONTENT_PENDING" description="FLEXI_NOTIFY_UGRP_NEW_CONTENT_PENDING_DESC" label="" level="level1" class="disp_notifications" />
 			<field name="usergrps_notify_new_pending" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" class="disp_notifications" />
-			<field name="userlist_notify_new_pending" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" class="disp_notifications" />
-			<field name="text_notify_new_pending" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications" />
+			<field name="userlist_notify_new_pending" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" class="disp_notifications input-xxlarge" />
+			<field name="text_notify_new_pending" type="textarea" rows="2" cols="60" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications input-xxlarge" />
 			
 			<field name="" type="separator" default="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED" description="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED_DESC" label="" level="level1" class="disp_notifications" />
 			<field name="states_notify_existing" type="fccheckbox" default=""
@@ -1426,13 +1426,13 @@
 				defaultvals="1,0,2,-3,-4,-5"
 				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" class="disp_notifications" />
 			<field name="usergrps_notify_existing" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" class="disp_notifications" />
-			<field name="userlist_notify_existing" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" class="disp_notifications"/>
-			<field name="text_notify_existing" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications" />
+			<field name="userlist_notify_existing" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" class="disp_notifications input-xxlarge"/>
+			<field name="text_notify_existing" type="textarea" rows="2" cols="60" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications input-xxlarge" />
 			
 			<field name="" type="separator" default="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_TOREVIEW" description="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_TOREVIEW_DESC" label="" level="level1" class="disp_notifications" />
 			<field name="usergrps_notify_existing_reviewal" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" class="disp_notifications" />
-			<field name="userlist_notify_existing_reviewal" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" class="disp_notifications" />
-			<field name="text_notify_existing_reviewal" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications" />
+			<field name="userlist_notify_existing_reviewal" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" class="disp_notifications input-xxlarge" />
+			<field name="text_notify_existing_reviewal" type="textarea" rows="2" cols="60" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" class="disp_notifications input-xxlarge" />
 			
 		</fieldset>
 	<fieldset name="backend_tabs_fset" label="FLEXI_BACKEND_TABS_CONF" description="" >
@@ -1488,7 +1488,7 @@
 			</field>
 			
 		<field name="" type="separator" default="FLEXI_PARAMETERS_APPEARANCE" label="" level="level1" />
-			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" />
+			<field name="items_manager_extra_fields" type="textarea" default="" rows="2" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" class="input-xxlarge" />
 			<field name="items_manager_custom_filters" type="filters" default="" field_type="select,selectmutiple,radio,radioimage,checkbox,checkboximage" label="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST" description="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST_DESC" />
 			<field name="items_manager_order" type="list" default="1" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC">
 				<option value="">FLEXI_ITEMS_MANAGER_ORDER_DEFAULT_UNORDERED</option>
@@ -1580,8 +1580,8 @@
 			<field name="csv_debug_records" type="text" default="2" size="12" label="FLEXI_CSV_DISPLAY_FIELDS_OF_FIRST_RECORDS" description="FLEXI_CSV_DISPLAY_FIELDS_OF_FIRST_RECORDS_DESC"/>
 			
 			<field name="" type="separator" default="FLEXI_IMPORT_FOLDERS" label="" level="level1" />
-			<field name="import_media_folder" type="text" default="tmp/fcimport_media" size="60" label="FLEXI_IMPORT_MEDIA_FOLDER" description="FLEXI_IMPORT_FOLDER_DESC"/>
-			<field name="import_docs_folder" type="text" default="tmp/fcimport_docs" size="60" label="FLEXI_IMPORT_DOCUMENTS_FOLDER" description="FLEXI_IMPORT_FOLDER_DESC"/>
+			<field name="import_media_folder" type="text" default="tmp/fcimport_media" size="60" label="FLEXI_IMPORT_MEDIA_FOLDER" description="FLEXI_IMPORT_FOLDER_DESC" class="input-xxlarge" />
+			<field name="import_docs_folder" type="text" default="tmp/fcimport_docs" size="60" label="FLEXI_IMPORT_DOCUMENTS_FOLDER" description="FLEXI_IMPORT_FOLDER_DESC" class="input-xxlarge" />
 			
 	</fieldset>
 	

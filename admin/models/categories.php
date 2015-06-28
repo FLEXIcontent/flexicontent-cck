@@ -45,12 +45,86 @@ class FlexicontentModelCategories extends JModelList
 	function __construct()
 	{
 		parent::__construct();
+		
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+		$fcform  = $jinput->get('fcform', 0, 'int');
+		
+		$p = $option.'.'.$view.'.';
+		
+		
+		// **************
+		// view's Filters
+		// **************
+		
+		// Various filters
+		$filter_cats      = $fcform ? $jinput->get('filter_cats',     0,  'int')     :  $app->getUserStateFromRequest( $p.'.filter_cats',      'filter_cats',      0,   'int' );
+		$filter_state     = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'.filter_state',     'filter_state',     '',  'string' );
+		$filter_access    = $fcform ? $jinput->get('filter_access',   '', 'string')  :  $app->getUserStateFromRequest( $p.'.filter_access',    'filter_access',    '',  'string' );
+		$filter_level     = $fcform ? $jinput->get('filter_level',    '', 'string')  :  $app->getUserStateFromRequest( $p.'.filter_level',     'filter_level',     '',  'string' );
+		$filter_language  = $fcform ? $jinput->get('filter_language', '', 'string')  :  $app->getUserStateFromRequest( $p.'.filter_language',  'filter_language',  '',  'string' );
+		
+		$this->setState('filter_cats',     $filter_cats);
+		$this->setState('filter_state',    $filter_state);
+		$this->setState('filter_access',   $filter_access);
+		$this->setState('filter_level',    $filter_level);
+		$this->setState('filter_language', $filter_language);
+		
+		$app->setUserState($p.'filter_cats',     $filter_cats);
+		$app->setUserState($p.'filter_state',    $filter_state);
+		$app->setUserState($p.'filter_access',   $filter_access);
+		$app->setUserState($p.'filter_level',    $filter_level);
+		$app->setUserState($p.'filter_language', $filter_language);
+		
+		
+		// Text search
+		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
+		$this->setState('search', $search);
+		$app->setUserState($p.'search', $search);
+		
+		
+		
+		// ****************************************
+		// Ordering: filter_order, filter_order_Dir
+		// ****************************************
+		
+		$filter_order      = $fcform ? $jinput->get('filter_order',     'c.lft', 'cmd')   :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     'c.lft', 'cmd' );
+		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', '',      'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', '',      'word' );
+		
+		$this->setState('filter_order', $filter_order);
+		$this->setState('filter_order_Dir', $filter_order_Dir);
+		
+		$app->setUserState($p.'filter_order', $filter_order);
+		$app->setUserState($p.'filter_order_Dir', $filter_order_Dir);
+		
+		
+		
+		// *****************************
+		// Pagination: limit, limitstart
+		// *****************************
+		
+		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
+		
+		// In case limit has been changed, adjust limitstart accordingly
+		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
+		$jinput->set( 'limitstart',	$limitstart );
 
-		$array = JRequest::getVar('cid',  0, '', 'array');
+		$this->setState('limit', $limit);
+		$this->setState('limitstart', $limitstart);
+		
+		$app->setUserState($p.'limit', $limit);
+		$app->setUserState($p.'limitstart', $limitstart);
+		
+		
+		// For some model function that use single id
+		$array = $jinput->get('cid', array(0), 'array');
 		$this->setId((int)$array[0]);
-
 	}
-
+	
+	
 	/**
 	 * Method to set the category identifier
 	 *
@@ -155,25 +229,34 @@ class FlexicontentModelCategories extends JModelList
 	{
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		global $globalcats;
-		$app  = JFactory::getApplication();
+		
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+		$fcform  = $jinput->get('fcform', 0, 'int');
+		
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
 		
-		$order_property = !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     $order_property, 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', '', 'word' );
-		$filter_cats      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',			 'filter_cats',			 '', 'int' );
-		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',     'filter_state',     '', 'string' );
-		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
-		$filter_level     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_level',     'filter_level',     '', 'string' );
-		$filter_language  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_language',  'filter_language',  '', 'string' );
-		$search  = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
+		// various filters
+		$filter_cats      = $this->getState( 'filter_cats' );
+		$filter_state     = $this->getState( 'filter_state' );
+		$filter_access    = $this->getState( 'filter_access' );
+		$filter_level     = $this->getState( 'filter_level' );
+		$filter_language  = $this->getState( 'filter_language' );
+		
+		// text search
+		$search  = $this->getState( 'search' );
 		$search  = trim( JString::strtolower( $search ) );
+		
+		// ordering filters
+		$filter_order     = $this->getState( 'filter_order' );
+		$filter_order_Dir = $this->getState( 'filter_order_Dir' );
 		
 		// Create a new query object.
 		$query = $db->getQuery(true);
+		
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
@@ -389,8 +472,7 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	/*function checkin()
 	{
-		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$pk       = (int)$cid[0];
+		$pk = (int)$this->_id;
 		
 		// Only attempt to check the row in if it exists.
 		if ($pk)

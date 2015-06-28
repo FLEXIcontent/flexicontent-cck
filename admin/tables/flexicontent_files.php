@@ -50,8 +50,10 @@ class flexicontent_files extends JTable
 	var $published			= 1;
 	/** @var string */
 	var $language		= '*';
-	/** @var int */
+	/** @var unsigned int */
 	var $hits				= 0;
+	/** @var unsigned int */
+	var $size				= 0;
 	/** @var date */
 	var $uploaded			= '';
 	/** @var int */

@@ -846,6 +846,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		}
 		return $cid;
 	}
+	
+	
 	/**
 	 * Method to set the access level of the Types
 	 *
@@ -872,6 +874,22 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			return false;
 		}
 		return true;
-	}	
+	}
+	
+	
+	/**
+	 * Method to get ids of all files
+	 *
+	 * @access	public
+	 * @return	boolean	integer array on success
+	 * @since	1.0
+	 */
+	function getFileIds()
+	{
+		$query	= 'SELECT id FROM #__flexicontent_files';
+		$this->_db->setQuery($query);
+		$file_ids = $this->_db->loadColumn();
+		return $file_ids;
+	}
 }
 ?>

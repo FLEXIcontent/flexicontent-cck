@@ -701,6 +701,9 @@ class com_flexicontentInstallerScript
 					if ( $files_tbl_exists && !array_key_exists('language', $tbl_fields['#__flexicontent_files'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `language` CHAR(7) NOT NULL DEFAULT '*' AFTER `published`";
 					}
+					if ( $files_tbl_exists && !array_key_exists('size', $tbl_fields['#__flexicontent_files'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `size` INT(11) unsigned NOT NULL default '0' AFTER `hits`";
+					}
 					
 					// Fields TABLE
 					if ( $fields_tbl_exists && !array_key_exists('untranslatable', $tbl_fields['#__flexicontent_fields'])) {

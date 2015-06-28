@@ -287,10 +287,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					
 				$db 	= JFactory::getDBO();
 				$user	= JFactory::getUser();
-				$config = JFactory::getConfig();
-
-				$date = JFactory::getDate( 'now' );
-
+				
+				$path = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
+				$filepath = $path . $filename;
+				$filesize = file_exists($filepath) ? filesize($filepath) : 0;
+				
 				$obj = new stdClass();
 				$obj->filename    = $filename;
 				$obj->filename_original = $filename_original;
@@ -299,9 +300,10 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$obj->secure      = $secure;
 				$obj->ext         = $ext;
 				$obj->hits        = 0;
+				$obj->size        = $filesize;
 				$obj->description = $filedesc;
-				$obj->language    = ($filelang ? $filelang : '*');
-				$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+				$obj->language    = $filelang ? $filelang : '*';
+				$obj->uploaded    = JFactory::getDate( 'now' )->toSql();
 				$obj->uploaded_by = $user->get('id');
 					
 				// Insert file record in DB
@@ -343,10 +345,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				} else {
 					$app->enqueueMessage(JText::_( 'FLEXI_UPLOAD_COMPLETE' ));
 					if ( !$return ) return $file_id;  // No return URL, return the file ID
-					$app->redirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
+					$this->setRedirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1" , '');
 				}
 			}
-				
 		}
 	}
 	
@@ -394,10 +395,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$db 	= JFactory::getDBO();
 		$user	= JFactory::getUser();
-		$config = JFactory::getConfig();
-
-		$date = JFactory::getDate( 'now' );
-
+		
 		$obj = new stdClass();
 		$obj->filename    = $filename;
 		$obj->altname     = $altname;
@@ -405,9 +403,10 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$obj->secure      = 1;
 		$obj->ext         = $ext;
 		$obj->description = $filedesc;
-		$obj->language    = ($filelang ? $filelang : '*');
+		$obj->language    = $filelang ? $filelang : '*';
 		$obj->hits        = 0;
-		$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+		$obj->size        = 0;
+		$obj->uploaded    = JFactory::getDate( 'now' )->toSql();
 		$obj->uploaded_by = $user->get('id');
 
 		$db->insertObject('#__flexicontent_files', $obj);
@@ -446,7 +445,6 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$app    = JFactory::getApplication();
 		$db 		= JFactory::getDBO();
 		$user		= JFactory::getUser();
-		$config = JFactory::getConfig();
 		
 		$return		=  JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filesdir	=  JRequest::getVar( 'file-dir-path', '', 'post' );
@@ -465,7 +463,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$filterext	= $filterext ? explode(',', $filterext) : array();
 		foreach($filterext as $_i => $_ext) $filterext[$_i] = strtolower($_ext);
 		
-		$confext	=  explode(',', $params->get('upload_extensions','jpg,png,gif,bmp,jpeg'));
+		$confext	=  explode(',', $params->get('upload_extensions', 'bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics'));
 		foreach($confext as $_i => $_ext) $confext[$_i] = strtolower($_ext);
 		
 		// (optionally) Limit COMPONENT configured extensions, to those extensions requested by the FORM/URL variable
@@ -509,54 +507,30 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$filename		= flexicontent_upload::sanitize($destpath, $filenames[$n]);
 				$destination 	= $destpath . $filename;
 				
-				if ($keep) {
-					// Copy the file
-					if (JFile::copy($source, $destination))
-					{
-						$date = JFactory::getDate( 'now' );
-						
-						$obj = new stdClass();
-						$obj->filename    = $filename;
-						$obj->altname     = $filename;
-						$obj->url         = 0;
-						$obj->secure      = $secure;
-						$obj->ext         = $ext;
-						$obj->description = $filedesc;
-						$obj->language    = ($filelang ? $filelang : '*');
-						$obj->hits        = 0;
-						$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
-						$obj->uploaded_by = $user->get('id');
+				// Copy or move the file
+				$success = $keep  ?  JFile::copy($source, $destination)  :  JFile::move($source, $destination) ;
+				if ($success)
+				{
+					$filesize = filesize($destination);
+					
+					$obj = new stdClass();
+					$obj->filename    = $filename;
+					$obj->altname     = $filename;
+					$obj->url         = 0;
+					$obj->secure      = $secure;
+					$obj->ext         = $ext;
+					$obj->description = $filedesc;
+					$obj->language    = $filelang ? $filelang : '*';
+					$obj->hits        = 0;
+					$obj->size        = $filesize;
+					$obj->uploaded    = JFactory::getDate( 'now' )->toSql();
+					$obj->uploaded_by = $user->get('id');
 
-						// Add the record to the DB
-						$db->insertObject('#__flexicontent_files', $obj);
-						$file_ids[$filename] = $db->insertid();
-						
-						$c++;
-					}
-				} else {
-					// Move the file
-					if (JFile::move($source, $destination))
-					{
-						$date = JFactory::getDate( 'now' );
-						
-						$obj = new stdClass();
-						$obj->filename    = $filename;
-						$obj->altname     = $filename;
-						$obj->url         = 0;
-						$obj->secure      = $secure;
-						$obj->ext         = $ext;
-						$obj->description = $filedesc;
-						$obj->language    = ($filelang ? $filelang : '*');
-						$obj->hits        = 0;
-						$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
-						$obj->uploaded_by = $user->get('id');
-
-						// Add the record to the DB
-						$db->insertObject('#__flexicontent_files', $obj);
-						$file_ids[$filename] = $db->insertid();
-						
-						$c++;
-					}
+					// Add the record to the DB
+					$db->insertObject('#__flexicontent_files', $obj);
+					$file_ids[$filename] = $db->insertid();
+					
+					$c++;
 				}
 			}
 			$app->enqueueMessage(JText::sprintf( 'FLEXI_FILES_COPIED_SUCCESS', $c ));
@@ -570,7 +544,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		if (!$return) return $file_ids;  // REDIRECT only if this was requested
 		$app->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
 	}
-
+	
+	
 	/**
 	 * Logic for editing a file
 	 *
@@ -644,7 +619,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			
 			$db->setQuery("SELECT * FROM #__flexicontent_fields WHERE id='".$fieldid."'");
 			$field = $db->loadObject();
-			$field->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
+			$field->parameters = new JRegistry($field->attribs);
 			$field->item_id = $u_item_id;
 			
 			$result = FLEXIUtilities::call_FC_Field_Func($field->field_type, 'removeOriginalFile', array( &$field, $filename ) );
@@ -725,12 +700,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			return;
 		}
 		
-		if ($model->store($post)) {
-
+		$path = $post['secure'] ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
+		$file_path = $path . $post['filename'];
+		$post['size'] = !$post['url'] && file_exists($file_path) ? filesize($file_path) : 0;
+		
+		if ($model->store($post))
+		{
 			switch ($task)
 			{
 				case 'apply' :
-					$edit_task = FLEXI_J16GE ? "task=filemanager.edit" : "controller=filemanager&task=edit";
+					$edit_task = "task=filemanager.edit";
 					$link = 'index.php?option=com_flexicontent&'.$edit_task.'&cid[]='.(int) $model->get('id');
 					break;
 
@@ -739,19 +718,19 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					break;
 			}
 			$msg = JText::_( 'FLEXI_FILE_SAVED' );
-
 			$model->checkin();
 			
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-
-		} else {
+		}
+		else {
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_FILENAME' ).' : '.$model->getError();
 			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
-
+		
 		$this->setRedirect($link, $msg);
 	}
+	
 	
 	/**
 	 * logic for cancel an action

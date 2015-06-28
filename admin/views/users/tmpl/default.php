@@ -29,19 +29,15 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableF
 // Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
 $site_zone = JFactory::getApplication()->getCfg('offset');
 $user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
-if (FLEXI_J16GE) {
-	$tz = new DateTimeZone( $user_zone );
-	$tz_offset = $tz->getOffset(new JDate()) / 3600;
-} else {
-	$tz_offset = $site_zone;
-}
+$tz = new DateTimeZone( $user_zone );
+$tz_offset = $tz->getOffset(new JDate()) / 3600;
 $tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
-if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
+$tz_info .= ' ('.$user_zone.')';
 $date_note_msg   = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
 $date_note_attrs = ' class="fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'" ';
 $date_zone_tip   = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), $date_note_attrs );
 
-$list_total_cols = 13;
+$list_total_cols = 12;
 
 // COMMON repeated texts
 $edit_entry = JText::_('FLEXI_EDIT_TAG', true);
@@ -50,21 +46,6 @@ $rem_filt_txt = JText::_('FLEXI_REMOVE_FILTER');
 $rem_filt_tip = ' class="'.$tip_class.' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
 ?>
 <script type="text/javascript">
-
-function fetchcounter()
-{
-	var url = "index.php?option=com_flexicontent&amp;controller=items&amp;task=getorphans&amp;format=raw";
-	var ajax = new Ajax(url, {
-		method: 'get',
-		update: $('count'),
-		onComplete:function(v) {
-			if(v==0)
-				if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>"))
-					location.href = 'index.php?option=com_flexicontent&amp;view=items';
-		}
-	});
-	ajax.request();
-}
 
 // the function overloads joomla standard event
 function submitform(pressbutton)
@@ -181,8 +162,8 @@ window.addEvent('domready', function(){
 				<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
 			</span>
 			<span class="btn-group hidden-phone">
-				<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
-				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="delAllFilters();this.form.submit();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
+				<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
+				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
 			</span>
 		</span>
 		
@@ -261,7 +242,7 @@ window.addEvent('domready', function(){
 				</span>
 				<?php endif; ?>
 			</th>
-			<th class="hideOnDemandClass center" colspan="2">
+			<th class="hideOnDemandClass center">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->filter_itemscount) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -284,7 +265,7 @@ window.addEvent('domready', function(){
 				<?php echo JHTML::_('grid.sort',   'FLEXI_ENABLED', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
 			<th class="hideOnDemandClass center">
-				<?php echo FLEXI_J16GE ? JText::_( 'FLEXI_USERGROUPS' ) : JHTML::_('grid.sort',   'Group', 'groupname', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php echo JText::_( 'FLEXI_USERGROUPS' ); ?>
 				<?php if ($this->filter_usergrp) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_usergrp');document.adminForm.submit();" />
@@ -347,35 +328,34 @@ window.addEvent('domready', function(){
 			{
 				$row 	=& $this->rows[$i];
 				if (!$row->id) continue;
-				if (FLEXI_J16GE) {
-					$row->groupname = array();
-					foreach($row->usergroups as $row_ugrp_id) {
-						$row->groupname[] = $this->usergroups[$row_ugrp_id]->title;
-					}
-					$row->groupname = implode(', ', $row->groupname);
+				$row->groupname = array();
+				foreach($row->usergroups as $row_ugrp_id) {
+					$row->groupname[] = $this->usergroups[$row_ugrp_id]->title;
 				}
+				$row->groupname = implode(', ', $row->groupname);
 
 				$img_path  = '../components/com_flexicontent/assets/images/';
 				$tick_img  = $img_path . 'tick.png';
 				$block_img = $img_path . ($row->block ? 'publish_x.png' : 'tick.png');
-				$task_block= (FLEXI_J16GE ? 'users.' : '') . ($row->block ? 'unblock' : 'block');
-				$users_task = FLEXI_J16GE ? 'task=users.' : 'controller=users&amp;task=';
+				$task_block= 'users.' . ($row->block ? 'unblock' : 'block');
+				$users_task = 'task=users.';
 				$alt   = $row->block ? JText::_( 'Enabled' ) : JText::_( 'Blocked' );
 				$link  = 'index.php?option=com_flexicontent&amp;controller=users&amp;view=user&amp;'.$users_task.'edit&amp;cid[]='. $row->id. '';
 
 				if ($row->lastvisitDate == "0000-00-00 00:00:00") {
 					$lvisit = JText::_( 'Never' );
 				} else {
-					$lvisit	= JHTML::_('date', $row->lastvisitDate, FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S');
+					$lvisit	= JHTML::_('date', $row->lastvisitDate, 'Y-m-d H:i:s');
 				}
-				$registered	= JHTML::_('date', $row->registerDate, FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S');
+				$registered	= JHTML::_('date', $row->registerDate, 'Y-m-d H:i:s');
 
-				$itemscount = '<span class="badge badge-info">'.$row->itemscount.'</span>';
+				$itemscount = '<span class="badge badge-info" title="'.$view_entry.'">'.$row->itemscount.'</span>';
 				if ($row->itemscount) {
-					$view_items_link = '<a onclick="delAllFilters();"  href="index.php?option=com_flexicontent&amp;view=items&amp;filter_authors='.$row->id.'">
-					['.$view_entry.']
+					$itemscount = '
+					<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_subcats=1&amp;filter_state=ALL&amp;filter_author='.$row->id.'&amp;fcform=1">
+						'.$itemscount.'
 					</a>';
-				} else $view_items_link = '';
+				}
 			?>
 			<tr class="<?php echo "row$k"; ?>">
 				<td class="center">
@@ -390,9 +370,6 @@ window.addEvent('domready', function(){
 				</td>
 				<td align="right" class="col_itemscount">
 					<?php echo $itemscount; ?>
-				</td>
-				<td align="left" class="col_view_items">
-					<?php echo $view_items_link; ?>
 				</td>
 				<td>
 					<!-- <a class="modal" rel="{handler: 'iframe', size: {x: 800, y: 500}, onClose: function() {alert('hello');} }" href="<?php echo $link; ?>"> -->
@@ -439,6 +416,7 @@ window.addEvent('domready', function(){
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 	
 	</div>

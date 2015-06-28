@@ -17,7 +17,7 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-$search_task = FLEXI_J16GE ? 'task=search.' : 'controller=search&task=';
+$fileman_task = FLEXI_J16GE ? 'task=filemanager.' : 'controller=filemanager&task=';
 ?>
 <div style="heading">Indexer Running ... <br/><br/><b>NOTE:</b><br/> Only the <b>execution time</b> of indexing process is displayed below, <br/> the <b>network request / reply time</b> is NOT included</div>
 <script type="text/javascript">
@@ -35,7 +35,7 @@ jQuery(document).ready(function() {
 			return;
 		}
 		jQuery.ajax({
-			url: "index.php?option=com_flexicontent&format=raw&<?php echo $search_task; ?>index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo JRequest::getVar('indexer','advanced');?>"+"&rebuildmode=<?php echo JRequest::getVar('rebuildmode','');?>",
+			url: "index.php?option=com_flexicontent&format=raw&<?php echo $fileman_task; ?>index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo JRequest::getVar('indexer','fileman_files');?>"+"&rebuildmode=<?php echo JRequest::getVar('rebuildmode','');?>",
 			success: function(response, status2, xhr2) {
 				var arr = response.split('|');
 				if(arr[0]=='fail') {
@@ -48,14 +48,14 @@ jQuery(document).ready(function() {
 				percent = width/3;
 				jQuery('div#insideprogress').css('width', width+'px');
 				jQuery('div#updatepercent').text(' '+percent.toFixed(2)+' %');
-				jQuery('div#statuscomment').html((looper<number?looper:number)+' / '+number+' items '+response);
+				jQuery('div#statuscomment').html((looper<number?looper:number)+' / '+number+' files '+response);
 				setTimeout(updateprogress, 20);  // milliseconds to delay updating the HTML display
 			}
 		});
 		looper=looper+items_per_call;
 	}
 	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&format=raw&<?php echo $search_task; ?>countrows"+"&indexer=<?php echo JRequest::getVar('indexer','advanced');?>",
+		url: "index.php?option=com_flexicontent&format=raw&<?php echo $fileman_task; ?>countrows"+"&indexer=<?php echo JRequest::getVar('indexer','fileman_files');?>",
 		success: function(response, status, xhr) {
 			var arr = response.split('|');
 			if(arr[0]=='fail') {
