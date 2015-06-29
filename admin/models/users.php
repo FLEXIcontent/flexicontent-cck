@@ -104,8 +104,8 @@ class FlexicontentModelUsers extends JModelList
 		
 		
 		// Author ID filter
-		$filter_id  = $fcform ? $jinput->get('filter_id', '', 'int')  :  $app->getUserStateFromRequest( $p.'filter_id', 'filter_id', '', 'int' );
-		$filter_id  = strlen($filter_id) ? $filter_id : '';  // needed to make text input field be empty AND strlen is to allow filtering sZERO author ID
+		$filter_id  = $fcform ? $jinput->get('filter_id', 0, 'int')  :  $app->getUserStateFromRequest( $p.'filter_id', 'filter_id', 0, 'int' );
+		$filter_id  = $filter_id ? $filter_id : '';  // needed to make text input field be empty AND strlen is to allow filtering sZERO author ID
 		$this->setState('filter_id', $filter_id);
 		$app->setUserState($p.'filter_id', $filter_id);
 		
@@ -212,7 +212,7 @@ class FlexicontentModelUsers extends JModelList
 		$enddate   = trim( JString::strtolower( $enddate ) );
 		
 		// author id
-		$filter_id  = $this->getState( 'filter_logged' );
+		$filter_id  = $this->getState( 'filter_id' );
 		
 		// text search
 		$search = $this->getState( 'search' );
@@ -287,6 +287,7 @@ class FlexicontentModelUsers extends JModelList
 		// Do main query to get the authors
 		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT a.*, s.userid IS NOT NULL AS loggedin'
 			. ', (SELECT COUNT(*) FROM #__content AS i WHERE i.created_by = a.id) AS itemscount '
+			. ', (SELECT SUM(size) FROM #__flexicontent_files AS f WHERE f.uploaded_by = a.id) AS uploadssize'
 			. ' FROM #__users AS a'
 			. ' LEFT JOIN #__flexicontent_authors_ext AS ue ON a.id = ue.user_id'
 			. ' LEFT JOIN #__session AS s ON s.userid = a.id'

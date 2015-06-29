@@ -70,7 +70,8 @@ class FlexicontentViewUsers extends JViewLegacy
 		$filter_usergrp    = $model->getState( 'filter_usergrp' );
 		$filter_logged     = $model->getState( 'filter_logged' );
 		
-		if ($filter_itemscount) $count_filters++;  if (strlen($filter_usergrp)) $count_filters++;
+		if ($filter_itemscount) $count_filters++;
+		if ($filter_usergrp)    $count_filters++;
 		if ($filter_logged)     $count_filters++;
 		
 		$date       = $model->getState( 'date' );
@@ -108,6 +109,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		
 		// Add custom css and js to document
 		flexicontent_html::loadFramework('select2');
+		JHTML::_('behavior.calendar');
 		JHTML::_('behavior.tooltip');
 		
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -213,35 +215,33 @@ class FlexicontentViewUsers extends JViewLegacy
 		$lists['date'] = '<label class="label">'.JText::_('FLEXI_DATE').'</label>'.
 			JHTML::_('select.genericlist', $dates, 'date', 'size="1" class="use_select2_lib fc_skip_highlight"', 'value', 'text', $date, 'date' );
 		
-		$lists['startdate'] =
-			JHTML::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'11',  'maxlength'=>'20'));
-		$lists['enddate'] 	=
-			JHTML::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'11',  'maxlength'=>'20'));
+		$lists['startdate'] = JHTML::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_FROM')));
+		$lists['enddate'] 	= JHTML::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'8',  'maxlength'=>'19', 'style'=>'width:auto', 'placeholder'=>JText::_('FLEXI_TO')));
 		
 		// search filter
 		$lists['search']= $search;
 		// search id
 		$lists['filter_id'] = $filter_id;
 
-		$this->assignRef('count_filters', $count_filters);
-		$this->assignRef('lists'	, $lists);
-		$this->assignRef('rows'		, $rows);
-		$this->assignRef('usergroups',	$usergroups);
+		$this->assignRef('count_filters'	, $count_filters);
+		$this->assignRef('lists'			, $lists);
+		$this->assignRef('rows'				, $rows);
+		$this->assignRef('usergroups'	,	$usergroups);
 		$this->assignRef('pagination'	, $pagination);
 
 		// filters
-		$this->assignRef('filter_id'		, $filter_id);
-		$this->assignRef('filter_itemscount'		, $filter_itemscount);
+		$this->assignRef('filter_id'	, $filter_id);
+		$this->assignRef('filter_itemscount', $filter_itemscount);
 		$this->assignRef('filter_usergrp'		, $filter_usergrp);
-		$this->assignRef('filter_logged'	, $filter_logged);
+		$this->assignRef('filter_logged'		, $filter_logged);
 		$this->assignRef('search'			, $search);
-		$this->assignRef('filter_id'			, $filter_id);
+		$this->assignRef('filter_id'	, $filter_id);
 		$this->assignRef('date'				, $date);
-		$this->assignRef('startdate'		, $startdate);
-		$this->assignRef('enddate'			, $enddate);
+		$this->assignRef('startdate'	, $startdate);
+		$this->assignRef('enddate'		, $enddate);
 		
-		$this->assignRef('option', $option);
-		$this->assignRef('view', $view);
+		$this->assignRef('option'	, $option);
+		$this->assignRef('view'		, $view);
 		
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);

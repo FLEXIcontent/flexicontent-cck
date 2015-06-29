@@ -104,43 +104,6 @@ function delAllFilters() {
 	delFilter('filter_id');
 }
 
-window.addEvent('domready', function(){
-	var startdate	= $('startdate');
-	var enddate 	= $('enddate');
-	if(MooTools.version>="1.2.4") {
-		var sdate = startdate.value;
-		var edate = enddate.value;
-	}else{
-		var sdate = startdate.getValue();
-		var edate = enddate.getValue();
-	}
-	if (sdate == '') {
-		startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM',true ); ?>');
-	}
-	if (edate == '') {
-		enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO',true ); ?>');
-	}
-	$('startdate').addEvent('focus', function() {
-		if (sdate == '<?php echo JText::_( 'FLEXI_FROM',true ); ?>') {
-			startdate.setProperty('value', '');
-		}
-	});
-	$('enddate').addEvent('focus', function() {
-		if (edate == '<?php echo JText::_( 'FLEXI_TO',true ); ?>') {
-			enddate.setProperty('value', '');
-		}
-	});
-	$('startdate').addEvent('blur', function() {
-		if (sdate == '') {
-			startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM',true ); ?>');
-		}
-	});
-	$('enddate').addEvent('blur', function() {
-		if (edate == '') {
-			enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO',true ); ?>');
-		}
-	});
-});
 </script>
 
 <div class="flexicontent">
@@ -242,14 +205,6 @@ window.addEvent('domready', function(){
 				</span>
 				<?php endif; ?>
 			</th>
-			<th class="hideOnDemandClass center">
-				<?php echo JHTML::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
-				<?php if ($this->filter_itemscount) : ?>
-				<span <?php echo $rem_filt_tip; ?>>
-					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_itemscount');document.adminForm.submit();" />
-				</span>
-				<?php endif; ?>
-			</th>
 			<th class="hideOnDemandClass center" >
 				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_NAME', 'a.username', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
@@ -269,6 +224,22 @@ window.addEvent('domready', function(){
 				<?php if ($this->filter_usergrp) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
 					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_usergrp');document.adminForm.submit();" />
+				</span>
+				<?php endif; ?>
+			</th>
+			<th class="hideOnDemandClass center">
+				<?php echo JHTML::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php if ($this->filter_itemscount) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_itemscount');document.adminForm.submit();" />
+				</span>
+				<?php endif; ?>
+			</th>
+			<th class="hideOnDemandClass center">
+				<?php echo JHTML::_('grid.sort',   'FLEXI_FILES_MBS', 'uploadssize', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+				<?php if (@$this->filter_uploadssize) : ?>
+				<span <?php echo $rem_filt_tip; ?>>
+					<img src="components/com_flexicontent/assets/images/delete.png" alt="<?php echo $rem_filt_txt ?>" class="fc-man-icon-s" onclick="delFilter('filter_uploadssize');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -368,9 +339,6 @@ window.addEvent('domready', function(){
 					<a href="<?php echo $link; ?>">
 						<?php echo $row->name; ?></a>
 				</td>
-				<td align="right" class="col_itemscount">
-					<?php echo $itemscount; ?>
-				</td>
 				<td>
 					<!-- <a class="modal" rel="{handler: 'iframe', size: {x: 800, y: 500}, onClose: function() {alert('hello');} }" href="<?php echo $link; ?>"> -->
 					<?php echo $row->username; ?>
@@ -385,6 +353,12 @@ window.addEvent('domready', function(){
 				</td>
 				<td align="center" class="col_usergrp">
 					<?php echo JText::_( $row->groupname ); ?>
+				</td>
+				<td align="right" class="col_itemscount">
+					<?php echo $itemscount; ?>
+				</td>
+				<td align="right" class="col_uploadssize">
+					<?php echo number_format(($row->uploadssize / (1024*1024)) , 2); ?>
 				</td>
 				<td align="left">
 					<a href="mailto:<?php echo $row->email; ?>">
