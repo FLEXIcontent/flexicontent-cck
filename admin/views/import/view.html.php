@@ -53,11 +53,6 @@ class FlexicontentViewImport extends JViewLegacy
 		$context	= 'com_flexicontent';
 		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 		
-		//add css to document
-		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
-
 		// Get filter vars
 		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.import.filter_order', 		'filter_order', 	'', 	'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.import.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
@@ -70,8 +65,29 @@ class FlexicontentViewImport extends JViewLegacy
 		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 		$session->set('csvimport_parse_log', null, 'flexicontent');
 		
-		// Get User's Global Permissions
+		
+		
+		// **************************
+		// Add css and js to document
+		// **************************
+		
+		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+		
+		
+		
+		// *****************************
+		// Get user's global permissions
+		// *****************************
+		
 		$perms = FlexicontentHelperPerm::getPerm();
+		
+		
+		
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
 		
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanImport');

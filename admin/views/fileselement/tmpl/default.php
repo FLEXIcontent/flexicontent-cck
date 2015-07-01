@@ -228,7 +228,7 @@ function delAllFilters() {
 					
 					$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
 					
-					$path		= @$row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
+					$path		= !empty($row->secure) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
 					$file_path = $row->filename;
 					
 					if ($this->folder_mode) {
@@ -308,7 +308,7 @@ function delAllFilters() {
 					<?php
 					$is_authorised = $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by);
 					if ($is_authorised) {
-						$access = flexicontent_html::userlevel('access['.$row->id.']', @$row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'filemanager.access\')"');
+						$access = flexicontent_html::userlevel('access['.$row->id.']', !empty($row->secure), 'onchange="return listItemTask(\'cb'.$i.'\',\'filemanager.access\')"');
 					} else {
 						$access = strlen($row->access_level) ? $this->escape($row->access_level) : '-';
 					}
@@ -331,7 +331,7 @@ function delAllFilters() {
 		<?php } ?>
 					
 					<td align="center"><?php echo $row->size; ?></td>
-					<td align="center"><?php echo @$row->hits; ?></td>
+					<td align="center"><?php echo empty($row->hits) ? 0 : $row->hits; ?></td>
 					<td align="center"><?php echo $row->uploader; ?></td>
 					<td align="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC4' )." H:i:s" ); ?></td>
 		<?php if (!$this->folder_mode) { ?>

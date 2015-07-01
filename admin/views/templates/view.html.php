@@ -31,34 +31,55 @@ class FlexicontentViewTemplates extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		//initialise variables
-		$mainframe = JFactory::getApplication();
-		$option    = JRequest::getVar('option');
-		$document  = JFactory::getDocument();
-		$user      = JFactory::getUser();
-		$db        = JFactory::getDBO();
+		// ********************
+		// Initialise variables
+		// ********************
 		
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+		
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		
+		
+		
+		// **************************
+		// Add css and js to document
+		// **************************
+		
+		flexicontent_html::loadFramework('select2');
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
-
-		//add css and submenu to document
+		
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		
-		$permission = FlexicontentHelperPerm::getPerm();
+		
+		
+		// *****************************
+		// Get user's global permissions
+		// *****************************
+		
+		$perms = FlexicontentHelperPerm::getPerm();
 
-		if (!$permission->CanTemplates) {
-			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+		if (!$perms->CanTemplates) {
+			$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
-		// Get User's Global Permissions
-		$perms = FlexicontentHelperPerm::getPerm();
 		
-		//Create Submenu
+		
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
+		
+		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanTemplates');
-		
-		
+				
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_TEMPLATES' );
 		$site_title = $document->getTitle();

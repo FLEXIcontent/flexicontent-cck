@@ -64,16 +64,22 @@ class FlexicontentViewTypes extends JViewLegacy
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		
-		// Get User's Global Permissions
+		
+		
+		// *****************************
+		// Get user's global permissions
+		// *****************************
+		
 		$perms = FlexicontentHelperPerm::getPerm();
+		
+		
+		
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
 		
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanTypes');
-		
-		
-		// ******************
-		// Create the toolbar
-		// ******************
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_TYPES' );

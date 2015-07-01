@@ -18,6 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
@@ -241,10 +243,11 @@ function delAllFilters() {
 		
 			<td style="text-align: left;" class="col_search_index">
 				<?php
+					$_search_index = !$search_prefix ? $row->search_index : preg_replace('/\b'.$search_prefix.'/u', '', $row->search_index);
 					if(iconv_strlen($row->search_index, "UTF-8")>400)
-						echo iconv_substr($row->search_index, 0, 400, "UTF-8").'...';
+						echo iconv_substr($_search_index, 0, 400, "UTF-8").'...';
 					else
-						echo $row->search_index;
+						echo $_search_index;
 				?>
 			</td>
 			<?php /*<td nowrap="nowrap" style="text-align: center;">
@@ -257,13 +260,16 @@ function delAllFilters() {
 	</tbody>
 	</table>
 
-	<input type="hidden" name="task" value="display" />
 	<input type="hidden" name="boxchecked" value="0" />
+	<input type="hidden" name="option" value="com_flexicontent" />
+	<input type="hidden" name="controller" value="search" />
+	<input type="hidden" name="view" value="search" />
+	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
-	<input type="hidden" name="controller" value="search" />
-	<?php echo JHTML::_('form.token'); ?>
-	
+	<input type="hidden" name="fcform" value="1" />
+	<?php echo JHTML::_( 'form.token' ); ?>
+
 	</div>
 </form>
 </div>

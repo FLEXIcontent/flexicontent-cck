@@ -39,19 +39,38 @@ class FlexicontentViewArchive extends JViewLegacy
 		$db       = JFactory::getDBO();
 		$document	= JFactory::getDocument();
 		
-		JHTML::_('behavior.tooltip');
 
 		//get vars
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.archive.filter_order', 		'filter_order', 	'i.ordering', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.archive.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.archive.search', 			'search', 			'', 'string' );
 		$search 			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
-
-		//add css and submenu to document
+		
+		
+		
+		// **************************
+		// Add css and js to document
+		// **************************
+		
+		JHTML::_('behavior.tooltip');
+		
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+		
+		
+		
+		// *****************************
+		// Get user's global permissions
+		// *****************************
+		
 		$perms = FlexicontentHelperPerm::getPerm();
+		
+		
+		
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
 		
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanArchives');

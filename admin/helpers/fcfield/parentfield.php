@@ -3,26 +3,29 @@
  * Package : FLEXIContent
  * @subpackage : fcfield parent field plugin.
  * @copyright : (c) 2015 http://www.flexicontent.org.
- * Created by : Suriya Kaewmungmuang(iamkeng,enjoyman), ColorPack Co.,Ltd.
+ * Created by : Suriya Kaewmungmuang(iamkeng,enjoyman), ColorPack Co.,Ltd., Georgios Papadakis
  * @license GNU/GPL v2
 */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-class FCField extends JPlugin{
+class FCField extends JPlugin
+{
 	// ***********
 	// ATTRIBUTES
 	// ***********
 	static $field_types = array('fcfield');
-	protected $fieldtypes = NULL;
-	protected $field = NULL;
-	protected $item = NULL;
-	protected $vars = NULL;
+	protected $fieldtypes = null;
+	protected $field = null;
+	protected $item = null;
+	protected $vars = null;
+	
 	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
-	public function __construct(&$subject, $params) {
+	public function __construct(&$subject, $params)
+	{
 		parent::__construct( $subject, $params );
 		if(!$this->fieldtypes)
 			$this->fieldtypes = self::$field_types;
@@ -35,21 +38,27 @@ class FCField extends JPlugin{
 		}
 	}
 	
-	public function setField(&$field) {
+	
+	public function setField(&$field)
+	{
 		$this->field = $field;
 	}
 	
-	public function &getField() {
+	public function &getField()
+	{
 		return $this->field;
 	}
 	
-	public function setItem(&$item) {
+	public function setItem(&$item)
+	{
 		$this->item = $item;
 	}
 	
-	public function &getItem() {
+	public function &getItem()
+	{
 		return $this->item;
 	}
+	
 	
 	protected function getSeparatorF($opentag, $closetag)
 	{
@@ -89,6 +98,7 @@ class FCField extends JPlugin{
 	}
 	
 	
+	
 	// *******************************************
 	// DISPLAY methods, item form & frontend views
 	// *******************************************
@@ -98,12 +108,21 @@ class FCField extends JPlugin{
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		$field->label = JText::_($field->label);
-
+		
+		// Set field and item objects
 		$this->setField($field);
 		$this->setItem($item);
+		
+		// Parse field values
 		$this->values = $this->parseValues($this->field->value);
-		$this->values = (count($this->values)>0)?$this->values:$this->getDefaultValues();
+		
+		// Optionally, get default field values array is empty
+		$this->values = count($this->values) ? $this->values : $this->getDefaultValues();
+		
+		// Call before display method, for optionally work
 		$this->beforeDisplayField();
+		
+		// Display the form field
 		$this->displayField();
 	}
 	
@@ -114,10 +133,17 @@ class FCField extends JPlugin{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		$field->label = JText::_($field->label);
 		
+		// Set field and item objects
 		$this->setField($field);
 		$this->setItem($item);
-		$this->values = $this->parseValues($this->field->value);
 		
+		// Use the custom field values, if these were provided
+		$values = $values !== null ? $values : $this->field->value;
+		
+		// Parse field values
+		$this->values = $this->parseValues($values);
+		
+		// Create field's display
 		$this->displayFieldValue($prop);
 	}
 	
@@ -166,6 +192,8 @@ class FCField extends JPlugin{
 		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
 	}
 	
+	
+	
 	// *************************
 	// SEARCH / INDEXING METHODS
 	// *************************
@@ -179,6 +207,7 @@ class FCField extends JPlugin{
 		return true;
 	}
 	
+	
 	// Method to create basic search index (added as the property field->search)
 	public function onIndexSearch(&$field, &$post, &$item) {
 		if ( !in_array($field->field_type, self::$field_types) ) return;
@@ -187,6 +216,7 @@ class FCField extends JPlugin{
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('originalname'), $search_properties=array('title','desc'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
+	
 	
 	/**
 	 * Get the path to a layout for a field
@@ -253,10 +283,12 @@ class FCField extends JPlugin{
 	protected function getCloseTag() {
 		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'closetag', '' ), 'closetag' );
 	}
-
+	
+	
 	protected function getDefaultValues() {
-		return array("");
+		return array('');
 	}
+	
 	
 	protected function beforeDisplayField() {
 		// do something
@@ -270,29 +302,30 @@ class FCField extends JPlugin{
 		$field  = $this->getField();
 		$item   = $this->getItem();
 		$values = & $this->values;
-
-		// Include template file: EDIT LAYOUT 
-		@ob_start();
-		include(self::getFormPath($this->fieldtypes[0], $layout));
-		$field->html = @ob_get_contents();
-		@ob_end_clean();
 		
-		// if ($use_ingroup) { // do not convert the array to string if field is in a group
-		// } else if ($multiple) { // handle multiple records
-		// 	$field->html =
-		// 		'<li class="'.$value_classes.'">'.
-		// 			implode('</li><li class="'.$value_classes.'">', $field->html).
-		// 		'</li>';
-		// 	$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-		// 	if (!$add_position) $field->html .= '<span class="fcfield-addvalue fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
-		// } else {  // handle single values
-		// 	$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
-		// }
+		$field->html = array();
+		
+		// Include template file: EDIT LAYOUT 
+		include(self::getFormPath($this->fieldtypes[0], $layout));
+		
+		if ($use_ingroup) { // do not convert the array to string if field is in a group
+		} else if ($multiple) { // handle multiple records
+			$field->html =
+				'<li class="'.$value_classes.'">'.
+					implode('</li><li class="'.$value_classes.'">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
+		} else {  // handle single values
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+		}
 	}
-
+	
+	
 	protected function afterDisplayField() {
 		// do something
 	}
+	
 	
 	protected function displayFieldValue($prop='display', $layout = 'value')
 	{
@@ -300,7 +333,6 @@ class FCField extends JPlugin{
 		$use_ingroup = 0;
 		$field  = $this->getField();
 		$item   = $this->getItem();
-		//$values = & $this->values;
 		
 		$opentag	= $this->getOpenTag();
 		$closetag	= $this->getCloseTag();

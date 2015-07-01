@@ -168,9 +168,9 @@ class FlexicontentViewItems extends JViewLegacy
 		if (strlen($search)) $js .= "jQuery('.col_title').each(function(){ jQuery(this).addClass('yellow'); });";
 		
 		
-		// **********************************
-		// Get component/category permissions
-		// **********************************
+		// *****************************
+		// Get user's global permissions
+		// *****************************
 		
 		$perms = FlexicontentHelperPerm::getPerm();
 		
@@ -198,16 +198,19 @@ class FlexicontentViewItems extends JViewLegacy
 		$CanAdd = $itemmodel->getItemAccess()->get('access-create');
 		
 		
+		// *****************************
+		// Get user's global permissions
+		// *****************************
 		
-		// ******************************************************
+		$perms = FlexicontentHelperPerm::getPerm();
+		
+				
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
+		
 		// Create Submenu (and also check access to current view)
-		// ******************************************************
 		FLEXISubmenu('notvariable');
-		
-		
-		// ******************
-		// Create the toolbar
-		// ******************
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_ITEMS' );

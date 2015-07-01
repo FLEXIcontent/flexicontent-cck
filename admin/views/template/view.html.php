@@ -31,8 +31,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 
 	function display($tpl = null)
 	{
-		
-		//initialise variables
+		// Initialise variables
 		$app = JFactory::getApplication();
 		$option   = JRequest::getVar('option');
 		$db       = JFactory::getDBO();
@@ -58,9 +57,6 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		//$fieldTypes = $this->get( 'FieldTypesList' );
 		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=false, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
 		
-		
-		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.tooltip');
 		
 		// Create CONTENT TYPE SELECTOR
 		foreach ($fields as $field) {
@@ -179,20 +175,38 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		}
 		
 		
+		
+		// **************************
+		// Add css and js to document
+		// **************************
+		
+		flexicontent_html::loadFramework('select2');
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
-
-		//add css and submenu to document
+		
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		
-		$permission = FlexicontentHelperPerm::getPerm();
-		if (!$permission->CanTemplates) {
+		
+		
+		// *****************************
+		// Get user's global permissions
+		// *****************************
+		
+		$perms = FlexicontentHelperPerm::getPerm();
+
+		if (!$perms->CanTemplates) {
 			$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
-		//Create Submenu
+		
+		
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
+		
+		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanTemplates');
 
 		//create the toolbar

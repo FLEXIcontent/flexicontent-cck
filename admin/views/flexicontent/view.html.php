@@ -180,7 +180,11 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		}
 		
 		
-		// Add custom css and js to document
+		
+		// **************************
+		// Add css and js to document
+		// **************************
+		
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
@@ -190,9 +194,21 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$document->addStyleDeclaration($css);
 		
 		
-		//Create Submenu
-		FLEXISubmenu('notvariable');
 		
+		// *****************************
+		// Get user's global permissions
+		// *****************************
+		
+		$perms = FlexicontentHelperPerm::getPerm();
+		
+		
+		
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
+		
+		// Create Submenu (and also check access to current view)
+		FLEXISubmenu('notvariable');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_DASHBOARD' );
@@ -201,8 +217,6 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
-		// Get User's Global Permissions
-		$perms = FlexicontentHelperPerm::getPerm();
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
 			$js = "jQuery(document).ready(function(){";
 			

@@ -2,6 +2,9 @@
 //No direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-foreach ($this->values as $v) {
+$values = & $this->values;
+
+foreach ($values as $v)
+{
 	$this->field->{$prop} = $v;
 }

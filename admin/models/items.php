@@ -31,14 +31,14 @@ jimport('joomla.application.component.model');
 class FlexicontentModelItems extends JModelLegacy
 {
 	/**
-	 * Items data
+	 * view's rows
 	 *
-	 * @var object
+	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * Items total
+	 * rows total
 	 *
 	 * @var integer
 	 */
@@ -97,20 +97,22 @@ class FlexicontentModelItems extends JModelLegacy
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function __construct()
 	{
 		parent::__construct();
 		
-		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
-		$option  = $jinput->get('option', '', 'cmd');
-		$view    = $jinput->get('view', '', 'cmd');
-		$fcform  = $jinput->get('fcform', 0, 'int');
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$fcform = $jinput->get('fcform', 0, 'int');
+		$p      = $option.'.'.$view.'.';
+		
+		// Parameters of the view, in our case it is only the component parameters
 		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
-		$p = $option.'.'.$view.'.';
 		
 		
 		// ***********************************************************
@@ -246,7 +248,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
 		$jinput->set( 'limitstart',	$limitstart );
-
+		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
 		
@@ -1315,6 +1317,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// *********************
 		// TEXT search filtering	
 		// *********************
+		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		
 		if ($search) {
 			$escaped_search = $this->_db->escape( $search, true );
@@ -1329,7 +1332,7 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 		if ($search && $scope == 4) {
-			$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $escaped_search.'*', false ).' IN BOOLEAN MODE)';
+			$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $search_prefix.$escaped_search.'*', false ).' IN BOOLEAN MODE)';
 		}
 		
 		

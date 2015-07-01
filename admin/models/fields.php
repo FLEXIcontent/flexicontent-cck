@@ -31,14 +31,14 @@ jimport('joomla.application.component.modellist');
 class FlexicontentModelFields extends JModelList
 {
 	/**
-	 * Field data
+	 * Field rows
 	 *
-	 * @var object
+	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * Field total
+	 * rows total
 	 *
 	 * @var integer
 	 */
@@ -61,19 +61,18 @@ class FlexicontentModelFields extends JModelList
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function __construct()
 	{
 		parent::__construct();
-
-		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
-		$option  = $jinput->get('option', '', 'cmd');
-		$view    = $jinput->get('view', '', 'cmd');
-		$fcform  = $jinput->get('fcform', 0, 'int');
 		
-		$p = $option.'.'.$view.'.';
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$fcform = $jinput->get('fcform', 0, 'int');
+		$p      = $option.'.'.$view.'.';
 		
 		
 		// **************
@@ -138,7 +137,7 @@ class FlexicontentModelFields extends JModelList
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
 		$jinput->set( 'limitstart',	$limitstart );
-
+		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
 		

@@ -64,7 +64,11 @@ class FlexicontentViewStats extends JViewLegacy
 		
 		// ************************************************** New data*********************************************************************************************************************//
 		
-		//add css and submenu to document
+		
+		// **************************
+		// Add css and js to document
+		// **************************
+		
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
@@ -76,17 +80,22 @@ class FlexicontentViewStats extends JViewLegacy
 		$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/esl/esl.js');
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		
-
-
-
-		// Get User's Global Permissions
+		
+		
+		// *****************************
+		// Get user's global permissions
+		// *****************************
+		
 		$perms = FlexicontentHelperPerm::getPerm();
 		
-		// **************************
-		// Create Submenu and toolbar
-		// **************************
-		FLEXISubmenu('CanStats');
 		
+		
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
+		
+		// Create Submenu (and also check access to current view)
+		FLEXISubmenu('CanStats');
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_STATISTICS' );

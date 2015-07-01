@@ -88,7 +88,11 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
 		$filter_item      = $filter_item ? $filter_item : '';
 		
-		// Add custom css and js to document
+		
+		
+		// **************************
+		// Add css and js to document
+		// **************************
 		
 		if ($app->isSite()) {
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
@@ -99,12 +103,21 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		
-		// Get User's Global Permissions
+		
+		
+		// *****************************
+		// Get user's global permissions
+		// *****************************
+		
 		$perms = FlexicontentHelperPerm::getPerm();
 		
-		// **************************
-		// Create Submenu and toolbar
-		// **************************
+		
+		
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
+		
+		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanFiles');
 		
 		// Create document/toolbar titles

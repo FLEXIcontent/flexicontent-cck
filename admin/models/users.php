@@ -31,14 +31,14 @@ jimport('joomla.application.component.modellist');
 class FlexicontentModelUsers extends JModelList
 {
 	/**
-	 * file data
+	 * view's rows
 	 *
-	 * @var object
+	 * @var array
 	 */
 	var $_data = null;
 
 	/**
-	 * file total
+	 * rows total
 	 *
 	 * @var integer
 	 */
@@ -55,20 +55,21 @@ class FlexicontentModelUsers extends JModelList
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function __construct()
 	{
 		parent::__construct();
-
-		$app     = JFactory::getApplication();
-		$jinput  = $app->input;
-		$option  = $jinput->get('option', '', 'cmd');
-		$view    = $jinput->get('view', '', 'cmd');
-		$fcform  = $jinput->get('fcform', 0, 'int');
-		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
-		$p = $option.'.'.$view.'.';
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$fcform = $jinput->get('fcform', 0, 'int');
+		$p      = $option.'.'.$view.'.';
+		
+		// Parameters of the view, in our case it is only the component parameters
+		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
 				
 		// **************
@@ -138,7 +139,7 @@ class FlexicontentModelUsers extends JModelList
 		
 		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
 		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
-
+		
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
 		$jinput->set( 'limitstart',	$limitstart );

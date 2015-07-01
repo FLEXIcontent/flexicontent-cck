@@ -92,6 +92,17 @@ class FlexicontentViewUsers extends JViewLegacy
 		$search = $db->escape( trim(JString::strtolower( $search ) ) );
 		
 		
+		
+		// *******************
+		// Get data from model
+		// *******************
+		
+		$rows  = $model->getData();    // User data
+		$total = $model->getTotal();   // Total rows
+		$pagination = $model->getPagination();  // Pagination
+		
+		
+		
 		// ******************************************
 		// Add usability notices if these are enabled
 		// ******************************************
@@ -107,7 +118,11 @@ class FlexicontentViewUsers extends JViewLegacy
 		}
 		
 		
-		// Add custom css and js to document
+		
+		// **************************
+		// Add css and js to document
+		// **************************
+		
 		flexicontent_html::loadFramework('select2');
 		JHTML::_('behavior.calendar');
 		JHTML::_('behavior.tooltip');
@@ -132,23 +147,23 @@ class FlexicontentViewUsers extends JViewLegacy
 		}
 		$js .= "});";
 		$document->addScriptDeclaration($js);
-
 		
-		// Get data from model
-		$rows  = $model->getData();    // User data
-		$total = $model->getTotal();   // Total rows
-		$pagination = $model->getPagination();  // Pagination
 		
-		// Get User's Global Permissions
+		
+		// *****************************
+		// Get user's global permissions
+		// *****************************
+		
 		$perms = FlexicontentHelperPerm::getPerm();
+		
+		
+		
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
 		
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanAuthors');
-		
-		
-		// ******************
-		// Create the toolbar
-		// ******************
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_AUTHORS' );
