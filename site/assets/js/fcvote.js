@@ -32,6 +32,9 @@ window.addEvent('domready', function() {
 			jQuery.ajax({
 				url: voteurl,
 				dataType: "json",
+				data: {
+					lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: '')
+				},
 				success: function( data )
 				{
 					if (typeof(data.percentage)!="undefined" && data.percentage) {
@@ -111,6 +114,9 @@ window.addEvent('domready', function() {
 		jQuery.ajax({
 			url: url,
 			dataType: "json",
+			data: {
+				lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: '')
+			},
 			success: function( data )
 			{
 				box.removeClass('ajax-loader');

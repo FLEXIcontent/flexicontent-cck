@@ -2373,6 +2373,9 @@ class flexicontent_html
 				}
 			}
 			
+			flexicontent_html::loadFramework('jQuery');
+			flexicontent_html::loadFramework('flexi_tmpl_common');
+			
 			$document = JFactory::getDocument();
 			$css 	= JURI::root(true).'/components/com_flexicontent/assets/css/fcvote.css';
 			$js		= JURI::root(true).'/components/com_flexicontent/assets/js/fcvote.js';
@@ -2631,6 +2634,9 @@ class flexicontent_html
 				// J3.0+ tooltips (bootstrap based)
 				if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
 			}
+			
+			flexicontent_html::loadFramework('jQuery');
+			flexicontent_html::loadFramework('flexi_tmpl_common');
 			
 			$document	= JFactory::getDocument();
 			$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/fcfav.js' );

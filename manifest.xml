@@ -110,6 +110,7 @@
 		</languages>
 		
 		<params>
+			<param name="add_search_prefix" default="1" /> <!-- ON here, OFF in config.xml for compatibility -->
 			<param name="flexi_category" default="com_content" />
 			<param name="comments" default="0" />
 			<param name="support_url" default="" />
@@ -139,8 +140,8 @@
 			<param name="show_email_icon" default="1" />
 			<param name="show_state_icon" default="1" />
 			
-			<param name="tags_using_catview" default="1" />
-			<param name="favs_using_catview" default="1" />
+			<param name="tags_using_catview" default="1" /> <!-- ON here, OFF in config.xml for compatibility -->
+			<param name="favs_using_catview" default="1" /> <!-- ON here, OFF in config.xml for compatibility -->
 			
 			<param name="display_subcategories_items" default="2" />
 			<param name="catlimit" default="100" />

@@ -147,19 +147,6 @@ $r = 0;
 								data-fc_label_text="<?php echo $text_search_label; ?>" name="q" size="30" maxlength="120" 
 								id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" />
 							
-							<?php
-							$ignoredwords = JRequest::getVar('ignoredwords');
-							$shortwords = JRequest::getVar('shortwords');
-							$shortwords_sanitize = JRequest::getVar('shortwords_sanitize');
-							$shortwords .= $shortwords_sanitize ? ' '.$shortwords_sanitize : '';
-							$min_word_len = JFactory::getApplication()->getUserState( JRequest::getVar('option').'.min_word_len', 0 );
-							$msg = '';
-							$msg .= $ignoredwords ? JText::_('FLEXI_WORDS_IGNORED_MISSING_COMMON').': <b>'.$ignoredwords.'</b>' : '';
-							$msg .= $ignoredwords && $shortwords ? ' <br/> ' : '';
-							$msg .= $shortwords ? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) .': <b>'.$shortwords.'</b>' : '';
-							?>
-							<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>					
-							
 							<?php $button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple'; ?>
 							<button class="<?php echo $button_classes; ?> button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);">
 								<span class="icon-search icon-white"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
@@ -179,6 +166,19 @@ $r = 0;
 						} ?>
 						
 						<?php if ( $show_searchphrase ) echo $this->lists['searchphrase']; ?>
+						
+						<?php
+						$ignoredwords = JRequest::getVar('ignoredwords');
+						$shortwords = JRequest::getVar('shortwords');
+						$shortwords_sanitize = JRequest::getVar('shortwords_sanitize');
+						$shortwords .= $shortwords_sanitize ? ' '.$shortwords_sanitize : '';
+						$min_word_len = JFactory::getApplication()->getUserState( JRequest::getVar('option').'.min_word_len', 0 );
+						$msg = '';
+						$msg .= $ignoredwords ? JText::_('FLEXI_WORDS_IGNORED_MISSING_COMMON').': <b>'.$ignoredwords.'</b>' : '';
+						$msg .= $ignoredwords && $shortwords ? ' <br/> ' : '';
+						$msg .= $shortwords ? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) .': <b>'.$shortwords.'</b>' : '';
+						?>
+						<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>					
 						
 						<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 					</span>

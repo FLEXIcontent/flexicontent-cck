@@ -27,12 +27,12 @@ class FLEXIadvsearchHelper
 	static function santiseSearchWord(&$searchword, $searchphrase, $min=2)
 	{
 		$ignored = false;
-
 		$lang = JFactory::getLanguage();
+		$lang_tag = $lang->getTag();
+		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 
-		$search_ignore	= array();
-		$tag			= $lang->getTag();
-		$ignoreFile		= $lang->getLanguagePath().DS.$tag.DS.$tag.'.ignore.php';
+		$search_ignore = array();
+		$ignoreFile = $lang->getLanguagePath().DS.$lang_tag.DS.$lang_tag.'.ignore.php';
 		if (file_exists($ignoreFile)) {
 			include $ignoreFile;
 		}
@@ -47,7 +47,7 @@ class FLEXIadvsearchHelper
 
 		// filter out search terms that are too small
 		foreach( $aterms AS $aterm ) {
-			if (JString::strlen( $aterm ) < $min) {
+			if (!$search_prefix && JString::strlen( $aterm ) < $min) {
 				$search_ignore[] = $aterm;
 			}
 		}

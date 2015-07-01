@@ -314,7 +314,9 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// ****************************************
 		
 		$si_tbl = !$txtmode ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
-		$text = trim( $text );
+		$search_prefix = 'vvv';
+		$text = preg_replace('/(\b[^\s]+\b)/', $search_prefix.'$0', trim($text));
+		
 		if( strlen($text) )
 		{
 			$ts = !$txtmode ? 'ie' : 'ts';
@@ -339,7 +341,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=0);
+					if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=0);
 					if (empty($words)) {
 						// All words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
 						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
@@ -359,7 +361,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
+					if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
 					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
@@ -377,7 +379,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 						$words = preg_split('/\s\s*/u', $text);
 						$stopwords = array();
 						$shortwords = array();
-						$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
+						if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
 						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 						JRequest::setVar('shortwords', implode(' ', $shortwords));
 						
@@ -712,6 +714,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 				if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION ) {
 					$item->categories = isset($item_cats[$item->id])  ?  $item_cats[$item->id] : array();  // in case of item categories missing
 					$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+					$item->text = preg_replace('/\b'.$search_prefix.'/', '', $item->text);
 				} else {
 					$item->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
 				}

@@ -1958,6 +1958,8 @@ class FlexicontentFields
 		// Make sure posted data is an array 
 		$unserialize = (isset($field->unserialize)) ? $field->unserialize : ( count($required_props) || count($search_props) );
 		
+		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		
 		// Create the new search data
 		foreach($items_values as $itemid => $item_values) 
 		{
@@ -2022,6 +2024,8 @@ class FlexicontentFields
 				$n = 0;
 				foreach ($searchindex as $vi => $search_text)
 				{
+					if ($search_prefix)
+						$search_text = preg_replace('/(\b[^\s]+\b)/u', $search_prefix.'$0', $search_text);
 					// Add new search value into the DB
 					$query_val = "( "
 						.$field->id. "," .$itemid. "," .($n++). "," .$db->Quote($search_text). "," .$db->Quote($vi).
@@ -2196,7 +2200,8 @@ class FlexicontentFields
 		// SINGLE TEXT select value cases
 		case 1:
 			// DO NOT put % in front of the value since this will force a full table scan instead of indexed column scan
-			$_value_like = $value[0].($is_full_text ? '*' : '%');
+			$search_prefix = 'vvv';
+			$_value_like = $search_prefix.$value[0].($is_full_text ? '*' : '%');
 			if (empty($quoted))  $_value_like = $db->Quote($_value_like);
 			if ($is_full_text)
 				$valueswhere .= ' AND  MATCH (_v_) AGAINST ('.$_value_like.' IN BOOLEAN MODE)';

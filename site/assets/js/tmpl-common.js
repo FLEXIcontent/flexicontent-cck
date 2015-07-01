@@ -327,6 +327,7 @@ jQuery(document).ready(function() {
 							task: "txtautocomplete",
 							pageSize: fc_select_pageSize,
 							text: request.term,
+							lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: ''),
 							cid: parseInt(_FC_GET['cid']),
 							cids: _FC_GET['cids'],
 							filter_13: _FC_GET['filter_13']
@@ -397,6 +398,7 @@ jQuery(document).ready(function() {
 						text: term,
 						pageSize: fc_select_pageSize,
 						pageNum: page,
+						lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: ''),
 						cid: parseInt(_FC_GET['cid']),
 						cids: _FC_GET['cids'],
 						filter_13: _FC_GET['filter_13']

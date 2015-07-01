@@ -560,7 +560,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_InlineBoxes';
 		
-		//$this->displayFieldValue( $values, $prop, $viewlayout );
+		//$this->values = $values;
+		//$this->displayFieldValue( $prop, $viewlayout );
 		include(self::getFormPath($this->fieldtypes[0], $viewlayout));
 		
 		if (!empty($fancybox_needed)) flexicontent_html::loadFramework('fancybox');

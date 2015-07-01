@@ -31,48 +31,69 @@ class FLEXIcontentViewSearch extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
-		$layout = JRequest::getVar('layout', 'default');
-		if($layout=='indexer') {
+		// ***********
+		// Batch tasks
+		// ***********
+		
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		
+		$layout  = $jinput->get('layout', '', 'cmd');
+		if($layout=='indexer')
+		{
 			$this->indexer($tpl);
 			return;
 		}
-		$app      = JFactory::getApplication();
+		
+
+
+		// ********************
+		// Initialise variables
+		// ********************
+		
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+		
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
-		$option   = JRequest::getCmd('option');
-		$view     = JRequest::getVar('view');
 		
+		// Get model
+		$model = $this->getModel();
+
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
-		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.tooltip');
-
+		
+		
+		// ***********
 		// Get filters
+		// ***********
+		
 		$count_filters = 0;
 		
 		// Get filter vars
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     'a.title', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', '', 'word' );
+		$filter_order     = $model->getState( 'filter_order' );
+		$filter_order_Dir = $model->getState( 'filter_order_Dir' );
 		
-		$filter_indextype = $app->getUserStateFromRequest( $option.'.search.filter_indextype', 'filter_indextype', 'advanced', 'word' );
+		$filter_indextype = $model->getState( 'filter_indextype' );
 		$isADV = $filter_indextype=='advanced';
 		
-		$filter_fieldtype	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
-		$filter_itemtype	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_itemtype', 	'filter_itemtype', 		'', 'int' );
-		$filter_itemstate	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_itemstate', 'filter_itemstate', 	'', 'word' );
+		$filter_fieldtype	= $model->getState( 'filter_fieldtype' );
+		$filter_itemtype	= $model->getState( 'filter_itemtype' );
+		$filter_itemstate	= $model->getState( 'filter_itemstate' );
 		if ($filter_fieldtype) $count_filters++; if ($filter_itemtype) $count_filters++; if ($filter_itemstate) $count_filters++;
 		
-		$search			= $app->getUserStateFromRequest( $option.'.'.$view.'.search',			'search', '', 'string' );
-		$search			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search			= $model->getState( 'search' );
+		$search			= $db->escape( trim(JString::strtolower( $search ) ) );
 		
-		$search_itemtitle	= $app->getUserStateFromRequest( $option.'.'.$view.'.search_itemtitle',	'search_itemtitle', '', 'string' );
-		$search_itemid		= $app->getUserStateFromRequest( $option.'.'.$view.'.search_itemid',	'search_itemid', '', 'string' );
+		$search_itemtitle	= $model->getState( 'search_itemtitle' );
+		$search_itemid		= $model->getState( 'search_itemid' );
 		$search_itemid		= !empty($search_itemid) ? (int)$search_itemid : '';
 		if ($search_itemtitle) $count_filters++; if ($search_itemid) $count_filters++;
 		
-		$filter_indextype	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_indextype',		'filter_indextype',	'advanced',		'word' );
+		$filter_indextype	= $model->getState( 'filter_indextype' );
 		
 		$f_active['filter_fieldtype']	= (boolean)$filter_fieldtype;
 		$f_active['filter_itemtype']	= (boolean)$filter_itemtype;
@@ -82,18 +103,35 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$f_active['search_itemtitle']	= strlen($search_itemtitle);
 		$f_active['search_itemid']		= (boolean)$search_itemid;
 		
-		// Add custom css and js to document
+		
+		
+		// **************************
+		// Add css and js to document
+		// **************************
+		
+		flexicontent_html::loadFramework('select2');
+		JHTML::_('behavior.tooltip');
+		
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		
+		
+		
+		// *****************************
+		// Get user's global permissions
+		// *****************************
+		
+		$perms = FlexicontentHelperPerm::getPerm();
+		
+		
+		
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
+		
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanIndex');
-		
-		
-		// ******************
-		// Create the toolbar
-		// ******************
 		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_SEARCH_INDEX' );
@@ -181,11 +219,28 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$notice_ft_min_word_len	= $app->getUserStateFromRequest( $option.'.fields.notice_ft_min_word_len',	'notice_ft_min_word_len',	0, 'int' );
 		//if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
 		//{
-			if ( $notice_ft_min_word_len < 2) {
+		
+		$old_add_search_prefix = $app->getUserState('add_search_prefix');
+		
+		$add_search_prefix = $cparams->get('add_search_prefix', 0);
+		$app->setUserState('add_search_prefix', $add_search_prefix);
+		
+		
+		if ($old_add_search_prefix != $add_search_prefix) {
+			$app->enqueueMessage('Parameter: "Searching small/common words" has changed, please recreate (just once) the search indexes, otherwise text search will not work', 'warning');
+		}
+		
+		if ( !$cparams->get('add_search_prefix', 0) )     // Important usability messages
+		{
+			if ( $ft_min_word_len > 1 && $notice_ft_min_word_len < 10) {
 				$app->setUserState( $option.'.fields.notice_ft_min_word_len', $notice_ft_min_word_len+1 );
-				$app->enqueueMessage("NOTE : Database limits minimum search word length (ft_min_word_len) to ".$ft_min_word_len, 'notice');
+				$app->enqueueMessage("NOTE : Database limits minimum search word length (ft_min_word_len) to ".$ft_min_word_len, 'message');
+				$app->enqueueMessage('Please enable: "Searching small/common words":
+					<a class="btn" href="index.php?option=com_config&view=component&component=com_flexicontent&path=&"><span class="icon-options"></span>Configuration</a>
+					and then click to re-INDEX both search indexes', 'notice');
 				//$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'message');
 			}
+		}
 		//}
 		
 		$this->assignRef('count_filters', $count_filters);

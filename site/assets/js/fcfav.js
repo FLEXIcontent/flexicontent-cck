@@ -22,6 +22,9 @@ function FCFav(id, type) {
 	jQuery.ajax({
 		url: favurl,
 		dataType: "text",
+		data: {
+			lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: '')
+		},
 		success: function( response ) {
 			var link = document.getElementById('favlink_'+type+'_'+id);
 			if (div) {

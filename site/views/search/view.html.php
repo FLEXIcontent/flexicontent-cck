@@ -597,6 +597,14 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				//print_r($searchwords);
 			}
 			
+			// Create regular expressions, for highlighting the matched words
+			$w_regexp_highlight = array();
+			foreach($searchwords as $n => $_word) {
+				$w_regexp_highlight[$_word] = mb_strlen($_word, 'utf-8')<=2  ||  $n+1 < count($searchwords) ?
+					'#\b('. preg_quote($_word, '#') .')\b#iu' :   // Non-last word or word too small avoid highlighting non exact matches
+					'#\b('. preg_quote($_word, '#') .')#iu' ;
+			}
+			
 			for ($i=0; $i < count($results); $i++)
 			{
 				$result = & $results[$i];
@@ -606,21 +614,26 @@ class FLEXIcontentViewSearch extends JViewLegacy
 					//if( count($parts)>1 ) { echo "<pre>"; print_r($parts); exit;}
 					foreach ($parts as $word_found => $part) {
 						if (!$word_found) continue;
-						$searchRegex = '#('. preg_quote($word_found, '#') .')#iu';
-						$parts[$word_found] = preg_replace($searchRegex, '<span class="highlight">\0</span>', $part );
+						$searchRegex = $w_regexp_highlight[$word_found];
+						$parts[$word_found] = preg_replace($searchRegex, '_fc_highlight_start_\0_fc_highlight_end_', $part );
 					}
 					$result->text = implode($parts, " <br/> ");
 					
 					$replace_count_total = 0;
 					
 					// This is for LIKE %word% search for languages without spaces
-					if ($filter_word_like_any == 0) {
+					if ($filter_word_like_any)
+					{
+						if (strlen($word_found)<=2) continue; // Do not highlight too small words, since we do not consider spaces
 						foreach ($searchwords as $_word) {
 							$searchRegex = '#('. preg_quote($_word, '#') .'[^\s]*)#iu';
-							$result->text = preg_replace($searchRegex, '<span class="highlight">\0</span>', $result->text, 1, $replace_count );
+							$result->text = preg_replace($searchRegex, '_fc_highlight_start_\0_fc_highlight_end_', $result->text, 1, $replace_count );
 							if ($replace_count) $replace_count_total++;
 						}
 					}
+					
+					$result->text = str_replace('_fc_highlight_start_', '<span class="highlight">', $result->text );
+					$result->text = str_replace('_fc_highlight_end_', '</span>', $result->text );
 					
 					// Add some message about matches
 					/*if ( $state->get('match')=='any' ) {

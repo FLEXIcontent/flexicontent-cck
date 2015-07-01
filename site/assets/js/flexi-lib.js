@@ -425,6 +425,7 @@
 			type: 'POST',
 			url: 'index.php?option=com_flexicontent&tmpl=component&format=raw',
 			data: {
+				lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: ''),
 				task: 'call_extfunc',
 				omethod: 'html', /* unused */
 				exttype: 'plugins',

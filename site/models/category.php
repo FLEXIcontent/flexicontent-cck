@@ -538,6 +538,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				;
 		}
 		
+		//echo $query."<br/><br/> \n";
 		return $query;
 	}
 	
@@ -900,18 +901,21 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Create WHERE clause part for Text Search 
 		// ****************************************
 		
-		$text = JRequest::getString('filter', '', 'default');
-		//$text = $this->_params->get('use_search') ? $text : '';
+		$text = JRequest::getString('filter', JRequest::getString('q', ''), 'default');
+		
 		// Check for LIKE %word% search, for languages without spaces
 		$filter_word_like_any = $cparams->get('filter_word_like_any', 0);
-		if ($filter_word_like_any) {
-			$phrase = JRequest::getWord('searchphrase', JRequest::getWord('p', 'any'), 'default');
-		} else {
-			$phrase = JRequest::getWord('searchphrase', JRequest::getWord('p', 'exact'), 'default');
-		}
+		
+		$phrase = $filter_word_like_any ?
+			JRequest::getWord('searchphrase', JRequest::getWord('p', 'any'),   'default') :
+			JRequest::getWord('searchphrase', JRequest::getWord('p', 'exact'), 'default');
+		
 		$si_tbl = 'flexicontent_items_ext';
 		
-		$text = trim( $text );
+		$search_prefix = $cparams->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s]+\b)/u', $search_prefix.'$0', trim($text));
+		$words = preg_split('/\s\s*/u', $text);
+		
 		if( strlen($text) )
 		{
 			$ts = 'ie';
@@ -929,10 +933,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 					break;
 				
 				case 'exact':
-					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=0);
+					if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=0);
 					if (empty($words)) {
 						// All words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
 						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
@@ -949,10 +952,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 					break;
 				
 				case 'all':
-					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
+					if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
 					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
@@ -968,10 +970,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 					if ($filter_word_like_any) {
 						$_text_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
 					} else {
-						$words = preg_split('/\s\s*/u', $text);
 						$stopwords = array();
 						$shortwords = array();
-						$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
+						if (!$search_prefix) $words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
 						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 						JRequest::setVar('shortwords', implode(' ', $shortwords));
 						

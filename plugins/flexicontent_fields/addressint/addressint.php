@@ -116,9 +116,16 @@ class plgFlexicontent_fieldsAddressint extends FCField {
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		$field->label = JText::_($field->label);
 		
+		// Set field and item objects
 		$this->setField($field);
 		$this->setItem($item);
-
-		$this->displayFieldValue($values, $prop);
+		
+		// Get choosen display layout
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value';
+		
+		// Render the field's HTML
+		$this->values = $values;
+		$this->displayFieldValue( $prop, $viewlayout );
 	}*/
 }

@@ -120,9 +120,15 @@ class FlexicontentController extends JControllerLegacy
 		if ( $type!='basic_index' && $type!='adv_index' ) jexit();
 		if ( !strlen($text) ) jexit();
 		
+		
 		// All starting words are exact words but last word is a ... word prefix
+		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$words = preg_split('/\s\s*/u', $text);
-		$newtext = '+' . implode( ' +', $words ) .'*';
+		
+		$_words = array();
+		foreach ($words as & $_w)
+			$_words[] = !$search_prefix  ?  trim($_w)  :  preg_replace('/(\b[^\s]+\b)/u', $search_prefix.'$0', trim($_w));
+		$newtext = '+' . implode( ' +', $_words ) .'*';  //print_r($_words); exit;
 		
 		// Query CLAUSE for match the given text
 		$db = JFactory::getDBO();
@@ -135,9 +141,8 @@ class FlexicontentController extends JControllerLegacy
 		$limit      = $pageSize;
 		
 		$lang_where = '';
-		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$lta = FLEXI_J16GE || $use_tmp ? 'i': 'ie';
-			$lang_where .= '   AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
+		if ($filtercat) {
+			$lang_where .= '   AND ( i.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR i.language="*" ' : '') . ' ) ';
 		}
 		
 		$access_where = '';
@@ -172,6 +177,7 @@ class FlexicontentController extends JControllerLegacy
 			;
 		$db->setQuery( $query  );
 		$data = $db->loadAssocList();
+		//print_r($data); exit;
 		//if ($db->getErrorNum())  echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 		
 		// Get last word (this is a word prefix) and remove it from words array
@@ -182,17 +188,21 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Find out the words that matched
 		$words_found = array();
-		$regex = '/(\b)('.$word_prefix.'\w*)(\b)/iu';
+		$regex = '/(\b)('.$search_prefix.$word_prefix.'\w*)(\b)/iu';
 		
 		foreach ($data as $_d) {
 			//echo $_d['item_id'] . ' ';
 			if (preg_match_all($regex, $_d['search_index'], $matches) ) {
+				//print_r($matches[2]); exit;
 				foreach ($matches[2] as $_m) {
+					if ($search_prefix)
+						$_m = preg_replace('/\b'.$search_prefix.'/u', '', $_m);
 					$_m_low = mb_strtolower($_m, 'UTF-8');
 					$words_found[$_m_low] = 1;
 				}
 			}
 		}
+		//print_r($words_found); exit;
 		
 		// Pagination not appropriate when using autocomplete ...
 		$options = array();
@@ -202,8 +212,10 @@ class FlexicontentController extends JControllerLegacy
 		$options['Matches'] = array();
 		$n = 0;
 		foreach ($words_found as $_w => $i) {
-			if ( mb_strlen($_w) < $min_word_len ) continue;  // word too short
-			if ( $this->isStopWord($_w, $tbl) ) continue;  // stopword or too common
+			if (!$search_prefix) {
+				if ( mb_strlen($_w) < $min_word_len ) continue;  // word too short
+				if ( $this->isStopWord($_w, $tbl) ) continue;  // stopword or too common
+			}
 			
 			$options['Matches'][] = array(
 				'text' => $complete_words.($complete_words ? ' ' : '').$_w,
@@ -2011,10 +2023,9 @@ class FlexicontentController extends JControllerLegacy
 			}
 			$field_type = $fields_props[$field_id]->field_type;
 			
-			$lta = FLEXI_J16GE ? 'i' : 'ie';
 			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url'
 					. ', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email'
-					. ', i.access as item_access, '.$lta.'.language as item_language, ie.type_id as item_type_id'
+					. ', i.access as item_access, i.language as item_language, ie.type_id as item_type_id'
 					
 					// item and current category slugs (for URL in notifications)
 					. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as itemslug'

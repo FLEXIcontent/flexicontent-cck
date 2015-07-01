@@ -21,6 +21,9 @@ var fc_statehandler = new Class(
 		jQuery.ajax({
 			url: stateurl,
 			dataType: "html",
+			data: {
+				lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: '')
+			},
 			success: function( data )
 			{
 				jQuery('#row' + id).removeClass('ajax-loader').html(data);

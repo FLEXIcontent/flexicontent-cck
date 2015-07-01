@@ -126,6 +126,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$db = JFactory::getDBO();
 		
 		@ob_end_clean();
+		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$indexer = JRequest::getVar('indexer','advanced');
 		$rebuildmode = JRequest::getVar('rebuildmode','');
 		
@@ -230,6 +231,9 @@ class FlexicontentControllerSearch extends FlexicontentController
 					$query = "UPDATE #__flexicontent_items_ext SET search_index = CASE item_id ";
 					foreach ($searchindex as $query_itemid => $search_text)
 					{
+						$_search_text = implode(' | ', $search_text);
+						if ($search_prefix && $_search_text) $_search_text = preg_replace('/(\b[^\s]+\b)/', $search_prefix.'$0', trim($_search_text));
+						
 						// Add new search value into the DB
 						$query .= " WHEN $query_itemid THEN ".$db->Quote( implode(' | ', $search_text) );
 					}

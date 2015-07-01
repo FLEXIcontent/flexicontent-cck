@@ -198,7 +198,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 
 			JPluginHelper::importPlugin( 'search');
 			$dispatcher = JDispatcher::getInstance();
-			$results = $dispatcher->trigger( FLEXI_J16GE ? 'onContentSearch' : 'onSearch', array(
+			$results = $dispatcher->trigger( 'onContentSearch', array(
 				$this->getState('keyword'),
 				$this->getState('match'),
 				$this->getState('ordering'),
@@ -273,7 +273,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		// Using other search areas, get all search
 		JPluginHelper::importPlugin( 'search');
 		$dispatcher = JDispatcher::getInstance();
-		$searchareas = $dispatcher->trigger( FLEXI_J16GE ? 'onContentSearchAreas' : 'onSearchAreas' );
+		$searchareas = $dispatcher->trigger( 'onContentSearchAreas' );
 		$areas = array();
 		foreach ($searchareas as $area) {
 			$areas = array_merge( $areas, $area );
