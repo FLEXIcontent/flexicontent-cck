@@ -417,7 +417,7 @@ flexicontent_html::loadFramework('flexi-lib');
 							}
 						?>
 						<?php echo '
-						<a style="cursor:pointer" id="file'.$row->id.'" class="'.$btn_class.' '.$tip_class.' btn-small" prv="'.$file_preview2.'" data-fileid="'.$fileid.'" data-filename="'.$filename.'" onclick="'.$img_assign_link.'" title="'.$flexi_select.'">
+						<a style="cursor:pointer" id="file'.$row->id.'" class="'.$btn_class.' '.$tip_class.' btn-small" prv="'.$file_preview2.'" data-fileid="'.$fileid.'" data-filename="'.$filename.'" onclick="'.$img_assign_link.'" title="'.$flexi_select.'" targetid="'.$this->targetid.'">
 							'.$filename_cut.'
 						</a>
 						'; ?>
