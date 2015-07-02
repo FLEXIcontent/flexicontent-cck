@@ -287,14 +287,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->category;
 		foreach ($tmpls as $tmpl) {
-			if (FLEXI_J16GE) {
-				$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
-				$jform->load($tmpl->params);
-				$tmpl->params = $jform;
-				// ... values applied at the template form file
-			} else {
-				$tmpl->params->loadINI($row->params);
-			}
+			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
+			$jform->load($tmpl->params);
+			$tmpl->params = $jform;
+			// ... values applied at the template form file
 		}
 		
 		//build selectlists

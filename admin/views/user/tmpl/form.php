@@ -288,12 +288,17 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 			
 			<?php
 			foreach($this->form->getGroup('templates') as $field):
+				$_value = $this->params_author->get($field->fieldname);
+				
 				if ($field->hidden):
 					echo $field->input;
 				else:
+					// setValue(), is ok if input property, has not been already created
+					// otherwise we need to re-initialize (which clears input)
+					//$field->setup($field->element, $_value, $field->group);
+					
+					$field->setValue($_value);
 					echo $field->label;
-					$field->set('input', null);
-					$field->set('value', $this->params_author->get($field->fieldname));
 					echo $field->input;
 					echo '<div class="clear"></div>';
 				endif;

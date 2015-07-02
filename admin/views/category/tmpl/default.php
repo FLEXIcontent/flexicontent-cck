@@ -285,21 +285,26 @@ $js = "
 			</span>
 			
 			<fieldset class="panelform">
-			<?php foreach($this->form->getGroup('templates') as $field): ?>
-				<?php if ($field->hidden): ?>
-					<?php echo $field->input; ?>
-				<?php else: ?>
-					<?php 
-						echo $field->label;
-						if (method_exists ( $field , 'set' )) {
-							$field->set('input', null);
-							$field->set('value', @$this->row->params[$field->fieldname]);
-						}
+				<?php
+				$_p = & $this->row->params;
+				foreach($this->form->getGroup('templates') as $field):
+					$_name  = $field->fieldname;
+					$_value = isset($_p[$_name])  ?  $_p[$_name]  :  null;
+					
+					if ($field->hidden):
 						echo $field->input;
-					?>
-				<?php endif; ?>
-				<div class="clear"></div>
-			<?php endforeach; ?>
+					else:
+						// setValue(), is ok if input property, has not been already created
+						// otherwise we need to re-initialize (which clears input)
+						//$field->setup($field->element, $_value, $field->group);
+						
+						$field->setValue($_value);
+						echo $field->label;
+						echo $field->input;
+						echo '<div class="clear"></div>';
+					endif;
+				endforeach;
+				?>
 			</fieldset>
 			
 			<div class="clear" style=""></div>
@@ -321,7 +326,7 @@ $js = "
 						?>
 						<fieldset class="panelform">
 							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
-								$fieldname =  $field->__get('fieldname');
+								$fieldname =  $field->fieldname;
 								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->params[$fieldname]);
 								echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 									$tmpl->params->getLabel($fieldname, $groupname));
