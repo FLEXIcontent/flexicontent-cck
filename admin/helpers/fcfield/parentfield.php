@@ -271,6 +271,17 @@ class FCField extends JPlugin
 	public function getFormPath($plg, $layout) {
 		return $this->getLayoutPath($plg, $layout);
 	}
+
+	protected function includePath($path) {
+		if(!file_exists($path)) {
+			return false;
+		}
+		$field  = $this->getField();
+		$item   = $this->getItem();
+		$values = & $this->values;
+		include($path);
+		return true;
+	}
 	
 	public function getViewPath($plg, $layout) {
 		return $this->getLayoutPath($plg, $layout);
@@ -305,8 +316,8 @@ class FCField extends JPlugin
 		
 		$field->html = array();
 		
-		// Include template file: EDIT LAYOUT 
-		include(self::getFormPath($this->fieldtypes[0], $layout));
+		// Include template file: EDIT LAYOUT
+		$this->includePath(self::getFormPath($this->fieldtypes[0], $layout));
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
