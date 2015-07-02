@@ -272,7 +272,7 @@ class FCField extends JPlugin
 		return $this->getLayoutPath($plg, $layout);
 	}
 
-	protected function includePath($path) {
+	protected function includePath($path, $prop='display') {
 		if(!file_exists($path)) {
 			return false;
 		}
@@ -317,7 +317,7 @@ class FCField extends JPlugin
 		$field->html = array();
 		
 		// Include template file: EDIT LAYOUT
-		$this->includePath(self::getFormPath($this->fieldtypes[0], $layout));
+		$this->includePath(self::getFormPath($this->fieldtypes[0], $layout), 'html');
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
@@ -349,10 +349,10 @@ class FCField extends JPlugin
 		$closetag	= $this->getCloseTag();
 		$separatorf	= $this->getSeparatorF($opentag, $closetag);
 		
-		$this->field->{$prop} = array();
+		$field->{$prop} = array();
 		
 		// Execute template file: VALUE VIEWING
-		include(self::getViewPath($this->fieldtypes[0], $layout));
+		$this->includePath(self::getViewPath($this->fieldtypes[0], $layout));
 		
 		// Apply separator and open/close tags
 		if (!$use_ingroup)  // do not convert the array to string if field is in a group
