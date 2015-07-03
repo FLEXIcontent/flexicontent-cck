@@ -1008,15 +1008,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		
-		// **********************************************************
-		// Check for no values, and return empty display, otherwise
-		// assign (possibly) altered value array to back to the field
-		// **********************************************************
+		// *********************************************
+		// Check for no values, and return empty display
+		// *********************************************
 		if ( !count($values) ) {
 			$field->{$prop} = $is_ingroup ? array() : '';
 			return;
 		}
-		$field->value = $values;
+		// Assign (possibly) altered value array to back to the field
+		$field->value = $values;  // This is not done for onDisplayFieldValue, TODO check if this is needed
 		
 		
 		// **************************************

@@ -91,7 +91,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
 		
-		$timezone = FLEXI_J16GE ? 'UTC' : 0; // Default is not to use TIMEZONE
+		$timezone = 'UTC'; // Default is not to use TIMEZONE
 		$append_str = '';
 		if ($date_allowtime)
 		{
@@ -101,7 +101,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			if ($use_editor_tz == 0)
 			{
 				// Raw date storing, ignoring timezone. NOTE: this is OLD BEHAVIOUR
-				$timezone = FLEXI_J16GE ? 'UTC' : 0;
+				$timezone = 'UTC';
 				$append_str .= '<br/>'.JText::_('FLEXI_DATE_TIMEZONE_USAGE_DISABLED');
 			}
 			else
@@ -109,12 +109,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				$append_str .= '<br/>'.JText::_('FLEXI_DATE_TIMEZONE_USAGE_ENABLED');
 				// Use timezone of editor, unlogged editor will use site's default timezone
 				$timezone = $user->getParam('timezone', $config->get('offset'));
-				if (FLEXI_J16GE) {
-					$tz = new DateTimeZone($timezone);
-					$tz_offset = $tz->getOffset(new JDate()) / 3600;
-				} else {
-					$tz_offset = $timezone;
-				}
+				$tz = new DateTimeZone($timezone);
+				$tz_offset = $tz->getOffset(new JDate()) / 3600;
 				$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
 
 				$append_str .= '<br/>'.JText::_($user->id ? 'FLEXI_DATE_ENTER_HOURS_IN_YOUR_TIMEZONE' : 'FLEXI_DATE_ENTER_HOURS_IN_TIMEZONE').': '.$tz_info;
@@ -151,7 +147,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			});
 			";
 			
-			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -374,6 +370,12 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$values = array($_value);
 		}
 		
+		// Load default value
+		if ( empty($values) ) {
+			$field->{$prop} = $is_ingroup ? array() : '';
+			return;
+		}
+		
 		// Timezone configuration
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
@@ -444,11 +446,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		{
 		default: // including value -1 for raw for output, see above
 		case 0:
-			$timezone = FLEXI_J16GE ? 'UTC' : 0;
+			$timezone = 'UTC';
 			//$tz_info = '';
 			break;
 		case 1:
-			$timezone = FLEXI_J16GE ? 'UTC' : 0;
+			$timezone = 'UTC';
 			//$tz_info = ' UTC+0';
 			break;
 		case 2:
@@ -463,13 +465,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		// display timezone suffix if this is enabled
 		if ($display_tz_suffix && $tz_suffix_type > 0) {
-			if (FLEXI_J16GE) {
-				$tz = new DateTimeZone($timezone);
-				$tz_offset = $tz->getOffset(new JDate()) / 3600;
-			} else {
-				// Raw date output  // FLEXI_J16GE ? 'UTC' : 0
-				$tz_offset = $timezone;
-			}
+			$tz = new DateTimeZone($timezone);
+			$tz_offset = $tz->getOffset(new JDate()) / 3600;
 			$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
 		}
 		
@@ -538,7 +535,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		if ($use_editor_tz == 0) {
 			// Raw date input, ignore timezone, NOTE: this is OLD BEHAVIOUR of this field
-			$timezone = FLEXI_J16GE ? 'UTC' : 0;
+			$timezone = 'UTC';
 		} else {
 			// For logged users the date values are in user's time zone, (unlogged users will submit in site default timezone)
 			$timezone = $user->getParam('timezone', $config->get('offset'));  // this is numeric offset in J1.5 and timezone STRING in J2.5

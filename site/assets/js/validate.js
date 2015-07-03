@@ -168,23 +168,9 @@ var JFormValidator = new Class({
 			var field_name = 'jform[cid][]';
 			var field_name_catid = 'jform[catid]';
 			
-			if(MooTools.version>="1.2.4") {
-				//var values = $(element_id).getSelected();  // does not work in old template form overrides with no id parameter
-				var values = $$(document.getElementsByName(field_name))[0].getSelected();
-				values = values.map( function(g) { return g.get('value'); } );
-				
-				var value_catid = $$(document.getElementsByName(field_name_catid))[0].getSelected();
-				value_catid = value_catid.map( function(g) { return g.get('value'); } );
-				value_catid = value_catid[0];
-			} else {
-				//values = $(element_id).getValue();  // does not work in old template form overrides with no id parameter
-				var values = $$(document.getElementsByName(field_name))[0].getValue();
-				//  ** Alternative code **
-				//var values = $(element_id).getChildren().filter( function(g) { return g.selected; } );
-				//values = values.map( function(g) { return g.getProperty('value'); } );
-				
-				var value_catid = $$(document.getElementsByName(field_name_catid))[0].getValue();
-			}
+			// Get first secondary category selected to use as maincat
+			var values = jQuery('#'+element_id).val();
+			var value_catid = values[0];
 			
 			//window.console.log(values);
 			//window.console.log(existing_cats_fc);
@@ -333,12 +319,6 @@ var JFormValidator = new Class({
 
 	validate: function(el)
 	{
-		if(MooTools.version>="1.2.4") {
-			el = document.id(el);
-		} else {
-			document.id = $;
-			el = document.id(el);
-		}
 		jqEL = jQuery(el);
 		el_value = jqEL.val();
 		el_name  = jqEL.attr('name');

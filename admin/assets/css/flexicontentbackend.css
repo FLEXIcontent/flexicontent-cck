@@ -753,11 +753,16 @@ body .tooltip.in {
 	margin:1px 6% 0px 1px;
 }
 
-.fcimporttbl {}
+.fcimporttbl {
+	width: auto;
+}
 .fcimportdata {
-	padding-top:6px;
+	padding-bottom:6px;
 	font-size:12px;
 	white-space:nowrap;
+}
+.fcimportdata > * {
+	vertical-align: top;
 }
 .fcimportdata label.fcdata {
 	font-weight: normal;

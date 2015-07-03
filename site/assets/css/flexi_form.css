@@ -198,8 +198,8 @@ input[type="checkbox"].fc_checkradio, input[type="checkbox"].fc_checkradio:focus
 /* Styling for radio/checkboxes , for browser not supporting above, e.g. ie8,ie9) */
 
 input.fc_checkradio {
-	margin: 0px 4px 3px 4px !important;
-	padding: 0px !important;
+	margin: 0px 4px 3px 4px;
+	padding: 0px;
 	vertical-align: bottom;
 	position: relative;
 	top: -1px;
@@ -208,31 +208,31 @@ input.fc_checkradio {
 
 /* Styling for radio/checkboxes lists */
 
-span.fc_checkradio_group_wrapper {
+div.fc_checkradio_group_wrapper {
 	display: inline-block;
 	float: left; clear: both; 
 	margin: 0px; padding: 0px;
-	overflow-y: auto !important;
+	overflow-y: auto;
 	overflow-x: visible;
 	height: auto;
 	max-height: 220px;
 }
 ul.fc_checkradio_group,
 li.fc_checkradio_option {
-	padding: 0px !important;
-	margin: 0px !important;
-	background: none transparent !important;
+	padding: 0px;
+	margin: 0px;
+	background: none transparent;
 }
 ul.fc_checkradio_group {
-	list-style-type: none !important;
+	list-style-type: none;
 	display: block;
 	clear: both;
 }
 li.fc_checkradio_option {
-	white-space: nowrap !important;
+	white-space: nowrap;
 	display: inline-block; /* auto-hide do not force display */
-	margin-top: 1px !important;
-	margin-bottom: 1px !important;
+	margin-top: 1px;
+	margin-bottom: 1px;
 	vertical-align:top;
 }
 

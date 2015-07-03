@@ -1601,6 +1601,8 @@ class FlexicontentFields
 		static $d;
 		static $c;
 		
+		if (JFactory::getApplication()->isAdmin()) return '';
+		
 		// Parse field variable if not already parsed
 		if ( !isset($parsed[$field->id][$varname]) )
 		{

@@ -232,10 +232,10 @@ class FlexicontentControllerSearch extends FlexicontentController
 					foreach ($searchindex as $query_itemid => $search_text)
 					{
 						$_search_text = implode(' | ', $search_text);
-						if ($search_prefix && $_search_text) $_search_text = preg_replace('/(\b[^\s]+\b)/', $search_prefix.'$0', trim($_search_text));
+						if ($search_prefix && $_search_text) $_search_text = preg_replace('/(\b[^\s]+\b)/u', $search_prefix.'$0', trim($_search_text));
 						
 						// Add new search value into the DB
-						$query .= " WHEN $query_itemid THEN ".$db->Quote( implode(' | ', $search_text) );
+						$query .= " WHEN $query_itemid THEN ".$db->Quote( $_search_text );
 					}
 					$query .= " END ";
 					$query .= " WHERE item_id IN (". implode(',', array_keys($searchindex)) .")";

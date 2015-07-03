@@ -112,9 +112,9 @@ if ( $show_mod )
 	{
 		$_fld_classes = 'fc_field_filter use_select2_lib select2_list_selected';
 		
-		$loader_html = '\'<p class=\\\'qf_centerimg=\\\'><img src=\\\''.JURI::base().'components/com_flexicontent/assets/images/ajax-loader.gif\\\' align=\\\'center\\\'></p>\'';
+		$loader_html = '<span class=\"ajax-loader\"></span>';
 		$url_to_load = JURI::root().'index.php?option=com_flexicontent&amp;task=getsefurl&amp;view=category&amp;tmpl=component&amp;cid=';
-		$autosubmit_msg = JText::_('FLEXI_RELOADING_PLEASE_WAIT');
+		$autosubmit_msg = '<span>'.JText::_('FLEXI_RELOADING_PLEASE_WAIT').'</span>';
 		
 		$_fld_onchange = $_fld_multiple = '';
 		if ($mcats_selection) {
@@ -319,7 +319,7 @@ if ( $show_mod )
 					adminFormPrepare(form, 1);
 					return;
 				}
-				getSEFurl("cid_loading_'.$module->id.'",	'.$loader_html.', form,"'.$url_to_load.'"+cid_val, "'.$autosubmit_msg.'", '.$autosubmit.', "'.$default_target.'");
+				getSEFurl("cid_loading_'.$module->id.'",	"'.$loader_html.'", form,"'.$url_to_load.'"+cid_val, "'.$autosubmit_msg.'", '.$autosubmit.', "'.$default_target.'");
 				/*jQuery("#'.$form_name.'_filter_box").css("display", "block");*/
 			}
 		';

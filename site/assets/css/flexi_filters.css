@@ -94,6 +94,22 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 }
 
 
+/* form submiting */
+.cid_loading {
+	color:darkred;
+	font-weight:bold;
+}
+.cid_loading > *{
+	vertical-align: middle;
+}
+.ajax-loader {
+	background: url("../images/ajax-loader.gif") no-repeat scroll left center transparent;
+	height: 16px;
+	padding: 0 0 0 20px;
+	display: inline-block;
+}
+
+
 /*****************/
 /* FIELD FILTERs */
 /*****************/
@@ -136,7 +152,7 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 .fc_filter,
 .fc_filter_line {
 	display: inline-block;
-	float: left;
+	float: none;
 	white-space: normal;
 	border: 0px solid lightgray;
 	border-radius: 2px;
@@ -147,6 +163,7 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 	padding: 1px 0% 1px 0%;
 	width: auto;
 	position: relative;
+	vertical-align: top;
 }
 .fc_filter_line {
 	clear: both;
@@ -272,11 +289,8 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html .fc_text_filter,
 .fc_filter_html .fc_field_filter {
 	color: black;
-	font-size: 11px;
 	font-weight: normal;
 	display: inline-block;
-	padding: 2px 0px 2px 4px;
-	margin: 2px 0px 2px 4px;
 	width: auto;
 }
 .fc_filter_html .fc_text_filter.select2-container.select2-container-multi,
@@ -288,11 +302,14 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	border-radius: 5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
+	padding: 2px 0px 2px 4px;
+	margin: 2px 0px 2px 4px;
+	font-size: 11px;
 }
-.fc_filter_html input.fc_text_filter,
-.fc_filter_html input.fc_field_filter,
-.fc_filter_html input.fc_text_filter:focus,
-.fc_filter_html input.fc_field_filter:focus {
+.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_text_filter,
+.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_field_filter,
+.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_text_filter:focus,
+.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_field_filter:focus {
 	height: auto;
 	line-height: 150%;
 	padding: 5px 4px 6px 4px;
@@ -322,6 +339,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html .input-append > input.fc_field_filter,
 .fc_filter_html .input-append > input.fc_text_filter:focus,
 .fc_filter_html .input-append > input.fc_field_filter:focus {
+	margin-top:0px;
 	margin-right:0px;
 	border-top-right-radius:0px;
 	border-bottom-right-radius:0px;
@@ -369,8 +387,9 @@ select.fc_field_filter { margin: 2px 2px 2px 2px; }
 input.fc_text_filter { vertical-align: top; }
 input.fc_field_filter { vertical-align: top; }
 span.fc_field_filter { border-width: 0px; }
-ul.fc_field_filter.fc_checkradio_group {
-	margin: 2px 0px 2px 2px;
+
+.fc_filter > .fc_filter_html > .fc_checkradio_group_wrapper > ul.fc_field_filter.fc_checkradio_group {
+	margin: 0px 0px 0px 4px;
 	padding: 3px 4px 3px 2px;
 	height: auto;
 	max-height: auto;
@@ -378,7 +397,7 @@ ul.fc_field_filter.fc_checkradio_group {
 	float: left;
 	text-align: left;
 }
-ul.fc_field_filter.fc_checkradio_group label {
+.fc_filter > .fc_filter_html > .fc_checkradio_group_wrapper > ul.fc_field_filter.fc_checkradio_group label {
 	margin: 6px 6px 4px 0px;
 	display: inline-block;
 }

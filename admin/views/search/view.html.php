@@ -220,13 +220,13 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		//if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
 		//{
 		
-		$old_add_search_prefix = $app->getUserState('add_search_prefix');
+		$old_add_search_prefix = $app->getUserState('add_search_prefix', null);
 		
 		$add_search_prefix = $cparams->get('add_search_prefix', 0);
 		$app->setUserState('add_search_prefix', $add_search_prefix);
 		
 		
-		if ($old_add_search_prefix != $add_search_prefix) {
+		if ($old_add_search_prefix !== null && $old_add_search_prefix != $add_search_prefix) {
 			$app->enqueueMessage('Parameter: "Searching small/common words" has changed, please recreate (just once) the search indexes, otherwise text search will not work', 'warning');
 		}
 		

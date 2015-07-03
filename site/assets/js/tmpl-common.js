@@ -10,50 +10,31 @@
 		adminFormPrepare(form, 2, task);
 	}
 
-	function getSEFurl(loader_el, loader_html, form, url_to_load, autosubmit_msg, autosubmit) {
-
-		var dooptions = {
-			method: 'get',
-			evalScripts: false,
-			onSuccess: function(responseText) {
+	function getSEFurl(loader_el, loader_html, form, url_to_load, autosubmit_msg, autosubmit)
+	{
+		jQuery('#'+loader_el).html(loader_html);
+		jQuery.ajax({
+			type: 'GET',
+			url: url_to_load,
+			dataType: "text",
+			data: {
+			},
+			success: function( responseText )
+			{
 			 	form.action=responseText;
 			 	var fcform = jQuery(form);
 			 	fcform.attr('data-fcform_action', responseText);
 			 	if (autosubmit) {
-			 		$(loader_el).innerHTML += autosubmit_msg;
+			 		jQuery('#'+loader_el).append(autosubmit_msg);
 					adminFormPrepare(form, 2);
 				} else {
-					$(loader_el).innerHTML = '';
+					jQuery('#'+loader_el).html('');
 				}
-			} 
-		};
-		if(typeof options!="undefined") {
-			dooptions = options;
-		}
-		
-		if (MooTools.version>='1.2.4') {
-			$(loader_el).set('html', loader_html);
-			new Request({
-				url: url_to_load,
-				method: 'get',
-				evalScripts: false,
-				onSuccess: function(responseText) {
-				 	form.action=responseText;
-				 	var fcform = jQuery(form);
-				 	fcform.attr('data-fcform_action', responseText);
-				 	if (autosubmit) {
-				 		$(loader_el).innerHTML += autosubmit_msg;
-						adminFormPrepare(form, 2);
-					} else {
-						$(loader_el).innerHTML = '';
-					}
-				} 
-			}).send();
-		} else {
-			$(loader_el).setHTML(loader_html);
-			var ajax = new Ajax(url_to_load, dooptions);
-			ajax.request.delay(300, ajax);
-		}
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+			}
+		});
 	}
 	
 	
