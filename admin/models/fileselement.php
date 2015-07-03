@@ -223,6 +223,8 @@ class FlexicontentModelFileselement extends JModelLegacy
 		
 		// Get all image files with a .jpg extension.
 		$images = glob($gallery_folder . "/*.{".$exts."}", GLOB_BRACE);
+
+		$imageexts = array('jpg','gif','png','bmp','jpeg');
 		
 		// Get image names
 		$rows = array();
@@ -239,6 +241,14 @@ class FlexicontentModelFileselement extends JModelLegacy
 			$row->uploader = '-';
 			$row->uploaded = date("F d Y H:i:s.", filectime($image) );
 			$row->id = $i;
+
+			if ( in_array(strtolower($row->ext), $imageexts)) {
+				$row->icon = JURI::root()."components/com_flexicontent/assets/images/mime-icon-16/image.png";
+			}elseif(file_exists(JPATH_SITE."/components/com_flexicontent/assets/images/mime-icon-16/".$row->ext.".png")) {
+				$row->icon = JURI::root()."components/com_flexicontent/assets/images/mime-icon-16/".$row->ext.".png";
+			}else{
+				$row->icon = JURI::root()."components/com_flexicontent/assets/images/mime-icon-16/unknown.png";
+			}
 			$rows[] = $row;
 		}
 		

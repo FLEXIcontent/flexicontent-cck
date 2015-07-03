@@ -164,7 +164,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 			$rows  = $this->get('Data');
 			$img_folder = '';
 		} else {
-			$rows = $model->getFilesFromPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param);
+			$exts = $cparams->get("upload_extensions", "jpg,jpeg,gif,png");
+			$rows = $model->getFilesFromPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param, $exts);
 			$img_folder = $model->getFieldFolderPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param);
 			$img_path = str_replace('\\', '/', $img_folder . DS . $newfilename);
 			$thumb = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$thumb_w.'&h='.$thumb_h;
