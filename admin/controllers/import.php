@@ -188,7 +188,25 @@ class FlexicontentControllerImport extends FlexicontentController
 			// ******************************************************************************************************
 			$pattern = '/(?<!\\\)(\\\(?:n|r|t|v|f|[0-7]{1,3}|x[0-9a-f]{1,2}))/i';
 			$replace = 'eval(\'return "$1";\')';
-
+			
+			$conf['mval_separator']  = preg_replace_callback(
+				$pattern,
+				function ($matches) {
+					$r = $matches[1];
+					eval("\$r = \"$r\";");
+					return $r;
+				},
+				JRequest::getVar('mval_separator')
+			);
+			$conf['mprop_separator']  = preg_replace_callback(
+				$pattern,
+				function ($matches) {
+					$r = $matches[1];
+					eval("\$r = \"$r\";");
+					return $r;
+				},
+				JRequest::getVar('mprop_separator')
+			);
 			$conf['field_separator']  = preg_replace_callback(
 				$pattern,
 				function ($matches) {
@@ -220,8 +238,14 @@ class FlexicontentControllerImport extends FlexicontentController
 			// ****************************************************************************************************************
 			// Check for proper CSV file format variables, js validation should have prevented form submission but check anyway
 			// ****************************************************************************************************************
+			if( $conf['mval_separator']=='' ||  $conf['mprop_separator']=='') {
+				echo "<script>alert ('CSV format not valid, please enter multi-value, and multi-property Separators');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			}
+
 			if( $conf['field_separator']=='' || $conf['record_separator']=='' ) {
-				// Check for the (required) title column
 				echo "<script>alert ('CSV format not valid, please enter Field Separator and Item Separator');";
 				echo "window.history.back();";
 				echo "</script>";
@@ -511,8 +535,8 @@ class FlexicontentControllerImport extends FlexicontentController
 			$data = array();
 			$data['type_id'] = $conf['type_id'];
 			$data['language']= $conf['language'];
-			$data['catid']   = $conf['maincat'];
-			$data['cid']     = $conf['seccats'];
+			$data['catid']   = $conf['maincat'];   // Default value maybe overriden by column
+			$data['cid']     = $conf['seccats'];   // Default value maybe overriden by column
 			$data['vstate']  = 2;
 			$data['state']   = $conf['state'];
 			
@@ -746,7 +770,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				
 				foreach($filedata_arr as $lineno => $field_data) {
 					// Split multi-value field
-					$vals = strlen($field_data) ? preg_split("/[\s]*%%[\s]*/", $field_data) : array();
+					$vals = strlen($field_data) ? preg_split("/[\s]*".$conf['mval_separator']."[\s]*/", $field_data) : array();
 					$vals = flexicontent_html::arrayTrim($vals);
 					unset($field_values);
 					
@@ -755,7 +779,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					foreach ($vals as $i => $val)
 					{
 						// Split multiple property fields
-						$props = strlen($val) ? preg_split("/[\s]*!![\s]*/", $val) : array();
+						$props = strlen($val) ? preg_split("/[\s]*".$conf['mprop_separator']."[\s]*/", $val) : array();
 						$props = flexicontent_html::arrayTrim($props);
 						unset($prop_arr);
 						
@@ -846,7 +870,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					$field_values = trim($field_data);
 				} else {
 					// Split multi-value field
-					$vals = strlen($field_data) ? preg_split("/[\s]*%%[\s]*/", $field_data) : array();
+					$vals = strlen($field_data) ? preg_split("/[\s]*".$conf['mval_separator']."[\s]*/", $field_data) : array();
 					$vals = flexicontent_html::arrayTrim($vals);
 					
 					// Handle each value of the field
@@ -854,7 +878,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					foreach ($vals as $i => $val)
 					{
 						// Split multiple property fields
-						$props = strlen($val) ? preg_split("/[\s]*!![\s]*/", $val) : array();
+						$props = strlen($val) ? preg_split("/[\s]*".$conf['mprop_separator']."[\s]*/", $val) : array();
 						$props = flexicontent_html::arrayTrim($props);
 						unset($prop_arr);
 						

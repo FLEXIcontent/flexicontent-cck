@@ -71,11 +71,24 @@ class FlexicontentViewImport extends JViewLegacy
 		// Add css and js to document
 		// **************************
 		
+		// Add css to document
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexi_shared.css');
+		FLEXI_J30GE ?
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css') :
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css') ;
 		
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
+		flexicontent_html::loadFramework('flexi-lib');
 		
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
+		
+				
 		
 		// *****************************
 		// Get user's global permissions
@@ -103,16 +116,16 @@ class FlexicontentViewImport extends JViewLegacy
 		
 		if ( !empty($conf) ) {
 			if ($task!='processcsv') {
-				$ctrl_task = FLEXI_J16GE ? 'import.processcsv' : 'processcsv';
+				$ctrl_task = 'import.processcsv';
 				$import_btn_title = empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK';
 				JToolBarHelper::custom( $ctrl_task, 'save.png', 'save.png', $import_btn_title, $list_check = false );
 			}
-			$ctrl_task = FLEXI_J16GE ? 'import.clearcsv' : 'clearcsv';
+			$ctrl_task = 'import.clearcsv';
 			JToolBarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
 		} else {
-			$ctrl_task = FLEXI_J16GE ? 'import.initcsv' : 'initcsv';
+			$ctrl_task = 'import.initcsv';
 			JToolBarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
-			$ctrl_task = FLEXI_J16GE ? 'import.testcsv' : 'testcsv';
+			$ctrl_task = 'import.testcsv';
 			JToolBarHelper::custom( $ctrl_task, 'test.png', 'test.png', 'FLEXI_IMPORT_TEST_FILE_FORMAT', $list_check = false );
 		}
 		//JToolBarHelper::Back();
@@ -156,20 +169,20 @@ class FlexicontentViewImport extends JViewLegacy
 		// ******************
 		// Create form fields
 		// ******************
-		$lists['type_id'] = flexicontent_html::buildtypesselect($types, 'type_id', '', true, 'class="fcfield_selectval" size="1"', 'type_id');
+		$lists['type_id'] = flexicontent_html::buildtypesselect($types, 'type_id', '', true, 'class="required use_select2_lib"', 'type_id');
 		
 		$actions_allowed = array('core.create');  // Creating categorories tree for item assignment, we use the 'create' privelege
 		
 		// build the secondary categories select list
-		$class  = "fcfield_selectmulval";
+		$class  = "use_select2_lib";
 		$attribs = 'multiple="multiple" size="10" class="'.$class.'"';
-		$fieldname = FLEXI_J16GE ? 'seccats[]' : 'seccats[]';
+		$fieldname = 'seccats[]';
 		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, $fieldname, '', false, $attribs, false, true,
 			$actions_allowed, $require_all=true);
 		
 		// build the main category select list
-		$attribs = 'class="fcfield_selectval"';
-		$fieldname = FLEXI_J16GE ? 'maincat' : 'maincat';
+		$attribs = 'class="use_select2_lib required"';
+		$fieldname = 'maincat';
 		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, $fieldname, '', 2, $attribs, false, true, $actions_allowed);
 		
 		/*
@@ -190,7 +203,14 @@ class FlexicontentViewImport extends JViewLegacy
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$default_lang = $cparams->get('import_lang', '*');
-			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $default_lang, 6, $allowed_langs, $published_only=true);
+			$lists['languages'] = flexicontent_html::buildlanguageslist('language'
+				, ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_langcol\'); this.value ? m.hide(600) : m.show(600);"'
+				, $default_lang, 6/*'- '.JText::_('FLEXI_USE_LANGUAGE_COLUMN').' -'*/, $allowed_langs, $published_only=true
+				, $disable_langs=null, $add_all=true, $conf=array('required'=>true)
+			).'
+				<span class="fc-mssg-inline fc-note fc-nobgimage" id="fc_import_about_langcol" style="display:none;">
+					'.JText::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'
+				</span>';
 		} else {
 			$default_lang = flexicontent_html::getSiteDefaultLang();
 			$_langs[] = JHTML::_('select.option', $default_lang, JText::_( 'Default' ).' ('.flexicontent_html::getSiteDefaultLang().')' );
@@ -198,8 +218,11 @@ class FlexicontentViewImport extends JViewLegacy
 		}
 
 		$default_state= $cparams->get('import_state', 1);
-		$lists['states'] = flexicontent_html::buildstateslist('state', '', $default_state, 2);
-		
+		$lists['states'] = flexicontent_html::buildstateslist('state', ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_statecol\'); this.value ? m.hide(600) : m.show(600);"'
+			, $default_state, 2/*'- '.JText::_('FLEXI_USE_STATE_COLUMN').' -'*/).
+			'<span class="fc-mssg-inline fc-note fc-nobgimage" id="fc_import_about_statecol" style="display:none;">
+				'.JText::_('FLEXI_USE_STATE_COLUMN_TIP').'
+			</span>';
 		
 		// Ignore warnings because component may not be installed
 		$warnHandlers = JERROR::getErrorHandling( E_WARNING );
