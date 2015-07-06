@@ -2414,15 +2414,77 @@ class ParentClassItem extends JModelAdmin
 		if ( $print_logging_info ) @$fc_run_times['fields_value_preparation'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		
+		
+		// **********************
+		// Empty per field TABLES
+		// **********************
+		
+		$filterables = FlexicontentFields::getSearchFields('id', $indexer='advanced', null, null, $_load_params=true, 0, $search_type='filter');
+		$filterables = array_keys($filterables);
+		$filterables = array_flip($filterables);
+		
+		$tbl_prefix = $app->getCfg('dbprefix').'flexicontent_advsearch_index_field_';
+		$query = "SELECT TABLE_NAME
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE TABLE_NAME LIKE '".$tbl_prefix."%'
+			";
+		$this->_db->setQuery($query);
+		$tbl_names = $this->_db->loadColumn();
+		
+		foreach($tbl_names as $tbl_name)
+		{
+			$_field_id = str_replace($tbl_prefix, '', $tbl_name);
+			
+			// Drop the table of no longer filterable field 
+			if ( !isset($filterables[$_field_id]) )
+				$this->_db->setQuery( 'DROP TABLE IF EXISTS '.$tbl_name );
+			else {
+				// Remove item's old advanced search index entries
+				$query = "DELETE FROM ".$tbl_name." WHERE item_id=". $item->id;
+				$this->_db->setQuery($query);
+				$this->_db->query();
+			}
+		}
+		
+		// VERIFY all search tables exist
+		$tbl_names_flipped = array_flip($tbl_names);
+		foreach ($filterables as $_field_id => $_ignored)
+		{
+			$tbl_name = $app->getCfg('dbprefix').'flexicontent_advsearch_index_field_'.$_field_id;
+			if ( isset($tbl_names_flipped[$tbl_name]) ) continue;
+			$query = '
+			CREATE TABLE IF NOT EXISTS `' .$tbl_name. '` (
+			  `sid` int(11) NOT NULL auto_increment,
+			  `field_id` int(11) NOT NULL,
+			  `item_id` int(11) NOT NULL,
+			  `extraid` int(11) NOT NULL,
+			  `search_index` longtext NOT NULL,
+			  `value_id` varchar(255) NULL,
+			  PRIMARY KEY (`field_id`,`item_id`,`extraid`),
+			  KEY `sid` (`sid`),
+			  KEY `field_id` (`field_id`),
+			  KEY `item_id` (`item_id`),
+			  FULLTEXT `search_index` (`search_index`),
+			  KEY `value_id` (`value_id`)
+			) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`
+			';
+			$this->_db->setQuery($query);
+			$this->_db->query();
+		}
+		
+		
+		
 		// ****************************************************************************************************************************
 		// Loop through Fields triggering onIndexAdvSearch, onIndexSearch Event handlers, this was seperated from the before save field
 		//  event, so that we will update search indexes only if the above has not canceled saving OR has not canceled version approval
 		// ****************************************************************************************************************************
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		if ($fields) 
+		
+		$ai_query_vals = array();
+		$ai_query_vals_f = array();
+		
+		if ($fields)
 		{
-			
-			$ai_query_vals = array();
 			foreach($fields as $field)
 			{
 				$field_type = $field->iscore ? 'core' : $field->field_type;
@@ -2431,7 +2493,12 @@ class ParentClassItem extends JModelAdmin
 				{
 					// Trigger plugin Event 'onIndexAdvSearch' to update field-item pair records in advanced search index
 					FLEXIUtilities::call_FC_Field_Func($field_type, 'onIndexAdvSearch', array( &$field, &$postdata[$field->name], &$item ));
-					if ( isset($field->ai_query_vals) ) foreach ($field->ai_query_vals as $query_val) $ai_query_vals[] = $query_val;
+					if ( isset($field->ai_query_vals) ) {
+						foreach ($field->ai_query_vals as $query_val) $ai_query_vals[] = $query_val;
+						if ( isset($filterables[$field->id]) ) {  // Current for advanced index only
+							foreach ($field->ai_query_vals as $query_val) $ai_query_vals_f[$field->id][] = $query_val;
+						}
+					}
 					//echo $field->name .":".implode(",", @$field->ai_query_vals ? $field->ai_query_vals : array() )."<br/>";
 					
 					// Trigger plugin Event 'onIndexSearch' to update item 's (basic) search index record
@@ -2448,13 +2515,24 @@ class ParentClassItem extends JModelAdmin
 		$this->_db->query();
 		
 		// Store item's advanced search index entries
-		if ( !empty($ai_query_vals) ) {
-			$query = "INSERT INTO #__flexicontent_advsearch_index "
+		$queries = array();
+		if ( count($ai_query_vals) )  // check for zero search index records
+		{
+			$queries[] = "INSERT INTO #__flexicontent_advsearch_index "
 				." (field_id,item_id,extraid,search_index,value_id) VALUES "
 				.implode(",", $ai_query_vals);
 			$this->_db->setQuery($query);
 			$this->_db->query();
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+		}
+		foreach( $ai_query_vals_f as $_field_id => $_query_vals) {  // Current for advanced index only
+			$queries[] = "INSERT INTO #__flexicontent_advsearch_index_field_".$_field_id
+				." (field_id,item_id,extraid,search_index,value_id) VALUES "
+				.implode(",", $_query_vals);
+		}
+		foreach( $queries as $query ) {
+			$this->_db->setQuery($query);
+			$this->_db->query();
 		}
 		
 		// Assigned created basic search index into item object

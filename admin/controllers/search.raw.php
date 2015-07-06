@@ -253,12 +253,9 @@ class FlexicontentControllerSearch extends FlexicontentController
 						.implode(",", $_query_vals);
 				}
 			}
-			foreach( $queries as $query) {
+			foreach( $queries as $query ) {
 				$db->setQuery($query);
 				$db->query();
-				if ($db->getErrorNum()) {
-					echo $db->getErrorMsg();
-				}
 			}
 		}
 		
