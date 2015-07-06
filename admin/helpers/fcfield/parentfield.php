@@ -357,10 +357,18 @@ class FCField extends JPlugin
 	}
 	
 	
-	protected function & parseValues(&$values)
+	protected function & parseValues(&$_values)
 	{
 		$vals = array();
-		if (!empty($values)) foreach($values as $value) {
+		
+		// Check if empty
+		if ( empty($_values) ) return $vals;
+		
+		// Check if already a value array
+		$values = isset($_values[0]) ? $_values : array(0 => $_values);
+		
+		foreach($values as $value)
+		{
 			$v = !empty($value) ? @unserialize($value) : false;
 			if ( $v !== false || $v === 'b:0;' ) {
 				$vals[] = $v;
