@@ -2458,6 +2458,7 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		// Assigned created basic search index into item object
+		$search_prefix = $cparams->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$item->search_index = implode(' | ', $searchindex);
 		if ($search_prefix && $item->search_index) $item->search_index = preg_replace('/(\b[^\s]+\b)/', $search_prefix.'$0', trim($item->search_index));
 		

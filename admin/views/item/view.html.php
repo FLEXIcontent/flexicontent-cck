@@ -315,10 +315,12 @@ class FlexicontentViewItem extends JViewLegacy
 				if ( !$is_editable ) {
 					$field->html = '<div class="fc-mssg fc-warning">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
 				} else {
-					if ( isset($jcustom[$field->name]) ) {
+					if ( isset($jcustom[$field->name]) )
+					{
 						$field->value = array();
 						foreach ($jcustom[$field->name] as $i => $_val) {
-							$field->value[$i] = is_array($_val) ? serialize($_val) : $_val;
+							//$field->value[$i] = is_array($_val) ? serialize($_val) : $_val;
+							$field->value[$i] = $_val;
 						}
 					}
 					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));

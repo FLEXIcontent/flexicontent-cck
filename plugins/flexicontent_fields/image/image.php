@@ -569,7 +569,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$uploadLimitsTxt = $this->getUploadLimitsTxt($field);
 		foreach ($field->value as $value)
 		{
-			$value = unserialize($value);
+			// Compatibility for unserialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			if ( !is_array($value) )
+			{
+				$v = !empty($value) ? @unserialize($value) : false;
+				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
+					array('originalname' => $value);
+			}
 			$i++;
 			
 			$fieldname_n = $fieldname.'['.$n.']';

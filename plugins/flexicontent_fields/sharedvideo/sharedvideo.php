@@ -4,7 +4,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
-class plgFlexicontent_fieldsSharedvideo extends JPlugin
+class plgFlexicontent_fieldsSharedvideo extends FCField
 {
 	static $field_types = array('sharedvideo');
 	
@@ -31,6 +31,14 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 		$field->label = JText::_($field->label);
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 
+		// initialize framework objects and other variables
+		$document = JFactory::getDocument();
+		
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
+		
 		// some parameter shortcuts
 		$required = $field->parameters->get('required',0);
 		$required = $required ? ' required' : '';
@@ -43,111 +51,131 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 		$display_duration_form    = $field->parameters->get('display_duration_form',1) ;
 		$display_description_form = $field->parameters->get('display_description_form',1) ;
 		
-		// get stored field value
-		if ( isset($field->value[0]) ) $value = unserialize($field->value[0]);
-		else {
-			$value['url'] = '';
-			$value['videotype'] = '';
-			$value['videoid'] = '';
-			$value['title'] = '';
-			$value['author'] = '';
-			$value['duration'] = '';
-			$value['description'] = '';
+		// Initialise value property
+		$values = $this->parseValues($field->value);
+		if (empty($values)) {
+			$values = array();
+			$values[0]['url'] = '';
+			$values[0]['videotype'] = '';
+			$values[0]['videoid'] = '';
+			$values[0]['title'] = '';
+			$values[0]['author'] = '';
+			$values[0]['duration'] = '';
+			$values[0]['description'] = '';
 		}
-		if (!isset($value['url']))         $value['url'] = '';
-		if (!isset($value['videotype']))   $value['videotype'] = '';
-		if (!isset($value['videoid']))     $value['videoid'] = '';
-		if (!isset($value['title']))       $value['title'] = '';
-		if (!isset($value['author']))      $value['author'] = '';
-		if (!isset($value['duration']))    $value['duration'] = '';
-		if (!isset($value['description'])) $value['description'] = '';
+		$value = $values[0];
 		
-		$field->html  = '';
-		$field->html .= '
-		<table class="admintable">
-			<tr>
-				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_URL').'</td>
-				<td>
-					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" '.$required.' />
-					<input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_FETCH').'" onclick="fetchVideo_'.$field->name.'();" />
-					<span id="fcfield_fetching_msg_'.$field->id.'"></span>
-				</td>
-			</tr>'
-		.($display_videotype_form ? '
-			<tr>
-				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_TYPE').'</td>
-				<td>
-					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][videotype]" value="'.$value['videotype'].'" size="10" readonly="readonly" style="background-color:#eee" />
-				</td>
-			</tr>' : '
-			<input type="hidden" name="custom['.$field->name.'][videotype]" value="'.$value['videotype'].'" size="10" readonly="readonly" style="background-color:#eee" />')
-		.($display_videoid_form ? '
-			<tr>
-				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_ID').'</td>
-				<td>
-					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][videoid]" value="'.$value['videoid'].'" size="15" readonly="readonly" style="background-color:#eee" />
-				</td>
-			</tr>' : '
-			<input type="hidden" name="custom['.$field->name.'][videoid]" value="'.$value['videoid'].'" size="15" readonly="readonly" style="background-color:#eee" />')
-		.($display_title_form ? '
-			<tr>
-				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_TITLE').'</td>
-				<td>
-					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />
-				</td>
-			</tr>' : '
-			<input type="hidden" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />')
-		.($display_author_form ? '
-			<tr>
-				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_AUTHOR').'</td>
-				<td>
-					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />
-				</td>
-			</tr>' : '
-			<input type="hidden" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />')
-		.($display_duration_form ? '
-			<tr>
-				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DURATION').'</td>
-				<td>
-					<input type="text" class="fcfield_textval" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" />
-				</td>
-			</tr>' : '
-			<input type="hidden" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" />')
-		.($display_description_form ? '
-			<tr>
-				<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DESCRIPTION').'</td>
-				<td>
-					<textarea class="fcfield_textareaval" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea>
-				</td>
-			</tr>' : '
-			<textarea style="display:none;" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea>')
-		;
-		
-		$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PREVIEW').'</td><td><div id="'.$field->name.'_thumb">';
-		if($value['videotype']!="" && $value['videoid']!="") {
-			$iframecode = '<iframe class="sharedvideo" src="';
-			switch($value['videotype']){
-				case "youtube":
-					$iframecode .= "//www.youtube.com/embed/";
-					break;
-				case "vimeo":
-					$iframecode .= "//player.vimeo.com/video/";
-					break;
-				case "dailymotion":
-					$iframecode .= "//www.dailymotion.com/embed/video/";
-					break;
-				default:
-					// For embed.ly we will have added 'URL' into our 'id' variable (below)
-					break;
+		$field->html = array();
+		foreach($values as $n => $value)
+		{
+			if (!isset($value['url']))         $value['url'] = '';
+			if (!isset($value['videotype']))   $value['videotype'] = '';
+			if (!isset($value['videoid']))     $value['videoid'] = '';
+			if (!isset($value['title']))       $value['title'] = '';
+			if (!isset($value['author']))      $value['author'] = '';
+			if (!isset($value['duration']))    $value['duration'] = '';
+			if (!isset($value['description'])) $value['description'] = '';
+			
+			$field->html[$n] = '
+			<table class="admintable"><tbody>
+				<tr>
+					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_URL').'</td>
+					<td>
+						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" '.$required.' />
+						<input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_FETCH').'" onclick="fetchVideo_'.$field->name.'();" />
+						<span id="fcfield_fetching_msg_'.$field->id.'"></span>
+					</td>
+				</tr>'
+			.($display_videotype_form ? '
+				<tr>
+					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_TYPE').'</td>
+					<td>
+						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][videotype]" value="'.$value['videotype'].'" size="10" readonly="readonly" style="background-color:#eee" />
+					</td>
+				</tr>' : '
+				<input type="hidden" name="custom['.$field->name.'][videotype]" value="'.$value['videotype'].'" size="10" readonly="readonly" style="background-color:#eee" />')
+			.($display_videoid_form ? '
+				<tr>
+					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_ID').'</td>
+					<td>
+						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][videoid]" value="'.$value['videoid'].'" size="15" readonly="readonly" style="background-color:#eee" />
+					</td>
+				</tr>' : '
+				<input type="hidden" name="custom['.$field->name.'][videoid]" value="'.$value['videoid'].'" size="15" readonly="readonly" style="background-color:#eee" />')
+			.($display_title_form ? '
+				<tr>
+					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_TITLE').'</td>
+					<td>
+						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />
+					</td>
+				</tr>' : '
+				<input type="hidden" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />')
+			.($display_author_form ? '
+				<tr>
+					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_AUTHOR').'</td>
+					<td>
+						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />
+					</td>
+				</tr>' : '
+				<input type="hidden" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />')
+			.($display_duration_form ? '
+				<tr>
+					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DURATION').'</td>
+					<td>
+						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" />
+					</td>
+				</tr>' : '
+				<input type="hidden" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" />')
+			.($display_description_form ? '
+				<tr>
+					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DESCRIPTION').'</td>
+					<td>
+						<textarea class="fcfield_textareaval" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea>
+					</td>
+				</tr>' : '
+				<textarea style="display:none;" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea>').'
+			';
+			
+			$iframecode = '';
+			if($value['videotype']!="" && $value['videoid']!="")
+			{
+				$iframecode = '<iframe class="sharedvideo" src="';
+				switch($value['videotype']){
+					case "youtube":
+						$iframecode .= "//www.youtube.com/embed/";
+						break;
+					case "vimeo":
+						$iframecode .= "//player.vimeo.com/video/";
+						break;
+					case "dailymotion":
+						$iframecode .= "//www.dailymotion.com/embed/video/";
+						break;
+					default:
+						// For embed.ly we will have added 'URL' into our 'id' variable (below)
+						break;
+				}
+				$val_id = $value['videoid'];  // In case of embed.ly, this is not id but it is full URL
+				$iframecode .= $val_id.'" width="240" height="135" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
 			}
-			$val_id = $value['videoid'];  // In case of embed.ly, this is not id but it is full URL
-			$iframecode .= $val_id.'" width="240" height="135" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
-			$field->html .= $iframecode;
+			
+			$field->html[$n] .= '
+				<tr>
+					<td class="key" align="right">
+						'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PREVIEW').'
+					</td>
+					<td>
+						<div id="'.$field->name.'_thumb">
+							'.$iframecode.'
+						</div>
+					</td>
+				</tr>
+			</tbody></table>';
 		}
-		$field->html	.= '</div></td></tr>';
-		$field->html	.= '</tbody></table>';
-		$field->html 	.= '
-		<script type="text/javascript">
+		
+		$js = "";
+		$css = "";
+		
+		$js = '
 		function fetchVideo_'.$field->name.'() {
 			var fieldname = \'custom['.$field->name.']\';
 			var url = fieldname+"[url]";
@@ -278,8 +306,22 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 			field = fieldname+"[description]";
 			document.forms["adminForm"].elements[field].value = data.description;
 		}
-		</script>';
-
+		';
+		
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
+		
+		if ($use_ingroup) { // do not convert the array to string if field is in a group
+		} else if ($multiple) { // handle multiple records
+			$field->html = !count($field->html) ? '' :
+				'<li class="'.$value_classes.'">'.
+					implode('</li><li class="'.$value_classes.'">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
+		} else {  // handle single values
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+		}
 	}
 	
 	
@@ -367,7 +409,7 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 	// **************************************************************
 	
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( $field, &$post, &$file )
+	function onBeforeSaveField(&$field, &$post, &$file, &$item)
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		

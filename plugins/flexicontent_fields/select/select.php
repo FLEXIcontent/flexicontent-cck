@@ -324,7 +324,8 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		
 		// Handle case of FORM fields that each value is an array of values
 		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
-		$values = self::$valueIsArr && !$multiple ? array($field->value) : $field->value;
+		$is_array_already = is_array($field->value) ? is_array(reset($field->value)) : false;
+		$values = self::$valueIsArr && !$multiple && !$is_array_already ? array($field->value) : $field->value;
 		
 		
 		// *****************************************

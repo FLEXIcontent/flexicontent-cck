@@ -245,12 +245,12 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
-			// Compatibility for unserialized values or for NULL values in a field group
-			$v = !empty($value) ? @unserialize($value) : false;
-			if ( $v !== false || $v === 'b:0;' ) {
-				$value = $v;
-			} else {
-				$value = array('label'=>'', 'cc'=>'', 'phone1'=>$value, 'phone2'=>'', 'phone3'=>'');
+			// Compatibility for unserialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			if ( !is_array($value) )
+			{
+				$v = !empty($value) ? @unserialize($value) : false;
+				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
+					array('label'=>'', 'cc'=>'', 'phone1'=>$value, 'phone2'=>'', 'phone3'=>'');
 			}
 			if ( empty($value['label']) && empty($value['cc']) && empty($value['phone1']) && empty($value['phone2']) && empty($value['phone3']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
@@ -365,8 +365,15 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		$n = 0;
 		foreach ($values as $value)
 		{
-			$value = unserialize($value);
+			// Compatibility for unserialized values or for NULL values in a field group
+			if ( !is_array($value) )
+			{
+				$v = !empty($value) ? @unserialize($value) : false;
+				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
+					array('label'=>'', 'cc'=>'', 'phone1'=>$value, 'phone2'=>'', 'phone3'=>'');
+			}
 			if (empty($value['phone1']) && empty($value['phone2']) && empty($value['phone3']) && !$is_ingroup ) continue;  // Skip empty values if not in field group
+			
 			$field->{$prop}[] = ''
 				.$opentag
 				.($display_phone_label  ? $label_prefix.$value['label'].$label_suffix : '')

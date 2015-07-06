@@ -845,7 +845,8 @@ class FlexicontentViewItem  extends JViewLegacy
 					if ( isset($jcustom[$field->name]) ) {
 						$field->value = array();
 						foreach ($jcustom[$field->name] as $i => $_val) {
-							$field->value[$i] = is_array($_val) ? serialize($_val) : $_val;
+							//$field->value[$i] = is_array($_val) ? serialize($_val) : $_val;
+							$field->value[$i] = $_val;
 						}
 					}
 					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));

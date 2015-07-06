@@ -41,7 +41,7 @@ foreach($files_data as $file_id => $file_data)
 				'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'
 			</label>
 			<span class="inlinefile-title-data">
-				<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.$file_data->altname.'" class="'.$required_class.'" />
+				<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.(!isset($form_data[$file_id]) ? $file_data->altname : $form_data[$file_id]['file-title']).'" class="'.$required_class.'" />
 			</span>
 		</div>' : '').
 	
@@ -51,7 +51,7 @@ foreach($files_data as $file_id => $file_data)
 				'.JText::_( 'FLEXI_LANGUAGE' ).'
 			</label>
 			<span class="inlinefile-lang-data">
-				'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="use_select2_lib"', $file_data->language, 1).'
+				'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="use_select2_lib"', (!isset($form_data[$file_id]) ? $file_data->language : $form_data[$file_id]['file-lang']), 1).'
 			</span>
 		</div>' : '').
 	
@@ -61,7 +61,7 @@ foreach($files_data as $file_id => $file_data)
 				'.JText::_( 'FLEXI_DESCRIPTION' ).'
 			</label>
 			<span class="inlinefile-desc-data">
-				<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]">'.$file_data->description.'</textarea>
+				<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]">'.(!isset($form_data[$file_id]) ? $file_data->description : $form_data[$file_id]['file-desc']).'</textarea>
 			</span>
 		</div>' : '').
 	
