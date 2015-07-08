@@ -33,45 +33,40 @@ class FlexicontentViewImport extends JViewLegacy
 
 	function display( $tpl = null )
 	{
-		$mainframe = JFactory::getApplication();
-
-		//initialise variables
+		// ********************
+		// Initialise variables
+		// ********************
+		
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+		$task    = $jinput->get('task', '', 'cmd');
+		
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
-		$option   = JRequest::getCmd( 'option' );
-		$context  = 'com_flexicontent';
-		$task     = JRequest::getVar('task', '');
-		$cid      = JRequest::getVar('cid', array());
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$session  = JFactory::getSession();
 		
-		$this->setLayout('import');
-
-		//initialise variables
-		$user 		= JFactory::getUser();
-		$document	= JFactory::getDocument();
-		$context	= 'com_flexicontent';
+		// Get model
+		$model = $this->getModel();
+		
+		// Some flags
 		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 		
-		// Get filter vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.import.filter_order', 		'filter_order', 	'', 	'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.import.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
-		
 		// Get session information
-		$session = JFactory::getSession();
-		$conf   = $session->get('csvimport_config', "", 'flexicontent');
-		$conf		= unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
+		$conf  = $session->get('csvimport_config', "", 'flexicontent');
+		$conf  = unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
 		
 		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
-		$session->set('csvimport_parse_log', null, 'flexicontent');
-		
+		$session->set('csvimport_parse_log', null, 'flexicontent');  // This is the flag if CSV file has been parsed (import form already submitted), thus to display the imported data
 		
 		
 		// **************************
 		// Add css and js to document
 		// **************************
 		
-		// Add css to document
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexi_shared.css');
 		FLEXI_J30GE ?
@@ -88,7 +83,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
 		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
 		
-				
+		
 		
 		// *****************************
 		// Get user's global permissions
@@ -139,23 +134,37 @@ class FlexicontentViewImport extends JViewLegacy
 			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
-		if ( !empty($conf) && $task=='processcsv' ) {
-			$this->assignRef('conf', $conf);
-			parent::display('process');
-			return;
-		}
 		
+			
 		// Get types
 		$types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
 		
 		// Get Languages
-		$languages = (FLEXI_FISH || FLEXI_J16GE) ? FLEXIUtilities::getLanguages('code') : array();
+		$languages = FLEXIUtilities::getLanguages('code');
 		
 		// Get categories
 		global $globalcats;
 		$categories = $globalcats;
 		
-		if ( !empty($conf) ) {
+		
+		// ************************************
+		// Decide layout to load: 'import*.php'
+		// ************************************
+		
+		$this->setLayout('import');
+		
+		
+		// Execute the import task, load the log-like AJAX-based layout (import_process.php), to display results including any warnings
+		if ( !empty($conf) && $task=='processcsv' )
+		{
+			$this->assignRef('conf', $conf);
+			parent::display('process');
+			return;
+		}
+		
+		// Configuration has been parsed, display a 'preview' layout:  (import_list.php)
+		else if ( !empty($conf) )
+		{
 			$this->assignRef('conf', $conf);
 			$this->assignRef('cparams', $cparams);
 			$this->assignRef('types', $types);
@@ -165,61 +174,97 @@ class FlexicontentViewImport extends JViewLegacy
 			return;
 		}
 		
+		// Session config is empty, means import form has not been submited, display the form
+		// We will display import form which is not 'default.php', it is 'import.php'
+		// else ...
+		
+		
+		$formvals = array();
+		
+		// Retrieve Basic configuration
+		$formvals['type_id']  = $model->getState('type_id');
+		$formvals['language'] = $model->getState('language');
+		$formvals['state']    = $model->getState('state');
+		
+		// Main and secondary categories, tags
+		$formvals['maincat']     = $model->getState('maincat');
+		$formvals['maincat_col'] = $model->getState('maincat_col');
+		$formvals['seccats']     = $model->getState('seccats');
+		$formvals['seccats_col'] = $model->getState('seccats_col');
+		$formvals['tags_col']    = $model->getState('tags_col');
+		
+		// Publication: Author/modifier
+		$formvals['created_by_col']  = $model->getState('created_by_col');
+		$formvals['modified_by_col'] = $model->getState('modified_by_col');
+		
+		// Publication: META data
+		$formvals['metadesc_col'] = $model->getState('metadesc_col');
+		$formvals['metakey_col']  = $model->getState('metakey_col');
+		
+		
+		// Publication: dates
+		$formvals['modified_col'] = $model->getState('modified_col');
+		$formvals['created_col']  = $model->getState('modified_col');
+		$formvals['publish_up_col']   = $model->getState('publish_up_col');
+		$formvals['publish_down_col'] = $model->getState('publish_down_col');
+		
+		
+		// Advanced configuration
+		$formvals['ignore_unused_cols'] = $model->getState('ignore_unused_cols');
+		$formvals['id_col']             = $model->getState('id_col');
+		$formvals['items_per_step']     = $model->getState('items_per_step');
+		
+		
+		// CSV file format
+		$formvals['mval_separator']   = $model->getState('mval_separator');
+		$formvals['mprop_separator']  = $model->getState('mprop_separator');
+		$formvals['field_separator']  = $model->getState('field_separator');
+		$formvals['enclosure_char']   = $model->getState('enclosure_char');
+		$formvals['record_separator'] = $model->getState('record_separator');
+		$formvals['debug_records']    = $model->getState('debug_records');
+		
+		
 		
 		// ******************
 		// Create form fields
 		// ******************
-		$lists['type_id'] = flexicontent_html::buildtypesselect($types, 'type_id', '', true, 'class="required use_select2_lib"', 'type_id');
+		$lists['type_id'] = flexicontent_html::buildtypesselect($types, 'type_id', $formvals['type_id'], true, 'class="required use_select2_lib"', 'type_id');
 		
 		$actions_allowed = array('core.create');  // Creating categorories tree for item assignment, we use the 'create' privelege
+		
+		// build the main category select list
+		$attribs = 'class="use_select2_lib required"';
+		$fieldname = 'maincat';
+		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, $fieldname, $formvals['maincat'], 2, $attribs, false, true, $actions_allowed);
 		
 		// build the secondary categories select list
 		$class  = "use_select2_lib";
 		$attribs = 'multiple="multiple" size="10" class="'.$class.'"';
 		$fieldname = 'seccats[]';
-		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, $fieldname, '', false, $attribs, false, true,
+		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, $fieldname, $formvals['seccats'], false, $attribs, false, true,
 			$actions_allowed, $require_all=true);
 		
-		// build the main category select list
-		$attribs = 'class="use_select2_lib required"';
-		$fieldname = 'maincat';
-		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, $fieldname, '', 2, $attribs, false, true, $actions_allowed);
 		
-		/*
-			// build the main category select list
-			$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false, false);
-			// build the secondary categories select list
-			$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false, false);
-		*/
-		
-		//build languages list
+		// build languages list
 		// Retrieve author configuration
 		$authorparams = flexicontent_db::getUserConfig($user->id);
 		
 		$allowed_langs = $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
-
+		
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			$default_lang = $cparams->get('import_lang', '*');
-			$lists['languages'] = flexicontent_html::buildlanguageslist('language'
-				, ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_langcol\'); this.value ? m.hide(600) : m.show(600);"'
-				, $default_lang, 6/*'- '.JText::_('FLEXI_USE_LANGUAGE_COLUMN').' -'*/, $allowed_langs, $published_only=true
-				, $disable_langs=null, $add_all=true, $conf=array('required'=>true)
-			).'
-				<span class="fc-mssg-inline fc-note fc-nobgimage" id="fc_import_about_langcol" style="display:none;">
-					'.JText::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'
-				</span>';
-		} else {
-			$default_lang = flexicontent_html::getSiteDefaultLang();
-			$_langs[] = JHTML::_('select.option', $default_lang, JText::_( 'Default' ).' ('.flexicontent_html::getSiteDefaultLang().')' );
-			$lists['languages'] = JHTML::_('select.radiolist', $_langs, 'language', $class='', 'value', 'text', $default_lang );
-		}
+		$lists['languages'] = flexicontent_html::buildlanguageslist('language'
+			, ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_langcol\'); this.value ? m.hide(600) : m.show(600);"'
+			, $formvals['language'], 6/*'- '.JText::_('FLEXI_USE_LANGUAGE_COLUMN').' -'*/, $allowed_langs, $published_only=true
+			, $disable_langs=null, $add_all=true, $conf=array('required'=>true)
+		).'
+			<span class="fc-mssg-inline fc-note fc-nobgimage" id="fc_import_about_langcol" style="display:none;">
+				'.JText::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'
+			</span>';
 
-		$default_state= $cparams->get('import_state', 1);
 		$lists['states'] = flexicontent_html::buildstateslist('state', ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_statecol\'); this.value ? m.hide(600) : m.show(600);"'
-			, $default_state, 2/*'- '.JText::_('FLEXI_USE_STATE_COLUMN').' -'*/).
+			, $formvals['state'], 2/*'- '.JText::_('FLEXI_USE_STATE_COLUMN').' -'*/).
 			'<span class="fc-mssg-inline fc-note fc-nobgimage" id="fc_import_about_statecol" style="display:none;">
 				'.JText::_('FLEXI_USE_STATE_COLUMN_TIP').'
 			</span>';
@@ -228,22 +273,8 @@ class FlexicontentViewImport extends JViewLegacy
 		$warnHandlers = JERROR::getErrorHandling( E_WARNING );
 		JERROR::setErrorHandling( E_WARNING, 'ignore' );
 		
-		if (FLEXI_J30GE) {
-			// J3.0+ adds an warning about component not installed, commented out ... till time ...
-			$fleximport_comp_enabled = false; //JComponentHelper::isEnabled('com_fleximport');
-		} else {
-			$fleximport_comp = JComponentHelper::getComponent('com_fleximport', true);
-			$fleximport_comp_enabled = $fleximport_comp && $fleximport_comp->enabled;
-		}
-		
 		// Reset the warning handler(s)
 		foreach( $warnHandlers as $mode )  JERROR::setErrorHandling( E_WARNING, $mode );
-		
-		if ($fleximport_comp_enabled) {
-			$fleximport = JText::sprintf('FLEXI_FLEXIMPORT_INSTALLED',JText::_('FLEXI_FLEXIMPORT_INFOS'));
-		} else {
-			$fleximport = JText::sprintf('FLEXI_FLEXIMPORT_NOT_INSTALLED',JText::_('FLEXI_FLEXIMPORT_INFOS'));
-		}
 		
 		
 		// ********************************************************************************
@@ -257,12 +288,13 @@ class FlexicontentViewImport extends JViewLegacy
 		$file_fields = $db->loadObjectList('name');
 		
 		//assign data to template
+		$this->assignRef('model'   	, $model);
 		$this->assignRef('lists'   	, $lists);
-		$this->assignRef('cid'     	, $cid);
 		$this->assignRef('user'			, $user);
-		$this->assignRef('fleximport', $fleximport);
 		$this->assignRef('cparams', $cparams);
 		$this->assignRef('file_fields', $file_fields);
+		
+		$this->assignRef('formvals', $formvals);
 
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);

@@ -81,7 +81,7 @@ $list_states = array(
 
 $n = 0;
 $_add_map = ($view!='item' && ($show_map=='category' || $show_map=='both')) || ($view=='item' && ($show_map=='item' || $show_map=='both'));
-foreach ($values as $value)
+foreach ($this->values as $value)
 {
 	// generate map
 	$map = '';

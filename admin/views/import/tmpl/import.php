@@ -32,18 +32,6 @@ $this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets
 $this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
-// Add some CSS to the doc header
-$document->addStyleDeclaration("
-#adminForm table fieldset.fleximport ul {
-	padding: 0px 0px 0px 24px;
-	margin: 12px 0px 12px 0px;
-}
-#adminForm table fieldset.fleximport li {
-	list-style: disc inside none !important;
-	margin: 0 !important;
-	padding: 1px 0 0 8px !important;
-}
-");
 ?>
 
 <div class="flexicontent" id="flexicontent">
@@ -128,7 +116,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_CREATOR_AUTHOR");?></label></td>
 				<td class="data">
 					<?php
-						$dv = $params->get('import_created_by_col', 0);
+						$dv = $this->model->getState('created_by_col');
 						$checked0 = $dv==0 ? 'checked="checked"' : '';
 						$checked1 = $dv==1 ? 'checked="checked"' : '';
 					?>
@@ -143,7 +131,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_MODIFIER");?></label></td>
 				<td class="data">
 					<?php
-						$dv = $params->get('import_modified_by_col', 0);
+						$dv = $this->model->getState('modified_by_col');
 						$checked0 = $dv==0 ? 'checked="checked"' : '';
 						$checked1 = $dv==1 ? 'checked="checked"' : '';
 					?>
@@ -158,8 +146,8 @@ $tabCnt[$tabSetCnt] = 0;
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_META_DATA");?></label></td>
 				<td class="data">
 					<?php
-						$_desc_checked = $params->get('import_metadesc_col', 0) == 1 ? 'checked="checked"' : '';
-						$_key_checked = $params->get('import_metakey_col', 0) == 1 ? 'checked="checked"' : '';
+						$_desc_checked = $this->model->getState('metadesc_col') == 1 ? 'checked="checked"' : '';
+						$_key_checked  = $this->model->getState('metakey_col') == 1 ? 'checked="checked"' : '';
 					?>
 					<input type="checkbox" id="metadesc_col" name="metadesc_col" value="1" <?php echo $_desc_checked; ?> />
 					<label for="metadesc_col"><?php echo JText::_("FLEXI_IMPORT_USE_METADESC_COL");?></label>
@@ -179,7 +167,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_CREATION_DATE");?></label></td>
 				<td class="data">
 					<?php
-						$dv = $params->get('import_created_col', 0);
+						$dv = $this->model->getState('created_col');
 						$checked0 = $dv==0 ? 'checked="checked"' : '';
 						$checked1 = $dv==1 ? 'checked="checked"' : '';
 					?>
@@ -194,7 +182,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_MODIFICATION_DATE");?></label></td>
 				<td class="data">
 					<?php
-						$dv = $params->get('import_modified_col', 0);
+						$dv = $this->model->getState('modified_col');
 						$checked0 = $dv==0 ? 'checked="checked"' : '';
 						$checked1 = $dv==1 ? 'checked="checked"' : '';
 					?>
@@ -209,8 +197,8 @@ $tabCnt[$tabSetCnt] = 0;
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_PUBLICATION_DATES");?></label></td>
 				<td class="data">
 					<?php
-						$_up_checked = $params->get('import_publish_up_col', 0) == 1 ? 'checked="checked"' : '';
-						$_down_checked = $params->get('import_publish_down_col', 0) == 1 ? 'checked="checked"' : '';
+						$_up_checked   = $this->model->getState('publish_up_col') == 1 ? 'checked="checked"' : '';
+						$_down_checked = $this->model->getState('publish_down_col') == 1 ? 'checked="checked"' : '';
 					?>
 					<input type="checkbox" id="publish_up_col" name="publish_up_col" value="1" <?php echo $_up_checked; ?> />
 					<label for="publish_up_col"><?php echo JText::_("FLEXI_IMPORT_USE_PUBLISH_UP_COL");?></label>
@@ -258,7 +246,10 @@ $tabCnt[$tabSetCnt] = 0;
 					<label class="label" for="maincat_col" style="clear:both;"><?php echo JText::_( 'FLEXI_IMPORT_FILE_OVERRIDE' ); ?> <?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label>
 				</td>
 				<td class="data">
-					<input type="checkbox" id="maincat_col" name="maincat_col" value="1" /> <label for="maincat_col">(Use 'catid' column, e.g. 54)</label>
+					<?php
+						$checked = $this->model->getState('maincat_col') == 1 ? 'checked="checked"' : '';
+					?>
+					<input type="checkbox" id="maincat_col" name="maincat_col" value="1" <?php echo $checked; ?> /> <label for="maincat_col">(Use 'catid' column, e.g. 54)</label>
 				</td>
 			</tr>
 			
@@ -267,7 +258,10 @@ $tabCnt[$tabSetCnt] = 0;
 					<label class="label" for="seccats_col" style="clear:both;"><?php echo JText::_( 'FLEXI_IMPORT_FILE_OVERRIDE' ); ?> <?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label>
 				</td>
 				<td class="data">
-					<input type="checkbox" id="seccats_col" name="seccats_col" value="1" /> <label for="seccats_col">(Use 'cid' column, e.g. 54,14,51)</label>
+					<?php
+						$checked = $this->model->getState('seccats_col') == 1 ? 'checked="checked"' : '';
+					?>
+					<input type="checkbox" id="seccats_col" name="seccats_col" value="1" <?php echo $checked; ?> /> <label for="seccats_col">(Use 'cid' column, e.g. 54,14,51)</label>
 				</td>
 			</tr>
 			
@@ -288,7 +282,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_TAGS");?></label></td>
 				<td class="data">
 					<?php
-						$dv = $params->get('import_tags_col', 0);
+						$dv = $this->model->getState('tags_col');
 						$checked0 = $dv==0 ? 'checked="checked"' : '';
 						$checked1 = $dv==1 ? 'checked="checked"' : '';
 						$checked2 = $dv==2 ? 'checked="checked"' : '';
@@ -318,7 +312,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_IMPORT_IGNORE_UNUSED_COLUMNS");?></label></td>
 				<td class="data">
 					<?php
-						$_ignore_unused_cols_checked = $params->get('import_ignore_unused_cols', 0) ? 'checked="checked"' : '';
+						$_ignore_unused_cols_checked = $this->model->getState('ignore_unused_cols') ? 'checked="checked"' : '';
 					?>
 					<input type="checkbox" id="ignore_unused_cols" name="ignore_unused_cols" value="1" <?php echo $_ignore_unused_cols_checked; ?> />
 					<label for="ignore_unused_cols"><?php echo JText::_( 'FLEXI_IMPORT_IGNORE_REDUDANT_COLS' ); ?></label>
@@ -332,7 +326,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<td class="key"><label class="label"><?php echo JText::_("FLEXI_IMPORT_CUSTOM_ITEM_ID");?></label></td>
 				<td class="data">
 					<?php
-						$_id_col_checked = $params->get('import_id_col', 0) ? 'checked="checked"' : '';
+						$_id_col_checked = $this->model->getState('id_col') ? 'checked="checked"' : '';
 					?>
 					<input type="checkbox" id="id_col" name="id_col" value="1" <?php echo $_id_col_checked; ?> />
 					<label for="id_col"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL");?></label>
@@ -344,10 +338,10 @@ $tabCnt[$tabSetCnt] = 0;
 			
 			<tr>
 				<td class="key">
-					<label class="label" for="import_items_per_step"><?php echo JText::_( 'FLEXI_IMPORT_ITEMS_PER_STEP' ); ?></label>
+					<label class="label" for="items_per_step"><?php echo JText::_( 'FLEXI_IMPORT_ITEMS_PER_STEP' ); ?></label>
 				</td>
 				<td class="data">
-					<input type="text" name="import_items_per_step" id="import_items_per_step" value="<?php echo $params->get('import_items_per_step',5); ?>" class="fcfield_textval required" size="40"/>
+					<input type="text" name="items_per_step" id="items_per_step" value="<?php echo $this->model->getState('items_per_step'); ?>" class="fcfield_textval required" size="40"/>
 				</td>
 				<td class="data">
 					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_( 'FLEXI_IMPORT_ITEMS_PER_STEP_DESC' ); ?></span>
@@ -373,10 +367,10 @@ $tabCnt[$tabSetCnt] = 0;
 			
 			<tr>
 				<td class="key">
-					<label class="label" for="import_media_folder"><?php echo JText::_( 'FLEXI_IMPORT_MEDIA_FOLDER' ); ?></label>
+					<label class="label" for="media_folder"><?php echo JText::_( 'FLEXI_IMPORT_MEDIA_FOLDER' ); ?></label>
 				</td>
 				<td class="data">
-					<input type="text" name="import_media_folder" id="import_media_folder" value="<?php echo $params->get('import_media_folder','tmp/fcimport_media'); ?>" class="fcfield_textval" size="40"/>
+					<input type="text" name="media_folder" id="media_folder" value="<?php echo $this->model->getState('media_folder'); ?>" class="fcfield_textval" size="40"/>
 				</td>
 				<td class="data" rowspan="2">
 					<div class="fc-mssg fc-info fc-nobgimage">
@@ -388,10 +382,10 @@ $tabCnt[$tabSetCnt] = 0;
 			
 			<tr>
 				<td class="key">
-					<label class="label" for="import_docs_folder"><?php echo JText::_( 'FLEXI_IMPORT_DOCUMENTS_FOLDER' ); ?></label>
+					<label class="label" for="docs_folder"><?php echo JText::_( 'FLEXI_IMPORT_DOCUMENTS_FOLDER' ); ?></label>
 				</td>
 				<td class="data">
-					<input type="text" name="import_docs_folder" id="import_docs_folder" value="<?php echo $params->get('import_docs_folder','tmp/fcimport_docs'); ?>" class="fcfield_textval" size="40"/>
+					<input type="text" name="docs_folder" id="docs_folder" value="<?php echo $this->model->getState('docs_folder'); ?>" class="fcfield_textval" size="40"/>
 				</td>
 			</tr>
 			
@@ -404,7 +398,7 @@ $tabCnt[$tabSetCnt] = 0;
 			
 			<tr>
 				<td class="key">
-					<label class="label" for="import_docs_folder"><?php echo JText::_( 'FLEXI_IMPORT_SKIP_FILE_CHECK' ); ?></label>
+					<label class="label" for="docs_folder"><?php echo JText::_( 'FLEXI_IMPORT_SKIP_FILE_CHECK' ); ?></label>
 				</td>
 				<td class="data" style="max-width:40%; white-space: unset;">
 					<?php foreach ($this->file_fields as $i=> $file_fieid) : ?>
@@ -438,10 +432,10 @@ $tabCnt[$tabSetCnt] = 0;
 			
 			<tr>
 				<td class="key">
-					<label class="label" for="debug"><?php echo JText::_( 'FLEXI_CSV_DISPLAY_FIELDS_OF_FIRST_RECORDS' ); ?></label>
+					<label class="label" for="debug_records"><?php echo JText::_( 'FLEXI_CSV_DISPLAY_FIELDS_OF_FIRST_RECORDS' ); ?></label>
 				</td>
 				<td class="data">
-					<input type="text" name="debug" id="debug" value="<?php echo (int)$params->get('csv_debug_records','0'); ?>" class="fcfield_textval" /> &nbsp;
+					<input type="text" name="debug_records" id="debug_records" value="<?php echo (int)$this->model->getState('debug_records'); ?>" class="fcfield_textval" /> &nbsp;
 				</td>
 				<td class="data">
 					<span class="fc-mssg fc-warning fc-nobgimage"><?php echo JText::_( 'FLEXI_CSV_DISPLAY_FIELDS_OF_FIRST_RECORDS_DESC' ); ?></span>
@@ -458,7 +452,7 @@ $tabCnt[$tabSetCnt] = 0;
 					<label class="label" for="field_separator"><?php echo JText::_( 'FLEXI_CSV_FIELD_SEPARATOR' ); ?> </label>
 				</td>
 				<td class="data">
-					<input type="text" name="field_separator" id="field_separator" value="<?php echo htmlspecialchars($params->get('csv_field_sep','~~')); ?>" class="fcfield_textval required" /> &nbsp;
+					<input type="text" name="field_separator" id="field_separator" value="<?php echo htmlspecialchars($this->model->getState('field_separator')); ?>" class="fcfield_textval required" /> &nbsp;
 				</td>
 				<td class="data">
 					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_( 'FLEXI_CSV_FIELD_SEPARATOR_DESC' ); ?></span>
@@ -469,7 +463,7 @@ $tabCnt[$tabSetCnt] = 0;
 					<label class="label" for="enclosure_char"><?php echo JText::_( 'FLEXI_CSV_FIELD_ENCLOSE_CHAR' ); ?></label>
 				</td>
 				<td class="data">
-					<input type="text" name="enclosure_char" id="enclosure_char" value="<?php echo htmlspecialchars($params->get('csv_field_enclose_char','')); ?>" class="fcfield_textval" /> &nbsp;
+					<input type="text" name="enclosure_char" id="enclosure_char" value="<?php echo htmlspecialchars($this->model->getState('enclosure_char')); ?>" class="fcfield_textval" /> &nbsp;
 				</td>
 				<td class="data">
 					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_( 'FLEXI_CSV_FIELD_ENCLOSE_CHAR_DESC' ); ?></span>
@@ -480,7 +474,7 @@ $tabCnt[$tabSetCnt] = 0;
 					<label class="label" for="record_separator"><?php echo JText::_( 'FLEXI_CSV_ITEM_SEPARATOR' ); ?> </label>
 				</td>
 				<td class="data">
-					<input type="text" name="record_separator" id="record_separator" value="<?php echo htmlspecialchars($params->get('csv_item_record_sep','\n~~')); ?>" class="fcfield_textval required" /> &nbsp;
+					<input type="text" name="record_separator" id="record_separator" value="<?php echo htmlspecialchars($this->model->getState('record_separator')); ?>" class="fcfield_textval required" /> &nbsp;
 				</td>
 				<td class="data">
 					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_( 'FLEXI_CSV_ITEM_SEPARATOR_DESC' ); ?></span>
@@ -499,7 +493,7 @@ $tabCnt[$tabSetCnt] = 0;
 					<label class="label" for="mval_separator"><?php echo JText::_( 'FLEXI_CSV_MVAL_SEPARATOR' ); ?> </label>
 				</td>
 				<td class="data">
-					<input type="text" name="mval_separator" id="mval_separator" value="<?php echo htmlspecialchars($params->get('csv_field_mval_sep','%%')); ?>" class="fcfield_textval required" /> &nbsp;
+					<input type="text" name="mval_separator" id="mval_separator" value="<?php echo htmlspecialchars($this->model->getState('mval_separator')); ?>" class="fcfield_textval required" /> &nbsp;
 				</td>
 				<td class="data">
 					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_( 'FLEXI_CSV_MVAL_SEPARATOR_DESC' ); ?></span>
@@ -511,7 +505,7 @@ $tabCnt[$tabSetCnt] = 0;
 					<label class="label" for="mprop_separator"><?php echo JText::_( 'FLEXI_CSV_MPROP_SEPARATOR' ); ?> </label>
 				</td>
 				<td class="data">
-					<input type="text" name="mprop_separator" id="mprop_separator" value="<?php echo htmlspecialchars($params->get('csv_field_mprop_sep','!!')); ?>" class="fcfield_textval required" /> &nbsp;
+					<input type="text" name="mprop_separator" id="mprop_separator" value="<?php echo htmlspecialchars($this->model->getState('mprop_separator')); ?>" class="fcfield_textval required" /> &nbsp;
 				</td>
 				<td class="data">
 					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_( 'FLEXI_CSV_MPROP_SEPARATOR_DESC' ); ?></span>
@@ -608,6 +602,7 @@ $tabCnt[$tabSetCnt] = 0;
 	<input type="hidden" name="controller" value="import" />
 	<input type="hidden" name="view" value="import" />
 	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 	
 </form>

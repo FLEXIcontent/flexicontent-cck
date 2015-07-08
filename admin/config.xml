@@ -1519,15 +1519,15 @@
 			<field name="import_items_per_step" type="text" default="5" size="12" label="FLEXI_IMPORT_ITEMS_PER_STEP" description="FLEXI_IMPORT_ITEMS_PER_STEP_DESC"/>
 			
 			<field name="" type="separator" default="FLEXI_IMPORT_CORE_CONF" label="" level="level1" />
-			<field name="import_ignore_unused_cols" type="radio" default="0" label="FLEXI_IMPORT_IGNORE_UNUSED_COLUMNS" description="FLEXI_IMPORT_IGNORE_REDUDANT_COLS" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="import_ignore_unused_cols" type="radio" default="0" label="FLEXI_IMPORT_IGNORE_UNUSED_COLUMNS" description="FLEXI_IMPORT_IGNORE_REDUDANT_COLS" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_IMPORT_STOP_IMPORT</option>
+				<option value="1">FLEXI_IGNORE</option>
 			</field>
-			<field name="import_id_col" type="radio" default="0" label="FLEXI_IMPORT_CUSTOM_ITEM_ID" description="FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
+			<field name="import_id_col" type="radio" default="0" label="FLEXI_IMPORT_CUSTOM_ITEM_ID" description="FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_IMPORT_AUTO_NEW</option>
 				<option value="1">FLEXI_IMPORT_USE_ID_COL</option>
 			</field>
-			<field name="import_lang" type="text" default="*" label="FLEXI_LANGUAGE" description="Enter * OR en-GB or fr-FR or de-DE ..." />
+			<field name="import_lang" type="fclanguage" default="*" label="FLEXI_LANGUAGE" description="Enter * OR en-GB or fr-FR or de-DE ..." />
 			<field name="import_state" type="list" default="1" label="FLEXI_STATE" description="...">
 				<option value="1">FLEXI_PUBLISHED</option>
 				<option value="-5">FLEXI_IN_PROGRESS</option>
@@ -1539,19 +1539,19 @@
 				<option value="">FLEXI_USE_STATE_COLUMN</option>
 			</field>
 			
-			<field name="import_created_col" type="radio" default="0" label="FLEXI_CREATION_DATE" description="..." class="btn-group btn-group-yesno">
+			<field name="import_created_col" type="radio" default="0" label="FLEXI_CREATION_DATE" description="..." class="btn-group group-fcinfo">
 				<option value="0">FLEXI_IMPORT_CREATION_CURR_DATE</option>
 				<option value="1">FLEXI_IMPORT_CREATION_USE_COL</option>
 			</field>
-			<field name="import_created_by_col" type="radio" default="0" label="FLEXI_CREATOR_AUTHOR" description="..." class="btn-group btn-group-yesno">
+			<field name="import_created_by_col" type="radio" default="0" label="FLEXI_CREATOR_AUTHOR" description="..." class="btn-group group-fcinfo">
 				<option value="0">FLEXI_IMPORT_CREATOR_CURR_USER</option>
 				<option value="1">FLEXI_IMPORT_CREATOR_USE_COL</option>
 			</field>
-			<field name="import_modified_col" type="radio" default="0" label="FLEXI_MODIFICATION_DATE" description="..." class="btn-group btn-group-yesno">
+			<field name="import_modified_col" type="radio" default="0" label="FLEXI_MODIFICATION_DATE" description="..." class="btn-group group-fcinfo">
 				<option value="0">FLEXI_IMPORT_MODIFICATION_NEVER_DATE</option>
 				<option value="1">FLEXI_IMPORT_MODIFICATION_USE_COL</option>
 			</field>
-			<field name="import_modified_by_col" type="radio" default="0" label="FLEXI_MODIFIER" description="..." class="btn-group btn-group-yesno">
+			<field name="import_modified_by_col" type="radio" default="0" label="FLEXI_MODIFIER" description="..." class="btn-group group-fcinfo">
 				<option value="0">FLEXI_IMPORT_MODIFIER_NONE_USER</option>
 				<option value="1">FLEXI_IMPORT_MODIFIER_USE_COL</option>
 			</field>
@@ -1583,6 +1583,10 @@
 			<field name="csv_field_enclose_char" type="text" size="12" default="" label="FLEXI_CSV_FIELD_ENCLOSE_CHAR" description="FLEXI_CSV_FIELD_ENCLOSE_CHAR_DESC"/>
 			<field name="csv_item_record_sep" type="text" default="\n~~" size="12" label="FLEXI_CSV_ITEM_SEPARATOR" description="FLEXI_CSV_ITEM_SEPARATOR_DESC"/>
 			<field name="csv_debug_records" type="text" default="0" size="12" label="FLEXI_CSV_DISPLAY_FIELDS_OF_FIRST_RECORDS" description="FLEXI_CSV_DISPLAY_FIELDS_OF_FIRST_RECORDS_DESC"/>
+			
+			<field name="" type="separator" default="FLEXI_IMPORT_MVAL_MPROP_FIELDS" label="" level="level2" />
+			<field name="csv_field_mval_sep" type="text" default="%%" size="12" label="FLEXI_CSV_MVAL_SEPARATOR" description="FLEXI_CSV_MVAL_SEPARATOR_DESC"/>
+			<field name="csv_field_mprop_sep" type="text" default="!!" size="12" label="FLEXI_CSV_MPROP_SEPARATOR" description="FLEXI_CSV_MPROP_SEPARATOR_DESC"/>
 			
 			<field name="" type="separator" default="FLEXI_IMPORT_FOLDERS" label="" level="level1" />
 			<field name="import_media_folder" type="text" default="tmp/fcimport_media" size="60" label="FLEXI_IMPORT_MEDIA_FOLDER" description="FLEXI_IMPORT_FOLDER_DESC" class="input-xxlarge" />

@@ -9,42 +9,101 @@
 <div class="alert fc-small fc-iblock">
 	<span class="fcimport_field_prop_list fcimport_field_prop_mainlist">
 		
-		<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box"><span class="label">Content type</span>
-		<span class="badge badge-info"><?php echo $this->types[$this->conf['type_id']]->name; ?></span></span>
-		
-		<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box"><span class="label">Language</span>
-		<span class="badge badge-info"><?php echo !$this->conf['language'] ? 'Using column' : $this->languages->{$this->conf['language']}->name; ?></span></span>
-		
-		<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box"><span class="label">Main category</span>
-		<span class="badge badge-info"><?php echo $this->conf['maincat_col'] ? 'Using column' : $this->categories[$this->conf['maincat']]->title; ?></span></span>
-		
-		<?php
-			$seccats = array();
-			foreach($this->conf['seccats'] as $seccatid) {
-				$seccats[] = $this->categories[$seccatid]->title;
-			}
-		?>
-		<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box"><span class="label">Secondary categories</span>
-		<span class="badge badge-info"><?php echo !empty($seccats) ? implode(", ", $seccats) : '-'; ?></span></span>
-		
-		<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box"><span class="label">Creation date</span>
-		<span class="badge badge-info"><?php echo $this->conf['created_col'] ? 'Using column' : 'NOW'; ?></span></span>
-		
-		<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box"><span class="label">Created by (user)</span>
-		<span class="badge badge-info"><?php echo $this->conf['created_by_col'] ? 'Using column' : 'Current user'; ?></span></span>
-		
-		<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box"><span class="label">Modification date</span>
-		<span class="badge badge-info"><?php echo $this->conf['modified_col'] ? 'Using column' : 'Never'; ?></span></span>
-		
-		<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box"><span class="label">Modified by (user)</span>
-		<span class="badge badge-info"><?php echo $this->conf['modified_by_col'] ? 'Using column' : 'NULL (none)'; ?></span></span>
-		
-		<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box"><span class="label">Item ID</span>
-		<span class="badge badge-info"><?php echo $this->conf['id_col'] ? 'Using column' : 'AUTO (new ID)'; ?></span></span>
-		
-		<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box"><span class="label">State</span>
-		<?php echo !$this->conf['state'] ? 'Using column' : flexicontent_html::stateicon( $this->conf['state'], $this->cparams); ?></span>
-		
+		<table>
+			<tr>
+				<td style="text-align:right">
+					<span class="label">Content type</span>
+				</td>
+				<td>
+					<span class="badge badge-success"><?php echo $this->types[$this->conf['type_id']]->name; ?></span>
+				</td>
+				<td style="text-align:right">
+					<span class="label">Item ID</span>
+				</td>
+				<td>
+					<span class="badge badge-success"><?php echo $this->conf['id_col'] ? 'Using column' : 'AUTO (new ID)'; ?></span>
+				</td>
+			</tr>
+			
+			<tr>
+				<td style="text-align:right">
+					<span class="label">State</span>
+				</td>
+				<td>
+					<span class="badge badge-success">
+					<?php
+						$tmpparams = new JRegistry();
+						$tmpparams->set('show_icons', '0');
+						echo !$this->conf['state'] ? 'Using column' : flexicontent_html::stateicon( $this->conf['state'], $tmpparams);
+					?>
+					</span>
+				</td>
+				<td style="text-align:right">
+					<span class="label">Main category</span>
+				</td>
+				<td>
+					<span class="badge badge-success"><?php echo $this->conf['maincat_col'] ? 'Using column' : $this->categories[$this->conf['maincat']]->title; ?></span>
+				</td>
+			</tr>
+			
+			<tr>
+				<td style="text-align:right">
+					<span class="label">Language</span>
+				</td>
+				<td>
+					<span class="badge badge-success"><?php echo !$this->conf['language'] ? 'Using column' : $this->languages->{$this->conf['language']}->name; ?></span>
+				</td>
+				<td style="text-align:right">
+					<span class="label">Secondary categories</span>
+				</td>
+				<td>
+					<?php
+						$seccats = array();
+						foreach($this->conf['seccats'] as $seccatid) {
+							$seccats[] = $this->categories[$seccatid]->title;
+						}
+					?>
+					<span class="badge badge-success"><?php echo !empty($seccats) ? implode(", ", $seccats) : '-'; ?></span>
+				</td>
+			</tr>
+			
+			<tr>
+				<td colspan="4" style="height:16px;">
+				</td>
+			</tr>
+			
+			<tr>
+				<td style="text-align:right">
+					<span class="label">Created by (user)</span>
+				</td>
+				<td>
+					<span class="badge badge-success"><?php echo $this->conf['created_by_col'] ? 'Using column' : 'Current user'; ?></span>
+				</td>
+				<td style="text-align:right">
+					<span class="label">Creation date</span>
+				</td>
+				<td>
+					<span class="badge badge-success"><?php echo $this->conf['created_col'] ? 'Using column' : 'NOW'; ?></span>
+				</td>
+			</tr>
+			
+			<tr>
+				<td style="text-align:right">
+					<span class="label">Modified by (user)</span>
+				</td>
+				<td>
+					<span class="badge badge-success"><?php echo $this->conf['modified_by_col'] ? 'Using column' : 'NULL (none)'; ?></span>
+				</td>
+				<td style="text-align:right">
+					<span class="label">Modification date</span>
+				</td>
+				<td>
+					<span class="badge badge-success"><?php echo $this->conf['modified_col'] ? 'Using column' : 'Never'; ?></span>
+				</td>
+			</tr>
+			
+		</table>
+						
 	</span>
 </div>
 
