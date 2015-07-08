@@ -612,7 +612,8 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( empty($this->_extra_cols) ) return;
 		if ( empty($this->_data) ) return;
 		
-		$item_ids  = array_keys($this->_data);
+		$item_ids = array();
+		foreach($this->_data as $item) $item_ids[] = $item->id;
 		$field_ids = array_keys($this->_extra_cols);
 		$db = JFactory::getDBO();
 		$query = 'SELECT field_id, value, item_id, valueorder, suborder'
