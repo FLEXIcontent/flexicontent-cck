@@ -314,6 +314,5 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$model->purge();
 		$msg = JText::_('FLEXI_ITEMS_PURGED');
 		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
-	}
-	
+	}	
 }

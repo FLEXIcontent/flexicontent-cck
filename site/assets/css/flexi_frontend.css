@@ -19,16 +19,8 @@
 	visibility: hidden;
 }
 
-#flexicontent .floattext:after { /* ie fix in conditional comments (html source) */
-	clear: both;
-	content: ".";
-	display: inline-block;
-	height: 0;
-	visibility: hidden;
-}
-
 #flexicontent .floattext {
-	display: inline-block;
+	display: block;
 	margin: 0 0 0.5em; /* safari */
 }
 

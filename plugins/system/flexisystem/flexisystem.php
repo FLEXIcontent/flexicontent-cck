@@ -148,14 +148,47 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function onAfterRoute()
 	{
-		$app    = JFactory::getApplication();
-		$option = JRequest::getCMD('option');
-		$view   = JRequest::getVar('view', '');
-		$layout = JRequest::getVar('layout', '');
-		$tmpl   = JRequest::getVar('tmpl', '');
-		$task   = JRequest::getVar('task', '');
-		$session= JFactory::getSession();
+		$jinput   = JFactory::getApplication()->input;
+		$app      = JFactory::getApplication();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
 		
+		$option = $jinput->get('option', '', 'string');
+		$view   = $jinput->get('view', '', 'string');
+		$controller = $jinput->get('controller', '', 'string');
+		$component  = $jinput->get('component', '', 'string');
+		
+		$layout = $jinput->get('layout', '', 'string');
+		$tmpl   = $jinput->get('tmpl', '', 'string');
+		$task   = $jinput->get('task', '', 'string');
+		
+		$js = '';
+			
+		if ( JFactory::getApplication()->isAdmin() && (
+			($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') ||
+			(($option=='com_modules' || $option=='com_advancedmodules') && $view == 'module') ||
+			($option=='com_flexicontent' && ($view == 'category' || $view == 'item'))
+		) ) {
+			// WORKAROUNDs of for 2 issues in com_config: slow chosen JS and PHP 5.3.9+ 'max_input_vars' limit
+			if (FLEXI_J30GE && ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent')) {
+				// Make sure chosen JS file is loaded before our code
+				JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
+				// replace chosen function
+				/*$js .= "
+					jQuery.fn.chosen = function(){};
+				";*/
+			}
+			$js .= "
+				jQuery(document).ready(function() {
+					jQuery(document.forms['adminForm']).attr('data-fc_doserialized_submit', '1');
+					//if ('".$option."'=='com_flexicontent') jQuery(document.forms['adminForm']).attr('data-fc_doajax_submit', '1');
+				});
+				var fc_max_input_vars = ".ini_get('max_input_vars').";
+			";
+		}
+		if ($js) $document->addScriptDeclaration($js);
+		
+
 		// Detect resultion we will do this regardless of ... using mobile layouts
 		if ($this->cparams->get('use_mobile_layouts') || $app->isAdmin()) $this->detectClientResolution($this->cparams);
 		

@@ -755,6 +755,8 @@ class FlexicontentModelItems extends JModelLegacy
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		
+		$search_prefix = $this->cparams->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		
 		$typeid       = $jinput->get('typeid', 1, 'int');
 		$default_cat  = $jinput->get('default_cat', 0, 'int');
 		$default_lang = flexicontent_html::getSiteDefaultLang();
@@ -813,7 +815,13 @@ class FlexicontentModelItems extends JModelLegacy
 		foreach ($rows as $row)
 		{
 			$ilang = $row->language ? $row->language : $default_lang;
-			$itemext[$i] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.$row->text_stripped).', 0)';
+			
+			if ($search_prefix)
+				$_search_index = preg_replace('/(\b[^\s]+\b)/', $search_prefix.'$0', $row->title.' | '.$row->text_stripped);
+			else
+				$_search_index = $row->title.' | '.$row->text_stripped;
+			
+			$itemext[$i] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($_search_index).', 0)';
 			$id_arr[$i] = (int)$row->id;
 			$query_len += strlen($itemext[$i]) + 2;  // Sum of query length so far
 			$n++; $i++;

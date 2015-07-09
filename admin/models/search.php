@@ -465,7 +465,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			
 			// Truncate (or drop/recreate) tables of fields that are still filterable. Any dropped but needed tables will be recreated below
 			else if ( empty($del_fieldids) || isset($del_fieldids[$_field_id]) )
-				$db->setQuery( /*TRUNCATE*/ 'DROP TABLE IF EXISTS '.$tbl_name );
+				//$db->setQuery( 'DROP TABLE IF EXISTS '.$tbl_name );
+				$db->setQuery( 'TRUNCATE TABLE '.$tbl_name );
 			
 			$db->query();
 		}
@@ -475,7 +476,6 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		foreach ($filterables as $_field_id => $_ignored)
 		{
 			$tbl_name = $app->getCfg('dbprefix').'flexicontent_advsearch_index_field_'.$_field_id;
-			if ( isset($tbl_names_flipped[$tbl_name]) ) continue;
 			$query = '
 			CREATE TABLE IF NOT EXISTS `' .$tbl_name. '` (
 			  `sid` int(11) NOT NULL auto_increment,
