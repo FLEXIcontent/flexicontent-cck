@@ -89,24 +89,29 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			if (strlen($fname_level2))  $file = $file[$fname_level2];
 			if (strlen($fname_level3))  $file = $file[$fname_level3];
 		}
-		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
-		$secure		= JRequest::getInt( 'secure', 1, 'post' );
+		$format		= JRequest::getVar( 'format', 'html', '', 'cmd' );
+		$secure		= JRequest::getInt( 'secure', 1 );
 		$secure		= $secure ? 1 : 0;
-		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
-		$filetitle= JRequest::getVar( 'file-title', '');
-		$filedesc	= JRequest::getVar( 'file-desc', '');
-		$filelang	= JRequest::getVar( 'file-lang', '');
-		$fieldid	= JRequest::getVar( 'fieldid', 0);
-		$u_item_id= JRequest::getVar( 'u_item_id', 0);
-		$file_mode= JRequest::getVar( 'folder_mode', 0) ? 'folder_mode' : 'db_mode';
+		$return		= JRequest::getVar( 'return-url', null, '', 'base64' );
+		$filetitle= JRequest::getVar( 'file-title', '' );
+		$filedesc	= JRequest::getVar( 'file-desc', '' );
+		$filelang	= JRequest::getVar( 'file-lang', '' );
+		$fieldid	= JRequest::getVar( 'fieldid', 0 );
+		$u_item_id= JRequest::getVar( 'u_item_id', 0 );
+		$file_mode= JRequest::getVar( 'folder_mode', 0 ) ? 'folder_mode' : 'db_mode';
 		$err		= null;
 		
 		$model = $this->getModel('filemanager');
-		if ($file_mode != 'folder_mode' && $fieldid) {
+		if ($file_mode != 'folder_mode' && $fieldid)
+		{
+			// Check if FORCED secure/media mode parameter exists and if it is forced
 			$field_params = $model->getFieldParams($fieldid);
-			$target_dir = $field_params->get('target_dir', 2);
-			if ($target_dir!=2) {
+			$target_dir = $field_params->get('target_dir', '');
+			
+			if ( strlen($target_dir) && $target_dir!=2 ) {
 				$secure = $target_dir ? 1 : 0; // force secure / media
+			} else {
+				// allow filter secure via form/URL variable
 			}
 		}
 		

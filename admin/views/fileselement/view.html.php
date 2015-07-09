@@ -81,12 +81,14 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$filter_url       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_url',       'filter_url',       '',          'word' );
 		
 		$filter_secure    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_secure',    'filter_secure',    '',          'word' );
+		
 		$target_dir = 2;
 		if (!$folder_mode)
 		{
 			$field_params = $model->getFieldParams();
-			$target_dir = $field_params->get('target_dir', 2);
-			if ($target_dir!=2) $filter_secure = '';
+			$target_dir = $field_params->get('target_dir', '');
+			// Clear secure/media filter if field is not configured to use specific
+			if ( !strlen($target_dir) || $target_dir!=2 ) $filter_secure = '';
 		}
 		
 		$filter_ext       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_ext',       'filter_ext',       '',          'alnum' );

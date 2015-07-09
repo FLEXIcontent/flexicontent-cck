@@ -424,7 +424,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
 		$params = $this->getFieldParams();
-		$target_dir = $params->get('target_dir', 2);
+		$target_dir = $params->get('target_dir', '');
 		
 		$scope		= $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.scope',            'scope',            1,           'int' );
 		$search   = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.search',           'search',           '',          'string' );
@@ -441,10 +441,9 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$permission = FlexicontentHelperPerm::getPerm();
 		$CanViewAllFiles = $permission->CanViewAllFiles;
 		
-		if ($target_dir!=2) {  // Limit to secure:1 or media:0, if 2 then both allowed
-			$filter_secure = $target_dir ? 'S' : 'M';
-		} else {
-			// allow filter secure via form/URL variable
+		// List any file, or limit to secure / media
+		if ( strlen($target_dir) && $target_dir!=2 ) {  // Limit to secure:1 or media:0, if 2 then both allowed
+			$filter_secure = $target_dir ? 'S' : 'M';   // force secure / media
 		}
 		
 		if ( !$CanViewAllFiles ) {

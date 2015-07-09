@@ -67,15 +67,15 @@ foreach($files_data as $file_id => $file_data)
 	
 	( $iform_dir ? '
 		<div class="nowrap_box inlinefile-secure-box">
-			<label class="label inlinefile-secure-lbl '.$tip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
-				'.JText::_( 'FLEXI_TARGET_DIRECTORY' ).'
+			<label class="label inlinefile-secure-lbl '.$tip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
+				'.JText::_( 'FLEXI_URL_SECURE' ).'
 			</label>
 			'.($has_values ? '
 			<span class="inlinefile-secure-info">
-				<span class="badge badge-info">'.JText::_($file_data->secure ?  'FLEXI_SECURE' : 'FLEXI_MEDIA').'</span>
+				<span class="badge badge-info">'.JText::_($file_data->secure ?  'FLEXI_YES' : 'FLEXI_NO').'</span>
 			</span>' : '').'
 			<span class="inlinefile-secure-data" style="'.($has_values ? 'display:none;' : '').'">
-				'.flexicontent_html::buildradiochecklist( array(0=> JText::_( 'FLEXI_MEDIA' ), 1=> JText::_( 'FLEXI_SECURE' )) , $fieldname_n.'[secure]', 1, 1, '', $elementid_n.'_secure').'
+				'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[secure]', 1, 1, '', $elementid_n.'_secure').'
 			</span>
 		</div>' : '').
 	'
