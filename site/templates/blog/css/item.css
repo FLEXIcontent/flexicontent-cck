@@ -93,7 +93,7 @@
 	
 	display:block;
 	float:left;
-	border-width: 0%;
+	* border-width: 0%;
 }
 
 /* Force 1 column for all elements */
