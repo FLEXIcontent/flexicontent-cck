@@ -3,6 +3,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsSharedaudio extends FCField
 {
