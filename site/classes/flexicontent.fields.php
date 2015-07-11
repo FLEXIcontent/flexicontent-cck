@@ -1184,7 +1184,7 @@ class FlexicontentFields
 		$typenames = array();
 		foreach ($items as $item) {
 			$typenames[$item->id] = new stdClass();
-			$typenames[$item->id]->name = $types[$item->type_id]->name;
+			$typenames[$item->id]->name = isset($types[$item->type_id]) ? $types[$item->type_id]->name : 'without type';
 		}
 		
 		return $typenames;

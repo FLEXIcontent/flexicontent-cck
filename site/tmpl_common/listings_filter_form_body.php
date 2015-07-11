@@ -39,8 +39,12 @@ $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 			</span>
 		<?php endif; ?>
 		
-		<?php if ($clayout_selector) : ?>
+		<?php if ($clayout_selector && $this->params->get('clayout_switcher_display_mode', 1) == 0) : ?>
 			<span class="fc_clayout_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LAYOUT', 'FLEXI_LAYOUT_INFO', 1, 1); ?>">
+				<span class="fc_clayout_selector"><?php echo $clayout_selector;?></span>
+			</span>
+		<?php elseif ($clayout_selector) : ?>
+			<span class="fc_clayout_box">
 				<span class="fc_clayout_selector"><?php echo $clayout_selector;?></span>
 			</span>
 		<?php endif; ?>

@@ -6,23 +6,32 @@
 	<license>GPLv3</license>
 	<version>1.2</version>
 	<release>20 May 2014</release>
-	<description>This HTML5 layout presents category items in a table. Each field put in the table position will be rendered as a column</description>
+
+	<defaulttitle>FLEXI_DEFAULT_CATEGORY_DEFAULT_TITLE</defaulttitle>
+	<description>FLEXI_DEFAULT_CATEGORY_SHORT_DESC</description>
+
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
-		<field name="show_field_labels_row" type="radio" default="" label="FLEXI_SHOW_LABELS_ROW" description="FLEXI_SHOW_LABELS_ROW_DESC" class="btn-group btn-group-yesno">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</field>
 		
-		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
-		<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_XHTML</option>
-			<option value="1">FLEXI_HTML5</option>
-		</field>
+			<field name="custom_layout_title" type="text" size="3" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
+			
+			<field name="disp_params" type="separator" default="FLEXI_DISPLAY" level="level1" menu="hide" />
+			<field name="show_field_labels_row" type="radio" default="" label="FLEXI_SHOW_LABELS_ROW" description="FLEXI_SHOW_LABELS_ROW_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
+			<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_XHTML</option>
+				<option value="1">FLEXI_HTML5</option>
+			</field>
+			
 		</fieldset>
 	</fields>
+	
 	<fieldgroups>
 		<group>table</group>
 		<group>renderonly</group>

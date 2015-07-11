@@ -483,6 +483,8 @@ class flexicontent_html
 		$option = JRequest::getCmd('option');
 		$layout = JRequest::getCmd('layout');
 		$svar = $layout ? '.'.$layout : '.category';
+		$layout_typename = $layout_type=='clayout' ? 'category' : 'items';
+
 		/*if (!$layout) $svar .= JRequest::getInt('cid');
 		else if ($layout=='tags') $svar .= JRequest::getInt('tagid');
 		else if ($layout=='author') $svar .= JRequest::getInt('authorid');
@@ -494,6 +496,7 @@ class flexicontent_html
 		$inside_label  = $_switcher_label==2 ? ' '.JText::_('FLEXI_LAYOUT') : '';
 		$outside_label = $_switcher_label==1 ? '<span class="flexi label limit_override_label">'.JText::_('FLEXI_LAYOUT').'</span>' : '';
 		
+		$tmpls = flexicontent_tmpl::getTemplates();
 		if ( $params->get('clayout_switcher_display_mode', 1) == 0 )
 		{
 			flexicontent_html::loadFramework('select2');
@@ -503,20 +506,27 @@ class flexicontent_html
 			
 			$options = array();
 			foreach($_options as $_option) {
-				$options[] = JHTML::_('select.option', $_option, $_option .$inside_label);
+				$tmpl_desc = JText::_( !empty($tmpls->$layout_typename->$_option) ? @ $tmpls->$layout_typename->$_option->defaulttitle : '');
+				$_text = $tmpl_desc ? $tmpl_desc : $_option;
+				$options[] = JHTML::_('select.option', $_option, $_text .$inside_label);
 			}
 			$html = JHTML::_('select.genericlist', $options, $layout_type, $attribs, 'value', 'text', $layout );
 		}
 		else
 		{
 			$tmplurl = 'components/com_flexicontent/templates/';
+			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			
 			$n = 0;
 			$options = array();
-			foreach($_options as $_option) {
+			foreach($_options as $_option)
+			{
+				$tmpl_desc = JText::_( !empty($tmpls->$layout_typename->$_option) ? @ $tmpls->$layout_typename->$_option->defaulttitle : '');
+				
 				$checked_attr = $layout==$_option ? ' checked=checked ' : '';
 				$options[] =
 					'<input type="radio" name="'.$layout_type.'" value="'.$_option.'" id="'.$layout_type.$n.'" onchange="adminFormPrepare(this.form, 2);" '.$checked_attr.'>'.
-					'<label for="'.$layout_type.$n.'" class="btn"><img alt="'.$_option.'" src="'.$tmplurl.$_option.'/clayout.png"></label>'
+					'<label for="'.$layout_type.$n.'" class="btn '.$tooltip_class.'" title="'.$tmpl_desc.'"><img alt="'.$_option.'" src="'.$tmplurl.$_option.'/clayout.png"></label>'
 					;
 				$n++;
 			}
@@ -4322,7 +4332,10 @@ class flexicontent_tmpl
 					$themes->items->{$tmpl}->license 		= @$document->license;
 					$themes->items->{$tmpl}->version 		= @$document->version;
 					$themes->items->{$tmpl}->release 		= @$document->release;
-					$themes->items->{$tmpl}->description= @$document->description;
+					
+					$themes->items->{$tmpl}->defaulttitle = @$document->defaulttitle;
+					$themes->items->{$tmpl}->description  = @$document->description;
+					
 					$groups = & $document->fieldgroups;
 					$pos    = & $groups->group;
 					if ($pos) {
@@ -4353,13 +4366,16 @@ class flexicontent_tmpl
 					}
 
 				} else {
-					$themes->items->{$tmpl}->author 		= @$document->author[0] ? $document->author[0]->data() : '';
+					$themes->items->{$tmpl}->author 		= @$document->author[0]  ? $document->author[0]->data()  : '';
 					$themes->items->{$tmpl}->website 		= @$document->website[0] ? $document->website[0]->data() : '';
-					$themes->items->{$tmpl}->email 			= @$document->email[0] ? $document->email[0]->data() : '';
+					$themes->items->{$tmpl}->email 			= @$document->email[0]   ? $document->email[0]->data()   : '';
 					$themes->items->{$tmpl}->license 		= @$document->license[0] ? $document->license[0]->data() : '';
 					$themes->items->{$tmpl}->version 		= @$document->version[0] ? $document->version[0]->data() : '';
 					$themes->items->{$tmpl}->release 		= @$document->release[0] ? $document->release[0]->data() : '';
-					$themes->items->{$tmpl}->description= @$document->description[0] ? $document->description[0]->data() : '';
+
+					$themes->items->{$tmpl}->defaulttitle = @$document->defaulttitle[0] ? $document->defaulttitle[0]->data() : '';
+					$themes->items->{$tmpl}->description  = @$document->description[0]  ? $document->description[0]->data()  : '';
+
 					$groups = $document->getElementByPath('fieldgroups');
 					$pos    = & $groups->group;
 					if ($pos) {
@@ -4427,7 +4443,10 @@ class flexicontent_tmpl
 					$themes->category->{$tmpl}->license 	= @$document->license;
 					$themes->category->{$tmpl}->version 	= @$document->version;
 					$themes->category->{$tmpl}->release 	= @$document->release;
-					$themes->category->{$tmpl}->description= @$document->description;
+
+					$themes->category->{$tmpl}->defaulttitle = @$document->defaulttitle;
+					$themes->category->{$tmpl}->description  = @$document->description;
+
 					$groups = & $document->fieldgroups;
 					$pos    = & $groups->group;
 					if ($pos) {
@@ -4456,13 +4475,17 @@ class flexicontent_tmpl
 						}
 					}
 				} else {
-					$themes->category->{$tmpl}->author 		= @$document->author[0] ? $document->author[0]->data() : '';
+					
+					$themes->category->{$tmpl}->author 		= @$document->author[0]  ? $document->author[0]->data()  : '';
 					$themes->category->{$tmpl}->website 	= @$document->website[0] ? $document->website[0]->data() : '';
-					$themes->category->{$tmpl}->email 		= @$document->email[0] ? $document->email[0]->data() : '';
+					$themes->category->{$tmpl}->email 		= @$document->email[0]   ? $document->email[0]->data()   : '';
 					$themes->category->{$tmpl}->license 	= @$document->license[0] ? $document->license[0]->data() : '';
 					$themes->category->{$tmpl}->version 	= @$document->version[0] ? $document->version[0]->data() : '';
 					$themes->category->{$tmpl}->release 	= @$document->release[0] ? $document->release[0]->data() : '';
-					$themes->category->{$tmpl}->description = @$document->description[0] ? $document->description[0]->data() : '';
+					
+					$themes->category->{$tmpl}->defaulttitle = @$document->defaulttitle[0] ? $document->defaulttitle[0]->data() : '';
+					$themes->category->{$tmpl}->description  = @$document->description[0]  ? $document->description[0]->data()  : '';
+					
 					$groups = $document->getElementByPath('fieldgroups');
 					$pos    = & $groups->group;
 					if ($pos) {
@@ -6046,7 +6069,7 @@ class flexicontent_db
 		
 		if (!empty($items))
 		{
-			foreach($items as $item) $item->lang_parent_id = isset($assoc_keys['id']) ? $assoc_keys['id'] : $item->id;
+			foreach($items as $item) $item->lang_parent_id = isset($assoc_keys[$item->id]) ? $assoc_keys[$item->id]->original_id : $item->id;
 		}
 		else
 			return $assoc_keys;
