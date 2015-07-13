@@ -20,6 +20,11 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
+
+flexicontent_html::loadFramework('flexi-lib');
+$start_text = '<span class="label">'.JText::_('FLEXI_TMPL_DEFAULT_COLUMNS_FE', true).'</span>';
+$end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
+flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCcategory', $start_text, $end_text);
 ?>
 
 <?php
@@ -58,8 +63,8 @@ $columns = array();
 foreach ($this->items as $item) :
 	if (isset($item->positions['table'])) :
 		foreach ($fbypos['table']->fields as $f) :
-			if ( ! @ $columns[$f] ) :
-				$columns[$f] = @ $item->fields[$f]->label;
+			if ( empty($columns[$f]) && isset($item->fields[$f]) ) :
+				$columns[$f] = $item->fields[$f]->label;
 			endif;
 		endforeach;
 	endif;
@@ -118,18 +123,26 @@ endif;
 ?>
 
 
-<table id="flexitable" class="flexitable" summary="<?php echo @$this->category->name; ?>">
+<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
+<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
+	<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_TMPL_DEFAULT_COLUMNS_FE' ); ?>" />
+</div>
+<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
+
+<table id="adminListTableFCcategory" class="adminlist" summary="<?php echo @$this->category->name; ?>">
 	<?php if ($this->params->get('show_field_labels_row', 1)) : ?>
 	<thead>
 		<tr>
 			<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
-				<th id="flexi_title" scope="col">
-					<?php echo $show_title ? JHtml::_('grid.sort', 'FLEXI_ITEMS' , 'i.title', $this->lists['filter_order_Dir'], $this->lists['filter_order']) : ''; ?>
+				<th id="flexi_title" class="hideOnDemandClass">
+					<?php echo $show_title ? JText::_('FLEXI_ITEMS') : ''; ?>
 				</th>
 			<?php endif; ?>
 			
 			<?php foreach ($columns as $name => $label) : ?>
-				<th id="field_<?php echo $name; ?>" scope="col"><?php echo $label; ?></th>
+				<th id="field_<?php echo $name; ?>" class="hideOnDemandClass">
+					<?php echo $label; ?>
+				</th>
 			<?php endforeach; ?>
 		</tr>
 	</thead>
@@ -155,7 +168,7 @@ endif;
 		$markup_tags .= '</span>';
 		?>
 
-		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
+		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes.' row'.($i%2 ? 1 : 0); ?>">
 		
 		<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
 			<td class="fc_title_col">

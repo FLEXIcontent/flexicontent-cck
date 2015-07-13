@@ -74,7 +74,7 @@ class FlexicontentFields
 			$method = isset( $methods[$i] ) ? $methods[$i] : 'display';
 			if ( $item_per_field )
 			{
-				if ( !isset( $_item_id_map[ $item_ids[$i] ] ) )  { echo "not found item: ".$item_ids[$i] ." <br/>"; continue;}
+				if ( !isset( $_item_id_map[ $item_ids[$i] ] ) )  { /*echo "not found item: ".$item_ids[$i] ." <br/>";*/ continue;}
 				
 				// Render Display variable of Field for respective item
 				$_item = & $_item_id_map[$item_ids[$i]];

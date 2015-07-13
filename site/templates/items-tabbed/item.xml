@@ -7,8 +7,8 @@
 	<version>1.2</version>
 	<release>20 May 2014</release>
 
-	<defaulttitle>FLEXI_ITEMSTABBED_ITEM_DEFAULT_TITLE</defaulttitle>
-	<description>FLEXI_ITEMSTABBED_ITEM_SHORT_DESC</description>
+	<defaulttitle>FLEXI_TMPL_ITEMSTABBED_ITEM_DEFAULT_TITLE</defaulttitle>
+	<description>FLEXI_TMPL_ITEMSTABBED_ITEM_SHORT_DESC</description>
 
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
