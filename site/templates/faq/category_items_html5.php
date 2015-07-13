@@ -102,9 +102,37 @@ $classnum = $tmpl_cols_classes[$tmpl_cols];
 // bootstrap span
 $tmpl_cols_spanclasses = array(1=>'span12',2=>'span6',3=>'span4',4=>'span3');
 $classspan = $tmpl_cols_spanclasses[$tmpl_cols];
+
+
+// ITEMS as MASONRY tiles
+if (!empty($this->items) && ($this->params->get('cols_placement', 1)==1))
+{
+	flexicontent_html::loadFramework('masonry');
+	flexicontent_html::loadFramework('imagesLoaded');
+	
+	$js = "
+		jQuery(document).ready(function(){
+	";
+	if ($this->params->get('cols_placement', 1)==1) {
+		$js .= "
+			var container_intro = document.querySelector('ul.faqblock.masonryblock');
+			var msnry_intro;
+			// initialize Masonry after all images have loaded
+			if (container_intro) {
+				imagesLoaded( container_intro, function() {
+					msnry_intro = new Masonry( container_intro );
+				});
+			}
+		";
+	}
+	$js .= "	
+		});
+	";
+	JFactory::getDocument()->addScriptDeclaration($js);
+}
 ?>
 
-<ul class="faqblock <?php echo $classnum; ?> group row">	
+<ul class="faqblock group row">	
 
 <?php
 $show_itemcount   = $this->params->get('show_itemcount', 1);
@@ -122,6 +150,11 @@ foreach ($cat_items as $catid => $items) :
 	if (count($items)==0) continue;
 	if ($catid!=$currcatid) $count_cat++;
 ?>
+
+<?php if ($count_cat==0): ?>
+</ul>
+<ul class="faqblock <?php echo $classnum; ?> masonryblock group">
+<?php endif; ?>
 
 <li class="<?php echo $catid==$currcatid ? 'full' : ($count_cat%2 ? 'even' : 'odd'); ?> <?php echo $classspan; ?>">
 	
@@ -200,7 +233,7 @@ foreach ($cat_items as $catid => $items) :
 					
 						<ul class="flexi-fieldlist">
 				   		<li class="flexi-field flexi-title">
-								<i class="icon-arrow-right"></i>
+								<i class="icon-arrow-right" style="position:absolute; left:0; padding:2px;"></i>
 
 				   			<?php echo @ $item->editbutton; ?>
 				   			<?php echo @ $item->statebutton; ?>

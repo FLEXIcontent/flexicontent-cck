@@ -27,6 +27,11 @@
 				<option value="3">FLEXI_3_COLS</option>
 				<option value="4">FLEXI_4_COLS</option>
 			</field>
+			<field name="cols_placement" type="radio" default="" label="FLEXI_TMPL_FAQ_COLS_PLACEMENT" description="FLEXI_TMPL_FAQ_COLS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_CLEARED</option>
+				<option value="1">FLEXI_AS_MASONRY_TILES</option>
+			</field>
 			
 			<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
 			<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">

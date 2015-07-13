@@ -24,7 +24,7 @@
 }
 
 #flexicontent ul.faqblock li {
-	margin: 0px 0px 8px 0px;
+	margin: 0px 0px 16px 0px;
 	padding: 0;
 	background: none;
 	min-height: 10px;
@@ -42,28 +42,33 @@
 #flexicontent ul.faqblock.four  li.full {
 	width: 100%;
 }
-
 #flexicontent ul.faqblock.one li {
 	width: 100%;
+	margin: 0;
 }
 
 #flexicontent ul.faqblock.two li {
 	width: 48%;
+	margin-left: 1%;
+	margin-right: 1%;
 }
 #flexicontent ul.faqblock.two li.even {
-	margin-left: 3%
 }
+
 #flexicontent ul.faqblock.three li {
-   width: 30%;
+	width: 30%;
+	margin-left: 1%;
+	margin-right: 1%;
 }
 #flexicontent ul.faqblock.three li.even {
-   margin-left: 1%
 }
+
 #flexicontent ul.faqblock.four li {
-   width: 23%;
+	width: 23%;
+	margin-left: 1%;
+	margin-right: 1%;
 }
 #flexicontent ul.faqblock.four li.even {
-   margin-left: 1%
 }
 
 #flexicontent .flexi-cat span.fc_cat_title {
@@ -95,14 +100,19 @@
 	text-decoration: none;
 }
 
-#flexicontent ul.flexi-fieldlist li.flexi-field.flexi-title {
+#flexicontent div:not(.group) ul.flexi-fieldlist li.flexi-field.flexi-title {
 	background: url(../../../assets/images/readon.gif) no-repeat;
+}
+
+#flexicontent ul.flexi-fieldlist li.flexi-field.flexi-title {
+	margin: 16px 0 0 0;
 }
 
 #flexicontent ul.flexi-itemlist,
 #flexicontent ul.flexi-fieldlist {
 	margin: 1px;
 	padding: 0;
+	position: relative;
 }
 
 #flexicontent ul.flexi-itemlist li.flexi-item {

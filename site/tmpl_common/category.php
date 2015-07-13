@@ -18,7 +18,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // USE HTML5 or XHTML
-$html5			= $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
+$html5 = $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
 if ($html5) {  /* BOF html5  */
 	echo $this->loadTemplate('html5');
 } else {
