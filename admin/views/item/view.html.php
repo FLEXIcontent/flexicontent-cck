@@ -192,10 +192,10 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		// Applying new item type is a special case that has not loaded custom fieds yet
 		JToolBarHelper::apply($item->type_id ? 'items.apply' : 'items.apply_type', !$isnew ? 'FLEXI_APPLY' : ($typesselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ), false);
-		if (!$isnew || $item->version) flexicontent_html::addToolBarButton(
+		/*if (!$isnew || $item->version) flexicontent_html::addToolBarButton(
 			'FLEXI_FAST_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('items.apply_ajax')", $msg_alert='', $msg_confirm='',
 			$btn_task='items.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="".$tip_class, $btn_icon="icon-loop",
-			'data-placement="bottom" title="Fast saving, without reloading the form. <br/><br/>Note: new files will not be uploaded, <br/>- in such a case please use \'Apply\'"');
+			'data-placement="bottom" title="Fast saving, without reloading the form. <br/><br/>Note: new files will not be uploaded, <br/>- in such a case please use \'Apply\'"');*/
 		
 		if (!$isnew || $item->version) JToolBarHelper::save('items.save');
 		if (!$isnew || $item->version) JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
