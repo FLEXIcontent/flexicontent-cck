@@ -9,32 +9,15 @@
 			<field name="flexi_cat_extension" type="hidden" size="1" default="com_content" label="Category Type" description="Please save configuration once" />
 			<field name="fcdata_serialized" type="hidden" size="1" default="" label=".." description="..." />
 			
-			<field name="add_search_prefix" type="radio" default="0" label="Enable searching small/common words" description="Enable this to be able to include small or very common words in the text search" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
+			<field name="add_search_prefix" type="radio" default="0" label="Text search of small/common words" description="Enable this to be able to include small or very common words in the text search" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_IGNORE</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="support_url" type="text" size="50" default="" label="FLEXI_HELP" description="FLEXI_HELP_DESC" class="input-xxlarge" />
-			<field name="add_tooltips" type="radio" default="1" label="FLEXI_LOAD_TOOLTIPS" description="FLEXI_LOAD_TOOLTIPS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="disablecss" type="radio" default="0" label="FLEXI_DISABLE_FRONTEND_CSS" description="FLEXI_DISABLE_FRONTEND_CSS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="show_updatecheck" type="radio" default="1" label="FLEXI_CHECK_UPDATE" description="FLEXI_CHECK_UPDATE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<!--field name="draggable_reordering" type="radio" default="1" label="FLEXI_DRAG_AND_DROP_ORDERING" description="FLEXI_DRAG_AND_DROP_ORDERING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field-->
-			<field name="show_usability_messages" type="radio" default="1" label="FLEXI_SHOW_USABILITY_MESSAGES" description="FLEXI_SHOW_USABILITY_MESSAGES_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<field name="print_logging_info" type="radio" default="0" label="FLEXI_DISPLAY_STATS_INFO" description="FLEXI_DISPLAY_STATS_INFO_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="2">FLEXI_YES</option>
@@ -44,15 +27,25 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="cats_always_astree" type="radio" default="1" label="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE" description="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE_DESC" class="btn-group btn-group-yesno">
+			<field name="cats_always_astree" type="hidden" default="1" label="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE" description="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE_DESC"/>
+			<!--field name="cats_always_astree" type="radio" default="1" label="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE" description="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</field>
+			</field-->
 			<!--field name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="2" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" class="input-xxlarge" /-->
-			<field name="non_orderable_types" type="textarea" default="toolbar,file,image,groupmarker,fcpagenav,minigallery,weblink,email" cols="60" rows="2" label="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS" description="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS_DESC" class="input-xxlarge" />
 			
+			<field name="" type="separator" default="FLEXI_FRONTEND_BACKEND" description="" level="level3" />
+			<field name="disablecss" type="radio" default="0" label="FLEXI_LOAD_FLEXICONTENT_CSS" description="FLEXI_LOAD_FLEXICONTENT_CSS_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_BOTH</option>
+				<option value="1">FLEXI_DISABLE_IN_FRONTEND</option>
+			</field>
+			<field name="add_tooltips" type="radio" default="1" label="FLEXI_LOAD_FRAMEWORK_TOOLTIPS" description="FLEXI_LOAD_FRAMEWORK_TOOLTIPS_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_BOTH</option>
+				<option value="0">FLEXI_DISABLE_IN_FRONTEND</option>
+			</field>
+						
 		<field name="" type="separator" default="FLEXI_BROWSER_FRAMEWORKS" label="" level="level0" />
-			
+
 			<field name="" type="separator" default="FLEXI_USE_BROWSER_FRAMEWORKS" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" level="level3" />
 			<!--field name="load_frameworks" type="fccheckbox" default="" display_useglobal="0" 
 				checkoptions="jQuery,(jQuery) image-picker,(jQuery) masonry,(jQuery) select2,(jQuery) inputmask,(jQuery) prettyCheckable,(jQuery) fancybox"
@@ -616,8 +609,12 @@
 				<option value="1">FLEXI_SHOW</option>
 				<option value="-1">FLEXI_SHOW_ALWAYS</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="" level="level1" />
 			
-			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
+			<field name="non_orderable_types" type="textarea" default="account_via_submit,authoritems,toolbar,file,image,groupmarker,fcpagenav,minigallery,weblink,extendedweblink,email,fcloadmodule" cols="60" rows="2" label="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS" description="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS_DESC" class="input-xxlarge" />
+			
+			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
 			<field name="orderby" type="list" default="rdate" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC" >
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
@@ -651,7 +648,7 @@
 				<option value="1">FLEXI_NUMERIC</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_2ND_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
+			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_2ND_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
 			<field name="orderby_2nd" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC" >
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
@@ -1442,7 +1439,18 @@
 		</fieldset>
 	<fieldset name="backend_tabs_fset" label="FLEXI_BACKEND_TABS_CONF" description="" >
 	
+			<field name="show_usability_messages" type="radio" default="1" label="FLEXI_SHOW_USABILITY_MESSAGES" description="FLEXI_SHOW_USABILITY_MESSAGES_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 		<field name="" type="separator" default="FLEXI_DASH_BOARD" label="" level="level0" />
+			
+			<field name="support_url" type="text" size="50" default="" label="FLEXI_HELP" description="FLEXI_HELP_DESC" class="input-xxlarge" />
+			<field name="show_updatecheck" type="radio" default="1" label="FLEXI_SHOW_VERSION_CHECK" description="FLEXI_SHOW_VERSION_CHECK_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_IN_SLIDER</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="dashboard_buttons_hide" type="fccheckbox" default="" display_useglobal="0" 
 				checkoptions="FLEXI_ITEMS,FLEXI_NEW_ITEM,FLEXI_CATEGORIES,FLEXI_NEW_CATEGORY,FLEXI_COMMENTS,FLEXI_TYPES,FLEXI_ADD_TYPE,FLEXI_FIELDS,FLEXI_ADD_FIELD,FLEXI_TAGS,FLEXI_NEW_TAG,FLEXI_FILES,FLEXI_TEMPLATES,FLEXI_INDEX,FLEXI_STATISTICS,FLEXI_USERS,FLEXI_ADD_USER,FLEXI_GROUPS,FLEXI_ADD_GROUP,FLEXI_IMPORT,Plugins-Fields,Plugins-System,Plugins-Flexicontent"

@@ -1334,10 +1334,11 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 		@ob_end_clean();
-			JRequest::setVar('layout', 'fversion');
-			parent::display();
+		JRequest::setVar('layout', 'fversion');
+		parent::display();
 		exit;
 	}
+	
 	function doPlgAct() {
 		FLEXIUtilities::doPlgAct();
 	}
