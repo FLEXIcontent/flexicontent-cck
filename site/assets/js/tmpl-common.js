@@ -294,7 +294,7 @@ jQuery(document).ready(function() {
 	var fc_select_pageSize = 10;
 	
 	// add Simple text search autocomplete
-	if (typeof jQuery.ui.autocomplete==='function') {
+	if (typeof jQuery.ui != 'undefined' && typeof jQuery.ui.autocomplete==='function') {
 		var theElements = jQuery("input.fc_index_complete_simple");
 		theElements.each(function () {
 			jQuery.ui.autocomplete( {
