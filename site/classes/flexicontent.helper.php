@@ -3806,7 +3806,7 @@ class flexicontent_html
 		foreach ($items as $item) 
 		{
 			$item->css_markups = array();
-			
+			//$item->categories = isset($item->categories) ? $item->categories : array();
 			
 			// Category markups
 			if ( $add_featured_cats || $add_other_cats ) foreach ($item->categories as $item_cat) {

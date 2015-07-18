@@ -47,7 +47,13 @@ class FlexicontentViewCategory extends JViewLegacy
 		$app      = JFactory::getApplication();
 		$session  = JFactory::getSession();
 		$option   = JRequest::getVar('option');
+		$format   = JRequest::getCmd('format', 'html');
 		$document = JFactory::getDocument();
+		
+		if ($format && $document->getType() != strtolower($format)) {
+			echo '<div class="alert">WARNING: &nbsp; Document format should be: <b>'.$format.'</b> but current document is: <b>'. $document->getType().'</b> <br/>Some system plugin may have forced current document type</div>';
+		}
+		
 		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
 		$uri      = JFactory::getURI();
@@ -77,7 +83,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = JRequest::getInt('limitstart');
-		$format     = JRequest::getCmd('format', null);
 		
 		
 		// ********************************
@@ -412,10 +417,12 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Anyway these events are usually not very time consuming as is the the event onPrepareContent(J1.5)/onContentPrepare(J1.6+) 
 		JPluginHelper::importPlugin('content');
 		
+		$noroute_cats = array_flip($globalnoroute);
 		foreach ($items as $item) 
 		{
 			$item->event 	= new stdClass();
 			$item->params = new JRegistry($item->attribs);
+			//$item->cats = isset($item->cats) ? $item->cats : array();
 			
 			// !!! The triggering of the event onPrepareContent(J1.5)/onContentPrepare(J1.6+) of content plugins
 			// !!! for description field (maintext) along with all other flexicontent
@@ -435,11 +442,11 @@ class FlexicontentViewCategory extends JViewLegacy
 			
 			// ADVANCED CATEGORY ROUTING (=set the most appropriate category for the item ...)
 			// CHOOSE APPROPRIATE category-slug FOR THE ITEM !!! ( )
-			if ($item_in_category && !in_array($category->id, $globalnoroute)) {
+			if ( $item_in_category && !isset($noroute_cats[$category->id]) ) {
 				// 1. CATEGORY SLUG: CURRENT category
 				// Current category IS a category of the item and ALSO routing (creating links) to this category is allowed
 				$item->categoryslug = $category->slug;
-			} else if (!in_array($item->catid, $globalnoroute)) {
+			} else if ( !isset($noroute_cats[$item->catid]) ) {
 				// 2. CATEGORY SLUG: ITEM's MAIN category   (already SET, ... no assignment needed)
 				// Since we cannot use current category (above), we will use item's MAIN category 
 				// ALSO routing (creating links) to this category is allowed
@@ -447,9 +454,8 @@ class FlexicontentViewCategory extends JViewLegacy
 				// 3. CATEGORY SLUG: ANY ITEM's category
 				// We will use the first for which routing (creating links) to the category is allowed
 				$allcats = array();
-				$item->cats = $item->cats ? $item->cats : array();
 				foreach ($item->cats as $cat) {
-					if (!in_array($cat->id, $globalnoroute)) {
+					if ( !isset($noroute_cats[$cat->id]) ) {
 						$item->categoryslug = $globalcats[$cat->id]->slug;
 						break;
 					}
