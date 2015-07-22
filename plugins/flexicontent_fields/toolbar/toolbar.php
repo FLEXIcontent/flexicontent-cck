@@ -167,7 +167,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		{
 			$pop = JRequest::getInt('pop');
 			$pstatus = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
-			$print_link = $pop ? '#' : $item_link . '&pop=1&print=1&tmpl=component';
+			$print_link = $pop ? '#' : ( $item_link .(strstr($item_link, '?') ? '&amp;'  : '?') . 'pop=1&print=1&tmpl=component' );
 			$js_link = $pop ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';
 			$display	.= '
 			<div class="flexi-print toolbar-element">

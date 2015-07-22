@@ -716,9 +716,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 
 
 
-if ( !isset($all_tab_fields['lang']) ||
-	( flexicontent_db::useAssociations() /*$this->params->get('enable_translation_groups')*/ && $this->params->get('uselang_fe', 1)==1 )
-) : ob_start(); // language ?>
+if ( ( !isset($all_tab_fields['lang']) && $captured['lang'] )  ||  ( flexicontent_db::useAssociations() && $this->params->get('uselang_fe', 1)==1 ) ) : ob_start(); // language ?>
 	<fieldset class="basicfields_set" id="fcform_language_container">
 		<legend>
 			<?php echo !isset($all_tab_fields['lang']) ? JText::_( 'FLEXI_LANGUAGE' ) : JText::_( 'FLEXI_LANGUAGE' ) . ' '. JText::_( 'FLEXI_ASSOCIATIONS' ) ; ?>

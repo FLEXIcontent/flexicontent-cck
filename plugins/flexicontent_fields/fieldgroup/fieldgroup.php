@@ -132,7 +132,6 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				newSubLabel.attr('for', newLabelFor);
 				newSubLabel.attr('for_bck', newLabelFor);
 				fcflabels[ newLabelFor ] = newSubLabel;
-				fcflabels_errcnt[ newLabelFor ] = 0;
 				addField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'), add_params);";
 			$delField_pattern = "
 				if(rowCount".$field->id." == 1)
@@ -145,7 +144,6 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 					newSubLabel.attr('for', newLabelFor);
 					newSubLabel.attr('for_bck', newLabelFor);
 					fcflabels[ newLabelFor ] = newSubLabel;
-					fcflabels_errcnt[ newLabelFor ] = 0;
 				}
 				deleteField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'));
 				";
