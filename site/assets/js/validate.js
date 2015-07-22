@@ -40,28 +40,35 @@ var JFormValidator = new Class({
 		if (JFormValidator_fc) return JFormValidator_fc;  //
 		//alert('Initializing FLEXIcontent form validator');
 		
+ 	 	inputEmail = (function() {
+ 	 	 	var input = document.createElement("input");
+ 	 	 	input.setAttribute("type", "email");
+ 	 	 	return input.type !== "text";
+ 	 	})();
+		
 		// Initialize variables
 		this.handlers	= Object();
 		this.custom		= Object();
 
 		// Default handlers
 		this.setHandler('username', function (value) {
-			regex = new RegExp("[\<|\>|\"|\'|\%|\;|\(|\)|\&]", "i");
+ 	 	 	var regex = new RegExp("[\<|\>|\"|\'|\%|\;|\(|\)|\&]", "i");
 			return !regex.test(value);
 		});
 
 		this.setHandler('password', function (value) {
-			regex=/^\S[\S ]{2,98}\S$/;
+			var regex = /^\S[\S ]{2,98}\S$/;
 			return regex.test(value);
 		});
 
 		this.setHandler('numeric', function (value) {
-			regex=/^(\d|-)?(\d|,)*\.?\d*$/;
+ 	 		var regex = /^(\d|-)?(\d|,)*\.?\d*$/;
 			return regex.test(value);
 		});
 
 		this.setHandler('email', function (value) {
-			regex=/^[a-zA-Z0-9._-]+(\+[a-zA-Z0-9._-]+)*@([a-zA-Z0-9.-]+\.)+[a-zA-Z0-9.-]{2,4}$/;
+			value = punycode.toASCII(value);
+			var regex = /^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 			return regex.test(value);
 		});
 
@@ -328,6 +335,9 @@ var JFormValidator = new Class({
 			else
 			{
 				el.on('blur', function(){ return document.formvalidator.validate(this); });
+ 	 	 	 	if (tag_name == 'input' && el.hasClass('validate-email') && inputEmail) {
+ 	 	 	 	 	el.get(0).type = 'email';
+ 	 	 	 	}
 			}
 			
 		});
@@ -571,12 +581,15 @@ JFormValidator_fc = new JFormValidator();
 
 document.formvalidator = null;
 jQuery(document).ready(function() {
+	//console.time("timing attachToForm()");
 	document.formvalidator = JFormValidator_fc;
 	jQuery('form.form-validate').each(function(){
 		document.formvalidator.attachToForm($(this));
 	});
+	//console.timeEnd("timing attachToForm()");
 	
 	// Executed only once to retrieve and hash all label via their for property
+	//console.time("timing form labels hash mapping");
 	if ( !fcflabels )
 	{
 		fcflabels = new Object;
@@ -598,6 +611,7 @@ jQuery(document).ready(function() {
 		//window.console.log('fcflabels_size: ' + fcflabels_size); //alert(fcflabels_size);
 		//window.console.log('err_cnt: ' + err_cnt); //alert(err_cnt);
 	}
+	//console.timeEnd("timing form labels hash mapping");
 });
 
 

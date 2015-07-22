@@ -47,16 +47,22 @@ class FlexicontentViewUser extends JViewLegacy
 			$form->setValue('password2',	null);
 		}
 		$form_folder = FLEXI_J16GE ? 'forms'.DS : '';
-		
-		JHTML::_('behavior.tooltip');
 
-		//add css to document
+
+		
+		// *****************
+		// Load JS/CSS files
+		// *****************
+		
+		// Add css to document
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+		FLEXI_J30GE ?
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css') :
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css') ;
 		
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
+		JHTML::_('behavior.tooltip');
 		
 		// Add js function to overload the joomla submitform validation
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
@@ -113,21 +119,6 @@ class FlexicontentViewUser extends JViewLegacy
 				$user->set( 'gid', $newGrp );
 		}
 		
-		// **************************************************
-		// Include needed files and add needed js / css files
-		// **************************************************
-		
-		// Load pane behavior
-		jimport('joomla.html.pane');
-		
-		// Add css to document
-		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
-		
-		// Add js function to overload the joomla submitform
-		$document->addScript('components/com_flexicontent/assets/js/admin.js');
-		$document->addScript('components/com_flexicontent/assets/js/validate.js');
 		
 		
 		// ********************
@@ -136,6 +127,8 @@ class FlexicontentViewUser extends JViewLegacy
 		
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		if (!FLEXI_J16GE) {
+			// Load pane behavior
+			jimport('joomla.html.pane');
 			$pane  = JPane::getInstance('sliders');
 			$tpane = JPane::getInstance('tabs', array('startOffset'=>2, 'allowAllClose'=>true, 'opacityTransition'=>true, 'duration'=>600));
 		}
