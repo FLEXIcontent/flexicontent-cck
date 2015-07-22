@@ -574,14 +574,14 @@ $tabCnt[$tabSetCnt] = 0;
 			
 			// Some fields may force a container width ?
 			$display_label_form = $field->parameters->get('display_label_form', 1);
-			$full_width = $display_label_form==0 || $display_label_form==2;
+			$full_width = $display_label_form==0 || $display_label_form==2 || $display_label_form==-1;
 			$width = $field->parameters->get('container_width', ($full_width ? '100%!important;' : false) );
 			$container_width = empty($width) ? '' : 'width:' .$width. ($width != (int)$width ? 'px!important;' : '');
 			$container_class = "container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
 			?>
 			
 			<?php /* description field label will be USED as TAB handle title, with field's description as Tooltip */
-			/*if ($display_label_form): ?>
+			/*if ($display_label_form > 0): ?>
 				<span class="label-fcouter">
 				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
 					<?php echo $field->label; ?>
@@ -720,14 +720,14 @@ if ($this->row->type_id) {
 				// Some fields may force a container width ?
 				$display_label_form = $field->parameters->get('display_label_form', 1);
 				$row_k = 1 - $row_k;
-				$full_width = $display_label_form==0 || $display_label_form==2;
+				$full_width = $display_label_form==0 || $display_label_form==2 || $display_label_form==-1;
 				$width = $field->parameters->get('container_width', ($full_width ? '100%!important;' : false) );
 				$container_width = empty($width) ? '' : 'width:' .$width. ($width != (int)$width ? 'px!important;' : '');
 				$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
 				?>
 				
 				<div class='fcclear'></div>
-				<?php if($display_label_form): ?>
+				<?php if($display_label_form > 0): ?>
 					<span class="label-fcouter">
 					<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
 						<?php echo $field->label; ?>

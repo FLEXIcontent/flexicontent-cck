@@ -93,9 +93,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 	  if ( $use_select2 && $select2_added === null ) $select2_added = flexicontent_html::loadFramework('select2');
 		
 		// Parameters for DISPLAY with / without using select2 JS
-		$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
-		$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
-		
+		// ...
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
@@ -476,11 +474,12 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			$elements = array(0=>$prompt);
 			return $elements;
 		} else {
-			$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
-			$usefirstoption  = $field->parameters->get( 'usefirstoption', self::$isDropDown ? 1 : 0 ) ;
+			$display_label_form= (int) $field->parameters->get( 'display_label_form', 1 ) ;
+			$firstoptiontext = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ));
+			$usefirstoption  = $display_label_form==-1 ? 1 : $field->parameters->get( 'usefirstoption', self::$isDropDown ? 1 : 0 );
 			if ($usefirstoption) { // Add selection prompt
-				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_($firstoptiontext), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
-				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_($firstoptiontext), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
+				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$firstoptiontext, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
 				array_unshift($elements, $prompt);
 			}
 		}

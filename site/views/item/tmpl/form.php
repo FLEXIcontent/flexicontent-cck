@@ -1226,7 +1226,7 @@ if ($this->fields && $typeid) :
 			// Some fields may force a container width ?
 			$display_label_form = $field->parameters->get('display_label_form', 1);
 			$row_k = 1 - $row_k;
-			$full_width = $display_label_form==0 || $display_label_form==2;
+			$full_width = $display_label_form==0 || $display_label_form==2 || $display_label_form==-1;
 			$width = $field->parameters->get('container_width', ($full_width ? '100%!important;' : false) );
 			$container_width = empty($width) ? '' : 'width:' .$width. ($width != (int)$width ? 'px!important;' : '');
 			$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
@@ -1234,7 +1234,7 @@ if ($this->fields && $typeid) :
 			
 			<div class='fcclear'></div>
 			
-			<?php if($display_label_form): ?>
+			<?php if($display_label_form > 0): ?>
 				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
 					<?php echo $field->label; ?>
 				</label>
