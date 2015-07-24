@@ -76,27 +76,6 @@ class FlexicontentViewField extends JViewLegacy
 		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel( $ctrl.'cancel' );
 		
-		//JToolBarHelper::spacer();  JToolBarHelper::divider();  JToolBarHelper::spacer();
-		//JToolBarHelper::custom( $ctrl.'exportcsv', 'download.png', 'download.png', 'Export CSV', false );
-		//JToolBarHelper::custom( $ctrl.'exportsql', 'download.png', 'download.png', 'Export SQL', false );
-		
-		/*$btn_icon = 'icon-download';
-		$btn_name = 'download';
-		$btn_task    = $ctrl.'exportcsv';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
-			
-		$btn_icon = 'icon-download';
-		$btn_name = 'download';
-		$btn_task    = $ctrl.'exportsql';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'Export SQL', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version only has export function, for testing purposes',
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);*/
-
-		
 		// Import Joomla plugin that implements the type of current flexi field
 		$extfolder = 'flexicontent_fields';
 		$extname = $row->iscore ? 'core' : $row->field_type;

@@ -44,6 +44,10 @@ class FlexicontentControllerFields extends FlexicontentController
 		$this->registerTask( 'saveandnew',   'save' );
 		$this->registerTask( 'copy',         'copy' );
 		$this->registerTask( 'copy_wvalues', 'copy' );
+		
+		$this->registerTask( 'exportxml', 'export' );
+		$this->registerTask( 'exportsql', 'export' );
+		$this->registerTask( 'exportcsv', 'export' );
 	}
 
 	/**
@@ -647,88 +651,196 @@ class FlexicontentControllerFields extends FlexicontentController
 	}
 	
 	
-	function exportcsv()
+	
+	function get_SQL_TableCreate($table, $backup_filename=false, $where='', $id_colname=null, $clear_id=false)
 	{
-		$cid = JRequest::getVar( 'cid' );
 		$db  = JFactory::getDBO();
-		$query = 'SELECT *'
-				. ' FROM #__flexicontent_fields'
-				. ($cid ? ' WHERE id = '.$cid : '')
-				;
-		$db->setQuery($query);
-		$_fields = $db->loadObjectList('id');
+		$app = JFactory::getApplication();
+		$dbprefix = $app->getCfg('dbprefix');
+		$dbtype   = $app->getCfg('dbtype');
 		
-		$fp = fopen('php://output', 'w');
-		if ($fp && $_fields) {
-			header('Content-Type: text/csv');
-			header('Content-Disposition: attachment; filename="export.csv"');
-			foreach($_fields as $row) {
-				fputcsv($fp, array_values((array)$row));
-			}
-			die;
-		}
+		$db->setQuery('SHOW CREATE TABLE '.$table);
+		$showTable = $db->loadRow();
+		$tableCreation = $showTable[1];
+		$tableCreation = str_replace('CREATE TABLE', 'CREATE TABLE IF NOT EXISTS', $tableCreation);
+		$tableCreation = str_replace($dbprefix, '#__', $tableCreation);
+		
+		return $tableCreation;
 	}
 	
 	
-	function exportsql()
+	
+	function export()
 	{
+		$db   = JFactory::getDBO();
+		$app  = JFactory::getApplication();
+		
+		$task = strtolower(JRequest::getVar('task', 'exportxml'));
+		$export_type = str_replace('export', '', $task);
+		
 		$targetfolder = JPATH_SITE.DS.'tmp';
-		$filename = "field_export_".time().".sql";
+		$filename = "field_export_".time().'.'.$export_type;
 		$abspath  = $targetfolder.DS.$filename;
 		$abspath  = str_replace(DS, '/', $abspath);
 		
-		$cid = JRequest::getInt( 'cid' );
-		$db  = JFactory::getDBO();
-		$query = 'SELECT * INTO OUTFILE "'.$abspath.'" '
-				. ' FROM #__flexicontent_fields'
-				. ($cid ? ' WHERE id = '.$cid : '')
-				;
+		$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
+		JArrayHelper::toInteger($cid, array(0));
+		
+		$table = "#__flexicontent_fields";
+		$id_colname = 'id';
+		
+		$query = 'SELECT * FROM '.$table
+			.' WHERE id IN ('.implode(',', $cid).')';
 		$db->setQuery($query);
-		if (!$db->query()) {
-			echo $db->getError();
-			exit;
+		$rows = $db->loadAssocList($id_colname);
+		
+		if (empty($rows))
+		{
+			$app->enqueueMessage("No rows to export", 'notice');
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			return;
 		}
 		
+		switch($export_type) {
+			case "xml":
+				$content = $this->create_XML_file($rows, $table, $id_colname, $clear_id=true);
+				break;
+			case "sql":
+				$content = $this->create_SQL_file($rows, $table, $id_colname, $clear_id=true);
+				break;
+			case "csv":
+				$content = $this->create_CSV_file($rows, $table, $id_colname, $clear_id=true);
+				break;
+			default:
+				$content = false;
+				$app->enqueueMessage("Unknown/unhandle file format: ".$export_type, 'error');
+				break;
+		}
 		
-		// Get file filesize and extension
-		$dlfile = new stdClass();
-		$dlfile->filename = $filename;
-		$dlfile->abspath  = $abspath;
-		$dlfile->size = filesize($dlfile->abspath);
-		$dlfile->ext  = strtolower(JFile::getExt($dlfile->filename));
+		// Check for error
+		if (!$content)
+		{
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			return;
+		}
 		
-		// Set content type of file (that is an archive for multi-download)
-		$ctypes = array(
-			"pdf" => "application/pdf", "exe" => "application/octet-stream", "rar" => "application/zip", "zip" => "application/zip",
-			"txt" => "text/plain", "doc" => "application/msword", "xls" => "application/vnd.ms-excel", "ppt" => "application/vnd.ms-powerpoint",
-			"gif" => "image/gif", "png" => "image/png", "jpeg" => "image/jpg", "jpg" => "image/jpg", "mp3" => "audio/mpeg"
-		);
-		$dlfile->ctype = isset($ctypes[$dlfile->ext]) ? $ctypes[$dlfile->ext] : "application/force-download";
+		$filename = str_replace('#__', '', $table)."___(".date('H-i-s')."_".date('d-m-Y').")__rand".rand(1,11111111).".".$export_type;
 		
-		// *****************************************
-		// Output an appropriate Content-Type header
-		// *****************************************
 		header("Pragma: public"); // required
 		header("Expires: 0");
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 		header("Cache-Control: private", false); // required for certain browsers
-		header("Content-Type: ".$dlfile->ctype);
-		//quotes to allow spaces in filenames
-		$download_filename = $dlfile->filename;
-		header("Content-Disposition: attachment; filename=\"".$download_filename."\";" );
-		header("Content-Transfer-Encoding: binary");
-		header("Content-Length: ".$dlfile->size);
-		
-		
-		$handle = @fopen($abspath,"rb");
-		while(!feof($handle))
+		header('Content-Type: application/force-download');  //header('Content-Type: text/'.$export_type);
+		header("Content-Disposition: attachment; filename=\"".$filename."\";");  // quote to allow spaces in filenames
+		header("Content-Transfer-Encoding: Binary");
+		header("Content-Length: ".strlen($content));
+		echo $content;
+		exit();
+	}
+	
+	
+	
+	/*** NEEDS PHP 5.5.4+ ***/
+	function create_CSV_file($rows, $table, $id_colname=null, $clear_id=false)
+	{
+		$temp_stream = fopen('php://temp', 'r+');
+		if (!$temp_stream)
 		{
-			print(@fread($handle, 1024*8));
-			ob_flush();
-			flush();
+			$app->enqueueMessage("Failed to open php://temp", 'error');
+			return false;
 		}
 		
-		unlink($file);
-		$app->close();
+		$delimiter = ",";  $enclosure = '"';   $escape_char = "\\";
+		
+		$_row = reset($rows);
+		fputcsv($temp_stream, array_keys($_row), $delimiter, $enclosure, $escape_char);
+		foreach($rows as $row)
+		{
+			$row[$id_colname] = $clear_id && $id_colname  ?  0  :  $row[$id_colname];
+			fputcsv($temp_stream, array_values($row), $delimiter, $enclosure, $escape_char);
+		}
+		
+		rewind($temp_stream);
+		$content = stream_get_contents($temp_stream);
+		return $content;
+	}
+
+	
+	
+	
+	function create_SQL_file($rows, $table, $id_colname=null, $clear_id=false)
+	{
+		$rows_cnt = 0;
+		$rows_num = count($rows);
+		
+		$content = "";
+		foreach($rows as $row)
+		{
+			// when started (and every after 100 command cycle):
+			if ($rows_cnt%100 == 0 || $rows_cnt == 0 )
+			{
+				$content .= "\nINSERT INTO ".$table." VALUES";
+			}
+			$content .= "\n(";
+			
+			$j = 0;
+			foreach($row as $colname => $coldata)
+			{
+				$coldata = $clear_id && $id_colname==$colname  ?  '0'  :  $coldata;
+				$coldata = str_replace("\n","\\n", addslashes($coldata) );
+				$content .= '"'.$coldata.'"';
+				
+				$j++;
+				if ( $j < count($row) ) $content.= ',';
+			}
+			$content .=")";
+			
+			//every after 100 command cycle [or at last line] ....p.s. but should be inserted 1 cycle eariler
+			if ( (($rows_cnt+1)%100==0 && $rows_cnt!=0) || $rows_cnt+1==$rows_num )
+				$content .= ";";
+			else
+				$content .= ",";
+			
+			$rows_cnt++;
+		}
+		$content .="\n\n\n";
+		
+		return $content;
+	}
+	
+	
+	
+	function create_XML_file($rows, $table, $id_colname=null, $clear_id=false)
+	{
+		$rows_cnt = 0;
+		$rows_num = count($rows);
+		
+		$indent = 0;
+		$istr   = "  ";
+		$content = "\n<rows table=\"".str_replace('#__', '',$table)."\">";
+		$indent++;
+		
+		foreach($rows as $row)
+		{
+			$content .= "\n".str_repeat($istr, $indent)."<row>";
+			$indent++;
+			
+			foreach($row as $colname => $coldata)
+			{
+				$coldata = $clear_id && $id_colname==$colname  ?  '0'  :  $coldata;
+				$coldata = str_replace("\n","\\n", addslashes($coldata) );
+				$content .= "\n".str_repeat($istr, $indent). '<'.$colname.'>"' .$coldata. '"</'.$colname.'>';
+			}
+			
+			$indent--;
+			$content .= "\n".str_repeat($istr, $indent)."</row>";
+			
+			$rows_cnt++;
+		}
+		
+		$indent--;
+		$content .= "\n</rows>";
+		
+		return $content;
 	}
 }

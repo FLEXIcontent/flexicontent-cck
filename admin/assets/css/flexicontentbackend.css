@@ -104,6 +104,7 @@ HEADER ICONS
 .icon-copy_wvalues:before,
 .icon-params:before     { content: "\e018"; color: #51a351; }
 .icon-32-archive:before { content: "\50"; }
+.fcsb-icon-wrench:before{ content: ":"; }
 .fcsb-icon-import:before{ content: "\e022"; }
 .icon-import:before     { content: "\e022"; color: darkorange; }
 .icon-32-restore:before { content: "\6c"; }
