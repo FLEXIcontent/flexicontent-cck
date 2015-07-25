@@ -148,7 +148,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		
 		$values = $values ? $values : $field->value;
 		
-		$display_non_selected = $field->parameters->get( 'display_non_selected', 0 ) ;
+		$add_non_selected = $field->parameters->get( 'add_non_selected', 0 ) ;
 		// Parse list elements, and create HTML of list elements
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
 		$elements = $this->parseElements($field, $field_elements);
@@ -168,10 +168,10 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		$options = array();
 		foreach($elements as $li_title => $li_params)
 		{
-			if ( !$display_non_selected && !in_array($li_title, $values) ) continue;
+			if ( !$add_non_selected && !in_array($li_title, $values) ) continue;
 			
 			$prefix = $suffix = '';
-			if ($display_non_selected) {
+			if ($add_non_selected) {
 				$prefix = '<span class="fc_linklist_non_selected" >';
 				$suffix = '</span>';
 				unset($li_params['link']);
