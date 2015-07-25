@@ -58,14 +58,17 @@ class FlexicontentModelImport extends JModelList
 		$type_id  = $fcform ? $jinput->get('type_id', 0, 'int')        :  $app->getUserStateFromRequest( $p.'type_id', 'type_id', 0, 'int');
 		$language = $fcform ? $jinput->get('language', '*', 'string')  :  $app->getUserStateFromRequest( $p.'language', 'language', $this->cparams->get('import_lang', '*'), 'string');
 		$state    = $fcform ? $jinput->get('state', 1, 'int')          :  $app->getUserStateFromRequest( $p.'state', 'state', $this->cparams->get('import_state', 1), 'int');
+		$access   = $fcform ? $jinput->get('access', 1, 'int')         :  $app->getUserStateFromRequest( $p.'access', 'access', $this->cparams->get('import_access', 1), 'int');
 		
 		$this->setState('type_id', $type_id);
 		$this->setState('language', $language);
 		$this->setState('state', $state);
+		$this->setState('access', $access);
 		
 		$app->setUserState($p.'type_id', $type_id);
 		$app->setUserState($p.'language', $language);
 		$app->setUserState($p.'state', $state);
+		$app->setUserState($p.'access', $access);
 		
 		
 		// Main and secondary categories, tags

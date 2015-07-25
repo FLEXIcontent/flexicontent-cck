@@ -1,3 +1,11 @@
+<?php
+$_levels = JHtml::_('access.assetgroups');
+$access_levels = array();
+foreach($_levels as $_level) {
+	$access_levels[$_level->value] = $_level->text;
+}
+?>
+
 <form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm">
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="import" />
@@ -21,28 +29,11 @@
 					<span class="label">Item ID</span>
 				</td>
 				<td>
-					<span class="badge badge-success"><?php echo $this->conf['id_col'] ? 'Using column' : 'AUTO (new ID)'; ?></span>
-				</td>
-			</tr>
-			
-			<tr>
-				<td style="text-align:right">
-					<span class="label">State</span>
-				</td>
-				<td>
-					<span class="badge badge-success">
-					<?php
-						$tmpparams = new JRegistry();
-						$tmpparams->set('show_icons', '0');
-						echo !$this->conf['state'] ? 'Using column' : flexicontent_html::stateicon( $this->conf['state'], $tmpparams);
-					?>
-					</span>
-				</td>
-				<td style="text-align:right">
-					<span class="label">Main category</span>
-				</td>
-				<td>
-					<span class="badge badge-success"><?php echo $this->conf['maincat_col'] ? 'Using column' : $this->categories[$this->conf['maincat']]->title; ?></span>
+					<?php if ($this->conf['id_col']): ?>
+						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+					<?php else: ?>
+						<span class="badge badge-success"><?php echo 'AUTO (new ID)'; ?></span>
+					<?php endif; ?>
 				</td>
 			</tr>
 			
@@ -54,6 +45,33 @@
 					<span class="badge badge-success"><?php echo !$this->conf['language'] ? 'Using column' : $this->languages->{$this->conf['language']}->name; ?></span>
 				</td>
 				<td style="text-align:right">
+					<span class="label">Main category</span>
+				</td>
+				<td>
+					<?php if ($this->conf['maincat_col']): ?>
+						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+					<?php else: ?>
+						<span class="badge badge-success"><?php echo $this->categories[$this->conf['maincat']]->title; ?></span>
+					<?php endif; ?>
+				</td>
+			</tr>
+			
+			<tr>
+				<td style="text-align:right">
+					<span class="label">State</span>
+				</td>
+				<td>
+					<?php
+						$tmpparams = new JRegistry();
+						$tmpparams->set('show_icons', '0');
+					?>
+					<?php if (!$this->conf['state']): ?>
+						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+					<?php else: ?>
+						<span class="badge badge-success"><?php echo flexicontent_html::stateicon( $this->conf['state'], $tmpparams); ?></span>
+					<?php endif; ?>
+				</td>
+				<td style="text-align:right">
 					<span class="label">Secondary categories</span>
 				</td>
 				<td>
@@ -63,7 +81,28 @@
 							$seccats[] = $this->categories[$seccatid]->title;
 						}
 					?>
-					<span class="badge badge-success"><?php echo !empty($seccats) ? implode(", ", $seccats) : '-'; ?></span>
+					<?php if ($this->conf['seccats_col']): ?>
+						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+					<?php else: ?>
+						<span class="badge badge-success"><?php echo !empty($seccats) ? implode(", ", $seccats) : '-'; ?></span>
+					<?php endif; ?>
+				</td>
+			</tr>
+			
+			<tr>
+				<td style="text-align:right">
+					<span class="label">Access</span>
+				</td>
+				<td>
+					<?php if ($this->conf['access']===0): ?>
+						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+					<?php else: ?>
+						<span class="badge badge-success"><?php echo isset($access_levels[$this->conf['access']]) ? $access_levels[$this->conf['access']] : $this->conf['access']; ?></span>
+					<?php endif; ?>
+				</td>
+				<td style="text-align:right">
+				</td>
+				<td>
 				</td>
 			</tr>
 			
@@ -77,13 +116,21 @@
 					<span class="label">Created by (user)</span>
 				</td>
 				<td>
-					<span class="badge badge-success"><?php echo $this->conf['created_by_col'] ? 'Using column' : 'Current user'; ?></span>
+					<?php if ($this->conf['created_by_col']): ?>
+						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+					<?php else: ?>
+						<span class="badge badge-success"><?php echo 'Current user'; ?></span>
+					<?php endif; ?>
 				</td>
 				<td style="text-align:right">
 					<span class="label">Creation date</span>
 				</td>
 				<td>
-					<span class="badge badge-success"><?php echo $this->conf['created_col'] ? 'Using column' : 'NOW'; ?></span>
+					<?php if ($this->conf['created_col']): ?>
+						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+					<?php else: ?>
+						<span class="badge badge-success"><?php echo 'NOW'; ?></span>
+					<?php endif; ?>
 				</td>
 			</tr>
 			
@@ -92,13 +139,21 @@
 					<span class="label">Modified by (user)</span>
 				</td>
 				<td>
-					<span class="badge badge-success"><?php echo $this->conf['modified_by_col'] ? 'Using column' : 'NULL (none)'; ?></span>
+					<?php if ($this->conf['modified_by_col']): ?>
+						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+					<?php else: ?>
+						<span class="badge badge-success"><?php echo 'NULL (none)'; ?></span>
+					<?php endif; ?>
 				</td>
 				<td style="text-align:right">
 					<span class="label">Modification date</span>
 				</td>
 				<td>
-					<span class="badge badge-success"><?php echo $this->conf['modified_col'] ? 'Using column' : 'Never'; ?></span>
+					<?php if ($this->conf['modified_col']): ?>
+						<span class="badge badge-info"><?php echo 'Using column'; ?></span>
+					<?php else: ?>
+						<span class="badge badge-success"><?php echo 'Never'; ?></span>
+					<?php endif; ?>
 				</td>
 			</tr>
 			
@@ -142,12 +197,16 @@
 			?>
 			<td>
 				<?php
-					if ($fieldname=='catid') {
-						echo $this->categories[$field_values]->title;
+					if ($fieldname=='access') {
+						echo $field_values .' : ';
+						echo isset($access_levels[$field_values]) ? $access_levels[$field_values] : 'Invalid, no Access level with ID: '.$field_values;
+					} else if ($fieldname=='catid') {
+						echo $field_values .' : ';
+						echo isset($this->categories[$field_values]) ? $this->categories[$field_values]->title : 'Invalid, no Category with ID: '.$field_values;
 					} else if ($fieldname=='cid') {
 						$seccats = array();
 						foreach($field_values as $seccatid) {
-							$seccats[] = $this->categories[$seccatid]->title;
+							$seccats[] = isset($this->categories[$seccatid]) ? $this->categories[$seccatid]->title : 'Invalid, no Category with ID: '.$seccatid;
 						}
 						echo !empty($seccats) ? implode(", ", $seccats) : '-';
 					} else if ($fieldname=='language') {

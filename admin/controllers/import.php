@@ -125,9 +125,10 @@ class FlexicontentControllerImport extends FlexicontentController
 			$conf['failure_count'] = $conf['success_count'] = 0;
 			
 			// Retrieve Basic configuration
-			$conf['type_id'] 	= JRequest::getInt( 'type_id', 0 );
-			$conf['language']	= JRequest::getVar( 'language', '' );
-			$conf['state'] = JRequest::getInt( 'state', '' );
+			$conf['type_id']  = JRequest::getInt( 'type_id', 0 );
+			$conf['language'] = JRequest::getVar( 'language', '' );
+			$conf['state']    = JRequest::getInt( 'state', '' );
+			$conf['access']   = JRequest::getInt( 'access', '' );
 			
 			// Main and secondary categories
 			$conf['maincat'] 	= JRequest::getInt( 'maincat', 0 );
@@ -311,6 +312,11 @@ class FlexicontentControllerImport extends FlexicontentController
 				$app->enqueueMessage('CSV file lacks column <b>\'state\'</b>', 'error');
 				$app->redirect($link);
 			} else if ( !strlen($conf['state']) ) $core_props['state'] = 'State';
+			
+			if ( $conf['access']===0 && !in_array('access', $conf['columns']) ) {
+				$app->enqueueMessage('CSV file lacks column <b>\'access\'</b>', 'error');
+				$app->redirect($link);
+			} else if ( $conf['access']===0 ) $core_props['access'] = 'Access';
 			
 			if ( $conf['maincat_col'] && !in_array('catid', $conf['columns']) ) {
 				$app->enqueueMessage('CSV file lacks column <b>\'catid\'</b> (Primary category)', 'error');
@@ -503,6 +509,7 @@ class FlexicontentControllerImport extends FlexicontentController
 			$data['cid']     = $conf['seccats'];   // Default value maybe overriden by column
 			$data['vstate']  = 2;
 			$data['state']   = $conf['state'];
+			$data['access']  = $conf['access'];
 			
 			
 			// Prepare request variable used by the item's Model
@@ -867,6 +874,10 @@ class FlexicontentControllerImport extends FlexicontentController
 				else if ( $fieldname=='state' )
 				{
 					if ( !strlen($conf['state']) ) $data[$fieldname] = $field_values;
+				}
+				else if ( $fieldname=='access' )
+				{
+					if ( $conf['access']===0 ) $data[$fieldname] = $field_values;
 				}
 				else if ( $fieldname=='catid' )
 				{

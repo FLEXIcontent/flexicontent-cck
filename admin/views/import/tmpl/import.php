@@ -85,6 +85,13 @@ $tabCnt[$tabSetCnt] = 0;
 				</td>
 			</tr>
 			
+			<tr>
+				<td class="key"><label class="label" id="access-lbl" for="access"><?php echo JText::_("FLEXI_ACCESS_LEVEL");?></label></td>
+				<td class="data">
+					<?php echo str_replace('<br />', '', $this->lists['access']); ?>
+				</td>
+			</tr>
+			
 		</table>
 		
 		<br/><br/>
@@ -302,57 +309,6 @@ $tabCnt[$tabSetCnt] = 0;
 	</div>
 
 
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-wrench">
-		<h3 class="tabberheading hasTooltip" title="<?php echo JText::_( '' ); ?>"><?php echo JText::_( 'FLEXI_ADVANCED' ); ?></h3>
-		
-		<br/>
-		<table class="fc-form-tbl keytop">
-								
-			<tr>
-				<td class="key"><label class="label"><?php echo JText::_("FLEXI_IMPORT_IGNORE_UNUSED_COLUMNS");?></label></td>
-				<td class="data">
-					<?php
-						$_ignore_unused_cols_checked = $this->model->getState('ignore_unused_cols') ? 'checked="checked"' : '';
-					?>
-					<input type="checkbox" id="ignore_unused_cols" name="ignore_unused_cols" value="1" <?php echo $_ignore_unused_cols_checked; ?> />
-					<label for="ignore_unused_cols"><?php echo JText::_( 'FLEXI_IMPORT_IGNORE_REDUDANT_COLS' ); ?></label>
-				</td>
-				<td class="data">
-					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_("FLEXI_IMPORT_IGNORE_REDUDANT_COLS_DESC");?></span>
-				</td>
-			</tr>
-			
-			<tr>
-				<td class="key"><label class="label"><?php echo JText::_("FLEXI_IMPORT_CUSTOM_ITEM_ID");?></label></td>
-				<td class="data">
-					<?php
-						$_id_col_checked = $this->model->getState('id_col') ? 'checked="checked"' : '';
-					?>
-					<input type="checkbox" id="id_col" name="id_col" value="1" <?php echo $_id_col_checked; ?> />
-					<label for="id_col"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL");?></label>
-				</td>
-				<td class="data">
-					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_("FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT");?></span>
-				</td>
-			</tr>
-			
-			<tr>
-				<td class="key">
-					<label class="label" for="items_per_step"><?php echo JText::_( 'FLEXI_IMPORT_ITEMS_PER_STEP' ); ?></label>
-				</td>
-				<td class="data">
-					<input type="text" name="items_per_step" id="items_per_step" value="<?php echo $this->model->getState('items_per_step'); ?>" class="fcfield_textval required" size="40"/>
-				</td>
-				<td class="data">
-					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_( 'FLEXI_IMPORT_ITEMS_PER_STEP_DESC' ); ?></span>
-				</td>
-			</tr>
-			
-		</table>
-		
-	</div>
-
-
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-images">
 		<h3 class="tabberheading hasTooltip" title="<?php echo JText::_( 'FLEXI_IMPORT_ABOUT_NEW_FILES' ); ?>">Media / Document fields</h3>
 		
@@ -509,6 +465,57 @@ $tabCnt[$tabSetCnt] = 0;
 				</td>
 				<td class="data">
 					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_( 'FLEXI_CSV_MPROP_SEPARATOR_DESC' ); ?></span>
+				</td>
+			</tr>
+			
+		</table>
+		
+	</div>
+
+
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-wrench">
+		<h3 class="tabberheading hasTooltip" title="<?php echo JText::_( '' ); ?>"><?php echo JText::_( 'FLEXI_ADVANCED' ); ?></h3>
+		
+		<br/>
+		<table class="fc-form-tbl keytop">
+								
+			<tr>
+				<td class="key"><label class="label"><?php echo JText::_("FLEXI_IMPORT_IGNORE_UNUSED_COLUMNS");?></label></td>
+				<td class="data">
+					<?php
+						$_ignore_unused_cols_checked = $this->model->getState('ignore_unused_cols') ? 'checked="checked"' : '';
+					?>
+					<input type="checkbox" id="ignore_unused_cols" name="ignore_unused_cols" value="1" <?php echo $_ignore_unused_cols_checked; ?> />
+					<label for="ignore_unused_cols"><?php echo JText::_( 'FLEXI_IMPORT_IGNORE_REDUDANT_COLS' ); ?></label>
+				</td>
+				<td class="data">
+					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_("FLEXI_IMPORT_IGNORE_REDUDANT_COLS_DESC");?></span>
+				</td>
+			</tr>
+			
+			<tr>
+				<td class="key"><label class="label"><?php echo JText::_("FLEXI_IMPORT_CUSTOM_ITEM_ID");?></label></td>
+				<td class="data">
+					<?php
+						$_id_col_checked = $this->model->getState('id_col') ? 'checked="checked"' : '';
+					?>
+					<input type="checkbox" id="id_col" name="id_col" value="1" <?php echo $_id_col_checked; ?> />
+					<label for="id_col"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL");?></label>
+				</td>
+				<td class="data">
+					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_("FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT");?></span>
+				</td>
+			</tr>
+			
+			<tr>
+				<td class="key">
+					<label class="label" for="items_per_step"><?php echo JText::_( 'FLEXI_IMPORT_ITEMS_PER_STEP' ); ?></label>
+				</td>
+				<td class="data">
+					<input type="text" name="items_per_step" id="items_per_step" value="<?php echo $this->model->getState('items_per_step'); ?>" class="fcfield_textval required" size="40"/>
+				</td>
+				<td class="data">
+					<span class="fc-mssg fc-info fc-nobgimage"><?php echo JText::_( 'FLEXI_IMPORT_ITEMS_PER_STEP_DESC' ); ?></span>
 				</td>
 			</tr>
 			

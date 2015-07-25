@@ -185,6 +185,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$formvals['type_id']  = $model->getState('type_id');
 		$formvals['language'] = $model->getState('language');
 		$formvals['state']    = $model->getState('state');
+		$formvals['access']   = $model->getState('access');
 		
 		// Main and secondary categories, tags
 		$formvals['maincat']     = $model->getState('maincat');
@@ -268,6 +269,15 @@ class FlexicontentViewImport extends JViewLegacy
 			'<span class="fc-mssg-inline fc-note fc-nobgimage" id="fc_import_about_statecol" style="display:none;">
 				'.JText::_('FLEXI_USE_STATE_COLUMN_TIP').'
 			</span>';
+		
+		// build access level filter
+		$access_levels = JHtml::_('access.assetgroups');
+		array_unshift($access_levels, JHtml::_('select.option', '0', "Use 'access' column") );
+		array_unshift($access_levels, JHtml::_('select.option', '', 'FLEXI_SELECT_ACCESS_LEVEL') );
+		$fieldname = 'access';  // make multivalue
+		$elementid = 'access';
+		$attribs = 'class="required use_select2_lib"';
+		$lists['access'] = JHTML::_('select.genericlist', $access_levels, $fieldname, $attribs, 'value', 'text', $formvals['access'], $elementid, $translate=true );
 		
 		// Ignore warnings because component may not be installed
 		$warnHandlers = JERROR::getErrorHandling( E_WARNING );
