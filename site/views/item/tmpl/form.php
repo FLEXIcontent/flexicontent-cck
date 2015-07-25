@@ -871,7 +871,7 @@ if ($typeid && $this->params->get('usepublicationdetails_fe', 1)) : // timezone_
 			<?php echo $this->form->getLabel('created_by'); ?>
 			<div class="container_fcfield"><?php echo $this->form->getInput('created_by'); ?></div>
 		</fieldset>
-	<?php $captured['createdby'] = ob_get_clean(); endif; ?>
+	<?php $captured['created_by'] = ob_get_clean(); endif; ?>
 	
 	<?php if ($this->perms['editcreationdate'] && $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
 		<fieldset class="flexi_params panelform">
@@ -1348,15 +1348,17 @@ $captured['fields_manager'] = ob_get_clean();
 // ANY field not found inside the 'captured' ARRAY,
 // must be a field not configured to be displayed
 // ***********************************************
-$duplicate_display = array();
+$displayed_at_tab = array();
 $_tmp = $tab_fields;
 foreach($_tmp as $tabname => $fieldnames) {
 	//echo "$tabname <br/>  %% ";
 	//print_r($fieldnames); echo "<br/>";
 	foreach($fieldnames as $fn => $i) {
+		//echo " -- $fn <br/>";
+		if (isset($captured[$fn])) {
+			$displayed_at_tab[$fn][] = $tabname;
+		}
 		if ( isset($shown[$fn]) ) {
-			//echo " -- $fn <br/>";
-			$duplicate_display[$fn] = 1;
 			unset( $tab_fields[$tabname][$fn] );
 			continue;
 		}
@@ -1373,10 +1375,14 @@ foreach($_tmp as $tabname => $fieldnames) {
 // **********************
 // CONFIGURATION WARNINGS
 // **********************
-if ( count($duplicate_display) ) :
-	$msg = JText::sprintf( 'FLEXI_FORM_FIELDS_DISPLAYED_TWICE', "<b>".implode(', ', array_keys($duplicate_display))."</b>");
+$msg = '';
+foreach($displayed_at_tab as $fieldname => $_places) {
+	if ( count($_places) > 1 ) $msg .= "<br/><b>".$fieldname."</b>" . " at [".implode(', ', $_places)."]";
+}
+if ($msg) {
+	$msg = JText::sprintf( 'FLEXI_FORM_FIELDS_DISPLAYED_TWICE', $msg."<br/>");
 	echo sprintf( $alert_box, '', 'error', '', $msg );
-endif;
+}
 
 if ( count($coreprop_missing) ) :
 	$msg = JText::sprintf( 'FLEXI_FORM_PLACER_FIELDS_MISSING', "<b>".implode(', ', array_keys($coreprop_missing))."</b>");

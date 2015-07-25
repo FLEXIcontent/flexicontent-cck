@@ -1646,7 +1646,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// Fix aliases, also replacing field types with field names
 		foreach($tab_fields as $tab_name => $field_list) {
-			$field_list = str_replace('created_by', 'createdby', $field_list);
+			$field_list = str_replace('createdby', 'created_by', $field_list);
+			$field_list = str_replace('modifiedby', 'modified_by', $field_list);
 			$field_list = str_replace('createdby_alias', 'created_by_alias', $field_list);
 			$field_list = str_replace('maintext', 'text', $field_list);
 			$tab_fields[$tab_name] = $field_list;
