@@ -1285,23 +1285,21 @@ class flexicontent_html
 	static function extractimagesrc( $row )
 	{
 		jimport('joomla.filesystem.file');
-
+		
 		$regex = '#<\s*img [^\>]*src\s*=\s*(["\'])(.*?)\1#im';
-
-		preg_match ($regex, $row->introtext, $matches);
-
-		if(!count($matches)) preg_match ($regex, $row->fulltext, $matches);
-
-		$images = (count($matches)) ? $matches : array();
-
-		$image = '';
-		if (count($images)) $image = $images[2];
-
-		if (!preg_match("#^http|^https|^ftp#i", $image)) {
-			// local file check that it exists
+		
+		if (isset($row->fields['text']->display)) preg_match ($regex, $row->fields['text']->display, $matches);
+		if (empty($matches)) preg_match ($regex, $row->introtext, $matches);
+		if (empty($matches)) preg_match ($regex, $row->fulltext, $matches);
+		
+		$image = !empty($matches) ? $matches[2] : '';
+		
+		// Case of local file, check that file exists
+		if (!preg_match("#^http|^https|^ftp#i", $image))
+		{
 			$image = JFile::exists( JPATH_SITE . DS . $image ) ? $image : '';
 		}
-
+		
 		return $image;
 	}
 
