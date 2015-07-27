@@ -49,6 +49,9 @@ class FlexicontentControllerSearch extends FlexicontentController
 	 */
 	function countrows()
 	{
+		// Test counting with limited memory
+		//ini_set("memory_limit", "20M");
+		
 		$start_microtime = microtime(true);
 		// Check for request forgeries
 		//JRequest::checkToken() or jexit( 'Invalid Token' );
@@ -66,7 +69,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		if ($rebuildmode=='quick' && $indexer=='advanced') {
 			$nse_fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='non-search');
 			$nsp_fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='dirty-nosupport');
-			$fields     = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=true,  0, $search_type='dirty-search');
+			$fields     = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='dirty-search');
 			
 			// Get the field ids of the fields removed from searching
 			$del_fieldids = array_unique( array_merge(array_keys($nse_fields), array_keys($nsp_fields), array_keys($fields)) ) ;
@@ -74,7 +77,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 			$session->set($indexer.'_nse_fields', $nse_fields, 'flexicontent');
 			$session->set($indexer.'_nsp_fields', $nsp_fields, 'flexicontent');
 		} else {  // INDEX: basic or advanced fully rebuilt
-			$fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=true, 0, $search_type='all-search');
+			$fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='all-search');
 			$del_fieldids = null;
 		}
 		
@@ -125,6 +128,9 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$session = JFactory::getSession();
 		$db = JFactory::getDBO();
 		
+		// Test indexing with limited memory
+		//ini_set("memory_limit", "20M");
+		
 		@ob_end_clean();
 		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$indexer = JRequest::getVar('indexer','advanced');
@@ -152,13 +158,24 @@ class FlexicontentControllerSearch extends FlexicontentController
 		// Get fields that will have atomic search tables, (current for advanced index only)
 		if ($indexer=='advanced')
 		{
-			$filterables = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=true, 0, $search_type='filter');
+			$filterables = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='filter');
 			$filterables = array_keys($filterables);
 			$filterables = array_flip($filterables);
 		} else $filterables = array();
 		
 		// Get items ids that have value for any of the searchable fields, but use session to avoid recalculation
 		$itemids = $session->get($indexer.'_items_to_index', array(),'flexicontent');
+		
+		$_fields = array();
+		foreach($fields as $field_id => $field)
+		{
+			// Clone field to avoid problems
+			$_fields[$field_id] = clone($field);
+			
+			// Create field parameters if not already created
+			if ( empty($_fields[$field_id]->parameters) ) $_fields[$field_id]->parameters = new JRegistry($_fields[$field_id]->attribs);
+		}
+		$fields = $_fields;
 		
 		$items_per_query = 50;
 		$items_per_query = $items_per_query > $items_per_call ? $items_per_call : $items_per_query;
@@ -192,7 +209,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 			// For current item: Loop though all searchable fields according to their type
 			foreach($fieldids as $fieldid)
 			{
-				// Clone field to avoid problems
+				// Must SHALLOW clone because we will be setting some properties , e.g. 'ai_query_vals', that we do not 
 				$field = clone($fields[$fieldid]);
 				
 				// Indicate multiple items per query
