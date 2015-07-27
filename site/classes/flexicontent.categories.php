@@ -61,12 +61,12 @@ class flexicontent_cats
 	 * and sets this parent in the member variable 'parentcats_ids'
 	 *
 	 */
-	protected function getParentCats()
+	protected function getParentCats($all_cols=false)
 	{
 		$db = JFactory::getDBO();
 		
-		$query = 'SELECT id, title, published,'
-				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
+		$query = 'SELECT ' .($all_cols ? '*,' : 'id, title, published,')
+				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				.' FROM #__categories'
 				.' WHERE id IN ('.implode($this->parentcats_ids, ',').')'
 				. (!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ' )

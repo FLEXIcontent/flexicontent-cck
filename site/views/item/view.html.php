@@ -140,18 +140,19 @@ class FlexicontentViewItem  extends JViewLegacy
 		$fields = $item->fields;
 		
 		
-		// ************************
-		// Pathway needed variables
-		// ************************
+		// ****************************************
+		// Get category titles needed by pathway,
+		// this will allow Falang to translate them
+		// ****************************************
 		
-		//$catshelper = new flexicontent_cats($cid);
-		//$parents    = $catshelper->getParentlist();
+		$catshelper = new flexicontent_cats($cid);
+		$parents    = $catshelper->getParentlist($all_cols=false);
 		//echo "<pre>".print_r($parents,true)."</pre>";
-		$parents = array();
+		/*$parents = array();
 		if ( $cid && isset($globalcats[$cid]->ancestorsarray) ) {
 			$parent_ids = $globalcats[$cid]->ancestorsarray;
 			foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
-		}
+		}*/
 		
 		
 		

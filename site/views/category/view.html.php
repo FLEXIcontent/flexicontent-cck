@@ -167,15 +167,15 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$limit		= $app->getUserStateFromRequest('com_flexicontent'.$category->id.'.category.limit', 'limit', $params->def('limit', 0), 'int');
 		
-		// Pathway needed variables
-		//$catshelper = new flexicontent_cats($cid);
-		//$parents    = $catshelper->getParentlist();
+		// Get category titles needed by pathway, this will allow Falang to translate them
+		$catshelper = new flexicontent_cats($cid);
+		$parents    = $catshelper->getParentlist($all_cols=false);
 		//echo "<pre>".print_r($parents,true)."</pre>";
-		$parents = array();
+		/*$parents = array();
 		if ( $cid && isset($globalcats[$cid]->ancestorsarray) ) {
 			$parent_ids = $globalcats[$cid]->ancestorsarray;
 			foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
-		}
+		}*/
 		
 		$rootcat = (int) $params->get('rootcat');
 		if ($rootcat) $root_parents = $globalcats[$rootcat]->ancestorsarray;
@@ -371,6 +371,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
 			$p++;
 		}
+		//echo "<pre>"; print_r($pathway); echo "</pre>";
 		
 		$authordescr_item_html = false;
 		if ($authordescr_item) {

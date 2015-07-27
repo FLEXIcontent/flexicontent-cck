@@ -2525,9 +2525,9 @@ class flexicontent_html
 						( $counter==-1 || $counter==0 ? '' :
 							($rating_count ? $rating_count : '0').
 							($counter_show_label ? ' '.JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '').
-							($show_percentage ? ' - ' : '')
+							($show_percentage && (int)$percent ? ' - ' : '')
 						).
-						($show_percentage ? (int)$percent.'%' : '')
+						($show_percentage ? ((int)$percent ? (int)$percent.'%' : '') : '')
 						.'
 					</div>
 				</div>
