@@ -168,19 +168,26 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		$options = array();
 		foreach($elements as $li_title => $li_params)
 		{
-			if ( !$add_non_selected && !in_array($li_title, $values) ) continue;
+			$is_selected = in_array($li_title, $values);
+			if ( !$add_non_selected && !$is_selected ) continue;
 			
 			$prefix = $suffix = '';
-			if ($add_non_selected) {
+			if ($is_selected)
+			{
+				if (isset($li_params['link'])) {
+					$prefix = '<a href="'.$li_params['link'].'">';
+					$suffix = '</a>';
+				} else {
+					$prefix = '<span class="fc_linklist_text_only" >';
+					$suffix = '</span>';
+				}
+			}
+			else {
 				$prefix = '<span class="fc_linklist_non_selected" >';
 				$suffix = '</span>';
-				unset($li_params['link']);
-			} else if (isset($li_params['link']))
-			{
-				$prefix = '<a href="'.$li_params['link'].'">';
-				$suffix = '</a>';
-				unset($li_params['link']);
 			}
+			unset($li_params['link']);
+			
 			array_walk($li_params, array($this, 'walk'), $li_title);
 			$li_params = $li_params ? ' '.implode(' ', $li_params) : null;
 			$options[] = '<li'.$li_params.'>'.$prefix.$li_title.$suffix.'</li>';
