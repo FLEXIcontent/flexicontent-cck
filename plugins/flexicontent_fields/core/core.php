@@ -425,8 +425,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			case 'createdby':     // Authors
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
 				// partial SQL clauses
-				$filter->filter_valuesselect = ' i.created_by AS value, usr.name AS text';
-				$filter->filter_valuesjoin   = ' JOIN #__users AS usr ON usr.id = i.modified_by';
+				$filter->filter_valuesselect = ' i.created_by AS value, CASE WHEN usr.name IS NULL THEN CONCAT(\''.JText::_('FLEXI_NOT_ASSIGNED').' ID:\', i.created_by) ELSE usr.name END AS text';
+				$filter->filter_valuesjoin   = ' JOIN #__users AS usr ON usr.id = i.created_by';
 				$filter->filter_valueswhere  = ' AND i.created_by <> 0';
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY i.created_by ';
@@ -439,7 +439,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			case 'modifiedby':   // Modifiers
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
 				// partial SQL clauses
-				$filter->filter_valuesselect = ' i.modified_by AS value, usr.name AS text';
+				$filter->filter_valuesselect = ' i.modified_by AS value, CASE WHEN usr.name IS NULL THEN CONCAT(\''.JText::_('FLEXI_NOT_ASSIGNED').' ID:\', i.modified_by) ELSE usr.name END AS text';
 				$filter->filter_valuesjoin   = ' JOIN #__users AS usr ON usr.id = i.modified_by';
 				$filter->filter_valueswhere  = ' AND i.modified_by <> 0';
 				// full SQL clauses
