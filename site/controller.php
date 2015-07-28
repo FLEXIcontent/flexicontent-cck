@@ -2457,16 +2457,27 @@ class FlexicontentController extends JControllerLegacy
 		// Finally read file and output it
 		// *******************************
 		
-		//readfile($dlfile->abspath);  // this will read an output the file but it will cause a memory exhausted error on large files
-		
 		if ( !FLEXIUtilities::funcIsDisabled('set_time_limit') ) @set_time_limit(0);
-		$handle = @fopen($dlfile->abspath,"rb");
-		while(!feof($handle))
+		
+		$chunksize = 1 * (1024 * 1024); // 1MB, highest possible for fread should be 8MB
+		if (1 || $dlfile->size > $chunksize)
 		{
-			print(@fread($handle, 1024*8));
-			ob_flush();
+			$handle = @fopen($dlfile->abspath,"rb");
+			while(!feof($handle))
+			{
+				print(@fread($handle, $chunksize));
+				ob_flush();
+				flush();
+			}
+			fclose($handle);
+		} else {
+			// This is good for small files, it will read an output the file into
+			// memory and output it, it will cause a memory exhausted error on large files
+			ob_clean();
 			flush();
+			readfile($dlfile->abspath);
 		}
+		
 		
 		// ****************************************************
 		// In case of multi-download clear the session variable
