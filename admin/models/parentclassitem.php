@@ -3356,7 +3356,7 @@ class ParentClassItem extends JModelAdmin
 		{
 			$query	= 'SELECT attribs'
 				. ' FROM #__flexicontent_layouts_conf'
-				. ' WHERE layout = "item"'
+				. ' WHERE layout = "items"'
 				. '  AND template = ' . $this->_db->Quote($this->_ilayout);
 			$this->_db->setQuery($query);
 			$attribs = $this->_db->loadResult();
