@@ -65,6 +65,9 @@ class flexicontent_cats
 	{
 		$db = JFactory::getDBO();
 		
+		$this->parentcats_data = array();
+		if (empty($this->parentcats_ids)) return;
+		
 		$query = 'SELECT ' .($all_cols ? '*,' : 'id, title, published,')
 				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				.' FROM #__categories'
