@@ -109,7 +109,7 @@ class flexicontent_cats
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');*/
 		
 		global $globalcats;
-		$this->parentcats_ids = $globalcats[$cid]->ancestorsarray;
+		$this->parentcats_ids = isset($globalcats[$cid]) ? $globalcats[$cid]->ancestorsarray : array();
 		//echo "<pre>" . print_r($this->parentcats_ids, true) ."</pre>";
 	}
 	
