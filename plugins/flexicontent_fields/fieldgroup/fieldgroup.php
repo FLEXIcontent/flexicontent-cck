@@ -343,6 +343,9 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
+		// Use custom HTML display parameter
+		$display_mode = (int) $field->parameters->get( 'display_mode', 0 ) ;
+		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
@@ -353,7 +356,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-		if (!$pretext && !$posttext)
+		if (!$pretext && !$posttext && !$display_mode)
 		{
 			$pretext = '<div class="fc-fieldgrp-value-box">';
 			$posttext = '</div>';
@@ -403,7 +406,6 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		// Create a CUSTOMIZED display of the field group
 		// **********************************************
 		
-		$display_mode = (int) $field->parameters->get( 'display_mode', 0 ) ;
 		if ( $display_mode )
 		{
 			$custom_html = trim($field->parameters->get( 'custom_html', '' )) ;
