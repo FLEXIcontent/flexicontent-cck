@@ -35,6 +35,12 @@
 			<field name="subtitle_tab4_label" type="text" default="" label="Label for Tab 4" description="The text for this label is filter via JText (you can add to your ini language files)" />
 			<field name="subtitle_tab5_label" type="text" default="" label="Label for Tab 5" description="The text for this label is filter via JText (you can add to your ini language files)" />
 			<field name="subtitle_tab6_label" type="text" default="" label="Label for Tab 6" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="subtitle_tab7_label" type="text" default="" label="Label for Tab 7" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="subtitle_tab8_label" type="text" default="" label="Label for Tab 8" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="subtitle_tab9_label" type="text" default="" label="Label for Tab 9" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="subtitle_tab10_label" type="text" default="" label="Label for Tab 10" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="subtitle_tab11_label" type="text" default="" label="Label for Tab 11" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="subtitle_tab12_label" type="text" default="" label="Label for Tab 12" description="The text for this label is filter via JText (you can add to your ini language files)" />
 			
 			<field name="bottom_tabs_grp" type="separator" default="Bottom Tabs" description="" level="level2" hr="false" />
 			<field name="bottom_tab1_label" type="text" default="" label="Label for Tab 1" description="The text for this label is filter via JText (you can add to your ini language files)" />
@@ -43,6 +49,12 @@
 			<field name="bottom_tab4_label" type="text" default="" label="Label for Tab 4" description="The text for this label is filter via JText (you can add to your ini language files)" />
 			<field name="bottom_tab5_label" type="text" default="" label="Label for Tab 5" description="The text for this label is filter via JText (you can add to your ini language files)" />
 			<field name="bottom_tab6_label" type="text" default="" label="Label for Tab 6" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="bottom_tab7_label" type="text" default="" label="Label for Tab 7" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="bottom_tab8_label" type="text" default="" label="Label for Tab 8" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="bottom_tab9_label" type="text" default="" label="Label for Tab 9" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="bottom_tab10_label" type="text" default="" label="Label for Tab 10" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="bottom_tab11_label" type="text" default="" label="Label for Tab 11" description="The text for this label is filter via JText (you can add to your ini language files)" />
+			<field name="bottom_tab12_label" type="text" default="" label="Label for Tab 12" description="The text for this label is filter via JText (you can add to your ini language files)" />
 			
 			<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
 			<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
@@ -64,6 +76,12 @@
 		<group posrow="subtitle">subtitle_tab4</group>
 		<group posrow="subtitle">subtitle_tab5</group>
 		<group posrow="subtitle">subtitle_tab6</group>
+		<group posrow="subtitle_wrap2">subtitle_tab7</group>
+		<group posrow="subtitle_wrap2">subtitle_tab8</group>
+		<group posrow="subtitle_wrap2">subtitle_tab9</group>
+		<group posrow="subtitle_wrap2">subtitle_tab10</group>
+		<group posrow="subtitle_wrap2">subtitle_tab11</group>
+		<group posrow="subtitle_wrap2">subtitle_tab12</group>
 		<group posrow="img_top">image</group>
 		<group posrow="img_top">top</group>
 		<group>description</group>
@@ -73,9 +91,15 @@
 		<group posrow="bottom">bottom_tab4</group>
 		<group posrow="bottom">bottom_tab5</group>
 		<group posrow="bottom">bottom_tab6</group>
+		<group posrow="bottom_wrap2">bottom_tab7</group>
+		<group posrow="bottom_wrap2">bottom_tab8</group>
+		<group posrow="bottom_wrap2">bottom_tab9</group>
+		<group posrow="bottom_wrap2">bottom_tab10</group>
+		<group posrow="bottom_wrap2">bottom_tab11</group>
+		<group posrow="bottom_wrap2">bottom_tab12</group>
 		<group>bottom</group>
 		<group>renderonly</group>
-	</fieldgroups>	
+	</fieldgroups>
 	<cssitem>
 		<file>css/item.css</file>
 	</cssitem>

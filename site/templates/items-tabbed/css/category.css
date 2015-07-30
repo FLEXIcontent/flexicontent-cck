@@ -2,6 +2,7 @@
 
 .flexi.lineinfo {
 	display: block;
+	padding: 0;
 	margin: 0 0 1em;
 	overflow: hidden;
 	clear: both;

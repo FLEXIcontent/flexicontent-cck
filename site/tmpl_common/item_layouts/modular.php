@@ -201,7 +201,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	
 	<?php
 		// Find if at least one tabbed position is used
-		$tabcount = 6; $createtabs = false;
+		$tabcount = 12; $createtabs = false;
 		for ($tc=1; $tc<=$tabcount; $tc++) {
 			$createtabs = @$createtabs ||  isset($item->positions['subtitle_tab'.$tc]);
 		}
@@ -312,7 +312,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	
 	<?php
 		// Find if at least one tabbed position is used
-		$tabcount = 6; $createtabs = false;
+		$tabcount = 12; $createtabs = false;
 		for ($tc=1; $tc<=$tabcount; $tc++) {
 			$createtabs = @$createtabs ||  isset($item->positions['bottom_tab'.$tc]);
 		}
