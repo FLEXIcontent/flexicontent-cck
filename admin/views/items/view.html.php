@@ -462,10 +462,12 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// build the include non-published cats boolean list
 		if ( ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering')) ) {
-			$ordering_tip  = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_REASON', true).'::'.JText::_('<u>Items may belong to both</u>: <br/> (a) currently filtered category <br/>(b) to any of its subcategories, <br/> -- Thus item may get listed in a subcategory instead of the currently filtered category, to avoid this sub-categories are not included.', true).'" />';
-			$lists['filter_subcats'] = '<span class="fc-mssg-inline fc-note">'.JText::_( 'Sub-categories not included during specific category ordering: ' )
-			.$ordering_tip
-			.'</span>';
+			$ordering_tip  = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTooltip" title="'.JText::_('FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER_DESC', true).'" />';
+			$lists['filter_subcats'] = '
+			<span class="fc-mssg-inline fc-note">
+				'.JText::_( 'FLEXI_SUBCATEGORIES_NOT_INCLUDED_DURING_CATORDER' ).' &nbsp;
+				'.$ordering_tip.'
+			</span>';
 		} else {
 			//$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', $filter_subcats );
 			$subcats = array();

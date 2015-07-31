@@ -252,7 +252,7 @@ table.adminlist.fcmanlist {
 }
 .flexicontent #fc-filters-box .fc-filter {
 	border:0px !important;
-	margin: 0px 12px 12px 0;
+	margin: 0px 12px 0px 0;
 	padding:0px !important;
 	vertical-align: baseline !important;
 }

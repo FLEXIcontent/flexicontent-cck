@@ -153,6 +153,7 @@ class FlexicontentModelItems extends JModelLegacy
 		if ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering'))
 		{
 			$jinput->set( 'filter_subcats',	0 );
+			$filter_subcats = 0;
 		}
 		
 		$this->setState('filter_cats', $filter_cats);
@@ -991,7 +992,7 @@ class FlexicontentModelItems extends JModelLegacy
 		} else {
 			$query =
 				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' u.name AS editor, rel.catid as rel_catid, '
-				. 'GROUP_CONCAT(DISTINCT rel.catid SEPARATOR  ",") AS relcats, '
+				. 'GROUP_CONCAT(DISTINCT icats.catid SEPARATOR  ",") AS relcats, '
 				. 'GROUP_CONCAT(DISTINCT tg.tid    SEPARATOR  ",") AS taglist, '
 				. 'level.title AS access_level, '
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
@@ -1015,6 +1016,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. ((!$query_ids && count($customFiltsActive)) ? ' JOIN #__flexicontent_fields_item_relations as fi ON i.id=fi.item_id' : '')
 				. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON i.id=tg.itemid'
 				. (in_array('RV', $filter_state)  ? ' JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS icats ON icats.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
 				.    ($filter_cats && !$filter_subcats ? ' AND rel.catid='.$filter_cats : '')
 				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = '.( $tmp_only ? 'i.' : 'ie.').'type_id'   // left join and not inner join, needed to INCLUDE items without type !!
