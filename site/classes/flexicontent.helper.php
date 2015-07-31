@@ -6265,7 +6265,7 @@ function FLEXISubmenu($cando)
 	//if ($perms->CanArchives)	call_user_func($addEntry, '<span class="fcsb-icon-archive"></span>'.JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
 	
 		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
-		if ($perms->CanImport)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-import"></span>' : '').JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
+		if ($perms->CanImport)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-import"></span>' : '').JText::_( 'FLEXI_IMPORT_CONTENT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
 		if ($perms->CanPlugins) call_user_func($addEntry,
 			'<a href="index.php?option=com_plugins" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
 				(FLEXI_J30GE ? '<span class="fcsb-icon-plugins"></span>' : '').JText::_( 'FLEXI_PLUGINS' ).
