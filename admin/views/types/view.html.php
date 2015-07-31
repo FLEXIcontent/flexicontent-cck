@@ -105,6 +105,19 @@ class FlexicontentViewTypes extends JViewLegacy
 			'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		
+		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
+		if (file_exists($appsman_path))
+		{
+			$btn_icon = 'icon-download';
+			$btn_name = 'download';
+			$btn_task    = 'appsman.exportxml';
+			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_types'}).appendTo(jQuery(f));";
+			flexicontent_html::addToolBarButton(
+				'Export', //'Export XML',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as XML',
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		}
+		
 		if ($perms->CanConfig) {
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			$session = JFactory::getSession();

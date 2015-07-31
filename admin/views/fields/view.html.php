@@ -184,16 +184,18 @@ class FlexicontentViewFields extends JViewLegacy
 			'FLEXI_TOGGLE_ADV_FILTERABLE', $btn_name, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
 		
-		/*
-		$btn_icon = 'icon-download';
-		$btn_name = 'download';
-		$btn_task    = 'fields.exportxml';
-		$extra_js    = "";
-		flexicontent_html::addToolBarButton(
-			'Export', //'Export XML',
-			$btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as XML',
-			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
-		*/
+		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
+		if (file_exists($appsman_path))
+		{
+			$btn_icon = 'icon-download';
+			$btn_name = 'download';
+			$btn_task    = 'appsman.exportxml';
+			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_fields'}).appendTo(jQuery(f));";
+			flexicontent_html::addToolBarButton(
+				'Export', //'Export XML',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as XML',
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		}
 		
 		/*$btn_icon = 'icon-download';
 		$btn_name = 'download';

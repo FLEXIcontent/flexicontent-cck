@@ -6265,6 +6265,10 @@ function FLEXISubmenu($cando)
 	//if ($perms->CanArchives)	call_user_func($addEntry, '<span class="fcsb-icon-archive"></span>'.JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
 	
 		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
+		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
+		if (file_exists($appsman_path)) {
+			if ($perms->CanConfig)	call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-wrench"></span>' : '').JText::_( 'FLEXI_IMPORT_CONFIGURATION' ), 'index.php?option=com_flexicontent&view=appsman', $view=='appsman');
+		}
 		if ($perms->CanImport)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-import"></span>' : '').JText::_( 'FLEXI_IMPORT_CONTENT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
 		if ($perms->CanPlugins) call_user_func($addEntry,
 			'<a href="index.php?option=com_plugins" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
