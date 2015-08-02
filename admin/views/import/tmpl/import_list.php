@@ -6,13 +6,19 @@ foreach($_levels as $_level) {
 }
 ?>
 
-<form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm">
-	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="controller" value="import" />
-	<input type="hidden" name="view" value="import" />
-	<input type="hidden" name="task" value="" />
-	<?php echo JHTML::_( 'form.token' ); ?>
-</form>
+<div class="flexicontent" id="flexicontent">
+
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data" >
+
+<?php if (!empty( $this->sidebar)) : ?>
+	<div id="j-sidebar-container" class="span2">
+		<?php echo $this->sidebar; ?>
+	</div>
+	<div id="j-main-container" class="span10">
+<?php else : ?>
+	<div id="j-main-container">
+<?php endif;?>
+
 
 <div class="alert fc-small fc-iblock">
 	<span class="fcimport_field_prop_list fcimport_field_prop_mainlist">
@@ -247,3 +253,13 @@ foreach($_levels as $_level) {
 	</tbody>
 	
 </table>
+
+	<input type="hidden" name="option" value="com_flexicontent" />
+	<input type="hidden" name="controller" value="import" />
+	<input type="hidden" name="view" value="import" />
+	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="fcform" value="1" />
+	<?php echo JHTML::_( 'form.token' ); ?>
+	
+</form>
+</div>

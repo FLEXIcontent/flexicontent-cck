@@ -89,38 +89,60 @@ class FlexicontentControllerImport extends FlexicontentController
 		JLog::addLogger(array('text_file' => $log_filename));
 		
 		
+		
+		// *************************
+		// Execute according to task
+		// *************************
+		switch ($task) {
+		
+		
+		// ***********************************************************************************************
 		// RESET/CLEAR an already started import task, e.g. import process was interrupted for some reason
-		if ($task == 'clearcsv')
-		{
+		// ***********************************************************************************************
+		
+		case 'clearcsv':
+		
 			// Clear any import data from session
 			$conf = $has_zlib ? base64_encode(zlib_encode(serialize(null), -15)) : base64_encode(serialize(null));
 			
 			$session->set('csvimport_config', $conf, 'flexicontent');
 			$session->set('csvimport_lineno', 0, 'flexicontent');
 			
-			// Set a total results message and redirect
-			$app->enqueueMessage( 'Imported task cleared' , 'notice' );
+			// Set a message that import task was cleared and redirect
+			$app->enqueueMessage( 'Import task cleared' , 'notice' );
 			$this->setRedirect( $link );
 			return;
-		}
+			break;
 		
+		
+		// ****************************************************
 		// CONTINUE an already started (multi-step) import task
-		else if ($task == 'importcsv')
-		{
+		// ****************************************************
+
+		case 'importcsv':
+		
 			$conf   = $session->get('csvimport_config', "", 'flexicontent');
 			$conf		= unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
 			
 			$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 			if ( empty($conf) ) {
-				$app->enqueueMessage( 'Can not continue import, import task not initialized or already finished:' , 'error');
+				$app->enqueueMessage( 'Can not continue import, import task not initialized or already finished' , 'error');
 				$this->setRedirect( $link );
 				return;
 			}
-		}
+			
+			// CONTINUE to do the import
+			// ...
+			break;
 		
-		// Initializate (prepare) import by getting configuration and reading CSV file
-		else if ( $task=='initcsv' || $task=='testcsv' )
-		{
+		
+		// *************************************************************************
+		// INITIALIZE (prepare) import by getting configuration and reading CSV file
+		// *************************************************************************
+		
+		case 'initcsv':
+		case 'testcsv':
+		
 			$conf  = array();
 			$conf['failure_count'] = $conf['success_count'] = 0;
 			
@@ -467,20 +489,37 @@ class FlexicontentControllerImport extends FlexicontentController
 				
 				$session->set('csvimport_lineno', 0, 'flexicontent');
 				
-				// Set a total results message and redirect
+				// Set a message that import task was prepared and redirect
 				$app->enqueueMessage(
-					'Imported task prepared. <br/>'.
+					'Import task prepared. <br/>'.
 					'File has '. count($conf['contents_parsed']) .' records (content items)'.
 					' and '. count($conf['columns']) .' columns (fields)' , 'message'
 				);
-				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+				$this->setRedirect( $link );
 				return;
 			}
 			
 			else { // task == 'testcsv'
 				$conf['debug_records'] = $conf['debug_records'] ? $conf['debug_records'] : 2;
 			}
+			
+			break;
+		
+		
+		// ************************
+		// UNKNWOWN task, terminate
+		// ************************
+		
+		default:
+		
+			// Set an error message about unknown task and redirect
+			$app->enqueueMessage('Unknown task: '.$task, 'error');
+			$this->setRedirect( $link );
+			return;
+			
+			break;
 		}
+		
 		
 		
 		// *********************************************************************************

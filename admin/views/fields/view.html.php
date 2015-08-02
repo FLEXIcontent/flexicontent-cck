@@ -106,6 +106,7 @@ class FlexicontentViewFields extends JViewLegacy
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		
+		$js = "jQuery(document).ready(function(){";
 		
 		
 		// *****************************
@@ -155,6 +156,27 @@ class FlexicontentViewFields extends JViewLegacy
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		}
 		
+		$ctrl_task = '&task=fields.selectsearchflag';
+		$popup_load_url = JURI::base().'index.php?option=com_flexicontent'.$ctrl_task.'&tmpl=component';
+		
+		$btn_name = 'basicindex';
+		$btn_task = '';
+		$full_js  = ';';
+		$extra_js = '';
+		flexicontent_html::addToolBarButton(
+			JText::_('FLEXI_TOGGLE').' '.JText::_('FLEXI_SEARCH').' '.JText::_('FLEXI_FLAG'), $btn_name, $full_js, $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
+		
+		$js .= "
+			jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
+				.attr('onclick', 'javascript:;')
+				.attr('href', '".$popup_load_url."')
+				.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 340}, onClose: function() {}}');
+		";
+		JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
+		
+		
+		/*
 		JToolBarHelper::divider(); JToolBarHelper::spacer();
 		$btn_name = 'basicindex';
 		$btn_task    = 'fields.toggleprop';
@@ -183,6 +205,7 @@ class FlexicontentViewFields extends JViewLegacy
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_ADV_FILTERABLE', $btn_name, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
+		*/
 		
 		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
 		if (file_exists($appsman_path))
@@ -192,9 +215,18 @@ class FlexicontentViewFields extends JViewLegacy
 			$btn_task    = 'appsman.exportxml';
 			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_fields'}).appendTo(jQuery(f));";
 			flexicontent_html::addToolBarButton(
-				'Export', //'Export XML',
-				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as XML',
+				'Export now',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Export now as XML',
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+			
+			$btn_icon = 'icon-box-add';
+			$btn_name = 'box-add';
+			$btn_task    = 'appsman.addtoexport';
+			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_fields'}).appendTo(jQuery(f));";
+			flexicontent_html::addToolBarButton(
+				'Add to export',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Add to export list',
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="", $btn_icon);
 		}
 		
 		/*$btn_icon = 'icon-download';
@@ -225,10 +257,16 @@ class FlexicontentViewFields extends JViewLegacy
 			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
+		$js .= "});";
+		$document->addScriptDeclaration($js);
+		
+		
 		// Get data from the model
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$rows       = $this->get( 'Items' );
 		$allrows    = $this->get( 'AllItems' );
-		$pagination = $this->get( 'Pagination' );
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		$pagination = $this->get( 'Pagination' ); // Pagination
 		$types      = $this->get( 'Typeslist' );  // Content types
 		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
 		

@@ -152,6 +152,7 @@ class FlexicontentViewImport extends JViewLegacy
 		// ************************************
 		
 		$this->setLayout('import');
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		
 		
 		// Execute the import task, load the log-like AJAX-based layout (import_process.php), to display results including any warnings
@@ -303,10 +304,8 @@ class FlexicontentViewImport extends JViewLegacy
 		$this->assignRef('user'			, $user);
 		$this->assignRef('cparams', $cparams);
 		$this->assignRef('file_fields', $file_fields);
-		
 		$this->assignRef('formvals', $formvals);
 
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 }

@@ -251,13 +251,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			<span class="fc-filter nowrap_box">
 				<?php /*<img src="<?php echo $icon; ?>" style="margin:4px 0 0 0; border-width:0px; vertical-align:top;" alt="<?php echo JText::_( $statedata['desc'] ); ?>" /> &nbsp;*/ ?>
 				<span style="<?php echo $css; ?>" class="<?php echo $btn_class.' '.$statedata['btn_class']; ?>"
-						onclick="
-							window.parent.document.adminForm.newstate.value='<?php echo $shortname; ?>';
-							if(window.parent.document.adminForm.boxchecked.value==0)
-								alert('<?php echo JText::_('FLEXI_NO_ITEMS_SELECTED'); ?>');
-							else
-								window.parent.Joomla.submitbutton('items.changestate')"
-						target="_parent">
+					onclick="window.parent.document.adminForm.newstate.value='<?php echo $shortname; ?>'; window.parent.document.adminForm.boxchecked.value==0  ?  alert('<?php echo JText::_('FLEXI_NO_ITEMS_SELECTED'); ?>')  :  window.parent.Joomla.submitbutton('items.changestate')"
+				>
 					<?php echo JText::_( $statedata['name'] ); ?>
 				</span>
 			</span>
