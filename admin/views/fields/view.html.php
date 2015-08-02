@@ -130,6 +130,28 @@ class FlexicontentViewFields extends JViewLegacy
 		JToolBarHelper::title( $doc_title, 'fields' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
+		if ($perms->CanEditField)
+		{
+			$ctrl_task = '&task=fields.selectsearchflag';
+			$popup_load_url = JURI::base().'index.php?option=com_flexicontent'.$ctrl_task.'&tmpl=component';
+			
+			$btn_name = 'basicindex';
+			$btn_task = '';
+			$full_js  = ';';
+			$extra_js = '';
+			flexicontent_html::addToolBarButton(
+				JText::_('FLEXI_TOGGLE_SEARCH_FLAG'), $btn_name, $full_js, $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="");
+			
+			$js .= "
+				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
+					.attr('onclick', 'javascript:;')
+					.attr('href', '".$popup_load_url."')
+					.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 340}, onClose: function() {}}');
+			";
+			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
+		}
+		
 		$contrl = "fields.";
 		if ($perms->CanCopyFields) {
 			JToolBarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
@@ -155,25 +177,6 @@ class FlexicontentViewFields extends JViewLegacy
 				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		}
-		
-		$ctrl_task = '&task=fields.selectsearchflag';
-		$popup_load_url = JURI::base().'index.php?option=com_flexicontent'.$ctrl_task.'&tmpl=component';
-		
-		$btn_name = 'basicindex';
-		$btn_task = '';
-		$full_js  = ';';
-		$extra_js = '';
-		flexicontent_html::addToolBarButton(
-			JText::_('FLEXI_TOGGLE').' '.JText::_('FLEXI_SEARCH').' '.JText::_('FLEXI_FLAG'), $btn_name, $full_js, $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
-			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info");
-		
-		$js .= "
-			jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
-				.attr('onclick', 'javascript:;')
-				.attr('href', '".$popup_load_url."')
-				.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 340}, onClose: function() {}}');
-		";
-		JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
 		
 		
 		/*
@@ -226,7 +229,7 @@ class FlexicontentViewFields extends JViewLegacy
 			flexicontent_html::addToolBarButton(
 				'Add to export',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Add to export list',
-				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="", $btn_icon);
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
 		}
 		
 		/*$btn_icon = 'icon-download';

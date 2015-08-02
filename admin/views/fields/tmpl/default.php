@@ -325,7 +325,7 @@ function delAllFilters() {
 			
 			if ($row->issearch==0 || $row->issearch==1 || !$supportsearch) {
 				$search_dirty = 0;
-				$issearch = ($row->issearch && $supportsearch) ? "tick.png" : "publish_x".(!$supportsearch ? '_f2' : '').".png";
+				$issearch = ($row->issearch && $supportsearch) ? "search.png" : "publish_x".(!$supportsearch ? '_f2' : '').".png";
 				$issearch_tip = ($row->issearch && $supportsearch) ? $flexi_yes.", ".$flexi_toggle : ($supportsearch ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
 			} else {
 				$search_dirty = 1;
@@ -333,12 +333,12 @@ function delAllFilters() {
 				$issearch_tip = ($row->issearch==2 ? $flexi_yes : $flexi_no) .", ".$flexi_toggle.", ". $flexi_rebuild;
 			}
 			
-			$isfilter = ($row->isfilter && $supportfilter) ? "tick.png" : "publish_x".(!$supportfilter ? '_f2' : '').".png";	
+			$isfilter = ($row->isfilter && $supportfilter) ? "filter.png" : "publish_x".(!$supportfilter ? '_f2' : '').".png";	
 			$isfilter_tip = ($row->isfilter && $supportfilter) ? $flexi_yes.", ".$flexi_toggle : ($supportsearch ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
 			
 			if ($row->isadvsearch==0 || $row->isadvsearch==1 || !$supportadvsearch) {
 				$advsearch_dirty = 0;
-				$isadvsearch = ($row->isadvsearch && $supportadvsearch) ? "tick.png" : "publish_x".(!$supportadvsearch ? '_f2' : '').".png";
+				$isadvsearch = ($row->isadvsearch && $supportadvsearch) ? "search.png" : "publish_x".(!$supportadvsearch ? '_f2' : '').".png";
 				$isadvsearch_tip = ($row->isadvsearch && $supportadvsearch) ? $flexi_yes.", ".$flexi_toggle : ($supportadvsearch ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
 			} else {
 				$advsearch_dirty = 1;
@@ -348,7 +348,7 @@ function delAllFilters() {
 			
 			if ($row->isadvfilter==0 || $row->isadvfilter==1 || !$supportadvfilter) {
 				$advfilter_dirty = 0;
-				$isadvfilter = ($row->isadvfilter && $supportadvfilter) ? "tick.png" : "publish_x".(!$supportadvfilter ? '_f2' : '').".png";
+				$isadvfilter = ($row->isadvfilter && $supportadvfilter) ? "filter.png" : "publish_x".(!$supportadvfilter ? '_f2' : '').".png";
 				$isadvfilter_tip = ($row->isadvfilter && $supportadvfilter) ? $flexi_yes : ($supportadvfilter ? $flexi_no : $flexi_nosupport);
 			} else {
 				$advfilter_dirty = 1;
@@ -522,36 +522,56 @@ function delAllFilters() {
 				
 				?>
 			</td>
+			
 			<td align="center">
 				<?php if($supportsearch) :?>
-				<a title="Toggle property" onclick="document.adminForm.propname.value='issearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
+					<?php if ($canEdit) :?>
+					<a title="Toggle property" onclick="document.adminForm.propname.value='issearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
+					<?php endif; ?>
 					<img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" style="border-width:0;" class="fc-man-icon-s" title="<?php echo $issearch_tip;?>" alt="<?php echo $issearch_tip;?>" />
-				</a>
+					<?php if ($canEdit) :?>
+					</a>
+					<?php endif; ?>
 				<?php else: ?>
-				-
+					<span style="display:inline-block; width:16px; height:16px;"></span>
 				<?php endif; ?> /
+				
 				<?php if($supportfilter) :?>
-				<a title="Toggle property" onclick="document.adminForm.propname.value='isfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
+					<?php if ($canEdit) :?>
+					<a title="Toggle property" onclick="document.adminForm.propname.value='isfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
+					<?php endif; ?>
 					<img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" style="border-width:0;" class="fc-man-icon-s" title="<?php echo $isfilter_tip;?>" alt="<?php echo $isfilter_tip;?>" />
-				</a>
+					<?php if ($canEdit) :?>
+					</a>
+					<?php endif; ?>
 				<?php else: ?>
-				-
+					<span style="display:inline-block; width:16px; height:16px;"></span>
 				<?php endif; ?>
 			</td>
+			
 			<td align="center">
 				<?php if($supportadvsearch) :?>
-				<a title="Toggle property" onclick="document.adminForm.propname.value='isadvsearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
+					<?php if ($canEdit) :?>
+					<a title="Toggle property" onclick="document.adminForm.propname.value='isadvsearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
+					<?php endif; ?>
 					<img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" style="border-width:0;" class="fc-man-icon-s" title="<?php echo $isadvsearch_tip;?>" alt="<?php echo $isadvsearch_tip;?>" />
-				</a>
+					<?php if ($canEdit) :?>
+					</a>
+					<?php endif; ?>
 				<?php else: ?>
-				-
+					<span style="display:inline-block; width:16px; height:16px;"></span>
 				<?php endif; ?> /
+				
 				<?php if($supportadvfilter) :?>
-				<a title="Toggle property" onclick="document.adminForm.propname.value='isadvfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
+					<?php if ($canEdit) :?>
+					<a title="Toggle property" onclick="document.adminForm.propname.value='isadvfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
+					<?php endif; ?>
 					<img src="components/com_flexicontent/assets/images/<?php echo $isadvfilter;?>" width="16" height="16" style="border-width:0;" class="fc-man-icon-s" title="<?php echo $isadvfilter_tip;?>" alt="<?php echo $isadvfilter_tip;?>" />
-				</a>
+					<?php if ($canEdit) :?>
+					</a>
+					<?php endif; ?>
 				<?php else: ?>
-				-
+					<span style="display:inline-block; width:16px; height:16px;"></span>
 				<?php endif; ?>
 			</td>
 			<td align="center">

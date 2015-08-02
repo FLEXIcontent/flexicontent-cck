@@ -255,13 +255,10 @@ class FlexicontentControllerFields extends FlexicontentController
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_TOGGLE_PROPERTY' ) );
-		/*} else if (!$model->cantoggleprop($cid, $propname)) {
-			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_TOGGLE_PROPERTIES_THESE_FIELDS' ));*/
 		} else {
 			
 			$asset = 'com_flexicontent.field.' . $field_id;
-			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
 			
 			if ( !$is_authorised ) {
 				$msg = '';
