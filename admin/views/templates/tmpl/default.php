@@ -18,6 +18,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $commentimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ), ' class="fc-man-icon-s" style="vertical-align:top;" ');
 
 $basetemplates = array('default', 'blog', 'faq', 'items-tabbed', 'presentation');
@@ -91,11 +92,11 @@ JFactory::getDocument()->addScriptDeclaration($js);
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th></th>
 			<th class="title" style="text-align:left;"><?php echo JText::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
-			<th>
+			<th colspan="2" style="text-align: left">
 				<?php echo JText::_( 'FLEXI_SINGLE_CONTENT' ); ?><br/>
 				<span class="badge badge-warning">ITEM Layout</span>
 			</th>
-			<th>
+			<th colspan="2" style="text-align: left">
 				<?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?><br/>
 				<span class="badge badge-warning">CATEGORY Layout</span>
 			</th>
@@ -104,18 +105,24 @@ JFactory::getDocument()->addScriptDeclaration($js);
 
 	<tbody>
 		<?php
-		$editSingle   = JHTML::image ( 'components/com_flexicontent/assets/images/page_single_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ) );
-		$editMultiple = JHTML::image ( 'components/com_flexicontent/assets/images/page_multiple_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ) );
-		$editlayout = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ) );
-		$noeditlayout = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_link.png', JText::_( 'FLEXI_NOEDIT_LAYOUT' ) );
-		$copytmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_add.png', JText::_( 'FLEXI_DUPLICATE' ) );
-		$deltmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE' ) );
+		$editSingle   = JHTML::image ( 'components/com_flexicontent/assets/images/page_single_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:22px;" ' );
+		$editMultiple = JHTML::image ( 'components/com_flexicontent/assets/images/page_multiple_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:22px;" '  );
+		$editlayout = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:16px;" '  );
+		$noeditlayout = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_link.png', JText::_( 'FLEXI_NOEDIT_LAYOUT' ), ' style="min-width:16px;" '  );
+		$copytmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_add.png', JText::_( 'FLEXI_DUPLICATE' ), ' style="min-width:16px;" '  );
+		$deltmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE' ), ' style="min-width:16px;" '  );
 		$k = 0;
 		$i = 1;
 		foreach ($this->rows as $row) :
 			$copylink 	= 'index.php?option=com_flexicontent&amp;view=templates&amp;layout=duplicate&amp;tmpl=component&amp;source='. $row->name;
 			$itemlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;folder='.$row->name;
 			$catlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;folder='.$row->name;
+			
+			$defaulttitle_item = !empty($row->items)    ? @ $row->items->defaulttitle    : '';
+			$defaulttitle_cat  = !empty($row->category) ? @ $row->category->defaulttitle : '';
+			
+			$description_item = !empty($row->items)    ? @ $row->items->description    : '';
+			$description_cat  = !empty($row->category) ? @ $row->category->description : '';
 			?>
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
 			<td><?php echo $i; ?></td>
@@ -135,11 +142,25 @@ JFactory::getDocument()->addScriptDeclaration($js);
 					<span class="icon-user"></span><span class="badge"><?php echo JText::_('FLEXI_USER').' - '.JText::_('FLEXI_CREATED'); ?></span>
 				<?php endif; ?>
 			</td>
-			<td align="center">
-				<?php echo @$row->items ? ((isset($row->items->positions)) ? '<a href="'.$itemlink.'">'.$editSingle.'</a>' : $noeditlayout) : ''; ?>
+			<td style="text-align:right; width:24px;">
+				<?php echo @$row->items ? (isset($row->items->positions) ? '<a href="'.$itemlink.'">'.$editSingle.'</a>' : $noeditlayout) : ''; ?>
 			</td>
-			<td align="center">
-				<?php echo @$row->category ? ((isset($row->category->positions)) ? '<a href="'.$catlink.'">'.$editMultiple.'</a>' : $noeditlayout) : ''; ?>
+			<td style="text-align: left">
+				<?php if ($defaulttitle_item): ?>
+					<span data-placement="top" class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('', $description_item, 1, 1); ?>" >
+						<?php echo JText::_($defaulttitle_item); ?>
+					</span>
+				<?php endif; ?>
+			</td>
+			<td style="text-align:right; width:24px;">
+				<?php echo @$row->category ? (isset($row->category->positions) ? '<a href="'.$catlink.'">'.$editMultiple.'</a>' : $noeditlayout) : ''; ?>
+			</td>
+			<td style="text-align: left">
+				<?php if ($defaulttitle_cat): ?>
+					<span data-placement="top" class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('', $description_cat, 1, 1); ?>" >
+						<?php echo JText::_($defaulttitle_cat); ?>
+					</span>
+				<?php endif; ?>
 			</td>
 		</tr>
 		<?php

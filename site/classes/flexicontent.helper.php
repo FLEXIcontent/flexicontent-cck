@@ -483,6 +483,8 @@ class flexicontent_html
 		$option = JRequest::getCmd('option');
 		$layout = JRequest::getCmd('layout');
 		$svar = $layout ? '.'.$layout : '.category';
+		$layout_typename = $layout_type=='clayout' ? 'category' : 'items';
+
 		/*if (!$layout) $svar .= JRequest::getInt('cid');
 		else if ($layout=='tags') $svar .= JRequest::getInt('tagid');
 		else if ($layout=='author') $svar .= JRequest::getInt('authorid');
@@ -494,6 +496,7 @@ class flexicontent_html
 		$inside_label  = $_switcher_label==2 ? ' '.JText::_('FLEXI_LAYOUT') : '';
 		$outside_label = $_switcher_label==1 ? '<span class="flexi label limit_override_label">'.JText::_('FLEXI_LAYOUT').'</span>' : '';
 		
+		$tmpls = flexicontent_tmpl::getTemplates();
 		if ( $params->get('clayout_switcher_display_mode', 1) == 0 )
 		{
 			flexicontent_html::loadFramework('select2');
@@ -503,20 +506,27 @@ class flexicontent_html
 			
 			$options = array();
 			foreach($_options as $_option) {
-				$options[] = JHTML::_('select.option', $_option, $_option .$inside_label);
+				$tmpl_desc = JText::_( !empty($tmpls->$layout_typename->$_option) ? @ $tmpls->$layout_typename->$_option->defaulttitle : '');
+				$_text = $tmpl_desc ? $tmpl_desc : $_option;
+				$options[] = JHTML::_('select.option', $_option, $_text .$inside_label);
 			}
 			$html = JHTML::_('select.genericlist', $options, $layout_type, $attribs, 'value', 'text', $layout );
 		}
 		else
 		{
 			$tmplurl = 'components/com_flexicontent/templates/';
+			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			
 			$n = 0;
 			$options = array();
-			foreach($_options as $_option) {
+			foreach($_options as $_option)
+			{
+				$tmpl_desc = JText::_( !empty($tmpls->$layout_typename->$_option) ? @ $tmpls->$layout_typename->$_option->defaulttitle : '');
+				
 				$checked_attr = $layout==$_option ? ' checked=checked ' : '';
 				$options[] =
 					'<input type="radio" name="'.$layout_type.'" value="'.$_option.'" id="'.$layout_type.$n.'" onchange="adminFormPrepare(this.form, 2);" '.$checked_attr.'>'.
-					'<label for="'.$layout_type.$n.'" class="btn"><img alt="'.$_option.'" src="'.$tmplurl.$_option.'/clayout.png"></label>'
+					'<label for="'.$layout_type.$n.'" class="btn '.$tooltip_class.'" title="'.$tmpl_desc.'"><img alt="'.$_option.'" src="'.$tmplurl.$_option.'/clayout.png"></label>'
 					;
 				$n++;
 			}
@@ -1275,23 +1285,21 @@ class flexicontent_html
 	static function extractimagesrc( $row )
 	{
 		jimport('joomla.filesystem.file');
-
+		
 		$regex = '#<\s*img [^\>]*src\s*=\s*(["\'])(.*?)\1#im';
-
-		preg_match ($regex, $row->introtext, $matches);
-
-		if(!count($matches)) preg_match ($regex, $row->fulltext, $matches);
-
-		$images = (count($matches)) ? $matches : array();
-
-		$image = '';
-		if (count($images)) $image = $images[2];
-
-		if (!preg_match("#^http|^https|^ftp#i", $image)) {
-			// local file check that it exists
+		
+		if (isset($row->fields['text']->display)) preg_match ($regex, $row->fields['text']->display, $matches);
+		if (empty($matches)) preg_match ($regex, $row->introtext, $matches);
+		if (empty($matches)) preg_match ($regex, $row->fulltext, $matches);
+		
+		$image = !empty($matches) ? $matches[2] : '';
+		
+		// Case of local file, check that file exists
+		if (!preg_match("#^http|^https|^ftp#i", $image))
+		{
 			$image = JFile::exists( JPATH_SITE . DS . $image ) ? $image : '';
 		}
-
+		
 		return $image;
 	}
 
@@ -2517,9 +2525,9 @@ class flexicontent_html
 						( $counter==-1 || $counter==0 ? '' :
 							($rating_count ? $rating_count : '0').
 							($counter_show_label ? ' '.JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '').
-							($show_percentage ? ' - ' : '')
+							($show_percentage && (int)$percent ? ' - ' : '')
 						).
-						($show_percentage ? (int)$percent.'%' : '')
+						($show_percentage ? ((int)$percent ? (int)$percent.'%' : '') : '')
 						.'
 					</div>
 				</div>
@@ -2977,7 +2985,12 @@ class flexicontent_html
 		if (!$selected_found) $selected = $user_langs[0]->code;  // Force first language to be selected
 		
 		if ( $conf && empty($conf['flags']) && empty($conf['texts']) ) {
-			 $conf['flags'] = $conf['texts'] = 1;
+			$conf['flags'] = $conf['texts'] = 1;
+		}
+		
+		$required = '';
+		if ( $conf && !empty($conf['required']) ) {
+			$required = ' validate-radio ';
 		}
 		
 		$langs = array();
@@ -3008,14 +3021,14 @@ class flexicontent_html
 					if ($lang->code == $selected) {
 						$checked = ' checked="checked"';
 					}
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' class="'.$required.'" />';
 					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'" >';
 					if($lang->shortcode=="*") {
-						$list 	.= '<span class="lang_lbl">'.JText::_('FLEXI_ALL').'</span>';  // Can appear in J1.6+ only
+						$list .= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else {
 						// Add Flag if configure and it exists
 						if (!$conf || $conf['flags']) {
-							$list .= !empty($lang->imgsrc)  ?  '<img class="lang_lbl" src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />'  :  $lang->code;
+							$list .= !empty($lang->imgsrc)  ?  '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />'  :  $lang->code;
 						}
 						
 						// Add text if configured
@@ -3037,13 +3050,13 @@ class flexicontent_html
 				}
 				break;
 			case 4:   // RADIO selection of ALL languages, with empty default option "Keep original language", e.g. when copying/moving items
-				$list  = '<input id="lang9999" type="radio" name="'.$name.'" class="lang" value="" checked="checked" />';
+				$list  = '<input id="lang9999" type="radio" name="'.$name.'" class="'.$required.'" value="" checked="checked" />';
 				$list .= '<label class="lang_box" for="lang9999" title="'.JText::_( 'FLEXI_NOCHANGE_LANGUAGE_DESC' ).'" >';
 				$list .= JText::_( 'FLEXI_NOCHANGE_LANGUAGE' );
 				$list .= '</label><div class="clear"></div>';
 
 				foreach ($user_langs as $lang) {
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" />';
 					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
@@ -3059,7 +3072,7 @@ class flexicontent_html
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					if ($lang->code==$selected) continue;
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" />';
 					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
@@ -3071,33 +3084,36 @@ class flexicontent_html
 					$list 	.= '</label>';
 				}
 				break;
-			case 6:   // CHECK-BOX selection of ALL languages, with empty option "Use language column", e.g. used in CSV import view
+			case 6:   // RADIO selection of ALL languages, with empty option "Use language column", e.g. used in CSV import view
 				$list		= '';
-				foreach ($user_langs as $lang) {
-					$checked = $lang->code==$selected ? 'checked="checked"' : '';
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" '.$checked.'/>';
-					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
-					if($lang->shortcode=="*") {
-						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
-					} else if (@$lang->imgsrc) {
-						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
-					} else {
-						$list 	.= $lang->name;
-					}
-					$list 	.= '&nbsp;</label>';
-				}
+				
 				$checked = $selected==='' ? 'checked="checked"' : '';
-				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="lang" value="" '.$checked.'/>';
+				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="'.$required.'" value="" '.$checked.'/>';
 				$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 				$tooltip_title = flexicontent_html::getToolTip('FLEXI_USE_LANGUAGE_COLUMN', 'FLEXI_USE_LANGUAGE_COLUMN_TIP', 1, 1);
 				$list 	.= '<label class="lang_box'.$tooltip_class.'" for="lang9999" title="'.$tooltip_title.'">';
 				$list 	.= JText::_( 'FLEXI_USE_LANGUAGE_COLUMN' );
 				$list 	.= '</label>';
+				
+				foreach ($user_langs as $lang) {
+					$checked = $lang->code==$selected ? 'checked="checked"' : '';
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" '.$checked.'/>';
+					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
+					if($lang->shortcode=="*") {
+						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
+					/*} else if (@$lang->imgsrc) {
+						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';*/
+					} else {
+						$list 	.= $lang->name;
+					}
+					$list 	.= '&nbsp;</label>';
+				}
 				break;
 		}
 		return $list;
 	}
-
+	
+	
 	/**
 	 * Method to build the Joomfish languages list
 	 *
@@ -3115,7 +3131,7 @@ class flexicontent_html
 			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
 		}
 		
-		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_DO_NOT_CHANGE' ) );
+		$state[] = JHTML::_('select.option',  '', JText::_( !is_numeric($displaytype) && is_string($displaytype) ? $displaytype : 'FLEXI_DO_NOT_CHANGE' ) );
 		$state[] = JHTML::_('select.option',  -4, $state_names[-4] );
 		$state[] = JHTML::_('select.option',  -3, $state_names[-3] );
 		$state[] = JHTML::_('select.option',  -5, $state_names[-5] );
@@ -3126,32 +3142,37 @@ class flexicontent_html
 		
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
 		
-		if ($displaytype==1)
+		if ( $displaytype==1 || (!is_numeric($displaytype) && is_string($displaytype)) )
 			$list = JHTML::_('select.genericlist', $state, $name, $attribs, 'value', 'text', $selected, $tagid);
 		
 		else if ($displaytype==2)
 		{
-			$state_ids   = array(1, -5, 0, -3, -4);
-			$state_ids[] = 2;
-			$state_ids[] = -2;
+			$state_ids   = array(1, -5, 0, -3, -4); // published: 1, -5   unpublished: 0, -3, -4
+			$state_ids[] = 2;  // archived
+			$state_ids[] = -2;  // trashed
+			$state_colors= array(1=>'darkgreen', -5=>'darkgreen', 0=>'darkred', -3=>'darkred', -4=>'darkred', 2=>'darkblue', -2=>'gray');
 
 			$img_path = JURI::root(true)."/components/com_flexicontent/assets/images/";
 
 			$list = '';
-			foreach ($state_ids as $i => $state_id) {
-				$checked = $state_id==$selected ? ' checked="checked"' : '';
-				$list 	.= '<input id="state'.$state_id.'" type="radio" name="state" class="state" value="'.$state_id.'" '.$checked.'/>';
-				$list 	.= '<label class="state_box" for="state'.$state_id.'" title="'.$state_names[$state_id].'" >';
-				$list 	.= '<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="'.$state_names[$state_id].'" />';
-				$list 	.= '</label>';
-			}
+			
 			$checked = $selected==='' ? ' checked="checked"' : '';
 			$list 	.= '<input id="state9999" type="radio" name="state" class="state" value="" '.$checked.'/>';
 			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 			$tooltip_title = flexicontent_html::getToolTip('FLEXI_USE_STATE_COLUMN', 'FLEXI_USE_STATE_COLUMN_TIP', 1, 1);
 			$list 	.= '<label class="state_box'.$tooltip_class.'" for="state9999" title="'.$tooltip_title.'">';
-			$list 	.= '<span class="state_lbl">'.JText::_( 'FLEXI_USE_STATE_COLUMN' ).'</span>';
+			$list 	.= JText::_( 'FLEXI_USE_STATE_COLUMN' );
 			$list 	.= '</label>';
+			
+			foreach ($state_ids as $i => $state_id) {
+				//if ($state_id==0 || $state_id==2) $list .= "<br/>";
+				$checked = $state_id==$selected ? ' checked="checked"' : '';
+				$list 	.= '<input id="state'.$state_id.'" type="radio" name="state" class="state" value="'.$state_id.'" '.$checked.'/>';
+				$list 	.= '<label class="state_box" for="state'.$state_id.'" title="'.$state_names[$state_id].'" style="color:'.$state_colors[$state_id].';">';
+				$list 	.= $state_names[$state_id];
+				//$list 	.= '<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="'.$state_names[$state_id].'" />';
+				$list 	.= '</label>';
+			}
 		}
 		
 		else
@@ -3783,7 +3804,7 @@ class flexicontent_html
 		foreach ($items as $item) 
 		{
 			$item->css_markups = array();
-			
+			//$item->categories = isset($item->categories) ? $item->categories : array();
 			
 			// Category markups
 			if ( $add_featured_cats || $add_other_cats ) foreach ($item->categories as $item_cat) {
@@ -4309,7 +4330,10 @@ class flexicontent_tmpl
 					$themes->items->{$tmpl}->license 		= @$document->license;
 					$themes->items->{$tmpl}->version 		= @$document->version;
 					$themes->items->{$tmpl}->release 		= @$document->release;
-					$themes->items->{$tmpl}->description= @$document->description;
+					
+					$themes->items->{$tmpl}->defaulttitle = @$document->defaulttitle;
+					$themes->items->{$tmpl}->description  = @$document->description;
+					
 					$groups = & $document->fieldgroups;
 					$pos    = & $groups->group;
 					if ($pos) {
@@ -4340,13 +4364,16 @@ class flexicontent_tmpl
 					}
 
 				} else {
-					$themes->items->{$tmpl}->author 		= @$document->author[0] ? $document->author[0]->data() : '';
+					$themes->items->{$tmpl}->author 		= @$document->author[0]  ? $document->author[0]->data()  : '';
 					$themes->items->{$tmpl}->website 		= @$document->website[0] ? $document->website[0]->data() : '';
-					$themes->items->{$tmpl}->email 			= @$document->email[0] ? $document->email[0]->data() : '';
+					$themes->items->{$tmpl}->email 			= @$document->email[0]   ? $document->email[0]->data()   : '';
 					$themes->items->{$tmpl}->license 		= @$document->license[0] ? $document->license[0]->data() : '';
 					$themes->items->{$tmpl}->version 		= @$document->version[0] ? $document->version[0]->data() : '';
 					$themes->items->{$tmpl}->release 		= @$document->release[0] ? $document->release[0]->data() : '';
-					$themes->items->{$tmpl}->description= @$document->description[0] ? $document->description[0]->data() : '';
+
+					$themes->items->{$tmpl}->defaulttitle = @$document->defaulttitle[0] ? $document->defaulttitle[0]->data() : '';
+					$themes->items->{$tmpl}->description  = @$document->description[0]  ? $document->description[0]->data()  : '';
+
 					$groups = $document->getElementByPath('fieldgroups');
 					$pos    = & $groups->group;
 					if ($pos) {
@@ -4414,7 +4441,10 @@ class flexicontent_tmpl
 					$themes->category->{$tmpl}->license 	= @$document->license;
 					$themes->category->{$tmpl}->version 	= @$document->version;
 					$themes->category->{$tmpl}->release 	= @$document->release;
-					$themes->category->{$tmpl}->description= @$document->description;
+
+					$themes->category->{$tmpl}->defaulttitle = @$document->defaulttitle;
+					$themes->category->{$tmpl}->description  = @$document->description;
+
 					$groups = & $document->fieldgroups;
 					$pos    = & $groups->group;
 					if ($pos) {
@@ -4443,13 +4473,17 @@ class flexicontent_tmpl
 						}
 					}
 				} else {
-					$themes->category->{$tmpl}->author 		= @$document->author[0] ? $document->author[0]->data() : '';
+					
+					$themes->category->{$tmpl}->author 		= @$document->author[0]  ? $document->author[0]->data()  : '';
 					$themes->category->{$tmpl}->website 	= @$document->website[0] ? $document->website[0]->data() : '';
-					$themes->category->{$tmpl}->email 		= @$document->email[0] ? $document->email[0]->data() : '';
+					$themes->category->{$tmpl}->email 		= @$document->email[0]   ? $document->email[0]->data()   : '';
 					$themes->category->{$tmpl}->license 	= @$document->license[0] ? $document->license[0]->data() : '';
 					$themes->category->{$tmpl}->version 	= @$document->version[0] ? $document->version[0]->data() : '';
 					$themes->category->{$tmpl}->release 	= @$document->release[0] ? $document->release[0]->data() : '';
-					$themes->category->{$tmpl}->description = @$document->description[0] ? $document->description[0]->data() : '';
+					
+					$themes->category->{$tmpl}->defaulttitle = @$document->defaulttitle[0] ? $document->defaulttitle[0]->data() : '';
+					$themes->category->{$tmpl}->description  = @$document->description[0]  ? $document->description[0]->data()  : '';
+					
 					$groups = $document->getElementByPath('fieldgroups');
 					$pos    = & $groups->group;
 					if ($pos) {
@@ -6033,7 +6067,7 @@ class flexicontent_db
 		
 		if (!empty($items))
 		{
-			foreach($items as $item) $item->lang_parent_id = isset($assoc_keys['id']) ? $assoc_keys['id'] : $item->id;
+			foreach($items as $item) $item->lang_parent_id = isset($assoc_keys[$item->id]) ? $assoc_keys[$item->id]->original_id : $item->id;
 		}
 		else
 			return $assoc_keys;
@@ -6077,7 +6111,7 @@ class flexicontent_db
 		// **********************************
 		
 		// Unset empty associations from associations array, to avoid save them in the associations table
-		$associations = $data['associations'];
+		$associations = isset($data['associations']) ? $data['associations'] : array();
 		foreach ($associations as $tag => $id)
 		{
 			if (empty($id)) unset($associations[$tag]);
@@ -6231,7 +6265,11 @@ function FLEXISubmenu($cando)
 	//if ($perms->CanArchives)	call_user_func($addEntry, '<span class="fcsb-icon-archive"></span>'.JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
 	
 		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
-		if ($perms->CanImport)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-import"></span>' : '').JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
+		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
+		if (file_exists($appsman_path)) {
+			if ($perms->CanConfig)	call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-wrench"></span>' : '').JText::_( 'FLEXI_IMPORT_CONFIGURATION' ), 'index.php?option=com_flexicontent&view=appsman', $view=='appsman');
+		}
+		if ($perms->CanImport)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-import"></span>' : '').JText::_( 'FLEXI_IMPORT_CONTENT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
 		if ($perms->CanPlugins) call_user_func($addEntry,
 			'<a href="index.php?option=com_plugins" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
 				(FLEXI_J30GE ? '<span class="fcsb-icon-plugins"></span>' : '').JText::_( 'FLEXI_PLUGINS' ).

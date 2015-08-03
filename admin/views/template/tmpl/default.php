@@ -309,17 +309,47 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo JText::_( 'View' ); ?>
+								<?php echo JText::_( 'FLEXI_VIEW' ); ?>
 							</label>
 						</td>
 						<td>
 							<span class="badge badge-success"><?php echo $this->layout->view; ?></span>
 						</td>
 					</tr>
+					
+					<tr>
+						<td style="padding-top:12px;" colspan="2">
+						</td>
+					</tr>
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo JText::_( 'Author' ); ?>
+								<?php echo JText::_( 'Default title' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo JText::_($this->layout->defaulttitle); ?>
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							<label class="label">
+								<?php echo JText::_( 'Description' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo JText::_($this->layout->description); ?>
+						</td>
+					</tr>
+					<tr>
+						<td style="padding-top:12px;" colspan="2">
+						</td>
+					</tr>					
+					
+					<tr>
+						<td style="text-align:right;">
+							<label class="label">
+								<?php echo JText::_( 'FLEXI_AUTHOR' ); ?>
 							</label>
 						</td>
 						<td>
@@ -374,16 +404,6 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						</td>
 						<td>
 							<?php echo $this->layout->release; ?>
-						</td>
-					</tr>
-					<tr>
-						<td style="text-align:right;">
-							<label class="label">
-								<?php echo JText::_( 'Description' ); ?>
-							</label>
-						</td>
-						<td>
-							<?php echo $this->layout->description; ?>
 						</td>
 					</tr>
 				</table>

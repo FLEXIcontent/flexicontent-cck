@@ -99,8 +99,6 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 	  if ( $use_select2 && $select2_added === null ) $select2_added = flexicontent_html::loadFramework('select2');
 		
 		// Parameters for DISPLAY with / without using select2 JS
-		$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
-		$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
 		$size = $field->parameters->get( 'size', 6 ) ;
 		$size = $size ? ' size="'.$size.'"' : '';
 		
@@ -326,6 +324,11 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			$onchange = '';
 			// Extra properties
 			$attribs = 'multiple="multiple" '.$size;
+			
+			$display_label_form= (int) $field->parameters->get( 'display_label_form', 1 ) ;
+			$placeholder = $display_label_form==-1 ? $field->label : '';
+			$attribs .= $placeholder ? ' placeholder="'.$placeholder.'" ' : '';
+			
 			if ($exact_values)  {
 				$attribs .= ' data-exact_values="'.$exact_values.'" ';
 			} else {
@@ -340,7 +343,8 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		
 		// Handle case of FORM fields that each value is an array of values
 		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
-		$values = self::$valueIsArr && !$multiple ? array($field->value) : $field->value;
+		$is_array_already = is_array($field->value) ? is_array(reset($field->value)) : false;
+		$values = self::$valueIsArr && !$multiple && !$is_array_already ? array($field->value) : $field->value;
 		
 		
 		// *****************************************
@@ -498,11 +502,12 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			$elements = array(0=>$prompt);
 			return $elements;
 		} else {
-			$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
-			$usefirstoption  = $field->parameters->get( 'usefirstoption', self::$isDropDown ? 1 : 0 ) ;
+			$display_label_form= (int) $field->parameters->get( 'display_label_form', 1 ) ;
+			$firstoptiontext = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ));
+			$usefirstoption  = $display_label_form==-1 ? 1 : $field->parameters->get( 'usefirstoption', self::$isDropDown ? 1 : 0 );
 			if ($usefirstoption) { // Add selection prompt
-				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_($firstoptiontext), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
-				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_($firstoptiontext), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
+				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$firstoptiontext, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
 				array_unshift($elements, $prompt);
 			}
 		}
@@ -768,10 +773,13 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		$field->use_suborder = $multiple && self::$valueIsArr;
 		
-		// Make sure posted data is an array 
+		// Make sure posted data is an array of arrays
 		$post = !is_array($post) ? array($post) : $post;
+		$v = reset($post);
+		$post = (!is_array($v) && @unserialize($v)=== false)  ?  array($post)  :  $post;
 		
 		// Reformat the posted data
 		$newpost = array();
@@ -779,6 +787,15 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
 		foreach ($post as $n => $v)
 		{
+			// support for basic CSV import / export
+			if ( $is_importcsv && !is_array($v) ) {
+				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
+					$v = unserialize($v);
+				} else {
+					$v = array($v);
+				}
+			}
+			
 			// Do server-side validation and skip empty/invalid values
 			$vals = array();
 			foreach ($v as $i => $nv) {

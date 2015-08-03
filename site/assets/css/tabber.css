@@ -150,7 +150,7 @@ ul.tabbernav > li.tabberactive a:hover {
 	padding-top: 4px;
 	padding-bottom: 5px;
 	display: inline-block;
-	border-radius: 4px 4px 0px 0px;
+	border-radius: 5px 5px 0px 0px;
 	/*box-shadow: 0px -1px 1px lightgray;*/
 	border-left: 1px solid #D0D0D0;
 	border-top: 1px solid #B0B0B0;
@@ -198,12 +198,12 @@ ul.tabbernav > li.tabberactive a:hover {
 #flexicontent ul.tabbernav > li.tabberactive a:before {
 	content: "";
 	position: absolute;
-	height: 1px;
-	border-top: 5px solid #26759e;
+	height: 0px;
+	border-top: 4px solid #26759e;
 	top: 0;
 	left: 0px;
 	width: 100%;
-	border-radius: 2px;
+	border-radius: 4px 3px 0px 0px;
 }
 
 

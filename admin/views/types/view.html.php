@@ -31,35 +31,64 @@ class FlexicontentViewTypes extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
-		//initialise variables
-		$app      = JFactory::getApplication();
+		// ********************
+		// Initialise variables
+		// ********************
+		
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
+		
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
-		$option   = JRequest::getCmd('option');
-		$view     = JRequest::getVar('view');
 		
+		// Get model
+		$model = $this->getModel();
+
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
-		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.tooltip');
-
+		
+		// ***********
 		// Get filters
+		// ***********
+		
 		$count_filters = 0;
 		
-		//get vars
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     't.name', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', '', 'word' );
+		// various filters
 		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 		'filter_state',     '', 'word' );
 		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
 		if ($filter_state) $count_filters++; if ($filter_access) $count_filters++;
 		
-		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
-		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		// ordering filters
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     't.name', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', '', 'word' );
 		
-		// Add custom css and js to document
+		// text search		
+		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
+		$search = $db->escape( trim(JString::strtolower( $search ) ) );
+		
+		
+		// ****************************
+		// Important usability messages
+		// ****************************
+		
+		if ( $cparams->get('show_usability_messages', 1) )
+		{
+		}
+		
+		
+		
+		// **************************
+		// Add css and js to document
+		// **************************
+		
+		flexicontent_html::loadFramework('select2');
+		JHTML::_('behavior.tooltip');
+		
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
@@ -105,6 +134,28 @@ class FlexicontentViewTypes extends JViewLegacy
 			'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		
+		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
+		if (file_exists($appsman_path))
+		{
+			$btn_icon = 'icon-download';
+			$btn_name = 'download';
+			$btn_task    = 'appsman.exportxml';
+			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_types'}).appendTo(jQuery(f));";
+			flexicontent_html::addToolBarButton(
+				'Export now',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Export now as XML',
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+			
+			$btn_icon = 'icon-box-add';
+			$btn_name = 'box-add';
+			$btn_task    = 'appsman.addtoexport';
+			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_types'}).appendTo(jQuery(f));";
+			flexicontent_html::addToolBarButton(
+				'Add to export',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Add to export list',
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		}
+		
 		if ($perms->CanConfig) {
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			$session = JFactory::getSession();
@@ -115,24 +166,17 @@ class FlexicontentViewTypes extends JViewLegacy
 			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
-		
 		// Get data from the model
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		if (FLEXI_J16GE) {
-			$rows = $this->get( 'Items');
-		} else {
-			$rows = $this->get( 'Data');
-		}
+		$rows       = $this->get( 'Items' );
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		$pagination = $this->get( 'Pagination' ); // Pagination
 		
 		// Create type's parameters
 		foreach($rows as $type) {
 			$type->config = FLEXI_J16GE ? new JRegistry($type->config) : new JParameter($type->config);
 		}
 		
-		// Create pagination object
-		$pagination = $this->get( 'Pagination' );
-
 		$lists = array();
 		
 		// build publication state filter
@@ -168,8 +212,8 @@ class FlexicontentViewTypes extends JViewLegacy
 		//assign data to template
 		$this->assignRef('CanTemplates', $perms->CanTemplates);
 		$this->assignRef('count_filters', $count_filters);
-		$this->assignRef('lists'	, $lists);
-		$this->assignRef('rows'		, $rows);
+		$this->assignRef('lists'			, $lists);
+		$this->assignRef('rows'				, $rows);
 		$this->assignRef('pagination'	, $pagination);
 		
 		$this->assignRef('option', $option);

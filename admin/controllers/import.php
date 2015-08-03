@@ -70,7 +70,8 @@ class FlexicontentControllerImport extends FlexicontentController
 		}
 		
 		// Get item model
-		$model  = $this->getModel('item');
+		$itemmodel = $this->getModel('item');
+		$model     = $this->getModel('import');
 		
 		// Set some variables
 		$link  = 'index.php?option=com_flexicontent&view=import';  // $_SERVER['HTTP_REFERER'];
@@ -81,105 +82,151 @@ class FlexicontentControllerImport extends FlexicontentController
 		$session = JFactory::getSession();
 		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 		
-		$parse_log = "\n\n\n".'<b>please click</b> <a href="JavaScript:window.history.back();">here</a> to return previous page'."\n\n\n";
+		$parse_log = "\n\n\n".'<b>please click</b> <a href="'.$link.'">here</a> to return previous page'."\n\n\n";
 		$log_filename = 'importcsv_'.($user->id).'.php';
 		
-		if (FLEXI_J16GE) {
-			jimport('joomla.log.log');
-			JLog::addLogger(array('text_file' => $log_filename));
-		} else {
-			jimport('joomla.error.log');
-			$log = JLog::getInstance($log_filename);
-		}
+		jimport('joomla.log.log');
+		JLog::addLogger(array('text_file' => $log_filename));
 		
 		
+		
+		// *************************
+		// Execute according to task
+		// *************************
+		switch ($task) {
+		
+		
+		// ***********************************************************************************************
 		// RESET/CLEAR an already started import task, e.g. import process was interrupted for some reason
-		if ($task == 'clearcsv')
-		{
+		// ***********************************************************************************************
+		
+		case 'clearcsv':
+		
 			// Clear any import data from session
 			$conf = $has_zlib ? base64_encode(zlib_encode(serialize(null), -15)) : base64_encode(serialize(null));
 			
 			$session->set('csvimport_config', $conf, 'flexicontent');
 			$session->set('csvimport_lineno', 0, 'flexicontent');
 			
-			// Set a total results message and redirect
-			$app->enqueueMessage( 'Imported task cleared' , 'notice' );
+			// Set a message that import task was cleared and redirect
+			$app->enqueueMessage( 'Import task cleared' , 'notice' );
 			$this->setRedirect( $link );
 			return;
-		}
+			break;
 		
+		
+		// ****************************************************
 		// CONTINUE an already started (multi-step) import task
-		else if ($task == 'importcsv')
-		{
+		// ****************************************************
+
+		case 'importcsv':
+		
 			$conf   = $session->get('csvimport_config', "", 'flexicontent');
 			$conf		= unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
 			
 			$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 			if ( empty($conf) ) {
-				$app->enqueueMessage( 'Can not continue import, import task not initialized or already finished:' , 'warning' );
+				$app->enqueueMessage( 'Can not continue import, import task not initialized or already finished' , 'error');
 				$this->setRedirect( $link );
 				return;
 			}
-		}
+			
+			// CONTINUE to do the import
+			// ...
+			break;
 		
-		// Initializate (prepare) import by getting configuration and reading CSV file
-		else if ( $task=='initcsv' || $task=='testcsv' )
-		{
+		
+		// *************************************************************************
+		// INITIALIZE (prepare) import by getting configuration and reading CSV file
+		// *************************************************************************
+		
+		case 'initcsv':
+		case 'testcsv':
+		
 			$conf  = array();
 			$conf['failure_count'] = $conf['success_count'] = 0;
 			
-			// Retrieve basic configuration
-			$conf['debug'] = JRequest::getInt( 'debug', 0 );
-			$conf['import_items_per_step'] = JRequest::getInt( 'import_items_per_step', 5 );
-			if ( $conf['import_items_per_step'] > 50 ) $conf['import_items_per_step'] = 50;
-			if ( ! $conf['import_items_per_step'] ) $conf['import_items_per_step'] = 5;
+			// Retrieve Basic configuration
+			$conf['type_id']  = JRequest::getInt( 'type_id', 0 );
+			$conf['language'] = JRequest::getVar( 'language', '' );
+			$conf['state']    = JRequest::getInt( 'state', '' );
+			$conf['access']   = JRequest::getInt( 'access', '' );
 			
-			// Retrieve from configuration for (a) typeid, language, main category, secondaries categories, etc
-			$conf['type_id'] 	= JRequest::getInt( 'type_id', 0 );
-			$conf['id_col'] = JRequest::getInt( 'id_col', 0 );
-			
-			$conf['language']	= JRequest::getVar( 'language', '' );
-			$conf['state'] = JRequest::getVar( 'state', '' );
-			
+			// Main and secondary categories
 			$conf['maincat'] 	= JRequest::getInt( 'maincat', 0 );
 			$conf['maincat_col'] = JRequest::getInt( 'maincat_col', 0 );
-			
 			$conf['seccats'] 	= JRequest::getVar( 'seccats', array(), 'post', 'array' );
 			$conf['seccats_col'] = JRequest::getInt( 'seccats_col', 0 );
 			
+			// Tags
 			$conf['tags_col'] = JRequest::getInt( 'tags_col', 0 );
 			
-			$conf['created_col'] = JRequest::getInt( 'created_col', 0 );
+			// Publication: META data
 			$conf['created_by_col'] = JRequest::getInt( 'created_by_col', 0 );
-			
-			$conf['modified_col'] = JRequest::getInt( 'modified_col', 0 );
 			$conf['modified_by_col'] = JRequest::getInt( 'modified_by_col', 0 );
 			
+			// Publication: META data
 			$conf['metadesc_col'] = JRequest::getInt( 'metadesc_col', 0 );
 			$conf['metakey_col'] = JRequest::getInt( 'metakey_col', 0 );
 			
+			// Publication: dates
+			$conf['modified_col'] = JRequest::getInt( 'modified_col', 0 );
+			$conf['created_col'] = JRequest::getInt( 'created_col', 0 );
 			$conf['publish_up_col'] = JRequest::getInt( 'publish_up_col', 0 );
 			$conf['publish_down_col'] = JRequest::getInt( 'publish_down_col', 0 );
 			
+			// Advanced configuration
 			$conf['ignore_unused_cols'] = JRequest::getInt( 'ignore_unused_cols', 0 );
+			
+			$conf['id_col'] = JRequest::getInt( 'id_col', 0 );
+			$conf['items_per_step'] = JRequest::getInt( 'items_per_step', 5 );
+			if ( $conf['items_per_step'] > 50 ) $conf['items_per_step'] = 50;
+			if ( ! $conf['items_per_step'] ) $conf['items_per_step'] = 5;
+			
+			// CSV file format
+			$conf['mval_separator']   = JRequest::getVar('mval_separator');
+			$conf['mprop_separator']  = JRequest::getVar('mprop_separator');
+			$conf['field_separator']  = JRequest::getVar('field_separator');
+			$conf['enclosure_char']   = JRequest::getVar('enclosure_char');
+			$conf['record_separator'] = JRequest::getVar('record_separator');
+			$conf['debug_records']    = JRequest::getInt('debug_records', 0);  // Debug, print parsed data without importing
 			
 			
 			// ********************************************************************************************
 			// Obligatory form fields, js validation should have prevented form submission but check anyway
 			// ********************************************************************************************
+			
+			// Check for the required Content Type Id
 			if( !$conf['type_id'] ) {
-				// Check for the required Content Type Id
-				echo "<script>alert ('Please select Content Type for the imported items');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('Please select Content Type for the imported items', 'error');
+				$app->redirect($link);
 			}
+			
+			// Check for the required main category
 			if( !$conf['maincat'] && !$conf['maincat_col'] ) {
-				// Check for the required main category
-				echo "<script>alert ('Please select main category for the imported items');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('Please select main category for the imported items', 'error');
+				$app->redirect($link);
+			}
+			
+			
+			// ********************************************************************************************************************
+			// Check for (required) CSV file format variables, js validation should have prevented form submission but check anyway
+			// ********************************************************************************************************************
+			if( $conf['mval_separator']=='' || $conf['mprop_separator']=='') {
+				$app->enqueueMessage('CSV format not valid, please enter multi-value, and multi-property Separators', 'error');
+				$app->redirect($link);
+			}
+
+			if( $conf['field_separator']=='' || $conf['record_separator']=='' ) {
+				$app->enqueueMessage('CSV format not valid, please enter Field Separator and Item Separator', 'error');
+				$app->redirect($link);
+			}
+			
+			// Retrieve the uploaded CSV file
+			$csvfile = @$_FILES["csvfile"]["tmp_name"];
+			if(!is_file($csvfile)) {
+				$app->enqueueMessage('Upload file error!', 'error');
+				$app->redirect($link);
 			}
 			
 			
@@ -188,7 +235,25 @@ class FlexicontentControllerImport extends FlexicontentController
 			// ******************************************************************************************************
 			$pattern = '/(?<!\\\)(\\\(?:n|r|t|v|f|[0-7]{1,3}|x[0-9a-f]{1,2}))/i';
 			$replace = 'eval(\'return "$1";\')';
-
+			
+			$conf['mval_separator']  = preg_replace_callback(
+				$pattern,
+				function ($matches) {
+					$r = $matches[1];
+					eval("\$r = \"$r\";");
+					return $r;
+				},
+				$conf['mval_separator']
+			);
+			$conf['mprop_separator']  = preg_replace_callback(
+				$pattern,
+				function ($matches) {
+					$r = $matches[1];
+					eval("\$r = \"$r\";");
+					return $r;
+				},
+				$conf['mprop_separator']
+			);
 			$conf['field_separator']  = preg_replace_callback(
 				$pattern,
 				function ($matches) {
@@ -196,7 +261,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					eval("\$r = \"$r\";");
 					return $r;
 				},
-				JRequest::getVar('field_separator')
+				$conf['field_separator']
 			);
 			$conf['enclosure_char']   = preg_replace_callback(
 				$pattern,
@@ -205,7 +270,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					eval("\$r = \"$r\";");
 					return $r;
 				},
-				JRequest::getVar('enclosure_char')
+				$conf['enclosure_char']
 			);
 			$conf['record_separator'] = preg_replace_callback(
 				$pattern,
@@ -214,28 +279,8 @@ class FlexicontentControllerImport extends FlexicontentController
 					eval("\$r = \"$r\";");
 					return $r;
 				},
-				JRequest::getVar('record_separator')
+				$conf['record_separator']
 			);
-			
-			// ****************************************************************************************************************
-			// Check for proper CSV file format variables, js validation should have prevented form submission but check anyway
-			// ****************************************************************************************************************
-			if( $conf['field_separator']=='' || $conf['record_separator']=='' ) {
-				// Check for the (required) title column
-				echo "<script>alert ('CSV format not valid, please enter Field Separator and Item Separator');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
-			}
-			
-			// Retrieve the uploaded CSV file
-			$csvfile = @$_FILES["csvfile"]["tmp_name"];
-			if(!is_file($csvfile)) {
-				echo "<script>alert ('Upload file error!');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
-			}
 			
 			
 			// ****************************************************
@@ -245,10 +290,8 @@ class FlexicontentControllerImport extends FlexicontentController
 			
 			// Basic error checking, for empty data
 			if(!$contents || count($contents[0])<=0) {
-				echo "<script>alert ('Upload file error! CSV file format is not correct!');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file format is not correct!', 'error');
+				$app->redirect($link);
 			}
 			
 			
@@ -269,17 +312,13 @@ class FlexicontentControllerImport extends FlexicontentController
 			// ******************************************************************
 			$core_props = array();
 			if ( $conf['id_col'] && !in_array('id', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'id\' (Item ID)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'id\'</b> (Item ID)', 'error');
+				$app->redirect($link);
 			} else if ($conf['id_col']) $core_props['id'] = 'Item ID';
 			
 			if(!in_array('title', $conf['columns'])) {
-				echo "<script>alert ('CSV file lacks column \'title\'');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'title\'</b>', 'error');
+				$app->redirect($link);
 			}
 			
 			$core_props['title'] = 'Title (core)';
@@ -287,104 +326,81 @@ class FlexicontentControllerImport extends FlexicontentController
 			$core_props['alias'] = 'Alias (core)';
 			
 			if ( !$conf['language'] && !in_array('language', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'language\'');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'language\'</b>', 'error');
+				$app->redirect($link);
 			} else if (!$conf['language']) $core_props['language'] = 'Language';
 			
 			if ( !strlen($conf['state']) && !in_array('state', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'state\'');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'state\'</b>', 'error');
+				$app->redirect($link);
 			} else if ( !strlen($conf['state']) ) $core_props['state'] = 'State';
 			
+			if ( $conf['access']===0 && !in_array('access', $conf['columns']) ) {
+				$app->enqueueMessage('CSV file lacks column <b>\'access\'</b>', 'error');
+				$app->redirect($link);
+			} else if ( $conf['access']===0 ) $core_props['access'] = 'Access';
+			
 			if ( $conf['maincat_col'] && !in_array('catid', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'catid\' (primary category)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'catid\'</b> (Primary category)', 'error');
+				$app->redirect($link);
 			} else if ($conf['maincat_col']) $core_props['catid'] = 'Primary category';
 			
 			if ( $conf['seccats_col'] && !in_array('cid', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'cid\' (secondary categories)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'cid\'</b> (Secondary categories)', 'error');
+				$app->redirect($link);
 			} else if ($conf['seccats_col']) $core_props['cid'] = 'Secondary categories';
 			
 			if ( $conf['created_col'] && !in_array('created', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'created\' (Creation date)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'created\'</b> (Creation date)', 'error');
+				$app->redirect($link);
 			} else if ($conf['created_col']) $core_props['created'] = 'Creation Date';
 			
 			if ( $conf['created_by_col'] && !in_array('created_by', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'created_by\' (Creator - Author)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'created_by\'</b> (Creator - Author)', 'error');
+				$app->redirect($link);
 			} else if ($conf['created_by_col']) $core_props['created_by'] = 'Creator (Author)';
 			
 			if ( $conf['modified_col'] && !in_array('modified', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'modified\' (Modification date)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'modified\'</b> (Modification date)', 'error');
+				$app->redirect($link);
 			} else if ($conf['modified_col']) $core_props['modified'] = 'Modification Date';
 			
 			if ( $conf['modified_by_col'] && !in_array('modified_by', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'modified_by\' (Last modifier)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'modified_by\'</b> (Last modifier)', 'error');
+				$app->redirect($link);
 			} else if ($conf['modified_by_col']) $core_props['modified_by'] = 'Last modifier';
 			
 			if ( $conf['metadesc_col'] && !in_array('metadesc', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'metadesc\' (META Description)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'metadesc\'</b> (META Description)', 'error');
+				$app->redirect($link);
 			} else if ($conf['metadesc_col']) $core_props['metadesc'] = 'META Description';
 			
 			if ( $conf['metakey_col'] && !in_array('metakey', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'metakey\' (META Keywords)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'metakey\'</b> (META Keywords)', 'error');
+				$app->redirect($link);
 			} else if ($conf['metakey_col']) $core_props['metakey'] = 'META Keywords';
 			
 			if ( $conf['publish_up_col'] && !in_array('publish_up', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'publish_up\' (Start publication date)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'publish_up\'</b> (Start publication date)', 'error');
+				$app->redirect($link);
 			} else if ($conf['publish_up_col']) $core_props['publish_up'] = 'Start publication date';
 			
 			if ( $conf['publish_down_col'] && !in_array('publish_down', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'publish_down\' (End publication Date)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'publish_down\'</b> (End publication Date)', 'error');
+				$app->redirect($link);
 			} else if ($conf['publish_down_col']) $core_props['publish_down'] = 'End publication Date';
 			
 			if ( $conf['tags_col']==1 && !in_array('tags_names', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'tags_names\' (Comma separated list of tag names)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'tags_names\'</b> (Comma separated list of tag names)', 'error');
+				$app->redirect($link);
 			} else if ($conf['tags_col']==1) {
 				$core_props['tags_names'] = 'Tag names';
 				$tags_model	= $this->getModel('tags');
 			}
 			
 			if ( $conf['tags_col']==2 && !in_array('tags_raw', $conf['columns']) ) {
-				echo "<script>alert ('CSV file lacks column \'tags_raw\' (Comma separated list of tag ids)');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('CSV file lacks column <b>\'tags_raw\'</b> (Comma separated list of tag ids)', 'error');
+				$app->redirect($link);
 			} else if ( $conf['tags_col']==2 ) {
 				$core_props['tags_raw'] = 'Tags';
 				$tags_model	= $this->getModel('tags');
@@ -399,16 +415,18 @@ class FlexicontentControllerImport extends FlexicontentController
 			foreach($conf['columns'] as $colname) {
 				if ( !isset($conf['core_props'][$colname]) && !isset($conf['thefields'][$colname]) ) {
 					$unused_columns[] = $colname;
-					JError::raiseNotice( 500, "Column '".$colname."' : &nbsp; field name NOT FOUND, column will be ignored<br>" );
+					if ($conf['ignore_unused_cols']) {
+						JError::raiseNotice( 500, "Column '".$colname."' : &nbsp; field name NOT FOUND (column will be ignored)" );
+					}
 				}
 			}
 			if ( count($unused_columns) && !$conf['ignore_unused_cols']) {
-				echo "<script>alert ('File has unused ".count($unused_columns)." columns \'".implode("\' , \'",$unused_columns)."\'".
-				"\\n\\n(these field names are not assigned to choosen CONTENT TYPE),".
-				"\\n\\nplease enable: \"Ignore unused columns\"');";
-				echo "window.history.back();";
-				echo "</script>";
-				jexit();
+				$app->enqueueMessage('
+					File has unused '.count($unused_columns).' columns: <b>'.implode(', ',$unused_columns).'</b>'.
+					' <br/>these field names are not assigned to choosen <b>content type</b>'.
+					' <br/><br/>please enable option: <b>\'Ignore unused columns\'</b>',
+				'error');
+				$app->redirect($link);
 			}
 			
 			
@@ -438,10 +456,8 @@ class FlexicontentControllerImport extends FlexicontentController
 				$db->setQuery($q);
 				$existing_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $existing_ids && count($existing_ids) ) {
-					echo "<script>alert ('File has ".count($existing_ids)." item IDs that already exist: \'".implode("\' , \'",$existing_ids)."\', please fix or set to ignore \'id\' column');";
-					echo "window.history.back();";
-					echo "</script>";
-					jexit();
+					$app->enqueueMessage('File has '.count($existing_ids).' item IDs that already exist: \''.implode("\' , \'",$existing_ids).'\', please fix or set to ignore \'id\' column', 'error');
+					$app->redirect($link);
 				}
 			}
 			
@@ -458,8 +474,8 @@ class FlexicontentControllerImport extends FlexicontentController
 			// ***************************************************************
 			
 			// Get fields that use files
-			$conf['import_media_folder'] = JRequest::getVar('import_media_folder');
-			$conf['import_docs_folder']  = JRequest::getVar('import_docs_folder');
+			$conf['media_folder'] = JRequest::getVar('media_folder');
+			$conf['docs_folder']  = JRequest::getVar('docs_folder');
 			
 			$this->checkfiles($conf, $parse_log, $task);
 			$this->parsevalues($conf, $parse_log, $task);
@@ -473,20 +489,37 @@ class FlexicontentControllerImport extends FlexicontentController
 				
 				$session->set('csvimport_lineno', 0, 'flexicontent');
 				
-				// Set a total results message and redirect
+				// Set a message that import task was prepared and redirect
 				$app->enqueueMessage(
-					'Imported task prepared. <br/>'.
+					'Import task prepared. <br/>'.
 					'File has '. count($conf['contents_parsed']) .' records (content items)'.
 					' and '. count($conf['columns']) .' columns (fields)' , 'message'
 				);
-				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+				$this->setRedirect( $link );
 				return;
 			}
 			
 			else { // task == 'testcsv'
-				$conf['debug'] = $conf['debug'] ? $conf['debug'] : 2;
+				$conf['debug_records'] = $conf['debug_records'] ? $conf['debug_records'] : 2;
 			}
+			
+			break;
+		
+		
+		// ************************
+		// UNKNWOWN task, terminate
+		// ************************
+		
+		default:
+		
+			// Set an error message about unknown task and redirect
+			$app->enqueueMessage('Unknown task: '.$task, 'error');
+			$this->setRedirect( $link );
+			return;
+			
+			break;
 		}
+		
 		
 		
 		// *********************************************************************************
@@ -497,8 +530,8 @@ class FlexicontentControllerImport extends FlexicontentController
 		$colcount  = count($conf['columns']);
 		$itemcount = count($conf['contents_parsed']);
 		$items_per_call = JRequest::getInt( 'items_per_call', 0 );
-		JRequest::setVar('import_media_folder', $conf['import_media_folder']);
-		JRequest::setVar('import_docs_folder', $conf['import_docs_folder']);
+		JRequest::setVar('media_folder', $conf['media_folder']);
+		JRequest::setVar('docs_folder', $conf['docs_folder']);
 		
 		$lineno  = $task=='testcsv'  ?  1  :  $lineno + 1;
 		$linelim = $items_per_call ?  $lineno + $items_per_call - 1 : $itemcount;
@@ -511,10 +544,11 @@ class FlexicontentControllerImport extends FlexicontentController
 			$data = array();
 			$data['type_id'] = $conf['type_id'];
 			$data['language']= $conf['language'];
-			$data['catid']   = $conf['maincat'];
-			$data['cid']     = $conf['seccats'];
+			$data['catid']   = $conf['maincat'];   // Default value maybe overriden by column
+			$data['cid']     = $conf['seccats'];   // Default value maybe overriden by column
 			$data['vstate']  = 2;
 			$data['state']   = $conf['state'];
+			$data['access']  = $conf['access'];
 			
 			
 			// Prepare request variable used by the item's Model
@@ -596,7 +630,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				foreach ($_d as $i => $flddata) if (is_string($_d[$i])) {
 					if ( mb_strlen($_d[$i], 'UTF-8') > 80 ) $_d[$i] = mb_substr(strip_tags($_d[$i]), 0, 80, 'UTF-8') . ' ... ';
 				}
-				if ($lineno <= $conf['debug']) {
+				if ($lineno <= $conf['debug_records']) {
 					$parse_log .= "<pre><b>Item no $lineno:</b>\n". print_r($_d,true) ."</pre><hr/>";
 				} else {
 					$parse_log .= "<b>Item no $lineno:</b> <br/>".
@@ -606,10 +640,10 @@ class FlexicontentControllerImport extends FlexicontentController
 			}
 			
 			// Otherwise (if not testing) try to create the item by using Item Model's store() method
-			else if ( !$model->store($data) ) {
+			else if ( !$itemmodel->store($data) ) {
 				$conf['failure_count']++;
-				$msg = 'Failed item no: '. $lineno . ". titled as: '" . $data['title'] . "' : ". $model->getError();
-				if (FLEXI_J16GE) JLog::add($msg); else $log->addEntry( array('comment' => $msg) );
+				$msg = 'Failed item no: '. $lineno . ". titled as: '" . $data['title'] . "' : ". $itemmodel->getError();
+				JLog::add($msg);
 				echo $msg."<br/>";
 			}
 			
@@ -617,13 +651,13 @@ class FlexicontentControllerImport extends FlexicontentController
 			else {
 				$conf['success_count']++;
 				$msg = 'Imported item no: '. $lineno . ". titled as: '" . $data['title'] . "'" ;
-				if (FLEXI_J16GE) JLog::add($msg); else $log->addEntry( array('comment' => $msg) );
+				JLog::add($msg);
 				echo $msg."<br/>";
 				
 				// Try to rename entry if id column is being used
 				if ( $conf['id_col'] && $c_item_id )
 				{
-					$item_id = $model->getId();
+					$item_id = $itemmodel->getId();
 					$q = "UPDATE #__content SET id='".$c_item_id."' WHERE id='".$item_id."'";
 					$db->setQuery($q);
 					$db->query();
@@ -670,25 +704,18 @@ class FlexicontentControllerImport extends FlexicontentController
 		// Done nothing more to do
 		if ( $task == 'testcsv' ) {
 			echo $parse_log;
-			echo "\n\n\n".'<b>please click</b> <a href="JavaScript:window.history.back();">here</a> to return previous page'."\n\n\n";
+			echo "\n\n\n".'<b>please click</b> <a href="'.$link.'">here</a> to return previous page'."\n\n\n";
 			jexit();
 		}
 		
 		if ($lineno == $itemcount) {
-			// Clean item's cache, but is this needed when adding items ?
-			if (FLEXI_J16GE) {
-				$cache = FLEXIUtilities::getCache($group='', 0);
-				$cache->clean('com_flexicontent_items');
-				$cache->clean('com_flexicontent_filters');
-				$cache = FLEXIUtilities::getCache($group='', 1);
-				$cache->clean('com_flexicontent_items');
-				$cache->clean('com_flexicontent_filters');
-			} else {
-				$itemcache = JFactory::getCache('com_flexicontent_items');
-				$itemcache->clean();
-				$filtercache = JFactory::getCache('com_flexicontent_filters');
-				$filtercache->clean();
-			}
+			// Clean item's cache
+			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+			$cache = FLEXIUtilities::getCache($group='', 1);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
 			
 			// Set a total results message and redirect
 			$msg =
@@ -704,8 +731,8 @@ class FlexicontentControllerImport extends FlexicontentController
 	
 	function checkfiles(&$conf, &$parse_log, &$task)
 	{
-		$mfolder  = JPath::clean( JPATH_SITE .DS. $conf['import_media_folder'] .DS );
-		$dfolder  = JPath::clean( JPATH_SITE .DS. $conf['import_docs_folder'] .DS );
+		$mfolder  = JPath::clean( JPATH_SITE .DS. $conf['media_folder'] .DS );
+		$dfolder  = JPath::clean( JPATH_SITE .DS. $conf['docs_folder'] .DS );
 		
 		$ff_types_to_props = array('image'=>'originalname', 'file'=>'_value_');
 		$ff_types_to_paths = array('image' => $mfolder, 'file'=> $dfolder);
@@ -746,7 +773,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				
 				foreach($filedata_arr as $lineno => $field_data) {
 					// Split multi-value field
-					$vals = strlen($field_data) ? preg_split("/[\s]*%%[\s]*/", $field_data) : array();
+					$vals = strlen($field_data) ? preg_split("/[\s]*".$conf['mval_separator']."[\s]*/", $field_data) : array();
 					$vals = flexicontent_html::arrayTrim($vals);
 					unset($field_values);
 					
@@ -755,7 +782,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					foreach ($vals as $i => $val)
 					{
 						// Split multiple property fields
-						$props = strlen($val) ? preg_split("/[\s]*!![\s]*/", $val) : array();
+						$props = strlen($val) ? preg_split("/[\s]*".$conf['mprop_separator']."[\s]*/", $val) : array();
 						$props = flexicontent_html::arrayTrim($props);
 						unset($prop_arr);
 						
@@ -827,7 +854,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		{
 			if (count($fields) > $colcount) {
 				$msg = "Redundadant columns at record row ".$lineno.", Found # columns: ". count($fields) . " > expected: ". $colcount;
-				if (FLEXI_J16GE) JLog::add($msg); else $log->addEntry( array('comment' => $msg) );
+				JLog::add($msg);
 				if ($task == 'testcsv') $parse_log .= $msg;
 			}
 			
@@ -846,7 +873,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					$field_values = trim($field_data);
 				} else {
 					// Split multi-value field
-					$vals = strlen($field_data) ? preg_split("/[\s]*%%[\s]*/", $field_data) : array();
+					$vals = strlen($field_data) ? preg_split("/[\s]*".$conf['mval_separator']."[\s]*/", $field_data) : array();
 					$vals = flexicontent_html::arrayTrim($vals);
 					
 					// Handle each value of the field
@@ -854,7 +881,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					foreach ($vals as $i => $val)
 					{
 						// Split multiple property fields
-						$props = strlen($val) ? preg_split("/[\s]*!![\s]*/", $val) : array();
+						$props = strlen($val) ? preg_split("/[\s]*".$conf['mprop_separator']."[\s]*/", $val) : array();
 						$props = flexicontent_html::arrayTrim($props);
 						unset($prop_arr);
 						
@@ -886,6 +913,10 @@ class FlexicontentControllerImport extends FlexicontentController
 				else if ( $fieldname=='state' )
 				{
 					if ( !strlen($conf['state']) ) $data[$fieldname] = $field_values;
+				}
+				else if ( $fieldname=='access' )
+				{
+					if ( $conf['access']===0 ) $data[$fieldname] = $field_values;
 				}
 				else if ( $fieldname=='catid' )
 				{

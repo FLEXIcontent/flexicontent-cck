@@ -98,8 +98,12 @@ class JFormFieldFields extends JFormField
 		}
 		$orderable = (int) @ $attributes['orderable'];
 		if ($orderable) {
-			$non_orderable = $cparams->get('non_orderable_types', 'account_via_submit,authoritems,toolbar,file,image,groupmarker,fcpagenav,minigallery,weblink,email');
-			$non_orderable = explode(",", $non_orderable);
+			$non_orderable1 = 'account_via_submit,authoritems,toolbar,file,image,groupmarker,fcpagenav,minigallery,weblink,extendedweblink,email,fcloadmodule';
+			$non_orderable2 = trim($cparams->get('non_orderable_types', ''));
+			
+			$non_orderable = $non_orderable1.($non_orderable2 ? ','.$non_orderable2 : '');
+			$non_orderable = array_unique(explode(",", $non_orderable));
+			
 			foreach($non_orderable as $i => $ft) $non_orderable_quoted[$i] = $db->Quote($ft);
 			$and .= " AND field_type NOT IN (". implode(",", $non_orderable_quoted).")";
 		}

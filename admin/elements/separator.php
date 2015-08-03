@@ -109,32 +109,6 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 		}
 		
-		$js = '';
-			
-		if ( JFactory::getApplication()->isAdmin() && (
-			($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') ||
-			(($option=='com_modules' || $option=='com_advancedmodules') && $view == 'module') ||
-			($option=='com_flexicontent' && ($view == 'category' || $view == 'item'))
-		) ) {
-			// WORKAROUNDs of for 2 issues in com_config: slow chosen JS and PHP 5.3.9+ 'max_input_vars' limit
-			if (FLEXI_J30GE && ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent')) {
-				// Make sure chosen JS file is loaded before our code
-				JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
-				// replace chosen function
-				/*$js .= "
-					jQuery.fn.chosen = function(){};
-				";*/
-			}
-			$js .= "
-				jQuery(document).ready(function() {
-					jQuery(document.forms['adminForm']).attr('data-fc_doserialized_submit', '1');
-					//if ('".$option."'=='com_flexicontent') jQuery(document.forms['adminForm']).attr('data-fc_doajax_submit', '1');
-				});
-				var fc_max_input_vars = ".ini_get('max_input_vars').";
-			";
-		}
-		if ($js) $document->addScriptDeclaration($js);
-		
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();

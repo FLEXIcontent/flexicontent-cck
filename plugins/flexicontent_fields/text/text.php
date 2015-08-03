@@ -70,9 +70,10 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$default_value = $default_value ? JText::_($default_value) : '';
 		
 		// Input field display size & max characters
+		$display_label_form= (int) $field->parameters->get( 'display_label_form', 1 ) ;
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced
-		$placeholder= $field->parameters->get( 'placeholder', '' ) ;
+		$placeholder= $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'placeholder', '' )) ;
 		
 		// create extra HTML TAG parameters for the form field
 		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;

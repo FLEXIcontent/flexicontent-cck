@@ -607,7 +607,6 @@ Base script. Great!!
 			}
 		};
 
-		//Ref mootools Asset
 		var createImage = function(source, properties){
 			if (!properties) properties = {};
 

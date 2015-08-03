@@ -85,20 +85,8 @@ class FlexicontentModelItem extends ParentClassItem
 			
 			// (b) Calculate edit access ... 
 			// NOTE: we will allow view access if current user can edit the item (but set a warning message about it, see bellow)
-			if (FLEXI_J16GE) {
-				$canedititem = $params->get('access-edit');
-				$caneditstate = $params->get('access-edit-state');
-			} else if ($user->gid >= 25) {
-				$canedititem = true;
-				$caneditstate = true;
-			} else if (FLEXI_ACCESS) {
-				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $this->_item->id, $this->_item->catid );
-				$canedititem = in_array('edit', $rights) || (in_array('editown', $rights) && $isOwner);
-				$caneditstate = in_array('publish', $rights) || (in_array('publish', $rights) && $isOwner);
-			} else {
-				$canedititem = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $isOwner);
-				$caneditstate = $user->authorize('com_content', 'publish', 'content', 'all');
-			}
+			$canedititem = $params->get('access-edit');
+			$caneditstate = $params->get('access-edit-state');
 			
 			if (!$caneditstate) {
 				// Item not editable, check if item is editable till logoff
@@ -109,18 +97,7 @@ class FlexicontentModelItem extends ParentClassItem
 			}
 			
 			// (c) Calculate read access ... 
-			if (FLEXI_J16GE) {
-				$canviewitem = $params->get('access-view');
-			} else if ($user->gid >= 25) {
-				$canviewitem = true;
-			} else {
-				//$has_item_access = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;
-				//$has_mcat_access = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_item->catid) : $this->_item->category_access <= $aid;
-				//$has_type_access = ... must do SQL query, because No FLEXIaccess support via checkAllItemReadAccess() function
-				//$canviewitem = $has_item_access && $has_type_access && $has_mcat_access;
-				$canviewitem = $this->_item->has_item_access &&
-					(!$this->_item->catid || $this->_item->has_mcat_access) && (!$this->_item->type_id || $this->_item->has_type_access);
-			}
+			$canviewitem = $params->get('access-view');
 			
 			
 			// *********************************************************************************
@@ -134,12 +111,12 @@ class FlexicontentModelItem extends ParentClassItem
 			{
 				// cid is set, check state of current item category only
 				// NOTE:  J1.6+ all ancestor categories from current one to the root, for J1.5 only the current one ($cid)
-				if ( FLEXI_J16GE && !isset($this->_item->ancestor_cats_published) ) {
+				if ( !isset($this->_item->ancestor_cats_published) ) {
 					$ancestor_cats_published = true;
 					foreach($globalcats[$cid]->ancestorsarray as $pcid)    $ancestor_cats_published = $ancestor_cats_published && ($globalcats[$pcid]->published==1);
 					$this->_item->ancestor_cats_published = $ancestor_cats_published;
 				}
-				$cats_are_published = FLEXI_J16GE ? $this->_item->ancestor_cats_published : $this->_item->catpublished;
+				$cats_are_published = $this->_item->ancestor_cats_published;  //$this->_item->catpublished;
 				$cats_np_err_mssg = JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_CURRCAT_UNPUBLISHED', $cid);
 			}
 			else
@@ -147,12 +124,13 @@ class FlexicontentModelItem extends ParentClassItem
 				// cid is not set, we have no current category, the item is visible if it belongs to at one published category
 				$itemcats = $this->_item->categories;
 				$cats_are_published = true;
-				foreach ($itemcats as $catid) {
+				foreach ($itemcats as $catid)
+				{
 					if (!isset($globalcats[$catid])) continue;
 					$cats_are_published |= $globalcats[$catid]->published;
-					if (FLEXI_J16GE) {  // For J1.6+ check all ancestor categories from current one to the root
-						foreach($globalcats[$catid]->ancestorsarray as $pcid)    $cats_are_published = $cats_are_published && ($globalcats[$pcid]->published==1);
-					}
+					
+					// For J1.6+ check all ancestor categories from current one to the root
+					foreach($globalcats[$catid]->ancestorsarray as $pcid)    $cats_are_published = $cats_are_published && ($globalcats[$pcid]->published==1);
 				}
 				$cats_np_err_mssg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_ALLCATS_UNPUBLISHED');
 			}
@@ -249,8 +227,9 @@ class FlexicontentModelItem extends ParentClassItem
 				}
 			}
 			
-			// SPECIAL cases for inactive item
-			else if ( !$item_n_cat_active && !$previewing_and_unlogged ) {
+			// SPECIAL cases for inactive item, but exclude preview+unlogged case (we will catch this below)
+			else if ( !$item_n_cat_active && !$previewing_and_unlogged )
+			{
 				if ( !$caneditstate && ($item_state_pending || $item_state_draft) && $isOwner )
 				{
 					// no redirect, SET message to owners, to wait for approval or to request approval of their content
@@ -273,7 +252,7 @@ class FlexicontentModelItem extends ParentClassItem
 			}
 			
 			// Cases for non-viewable and non-editable item
-			else if ( !$canviewitem && !$canedititem )
+			else if ( ( !$canviewitem && !$canedititem ) || !$item_n_cat_active )
 			{
 				if($user->guest) {
 					// (c) redirect unlogged user to login, so that user can possible login to privileged account
@@ -303,7 +282,7 @@ class FlexicontentModelItem extends ParentClassItem
 				}
 			}
 			
-			// User can read item and item is active, no further actions
+			// User can view (or edit) the item and item is active, no further actions
 			else {
 			}
 			

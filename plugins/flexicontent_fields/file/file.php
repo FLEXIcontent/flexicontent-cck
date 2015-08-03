@@ -82,13 +82,32 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ( !$field->value ) {
 			// Field value empty
 			$files_data = array();
+			$form_data = array();
 			$field->value = array();
 		}
 		else {
+			$file_ids  = array();
+			$form_data = array();
+			
+			// Check if reloading user data after form validation error
+			$v = reset($field->value);
+			if (is_array($v) && isset($v['file-id']))
+			{
+				foreach($field->value as $v) {
+					$file_ids[] = $v['file-id'];
+					$form_data[$v['file-id']] = $v;
+				}
+			} else {
+				$file_ids = $field->value;
+			}
+			
 			// Get data for given file ids
-			$files_data = $this->getFileData( $field->value, $published=false );
+			$files_data = $this->getFileData( $file_ids, $published=false );
+			
 			$field->value = array();
-			foreach($files_data as $file_id => $file_data) $field->value[] = $file_id;
+			foreach($files_data as $file_id => $file_data) {
+				$field->value[] = $file_id;
+			}
 		}
 		
 		// Inline mode needs an default value

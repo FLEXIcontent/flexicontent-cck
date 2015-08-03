@@ -76,11 +76,19 @@
 			<field name="cascade_prompt" type="text" default="" label="Cascade prompt" description="A prompt to ask user to select a value in the cascade-after field, so that this field loads dependent values" />
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
-			<field name="usefirstoption" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC" class="btn-group btn-group-yesno">
+
+			<field name="display_label_form" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="custom_placeholder" hide_list="">FLEXI_NO</option>
+				<option value="1" show_list="custom_placeholder" hide_list="">FLEXI_FLOATED_LEFT</option>
+				<option value="2" show_list="custom_placeholder" hide_list="">FLEXI_CLEARED</option>
+				<option value="-1" show_list="" hide_list="custom_placeholder">FLEXI_AS_PLACEHOLDER</option>
+			</field>
+
+			<field name="usefirstoption" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC" toggle_related="1" depend_class="custom_placeholder" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="use_prompt">FLEXI_NO</option>
 				<option value="1" show_list="use_prompt" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="firstoptiontext" type="text" default="FLEXI_PLEASE_SELECT" label="FLEXI_FIELD_FIRST_OPTION_TEXT" depend_class="use_prompt" description="FLEXI_FIELD_FIRST_OPTION_TEXT_DESC" />
+			<field name="firstoptiontext" type="text" default="FLEXI_PLEASE_SELECT" label="FLEXI_FIELD_FIRST_OPTION_TEXT" depend_class="use_prompt custom_placeholder" description="FLEXI_FIELD_FIRST_OPTION_TEXT_DESC" />
 			<field name="size" type="text" default="6" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			<field name="use_jslib" type="radio" default="1" label="FLEXI_USE_JS_FORM_FIELD" description="FLEXI_USE_JS_FORM_FIELD_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

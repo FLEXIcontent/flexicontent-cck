@@ -6,10 +6,14 @@
 	<license>GPLv3</license>
 	<version>1.2</version>
 	<release>20 May 2014</release>
-	<description>Category HTML5 layout similar to the Joomla blog layout. Title, description and image are set as category parameters</description>
+	
+	<defaulttitle>FLEXI_TMPL_BLOG_CATEGORY_DEFAULT_TITLE</defaulttitle>
+	<description>FLEXI_TMPL_BLOG_CATEGORY_SHORT_DESC</description>
+
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
+			<field name="custom_layout_title" type="text" size="3" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
 			
 			<field name="leadingitems_sep" type="separator" hr="false" default="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" level="level1" menu="hide" />
 			<field name="lead_num" type="text" size="3" default="" label="FLEXI_LEADING_NUM" description="FLEXI_LEADING_NUM_DESC" />

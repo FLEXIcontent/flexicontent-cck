@@ -28,6 +28,7 @@ $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" sty
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCsearch'.($this->isADV ? '_advanced' : '_basic'), $start_text, $end_text);
 
 $edit_entry = JText::_('FLEXI_EDIT_TYPE', true);
+$list_total_cols = $this->isADV ? 10 : 5;
 ?>
 
 <script type="text/javascript">
@@ -183,7 +184,7 @@ function delAllFilters() {
 		
 	<tfoot>
 		<tr>
-			<td colspan="9" nowrap="nowrap">
+			<td colspan="<?php echo $list_total_cols; ?>">
 				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>
@@ -193,7 +194,7 @@ function delAllFilters() {
 		
 		<?php if (count($this->rows) == 0): ?>
 		<tr class="row0">
-			<td align="center" colspan="9">
+			<td align="center" colspan="<?php echo $list_total_cols; ?>">
 				<?php
 				if ($this->total == 0) {
 					echo JText::_('FLEXI_NO_DATA');

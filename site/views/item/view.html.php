@@ -140,18 +140,19 @@ class FlexicontentViewItem  extends JViewLegacy
 		$fields = $item->fields;
 		
 		
-		// ************************
-		// Pathway needed variables
-		// ************************
+		// ****************************************
+		// Get category titles needed by pathway,
+		// this will allow Falang to translate them
+		// ****************************************
 		
-		//$catshelper = new flexicontent_cats($cid);
-		//$parents    = $catshelper->getParentlist();
+		$catshelper = new flexicontent_cats($cid);
+		$parents    = $catshelper->getParentlist($all_cols=false);
 		//echo "<pre>".print_r($parents,true)."</pre>";
-		$parents = array();
+		/*$parents = array();
 		if ( $cid && isset($globalcats[$cid]->ancestorsarray) ) {
 			$parent_ids = $globalcats[$cid]->ancestorsarray;
 			foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
-		}
+		}*/
 		
 		
 		
@@ -845,7 +846,8 @@ class FlexicontentViewItem  extends JViewLegacy
 					if ( isset($jcustom[$field->name]) ) {
 						$field->value = array();
 						foreach ($jcustom[$field->name] as $i => $_val) {
-							$field->value[$i] = is_array($_val) ? serialize($_val) : $_val;
+							//$field->value[$i] = is_array($_val) ? serialize($_val) : $_val;
+							$field->value[$i] = $_val;
 						}
 					}
 					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
@@ -1645,7 +1647,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// Fix aliases, also replacing field types with field names
 		foreach($tab_fields as $tab_name => $field_list) {
-			$field_list = str_replace('created_by', 'createdby', $field_list);
+			$field_list = str_replace('createdby', 'created_by', $field_list);
+			$field_list = str_replace('modifiedby', 'modified_by', $field_list);
 			$field_list = str_replace('createdby_alias', 'created_by_alias', $field_list);
 			$field_list = str_replace('maintext', 'text', $field_list);
 			$tab_fields[$tab_name] = $field_list;

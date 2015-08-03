@@ -351,7 +351,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				);
 			
 			$txtarea = '
-				<div class="nowrap_box fc_txtarea" style="width: 100%;">
+				<div class="fc_txtarea" style="width: 100%;">
 					'.$txtarea.'
 				</div>';
 			

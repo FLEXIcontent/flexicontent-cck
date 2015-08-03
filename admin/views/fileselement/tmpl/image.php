@@ -32,6 +32,10 @@ $session = JFactory::getSession();
 $document = JFactory::getDocument();
 $cparams = JComponentHelper::getComponent('com_flexicontent')->params;
 
+$_folder_type_title = JText::_('FLEXI_URL_SECURE');
+$_folder_type_desc = JText::_('FLEXI_URL_SECURE_DESC');
+$secure_folder_tip  = '<img src="components/com_flexicontent/assets/images/comment.png" data-placement="bottom" class="fc-man-icon-s '.$tip_class.'" alt="'.$_folder_type_title.'" title="'.flexicontent_html::getToolTip($_folder_type_title, $_folder_type_desc, 0, 1).'" />';
+
 $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 
@@ -40,7 +44,7 @@ $document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/ta
 $document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
 $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
-$list_total_cols = $this->folder_mode ? 10 : 10;
+$list_total_cols = $this->folder_mode ? 7 : 10;
 $flexi_select = JText::_('FLEXI_SELECT');
 ?>
 <script type="text/javascript">
@@ -48,7 +52,7 @@ $flexi_select = JText::_('FLEXI_SELECT');
 jQuery(document).ready(function() {
 	showUploader();
 	jQuery('#flash_uploader').height(330);
-	//fc_toggle_box_via_btn('fileman_tabset', this, 'btn-primary');
+	fctabber['fileman_tabset'].tabShow(0);
 });
 
 // delete active filter
@@ -251,7 +255,6 @@ flexicontent_html::loadFramework('flexi-lib');
 				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
 					<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 					<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-					<!--input type="button" id="fc_upload_box_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('fileman_tabset', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_UPLOAD' ); ?>" /-->
 				</div>
 				
 				<div class="fcclear"></div>
@@ -321,21 +324,37 @@ flexicontent_html::loadFramework('flexi-lib');
 			<thead>
 				<tr>
 					<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-		<?php if ($this->folder_mode) { ?>
-					<th width="5">&nbsp;</th>
-		<?php } ?>
+					
+					<?php if (!$this->folder_mode) : ?>
+						<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+					<?php else : ?>
+						<th width="5">&nbsp;</th>
+					<?php endif; ?>
+					
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 					<th class="left">
 						<?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 						/
 						<?php echo JHTML::_('grid.sort', 'FLEXI_FILE_DISPLAY_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					</th>
-					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
+					
+					<?php if ($this->folder_mode) : ?>
+						<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
+					<?php else : ?>
+						<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_SIZE', 'f.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<?php endif; ?>
+					
+					<?php if (!$this->folder_mode) : ?>
+						<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'f.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+						<th class="center hideOnDemandClass"><?php echo $secure_folder_tip; ?><?php echo JHTML::_('grid.sort', 'FLEXI_URL_SECURE', 'f.secure', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<?php endif; ?>
+					
 					<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 					<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-		<?php if (!$this->folder_mode) { ?>
-					<th class="center hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-		<?php } ?>
+					
+					<?php if (!$this->folder_mode) : ?>
+						<th class="center hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<?php endif; ?>
 				</tr>
 			</thead>
 		
@@ -365,7 +384,9 @@ flexicontent_html::loadFramework('flexi-lib');
 					
 					if ( !in_array(strtolower($row->ext), $imageexts)) continue;  // verify image is in allowed extensions
 					
-					$path      = COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path>
+					$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
+					
+					$path		= !empty($row->secure) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
 					$file_path = $row->filename;
 					
 					if ($this->folder_mode) {
@@ -396,6 +417,9 @@ flexicontent_html::loadFramework('flexi-lib');
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">
 					<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+		<?php if (!$this->folder_mode) : ?>
+					<td><?php echo $checked; ?></td>
+		<?php endif; ?>
 		<?php if ($this->folder_mode) { ?>
 					<td>
 						<a href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo $row->filename;?>'; document.adminForm.controller.value='filemanager'; <?php echo FLEXI_J16GE ? "Joomla." : ""; ?>submitbutton('<?php echo $del_task; ?>'); }" href="#">
@@ -432,7 +456,13 @@ flexicontent_html::loadFramework('flexi-lib');
 						}
 						?>
 					</td>
+					
 					<td align="center"><?php echo $row->size; ?></td>
+					<?php if (!$this->folder_mode) : ?>
+						<td align="center"><span class="badge"><?php echo empty($row->hits) ? 0 : $row->hits; ?></span></td>
+						<td align="center"><span class="badge badge-info"><?php echo JText::_( $row->secure ? 'FLEXI_YES' : 'FLEXI_NO' ); ?></span></td>
+					<?php endif; ?>
+					
 					<td align="center"><?php echo $row->uploader; ?></td>
 					<td align="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC4' )." H:i:s" ); ?></td>
 		<?php if (!$this->folder_mode) { ?>
@@ -561,7 +591,7 @@ flexicontent_html::loadFramework('flexi-lib');
 						<tr>
 							<td id="secure-lbl-container" class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
 								<label class="label" id="secure-lbl">
-								<?php echo JText::_( 'FLEXI_TARGET_DIRECTORY' ); ?>
+								<?php echo JText::_( 'FLEXI_URL_SECURE' ); ?>
 								</label>
 							</td>
 							<td id="secure-container">

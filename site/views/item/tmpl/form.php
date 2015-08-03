@@ -254,7 +254,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				<?php endif; ?>
 
 				<?php
-					$params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=100%,height=100%,directories=no,location=no';
+					$params = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+((screen.width-100) > 1360 ? 1360 : (screen.width-100))+\',top=20,height=\'+((screen.width-160) > 100 ? 1000 : (screen.width-160))+\',directories=no,location=no';
 					$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->id.':'.$this->item->alias, $this->item->catid, 0, $this->item).'&preview=1');
 				?>
 			
@@ -716,9 +716,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 
 
 
-if ( !isset($all_tab_fields['lang']) ||
-	( flexicontent_db::useAssociations() /*$this->params->get('enable_translation_groups')*/ && $this->params->get('uselang_fe', 1)==1 )
-) : ob_start(); // language ?>
+if ( ( !isset($all_tab_fields['lang']) && $captured['lang'] )  ||  ( flexicontent_db::useAssociations() && $this->params->get('uselang_fe', 1)==1 ) ) : ob_start(); // language ?>
 	<fieldset class="basicfields_set" id="fcform_language_container">
 		<legend>
 			<?php echo !isset($all_tab_fields['lang']) ? JText::_( 'FLEXI_LANGUAGE' ) : JText::_( 'FLEXI_LANGUAGE' ) . ' '. JText::_( 'FLEXI_ASSOCIATIONS' ) ; ?>
@@ -873,7 +871,7 @@ if ($typeid && $this->params->get('usepublicationdetails_fe', 1)) : // timezone_
 			<?php echo $this->form->getLabel('created_by'); ?>
 			<div class="container_fcfield"><?php echo $this->form->getInput('created_by'); ?></div>
 		</fieldset>
-	<?php $captured['createdby'] = ob_get_clean(); endif; ?>
+	<?php $captured['created_by'] = ob_get_clean(); endif; ?>
 	
 	<?php if ($this->perms['editcreationdate'] && $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
 		<fieldset class="flexi_params panelform">
@@ -1228,7 +1226,7 @@ if ($this->fields && $typeid) :
 			// Some fields may force a container width ?
 			$display_label_form = $field->parameters->get('display_label_form', 1);
 			$row_k = 1 - $row_k;
-			$full_width = $display_label_form==0 || $display_label_form==2;
+			$full_width = $display_label_form==0 || $display_label_form==2 || $display_label_form==-1;
 			$width = $field->parameters->get('container_width', ($full_width ? '100%!important;' : false) );
 			$container_width = empty($width) ? '' : 'width:' .$width. ($width != (int)$width ? 'px!important;' : '');
 			$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
@@ -1236,7 +1234,7 @@ if ($this->fields && $typeid) :
 			
 			<div class='fcclear'></div>
 			
-			<?php if($display_label_form): ?>
+			<?php if($display_label_form > 0): ?>
 				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
 					<?php echo $field->label; ?>
 				</label>
@@ -1350,15 +1348,17 @@ $captured['fields_manager'] = ob_get_clean();
 // ANY field not found inside the 'captured' ARRAY,
 // must be a field not configured to be displayed
 // ***********************************************
-$duplicate_display = array();
+$displayed_at_tab = array();
 $_tmp = $tab_fields;
 foreach($_tmp as $tabname => $fieldnames) {
 	//echo "$tabname <br/>  %% ";
 	//print_r($fieldnames); echo "<br/>";
 	foreach($fieldnames as $fn => $i) {
+		//echo " -- $fn <br/>";
+		if (isset($captured[$fn])) {
+			$displayed_at_tab[$fn][] = $tabname;
+		}
 		if ( isset($shown[$fn]) ) {
-			//echo " -- $fn <br/>";
-			$duplicate_display[$fn] = 1;
 			unset( $tab_fields[$tabname][$fn] );
 			continue;
 		}
@@ -1375,10 +1375,14 @@ foreach($_tmp as $tabname => $fieldnames) {
 // **********************
 // CONFIGURATION WARNINGS
 // **********************
-if ( count($duplicate_display) ) :
-	$msg = JText::sprintf( 'FLEXI_FORM_FIELDS_DISPLAYED_TWICE', "<b>".implode(', ', array_keys($duplicate_display))."</b>");
+$msg = '';
+foreach($displayed_at_tab as $fieldname => $_places) {
+	if ( count($_places) > 1 ) $msg .= "<br/><b>".$fieldname."</b>" . " at [".implode(', ', $_places)."]";
+}
+if ($msg) {
+	$msg = JText::sprintf( 'FLEXI_FORM_FIELDS_DISPLAYED_TWICE', $msg."<br/>");
 	echo sprintf( $alert_box, '', 'error', '', $msg );
-endif;
+}
 
 if ( count($coreprop_missing) ) :
 	$msg = JText::sprintf( 'FLEXI_FORM_PLACER_FIELDS_MISSING', "<b>".implode(', ', array_keys($coreprop_missing))."</b>");

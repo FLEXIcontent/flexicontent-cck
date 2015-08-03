@@ -953,19 +953,35 @@ jQuery(document).ready(function(){
 			
 			<td class="col_cats">
 				<?php
-				// Reorder categories when changing Joomla ordering and place item's MAIN category first ...
-				if (!$this->filter_order_type) {
-					$__cats = array();
-					$nn = 1;
-					foreach ($row->cats as $key => $_icat) {
-						if ( !isset($this->itemCats[$_icat]) ) continue;
-						$category = & $this->itemCats[$_icat];
-						$isMainCat = ((int)$category->id == (int)$row->catid);
-						if ($isMainCat) $__cats[0] = $_icat;
-						else $__cats[$nn++] = $_icat;
+				// Reorder categories place item's MAIN category first or ...
+				// place first the category being filtered (if order is 'FLEXIcontent')
+				$_cats = array();
+				$nn = 1;
+				foreach ($row->cats as $key => $_icat)
+				{
+					if ( !isset($this->itemCats[$_icat]) ) continue;
+					$category = & $this->itemCats[$_icat];
+					
+					// Place first category of category filter
+					if ($this->filter_order=='catsordering' && (int)$this->filter_cats) {
+						$isFilterCat = ((int)$category->id == (int)$this->filter_cats);
+						if ($isFilterCat) $_cats[0] = $_icat;
+						else $_cats[$nn++] = $_icat;
 					}
-					$row->cats = $__cats;
+					
+					// Place first the main category of the item, in ALL cases except if doing per category FLEXIcontent ordering
+					else if ($this->filter_order!='catsordering') {
+						$isMainCat = ((int)$category->id == (int)$row->catid);
+						if ($isMainCat) $_cats[0] = $_icat;
+						else $_cats[$nn++] = $_icat;
+					}
+					else {  // $this->filter_order=='catsordering' AND filter_cats is empty, ordering by first found category, DONOT reoder the display
+						$_cats[$nn-1] = $_icat;
+						$nn++;
+					}
 				}
+				$row->cats = $_cats;
+				
 				$nr = count($row->cats);
 				$ix = 0;
 				$nn = 0;
@@ -977,10 +993,10 @@ jQuery(document).ready(function(){
 					$isMainCat = ((int)$category->id == (int)$row->catid);
 					//if (!$this->filter_order_type && !$isMainCat) continue;
 					
-					$typeofcats = '';
-					if ( $ix==0 && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering') )
+					$typeofcats = $isMainCat ? 'maincat' : 'secondarycat';
+					if ( $ix==0 && ($this->filter_order=='catsordering' || $this->filter_order=='i.ordering') )
 						$typeofcats .= ' orderingcat';
-					$typeofcats .= $isMainCat ? ' maincat' : ' secondarycat';
+					
 					$catlink	= 'index.php?option=com_flexicontent&amp;'.$cats_task.'edit&amp;cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 					if ($this->CanCats) :

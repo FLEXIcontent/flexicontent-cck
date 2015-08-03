@@ -29,7 +29,7 @@ $import_task = FLEXI_J16GE ? 'task=import.' : 'controller=import&task=';
 </form>
 <script type="text/javascript">
 jQuery(document).ready(function() {
-	var items_per_call = <?php echo (int) $this->conf['import_items_per_step']; ?>;
+	var items_per_call = <?php echo (int) $this->conf['items_per_step']; ?>;
 	var width = 0;
 	var looper = 0;
 	var onesector = 1000;

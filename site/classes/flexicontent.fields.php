@@ -74,7 +74,7 @@ class FlexicontentFields
 			$method = isset( $methods[$i] ) ? $methods[$i] : 'display';
 			if ( $item_per_field )
 			{
-				if ( !isset( $_item_id_map[ $item_ids[$i] ] ) )  { echo "not found item: ".$item_ids[$i] ." <br/>"; continue;}
+				if ( !isset( $_item_id_map[ $item_ids[$i] ] ) )  { /*echo "not found item: ".$item_ids[$i] ." <br/>";*/ continue;}
 				
 				// Render Display variable of Field for respective item
 				$_item = & $_item_id_map[$item_ids[$i]];
@@ -1184,7 +1184,7 @@ class FlexicontentFields
 		$typenames = array();
 		foreach ($items as $item) {
 			$typenames[$item->id] = new stdClass();
-			$typenames[$item->id]->name = $types[$item->type_id]->name;
+			$typenames[$item->id]->name = isset($types[$item->type_id]) ? $types[$item->type_id]->name : 'without type';
 		}
 		
 		return $typenames;
@@ -1600,6 +1600,8 @@ class FlexicontentFields
 		static $parsed = array();
 		static $d;
 		static $c;
+		
+		if (JFactory::getApplication()->isAdmin()) return '';
 		
 		// Parse field variable if not already parsed
 		if ( !isset($parsed[$field->id][$varname]) )

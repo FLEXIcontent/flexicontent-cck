@@ -44,6 +44,10 @@ class FlexicontentControllerFields extends FlexicontentController
 		$this->registerTask( 'saveandnew',   'save' );
 		$this->registerTask( 'copy',         'copy' );
 		$this->registerTask( 'copy_wvalues', 'copy' );
+		
+		$this->registerTask( 'exportxml', 'export' );
+		$this->registerTask( 'exportsql', 'export' );
+		$this->registerTask( 'exportcsv', 'export' );
 	}
 
 	/**
@@ -251,13 +255,10 @@ class FlexicontentControllerFields extends FlexicontentController
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_TOGGLE_PROPERTY' ) );
-		/*} else if (!$model->cantoggleprop($cid, $propname)) {
-			$msg = '';
-			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_TOGGLE_PROPERTIES_THESE_FIELDS' ));*/
 		} else {
 			
 			$asset = 'com_flexicontent.field.' . $field_id;
-			$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
 			
 			if ( !$is_authorised ) {
 				$msg = '';
@@ -645,90 +646,55 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 		$this->setRedirect('index.php?option=com_flexicontent&view=fields', $msg );
 	}
-	
-	
-	function exportcsv()
+
+
+	/**
+	 * Method to select new state for many items
+	 * 
+	 * @since 1.5
+	 */
+	function selectsearchflag()
 	{
-		$cid = JRequest::getVar( 'cid' );
-		$db  = JFactory::getDBO();
-		$query = 'SELECT *'
-				. ' FROM #__flexicontent_fields'
-				. ($cid ? ' WHERE id = '.$cid : '')
-				;
-		$db->setQuery($query);
-		$_fields = $db->loadObjectList('id');
+		$user	= JFactory::getUser();
+		$document = JFactory::getDocument();
 		
-		$fp = fopen('php://output', 'w');
-		if ($fp && $_fields) {
-			header('Content-Type: text/csv');
-			header('Content-Disposition: attachment; filename="export.csv"');
-			foreach($_fields as $row) {
-				fputcsv($fp, array_values((array)$row));
-			}
-			die;
+		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
+		
+		// Load jquery Framework
+		flexicontent_html::loadJQuery();
+		JHtml::_('bootstrap.framework');
+		JHtml::_('bootstrap.tooltip');
+		
+		$btn_class = 'hasTooltip btn btn-small';
+		
+		$state['issearch'] = array( 'name' =>'FLEXI_TOGGLE_TEXT_SEARCHABLE', 'desc' =>'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC', 'icon' => 'search', 'btn_class' => 'btn-success', 'clear' => true );
+		$state['isfilter'] = array( 'name' =>'FLEXI_TOGGLE_FILTERABLE', 'desc' =>'FLEXI_FIELD_CONTENT_LIST_FILTERABLE_DESC', 'icon' => 'filter', 'btn_class' => 'btn-success', 'clear' => true );
+		$state['isadvsearch'] = array( 'name' =>'FLEXI_TOGGLE_ADV_TEXT_SEARCHABLE', 'desc' =>'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE_DESC', 'icon' => 'search', 'btn_class' => 'btn-info', 'clear' => true );
+		$state['isadvfilter'] = array( 'name' =>'FLEXI_TOGGLE_ADV_FILTERABLE', 'desc' =>'FLEXI_FIELD_ADVANCED_FILTERABLE_DESC', 'icon' => 'filter', 'btn_class' => 'btn-info', 'clear' => true );
+		
+?><div id="flexicontent" class="flexicontent" style="padding-top:5%;"><?php
+		
+		foreach($state as $shortname => $statedata) {
+			$css = "width:216px; margin:0px 24px 12px 0px; text-align: left;";
+			$link = JURI::base(true)."/index.php?option=com_flexicontent&task=fields.toggleprop&propname=".$shortname."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
+			$icon = $statedata['icon'];
+			
+			if ($shortname=='issearch') echo '<br/><span class="label">'. JText::_( 'FLEXI_TOGGLE' ).'</span> '.JText::_( 'Content Lists' ).'<br/>';
+			else if ($shortname=='isadvsearch') echo '<br/><span class="label">'. JText::_( 'FLEXI_TOGGLE' ).'</span> '.JText::_( 'Search View' ).'<br/>';
+			?>
+			<span style="<?php echo $css; ?>" class="<?php echo $btn_class.' '.$statedata['btn_class']; ?>" title="<?php echo JText::_( $statedata['desc'] ); ?>" data-placement="right"
+				onclick="window.parent.document.adminForm.propname.value='<?php echo $shortname; ?>'; window.parent.document.adminForm.boxchecked.value==0  ?  alert('<?php echo JText::_('FLEXI_NO_ITEMS_SELECTED'); ?>')  :  window.parent.Joomla.submitbutton('fields.toggleprop')"
+			>
+				<span class="icon-<?php echo $icon; ?>"></span><?php echo JText::_( $statedata['name'] ); ?>
+			</span>
+			<?php
+			if ( isset($statedata['clear']) ) echo '<div class="fcclear"></div>';
 		}
+
+?></div><?php
+
+		return;
 	}
 	
-	
-	function exportsql()
-	{
-		$targetfolder = JPATH_SITE.DS.'tmp';
-		$filename = "field_export_".time().".sql";
-		$abspath  = $targetfolder.DS.$filename;
-		$abspath  = str_replace(DS, '/', $abspath);
-		
-		$cid = JRequest::getInt( 'cid' );
-		$db  = JFactory::getDBO();
-		$query = 'SELECT * INTO OUTFILE "'.$abspath.'" '
-				. ' FROM #__flexicontent_fields'
-				. ($cid ? ' WHERE id = '.$cid : '')
-				;
-		$db->setQuery($query);
-		if (!$db->query()) {
-			echo $db->getError();
-			exit;
-		}
-		
-		
-		// Get file filesize and extension
-		$dlfile = new stdClass();
-		$dlfile->filename = $filename;
-		$dlfile->abspath  = $abspath;
-		$dlfile->size = filesize($dlfile->abspath);
-		$dlfile->ext  = strtolower(JFile::getExt($dlfile->filename));
-		
-		// Set content type of file (that is an archive for multi-download)
-		$ctypes = array(
-			"pdf" => "application/pdf", "exe" => "application/octet-stream", "rar" => "application/zip", "zip" => "application/zip",
-			"txt" => "text/plain", "doc" => "application/msword", "xls" => "application/vnd.ms-excel", "ppt" => "application/vnd.ms-powerpoint",
-			"gif" => "image/gif", "png" => "image/png", "jpeg" => "image/jpg", "jpg" => "image/jpg", "mp3" => "audio/mpeg"
-		);
-		$dlfile->ctype = isset($ctypes[$dlfile->ext]) ? $ctypes[$dlfile->ext] : "application/force-download";
-		
-		// *****************************************
-		// Output an appropriate Content-Type header
-		// *****************************************
-		header("Pragma: public"); // required
-		header("Expires: 0");
-		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-		header("Cache-Control: private", false); // required for certain browsers
-		header("Content-Type: ".$dlfile->ctype);
-		//quotes to allow spaces in filenames
-		$download_filename = $dlfile->filename;
-		header("Content-Disposition: attachment; filename=\"".$download_filename."\";" );
-		header("Content-Transfer-Encoding: binary");
-		header("Content-Length: ".$dlfile->size);
-		
-		
-		$handle = @fopen($abspath,"rb");
-		while(!feof($handle))
-		{
-			print(@fread($handle, 1024*8));
-			ob_flush();
-			flush();
-		}
-		
-		unlink($file);
-		$app->close();
-	}
 }

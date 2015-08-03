@@ -122,7 +122,7 @@ fieldset.fieldgroups legend {
 	background-color: #f6F6F6;
 	padding: 3px 6px 2px;
 	margin: 0px 20px 0px 0px;
-	}
+}
 fieldset.fieldgroups legend span img {
 	vertical-align: middle;
 	padding-left: 5px;
@@ -544,25 +544,21 @@ span.fc_select_button:hover {
 
 div label.state_box,
 div label.lang_box {
-	white-space:nowrap;
 	display:inline-block;
-	margin: 0px 8px 0px 0px;
-	padding: 0px!important;
+	margin: 4px 12px 0px 0px;
+	padding: 0px !important;
 	vertical-align: top;
-	font-size: 12px;
+	line-height: 1em;
+	white-space:nowrap;
 }
 div label.state_box input,
 div label.state_box img,
-div label.state_box .state_lbl,
 div label.lang_box input,
-div label.lang_box img,
-div label.lang_box .lang_lbl {
+div label.lang_box img {
 	display:inline-block;
-	margin: 4px 5px 0px 0px;
+	margin: 0px;
 	padding: 0px;
 	vertical-align: top;
-	line-height: 1em;
-	font-size: 12px;
 }
 div label.lang_box img {
 	border: 1px solid lightgray;
@@ -1121,6 +1117,9 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 
 /* Table for forms with label styling */
 
+table.fc-form-tbl.keytop td.key {
+	vertical-align: top;
+}
 table.fc-form-tbl td {
 	vertical-align: middle;
 	padding: 4px 24px 4px 0px;
@@ -1128,14 +1127,14 @@ table.fc-form-tbl td {
 table.fc-form-tbl td.key {
 	text-align: right;
 	padding: 4px 0px;
-	max-width: 120px;
-	min-width: 90px;
+	max-width: 140px;
+	min-width: 114px;
 }
 table.fc-form-tbl td.key label.label {
 	display: inline-block;
 	padding: 8px 4%;
-	width: 84%;
-	margin: 0px 4%;
+	width: 82%;
+	margin: 0px 5%;
 	white-space: normal;
 }
 table.fc-form-tbl.fcinner td.key label.label {
@@ -1146,7 +1145,9 @@ table.fc-form-tbl fieldset {
 	padding:0px;
 	border-width:0px;
 }
-
+table.fc-form-tbl td.data {
+	vertical-align: top;
+}
 
 
 /****************************

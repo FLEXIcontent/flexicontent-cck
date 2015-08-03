@@ -9,7 +9,7 @@ var max_cat_assign_fc = 0;
 var existing_cats_fc  = [];
 var max_cat_overlimit_msg_fc = 'Too many categories selected. You are allowed a maximum number of ';
 var fcflabels = null;
-var fcflabels_errcnt = null;  // Error counter for multi-value fields
+var popup_msg_done = null;  // Popup-once message for multi-value fields
 var fcpass_element = new Object();  // Validation functions needing element instead of value
 fcpass_element['jform_catid'] = 1;
 
@@ -40,28 +40,35 @@ var JFormValidator = new Class({
 		if (JFormValidator_fc) return JFormValidator_fc;  //
 		//alert('Initializing FLEXIcontent form validator');
 		
+ 	 	inputEmail = (function() {
+ 	 	 	var input = document.createElement("input");
+ 	 	 	input.setAttribute("type", "email");
+ 	 	 	return input.type !== "text";
+ 	 	})();
+		
 		// Initialize variables
 		this.handlers	= Object();
 		this.custom		= Object();
 
 		// Default handlers
 		this.setHandler('username', function (value) {
-			regex = new RegExp("[\<|\>|\"|\'|\%|\;|\(|\)|\&]", "i");
+ 	 	 	var regex = new RegExp("[\<|\>|\"|\'|\%|\;|\(|\)|\&]", "i");
 			return !regex.test(value);
 		});
 
 		this.setHandler('password', function (value) {
-			regex=/^\S[\S ]{2,98}\S$/;
+			var regex = /^\S[\S ]{2,98}\S$/;
 			return regex.test(value);
 		});
 
 		this.setHandler('numeric', function (value) {
-			regex=/^(\d|-)?(\d|,)*\.?\d*$/;
+ 	 		var regex = /^(\d|-)?(\d|,)*\.?\d*$/;
 			return regex.test(value);
 		});
 
 		this.setHandler('email', function (value) {
-			regex=/^[a-zA-Z0-9._-]+(\+[a-zA-Z0-9._-]+)*@([a-zA-Z0-9.-]+\.)+[a-zA-Z0-9.-]{2,4}$/;
+			value = punycode.toASCII(value);
+			var regex = /^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 			return regex.test(value);
 		});
 
@@ -168,23 +175,9 @@ var JFormValidator = new Class({
 			var field_name = 'jform[cid][]';
 			var field_name_catid = 'jform[catid]';
 			
-			if(MooTools.version>="1.2.4") {
-				//var values = $(element_id).getSelected();  // does not work in old template form overrides with no id parameter
-				var values = $$(document.getElementsByName(field_name))[0].getSelected();
-				values = values.map( function(g) { return g.get('value'); } );
-				
-				var value_catid = $$(document.getElementsByName(field_name_catid))[0].getSelected();
-				value_catid = value_catid.map( function(g) { return g.get('value'); } );
-				value_catid = value_catid[0];
-			} else {
-				//values = $(element_id).getValue();  // does not work in old template form overrides with no id parameter
-				var values = $$(document.getElementsByName(field_name))[0].getValue();
-				//  ** Alternative code **
-				//var values = $(element_id).getChildren().filter( function(g) { return g.selected; } );
-				//values = values.map( function(g) { return g.getProperty('value'); } );
-				
-				var value_catid = $$(document.getElementsByName(field_name_catid))[0].getValue();
-			}
+			// Get first secondary category selected to use as maincat
+			var values = jQuery('#'+element_id).val();
+			var value_catid = values[0];
 			
 			//window.console.log(values);
 			//window.console.log(existing_cats_fc);
@@ -233,15 +226,18 @@ var JFormValidator = new Class({
 				
 				// Check maximum number of selected options
 				if ( min_values && count < min_values) {
-					if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is less than minimum allowed: '+min_values);
+					if (el.labelref && js_popup_err && !popup_msg_done[el.labelfor]) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is less than minimum allowed: '+min_values);
+					popup_msg_done[el.labelfor]=1;
 					return false;
 				}
 				if ( max_values && count > max_values) {
-					if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is more than maximum allowed: '+max_values);
+					if (el.labelref && js_popup_err && !popup_msg_done[el.labelfor]) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is more than maximum allowed: '+max_values);
+					popup_msg_done[el.labelfor]=1;
 					return false;
 				}
 				if ( exact_values && count != exact_values) {
-					if (el.labelref && js_popup_err) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n but it must be exactly '+exact_values);
+					if (el.labelref && js_popup_err && !popup_msg_done[el.labelfor]) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n but it must be exactly '+exact_values);
+					popup_msg_done[el.labelfor]=1;
 					return false;
 				}
 				return true;
@@ -274,15 +270,18 @@ var JFormValidator = new Class({
 				
 				// Check maximum number of selected options
 				if ( min_values && count < min_values) {
-					if (el.labelref && js_popup_err && fcflabels_errcnt[el.labelfor]==0) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is less than minimum allowed: '+min_values);
+					if (el.labelref && js_popup_err && !popup_msg_done[el.labelfor]) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is less than minimum allowed: '+min_values);
+					popup_msg_done[el.labelfor]=1;
 					return false;
 				}
 				if ( max_values && count > max_values) {
-					if (el.labelref && js_popup_err && fcflabels_errcnt[el.labelfor]==0) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is more than maximum allowed: '+max_values);
+					if (el.labelref && js_popup_err && !popup_msg_done[el.labelfor]) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n which is more than maximum allowed: '+max_values);
+					popup_msg_done[el.labelfor]=1;
 					return false;
 				}
 				if ( exact_values && count != exact_values) {
-					if (el.labelref && js_popup_err && fcflabels_errcnt[el.labelfor]==0) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n but it must be exactly '+exact_values);
+					if (el.labelref && js_popup_err && !popup_msg_done[el.labelfor]) alert('Number of values for field --'+el.labelref.innerHTML.replace(/^\s+|\s+$/g,'')+'-- is '+count+',\n but it must be exactly '+exact_values);
+					popup_msg_done[el.labelfor]=1;
 					return false;
 				}
 				return true;
@@ -301,44 +300,51 @@ var JFormValidator = new Class({
 		// Iterate through the form object and attach the validate method to all input fields.
 		jQuery(form).find('input,textarea,select,button').each(function(){
 			el = jQuery(this);
-			if ( el.hasClass('required') || el.attr('aria-required')=='true' ) {
+			if ( el.hasClass('required') || el.attr('aria-required')=='true' )
+			{
 				el.attr('required', 'required');
 				el.attr('aria-required', 'true');
 			}
 			
+			var tag_type = el.attr('type');
+			var tag_name = el.prop("tagName").toLowerCase();
+			
 			// Styled via JS
-			if (el.hasClass('use_select2_lib') || el.hasClass('use_prettycheckable')) {
-				el.on('change', function(){return document.formvalidator.validate(this);});
+			if ( el.hasClass('use_select2_lib') || el.hasClass('use_prettycheckable') )
+			{
+				el.on('change', function(){ return document.formvalidator.validate(this); });
 			}
+			
 			// Radio / checkbox
-			else if (el.attr('type') == 'radio' || el.attr('type') == 'checkbox') {
-				el.on('click', function(){return document.formvalidator.validate(this);});
+			else if ( tag_type == 'radio' || tag_type == 'checkbox' )
+			{
+				el.on('click', function(){ document.formvalidator.validate(this); return true; });
 			}
-			else {
-				var tag_name = el.prop("tagName").toLowerCase();
-				var tag_type = el.attr('type');
-				// Submit button 
-				if ( (tag_name == 'input' || tag_name == 'button') && tag_type == 'submit' ) {
-					if (el.hasClass('validate')) {
-						el.on('click', function(){return document.formvalidator.isValid(this.form);});
-					}
-				}
-				// text inputs, selects, ... other ?
-				else {
-					el.on('blur', function(){return document.formvalidator.validate(this);});
+			
+			// Submit button, needs to return true false to avoid form being submited 
+			else if ( (tag_name == 'input' || tag_name == 'button') && (tag_type == 'submit' || tag_type === 'image') )
+			{
+				if (el.hasClass('validate')) {
+					el.on('click', function(){
+						return document.formvalidator.isValid(this.form);
+					});
 				}
 			}
+			
+			// text inputs, selects, ... other ?
+			else
+			{
+				el.on('blur', function(){ return document.formvalidator.validate(this); });
+ 	 	 	 	if (tag_name == 'input' && el.hasClass('validate-email') && inputEmail) {
+ 	 	 	 	 	el.get(0).type = 'email';
+ 	 	 	 	}
+			}
+			
 		});
 	},
 
 	validate: function(el)
 	{
-		if(MooTools.version>="1.2.4") {
-			el = document.id(el);
-		} else {
-			document.id = $;
-			el = document.id(el);
-		}
 		jqEL = jQuery(el);
 		el_value = jqEL.val();
 		el_name  = jqEL.attr('name');
@@ -387,7 +393,7 @@ var JFormValidator = new Class({
 				// radio/checkbox can be checked only via specific validation handler if this is set
 			}
 			else if (el_value === null || el_value.length==0) {
-				//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
+				//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + popup_msg_done[el.labelfor]);
 				//else window.console.log('INVALID with element id:' + el_id);
 				this.handleResponse(false, el);
 				return false;
@@ -405,7 +411,7 @@ var JFormValidator = new Class({
 		if (handler == "sellimitations" || handler == "cboxlimitations") {
 			// Execute the validation handler and return result
 			if (this.handlers[handler].exec(el) != true) {
-				//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
+				//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + popup_msg_done[el.labelfor]);
 				//else window.console.log('INVALID with element id:' + el_id);
 				this.handleResponse(false, el);
 				return false;
@@ -415,7 +421,7 @@ var JFormValidator = new Class({
 			if ( typeof fcpass_element[el_id] != 'undefined' ) {
 				// Execute the validation handler and return result
 				if (this.handlers[handler].exec(el) != true) {
-					//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
+					//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + popup_msg_done[el.labelfor]);
 					//else window.console.log('INVALID with element id:' + el_id);
 					this.handleResponse(false, el);
 					return false;
@@ -423,7 +429,7 @@ var JFormValidator = new Class({
 			} else if ((handler) && (handler != 'none') && (this.handlers[handler]) && el_value) {
 				// Execute the validation handler and return result
 				if (this.handlers[handler].exec(el_value) != true) {
-					//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
+					//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + popup_msg_done[el.labelfor]);
 					//else window.console.log('INVALID with element id:' + el_id);
 					this.handleResponse(false, el);
 					return false;
@@ -435,7 +441,7 @@ var JFormValidator = new Class({
 					if (jqEL.hasClass('required')) {
 						// Execute the validation handler and return result
 						if (this.handlers[handler].exec(el.parentNode) != true) {
-							//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
+							//if (el.labelfor) window.console.log('INVALID with labelfor: ' + el.labelfor +': ' + popup_msg_done[el.labelfor]);
 							//else window.console.log('INVALID with element id:' + el_id);
 							this.handleResponse(false, el);
 							return false;
@@ -452,16 +458,22 @@ var JFormValidator = new Class({
 
 	isValid: function(form)
 	{
-		var valid = true;
+ 		var valid = true;
 		tab_focused = false; // global variable defined above, we use this to focus the first tab that contains required field
-
-		// Validate form fields
-		var elements = jQuery(form).find('fieldset').toArray().concat(Array.from(form.elements));
 		
-		for (var i=0;i < elements.length; i++) {
-			if (this.validate(elements[i]) == false) {
+ 		var message, error, label, invalid = [];
+ 		var i, l;
+ 		
+ 		// Get fieldset containers of (checkbox/radio) and all form fields
+		var fields = jQuery(form).find('fieldset').toArray().concat(Array.from(form.elements));
+		
+		// Validate form fields
+ 	 	for (i = 0, l = fields.length; i < l; i++)
+ 	 	{
+			if (this.validate(fields[i]) == false) {
 				tab_focused = true;
 				valid = false;
+				invalid.push(fields[i]);
 			}
 		}
 
@@ -489,6 +501,23 @@ var JFormValidator = new Class({
 			}
 		}
 		
+ 	 	if (!valid && invalid.length > 0) {
+ 	 	 	message = Joomla.JText._('JLIB_FORM_FIELD_INVALID');
+ 	 	 	error = {"error": []};
+ 	 	 	var added = [];
+ 	 	 	for (i = invalid.length - 1; i >= 0; i--) {
+ 	 	 		//label = jQuery(invalid[i]).data("label");
+ 	 	 		label = jQuery(invalid[i].labelref);
+ 	 	 		
+ 	 			if (label && typeof added[label.text()] === 'undefined')
+				{
+ 	 	 			error.error.push(message + label.text().replace("*", ""));
+				}
+ 	 	 		added[label.text()] = 1;
+ 	 	 	}
+ 	 	 	Joomla.renderMessages(error);
+ 	 	}
+		
 		fcform_isValid = valid;
 		return valid;
 	},
@@ -513,32 +542,35 @@ var JFormValidator = new Class({
 				tabset = jQuery(tabset).parent().closest("div.tabberlive");
 			}
 		}
-
+		
+		// If it is already invalid
+		var isInvalid = jqEL.hasClass('invalid') || jqEL.attr('aria-invalid')=='true';
+		
 		// Set the element and its label (if exists) invalid state
-		if (state == false) {
-			var isInvalid = jqEL.hasClass('invalid') || jqEL.attr('aria-invalid')=='true';
-			jqEL.addClass('invalid').attr('aria-invalid', 'true');
+		if (state == false)
+		{
+			// Add INVALID to ELEMENT (but not to checkboxes/radio if their group label was found)
+			if (jqEL.attr('type') == 'checkbox' || jqEL.attr('type') == 'radio') {
+				if (!el.labelref) jqEL.addClass('invalid').attr('aria-invalid', 'true');
+			}
+			else {
+				jqEL.addClass('invalid').attr('aria-invalid', 'true');
+			}
+			
+			// Add INVALID to LABEL, (Mark /  the label to indicate validation error for current form field / fieldset)
 			if (el.labelref) {
 				var labelref = jQuery(el.labelref);
 				labelref.addClass('invalid');
-				// Increment error count for multi-value field or set FLAG for others
-				if (!isInvalid)
-					fcflabels_errcnt[el.labelfor] = jqEL.attr('type') == 'checkbox'  ?  ++fcflabels_errcnt[el.labelfor]  :  1;
-				//window.console.log(el.labelfor +': ' + fcflabels_errcnt[el.labelfor]);
-				// Mark /  the label to indicate validation error for current form field / fieldset
 			}
-		} else {
-			var isInvalid = jqEL.hasClass('invalid') || jqEL.attr('aria-invalid')=='true';
+		}
+		else
+		{
+			// Remove INVALID from ELEMENT
 			jqEL.removeClass('invalid').attr('aria-invalid', 'false');
+			
+			// Remove INVALID from LABEL, (Unmarkup / clear CSS style to indicate no validation error for current form field / fieldset)
 			if (el.labelref) {
-				var labelref = jQuery(el.labelref);
-				// Decrement error count for multi-value field or clear FLAG for others
-				if (isInvalid)
-					fcflabels_errcnt[el.labelfor] = jqEL.attr('type') == 'checkbox'  ?  --fcflabels_errcnt[el.labelfor]  :  0;
-				if (fcflabels_errcnt[el.labelfor] == 0) {
-					// Unmarkup / clear CSS style to indicate no validation error for current form field / fieldset
-					labelref.removeClass('invalid');
-				}
+				jQuery(el.labelref).removeClass('invalid');
 			}
 		}
 	}
@@ -549,16 +581,19 @@ JFormValidator_fc = new JFormValidator();
 
 document.formvalidator = null;
 jQuery(document).ready(function() {
+	//console.time("timing attachToForm()");
 	document.formvalidator = JFormValidator_fc;
 	jQuery('form.form-validate').each(function(){
 		document.formvalidator.attachToForm($(this));
 	});
+	//console.timeEnd("timing attachToForm()");
 	
 	// Executed only once to retrieve and hash all label via their for property
+	//console.time("timing form labels hash mapping");
 	if ( !fcflabels )
 	{
 		fcflabels = new Object;
-		fcflabels_errcnt = new Object;  // error counter for multi-value fields
+		popup_msg_done = new Object;  // Popup-once message for multi-value fields
 		var err_cnt = 0;
 		jQuery('label, span.label-fcouter > span').each( function(g) {
 			g = jQuery(this);
@@ -566,7 +601,7 @@ jQuery(document).ready(function() {
 			if ( !label_for ) label_for = g.attr('for');
 			if ( label_for )  {
 				fcflabels[ label_for ] = this;
-				fcflabels_errcnt[ label_for ] = 0;
+				popup_msg_done[ label_for ] = 0;
 			} else {
 				//window.console.log( g.append(jQuery('#xxx').clone()).html() );
 				err_cnt++;
@@ -576,6 +611,7 @@ jQuery(document).ready(function() {
 		//window.console.log('fcflabels_size: ' + fcflabels_size); //alert(fcflabels_size);
 		//window.console.log('err_cnt: ' + err_cnt); //alert(err_cnt);
 	}
+	//console.timeEnd("timing form labels hash mapping");
 });
 
 

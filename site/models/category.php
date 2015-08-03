@@ -148,7 +148,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * return	void
 	 * @since	1.5
 	 */
-	protected function populateCategoryState($ordering = null, $direction = null) {
+	protected function populateCategoryState($ordering = null, $direction = null)
+	{
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$p      = $option.'.'.$view.'.';
+		
 		$this->_layout = JRequest::getCmd('layout', '');  // !! This should be empty for empty for 'category' layout
 		
 		// Force layout to be have proper value
@@ -210,8 +217,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('filter_order_Dir', JRequest::getCmd('filter_order_Dir', 'ASC', 'default'));
 		
 		// Get minimum word search length
-		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
 		if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {
 			$db = JFactory::getDBO();
 			$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
@@ -668,7 +673,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$request_var = $this->_params->get('orderby_override') ? 'orderby' : '';
 		$default_order = $this->getState('filter_order');
 		$default_order_dir = $this->getState('filter_order_Dir');
-	
+		
 		// Precedence: $request_var ==> $order ==> $config_param ==> $default_order
 		return flexicontent_db::buildItemOrderBy(
 			$this->_params,

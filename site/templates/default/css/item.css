@@ -6,7 +6,6 @@
 	margin: 0 0 1em;
 	overflow: hidden;
 	clear: both;
-	border: 1px solid lightgray;
 }
 
 .flexi.subtitle1 {
@@ -115,12 +114,13 @@ span.flexi.value, .flexi.value {
 }
 .twocols .flexi.label {
 	min-width: 34%;
-	margin-right: 6%;
-	margin-bottom:6px;
+	margin: 2px 3% 6px 0;
+	box-sizing: border-box;
 }
 .twocols .flexi.value {
-	min-width: 58%;
-	margin-right: 1%;
+	min-width: 59%;
+	margin: 2px 4% 6px 0;
+	box-sizing: border-box;
 }
 
 /* ===============================================

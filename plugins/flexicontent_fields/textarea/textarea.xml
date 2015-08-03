@@ -77,7 +77,7 @@
 			<field name="cols" type="text" default="80" size="3" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" depend_class="using-html-editor" />
-			<field name="" type="separator" default= "NOTE: for multi-value, only editors based on: &lt;b&gt;tinyMCE&lt;/b&gt; are supported, otherwise then the editor on new values will appear only after saving" description="" level="level4" depend_class="using-html-editor" />
+			<field name="" type="separator" default= "NOTE: for multi-value, only editors based on: &lt;b&gt;tinyMCE&lt;/b&gt; are supported, otherwise the editor on new values will appear only after saving" description="" level="level4" depend_class="using-html-editor" />
 			<field name="width" type="text" default="98%" size="6" label="FLEXI_FIELD_WIDTH" description="FLEXI_FIELD_WIDTH_DESC" depend_class="using-html-editor" />
 			<field name="height" type="text" default="250px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" depend_class="using-html-editor" />
 			<field name="editor" type="plugins" folder="editors" label="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" depend_class="using-html-editor">

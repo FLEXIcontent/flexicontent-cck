@@ -70,7 +70,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$min_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'min_values', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
+		//$required   = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		// Sanitize limitations
 		$exact_values	= $field->parameters->get( 'exact_values', 0 ) ;
@@ -390,7 +390,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		if ($display_as_checkbox)
 		{
 			$classes  = $use_prettycheckable && $prettycheckable_added ? ' use_prettycheckable ' : '';
-			$classes .= $required;
+			//$classes .= $required;
 			$onchange = '';
 			// Extra properties
 			$attribs  = '';
@@ -410,7 +410,8 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		
 		// Handle case of FORM fields that each value is an array of values
 		// (e.g. selectmultiple, checkbox), and that multi-value input is also enabled
-		$values = self::$valueIsArr && !$multiple ? array($field->value) : $field->value;
+		$is_array_already = is_array($field->value) ? is_array(reset($field->value)) : false;
+		$values = self::$valueIsArr && !$multiple && !$is_array_already ? array($field->value) : $field->value;
 		
 		
 		// *****************************************
@@ -878,10 +879,13 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		$field->use_suborder = $multiple && self::$valueIsArr;
 		
-		// Make sure posted data is an array 
+		// Make sure posted data is an array of arrays
 		$post = !is_array($post) ? array($post) : $post;
+		$v = reset($post);
+		$post = (!is_array($v) && @unserialize($v)=== false)  ?  array($post)  :  $post;
 		
 		// Reformat the posted data
 		$newpost = array();
@@ -889,6 +893,15 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
 		foreach ($post as $n => $v)
 		{
+			// support for basic CSV import / export
+			if ( $is_importcsv && !is_array($v) ) {
+				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
+					$v = unserialize($v);
+				} else {
+					$v = array($v);
+				}
+			}
+			
 			// Do server-side validation and skip empty/invalid values
 			$vals = array();
 			foreach ($v as $i => $nv) {

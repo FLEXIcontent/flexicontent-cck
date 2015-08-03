@@ -332,11 +332,12 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
-			// Compatibility for unserialized values
-			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
-				$value = unserialize($value);
-			} else {
-				$value = array('title' => $value, 'text' => '');
+			// Compatibility for unserialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			if ( !is_array($value) )
+			{
+				$v = !empty($value) ? @unserialize($value) : false;
+				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
+					array('title' => $value, 'text' => '');
 			}
 			if ( empty($value['title']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
@@ -452,11 +453,11 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			foreach ($values as &$value)
 			{
 				// Compatibility for unserialized values or for NULL values in a field group
-				$v = !empty($value) ? @unserialize($value) : false;
-				if ( $v !== false || $v === 'b:0;' ) {
-					$value = $v;
-				} else {
-					$value = array('title' => $value, 'text' => '');
+				if ( !is_array($value) )
+				{
+					$v = !empty($value) ? @unserialize($value) : false;
+					$value = ( $v !== false || $v === 'b:0;' ) ? $v :
+						array('title' => $value, 'text' => '');
 				}
 				
 				if ($lang_filter_values) {

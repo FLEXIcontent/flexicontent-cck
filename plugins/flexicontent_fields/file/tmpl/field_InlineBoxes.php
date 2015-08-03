@@ -41,7 +41,7 @@ foreach($files_data as $file_id => $file_data)
 				'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'
 			</label>
 			<span class="inlinefile-title-data">
-				<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.$file_data->altname.'" class="'.$required_class.'" />
+				<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.(!isset($form_data[$file_id]) ? $file_data->altname : $form_data[$file_id]['file-title']).'" class="'.$required_class.'" />
 			</span>
 		</div>' : '').
 	
@@ -51,7 +51,7 @@ foreach($files_data as $file_id => $file_data)
 				'.JText::_( 'FLEXI_LANGUAGE' ).'
 			</label>
 			<span class="inlinefile-lang-data">
-				'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="use_select2_lib"', $file_data->language, 1).'
+				'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="use_select2_lib"', (!isset($form_data[$file_id]) ? $file_data->language : $form_data[$file_id]['file-lang']), 1).'
 			</span>
 		</div>' : '').
 	
@@ -61,21 +61,21 @@ foreach($files_data as $file_id => $file_data)
 				'.JText::_( 'FLEXI_DESCRIPTION' ).'
 			</label>
 			<span class="inlinefile-desc-data">
-				<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]">'.$file_data->description.'</textarea>
+				<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]">'.(!isset($form_data[$file_id]) ? $file_data->description : $form_data[$file_id]['file-desc']).'</textarea>
 			</span>
 		</div>' : '').
 	
 	( $iform_dir ? '
 		<div class="nowrap_box inlinefile-secure-box">
-			<label class="label inlinefile-secure-lbl '.$tip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
-				'.JText::_( 'FLEXI_TARGET_DIRECTORY' ).'
+			<label class="label inlinefile-secure-lbl '.$tip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
+				'.JText::_( 'FLEXI_URL_SECURE' ).'
 			</label>
 			'.($has_values ? '
 			<span class="inlinefile-secure-info">
-				<span class="badge badge-info">'.JText::_($file_data->secure ?  'FLEXI_SECURE' : 'FLEXI_MEDIA').'</span>
+				<span class="badge badge-info">'.JText::_($file_data->secure ?  'FLEXI_YES' : 'FLEXI_NO').'</span>
 			</span>' : '').'
 			<span class="inlinefile-secure-data" style="'.($has_values ? 'display:none;' : '').'">
-				'.flexicontent_html::buildradiochecklist( array(0=> JText::_( 'FLEXI_MEDIA' ), 1=> JText::_( 'FLEXI_SECURE' )) , $fieldname_n.'[secure]', 1, 1, '', $elementid_n.'_secure').'
+				'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[secure]', 1, 1, '', $elementid_n.'_secure').'
 			</span>
 		</div>' : '').
 	'

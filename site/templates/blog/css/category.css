@@ -11,18 +11,6 @@
 	visibility: hidden;
 }
 
-#flexicontent .floattext:after { /* ie fix in conditional comments (html source) */
-	content: ".";
-	display: block;
-	height: 0;
-	clear: both;
-	visibility: hidden;
-}
-
-#flexicontent .floattext {
-	display:block; /* safari */
-}
-
 /**
  * @section buttons
  *

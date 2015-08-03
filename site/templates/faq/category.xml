@@ -6,29 +6,43 @@
 	<license>GPLv3</license>
 	<version>1.2</version>
 	<release>20 May 2014</release>
-	<description>This HTML5 layout presents category items as faq like listings. Each field put in the aftertitle position will be rendered in a separate row</description>
+	
+	<defaulttitle>FLEXI_TMPL_FAQ_CATEGORY_DEFAULT_TITLE</defaulttitle>
+	<description>FLEXI_TMPL_FAQ_CATEGORY_SHORT_DESC</description>
+
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
-		<field name="description_cut_text" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
-		
-		<field name="subcat_conf" type="separator" hr="false" default="FLEXI_SUBCATEGORIES" level="level2" menu="hide" />
-		<field name="description_cut_text_subcat" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
-		<field name="tmpl_cols" type="radio" default="" label="FLEXI_SUBCAT_COLS" description="FLEXI_SUBCAT_COLS_DESC" class="btn-group btn-group-yesno">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="1">FLEXI_1_COL</option>
-			<option value="2">FLEXI_2_COLS</option>
-			<option value="3">FLEXI_3_COLS</option>
-			<option value="4">FLEXI_4_COLS</option>
-		</field>
-		
-		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
-		<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
-			<option value="">FLEXI_USE_GLOBAL</option>
-			<option value="0">FLEXI_XHTML</option>
-			<option value="1">FLEXI_HTML5</option>
-		</field>
+
+			<field name="custom_layout_title" type="text" size="3" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
+			
+			<field name="disp_params" type="separator" default="FLEXI_DISPLAY" level="level1" menu="hide" />
+			<field name="description_cut_text" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
+			
+			<field name="subcat_conf" type="separator" hr="false" default="FLEXI_SUBCATEGORIES" level="level2" menu="hide" />
+			<field name="description_cut_text_subcat" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
+			<field name="tmpl_cols" type="radio" default="" label="FLEXI_SUBCAT_COLS" description="FLEXI_SUBCAT_COLS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="1">FLEXI_1_COL</option>
+				<option value="2">FLEXI_2_COLS</option>
+				<option value="3">FLEXI_3_COLS</option>
+				<option value="4">FLEXI_4_COLS</option>
+			</field>
+			<field name="cols_placement" type="radio" default="" label="FLEXI_TMPL_FAQ_COLS_PLACEMENT" description="FLEXI_TMPL_FAQ_COLS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_CLEARED</option>
+				<option value="1">FLEXI_AS_MASONRY_TILES</option>
+			</field>
+			
+			<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
+			<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_XHTML</option>
+				<option value="1">FLEXI_HTML5</option>
+			</field>
+			
 		</fieldset>
 	</fields>
+	
 	<fieldgroups>
 		<group readonly="true">subcategory_title</group>
 		<group readonly="true">subcategory_description</group>

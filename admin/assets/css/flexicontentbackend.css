@@ -104,6 +104,7 @@ HEADER ICONS
 .icon-copy_wvalues:before,
 .icon-params:before     { content: "\e018"; color: #51a351; }
 .icon-32-archive:before { content: "\50"; }
+.fcsb-icon-wrench:before{ content: ":"; }
 .fcsb-icon-import:before{ content: "\e022"; }
 .icon-import:before     { content: "\e022"; color: darkorange; }
 .icon-32-restore:before { content: "\6c"; }
@@ -251,7 +252,7 @@ table.adminlist.fcmanlist {
 }
 .flexicontent #fc-filters-box .fc-filter {
 	border:0px !important;
-	margin: 0px 12px 12px 0;
+	margin: 0px 12px 0px 0;
 	padding:0px !important;
 	vertical-align: baseline !important;
 }
@@ -753,15 +754,6 @@ body .tooltip.in {
 	margin:1px 6% 0px 1px;
 }
 
-.fcimporttbl {}
-.fcimportdata {
-	padding-top:6px;
-	font-size:12px;
-	white-space:nowrap;
-}
-.fcimportdata label.fcdata {
-	font-weight: normal;
-}
 .fcimport_sampleline {
 	font-size:12px;
 	line-height:1.6em;

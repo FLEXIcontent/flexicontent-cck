@@ -330,7 +330,37 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			?></div></fieldset><?php endif; ?><?php
 		}
 		?>
-		</div>
+		
+
+		<?php
+		if ( $this->params->get('show_updatecheck', 1) && $user->authorise('core.admin', 'com_flexicontent') )
+		{
+			$this->document->addScriptDeclaration("
+			jQuery(document).ready(function () {
+				if(jQuery.trim(jQuery('#displayfversion').html())=='') {
+					jQuery('#displayfversion').html('<p class=\"qf_centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
+					jQuery.ajax({
+						url: 'index.php?option=com_flexicontent&task=fversioncompare&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1',
+						success: function(str) {
+							jQuery('#displayfversion').html(str);
+							jQuery('#displayfversion').parent().css('height', 'auto');
+						}
+					});
+				}
+			});
+			");
+			echo '
+			<fieldset class="fc-board-set">
+				<legend class="fc-board-header-content-editing">'.JText::_( 'FLEXI_UPDATE_CHECK' ).'</legend>
+				<div class="fc-board-set-inner">
+					<div id="displayfversion" style="float: left;"></div>
+				</div>
+			</fieldset>
+			';
+		}
+		?>
+		
+		</div> <!-- END OF #fc-dash-boardbtns -->
 		
 		
 		<?php
@@ -592,16 +622,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			
 			<?php if (!isset($ssliders['version'])): ?>
 			<?php
-			if($this->params->get('show_updatecheck', 1) == 1) {	 
-				/*if(@$this->check['connect'] == 0) {
-					$title = JText::_( 'FLEXI_CANNOT_CHECK_VERSION' );
-				} else {
-					if (@$this->check['current'] == 0 ) {	 
-						$title = JText::_( 'FLEXI_VERSION_OK' );
-					} else {
-						$title = JText::_( 'FLEXI_NEW_VERSION' );
-					}
-				}*/
+			if ( ! $this->params->get('show_updatecheck', 1) || !$user->authorise('core.admin', 'com_flexicontent') )
+			{
 				$this->document->addScriptDeclaration("
 				jQuery(document).ready(function () {
 					jQuery('#updatecomponent').click(function(e){
@@ -624,74 +646,77 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			?>
 			<?php endif; /* !isset($ssliders['version']) */ ?>
 			
-		<?php ob_start(); ?>
-		<div id="fc-dash-credits">
-		<?php echo !$hide_fc_license_credits ? '<fieldset class="fc-board-set"><legend class="fc-board-header-content-editing">'.JText::_( 'About FLEXIcontent' ).'</legend>' : ''; ?>
-			<div class="fc-board-set-inner">
-			<?php
-				$logo_style = ';';
-				if (!$disable_fc_logo) echo (FLEXI_J16GE ?
-					JHTML::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ') :
-					JHTML::_('image.site', 'logo.png', '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, 'FLEXIcontent', ' id="fc-dash-logo" '));
-			?>
-				<span id="fc-dash-license" class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="">
-					FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2015
-				</span><br/><br/>
-				<span id="fc-dash-devs" class="nowrap_box">
-					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
-						<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span>
-						<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span><br/><br/>
-						<a class="<?php echo $btn_class.(FLEXI_J16GE ? ' btn-primary ' : ' ').$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
+			
+			<?php ob_start(); ?>
+			<div id="fc-dash-credits">
+			<?php echo !$hide_fc_license_credits ? '<fieldset class="fc-board-set"><legend class="fc-board-header-content-editing">'.JText::_( 'About FLEXIcontent' ).'</legend>' : ''; ?>
+				<div class="fc-board-set-inner">
+				<?php
+					$logo_style = ';';
+					if (!$disable_fc_logo) echo (FLEXI_J16GE ?
+						JHTML::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ') :
+						JHTML::_('image.site', 'logo.png', '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, 'FLEXIcontent', ' id="fc-dash-logo" '));
+				?>
+					<span id="fc-dash-license" class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="">
+						FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2015
+					</span><br/><br/>
+					<span id="fc-dash-devs" class="nowrap_box">
+						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
+							<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span>
+							<span class="label label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span><br/><br/>
+							<a class="<?php echo $btn_class.(FLEXI_J16GE ? ' btn-primary ' : ' ').$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
+						</span>
+						
+						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+							<span class="label label-info <?php echo $tooltip_class;?>" title="Core Developer">Marvelic Engine</span><br/><br/>
+							<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
+								marvelic.co.th
+							</a>
+						</span>
+						
+						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+							<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Suriya Kaewmungmuang</span>
+						</span>
+						
+						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+							<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Yannick Berges</span><br/><br/>
+							<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://com3elles.com/" target="_blank" title="<?php echo flexicontent_html::getToolTip("Com'3Elles", "Com'3Elles, agence de communication, conseil et formations", 0, 1); ?>">
+								com3elles.com
+							</a>
+						</span>
+						
+						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+							<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">Ruben Reyes</span><br/><br/>
+							<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
+								lyquix.com
+							</a>
+						</span>
 					</span>
 					
-					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-						<span class="label label-info <?php echo $tooltip_class;?>" title="Core Developer">Marvelic Engine</span><br/><br/>
-						<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
-							marvelic.co.th
-						</a>
-					</span>
-					
-					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-						<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Suriya Kaewmungmuang</span>
-					</span>
-					
-					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-						<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Yannick Berges</span><br/><br/>
-						<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://com3elles.com/" target="_blank" title="<?php echo flexicontent_html::getToolTip("Com'3Elles", "Com'3Elles, agence de communication, conseil et formations", 0, 1); ?>">
-							com3elles.com
-						</a>
-					</span>
-					
-					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-						<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">Ruben Reyes</span><br/><br/>
-						<a class="<?php echo $btn_class.(FLEXI_J30GE ? ' btn-small ' : ' fcsmall fcsimple ').$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
-							lyquix.com
-						</a>
-					</span>
-				</span>
-				
+				</div>
+			<?php echo !$hide_fc_license_credits ? '</fieldset>' : ''; ?>
+			
 			</div>
-		<?php echo !$hide_fc_license_credits ? '</fieldset>' : ''; ?>
+			<?php $fc_logo_license = ob_get_clean(); ?>
+			
+			<?php
+			// Place PHP/DB requirements at bottom if no warning found
+			if ( !isset($php_lims['warning']) ) :
+				echo $fc_requirements;
+			endif;
+			?>
+			
+			<?php
+			if ($hide_fc_license_credits) :
+				echo JHtml::_('sliders.panel', "About FLEXIcontent", 'aboutflexi' );
+				echo $fc_logo_license;
+			endif;
+			?>
+			
+			<?php echo JHtml::_('sliders.end'); ?>
+			
+		<?php endif; /* !$skip_sliders */ ?>
 		
-		</div>
-		<?php $fc_logo_license = ob_get_clean(); ?>
-		
-		<?php
-		// Place PHP/DB requirements at bottom if no warning found
-		if ( !isset($php_lims['warning']) ) :
-			echo $fc_requirements;
-		endif;
-		?>
-		
-		<?php
-		if ($hide_fc_license_credits) :
-			echo JHtml::_('sliders.panel', "About FLEXIcontent", 'aboutflexi' );
-			echo $fc_logo_license;
-		endif;
-		?>
-		
-		<?php echo JHtml::_('sliders.end'); ?>
-	<?php endif; /* !$skip_sliders */ ?>
 		
 		<?php if (!$hide_fc_license_credits) echo $fc_logo_license; ?>
 		

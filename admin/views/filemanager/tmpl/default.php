@@ -31,6 +31,12 @@ $ctrl_task_authors = FLEXI_J16GE ? 'task=users.'  :  'controller=users&amp;task=
 $permissions = FlexicontentHelperPerm::getPerm();
 $session = JFactory::getSession();
 $document = JFactory::getDocument();
+$cparams = JComponentHelper::getComponent('com_flexicontent')->params;
+
+$_folder_type_title = JText::_('FLEXI_URL_SECURE');
+$_folder_type_desc = JText::_('FLEXI_URL_SECURE_DESC');
+$secure_folder_tip  = '<img src="components/com_flexicontent/assets/images/comment.png" data-placement="bottom" class="fc-man-icon-s '.$tip_class.'" alt="'.$_folder_type_title.'" title="'.flexicontent_html::getToolTip($_folder_type_title, $_folder_type_desc, 0, 1).'" />';
+
 
 // Common language strings
 $edit_entry = JText::_('FLEXI_EDIT_FILE', true);
@@ -46,9 +52,13 @@ $document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/ta
 $document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
 $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
-$list_total_cols = 13;
+$list_total_cols = 14;
 ?>
 <script type="text/javascript">
+
+jQuery(document).ready(function() {
+	fctabber['fileman_tabset'].tabShow(0);
+});
 
 // delete active filter
 function delFilter(name)
@@ -183,7 +193,10 @@ function delAllFilters() {
 			<thead>
 				<tr>
 					<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-					<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+					<?php if (!$this->folder_mode) : ?>
+						<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+					<?php endif; ?>
+					
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 					<th class="left">
 						<?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -193,14 +206,25 @@ function delAllFilters() {
 					<th class="center hideOnDemandClass" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_ACCESS' ); ?></th>
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_LANGUAGE' ); ?></th>
-					<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_SIZE', 'f.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-					<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'f.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					
+					<?php if ($this->folder_mode) : ?>
+						<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
+					<?php else : ?>
+						<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_SIZE', 'f.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<?php endif; ?>
+					
+					<?php if (!$this->folder_mode) : ?>
+						<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'f.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+						<th class="center hideOnDemandClass"><?php echo $secure_folder_tip; ?><?php echo JHTML::_('grid.sort', 'FLEXI_URL_SECURE', 'f.secure', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<?php endif; ?>
+					
 					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_FILE_ITEM_ASSIGNMENTS' ); ?> </th>
 					<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 					<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-					<?php if (!$this->folder_mode) { ?>
-					<th class="center hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-					<?php } ?>
+					
+					<?php if (!$this->folder_mode) : ?>
+						<th class="center hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<?php endif; ?>
 				</tr>
 			</thead>
 		
@@ -244,13 +268,14 @@ function delAllFilters() {
 					unset($thumb_or_icon);
 					$filename    = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 					$filename_original = $this->folder_mode ? '' : str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
+					$fileid = $this->folder_mode ? '' : $row->id;
 					$display_filename  = $filename_original ? $filename_original : $filename;
 					
 					if ( !in_array(strtolower($row->ext), $imageexts)) $thumb_or_icon = JHTML::image($row->icon, $row->filename);
 					
 					$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
 					
-					$path		= $row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
+					$path		= !empty($row->secure) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
 					$file_path = $row->filename;
 					
 					if ($this->folder_mode) {
@@ -297,9 +322,11 @@ function delAllFilters() {
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">
 					<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
-					<td>
-						<?php echo $checked; ?>
-					</td>
+					
+					<?php if (!$this->folder_mode) : ?>
+						<td><?php echo $checked; ?></td>
+					<?php endif; ?>
+					
 					<td align="center">
 						<?php echo ' <a href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;cid[]='.$row->id.'" title="'.$edit_entry.'">'.$thumb_or_icon.'</a>'; ?>
 					</td>
@@ -345,20 +372,27 @@ function delAllFilters() {
 					?>
 					</td>
 					
+		<?php if (!$this->folder_mode) : ?>
 					<?php
 					// Set a row language, even if empty to avoid errors
 					$row->language = @$row->language ? $row->language : '*';
 		   		?>
 					<td align="center" class="col_lang">
 						<?php if ( 0 && !empty($row->language) && !empty($this->langs->{$row->language}->imgsrc) ) : ?>
-							<img title="<?php echo $row->language=='*' ? JText::_("All") : $this->langs->{$row->language}->name; ?>" src="<?php echo $this->langs->{$row->language}->imgsrc; ?>" alt="<?php echo $row->language; ?>" />
+							<img title="<?php echo $row->language=='*' ? JText::_("FLEXI_ALL") : $this->langs->{$row->language}->name; ?>" src="<?php echo $this->langs->{$row->language}->imgsrc; ?>" alt="<?php echo $row->language; ?>" />
 						<?php elseif( !empty($row->language) ) : ?>
 							<?php echo $row->language=='*' ? JText::_("FLEXI_ALL") : $this->langs->{$row->language}->name;?>
 						<?php endif; ?>
 					</td>
+		<?php endif; ?>
 					
 					<td align="center"><?php echo $row->size; ?></td>
-					<td align="center"><span class="badge"><?php echo $row->hits; ?></span></td>
+					
+					<?php if (!$this->folder_mode) : ?>
+						<td align="center"><span class="badge"><?php echo empty($row->hits) ? 0 : $row->hits; ?></span></td>
+						<td align="center"><span class="badge badge-info"><?php echo JText::_( $row->secure ? 'FLEXI_YES' : 'FLEXI_NO' ); ?></span></td>
+					<?php endif; ?>
+					
 					<td align="center">
 						<span class="nowrap_box"><?php echo $row->assigned; ?></span>
 						<?php if ($row->count_assigned) : ?>
@@ -513,7 +547,7 @@ function delAllFilters() {
 						<tr>
 							<td id="secure-lbl-container" class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
 								<label class="label" id="secure-lbl">
-								<?php echo JText::_( 'FLEXI_TARGET_DIRECTORY' ); ?>
+								<?php echo JText::_( 'FLEXI_URL_SECURE' ); ?>
 								</label>
 							</td>
 							<td id="secure-container">

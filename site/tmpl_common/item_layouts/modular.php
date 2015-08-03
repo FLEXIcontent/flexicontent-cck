@@ -19,7 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // USE HTML5 or XHTML
-$html5			= $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
+$html5 = $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
 if ($html5) {  /* BOF html5  */
 	echo $this->loadTemplate('html5');
 } else {
@@ -201,7 +201,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	
 	<?php
 		// Find if at least one tabbed position is used
-		$tabcount = 6; $createtabs = false;
+		$tabcount = 12; $createtabs = false;
 		for ($tc=1; $tc<=$tabcount; $tc++) {
 			$createtabs = @$createtabs ||  isset($item->positions['subtitle_tab'.$tc]);
 		}
@@ -298,9 +298,9 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 		<div class="description group">
 			<?php foreach ($item->positions['description'] as $field) : ?>
 				<?php if ($field->label) : ?>
-			<div class="desc-title flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
+			<div class="desc-title label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
 				<?php endif; ?>
-			<div class="desc-content flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			<div class="desc-content field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
 			<?php endforeach; ?>
 		</div>
 		<!-- EOF description -->
@@ -312,7 +312,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	
 	<?php
 		// Find if at least one tabbed position is used
-		$tabcount = 6; $createtabs = false;
+		$tabcount = 12; $createtabs = false;
 		for ($tc=1; $tc<=$tabcount; $tc++) {
 			$createtabs = @$createtabs ||  isset($item->positions['bottom_tab'.$tc]);
 		}

@@ -17,7 +17,7 @@ foreach($files_data as $file_id => $file_data)
 			'.($file_data->published ?
 			'  <span class="fcfield_textval inline_style_published inlinefile-file-info-txt" id="a_name'.$n.'">'.$filename_original.'</span> '
 				.($file_data->url ? ' ['.$file_data->altname.']' : '') :
-			'  <span class="fcfield_textval inline_style_unpublished inlinefile-file-info-txt hasTooltip" title="'.flexicontent_html::getToolTip('FLEXI_UNPUBLISHED', '', 1, 1).'" style="opacity:0.5; text-style:italic;" id="a_name'.$n.'" [UNPUBLISHED]">'.$filename_original.'</span> '
+			'  <span class="fcfield_textval inline_style_unpublished inlinefile-file-info-txt hasTooltip" title="'.flexicontent_html::getToolTip('FLEXI_FILE_FIELD_FILE_UNPUBLISHED', 'FLEXI_FILE_FIELD_FILE_UNPUBLISHED_DESC', 1, 1).'" style="opacity:0.5; text-style:italic;" id="a_name'.$n.'" [UNPUBLISHED]">'.$filename_original.'</span> '
 				.($file_data->url ? ' ['.$file_data->altname.']' : '')
 			).'
 			
@@ -53,7 +53,7 @@ foreach($files_data as $file_id => $file_data)
 		</td>
 		<td class="inlinefile-title-data-cell">
 			<span class="inlinefile-title-data">
-				<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.$file_data->altname.'" class="'.$required_class.'" />
+				<input type="text" id="'.$elementid_n.'_file-title" size="44" name="'.$fieldname_n.'[file-title]" value="'.(!isset($form_data[$file_id]) ? $file_data->altname : $form_data[$file_id]['file-title']).'" class="'.$required_class.'" />
 			</span>
 		</td>
 	</tr>' : '').
@@ -67,7 +67,7 @@ foreach($files_data as $file_id => $file_data)
 		</td>
 		<td class="inlinefile-lang-data-cell">
 			<span class="inlinefile-lang-data">
-				'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="use_select2_lib"', $file_data->language, 1).'
+				'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="use_select2_lib"', (!isset($form_data[$file_id]) ? $file_data->language : $form_data[$file_id]['file-lang']), 1).'
 			</span>
 		</td>
 	</tr>' : '').
@@ -81,7 +81,7 @@ foreach($files_data as $file_id => $file_data)
 		</td>
 		<td class="inlinefile-desc-data-cell">
 			<span class="inlinefile-desc-data">
-				<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]">'.$file_data->description.'</textarea>
+				<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]">'.(!isset($form_data[$file_id]) ? $file_data->description : $form_data[$file_id]['file-desc']).'</textarea>
 			</span>
 		</td>
 	</tr>' : '').
@@ -89,17 +89,17 @@ foreach($files_data as $file_id => $file_data)
 	( $iform_dir ? '
 	<tr class="inlinefile-secure-row">
 		<td class="key inlinefile-secure-lbl-cell">
-			<label class="label inlinefile-secure-lbl '.$tip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
-				'.JText::_( 'FLEXI_TARGET_DIRECTORY' ).'
+			<label class="label inlinefile-secure-lbl '.$tip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
+				'.JText::_( 'FLEXI_URL_SECURE' ).'
 			</label>
 		</td>
 		<td class="inlinefile-secure-data-cell">
 			'.($has_values ? '
 			<span class="inlinefile-secure-info">
-				<span class="badge badge-success">'.JText::_($file_data->secure ?  'FLEXI_SECURE' : 'FLEXI_MEDIA').'</span>
+				<span class="badge badge-info">'.JText::_($file_data->secure ?  'FLEXI_YES' : 'FLEXI_NO').'</span>
 			</span>' : '').'
 			<span class="inlinefile-secure-data" style="'.($has_values ? 'display:none;' : '').'">
-				'.flexicontent_html::buildradiochecklist( array(0=> JText::_( 'FLEXI_MEDIA' ), 1=> JText::_( 'FLEXI_SECURE' )) , $fieldname_n.'[secure]', 1, 1, '', $elementid_n.'_secure').'
+				'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[secure]', 1, 1, '', $elementid_n.'_secure').'
 			</span>
 		</td>
 	</tr>' : '').

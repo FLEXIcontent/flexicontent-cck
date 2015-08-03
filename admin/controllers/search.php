@@ -37,4 +37,13 @@ class FlexicontentControllerSearch extends FlexicontentController
 	function __construct() {
 		parent::__construct();
 	}
+
+	function purge()
+	{
+		$model = $this->getModel('search');
+		$model->purge();
+		$msg = JText::_('FLEXI_ITEMS_PURGED');
+		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
+	}
+
 }

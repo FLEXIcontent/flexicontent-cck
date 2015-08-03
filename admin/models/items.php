@@ -153,6 +153,7 @@ class FlexicontentModelItems extends JModelLegacy
 		if ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering'))
 		{
 			$jinput->set( 'filter_subcats',	0 );
+			$filter_subcats = 0;
 		}
 		
 		$this->setState('filter_cats', $filter_cats);
@@ -612,7 +613,8 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( empty($this->_extra_cols) ) return;
 		if ( empty($this->_data) ) return;
 		
-		$item_ids  = array_keys($this->_data);
+		$item_ids = array();
+		foreach($this->_data as $item) $item_ids[] = $item->id;
 		$field_ids = array_keys($this->_extra_cols);
 		$db = JFactory::getDBO();
 		$query = 'SELECT field_id, value, item_id, valueorder, suborder'
@@ -754,6 +756,8 @@ class FlexicontentModelItems extends JModelLegacy
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		
+		$search_prefix = $this->cparams->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		
 		$typeid       = $jinput->get('typeid', 1, 'int');
 		$default_cat  = $jinput->get('default_cat', 0, 'int');
 		$default_lang = flexicontent_html::getSiteDefaultLang();
@@ -812,7 +816,13 @@ class FlexicontentModelItems extends JModelLegacy
 		foreach ($rows as $row)
 		{
 			$ilang = $row->language ? $row->language : $default_lang;
-			$itemext[$i] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.$row->text_stripped).', 0)';
+			
+			if ($search_prefix)
+				$_search_index = preg_replace('/(\b[^\s]+\b)/', $search_prefix.'$0', $row->title.' | '.$row->text_stripped);
+			else
+				$_search_index = $row->title.' | '.$row->text_stripped;
+			
+			$itemext[$i] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($_search_index).', 0)';
 			$id_arr[$i] = (int)$row->id;
 			$query_len += strlen($itemext[$i]) + 2;  // Sum of query length so far
 			$n++; $i++;
@@ -982,7 +992,7 @@ class FlexicontentModelItems extends JModelLegacy
 		} else {
 			$query =
 				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' u.name AS editor, rel.catid as rel_catid, '
-				. 'GROUP_CONCAT(DISTINCT rel.catid SEPARATOR  ",") AS relcats, '
+				. 'GROUP_CONCAT(DISTINCT icats.catid SEPARATOR  ",") AS relcats, '
 				. 'GROUP_CONCAT(DISTINCT tg.tid    SEPARATOR  ",") AS taglist, '
 				. 'level.title AS access_level, '
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
@@ -1006,6 +1016,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. ((!$query_ids && count($customFiltsActive)) ? ' JOIN #__flexicontent_fields_item_relations as fi ON i.id=fi.item_id' : '')
 				. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON i.id=tg.itemid'
 				. (in_array('RV', $filter_state)  ? ' JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS icats ON icats.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' // left join and not inner join, needed to INCLUDE items do not have records in the multi-cats-items TABLE
 				.    ($filter_cats && !$filter_subcats ? ' AND rel.catid='.$filter_cats : '')
 				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = '.( $tmp_only ? 'i.' : 'ie.').'type_id'   // left join and not inner join, needed to INCLUDE items without type !!

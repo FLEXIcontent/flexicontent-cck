@@ -61,12 +61,15 @@ class flexicontent_cats
 	 * and sets this parent in the member variable 'parentcats_ids'
 	 *
 	 */
-	protected function getParentCats()
+	protected function getParentCats($all_cols=false)
 	{
 		$db = JFactory::getDBO();
 		
-		$query = 'SELECT id, title, published,'
-				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
+		$this->parentcats_data = array();
+		if (empty($this->parentcats_ids)) return;
+		
+		$query = 'SELECT ' .($all_cols ? '*,' : 'id, title, published,')
+				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				.' FROM #__categories'
 				.' WHERE id IN ('.implode($this->parentcats_ids, ',').')'
 				. (!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ' )
@@ -106,7 +109,7 @@ class flexicontent_cats
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');*/
 		
 		global $globalcats;
-		$this->parentcats_ids = $globalcats[$cid]->ancestorsarray;
+		$this->parentcats_ids = isset($globalcats[$cid]) ? $globalcats[$cid]->ancestorsarray : array();
 		//echo "<pre>" . print_r($this->parentcats_ids, true) ."</pre>";
 	}
 	

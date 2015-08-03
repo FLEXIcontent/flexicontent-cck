@@ -53,12 +53,10 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			return;
 		}
 		
-		//Load pane behavior
-		if (!FLEXI_J16GE)
-			jimport('joomla.html.pane');
-		// load the file system librairies
+		// Load the file system librairies
 		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.file');	
+		jimport('joomla.filesystem.file');
+		
 		// activate the tooltips
 		JHTML::_('behavior.tooltip');
 
@@ -287,8 +285,6 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$website 	= $app->getCfg('live_site');
 
 				
-		if (!FLEXI_J16GE)
-			$this->assignRef('pane'			, $pane);
 		$this->assignRef('pending'		, $pending);
 		$this->assignRef('revised'		, $revised);
 		$this->assignRef('draft'		, $draft);
@@ -388,6 +384,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$check = array();
 		$check['connect'] = 0;
 		$check['current_version'] = $com_xml['version'];
+		$check['current_creationDate'] = $com_xml['creationDate'];
 
 		//try to connect via cURL
 		if (function_exists('curl_init') && function_exists('curl_exec')) {
@@ -405,7 +402,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 						
 			@curl_close($ch);
 		}
-
+		
 		//try to connect via fsockopen
 		if(function_exists('fsockopen') && $data == '') {
 
@@ -466,41 +463,29 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			@fclose($handle);
 		}
 		
-		if( $data && strstr($data, '<?xml version="1.0" encoding="utf-8"?><update>') ) {
-			if (!FLEXI_J16GE) {
-				$xml = JFactory::getXMLparser('Simple');
-				$xml->loadString($data);
-				$version           = & $xml->document->version[0];
-				$check['version']  = $version->data();
-				$released          = & $xml->document->released[0];
-				$check['released'] = $released->data();
-				$check['connect']  = 1;
-				$check['enabled']  = 1;
-				$check['current']  = version_compare( str_replace(' ', '', $check['current_version']), str_replace(' ', '', $check['version']) );
-			} else {
-				$xml = JFactory::getXML($data, $isFile=false);
-				$check['version']  = (string)$xml->version;
-				$check['released'] = (string)$xml->released;
-				$check['connect']  = 1;
-				$check['enabled']  = 1;
-				$check['current']  = version_compare( str_replace(' ', '', $check['current_version']), str_replace(' ', '', $check['version']) );
-			}
+		if( $data && strstr($data, '<?xml') )
+		{
+			$xml = JFactory::getXML($data, $isFile=false);
+			$check['version']  = (string)$xml->version;
+			$check['released'] = (string)$xml->released;
+			$check['connect']  = 1;
+			$check['enabled']  = 1;
+			$check['current']  = version_compare( str_replace(' ', '', $check['current_version']), str_replace(' ', '', $check['version']) );
 		}
 		
 		return $check;
 	}
 	
 	
-	function fversion(&$tpl, &$params) {
+	function fversion(&$tpl, &$params)
+	{
 		// Cache update check of FLEXIcontent version
-		if( $params->get('show_updatecheck', 1) )
-		{
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->setCaching( 1 );
-			$cache->setLifeTime( 24*3600 );  // Set expire time (hard-code this to 1 day), since it is costly
-			$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
-			$this->assignRef('check', $check);
-		}
+		$cache = JFactory::getCache('com_flexicontent');
+		$cache->setCaching( 1 );
+		$cache->setLifeTime( 3600 );  // Set expire time (hard-code this to 1 hour), to avoid server load
+		$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
+		$this->assignRef('check', $check);
+		
 		parent::display($tpl);
 	}
 }
