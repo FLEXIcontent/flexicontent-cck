@@ -21,7 +21,7 @@
 	
 	<fields name="attribs">
 		
-		<!--FLEXI_TYPE_DESC_CUSTOMIZE--><!--FLEXI_TYPE_FIELDS1_CUSTOMIZE--><!--FLEXI_TYPE_FIELDS2_CUSTOMIZE-->s
+		<!--FLEXI_TYPE_DESC_CUSTOMIZE--><!--FLEXI_TYPE_FIELDS1_CUSTOMIZE--><!--FLEXI_TYPE_FIELDS2_CUSTOMIZE-->
 
 		<fieldset name="customize_field-title" label="FLEXI_TITLE">
 		
@@ -34,6 +34,12 @@
 			<field name="title_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
 			<field name="title_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
 			<field name="title_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2" />
+			<field name="auto_title" type="radio" default="0" label="FLEXI_AUTO_TITLE" description="FLEXI_AUTO_TITLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_SET_TO_ID</option>
+			</field>
 			
 		</fieldset>
 		<fieldset name="customize_field-description" label="FLEXI_DESCRIPTION">
@@ -440,6 +446,11 @@
 			<field name="" type="separator" default="FLEXI_BASIC_EDITING" label="" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_NEW_EXISTING_ITEMS" label="" level="level2" />
+			<field name="usetitle_fe" type="radio" default="" label="FLEXI_USE_TITLE_EDIT_FIELD" description="FLEXI_USE_TITLE_EDIT_FIELD_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE_IF_AUTO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="usealias_fe" type="radio" default="" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>

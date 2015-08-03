@@ -52,6 +52,11 @@
 			
 			<field name="" type="separator" default="FLEXI_BASIC_EDITING" label="" level="level1" />
 			
+			<field name="usetitle_fe" type="radio" default="" label="FLEXI_USE_TITLE_EDIT_FIELD" description="FLEXI_USE_TITLE_EDIT_FIELD_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE_IF_AUTO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="usealias_fe" type="radio" default="" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>

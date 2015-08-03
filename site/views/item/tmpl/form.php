@@ -343,11 +343,11 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		</fieldset>
 	<?php $captured['captcha'] = ob_get_clean(); ?>
 
-<?php endif; ?>
+<?php endif;
 
 
 
-<?php ob_start();  // title ?>
+if ( !$this->params->get('auto_title', 0) || $this->params->get('usetitle_fe', 1)  ) :  ob_start();  // title ?>
 	<?php
 	$field = $this->fields['title'];
 	$field_description = $field->description ? $field->description :
@@ -362,7 +362,10 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	<?php /*echo $this->form->getLabel('title');*/ ?>
 	
 	<div class="container_fcfield container_fcfield_id_6 container_fcfield_name_title" id="container_fcfield_6">
-	<?php	if ( isset($this->item->item_translations) ) :?>
+		
+	<?php if ( $this->params->get('auto_title', 0) ): ?>
+		<?php echo '<span class="badge badge-info">'.($this->item->id ? $this->item->id : JText::_('FLEXI_AUTO')).'</span>'; ?>
+	<?php elseif ( isset($this->item->item_translations) ) :?>
 		
 		<?php
 		array_push($tabSetStack, $tabSetCnt);
@@ -396,7 +399,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	<?php endif; ?>
 
 	</div>
-<?php $captured['title'] = ob_get_clean();
+<?php $captured['title'] = ob_get_clean(); endif;
 
 
 

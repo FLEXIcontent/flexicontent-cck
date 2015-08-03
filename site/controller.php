@@ -277,7 +277,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Merge the type parameters
 		$tparams = $model->getTypeparams();
-		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
+		$tparams = new JRegistry($tparams);
 		$params->merge($tparams);
 		
 		// Merge the menu parameters
@@ -300,8 +300,10 @@ class FlexicontentController extends JControllerLegacy
 		$data   = JRequest::getVar('jform', array(), 'post', 'array');   // Core Fields and and item Parameters
 		$custom = JRequest::getVar('custom', array(), 'post', 'array');  // Custom Fields
 		$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
+		
 		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid' );
 		if ( ! @ $data['rules'] ) $data['rules'] = array();
+		if ( $params->get('auto_title', 0) )  $data['title'] = (int) $data['id'];  // item id or ZERO for new items
 		
 		// Set data id into model in case not already set ?
 		$model->setId((int) $data['id']);

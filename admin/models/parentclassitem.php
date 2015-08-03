@@ -2067,6 +2067,12 @@ class ParentClassItem extends JModelAdmin
 		{
 			// Only create the item not save the CUSTOM fields yet, no need to rebind this is already done above
 			$this->applyCurrentVersion($item, $data, $createonly=true);
+			if ($cparams->get('auto_title', 0))  // AUTOMATIC TITLE, set to item ID
+			{
+				$item->title = $item->id;
+				$this->_db->setQuery('UPDATE #__content SET title=id WHERE id=' . (int)$item->id);
+				$this->_db->query();
+			}
 		} else {
 			// ??? Make sure the data of the model are correct  ??? ... maybe this no longer needed
 			// e.g. a getForm() used to validate input data may have set an empty item and empty id

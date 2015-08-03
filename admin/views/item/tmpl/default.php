@@ -240,7 +240,10 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<?php /*echo $this->form->getLabel('title');*/ ?>
 	
 			<div class="container_fcfield container_fcfield_id_6 container_fcfield_name_title input-fcmax" id="container_fcfield_6">
-			<?php	if ( isset($this->row->item_translations) ) :?>
+			
+			<?php if ( $this->params->get('auto_title', 0) ): ?>
+				<?php echo '<span class="badge badge-info">'.($this->row->id ? $this->row->id : JText::_('FLEXI_AUTO')).'</span>'; ?>
+			<?php	elseif ( isset($this->row->item_translations) ) :?>
 				<?php
 				array_push($tabSetStack, $tabSetCnt);
 				$tabSetCnt = ++$tabSetMax;
@@ -271,6 +274,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<?php else : ?>
 				<?php echo $this->form->getInput('title');?>
 			<?php endif; ?>
+			
 			</div>
 			
 			

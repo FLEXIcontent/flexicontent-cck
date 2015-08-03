@@ -88,7 +88,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		$data   = JRequest::getVar('jform', array(), 'post', 'array');   // Core Fields and and item Parameters
 		$custom = JRequest::getVar('custom', array(), 'post', 'array');  // Custom Fields
 		$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
+		
 		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid' );
+		if ( $params->get('auto_title', 0) )  $data['title'] = (int) $data['id'];  // item id or ZERO for new items
 		
 		// Set data id into model in case not already set ?
 		$model->setId((int) $data['id']);
