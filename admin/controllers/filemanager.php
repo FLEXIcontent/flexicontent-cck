@@ -101,7 +101,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$file_mode= JRequest::getVar( 'folder_mode', 0 ) ? 'folder_mode' : 'db_mode';
 		$err		= null;
 		
-		$model = $this->getModel('fileselement');
+		$model = $this->getModel('filemanager');
 		if ($file_mode != 'folder_mode' && $fieldid)
 		{
 			// Check if FORCED secure/media mode parameter exists and if it is forced
