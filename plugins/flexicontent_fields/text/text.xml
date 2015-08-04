@@ -77,6 +77,7 @@
 				<option value="2" show_list="custom_placeholder" hide_list="">FLEXI_CLEARED</option>
 				<option value="-1" show_list="" hide_list="custom_placeholder">FLEXI_AS_PLACEHOLDER</option>
 			</field>
+			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			<field name="placeholder" type="text" default="" label="FLEXI_FIELD_PLACEHOLDER" description="FLEXI_FIELD_PLACEHOLDER_DESC" depend_class="custom_placeholder" />
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />

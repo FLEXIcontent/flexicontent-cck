@@ -27,6 +27,7 @@
 				<option value="1">FLEXI_FLOATED_LEFT</option>
 				<option value="2">FLEXI_CLEARED</option>
 			</field>
+			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
@@ -226,11 +227,11 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" level="level2" />
-			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC" class="btn-group btn-group-yesno" depend_class="img-link-nourl-mode">
+			<field name="usepopup_disabled" type="separator" label="" default="Gallery navigation JS has been disabled, because parameter 'Link to URL' was enabled" description="..." class="alert fcpadded" depend_class="img-link-url-mode" />
+			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC" class="btn-group btn-group-yesno" depend_class="">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usepopup_disabled" type="separator" label="" default="Gallery navigation JS has been disabled, because parameter 'Link to URL' was enabled" description="..." class="alert fcpadded" depend_class="img-link-url-mode" />
 				
 			<field name="popupinview" type="fccheckbox" default=""
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"

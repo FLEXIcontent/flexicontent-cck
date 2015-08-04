@@ -838,24 +838,37 @@ class FlexicontentViewItem  extends JViewLegacy
 			// NOTE: this is DONE only for CUSTOM fields, since form field html is created by the form for all CORE fields, EXCEPTION is the 'text' field (see bellow)
 			if (!$field->iscore)
 			{
+				if ( isset($jcustom[$field->name]) ) {
+					$field->value = array();
+					foreach ($jcustom[$field->name] as $i => $_val)  $field->value[$i] = $_val;
+				}
+				
 				$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
-
-				if ( !$is_editable ) {
-					$field->html = '<div class="fc-mssg fc-warning">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
-				} else {
-					if ( isset($jcustom[$field->name]) ) {
-						$field->value = array();
-						foreach ($jcustom[$field->name] as $i => $_val) {
-							//$field->value[$i] = is_array($_val) ? serialize($_val) : $_val;
-							$field->value[$i] = $_val;
-						}
-					}
+				
+				if ($is_editable) {
 					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
 					if (/*$modify_untraslatable_values &&*/ $field->untranslatable) {
-						$field->html = '
-							<div class="alert alert-info fc-small fc-iblock">'. JText::_('FLEXI_FIELD_VALUE_IS_NON_TRANSLATABLE') . '</div>'
-							.$field->html;
+						$field->html = '<div class="alert alert-info fc-small fc-iblock">'. JText::_('FLEXI_FIELD_VALUE_IS_NON_TRANSLATABLE') . '</div>'."\n".$field->html;
 					}
+				}
+				
+				else if ($field->valueseditable==1) {
+					$field->html = '<div class="fc-mssg fc-note">'. JText::_($field->parameters->get('no_acc_msg_form') ? $field->parameters->get('no_acc_msg_form') : 'FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
+				}
+				
+				else if ($field->valueseditable==2) {
+					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
+					$field->html = '<div class="fc-mssg fc-note">'. JText::_($field->parameters->get('no_acc_msg_form') ? $field->parameters->get('no_acc_msg_form') : 'FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>'."\n".$field->display;
+				}
+				
+				else if ($field->valueseditable==3) {
+					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array( &$field, $item ));
+					$field->html = $field->display;
+				}
+				
+				else if ($field->valueseditable==4) {
+					$field->html = '';
+					$field->formhidden = 4;
 				}
 			}
 
