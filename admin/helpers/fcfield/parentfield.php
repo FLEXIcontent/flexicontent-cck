@@ -39,25 +39,15 @@ class FCField extends JPlugin
 	}
 	
 	
-	public function setField(&$field)
-	{
-		$this->field = $field;
-	}
 	
-	public function &getField()
-	{
-		return $this->field;
-	}
+	// ******************
+	// Accessor functions
+	// ******************
 	
-	public function setItem(&$item)
-	{
-		$this->item = $item;
-	}
-	
-	public function &getItem()
-	{
-		return $this->item;
-	}
+	public function setField(&$field) { $this->field = $field; }
+	public function setItem(&$item)   { $this->item = $item; }
+	public function &getField() { return $this->field; }
+	public function &getItem()  { return $this->item; }
 	
 	
 	protected function getSeparatorF($opentag, $closetag)
@@ -218,16 +208,11 @@ class FCField extends JPlugin
 	}
 	
 	
-	/**
-	 * Get the path to a layout for a field
-	 *
-	 * @param   string  $plg  The name of the field
-	 * @param   string  $layout  The name of the field layout. If alternative layout, in the form template:filename.
-	 *
-	 * @return  string  The path to the field layout
-	 *
-	 * @since   1.5
-	 */
+	
+	// ************************************************
+	// Calculate and return the layout path for a field
+	// ************************************************
+	
 	public static function getLayoutPath($plg, $layout = 'field')
 	{
 		static $paths = array();
@@ -268,14 +253,26 @@ class FCField extends JPlugin
 		return $return;
 	}
 	
+	
+	// Get Layout paths for editing, this is a wrapper to getLayoutPath()
 	public function getFormPath($plg, $layout) {
 		return $this->getLayoutPath($plg, $layout);
 	}
-
-	protected function includePath($path, $prop='display') {
-		if(!file_exists($path)) {
-			return false;
-		}
+	
+	// Get Layout paths for viewing, this is a wrapper to getLayoutPath()
+	public function getViewPath($plg, $layout) {
+		return $this->getLayoutPath($plg, $layout);
+	}
+	
+	
+	
+	// ****************************************************************************************
+	// Include a layout file, setting some variables, for compatibility: $field, $item, $values
+	// ****************************************************************************************
+	
+	protected function includePath($path, $prop='display')
+	{
+		if (!file_exists($path)) return false;
 		$field  = $this->getField();
 		$item   = $this->getItem();
 		$values = & $this->values;
@@ -283,28 +280,12 @@ class FCField extends JPlugin
 		return true;
 	}
 	
-	public function getViewPath($plg, $layout) {
-		return $this->getLayoutPath($plg, $layout);
-	}
-	
-	protected function getOpenTag() {
-		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'opentag', '' ), 'opentag' );
-	}
-	
-	protected function getCloseTag() {
-		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'closetag', '' ), 'closetag' );
-	}
 	
 	
-	protected function getDefaultValues() {
-		return array('');
-	}
+	// *********************************************
+	// Function to create field's HTML for edit form
+	// *********************************************
 	
-	
-	protected function beforeDisplayField() {
-		// do something
-	}
-
 	protected function displayField($layout = 'field')
 	{
 		// Prepare variables
@@ -333,10 +314,10 @@ class FCField extends JPlugin
 	}
 	
 	
-	protected function afterDisplayField() {
-		// do something
-	}
 	
+	// *****************************************************
+	// Function to create field's HTML display (for viewing)
+	// *****************************************************
 	
 	protected function displayFieldValue($prop='display', $layout = 'value')
 	{
@@ -352,7 +333,7 @@ class FCField extends JPlugin
 		$field->{$prop} = array();
 		
 		// Execute template file: VALUE VIEWING
-		$this->includePath(self::getViewPath($this->fieldtypes[0], $layout));
+		$this->includePath(self::getViewPath($this->fieldtypes[0], $layout), $prop);
 		
 		// Apply separator and open/close tags
 		if (!$use_ingroup)  // do not convert the array to string if field is in a group
@@ -368,6 +349,30 @@ class FCField extends JPlugin
 	}
 	
 	
+	
+	// *********************************************
+	// Functions to execute common value preparation
+	// *********************************************
+	
+	protected function getOpenTag() {
+		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'opentag', '' ), 'opentag' );
+	}
+	protected function getCloseTag() {
+		return FlexicontentFields::replaceFieldValue( $this->field, $this->item, $this->field->parameters->get( 'closetag', '' ), 'closetag' );
+	}
+	
+	// Do something before creating field's HTML for edit form
+	protected function beforeDisplayField() {}
+	
+	// do something after creating field's HTML for edit form
+	protected function afterDisplayField() {}
+	
+	// Create and returns a default value
+	protected function getDefaultValues() {
+		return array('');
+	}
+	
+	// Parses and returns fields values, unserializing them if serialized
 	protected function & parseValues(&$_values)
 	{
 		$vals = array();

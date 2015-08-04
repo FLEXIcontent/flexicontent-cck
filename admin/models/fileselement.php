@@ -208,10 +208,11 @@ class FlexicontentModelFileselement extends JModelLegacy
 	 * @return integer
 	 * @since 1.0
 	 */
-	function getFilesFromPath($itemid, $fieldid, $append_item=1, $append_field=0, $folder_param_name='dir', $exts='jpg,jpeg,gif,png')
+	function getFilesFromPath($itemid, $fieldid, $append_item=1, $append_field=0, $folder_param_name='dir', $exts='bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics')
 	{
 		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
+		$imageexts = array('jpg','gif','png','bmp','jpeg');  // Common image extensions
 		
 		$gallery_folder = $this->getFieldFolderPath($itemid, $fieldid, $append_item, $append_field, $folder_param_name);
 		//echo $gallery_folder ."<br />";
@@ -221,35 +222,44 @@ class FlexicontentModelFileselement extends JModelLegacy
 			mkdir($gallery_folder, $mode = 0755, $recursive=true);
 		}
 		
-		// Get all image files with a .jpg extension.
-		$images = glob($gallery_folder . "/*.{".$exts."}", GLOB_BRACE);
-
-		$imageexts = array('jpg','gif','png','bmp','jpeg');
 		
-		// Get image names
+		// Get file list according to filtering
+		$exts = preg_replace("/[\s]*,[\s]*/", '|', $exts);
+		$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gallery_folder)), '#(.*\.)('.$exts.')#i');
+		$it->rewind();
+		
+		// Get file information
 		$rows = array();
-		if ($images) foreach($images as $i => $image) {
-			$pinfo = pathinfo($image);
-			$pinfo['filename'] = !isset($pinfo['filename']) ?   			// workaround for 'filename' added in PHP 5.2+
-				str_replace('.'.$pinfo['extension'], '', $pinfo['basename']) : $pinfo['filename'];
-			//echo "<pre>"; print_r($pinfo); exit;
+		$i = 1;
+		while($it->valid())
+		{
+			if ($it->isDot()) {
+				$it->next();
+				continue;
+			}
+			$filesubpath = $it->getSubPathName();  // filename including the folder subpath
+			$filepath = $it->key();
+			$pinfo = pathinfo($filepath);
 			$row = new stdClass();
 			$row->ext = $pinfo['extension'];
-			$row->filename = $pinfo['filename'].".".$pinfo['extension'];
-			$row->size = sprintf("%.0f KB", (filesize($image) / 1024) );
+			$row->filename = $filesubpath;  //$pinfo['filename'].".".$pinfo['extension'];
+			$row->size = sprintf("%.0f KB", (filesize($filepath) / 1024) );
 			$row->altname = $pinfo['filename'];
 			$row->uploader = '-';
-			$row->uploaded = date("F d Y H:i:s.", filectime($image) );
+			$row->uploaded = date("F d Y H:i:s.", filectime($filepath) );
 			$row->id = $i;
 
 			if ( in_array(strtolower($row->ext), $imageexts)) {
 				$row->icon = JURI::root()."components/com_flexicontent/assets/images/mime-icon-16/image.png";
-			}elseif(file_exists(JPATH_SITE."/components/com_flexicontent/assets/images/mime-icon-16/".$row->ext.".png")) {
+			} elseif (file_exists(JPATH_SITE."/components/com_flexicontent/assets/images/mime-icon-16/".$row->ext.".png")) {
 				$row->icon = JURI::root()."components/com_flexicontent/assets/images/mime-icon-16/".$row->ext.".png";
-			}else{
+			} else {
 				$row->icon = JURI::root()."components/com_flexicontent/assets/images/mime-icon-16/unknown.png";
 			}
 			$rows[] = $row;
+			
+			$i++;
+			$it->next();
 		}
 		
 		return $rows;
