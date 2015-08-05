@@ -149,7 +149,7 @@ input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.bt
 	background-position: 0 -72px !important;
 	font-style: italic !important;
 	color: gray !important;
-	cursor: normal !important;
+	cursor: default !important;
 	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
 }
 
