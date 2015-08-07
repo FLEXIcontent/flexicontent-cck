@@ -33,7 +33,7 @@ if($this->check['connect'] == 0) {
 			<tr>
 				<td colspan="2">
 				<?php
-					echo '<b><font color="red">'.JText::_( 'FLEXI_CONNECTION_FAILED' ).'</font></b>';
+					echo '<strong><font color="red">'.JText::_( 'FLEXI_CONNECTION_FAILED' ).'</font></strong>';
 				?>
 				</td>
 			</tr>
@@ -68,11 +68,11 @@ if($this->check['connect'] == 0) {
 					echo '<strong><span style="color:darkgreen">'.JText::_( 'FLEXI_LATEST_VERSION_INSTALLED' ).'</span></strong>';
 				} elseif( $this->check['current'] == -1 ) {
 					echo '
-					<b><span style="color:darkorange">'.JText::_( 'FLEXI_NEWS_VERSION_COMPONENT' /*'FLEXI_OLD_VERSION_INSTALLED'*/ ).'</span></b>
+					<strong><span style="color:darkorange">'.JText::_( 'FLEXI_NEWS_VERSION_COMPONENT' /*'FLEXI_OLD_VERSION_INSTALLED'*/ ).'</span></strong>
 					<a class="btn btn-primary" href="http://www.flexicontent.org/downloads/latest-version.html" target="_blank" style="margin:4px;">'.JText::_( 'Download' ) .'</a>
 					';
 				} else {
-					echo '<b><span style="color:#777">'.JText::_( 'You have installed a newer version than the latest official version' /*'FLEXI_NEWS_VERSION_COMPONENT'*/ ).'</span></b>';
+					echo '<strong><span style="color:#777">'.JText::_( 'You have installed a newer version than the latest official version' /*'FLEXI_NEWS_VERSION_COMPONENT'*/ ).'</span></strong>';
 				}
 			?>
 			</td>
@@ -84,7 +84,7 @@ if($this->check['connect'] == 0) {
 			</td>
 			<td>
 				<span class="badge badge-success"><?php echo $this->check['version']; ?></span>
-				&nbsp; <b><?php echo JText::_( 'FLEXI_RELEASED_DATE' ); ?></b>:
+				&nbsp; <strong><?php echo JText::_( 'FLEXI_RELEASED_DATE' ); ?></strong>:
 				<?php echo $this->check['released']; ?>
 			</td>
 		</tr>
@@ -94,7 +94,7 @@ if($this->check['connect'] == 0) {
 			</td>
 			<td>
 				<span class="badge <?php echo $this->check['current']==-1 ? 'badge-warning' : ($this->check['current']==0 ? 'badge-success' : ''); ?>"><?php echo $this->check['current_version']; ?></span>
-				&nbsp; <b><?php echo JText::_( 'FLEXI_RELEASED_DATE' ); ?></b>:
+				&nbsp; <strong><?php echo JText::_( 'FLEXI_RELEASED_DATE' ); ?></strong>:
 				
 				<?php
 					try {
