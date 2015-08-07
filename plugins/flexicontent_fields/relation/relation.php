@@ -369,9 +369,11 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			}
 		}
 		
+		$cat_selected = count($allowedtree)==1 ? reset($allowedtree) : '';
+		$cat_selecor_box_style = count($allowedtree)==1 ? 'style="display:none;" ' :'';
 		
 		$_cat_selector = flexicontent_cats::buildcatselect(
-			$allowedtree, $ri_field_name.'_fccats', $catvals="",
+			$allowedtree, $ri_field_name.'_fccats', $catvals=($cat_selected ? $cat_selected->id : ''),
 			$top=2, // (adds first option "please select") Important otherwise single entry in select cannot initiate onchange event
 			' class="use_select2_lib '.$ri_field_name.'_fccats" ',
 			$check_published = true, $check_perms = true,
@@ -392,7 +394,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
 			<span class="fcrelation_field_filters">
 				
-				<span class="fcrelation_field_filter_by_cat nowrap_box">
+				<span class="fcrelation_field_filter_by_cat nowrap_box" '.$cat_selecor_box_style.'>
 					'.($display_cat_filter_label ? '<span class="label">'.JText::_('FLEXI_RIFLD_FILTER_BY_CAT').'</span>' : '').'
 					'.$_cat_selector.'
 				</span>
@@ -489,8 +491,8 @@ jQuery(document).ready(function() {
 		});
 		
 		". ( $title_filter ? $ri_field_name."_titlefilter.init();" : "" ) . "
-		
 	});
+	". ( count($allowedtree)==1 ? "jQuery('#".$ri_field_name."_fccats').trigger('change');" : "" ) . "
 	
 });";
 		

@@ -257,7 +257,7 @@
 			</field>
 			<field name="total_in_view" type="fccheckbox" default=""
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="backend"
-				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" depend_class="viewing-total-mode" class="btn-group btn-group-yesno" />
+				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" depend_class="viewing-total-mode" />
 			<field name="total_append_text" type="text" label="FLEXI_RIFLD_TOTAL_APPEND_TEXT" description="FLEXI_RIFLD_TOTAL_APPEND_TEXT_DESC" depend_class="viewing-total-mode" />
 			
 			<field name="" type="separator" default="FLEXI_EXTRA_INFO" level="level2" depend_class="viewing-total-mode" />
