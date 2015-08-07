@@ -20,7 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 ?>
 
 <div id="flexicontent" class="flexicontent">
-<form action="index.php" method="post"  name="adminForm" id="adminForm">
+<form action="index.php" method="post"  name="adminForm" id="adminForm" class="validate">
 
 	<table cellspacing="10" cellpadding="0" border="0" width="100%">
 		<tr>
@@ -148,7 +148,7 @@ defined('_JEXEC') or die('Restricted access');
 						</td>
 					</tr>
 					<tr id="row_prefix">
-						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_ADD_PREFIX' ); ?></label></td>
+						<td class="key"><label class="label" for="prefix"><?php echo JText::_( 'FLEXI_ADD_PREFIX' ); ?></label></td>
 						<td>
 							<?php
 							if ($this->behaviour == 'translate') $defprefix = JText::_( 'FLEXI_DEFAULT_TRANSLATE_PREFIX' );
@@ -158,7 +158,7 @@ defined('_JEXEC') or die('Restricted access');
 						</td>
 					</tr>
 					<tr id="row_suffix">
-						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_ADD_SUFFIX' ); ?></label></td>
+						<td class="key"><label class="label" for="suffix"><?php echo JText::_( 'FLEXI_ADD_SUFFIX' ); ?></label></td>
 						<td>
 							<input type="text" id="suffix" name="suffix" value="" size="15" />
 						</td>
@@ -177,7 +177,7 @@ defined('_JEXEC') or die('Restricted access');
 						</td>
 					</tr>
 					<tr id="row_language">
-						<td class="key"><label class="label"><?php echo ($this->behaviour == 'translate' ? JText::_( 'NEW' )." " : '').JText::_( 'FLEXI_LANGUAGE' ); ?></label></td>
+						<td class="key"><label class="label" for="language"><?php echo ($this->behaviour == 'translate' ? JText::_( 'NEW' )." " : '').JText::_( 'FLEXI_LANGUAGE' ); ?></label></td>
 						<td>
 							<?php echo $this->lists['language']; ?>
 						</td>

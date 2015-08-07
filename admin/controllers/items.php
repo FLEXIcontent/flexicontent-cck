@@ -770,9 +770,14 @@ class FlexicontentControllerItems extends FlexicontentController
 		$seccats  = JRequest::getVar( 'seccats', array(), 'post', 'array' );
 		$keepseccats = JRequest::getVar( 'keepseccats', 0, 'post', 'int' );
 		$lang    = JRequest::getVar( 'language', '', 'post' );
-		$state   = JRequest::getInt( 'state', '');
+		
+		$state   = JRequest::getVar( 'state', '');
+		$state   = strlen($state) ? (int)$state : null;
+		
 		$type_id = JRequest::getInt( 'type_id', '');
-		$access  = JRequest::getInt( 'access', '');
+		
+		$access  = JRequest::getVar( 'access', '');
+		$access  = strlen($access) ? (int)$access : null;
 		
 		// Set $seccats to --null-- to indicate that we will maintain secondary categories
 		$seccats = $keepseccats ? null : $seccats;
@@ -1040,6 +1045,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				$model->setitemstate($item_id, $stateids[$newstate]);
 			}
 			$msg = count($auth_cid) ." ". JText::_('FLEXI_ITEMS') ." : &nbsp; ". JText::_( 'FLEXI_ITEMS_STATE_CHANGED_TO')." -- ".JText::_( $statenames[$newstate] ) ." --";
+			if ($newstate=='T') $msg .= '<br/> '.JText::_('FLEXI_NOTES').': '.JText::_('FLEXI_DELETE_PERMANENTLY');
 		}
 
 		$cache = FLEXIUtilities::getCache($group='', 0);

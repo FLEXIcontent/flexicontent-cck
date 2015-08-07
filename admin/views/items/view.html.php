@@ -256,7 +256,7 @@ class FlexicontentViewItems extends JViewLegacy
 					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning");
 			} else {
 				$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_TRASH') );
-				$msg_confirm = JText::_('FLEXI_TRASH_CONFIRM');
+				$msg_confirm = JText::_('FLEXI_TRASH_CONFIRM').' '.JText::_('FLEXI_NOTES').': '.JText::_('FLEXI_DELETE_PERMANENTLY');
 				$btn_task    = 'items.changestate';
 				$extra_js    = "document.adminForm.newstate.value='T';";
 				flexicontent_html::addToolBarButton(
@@ -705,6 +705,11 @@ class FlexicontentViewItems extends JViewLegacy
 		flexicontent_html::loadFramework('select2');
 		$document->addScript('components/com_flexicontent/assets/js/copymove.js');
 		
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
+		
 		// Create document/toolbar titles
 		if ($behaviour == 'translate') {
 			$doc_title =  JText::_( 'FLEXI_TRANSLATE_ITEM' );
@@ -731,10 +736,13 @@ class FlexicontentViewItems extends JViewLegacy
 		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="use_select2_lib" multiple="multiple" size="10"', false, false);
 		
 		// build language selection
-		$lists['language'] = flexicontent_html::buildlanguageslist('language', 'class="use_select2_lib"', '', $type = ($behaviour != 'translate' ? JText::_( 'FLEXI_NOCHANGE_LANGUAGE') : 5) );
+		$lists['language'] = flexicontent_html::buildlanguageslist('language', ''/*'class="use_select2_lib"'*/, '', $type = ($behaviour != 'translate' ? JText::_( 'FLEXI_NOCHANGE_LANGUAGE') : 7),
+			$allowed_langs=null, $published_only=true, $disable_langs=null, $add_all=true, array('required'=>1)
+		 );
 		
 		// build state selection
-		$lists['state'] = flexicontent_html::buildstateslist('state', 'class="use_select2_lib"', '');
+		$selected_state = 0; // use unpublished as default state of new items, (instead of '' which means do not change)
+		$lists['state'] = flexicontent_html::buildstateslist('state', 'class="use_select2_lib"', $selected_state);
 		
 		// build types selection
 		$types = flexicontent_html::getTypesList();

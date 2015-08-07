@@ -1493,9 +1493,9 @@ class FlexicontentModelItems extends JModelLegacy
 				$lang_from			= substr($row->language,0,2);
 				$row->language	= $lang ? $lang : $row->language;
 				$lang_to				= substr($row->language,0,2);
-				$row->state			= strlen($state) ? $state : $row->state;
-				$row->type_id		= $type_id ? $type_id : $row->type_id;
-				$row->access		= $access ? $access : $row->access;
+				$row->state			= strlen($state) ? $state : $row->state;  // keep original if: null, ''
+				$row->type_id		= $type_id ? $type_id : $row->type_id;    // keep original if: null, zero, ''
+				$row->access		= $access ? $access : $row->access;       // keep original if: null, zero, ''
 				
 				$doauto['title'] = $doauto['introtext'] = $doauto['fulltext'] = $doauto['metakey'] = $doauto['metadesc'] = true;    // In case JF data is missing
 				if ($translate_method == 2 || $translate_method == 4) {
@@ -1600,11 +1600,10 @@ class FlexicontentModelItems extends JModelLegacy
 				
 				// Create a new item in the content fc_items_ext table
 				$row->store();
-				$copyid = (int)$row->id;
 				
 				// Not doing a translation, we start a new language group for the new item
 				if ($translate_method == 0) {
-					$row->lang_parent_id = 0;//$copyid;
+					$row->lang_parent_id = 0; //$row->id;
 					$row->store();
 				}
 				
@@ -1629,7 +1628,7 @@ class FlexicontentModelItems extends JModelLegacy
 				{
 					if (strlen($field->value)) {
 						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `suborder`, `value`)'
-							.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $field->suborder . ', ' . $this->_db->Quote($field->value) . ')'
+							.' VALUES(' . $field->field_id . ', ' . $row->id . ', ' . $field->valueorder . ', ' . $field->suborder . ', ' . $this->_db->Quote($field->value) . ')'
 							;
 						$this->_db->setQuery($query);
 						$this->_db->query();
@@ -1658,7 +1657,7 @@ class FlexicontentModelItems extends JModelLegacy
 
 				foreach ($curversions as $cv) {
 					$query 	= 'INSERT INTO #__flexicontent_items_versions (`version`, `field_id`, `item_id`, `valueorder`, `suborder`, `value`)'
-						. ' VALUES(1 ,'  . $cv->field_id . ', ' . $copyid . ', ' . $cv->valueorder . ', ' . $cv->suborder . ', ' . $this->_db->Quote($cv->value) . ')'
+						. ' VALUES(1 ,'  . $cv->field_id . ', ' . $row->id . ', ' . $cv->valueorder . ', ' . $cv->suborder . ', ' . $this->_db->Quote($cv->value) . ')'
 						;
 					$this->_db->setQuery($query);
 					$this->_db->query();
@@ -1675,7 +1674,7 @@ class FlexicontentModelItems extends JModelLegacy
 				foreach($cats as $cat)
 				{
 					$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
-							.' VALUES(' . $cat . ',' . $copyid . ')'
+							.' VALUES(' . $cat . ',' . $row->id . ')'
 							;
 					$this->_db->setQuery($query);
 					$this->_db->query();
@@ -1694,7 +1693,7 @@ class FlexicontentModelItems extends JModelLegacy
 					foreach($tags as $tag)
 					{
 						$query 	= 'INSERT INTO #__flexicontent_tags_item_relations (`tid`, `itemid`)'
-								.' VALUES(' . $tag . ',' . $copyid . ')'
+								.' VALUES(' . $tag . ',' . $row->id . ')'
 								;
 						$this->_db->setQuery($query);
 						$this->_db->query();
@@ -1703,17 +1702,33 @@ class FlexicontentModelItems extends JModelLegacy
 
 				if ($method == 3)
 				{
-					$this->moveitem($copyid, $maincat, $seccats);
+					$this->moveitem($row->id, $maincat, $seccats);
 				}
 				else if ($method == 99 && ($maincat || $seccats))
 				{
 					$row->catid = $maincat ? $maincat : $row->catid;
-					$this->moveitem($copyid, $row->catid, $seccats);
-					
-					// Load item model and save it once, e.g. updating Joomla featured FLAG data
-					//$itemmodel = new FlexicontentModelItem();
-					//$itemmodel->getItem($copyid);
-					//$itemmodel->store((array)$row);
+					$this->moveitem($row->id, $row->catid, $seccats);
+				}
+				// Load item model and save it once, e.g. updating Joomla featured FLAG data
+				//$itemmodel = new FlexicontentModelItem();
+				//$itemmodel->getItem($row->id);
+				//$itemmodel->store((array)$row);
+				
+				// If new item is a tranlation, load the language associations of item
+				// that was copied, and save the associations, adding the new item to them
+				if ($method == 99 && $item->language!='*' && $row->language!='*' && flexicontent_db::useAssociations())
+				{
+					$associations = JLanguageAssociations::getAssociations('com_content', '#__content', 'com_content.item', $item->id);  // associations of item that was copied
+					$_data = array();
+					foreach ($associations as $tag => $association)
+					{
+						$_data['associations'][$tag] = (int)$association->id;
+					}
+					$_data['associations'][$row->language]  = $row->id;  // Add new item itself
+					$_data['associations'][$item->language] = $item->id; // unneeded, done by saving ...
+					$context = 'com_content';
+					flexicontent_db::saveAssociations($row, $_data, $context);  // Save associations, adding the new item
+					//$app->enqueueMessage( print_r($_data, true), 'message' );
 				}
 			}
 		}
@@ -1851,15 +1866,15 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.5
 	 */
-	function moveitem($itemid, $maincat, $seccats = null, $lang, $state, $type_id, $access)
+	function moveitem($itemid, $maincat, $seccats = null, $lang, $state=null, $type_id=0, $access=null)
 	{
 		$item = JTable::getInstance('flexicontent_items', '');
 		$item->load($itemid);
 		$item->catid    = $maincat ? $maincat : $item->catid;
 		$item->language = $lang ? $lang : $item->language;
-		$item->state    = strlen($state) ? $state : $item->state;
-		$item->type_id  = $type_id ? $type_id : $item->type_id;
-		$item->access   = $access ? $access : $item->access;
+		$item->state    = strlen($state) ? $state : $item->state;  // keep original if: null, ''
+		$item->type_id  = $type_id ? $type_id : $item->type_id;    // keep original if: null, zero, ''
+		$item->access   = $access ? $access : $item->access;       // keep original if: null, zero, ''
 		$item->store();
 		
 		if ($seccats === null)
