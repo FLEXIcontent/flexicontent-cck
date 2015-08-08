@@ -475,14 +475,17 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$app  = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();     // Retrieve active menu
 		
-		// Get the COMPONENT only parameters, then merge the menu parameters
-		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
-		$params = clone ($comp_params); // clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) {
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
-			$params->merge($menu_params);
+		// Get the COMPONENT only parameter
+		$params  = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$params->merge($cparams);
+		
+		// Merge the active menu parameters
+		if ($menu)
+		{
+			$params->merge($menu->params);
 		}
-				
+		
 		$this->_params = $params;
 	}
 	

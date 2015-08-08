@@ -33,7 +33,7 @@ class ParentClassItem extends JModelAdmin
 	var $_name = 'ParentClassItem';
 	
 	/**
-	 * component + type + menu parameters
+	 * component + type parameters
 	 *
 	 * @var object
 	 */
@@ -124,33 +124,9 @@ class ParentClassItem extends JModelAdmin
 			}
 			$curcatid = 0;
 		}
-		$typeid = JRequest::getInt('typeid', 0);
+		
+		$typeid = !$pk ? JRequest::getInt('typeid', 0) : 0;  // Set type id only for new items
 		$this->setId($pk, $curcatid, $typeid);  // NOTE: when setting $pk to a new value the $this->_item is cleared
-		
-		
-		// Get component parameters
-		$params  = new JRegistry();
-		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$params->merge($cparams);
-		
-		// Merge into them the type parameters, *(type was set/verified above)
-		if ($this->_typeid) {
-			$tparams = $this->getTypeparams();
-			$tparams = new JRegistry($tparams);
-			$params->merge($tparams);
-		}
-		
-		// Merge (frontend) the active menu parameters
-		if (!$app->isAdmin()) {
-			$menu = $app->getMenu()->getActive();
-			if ($menu) {
-				$menu_params = $menu->params;
-				$params->merge($menu_params);
-			}
-		}
-		
-		// Set component + type + menu parameters, these are enough for the backend and are needed before frontend view's complete parameters are created
-		$this->_cparams = $params;
 		
 		$this->populateState();
 	}
@@ -168,6 +144,7 @@ class ParentClassItem extends JModelAdmin
 		if ($this->_id != $id) {
 			$this->_item = null;
 			$this->_version = null;
+			$this->_cparams = null;
 		}
 		$this->_id = (int) $id;
 		
@@ -184,19 +161,53 @@ class ParentClassItem extends JModelAdmin
 		// Set item layout
 		$this->_ilayout = $ilayout;
 		
-		// Set item type
+		// Set item type, will be verified below
 		$this->_typeid = $typeid;
 		
 		// Get the type of an existing item, or check that the type of new item exists
 		if ($this->_id || $this->_typeid)
 		{
-			$this->getTypesselected()->id;  // Check, set, or clear member variable: $this->_typeid
+			$this->getTypesselected();  // Check, set, or clear member variable: $this->_typeid
 		}
+		
+		// Recalcuclate if needed, component + type parameters
+		$this->getComponentTypeParams();
 	}
 	
 	
 	/**
-	 * Method to get the identifier
+	 * Method to get component + type parameters these are enough for the backend,
+	 * also they are needed before frontend view's FULL item parameters are created
+	 *
+	 * @access	public
+	 * @return	int item identifier
+	 */
+	function getComponentTypeParams()
+	{
+		// Calculate component + type parameters
+		if ($this->_cparams) return $this->_cparams;
+		$app = JFactory::getApplication();
+		
+		// Get component parameters
+		$params  = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$params->merge($cparams);
+		
+		// Merge into them the type parameters, *(type was set/verified above)
+		if ($this->_typeid) {
+			$tparams = $this->getTypeparams();
+			$tparams = new JRegistry($tparams);
+			$params->merge($tparams);
+		}
+		
+		// Set and return component + type parameters
+		$this->_cparams = $params;
+		return $this->_cparams;
+	}
+	
+	
+	/**
+	 * Method to get item's id
 	 *
 	 * @access	public
 	 * @return	int item identifier
@@ -204,6 +215,18 @@ class ParentClassItem extends JModelAdmin
 	function getId()
 	{
 		return $this->_id;
+	}
+	
+	
+	/**
+	 * Method to get item's type id
+	 *
+	 * @access	public
+	 * @return	int item identifier
+	 */
+	function getTypeId()
+	{
+		return $this->_typeid;
 	}
 	
 	
@@ -1004,7 +1027,7 @@ class ParentClassItem extends JModelAdmin
 			$form->setFieldAttribute('created_by', 'disabled', 'true');
 			$form->setFieldAttribute('created_by_alias', 'disabled', 'true');
 			if ( !$frontend_new ) {
-				// skip new items in frontend to allow override via menu (auto-publish), menu override must be check during store
+				// skip new items in frontend to allow override via menu (auto-publish), menu override must be checked during store
 				$form->setFieldAttribute('state', 'disabled', 'true');   // only for existing items, not for new to allow menu item override
 			}
 			//$form->setFieldAttribute('vstate', 'disabled', 'true');  // DO not -disable- will cause problems
@@ -1478,7 +1501,7 @@ class ParentClassItem extends JModelAdmin
 			$item->language     = $default_lang;
 			$item->lang_parent_id = 0;
 			$item->search_index = null;
-			$item->parameters   = clone ($cparams);   // Assign component parameters, merge with menu item (for frontend)
+			$item->parameters   = $this->_cparams;  // initialized to component + type parameters
 			
 			$query = 'SELECT title FROM #__viewlevels WHERE id = '. (int) $item->access;
 			$this->_db->setQuery($query);
@@ -1502,7 +1525,7 @@ class ParentClassItem extends JModelAdmin
 		// Initialise variables.
 		$this->setState($this->getName().'.id', $this->_id);
 
-		// Set global parameters: component + type + menu parameters, ? UNUSED ? maybe used by parent class
+		// Set global parameters: component + type parameters, ? UNUSED ? maybe used by parent class
 		$this->setState('params', $this->_cparams);
 	}
 	
@@ -2070,7 +2093,7 @@ class ParentClassItem extends JModelAdmin
 			if ($cparams->get('auto_title', 0))  // AUTOMATIC TITLE, set to item ID
 			{
 				$item->title = $item->id;
-				$this->_db->setQuery('UPDATE #__content SET title=id WHERE id=' . (int)$item->id);
+				$this->_db->setQuery('UPDATE #__content SET title=id, alias=id WHERE id=' . (int)$item->id);
 				$this->_db->query();
 			}
 		} else {
@@ -3244,7 +3267,10 @@ class ParentClassItem extends JModelAdmin
 	function getTypesselected($force = false)
 	{
 		static $typedata = array();
-		if ( !$force && isset($typedata[$this->_id]) ) return $typedata[$this->_id];
+		
+		if ( !$this->_id && !$this->_typeid) return '';
+		
+		if ( !$force && isset($typedata[$this->_typeid]) ) return $typedata[$this->_typeid];
 		
 		// Existing item, get its type
 		if ($this->_id)
@@ -3275,8 +3301,8 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		// Cache and return
-		$typedata[$this->_id] = & $_typedata;
-		return $typedata[$this->_id];
+		$typedata[$this->_typeid] = & $_typedata;
+		return $typedata[$this->_typeid];
 	}
 	
 	
@@ -3323,27 +3349,30 @@ class ParentClassItem extends JModelAdmin
 	function getTypeparams($force = false)
 	{
 		static $typeparams = array();
-		if ( !$force && isset($typeparams[$this->_id]) ) return $typeparams[$this->_id];
+		
+		if ( !$this->_id && !$this->_typeid) return '';
+		
+		if ( !$force && isset($typeparams[$this->_typeid]) ) return $typeparams[$this->_typeid];
 		
 		if ( $this->_id || $this->_typeid)
 		{
-			$query	= 'SELECT t.attribs'
+			$query	= 'SELECT t.id, t.attribs'
 				. ' FROM #__flexicontent_types AS t'
-				;
-			if ( $this->_id ) {
-				$query .= ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-					. ' WHERE ie.item_id = ' . (int)$this->_id
-					;
-			} else {
-				$query .= ' WHERE t.id = ' . (int)$this->_typeid;
-			}
+				.( $this->_id ?
+					' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id WHERE ie.item_id = ' . (int)$this->_id :
+					' WHERE t.id = ' . (int)$this->_typeid
+				);
 			$this->_db->setQuery($query);
-			$attribs = $this->_db->loadResult();
+			if ( $data = $this->_db->loadObject() )
+			{
+				$this->_typeid = $data->id;
+				$attribs = $data->attribs;
+			}
 		}
 		
 		// Cache and return
-		$typeparams[$this->_id] = !empty($attribs) ? $attribs : '';
-		return $typeparams[$this->_id];
+		$typeparams[$this->_typeid] = !empty($attribs) ? $attribs : '';
+		return $typeparams[$this->_typeid];
 	}
 	
 	
@@ -4248,18 +4277,8 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function getApprovalRequestReceivers($id, $catid)
 	{
-		// Get component parameters
-		$params  = new JRegistry();
-		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$params->merge($cparams);
-		
-		// Merge into them the type parameters
-		$tparams = $this->getTypeparams();
-		$tparams = new JRegistry($tparams);
-		$params->merge($tparams);
-		
 		// We will use the email receivers of --new items-- pending approval, as receivers of the manual approval request
-		$nConf = $this->getNotificationsConf($params);
+		$nConf = $this->getNotificationsConf($this->_cparams);
 		$validators = new stdClass();
 		$validators->notify_emails = $nConf->emails->notify_new_pending;
 		$validators->notify_text = ''; // clear this ... default is : 'text_notify_new_pending', but it is not used the case of manual approval
@@ -4301,8 +4320,10 @@ class ParentClassItem extends JModelAdmin
 				continue;
 			}
 			
-			// Get item setting it into the model, and get publish privilege
+			// Get item setting it into the model (ITEM DATE: _id, _type_id, _params, etc will be updated)
 			$item = $this->getItem($approvable->id, $check_view_access=false, $no_cache=true);
+			
+			// Get publish privilege
 			$canEditState = $this->canEditState( $item, $check_cat_perm=true );
 			if ( $canEditState ) {
 				$publishable[] = $item->title;
@@ -4317,16 +4338,7 @@ class ParentClassItem extends JModelAdmin
 			if ( !count($validators->notify_emails) ) {
 				$validators->notify_emails[] = JFactory::getApplication()->getCfg('mailfrom');
 			}
-					
-			// Get component parameters and them merge into them the type parameters
-			$params  = new JRegistry();
-			$cparams = JComponentHelper::getParams('com_flexicontent');
-			$params->merge($cparams);
-				
-			$tparams = $this->getTypeparams();
-			$tparams = new JRegistry($tparams);
-			$params->merge($tparams);
-					
+			
 			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 				. ' WHERE rel.itemid = '.(int) $approvable->id;
@@ -4342,7 +4354,7 @@ class ParentClassItem extends JModelAdmin
 			$notify_vars->before_cats   = array();
 			$notify_vars->after_cats    = $after_cats;
 					
-			$this->sendNotificationEmails($notify_vars, $params, $manual_approval_request=1);
+			$this->sendNotificationEmails($notify_vars, $this->_cparams, $manual_approval_request=1);
 			$submitted++;
 		}
 		

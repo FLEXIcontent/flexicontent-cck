@@ -55,7 +55,11 @@ class FlexicontentViewItem extends JViewLegacy
 		$nullDate   = $db->getNullDate();
 		
 		// Get the COMPONENT only parameters
-		$params     = clone( JComponentHelper::getParams('com_flexicontent') );
+		// Get component parameters
+		$params  = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$params->merge($cparams);
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
 		
 		// Some flags
 		$enable_translation_groups = flexicontent_db::useAssociations(); //$params->get("enable_translation_groups");

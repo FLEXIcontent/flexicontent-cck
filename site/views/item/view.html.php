@@ -477,13 +477,17 @@ class FlexicontentViewItem  extends JViewLegacy
 		$nullDate   = $db->getNullDate();
 		$menu				= $app->getMenu()->getActive();
 		
-		// ... we do not YET have item parameters ... and we need to do some work before creating the item ...
-		// Get the COMPONENT only parameters, then merge the ACTIVE MENU parameters
-		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
-		$params = clone ($comp_params); // clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) {
-			$menu_params = $menu->params;
-			$params->merge($menu_params);
+		// We do not have item parameters yet, but we need to do some work before creating the item
+		
+		// Get the COMPONENT only parameter
+		$params  = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$params->merge($cparams);
+		
+		// Merge the active menu parameters
+		if ($menu)
+		{
+			$params->merge($menu->params);
 		}
 		
 		// Some flags

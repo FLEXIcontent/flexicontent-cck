@@ -578,7 +578,7 @@ class flexicontent_items extends _flexicontent_items {
 		$this->fulltext =  trim( $filter->clean( $this->fulltext ) );
 		*/
 		
-		if(empty($this->title)) {
+		if(!strlen($this->title)) {
 			$this->setError(JText::_( 'FLEXI_ARTICLES_MUST_HAVE_A_TITLE' ));
 			return false;
 		}

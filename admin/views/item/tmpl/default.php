@@ -731,15 +731,13 @@ if ($this->row->type_id) {
 				?>
 				
 				<div class='fcclear'></div>
-				<?php if($display_label_form > 0): ?>
-					<span class="label-fcouter">
-					<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
-						<?php echo $field->label; ?>
-					</label>
-					</span>
-					<?php if($display_label_form==2):  ?>
-						<div class='fcclear'></div>
-					<?php endif; ?>
+				<span class="label-fcouter" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
+				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
+					<?php echo $field->label; ?>
+				</label>
+				</span>
+				<?php if($display_label_form==2):  ?>
+					<div class='fcclear'></div>
 				<?php endif; ?>
 								
 				<div style="<?php echo $container_width; ?>" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">

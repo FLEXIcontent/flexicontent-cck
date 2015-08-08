@@ -1800,7 +1800,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// ***************************
 		
 		// 0. Start from component parameters
-		$params = clone($compParams);
+		$params = new JRegistry();
+		$params->merge($compParams);
 		
 		// 1. Merge category's inherited parameters (e.g. ancestor categories or specific category)
 		while (!empty($heritage_stack)) {

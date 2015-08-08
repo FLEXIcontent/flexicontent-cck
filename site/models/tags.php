@@ -549,16 +549,19 @@ class FlexicontentModelTags extends JModelLegacy
 		$app  = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();     // Retrieve active menu
 		
-		// Get the COMPONENT only parameters, then merge the menu parameters
-		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
-		$cparams = clone ($comp_params); // clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) {
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
-			$cparams->merge($menu_params);
+		// Get the COMPONENT only parameter
+		$params  = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$params->merge($cparams);
+		
+		// Merge the active menu parameters
+		if ($menu)
+		{
+			$params->merge($menu->params);
 		}
 		
-		// b. Merge module parameters overriding current configuration
-		//   (this done when module id is present in the HTTP request) (tags cloud module include tags view configuration)
+		// Merge module parameters overriding current configuration
+		// (this done when module id is present in the HTTP request) (tags cloud module include tags view configuration)
 		if ( JRequest::getInt('module', 0 ) )
 		{
 			// load by module name, not used
@@ -572,13 +575,13 @@ class FlexicontentModelTags extends JModelLegacy
 			
 			if ( $module->load($module_id) ) {
 				$moduleParams = FLEXI_J16GE ? new JRegistry($module->params) : new JParameter($module->params);
-				$cparams->merge($moduleParams);
+				$params->merge($moduleParams);
 			} else {
 				JError::raiseNotice ( 500, $module->getError() );
 			}
 		}
 		
-		$this->_params = $cparams;
+		$this->_params = $params;
 	}
 	
 	

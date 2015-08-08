@@ -574,6 +574,7 @@ class flexicontent_html
 		static $jquery_ui_added = false;
 		static $jquery_ui_css_added = false;
 		$document = JFactory::getDocument();
+		$lib_path = '/components/com_flexicontent/librairies';
 		
 		// Set jQuery to load in views that use it
 		$JQUERY_VER    = !$params ? '1.8.3' : $params->get('jquery_ver', '1.8.3');
@@ -593,10 +594,10 @@ class flexicontent_html
 			} else {
 				FLEXI_J30GE ?
 					JHtml::_('jquery.framework') :
-					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-'.$JQUERY_VER.'.min.js');
+					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-'.$JQUERY_VER.'.min.js');
 			}
 			// The 'noConflict()' statement must be inside a js file, to make sure it executed immediately
-			if (!FLEXI_J30GE) $document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-no-conflict.js');
+			if (!FLEXI_J30GE) $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-no-conflict.js');
 			//$document->addCustomTag('<script>jQuery.noConflict();</script>');  // not placed in proper place
 			$jquery_added = 1;
 		}
@@ -613,11 +614,11 @@ class flexicontent_html
 			} else {
 				if (FLEXI_J30GE) {
 					JHtml::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position
-					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
-					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.menu.min.js');
-					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
+					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
+					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.menu.min.js');
+					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
 				} else {
-					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
+					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
 				}
 			}
 			$jquery_ui_added = 1;
@@ -629,7 +630,7 @@ class flexicontent_html
 			if ($add_remote) {
 				$document->addStyleSheet('//ajax.googleapis.com/ajax/libs/jqueryui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css');
 			} else {
-				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
+				$document->addStyleSheet(JURI::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
 				$jquery_ui_css_added = 1;
 			}
 		}
@@ -694,6 +695,7 @@ class flexicontent_html
 		
 		// Load Framework
 		$document = JFactory::getDocument();
+		$lib_path = '/components/com_flexicontent/librairies';
 		$js = "";
 		$css = "";
 		switch ( $framework )
@@ -705,7 +707,7 @@ class flexicontent_html
 			case 'mCSB':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/mCSB';
+				$framework_path = JURI::root(true).$lib_path.'/mCSB';
 				$document->addScript($framework_path.'/jquery.mCustomScrollbar.min.js');
 				$document->addStyleSheet($framework_path.'/jquery.mCustomScrollbar.css');
 				$js .= "
@@ -726,13 +728,13 @@ class flexicontent_html
 			case 'image-picker':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/image-picker';
+				$framework_path = JURI::root(true).$lib_path.'/image-picker';
 				$document->addScript($framework_path.'/image-picker.min.js');
 				$document->addStyleSheet($framework_path.'/image-picker.css');
 				break;
 			
 			case 'masonry':
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/masonry';
+				$framework_path = JURI::root(true).$lib_path.'/masonry';
 				$document->addScript($framework_path.'/masonry.pkgd.min.js');
 				
 				break;
@@ -740,7 +742,7 @@ class flexicontent_html
 			case 'select2':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/select2';
+				$framework_path = JURI::root(true).$lib_path.'/select2';
 				$framework_folder = JPATH_SITE .DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
 				$document->addScript($framework_path.'/select2.min.js');
 				$document->addStyleSheet($framework_path.'/select2.css');
@@ -888,7 +890,7 @@ class flexicontent_html
 			case 'inputmask':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/inputmask';
+				$framework_path = JURI::root(true).$lib_path.'/inputmask';
 				$document->addScript($framework_path.'/jquery.inputmask.bundle.min.js');
 				
 				// Extra inputmask declarations definitions, e.g. ...
@@ -914,7 +916,7 @@ class flexicontent_html
 			case 'prettyCheckable':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/prettyCheckable';
+				$framework_path = JURI::root(true).$lib_path.'/prettyCheckable';
 				$document->addScript($framework_path.'/dev/prettyCheckable.js');
 				$document->addStyleSheet($framework_path.'/dist/prettyCheckable.css');
 				$js .= "
@@ -937,7 +939,7 @@ class flexicontent_html
 			case 'jmultibox':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/jmultibox';
+				$framework_path = JURI::root(true).$lib_path.'/jmultibox';
 				
 				// Add JS
 				$document->addScript($framework_path.'/js/jmultibox.js');
@@ -958,7 +960,7 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js' );
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/fancybox';
+				$framework_path = JURI::root(true).$lib_path.'/fancybox';
 				
 				// Add mousewheel plugin (this is optional)
 				$document->addScript($framework_path.'/lib/jquery.mousewheel-3.0.6.pack.js');
@@ -991,7 +993,7 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				//flexicontent_html::loadFramework('fancybox');
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/galleriffic';
+				$framework_path = JURI::root(true).$lib_path.'/galleriffic';
 				//$document->addStyleSheet($framework_path.'/css/basic.css');  // This is too generic and should not be loaded
 				$document->addStyleSheet($framework_path.'/css/galleriffic-3.css');
 				$document->addScript($framework_path.'/js/jquery.galleriffic.js');
@@ -1002,7 +1004,7 @@ class flexicontent_html
 			case 'elastislide':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/elastislide';
+				$framework_path = JURI::root(true).$lib_path.'/elastislide';
 				$document->addStyleSheet($framework_path.'/css/style.css');
 				$document->addStyleSheet($framework_path.'/css/elastislide.css');
 				
@@ -1015,7 +1017,7 @@ class flexicontent_html
 			case 'photoswipe':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/photoswipe';
+				$framework_path = JURI::root(true).$lib_path.'/photoswipe';
 				
 				//$document->addStyleSheet($framework_path.'/lib/jquery.mobile/jquery.mobile.css');
 				$document->addStyleSheet($framework_path.'/photoswipe.css');
@@ -1035,14 +1037,14 @@ class flexicontent_html
 			case 'fcxSlide':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/fcxSlide';
+				$framework_path = JURI::root(true).$lib_path.'/fcxSlide';
 				$document->addScript($framework_path.'/class.fcxSlide.js');
 				$document->addStyleSheet($framework_path.'/fcxSlide.css');
 				//$document->addScript($framework_path.'/class.fcxSlide.packed.js');
 				break;
 			
 			case 'imagesLoaded':
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/imagesLoaded';
+				$framework_path = JURI::root(true).$lib_path.'/imagesLoaded';
 				$document->addScript($framework_path.'/imagesloaded.pkgd.min.js');
 				break;
 			
@@ -1050,7 +1052,7 @@ class flexicontent_html
 				// Make sure mootools are loaded
 				FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/noobSlide';
+				$framework_path = JURI::root(true).$lib_path.'/noobSlide';
 				//$document->addScript($framework_path.'/_class.noobSlide.js');
 				$document->addScript($framework_path.'/_class.noobSlide.packed.js');
 				break;
@@ -1058,7 +1060,7 @@ class flexicontent_html
 			case 'zTree':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/zTree';
+				$framework_path = JURI::root(true).$lib_path.'/zTree';
 				$document->addStyleSheet($framework_path.'/css/flexi_ztree.css');
 				$document->addStyleSheet($framework_path.'/css/zTreeStyle/zTreeStyle.css');
 				$document->addScript($framework_path.'/js/jquery.ztree.all-3.5.min.js');
@@ -1071,7 +1073,7 @@ class flexicontent_html
 			case 'plupload':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/plupload';
+				$framework_path = JURI::root(true).$lib_path.'/plupload';
 				$document->addScript($framework_path.'/js/plupload.full.min.js');
 				
 				if ($mode=='ui') {
@@ -1086,7 +1088,7 @@ class flexicontent_html
 				//$document->addScript($framework_path.'/js/moxie.min.js');
 				//$document->addScript($framework_path.'/js/plupload.dev.js');
 				break;
-			
+				
 			case 'flexi_tmpl_common':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				flexicontent_html::loadFramework('select2');  // make sure select2 is loaded
@@ -2990,7 +2992,7 @@ class flexicontent_html
 		
 		$required = '';
 		if ( $conf && !empty($conf['required']) ) {
-			$required = ' validate-radio ';
+			$required = ' required validate-radio ';
 		}
 		
 		$langs = array();
@@ -3021,7 +3023,7 @@ class flexicontent_html
 					if ($lang->code == $selected) {
 						$checked = ' checked="checked"';
 					}
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' class="'.$required.'" />';
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' class="'.$required.'" data-element-grpid="'.$tagid.'" />';
 					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'" >';
 					if($lang->shortcode=="*") {
 						$list .= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
@@ -3050,13 +3052,13 @@ class flexicontent_html
 				}
 				break;
 			case 4:   // RADIO selection of ALL languages, with empty default option "Keep original language", e.g. when copying/moving items
-				$list  = '<input id="lang9999" type="radio" name="'.$name.'" class="'.$required.'" value="" checked="checked" />';
+				$list  = '<input id="lang9999" type="radio" name="'.$name.'" class="'.$required.'" value="" checked="checked" data-element-grpid="'.$tagid.'" />';
 				$list .= '<label class="lang_box" for="lang9999" title="'.JText::_( 'FLEXI_NOCHANGE_LANGUAGE_DESC' ).'" >';
 				$list .= JText::_( 'FLEXI_NOCHANGE_LANGUAGE' );
 				$list .= '</label><div class="clear"></div>';
 
 				foreach ($user_langs as $lang) {
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" />';
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" data-element-grpid="'.$tagid.'" />';
 					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
@@ -3069,10 +3071,12 @@ class flexicontent_html
 				}
 				break;
 			case 5:   // RADIO selection of ALL languages, EXCLUDE selected language, e.g. when translating items into another language
+			case 7:   // also exclude '*' (ALL) language
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					if ($lang->code==$selected) continue;
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" />';
+					if ($displaytype==7 && $lang->shortcode=="*") continue;
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" data-element-grpid="'.$tagid.'" />';
 					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
@@ -3088,7 +3092,7 @@ class flexicontent_html
 				$list		= '';
 				
 				$checked = $selected==='' ? 'checked="checked"' : '';
-				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="'.$required.'" value="" '.$checked.'/>';
+				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="'.$required.'" value="" '.$checked.' data-element-grpid="'.$tagid.'" />';
 				$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 				$tooltip_title = flexicontent_html::getToolTip('FLEXI_USE_LANGUAGE_COLUMN', 'FLEXI_USE_LANGUAGE_COLUMN_TIP', 1, 1);
 				$list 	.= '<label class="lang_box'.$tooltip_class.'" for="lang9999" title="'.$tooltip_title.'">';
@@ -3097,7 +3101,7 @@ class flexicontent_html
 				
 				foreach ($user_langs as $lang) {
 					$checked = $lang->code==$selected ? 'checked="checked"' : '';
-					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" '.$checked.'/>';
+					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" '.$checked.' data-element-grpid="'.$tagid.'" />';
 					$list 	.= '<label class="lang_box" for="'.$tagid.'_'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
@@ -6103,7 +6107,6 @@ class flexicontent_db
 	{
 		$assoc = flexicontent_db::useAssociations();
 		if (!$assoc) return true;
-		$id = $item->id;
 		
 		
 		// **********************************

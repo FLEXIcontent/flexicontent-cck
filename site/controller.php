@@ -253,42 +253,16 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+		//echo '<html>  <meta http-equiv="content-type" content="text/html; charset=utf-8" /> <body>';
 		
 		// Initialize variables
 		$app     = JFactory::getApplication();
 		$db      = JFactory::getDBO();
 		$user    = JFactory::getUser();
-		$menu    = $app->getMenu()->getActive();
 		$config  = JFactory::getConfig();
 		$session = JFactory::getSession();
 		$task	   = JRequest::getVar('task');
-		$model   = $this->getModel(FLEXI_ITEMVIEW);
-		$isnew   = !$model->getId();
-		$isOwner = $model->get('created_by') == $user->get('id');
-		
 		$ctrl_task = 'task=items.';
-		
-		$fc_params  = JComponentHelper::getParams( 'com_flexicontent' );
-		$dolog      = $fc_params->get('print_logging_info');
-		
-		// Get the COMPONENT only parameters
-		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
-		$params = clone ($comp_params); // clone( JComponentHelper::getParams('com_flexicontent') );
-		
-		// Merge the type parameters
-		$tparams = $model->getTypeparams();
-		$tparams = new JRegistry($tparams);
-		$params->merge($tparams);
-		
-		// Merge the menu parameters
-		if ($menu) {
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
-			$params->merge($menu_params);
-		}
-		
-		// Get needed parameters
-		$submit_redirect_url_fe = $params->get('submit_redirect_url_fe', '');
-		$allowunauthorize       = $params->get('allowunauthorize', 0);
 		
 		
 		
@@ -301,12 +275,53 @@ class FlexicontentController extends JControllerLegacy
 		$custom = JRequest::getVar('custom', array(), 'post', 'array');  // Custom Fields
 		$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
 		
+		// Set into model: id (needed for loading correct item), and type id (e.g. needed for getting correct type parameters for new items)
+		$data_id = (int) $data['id'];
+		$isnew   = $data_id == 0;
+		
+		// If new make sure that type id is set too, before creating the model
+		if ($isnew)
+		{
+			$typeid = JRequest::setvar('typeid', (int) @ $data['type_id']);
+		}
+		
+		// Get the model
+		$model = $this->getModel('item');
+		$model->setId($data_id);  // Make sure id is correct
+		
+		// Get some flags this will also trigger item loading if not already loaded
+		$isOwner = $model->get('created_by') == $user->get('id');
+		
+		
+		// Get merged parameters: component, type, menu
+		$params = new JRegistry();
+		$model_params = $model->getComponentTypeParams();
+		$params->merge($model_params);
+		
+		// Merge the active menu parameters
+		$menu = $app->getMenu()->getActive();
+		if ($menu) {
+			$params->merge($menu->params);
+		}
+		
+		// Get some needed parameters
+		$submit_redirect_url_fe = $params->get('submit_redirect_url_fe', '');
+		$allowunauthorize       = $params->get('allowunauthorize', 0);
+		$dolog = $params->get('print_logging_info');
+		
+		// Unique id for new items, needed by some fields for temporary data
 		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid' );
-		if ( ! @ $data['rules'] ) $data['rules'] = array();
+		
+		// Auto title for some content types
 		if ( $params->get('auto_title', 0) )  $data['title'] = (int) $data['id'];  // item id or ZERO for new items
 		
-		// Set data id into model in case not already set ?
-		$model->setId((int) $data['id']);
+		if ( ! @ $data['rules'] ) $data['rules'] = array();
+		
+		
+		// We use some strings from administrator part, load english language file
+		// for 'com_flexicontent' component then override with current language file
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		
 		
 		
@@ -315,8 +330,9 @@ class FlexicontentController extends JControllerLegacy
 		// *************************************
 		
 		$perms = FlexicontentHelperPerm::getPerm();
+		
 		// Per content type change category permissions
-		$current_type_id  = ($isnew || !$model->get('type_id')) ? $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
+		$current_type_id  = ($isnew || !$model->get('type_id')) ? (int) @ $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
 		$CanChangeFeatCat = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
 		$CanChangeSecCat  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $current_type_id);
 		$CanChangeCat     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $current_type_id);
@@ -371,7 +387,8 @@ class FlexicontentController extends JControllerLegacy
 		// Basic Form data validation
 		// **************************
 		
-		// Get the JForm object, but do not pass any data we only want the form object in order to validate the data and not create a filled-in form
+		// Get the JForm object, but do not pass any data we only want the form object,
+		// in order to validate the data and not create a filled-in form
 		$form = $model->getForm();
 		
 		// *** MANUALLY CHECK CAPTCHA ***
@@ -403,8 +420,14 @@ class FlexicontentController extends JControllerLegacy
 					$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', $jfdata);  // Save the falang translations into the session
 					$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 					
-					// Redirect back to the registration form.
+					// Redirect back to the item form
 					$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+					
+					if ( JRequest::getVar('fc_doajax_submit') )
+					{
+						echo flexicontent_html::get_system_messages_html();
+						exit();  // Ajax submit, do not rerender the view
+					}
 					return false;
 				}
 			}
@@ -427,17 +450,16 @@ class FlexicontentController extends JControllerLegacy
 			$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', $jfdata);  // Save the falang translations into the session
 			$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 			
-			// Redirect back to the registration form.
+			// Redirect back to the item form
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			
+			if ( JRequest::getVar('fc_doajax_submit') )
+			{
+				echo flexicontent_html::get_system_messages_html();
+				exit();  // Ajax submit, do not rerender the view
+			}
 			return false; //die('error');
 		}
-		
-		/*if (!$post) {
-			//JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
-			echo "Error while validating data: " . $model->getError();
-			echo '<span class="fc_return_msg">'.JText::sprintf('FLEXI_CLICK_HERE_TO_RETURN', '"JavaScript:window.history.back();"').'</span>';
-			jexit();
-		}*/
 		
 		// Some values need to be assigned after validation
 		$post['attribs'] = @$data['attribs'];  // Workaround for item's template parameters being clear by validation since they are not present in item.xml
@@ -460,6 +482,10 @@ class FlexicontentController extends JControllerLegacy
 		// checked them on edit form load, because user may have tampered with the form ... 
 		// ********************************************************************************
 		
+		$itemAccess = $model->getItemAccess();
+		$canAdd  = $itemAccess->get('access-create');  // includes check of creating in at least one category
+		$canEdit = $itemAccess->get('access-edit');    // includes privileges edit and edit-own
+		
 		$type_id = (int) @ $post['type_id'];  // Typecast to int, (already done for J2.5 via validating)
 		if ( !$isnew && $model->get('type_id') == $type_id ) {
 			// Existing item with Type not being ALTERED, content type can be maintained regardless of privilege
@@ -470,65 +496,72 @@ class FlexicontentController extends JControllerLegacy
 		}
 		
 		
-		// ****************************************************************
-		// Calculate user's privileges on current content item
-		// ... canPublish IS RECALCULATED after saving, maybe comment out ?
-		// ****************************************************************
+		// *****************************************************************
+		// Calculate user's CREATE / EDIT privileges on current content item
+		// *****************************************************************
 		
-		$hasCoupon = false;
+		$hasCoupon = false;  // Normally used in frontend only
 		if (!$isnew)
 		{
-			$asset = 'com_content.article.' . $model->get('id');
-			$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
-			// ALTERNATIVE 1
-			//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
-			// ALTERNATIVE 2
-			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-			//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
-			
+			// If no edit privilege, check if item is editable till logoff
 			if ( !$canEdit ) {
-				// No edit privilege, check if item is editable till logoff
 				if ($session->has('rendered_uneditable', 'flexicontent')) {
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
 					$hasCoupon = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')] == 2;  // editable via coupon
 				}
 			}
-			$canPublish = $user->authorise('core.edit.state', $asset) // edit.state on ITEM
-				|| ($user->authorise('core.edit.state.own', $asset) && ($isOwner || $hasCoupon));  // OR edit.state.own on ITEM AND (is item owner OR has edit Coupon)
 		}
 		
 		else
 		{
-			$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
-			$not_authorised = !$canAdd;
-			$canPublish	= $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
-			
-			if ( $allowunauthorize ) {
+			// Allow creating via submit menu OVERRIDE
+			if ( $allowunauthorize )
+			{
 				$canAdd = true;
 				$canCreateType = true;
 			}
 		}
 		
-		// ... we use some strings from administrator part
-		// load english language file for 'com_flexicontent' component then override with current language file
-		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
-		
-		// Check for new content
-		if ( ($isnew && !$canAdd) || (!$isnew && !$canEdit)) {
-			$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
-			JError::raiseWarning(403, $msg);
+		// New item: check if user can create in at least one category
+		if ($isnew && !$canAdd)
+		{
+			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			if ( JRequest::getVar('fc_doajax_submit') ) {
+				echo flexicontent_html::get_system_messages_html();
+				exit();  // Ajax submit, do not rerender the view
+			}
+			return;
 		}
 		
+		
+		// Existing item: Check if user can edit current item
+		if (!$isnew && !$canEdit)
+		{
+			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_EDIT' ) );
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			if ( JRequest::getVar('fc_doajax_submit') ) {
+				echo flexicontent_html::get_system_messages_html();
+				exit();  // Ajax submit, do not rerender the view
+			}
+			return;
+		}
+
 		if ( !$canCreateType ) {
 			$msg = isset($types[$type_id]) ?
 				JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', JText::_($types[$type_id]->name) ) :
 				' Content Type '.$type_id.' was not found OR is not published';
-			JError::raiseWarning(403, $msg);
+			JError::raiseWarning( 403, $msg );
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			if ( JRequest::getVar('fc_doajax_submit') ) {
+				echo flexicontent_html::get_system_messages_html();
+				exit();  // Ajax submit, do not rerender the view
+			}
 			return;
 		}
-		
+
+
 		// Get "BEFORE SAVE" categories for information mail
 		$before_cats = array();
 		if ( !$isnew )
@@ -555,11 +588,20 @@ class FlexicontentController extends JControllerLegacy
 			// Set POST form date into the session, so that they get reloaded
 			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
 			$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);  // Save the custom fields data in the session
+			$app->setUserState($form->option.'.edit.'.$form->context.'.jfdata', $jfdata);  // Save the falang translations into the session
+			$app->setUserState($form->option.'.edit.'.$form->context.'.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 			
-			// Redirect back to the registration form.
+			// Saving has failed check-in and redirect back to the item form,
+			// redirect back to the item form reloading the posted data
 			$model->checkin();
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
-			return false; //die('save error');
+			
+			if ( JRequest::getVar('fc_doajax_submit') )
+			{
+				echo flexicontent_html::get_system_messages_html();
+				exit();  // Ajax submit, do not rerender the view
+			}
+			return; //die('save error');
 		}
 		
 		
@@ -594,11 +636,9 @@ class FlexicontentController extends JControllerLegacy
 			$saved_fcitems = $session->get('saved_fcitems', array(), 'flexicontent');
 			$is_first_save = $isnew ? true : !isset($saved_fcitems[$model->get('id')]);
 		}
-		if ($isnew) {
-			// Add item to saved items of the corresponding session array
-			$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
-			$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
-		}
+		// Add item to saved items of the corresponding session array
+		$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
+		$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
 		
 		
 		// ********************************************

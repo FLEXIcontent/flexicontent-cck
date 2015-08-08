@@ -387,7 +387,7 @@ class FlexicontentModelItem extends ParentClassItem
 		// **********************************************************************
 		
 		// Retrieve COMPONENT parameters
-		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
+		$compParams = JComponentHelper::getComponent('com_flexicontent')->params;
 		
 		// Retrieve parameters of current category (NOTE: this applies when cid variable exists in the URL)
 		$catParams = "";
@@ -411,7 +411,7 @@ class FlexicontentModelItem extends ParentClassItem
 			$itemParams = $this->_item->attribs;
 		
 		// Retrieve Layout's parameters, also deciding the layout
-		$this->decideLayout($comp_params, $typeParams, $itemParams);
+		$this->decideLayout($compParams, $typeParams, $itemParams);
 		$layoutParams = $this->getLayoutparams();
 		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
 		
@@ -420,8 +420,9 @@ class FlexicontentModelItem extends ParentClassItem
 		// Merge parameters in order: component, menu, (item 's) current category, (item's) content type, item
 		// ***************************************************************************************************
 		
-		// a. Start by cloning the COMPONENT parameters
-		$params = clone ($comp_params); // clone( JComponentHelper::getParams('com_flexicontent') );
+		// a. Start with empty registry, then merge COMPONENT parameters
+		$params = new JRegistry();
+		$params->merge($compParams);
 		
 		// b. Merge parameters from current category
 		$catParams->set('show_title', '');       // Prevent show_title from propagating ... to the item, it is meant for category view only
