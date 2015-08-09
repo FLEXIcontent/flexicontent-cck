@@ -2156,17 +2156,19 @@ class FlexicontentFields
 		$db = JFactory::getDBO();
 		$display_filter_as = $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
 		$filter_compare_type = $filter->parameters->get( 'filter_compare_type', 0 );
-		$require_all = count($value)>1 && !in_array( $display_filter_as, array(1,2,3) ) ?
-			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
-		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
 		
 		// Make sure the current filtering values match the field filter configuration to be single or multi-value
-		if ( in_array($display_filter_as, array(2,3,5,6)) ) {
+		if ( in_array($display_filter_as, array(2,3,5,6,8)) ) {  // range or multi-value filter
 			if (!is_array($value)) $value = array( $value );
 		} else {
 			if (is_array($value)) $value = array ( @ $value[0] );
 			else $value = array ( $value );
 		}
+		
+		$isRange = in_array( $display_filter_as, array(2,3,8) );
+		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
+			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
+		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
 		
 		$_value = array();
 		foreach ($value as $i => $v) {
@@ -2190,7 +2192,7 @@ class FlexicontentFields
 		$valueswhere = '';
 		switch ($display_filter_as) {
 		// RANGE cases
-		case 2: case 3:
+		case 2: case 3: case 8:
 			if ( ! @ $quoted ) foreach($value as $i => $v) {
 				if ( !$filter_compare_type ) $value[$i] = $db->Quote($v);
 				else $value[$i] = $filter_compare_type==1 ? intval($v) : floatval($v);
@@ -2211,7 +2213,7 @@ class FlexicontentFields
 				$valueswhere .= ' AND _v_ LIKE ' . $_value_like;
 			break;
 		// EXACT value cases
-		case 0: case 4: case 5: default:
+		case 0: case 4: case 5: case 6: case 7: default:
 			$value_clauses = array();
 			
 			if ( ! $require_all ) {
@@ -2251,7 +2253,9 @@ class FlexicontentFields
 		
 		// Decide to require all values
 		$display_filter_as = $filter->parameters->get('display_filter_as', 0 );
-		$require_all = count($value)>1 && !in_array( $display_filter_as, array(1,2,3) ) ?
+		
+		$isRange = in_array( $display_filter_as, array(2,3,8) );
+		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
 			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
 		
 		if ( @$filter->filter_valuesjoin ) {
@@ -2340,7 +2344,9 @@ class FlexicontentFields
 
 		// Decide to require all values
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );
-		$require_all = count($value)>1 && !in_array( $display_filter_as, array(1,2,3) ) ?
+		
+		$isRange = in_array( $display_filter_as, array(2,3,8) );
+		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
 			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
 		
 		$istext_input = $display_filter_as==1 || $display_filter_as==3;
@@ -2444,8 +2450,8 @@ class FlexicontentFields
 			$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 		}
 		
-		$isdate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
-		$default_size = $isdate ? 15 : 30;
+		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
+		$default_size = $isDate ? 15 : 30;
 		$_s = $isSearchView ? '_s' : '';
 		
 		// Some parameter shortcuts
@@ -2454,22 +2460,28 @@ class FlexicontentFields
 		
 		$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
-		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		
+		$isSlider = $display_filter_as == 7 || $display_filter_as == 8;
+		$slider_display_config = $filter->parameters->get( 'slider_display_config'.$_s, 1 );  // Slider found values: 1 or custom values/labels: 2
+		
 		$filter_vals_display = $filter->parameters->get( 'filter_vals_display'.$_s, 0 );
 		
-		$require_all = !in_array( $display_filter_as, array(1,2,3) ) ? $filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
+		$isRange = in_array( $display_filter_as, array(2,3,8) );
+		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
+			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
+		
 		$combine_tip = $filter->parameters->get( 'filter_values_require_all_tip', 0 );
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items'.$_s, 1 );
-		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
+		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
 		$hide_disabled_values = $filter->parameters->get( 'hide_disabled_values'.$_s, 0 );
-		$get_filter_vals = in_array($display_filter_as, array(0,2,4,5,6));
+		$get_filter_vals = in_array($display_filter_as, array(0,2,4,5,6)) || ($isSlider && $slider_display_config==1);
 		
 		$filter_ffname = 'filter_'.$filter->id;
 		$filter_ffid   = $formName.'_'.$filter->id.'_val';
 		
 		// Make sure the current filtering values match the field filter configuration to single or multi-value
-		if ( in_array($display_filter_as, array(2,3,5,6)) ) {
+		if ( in_array($display_filter_as, array(2,3,5,6,8)) ) {
 			if (!is_array($value)) $value = strlen($value) ? array($value) : array();
 		} else {
 			if (is_array($value)) $value = @ $value[0];
@@ -2618,6 +2630,10 @@ class FlexicontentFields
 				}
 				$options[] = JHTML::_('select.option', '', !$first_option_txt ? '-' : '- '.$first_option_txt.' -');
 			}
+			foreach($results as $result) {
+				if ( !strlen($result->value) ) continue;
+				$options[] = JHTML::_('select.option', $result->value, $result->text, 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
+			}
 			
 			// Make use of select2 lib
 			flexicontent_html::loadFramework('select2');
@@ -2643,10 +2659,6 @@ class FlexicontentFields
 			}
 			//$attribs_str .= ($display_filter_as==0 || $display_filter_as==6) ? ' onchange="document.getElementById(\''.$formName.'\').submit();"' : '';
 			
-			foreach($results as $result) {
-				if ( !strlen($result->value) ) continue;
-				$options[] = JHTML::_('select.option', $result->value, $result->text, 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
-			}
 			if ($display_filter_as==6 && $combine_tip) {
 				$filter->html	.= ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
 			}
@@ -2660,35 +2672,218 @@ class FlexicontentFields
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[2]', $attribs_str, 'value', 'text', @ $value[2], $filter_ffid.'2');
 			}
 			break;
-		case 1: case 3:  // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars
-			$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isdate ? 'FLEXI_CLICK_CALENDAR' : 'FLEXI_TYPE_TO_LIST');
-			$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
-			$attribs_str = ' class="fc_field_filter fc_label_internal '.($isdate ? 'fc_iscalendar' : '').'" data-fc_label_text="'.$_inner_lb.'"';
-			$attribs_arr = array('class'=>'fc_field_filter fc_label_internal '.($isdate ? 'fc_iscalendar' : '').'', 'data-fc_label_text' => $_inner_lb );
+		case 1: case 3: case 7: case 8: // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars, 7: Slider, 8: Slider range
 			
-			if ($display_filter_as==1) {
-				if ($isdate) {
-					$filter->html	.= FlexicontentFields::createCalendarField($value, $allowtime=0, $filter_ffname, $filter_ffid, $attribs_arr);
-				} else
-					$filter->html	.= '<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value.'" />';
+			if ( !$isSlider ) {
+				$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isDate ? 'FLEXI_CLICK_CALENDAR' : 'FLEXI_TYPE_TO_LIST');
+				$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
+				$attribs_str = ' class="fc_field_filter fc_label_internal '.($isDate ? 'fc_iscalendar' : '').'" data-fc_label_text="'.$_inner_lb.'"';
+				$attribs_arr = array('class'=>'fc_field_filter fc_label_internal '.($isDate ? 'fc_iscalendar' : '').'', 'data-fc_label_text' => $_inner_lb );
 			} else {
-				if ($isdate) {
-					$filter->html	.= '<span class="fc_filter_element">';
-					$filter->html	.= FlexicontentFields::createCalendarField(@ $value[1], $allowtime=0, $filter_ffname.'[1]', $filter_ffid.'1', $attribs_arr);
-					$filter->html	.= '</span>';
-					$filter->html	.= '<span class="fc_range"></span>';
-					$filter->html	.= '<span class="fc_filter_element">';
-					$filter->html	.= FlexicontentFields::createCalendarField(@ $value[2], $allowtime=0, $filter_ffname.'[2]', $filter_ffid.'2', $attribs_arr);
-					$filter->html	.= '</span>';
+				$attribs_str = "";
+				
+				$value1 = $display_filter_as==8 ? @$value[1] : $value;
+				$value2 = @$value[2];
+				if ($isSlider && $slider_display_config==1)
+				{
+					$start = $min = 0;
+					$end   = $max = count($results)+($display_filter_as==7 ? 0 : 1); //count($results)-1;
+					$step=1;
+					$step_values = array(0=>"''");
+					$step_labels = array(0=>JText::_('FLEXI_ANY'));
+					$i = 1;
+					foreach($results as $result) {
+						$step_values[] = "'".$result->value."'";
+						$step_labels[] = $result->text;
+						if ($result->value==$value1) $start = $i;
+						if ($result->value==$value2) $end   = $i;
+						$i++;
+					}
+					if ($display_filter_as==8)
+					{
+						$step_values[] = "''";
+						$step_labels[] = JText::_('FLEXI_ANY');
+					}
+					$step_range = 
+							"step: 1,
+							range: {'min': " .$min. ", 'max': " .$max. "},";
+				}
+				else if ($isSlider) {
+					$custom_range  = $filter->parameters->get( 'slider_custom_range'.$_s, "'min': '', '25%': 500, '50%': 2000, '75%': 10000, 'max': ''" );
+					$custom_labels = preg_split("/\s*##\s*/u", $filter->parameters->get( 'slider_custom_labels'.$_s, 'label_any ## label_500 ## label_2000 ## label_10000 ## label_any' ));
+					if ($filter->parameters->get('slider_custom_labels_jtext'.$_s, 0))
+					{
+						foreach ($custom_labels as $i=> $custom_label) $custom_labels[$i] = JText::_($custom_label);  // Language filter the custom labels
+					}
+					$custom_vals = json_decode('{'.str_replace("'", '"', $custom_range).'}', true);
+					if (!$custom_vals) {
+						$filter->html = '
+							<div class="alert">
+								Bad syntax for custom range for slider filter: '.$filter->label."
+								EXAMPLE: <br/> 'min': 0, '25%': 500, '50%': 2000, '75%': 10000, 'max': 50000".'
+							</div>';
+						break;
+					}
+					if (!strlen($custom_vals['min'])) $custom_vals['min'] = "''";
+					if (!strlen($custom_vals['max'])) $custom_vals['max'] = "''";
+					
+					$start = 0;
+					$end   = count($custom_vals)-1;
+					$step_values = $custom_vals;
+					$step_labels = & $custom_labels;
+					$i = 0;
+					$set_start = strlen($value1)>0;
+					$set_end   = strlen($value1)>0;
+					foreach($custom_vals as $n => $custom_val) {
+						if ($set_start && $custom_val==$value1) $start = $i;
+						if ($set_end   && $custom_val==$value2) $end   = $i;
+						$custom_vals[$n] = $i++;
+					}
+					$step_range = '
+							snap: true,
+							range: '.json_encode($custom_vals).',
+					';
+				}
+				
+				flexicontent_html::loadFramework('nouislider');
+				$left_no = $display_filter_as==7 ? '' : '1';
+				$rght_no = '2';  // sometimes unused
+				$js = "
+					jQuery(document).ready(function(){
+						var slider = document.getElementById('".$filter_ffid."_nouislider');
+						
+						var input1 = document.getElementById('".$filter_ffid.$left_no."');
+						var input2 = document.getElementById('".$filter_ffid.$rght_no."');
+						var isSingle = ".($display_filter_as==7 ? '1' : '0').";
+						
+						var step_values = [".implode(', ', $step_values)."];
+						var step_labels = [\"".implode('", "', array_map('addslashes', $step_labels))."\"];
+						
+						noUiSlider.create(slider, {".
+							($display_filter_as==7 ? "
+								start: ".$start.",
+								connect: false,
+							" : "
+								start: [".$start.", ".$end."],
+								connect: true,
+							")."
+								".$step_range."
+						});
+						
+						var tipHandles = slider.getElementsByClassName('noUi-handle'),
+						tooltips = [];
+						
+						// Add divs to the slider handles.
+						for ( var i = 0; i < tipHandles.length; i++ ){
+							tooltips[i] = document.createElement('span');
+							tipHandles[i].appendChild(tooltips[i]);
+							
+							tooltips[i].className += 'fc-sliderTooltip'; // Add a class for styling
+							tooltips[i].innerHTML = '<span></span>'; // Add additional markup
+							tooltips[i] = tooltips[i].getElementsByTagName('span')[0];  // Replace the tooltip reference with the span we just added
+						}
+						
+						// When the slider changes, display the value in the tooltips and set it into the input form elements
+						slider.noUiSlider.on('update', function( values, handle ) {
+							var value = parseInt(values[handle]);
+							var i = value;
+							
+							if ( handle ) {
+								input2.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
+							} else {
+								input1.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
+							}
+							var tooltip_text = typeof step_labels[value] !== 'undefined' ? step_labels[value] : value;
+							var max_len = 36;
+							tooltips[handle].innerHTML = tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text;
+							var left  = jQuery(tooltips[handle]).closest('.noUi-origin').position().left;
+							var width = jQuery(tooltips[handle]).closest('.noUi-base').width();
+							
+							//window.console.log ('handle: ' + handle + ', left : ' + left + ', width : ' + width);
+							if (isSingle) {
+								left<(50/100)*width ?
+									jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
+									jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
+							}
+							else if (handle) {
+								left<=(76/100)*width ?
+									jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
+									jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
+								left<=(49/100)*width ?
+									jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
+									jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
+							}
+							else {
+								left>=(24/100)*width ?
+									jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left') :
+									jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right');
+								left>=(51/100)*width ?
+									jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
+									jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
+							}
+						});
+						
+						slider.noUiSlider.on('slide', function( event, ui ) {
+						});
+						
+						input1.addEventListener('change', function(){
+							var value = 0;  // default is first value = empty
+							for(var i=1; i<step_values.length-1; i++) {
+								if (step_values[i] == this.value) { value=i; break; }
+							}
+							slider.noUiSlider.set([value, null]);
+						});
+						".($display_filter_as==8 ? "
+						input2.addEventListener('change', function(){
+							var value = step_values.length-1;  // default is last value = empty
+							for(var i=1; i<step_values.length-1; i++) {
+								if (step_values[i] == this.value) { value=i; break; }
+							}
+							slider.noUiSlider.set([null, value]);
+						});
+						" : "")."
+					});
+				";
+				JFactory::getDocument()->addScriptDeclaration($js);
+				//JFactory::getDocument()->addStyleDeclaration("");
+			}
+			
+			if ($display_filter_as==1 || $display_filter_as==7) {
+				if ($isDate && !$isSlider) {
+					$filter->html	.= '
+						<span class="fc_filter_element">
+							'.FlexicontentFields::createCalendarField($value, $allowtime=0, $filter_ffname, $filter_ffid, $attribs_arr).'
+						</span>';
+				} else {
+					$filter->html	.=
+					($isSlider ? '<div id="'.$filter_ffid.'_nouislider"></div><div class="fc_slider_input_box">' : '').'
+						<span class="fc_filter_element">
+							<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value.'" />
+						</span>
+					'.($isSlider ? '</div>' : '');
+				}
+			} else {
+				if ($isDate && !$isSlider) {
+					$filter->html	.= '
+						<span class="fc_filter_element">
+							'.FlexicontentFields::createCalendarField(@ $value[1], $allowtime=0, $filter_ffname.'[1]', $filter_ffid.'1', $attribs_arr).'
+						</span>
+						<span class="fc_range"></span>
+						<span class="fc_filter_element">
+							'.FlexicontentFields::createCalendarField(@ $value[2], $allowtime=0, $filter_ffname.'[2]', $filter_ffid.'2', $attribs_arr).'
+						</span>';
 				} else {
 					$size = (int)($size / 2);
-					$filter->html	.= '<span class="fc_filter_element">';
-					$filter->html	.= '<input name="'.$filter_ffname.'[1]" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value[1].'" />';
-					$filter->html	.= '</span>';
-					$filter->html	.= '<span class="fc_range"></span>';
-					$filter->html	.= '<span class="fc_filter_element">';
-					$filter->html	.= '<input name="'.$filter_ffname.'[2]" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value[2].'" />'."\n";
-					$filter->html	.= '</span>';
+					$filter->html	.=
+					($isSlider ? '<div id="'.$filter_ffid.'_nouislider"></div><div class="fc_slider_input_box">' : '').'
+						<span class="fc_filter_element">
+							<input name="'.$filter_ffname.'[1]" '.$attribs_str.' id="'.$filter_ffid.'1" type="text" size="'.$size.'" value="'.@ $value[1].'" />
+						</span>
+						<span class="fc_range"></span>
+						<span class="fc_filter_element">
+							<input name="'.$filter_ffname.'[2]" '.$attribs_str.' id="'.$filter_ffid.'2" type="text" size="'.$size.'" value="'.@ $value[2].'" />
+						</span>
+					'.($isSlider ? '</div>' : '');
 				}
 			}
 			break;
@@ -2834,11 +3029,11 @@ class FlexicontentFields
 	{
 		$faceted_filter = $filter->parameters->get( 'faceted_filter', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
-		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items', 1 );
-		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
+		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
 		
 		//echo "<b>FILTER NAME</b>: ". $filter->label ."<br/>\n";
 		//echo "<b> &nbsp; view_join</b>: <br/>". $view_join ."<br/>\n";
@@ -2913,11 +3108,11 @@ class FlexicontentFields
 	{
 		$faceted_filter = $filter->parameters->get( 'faceted_filter_s', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
-		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
-		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
+		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
 		
 		$filter->filter_isindexed = (boolean) $indexed_elements; 
 		if ($faceted_filter || !$indexed_elements) {
@@ -2986,10 +3181,10 @@ class FlexicontentFields
 		
 		$faceted_filter = $filter->parameters->get( 'faceted_filter', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
-		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items', 1 );
-		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
+		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
 		
 		$use_tmp = true;
 		static $iids_subquery = null;
@@ -3099,10 +3294,10 @@ class FlexicontentFields
 		
 		$faceted_filter = $filter->parameters->get( 'faceted_filter_s', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
-		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
-		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
+		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
 		
 		$field_tbl = 'flexicontent_advsearch_index_field_'.$filter->id;
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . $field_tbl . '"';

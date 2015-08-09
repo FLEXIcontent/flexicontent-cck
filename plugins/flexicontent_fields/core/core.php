@@ -399,7 +399,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$faceted_filter = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$disable_keyboardinput = $filter->parameters->get('disable_keyboardinput', 0);
-		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		$filter_as_range = in_array($display_filter_as, array(2,3,8)) ;
 		
 		// Create first prompt option of drop-down select
 		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 2 ) ;
@@ -598,15 +598,16 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					}
 				}
 
-				$nullDate = $db->getNullDate();
-				$valuecol = sprintf(' CASE WHEN i.%s='.$db->Quote($nullDate).' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_valformat);
-				$textcol  = sprintf(' CASE WHEN i.%s='.$db->Quote($nullDate).' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_txtformat);
+				$filter_as_range = in_array($display_filter_as, array(2,3,8));  // We don't want null date if using a range
+				$nullDate_quoted = $db->Quote($db->getNullDate());
+				$valuecol = sprintf(' CASE WHEN i.%s='.$nullDate_quoted.' THEN '.$nullDate_quoted.' ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_valformat);
+				$textcol  = sprintf(' CASE WHEN i.%s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_txtformat);
 				
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
 				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
-				$filter->filter_valueswhere  = ' AND i.'.$filter->field_type.' IS NOT NULL';
+				$filter->filter_valueswhere  = $filter_as_range ? ' AND i.'.$filter->field_type.'<>'.$nullDate_quoted : '';
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY '.$valuecol;
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty

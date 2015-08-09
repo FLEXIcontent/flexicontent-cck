@@ -626,23 +626,27 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; $date_txtformat='%Y-%b'; }
 		else { $date_valformat='%Y-%m-%d'; $date_txtformat='%Y-%b-%d'; }
 		
+		$db = JFactory::getDBO();
+		$nullDate_quoted = $db->Quote($db->getNullDate());
+		
+		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
+		$filter_as_range = in_array($display_filter_as, array(2,3,8));  // We don't want null date if using a range
 		$date_source = $filter->parameters->get('date_source', 0);
+		
 		if ( ! $date_source ) {
 			$valuecol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_valformat);
 			$textcol  = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_txtformat);
 		} else {
-			$db = JFactory::getDBO();
-			$nullDate = $db->getNullDate();
 			$_value_col = ($date_source == 1) ? 'i.publish_up' : 'i.publish_down';
-			$valuecol = sprintf(' CASE WHEN %s='.$db->Quote($nullDate).' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_valformat);
-			$textcol  = sprintf(' CASE WHEN %s='.$db->Quote($nullDate).' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_txtformat);
+			$valuecol = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN '.(!$filter_as_range ? $nullDate_quoted : $db->Quote('')).' ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_valformat);
+			$textcol  = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_txtformat);
 		}
 		
 		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
 		$filter->filter_valuesjoin   = null;  // use default
-		$filter->filter_valueswhere  = null;  // use default
+		$filter->filter_valueswhere  = $filter_as_range ? ' AND i.'.$filter->field_type.'<>'.$nullDate_quoted : '';
 		// full SQL clauses
 		$filter->filter_groupby = ' GROUP BY '.$valuecol;
 		$filter->filter_having  = null;  // use default

@@ -275,6 +275,9 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	width: 100%;
 }
 
+/* Slider filter container */
+.fc_filter_html > .noUi-target { margin: 24px 24px 6px 24px; }
+
 /* Highlight date calendar inside FC filters */
 .fc_filter_html .calendar { vertical-align: bottom; margin: 0px 6px 9px 2px; cursor: pointer; }
 .fc_filter_html .calendar:hover { border: 1px solid darkred; }

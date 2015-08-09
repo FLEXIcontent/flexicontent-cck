@@ -109,7 +109,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="text_or_value" type="radio" default="1" label="FLEXI_LABEL_OR_VALUE_ETC" description="FLEXI_LABEL_OR_VALUE_ETC_DESC">
+			<field name="text_or_value" type="radio" default="1" label="FLEXI_LABEL_OR_VALUE_ETC" description="FLEXI_LABEL_OR_VALUE_ETC_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_VALUE</option>
 				<option value="1">FLEXI_LABEL</option>
 			</field>
@@ -185,25 +185,22 @@
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level2" />
-			<field name="display_label_filter" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
+			<field name="display_label_filter" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0" show_list="filt-drop-down" hide_list="">FLEXI_DISPLAY_AS_DROP_DOWN</option>
-				<option value="1" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
-				<option value="2" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
-				<option value="3" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
-				<option value="4" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_RADIO</option>
-				<option value="5" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_CHECKBOXES</option>
-				<option value="6" show_list="" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_TAG_LIKE</option>
+				<option value="0" show_list="filt-drop-down" hide_list="filt-as-slider">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="1" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
+				<option value="7" show_list="filt-as-slider" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_SLIDER</option>
+				<option value="2" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
+				<option value="3" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
+				<option value="8" show_list="filt-as-slider" hide_list="filt-drop-down">FLEXI_DISPLAY_AS_SLIDER_RANGE</option>
+				<option value="4" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="filter_usefirstoption" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="displaydefauttext-mode">FLEXI_NO</option>
-				<option value="1" show_list="displaydefauttext-mode" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="filter_firstoptiontext" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="filt-drop-down displaydefauttext-mode" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
 			
 			<field name="faceted_filter" type="multilist" subtype="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC" toggle_related="1">
 				<option value="0" show_list="" hide_list="active-filts-mode">FLEXI_FS_NONE</option>
@@ -221,26 +218,43 @@
 				<option value="1">FLEXI_HIDE</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_DISPLAY_AS_DROP_DOWN" level="level3" depend_class="filt-drop-down" />
+			<field name="filter_usefirstoption" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="displaydefauttext-mode">FLEXI_NO</option>
+				<option value="1" show_list="displaydefauttext-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="filter_firstoptiontext" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="filt-drop-down displaydefauttext-mode" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_DISPLAY_AS_SLIDER" level="level3" depend_class="filt-as-slider" />
+			<field name="slider_display_config" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FILTER_SLIDER_DATA" description="FLEXI_FILTER_SLIDER_DATA_DESC" depend_class="filt-as-slider" class="btn-group group-fcmethod fcoffinfo">
+				<option value="1" show_list="" hide_list="filt-as-slider-custom">Found values</option>
+				<option value="2" show_list="filt-as-slider-custom" hide_list="">Custom values</option>
+			</field>
+			<field name="slider_custom_range"  type="textarea" default="'min': '', '25%': '50', '50%': '150', '75%': '600', 'max': ''" label="FLEXI_FILTER_SLIDER_CUSTOM_VALUES" description="FLEXI_FILTER_SLIDER_CUSTOM_VALUES_DESC" depend_class="filt-as-slider filt-as-slider-custom"/>
+			<field name="slider_custom_labels" type="textarea" default="label_any ## label_50 ## label_150 ## label_600 ## label_any" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_DESC" depend_class="filt-as-slider filt-as-slider-custom"/>
+			<field name="slider_custom_labels_jtext" type="radio" default="0" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING_DESC" depend_class="filt-as-slider filt-as-slider-custom" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
-			<field name="display_label_filter_s" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
+			<field name="display_label_filter_s" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as_s" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0" show_list="filt-drop-down-s" hide_list="">FLEXI_DISPLAY_AS_DROP_DOWN</option>
-				<option value="1" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
-				<option value="2" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
-				<option value="3" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
-				<option value="4" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_RADIO</option>
-				<option value="5" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_CHECKBOXES</option>
-				<option value="6" show_list="" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_TAG_LIKE</option>
+				<option value="0" show_list="filt-drop-down-s" hide_list="filt-as-slider-s">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="1" show_list="" hide_list="filt-drop-down-s,filt-as-slider-s">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
+				<option value="7" show_list="filt-as-slider-s" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_SLIDER</option>
+				<option value="2" show_list="" hide_list="filt-drop-down-s,filt-as-slider-s">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
+				<option value="3" show_list="" hide_list="filt-drop-down-s,filt-as-slider-s">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
+				<option value="8" show_list="filt-as-slider-s" hide_list="filt-drop-down-s">FLEXI_DISPLAY_AS_SLIDER_RANGE</option>
+				<option value="4" show_list="" hide_list="filt-drop-down-s,filt-as-slider-s">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5" show_list="" hide_list="filt-drop-down-s,filt-as-slider-s">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6" show_list="" hide_list="filt-drop-down-s,filt-as-slider-s">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="filter_usefirstoption_s" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down-s" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="displaydefauttext-mode-s">FLEXI_NO</option>
-				<option value="1" show_list="displaydefauttext-mode-s" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="filter_firstoptiontext_s" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="filt-drop-down-s displaydefauttext-mode-s" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
 			
 			<field name="faceted_filter_s" type="multilist" subtype="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC" toggle_related="1">
 				<option value="0" show_list="" hide_list="active-filts-mode-s">FLEXI_FS_NONE</option>
@@ -258,6 +272,25 @@
 				<option value="1">FLEXI_HIDE</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_DISPLAY_AS_DROP_DOWN" level="level3" depend_class="filt-drop-down" />
+			<field name="filter_usefirstoption_s" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down-s" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="displaydefauttext-mode-s">FLEXI_NO</option>
+				<option value="1" show_list="displaydefauttext-mode-s" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="filter_firstoptiontext_s" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" depend_class="filt-drop-down-s displaydefauttext-mode-s" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_DISPLAY_AS_SLIDER" level="level3" depend_class="filt-as-slider-s" />
+			<field name="slider_display_config_s" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FILTER_SLIDER_DATA" description="FLEXI_FILTER_SLIDER_DATA_DESC" depend_class="filt-as-slider-s" class="btn-group group-fcmethod fcoffinfo">
+				<option value="1" show_list="" hide_list="filt-as-slider-custom-s">Found values</option>
+				<option value="2" show_list="filt-as-slider-custom-s" hide_list="">Custom values</option>
+			</field>
+			<field name="slider_custom_range_s"  type="textarea" default="'min': '', '25%': 500, '50%': 2000, '75%': 10000, 'max': ''" label="FLEXI_FILTER_SLIDER_CUSTOM_VALUES" description="FLEXI_FILTER_SLIDER_CUSTOM_VALUES_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s"/>
+			<field name="slider_custom_labels_s" type="textarea" default="label_any ## label_500 ## label_2000 ## label_10000 ## label_any" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s"/>
+			<field name="slider_custom_labels_jtext_s" type="radio" default="0" label="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING" description="FLEXI_FILTER_SLIDER_CUSTOM_LABELS_ARE_LANG_STRING_DESC" depend_class="filt-as-slider-s filt-as-slider-custom-s" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
 		</fieldset>
 		
 	</fields>

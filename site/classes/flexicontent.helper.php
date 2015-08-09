@@ -1089,6 +1089,13 @@ class flexicontent_html
 				//$document->addScript($framework_path.'/js/plupload.dev.js');
 				break;
 				
+			case 'nouislider':
+				
+				$framework_path = JURI::root(true).$lib_path.'/nouislider';
+				$document->addStyleSheet($framework_path.'/nouislider.min.css');
+				$document->addScript($framework_path.'/nouislider.min.js');
+				break;
+
 			case 'flexi_tmpl_common':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				flexicontent_html::loadFramework('select2');  // make sure select2 is loaded

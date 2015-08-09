@@ -96,7 +96,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 		
 		$_s = $isSearchView ? '_s' : '';
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
-		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		$filter_as_range = in_array($display_filter_as, array(2,3,8)) ;
 		
 		// Create first prompt option of drop-down select
 		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 2 ) ;
