@@ -144,12 +144,12 @@ class FlexicontentViewFields extends JViewLegacy
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false, $btn_class="");
 			
 			$js .= "
-				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
+				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button, a.modal')
 					.attr('onclick', 'javascript:;')
 					.attr('href', '".$popup_load_url."')
 					.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 340}, onClose: function() {}}');
 			";
-			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
+			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button, a.modal');
 		}
 		
 		$contrl = "fields.";
