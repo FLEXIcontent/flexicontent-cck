@@ -188,6 +188,7 @@
 				<option value="month">FLEXI_MONTH</option>
 				<option value="day">FLEXI_DAY</option>
 			</field>
+			<field name="date_filter_label_format" type="text" default="" label="FLEXI_FILTER_DATE_LABEL_FORMAT" description="FLEXI_FILTER_DATE_LABEL_FORMAT_DESC" class="btn-group btn-group-yesno" />
 			<field name="display_filter_as" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC">
 				<option value="0" show_list="filt-drop-down" hide_list="filt-as-slider">FLEXI_DISPLAY_AS_DROP_DOWN</option>
 				<option value="1" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_DATE_PICKER</option>
@@ -247,6 +248,7 @@
 				<option value="month">FLEXI_MONTH</option>
 				<option value="day">FLEXI_DAY</option>
 			</field>
+			<field name="date_filter_label_format_s" type="text" default="" label="FLEXI_FILTER_DATE_LABEL_FORMAT" description="FLEXI_FILTER_DATE_LABEL_FORMAT_DESC" class="btn-group btn-group-yesno" />
 			<field name="display_filter_as_s" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC">
 				<option value="0" show_list="filt-drop-down-s" hide_list="filt-as-slider-s">FLEXI_DISPLAY_AS_DROP_DOWN</option>
 				<option value="1" show_list="" hide_list="filt-drop-down-s,filt-as-slider-s">FLEXI_DISPLAY_AS_DATE_PICKER</option>

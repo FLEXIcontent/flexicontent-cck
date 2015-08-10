@@ -570,9 +570,13 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			case 'created':  // creation dates
 			case 'modified': // modification dates
 				$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
-				if ($date_filter_group=='year') { $date_valformat='%Y'; $date_txtformat='%Y'; }
-				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; $date_txtformat='%Y-%b'; }
-				else { $date_valformat='%Y-%m-%d'; $date_txtformat='%Y-%b-%d'; }
+				if ($date_filter_group=='year') { $date_valformat='%Y'; }
+				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
+				else { $date_valformat='%Y-%m-%d'; }
+				
+				// Display date 'label' can be different than the (aggregated) date value
+				$date_filter_label_format = $filter->parameters->get('date_filter_label_format', '');
+				$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
 				
 				if($disable_keyboardinput)
 				{
@@ -702,7 +706,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		
 		$filter->isindexed = in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
-	}	
+	}
 	
 	
 	
@@ -738,58 +742,68 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	}
 	
 	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
+	
 	// Method to prepare for indexing, either preparing SQL query (if post is null) or formating/preparing given $post data for usage bu index
 	function _prepareForSearchIndexing(&$field, &$post, $for_advsearch=0)
 	{
 		static $nullDate = null;
 		
-		if ($post!==null && isset($post[0])) {
-			$db = JFactory::getDBO();
-			$values = array();
-			if ($field->field_type=='type') {
-				$textcol = 't.name';
-				$query 	= ' SELECT t.id AS value_id, '.$textcol.' AS value FROM #__flexicontent_types AS t WHERE t.id<>0 AND t.id = '.(int)$post[0];
-				
-			} else if ($field->field_type=='categories') {
-				$query 	= ' SELECT c.id AS value_id, c.title AS value FROM #__categories AS c WHERE c.id<>0 AND c.id IN ('.implode(",",$post).')';
-				
-			} else if ($field->field_type=='tags') {
-				$query 	= ' SELECT t.id AS value_id, t.name AS value FROM #__flexicontent_tags AS t WHERE t.id<>0 AND t.id IN ('.implode(",",$post).')';
-				
-			} else if ($field->field_type=='createdby' || $field->field_type=='modifiedby') {
-				$textcol = 'u.name';
-				$query 	= ' SELECT u.id AS value_id, '.$textcol.' AS value FROM #__users AS u WHERE u.id<>0 AND u.id = '.(int)$post[0];
-				
-			} else if ($field->field_type=='created' || $field->field_type=='modified') {
-				if ($nullDate===null) $nullDate	= $db->getNullDate();
-				
-				$date_filter_group = $field->parameters->get( $for_advsearch ? 'date_filter_group_s' : 'date_filter_group', 'month');
-				if ($date_filter_group=='year') { $date_valformat='%Y'; }
-				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
-				else { $date_valformat='%Y-%m-%d'; }
-				$valuecol = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_valformat);
-				
-				$query 	= 'SELECT '.$valuecol.' AS value_id'
-					.' FROM #__content AS i'
-					.' WHERE i.'.$field->name.'<>'.$db->Quote($nullDate).' AND i.id='.$field->item_id;
-				$db->setQuery($query);
-				$value = $db->loadResult();
-				$values = !$value ? false : array( $value => $value) ;
-				unset($query);
-				
-			} else {
-				$values = $post;  // Other fields will be entered as is into the index !!
-			}
+		if ($post===null || !isset($post[0]))  return null;
+		
+		$db = JFactory::getDBO();
+		$values = array();
+		if ($field->field_type=='type') {
+			$textcol = 't.name';
+			$query 	= ' SELECT t.id AS value_id, '.$textcol.' AS value FROM #__flexicontent_types AS t WHERE t.id<>0 AND t.id = '.(int)$post[0];
 			
-			if (!empty($query)) {
-				$db->setQuery($query);
-				$_values = $db->loadAssocList();
-				$values = array();
-				foreach ($_values as $v)  $values[$v['value_id']] = $v['value'];
-			}
+		} else if ($field->field_type=='categories') {
+			$query 	= ' SELECT c.id AS value_id, c.title AS value FROM #__categories AS c WHERE c.id<>0 AND c.id IN ('.implode(",",$post).')';
+			
+		} else if ($field->field_type=='tags') {
+			$query 	= ' SELECT t.id AS value_id, t.name AS value FROM #__flexicontent_tags AS t WHERE t.id<>0 AND t.id IN ('.implode(",",$post).')';
+			
+		} else if ($field->field_type=='createdby' || $field->field_type=='modifiedby') {
+			$textcol = 'u.name';
+			$query 	= ' SELECT u.id AS value_id, '.$textcol.' AS value FROM #__users AS u WHERE u.id<>0 AND u.id = '.(int)$post[0];
+			
+		} else if ($field->field_type=='created' || $field->field_type=='modified') {
+			if ($nullDate===null) $nullDate	= $db->getNullDate();
+			
+			$date_filter_group = $field->parameters->get( $for_advsearch ? 'date_filter_group_s' : 'date_filter_group', 'month');
+			if ($date_filter_group=='year') { $date_valformat='%Y'; }
+			else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
+			else { $date_valformat='%Y-%m-%d'; }
+			
+			// Display date 'label' can be different than the (aggregated) date value
+			$date_filter_label_format = $filter->parameters->get('date_filter_label_format_s', '');
+			$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
+			
+			$valuecol = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_valformat);
+			$textcol  = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_txtformat);
+			
+			$query 	= 'SELECT '.$valuecol.' AS value_id, '.$textcol.' AS value'
+				.' FROM #__content AS i'
+				.' WHERE i.'.$field->name.'<>'.$db->Quote($nullDate).' AND i.id='.$field->item_id;
+			$db->setQuery($query);
+			$value = $db->loadResult();
+			$values = !$value ? false : array( $value => $value) ;
+			unset($query);
+			
 		} else {
-			$values = null;
+			$values = $post;  // Other fields will be entered as is into the index !!
+		}
+		
+		if (!empty($query)) {
+			$db->setQuery($query);
+			$_values = $db->loadAssocList();
+			$values = array();
+			foreach ($_values as $v)  $values[$v['value_id']] = $v['value'];
 		}
 		return $values;
 	}
+	
 }

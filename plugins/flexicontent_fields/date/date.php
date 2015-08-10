@@ -622,9 +622,13 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$_s = $isSearchView ? '_s' : '';
 		$date_filter_group = $filter->parameters->get('date_filter_group'.$_s, 'month');
-		if ($date_filter_group=='year') { $date_valformat='%Y'; $date_txtformat='%Y'; }
-		else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; $date_txtformat='%Y-%b'; }
-		else { $date_valformat='%Y-%m-%d'; $date_txtformat='%Y-%b-%d'; }
+		if ($date_filter_group=='year') { $date_valformat='%Y'; }
+		else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
+		else { $date_valformat='%Y-%m-%d'; }
+		
+		// Display date 'label' can be different than the (aggregated) date value
+		$date_filter_label_format = $filter->parameters->get('date_filter_label_format'.$_s, '');
+		$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
 		
 		$db = JFactory::getDBO();
 		$nullDate_quoted = $db->Quote($db->getNullDate());
@@ -753,9 +757,13 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	function _prepareForSearchIndexing(&$field, &$post, $for_advsearch=0)
 	{
 		$date_filter_group = $field->parameters->get( $for_advsearch ? 'date_filter_group_s' : 'date_filter_group', 'month');
-		if ($date_filter_group=='year') { $date_valformat='%Y'; $date_txtformat='%Y'; }
-		else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; $date_txtformat='%Y-%b'; }
-		else { $date_valformat='%Y-%m-%d'; $date_txtformat='%Y-%b-%d'; }
+		if ($date_filter_group=='year') { $date_valformat='%Y'; }
+		else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
+		else { $date_valformat='%Y-%m-%d'; }
+		
+		// Display date 'label' can be different than the (aggregated) date value
+		$date_filter_label_format = $filter->parameters->get('date_filter_label_format_s', '');
+		$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
 		
 		if ($post===null) {
 			$valuecol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_valformat);
