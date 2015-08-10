@@ -2630,7 +2630,7 @@ class FlexicontentFields
 				}
 				$options[] = JHTML::_('select.option', '', !$first_option_txt ? '-' : '- '.$first_option_txt.' -');
 			}
-			foreach($results as $result) {
+			foreach ($results as $result) {
 				if ( !strlen($result->value) ) continue;
 				$options[] = JHTML::_('select.option', $result->value, $result->text, 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
 			}
@@ -2692,7 +2692,7 @@ class FlexicontentFields
 					$step_values = array(0=>"''");
 					$step_labels = array(0=>JText::_('FLEXI_ANY'));
 					$i = 1;
-					foreach($results as $result) {
+					foreach ($results as $result) {
 						$step_values[] = "'".$result->value."'";
 						$step_labels[] = $result->text;
 						if ($result->value==$value1) $start = $i;
@@ -2924,7 +2924,7 @@ class FlexicontentFields
 				.' </li>';
 			$i++;
 			
-			foreach($results as $result) {
+			foreach ($results as $result) {
 				if ( !strlen($result->value) ) continue;
 				$checked = ($display_filter_as==5) ? in_array($result->value, $value) : $result->value==$value;
 				$checked_attr = $checked ? ' checked=checked ' : '';
@@ -3384,6 +3384,13 @@ class FlexicontentFields
 		catch (Exception $e) {
 			$filter->html = __FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br />" .$e->getMessage() ."<br/>";
 			return array();
+		}
+		
+		static $search_prefix = null;
+		if ($search_prefix === null) $search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		if ($search_prefix) foreach ($results as $i => $result)
+		{
+			$result->text = preg_replace('/\b'.$search_prefix.'/u', '', $result->text);
 		}
 		
 		return $results;
