@@ -128,7 +128,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		$enable_featured_cid_selector = $perms->MultiCat && $CanChangeFeatCat;
 		$enable_cid_selector   = $perms->MultiCat && $CanChangeSecCat;
-		$enable_catid_selector = ($isnew && !$tparams->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
+		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
 		
 		// Enforce maintaining featured categories
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
@@ -150,7 +150,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Enforce maintaining secondary categories
 		if (!$enable_cid_selector) {
 			if ($isnew) {
-				$data['cid'] = $tparams->get('cid_default');
+				$data['cid'] = $params->get('cid_default');
 			} else if ( isset($featured_cid) ) {
 				$featured_cid_arr = array_flip($featured_cid);
 				$sec_cid = array();
@@ -162,8 +162,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		if (!$enable_catid_selector) {
-			if ($isnew && $tparams->get('catid_default'))
-				$data['catid'] = $tparams->get('catid_default');
+			if ($isnew && $params->get('catid_default'))
+				$data['catid'] = $params->get('catid_default');
 			else if ($model->get('catid'))
 				$data['catid'] = $model->get('catid');
 		}
@@ -607,8 +607,6 @@ class FlexicontentControllerItems extends FlexicontentController
 			echo flexicontent_html::get_system_messages_html();
 			exit();  // Ajax submit, do not rerender the view
 		}
-		
-		//echo "</body></html>"; exit;
 	}
 	
 	

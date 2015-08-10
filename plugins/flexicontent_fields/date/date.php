@@ -762,7 +762,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		else { $date_valformat='%Y-%m-%d'; }
 		
 		// Display date 'label' can be different than the (aggregated) date value
-		$date_filter_label_format = $filter->parameters->get('date_filter_label_format_s', '');
+		$date_filter_label_format = $field->parameters->get('date_filter_label_format_s', '');
 		$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
 		
 		if ($post===null) {

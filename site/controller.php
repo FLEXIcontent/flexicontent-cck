@@ -341,7 +341,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		$enable_featured_cid_selector = $perms->MultiCat && $CanChangeFeatCat;
 		$enable_cid_selector   = $perms->MultiCat && $CanChangeSecCat;
-		$enable_catid_selector = ($isnew && !$tparams->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
+		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
 		
 		// Enforce maintaining featured categories
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
@@ -363,7 +363,7 @@ class FlexicontentController extends JControllerLegacy
 		// Enforce maintaining secondary categories
 		if (!$enable_cid_selector && (empty($data['submit_conf']) || empty($data['cid'])) ) { // respect submit menu cat override
 			if ($isnew) {
-				$data['cid'] = $tparams->get('cid_default');
+				$data['cid'] = $params->get('cid_default');
 			} else if ( isset($featured_cid) ) {
 				$featured_cid_arr = array_flip($featured_cid);
 				$sec_cid = array();
@@ -375,8 +375,8 @@ class FlexicontentController extends JControllerLegacy
 		}
 		
 		if (!$enable_catid_selector && (empty($data['submit_conf']) || empty($data['catid'])) ) { // respect submit menu cat override
-			if ($isnew && $tparams->get('catid_default'))
-				$data['catid'] = $tparams->get('catid_default');
+			if ($isnew && $params->get('catid_default'))
+				$data['catid'] = $params->get('catid_default');
 			else if ($model->get('catid'))
 				$data['catid'] = $model->get('catid');
 		}
