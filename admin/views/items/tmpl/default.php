@@ -328,7 +328,7 @@ jQuery(document).ready(function(){
 				<span style="font-size:150%;"><span id="badcat_items_count"><?php echo $this->badcatitems; ?></span></span>&nbsp;
 				<br/>
 				<?php echo JText::_( 'FLEXI_DEFAULT_CAT_FOR_NO_CAT_ITEMS' ).': '.$this->lists['default_cat']; ?>
-				<input id="button-fixcat" type="submit" class="fc_button" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_FIX' ); ?>"
+				<input id="button-fixcat" type="submit" class="<?php echo $btn_class; ?>" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_FIX' ); ?>"
 				onclick="" />
 				<div id="log-fixcat"></div>
 			</td>
