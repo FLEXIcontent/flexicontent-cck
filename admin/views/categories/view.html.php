@@ -237,7 +237,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		$categories = & $globalcats;
 		$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"', false, true, $actions_allowed=array('core.edit'));
-		$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"', false, true, $actions_allowed=array('core.edit'));
+		$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="10" multiple="true"', false, true, $actions_allowed=array('core.edit'));
 		
 		
 		// *******************
