@@ -38,11 +38,10 @@ window.addEvent('domready', function(){
 <form action="index.php?option=com_flexicontent&task=categories.params&layout=params&format=raw" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
-		<legend><?php echo JText::_( 'FLEXI_COPY_PARAMETERS_SOURCE' ).':'; ?></legend>
+		<span class="label"><?php echo JText::_( 'FLEXI_COPY_PARAMETERS_SOURCE' ).':'; ?></span>
 		<?php echo $this->lists['copyid']; ?>
-	</fieldset>
-	<fieldset>
-		<legend><?php echo JText::_( 'FLEXI_COPY_PARAMETERS_DEST' ).':'; ?></legend>
+		<br/>
+		<span class="label"><?php echo JText::_( 'FLEXI_COPY_PARAMETERS_DEST' ).':'; ?></span>
 		<?php echo $this->lists['destid']; ?>
 	</fieldset>
 	<table width="100%" align="center">
