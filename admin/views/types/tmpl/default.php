@@ -133,29 +133,23 @@ function delAllFilters() {
 	
 	<table id="adminListTableFCtypes" class="adminlist fcmanlist">
 	<thead>
-		<tr>
-			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+		<tr class="header">
+			<th class="hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo $article_viewing_tip . JText::_( 'FLEXI_REDIRECT_ARTICLE_VIEW' )."<br/><small>(".JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REDIRECTED' ).")</small>"; ?></th>
-			<th class="hideOnDemandClass left" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass col_redirect center hidden-tablet hidden-phone"><?php echo $article_viewing_tip . JText::_( 'FLEXI_REDIRECT_ARTICLE_VIEW' )."<br/><small>(".JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REDIRECTED' ).")</small>"; ?></th>
+			<th class="hideOnDemandClass center hidden-tablet hidden-phone" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
+			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<!--th class="hideOnDemandClass"><?php // echo JHTML::_('grid.sort', 'ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
-			<th class="hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
+			<th class="hideOnDemandClass center hidden-tablet hidden-phone" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-	</tfoot>
+
 
 	<tbody>
 		<?php
@@ -185,9 +179,9 @@ function delAllFilters() {
 			$canEditOwn = 1;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+			<td class="hidden-phone"><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td><?php echo $checked; ?></td>
-			<td align="left">
+			<td class="left">
 				<?php
 				
 				// Display an icon with checkin link, if current user has checked out current item
@@ -227,7 +221,7 @@ function delAllFilters() {
 				}
 				?>
 			</td>
-			<td align="center">
+			<td class="col_redirect center hidden-tablet hidden-phone">
 				<span style="cursor:pointer;"
 					<?php
 					echo ' class="'.$btn_class.' btn-small" onclick="return listItemTask(\'cb'.$i.'\',\'types.toggle_jview\');">';
@@ -236,18 +230,18 @@ function delAllFilters() {
 				</span>
 			</td>
 			
-			<td align="right">
+			<td class="hidden-tablet hidden-phone">
 				<?php if ($this->CanTemplates) : ?>
 				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;" >
 					<?php echo $layout_edit_icon;?>
 				</a>
 				<?php endif; ?>
 			</td>
-			<td align="left">
+			<td class="center hidden-tablet hidden-phone">
 				<?php echo $row->config->get("ilayout"); ?>
 			</td>
 			
-			<td>
+			<td class="center hidden-tablet hidden-phone">
 				<?php
 				if (JString::strlen($row->alias) > 25) {
 					echo JString::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
@@ -256,30 +250,32 @@ function delAllFilters() {
 				}
 				?>
 			</td>
-			<td align="center">
+			<td class="center">
 				<span class="badge"><?php echo $row->fassigned; ?></span>
 				<a href="<?php echo $fields_url; ?>">
 					[<?php echo $view_fields;?>]
 				</a>
 			</td>
-			<td align="center">
+			<td class="center">
 				<span class="badge badge-info"><?php echo $row->iassigned; ?></span>
 				<a href="<?php echo $items_url; ?>">
 					[<?php echo $view_items;?>]
 				</a>
 			</td>
-			<td align="center">
+			<td class="center hidden-phone">
 				<?php echo $access; ?>
 			</td>
-			<td align="center">
+			<td class="center">
 				<?php echo $published; ?>
 			</td>
-			<td align="center"><?php echo $row->id; ?></td>
+			<td class="center hidden-tablet hidden-phone"><?php echo $row->id; ?></td>
 		</tr>
 		<?php $k = 1 - $k; } ?>
 	</tbody>
 
 	</table>
+
+<p><?php echo $pagination_footer; ?></p>
 
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
