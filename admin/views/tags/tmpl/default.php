@@ -69,45 +69,28 @@ function delAllFilters() {
 	<div id="j-main-container">
 <?php endif;?>
 
-	<div id="fc-filters-header">
-		<span class="fc-filter nowrap_box">
-			<span class="filter-search btn-group">
-				<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
-			</span>
-			<span class="btn-group hidden-phone">
-				<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
-				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
-			</span>
-		</span>
-		
-		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
-		<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
-			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
-			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-		</div>
-		
-		<span class="fc-filter nowrap_box">
-			<span class="limit nowrap_box" style="display: inline-block;">
-				<label class="label">
-					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
-				</label>
-				<?php
+<div id="fc-filters-header"> <span class="btn-wrapper input-append fc-filter"><span class="filter-search btn-group">
+        <input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
+        </span> <span class="btn-group hidden-phone">
+        <button title="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" class="<?php echo $btn_class; ?> <?php echo $tip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"  data-original-title="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
+        <button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?> hidden-phone" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
+        </span></span>
+        <?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
+        <div class="btn-wrapper btn-group hidden-phone">
+          <input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+          <input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+        </div>
+        <span class="limit btn-group pull-right hidden-phone">
+        <?php
 				$pagination_footer = $this->pagination->getListFooter();
 				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 				?>
-			</span>
-			
-			<span class="fc_item_total_data nowrap_box badge badge-info">
-				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
-			</span>
-			
-			<?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
-			<span class="fc_pages_counter nowrap_box fc-mssg-inline fc-info fc-nobgimage">
-				<?php echo $getPagesCounter; ?>
-			</span>
-			<?php endif; ?>
-		</span>
-	</div>
+        <?php if (($getPagesCounter = $this->pagination->getPagesCounter())): ?>
+        <?php echo $getPagesCounter; ?>
+        <?php endif; ?>
+        </span></div>
+		
+	
 	
 	
 	<div id="fc-filters-box" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> class="">
@@ -128,27 +111,23 @@ function delAllFilters() {
 	
 	<div class="fcclear"></div>
 	
-	<table id="adminListTableFCtags" class="adminlist fcmanlist">
+    
+    
+	<table id="adminListTableFCtags" class="adminlist fcmanlist table no-border hover">
 	<thead>
-		<tr>
-			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
-			<th nowrap="nowrap"></th>
+		<tr class="header">
+			<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+			<th class="center"><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+			<th nowrap="nowrap"  class="center hidden-tablet hidden-phone"></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TAG_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TO', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass alias hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TO', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center hidden-phone" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>">
-				<?php echo $pagination_footer; ?>
-			</td>
-		</tr>
-	</tfoot>
+
 
 	<tbody>
 		<?php
@@ -177,9 +156,9 @@ function delAllFilters() {
 			$canEditOwn = 1;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
-			<td><?php echo $checked; ?></td>
-			<td>
+			<td class="center hidden-phone"><?php echo $this->pagination->getRowOffset( $i ); ?></td>
+			<td class="center"><?php echo $checked; ?></td>
+			<td class="center hidden-tablet hidden-phone">
 				<?php
 				$tag_link    = str_replace('&', '&amp;', FlexicontentHelperRoute::getTagRoute($row->id));
 				$tag_link    = JRoute::_(JURI::root().$tag_link, $xhtml=false);  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
@@ -187,7 +166,7 @@ function delAllFilters() {
 				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
 				?>
 			</td>
-			<td align="left">
+			<td class="title">
 				<?php
 				
 				// Display an icon with checkin link, if current user has checked out current item
@@ -227,7 +206,7 @@ function delAllFilters() {
 				}
 				?>
 			</td>
-			<td>
+			<td class="alias hidden-phone">
 				<?php
 				if (JString::strlen($row->alias) > 25) {
 					echo JString::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
@@ -236,17 +215,20 @@ function delAllFilters() {
 				}
 				?>
 			</td>
-			<td align="center"><span class="badge badge-info"><?php echo $row->nrassigned ? $row->nrassigned : 0; ?></span></td>
-			<td align="center">
+			<td class="center"><span class="badge badge-info"><?php echo $row->nrassigned ? $row->nrassigned : 0; ?></span></td>
+			<td class="center">
 				<?php echo $published; ?>
 			</td>
-			<td align="center"><?php echo $row->id; ?></td>
+			<td class="center hidden-phone"><?php echo $row->id; ?></td>
 		</tr>
 		<?php $k = 1 - $k; } ?>
 	</tbody>
 
 	</table>
 	
+    
+    <p><?php echo $pagination_footer; ?></p>
+    
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="tags" />
