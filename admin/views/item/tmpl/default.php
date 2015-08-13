@@ -1050,7 +1050,7 @@ if ($this->perms['canparams']) : ?>
 		<span class="fcsep_level1" style=""><?php echo JText::_( 'FLEXI_META' ); ?></span>
 		<div class="fcclear"></div>
 		
-		<div class="fc_tabset_inner">
+		<fieldset class="panelform">
 			<span class="label-fcouter"><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('metadesc')); ?></span>
 			
 			<div class="container_fcfield">
@@ -1088,7 +1088,7 @@ if ($this->perms['canparams']) : ?>
 				<?php endif; ?>
 				
 			</div>
-		</div>
+		</fieldset>
 			
 		<fieldset class="panelform">
 			<span class="label-fcouter"><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('metakey')); ?></span>
