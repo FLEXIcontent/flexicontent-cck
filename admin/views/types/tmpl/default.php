@@ -37,7 +37,7 @@ $list_total_cols = 12;
 
 $article_viewing_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_REDIRECT_ARTICLE_VIEW').'" title="'.flexicontent_html::getToolTip('FLEXI_REDIRECT_ARTICLE_VIEW', 'FLEXI_REDIRECT_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
 $default_template_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
-$layout_edit_icon = '<img src="components/com_flexicontent/assets/images/layout_edit.png" class="fc-man-icon-s" /> ';
+$layout_edit_icon = '<img src="components/com_flexicontent/assets/images/layout_edit.png" class="fc-man-icon-s" alt="'.$edit_layout.'" /> ';
 ?>
 <script type="text/javascript">
 
@@ -61,7 +61,7 @@ function delAllFilters() {
 
 <div class="flexicontent">
 
-<form action="index.php?option=<?php echo $this->option; ?>&view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
@@ -73,34 +73,27 @@ function delAllFilters() {
 <?php endif;?>
 
 	<div id="fc-filters-header">
-		<span class="fc-filter nowrap_box">
-			<span class="filter-search btn-group">
-				<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
-			</span>
-			<span class="btn-group hidden-phone">
-				<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
-				<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
-			</span>
+		<span class="btn-group input-append filter-search fc-filter">
+			<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
+			<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
+			<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
 		</span>
 		
 		<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
-		<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
+		<span class="btn-group input-append hidden-phone fc-filter">
 			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-		</div>
+		</span>
 		
 		<span class="fc-filter nowrap_box">
-			<span class="limit nowrap_box" style="display: inline-block;">
-				<label class="label">
-					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
-				</label>
+			<span class="limit nowrap_box">
 				<?php
 				$pagination_footer = $this->pagination->getListFooter();
 				if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 				?>
 			</span>
 			
-			<span class="fc_item_total_data nowrap_box badge badge-info">
+			<span class="fc_item_total_data nowrap_box fc-mssg-inline fc-info fc-nobgimage">
 				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
 			</span>
 			
@@ -131,6 +124,7 @@ function delAllFilters() {
 	
 	<div class="fcclear"></div>
 	
+  
 	<table id="adminListTableFCtypes" class="adminlist fcmanlist">
 	<thead>
 		<tr class="header">
@@ -143,12 +137,11 @@ function delAllFilters() {
 			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<!--th class="hideOnDemandClass"><?php // echo JHTML::_('grid.sort', 'ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
-			<th class="hideOnDemandClass center hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
-			<th class="hideOnDemandClass center hidden-tablet hidden-phone" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center hidden-phone"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
+			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
-
 
 
 	<tbody>
@@ -161,15 +154,9 @@ function delAllFilters() {
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
 			$row = & $this->rows[$i];
-			if (FLEXI_J16GE) {
-				$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;cid[]='. $row->id;
-				$published 	= JHTML::_('jgrid.published', $row->published, $i, 'types.' );
-				$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')"');
-			} else {
-				$link 		= 'index.php?option=com_flexicontent&amp;controller=types&amp;task=edit&amp;cid[]='. $row->id;
-				$published 	= JHTML::_('grid.published', $row, $i );
-				$access 	= JHTML::_('grid.access', $row, $i );
-			}
+			$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;cid='. $row->id;
+			$published 	= JHTML::_('jgrid.published', $row->published, $i, 'types.' );
+			$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')"');
 			
 			$checked	= @ JHTML::_('grid.checkedout', $row, $i );
 			$fields_url = 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;
@@ -262,10 +249,10 @@ function delAllFilters() {
 					[<?php echo $view_items;?>]
 				</a>
 			</td>
-			<td class="center hidden-phone">
+			<td class="center">
 				<?php echo $access; ?>
 			</td>
-			<td class="center">
+			<td class="center hidden-phone">
 				<?php echo $published; ?>
 			</td>
 			<td class="center hidden-tablet hidden-phone"><?php echo $row->id; ?></td>
@@ -274,8 +261,9 @@ function delAllFilters() {
 	</tbody>
 
 	</table>
-
-<p><?php echo $pagination_footer; ?></p>
+	
+	<div class="fcclear"></div>
+	<?php echo $pagination_footer; ?>
 
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
