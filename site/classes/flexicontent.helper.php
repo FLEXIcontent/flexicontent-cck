@@ -1995,7 +1995,9 @@ class flexicontent_html
 		$link  = JRoute::_($link);
 		
 		// Add main category ID (if given)
-		$link .= ($submit_cat && $submit_cat->id)  ?  '&maincat='.$submit_cat->id  :  '';
+		if ($submit_cat && $submit_cat->id) {
+			$link .= (strstr($link, '?') ? '&' : '?') . 'maincat='.$submit_cat->id;
+		}
 		
 		// Append autorelate information to the URL (if given)
 		if ($auto_relations) foreach ( $auto_relations as $auto_relation ) {
