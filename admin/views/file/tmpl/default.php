@@ -55,70 +55,68 @@ if (!$this->row->url)
 
 
 <div id="flexicontent" class="flexicontent">
-<form action="index.php" method="post" name="adminForm" id="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-horizontal">
 
-	<table class="fc-form-tbl" cellspacing="0" cellpadding="0" border="0" width="100%">
-		<tr>
-			<td class="key">
+	<div class="fc-form-tbl">
+		<div class="control-group">
+            <div class="control-label">
 				<label class="label" for="altname">
 					<?php echo JText::_( !$this->row->url ? 'FLEXI_FILENAME' : 'FLEXI_FILE_URL' ); ?>
 				</label>
-			</td>
-			<td>
+			</div>
+            <div class="controls">
 				<input type="text" name="filename_original" value="<?php echo strlen($this->row->filename_original) ? $this->row->filename_original : $this->row->filename; ?>" style="width:96%; max-width:800px;" maxlength="100" />
-			</td>
-		</tr>
+			</div></div>
 
-		<tr>
-			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
-				<label class="label" for="altname">
+		<div class="control-group">
+            <div class="control-label">
+				<label class="label <?php echo $tip_class;?>" for="altname" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
 					<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 				</label>
-			</td>
-			<td>
-				<input type="text" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="100" style="width:96%; max-width:800px;" />
-			</td>
-		</tr>
-		<tr>
-			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
-				<label class="label" for="file-desc">
+			</div>
+            <div class="controls">
+				<input type="text" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="100"/>
+			</div></div>
+		<div class="control-group">
+            <div class="control-label">
+				<label class="label <?php echo $tip_class;?>" for="file-desc" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 				<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 				</label>
-			</td>
-			<td>
+			</div>
+            <div class="controls">
 				<textarea name="description" rows="5" style="width:94%; max-width:800px;" id="file-desc"><?php echo $this->row->description; ?></textarea>
-			</td>
-		</tr>
-		<tr>
-			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
-				<label class="label" for="access">
+			</div></div>
+            
+            <div class="control-group">
+            <div class="control-label">
+				<label class="label" for="access" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
 					<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 				</label>
-			</td>
-			<td>
-				<span style="width:94%; max-width:800px; display:inline-block;">
+			</div>
+            <div class="controls">
+				
 					<?php echo $this->lists['language']; ?>
-				</span>
-			</td>
-		</tr>
-		<tr>
-			<td class="key">
+				
+			</div></div>
+		<div class="control-group">
+            <div class="control-label">
 				<label class="label" for="access">
 					<?php echo JText::_( 'FLEXI_ACCESS_LEVEL' ); ?>
 				</label>
-			</td>
-			<td>
+			</div>
+            <div class="controls">
 				<?php echo $this->lists['access']; ?>
-			</td>
-		</tr>
+			</div></div>
 
-		<tr>
-			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC' ); ?>">
-				<label class="label" for="ext">
+
+
+<div class="control-group">
+            <div class="control-label">
+				<label class="label" for="ext" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC' ); ?>">
 					<?php echo JText::_( 'FLEXI_FILEEXT_MIME' ); ?>
 				</label>
-			</td>
-			<td>
+			</div>
+            <div class="controls">
 				<input type="text" id="mime_ext" name="ext" value="<?php echo $this->row->ext; ?>" size="5" style="max-width:100px;" maxlength="100"/>
 <select class="use_select2_lib" onchange="jQuery(this).parent().find('input').val(jQuery(this).val()); jQuery(this).val('').select2('destroy').show().select2(); ">
 <option value=""><?php echo JText::_( 'FLEXI_PLEASE_SELECT' ); ?></option>
@@ -769,21 +767,18 @@ if (!$this->row->url)
 <option value="zoo">zoo :: application/octet-stream</option>
 <option value="zsh">zsh :: text/x-script.zsh</option>
 </select>
-			</td>
-		</tr>
+			</div></div>
 
 		<?php if (!$this->row->url) : ?>
-		<tr>
-			<td colspan="2">
-				<br/><span class="badge badge-info" style="margin-top:6px;"><?php echo JText::_( 'FLEXI_SIZE' ); ?></span>
+		<div class="well">
+				<span class="badge badge-info" style="margin-top:6px;"><?php echo JText::_( 'FLEXI_SIZE' ); ?></span>
 				<?php echo file_exists($file_path) ? $file_size_str : JText::_('FLEXI_FILE_NOT_FOUND'); ?>
 				<br/><span class="badge badge-info" style="margin-top:6px;"><?php echo JText::_( 'FLEXI_REAL_PATH' ); ?></span>
 				<?php echo $file_path;?>
-			</td>
-		</tr>
+			</div>
 		<?php endif; ?>
 		
-	</table>
+	</div>
 
 
 <?php echo JHTML::_( 'form.token' ); ?>
