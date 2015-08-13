@@ -143,7 +143,7 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>">
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
 				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>

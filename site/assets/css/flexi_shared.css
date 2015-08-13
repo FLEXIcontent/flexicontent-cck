@@ -394,7 +394,7 @@ table.adminlist tbody tr.row1:hover td { background: transparent; }
 
 /* FOOTER of table */
 table.adminlist tfoot {
-	border-top: 1px solid #aaa !important; /* forced, combines with table, row, cell borders */
+	border-top: 1px solid #ddd !important; /* forced, combines with table, row, cell borders */
 }
 table.adminlist tfoot tr {
 	color: #333333;

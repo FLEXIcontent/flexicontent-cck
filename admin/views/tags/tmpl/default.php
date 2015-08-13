@@ -122,7 +122,7 @@ function delAllFilters() {
 	<div class="fcclear"></div>
 	
   
-	<table id="adminListTableFCtags" class="adminlist fcmanlist table no-border hover">
+	<table id="adminListTableFCtags" class="adminlist fcmanlist">
 	<thead>
 		<tr class="header">
 			<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
@@ -136,6 +136,13 @@ function delAllFilters() {
 		</tr>
 	</thead>
 
+	<tfoot>
+		<tr>
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
+				<?php echo $pagination_footer; ?>
+			</td>
+		</tr>
+	</tfoot>
 
 	<tbody>
 		<?php
@@ -228,9 +235,6 @@ function delAllFilters() {
 
 	</table>
 	
-	<div class="fcclear"></div>
-	<?php echo $pagination_footer; ?>
-
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="tags" />

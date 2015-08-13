@@ -51,7 +51,7 @@ $state_imgs = array('ALL_P'=>'tick.png', 'ALL_U'=>'publish_x.png', 'A'=>'archive
 $edit_entry = JText::_('FLEXI_EDIT_CATEGORY', true);
 $edit_layout = JText::_('FLEXI_EDIT_LAYOUT', true);
 
-$list_total_cols = 16;
+$list_total_cols = 17;
 ?>
 <script type="text/javascript">
 
@@ -195,7 +195,7 @@ function delAllFilters() {
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo $list_total_cols ;?>">
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
 				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>

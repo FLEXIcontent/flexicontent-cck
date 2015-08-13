@@ -132,7 +132,7 @@ function delAllFilters() {
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass col_redirect center hidden-tablet hidden-phone"><?php echo $article_viewing_tip . JText::_( 'FLEXI_REDIRECT_ARTICLE_VIEW' )."<br/><small>(".JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REDIRECTED' ).")</small>"; ?></th>
-			<th class="hideOnDemandClass center hidden-tablet hidden-phone" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
+			<th class="hideOnDemandClass center hidden-phone" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
 			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -143,6 +143,13 @@ function delAllFilters() {
 		</tr>
 	</thead>
 
+	<tfoot>
+		<tr>
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
+				<?php echo $pagination_footer; ?>
+			</td>
+		</tr>
+	</tfoot>
 
 	<tbody>
 		<?php
@@ -217,14 +224,14 @@ function delAllFilters() {
 				</span>
 			</td>
 			
-			<td class="hidden-tablet hidden-phone">
+			<td class="hidden-phone">
 				<?php if ($this->CanTemplates) : ?>
 				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;" >
 					<?php echo $layout_edit_icon;?>
 				</a>
 				<?php endif; ?>
 			</td>
-			<td class="center hidden-tablet hidden-phone">
+			<td class="center hidden-phone">
 				<?php echo $row->config->get("ilayout"); ?>
 			</td>
 			
@@ -262,8 +269,6 @@ function delAllFilters() {
 
 	</table>
 	
-	<div class="fcclear"></div>
-	<?php echo $pagination_footer; ?>
 
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />

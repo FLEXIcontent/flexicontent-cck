@@ -56,7 +56,7 @@ if ($this->filter_type == '' || $this->filter_type == 0) {
 	$ord_col = 'typeordering';
 }
 $ord_grp = 1;
-$list_total_cols = 13;
+$list_total_cols = 14;
 
 
 // Parse parameter and find fieldgroup
@@ -253,14 +253,14 @@ function delAllFilters() {
 			</th>
 			<th class="hideOnDemandClass left" colspan="2"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>">
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
 				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>
@@ -606,9 +606,6 @@ function delAllFilters() {
 	<sup>[1]</sup> <?php echo JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_BY_TYPE'); ?><br />
 	<sup>[2]</sup> <?php echo JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_WITHOUT_TYPE'); ?><br />
 	
-	<div class="fcclear"></div>
-	<?php echo $pagination_footer; ?>
-
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="fields" />

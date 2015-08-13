@@ -46,18 +46,13 @@ class FlexicontentViewFile extends JViewLegacy {
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FILE' ), 'fileedit' );
 		
-		if (FLEXI_J16GE) {
-			JToolBarHelper::apply('filemanager.apply');
-			JToolBarHelper::save('filemanager.save');
-			JToolBarHelper::cancel('filemanager.cancel');
-		} else {
-			JToolBarHelper::apply();
-			JToolBarHelper::save();
-			JToolBarHelper::cancel();
-		}
+		JToolBarHelper::apply('filemanager.apply');
+		JToolBarHelper::save('filemanager.save');
+		JToolBarHelper::cancel('filemanager.cancel');
+		
 		//Get data from the model
 		$model		= $this->getModel();
-		if (FLEXI_J16GE) $form = $this->get('Form');
+		$form = $this->get('Form');
 		$row     	= $this->get( 'File' );
 		
 		// fail if checked out not by 'me'
@@ -69,29 +64,19 @@ class FlexicontentViewFile extends JViewLegacy {
 		}
 		
 		//build access level list
-		if (FLEXI_J16GE) {
-			$lists['access'] 	= JHTML::_('access.assetgrouplist', 'access', $row->access);
-		} else if (FLEXI_ACCESS) {
-			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 0, 0, 0, 0, 0, 0, 0, 0 );
-		} else {
-			$lists['access'] 	= JHTML::_('list.accesslevel', $row );
-		}
+		$lists['access'] 	= JHTML::_('access.assetgrouplist', 'access', $row->access, $config=array('class'=>'use_select2_lib'));
 		
 		// Build languages list
 		//$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		//$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 		$allowed_langs = null;
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			$lists['language'] = flexicontent_html::buildlanguageslist('language', '', $row->language, 3, $allowed_langs, $published_only=false);
-		} else {
-			$lists['language'] = flexicontent_html::getSiteDefaultLang() . '<input type="hidden" name="language" value="'.flexicontent_html::getSiteDefaultLang().'" />';
-		}
+		$lists['language'] = flexicontent_html::buildlanguageslist('language', ' class="use_select2_lib" ', $row->language, 2, $allowed_langs, $published_only=false);
 		
 		//clean data
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
 
 		//assign data to template
-		if (FLEXI_J16GE) $this->assignRef('form'				, $form);
+		$this->assignRef('form'				, $form);
 		$this->assignRef('row'				, $row);
 		$this->assignRef('lists'			, $lists);
 		$this->assignRef('document'		, $document);

@@ -175,7 +175,7 @@ function delAllFilters() {
 		
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>">
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
 				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>

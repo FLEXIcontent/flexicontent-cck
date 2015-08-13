@@ -45,6 +45,15 @@ jQuery(document).ready(function() {
 });
 ";
 JFactory::getDocument()->addScriptDeclaration($js);
+
+$editSingle   = JHTML::image ( 'components/com_flexicontent/assets/images/page_single_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:22px;" ' );
+$editMultiple = JHTML::image ( 'components/com_flexicontent/assets/images/page_multiple_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:22px;" '  );
+$editlayout = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:16px;" '  );
+$noeditlayout = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_link.png', JText::_( 'FLEXI_NOEDIT_LAYOUT' ), ' style="min-width:16px;" '  );
+$copytmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_add.png', JText::_( 'FLEXI_DUPLICATE' ), ' style="min-width:16px;" '  );
+$deltmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE' ), ' style="min-width:16px;" '  );
+
+$list_total_cols = 7;
 ?>
 
 <div id="flexicontent" class="flexicontent">
@@ -60,8 +69,8 @@ JFactory::getDocument()->addScriptDeclaration($js);
 <?php endif;?>
 
 
-	<div id="howto_box" style="margin:10px 10px 48px 0px;">
-	<table class="fc-table-list" style="margin:0px;">
+	<div id="howto_box" style="margin:10px 10px 24px 0px;">
+	<table class="fc-table-list" style="margin:0px; min-width: unset;">
 		<tr>
 			<th>Configure display of your fields <span class="badge">item</span> view and <span class="badge">multi-item</span> views</th>
 		</tr>
@@ -84,11 +93,7 @@ JFactory::getDocument()->addScriptDeclaration($js);
 	<table class="adminlist" cellspacing="1">
 	
 	<thead>
-		<tr>
-			<td colspan="3"></td>
-			<td colspan="2"><span class="badge badge-info">Place fields in layouts</span></td>
-		</tr>
-		<tr>
+		<tr class="header">
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th></th>
 			<th class="title" style="text-align:left;"><?php echo JText::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
@@ -103,14 +108,45 @@ JFactory::getDocument()->addScriptDeclaration($js);
 		</tr>
 	</thead>
 
+	<tfoot>
+		<tr>
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
+				<table class="admintable" style="margin: 0 auto !important;">
+					<tr>
+						<td>
+						<?php echo $copytmpl; ?>
+						</td>
+						<td>
+						<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
+						</td>
+						<td>
+						<?php echo $editlayout; ?>
+						</td>
+						<td>
+						<?php echo JText::_( 'FLEXI_EDIT_LAYOUT' ); ?>
+						</td>
+					</tr>
+					<tr>
+						<td>
+						<?php echo $deltmpl; ?>
+						</td>
+						<td>
+						<?php echo JText::_( 'FLEXI_REMOVE_TEMPLATE' ); ?>
+						</td>
+						<td>
+						<?php echo $noeditlayout; ?>
+						</td>
+						<td>
+						<?php echo JText::_( 'FLEXI_NOEDIT_LAYOUT' ); ?>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</tfoot>
+	
 	<tbody>
 		<?php
-		$editSingle   = JHTML::image ( 'components/com_flexicontent/assets/images/page_single_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:22px;" ' );
-		$editMultiple = JHTML::image ( 'components/com_flexicontent/assets/images/page_multiple_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:22px;" '  );
-		$editlayout = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:16px;" '  );
-		$noeditlayout = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_link.png', JText::_( 'FLEXI_NOEDIT_LAYOUT' ), ' style="min-width:16px;" '  );
-		$copytmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_add.png', JText::_( 'FLEXI_DUPLICATE' ), ' style="min-width:16px;" '  );
-		$deltmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE' ), ' style="min-width:16px;" '  );
 		$k = 0;
 		$i = 1;
 		foreach ($this->rows as $row) :
@@ -174,37 +210,6 @@ JFactory::getDocument()->addScriptDeclaration($js);
 	
 	<div class="clear"></div>
 	
-	<table class="admintable" style="margin: 0 auto !important;">
-		<tr>
-			<td>
-			<?php echo $copytmpl; ?>
-			</td>
-			<td>
-			<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
-			</td>
-			<td>
-			<?php echo $editlayout; ?>
-			</td>
-			<td>
-			<?php echo JText::_( 'FLEXI_EDIT_LAYOUT' ); ?>
-			</td>
-		</tr>
-		<tr>
-			<td>
-			<?php echo $deltmpl; ?>
-			</td>
-			<td>
-			<?php echo JText::_( 'FLEXI_REMOVE_TEMPLATE' ); ?>
-			</td>
-			<td>
-			<?php echo $noeditlayout; ?>
-			</td>
-			<td>
-			<?php echo JText::_( 'FLEXI_NOEDIT_LAYOUT' ); ?>
-			</td>
-		</tr>
-	</table>
-
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="templates" />
 	<input type="hidden" name="view" value="templates" />

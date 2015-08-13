@@ -37,7 +37,7 @@ $date_note_msg   = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_N
 $date_note_attrs = ' class="fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip(null, $date_note_msg, 0, 1).'" ';
 $date_zone_tip   = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), $date_note_attrs );
 
-$list_total_cols = 12;
+$list_total_cols = 13;
 
 // COMMON repeated texts
 $edit_entry = JText::_('FLEXI_EDIT_TAG', true);
@@ -280,7 +280,7 @@ function delAllFilters() {
 		</thead>
 		<tfoot>
 			<tr>
-				<td colspan="<?php echo $list_total_cols; ?>">
+				<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
 					<?php echo $pagination_footer; ?>
 				</td>
 			</tr>
