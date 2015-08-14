@@ -80,6 +80,7 @@ foreach ($this->allrows as $row)
 	if ($row->field_type=='fieldgroup') {
 		$row->parameters = new JRegistry($row->attribs);
 		$fid_arr = preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields'));
+		$grouped_fields[$row->id] = array();  // Add this in case it is empty (= has no fields in it)
 		foreach($fid_arr as $_fid) $f2g_map[$_fid] = $row;
 	}
 	$allrows_byid[$row->id] = $row;  // used to display information for: CASCADE-after-master feature (and in future for more cases)

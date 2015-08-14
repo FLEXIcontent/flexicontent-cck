@@ -607,6 +607,10 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$fieldids = preg_split("/[\|,]/", $fieldids);
 		}
 		
+		if ( empty($fieldids) ) {  // No assigned fields
+			return $grouped_fields[$field->id] = array();  
+		}
+		
 		$db = JFactory::getDBO();
 		$query = 'SELECT f.* '
 			. ' FROM #__flexicontent_fields AS f '
