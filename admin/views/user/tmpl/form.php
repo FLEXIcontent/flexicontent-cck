@@ -65,155 +65,201 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		form.contact_id.value = id;
 		submitform( 'contact' );
 	}
+	
+/*
+--------------------------------------------------
++ SET TAB MEMORY
+==================================================
+*/	
+jQuery(function($) 
+                    { 
+                      $('a[data-toggle="tab"]').on('shown', function () {
+                        //save the latest tab; use cookies if you like 'em better:
+                        localStorage.setItem('lastTab', $(this).attr('href'));
+                       });
+
+                      //go to the latest tab, if it exists:
+                      var lastTab = localStorage.getItem('lastTab');
+                      if (lastTab) {
+                         $('a[href=' + lastTab + ']').tab('show');
+                      }
+                      else
+                      {
+                        // Set the first tab if cookie do not exist
+                        $('a[data-toggle="tab"]:first').tab('show');
+                      }
+                  });
 </script>
 
 <div id="flexicontent">
-<form action="index.php?controller=users" method="post" name="adminForm" autocomplete="off">
+<form action="index.php?controller=users" method="post" name="adminForm" class="form-horizontal" autocomplete="off">
 	
-	<fieldset id="user-basic_set" class="adminform" style="border:0 !important; margin:0 !important;">
-		<table class="admintable" cellspacing="1">
-			<?php foreach($this->form->getFieldset('user_basic') as $field) :?>
-				<tr>
-					<td width="150" class="key"><?php echo $field->label; ?></td>
-					<td><?php echo $field->input; ?></td>
-				</tr>
-			<?php endforeach; ?>
-		</table>
+    <div class="block-flat">
+	<fieldset id="user-basic_set" class="adminform">
+    
+    
+      <?php foreach($this->form->getFieldset('user_basic') as $field) :?>
+      <div class="control-group">
+	  <div class="control-label"><?php echo $field->label; ?></div>
+        <div class="controls"><?php echo $field->input; ?></div>
+      </div>
+      <?php endforeach; ?>
+      
+
 	</fieldset>
 	
-	<?php
+
+<?php /*?>	<?php
 		echo JHtml::_('tabs.start','basic-tabs-'.$this->form->getValue("id"), array('useCookie'=>1));
 		echo JHtml::_('tabs.panel',JText::_('FLEXI_ACCOUNT_DETAILS'), 'user-details');
 	?>
 	
 	<fieldset id="user-details_set" class="adminform">
-		<table class="admintable" cellspacing="1">
-			<?php foreach($this->form->getFieldset('user_details') as $field) :?>
-				<tr>
-					<td width="150" class="key"><?php echo $field->label; ?></td>
-					<td><?php echo $field->input; ?></td>
-				</tr>
-			<?php endforeach; ?>
-		</table>
+		 <?php foreach($this->form->getFieldset('user_details') as $field) :?>
+        <div class="control-group"> 
+		<div class="control-label"><?php echo $field->label; ?></div>
+          <div class="controls"><?php echo $field->input; ?></div>
+        </div>
+        <?php endforeach; ?>
+	</fieldset><?php */?>
+	
+    </div>
+	<h3><?php
+		echo JText::_('FLEXI_ACCOUNT_DETAILS');
+	?></h3>
+	
+<!--JoomlaID-->
+<?php 
+$options = array(
+'active'    => 'tab1_id'    // Not in docs, but DOES work
+); ?>
+
+
+<?php echo JHtml::_('bootstrap.startTabSet', 'ID-Tabs-Group', $options, array('useCookie'=>1));?> 
+
+<!--FLEXI_ACCOUNT_DETAILS TAB1 -->
+<?php echo JHtml::_('bootstrap.addTab', 'ID-Tabs-Group', 'tab1_id', JText::_('FLEXI_ACCOUNT_DETAILS')); ?> 
+<fieldset id="user-details_set" class="adminform">
+		 <?php foreach($this->form->getFieldset('user_details') as $field) :?>
+        <div class="control-group"> 
+		<div class="control-label"><?php echo $field->label; ?></div>
+          <div class="controls"><?php echo $field->input; ?></div>
+        </div>
+        <?php endforeach; ?>
 	</fieldset>
-	
-	<?php
-		echo JHtml::_('tabs.panel',JText::_('FLEXI_ACCOUNT_SETTINGS'), 'user-account');
-	?>
-	
-	<?php
-	echo JHtml::_('sliders.start');
-	foreach ($this->form->getFieldsets() as $fieldset) :
+<?php echo JHtml::_('bootstrap.endTab');?> 
+<!--/FLEXI_ACCOUNT_DETAILS TAB1 -->
+
+
+<!--FLEXI_ASSIGNED_GROUPS TAB2 -->
+<?php echo JHtml::_('bootstrap.addTab', 'ID-Tabs-Group', 'tab2_id', JText::_('FLEXI_ASSIGNED_GROUPS'), 'user-groups'); ?> 
+
+	<fieldset id="user-groups_set" class="adminform">
+		<div class="adminformlist">
+		<?php JHtml::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_users/helpers/html'); ?>
+		<?php echo JHtml::_('access.usergroups', 'jform[groups]', $this->usergroups, true); ?>
+        </div>
+	</fieldset>
+    
+<?php echo JHtml::_('bootstrap.endTab');?> 
+<!--/ FLEXI_ASSIGNED_GROUPS TAB2 -->
+
+<!--FLEXI_user_details TAB3 -->
+<?php 
+
+foreach ($this->form->getFieldsets() as $fieldset) :
 		if ($fieldset->name == 'user_basic' || $fieldset->name == 'user_details') :
 			continue;
 		endif;
-		echo JHtml::_('sliders.panel', JText::_($fieldset->label), $fieldset->name);
-	?>
-	<fieldset class="panelform">
-	<ul class="adminformlist">
+echo JHtml::_('bootstrap.addTab', 'ID-Tabs-Group', 'tab3_id',  JText::_($fieldset->label), $fieldset->name); ?> 
+
+<fieldset class="panelform">
+	<div class="adminformlist">
 	<?php foreach($this->form->getFieldset($fieldset->name) as $field): ?>
 		<?php if ($field->hidden): ?>
 			<?php echo $field->input; ?>
 		<?php else: ?>
-			<li><?php echo $field->label; ?>
-			<?php echo $field->input; ?></li>
+      <div class="control-group">
+            <div class="control-label">
+			<?php echo $field->label; ?></div>
+			<div class="controls"><?php echo $field->input; ?></div>
+            </div>
 		<?php endif; ?>
 	<?php endforeach; ?>
-	</ul>
+	</div>
 	</fieldset>
-	<?php endforeach; ?>
-	<?php echo JHtml::_('sliders.end'); ?>
-
-	<?php
-		echo JHtml::_('tabs.panel',JText::_('FLEXI_ASSIGNED_GROUPS'), 'user-groups');
-	?>
-	
-	<fieldset id="user-groups_set" class="adminform">
-		<legend><?php echo JText::_('FLEXI_ASSIGNED_GROUPS'); ?></legend>
-		<?php JHtml::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_users/helpers/html'); ?>
-		<?php echo JHtml::_('access.usergroups', 'jform[groups]', $this->usergroups, true); ?>
-	</fieldset>
+    
+<?php echo JHtml::_('bootstrap.endTab');
+endforeach; ?>
+<!--/FLEXI_user_details TAB3 -->
 
 
-	<?php echo JHtml::_('tabs.panel',JText::_('FLEXI_CONTACT_INFORMATION'), 'user-contact'); ?>
-	
-	<?php if (!$this->contact) :?>
-		<table class="admintable" style="width:100%">
-			<tr>
-				<td>
-					<span class="fc-mssg fc-note" style="padding:16px; border:1px solid lightgray;">
+
+<!--FLEXI_CONTACT TAB4 -->
+<?php echo JHtml::_('bootstrap.addTab', 'ID-Tabs-Group', 'tab4_id', JText::_('FLEXI_CONTACT_INFORMATION'), 'user-contact'); ?> 
+<?php if (!$this->contact) :?>
+<span class="fc-mssg fc-note">
 						<b><?php echo JText::_( 'FLEXI_NO_CONTACT_INFORMATION' ); ?>:</b>
 						<br /><br />
 						<?php echo JText::_( 'FLEXI_MANAGE_IN_CONTACT_COMPONENT' ); ?>.
 					</span>
-				</td>
-			</tr>
-		</table>
-	<?php else : ?>
-		<table class="admintable">
-			<tr>
-				<td width="120" class="key">
+   	<?php else : ?>
+	
+			<div class="control-group">
+            <div class="control-label">
 					<?php echo JText::_( 'Name' ); ?>
-				</td>
-				<td>
+				</div><div class="controls">
 					<strong>
 						<?php echo $this->contact[0]->name;?>
 					</strong>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
+				</div>
+                </div>
+			<div class="control-group">
+            <div class="control-label">
 					<?php echo JText::_( 'Position' ); ?>
-				</td>
-				<td >
+				</div><div class="controls">
 					<strong>
 						<?php echo $this->contact[0]->con_position;?>
 					</strong>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
+				</div></div>
+                
+			<div class="control-group">
+            <div class="control-label">
 					<?php echo JText::_( 'Telephone' ); ?>
-				</td>
-				<td >
+				</div><div class="controls">
 					<strong>
 						<?php echo $this->contact[0]->telephone;?>
 					</strong>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
+				</div></div>
+                
+			<div class="control-group">
+            <div class="control-label">
 					<?php echo JText::_( 'Fax' ); ?>
-				</td>
-				<td >
+				</div><div class="controls">
 					<strong>
 						<?php echo $this->contact[0]->fax;?>
 					</strong>
-				</td>
-			</tr>
-			<tr>
-				<td class="key">
+				</div></div>
+			<div class="control-group">
+            <div class="control-label">
 					<?php echo JText::_( 'Misc' ); ?>
-				</td>
-				<td >
+				</div><div class="controls">
 					<strong>
 						<?php echo $this->contact[0]->misc;?>
 					</strong>
-				</td>
-			</tr>
+				</div>
+                </div>
 			<?php if ($this->contact[0]->image) { ?>
-			<tr>
-				<td class="key">
+			<div class="control-group">
+            <div class="control-label">
 					<?php echo JText::_( 'Image' ); ?>
-				</td>
-				<td valign="top">
+				</div><div class="controls">
 					<img src="<?php echo JURI::root() . $cparams->get('image_path') . '/' . $this->contact[0]->image; ?>" align="middle" alt="<?php echo JText::_( 'Contact' ); ?>" />
-				</td>
-			</tr>
+			</div>
+                </div>
 			<?php } ?>
-			<tr>
-				<td class="key">&nbsp;</td>
-				<td>
+			<div class="control-group">
+            <div class="control-label">&nbsp;</div><div class="controls">
 					<div style='display:none;'>
 						<br />
 						<input type="button" class="fc_button" value="<?php echo JText::_( 'change Contact Details' ); ?>" onclick="gotocontact( '<?php echo $this->contact[0]->id; ?>' )" />
@@ -223,70 +269,98 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 						</i>
 					</div>
 					<?php echo "<span class='fc-note fc-mssg'>".JText::_( 'Please note that we recomment using an Flexicontent Item to display Author details' )."</span>"; ?>
-				</td>
-			</tr>
-		</table>
-	<?php endif; /* this->contact */ ?>
+				</div>
+			</div>
 	
-	<?php
-		$fieldSets = $this->jform_authorbasic->getFieldsets('authorbasicparams');
+	<?php endif; /* this->contact */ ?>
+    
+<?php echo JHtml::_('bootstrap.endTab');?> 
+<!--/FLEXI_CONTACT TAB4 -->
+
+<!-- AUTHORING TAB5-->
+<?php 
+$fieldSets = $this->jform_authorbasic->getFieldsets('authorbasicparams');
 		foreach ($fieldSets as $name => $fieldSet) :
 		
 			$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMETERS_'.$name;
-			echo JHtml::_('tabs.panel',JText::_($label), $name.'-options');
-			echo strlen(trim(@$fieldSet->description)) ? '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>' : '';
-			
-			echo '<fieldset class="panelform">';
-			foreach ($this->jform_authorbasic->getFieldset($name) as $field) :
-				echo $field->label;
-				echo $field->input;
-			endforeach;
-			echo '</fieldset>';
-			
-		endforeach;
-		
-		
-		
-		echo JHtml::_('tabs.panel',JText::_('FLEXI_AUTHOR_ITEMS_LIST'), 'author-items-list');
-		echo JHtml::_('tabs.start','cat-tabs-'.$this->form->getValue("id"), array('useCookie'=>1));
-		
-		$fieldSets = $this->jform_authorcat->getFieldsets('authorcatparams');
+echo JHtml::_('bootstrap.addTab', 'ID-Tabs-Group', 'tab5_id', JText::_($label)); ?> 
+
+
+<?php 
+echo strlen(trim(@$fieldSet->description)) ? '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>' : '';
+
+foreach($this->jform_authorbasic->getFieldset($name) as $field) :?>
+        <div class="control-group"> 
+		<div class="control-label"><?php echo $field->label; ?></div>
+          <div class="controls"><?php echo $field->input; ?></div>
+        </div>
+        <?php endforeach; ?>
+        
+<?php echo JHtml::_('bootstrap.endTab');
+endforeach;?> 
+<!-- / AUTHORING TAB5-->
+
+
+<?php echo JHtml::_('bootstrap.addTab', 'ID-Tabs-Group', 'tab6_id', JText::_('FLEXI_AUTHOR_ITEMS_LIST'), 'author-items-list'); ?> 
+
+<!--
+#####
+TAB TAB-->
+<?php 
+$options2 = array(
+'active'    => 'cat_info_options-options'    // Not in docs, but DOES work
+); ?>
+<?php echo JHtml::_('bootstrap.startTabSet', 'TabTab', $options2, array('useCookie'=>1));?> 
+
+
+<?php 
+$fieldSets = $this->jform_authorcat->getFieldsets('authorcatparams');
 		$skip_fieldSets_names = array('settings','author_ext_config', 'cat_basic');
 		foreach ($fieldSets as $name => $fieldSet) :
 		
 			if ( in_array($name, $skip_fieldSets_names) ) continue;
 			$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMS_'.$name;
-			echo JHtml::_('tabs.panel', str_replace(':',':<br/>', JText::_($label)), $name.'-options');
-			echo strlen(trim(@$fieldSet->description)) ? '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>' : '';
-			
-			echo '<fieldset class="panelform">';
-			foreach ($this->jform_authorcat->getFieldset($name) as $field) :
-				echo $field->label;
-				echo $field->input;
-			endforeach;
-			echo '</fieldset>';
-			
-		endforeach;
-		
-		echo JHtml::_('tabs.end');
-		echo JHtml::_('tabs.panel',JText::_('FLEXI_TEMPLATE'), 'author-template-options');
-		?>
-		
-		<fieldset class="panelform">
-			<?php
-			echo '<span class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' );
+
+echo JHtml::_('bootstrap.addTab', 'TabTab', str_replace(':',':<br/>', $name.'-options'), JText::_($label));?>
+
+<?php 
+/* inputs */
+echo strlen(trim(@$fieldSet->description)) ? '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>' : '';
+
+foreach ($this->jform_authorcat->getFieldset($name) as $field) :?>
+        <div class="control-group"> 
+		<div class="control-label"><?php echo $field->label; ?></div>
+          <div class="controls"><?php echo $field->input; ?></div>
+        </div>
+        <?php endforeach; ?>
+        
+<?php echo JHtml::_('bootstrap.endTab');
+endforeach;?>
+
+
+<?php echo JHtml::_('bootstrap.endTabSet');?>
+<!--
+/#####
+TAB TAB-->
+<?php echo JHtml::_('bootstrap.endTab');?> 
+
+
+<!--TEMPLATE TAB 7 -->
+<?php echo JHtml::_('bootstrap.addTab', 'ID-Tabs-Group', 'tab7_id', JText::_('FLEXI_TEMPLATE'), 'author-template-options'); ?> 
+
+<?php echo '<span class="fc-note fc-mssg-inline">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' );
 			?>
-			<br/><br/>
-			<ol style="margin:0 0 0 16px; padding:0;">
-				<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
-				<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
+			
+			<ol>
+				<li> Select TEMPLATE layout </li>
+				<li> Open slider with TEMPLATE (layout) PARAMETERS </li>
 			</ol>
-			<br/>
-			<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
+			
+			<p><b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b></p>
 			</span>
 			<div class="clear"></div>
-			
-			<?php
+    
+    <?php
 			foreach($this->form->getGroup('templates') as $field):
 				$_value = $this->params_author->get($field->fieldname);
 				
@@ -304,9 +378,8 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				endif;
 			endforeach;
 			?>
-		</fieldset>
-		
-		<?php
+            
+            <?php
 		echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 		
 		foreach ($this->tmpls as $tmpl) :
@@ -320,16 +393,19 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				
 				echo '<fieldset class="panelform">';
 				foreach ($tmpl->params->getFieldset($name) as $field) :
-					$fieldname =  $field->fieldname;
+				echo '<div class="control-group"><div class="control-label">';
+					$fieldname =  ''.$field->fieldname;
 					$value = $tmpl->params->getValue($fieldname, $name, $this->params_authorcat->get($field->fieldname));
 					echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
 						$tmpl->params->getLabel($fieldname, $name));
+					echo '</div><div class="controls">';
 					echo
 						str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
 							str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
 								$tmpl->params->getInput($fieldname, $name, $value)
 							)
 						);
+					echo '</div></div>';
 				endforeach;
 				echo '</fieldset>';
 			endforeach;
@@ -340,6 +416,12 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		
 		echo JHtml::_('tabs.end');
 	?>	
+ <!-- / CONTENT TAB 7 END-->
+<?php echo JHtml::_('bootstrap.endTab');?> 
+<!-- / TEMPLATE TAB 7 -->
+<?php echo JHtml::_('bootstrap.endTabSet');?>
+    
+
 	
 	<div class="clr"></div>
 
