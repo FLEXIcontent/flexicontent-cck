@@ -27,6 +27,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_textarea', JPATH_ADMINISTRATOR);
 	}
 	
 	

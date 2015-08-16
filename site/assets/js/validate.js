@@ -542,6 +542,10 @@ var JFormValidator = new Class({
 				tabset = jQuery(tabset).parent().closest("div.tabberlive");
 			}
 		}
+		if (state === false && tab_focused === false) {
+			jqEL.parent().closest("li.fcfieldval_container").find(".fcfieldval_container_outer").show();
+			jqEL.parent().closest("li.fcfieldval_container").parent().show();
+		}
 		
 		// If it is already invalid
 		var isInvalid = jqEL.hasClass('invalid') || jqEL.attr('aria-invalid')=='true';

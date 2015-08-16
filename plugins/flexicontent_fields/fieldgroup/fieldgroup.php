@@ -58,6 +58,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$use_ingroup = 0; // Field grouped should not be recursively grouped
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
+		$compact_edit = $field->parameters->get('compact_edit', 0);
 		
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
@@ -114,6 +115,12 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 					tolerance: 'pointer'
 				});
 			});
+			";
+			$js .= "
+			jQuery(document).ready(function(){"
+				.($compact_edit==2 ? "jQuery('#sortables_".$field->id."').find('.toggle_group_down').trigger('click');" : "")
+				.($compact_edit==1 ? "jQuery('#sortables_".$field->id."').find('.toggle_group_up').trigger('click');" : "")
+			."});
 			";
 			
 			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
@@ -265,6 +272,14 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '<span class="fcfield-insertvalue fc_before" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '<span class="fcfield-insertvalue fc_after"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			if ($compact_edit) $add_here .= '
+				<button class="toggle_group_down btn btn-small btn-success" style="'.($compact_edit==2 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).next(), 1); return false;">
+					<i class="icon-downarrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_EDIT_DETAILS' ). '
+				</button>
+				<button class="toggle_group_up   btn btn-small" style="'.($compact_edit==1 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 0); return false;">
+					<i class="icon-uparrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_HIDE_DETAILS' ). '
+				</button>
+			';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -279,6 +294,15 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 		$alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 		
+		
+		if ($compact_edit) {
+			$compact_edit_excluded = $field->parameters->get('compact_edit_excluded', array());
+			if ( empty($compact_edit_excluded) )  $compact_edit_excluded = array();
+			if ( !is_array($compact_edit_excluded) )  $compact_edit_excluded = preg_split("/[\|,]/", $compact_edit_excluded);
+			$compact_edit_excluded = array_flip($compact_edit_excluded);
+		}
+		
+		
 		$field->html = array();
 		for($n = 0; $n < $max_count; $n++)
 		{
@@ -289,6 +313,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				';
 			
 			// Append item-form display HTML of the every field in the group
+			$i = 0;
 			foreach($grouped_fields as $field_id => $grouped_field) {
 				$lbl_class = 'flexi label sub_label';
 				$lbl_title = '';
@@ -299,13 +324,16 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 					 $lbl_title = flexicontent_html::getToolTip(trim($field->label, ':'), $grouped_field->description, 0, 1);
 				}
 				
-				$field->html[$n] .= '<div class="fcclear"></div>'
-				.'<label class="'.$lbl_class.'" title="'.$lbl_title.'" for="custom_'.$grouped_field->name.'_'.$n.'" for_bck="custom_'.$grouped_field->name.'_'.$n.'">'.$grouped_field->label.'</label>'
-				.'<div class="fcfieldval_container valuebox fcfieldval_container_'.$grouped_field->id.' container_fcfield_name_'.$grouped_field->name.'" >'
-					.($grouped_field->description && $edithelp==3 ? sprintf( $alert_box, '', 'info', 'fc-nobgimage', $grouped_field->description ) : '')
-					.@ $grouped_field->html[$n]
-				.'</div>
+				$field->html[$n] .= '<div class="fcclear"></div>
+				<div class="fcfieldval_container_outer'.($compact_edit && isset($compact_edit_excluded[$field_id]) ? ' fcAlwaysVisibleField' : '').'">
+					<label class="'.$lbl_class.'" title="'.$lbl_title.'" for="custom_'.$grouped_field->name.'_'.$n.'" for_bck="custom_'.$grouped_field->name.'_'.$n.'">'.$grouped_field->label.'</label>
+					<div class="fcfieldval_container valuebox fcfieldval_container_'.$grouped_field->id.' container_fcfield_name_'.$grouped_field->name.'" >
+						'.($grouped_field->description && $edithelp==3 ? sprintf( $alert_box, '', 'info', 'fc-nobgimage', $grouped_field->description ) : '').'
+						'.@ $grouped_field->html[$n].'
+					</div>
+				</div>
 				';
+				$i++;
 			}
 			
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
@@ -334,7 +362,13 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		if (!$add_position) $field->html .= '<span class="fcfield-addvalue fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
 		
 		// Append non value html of fields
-		$field->html .= '<div class="fcclear"></div>' . $non_value_html;
+		if ($field->parameters->get('compact_edit_global', 0)) $field->html = '
+			<input type="button" id="sortables_'.$field->id.'_btn" class="btn" onclick="fc_toggle_box_via_btn(\'sortables_'.$field->id.'\', this, \'btn-primary\');" value="'.JText::_( 'FLEXI_FIELD_GROUP_TOGGLE_VALUES' ).'" />
+			<br/><br/>
+			'.$field->html;
+		$field->html .= '
+			<div class="fcclear"></div>
+			'.$non_value_html;
 	}
 	
 	

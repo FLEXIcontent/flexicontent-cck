@@ -44,6 +44,18 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
+			<field name="" type="separator" default="Compact editing" description="" depend_class="" level="level2" />
+			<field name="compact_edit_global" type="radio" default="0" label="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING" description="FLEXI_FIELD_GROUP_ALL_VALS_TOGGLING_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="compact_edit" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_GROUP_VALS_TOGGLING" description="FLEXI_FIELD_GROUP_VALS_TOGGLING_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="compact_edit">FLEXI_NO</option>
+				<option value="1" show_list="compact_edit" hide_list="">Yes, start collapsed</option>
+				<option value="2" show_list="compact_edit" hide_list="">Yes, start expanded</option>
+			</field>
+			<field name="compact_edit_excluded" type="filters" multiple="false" groupables="1" isfilter="0" default="" label="FLEXI_FIELD_ALWAYS_VISIBLE_FIELDS" description="FLEXI_FIELD_ALWAYS_VISIBLE_FIELDS_DESC" depend_class="compact_edit"/>
+			
 		</fieldset>
 		
 		<fieldset name="group-fieldgroup-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">

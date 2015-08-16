@@ -92,14 +92,15 @@
 /* FIELD-GROUP: label of grouped field */
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label {
 	box-sizing: border-box;
-	max-width: 150px !important;
-	width: 20% !important;
-	padding: 4px 6px 4px 6px !important;
-	margin: 0 1% 0 0 !important;
-	float:none !important;
+	max-width: 150px;
+	width: 20%;
+	padding: 4px 6px 4px 6px;
+	margin: 0 1% 0 0;
+	float:none;
 	
 	clear:none;
 	display:inline-block;
+	vertical-align:top;
 	border-width: 0px !important;
 }
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label.fc_tooltip_icon {
