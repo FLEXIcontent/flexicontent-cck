@@ -5766,6 +5766,18 @@ class flexicontent_db
 				$order_col	= $i_as.'.publish_up';
 				$order_dir	= 'DESC';
 				break;
+			case 'published_oldest':
+				$order_col	= $i_as.'.publish_up';
+				$order_dir	= 'ASC';
+				break;
+			case 'expired':
+				$order_col	= $i_as.'.publish_down';
+				$order_dir	= 'DESC';
+				break;
+			case 'expired_oldest':
+				$order_col	= $i_as.'.publish_down';
+				$order_dir	= 'ASC';
+				break;
 			case 'alpha':
 				$order_col	= $i_as.'.title';
 				$order_dir	= 'ASC';

@@ -45,18 +45,25 @@ class JFormFieldFcordering extends JFormFieldList
 	
 	function getOptions()
 	{
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		$ordering[] = JHTML::_('select.option',  'addedrev', 	JText::_( 'FLEXI_ORDER_OLDEST_FIRST' ) );       // 'date'
 		$ordering[] = JHTML::_('select.option',  'added', 		JText::_( 'FLEXI_ORDER_MOST_RECENT_FIRST' ) );  // 'rdate'
+		
 		$ordering[] = JHTML::_('select.option',  'updated', 	JText::_( 'FLEXI_ORDER_LAST_MODIFIED_FIRST' ) );
-		$ordering[] = JHTML::_('select.option',  'published',	JText::_( 'FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST' ) );
+		
+		if (!empty($attributes['add_expired_scheduled']))
+		{
+			$ordering[] = JHTML::_('select.option',  'published',        JText::_( 'FLEXI_ORDER_RECENTLY_PUBLISHED_SCHEDULED_FIRST' ) );
+			$ordering[] = JHTML::_('select.option',  'published_oldest', JText::_( 'FLEXI_ORDER_OLDEST_PUBLISHED_SCHEDULED_FIRST' ) );
+			$ordering[] = JHTML::_('select.option',  'expired',	         JText::_( 'FLEXI_ORDER_RECENTLY_EXPIRING_EXPIRED_FIRST' ) );
+			$ordering[] = JHTML::_('select.option',  'expired_oldest',   JText::_( 'FLEXI_ORDER_OLDEST_EXPIRING_EXPIRED_FIRST' ) );
+		} else {
+			$ordering[] = JHTML::_('select.option',  'published',        JText::_( 'FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST' ) );
+			$ordering[] = JHTML::_('select.option',  'published_oldest', JText::_( 'FLEXI_ORDER_OLDEST_PUBLISHED_FIRST' ) );
+		}
 		
 		$ordering[] = JHTML::_('select.option',  'alpha', 		JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL' ) );
 		$ordering[] = JHTML::_('select.option',  'alpharev', 	JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE' ) );  // 'ralpha'
