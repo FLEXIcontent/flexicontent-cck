@@ -53,15 +53,18 @@ class FlexicontentModelType extends JModelAdmin
 	{
 		parent::__construct();
 
-		$array = JRequest::getVar('cid',  array(0), '', 'array');
-		$array = is_array($array) ? $array : array($array);
-		$id = $array[0];
-		if(!$id) {
+		$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
+		JArrayHelper::toInteger($cid, array(0));
+		$pk = (int) $cid[0];
+		
+		if (!$pk) {
 			$post = JRequest::get( 'post' );
-			$data = FLEXI_J16GE ? @$post['jform'] : $post;
-			$id = @$data['id'];
+			$data = @$post['jform'];
+			$pk = (int) @$data['id'];
 		}
-		$this->setId((int)$id);
+		$this->setId((int)$pk);
+		
+		$this->populateState();
 	}
 
 	/**
@@ -469,7 +472,8 @@ class FlexicontentModelType extends JModelAdmin
 	 */
 	protected function preprocessForm(JForm $form, $data, $group = 'content')
 	{
-		parent::preprocessForm($form, $data);
+		// Trigger the default form events.
+		parent::preprocessForm($form, $data, $plugin_type='_none_');  // by default content plugins are imported, skip them
 	}
 
 
@@ -520,20 +524,28 @@ class FlexicontentModelType extends JModelAdmin
 	 *
 	 * @since	1.6
 	 */
-	protected function populateState() {
+	protected function populateState()
+	{
 		$app = JFactory::getApplication('administrator');
 
 		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
 			$extension = JRequest::getCmd('extension', 'com_flexicontent');
 		}
-		// Load the User state.
-		if (!($pk = (int) $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id'))) {
-			$cid = JRequest::getVar('cid', array(0));
-			$pk = (int)@$cid[0];
+		
+		// Get id from user state
+		$pk = $this->_id;
+		if ( !$pk ) {
+			$cid = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id');
+			JArrayHelper::toInteger($cid, array(0));
+			$pk = $cid[0];
+		}
+		if ( !$pk ) {
+			$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
+			JArrayHelper::toInteger($cid, array(0));
+			$pk = $cid[0];
 		}
 		$this->setState($this->getName().'.id', $pk);
-
-
+		
 		$this->setState('com_flexicontent.'.$this->getName().'.extension', $extension);
 		$parts = explode('.',$extension);
 		// extract the component name

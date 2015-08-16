@@ -66,15 +66,51 @@ class FlexicontentModelTypes extends JModelList
 	function __construct()
 	{
 		parent::__construct();
-
+		
 		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
-		$limit      = $app->getUserStateFromRequest( $option.'.types.limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $app->getUserStateFromRequest( $option.'.types.limitstart', 'limitstart', 0, 'int' );
-
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$fcform = $jinput->get('fcform', 0, 'int');
+		$p      = $option.'.'.$view.'.';
+		
+		
+		// *****************************
+		// Pagination: limit, limitstart
+		// *****************************
+		
+		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
+		
+		// In case limit has been changed, adjust limitstart accordingly
+		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
+		$jinput->set( 'limitstart',	$limitstart );
+		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
+		
+		$app->setUserState($p.'limit', $limit);
+		$app->setUserState($p.'limitstart', $limitstart);
+		
+		
+		// For some model function that use single id
+		$array = $jinput->get('cid', array(0), 'array');
+		$this->setId((int)$array[0]);
+	}
+	
+	
+	/**
+	 * Method to set the Field identifier
+	 *
+	 * @access	public
+	 * @param	int Field identifier
+	 */
+	function setId($id)
+	{
+		// Set id and wipe data
+		$this->_id	 = $id;
+		$this->_data = null;
+		$this->_total= null;
 	}
 	
 	

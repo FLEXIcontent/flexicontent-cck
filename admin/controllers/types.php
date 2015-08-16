@@ -248,19 +248,33 @@ class FlexicontentControllerTypes extends FlexicontentController
 	
 	
 	/**
-	 * Logic to create the view for the record editing
+	 * Logic to create the view for the edit field screen
 	 *
 	 * @access public
 	 * @return void
-	 * @since 1.5
+	 * @since 1.0
 	 */
 	function edit()
 	{
 		JRequest::setVar( 'view', 'type' );
 		JRequest::setVar( 'hidemainmenu', 1 );
-
+		
+		$user     = JFactory::getUser();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
+		
+		// Get/Create the view
+		$viewType   = $document->getType();
+		$viewName   = FLEXI_J30GE ? $this->input->get('view', $this->default_view) : JRequest::getVar('view');
+		$viewLayout = FLEXI_J30GE ? $this->input->get('layout', 'default', 'string') : JRequest::getVar('layout', 'default', 'string');
+		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
+		
+		// Get/Create the model
 		$model = $this->getModel('type');
-		$user  = JFactory::getUser();
+		
+		// Push the model into the view (as default), later we will call the view display method instead of calling parent's display task, because it will create a 2nd model instance !!
+		$view->setModel($model, true);
+		$view->document = $document;
 		
 		// Check if record is checked out by other editor
 		if ( $model->isCheckedOut( $user->get('id') ) ) {
@@ -276,8 +290,9 @@ class FlexicontentControllerTypes extends FlexicontentController
 			return;
 		}
 		
-		parent::display();
+		$view->display();
 	}
+	
 	
 	/**
 	 * Logic to set the access level of the Types

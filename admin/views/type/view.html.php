@@ -55,12 +55,10 @@ class FlexicontentViewType extends JViewLegacy
 
 		//Get data from the model
 		$model  = $this->getModel();
-		$row		= $this->get( FLEXI_J16GE ? 'Item' : 'Type' );
-		if (FLEXI_J16GE) {
-			$form = $this->get('Form');
-		}
-		$themes		= flexicontent_tmpl::getTemplates();
-		$tmpls		= $themes->items;
+		$row    = $this->get( FLEXI_J16GE ? 'Item' : 'Type' );
+		$form   = $this->get('Form');
+		$themes = flexicontent_tmpl::getTemplates();
+		$tmpls  = $themes->items;
 		
 		//create the toolbar
 		if ( $row->id ) {

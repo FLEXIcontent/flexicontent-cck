@@ -117,19 +117,20 @@ function delAllFilters() {
 	delFilter('filter_fieldtype'); delFilter('filter_state');  delFilter('filter_access');
 }
 
+jQuery(function($) {
+	SqueezeBox.initialize({});
+	SqueezeBox.assign($('a.modal').get(), {
+		parse: 'rel'
+	});
+});
+function jModalClose() {
+	SqueezeBox.close();
+}
+
 </script>
 
-<script>
-		jQuery(function($) {
-			SqueezeBox.initialize({});
-			SqueezeBox.assign($('a.modal').get(), {
-				parse: 'rel'
-			});
-		});
-		function jModalClose() {
-			SqueezeBox.close();
-		}
-</script>
+
+
 <div class="flexicontent">
 
 <form action="index.php?option=<?php echo $this->option; ?>&view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">

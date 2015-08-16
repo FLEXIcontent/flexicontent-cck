@@ -45,15 +45,24 @@ class FlexicontentModelCategory extends JModelAdmin
 	function __construct()
 	{
 		parent::__construct();
-
-		$array = JRequest::getVar('cid',  0, '', 'array');
-		if ( !@$array[0] ) {
-			// Try id variable too (needed by J3.0+)
-			$array = JRequest::getVar('id',  0, '', 'array');
+		
+		$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
+		JArrayHelper::toInteger($cid, array(0));
+		$pk = (int) $cid[0];
+		
+		if (!$pk) {
+			// Try id variable too
+			$cid = JRequest::getVar('id',  0, '', 'array');
+			JArrayHelper::toInteger($cid, array(0));
+			$pk = (int) $cid[0];
 		}
+		
 		// Make sure id variable is set (needed by J3.0+ controller)
-		JRequest::setVar('id', (int)$array[0]);
-		$this->setId((int)$array[0]);
+		JRequest::setVar('id', (int)$pk);
+		
+		$this->setId((int)$pk);
+		
+		$this->populateState();
 	}
 
 	/**
@@ -725,11 +734,19 @@ class FlexicontentModelCategory extends JModelAdmin
 		}
 		$this->setState('com_flexicontent.category.parent_id', $parentId);
 
-		// Load the User state.
-		if (!($pk = (int) $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id'))) {
-			$cid = JRequest::getVar('cid', array(0));
-			$pk = (int)$cid[0];
+		// Get id from user state
+		$pk = $this->_id;
+		if ( !$pk ) {
+			$cid = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id');
+			JArrayHelper::toInteger($cid, array(0));
+			$pk = $cid[0];
 		}
+		if ( !$pk ) {
+			$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
+			JArrayHelper::toInteger($cid, array(0));
+			$pk = $cid[0];
+		}
+		$this->setState($this->getName().'.id', $pk);
 		
 		if (!($extension = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.extension'))) {
 			$extension = JRequest::getCmd('extension', FLEXI_CAT_EXTENSION);
