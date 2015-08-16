@@ -753,6 +753,8 @@ class modFlexicontentHelper
 			$comp = 'i.modified';
 		} else if ($date_type == 2) { // publish up
 			$comp = 'i.publish_up';
+		} else if ($date_type == 4) { // publish down
+			$comp = 'i.publish_down';
 		} else { // $date_type == 3
 			$comp = 'dfrel.value';
 		}
@@ -781,8 +783,13 @@ class modFlexicontentHelper
 		
 		$where  = ' WHERE c.published = 1';
 		$where .= FLEXI_J16GE ? '' : ' AND i.sectionid = ' . FLEXI_SECTION;
-		$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )';
-		$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
+		
+		$ignore_up_down_dates = $params->get('ignore_up_down_dates', 0);  // 1: ignore publish_up, 2: ignore publish_donw, 3: ignore both
+		$ignoreState =  $params->get('use_list_items_in_any_state_acl', 0) && $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
+		if (!$ignoreState && $ignore_up_down_dates != 3 && $ignore_up_down_dates != 1)
+			$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )';
+		if (!$ignoreState && $ignore_up_down_dates != 3 && $ignore_up_down_dates != 2)
+			$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
 		
 		
 		// *********************
@@ -926,8 +933,10 @@ class modFlexicontentHelper
 		
 		$item_states = is_array($item_states) ? implode(',', $item_states) : $item_states;
 		if ($method_states==0) {
-		  // method normal: Published item states
-			$where .= ' AND i.state IN ( 1, -5 )';
+			if (!$ignoreState) {
+			  // method normal: Published item states
+				$where .= ' AND i.state IN ( 1, -5 )';
+			}
 		} else {
 			// exclude trashed
 			$where .= ' AND i.state <> -2';

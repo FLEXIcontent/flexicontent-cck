@@ -186,11 +186,21 @@
 			
 			<field name="" type="separator" default="FLEXI_STATES_SCOPE" level="level2" />
 			<field name="method_states" type="multilist" subtype="radio" default="0" label="FLEXI_METHOD_STATIC" description="FLEXI_STATES_DESC" toggle_related="1" class="btn-group group-fcmethod">
-				<option value="0" show_list="" hide_list="method_states_ops">FLEXI_NORMAL_STATES</option>
-				<option value="1" show_list="method_states_ops" hide_list="">FLEXI_EXCLUDE</option>
-				<option value="2" show_list="method_states_ops" hide_list="">FLEXI_INCLUDE</option>
+				<option value="0" show_list="items_in_any_state_acl" hide_list="method_states_ops">FLEXI_NORMAL_STATES</option>
+				<option value="1" show_list="method_states_ops" hide_list="items_in_any_state_acl">FLEXI_EXCLUDE</option>
+				<option value="2" show_list="method_states_ops" hide_list="items_in_any_state_acl">FLEXI_INCLUDE</option>
+			</field>
+			<field name="use_list_items_in_any_state_acl" type="multilist" subtype="radio" default="0" label="FLEXI_UMOD_USE_LIST_ITEMS_IN_ANY_STATE_ACL" description="FLEXI_UMOD_USE_LIST_ITEMS_IN_ANY_STATE_ACL_DESC" class="items_in_any_state_acl btn-group group-fcmethod">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="item_states" type="fcitemstate" multiple="true" size="6" default="" label="FLEXI_ITEM_STATES" description="FLEXI_ITEM_STATES_DESC" class="method_states_ops" />
+			<field name="ignore_up_down_dates" type="radio" default="0" label="FLEXI_UMOD_IGNORE_SCHEDULED_EXPIRED_DATES" description="FLEXI_UMOD_IGNORE_SCHEDULED_EXPIRED_DATES_DESC" class="btn-group group-fcmethod" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Scheduled (Publish Up)</option>
+				<option value="2">Expired (Publish down)</option>
+				<option value="3">FLEXI_BOTH</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_TAGS_SCOPE" level="level2" />
 			<field name="method_tags" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_DESC" toggle_related="1" class="btn-group group-fcmethod">
@@ -351,7 +361,8 @@
 			<field name="date_type" type="multilist" subtype="radio" default="0" label="FLEXI_DATE_DATA" description="FLEXI_DATE_DATA_DESC" toggle_related="1" class="method_dates_ops dateStatic dateDataSrc btn-group group-fcinfo" >
 				<option value="0" show_list="" hide_list="date_custom_fld">FLEXI_DATE_CREATED</option>
 				<option value="1" show_list="" hide_list="date_custom_fld">FLEXI_DATE_MODIFIED</option>
-				<option value="2" show_list="" hide_list="date_custom_fld">FLEXI_DATE_PUBLISH_UP</option>
+				<option value="2" show_list="" hide_list="date_custom_fld">FLEXI_UMOD_DATE_PUBLISH_UP</option>
+				<option value="4" show_list="" hide_list="date_custom_fld">FLEXI_UMOD_DATE_PUBLISH_DOWN</option>
 				<option value="3" show_list="date_custom_fld" hide_list="">FLEXI_CUSTOM_DATE_FIELD</option>
 			</field>
 			<field name="datecomp_field" type="fields" fieldnameastext="true" default="" multiple="false" field_type="date" label="FLEXI_CUSTOM_FIELD_AS_DATE_DATA" description="FLEXI_CUSTOM_FIELD_AS_DATE_DATA_DESC" class="date_custom_on date_custom_fld" />

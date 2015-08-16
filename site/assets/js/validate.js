@@ -542,6 +542,8 @@ var JFormValidator = new Class({
 				tabset = jQuery(tabset).parent().closest("div.tabberlive");
 			}
 		}
+		
+		// Extra code to open the field group that contains the first field to fail the validation
 		if (state === false && tab_focused === false) {
 			jqEL.parent().closest("li.fcfieldval_container").find(".fcfieldval_container_outer").show();
 			jqEL.parent().closest("li.fcfieldval_container").parent().show();
