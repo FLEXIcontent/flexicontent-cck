@@ -221,20 +221,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
 				
 				// Enable tooltips on new element
-				".( FLEXI_J30GE ? "
-					newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
-				" : "
-					var tipped_elements = newField.find('.hasTip');
-					tipped_elements.each(function() {
-						var title = this.get('title');
-						if (title) {
-							var parts = title.split('::', 2);
-							this.store('tip:title', parts[0]);
-							this.store('tip:text', parts[1]);
-						}
-					});
-					var ajax_JTooltips = new Tips($('#sortables_".$field->id."').getNext().getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
-				")."
+				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
@@ -355,20 +342,27 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 					$field->html
 				).
 				'</li>';
-			$field->html = '<ul class="'.$list_classes.'" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			$field->html = '<div id="sortables_outer_'.$field->id.'"><ul class="'.$list_classes.'" id="sortables_'.$field->id.'">' .$field->html. '</ul></div>';
 		} else {
 			$field->html = '';
 		}
 		if (!$add_position) $field->html .= '<span class="fcfield-addvalue fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
 		
 		// Append non value html of fields
-		if ($field->parameters->get('compact_edit_global', 0)) $field->html = '
-			<input type="button" id="sortables_'.$field->id.'_btn" class="btn" onclick="fc_toggle_box_via_btn(\'sortables_'.$field->id.'\', this, \'btn-primary\');" value="'.JText::_( 'FLEXI_FIELD_GROUP_TOGGLE_VALUES' ).'" />
-			<br/><br/>
-			'.$field->html;
-		$field->html .= '
-			<div class="fcclear"></div>
-			'.$non_value_html;
+		$field->html =
+			($field->parameters->get('compact_edit_global', 0) ? '
+			<div class="toggle_all_values_buttons_box">
+				<span id="sortables_'.$field->id.'_btn" class="btn" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).next(), 0); return false;">
+					<i class="icon-uparrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_HIDE_VALUES' ).'
+				</span>
+				<span id="sortables_'.$field->id.'_btn" class="btn btn-success" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).prev(), 1); return false;" style="display:none;">
+					<i class="icon-downarrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_SHOW_VALUES' ).'
+				</span>
+			</div>
+				' : '').'
+			'.$field->html.
+			($non_value_html ? '
+				<div class="fcclear"></div>'.$non_value_html : '');
 	}
 	
 	

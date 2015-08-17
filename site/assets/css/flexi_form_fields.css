@@ -42,6 +42,11 @@
 #flexicontent div.fcfieldval_container.valuebox {
 }
 
+.toggle_all_values_buttons_box {
+	display:block;
+	margin: 0 0 6px 0;
+}
+
 
 /* FIELD: (sortable) special cases alignment, etc */
 #flexicontent ul.fcfield-sortables > li .input-append,

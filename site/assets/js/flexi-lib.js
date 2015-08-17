@@ -729,14 +729,16 @@
 	/* Toggle box via a button and set CSS class to indicate that it is open  */
 	function fc_toggle_box_via_btn(theBox, btn, btnClass, btnNew, mode) {
 		var box = typeof theBox=='string' ? jQuery('#'+theBox) : theBox;
-		var _box = typeof theBox=='string' ? box : box.get(0);
 		
 		if (btnNew) {
 			btnNew.show();
 			jQuery(btn).hide();
 		}
 		
-		if ( (typeof mode==='undefined' && _box.is(':hidden')) || (typeof mode!=='undefined' && parseInt(mode)) ) {
+		if (
+			(typeof mode!=='undefined' && parseInt(mode)) ||  // use the mode provided
+			(typeof mode==='undefined' && box.is(':hidden'))  // if any of the elements collection 'box' is hidden then open them all
+		) {
 			jQuery(btn).addClass(btnClass);
 			box.slideDown(400);
 		} else {
