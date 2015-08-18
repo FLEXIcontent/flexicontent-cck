@@ -2823,7 +2823,12 @@ class FlexicontentFields
 							}
 						});
 						
-						slider.noUiSlider.on('slide', function( event, ui ) {
+						// Handle form autosubmit
+						slider.noUiSlider.on('change', function() {
+							var slider = jQuery('#".$filter_ffid."_nouislider');
+							var jform  = slider.closest('form');
+							var form   = jform.get(0);
+							adminFormPrepare(form, parseInt(jform.attr('data-fc-autosubmit')));
 						});
 						
 						input1.addEventListener('change', function(){
@@ -2856,7 +2861,7 @@ class FlexicontentFields
 						</span>';
 				} else {
 					$filter->html	.=
-					($isSlider ? '<div id="'.$filter_ffid.'_nouislider"></div><div class="fc_slider_input_box">' : '').'
+					($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider"></div><div class="fc_slider_input_box">' : '').'
 						<span class="fc_filter_element">
 							<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value.'" />
 						</span>
@@ -2875,7 +2880,7 @@ class FlexicontentFields
 				} else {
 					$size = (int)($size / 2);
 					$filter->html	.=
-					($isSlider ? '<div id="'.$filter_ffid.'_nouislider"></div><div class="fc_slider_input_box">' : '').'
+					($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider"></div><div class="fc_slider_input_box">' : '').'
 						<span class="fc_filter_element">
 							<input name="'.$filter_ffname.'[1]" '.$attribs_str.' id="'.$filter_ffid.'1" type="text" size="'.$size.'" value="'.@ $value[1].'" />
 						</span>

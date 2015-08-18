@@ -280,6 +280,7 @@ if ($filter_autosubmit) {
 				var form=document.getElementById("'.$form_id.'");
 				adminFormPrepare(form, 2);
 			});
+			jQuery("#'.$form_id.'").attr("data-fc-autosubmit", "2");
 		});
 	';
 } else {
@@ -289,6 +290,7 @@ if ($filter_autosubmit) {
 				var form=document.getElementById("'.$form_id.'");
 				adminFormPrepare(form, 1);
 			});
+			jQuery("#'.$form_id.'").attr("data-fc-autosubmit", "1");
 		});
 	';
 }
