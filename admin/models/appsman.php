@@ -181,7 +181,7 @@ class FlexicontentModelAppsman extends JModelList
 			foreach($row as $colname => $coldata)
 			{
 				$coldata = $clear_id && $id_colname==$colname  ?  '0'  :  $coldata;
-				$coldata = str_replace("\n","\\n", addslashes($coldata) );
+				$coldata = str_replace("\n","\\n", addslashes(htmlspecialchars($coldata, ENT_NOQUOTES, 'UTF-8')) );
 				$content .= "\n".str_repeat($istr, $indent). '<'.$colname.'>"' .$coldata. '"</'.$colname.'>';
 			}
 			
