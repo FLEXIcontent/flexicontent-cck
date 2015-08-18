@@ -147,8 +147,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		
 		// Get/Create the view
 		$viewType   = $document->getType();
-		$viewName   = FLEXI_J30GE ? $this->input->get('view', $this->default_view) : JRequest::getVar('view');
-		$viewLayout = FLEXI_J30GE ? $this->input->get('layout', 'default', 'string') : JRequest::getVar('layout', 'default', 'string');
+		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
+		$viewLayout = $this->input->get('layout', 'default', 'string');
 		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 		
 		// Get/Create the model
@@ -174,7 +174,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		
 		
 		$link = $_SERVER['HTTP_REFERER'];  // 'index.php?option=com_flexicontent&view=appsman';
-		$task = strtolower(JRequest::getVar('task'));
+		$task = strtolower($this->input->get('task', '', 'cmd'));
 		
 		
 		
@@ -241,7 +241,16 @@ class FlexicontentControllerAppsman extends FlexicontentController
 				$app->redirect( $link );
 			}
 			
-			$conf['xml'] = file_get_contents($xmlfile);
+			$zip = new ZipArchive(); 
+			if ( $zip->open($xmlfile) !== FALSE )
+			{
+				$zip->open($xmlfile); 
+				$conf['xml'] = $zip->getFromName('dbdata.xml');
+			}
+			else
+			{
+				$conf['xml'] = file_get_contents($xmlfile);
+			}
 			
 			// Set import configuration into session
 			$session->set('appsman_config',
@@ -283,8 +292,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		
 		// Get/Create the view
 		$viewType   = $document->getType();
-		$viewName   = FLEXI_J30GE ? $this->input->get('view', $this->default_view) : JRequest::getVar('view');
-		$viewLayout = FLEXI_J30GE ? $this->input->get('layout', 'default', 'string') : JRequest::getVar('layout', 'default', 'string');
+		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
+		$viewLayout = $this->input->get('layout', 'default', 'string');
 		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 		
 		// Get/Create the model
@@ -304,7 +313,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		
 		
 		// Get export task
-		$task = strtolower(JRequest::getVar('task', 'exportxml'));
+		$task = strtolower($this->input->get('task', 'exportxml', 'cmd'));
 		$export_type = str_replace('export', '', $task);
 		
 		// Get optional filename of export file
@@ -336,10 +345,11 @@ class FlexicontentControllerAppsman extends FlexicontentController
 
 			switch($export_type) {
 				case "xml":
+					$customHandler = 'getExtraData_'.$table;
 					$content = '<?xml version="1.0"?>'
 						."\n<conf>\n"
 						.$model->create_XML_records($rows, $table_name, $id_colname, $clear_id=false)
-						.$model->create_XML_records($rows, $table_name, $id_colname, $clear_id=false)
+						.(is_callable(array($model, $customHandler)) ? $model->$customHandler($rows) : '')
 						."\n</conf>";
 					break;
 				case "sql":
@@ -388,23 +398,72 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			return;
 		}
 		
-		if ( empty($filename) )
-		{
-			$filename = $export_type ?
-				str_replace('#__', '', $table)."_".date('Y-m-d')."__".rand(1,11111111).".".$export_type :
-				date('Y-m-d')."__".rand(1,11111111).".xml";
-		} else {
-			$filename = $filename.'.'.($export_type ? $export_type : 'xml');
-		}
+		$filename = $filename ? $filename : 'dbdata';//str_replace('#__', '', $table);
+		$filename .= '.'.($export_type ? $export_type : 'xml');
+		
+		
+		// *****************************
+		// Create temporary archive name
+		// *****************************
+				
+		$tmp_ffname = 'fcmd_uid_'.$user->id.'_'.date('Y-m-d__H-i-s');
+		$archivename = $tmp_ffname . '.zip';
+		$archivepath = JPath::clean( $app->getCfg('tmp_path').DS.$archivename );
+		
+		
+		// *******************************************
+		// Create a new Zip archive on the server disk
+		// *******************************************
+		
+		$zip = new flexicontent_zip();  // extends ZipArchive
+		$res = $zip->open($archivepath, ZipArchive::CREATE);
+		$zip->addFromString($filename, $content);
+		$zip->close();
+		$filesize = filesize($archivepath);
+		//echo $content;exit;
+		
+		
+		// *******************
+		// Output HTTP headers
+		// *******************
+		
 		header("Pragma: public"); // required
 		header("Expires: 0");
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 		header("Cache-Control: private", false); // required for certain browsers
 		header('Content-Type: application/force-download');  //header('Content-Type: text/'.$export_type);
-		header("Content-Disposition: attachment; filename=\"".$filename."\";");  // quote to allow spaces in filenames
+		//header("Content-Disposition: attachment; filename=\"".$filename."\";");  // quote to allow spaces in filenames
+		header("Content-Disposition: attachment; filename=\"".$archivename."\";");  // quote to allow spaces in filenames
 		header("Content-Transfer-Encoding: Binary");
-		header("Content-Length: ".strlen($content));
-		echo $content;
-		exit();
+		//header("Content-Length: ".strlen($content));
+		header("Content-Length: ".$filesize);
+		//echo $content;
+		
+		
+		// *******************************
+		// Finally read file and output it
+		// *******************************
+		
+		$chunksize = 1 * (1024 * 1024); // 1MB, highest possible for fread should be 8MB
+		if (1 || $filesize > $chunksize)
+		{
+			$handle = @fopen($archivepath,"rb");
+			while(!feof($handle))
+			{
+				print(@fread($handle, $chunksize));
+				ob_flush();
+				flush();
+			}
+			fclose($handle);
+		} else {
+			// This is good for small files, it will read an output the file into
+			// memory and output it, it will cause a memory exhausted error on large files
+			ob_clean();
+			flush();
+			readfile($archivepath);
+		}
+		unlink($archivepath); // remove temporary file
+		
+		$app->close();
 	}
 }
