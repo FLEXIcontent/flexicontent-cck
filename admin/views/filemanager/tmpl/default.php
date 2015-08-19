@@ -450,11 +450,11 @@ function delAllFilters() {
 					<tbody>
 						<tr>
 							<td class="key"><label class="label" for="username"><?php echo JText::_( 'FLEXI_USERNAME' ); ?>:</label></td>
-							<td><input type="text" id="username" name="username" class="input_box" size="70" value="" /></td>
+							<td><input type="text" id="username" name="username" class="input-xlarge" size="70" value="" /></td>
 						</tr>
 						<tr>
 							<td class="key"><label class="label" for="password"><?php echo JText::_( 'FLEXI_PASSWORD' ); ?>:</label></td>
-							<td><input type="password" id="password" name="password" class="input_box" size="70" value="" /></td>
+							<td><input type="password" id="password" name="password" class="input-xlarge" size="70" value="" /></td>
 						</tr>
 					</tbody>
 				</table>
@@ -518,7 +518,7 @@ function delAllFilters() {
 								</label>
 							</td>
 							<td id="file-title-container">
-								<input type="text" id="file-title" size="44" class="required" name="file-title" />
+								<input type="text" id="file-title" size="44" class="required input-xxlarge" name="file-title" />
 							</td>
 						</tr>
 		<?php } ?>
@@ -542,7 +542,7 @@ function delAllFilters() {
 								</label>
 							</td>
 							<td id="file-desc-container" style="vertical-align: top;">
-								<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm"></textarea>
+								<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm" class="input-xxlarge"></textarea>
 							</td>
 						</tr>
 							
@@ -600,7 +600,7 @@ function delAllFilters() {
 								</label>
 							</td>
 							<td>
-								<input type="text" id="file-url-data" size="44" class="required" name="file-url-data" />
+								<input type="text" id="file-url-data" size="44" class="required input-xxlarge" name="file-url-data" />
 							</td>
 						</tr>
 						
@@ -611,7 +611,7 @@ function delAllFilters() {
 								</label>
 							</td>
 							<td>
-								<input type="text" id="file-url-title" size="44" class="required" name="file-url-title" />
+								<input type="text" id="file-url-title" size="44" class="required input-xxlarge" name="file-url-title" />
 							</td>
 						</tr>
 						
@@ -633,7 +633,7 @@ function delAllFilters() {
 								</label>
 							</td>
 							<td>
-								<textarea name="file-url-desc" cols="24" rows="3" id="file-url-desc"></textarea>
+								<textarea name="file-url-desc" cols="24" rows="3" id="file-url-desc" class="input-xxlarge"></textarea>
 							</td>
 						</tr>
 						
@@ -644,7 +644,7 @@ function delAllFilters() {
 								</label>
 							</td>
 							<td>
-								<input type="text" id="file-url-ext" size="5" class="required" name="file-url-ext" />
+								<input type="text" id="file-url-ext" size="5" class="required input-xxlarge" name="file-url-ext" />
 							</td>
 						</tr>
 						
@@ -678,7 +678,7 @@ function delAllFilters() {
 								</label>
 							</td>
 							<td>
-								<input type="text" id="file-dir-path" size="50" value="/tmp" class="required" name="file-dir-path" />
+								<input type="text" id="file-dir-path" size="50" value="/tmp" class="required input-xxlarge" name="file-dir-path" />
 							</td>
 						</tr>
 						
@@ -703,7 +703,7 @@ function delAllFilters() {
 								</label>
 							</td>
 							<td>
-								<input type="text" id="file-filter-ext" size="50" value="" name="file-filter-ext" />
+								<input type="text" id="file-filter-ext" size="50" value="" class="input-xxlarge" name="file-filter-ext" />
 							</td>
 						</tr>
 						
@@ -714,7 +714,7 @@ function delAllFilters() {
 								</label>
 							</td>
 							<td>
-								<textarea name="file-desc" cols="24" rows="6" id="file-desc_addFileForm"></textarea>
+								<textarea name="file-desc" cols="24" rows="6" id="file-desc_addFileForm" class="input-xxlarge"></textarea>
 							</td>
 						</tr>
 						
@@ -725,7 +725,7 @@ function delAllFilters() {
 								</label>
 							</td>
 							<td>
-								<input type="text" id="file-filter-re" size="50" value="" name="file-filter-re" />
+								<input type="text" id="file-filter-re" size="50" value="" class="input-xxlarge" name="file-filter-re" />
 							</td>
 						</tr>
 						

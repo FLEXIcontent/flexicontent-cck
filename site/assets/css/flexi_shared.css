@@ -1125,6 +1125,7 @@ table.fc-form-tbl td {
 	padding: 4px 24px 4px 0px;
 }
 table.fc-form-tbl td.key {
+	vertical-align: top;
 	text-align: right;
 	padding: 4px 0px;
 	max-width: 140px;
