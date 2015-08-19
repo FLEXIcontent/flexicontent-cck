@@ -29,7 +29,8 @@ jimport('joomla.application.component.controller');
  */
 class FlexicontentControllerAppsman extends FlexicontentController
 {
-	static $allowed_tables = array('flexicontent_fields', 'flexicontent_types', 'categories', 'usergroups');
+	static $allowed_tables = array('flexicontent_fields', 'flexicontent_types',  'flexicontent_templates', 'categories', 'usergroups');
+	static $table_idcols   = array('flexicontent_fields'=>'id', 'flexicontent_types'=>'id', 'flexicontent_templates'=>'template', 'categories'=>'id', 'usergroups'=> 'id');
 	
 	
 	/**
@@ -62,7 +63,11 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// Get/Create the model
 		$model = $this->getModel('appsman');
 		
-		// calculate / check access
+		
+		// ************************
+		// Calculate / check access
+		// ************************
+		
 		$is_authorised = $user->authorise('core.admin', 'com_flexicontent');
 		if ( !$is_authorised ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS' ) );
@@ -70,16 +75,26 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			return;
 		}
 		
-		$cid = JRequest::getVar( 'cid', array(), $hash='default', 'array' );
-		JArrayHelper::toInteger($cid, array());
+		
+		// ******************************************
+		// Security Concern: check for allowed tables
+		// ******************************************
 		
 		$table = strtolower(JRequest::getCmd('table', 'flexicontent_fields'));
-		
 		if ( !in_array($table, self::$allowed_tables) ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS' . ' Table: ' .$table. ' not in allowed tables' ) );
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 			return;
 		}
+		$ids_are_integers = $table!='flexicontent_templates';
+		
+		
+		// ************
+		// Get rows ids
+		// ************
+		
+		$cid = JRequest::getVar( 'cid', array(), $hash='default', 'array' );
+		if ($ids_are_integers) JArrayHelper::toInteger($cid, array());
 		
 		$conf = $session->get('appsman_export', array(), 'flexicontent');	
 		
@@ -93,7 +108,11 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			$conf[$table][$_id] = 1;
 		}
 		
+		
+		// ******************************************
 		// Some tables have related DB data, add them
+		// ******************************************
+		
 		$customHandler = 'getRelatedIds_'.$table;
 		if ( is_callable(array($model, $customHandler)) ) {
 			$related_ids = $model->$customHandler($cid);
@@ -101,6 +120,11 @@ class FlexicontentControllerAppsman extends FlexicontentController
 				foreach ($_cid as $_id)  $conf[$_table][$_id] = 1;
 			}
 		}
+		
+		
+		// ********************************************************************
+		// Set row ids into session, and redirect back to refere with a message
+		// ********************************************************************
 		
 		$session->set('appsman_export', $conf, 'flexicontent');
 		
@@ -333,7 +357,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			}
 			
 			$table_name = '#__'.$table;
-			$id_colname = 'id';
+			$id_colname = self::$table_idcols[$table];
 			$rows = $model->getTableRows($table_name, $id_colname, $cid, true);
 			
 			if (empty($rows))
@@ -374,7 +398,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 				if ( empty($conf[$table]) ) continue;
 				$cid = array_keys($conf[$table]);
 				$table_name = '#__'.$table;
-				$id_colname = 'id';
+				$id_colname = self::$table_idcols[$table];
 				$rows = $model->getTableRows($table_name, $id_colname, $cid, true);
 				$content .= $model->create_XML_records($rows, $table_name, $id_colname, $clear_id=false);
 				$customHandler = 'getExtraData_'.$table;
@@ -402,25 +426,42 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		$filename .= '.'.($export_type ? $export_type : 'xml');
 		
 		
-		// *****************************
-		// Create temporary archive name
-		// *****************************
-				
-		$tmp_ffname = 'fcmd_uid_'.$user->id.'_'.date('Y-m-d__H-i-s');
-		$archivename = $tmp_ffname . '.zip';
-		$archivepath = JPath::clean( $app->getCfg('tmp_path').DS.$archivename );
-		
-		
-		// *******************************************
-		// Create a new Zip archive on the server disk
-		// *******************************************
-		
-		$zip = new flexicontent_zip();  // extends ZipArchive
-		$res = $zip->open($archivepath, ZipArchive::CREATE);
-		$zip->addFromString($filename, $content);
-		$zip->close();
-		$filesize = filesize($archivepath);
-		//echo $content;exit;
+		if ( $export_type ) {
+			// Simple export from a string
+			$downloadname = $filename;
+			$downloadsize = strlen($content);
+		} else {
+			
+			// *****************************
+			// Create temporary archive name
+			// *****************************
+			
+			$tmp_ffname = 'fcmd_uid_'.$user->id.'_'.date('Y-m-d__H-i-s');
+			$archivename = $tmp_ffname . '.zip';
+			$archivepath = JPath::clean( $app->getCfg('tmp_path').DS.$archivename );
+			
+			
+			// *******************************************
+			// Create a new Zip archive on the server disk
+			// *******************************************
+			
+			$zip = new flexicontent_zip();  // extends ZipArchive
+			$res = $zip->open($archivepath, ZipArchive::CREATE);
+			if (!$res) die('failed creating temporary archive: '.$archivepath);
+			$zip->addFromString($filename, $content);
+			
+			// Get extra files
+			foreach(self::$allowed_tables as $table)
+			{
+				$customHandler = 'getExtraFiles_'.$table;
+				if ( is_callable(array($model, $customHandler)) ) {
+					$model->$customHandler($rows, $zip);
+				}
+			}
+			$zip->close();
+			$downloadname = $archivename;
+			$downloadsize = filesize($archivepath);
+		}
 		
 		
 		// *******************
@@ -432,37 +473,41 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 		header("Cache-Control: private", false); // required for certain browsers
 		header('Content-Type: application/force-download');  //header('Content-Type: text/'.$export_type);
-		//header("Content-Disposition: attachment; filename=\"".$filename."\";");  // quote to allow spaces in filenames
-		header("Content-Disposition: attachment; filename=\"".$archivename."\";");  // quote to allow spaces in filenames
+		header("Content-Disposition: attachment; filename=\"".$downloadname."\";");  // quote to allow spaces in filenames
 		header("Content-Transfer-Encoding: Binary");
-		//header("Content-Length: ".strlen($content));
-		header("Content-Length: ".$filesize);
-		//echo $content;
+		header("Content-Length: ".$downloadsize);
 		
 		
-		// *******************************
-		// Finally read file and output it
-		// *******************************
+		// ***************
+		// Output the file
+		// ***************
 		
-		$chunksize = 1 * (1024 * 1024); // 1MB, highest possible for fread should be 8MB
-		if (1 || $filesize > $chunksize)
-		{
-			$handle = @fopen($archivepath,"rb");
-			while(!feof($handle))
-			{
-				print(@fread($handle, $chunksize));
-				ob_flush();
-				flush();
-			}
-			fclose($handle);
-		} else {
-			// This is good for small files, it will read an output the file into
-			// memory and output it, it will cause a memory exhausted error on large files
-			ob_clean();
-			flush();
-			readfile($archivepath);
+		if ( $export_type ) {
+			// Simple export from a string
+			echo $content;
 		}
-		unlink($archivepath); // remove temporary file
+		else {
+			// Read archive file from the server disk
+			$chunksize = 1 * (1024 * 1024); // 1MB, highest possible for fread should be 8MB
+			if (1 || $filesize > $chunksize)
+			{
+				$handle = @fopen($archivepath,"rb");
+				while(!feof($handle))
+				{
+					print(@fread($handle, $chunksize));
+					ob_flush();
+					flush();
+				}
+				fclose($handle);
+			} else {
+				// This is good for small files, it will read an output the file into
+				// memory and output it, it will cause a memory exhausted error on large files
+				ob_clean();
+				flush();
+				readfile($archivepath);
+			}
+			unlink($archivepath); // remove temporary archive file
+		}
 		
 		$app->close();
 	}
