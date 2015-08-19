@@ -333,6 +333,10 @@ class ParentClassItem extends JModelAdmin
 		{
 			$this->_typeid = JRequest::getInt('typeid', 0);  // Get this again since it might have been change since model was constructed
 			$this->_initItem();
+			if ( !$app->isAdmin() )  {
+				// Load item parameters with heritage, (SUBMIT ITEM FORM)
+				$this->_loadItemParams();
+			}
 		}
 		
 		// Verify item's type

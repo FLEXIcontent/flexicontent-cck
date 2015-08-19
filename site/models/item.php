@@ -375,8 +375,6 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function _loadItemParams()
 	{
-		if (!empty($this->_item->parameters)) return;
-		
 		$app = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
 		jimport('joomla.html.parameter');
@@ -405,7 +403,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$typeParams = new JRegistry($typeParams);
 		
 		// Create item parameters
-		if ( is_string($this->_item->attribs) )
+		if ( !is_object($this->_item->attribs) )
 			$itemParams = new JRegistry($this->_item->attribs);
 		else
 			$itemParams = $this->_item->attribs;
