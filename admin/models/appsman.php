@@ -83,8 +83,13 @@ class FlexicontentModelAppsman extends JModelList
 	
 	function getTableRows($table, $id_colname, $cid, $id_is_unique=false)
 	{
+		$ids = array();
+		foreach($cid as $id) {
+			$ids[] = $this->_db->Quote($id);
+		}
+		
 		$query = 'SELECT * FROM '.$table
-			.' WHERE '.$id_colname.' IN ('.implode(',', $cid).')';
+			.' WHERE '.$id_colname.' IN ('.implode(',', $ids).')';
 		$this->_db->setQuery($query);
 		$rows = $id_is_unique ? $this->_db->loadAssocList($id_colname) : $this->_db->loadAssocList();
 		return $rows;
@@ -200,13 +205,30 @@ class FlexicontentModelAppsman extends JModelList
 	
 	function getRelatedIds_flexicontent_types($type_ids)
 	{
+		// *************************
 		// Get fields-type relations
+		// *************************
 		$fields_type_rows = $this->getTableRows('#__flexicontent_fields_type_relations', 'type_id', $type_ids, $id_is_unique=false);
 		
 		// Get related fields
 		$related_ids['flexicontent_fields'] = array();
 		foreach($fields_type_rows as $fields_type_row) {
 			$related_ids['flexicontent_fields'][] = $fields_type_row['field_id'];
+		}
+		
+		
+		// *****************************************************
+		// Get templates, (we need to load type's configuration)
+		// *****************************************************
+		
+		$template_names = array();
+		$type = JTable::getInstance('flexicontent_types', '');
+		foreach ($type_ids as $type_id)
+		{
+			$type->id = $type_id;
+			$type->load();
+			$type->params = new JRegistry($type->attribs);
+			$related_ids['flexicontent_templates'][] = $type->params->get('ilayout', 'default'); // template folder name
 		}
 		
 		return $related_ids;
@@ -216,15 +238,39 @@ class FlexicontentModelAppsman extends JModelList
 	function getExtraData_flexicontent_types($rows)
 	{
 		if (!count($rows)) return '';
-		
-		// Get fields-type relations
-		$type_ids = array_keys($rows);
-		$fields_type_rows = $this->getTableRows('#__flexicontent_fields_type_relations', 'type_id', $type_ids, $id_is_unique=false);
-		
-		// Return the extra data
 		$content = '';
-		$content .= $this->create_XML_records($fields_type_rows, '#__flexicontent_fields_type_relations', $id_colname=null, $clear_id=false);
+		
+		// *************************
+		// Get fields-type relations
+		// *************************
+		
+		// Get DB data
+		$type_ids = array_keys($rows);
+		$tbl = '#__flexicontent_fields_type_relations';
+		$id_colname = 'type_id';
+		$rows = $this->getTableRows($tbl, $id_colname, $type_ids, $id_is_unique=false);
+		
+		// Convert them to XML format
+		$content .= $this->create_XML_records($rows, $tbl, $id_colname, $clear_id=false);
+		
 		return $content;
 	}
 	
+	
+	function getExtraFiles_flexicontent_templates($rows, $zip)
+	{
+		if (!count($rows)) return '';
+		$content = '';
+		
+		// Get DB data
+		$template_names = array_keys($rows);
+		foreach($template_names as $template_name) {
+			$dir = JPATH_COMPONENT_SITE.DS.'templates'.DS.$template_name;
+			if (file_exists($dir))
+			{
+				$zip->addDir($dir, 'templates/'.$template_name);
+			}
+		}
+		return;
+	}
 }
