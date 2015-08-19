@@ -120,9 +120,9 @@ $tabCnt[$tabSetCnt] = 0;
 			<br/><br/>
 			
 			<?php
-			$tablename_to_option = array('flexicontent_fields'=>'flexicontent', 'flexicontent_types'=>'flexicontent', 'categories'=>'flexicontent', 'usergroups'=> 'flexicontent');
-			$tablename_to_view   = array('flexicontent_fields'=>'fields', 'flexicontent_types'=>'types', 'categories'=>'categories', 'usergroups'=> 'groups');
-			$tablename_to_title  = array('flexicontent_fields'=>'Fields', 'flexicontent_types'=>'Types', 'categories'=>'Categories', 'usergroups'=> 'User groups');
+			$tablename_to_option = array('flexicontent_fields'=>'flexicontent', 'flexicontent_types'=>'flexicontent', 'flexicontent_templates'=>'flexicontent', 'categories'=>'flexicontent', 'usergroups'=> 'flexicontent');
+			$tablename_to_view   = array('flexicontent_fields'=>'fields', 'flexicontent_types'=>'types', 'flexicontent_templates'=>'templates', 'categories'=>'categories', 'usergroups'=> 'groups');
+			$tablename_to_title  = array('flexicontent_fields'=>'Fields', 'flexicontent_types'=>'Types', 'flexicontent_templates'=>'Templates', 'categories'=>'Categories', 'usergroups'=> 'User groups');
 			$session  = JFactory::getSession();
 			$export_conf = $session->get('appsman_export', array(), 'flexicontent');
 			?>
@@ -141,7 +141,7 @@ $tabCnt[$tabSetCnt] = 0;
 				</div>
 				<div class="fcclear"></div>
 				<?php
-				echo 'IDs: '.implode(', ', array_keys($row_ids));
+				echo '<span class="label">IDs / Names</span> '.implode(', ', array_keys($row_ids));
 				echo '<br/>';
 				?>
 			<?php endforeach; ?>
