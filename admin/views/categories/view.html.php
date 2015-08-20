@@ -307,7 +307,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 
-		$orderingx = ($lists['order'] == $order_property) ? $order_property : '';
+		$orderingx = ($lists['order'] == $order_property && strtolower($lists['order_Dir']) == 'asc') ? $order_property : '';
 
 		//assign data to template
 		$this->assignRef('CanTemplates', $perms->CanTemplates);

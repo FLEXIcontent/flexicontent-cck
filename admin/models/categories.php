@@ -60,11 +60,11 @@ class FlexicontentModelCategories extends JModelList
 		// **************
 		
 		// Various filters
-		$filter_cats      = $fcform ? $jinput->get('filter_cats',     0,  'int')     :  $app->getUserStateFromRequest( $p.'.filter_cats',      'filter_cats',      0,   'int' );
-		$filter_state     = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'.filter_state',     'filter_state',     '',  'string' );
-		$filter_access    = $fcform ? $jinput->get('filter_access',   '', 'string')  :  $app->getUserStateFromRequest( $p.'.filter_access',    'filter_access',    '',  'string' );
-		$filter_level     = $fcform ? $jinput->get('filter_level',    '', 'string')  :  $app->getUserStateFromRequest( $p.'.filter_level',     'filter_level',     '',  'string' );
-		$filter_language  = $fcform ? $jinput->get('filter_language', '', 'string')  :  $app->getUserStateFromRequest( $p.'.filter_language',  'filter_language',  '',  'string' );
+		$filter_cats      = $fcform ? $jinput->get('filter_cats',     0,  'int')     :  $app->getUserStateFromRequest( $p.'filter_cats',      'filter_cats',      0,   'int' );
+		$filter_state     = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',     'filter_state',     '',  'string' );
+		$filter_access    = $fcform ? $jinput->get('filter_access',   '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_access',    'filter_access',    '',  'string' );
+		$filter_level     = $fcform ? $jinput->get('filter_level',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_level',     'filter_level',     '',  'string' );
+		$filter_language  = $fcform ? $jinput->get('filter_language', '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_language',  'filter_language',  '',  'string' );
 		
 		$this->setState('filter_cats',     $filter_cats);
 		$this->setState('filter_state',    $filter_state);
@@ -92,6 +92,7 @@ class FlexicontentModelCategories extends JModelList
 		
 		$filter_order      = $fcform ? $jinput->get('filter_order',     'c.lft', 'cmd')   :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     'c.lft', 'cmd' );
 		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', '',      'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', '',      'word' );
+		if ($filter_order_Dir && $filter_order_Dir!='asc') $filter_order_Dir = 'asc';
 		
 		$this->setState('filter_order', $filter_order);
 		$this->setState('filter_order_Dir', $filter_order_Dir);
@@ -307,7 +308,7 @@ class FlexicontentModelCategories extends JModelList
 		
 		// Filter by language
 		if ( $filter_language ) {
-			$query->where('l.lang_code = '.$db->Quote( $filter_language ) );
+			$query->where('c.language = '.$db->Quote( $filter_language ) );
 		}
 		
 		// Implement View Level Access
