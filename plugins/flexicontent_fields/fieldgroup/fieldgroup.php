@@ -673,6 +673,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$itemmodel = new FlexicontentModelItem();
 			$item->fieldvalues = $itemmodel->getCustomFieldsValues($item->id);
 		}
+		//echo "<pre>"; print_r($item->fieldvalues); echo "</pre>"; exit;
 		
 		foreach($grouped_fields as $field_id => $grouped_field)
 		{
