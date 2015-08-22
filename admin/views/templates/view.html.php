@@ -87,6 +87,29 @@ class FlexicontentViewTemplates extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
+		
+		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
+		if (file_exists($appsman_path))
+		{
+			$btn_icon = 'icon-download';
+			$btn_name = 'download';
+			$btn_task    = 'appsman.exportxml';
+			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_templates'}).appendTo(jQuery(f));";
+			flexicontent_html::addToolBarButton(
+				'Export now',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Export now as XML',
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+			
+			$btn_icon = 'icon-box-add';
+			$btn_name = 'box-add';
+			$btn_task    = 'appsman.addtoexport';
+			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'flexicontent_templates'}).appendTo(jQuery(f));";
+			flexicontent_html::addToolBarButton(
+				'Add to export',
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm='Add to export list',
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-warning", $btn_icon);
+		}
+		
 		//JToolBarHelper::Back();
 		if ($perms->CanConfig) {
 			//JToolBarHelper::divider(); JToolBarHelper::spacer();

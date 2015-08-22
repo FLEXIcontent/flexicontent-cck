@@ -330,7 +330,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 				.'.fcrelation_field_used_items, .fcrelation_field_unused_items, .fcrelation_field_controls { display:inline-block; float:left !important; margin: 0 0 8px 0; }'
 				
 				.'.fcrelation_field_used_items.fc_vertical,   .fcrelation_field_unused_items.fc_vertical   { min-width: 100%; }'
-				.'.fcrelation_field_used_items.fc_horizontal, .fcrelation_field_unused_items.fc_horizontal { width: 46%; margin: 8px 0%; }'
+				.'.fcrelation_field_used_items.fc_horizontal, .fcrelation_field_unused_items.fc_horizontal { margin: 8px 0%; }'
 				
 				.'.fcrelation_field_controls.fc_vertical   { min-width: 100%; }'
 				.'.fcrelation_field_controls.fc_horizontal { max-width:6%; margin: 48px 1% 0 1%; width: auto; }'
@@ -407,6 +407,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 				' : '').'
 				
 			</span>
+			<div class="fcclear"></div>
 		';
     
 		$initial_placement = $field->parameters->get( 'initial_placement', 'h' ) ;

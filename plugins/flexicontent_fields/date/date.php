@@ -316,12 +316,9 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
 		
-		if (!$use_ingroup) $field->html =
-			 '<div style="float:left">'
-			.(($show_usage && $append_str) ? ' <div class="alert alert-info fc-small fc-iblock">'.$append_str.'</div>' : '')
-			.  $field->html
-			.'</div>';
-			
+		if (!$use_ingroup)
+			$field->html = (($show_usage && $append_str) ? ' <div class="alert alert-info fc-small fc-iblock">'.$append_str.'</div>' : '')  .  $field->html;
+		
 		if ( count($skipped_vals) )
 			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 	}

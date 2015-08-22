@@ -525,7 +525,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 		";
 		$css .='
-			table.fcfield'.$field->id.'.img_upload_select { float:left; clear:none; border:1px dashed gray; margin-bottom:16px; }
 			table.fcfield'.$field->id.'.img_upload_select li { min-height:'.($thumb_h_s+56).'px; }
 			table.fcfield'.$field->id.'.img_upload_select ul { height:'.($thumb_h_s+96).'px; }
 			table.fcfield'.$field->id.'.img_upload_select ul { width:'.(2*($thumb_w_s+64)).'px; }

@@ -53,7 +53,7 @@ $noeditlayout = JHTML::image ( 'administrator/components/com_flexicontent/assets
 $copytmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_add.png', JText::_( 'FLEXI_DUPLICATE' ), ' style="min-width:16px;" '  );
 $deltmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE' ), ' style="min-width:16px;" '  );
 
-$list_total_cols = 7;
+$list_total_cols = 8;
 ?>
 
 <div id="flexicontent" class="flexicontent">
@@ -95,6 +95,7 @@ $list_total_cols = 7;
 	<thead>
 		<tr class="header">
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo 'Joomla.checkAll(this);'; ?>" /></th>
 			<th></th>
 			<th class="title" style="text-align:left;"><?php echo JText::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
 			<th colspan="2" style="text-align: left">
@@ -159,9 +160,13 @@ $list_total_cols = 7;
 			
 			$description_item = !empty($row->items)    ? @ $row->items->description    : '';
 			$description_cat  = !empty($row->category) ? @ $row->category->description : '';
+			
+			$row->id = $row->name;
+			$checked	= JHTML::_('grid.checkedout', $row, $i-1 );
 			?>
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
 			<td><?php echo $i; ?></td>
+			<td><?php echo $checked; ?></td>
 			<td align="right">
 				<?php if (!in_array($row->name, $basetemplates)) :?>
 					<a style="margin-right: 5px" id="<?php echo 'del-' . $row->name ?>" class="deletable-template" href="javascript:;">

@@ -596,7 +596,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<?php endif; ?>
 			<?php endif; */?>
 			
-			<div style="<?php echo $width; ?>;" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
+			<div style="<?php echo $container_width; ?>;" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
 				<?php echo ($field->description && $edithelp==3) ? '<div class="alert fc-small fc-iblock">'.$field->description.'</div>' : ''; ?>
 				
 			<?php	if (isset($this->row->item_translations) ) :

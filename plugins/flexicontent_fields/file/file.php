@@ -286,7 +286,6 @@ class plgFlexicontent_fieldsFile extends FCField
 		}
 		
 		$css .= '
-			#sortables_'.$field->id.' li span.fcfield_textval { cursor:text; padding:4px; white-space:pre-wrap; word-wrap:break-word; min-width:220px; }
 			#sortables_'.$field->id.' li span.inline_style_published   { color:#444; }
 			#sortables_'.$field->id.' li span.inline_style_unpublished { background: #ffffff; color:gray; border-width:0px; text-decoration:line-through; }
 			';

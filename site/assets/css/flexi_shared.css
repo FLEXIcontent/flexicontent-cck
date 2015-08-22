@@ -1079,14 +1079,25 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	text-decoration: none;
 	font-size: 12px;
 }
+#flexicontent form span.fcfield_textval {
+	cursor:text;
+	padding:4px;
+	white-space:pre-wrap;
+	word-wrap:break-word;
+	min-width: 220px;
+	width: 50%;
+	max-width: 600px;
+}
 
 #flexicontent form select.fcfield_selectval,
 #flexicontent form input.fcfield_textval {
 	height: 26px;
 	line-height: 26px;
 	overflow: auto;
-	min-width:24%;
 	vertical-align: top;
+	min-width: 220px;
+	width: 50%;
+	max-width: 600px;
 }
 #flexicontent form select.fcfield_selectval {
 	padding: 4px 0 2px 4px;

@@ -201,7 +201,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			";
 			
 			$css .= '
-			#sortables_'.$field->id.' li img.thumbs { border:1px solid silver; padding:0;  margin:0px 0px 6px 0px; float:left; clear:both; }
+			#sortables_'.$field->id.' li img.thumbs { border:1px solid silver; padding:0;  margin:0px 4px 6px 0px; float:left; clear:both; }
 			';
 			
 			$remove_button = '<span class="fcfield-delvalue" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';

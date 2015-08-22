@@ -118,7 +118,7 @@ $js = "
 		<div class="tabbertab" id="tabset_cat_props_desc_tab" data-icon-class="icon-file-2" >
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?> </h3>
 			
-			<div class="flexi_params" style="margin:0px 24px; width: 99% !important;">
+			<div class="flexi_params">
 				<?php
 					// parameters : areaname, content, hidden field, width, height, rows, cols
 					echo $this->editor->display( FLEXI_J16GE ? 'jform[description]' : 'description',  $this->row->description, '100%', '350px', '75', '20', array('pagebreak', 'readmore') ) ;
