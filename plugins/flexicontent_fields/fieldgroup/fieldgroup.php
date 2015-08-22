@@ -689,12 +689,16 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$max_count = $value_count > $max_count ? $value_count : $max_count;
 		}
 		
-		// Add empty values the the fields not having enough values
+		// COMPATIBILITY: in every field add (aka pad with) NULL values for groups that a field value was not given
+		// every field will create an empty display instead of skipping an NULL value, thus field group will display properly
 		foreach($grouped_fields as $field_id => $grouped_field)
 		{
-			for($n=count($grouped_field->value); $n < $max_count; $n++) {
-				$grouped_field->value[$n] = null;
+			$vals = array();
+			for ($n=0; $n < $max_count; $n++) {
+				$vals[$n] = isset($grouped_field->value[$n]) ? $grouped_field->value[$n] : null;
 			}
+			$grouped_field->value = $vals;
+			//echo "<pre>"; print_r($grouped_field->value); echo "</pre>";
 		}
 	}
 	
