@@ -69,6 +69,10 @@ class FlexicontentViewCategories extends JViewLegacy
 		if ($filter_level) $count_filters++; if ($filter_access) $count_filters++;
 		if ($filter_language) $count_filters++;
 		
+		// Item ID filter
+		$filter_id  = $model->getState('filter_id');
+		if ($filter_id) $count_filters++;
+		
 		// text search
 		$search = $model->getState( 'search' );
 		$search = $db->escape( trim(JString::strtolower( $search ) ) );
@@ -302,6 +306,8 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		// filter search word
 		$lists['search']= $search;
+		// search id
+		$lists['filter_id'] = $filter_id;
 		
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;

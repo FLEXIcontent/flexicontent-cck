@@ -79,6 +79,14 @@ class FlexicontentModelCategories extends JModelList
 		$app->setUserState($p.'filter_language', $filter_language);
 		
 		
+		// Item ID filter
+		$filter_id  = $fcform ? $jinput->get('filter_id', '', 'int')  :  $app->getUserStateFromRequest( $p.'filter_id',  'filter_id',  '',  'int' );
+		$filter_id  = $filter_id ? $filter_id : '';  // needed to make text input field be empty
+		
+		$this->setState('filter_id', $filter_id);
+		$app->setUserState($p.'filter_id', $filter_id);
+		
+		
 		// Text search
 		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
 		$this->setState('search', $search);
@@ -247,6 +255,9 @@ class FlexicontentModelCategories extends JModelList
 		$filter_level     = $this->getState( 'filter_level' );
 		$filter_language  = $this->getState( 'filter_language' );
 		
+		// filter id
+		$filter_id = $this->getState( 'filter_id' );
+		
 		// text search
 		$search  = $this->getState( 'search' );
 		$search  = trim( JString::strtolower( $search ) );
@@ -309,6 +320,11 @@ class FlexicontentModelCategories extends JModelList
 		// Filter by language
 		if ( $filter_language ) {
 			$query->where('c.language = '.$db->Quote( $filter_language ) );
+		}
+		
+		// Filter by id
+		if ( $filter_id ) {
+			$query->where('c.id = '.$db->Quote( $filter_id ) );
 		}
 		
 		// Implement View Level Access

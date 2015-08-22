@@ -139,7 +139,7 @@ class flexicontent_html
 	}
 	
 	
-	static function getDefaultCanonical()
+	static function getDefaultCanonical(&$domain=null)
 	{
 		$app = JFactory::getApplication();
 		$doc = JFactory::getDocument();
@@ -150,26 +150,22 @@ class flexicontent_html
 		}
 
 		$router = $app->getRouter();
+		$uri    = JUri::getInstance();
 		
-		$uri = clone JUri::getInstance();
-		// Get configuration from plugin
+		// Get SEF plugin configuration
 		$plugin = JPluginHelper::getPlugin('system', 'sef');
-		$domain = null;
-		if (!empty($plugin)) {
-			$pluginParams = new JRegistry($plugin->params);
-			$domain = $pluginParams->get('domain');
-		}
-
+		$pluginParams = new JRegistry($plugin ? $plugin->params : null);
+		
+		$domain = $pluginParams->get('domain');
+		
 		if ($domain === null || $domain === '')
 		{
 			$domain = $uri->toString(array('scheme', 'host', 'port'));
 		}
-
-		$parsed = $router->parse($uri);
-		$fakelink = 'index.php?' . http_build_query($parsed);
-		$link = $domain . JRoute::_($fakelink, false);
-
-		return ($uri !== $link) ? htmlspecialchars($link) : false;
+		
+		$link = $domain . JRoute::_('index.php?' . http_build_query($router->getVars()), false);
+		
+		return $link; //($uri->toString() !== $link) ? htmlspecialchars($link) : false;
 	}
 
 

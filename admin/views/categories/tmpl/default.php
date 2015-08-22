@@ -70,6 +70,7 @@ function delFilter(name)
 function delAllFilters() {
 	delFilter('search'); delFilter('filter_state'); delFilter('filter_cats');
 	delFilter('filter_level'); delFilter('filter_access'); delFilter('filter_language');
+	delFilter('filter_id');
 }
 
 </script>
@@ -142,6 +143,11 @@ function delAllFilters() {
 		
 		<span class="fc-filter nowrap_box">
 		  <?php echo $this->lists['language']; ?>
+		</span>
+		
+		<span class="fc-filter nowrap_box">
+			<label class="label"><?php echo JText::_('FLEXI_ID'); ?></label>
+			<input type="text" name="filter_id" id="filter_id" size="6" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" style="width:auto;" />
 		</span>
 		
 		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>

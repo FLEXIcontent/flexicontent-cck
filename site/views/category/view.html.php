@@ -317,20 +317,31 @@ class FlexicontentViewCategory extends JViewLegacy
 		$category_link = flexicontent_html::createCatLink($category->slug, $non_sef_link, $model);
 		
 		
-		// ************************************
-		// Add rel canonical html head link tag (TODO: improve multi-page handing)
-		// ************************************
+		// ****************************************************************
+		// Make sure Joomla SEF plugin has inserted a correct REL canonical
+		// or that it has not insert any REL if current URL is sufficient
+		// ****************************************************************
 		
-		$port =  $uri->getPort();
-		$base  = $uri->getScheme() . '://' . $uri->getHost() . ($port ? ':'. $port : '');
-		$start = JRequest::getInt('start', '');
-		$start = $start ? "&start=".$start : "";
-		$ucanonical 	= $base . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug).$start);
-		if ($params->get('add_canonical')) {
-			$head_obj = $document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
-			$defaultCanonical = flexicontent_html::getDefaultCanonical();
-			if ( FLEXI_J30GE && $defaultCanonical != $ucanonical ) {
-				unset($head_obj->_links[$defaultCanonical]);
+		if ($params->get('add_canonical'))
+		{
+			// Get canonical URL that SEF plugin adds, also $domain passed by reference, to get the domain configured in SEF plugin (multi-domain website)
+			$domain = null;
+			$defaultCanonical = flexicontent_html::getDefaultCanonical($domain);
+			$domain = $domain ? $domain : $uri->toString(array('scheme', 'host', 'port'));
+			
+			// Create desired REL canonical URL
+			$start = JRequest::getInt('start', '');
+			$ucanonical = $domain . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug).($start ? "&start=".$start : ''));
+			
+			// Check if SEF plugin inserted a different REL canonical
+			if ($defaultCanonical != $ucanonical)
+			{
+				// Add REL canonical only if different than current URL
+				$head_obj = $document->addHeadLink( htmlspecialchars($ucanonical), 'canonical', 'rel', '' );
+				if ($uri->toString() == $ucanonical)  unset($head_obj->_links[htmlspecialchars($ucanonical)]);
+				
+				// Remove canonical inserted by SEF plugin
+				unset($head_obj->_links[htmlspecialchars($defaultCanonical)]);
 			}
 		}
 		
