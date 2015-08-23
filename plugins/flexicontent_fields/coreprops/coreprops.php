@@ -110,7 +110,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 		switch ($props_type)
 		{
 			case 'language':     // Authors
-				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' i.language AS value, CONCAT_WS(\': \', lg.title, lg.title_native) AS text';
 				$filter->filter_valuesfrom   = ' FROM #__content AS i ';
@@ -119,7 +119,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY i.language ';
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty
-				$filter->filter_orderby = ' ORDER BY lg.title ASC ';
+				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
 				
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;

@@ -177,6 +177,10 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
+			<field name="reverse_filter_order" type="radio" default="0" label="FLEXI_FILTER_USER_REVERSE_ORDER" description="FLEXI_FILTER_USER_REVERSE_ORDER_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_FILTER_VALUES_MATCHING_CONF" level="level3" />
 			<field name="filter_values_require_all" type="radio" default="0" label="FLEXI_FILTER_VALUES_REQUIRE_ALL" description="FLEXI_FILTER_VALUES_REQUIRE_ALL_DESC" class="btn-group group-fcinfo">

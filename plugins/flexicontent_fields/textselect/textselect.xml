@@ -226,21 +226,16 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
-			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_CONF" description="" level="level2"/>
-			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_WARNING" description="" level="level3"/>
-			<field name="filter_customize_options" type="multilist" subtype="list" default="0" label="FLEXI_CUSTOM_FILTER_VALUES" toggle_related="1" description="FLEXI_CUSTOM_FILTER_VALUES_DESC">
-				<option value="0" show_list="" hide_list="filtervalue-mode">FLEXI_USE_ALL_VALUES_DEFAULT</option>
-				<option value="1" show_list="filtervalue-mode" hide_list="">FLEXI_USE_CUSTOM_QUERY</option>
-				<option value="2" show_list="filtervalue-mode" hide_list="">FLEXI_USE_CUSTOM_ELEMENTS</option>
-			</field>
-			<field name="filter_custom_options" type="textarea" rows="6" cols="25" label="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY" depend_class="filtervalue-mode" description="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY_DESC" default="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field_id}' AND value != '' GROUP BY value" />
-			
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
 			
 			<field name="filter_compare_type" type="list" default="0" label="FLEXI_FILTER_VALUE_COMPARISON" description="FLEXI_FILTER_VALUE_COMPARISON_DESC">
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_INTEGER</option>
 				<option value="2">FLEXI_FLOAT</option>
+			</field>
+			<field name="reverse_filter_order" type="radio" default="0" label="FLEXI_FILTER_USER_REVERSE_ORDER" description="FLEXI_FILTER_USER_REVERSE_ORDER_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_FILTER_VALUES_MATCHING_CONF" level="level3" />
 			<field name="filter_values_require_all" type="radio" default="0" label="FLEXI_FILTER_VALUES_REQUIRE_ALL" description="FLEXI_FILTER_VALUES_REQUIRE_ALL_DESC" class="btn-group group-fcinfo">

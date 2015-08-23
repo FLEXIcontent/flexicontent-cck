@@ -643,7 +643,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$textcol  = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_txtformat);
 		}
 		
-		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
+		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
 		$filter->filter_valuesjoin   = null;  // use default
@@ -651,8 +651,12 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// full SQL clauses
 		$filter->filter_groupby = ' GROUP BY '.$valuecol;
 		$filter->filter_having  = null;  // use default
-		$filter->filter_orderby = ' ORDER BY '.$valuecol;
-		$filter->filter_orderby_adv = ' ORDER BY value_id';  //  'value_id' or 'search_index' (default), we can use a date type here but it is not needed
+		
+		if ($isSearchView)
+			$filter->filter_orderby_adv = ' ORDER BY value_id';  // we can use a date type cast here, but it is not needed due to the format of value_id
+		else
+			$filter->filter_orderby = ' ORDER BY '.$valuecol;
+		
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
 	
@@ -680,6 +684,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$filter->filter_colname    = sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat);
 		$filter->filter_valuesjoin = null;   // use default
 		$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);
+		
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
 	

@@ -3102,7 +3102,10 @@ class FlexicontentFields
 		
 		// Skip sorting for indexed elements, DB query or element entry is responsible
 		// for ordering indexable fields, also skip if ordering is done by the filter
-		if ( !$indexed_elements && empty($filter->filter_orderby) ) uksort($results, 'strnatcasecmp');
+		if ( !$indexed_elements && empty($filter->filter_orderby) ) {
+			uksort($results, 'strnatcasecmp');
+			if ($filter->parameters->get( 'reverse_filter_order', 0)) $results = array_reverse($results, true);
+		}
 		
 		return $results;
 	}
@@ -3156,7 +3159,10 @@ class FlexicontentFields
 		
 		// Skip sorting for indexed elements, DB query or element entry is responsible
 		// for ordering indexable fields, also skip if ordering is done by the filter
-		if ( !$indexed_elements && empty($filter->filter_orderby_adv) ) uksort($results, 'strnatcasecmp');
+		if ( !$indexed_elements && empty($filter->filter_orderby_adv) ) {
+			uksort($results, 'strnatcasecmp');
+			if ($filter->parameters->get( 'reverse_filter_order', 0)) $results = array_reverse($results, true);
+		}
 		
 		return $results;
 	}
@@ -3183,6 +3189,11 @@ class FlexicontentFields
 		$groupby = @$filter->filter_groupby ? $filter->filter_groupby : ' GROUP BY value ';
 		$having  = @$filter->filter_having  ? $filter->filter_having  : '';
 		$orderby = @$filter->filter_orderby ? $filter->filter_orderby : '';
+		if ($filter->parameters->get( 'reverse_filter_order', 0) && $orderby) {
+			$replace_count = null;
+			$orderby = str_ireplace( ' ASC', ' DESC', $orderby, $replace_count);
+			if (!$replace_count) $orderby .= ' DESC';
+		}
 		
 		$faceted_filter = $filter->parameters->get( 'faceted_filter', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
@@ -3297,6 +3308,11 @@ class FlexicontentFields
 		
 		$valuesselect = @$filter->filter_isindexed ? ' ai.value_id as value, ai.search_index as text ' : ' ai.search_index as value, ai.search_index as text';
 		$orderby = @$filter->filter_orderby_adv ? $filter->filter_orderby_adv : '';
+		if ($filter->parameters->get( 'reverse_filter_order', 0) && $orderby) {
+			$replace_count = null;
+			$orderby = str_ireplace( ' ASC', ' DESC', $orderby, $replace_count);
+			if (!$replace_count) $orderby .= ' DESC';
+		}
 		
 		$faceted_filter = $filter->parameters->get( 'faceted_filter_s', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display

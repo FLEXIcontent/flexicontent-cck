@@ -669,7 +669,7 @@ jQuery(document).ready(function() {
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
+		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' i.id AS value, i.title AS text';
 		$filter->filter_valuesjoin   = null;  // use default
@@ -678,6 +678,7 @@ jQuery(document).ready(function() {
 		$filter->filter_groupby = null;  // use default, which is 'value'
 		$filter->filter_having  = null;  // use default
 		$filter->filter_orderby = null;  // use default, no ordering done to improve speed, it will be done inside PHP code
+		
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
 	

@@ -382,7 +382,15 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		
 		if ($filter->field_type == 'categories' || $filter->field_type == 'title') {
 			plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName, $isSearchView=1);
-		} else {
+		}
+		
+		else if ($filter->field_type == 'created' || $filter->field_type == 'modified') {
+			$filter->filter_orderby_adv = ' ORDER BY value_id';  // we can use a date type cast here, but it is not needed due to the format of value_id
+			FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
+		}
+		
+		else {
+			$filter->filter_orderby_adv = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
 			FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
 		}
 	}
@@ -424,7 +432,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			break;
 			
 			case 'createdby':     // Authors
-				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' i.created_by AS value, CASE WHEN usr.name IS NULL THEN CONCAT(\''.JText::_('FLEXI_NOT_ASSIGNED').' ID:\', i.created_by) ELSE usr.name END AS text';
 				$filter->filter_valuesjoin   = ' JOIN #__users AS usr ON usr.id = i.created_by';
@@ -432,13 +440,13 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY i.created_by ';
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty
-				$filter->filter_orderby = ' ORDER BY text ASC ';
+				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
 				
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
 			
 			case 'modifiedby':   // Modifiers
-				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' i.modified_by AS value, CASE WHEN usr.name IS NULL THEN CONCAT(\''.JText::_('FLEXI_NOT_ASSIGNED').' ID:\', i.modified_by) ELSE usr.name END AS text';
 				$filter->filter_valuesjoin   = ' JOIN #__users AS usr ON usr.id = i.modified_by';
@@ -446,13 +454,13 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY i.modified_by ';
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty
-				$filter->filter_orderby = ' ORDER BY text ASC ';
+				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
 				
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
 			
 			case 'type':  // Document Type
-				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' ict.id AS value, ict.name AS text';
 				$filter->filter_valuesjoin   = ''
@@ -463,7 +471,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY ict.id';
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty
-				$filter->filter_orderby = ' ORDER BY text ASC ';
+				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
 				
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
@@ -553,7 +561,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			break;
 			
 			case 'tags':
-				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' tags.id AS value, tags.name AS text';
 				$filter->filter_valuesjoin   =
@@ -563,7 +571,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY tags.id ';
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty
-				$filter->filter_orderby = ' ORDER BY text ';
+				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
 				
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
@@ -608,7 +616,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				$valuecol = sprintf(' CASE WHEN i.%s='.$nullDate_quoted.' THEN '.$nullDate_quoted.' ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_valformat);
 				$textcol  = sprintf(' CASE WHEN i.%s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_txtformat);
 				
-				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
 				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
@@ -617,6 +625,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				$filter->filter_groupby = ' GROUP BY '.$valuecol;
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty
 				$filter->filter_orderby = ' ORDER BY '.$valuecol;
+				
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
 
