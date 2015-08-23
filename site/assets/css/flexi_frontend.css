@@ -685,9 +685,9 @@ div.fc-fieldgrp-value-box {
 	box-sizing: border-box;
 	/*max-width: 98%;
 	min-width: 48%;*/
-	width: 98%;
+	width: 100%;
 	margin: 4px 1%;
-	padding: 2px;
+	padding: 6px 4px;
 	vertical-align: top;
 }
 

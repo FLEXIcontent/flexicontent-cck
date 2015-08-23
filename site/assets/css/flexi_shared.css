@@ -644,6 +644,9 @@ div label.lang_box img {
 	-ms-user-select: none;
 	user-select: none;
 }
+@media (min-width: 1020px) {
+	.btn.spaced-btn { margin-left:32px; }
+}
 body .group-fcinfo .btn:not(.btn-primary),
 body .group-fcprimary .btn:not(.btn-primary),
 body .group-fcinfo .btn:not(.btn-primary),

@@ -245,7 +245,7 @@ class FlexicontentViewItem extends JViewLegacy
 			// PREVIEW for latest version
 			if ( !$params->get('use_versioning', 1) || ($item->version == $item->current_version && $item->version == $item->last_version) )
 			{
-				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small btn-info" style="margin-left:32px;" onClick="window.open(\''.$previewlink.'\');" target="_blank"><span title="'.JText::_('Preview').'" class="icon-screen"></span>'.JText::_('Preview').'</button>', 'preview' );
+				$toolbar->appendButton( 'Custom', '<button class="preview btn btn-small btn-info spaced-btn" onClick="window.open(\''.$previewlink.'\');" target="_blank"><span title="'.JText::_('Preview').'" class="icon-screen"></span>'.JText::_('Preview').'</button>', 'preview' );
 			}
 			
 			// PREVIEW for non-approved versions of the item, if they exist
