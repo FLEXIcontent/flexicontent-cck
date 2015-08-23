@@ -652,6 +652,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$filter->filter_groupby = ' GROUP BY '.$valuecol;
 		$filter->filter_having  = null;  // use default
 		$filter->filter_orderby = ' ORDER BY '.$valuecol;
+		$filter->filter_orderby_adv = ' ORDER BY value_id';  //  'value_id' or 'search_index' (default), we can use a date type here but it is not needed
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
 	

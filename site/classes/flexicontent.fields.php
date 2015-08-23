@@ -3156,7 +3156,7 @@ class FlexicontentFields
 		
 		// Skip sorting for indexed elements, DB query or element entry is responsible
 		// for ordering indexable fields, also skip if ordering is done by the filter
-		if ( !$indexed_elements && empty($filter->filter_orderby) ) uksort($results, 'strnatcasecmp');
+		if ( !$indexed_elements && empty($filter->filter_orderby_adv) ) uksort($results, 'strnatcasecmp');
 		
 		return $results;
 	}
@@ -3296,6 +3296,7 @@ class FlexicontentFields
 		}
 		
 		$valuesselect = @$filter->filter_isindexed ? ' ai.value_id as value, ai.search_index as text ' : ' ai.search_index as value, ai.search_index as text';
+		$orderby = @$filter->filter_orderby_adv ? $filter->filter_orderby_adv : '';
 		
 		$faceted_filter = $filter->parameters->get( 'faceted_filter_s', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
@@ -3364,6 +3365,7 @@ class FlexicontentFields
 				. (empty($iids_subquery[$view_n_text]) ? '' : ' AND ai.item_id IN('.$iids_subquery[$view_n_text].')'."\n")
 				.  str_replace('i.id', 'ai.item_id', $filter_where_curr)."\n"
 				. ' GROUP BY ai.search_index, ai.value_id'."\n"
+				. $orderby
 				;
 		}
 		
@@ -3375,6 +3377,7 @@ class FlexicontentFields
 				. (empty($iids_subquery[$view_n_text]) ? '' : ' AND ai.item_id IN('.$iids_subquery[$view_n_text].')'."\n")
 				.  str_replace('i.id', 'ai.item_id', $filter_where_curr)."\n"
 				//. ' GROUP BY ai.search_index, ai.value_id'."\n"  // replaced by distinct, when not counting items
+				. $orderby
 				;
 		}
 		//echo $query."<br/><br/>";
