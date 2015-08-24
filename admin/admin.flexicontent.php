@@ -137,11 +137,9 @@ $task = JRequest::getVar( 'task' );
 
 
 // b. In J1.6+ controller is set via task variable ... split task from controller name
-if (FLEXI_J16GE) {
-	$_ct = explode('.', $task);
-	$task = $_ct[ count($_ct) - 1];
-	if (count($_ct) > 1) $controller = $_ct[0];
-}
+$_ct = explode('.', $task);
+$task = $_ct[ count($_ct) - 1];
+if (count($_ct) > 1) $controller = $_ct[0];
 
 
 // c. Force variables: controller AND/OR task

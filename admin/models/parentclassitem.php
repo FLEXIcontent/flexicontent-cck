@@ -3272,7 +3272,11 @@ class ParentClassItem extends JModelAdmin
 	{
 		static $typedata = array();
 		
-		if ( !$this->_id && !$this->_typeid) return '';
+		if ( !$this->_id && !$this->_typeid) {
+			$_typedata = new stdClass();
+			$_typedata->id = 0;
+			$_typedata->name = null;
+		}
 		
 		if ( !$force && isset($typedata[$this->_typeid]) ) return $typedata[$this->_typeid];
 		

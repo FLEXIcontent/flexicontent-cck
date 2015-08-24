@@ -153,10 +153,10 @@ class plgSystemFlexisystem extends JPlugin
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 		
-		$option = $jinput->get('option', '', 'string');
-		$view   = $jinput->get('view', '', 'string');
-		$controller = $jinput->get('controller', '', 'string');
-		$component  = $jinput->get('component', '', 'string');
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$controller = $jinput->get('controller', '', 'cmd');
+		$component  = $jinput->get('component', '', 'cmd');
 		
 		$layout = $jinput->get('layout', '', 'string');
 		$tmpl   = $jinput->get('tmpl', '', 'string');
@@ -216,9 +216,17 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function redirectAdminComContent()
 	{
+		$jinput = JFactory::getApplication()->input;
 		$app    = JFactory::getApplication();
-		$option = JRequest::getCMD('option');
 		$user   = JFactory::getUser();
+		
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$task   = $jinput->get('task', '', 'string');
+		
+		$_ct = explode('.', $task);
+		$task = $_ct[ count($_ct) - 1];
+		if (count($_ct) > 1) $controller = $_ct[0];
 		
 		// NOTE: in J1.6+, a user can be assigned multiple groups, so we need to retrieve them
 		$usergroups = $user->get('groups');
@@ -253,13 +261,11 @@ class plgSystemFlexisystem extends JPlugin
 				if( count(array_intersect($usergroups, $exclude_arts)) ) return false;
 				
 				// Default (target) redirection url
-				$urlItems = 'index.php?option='.$this->extension;
+				$redirectURL = 'index.php?option='.$this->extension;
 				
 				// Get request variables used to determine whether to apply redirection
-				$task = JRequest::getCMD('task');
-				$layout = JRequest::getCMD('layout');      // Currently used for J2.5 only
-				$function = JRequest::getCMD('function');  // Currently used for J2.5 only
-				$view = JRequest::getCMD('view');  // Currently used for J2.5 only
+				$layout   = $jinput->get('layout', '', 'cmd');
+				$function = $jinput->get('function', '', 'cmd');
 				
 				// *** Specific Redirect Exclusions ***
 				
@@ -267,24 +273,26 @@ class plgSystemFlexisystem extends JPlugin
 				if ( $layout=="modal" && $function="jSelectArticle_jform_request_id" ) return false;
 				
 				//--. JA jatypo (editor-xtd plugin button for text style selecting)
-				if (JRequest::getCMD('jatypo')!="" && $layout=="edit") return false;
+				if ($jinput->get('jatypo', '', 'cmd')!="" && $layout=="edit") return false;
 
 				//--. Allow listing featured backend management
 				if ($view=="featured") return false;
 				//return false;  // for testing
 				
-				if ($task == 'edit') {
+				if ($task == 'add') {
+					$redirectURL .= '&task=items.add';
+				} else if ($task == 'edit') {
 					$cid = JRequest::getVar('id');
 					$cid = $cid ? $cid : JRequest::getVar('cid');
-					$urlItems .= '&controller=items&task=edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
+					$redirectURL .= '&task=items.edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
 				} else if ($task == 'element') {
-					$urlItems .= '&view=itemelement&tmpl=component&object='.JRequest::getVar('object','');
+					$redirectURL .= '&view=itemelement&tmpl=component&object='.JRequest::getVar('object','');
 				} else {
-					$urlItems .= '&view=items';
+					$redirectURL .= '&view=items';
 				}
 				
 				// Apply redirection
-				$app->redirect($urlItems,'');
+				$app->redirect($redirectURL,'');
 				return false;
 
 			} elseif ( $option == 'com_categories' ) {
@@ -292,15 +300,22 @@ class plgSystemFlexisystem extends JPlugin
 				// Check if a user group is groups, that are excluded from category redirection
 				if( count(array_intersect($usergroups, $exclude_cats)) ) return false;
 				
-				// Default (target) redirection url
-				$urlItems = 'index.php?option='.$this->extension.'&view=categories';
-				
 				// Get request variables used to determine whether to apply redirection
 				$category_scope = JRequest::getVar( 'extension' );
 				
 				// Apply redirection if in com_categories is in content scope
-				if ( $category_scope == 'com_content' ) {
-					$app->redirect($urlItems,'');
+				if ( $category_scope == 'com_content' )
+				{
+					if ($task == 'add') {
+						$redirectURL .= 'index.php?option='.$this->extension.'&task=category.add&extension='.$this->extension;
+					} else if ($task == 'edit') {
+						$cid = JRequest::getVar('id');
+						$cid = $cid ? $cid : JRequest::getVar('cid');
+						$redirectURL .= 'index.php?option='.$this->extension.'&task=category.edit&cid='.intval(is_array($cid) ? $cid[0] : $cid);
+					} else {
+						$redirectURL = 'index.php?option='.$this->extension.'&view=categories';
+					}
+					$app->redirect($redirectURL,'');
 				}
 				return false;
 				
