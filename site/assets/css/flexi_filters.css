@@ -250,9 +250,16 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	padding: 0px 0% 0px 0%;
 	margin: 0px 0% 0px 0%;
 }
+.fcfilter_with_nouislider { /* make sure slider filter has a container of non-zero width */
+	min-width:120px;
+}
 .fc_filter_html {
 	position: relative;
 	display: inline-block;
+}
+.fc_search_option_cell .fc_filter_html { /* allow inner filter HTML to auto-expand */
+	width: 100%;
+	box-sizing: border-box;
 }
 .fc_filter_line .fc_filter_html {
 	clear: none;

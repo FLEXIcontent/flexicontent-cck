@@ -2151,8 +2151,12 @@ class FlexicontentFields
 	// ********************************************************************************************
 	
 	// Private Method to create a generic matching of filter
-	static function createFilterValueMatchSQL(&$filter, &$value, $is_full_text=0, $is_search=0)
+	static function createFilterValueMatchSQL(&$filter, &$value, $is_full_text=0, $is_search=0, $colname='')
 	{
+		static $search_prefix = null;
+		if ($search_prefix === null) $search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$_search_prefix = $colname=='fs.search_index' ? $search_prefix : '';
+		
 		$db = JFactory::getDBO();
 		$display_filter_as = $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
 		$filter_compare_type = $filter->parameters->get( 'filter_compare_type', 0 );
@@ -2194,18 +2198,20 @@ class FlexicontentFields
 		// RANGE cases
 		case 2: case 3: case 8:
 			if ( ! @ $quoted ) foreach($value as $i => $v) {
-				if ( !$filter_compare_type ) $value[$i] = $db->Quote($v);
-				else $value[$i] = $filter_compare_type==1 ? intval($v) : floatval($v);
+				if ( !$filter_compare_type ) $value[$i] = $db->Quote( $_search_prefix . $v );
+				else $value[$i] = $filter_compare_type==1 ? intval( $v ) : floatval( $v );
 			}
+			$reverse_values = $filter->parameters->get( 'reverse_filter_order', 0) && $display_filter_as == 8;
+			$value1 = $reverse_values ? @$value[2] : @$value[1];
+			$value2 = $reverse_values ? @$value[1] : @$value[2];
 			$value_empty = !strlen(@$value[1]) && strlen(@$value[2]) ? ' OR _v_="" OR _v_ IS NULL' : '';
-			if ( strlen(@$value[1]) ) $valueswhere .= ' AND (_v_ >=' . $value[1] . ')';
-			if ( strlen(@$value[2]) ) $valueswhere .= ' AND (_v_ <=' . $value[2] . $value_empty . ')';
+			if ( strlen($value1) ) $valueswhere .= ' AND (_v_ >=' . $value1 . ')';
+			if ( strlen($value2) ) $valueswhere .= ' AND (_v_ <=' . $value2 . $value_empty . ')';
 			break;
 		// SINGLE TEXT select value cases
 		case 1:
 			// DO NOT put % in front of the value since this will force a full table scan instead of indexed column scan
-			$search_prefix = 'vvv';
-			$_value_like = $search_prefix.$value[0].($is_full_text ? '*' : '%');
+			$_value_like = $_search_prefix.$value[0].($is_full_text ? '*' : '%');
 			if (empty($quoted))  $_value_like = $db->Quote($_value_like);
 			if ($is_full_text)
 				$valueswhere .= ' AND  MATCH (_v_) AGAINST ('.$_value_like.' IN BOOLEAN MODE)';
@@ -2218,12 +2224,12 @@ class FlexicontentFields
 			
 			if ( ! $require_all ) {
 				foreach ($value as $val) {
-					$value_clauses[] = '_v_=' . $db->Quote( $val );
+					$value_clauses[] = '_v_=' . $db->Quote( $_search_prefix . $val );
 				}
 				$valueswhere .= ' AND ('.implode(' OR ', $value_clauses).') ';
 			} else {
 				foreach ($value as $val) {
-					$value_clauses[] = $db->Quote( $val );
+					$value_clauses[] = $db->Quote( $_search_prefix . $val );
 				}
 				$valueswhere = ' AND _v_ IN ('. implode(',', $value_clauses) .')';
 			}
@@ -2339,20 +2345,20 @@ class FlexicontentFields
 		$support = FlexicontentFields::getPropertySupport($filter->field_type, $filter->iscore);
 		if ( ! $support->supportadvsearch && ! $support->supportadvfilter )  return null;
 		
-		$valueswhere = FlexicontentFields::createFilterValueMatchSQL($filter, $value, $is_full_text=1, $is_search=1);
-		if ( !$valueswhere ) { return; }
-
 		// Decide to require all values
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );
 		
+		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
 			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
 		
 		$istext_input = $display_filter_as==1 || $display_filter_as==3;
-		//$colname = $istext_input ? 'fs.search_index' : 'fs.value_id';
-		$colname = @ $filter->isindexed && !$istext_input ? 'fs.value_id' : 'fs.search_index';
+		$colname = (@ $filter->isindexed && !$istext_input) || $isDate ? 'fs.value_id' : 'fs.search_index';
 		
+		// Create where clause for matching the filter's values
+		$valueswhere = FlexicontentFields::createFilterValueMatchSQL($filter, $value, $is_full_text=1, $is_search=1, $colname);
+		if ( !$valueswhere ) { return; }
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
 		
 		$field_tbl = 'flexicontent_advsearch_index_field_'.$filter->id;
@@ -2642,11 +2648,13 @@ class FlexicontentFields
 			
 			// MULTI-select: special label and prompts
 			if ($display_filter_as == 6) {
-				$classes .= ' fc_label_internal fc_prompt_internal';
+				//$classes .= ' fc_label_internal fc_prompt_internal';
+				$classes .= ' fc_prompt_internal';
 				// Add field's LABEL internally or click to select PROMPT (via js)
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
 				// Add type to filter PROMPT (via js)
-				$extra_param  = ' data-fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
+				//$extra_param  = ' data-fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
+				$extra_param  = ' placeholder="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
 				$extra_param .= ' data-fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
 			}
 			
@@ -2677,8 +2685,10 @@ class FlexicontentFields
 			if ( !$isSlider ) {
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isDate ? 'FLEXI_CLICK_CALENDAR' : 'FLEXI_TYPE_TO_LIST');
 				$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
-				$attribs_str = ' class="fc_field_filter fc_label_internal '.($isDate ? 'fc_iscalendar' : '').'" data-fc_label_text="'.$_inner_lb.'"';
-				$attribs_arr = array('class'=>'fc_field_filter fc_label_internal '.($isDate ? 'fc_iscalendar' : '').'', 'data-fc_label_text' => $_inner_lb );
+				//$attribs_str = ' class="fc_field_filter fc_label_internal '.($isDate ? 'fc_iscalendar' : '').'" data-fc_label_text="'.$_inner_lb.'"';
+				//$attribs_arr = array('class'=>'fc_field_filter fc_label_internal '.($isDate ? 'fc_iscalendar' : '').'', 'data-fc_label_text' => $_inner_lb );
+				$attribs_str = ' class="fc_field_filter '.($isDate ? 'fc_iscalendar' : '').'" placeholder="'.$_inner_lb.'"';
+				$attribs_arr = array('class'=>'fc_field_filter '.($isDate ? 'fc_iscalendar' : '').'', 'placeholder' => $_inner_lb );
 			} else {
 				$attribs_str = "";
 				
@@ -3011,9 +3021,9 @@ class FlexicontentFields
 			if ( !$value ) {
 				$date = '';
 			} else if (!$date_allowtime || !$time) {
-				$date = JHTML::_('date',  $date, (FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d'), $timezone, $gregorian = true);
+				$date = JHTML::_('date',  $date, 'Y-m-d', $timezone, $gregorian = true);
 			} else {
-				$date = JHTML::_('date',  $value, (FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M'), $timezone, $gregorian = true);
+				$date = JHTML::_('date',  $value, 'Y-m-d H:i', $timezone, $gregorian = true);
 			}
 		} catch ( Exception $e ) {
 			if (!$skip_on_invalid) return '';
@@ -3048,7 +3058,7 @@ class FlexicontentFields
 		
 		if ($faceted_filter || !$indexed_elements) {
 			$_results = FlexicontentFields::getFilterValues($filter, $view_join, $view_where, $filters_where);
-			//echo "<pre>". $filter->label.": ". print_r($_results, true) ."\n\n</pre>";
+			//if ($filter->id==NN) echo "<pre>". $filter->label.": ". print_r($_results, true) ."\n\n</pre>";
 		}
 		
 		// Support of value-indexed fields
@@ -3261,7 +3271,7 @@ class FlexicontentFields
 				. $having."\n"
 				. $orderby
 				;
-			//echo $query."<br/><br/>";
+			//if ($filter->id==NN) echo $query."<br/><br/>";
 		}
 		
 		// Non FACETED filter (according to view but without acounting for filtering and without counting items)
@@ -3306,7 +3316,9 @@ class FlexicontentFields
 			if ($filter_id != $filter->id)  $filter_where_curr .= ' ' . $filter_where;
 		}
 		
-		$valuesselect = @$filter->filter_isindexed ? ' ai.value_id as value, ai.search_index as text ' : ' ai.search_index as value, ai.search_index as text';
+		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
+		$using_value_id = $isDate || @$filter->filter_isindexed;
+		$valuesselect = $using_value_id ? ' ai.value_id as value, ai.search_index as text ' : ' ai.search_index as value, ai.search_index as text';
 		$orderby = @$filter->filter_orderby_adv ? $filter->filter_orderby_adv : '';
 		if ($filter->parameters->get( 'reverse_filter_order', 0) && $orderby) {
 			$replace_count = null;
@@ -3415,6 +3427,7 @@ class FlexicontentFields
 		if ($search_prefix) foreach ($results as $i => $result)
 		{
 			$result->text = preg_replace('/\b'.$search_prefix.'/u', '', $result->text);
+			if (!$using_value_id) $result->value = $result->text;
 		}
 		
 		return $results;

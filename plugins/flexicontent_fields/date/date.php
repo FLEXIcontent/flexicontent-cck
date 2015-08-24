@@ -647,7 +647,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
 		$filter->filter_valuesjoin   = null;  // use default
-		$filter->filter_valueswhere  = $filter_as_range ? ' AND i.'.$filter->field_type.'<>'.$nullDate_quoted : '';
+		$filter->filter_valueswhere  = null;  // use default
 		// full SQL clauses
 		$filter->filter_groupby = ' GROUP BY '.$valuecol;
 		$filter->filter_having  = null;  // use default

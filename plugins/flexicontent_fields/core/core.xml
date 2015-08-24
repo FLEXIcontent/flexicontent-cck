@@ -144,6 +144,13 @@
 		</fieldset>
 		<fieldset name="group-created-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
+			<field name="reverse_filter_order" type="radio" default="0" label="FLEXI_FILTER_USER_REVERSE_ORDER" description="FLEXI_FILTER_USER_REVERSE_ORDER_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
 			
 			<field name="disable_keyboardinput" type="radio" default="0" label="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT" description="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT_DESC" class="btn-group btn-group-yesno">
@@ -427,6 +434,13 @@
 			
 		</fieldset>
 		<fieldset name="group-modified-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
+			<field name="reverse_filter_order" type="radio" default="0" label="FLEXI_FILTER_USER_REVERSE_ORDER" description="FLEXI_FILTER_USER_REVERSE_ORDER_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
 			

@@ -620,7 +620,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
 				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
-				$filter->filter_valueswhere  = $filter_as_range ? ' AND i.'.$filter->field_type.'<>'.$nullDate_quoted : '';
+				$filter->filter_valueswhere  = $filter_as_range ? ' AND i.'.$filter->field_type.'<>'.$nullDate_quoted : ' ';  // ... a space, (indicates not needed and prevents using default)
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY '.$valuecol;
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty

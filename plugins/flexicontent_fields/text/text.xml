@@ -221,16 +221,17 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
+			<field name="reverse_filter_order" type="radio" default="0" label="FLEXI_FILTER_USER_REVERSE_ORDER" description="FLEXI_FILTER_USER_REVERSE_ORDER_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
 			
 			<field name="filter_compare_type" type="list" default="0" label="FLEXI_FILTER_VALUE_COMPARISON" description="FLEXI_FILTER_VALUE_COMPARISON_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_INTEGER</option>
 				<option value="2">FLEXI_FLOAT</option>
-			</field>
-			<field name="reverse_filter_order" type="radio" default="0" label="FLEXI_FILTER_USER_REVERSE_ORDER" description="FLEXI_FILTER_USER_REVERSE_ORDER_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_FILTER_VALUES_MATCHING_CONF" level="level3" />
 			<field name="filter_values_require_all" type="radio" default="0" label="FLEXI_FILTER_VALUES_REQUIRE_ALL" description="FLEXI_FILTER_VALUES_REQUIRE_ALL_DESC" class="btn-group group-fcinfo">
