@@ -429,7 +429,13 @@ class com_flexicontentInstallerScript
 		}
 		
 		$this->setParams( $params );*/
-		JFactory::getApplication()->enqueueMessage('Please clear your browser cache or press CTRL+F5 (windows) or F5 (Linux) or command+R (Safari) in flexicontent views to make sure that latest FLEXIcontent JS/CSS is retrieved', 'warning');
+		JFactory::getApplication()->enqueueMessage('
+			Please clear your frontend / backend Joomla cache once, <br/>
+			- to make sure that any changes (e.g in filtering) take immediate effect<br/>
+			In case of display issue, press CTRL+F5 / F5 / command+R, (Windows / Linux / Apple\'s Safari)<br/>
+			- to make sure that latest FLEXIcontent JS/CSS is retrieved',
+			'warning'
+		);
 		
 		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 		echo '
