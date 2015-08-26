@@ -52,7 +52,7 @@ class FCPagination extends JPagination
 		}
 
 		// If there are results found
-		$fc_view_total = (int) $app->getUserState('fc_view_total_'.$view);
+		$fc_view_total = 0; //(int) $app->getUserState('fc_view_total_'.$view);
 		if (!$fc_view_total) $fc_view_total = $this->total;
 		
 		if ($fc_view_total > 0) {

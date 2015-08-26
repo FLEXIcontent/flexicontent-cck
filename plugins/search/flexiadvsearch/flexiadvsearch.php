@@ -650,15 +650,26 @@ class plgSearchFlexiadvsearch extends JPlugin
 		;
 		//echo "Adv search plugin main SQL query: ".nl2br($query)."<br/><br/>";
 		
-		
-		// Execute query
-		$db->setQuery( $query, 0, $search_limit ); // NOTE: The plugin will return a PRECONFIGURED limited number of results, the SEARCH VIEW to do the pagination, splicing (appropriately) the data returned by all search plugins
-		$item_ids = $db->loadColumn(0);
-		if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
-		
-		$db->setQuery("SELECT FOUND_ROWS()");
-		$fc_searchview['view_total'] = $db->loadResult();   // $search_limit
-		$app->setUserState('fc_view_total_'.$view, $fc_searchview['view_total']);
+		// NOTE: The plugin will return a PRECONFIGURED limited number of results, the SEARCH VIEW to do the pagination, splicing (appropriately) the data returned by all search plugins
+		try {
+			// Get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
+			// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
+			// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
+			$query_limited = $query . ' LIMIT '.$search_limit.' OFFSET 0';
+			$rows = flexicontent_db::directQuery($query_limited);
+			$item_ids = array();
+			foreach ($rows as $row) $item_ids[] = $row->id;
+			
+			// Get current items total for pagination
+			$db->setQuery("SELECT FOUND_ROWS()");
+			$fc_searchview['view_total'] = $db->loadResult();
+			$app->setUserState('fc_view_total_'.$view, $fc_searchview['view_total']);
+		}
+		catch (Exception $e) {
+			// Get items via normal joomla SQL layer
+			$db->setQuery(str_replace('SQL_CALC_FOUND_ROWS', '', $query), 0, $search_limit);
+			$item_ids = $db->loadColumn(0);
+		}
 		
 		if ( !count($item_ids) ) return array();  // No items found
 		
