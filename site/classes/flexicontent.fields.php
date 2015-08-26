@@ -2170,8 +2170,9 @@ class FlexicontentFields
 		}
 		
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
+		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
 		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
-			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
+			$require_all_param : 0;
 		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
 		
 		$_value = array();
@@ -2261,8 +2262,9 @@ class FlexicontentFields
 		$display_filter_as = $filter->parameters->get('display_filter_as', 0 );
 		
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
+		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
 		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
-			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
+			$require_all_param : 0;
 		
 		if ( @$filter->filter_valuesjoin ) {
 			$query = 'SELECT '.($require_all ? 'c.id' : 'DISTINCT c.id')
@@ -2350,8 +2352,9 @@ class FlexicontentFields
 		
 		$isDate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
+		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
 		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
-			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
+			$require_all_param : 0;
 		
 		$istext_input = $display_filter_as==1 || $display_filter_as==3;
 		$colname = (@ $filter->isindexed && !$istext_input) || $isDate ? 'fs.value_id' : 'fs.search_index';
@@ -2473,8 +2476,9 @@ class FlexicontentFields
 		$filter_vals_display = $filter->parameters->get( 'filter_vals_display'.$_s, 0 );
 		
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
+		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
 		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
-			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
+			$require_all_param : 0;
 		
 		$combine_tip = $filter->parameters->get( 'filter_values_require_all_tip', 0 );
 		
@@ -2668,7 +2672,7 @@ class FlexicontentFields
 			//$attribs_str .= ($display_filter_as==0 || $display_filter_as==6) ? ' onchange="document.getElementById(\''.$formName.'\').submit();"' : '';
 			
 			if ($display_filter_as==6 && $combine_tip) {
-				$filter->html	.= ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
+				$filter->html	.= ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all_param ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
 			}
 			if ($display_filter_as==0) {
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname, $attribs_str, 'value', 'text', $value, $filter_ffid);
@@ -2683,7 +2687,7 @@ class FlexicontentFields
 		case 1: case 3: case 7: case 8: // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars, 7: Slider, 8: Slider range
 			
 			if ( !$isSlider ) {
-				$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isDate ? 'FLEXI_CLICK_CALENDAR' : 'FLEXI_TYPE_TO_LIST');
+				$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isDate ? 'FLEXI_CLICK_CALENDAR' : ''/*'FLEXI_TYPE_TO_LIST'*/);
 				$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
 				//$attribs_str = ' class="fc_field_filter fc_label_internal '.($isDate ? 'fc_iscalendar' : '').'" data-fc_label_text="'.$_inner_lb.'"';
 				//$attribs_arr = array('class'=>'fc_field_filter fc_label_internal '.($isDate ? 'fc_iscalendar' : '').'', 'data-fc_label_text' => $_inner_lb );
@@ -2697,18 +2701,23 @@ class FlexicontentFields
 				if ($isSlider && $slider_display_config==1)
 				{
 					$start = $min = 0;
-					$end   = $max = count($results)+($display_filter_as==7 ? 0 : 1); //count($results)-1;
+					$end = $max = -1;
 					$step=1;
 					$step_values = array(0=>"''");
 					$step_labels = array(0=>JText::_('FLEXI_ANY'));
 					$i = 1;
 					foreach ($results as $result) {
+						if ( !strlen($result->value) ) continue;
 						$step_values[] = "'".$result->value."'";
 						$step_labels[] = $result->text;
 						if ($result->value==$value1) $start = $i;
 						if ($result->value==$value2) $end   = $i;
 						$i++;
 					}
+					// Set max according considering the skipped empty values
+					$max = ($i-1)+($display_filter_as==7 ? 0 : 1); //count($results)-1;
+					if ($end == -1) $end = $max;  // Set end to last element if it was not set
+					
 					if ($display_filter_as==8)
 					{
 						$step_values[] = "''";
@@ -2935,7 +2944,7 @@ class FlexicontentFields
 				.($checked ? ' style="display:none!important;" ' : ' style="background:none!important; padding-left:0px!important;" ').'>'.
 				'<span class="fc_delall_filters"></span>';
 			$filter->html .= '</label> '
-				.($combine_tip ? ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ' : '')
+				.($combine_tip ? ' <span class="fc_filter_tip_inline badge badge-info">'.JText::_(!$require_all_param ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ' : '')
 				.' </li>';
 			$i++;
 			

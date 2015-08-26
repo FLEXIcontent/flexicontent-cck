@@ -112,16 +112,15 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		// Prepare field as IF it is a select field
+		// Prepare field as IF it is a using custom Query or custom elements
 		plgFlexicontent_fieldsTextselect::_prepareField_as_SelectField($filter);
+		$asSelect = $filter->parameters->get('filter_customize_options') != 0;
 		
-		// Create a select field object
+		// Create a 'select' or 'text' field object and render its filter display
 		$dispatcher = JDispatcher::getInstance();
-		$sel_fld_obj = new plgFlexicontent_fieldsSelect($dispatcher, array());
-		
-		// Get the FILTER's display ... by changing field type to 'select'
-		$filter->field_type = 'select';
-		$sel_fld_obj->onDisplayFilter($filter, $value, $formName);
+		$filter->field_type = $asSelect ? 'select' : 'text';
+		$_fld_obj = $asSelect ? new plgFlexicontent_fieldsSelect($dispatcher, array()) : new plgFlexicontent_fieldsText($dispatcher, array());
+		$_fld_obj->onDisplayFilter($filter, $value, $formName);
 		$filter->field_type = 'textselect';
 	}	
 	
@@ -188,19 +187,6 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 				$field->parameters->set($keyname, $field->parameters->get($k));
 			}
 		}
-		
-		if ( !$field->parameters->get('sql_mode_override') ) {
-			// Default is to use all text's field values
-			$query = "SELECT value, value as text FROM #__flexicontent_fields_item_relations as fir WHERE field_id='{field_id}' AND value != '' GROUP BY value";
-		} else {
-			// Custom query for value retrieval
-			$query = $field->parameters->set('sql_mode_query');
-		}
-		$query = str_replace('{field_id}', $field->id, $query);
-		
-		// Set remaining parameters needed for Select Field
-		$field->parameters->set('sql_mode', 1);
-		$field->parameters->set('field_elements', $query);		
 	}
 	
 }

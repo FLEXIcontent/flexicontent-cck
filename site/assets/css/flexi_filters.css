@@ -179,9 +179,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	width: 96%;
 }
 
-.fc_filter .fc_filter_tip_inline,
 .fc_filter .fc_filter_label_inline,
-.fc_filter_line .fc_filter_tip_inline,
 .fc_filter_line .fc_filter_label_inline {
 	color: #FFFFFF;
 	display: inline-block;
@@ -201,7 +199,6 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 }
 .fc_filter .fc_filter_tip_inline,
 .fc_filter_line .fc_filter_tip_inline {
-	background-color: darkgray;
 }
 
 /* Container of each individual field filter LABEL */
@@ -338,7 +335,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus,
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
 	padding: 5px 26px 6px 4px;
-	background: url(../images/magnifier-left.png) 96% 4px no-repeat white;
+	background: url(../images/magnifier-left.png) 98% 6px no-repeat white;
 }
 .fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_field_filter,

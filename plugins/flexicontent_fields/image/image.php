@@ -364,15 +364,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			$css .= '
 			ul#sortables_'.$field->id.' {
-				float:left!important; margin:0px!important; padding:0px!important;
-				list-style:none!important; white-space:normal!important;
+				float:left; margin:0px; padding:0px;
+				list-style:none; white-space:normal;
 			}
 			ul#sortables_'.$field->id.' li {
 				'.($none_props ?
-					'float:left!important; clear:none!important; white-space:normal!important;' :
-					'float:left!important; clear:both!important;').'
+					'clear:none; white-space:normal;' :
+					'').'
+				float:left;
 				display: block;
-				list-style: none!important;
+				list-style: none;
 				position: relative;  .'/* do not make important */.'
 			}
 			.fcfieldval_container_'.$field->id.' input { cursor:text; }
@@ -528,6 +529,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			table.fcfield'.$field->id.'.img_upload_select li { min-height:'.($thumb_h_s+56).'px; }
 			table.fcfield'.$field->id.'.img_upload_select ul { height:'.($thumb_h_s+96).'px; }
 			table.fcfield'.$field->id.'.img_upload_select ul { width:'.(2*($thumb_w_s+64)).'px; }
+			table.fcfield'.$field->id.'.img_upload_select ul.image_picker_selector { min-height: 400px; max-height: 600px; height: unset; width:100%; box-sizing: border-box; }
 		';
 		
 		if ($js)  $document->addScriptDeclaration($js);
@@ -1037,6 +1039,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		$cat_link_single_to = $field->parameters->get( 'cat_link_single_to', 1) ;
 		
+		// Calculate some flags, SINGLE image display and Link-to-Item FLAG
+		$isSingle = isset(self::$single_displays[$_method]);
+		$linkToItem = $_method == 'display_link' || $_method == 'display_single_link' || $_method == 'display_single_total_link' || ($view!='item' && $cat_link_single_to && $isSingle);
+		
 		
 		// ************************
 		// JS gallery configuration
@@ -1048,13 +1054,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$popuptype_mobile = (int)$field->parameters->get( 'popuptype_mobile', $popuptype ) ;  // this defaults to desktop when empty
 		$popuptype = $useMobile ? $popuptype_mobile : $popuptype;
 		
-		// Enable/Disable according to current view
+		// Enable/Disable GALLERY JS according to current view and according to other parameters
 		$popupinview = $field->parameters->get('popupinview', array(FLEXI_ITEMVIEW,'category','backend'));
 		$popupinview  = FLEXIUtilities::paramToArray($popupinview);
 		if ($view==FLEXI_ITEMVIEW && !in_array(FLEXI_ITEMVIEW,$popupinview)) $usepopup = 0;
 		if ($view=='category' && !in_array('category',$popupinview)) $usepopup = 0;
 		if ($view=='module' && !in_array('module',$popupinview)) $usepopup = 0;
 		if ($isItemsManager && !in_array('backend',$popupinview)) $usepopup = 0;
+		
+		// Enable/Disable GALLERY JS if linking to item view
+		if ($linkToItem) $usepopup = 0;
 		
 		// Only allow multibox and fancybox in items manager, in other cases force fancybox
 		if ($isItemsManager && !in_array($popuptype, array(1,4))) $popuptype = 4;
@@ -1373,8 +1382,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// The values loop
 		// ***************
 		
-		$isSingle = isset(self::$single_displays[$_method]);
-		$linkSingleToItem = $_method == 'display_single_link' || $_method == 'display_single_total_link' || ($view!='item' && $cat_link_single_to && $isSingle);
 		foreach ($values as $val)
 		{
 			// Unserialize value's properties and check for empty original name property
@@ -1569,12 +1576,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// FINALLY CREATE the field display variable ...
 			// *********************************************
 			
-			if ( $linkSingleToItem ) {
+			if ( $linkToItem ) {
 				
 				// CASE 0: Add single image display information (e.g. image count)
 				
 				$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
-				$field->{$prop} =
+				$field->{$prop}[] =
 				'<span style="display: inline-block; text-align:center; ">
 					<a href="'.$item_link.'" style="display: inline-block;">
 					'.$img_nolegend.'
@@ -1584,7 +1591,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						'.count($values).' '.JText::_('FLEXI_IMAGES').'
 					</span>' : '').'
 				</span>';
-				return; // do not apply any prefix/suffix/etc, since these are for the value list, end the function call
+				
+				// If single display and not in field group then do not add more images
+				if (!$is_ingroup && $isSingle) break;
 				
 			} else if ($linkto_url) {
 				

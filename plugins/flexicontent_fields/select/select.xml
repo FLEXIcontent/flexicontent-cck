@@ -61,6 +61,7 @@
 				<option value="1" show_list="elements_sql" hide_list="elements_list">FLEXI_YES</option>
 			</field>
 			<field name="field_elements" type="textarea" default="1::Yes%% 0::No%% " class="required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" />
+			<field name="imagedir" type="hidden" default="images/stories/" class="required" label="FLEXI_FIELD_IMAGEDIR" description="FLEXI_FIELD_IMAGEDIR_DESC" />
 			
 			<field name="cascade_after" type="fields" field_type="select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="Cascade after master" description="Load values when another field is changed" 
 				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of -master- field will filter the values of -this- field, by requiring that:&lt;br/&gt;&lt;br/&gt; value master-field == valgrp this-field" tip_class="" tip_img="comment.png"  preview_img="relationships.png" 
@@ -176,7 +177,7 @@
 				<option value="1" show_list="filtervalue-mode" hide_list="">FLEXI_USE_CUSTOM_QUERY</option>
 				<option value="2" show_list="filtervalue-mode" hide_list="">FLEXI_USE_CUSTOM_ELEMENTS</option>
 			</field>
-			<field name="filter_custom_options" type="textarea" rows="6" cols="25" label="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY" depend_class="filtervalue-mode" description="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY_DESC" default="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field_id}' AND value != '' GROUP BY value" />
+			<field name="filter_custom_options" type="textarea" rows="6" cols="25" label="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY" depend_class="filtervalue-mode" description="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY_DESC" default="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field->id}' AND value != '' GROUP BY value" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
 			
@@ -312,4 +313,5 @@
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_select.ini</language>
 	</languages>
+	
 </extension>
