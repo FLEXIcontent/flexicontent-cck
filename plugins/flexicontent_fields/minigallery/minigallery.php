@@ -453,14 +453,14 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				if ($usepopup && $popuptype == 4) {
 					$display[] = '
 						<a href="'.$img_path.'" class="fc_image_thumb fancybox" '.$group_str.' title="'.$captions.'" >
-							<img src="'.$srcb.'" id="'.$htmltag_id.'_'.$n.'" alt="'.$captions.'" border="0" />
+							<img src="'.$srcb.'" id="'.$htmltag_id.'_'.$n.'" alt="'.$captions.'" border="0" itemprop="image" />
 						</a>';
 				} else {
 					$display[] = '
-						<a href="javascript:;"><img src="'.$srcb.'" id="'.$htmltag_id.'_'.$n.'" alt="'.$captions.'" border="0" /></a>';
+						<a href="javascript:;"><img src="'.$srcb.'" id="'.$htmltag_id.'_'.$n.'" alt="'.$captions.'" border="0" itemprop="image" /></a>';
 				}
 				$thumbs[] = '
-					<li><a href="#'.$htmltag_id.'_'.$n.'"><img src="'.$srcs.'" border="0" /></a></li>';
+					<li><a href="#'.$htmltag_id.'_'.$n.'"><img src="'.$srcs.'" border="0" itemprop="image"/></a></li>';
 				$n++;
 			}
 		}

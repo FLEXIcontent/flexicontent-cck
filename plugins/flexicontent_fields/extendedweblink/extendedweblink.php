@@ -639,7 +639,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				$linktext = $title ? $title : $this->cleanurl(
 					(FLEXI_J30GE ? JStringPunycode::urlToUTF8($value['link']) : $value['link'])    // If using URL convert from Punycode to UTF8
 				);
-			$html = '<a href="' .$href. '" '.$link_params.'>' .$linktext. '</a>';
+			$html = '<a href="' .$href. '" '.$link_params.' itemprop="url">' .$linktext. '</a>';
 			
 			// HITS: either as icon or as inline text or both
 			$hits_html = '';

@@ -442,7 +442,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			// A cloacked email address with custom linking text
 			$html = $format != 'feed' ?
 				JHTML::_('email.cloak', $addr, $addr!=$text, $text, $text_is_email) :
-				'<a href="mailto:'.$addr.'" target="_blank">' .$text. '</a>';
+				'<a href="mailto:'.$addr.'" target="_blank" itemprop="email">' .$text. '</a>';
 			
 			// Add prefix / suffix
 			$field->{$prop}[$n]	= $pretext . $html . $posttext;
