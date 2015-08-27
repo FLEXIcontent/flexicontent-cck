@@ -430,10 +430,20 @@ class FlexicontentViewCategory extends JViewLegacy
 		JPluginHelper::importPlugin('content');
 		
 		$noroute_cats = array_flip($globalnoroute);
+		
+		$type_attribs = flexicontent_db::getTypeAttribs($force=true, $typeid=0);
+		$type_params = array();
 		foreach ($items as $item) 
 		{
 			$item->event 	= new stdClass();
-			$item->params = new JRegistry($item->attribs);
+			
+			if ( !isset($type_params[$item->type_id]) )
+			{
+				$type_params[$item->type_id] = new JRegistry($type_attribs[$item->type_id]);
+			}
+			$item->params = clone($type_params[$item->type_id]);
+			$item->params->merge( new JRegistry($item->attribs) );
+			
 			//$item->cats = isset($item->cats) ? $item->cats : array();
 			
 			// !!! The triggering of the event onPrepareContent(J1.5)/onContentPrepare(J1.6+) of content plugins

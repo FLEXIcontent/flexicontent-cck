@@ -45,9 +45,11 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcitems fcitem'.$item->id;
 $page_classes .= ' fctype'.$item->type_id;
 $page_classes .= ' fcmaincat'.$item->catid;
+$microdata_itemtype = $this->params->get( 'microdata_itemtype');
+$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>
 
-<div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
+<div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" <?php echo $microdata_itemtype_props; ?> >
 
 	
   <?php if ($item->event->beforeDisplayContent) : ?>
@@ -198,7 +200,13 @@ $page_classes .= ' fcmaincat'.$item->catid;
 			<?php if ($field->label) : ?>
 			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<span class="flexi value field_<?php echo $field->name; ?><?php echo !$field->label ? ' nolabel ' : ''; ?>"><?php echo $field->display; ?></span>
+			<?php
+				$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+				$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+			?>
+			<span class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>" <?php echo $microdata_itemprop_tagparam; ?> >
+				<?php echo $field->display; ?>
+			</span>
 		</span>
 		<?php endforeach; ?>
 	</div>
@@ -220,7 +228,13 @@ $page_classes .= ' fcmaincat'.$item->catid;
 			<?php if ($field->label) : ?>
 			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<span class="flexi value field_<?php echo $field->name; ?><?php echo !$field->label ? ' nolabel ' : ''; ?>"><?php echo $field->display; ?></span>
+			<?php
+				$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+				$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+			?>
+			<span class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>" <?php echo $microdata_itemprop_tagparam; ?> >
+				<?php echo $field->display; ?>
+			</span>
 		</span>
 		<?php endforeach; ?>
 	</div>

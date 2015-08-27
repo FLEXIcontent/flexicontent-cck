@@ -4332,81 +4332,44 @@ class flexicontent_tmpl
 					//$themes->items->{$tmpl}->params		= new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
 					//$themes->items->{$tmpl}->params->loadFile($tmplxml);
 				}
-				if (FLEXI_J30GE) {
-					$themes->items->{$tmpl}->author 		= @$document->author;
-					$themes->items->{$tmpl}->website 		= @$document->website;
-					$themes->items->{$tmpl}->email 			= @$document->email;
-					$themes->items->{$tmpl}->license 		= @$document->license;
-					$themes->items->{$tmpl}->version 		= @$document->version;
-					$themes->items->{$tmpl}->release 		= @$document->release;
-					
-					$themes->items->{$tmpl}->defaulttitle = @$document->defaulttitle;
-					$themes->items->{$tmpl}->description  = @$document->description;
-					
-					$groups = & $document->fieldgroups;
-					$pos    = & $groups->group;
-					if ($pos) {
-						for ($n=0; $n<count($pos); $n++) {
-							$themes->items->{$tmpl}->attributes[$n] = array();
-							foreach ($pos[$n]->attributes() as $_attr_name => $_attr_val) {
-								$themes->items->{$tmpl}->attributes[$n][(string)$_attr_name] = (string)$_attr_val;
-							}
-							$themes->items->{$tmpl}->positions[$n] = (string)$pos[$n];
+				
+				$themes->items->{$tmpl}->author 		= @$document->author;
+				$themes->items->{$tmpl}->website 		= @$document->website;
+				$themes->items->{$tmpl}->email 			= @$document->email;
+				$themes->items->{$tmpl}->license 		= @$document->license;
+				$themes->items->{$tmpl}->version 		= @$document->version;
+				$themes->items->{$tmpl}->release 		= @$document->release;
+				$themes->items->{$tmpl}->microdata_support	= @$document->microdata_support;
+				
+				$themes->items->{$tmpl}->defaulttitle = @$document->defaulttitle;
+				$themes->items->{$tmpl}->description  = @$document->description;
+				
+				$groups = & $document->fieldgroups;
+				$pos    = & $groups->group;
+				if ($pos) {
+					for ($n=0; $n<count($pos); $n++) {
+						$themes->items->{$tmpl}->attributes[$n] = array();
+						foreach ($pos[$n]->attributes() as $_attr_name => $_attr_val) {
+							$themes->items->{$tmpl}->attributes[$n][(string)$_attr_name] = (string)$_attr_val;
 						}
+						$themes->items->{$tmpl}->positions[$n] = (string)$pos[$n];
 					}
+				}
 
-					$css     = & $document->cssitem;
-					$cssfile = & $css->file;
-					if ($cssfile) {
-						$themes->items->{$tmpl}->css = new stdClass();
-						for ($n=0; $n<count($cssfile); $n++) {
-							$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$cssfile[$n];
-						}
+				$css     = & $document->cssitem;
+				$cssfile = & $css->file;
+				if ($cssfile) {
+					$themes->items->{$tmpl}->css = new stdClass();
+					for ($n=0; $n<count($cssfile); $n++) {
+						$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$cssfile[$n];
 					}
-					$js 		= & $document->jsitem;
-					$jsfile	= & $js->file;
-					if ($jsfile) {
-						$themes->items->{$tmpl}->js = new stdClass();
-						for ($n=0; $n<count($jsfile); $n++) {
-							$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$jsfile[$n];
-						}
-					}
-
-				} else {
-					$themes->items->{$tmpl}->author 		= @$document->author[0]  ? $document->author[0]->data()  : '';
-					$themes->items->{$tmpl}->website 		= @$document->website[0] ? $document->website[0]->data() : '';
-					$themes->items->{$tmpl}->email 			= @$document->email[0]   ? $document->email[0]->data()   : '';
-					$themes->items->{$tmpl}->license 		= @$document->license[0] ? $document->license[0]->data() : '';
-					$themes->items->{$tmpl}->version 		= @$document->version[0] ? $document->version[0]->data() : '';
-					$themes->items->{$tmpl}->release 		= @$document->release[0] ? $document->release[0]->data() : '';
-
-					$themes->items->{$tmpl}->defaulttitle = @$document->defaulttitle[0] ? $document->defaulttitle[0]->data() : '';
-					$themes->items->{$tmpl}->description  = @$document->description[0]  ? $document->description[0]->data()  : '';
-
-					$groups = $document->getElementByPath('fieldgroups');
-					$pos    = & $groups->group;
-					if ($pos) {
-						for ($n=0; $n<count($pos); $n++) {
-							$themes->items->{$tmpl}->attributes[$n] = $pos[$n]->_attributes;
-							$themes->items->{$tmpl}->positions[$n] = $pos[$n]->data();
-						}
-					}
-
-					$css     = $document->getElementByPath('cssitem');
-					$cssfile = & $css->file;
-					if ($cssfile) {
-						$themes->items->{$tmpl}->css = new stdClass();
-						for ($n=0; $n<count($cssfile); $n++) {
-							$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->data();
-						}
-					}
-					$js 		= $document->getElementByPath('jsitem');
-					$jsfile	=& $js->file;
-					if ($jsfile) {
-						$themes->items->{$tmpl}->js = new stdClass();
-						for ($n=0; $n<count($jsfile); $n++) {
-							$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->data();
-						}
+				}
+				$js 		= & $document->jsitem;
+				$jsfile	= & $js->file;
+				if ($jsfile) {
+					$themes->items->{$tmpl}->js = new stdClass();
+					for ($n=0; $n<count($jsfile); $n++) {
+						$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$jsfile[$n];
 					}
 				}
 			}
@@ -4443,82 +4406,46 @@ class flexicontent_tmpl
 					//$themes->category->{$tmpl}->params		= new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
 					//$themes->category->{$tmpl}->params->loadFile($tmplxml);
 				}
-				if (FLEXI_J30GE) {
-					$themes->category->{$tmpl}->author 		= @$document->author;
-					$themes->category->{$tmpl}->website 	= @$document->website;
-					$themes->category->{$tmpl}->email 		= @$document->email;
-					$themes->category->{$tmpl}->license 	= @$document->license;
-					$themes->category->{$tmpl}->version 	= @$document->version;
-					$themes->category->{$tmpl}->release 	= @$document->release;
+				
+				$themes->category->{$tmpl}->author 		= @$document->author;
+				$themes->category->{$tmpl}->website 	= @$document->website;
+				$themes->category->{$tmpl}->email 		= @$document->email;
+				$themes->category->{$tmpl}->license 	= @$document->license;
+				$themes->category->{$tmpl}->version 	= @$document->version;
+				$themes->category->{$tmpl}->release 	= @$document->release;
+				$themes->category->{$tmpl}->microdata_support	= @$document->microdata_support;
 
-					$themes->category->{$tmpl}->defaulttitle = @$document->defaulttitle;
-					$themes->category->{$tmpl}->description  = @$document->description;
+				$themes->category->{$tmpl}->defaulttitle = @$document->defaulttitle;
+				$themes->category->{$tmpl}->description  = @$document->description;
 
-					$groups = & $document->fieldgroups;
-					$pos    = & $groups->group;
-					if ($pos) {
-						for ($n=0; $n<count($pos); $n++) {
-							$themes->category->{$tmpl}->attributes[$n] = array();
-							foreach ($pos[$n]->attributes() as $_attr_name => $_attr_val) {
-								$themes->category->{$tmpl}->attributes[$n][(string)$_attr_name] = (string)$_attr_val;
-							}
-							$themes->category->{$tmpl}->positions[$n] = (string)$pos[$n];
+				$groups = & $document->fieldgroups;
+				$pos    = & $groups->group;
+				if ($pos) {
+					for ($n=0; $n<count($pos); $n++) {
+						$themes->category->{$tmpl}->attributes[$n] = array();
+						foreach ($pos[$n]->attributes() as $_attr_name => $_attr_val) {
+							$themes->category->{$tmpl}->attributes[$n][(string)$_attr_name] = (string)$_attr_val;
 						}
-					}
-					$css     = & $document->csscategory;
-					$cssfile = & $css->file;
-					if ($cssfile) {
-						$themes->category->{$tmpl}->css = new stdClass();
-						for ($n=0; $n<count($cssfile); $n++) {
-							$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$cssfile[$n];
-						}
-					}
-					$js     = & $document->jscategory;
-					$jsfile = & $js->file;
-					if ($jsfile) {
-						$themes->category->{$tmpl}->js = new stdClass();
-						for ($n=0; $n<count($jsfile); $n++) {
-							$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$jsfile[$n];
-						}
-					}
-				} else {
-					
-					$themes->category->{$tmpl}->author 		= @$document->author[0]  ? $document->author[0]->data()  : '';
-					$themes->category->{$tmpl}->website 	= @$document->website[0] ? $document->website[0]->data() : '';
-					$themes->category->{$tmpl}->email 		= @$document->email[0]   ? $document->email[0]->data()   : '';
-					$themes->category->{$tmpl}->license 	= @$document->license[0] ? $document->license[0]->data() : '';
-					$themes->category->{$tmpl}->version 	= @$document->version[0] ? $document->version[0]->data() : '';
-					$themes->category->{$tmpl}->release 	= @$document->release[0] ? $document->release[0]->data() : '';
-					
-					$themes->category->{$tmpl}->defaulttitle = @$document->defaulttitle[0] ? $document->defaulttitle[0]->data() : '';
-					$themes->category->{$tmpl}->description  = @$document->description[0]  ? $document->description[0]->data()  : '';
-					
-					$groups = $document->getElementByPath('fieldgroups');
-					$pos    = & $groups->group;
-					if ($pos) {
-						for ($n=0; $n<count($pos); $n++) {
-							$themes->category->{$tmpl}->attributes[$n] = $pos[$n]->_attributes;
-							$themes->category->{$tmpl}->positions[$n] = $pos[$n]->data();
-						}
-					}
-					$css     = $document->getElementByPath('csscategory');
-					$cssfile = & $css->file;
-					if ($cssfile) {
-						$themes->category->{$tmpl}->css = new stdClass();
-						for ($n=0; $n<count($cssfile); $n++) {
-							$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->data();
-						}
-					}
-					$js     = $document->getElementByPath('jscategory');
-					$jsfile = & $js->file;
-					if ($jsfile) {
-						$themes->category->{$tmpl}->js = new stdClass();
-						for ($n=0; $n<count($jsfile); $n++) {
-							$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->data();
-						}
+						$themes->category->{$tmpl}->positions[$n] = (string)$pos[$n];
 					}
 				}
-
+				$css     = & $document->csscategory;
+				$cssfile = & $css->file;
+				if ($cssfile) {
+					$themes->category->{$tmpl}->css = new stdClass();
+					for ($n=0; $n<count($cssfile); $n++) {
+						$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$cssfile[$n];
+					}
+				}
+				$js     = & $document->jscategory;
+				$jsfile = & $js->file;
+				if ($jsfile) {
+					$themes->category->{$tmpl}->js = new stdClass();
+					for ($n=0; $n<count($jsfile); $n++) {
+						$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$jsfile[$n];
+					}
+				}
+				
 			}
 		}
 		return $themes;
@@ -5422,6 +5349,42 @@ class FLEXIUtilities
  */
 class flexicontent_db
 {
+	/**
+	 * Method to get the type parameters of an item
+	 * 
+	 * @return string
+	 * @since 1.5
+	 */
+	static function getTypeAttribs($force = false, $typeid)
+	{
+		static $typeparams = array();
+		
+		if ( !$force && isset($typeparams[$typeid]) ) return $typeparams[$typeid];
+		
+		$db = JFactory::getDBO();
+		$query	= 'SELECT t.id, t.attribs'
+			. ' FROM #__flexicontent_types AS t'
+			.( $typeid ? ' WHERE t.id = ' . (int)$typeid : '')
+			;
+		$db->setQuery($query);
+		if ( $typeid ) {
+			$data = $db->loadObject();
+			if (!$data) return false;
+			
+			$typeid = $data->id;
+			$typeparams[$typeid] = $data->attribs;
+			return $typeparams[$typeid];
+		}
+		else {
+			$rows = $db->loadObjectList();
+			foreach($rows as $data) {
+				$typeid = $data->id;
+				$typeparams[$typeid] = $data->attribs;
+			}
+			return $typeparams;
+		}
+	}
+	
 	/**
 	 * Method to get the nr of favourites of anitem
 	 *

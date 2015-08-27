@@ -161,6 +161,9 @@ if ($leadnum) :
 			}
 			$markup_tags .= '</span>';
 			
+			$microdata_itemtype = $item->params->get( 'microdata_itemtype');
+			$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
+			
 			$custom_link = null;
 			if ($lead_use_image) :
 				if (!empty($img_field_name)) {
@@ -202,7 +205,7 @@ if ($leadnum) :
 				.($lead_catblock_title && @$globalcats[$item->rel_catid] ? $globalcats[$item->rel_catid]->title : '').
 			'</li>' : ''; ?>		
 		
-		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
+		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_props; ?> style="overflow: hidden;">
 			
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<article class="group">
@@ -288,7 +291,11 @@ if ($leadnum) :
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -300,7 +307,11 @@ if ($leadnum) :
 			<div class="lineinfo line1">
 				<?php foreach ($item->positions['above-description-line1-nolabel'] as $field) : ?>
 				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -315,7 +326,11 @@ if ($leadnum) :
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -327,7 +342,11 @@ if ($leadnum) :
 			<div class="lineinfo line2">
 				<?php foreach ($item->positions['above-description-line2-nolabel'] as $field) : ?>
 				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -367,7 +386,11 @@ if ($leadnum) :
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -379,7 +402,11 @@ if ($leadnum) :
 			<div class="lineinfo line3">
 				<?php foreach ($item->positions['under-description-line1-nolabel'] as $field) : ?>
 				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -394,7 +421,11 @@ if ($leadnum) :
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -406,7 +437,11 @@ if ($leadnum) :
 			<div class="lineinfo line4">
 				<?php foreach ($item->positions['under-description-line2-nolabel'] as $field) : ?>
 				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -504,6 +539,9 @@ if ($count > $leadnum) :
 			}
 			$markup_tags .= '</span>';
 			
+			$microdata_itemtype = $item->params->get( 'microdata_itemtype');
+			$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
+			
 			$custom_link = null;
 			if ($intro_use_image) :
 				if (!empty($img_field_name)) {
@@ -545,7 +583,7 @@ if ($count > $leadnum) :
 				.($intro_catblock_title && @$globalcats[$item->rel_catid] ? $globalcats[$item->rel_catid]->title : '').
 			'</li>' : ''; ?>
 		
-		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
+		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_props; ?> style="overflow: hidden;">
 			
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<article class="group">
@@ -631,7 +669,11 @@ if ($count > $leadnum) :
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -643,7 +685,11 @@ if ($count > $leadnum) :
 			<div class="lineinfo line1">
 				<?php foreach ($item->positions['above-description-line1-nolabel'] as $field) : ?>
 				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -658,7 +704,11 @@ if ($count > $leadnum) :
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -670,7 +720,11 @@ if ($count > $leadnum) :
 			<div class="lineinfo line2">
 				<?php foreach ($item->positions['above-description-line2-nolabel'] as $field) : ?>
 				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -710,7 +764,11 @@ if ($count > $leadnum) :
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -722,7 +780,11 @@ if ($count > $leadnum) :
 			<div class="lineinfo line3">
 				<?php foreach ($item->positions['under-description-line1-nolabel'] as $field) : ?>
 				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -737,7 +799,11 @@ if ($count > $leadnum) :
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>
@@ -749,7 +815,11 @@ if ($count > $leadnum) :
 			<div class="lineinfo line4">
 				<?php foreach ($item->positions['under-description-line2-nolabel'] as $field) : ?>
 				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
+					<?php
+						$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
+						$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
+					?>
+					<span class="value field_<?php echo $field->name; ?>" <?php echo $microdata_itemprop_tagparam; ?> ><?php echo $field->display; ?></span>
 				</span>
 				<?php endforeach; ?>
 			</div>

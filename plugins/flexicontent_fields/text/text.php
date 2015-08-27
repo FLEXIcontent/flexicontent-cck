@@ -384,7 +384,12 @@ class plgFlexicontent_fieldsText extends JPlugin
 			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
 			{
-				if ( empty($value) ) continue;  // skip further actions
+				if ($format_output==1) {
+					$value = @ number_format($value, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
+					$value = $value === NULL ? 0 : '';
+				}
+				
+				if ( !strlen($value) ) continue;  // skip further actions
 				
 				if ($lang_filter_values) {
 					$value = JText::_($value);
@@ -394,9 +399,6 @@ class plgFlexicontent_fieldsText extends JPlugin
 				}
 				if ($encode_output) {
 					$value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
-				}
-				if ($format_output==1) {
-					$value = @ number_format($value, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
 				}
 			}
 			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!

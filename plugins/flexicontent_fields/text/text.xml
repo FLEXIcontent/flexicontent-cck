@@ -200,6 +200,12 @@
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
 		</fieldset>
+		<fieldset name="group-text-microdata" repeat="1" icon_class="icon-search" label="FLEXI_SEO" addfieldpath="/administrator/components/com_flexicontent/elements">
+		
+			<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level1" />
+			<field name="microdata_itemprop" type="microdata" label="FLEXI_MICRODATA_ITEMPROP" description="FLEXI_MICRODATA_ITEMPROP_DESC" />
+			
+		</fieldset>
 		<fieldset name="group-text-social" repeat="1" icon_class="icon-users" label="FLEXI_SOCIAL" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />

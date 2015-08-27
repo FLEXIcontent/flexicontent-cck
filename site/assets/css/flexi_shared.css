@@ -256,7 +256,7 @@ span.editlinktip.hasTip.tags img {
 	width: 100%;
 }
 
-.fields {
+.positions_container .fields {
 	display: block;
 	border: 1px solid silver;
 	padding: 4px 6px 3px 24px;
@@ -264,14 +264,14 @@ span.editlinktip.hasTip.tags img {
 	float: left;
 	cursor: move;
 }
-.fields.delfield {
+.positions_container .fields.delfield {
 	background: url("../images/publish_r.png") no-repeat scroll 100% 50% #F9F9F9 !important;
 	padding: 4px 0px 3px 6px;
 	margin: 2px;
 	float: left;
 	cursor: move;
 }
-.fields.delfield .delfield_handle {
+.positions_container .fields.delfield .delfield_handle {
 	display: block;
 	width: 18px;
 	height: 18px;
@@ -280,11 +280,13 @@ span.editlinktip.hasTip.tags img {
 	outline: none;
 	background-color: transparent;
 }
-.fields.user {
+.positions_container .fields.user {
 	background: url(../images/textfield.png) #f9f9f9 no-repeat  3px 50%;
+	white-space: nowrap;
 }
-.fields.core {
+.positions_container .fields.core {
 	background: url(../images/textfield_key.png) #f9f9f9 no-repeat  3px 50%;
+	white-space: nowrap;
 }
 #lay-desc-table .key {
 	width: 80px;

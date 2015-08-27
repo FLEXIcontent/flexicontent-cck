@@ -127,7 +127,14 @@ class FlexicontentViewTemplates extends JViewLegacy
 
 		//Get data from the model
 		$rows = $this->get( 'Data');
-
+		
+		// Get layout data
+		/*$tmpl	= flexicontent_tmpl::getTemplates();
+		foreach($rows as $row) {
+			$row->item_layout = @ $tmpl->items->{$row->name};
+			$row->category_layout = @ $tmpl->category->{$row->name};
+		}*/
+		
 		//assign data to template
 		$this->assignRef('rows'      		, $rows);
 		$this->assignRef('user'      		, $user);

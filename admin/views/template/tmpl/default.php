@@ -341,6 +341,23 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 							<?php echo JText::_($this->layout->description); ?>
 						</td>
 					</tr>
+					
+					<tr>
+						<td style="padding-top:12px;" colspan="2">
+						</td>
+					</tr>					
+					
+					<tr>
+						<td style="text-align:right;">
+							<label class="label">
+								<?php echo JText::_( 'FLEXI_MICRODATA' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo $this->layout->microdata_support!=0 ? '<i class="icon-checkmark"></i>' :  '<i class="icon-cancel"></i>'; ?>
+						</td>
+					</tr>
+					
 					<tr>
 						<td style="padding-top:12px;" colspan="2">
 						</td>

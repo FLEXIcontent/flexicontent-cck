@@ -297,6 +297,51 @@
 			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" labelclass="label-success"/>
 			
 		</fieldset>
+		
+		<fieldset name="seo" label="FLEXI_SEO" icon_class="icon-search">
+		
+			<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level2" />
+			<field name="microdata_itemtype" type="list" default="" label="FLEXI_MICRODATA_ITEMTYPE" description="FLEXI_MICRODATA_ITEMTYPE_DESC" class="use_select2_lib">
+				<option value="">FLEXI_NO</option>
+				<option value="NewsArticle">NewsArticle</option>
+				<option value="Person">Person</option>
+				<option value="Product">Product</option>
+				<option value="Event">Event</option>
+				<option value="Recipe">Recipe</option>
+				<option value="Organization">Organization</option>
+				<option value="Movie">Movie</option>
+				<option value="Book">Book</option>
+				<option value="Review">Review</option>
+				<option value="SoftwareApplication">SoftwareApplication</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level2" />
+			<field name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="addcat_title" type="radio" default="1" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_ON_LEFT</option>
+				<option value="2">FLEXI_ON_RIGHT</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_TYPE_SEO_OTHER" level="level2" />
+			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="robots" type="radio" label="FLEXI_METADATA_ROBOTS_LABEL" description="FLEXI_METADATA_ROBOTS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_JOOMLA_DEFAULT</option>
+				<option value="index, follow">JGLOBAL_INDEX_FOLLOW</option>
+				<option value="noindex, follow">JGLOBAL_NOINDEX_FOLLOW</option>
+				<option value="index, nofollow">JGLOBAL_INDEX_NOFOLLOW</option>
+				<option value="noindex, nofollow">JGLOBAL_NOINDEX_NOFOLLOW</option>
+			</field>
+		
+		</fieldset>
+			
 		<fieldset name="viewing" label="FLEXI_ITEM_VIEW" icon_class="icon-eye-open">
 			
 			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level0" />
@@ -366,33 +411,7 @@
 			
 			<!--field name="" type="separator" default="FLEXI_PDF_VIEW_CONF" level="level2" />
 			<field name="pdf_format_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_PDF_FORMAT_FIELDS" description="FLEXI_PDF_FORMAT_FIELDS_DESC"  /-->
-				
-			<field name="" type="separator" default="FLEXI_SEO" level="level1" />
-			<field name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level2" />
-			<field name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="addcat_title" type="radio" default="1" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_ON_LEFT</option>
-				<option value="2">FLEXI_ON_RIGHT</option>
-			</field>
 			
-			<field name="" type="separator" default="FLEXI_TYPE_SEO_OTHER" level="level2" />
-			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="robots" type="radio" label="FLEXI_METADATA_ROBOTS_LABEL" description="FLEXI_METADATA_ROBOTS_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_JOOMLA_DEFAULT</option>
-				<option value="index, follow">JGLOBAL_INDEX_FOLLOW</option>
-				<option value="noindex, follow">JGLOBAL_NOINDEX_FOLLOW</option>
-				<option value="index, nofollow">JGLOBAL_INDEX_NOFOLLOW</option>
-				<option value="noindex, nofollow">JGLOBAL_NOINDEX_NOFOLLOW</option>
-			</field>
-	
 			<!--field name="show_item_navigation" type="radio" default="1" label="Show Navigation" description="PARAMNAVIGATIONARTICLE" class="btn-group btn-group-yesno">
 				<option value="0">Hide</option>
 				<option value="1">Show</option>
