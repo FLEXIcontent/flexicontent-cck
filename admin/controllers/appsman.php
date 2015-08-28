@@ -29,8 +29,23 @@ jimport('joomla.application.component.controller');
  */
 class FlexicontentControllerAppsman extends FlexicontentController
 {
-	static $allowed_tables = array('flexicontent_fields', 'flexicontent_types',  'flexicontent_templates', 'categories', 'usergroups');
-	static $table_idcols   = array('flexicontent_fields'=>'id', 'flexicontent_types'=>'id', 'flexicontent_templates'=>'template', 'categories'=>'id', 'usergroups'=> 'id');
+	static $allowed_tables = array(
+		'flexicontent_fields',
+		'flexicontent_types',
+		'flexicontent_templates',
+		'categories',
+		'usergroups',
+		'assets'
+	);
+	static $table_idcols = array(
+		'flexicontent_fields'=>'id',
+		'flexicontent_types'=>'id',
+		'flexicontent_templates'=>'template',
+		'categories'=>'id',
+		'usergroups'=> 'id',
+		'assets'=>'id'
+	);
+	static $no_id_tables = array(
 	
 	
 	/**
@@ -113,13 +128,17 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// Some tables have related DB data, add them
 		// ******************************************
 		
+		$customHandler_msg = array();
 		$customHandler = 'getRelatedIds_'.$table;
-		if ( is_callable(array($model, $customHandler)) ) {
+		if ( is_callable(array($model, $customHandler)) )
+		{
 			$related_ids = $model->$customHandler($cid);
 			foreach ($related_ids as $_table => $_cid) {
+				$customHandler_msg[] = '- added related '.count($_cid).' records from <strong>'.$_table.'</strong>';
 				foreach ($_cid as $_id)  $conf[$_table][$_id] = 1;
 			}
 		}
+		$customHandler_msg = empty($customHandler_msg) ? '' : "<br/>\n".implode("<br/>\n", $customHandler_msg);
 		
 		
 		// ********************************************************************
@@ -128,7 +147,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		
 		$session->set('appsman_export', $conf, 'flexicontent');
 		
-		$app->enqueueMessage( '<br/>'.$count_new.' rows were added to export list <br/> '.$count_old.' rows were already in export list', 'notice' );
+		$app->enqueueMessage( 'TABLE: <strong>'.$table.'</strong><br/>'.$count_new.' new records added, '.$count_old.' existing records updated'.$customHandler_msg, 'notice' );
 		$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 		return;
 	}
@@ -243,8 +262,66 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			}
 			
 			$xml = simplexml_load_string($conf['xml']);
-			echo "<pre>";
-			print_r($xml);
+			$db = JFactory::getDBO();
+			$nullDate = $db->getNullDate();
+			
+			$remap = array();
+			foreach ($xml->rows as $table)
+			{
+				$table_name  = (string)$table->attributes()->table;
+				$table_label = ucfirst(str_replace('flexicontent_', '', $table_name));
+				$remap[$table_name] = array();
+				
+				$rows = $table->row;
+				if (!count($rows)) continue;
+				
+				if (!isset(self::$table_idcols[$table_name])) continue;
+				
+				// TODO: allow here assets too
+				if ($table_name=='assets' || $table_name=='flexicontent_templates') continue;
+				
+				
+				$id_colname = self::$table_idcols[$table_name];
+				
+				foreach ($rows as $row)
+				{
+					$obj = new stdClass();
+					foreach($row as $col => $val)
+					{
+						$val = trim((string)$val,'"');
+						if ($col == $id_colname) $old_id = $val;
+						
+						if ($col == 'checked_out_time')  $obj->$col = $nullDate;
+						else if ($col == 'checked_out')  $obj->$col = 0;
+						else $obj->$col = ($col == $id_colname && $table_name!=='flexicontent_templates') ? 0 : $val;
+					}
+					echo $table_name." <br/><pre>";	print_r($obj); echo "</pre>";
+					
+					// Insert record in DB
+					//$db->insertObject('#__'.$table_name, $obj);
+					
+					// Get id of the new record
+					$new_id = (int)$db->insertid();
+					$remap[$table_name][$old_id] = $new_id;
+				}
+			}
+			
+			
+			// Special handling tables
+			foreach ($xml->rows as $table)
+			{
+				$table_name  = (string)$table->attributes()->table;
+				$table_label = ucfirst(str_replace('flexicontent_', '', $table_name));
+				
+				$rows = $table->row;
+				if (!count($rows)) continue;
+				
+				$customHandler = 'doImport_'.$table_name;
+				if (is_callable(array($model, $customHandler)))
+					$model->$customHandler($rows, $remap);
+			}
+			
+			//echo "<pre>";	print_r($xml); echo "</pre>";
 			exit;
 			
 			// CONTINUE to do the import task
@@ -396,13 +473,17 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			foreach(self::$allowed_tables as $table)
 			{
 				if ( empty($conf[$table]) ) continue;
+				
 				$cid = array_keys($conf[$table]);
-				$table_name = '#__'.$table;
+				
 				$id_colname = self::$table_idcols[$table];
+				$table_name = '#__'.$table;
 				$rows = $model->getTableRows($table_name, $id_colname, $cid, true);
+				
 				$content .= $model->create_XML_records($rows, $table_name, $id_colname, $clear_id=false);
 				$customHandler = 'getExtraData_'.$table;
-				if ( is_callable(array($model, $customHandler)) ) {
+				if ( is_callable(array($model, $customHandler)) )
+				{
 					$content .= $model->$customHandler($rows);
 				}
 			}
@@ -424,7 +505,6 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		
 		$filename = $filename ? $filename : 'dbdata';//str_replace('#__', '', $table);
 		$filename .= '.'.($export_type ? $export_type : 'xml');
-		
 		
 		if ( $export_type ) {
 			// Simple export from a string
@@ -450,11 +530,23 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			if (!$res) die('failed creating temporary archive: '.$archivepath);
 			$zip->addFromString($filename, $content);
 			
-			// Get extra files
+			// ***********************************************
+			// Get extra files for those tables that need this
+			// ***********************************************
+			
 			foreach(self::$allowed_tables as $table)
 			{
+				if ( empty($conf[$table]) ) continue;
 				$customHandler = 'getExtraFiles_'.$table;
-				if ( is_callable(array($model, $customHandler)) ) {
+				if ( is_callable(array($model, $customHandler)) )
+				{
+					// Custom file handler needs the DB rows of the current table, get them
+					$cid = array_keys($conf[$table]);
+					
+					$id_colname = self::$table_idcols[$table];
+					$table_name = '#__'.$table;
+					$rows = $model->getTableRows($table_name, $id_colname, $cid, true);
+					
 					$model->$customHandler($rows, $zip);
 				}
 			}
