@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6" client="site" method="upgrade">
-	<name>mod_flexicontent</name>
+	<name>Universal Content Module for FLEXIcontent</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>12/04/2011</creationDate>
 	<copyright>(C) 2009 Emmanuel Danan</copyright>
@@ -8,7 +8,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>1.3</version>
-	<description>MOD_FLEXICONTENT_XML_DESCRIPTION</description>
+	<description>Universal Content Module for FLEXIcontent</description>
 	
 	<files>
 		<filename module="mod_flexicontent">mod_flexicontent.php</filename>
@@ -22,12 +22,11 @@
 	
 	<languages>
 		<language tag="en-GB">languages/en-GB.mod_flexicontent.ini</language>
-		<language tag="en-GB">languages/en-GB.mod_flexicontent.sys.ini</language>
 	</languages>
 	
 	<config>
 	<fields name="params" addfieldpath="/modules/mod_flexicontent/elements">
-		
+
 		<fieldset name="basic">
 			
 			<field name="" type="separator" default="FLEXI_UMOD_BASIC_PARAMETERS_DESC" level="level4" />
@@ -81,7 +80,7 @@
 			<field name="" type="separator" default="FLEXI_ORDER_ORDERING" description="FLEXI_ORDERING_MULTIPLE" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" level="level2" />
-			<field name="ordering" type="fcordering" default="added" add_expired_scheduled="1" size="16" multiple="true" label="FLEXI_ORDERING_GROUPS" description="FLEXI_ORDERING_GROUPS_DESC" />
+			<field name="ordering" type="fcordering" default="added" size="16" multiple="true" label="FLEXI_ORDERING_GROUPS" description="FLEXI_ORDERING_GROUPS_DESC" />
 			<field name="ordering_addtitle" type="radio" default="0" label="FLEXI_ORDERING_GROUP_ADDTITLE" description="FLEXI_ORDERING_GROUP_ADDTITLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -104,10 +103,7 @@
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
 				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
-				<option value="published">FLEXI_ORDER_RECENTLY_PUBLISHED_SCHEDULED_FIRST</option>
-				<option value="published_oldest">FLEXI_ORDER_OLDEST_PUBLISHED_SCHEDULED_FIRST</option>
-				<option value="expired">FLEXI_ORDER_RECENTLY_EXPIRING_EXPIRED_FIRST</option>
-				<option value="expired_oldest">FLEXI_ORDER_OLDEST_EXPIRING_EXPIRED_FIRST</option>
+				<option value="published">FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST</option>
 				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
 				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
 				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
@@ -189,21 +185,11 @@
 			
 			<field name="" type="separator" default="FLEXI_STATES_SCOPE" level="level2" />
 			<field name="method_states" type="multilist" subtype="radio" default="0" label="FLEXI_METHOD_STATIC" description="FLEXI_STATES_DESC" toggle_related="1" class="btn-group group-fcmethod">
-				<option value="0" show_list="items_in_any_state_acl" hide_list="method_states_ops">FLEXI_NORMAL_STATES</option>
-				<option value="1" show_list="method_states_ops" hide_list="items_in_any_state_acl">FLEXI_EXCLUDE</option>
-				<option value="2" show_list="method_states_ops" hide_list="items_in_any_state_acl">FLEXI_INCLUDE</option>
-			</field>
-			<field name="use_list_items_in_any_state_acl" type="multilist" subtype="radio" default="0" label="FLEXI_UMOD_USE_LIST_ITEMS_IN_ANY_STATE_ACL" description="FLEXI_UMOD_USE_LIST_ITEMS_IN_ANY_STATE_ACL_DESC" class="items_in_any_state_acl btn-group group-fcmethod">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="method_states_ops">FLEXI_NORMAL_STATES</option>
+				<option value="1" show_list="method_states_ops" hide_list="">FLEXI_EXCLUDE</option>
+				<option value="2" show_list="method_states_ops" hide_list="">FLEXI_INCLUDE</option>
 			</field>
 			<field name="item_states" type="fcitemstate" multiple="true" size="6" default="" label="FLEXI_ITEM_STATES" description="FLEXI_ITEM_STATES_DESC" class="method_states_ops" />
-			<field name="ignore_up_down_dates" type="radio" default="0" label="FLEXI_UMOD_IGNORE_SCHEDULED_EXPIRED_DATES" description="FLEXI_UMOD_IGNORE_SCHEDULED_EXPIRED_DATES_DESC" class="btn-group group-fcmethod" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">Scheduled (Publish Up)</option>
-				<option value="2">Expired (Publish down)</option>
-				<option value="3">FLEXI_BOTH</option>
-			</field>
 			
 			<field name="" type="separator" default="FLEXI_TAGS_SCOPE" level="level2" />
 			<field name="method_tags" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_DESC" toggle_related="1" class="btn-group group-fcmethod">
@@ -316,9 +302,9 @@
 			<!-- DYNAMIC METHOD -->
 			<field name="" type="separator" default="FLEXI_UMOD_DYNAMIC_SET_TO_STATIC_TO_DISABLE" level="level3" class="dateDynamic" />
 			<field name="behaviour_dates" type="multilist" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE_DESC" toggle_related="1">
-				<option value="0" show_list="dateStatic,dateDataSrc,cDateLims,emptyDates" hide_list="dateDynamic,dynDateOffsets,startOfWeek" refsh_list="date_custom_on,date_custom_fld">FLEXI_UMOD_STATIC_USE_SPECIFIC_DATES</option>
+				<option value="0" show_list="dateStatic,dateDataSrc,cDateLims,emptyDates" hide_list="dateDynamic,dynDateOffsets,startOfWeek" refsh_list="date_custom_on,date_custom_fld">FLEXI_STATIC_USE_SPECIFIC_DATES</option>
 				<group label="FLEXI_DYNAMIC_CMP_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
-					<option value="1" show_list="dateDynamic,dynDateOffsets,date_custom_on" force_list="dateDataSrc,cDateLims,emptyDates" hide_list="dateStatic,startOfWeek">FLEXI_UMOD_DATE_OFFSET_OF_COMPARE_WITH</option>
+					<option value="1" show_list="dateDynamic,dynDateOffsets,date_custom_on" force_list="dateDataSrc,cDateLims,emptyDates" hide_list="dateStatic,startOfWeek">FLEXI_DATE_OFFSET</option>
 				</group>
 				<group label="FLEXI_DYNAMIC_SAME_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
 					<option value="8" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_SAME_DAY</option>
@@ -364,8 +350,7 @@
 			<field name="date_type" type="multilist" subtype="radio" default="0" label="FLEXI_DATE_DATA" description="FLEXI_DATE_DATA_DESC" toggle_related="1" class="method_dates_ops dateStatic dateDataSrc btn-group group-fcinfo" >
 				<option value="0" show_list="" hide_list="date_custom_fld">FLEXI_DATE_CREATED</option>
 				<option value="1" show_list="" hide_list="date_custom_fld">FLEXI_DATE_MODIFIED</option>
-				<option value="2" show_list="" hide_list="date_custom_fld">FLEXI_UMOD_DATE_PUBLISH_UP</option>
-				<option value="4" show_list="" hide_list="date_custom_fld">FLEXI_UMOD_DATE_PUBLISH_DOWN</option>
+				<option value="2" show_list="" hide_list="date_custom_fld">FLEXI_DATE_PUBLISH_UP</option>
 				<option value="3" show_list="date_custom_fld" hide_list="">FLEXI_CUSTOM_DATE_FIELD</option>
 			</field>
 			<field name="datecomp_field" type="fields" fieldnameastext="true" default="" multiple="false" field_type="date" label="FLEXI_CUSTOM_FIELD_AS_DATE_DATA" description="FLEXI_CUSTOM_FIELD_AS_DATE_DATA_DESC" class="date_custom_on date_custom_fld" />
@@ -375,17 +360,21 @@
 			</field>
 			
 			<!-- DYNAMIC BEHAVIOUR -->
+			<field name="date_compare" type="radio" default="0" label="FLEXI_COMPARE_DATE_DATA_WITH" description="FLEXI_COMPARE_DATE_DATA_WITH_DESC" class="dateDynamic btn-group group-fcinfo">
+				<option value="0">FLEXI_CURRENT_SERVER_TIME</option>
+				<option value="1">FLEXI_CURRENT_ITEM_DATE_ABOVE</option>
+			</field>
 			<field name="week_start" type="radio" default="0" label="FLEXI_FIRST_DAY_OF_WEEK" description="FLEXI_FIRST_DAY_OF_WEEK_DESC" class="dateDynamic startOfWeek btn-group group-fcinfo">
 				<option value="0">FLEXI_FIRST_DAY_SUNDAY</option>
 				<option value="5">FLEXI_FIRST_DAY_MONDAY</option>
 			</field>
 			
 			<!-- STATIC BEHAVIOUR or CUSTOM OFFSET FOR DYNAMIC BEHAVIOUR -->
-			<field name="" type="separator" default="Custom offsets that shift the DYNAMIC date, e.g. -5 d (minus 5 days) &lt;br/&gt;- to enter &lt;b&gt;CURRENT date (now)&lt;/b&gt; use: 0 d" level="alert alert-info" class="dynDateOffsets alert alert-info fcpadded fcinlineblock" />
-			<field name="" type="separator" default="Compare to specific dates (YYYY-MM-DD) e.g. 2015-01-23 &lt;br/&gt;- to enter &lt;b&gt;CURRENT date (now)&lt;/b&gt; use: CURDATE() &lt;nbsp;&gt; , and set date type to 'SQL date expression'" level="" class="staticCustomDates dateStatic alert alert-info fcpadded fcinlineblock" />
+			<field name="" type="separator" default="Custom offsets added to DATE DATA, e.g. -5 d (minus 5 days)" level="level4" class="dynDateOffsets" />
+			<field name="" type="separator" default="Compare to specific dates (YYYY-MM-DD) e.g. 2015-01-23" level="level4" class="staticCustomDates" />
 			
-			<field name="bdate" type="fcdate" size="50" label="FLEXI_UMOD_BDATE_FROM" description="FLEXI_UMOD_BDATE_FROM_DESC" placeholder="No limit" class="method_dates_ops dateStatic cDateLims" />
-			<field name="edate" type="fcdate" size="50" label="FLEXI_UMOD_EDATE_TO" description="FLEXI_UMOD_EDATE_TO_DESC" placeholder="No limit" class="method_dates_ops dateStatic cDateLims" />
+			<field name="bdate" type="fcdate" size="50" label="FLEXI_BDATE" description="FLEXI_BDATE_DESC" class="method_dates_ops dateStatic cDateLims" />
+			<field name="edate" type="fcdate" size="50" label="FLEXI_EDATE" description="FLEXI_EDATE_DESC" class="method_dates_ops dateStatic cDateLims" />
 			<field name="raw_bdate" type="radio" default="0" label="FLEXI_TREAT_BDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC" class="method_dates_ops dateStatic btn-group group-fcinfo">
 				<option value="0">FLEXI_SPECIFIC_DATE</option>
 				<option value="1">FLEXI_SQL_DATE_EXPRESSION</option>
@@ -393,10 +382,6 @@
 			<field name="raw_edate" type="radio" default="0" label="FLEXI_TREAT_EDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC" class="method_dates_ops dateStatic btn-group group-fcinfo">
 				<option value="0">FLEXI_SPECIFIC_DATE</option>
 				<option value="1">FLEXI_SQL_DATE_EXPRESSION</option>
-			</field>
-			<field name="date_compare" type="radio" default="0" label="FLEXI_UMOD_COMPARE_DATE_DATA_WITH_DYNAMIC_DATE" description="FLEXI_UMOD_COMPARE_DATE_DATA_WITH_DYNAMIC_DATE_DESC" class="dateDynamic btn-group group-fcinfo">
-				<option value="0">FLEXI_CURRENT_SERVER_TIME</option>
-				<option value="1">FLEXI_CURRENT_ITEM_DATE_ABOVE</option>
 			</field>
 			
 			
@@ -725,7 +710,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="text_after_label_feat" type="text" default="" label="FLEXI_FIELD_TEXT_AFTER_LABEL" description="FLEXI_FIELD_TEXT_AFTER_LABEL_DESC" class="display_fieldsfeat btn-group btn-group-yesno"/>
-			<field name="fields_feat" type="textarea" cols="35" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" class="display_fieldsfeat btn-group btn-group-yesno"/>
+			<field name="fields_feat" type="textarea" cols="35" rows="4" default="" label="FLEXI_SELECT_FIELDS" description="FLEXI_SELECT_FIELDS_DESC" class="display_fieldsfeat"/>
 		</fieldset>
 		
 		
