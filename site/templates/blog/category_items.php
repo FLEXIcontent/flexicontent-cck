@@ -139,6 +139,20 @@ if ($leadnum) :
 			$img_field_size = $img_size_map[ $this->params->get('lead_image_size' , 'l') ];
 			$img_field_name = $this->params->get('lead_image');
 		}
+		
+		$lead_dimgs = $this->params->get('lead_default_images');
+		if ($lead_use_image && $lead_dimgs) {
+			$lead_dimgs = preg_split("/[\s]*,[\s]*/", $lead_dimgs);
+			$lead_type_default_imgs = array();
+			foreach ($lead_dimgs as $_image) {
+				$_d = preg_split("/[\s]*##[\s]*/", $_image);
+				$_type_alias  = empty($_d[1]) ? '_OTHER_' : $_d[0];
+				$_type_dimage = empty($_d[1]) ? $_d[0] : $_d[1];
+				$lead_type_default_imgs[$_type_alias] = $_type_dimage;
+			}
+		}
+		
+		
 		for ($i=0; $i<$leadnum; $i++) :
 			$item = $items[$i];
 			$fc_item_classes = 'fc_bloglist_item';
@@ -176,6 +190,10 @@ if ($leadnum) :
 				} else {
 					$src = flexicontent_html::extractimagesrc($item);
 				}
+				
+				// Use default image form layout parameters
+				if (!$src && isset($lead_type_default_imgs[$item->typealias]))  $src = $lead_type_default_imgs[$item->typealias];
+				if (!$src && isset($lead_type_default_imgs['_OTHER_']))         $src = $lead_type_default_imgs['_OTHER_'];
 				
 				$RESIZE_FLAG = !$this->params->get('lead_image') || !$this->params->get('lead_image_size');
 				if ( $src && $RESIZE_FLAG ) {
@@ -457,6 +475,19 @@ if ($count > $leadnum) :
 			$img_field_name = $this->params->get('intro_image');
 		}
 		
+		$intro_dimgs = $this->params->get('intro_default_images');
+		if ($intro_use_image && $intro_dimgs) {
+			$intro_dimgs = preg_split("/[\s]*,[\s]*/", $intro_dimgs);
+			$intro_type_default_imgs = array();
+			foreach ($intro_dimgs as $_image) {
+				$_d = preg_split("/[\s]*##[\s]*/", $_image);
+				$_type_alias  = empty($_d[1]) ? '_OTHER_' : $_d[0];
+				$_type_dimage = empty($_d[1]) ? $_d[0] : $_d[1];
+				$intro_type_default_imgs[$_type_alias] = $_type_dimage;
+			}
+		}
+		
+		
 		for ($i=$leadnum; $i<$count; $i++) :
 			$item = $items[$i];
 			$fc_item_classes = 'fc_bloglist_item';
@@ -494,6 +525,10 @@ if ($count > $leadnum) :
 				} else {
 					$src = flexicontent_html::extractimagesrc($item);
 				}
+				
+				// Use default image form layout parameters
+				if (!$src && isset($intro_type_default_imgs[$item->typealias]))  $src = $intro_type_default_imgs[$item->typealias];
+				if (!$src && isset($intro_type_default_imgs['_OTHER_']))         $src = $intro_type_default_imgs['_OTHER_'];
 				
 				$RESIZE_FLAG = !$this->params->get('intro_image') || !$this->params->get('intro_image_size');
 				if ( $src && $RESIZE_FLAG ) {

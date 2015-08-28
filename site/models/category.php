@@ -428,21 +428,21 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _buildQuery( $query_ids=false )
 	{
 		$params  = $this->_params;
-		
+		$counting=true;
 		
 		if ( $query_ids==-1 ) {
 			// Get FROM and JOIN SQL CLAUSES
-			$fromjoin = $this->_buildItemFromJoin($counting=true);
+			$fromjoin = $this->_buildItemFromJoin($counting);
 			
 			// ... count rows
 			// Create sql WHERE clause
-			$where = $this->_buildItemWhere('where', $counting=true);
+			$where = $this->_buildItemWhere('where', $counting);
 		} else if ( !$query_ids ) {
 			// Get FROM and JOIN SQL CLAUSES
-			$fromjoin = $this->_buildItemFromJoin($counting=true);
+			$fromjoin = $this->_buildItemFromJoin($counting);
 			
 			// Create sql WHERE clause
-			$where = $this->_buildItemWhere('where', $counting=true);
+			$where = $this->_buildItemWhere('where', $counting);
 			
 			// Create sql ORDERBY clause -and- set 'order' variable (passed by reference), that is, if frontend user ordering override is allowed
 			$order = '';
@@ -512,7 +512,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id ';  // SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
 			$query .= @ $orderby_col;
 		} else {
-			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, rel.catid as rel_catid,'
+			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, ty.alias AS typealias, rel.catid as rel_catid,'
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 				. @ $feed_img_col      // optional
