@@ -114,7 +114,7 @@
 				<option value="mm/yyyy" show_list="" hide_list="regexmask-mode,custommask-mode">Month/Year (mm/yyyy)</option>
 			</field>
 			<field name="regexmask" type="text" default="" label="Regular Expression" depend_class="regexmask-mode" description="See PERL regular expression e.g. [0-9]{0-10}"  />
-			<field name="custommask" type="text" default="" label="FLEXI_VALUE_VALIDATION_CUSTOM_MASK" depend_class="custommask-mode" description="FLEXI_VALUE_VALIDATION_CUSTOM_MASK_DESC" />
+			<field name="custommask" type="textarea" default="" label="FLEXI_VALUE_VALIDATION_CUSTOM_MASK" depend_class="custommask-mode" description="FLEXI_VALUE_VALIDATION_CUSTOM_MASK_DESC" />
 			
 		</fieldset>
 		<fieldset name="group-text-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">

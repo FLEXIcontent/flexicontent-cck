@@ -127,6 +127,9 @@
 	
 	<fieldset name="params-seoconf" label="FLEXI_PARAMETERS_ITEM_SEO" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
+		<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level2" />
+		<field name="microdata_itemtype" type="microdatatype" label="FLEXI_MICRODATA_ITEMTYPE_ITEM_OVERRIDE" description="FLEXI_MICRODATA_ITEMTYPE_ITEM_OVERRIDE_DESC" />
+		
 		<field name="override_title" type="radio" default="" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>

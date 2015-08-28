@@ -25,6 +25,9 @@ $user = JFactory::getUser();
 $btn_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall';
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 
+// MICRODATA 'itemtype' for ALL items in the listing (this will override the 'itemtype' in content type configuration)
+$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat');
+
 if ($this->params->get('togglable_table_cols', 1))
 {
 	flexicontent_html::loadFramework('flexi-lib');
@@ -126,13 +129,6 @@ if (!$show_title && !count($columns)) :
 	echo '<span style="font-weight:bold; color:red;">'.JText::_('FLEXI_TPL_NO_COLUMNS_SELECT_FORCING_DISPLAY_ITEM_TITLE').'</span>';
 	$this->params->set('show_title', 1);
 endif;
-
-//microdata params
-$catmicrodata_itemtype = $this->params->get( 'catmicrodata_itemtype');
-$catmicrodata_itemtype_props = $catmicrodata_itemtype ? 'itemscope itemtype="http://schema.org/'.$catmicrodata_itemtype.'"' : '';
-
-$microdata_itemtype = $item->params->get( 'microdata_itemtype');
-$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>
 
 
@@ -143,7 +139,7 @@ $microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://sc
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 <?php endif; ?>
 
-<table id="adminListTableFCcategory" class="adminlist" summary="<?php echo @$this->category->name; ?>" <?php echo $catmicrodata_itemtype_props; ?>>
+<table id="adminListTableFCcategory" class="adminlist" summary="<?php echo @$this->category->name; ?>">
 	
 	<?php if ($this->params->get('show_field_labels_row', 1) || $this->params->get('togglable_table_cols', 1)) : ?>
 	<thead style="<?php echo $this->params->get('show_field_labels_row', 1) ? '' : 'display:none;' ?>">
@@ -181,12 +177,17 @@ $microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://sc
 			}
 		}
 		$markup_tags .= '</span>';
+		
+		// MICRODATA document type (itemtype) for each item
+		// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
+		$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
+		$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 		?>
 
-		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes.' row'.($i%2 ? 1 : 0); ?>">
+		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes.' row'.($i%2 ? 1 : 0); ?>" <?php echo $microdata_itemtype_props; ?>>
 		
 		<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
-			<td class="fc_title_col" <?php echo $microdata_itemtype_props; ?>>
+			<td class="fc_title_col">
 			
 			<?php echo @ $item->editbutton; ?>
 			<?php echo @ $item->statebutton; ?>

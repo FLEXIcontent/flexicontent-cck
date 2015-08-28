@@ -26,6 +26,9 @@ $lead_link_image_to = $this->params->get('lead_link_image_to', 0);
 $intro_use_image = $this->params->get('intro_use_image', 1);
 $intro_link_image_to = $this->params->get('intro_link_image_to', 0);
 
+// MICRODATA 'itemtype' for ALL items in the listing (this will override the 'itemtype' in content type configuration)
+$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat');
+
 // ITEMS as MASONRY tiles
 if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_placement', 0)==1))
 {
@@ -132,7 +135,7 @@ if ($leadnum) :
 	$classnum = $lead_cols_classes[$lead_cols];
 ?>
 
-	<ul class="leadingblock <?php echo $classnum; ?> group">
+	<ul class="leadingblock <?php echo $classnum; ?> group row">
 		<?php
 		if ($lead_use_image && $this->params->get('lead_image')) {
 			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', 'o'=>'original');
@@ -174,9 +177,6 @@ if ($leadnum) :
 			}
 			$markup_tags .= '</span>';
 			
-			$microdata_itemtype = $item->params->get( 'microdata_itemtype');
-			$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
-			
 			$custom_link = null;
 			if ($lead_use_image) :
 				if (!empty($img_field_name)) {
@@ -215,6 +215,11 @@ if ($leadnum) :
 				}
 			endif;
 			$link_url = $custom_link ? $custom_link : JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+			
+			// MICRODATA document type (itemtype) for each item
+			// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
+			$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
+			$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 		?>
 		
 		<?php echo $lead_catblock ?
@@ -509,9 +514,6 @@ if ($count > $leadnum) :
 			}
 			$markup_tags .= '</span>';
 			
-			$microdata_itemtype = $item->params->get( 'microdata_itemtype');
-			$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
-			
 			$custom_link = null;
 			if ($intro_use_image) :
 				if (!empty($img_field_name)) {
@@ -550,6 +552,11 @@ if ($count > $leadnum) :
 				}
 			endif;
 			$link_url = $custom_link ? $custom_link : JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+			
+			// MICRODATA document type (itemtype) for each item
+			// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
+			$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
+			$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 		?>
 		
 		<?php echo $intro_catblock ?
