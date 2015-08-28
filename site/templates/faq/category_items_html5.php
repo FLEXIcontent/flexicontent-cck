@@ -219,8 +219,11 @@ foreach ($cat_items as $catid => $items) :
 						}
 					}
 					$markup_tags .= '</span>';
+                    //microdata
+                    $microdata_itemtype = $item->params->get( 'microdata_itemtype');
+                    $microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 					?>
-					<li id="faqlist_cat_<?php echo $catid; ?>item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
+					<li id="faqlist_cat_<?php echo $catid; ?>item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_props; ?>>
 						
 					  <?php if ($item->event->beforeDisplayContent) : ?>
 					  <!-- BOF beforeDisplayContent -->

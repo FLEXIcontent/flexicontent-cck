@@ -20,6 +20,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
+//microdata params
+$catmicrodata_itemtype = $this->params->get( 'catmicrodata_itemtype');
+$catmicrodata_itemtype_props = $catmicrodata_itemtype ? 'itemscope itemtype="http://schema.org/'.$catmicrodata_itemtype.'"' : '';
+
 ?>
 
 <?php
@@ -129,6 +133,7 @@ if (!empty($this->items) && ($this->params->get('cols_placement', 1)==1))
 	";
 	JFactory::getDocument()->addScriptDeclaration($js);
 }
+
 ?>
 
 <ul class="faqblock group">	
@@ -159,7 +164,7 @@ foreach ($cat_items as $catid => $items) :
 	
 	<div class="group">	
 		
-		<div class="flexi-cat group">
+		<div class="flexi-cat group" <?php echo $catmicrodata_itemtype_props; ?>>
 
 			<?php if (!empty($sub->image) && $this->params->get(($catid!=$currcatid? 'show_description_image_subcat' : 'show_description_image'), 1)) : ?>
 				<!-- BOF subcategory image -->
@@ -218,8 +223,11 @@ foreach ($cat_items as $catid => $items) :
 						}
 					}
 					$markup_tags .= '</span>';
+//microdata
+$microdata_itemtype = $item->params->get( 'microdata_itemtype');
+$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 					?>
-					<li id="faqlist_cat_<?php echo $catid; ?>item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
+					<li id="faqlist_cat_<?php echo $catid; ?>item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_props; ?> >
 						
 					  <?php if ($item->event->beforeDisplayContent) : ?>
 					  <!-- BOF beforeDisplayContent -->
