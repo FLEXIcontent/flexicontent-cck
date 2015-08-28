@@ -120,9 +120,18 @@ $tabCnt[$tabSetCnt] = 0;
 			<br/><br/>
 			
 			<?php
-			$tablename_to_option = array('flexicontent_fields'=>'flexicontent', 'flexicontent_types'=>'flexicontent', 'flexicontent_templates'=>'flexicontent', 'categories'=>'flexicontent', 'usergroups'=> 'flexicontent');
-			$tablename_to_view   = array('flexicontent_fields'=>'fields', 'flexicontent_types'=>'types', 'flexicontent_templates'=>'templates', 'categories'=>'categories', 'usergroups'=> 'groups');
-			$tablename_to_title  = array('flexicontent_fields'=>'Fields', 'flexicontent_types'=>'Types', 'flexicontent_templates'=>'Templates', 'categories'=>'Categories', 'usergroups'=> 'User groups');
+			$tablename_to_option = array(
+				'flexicontent_fields'=>'flexicontent', 'flexicontent_types'=>'flexicontent', 'flexicontent_templates'=>'flexicontent',
+				'categories'=>'flexicontent', 'usergroups'=> 'flexicontent', 'assets'=>''
+			);
+			$tablename_to_view   = array(
+				'flexicontent_fields'=>'fields', 'flexicontent_types'=>'types', 'flexicontent_templates'=>'templates',
+				'categories'=>'categories', 'usergroups'=> 'groups', 'assets'=>''
+			);
+			$tablename_to_title  = array(
+				'flexicontent_fields'=>'Fields', 'flexicontent_types'=>'Types', 'flexicontent_templates'=>'Templates',
+				'categories'=>'Categories', 'usergroups'=> 'User groups', 'assets'=>'Assets'
+			);
 			$session  = JFactory::getSession();
 			$export_conf = $session->get('appsman_export', array(), 'flexicontent');
 			?>
@@ -135,9 +144,11 @@ $tabCnt[$tabSetCnt] = 0;
 					$_view_name   = $tablename_to_view[$table_name];
 					echo '<h1 style="vertical-align:middle; display:inline-block;">'.str_replace('flexicontent_', '', $_title_name).'</h1>';
 					?> &nbsp;
+					<?php if ($_option_name && $_view_name): ?>
 					<a class="btn btn-small" href="index.php?option=com_<?php echo $_option_name; ?>&view=<?php echo $_view_name; ?>" style="vertical-align:middle; display:inline-block;">
 						<span class="icon-box-add"></span><?php echo JText::_('FLEXI_ADD_MORE'); ?>
 					</a>
+					<?php endif; ?>
 				</div>
 				<div class="fcclear"></div>
 				<?php

@@ -130,6 +130,7 @@ class FlexicontentModelAppsman extends JModelList
 		$rows_cnt = 0;
 		$rows_num = count($rows);
 		
+		$nullDate = $this->_db->getNullDate();
 		$content = "";
 		foreach($rows as $row)
 		{
@@ -143,7 +144,10 @@ class FlexicontentModelAppsman extends JModelList
 			$j = 0;
 			foreach($row as $colname => $coldata)
 			{
-				$coldata = $clear_id && $id_colname==$colname  ?  '0'  :  $coldata;
+				if ($colname=='checked_out_time')  $coldata = $nullDate;
+				else if ($colname=='checked_out')  $coldata = '0';
+				else $coldata = ($clear_id && $id_colname==$colname) ? '0' : $coldata;
+				
 				$coldata = str_replace("\n","\\n", addslashes($coldata) );
 				$content .= '"'.$coldata.'"';
 				
@@ -173,6 +177,7 @@ class FlexicontentModelAppsman extends JModelList
 		$rows_cnt = 0;
 		$rows_num = count($rows);
 		
+		$nullDate = $this->_db->getNullDate();
 		$indent = 1;
 		$istr   = "  ";
 		$content = "\n".str_repeat($istr, $indent)."<rows table=\"".str_replace('#__', '',$table)."\">";
@@ -185,7 +190,10 @@ class FlexicontentModelAppsman extends JModelList
 			
 			foreach($row as $colname => $coldata)
 			{
-				$coldata = $clear_id && $id_colname==$colname  ?  '0'  :  $coldata;
+				if ($colname=='checked_out_time')  $coldata = $nullDate;
+				else if ($colname=='checked_out')  $coldata = '0';
+				else $coldata = ($clear_id && $id_colname==$colname) ? '0' : $coldata;
+				
 				$coldata = str_replace("\n","\\n", addslashes(htmlspecialchars($coldata, ENT_NOQUOTES, 'UTF-8')) );
 				$content .= "\n".str_repeat($istr, $indent). '<'.$colname.'>"' .$coldata. '"</'.$colname.'>';
 			}
@@ -205,15 +213,20 @@ class FlexicontentModelAppsman extends JModelList
 	
 	function getRelatedIds_flexicontent_types($type_ids)
 	{
+		if (empty($type_ids)) return array();
+		
 		// *************************
 		// Get fields-type relations
 		// *************************
 		$fields_type_rows = $this->getTableRows('#__flexicontent_fields_type_relations', 'type_id', $type_ids, $id_is_unique=false);
 		
 		// Get related fields
+		$field_ids = array();
 		$related_ids['flexicontent_fields'] = array();
 		foreach($fields_type_rows as $fields_type_row) {
-			$related_ids['flexicontent_fields'][] = $fields_type_row['field_id'];
+			$field_id = $fields_type_row['field_id'];
+			$related_ids['flexicontent_fields'][$field_id] = $field_id;
+			$field_ids[] = $field_id;
 		}
 		
 		
@@ -228,7 +241,27 @@ class FlexicontentModelAppsman extends JModelList
 			$type->id = $type_id;
 			$type->load();
 			$type->params = new JRegistry($type->attribs);
-			$related_ids['flexicontent_templates'][] = $type->params->get('ilayout', 'default'); // template folder name
+			$ilayout = $type->params->get('ilayout', 'default');   // template folder name
+			$related_ids['flexicontent_templates'][$ilayout] = $ilayout;
+		}
+		
+		
+		// ****************************************
+		// Get asset records of types and of fields
+		// ****************************************
+		
+		$type_rows = $this->getTableRows('#__flexicontent_types', 'id', $type_ids, $id_is_unique=true);
+		foreach ($type_rows as $row)
+		{
+			$asset_id = $row['asset_id'];
+			$related_ids['assets'][$asset_id] = $asset_id;
+		}
+		
+		$field_rows = empty($field_ids) ? array() : $this->getTableRows('#__flexicontent_fields', 'id', $field_ids, $id_is_unique=true);
+		foreach ($field_rows as $row)
+		{
+			$asset_id = $row['asset_id'];
+			$related_ids['assets'][$asset_id] = $asset_id;
 		}
 		
 		return $related_ids;
@@ -270,6 +303,37 @@ class FlexicontentModelAppsman extends JModelList
 			{
 				$zip->addDir($dir, 'templates/'.$template_name);
 			}
+		}
+		return;
+	}
+	
+	function doImport_assets($rows, $remap)
+	{
+		echo 'doImport_assets<br/>';
+		return;
+	}
+	
+	
+	function doImport_flexicontent_fields_type_relations($rows, $remap)
+	{
+		$table_name = 'flexicontent_fields_type_relations';
+		foreach ($rows as $row)
+		{
+			$obj = new stdClass();
+			foreach($row as $col => $val)
+			{
+				$val = trim((string)$val,'"');
+				switch ($col) {
+					case 'field_id': $obj->$col = $remap['flexicontent_fields'][$val]; break;
+					case 'type_id':  $obj->$col = $remap['flexicontent_types'][$val];  break;
+					default: $obj->$col = $val;  break;
+				}
+			}
+			echo $table_name." <br/><pre>";	print_r($obj); echo "</pre>";
+			exit;
+			
+			// Insert record in DB
+			//$db->insertObject('#__'.$table_name, $obj);
 		}
 		return;
 	}
