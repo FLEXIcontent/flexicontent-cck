@@ -85,11 +85,15 @@ foreach ($items as $i => $item) :
 		}
 	}
 	$markup_tags .= '</span>';
+//microdata params
+
+$microdata_itemtype = $item->params->get( 'microdata_itemtype');
+$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>
 
 <div class="fc_item_separator"></div>
 
-<?php echo '<'.$mainAreaTag; ?> id="cataloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group">
+<?php echo '<'.$mainAreaTag; ?> id="cataloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group" <?php echo $microdata_itemtype_props; ?>>
 	
 	
   <?php if ($item->event->beforeDisplayContent) : ?>

@@ -23,6 +23,11 @@ $user = JFactory::getUser();
 
 JFactory::getDocument()->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/tabber.css');
+
+//microdata params
+$catmicrodata_itemtype = $this->params->get( 'catmicrodata_itemtype');
+$catmicrodata_itemtype_props = $catmicrodata_itemtype ? 'itemscope itemtype="http://schema.org/'.$catmicrodata_itemtype.'"' : '';
+
 ?>
 
 <?php
@@ -89,10 +94,13 @@ foreach ($items as $i => $item) :
 		}
 	}
 	$markup_tags .= '</span>';
+    //microdata
+    $microdata_itemtype = $item->params->get( 'microdata_itemtype');
+    $microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>
 
 <!-- tab start -->
-<?php echo '<'.$mainAreaTag; ?> id="tablist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group">
+<?php echo '<'.$mainAreaTag; ?> id="tablist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group" <?php echo $microdata_itemtype_props; ?>>
 	<h3 class="tabberheading"><?php echo mb_substr ($item->title, 0, 20, 'utf-8'); ?></h3><!-- tab title -->
 	
 	
