@@ -125,6 +125,14 @@ if (!$show_title && !count($columns)) :
 	echo '<span style="font-weight:bold; color:red;">'.JText::_('FLEXI_TPL_NO_COLUMNS_SELECT_FORCING_DISPLAY_ITEM_TITLE').'</span>';
 	$this->params->set('show_title', 1);
 endif;
+
+//microdata params
+$catmicrodata_itemtype = $this->params->get( 'catmicrodata_itemtype');
+$catmicrodata_itemtype_props = $catmicrodata_itemtype ? 'itemscope itemtype="http://schema.org/'.$catmicrodata_itemtype.'"' : '';
+
+
+$microdata_itemtype = $item->params->get( 'microdata_itemtype');
+$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>
 
 
@@ -135,7 +143,7 @@ endif;
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 <?php endif; ?>
 
-<table id="adminListTableFCcategory" class="adminlist" summary="<?php echo @$this->category->name; ?>">
+<table id="adminListTableFCcategory" class="adminlist" summary="<?php echo @$this->category->name; ?>" <?php echo $catmicrodata_itemtype_props; ?>>
 	
 	<?php if ($this->params->get('show_field_labels_row', 1) || $this->params->get('togglable_table_cols', 1)) : ?>
 	<thead style="<?php echo $this->params->get('show_field_labels_row', 1) ? '' : 'display:none;' ?>">
@@ -178,7 +186,7 @@ endif;
 		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes.' row'.($i%2 ? 1 : 0); ?>">
 		
 		<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
-			<td class="fc_title_col">
+			<td class="fc_title_col" <?php echo $microdata_itemtype_props; ?>>
 			
 			<?php echo @ $item->editbutton; ?>
 			<?php echo @ $item->statebutton; ?>

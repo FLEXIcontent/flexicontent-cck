@@ -185,7 +185,7 @@
 		<fieldset name="group-radio-seo" repeat="1" icon_class="icon-search" label="FLEXI_SEO" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
 			<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level1" />
-			<field name="microdata_itemprop" type="microdata" label="FLEXI_MICRODATA_ITEMPROP" description="FLEXI_MICRODATA_ITEMPROP_DESC" />
+			<field name="microdata_itemprop" type="microdataprops" label="FLEXI_MICRODATA_ITEMPROP" description="FLEXI_MICRODATA_ITEMPROP_DESC" />
 			
 		</fieldset>
 		<fieldset name="group-radio-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
