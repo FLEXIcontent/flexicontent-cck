@@ -211,11 +211,7 @@ $microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://sc
 			<?php if ($field->label) : ?>
 			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<?php
-				$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
-				$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
-			?>
-			<span class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>" <?php echo $microdata_itemprop_tagparam; ?> >
+			<span class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>">
 				<?php echo $field->display; ?>
 			</span>
 		</span>
@@ -239,11 +235,7 @@ $microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://sc
 			<?php if ($field->label) : ?>
 			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<?php
-				$microdata_itemprop = isset($item->fields[$field->name]) ? $item->fields[$field->name]->parameters->get('microdata_itemprop') : '';
-				$microdata_itemprop_tagparam = $microdata_itemprop ? 'itemprop="'.$microdata_itemprop.'"' : '';
-			?>
-			<span class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>" <?php echo $microdata_itemprop_tagparam; ?> >
+			<span class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>">
 				<?php echo $field->display; ?>
 			</span>
 		</span>

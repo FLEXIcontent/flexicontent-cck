@@ -82,7 +82,7 @@
 		</fieldset>
 		<fieldset name="group-account_via_submit-accountman" repeat="1" icon_class="icon-user" label="User creation / Edit coupons" description="... create new users, and/or allow them to edit items as guests" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="handle_existing_email" type="radio" default="0" label="Email exists" description="..." class="btn-group btn-group-yesno">
+			<field name="handle_existing_email" type="radio" default="0" label="Email exists" description="" class="btn-group btn-group-yesno">
 				<option value="0">Cancel item creation</option>
 				<option value="1">Assign new item</option>
 			</field>

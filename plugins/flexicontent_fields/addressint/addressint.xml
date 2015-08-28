@@ -81,8 +81,8 @@
 				<option value="item">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ITEM_VIEW</option>
 				<option value="both">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALWAYS</option>
 			</field>
-			<field name="map_width" type="text" default="200" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH" description="..." />
-			<field name="map_height" type="text" default="150" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT" description="..." />
+			<field name="map_width" type="text" default="200" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH" description="" />
+			<field name="map_height" type="text" default="150" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT" description="" />
 			<field name="map_type" type="list" default="roadmap" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE_DESC">
 				<option value="roadmap">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ROADMAP</option>
 				<option value="satellite">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SATELLITE</option>

@@ -48,15 +48,15 @@
 			
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
 			
-			<field name="use_label" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LABEL" description="...">
+			<field name="use_label" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LABEL" description="">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="use_cc" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE" description="...">
+			<field name="use_cc" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE" description="">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="use_phone" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER" description="...">
+			<field name="use_phone" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER" description="">
 				<option value="1">PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_1_PART_NUM</option>
 				<option value="2">PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_2_PART_NUM</option>
 				<option value="3">PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_3_PART_NUM</option>
@@ -73,7 +73,7 @@
 			<field name="cc_size" type="text" default="6" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER" description="" level="level2" />
-			<field name="show_part_labels" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_SHOW_PART_LABELS" description="...">
+			<field name="show_part_labels" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_SHOW_PART_LABELS" description="">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -113,11 +113,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="display_country_code" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_COUNTRY_CODE" description="...">
+			<field name="display_country_code" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_COUNTRY_CODE" description="">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="display_area_code" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_AREA_CODE" description="...">
+			<field name="display_area_code" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_AREA_CODE" description="">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -133,7 +133,7 @@
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PROPERTY_SEPARATORS" description="..." level="level2" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PROPERTY_SEPARATORS" description="" level="level2" />
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LABEL" description="" level="level4" />
 			<field name="label_prefix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_PREFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_PREFIX_DESC" />

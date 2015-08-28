@@ -669,6 +669,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
     $display_all = $field->parameters->get( 'display_all', 0 ) ;
 		if ( empty($values) && !$display_all ) { $field->{$prop} = ''; $field->display_index = ''; return; }
 		
+		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
@@ -676,6 +677,9 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
+		// Microdata (classify the field values for search engines)
+		$itemprop    = $field->parameters->get('microdata_itemprop');
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
@@ -822,7 +826,16 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		}
 		
 		
-		if (!$is_ingroup)  // do not convert the array to string if field is in a group
+		// Add microdata to every group of values if field -- is -- in a field group
+		if ($is_ingroup && $itemprop) {
+			foreach($field->{$prop} as $n => $disp_html) {
+				$field->{$prop}[$n] = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</span>';
+			}
+		}
+		
+		
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
+		if (!$is_ingroup)
 		{
 			if ($multiple && self::$valueIsArr) {
 				// Values separator, field 's opening / closing texts, were already applied for every array of values
@@ -832,6 +845,12 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 				// Apply values separator, and field 's opening / closing texts
 				$field->{$prop} = !count($field->{$prop}) ? '' : $opentag . implode($separatorf, $field->{$prop}) . $closetag;
 				$field->display_index = !count($field->{$prop}) ? '' : $opentag . implode($separatorf, $display_index) . $closetag;
+			}
+			
+			// Add microdata once for all values, if field -- is NOT -- in a field group
+			if ( $field->{$prop}!=='' && $itemprop )
+			{
+				$field->{$prop} = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}. '</span>';
 			}
 		}
 	}

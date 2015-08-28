@@ -229,8 +229,8 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" level="level2" />
-			<field name="usepopup_disabled_link_to_url" type="separator" label="" default="Gallery navigation JS has been disabled in ITEM &amp; CATEGORY view, because parameter 'Link to URL' was enabled" description="..." class="alert fcpadded" depend_class="img-link-url-mode" />
-			<field name="usepopup_disabled_link_to_item" type="separator" label="" default="Gallery navigation JS has been disabled in CATEGORY view, because parameter 'Link to item' was enabled" description="..." class="alert fcpadded" depend_class="cat_view_link_to_item single_mode_cat" />
+			<field name="usepopup_disabled_link_to_url" type="separator" label="" default="Gallery navigation JS has been disabled in ITEM &amp; CATEGORY view, because parameter 'Link to URL' was enabled" description="" class="alert fcpadded" depend_class="img-link-url-mode" />
+			<field name="usepopup_disabled_link_to_item" type="separator" label="" default="Gallery navigation JS has been disabled in CATEGORY view, because parameter 'Link to item' was enabled" description="" class="alert fcpadded" depend_class="cat_view_link_to_item single_mode_cat" />
 			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC" class="btn-group btn-group-yesno" depend_class="">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

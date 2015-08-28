@@ -32,7 +32,7 @@ class JFormFieldMicrodata extends JFormField {
 			'job-title' => 'Jobtitle',
 			'description'=>'description',
 			'address'=>'Address',
-			'streetAdress'=>'streetAdress',
+			'streetAddress'=>'streetAddress',
 			'postOfficeBoxNumber'=>'postOfficeBoxNumber',
 			'addressLocality'=>'addressLocality',
 			'addressRegion'=>'addressRegion',
