@@ -199,6 +199,23 @@ $js = "
 				<?php endforeach; ?>
 			</fieldset>
 			
+			<?php
+			$fieldSets = $this->form->getFieldsets('params');
+			foreach ($fieldSets as $name => $fieldSet) :
+				if ($name != 'cat_seo' ) continue;
+				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMS_'.$name;
+				if (isset($fieldSet->description) && trim($fieldSet->description)) :
+					echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+				endif;
+				?>
+				<fieldset class="panelform">
+					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+						<?php echo $field->label; ?>
+						<?php echo $field->input; ?>
+					<?php endforeach; ?>
+				</fieldset>
+			<?php endforeach; ?>
+			
 		</div><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_PARAMETERS_HANDLING'), 'cat-params-handling');*/ ?>
 		
 		
@@ -252,6 +269,7 @@ $js = "
 				foreach ($fieldSets as $name => $fieldSet) :
 					if ($name == 'cat_basic' ) continue;
 					if ($name == 'cat_notifications_conf' && ( !$this->cparams->get('enable_notifications', 0) || !$this->cparams->get('nf_allow_cat_specific', 0) ) ) continue;
+					if ($name == 'cat_seo' ) continue;
 					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMS_'.$name;
 					echo JHtml::_('tabs.panel',JText::_($label), $name.'-options');
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :

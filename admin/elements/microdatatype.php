@@ -25,7 +25,12 @@ class JFormFieldMicrodatatype extends JFormField {
 
 	// getLabel() left out
 
-	public function getInput() {
+	public function getInput()
+	{
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+		
 		$values = array(
 			'NewsArticle' => 'NewsArticle',
 			'Person' => 'Person',
@@ -38,10 +43,12 @@ class JFormFieldMicrodatatype extends JFormField {
 			'Review' => 'Review',
 			'SoftwareApplication' => 'SoftwareApplication'
 		);
-
+		
+		$first_option = @$attributes['first_option'];
+		
 		## Initialize array to store dropdown options ##
 		$options = array();
-		$options[] = JHTML::_('select.option','', '-- '.JText::_('FLEXI_DISABLE').' --');
+		$options[] = JHTML::_('select.option','', '-- '.JText::_($first_option ? $first_option : 'FLEXI_USE_GLOBAL').' --');
 
 		foreach($values as $key=>$value) :
 		## Create $value ##

@@ -301,7 +301,7 @@
 		<fieldset name="seo" label="FLEXI_SEO" icon_class="icon-search">
 		
 			<field name="" type="separator" default="FLEXI_MICRODATA_SUPPORT" description="FLEXI_MICRODATA_SUPPORT_DESC" level="level2" />
-			<field name="microdata_itemtype" type="microdatatype" label="FLEXI_MICRODATA_ITEMTYPE" description="FLEXI_MICRODATA_ITEMTYPE_DESC" />
+			<field name="microdata_itemtype" type="microdatatype" first_option="FLEXI_DISABLE" label="FLEXI_MICRODATA_ITEMTYPE" description="FLEXI_MICRODATA_ITEMTYPE_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level2" />
 			<field name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC" class="btn-group btn-group-yesno">

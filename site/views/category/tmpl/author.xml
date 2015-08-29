@@ -60,11 +60,6 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			
 			<field name="sep_cat_icons" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level2" />
 			<field name="show_icons" type="radio" default="" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" class="btn-group btn-group-yesno">
@@ -877,6 +872,17 @@
 				<option value="1">FLEXI_NUMERIC</option>
 			</field>
 		
+		</fieldset>
+		
+		<fieldset name="cat_seo" label="FLEXI_PARAMETERS_CAT_SEO_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements" >
+			
+			<field name="microdata_itemtype_cat" type="microdatatype" default="" label="FLEXI_MICRODATA_ITEMTYPE_LIST_OVERRIDE" description="FLEXI_MICRODATA_ITEMTYPE_LIST_OVERRIDE_DESC" class="use_select2_lib" />
+			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 		</fieldset>
 		
 		<fieldset name="layout_themes" label="FLEXI_PARAMETERS_CAT_LAYOUT_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">

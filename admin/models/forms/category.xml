@@ -58,11 +58,6 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			
 			<field name="sep_cat_icons" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level2" />
 			<field name="show_icons" type="radio" default="" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" class="btn-group btn-group-yesno">
@@ -877,6 +872,17 @@
 		
 		</fieldset>
 		
+		<fieldset name="cat_seo" label="FLEXI_SEO" addfieldpath="/administrator/components/com_flexicontent/elements" >
+			
+			<field name="microdata_itemtype_cat" type="microdatatype" default="" label="FLEXI_MICRODATA_ITEMTYPE_LIST_OVERRIDE" description="FLEXI_MICRODATA_ITEMTYPE_LIST_OVERRIDE_DESC" class="use_select2_lib" />
+			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		</fieldset>
+		
 		<fieldset name="cat_notifications_conf" label="FLEXI_EMAIL_NOTIFICATIONS_CONF"  addfieldpath="/administrator/components/com_flexicontent/elements" >
 			
 			<field name="sep_cat_notifications" type="separator" default="FLEXI_CONTENT_NOTIFICATIONS_CONF" label="" level="level1" />
@@ -908,7 +914,6 @@
 	<fields name="metadata">
 		<field name="page_title" type="text" label="JFIELD_ALT_PAGE_TITLE_LABEL" description="JFIELD_ALT_PAGE_TITLE_DESC" size="30"/>
 		<field name="author" type="text" label="JAUTHOR" description="JFIELD_METADATA_AUTHOR_DESC" size="30"/>
-		<field name="microdata_itemtype_cat" type="microdatatype" default="" label="FLEXI_MICRODATA_ITEMTYPE_LIST_OVERRIDE" description="FLEXI_MICRODATA_ITEMTYPE_LIST_OVERRIDE_DESC" class="use_select2_lib" />
 		<field name="robots" type="radio" label="FLEXI_METADATA_ROBOTS_LABEL" description="FLEXI_METADATA_ROBOTS_DESC" class="btn-group btn-group-yesno">
 			<option value="">JGLOBAL_USE_GLOBAL</option>
 			<option value="index, follow">JGLOBAL_INDEX_FOLLOW</option>
