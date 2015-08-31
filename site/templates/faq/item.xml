@@ -6,6 +6,7 @@
 	<license>GPLv3</license>
 	<version>1.2</version>
 	<release>20 May 2014</release>
+	<microdata_support>1</microdata_support>
 
 	<defaulttitle>FLEXI_TMPL_FAQ_ITEM_DEFAULT_TITLE</defaulttitle>
 	<description>FLEXI_TMPL_FAQ_ITEM_SHORT_DESC</description>
