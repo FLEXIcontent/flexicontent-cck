@@ -1488,16 +1488,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$field->thumbs_path['large'][] = JPATH_SITE.DS.$srcl;
 			$field->thumbs_path['original'][] = JPATH_SITE.DS.$srco;
 			
-			// Suggest image for external use, e.g. for Facebook etc
+			// Suggest image for external use, e.g. for Facebook etc, (making sure that URL is ABSOLUTE URL)
 			if ( ($isSite && !$isFeedView) && $useogp ) {
 				if ( in_array($view, $ogpinview) ) {
 					switch ($ogpthumbsize)
 					{
-						case 1: $ogp_src = $field->thumbs_src['small'][$i]; break;   // this maybe problematic, since it maybe too small or not accepted by social website
-						case 2: $ogp_src = $field->thumbs_src['medium'][$i]; break;
-						case 3: $ogp_src = $field->thumbs_src['large'][$i]; break;
-						case 4: $ogp_src =  $field->thumbs_src['original'][$i]; break;
-						default: $ogp_src = $field->thumbs_src['medium'][$i]; break;
+						case 1: $ogp_src = JURI::root().$srcs; break;   // this maybe problematic, since it maybe too small or not accepted by social website
+						case 2: $ogp_src = JURI::root().$srcm; break;
+						case 3: $ogp_src = JURI::root().$srcl; break;
+						case 4: $ogp_src =  JURI::root().$srco; break;
+						default: $ogp_src = JURI::root().$srcm; break;
 					}
 					$document->addCustomTag('<link rel="image_src" href="'.$ogp_src.'" />');
 					$document->addCustomTag('<meta property="og:image" content="'.$ogp_src.'" />');

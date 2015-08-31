@@ -269,8 +269,19 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 				{
 					$imageurl = $this->_extractimageurl($item);
 				}
-				if ($imageurl) $document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
+				// Add image if fould, making sure it is converted to ABSOLUTE URL
+				if ($imageurl) {
+					$is_absolute = (boolean) parse_url($imageurl, PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $imageurl);
+					$imageurl = $is_absolute ? $imageurl : JURI::root().$imageurl;
+					$document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
+				}
 			}
+			
+			// Add og-URL explicitely as this is required by facebook ?
+			if ($item_link) {
+				$document->addCustomTag("<meta property=\"og:url\" content=\"".$item_link."\" />");
+			}
+
 			
 			
 			// ****************************
@@ -384,12 +395,12 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			
 			if (!$addthis) {
 				$document->addCustomTag('	
-					<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid='.$addthis_pubid.'"></script>
 					<script type="text/javascript">
 					var addthis_config = {
-					     services_exclude: "print,email"
+						services_exclude: "print,email"
 					}
 					</script>
+					<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js'.($addthis_pubid ? '#pubid='.$addthis_pubid : '').'"></script>
 				');
 				$addthis = 1;
 			}
