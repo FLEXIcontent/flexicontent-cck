@@ -270,21 +270,21 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			$phone = '
 				<tr><td class="key">' .JText::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER' ). '</td><td>
 					<div class="nowrap_box">
-						'.($show_part_labels && $part2_lbl ? '<label class="label phonenum1-lbl" for="'.$elementid_n.'_phone2" >'.JText::_($part2_lbl).'</label><br/>' : '').'
+						'.($show_part_labels && $part1_lbl ? '<label class="label phonenum1-lbl" for="'.$elementid_n.'_phone1" >'.JText::_($part1_lbl).'</label><br/>' : '').'
 						<input class="phonenum1 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone1]" id="'.$elementid_n.'_phone1" type="text" value="'.$value['phone1'].'" '.$phone1_attribs.' />
 						'.($use_phone > 1 ? '-' : '').'
 					</div>
 					
 					'.($use_phone >= 2 ? '
 					<div class="nowrap_box">
-						'.($show_part_labels && $part3_lbl ? '<label class="label phonenum2-lbl" for="'.$elementid_n.'_phone3" >'.JText::_($part3_lbl).'</label><br/>' : '').'
+						'.($show_part_labels && $part2_lbl ? '<label class="label phonenum2-lbl" for="'.$elementid_n.'_phone2" >'.JText::_($part2_lbl).'</label><br/>' : '').'
 						<input class="phonenum2 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone2]" id="'.$elementid_n.'_phone2" type="text" value="'.$value['phone2'].'" '.$phone2_attribs.' />
 						'.($use_phone > 2 ? '-' : '').'
 					</div>' : '').'
 					
 					'.($use_phone > 2 ? '
 					<div class="nowrap_box">
-						'.($show_part_labels && $part1_lbl ? '<label class="label phonenum3-lbl" for="'.$elementid_n.'_phone1" >'.JText::_($part1_lbl).'</label><br/>' : '').'
+						'.($show_part_labels && $part3_lbl ? '<label class="label phonenum3-lbl" for="'.$elementid_n.'_phone3" >'.JText::_($part3_lbl).'</label><br/>' : '').'
 						<input class="phonenum3 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone3]" id="'.$elementid_n.'_phone3" type="text" value="'.$value['phone3'].'" '.$phone3_attribs.' />
 					</div>' : '').'
 				</td></tr>';

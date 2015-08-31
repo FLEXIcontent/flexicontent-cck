@@ -48,15 +48,15 @@
 			
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level2" />
 			
-			<field name="use_label" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LABEL" description="">
+			<field name="use_label" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_LABEL" description="" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="use_cc" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE" description="">
+			<field name="use_cc" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE" description="" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="use_phone" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER" description="">
+			<field name="use_phone" type="radio" default="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER" description="" class="btn-group btn-group-yesno">
 				<option value="1">PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_1_PART_NUM</option>
 				<option value="2">PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_2_PART_NUM</option>
 				<option value="3">PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_3_PART_NUM</option>
