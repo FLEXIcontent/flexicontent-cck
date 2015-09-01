@@ -341,7 +341,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		
 		// Optional display
 		$display_phone_label		= $field->parameters->get( 'display_phone_label', 1 ) ;
-		$display_country_code		= $field->parameters->get( 'display_phone_label', 1 ) ;
+		$display_country_code		= $field->parameters->get( 'display_country_code', 1 ) ;
 		$display_area_code		= $field->parameters->get( 'display_area_code', 1 ) ;
 		
 		// Property Separators
