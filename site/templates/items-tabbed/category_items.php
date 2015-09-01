@@ -96,11 +96,11 @@ foreach ($items as $i => $item) :
 	// MICRODATA document type (itemtype) for each item
 	// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
 	$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
-	$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
+	$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>
 
 <!-- tab start -->
-<?php echo '<'.$mainAreaTag; ?> id="tablist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group" <?php echo $microdata_itemtype_props; ?>>
+<?php echo '<'.$mainAreaTag; ?> id="tablist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group" <?php echo $microdata_itemtype_code; ?>>
 	<h3 class="tabberheading"><?php echo mb_substr ($item->title, 0, 20, 'utf-8'); ?></h3><!-- tab title -->
 	
 	

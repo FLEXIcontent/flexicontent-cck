@@ -181,10 +181,10 @@ endif;
 		// MICRODATA document type (itemtype) for each item
 		// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
 		$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
-		$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
+		$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 		?>
 
-		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes.' row'.($i%2 ? 1 : 0); ?>" <?php echo $microdata_itemtype_props; ?>>
+		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes.' row'.($i%2 ? 1 : 0); ?>" <?php echo $microdata_itemtype_code; ?>>
 		
 		<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
 			<td class="fc_title_col">

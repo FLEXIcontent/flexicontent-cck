@@ -382,6 +382,11 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
 		
+		// Microdata (classify the field group values for search engines)
+		// we use itemtype and not itemprop as it is more appropriate for the a grouping field
+		$fieldgroup_itemtype      = $field->parameters->get('fieldgroup_itemtype');
+		$fieldgroup_itemtype_code = $fieldgroup_itemtype ? 'itemscope itemtype="http://schema.org/'.$fieldgroup_itemtype.'"' : '';
+		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		if (!$pretext && !$posttext && !$display_mode)
@@ -389,6 +394,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$pretext = '<div class="fc-fieldgrp-value-box">';
 			$posttext = '</div>';
 		}
+		$pretext  = '<span '.$fieldgroup_itemtype_code.'" >'.$pretext;
+		$posttext = $posttext.'</span>';
 		
 		switch($separatorf)
 		{

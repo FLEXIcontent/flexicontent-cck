@@ -220,7 +220,7 @@ if ($leadnum) :
 			// MICRODATA document type (itemtype) for each item
 			// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
 			$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
-			$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
+			$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 		?>
 		
 		<?php echo $lead_catblock ?
@@ -228,7 +228,7 @@ if ($leadnum) :
 				.($lead_catblock_title && @$globalcats[$item->rel_catid] ? $globalcats[$item->rel_catid]->title : '').
 			'</li>' : ''; ?>		
 		
-		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_props; ?> style="overflow: hidden;">
+		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_code; ?> style="overflow: hidden;">
 			
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<article class="group">
@@ -585,7 +585,7 @@ if ($count > $leadnum) :
 			// MICRODATA document type (itemtype) for each item
 			// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
 			$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
-			$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
+			$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 		?>
 		
 		<?php echo $intro_catblock ?
@@ -593,7 +593,7 @@ if ($count > $leadnum) :
 				.($intro_catblock_title && @$globalcats[$item->rel_catid] ? $globalcats[$item->rel_catid]->title : '').
 			'</li>' : ''; ?>
 		
-		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_props; ?> style="overflow: hidden;">
+		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_code; ?> style="overflow: hidden;">
 			
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<article class="group">

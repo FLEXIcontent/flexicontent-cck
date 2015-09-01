@@ -45,10 +45,10 @@ $mainAreaTag = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->
 // SEO
 $itemTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $item->title && $this->params->get('show_title', 1) ) ? '2' : '1'; 
 $microdata_itemtype = $this->params->get( 'microdata_itemtype');
-$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
+$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>
 
-<?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" <?php echo $microdata_itemtype_props; ?> >
+<?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" <?php echo $microdata_itemtype_code; ?> >
 
 	<?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
 	

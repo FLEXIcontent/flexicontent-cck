@@ -59,10 +59,10 @@ $page_classes .= ' fctype'.$item->type_id;
 $page_classes .= ' fcmaincat'.$item->catid;
 if ($menu) $page_classes .= ' menuitem'.$menu->id; 
 $microdata_itemtype = $this->params->get( 'microdata_itemtype');
-$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
+$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>
 
-<?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="<?php echo $page_classes; ?> group" <?php echo $microdata_itemtype_props; ?>>
+<?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="<?php echo $page_classes; ?> group" <?php echo $microdata_itemtype_code; ?>>
 	
 	<?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
 	

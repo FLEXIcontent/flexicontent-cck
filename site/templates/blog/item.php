@@ -46,10 +46,10 @@ $page_classes .= ' fcitems fcitem'.$item->id;
 $page_classes .= ' fctype'.$item->type_id;
 $page_classes .= ' fcmaincat'.$item->catid;
 $microdata_itemtype = $this->params->get( 'microdata_itemtype');
-$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
+$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>
 
-<div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" <?php echo $microdata_itemtype_props; ?> >
+<div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" <?php echo $microdata_itemtype_code; ?> >
 
 	
   <?php if ($item->event->beforeDisplayContent) : ?>

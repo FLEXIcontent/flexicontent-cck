@@ -226,9 +226,9 @@ foreach ($cat_items as $catid => $items) :
 					// MICRODATA document type (itemtype) for each item
 					// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
 					$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
-					$microdata_itemtype_props = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
+					$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 					?>
-					<li id="faqlist_cat_<?php echo $catid; ?>item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_props; ?> >
+					<li id="faqlist_cat_<?php echo $catid; ?>item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_code; ?> >
 						
 					  <?php if ($item->event->beforeDisplayContent) : ?>
 					  <!-- BOF beforeDisplayContent -->
