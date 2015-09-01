@@ -287,13 +287,13 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			
 			// Autopublishing new item regardless of publish privilege, use a menu item specific
 			// message if this is set, or notify user of autopublishing with a default message
-			if ( $isnew && $this->params->get('autopublished') ) {
+			if ( $isnew && $this->params->get('autopublished', 0) ) {
 				$approval_msg = $this->params->get('autopublished_message') ? $this->params->get('autopublished_message') :  JText::_( 'FLEXI_CONTENT_WILL_BE_AUTOPUBLISHED' ) ;
 				$approval_msg = str_replace('_PUBLISH_UP_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
 				$approval_msg = str_replace('_PUBLISH_DOWN_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
 				$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'info', 'fc-nobgimage', $approval_msg );
 			}
-			else {
+			else if ( $this->params->get('display_approval_warning', 1) ) {
 				// Current user does not have general publish privilege, aka new/existing items will surely go through approval/reviewal process
 				if ( !$this->perms['canpublish'] ) {
 					if ($isnew) {
@@ -477,7 +477,7 @@ if ($typeid==0) : ob_start();  // type ?>
 
 
 
-if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item via menu override ?>
+if ( $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new item via menu override ?>
 
 	<input type="hidden" id="jform_state" name="jform[state]" value="1" />
 	<input type="hidden" id="jform_vstate" name="jform[vstate]" value="2" />
