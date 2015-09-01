@@ -377,7 +377,7 @@ class FlexicontentModelItem extends ParentClassItem
 	{
 		$app = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
-		jimport('joomla.html.parameter');
+		$isnew = !$this->_id;
 		
 		
 		// **********************************************************************
@@ -441,9 +441,57 @@ class FlexicontentModelItem extends ParentClassItem
 		$accessperms = $this->getItemAccess();
 		$params->merge($accessperms);
 		
-		// d. Merge the active menu parameters
-		if ($menu) {
+		// d. Merge the active menu parameters, verify menu item points to current FLEXIcontent object
+		if ( $menu && !empty($this->mergeMenuParams) ) {
+			if ($this->isForm) {
+				$this->menu_matches = false;
+				$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'] || 'article' == @$menu->query['view'];
+				$this->menu_matches = $view_ok;
+			} else {
+				$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'] || 'article' == @$menu->query['view'];
+				$cid_ok  = JRequest::getInt('cid') == (int) @$menu->query['cid'];
+				$id_ok   = JRequest::getInt('id')  == (int) @$menu->query['id'];
+				$this->menu_matches = $view_ok /*&& $cid_ok*/ && $id_ok;
+			}
+		} else {
+			$this->menu_matches = false;
+		}
+		
+		// MENU ITEM matched, merge parameters and use its page heading (but use menu title if the former is not set)
+		if ( $this->menu_matches ) {
 			$params->merge($menu->params);
+			$default_heading = $menu->title;
+			
+			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->def('page_heading', $params->get('page_title',   $default_heading));
+			$params->def('page_title',   $params->get('page_heading', $default_heading));
+		  $params->def('show_page_heading', $params->get('show_page_title',   0));
+		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
+		}
+		
+		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
+		else {
+			// Clear some menu parameters
+			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
+			
+			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
+			$default_heading = $this->isForm ? $this->_item->title :
+				(!$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' ));
+			
+			// Decide to show page heading (=J1.5 page title), there is no need for this in item view
+			$show_default_heading = 0;
+			
+			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->set('page_title',   $default_heading);
+			$params->set('page_heading', $default_heading);
+		  $params->set('show_page_heading', $show_default_heading);
+			$params->set('show_page_title',   $show_default_heading);
+		}
+		
+		// Prevent showing the page heading if (a) IT IS same as item title and (b) item title is already configured to be shown
+		if ( $params->get('show_title', 1) ) {
+			if ($params->get('page_heading') == $this->_item->title) $params->set('show_page_heading', 0);
+			if ($params->get('page_title')   == $this->_item->title) $params->set('show_page_title',   0);
 		}
 		
 		// Also convert metadata property string to parameters object
@@ -452,6 +500,7 @@ class FlexicontentModelItem extends ParentClassItem
 		} else {
 			$this->_item->metadata = new JRegistry();
 		}
+		
 		
 		// *********************************************
 		// Finally set 'parameters' property of the item

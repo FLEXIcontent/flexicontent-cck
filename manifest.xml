@@ -122,7 +122,6 @@
 			<!--param name="enable_translation_groups" default="0" /-->
 			<param name="filtercat" default="1" />
 			<param name="filtertag" default="1" />
-			<param name="disable_lang_select" default="1" />
 			<param name="use_versioning" default="1" />
 			<param name="nr_versions" default="10" />
 			<param name="versionsperpage" default="5" />

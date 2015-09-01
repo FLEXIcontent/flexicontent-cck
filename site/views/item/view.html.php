@@ -84,19 +84,21 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// Allow iLayout from HTTP request, this will be checked during loading item parameters
 		$model->setItemLayout('__request__');
+		// Indicate to model to merge menu parameters if menu matches
+		$model->mergeMenuParams = true;
+		// Indicate to model that current view IS item form
+		$model->isForm = false;
 		
 		
 		// Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
 		// indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
 		$start_microtime = microtime(true);
+		// Get the item, loading item data and doing parameters merging
 		$item = $model->getItem(null, $check_view_access=2, $no_cache=($version||$preview), $force_version=($version||$preview ? $version : 0));  // ZERO means unversioned data
 		$_run_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Get item parameters as VIEW's parameters (item parameters are merged parameters in order: component/category/layout/type/item/menu/access)
 		$params = & $item->parameters;
-		
-		// Get item 's layout as this may have been altered
-		$ilayout = $params->get('ilayout');
 		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
@@ -117,17 +119,14 @@ class FlexicontentViewItem  extends JViewLegacy
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
-		//special to hide the joomfish language selector on item views
-		if ($params->get('disable_lang_select', 0)) {
-			$css = '#jflanguageselection { visibility:hidden; }';
-			$document->addStyleDeclaration($css);
-		}
 		
 		
 		// *************************************************************
 		// Get cached template data, loading any template language files
 		// *************************************************************
 		
+		// Get item 's layout as this may have been altered
+		$ilayout = $params->get('ilayout');
 		$themes = flexicontent_tmpl::getTemplates( $lang_files = array($ilayout) );
 		
 		
@@ -159,53 +158,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// **********************************************************
 		// Calculate a (browser window) page title and a page heading
 		// **********************************************************
-		
-		// Verify menu item points to current FLEXIcontent object
-		if ( $menu ) {
-			$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'] || 'article' == @$menu->query['view'];
-			$cid_ok  = JRequest::getInt('cid') == (int) @$menu->query['cid'];
-			$id_ok   = JRequest::getInt('id')  == (int) @$menu->query['id'];
-			$menu_matches = $view_ok /*&& $cid_ok*/ && $id_ok;
-			//$menu_params = $menu->params;  // Get active menu item parameters
-		} else {
-			$menu_matches = false;
-		}
-		
-		// MENU ITEM matched, use its page heading (but use menu title if the former is not set)
-		if ( $menu_matches ) {
-			$default_heading = FLEXI_J16GE ? $menu->title : $menu->name;
-			
-			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
-			$params->def('page_heading', $params->get('page_title',   $default_heading));
-			$params->def('page_title',   $params->get('page_heading', $default_heading));
-		  $params->def('show_page_heading', $params->get('show_page_title',   0));
-		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
-		}
-		
-		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
-		else {
-			// Clear some menu parameters
-			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
-			
-			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
-			$default_heading = $item->title;
-			
-			// Decide to show page heading (=J1.5 page title), there is no need for this in item view
-			$show_default_heading = 0;
-			
-			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
-			$params->set('page_title',   $default_heading);
-			$params->set('page_heading', $default_heading);
-		  $params->set('show_page_heading', $show_default_heading);
-			$params->set('show_page_title',   $show_default_heading);
-		}
-		
-		// Prevent showing the page heading if (a) IT IS same as item title and (b) item title is already configured to be shown
-		if ( $params->get('show_title', 1) ) {
-			if ($params->get('page_heading') == $item->title) $params->set('show_page_heading', 0);
-			if ($params->get('page_title')   == $item->title) $params->set('show_page_title',   0);
-		}
-		
+		// This was done inside model, because we have set the merge parameters flag
 		
 		
 		
@@ -267,7 +220,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		// Overwrite with menu META data if menu matched
-		if ($menu_matches) {
+		if ($model->menu_matches) {
 			if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
 			if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
 			if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
@@ -585,9 +538,15 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// FORCE model to load versioned data (URL specified version or latest version (last saved))
 		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
+		// Indicate to model to merge menu parameters if menu matches
+		$model->mergeMenuParams = true;
+		// Indicate to model that current view IS item form
+		$model->isForm = true;
+		
+		// Get the item, loading item data and doing parameters merging
 		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
 		
-		// Replace component/menu 'params' with thee merged component/category/type/item/menu ETC ... parameters
+		// Replace component/menu 'params' with the merged component/category/type/item/menu ETC ... parameters
 		$params = & $item->parameters;
 		
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -939,45 +898,13 @@ class FlexicontentViewItem  extends JViewLegacy
 		//Load the JEditor object
 		$editor = JFactory::getEditor();
 		
+		
+		
 		// **********************************************************
 		// Calculate a (browser window) page title and a page heading
 		// **********************************************************
+		// This was done inside model, because we have set the merge parameters flag
 		
-		// Verify menu item points to current FLEXIcontent object
-		if ( $menu ) {
-			$menu_matches = false;
-			$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'] || 'article' == @$menu->query['view'];
-			$menu_matches = $view_ok;
-			//$menu_params = $menu->params;  // Get active menu item parameters
-		} else {
-			$menu_matches = false;
-		}		
-		
-		// MENU ITEM matched, use its page heading (but use menu title if the former is not set)
-		if ($menu_matches) {
-			$default_heading = FLEXI_J16GE ? $menu->title : $menu->name;
-			
-			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
-			$params->def('page_heading', $params->get('page_title',   $default_heading));
-			$params->def('page_title',   $params->get('page_heading', $default_heading));
-		  $params->def('show_page_heading', $params->get('show_page_title',   0));
-		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
-		}
-		
-		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
-		else {
-			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
-			$default_heading = !$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' );
-
-			// Decide to show page heading (=J1.5 page title), there is no need for this in item view
-			$show_default_heading = 0;
-			
-			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
-			$params->set('page_title',   $default_heading);
-			$params->set('page_heading', $default_heading);
-		  $params->set('show_page_heading', $show_default_heading);
-			$params->set('show_page_title',   $show_default_heading);
-		}
 		
 		
 		// ************************************************************
