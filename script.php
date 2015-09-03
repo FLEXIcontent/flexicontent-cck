@@ -313,7 +313,7 @@ class com_flexicontentInstallerScript
 						.'  AND type = '.$db->Quote($extensions[$i]['type'])
 						;
 					$db->setQuery($query);
-					$db->query();
+					$db->execute();
 				}
 			} else {
 				$extensions[$i]['status'] = false;
@@ -437,7 +437,7 @@ class com_flexicontentInstallerScript
 			'warning'
 		);
 		
-		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
+		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 		echo '
 		<link type="text/css" href="components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">
 		<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' .JText::_('Performing after installation tasks ... '). '</div>
@@ -543,17 +543,19 @@ class com_flexicontentInstallerScript
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
-							if ( !($result = $db->query()) ) {
-								$result = false;
-								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							try {
+								$db->execute();
+								echo ($count_rows = $db->getAffectedRows($result)) ?
+									'<span class="badge badge-success">'.$count_rows.' effected rows </span>' :
+									'<span class="badge badge-info">no changes</span>' ;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
 							}
 						}
-						$count_rows = $db->getAffectedRows($result);
-						if ( $count_rows ) {
-							echo "<span class='badge badge-success'>".$count_rows." effected rows </span>";
-						} else echo "<span class='badge badge-info'>no changes</span>";
 					}
-					else echo "<span class='badge badge-info'>nothing to do</span>";
+					else echo '<span class="badge badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -566,22 +568,24 @@ class com_flexicontentInstallerScript
 					<td>
 					<?php
 					$queries = array();
-					if (FLEXI_J30GE) $queries[] = "UPDATE #__extensions SET enabled=1 WHERE type='plugin' AND (element=".$db->Quote('flexisystem')." OR element=".$db->Quote('flexiadvroute').") AND folder=".$db->Quote('system');
+					$queries[] = "UPDATE #__extensions SET enabled=1 WHERE type='plugin' AND (element=".$db->Quote('flexisystem')." OR element=".$db->Quote('flexiadvroute').") AND folder=".$db->Quote('system');
 					
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
-							if ( !($result = $db->query()) ) {
-								$result = false;
-								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							try {
+								$db->execute();
+								echo ($count_rows = $db->getAffectedRows($result)) ?
+									'<span class="badge badge-success">'.$count_rows.' effected rows </span>' :
+									'<span class="badge badge-info">no changes</span>' ;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
 							}
 						}
-						$count_rows = $db->getAffectedRows($result);
-						if ( $count_rows ) {
-							echo "<span class='badge badge-success'>".$count_rows." effected rows </span>";
-						} else echo "<span class='badge badge-info'>no changes</span>";
 					}
-					else echo "<span class='badge badge-info'>nothing to do</span>";
+					else echo '<span class="badge badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -601,9 +605,11 @@ class com_flexicontentInstallerScript
 							.' SET field_type = ' .$db->Quote($new_type)
 							.' WHERE field_type = ' .$db->Quote($old_type);
 						$db->setQuery($query);
-						$result = $db->query();
-						if( !$result ) {
-							$msg[] = "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+						try {
+							$db->execute();
+						}
+						catch (Exception $e) {
+							$msg[$n++] = '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
 							continue;
 						}
 						
@@ -621,9 +627,9 @@ class com_flexicontentInstallerScript
 						if ($ext && $ext['id'] > 0) {
 							$installer = new JInstaller();
 							if ( $installer->uninstall($ext['type'], $ext['id'], (int)$ext['client_id']) )
-								$msg[$n] = "<br/>".$msg[$n].", uninstalling plugin: <span class='badge badge-success'>success</span> <br/>";
+								$msg[$n] = '<br/>'.$msg[$n].', uninstalling plugin: <span class="badge badge-success">success</span> <br/>';
 							else
-								$msg[$n] = "<br/>".$msg[$n].", uninstalling plugin: <span class='badge badge-error'>failed</span> <br/>";
+								$msg[$n] = '<br/>'.$msg[$n].', uninstalling plugin: <span class="badge badge-error">failed</span> <br/>';
 						}
 						$n++;
 					}
@@ -744,19 +750,22 @@ class com_flexicontentInstallerScript
 						$queries[] = "ALTER TABLE `#__flexicontent_templates` ADD `cfgname` varchar(50) NOT NULL default '' AFTER `template`";
 					}
 					
+					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
-							if ( !($result = $db->query()) ) {
-								$result = false;
-								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							try {
+								$db->execute();
+								$upgrade_count++;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
 							}
 						}
-						if ( $result !== false ) {
-							echo "<span class='badge badge-success'>tables altered</span>";
-						}
+						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo "<span class='badge badge-info'>nothing to do</span>";
+					else echo '<span class="badge badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -809,24 +818,28 @@ class com_flexicontentInstallerScript
 					
 					if (count($_add_indexes)) {
 						$db->setQuery('TRUNCATE TABLE #__flexicontent_advsearch_index');
-						$db->query();   // Truncate table of search index to avoid long-delay on indexing
+						$db->execute();   // Truncate table of search index to avoid long-delay on indexing
 						$queries[] = "ALTER TABLE `#__flexicontent_advsearch_index` ". implode(",", $_add_indexes);
 					}
 					*/
 					
+					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
-							if ( !($result = $db->query()) ) {
-								$result = false;
-								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							try {
+								$db->execute();
+								$upgrade_count++;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
 							}
 						}
-						if ( $result !== false ) {
-							echo "<span class='badge badge-success'>table altered</span> please re-index your content</span>";
-						}
+						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
+						if ($upgrade_count) echo ' Please <span class="badge badge-warning">re-index</span> your content';
 					}
-					else echo "<span class='badge badge-info'>nothing to do</span>";
+					else echo '<span class="badge badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -850,19 +863,22 @@ class com_flexicontentInstallerScript
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
 					
+					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
-							if ( !($result = $db->query()) ) {
-								$result = false;
-								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							try {
+								$db->execute();
+								$upgrade_count++;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
 							}
 						}
-						if ( $result !== false ) {
-							echo "<span class='badge badge-success'>table created / upgraded</span>";
-						}
+						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo "<span class='badge badge-info'>nothing to do</span>";
+					else echo '<span class="badge badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -897,19 +913,22 @@ class com_flexicontentInstallerScript
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
 					}
 					
+					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
-							if ( !($result = $db->query()) ) {
-								$result = false;
-								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							try {
+								$db->execute();
+								$upgrade_count++;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
 							}
 						}
-						if ( $result !== false ) {
-							echo "<span class='badge badge-success'>table created / upgraded</span>";
-						}
+						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo "<span class='badge badge-info'>nothing to do</span>";
+					else echo '<span class="badge badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -955,19 +974,22 @@ class com_flexicontentInstallerScript
 						if (!empty($_querycols)) $queries[] = "ALTER TABLE `#__flexicontent_items_tmp` " . implode(",", $_querycols);
 					}
 					
+					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
-							if ( !($result = $db->query()) ) {
-								$result = false;
-								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							try {
+								$db->execute();
+								$upgrade_count++;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
 							}
 						}
-						if ( $result !== false ) {
-							echo "<span class='badge badge-success'>table created / upgraded</span>";
-						}
+						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo "<span class='badge badge-info'>nothing to do</span>";
+					else echo '<span class="badge badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -1013,19 +1035,22 @@ class com_flexicontentInstallerScript
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
 					
+					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
-							if ( !($result = $db->query()) ) {
-								$result = false;
-								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							try {
+								$db->execute();
+								$upgrade_count++;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
 							}
 						}
-						if ( $result !== false ) {
-							echo "<span class='badge badge-success'>table(s) created or upgraded</span>";
-						}
+						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo "<span class='badge badge-info'>nothing to do</span>";
+					else echo '<span class="badge badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -1050,19 +1075,22 @@ class com_flexicontentInstallerScript
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
 					
+					$upgrade_count = 0;
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
-							if ( !($result = $db->query()) ) {
-								$result = false;
-								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							try {
+								$db->execute();
+								$upgrade_count++;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
 							}
 						}
-						if ( $result !== false ) {
-							echo "<span class='badge badge-success'>table created</span>";
-						}
+						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
 					}
-					else echo "<span class='badge badge-info'>nothing to do</span>";
+					else echo '<span class="badge badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -1083,17 +1111,19 @@ class com_flexicontentInstallerScript
 					if ( !empty($queries) ) {
 						foreach ($queries as $query) {
 							$db->setQuery($query);
-							if ( !($result = $db->query()) ) {
-								$result = false;
-								echo "<span class='badge badge-error'>SQL QUERY failed: ". $query ."</span>";
+							try {
+								$db->execute();
+								echo ($count_rows = $db->getAffectedRows($result)) ?
+									'<span class="badge badge-success">'.$count_rows.' effected rows </span>' :
+									'<span class="badge badge-info">no changes</span>' ;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
 							}
 						}
-						$count_rows = $db->getAffectedRows($result);
-						if ( $count_rows ) {
-							echo "<span class='badge badge-success'>".$count_rows." effected rows </span>";
-						} else echo "<span class='badge badge-info'>no changes</span>";
 					}
-					else echo "<span class='badge badge-info'>nothing to do</span>";
+					else echo '<span class="badge badge-info">nothing to do</span>';
 					?>
 					</td>
 				</tr>
@@ -1113,7 +1143,7 @@ class com_flexicontentInstallerScript
 		$app = JFactory::getApplication();
 		
 		// Extra CSS needed for J3.x+
-		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
+		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 		
 		// Installed component manifest file version
 		$this->release = $parent->get( "manifest" )->version;
@@ -1254,37 +1284,36 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Restore jComments comment to be of com_content Type</td>
 					<td>
 						<?php
+						$queries = array();
+						
 						$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'jcomments"';
 						$db->setQuery($query);
 						$jcomments_tbl_exists = (boolean) count($db->loadObjectList());
+						if ($jcomments_tbl_exists) {
+							$queries['jcomments'] = 'UPDATE #__jcomments AS j SET j.object_group="com_content" WHERE j.object_group="com_flexicontent" ';
+							$queries['jcomments_objects'] = 'UPDATE #__jcomments_objects AS j SET j.object_group="com_content" WHERE j.object_group="com_flexicontent" ';
+						}
 						
-						if (!$jcomments_tbl_exists) {
-							$result = 0;
-						} else {
-							$query = 'UPDATE #__jcomments AS j'
-								.' SET j.object_group="com_content" '
-								.' WHERE j.object_group="com_flexicontent" ';
-							$db->setQuery($query);
-							$db->query();
-							if ($db->getErrorNum()) {
-								echo $db->getErrorMsg();
-								$result = 1;
-							} else {
-								$result = 2;
+						if ( !empty($queries) ) {
+							$count_rows = 0;
+							foreach ($queries as $query) {
+								$db->setQuery($query);
+								try {
+									$db->execute();
+									if ($tbl=='jcomments') $count_rows = (int)$db->getAffectedRows($result);
+								}
+								catch (Exception $e) {
+									echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+									$result = false;
+									break;
+								}
 							}
+							if ( $count_rows ) {
+								echo '<span class="badge badge-success">'.JText::_("Comments restored").' ('.$count_rows.' effected rows)</span>';
+							} else if ($result!==false) echo '<span class="badge badge-info">restoring not needed</span>';
 						}
-						
-						$status_class = ($result==2 || $result==0) ? 'badge badge-success' : 'badge badge-error';
+						else echo '<span class="badge badge-info">jComments not installed, nothing to do</span>';
 						?>
-						<span class="<?php echo $status_class; ?>"><?php
-						if ($result==2) {
-							echo JText::_("Comments restored");
-						} else if ($result==1) {
-							echo JText::_("Failed to set comments as com_content comments");
-						} else {
-							echo JText::_("No jcomments table found, nothing to do");
-						}
-						?></span>
 					</td>
 				</tr>
 		<?php
@@ -1354,32 +1383,23 @@ class com_flexicontentInstallerScript
 						$db->setQuery($query);
 						$tbl_names = $db->loadColumn();
 						
+						$count_removed = 0;
 						if (!count($tbl_names)) {
-							$result = 0;
-						} else {
 							foreach($tbl_names as $tbl_name) {
 								$db->setQuery( 'DROP TABLE '.$tbl_name );
-								$db->query();
+								try {
+									$db->execute();
+									$count_removed++;
+								}
+								catch (Exception $e) {
+									echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+									continue;
+								}
 							}
-							if ($db->getErrorNum()) {
-								echo $db->getErrorMsg();
-								$result = 1;
-							} else {
-								$result = 2;
-							}
+							echo '<span class="badge badge-success">table(s) removed: '.$count_removed.'</span>';
 						}
-						
-						$status_class = ($result==2 || $result==0) ? 'badge badge-success' : 'badge badge-error';
+						else echo '<span class="badge badge-info">nothing to do</span>';
 						?>
-						<span class="<?php echo $status_class; ?>"><?php
-						if ($result==2) {
-							echo JText::_("Search tables removed");
-						} else if ($result==1) {
-							echo JText::_("Failed to remove all search tables");
-						} else {
-							echo JText::_("No search tables found, nothing to do");
-						}
-						?></span>
 					</td>
 				</tr>
 			</tbody>
@@ -1420,7 +1440,7 @@ class com_flexicontentInstallerScript
 			$db->setQuery('UPDATE #__extensions SET params = ' .
 			$db->quote( $paramsString ) .
 			' WHERE name = "com_flexicontent"' );
-			$db->query();
+			$db->execute();
 		}
 	}
 }
