@@ -2209,12 +2209,14 @@ class ParentClassItem extends JModelAdmin
 		// ITEM DATA NOT SAVED:  NEITHER new, NOR approving current item version
 		// *********************************************************************
 		if ( !$version_approved ) {
-			// Warn editor that his/her changes will need approval to before becoming visible
-			if ( $canEditState )
-				JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE') );
-			else
-				JError::raiseNotice(10, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE') );
-			
+			if ( $app->isAdmin() || $cparams->get('approval_warning_aftersubmit_fe', 1) )
+			{
+				// Warn editor that his/her changes will need approval to before becoming active / visible
+				if ( $canEditState )
+					JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE') );
+				else
+					JError::raiseNotice(10, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE') );
+			}
 			// Set modifier and modification time (as if item has been saved), so that we can use this information for updating the versioning tables
 			$datenow = JFactory::getDate();
 			$item->modified			= $datenow->toSql();

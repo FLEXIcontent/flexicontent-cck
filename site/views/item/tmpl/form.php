@@ -293,7 +293,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				$approval_msg = str_replace('_PUBLISH_DOWN_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
 				$approval_msg = sprintf( $alert_box, 'id="fc_approval_msg"', 'info', 'fc-nobgimage', $approval_msg );
 			}
-			else if ( $this->params->get('display_approval_warning', 1) ) {
+			else if ( $this->params->get('approval_warning_inform_fe', 1) ) {
 				// Current user does not have general publish privilege, aka new/existing items will surely go through approval/reviewal process
 				if ( !$this->perms['canpublish'] ) {
 					if ($isnew) {
