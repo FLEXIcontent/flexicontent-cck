@@ -1588,8 +1588,8 @@ class FlexicontentFields
 		}
 		
 		// replace current user language
-		$query = str_replace("{curr_userlang_shorttag}", flexicontent_html::getUserCurrentLang(), $query);
-		$query = str_replace("{curr_userlang_fulltag}", flexicontent_html::getUserCurrentLang(), $query);
+		$query = str_replace("{curr_userlang_shorttag}", flexicontent_html::getUserCurrentLang($short_tag=true), $query);
+		$query = str_replace("{curr_userlang_fulltag}", flexicontent_html::getUserCurrentLang($short_tag=false), $query);
 		return $query;
 	}
 	

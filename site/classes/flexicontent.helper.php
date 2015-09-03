@@ -3197,26 +3197,17 @@ class flexicontent_html
 	 * @return string
 	 * @since 1.5
 	 */
-	static function getUserCurrentLang()
+	static function getUserCurrentLang($short_tag=true)
 	{
-		static $lang = null;      // A two character language tag
-		if ($lang) return $lang;
-
-		// Get default content language for J1.5 and CURRENT content language for J2.5
-		// NOTE: Content language can be natively switched in J2.5, by using
-		// (a) the language switcher module and (b) the Language Filter - System Plugin
-		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);
-
-		// Language as set in the URL (can be switched via Joomfish in J1.5)
-		$urlLang  = JRequest::getWord('lang', '' );
-
-		// Language from URL is used only in J1.5 -- (As said above, in J2.5 the content language can be switched natively)
-		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
-
-		// WARNING !!!: This variable is wrongly set in J2.5, maybe correct it?
-		//JRequest::setVar('lang', $lang );
-
-		return $lang;
+		static $UILang = null;
+		if ($UILang) return $UILang[$short_tag];
+		
+		// Get CURRENT user interface language. Content language can be natively switched in J2.5
+		// by using (a) the language switcher module and (b) the Language Filter - System Plugin
+		$UILang[false] = JFactory::getLanguage()->getTag();
+		$UILang[true]  = substr($UILang[false], 0,2);
+		
+		return $UILang[$short_tag];
 	}
 
 
@@ -4628,7 +4619,6 @@ class FLEXIUtilities
 	 * @return object
 	 * @since 1.5
 	 */
-
 	static function loadTemplateLanguageFile( $tmplname='default', $view='' )
 	{
 		// Check that template name was given
@@ -4638,11 +4628,8 @@ class FLEXIUtilities
 		// e.g. en/en.category.ini, but this is an overkill and make result into duplication of strings ... better all in one file
 		$extension = '';  // JRequest::get('view');
 
-		// Current language, we decided to use LL-CC (language-country) format mapping SEF shortcode, e.g. 'en' to 'en-GB'
-		$user_lang = flexicontent_html::getUserCurrentLang();
-		$languages = FLEXIUtilities::getLanguages($hash='shortcode');
-		if ( !$user_lang || !isset($languages->$user_lang->code) ) return;  // Language has been disabled
-		$language_tag = $languages->$user_lang->code;
+		// Get current UI language, because language file paths use LL-CC (language-country)
+		$language_tag = JFactory::getLanguage()->getTag();
 
 		// We will use template folder as BASE of language files instead of joomla's language folder
 		// Since FLEXIcontent templates are meant to be user-editable it makes sense to place language files inside them
@@ -4652,7 +4639,8 @@ class FLEXIUtilities
 		JFactory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
 		JFactory::getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
 	}
-
+	
+	
 	/**
 	 * Method to get information of site languages
 	 *
