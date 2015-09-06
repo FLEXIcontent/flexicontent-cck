@@ -408,11 +408,11 @@ jQuery(document).ready(function() {
 });
 
 
-/* recalculate window width/height and widow scrollbars */
+// recalculate window width/height and window scrollbars
 function fc_recalculateWindow()
 {
 	// Set these to hidden to force scrollbar recalculation when we set to auto	
-	document.documentElement.style.overflow = "hidden";
+	/*document.documentElement.style.overflow = "hidden";
 	document.body.style.overflow = "hidden";
 	
 	// make sure widht & height is automatic
@@ -421,13 +421,11 @@ function fc_recalculateWindow()
 	document.body.style.height = "auto";
 	document.body.style.width  = "auto";
 	
-	//document.body.scroll = "no";  // old ie versions ??
 	setTimeout(function() {
 		document.documentElement.style.overflow = "";  // firefox, chrome, ie11+
 		document.body.style.overflow = "";
-		//document.body.scroll = "yes";  // old ie versions ??
-	}, 100);
+	}, 100);*/
 	
-	/* reset popup overlay containers ... TODO add more ? */
+	// reset popup overlay containers ... TODO add more ?
 	jQuery('#OverlayContainer').css("height", jQuery('body').css('height'));
 }
