@@ -55,9 +55,12 @@ if ( $show_mod )
 	// initialize various variables
 	$document	= JFactory::getDocument();
 	$caching 	= $app->getCfg('caching', 0);
+	$flexiparams = JComponentHelper::getParams('com_flexicontent');
+	
+	// Other parameters
 	$moduleclass_sfx= $params->get('moduleclass_sfx', '');
 	$layout 				= $params->get('layout', 'default');
-	$add_ccs 				= $params->get('add_ccs', 1);
+	$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
 	$add_tooltips 	= $params->get('add_tooltips', 1);
 	
 	$text      = JText::_($params->get('text', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
@@ -152,7 +155,6 @@ if ( $show_mod )
 	require(JModuleHelper::getLayoutPath('mod_flexiadvsearch', $layout));
 	
 	// append performance stats to global variable
-	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
 		$modfc_jprof->mark('END: FLEXIcontent Adv Search Module');

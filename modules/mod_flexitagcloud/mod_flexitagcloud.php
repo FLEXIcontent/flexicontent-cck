@@ -52,12 +52,13 @@ if ( $show_mod )
 	// initialize various variables
 	$document = JFactory::getDocument();
 	$caching 	= $app->getCfg('caching', 0);
+	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 
 	// include the helper only once
 	require_once (dirname(__FILE__).DS.'helper.php');
 
 	// get module's basic display parameters
-	$add_ccs 				= $params->get('add_ccs', 1);
+	$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
 	$layout 				= $params->get('layout', 'default');
 
 	// Add css
@@ -91,7 +92,6 @@ if ( $show_mod )
 	require(JModuleHelper::getLayoutPath('mod_flexitagcloud', $layout));
 	
 	// append performance stats to global variable
-	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
 		$modfc_jprof->mark('END: FLEXIcontent Tags Cloud Module');

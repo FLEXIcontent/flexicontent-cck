@@ -29,7 +29,7 @@
 		<fieldset name="basic">
 		
 			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level0" />
-			<field name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexifilter/tmpl"
+			<field name="layout" type="fclayout" label="FLEXI_CHOOSE_TMPL" description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexifilter/tmpl"
 					default="default"  hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" />
@@ -218,7 +218,8 @@
 			
 			<field name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" />
 			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
-			<field name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC" class="btn-group btn-group-yesno">
+			<field name="add_ccs" type="radio" default="" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC" class="btn-group btn-group-yesno">
+				<option value="">Use component setting</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">CSS links inside HTML (allows capturing)</option>

@@ -55,6 +55,7 @@ if ( $show_mod )
 	// initialize various variables
 	$document = JFactory::getDocument();
 	$caching 	= $app->getCfg('caching', 0);
+	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	
 	// include the helper only once
 	require_once (dirname(__FILE__).DS.'helper.php');
@@ -62,7 +63,7 @@ if ( $show_mod )
 	// Other parameters
 	$moduleclass_sfx= $params->get('moduleclass_sfx', '');
 	$layout 				= $params->get('layout', 'default');
-	$add_ccs 				= $params->get('add_ccs', 1);
+	$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
 	$add_tooltips 	= $params->get('add_tooltips', 1);
 	$autosubmit  	  = $params->get('filter_autosubmit', 0);
 	
@@ -327,7 +328,6 @@ if ( $show_mod )
 	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 	
 	// append performance stats to global variable
-	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
 		$modfc_jprof->mark('END: FLEXIcontent Filter-Search Module');

@@ -59,6 +59,7 @@ if ( $show_mod )
 	global $globalcats;
 	$document = JFactory::getDocument();
 	$caching 	= $app->getCfg('caching', 0);
+	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	
 	// include the helper only once
 	require_once (dirname(__FILE__).DS.'helper.php');
@@ -79,7 +80,7 @@ if ( $show_mod )
 	// get module's basic display parameters
 	$moduleclass_sfx= $params->get('moduleclass_sfx', '');
 	$layout 				= $params->get('layout', 'default');
-	$add_ccs 				= $params->get('add_ccs', 1);
+	$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
 	$add_tooltips 	= $params->get('add_tooltips', 1);
 	$width 					= $params->get('width');
 	$height 				= $params->get('height');
@@ -236,7 +237,6 @@ if ( $show_mod )
 	);
 	
 	// append performance stats to global variable
-	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
 		$modfc_jprof->mark('END: FLEXIcontent Module');
