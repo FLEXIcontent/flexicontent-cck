@@ -75,6 +75,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// Get model
 		$model  = $this->getModel();
+		// Indicate to model that current view IS item form
+		$model->isForm = false;
+		
 		$cid    = $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id
 		
 		// Decide version to load
@@ -86,8 +89,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		$model->setItemLayout('__request__');
 		// Indicate to model to merge menu parameters if menu matches
 		$model->mergeMenuParams = true;
-		// Indicate to model that current view IS item form
-		$model->isForm = false;
 		
 		
 		// Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
@@ -508,6 +509,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
 		$model = $this->getModel();
+		// Indicate to model that current view IS item form
+		$model->isForm = true;
 		
 		// ** WE NEED TO get OR decide the Content Type, before we call the getItem
 		// ** We rely on typeid Request variable to decide type for new items so make sure this is set,
@@ -540,8 +543,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		$version = JRequest::getVar( 'version', 0, 'request', 'int' );   // Load specific item version (non-zero), 0 version: is unversioned data, -1 version: is latest version (=default for edit form)
 		// Indicate to model to merge menu parameters if menu matches
 		$model->mergeMenuParams = true;
-		// Indicate to model that current view IS item form
-		$model->isForm = true;
 		
 		// Get the item, loading item data and doing parameters merging
 		$item = $model->getItem(null, $check_view_access=false, $no_cache=true, $force_version=($version!=0 ? $version : -1));  // -1 version means latest
@@ -969,7 +970,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// ****************************************************************
 
 		if ( JHTML::_('date', $item->publish_down , 'Y') <= 1969 || $item->publish_down == $nullDate ) {
-			$item->publish_down= JText::_( 'FLEXI_NEVER' );
+			$item->publish_down = '';//JText::_( 'FLEXI_NEVER' );
 		}
 		
 		

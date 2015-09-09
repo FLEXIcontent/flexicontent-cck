@@ -188,10 +188,10 @@ class FlexicontentModelItemcompare extends JModelLegacy
 			$item->created				= $createdate->toUnix();
 			$item->created_by			= null;
 			$item->created_by_alias		= '';
-			$item->modified				= $nullDate;
+			$item->modified				= '';//$nullDate//JText::_( 'FLEXI_NEVER' );
 			$item->modified_by		= null;
 			$item->publish_up 		= $createdate->toUnix();
-			$item->publish_down 	= JText::_( 'FLEXI_NEVER' );
+			$item->publish_down 	= '';//$nullDate//JText::_( 'FLEXI_NEVER' );
 			$item->attribs				= null;
 			$item->access					= 0;
 			$item->metadata				= null;

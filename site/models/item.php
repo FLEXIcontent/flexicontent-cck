@@ -373,8 +373,10 @@ class FlexicontentModelItem extends ParentClassItem
 	 * @return	void
 	 * @since	1.5
 	 */
-	function _loadItemParams()
+	function _loadItemParams($force=false)
 	{
+		if (!$force && !empty($this->_item->parameters)) return;
+		
 		$app = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
 		$isnew = !$this->_id;
@@ -443,7 +445,7 @@ class FlexicontentModelItem extends ParentClassItem
 		
 		// d. Merge the active menu parameters, verify menu item points to current FLEXIcontent object
 		if ( $menu && !empty($this->mergeMenuParams) ) {
-			if ($this->isForm) {
+			if (!empty($this->isForm)) {
 				$this->menu_matches = false;
 				$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'] || 'article' == @$menu->query['view'];
 				$this->menu_matches = $view_ok;
@@ -475,7 +477,7 @@ class FlexicontentModelItem extends ParentClassItem
 			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
 			
 			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
-			$default_heading = $this->isForm ? $this->_item->title :
+			$default_heading = !empty($this->isForm) ? $this->_item->title :
 				(!$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' ));
 			
 			// Decide to show page heading (=J1.5 page title), there is no need for this in item view
@@ -505,7 +507,6 @@ class FlexicontentModelItem extends ParentClassItem
 		// *********************************************
 		// Finally set 'parameters' property of the item
 		// *********************************************
-		
 		$this->_item->parameters = $params;
 	}
 	

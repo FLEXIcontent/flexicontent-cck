@@ -726,48 +726,8 @@ class FlexicontentViewItem extends JViewLegacy
 		// In J1.6+ we declare them in the item form XML file
 		// **************************************************************
 		
-		if (!FLEXI_J16GE) {
-			// Create the form parameters object
-			if (FLEXI_ACCESS) {
-				$formparams = new JParameter('', JPATH_COMPONENT.DS.'models'.DS.'item2.xml');
-			} else {
-				$formparams = new JParameter('', JPATH_COMPONENT.DS.'models'.DS.'item.xml');
-			}
-
-			// Details Group
-			$active = (intval($item->created_by) ? intval($item->created_by) : $user->get('id'));
-			if (!FLEXI_ACCESS) {
-				$formparams->set('access', $item->access);
-			}
-			$formparams->set('created_by', $active);
-			$formparams->set('created_by_alias', $item->created_by_alias);
-			$formparams->set('created', JHTML::_('date', $item->created, '%Y-%m-%d %H:%M:%S'));
-			$formparams->set('publish_up', JHTML::_('date', $item->publish_up, '%Y-%m-%d %H:%M:%S'));
-			if ( JHTML::_('date', $item->publish_down, '%Y') <= 1969 || $item->publish_down == $db->getNullDate() || empty($item->publish_down) ) {
-				$formparams->set('publish_down', JText::_( 'FLEXI_NEVER' ));
-			} else {
-				$formparams->set('publish_down', JHTML::_('date', $item->publish_down, '%Y-%m-%d %H:%M:%S'));
-			}
-
-			// Advanced Group
-			$formparams->loadINI($item->attribs);
-
-			//echo "<pre>"; print_r($formparams->_xml['themes']->_children[0]);  echo "<pre>"; print_r($formparams->_xml['themes']->param[0]); exit;
-			foreach($formparams->_xml['themes']->_children as $i => $child) {
-				if ( isset($child->_attributes['enableparam']) && !$params->get($child->_attributes['enableparam']) ) {
-					unset($formparams->_xml['themes']->_children[$i]);
-					unset($formparams->_xml['themes']->param[$i]);
-				}
-			}
-
-			// Metadata Group
-			$formparams->set('description', $item->metadesc);
-			$formparams->set('keywords', $item->metakey);
-			$formparams->loadINI($item->metadata);
-		} else {
-			if ( JHTML::_('date', $item->publish_down , 'Y') <= 1969 || $item->publish_down == $db->getNullDate() || empty($item->publish_down) ) {
-				$form->setValue('publish_down', null, JText::_( 'FLEXI_NEVER' ) );
-			}
+		if ( JHTML::_('date', $item->publish_down , 'Y') <= 1969 || $item->publish_down == $db->getNullDate() || empty($item->publish_down) ) {
+			$form->setValue('publish_down', null, ''/*JText::_( 'FLEXI_NEVER' )*/);  // Setting to text will break form date element 
 		}
 		
 		
