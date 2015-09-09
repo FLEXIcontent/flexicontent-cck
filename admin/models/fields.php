@@ -505,7 +505,7 @@ class FlexicontentModelFields extends JModelList
 			}
 			
 			// Get affected fields, non affected fields must have been locked by another user
-			$affected = $this->_db->getAffectedRows($result);
+			$affected = $this->_db->getAffectedRows();
 			$locked = count($support_ids) - $affected;
 		}
 		return $affected;

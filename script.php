@@ -545,7 +545,7 @@ class com_flexicontentInstallerScript
 							$db->setQuery($query);
 							try {
 								$db->execute();
-								echo ($count_rows = $db->getAffectedRows($result)) ?
+								echo ($count_rows = $db->getAffectedRows()) ?
 									'<span class="badge badge-success">'.$count_rows.' effected rows </span>' :
 									'<span class="badge badge-info">no changes</span>' ;
 							}
@@ -575,7 +575,7 @@ class com_flexicontentInstallerScript
 							$db->setQuery($query);
 							try {
 								$db->execute();
-								echo ($count_rows = $db->getAffectedRows($result)) ?
+								echo ($count_rows = $db->getAffectedRows()) ?
 									'<span class="badge badge-success">'.$count_rows.' effected rows </span>' :
 									'<span class="badge badge-info">no changes</span>' ;
 							}
@@ -613,7 +613,7 @@ class com_flexicontentInstallerScript
 							continue;
 						}
 						
-						$count_rows = $db->getAffectedRows($result);
+						$count_rows = $db->getAffectedRows();
 						$msg[$n] = '<span class="label label-'.($count_rows ? 'warning' : 'info').'">'.$count_rows.'</span><span class="label">'.$old_type.'</span> &nbsp; ';
 						
 						$query = 'SELECT *, extension_id AS id '
@@ -1113,7 +1113,7 @@ class com_flexicontentInstallerScript
 							$db->setQuery($query);
 							try {
 								$db->execute();
-								echo ($count_rows = $db->getAffectedRows($result)) ?
+								echo ($count_rows = $db->getAffectedRows()) ?
 									'<span class="badge badge-success">'.$count_rows.' effected rows </span>' :
 									'<span class="badge badge-info">no changes</span>' ;
 							}
@@ -1296,21 +1296,20 @@ class com_flexicontentInstallerScript
 						
 						if ( !empty($queries) ) {
 							$count_rows = 0;
-							foreach ($queries as $query) {
+							foreach ($queries as $tbl => $query) {
 								$db->setQuery($query);
 								try {
 									$db->execute();
-									if ($tbl=='jcomments') $count_rows = (int)$db->getAffectedRows($result);
+									if ($tbl=='jcomments') $count_rows = (int)$db->getAffectedRows();
 								}
 								catch (Exception $e) {
 									echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
-									$result = false;
 									break;
 								}
 							}
 							if ( $count_rows ) {
 								echo '<span class="badge badge-success">'.JText::_("Comments restored").' ('.$count_rows.' effected rows)</span>';
-							} else if ($result!==false) echo '<span class="badge badge-info">restoring not needed</span>';
+							} else echo '<span class="badge badge-info">restoring not needed</span>';
 						}
 						else echo '<span class="badge badge-info">jComments not installed, nothing to do</span>';
 						?>
