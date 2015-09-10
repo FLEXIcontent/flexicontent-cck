@@ -396,6 +396,10 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		}
 		$pretext  = '<span '.$fieldgroup_itemtype_code.'" >'.$pretext;
 		$posttext = $posttext.'</span>';
+		if ($fieldgroup_itemtype_code) {
+			$pretext = '<span '.$fieldgroup_itemtype_code.' >'.$pretext;
+			$posttext = $posttext.'</span>';
+		}
 		
 		switch($separatorf)
 		{

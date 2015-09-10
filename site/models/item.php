@@ -477,7 +477,7 @@ class FlexicontentModelItem extends ParentClassItem
 			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
 			
 			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
-			$default_heading = !empty($this->isForm) ? $this->_item->title :
+			$default_heading = empty($this->isForm) ? $this->_item->title :
 				(!$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' ));
 			
 			// Decide to show page heading (=J1.5 page title), there is no need for this in item view
