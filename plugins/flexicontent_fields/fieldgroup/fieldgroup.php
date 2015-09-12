@@ -394,8 +394,6 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$pretext = '<div class="fc-fieldgrp-value-box">';
 			$posttext = '</div>';
 		}
-		$pretext  = '<span '.$fieldgroup_itemtype_code.'" >'.$pretext;
-		$posttext = $posttext.'</span>';
 		if ($fieldgroup_itemtype_code) {
 			$pretext = '<span '.$fieldgroup_itemtype_code.' >'.$pretext;
 			$posttext = $posttext.'</span>';
@@ -521,6 +519,11 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		//foreach ($gf_names as $i => $gf_name)
 		//	$parsed_fields[] = $gf_names[$i] . ($gf_methods[$i] ? "->". $gf_methods[$i] : "");
 		//echo "$custom_html :: Fields for Related Items List: ". implode(", ", $parsed_fields ? $parsed_fields : array() ) ."<br/>\n";
+		$_name_to_field = array();
+		foreach($grouped_fields as $i => $grouped_field) {
+			$_name_to_field[$grouped_field->name] = & $grouped_fields[$i];
+		}
+		//print_r(array_keys($_name_to_field)); echo "<br/>";
 		
 		
 		// ***********************************************************************
@@ -538,23 +541,26 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		// **************************************************************
 		
 		$_rendered_fields = array();
-		$found_names = array_flip($gf_names);
-		//print_r($gf_names);
 		if ( count($gf_names) )
 		{
 			$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));;
 			$gf_props = array();
-			foreach($grouped_fields as $grouped_field) {
-				if ( ! isset($found_names[ $grouped_field->name ]) ) continue;
-				
-				$pos = $found_names[ $grouped_field->name ];
-				$_rendered_fields[$pos] = $grouped_field;
-				
+			foreach($gf_names as $pos => $grp_field_name)
+			{
 				// Check if display method is 'label' aka nothing to render
 				if ( $gf_methods[$pos] == 'label' ) continue;
 				
-				// Check if display method of the field has been created already
+				// Check that field exists and is assgined the fieldgroup field
+				$grouped_field = $_name_to_field[$grp_field_name];
+				if ( ! isset($_name_to_field[$grp_field_name]) ) continue;
+				
+				$_rendered_fields[$pos] = $grouped_field;
+				
+				// Optional use custom display method
 				$method = $gf_methods[$pos] ? $gf_methods[$pos] : 'display';
+				
+				// SAME field with SAME method, may have been used more than ONCE, inside the custom HTML parameter
+				// Check if field has been rendered already
 				if ( isset($grouped_field->{$method}) && is_array($grouped_field->{$method}) ) continue;
 				
 				// Render the display method for the given field
@@ -564,8 +570,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				//echo 'Rendering: '. $grouped_field->name . ', method: ' . $method . '<br/>';
 				//FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayFieldValue', array(&$grouped_field, $item, $_values, $method));
 				
-				unset($grouped_field->$method);  // Unset display variable to make sure display HTML it is created, because we reuse the field
 				FlexicontentFields::renderField($item, $grouped_field, $_values, $method, $view);  // Includes content plugins triggering
+				//print_r($grouped_field->$method);
 				unset($grouped_field->ingroup);
 			}
 		}
@@ -577,16 +583,25 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		// *******************************************************************
 		
 		$custom_display = array();
+		//echo "<br/>max_count: ".$max_count."<br/>";
 		for($n=0; $n < $max_count; $n++) {
 			$rendered_html = $custom_html;
-			foreach($_rendered_fields as $pos => $_rendered_field) {
-				$pos = $found_names[ $_rendered_field->name ];
+			foreach($_rendered_fields as $pos => $_rendered_field)
+			{
 				$method = $gf_methods[$pos] ? $gf_methods[$pos] : 'display';
 				//echo 'Replacing: '. $_rendered_field->name . ', method: ' . $method . ', index: ' .$n. '<br/>';
-				$rendered_html = str_replace($gf_reps[$pos], @ $_rendered_field->{$method}[$n], $rendered_html);
-				//unset($_rendered_field->{$method});  // Unset display of fields in case they need to be rendered again
+				if ($method!='label')
+					$_html = isset($_rendered_field->{$method}[$n]) ? $_rendered_field->{$method}[$n] : '';
+				else
+					$_html = $_rendered_field->label;
+				$rendered_html = str_replace($gf_reps[$pos], $_html, $rendered_html);
 			}
 			$custom_display[$n] = $pretext . $rendered_html . $posttext;
+		}
+		
+		// IMPORTANT FIELD IS REUSED, !! unset display methods since it maybe rendered again for different item
+		foreach($_rendered_fields as $pos => $_rendered_field) {
+			unset($_rendered_field->$method);
 		}
 		
 		return $custom_display;

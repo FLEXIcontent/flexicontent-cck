@@ -666,8 +666,15 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		$values = $values ? $values : $field->value;
 		
 		// Check for no values and not displaying ALL elements
-    $display_all = $field->parameters->get( 'display_all', 0 ) ;
-		if ( empty($values) && !$display_all ) { $field->{$prop} = ''; $field->display_index = ''; return; }
+    $display_all = $field->parameters->get( 'display_all', 0 ) && !$is_ingroup;  // NOT supported inside fielgroup yet
+		if ( empty($values) && !$display_all ) {
+			if (!$is_ingroup) {
+				$field->{$prop} = ''; $field->display_index = '';
+			} else {
+				$field->{$prop} = array(); $field->display_index = array();
+			}
+			return;
+		}
 		
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
@@ -777,7 +784,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			$html  = array();
 			$index = array();
 			
-			// CASE a. Display ALL elements (selected and NON-selected)
+			// CASE a. Display ALL elements (selected and NON-selected)   ***  NOT supported inside fieldgroup YET
 			if ( $display_all )
 			{
 				// *** value is always an array we made sure above
