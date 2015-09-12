@@ -332,7 +332,7 @@ class flexicontent_categories extends _flexicontent_categories
 				$query->where('id = '.(int) $this->id);
 				$this->_db->setQuery($query);
 				
-				if (!$this->_db->query()) {
+				if (!$this->_db->execute()) {
 					$e = new JException(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED_UPDATE_ASSET_ID', $this->_db->getErrorMsg()));
 					$this->setError($e);
 					return false;
@@ -350,8 +350,8 @@ class flexicontent_categories extends _flexicontent_categories
 				. ' WHERE id = ' . (int)$this->id;
 				;
 			$this->_db->setQuery($query);
-			$this->_db->query();
-			if (!$this->_db->query()) {
+			$this->_db->execute();
+			if (!$this->_db->execute()) {
 				$e = new JException(JText::sprintf($this->_db->getErrorMsg()));
 				$this->setError($e);
 				return false;

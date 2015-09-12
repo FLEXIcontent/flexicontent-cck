@@ -260,7 +260,7 @@ class FlexicontentModelArchive extends JModelList
 
 			$this->_db->setQuery( $query );
 			
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -272,7 +272,7 @@ class FlexicontentModelArchive extends JModelList
 
 			$this->_db->setQuery( $query );
 			
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -283,7 +283,7 @@ class FlexicontentModelArchive extends JModelList
 					;
 			$this->_db->setQuery($query);
 
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -294,7 +294,7 @@ class FlexicontentModelArchive extends JModelList
 					;
 			$this->_db->setQuery($query);
 
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -305,7 +305,7 @@ class FlexicontentModelArchive extends JModelList
 					;
 			$this->_db->setQuery($query);
 
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -317,7 +317,7 @@ class FlexicontentModelArchive extends JModelList
 
 			$this->_db->setQuery( $query );
 
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -373,7 +373,7 @@ class FlexicontentModelArchive extends JModelList
 					. ' AND ( checked_out = 0 OR ( checked_out = ' .$userid. ' ) )'
 			;
 			$this->_db->setQuery( $query );
-			if (!$this->_db->query()) {
+			if (!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}

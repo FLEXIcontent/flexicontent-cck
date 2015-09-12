@@ -663,7 +663,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. ' WHERE item_id = ' . (int)$id
 				;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 					
 		return $lang;
 	}
@@ -729,7 +729,7 @@ class FlexicontentModelItems extends JModelLegacy
 					.' SET c.catid=' .$default_cat
 					.' WHERE cat.id IS NULL';
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		// Correct non-existent main category in content table
 		$query = 'UPDATE #__flexicontent_items_tmp as c '
@@ -737,7 +737,7 @@ class FlexicontentModelItems extends JModelLegacy
 					.' SET c.catid=' .$default_cat
 					.' WHERE cat.id IS NULL';
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 	}
 	
 	
@@ -772,7 +772,7 @@ class FlexicontentModelItems extends JModelLegacy
 						.' SET c.catid=' .$default_cat
 						.' WHERE cat.id IS NULL';
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 			$session->set('badcats_fixed', 1, 'flexicontent');
 		}
 		
@@ -795,7 +795,7 @@ class FlexicontentModelItems extends JModelLegacy
 				."  VALUES ".$catrel
 				." ON DUPLICATE KEY UPDATE ordering=ordering";
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		
 		$query = "SHOW VARIABLES LIKE '%max_allowed_packet%'";
@@ -833,7 +833,7 @@ class FlexicontentModelItems extends JModelLegacy
 						." VALUES " . $itemext_list
 						." ON DUPLICATE KEY UPDATE type_id=VALUES(type_id), language=VALUES(language), search_index=VALUES(search_index)";
 				$this->_db->setQuery($query);
-				$this->_db->query();
+				$this->_db->execute();
 				// reset the item array
 				$itemext = array();
 				
@@ -841,7 +841,7 @@ class FlexicontentModelItems extends JModelLegacy
 					." SET type_id=".$typeid
 					." WHERE id IN(".implode(',',$id_arr).")";
 				$this->_db->setQuery($query);
-				$this->_db->query();
+				$this->_db->execute();
 				// reset the item id array
 				$id_arr = array();
 				
@@ -890,7 +890,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); } catch (Exception $e) { $result = false; }
+		try { $result = $db->execute(); } catch (Exception $e) { $result = false; }
 		if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
 		return $result;
@@ -1631,7 +1631,7 @@ class FlexicontentModelItems extends JModelLegacy
 							.' VALUES(' . $field->field_id . ', ' . $row->id . ', ' . $field->valueorder . ', ' . $field->suborder . ', ' . $this->_db->Quote($field->value) . ')'
 							;
 						$this->_db->setQuery($query);
-						$this->_db->query();
+						$this->_db->execute();
 					}
 				}
 				
@@ -1660,7 +1660,7 @@ class FlexicontentModelItems extends JModelLegacy
 						. ' VALUES(1 ,'  . $cv->field_id . ', ' . $row->id . ', ' . $cv->valueorder . ', ' . $cv->suborder . ', ' . $this->_db->Quote($cv->value) . ')'
 						;
 					$this->_db->setQuery($query);
-					$this->_db->query();
+					$this->_db->execute();
 				}
 
 				// get the item categories
@@ -1677,7 +1677,7 @@ class FlexicontentModelItems extends JModelLegacy
 							.' VALUES(' . $cat . ',' . $row->id . ')'
 							;
 					$this->_db->setQuery($query);
-					$this->_db->query();
+					$this->_db->execute();
 				}
 			
 				if ($keeptags)
@@ -1696,7 +1696,7 @@ class FlexicontentModelItems extends JModelLegacy
 								.' VALUES(' . $tag . ',' . $row->id . ')'
 								;
 						$this->_db->setQuery($query);
-						$this->_db->query();
+						$this->_db->execute();
 					}
 				}
 
@@ -1904,7 +1904,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. ' WHERE itemid = '.$itemid
 				;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		foreach($seccats as $cat)
 		{
@@ -1912,7 +1912,7 @@ class FlexicontentModelItems extends JModelLegacy
 					.' VALUES(' . $cat . ',' . $itemid . ')'
 					;
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 		}
 		
 		// update version table
@@ -1925,7 +1925,7 @@ class FlexicontentModelItems extends JModelLegacy
 					. ' AND suborder = 1'
 					;
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 		}
 		
 		return true;
@@ -2091,7 +2091,7 @@ class FlexicontentModelItems extends JModelLegacy
 					. ' AND catid = ' . $row_ord_catid
 					;
 				$this->_db->setQuery( $query );  //echo $query."\n";
-				$this->_db->query();
+				$this->_db->execute();
 
 				if ( $this->_db->getErrorNum() ) {
 					$msg = $this->_db->getErrorMsg();
@@ -2105,7 +2105,7 @@ class FlexicontentModelItems extends JModelLegacy
 					. ' AND catid = ' . $row_ord_catid
 					;
 				$this->_db->setQuery( $query );  //echo $query."\n";
-				$this->_db->query();
+				$this->_db->execute();
 
 				if ( $this->_db->getErrorNum() ) {
 					$msg = $this->_db->getErrorMsg();
@@ -2242,7 +2242,7 @@ class FlexicontentModelItems extends JModelLegacy
 							.' AND itemid = ' . (int)$cid[$i]
 							;
 					$this->_db->setQuery($query);  //echo "$query <br/>";
-					$this->_db->query();
+					$this->_db->execute();
 					
 					if ( $this->_db->getErrorNum() ) {
 						$msg = $this->_db->getErrorMsg();
@@ -2303,7 +2303,7 @@ class FlexicontentModelItems extends JModelLegacy
 											. ' AND catid = '. $altered_catid
 											;
 									$this->_db->setQuery( $query);  //echo "$query <br/>";
-									$this->_db->query();
+									$this->_db->execute();
 									
 									if ( $this->_db->getErrorNum() ) {
 										$msg = $this->_db->getErrorMsg();
@@ -2426,7 +2426,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. ' WHERE id IN ('. $cids .')';
 		$this->_db->setQuery( $query );
 		
-		if(!$this->_db->query()) {
+		if(!$this->_db->execute()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -2442,7 +2442,7 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		$this->_db->setQuery( $query );
 		
-		if(!$this->_db->query()) {
+		if(!$this->_db->execute()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -2456,7 +2456,7 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		$this->_db->setQuery( $query );
 		
-		if(!$this->_db->query()) {
+		if(!$this->_db->execute()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -2470,7 +2470,7 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		$this->_db->setQuery( $query );
 		
-		if(!$this->_db->query()) {
+		if(!$this->_db->execute()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -2484,7 +2484,7 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		$this->_db->setQuery($query);
 
-		if(!$this->_db->query()) {
+		if(!$this->_db->execute()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -2498,7 +2498,7 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		$this->_db->setQuery($query);
 
-		if(!$this->_db->query()) {
+		if(!$this->_db->execute()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -2512,7 +2512,7 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		$this->_db->setQuery( $query );
 
-		if(!$this->_db->query()) {
+		if(!$this->_db->execute()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -2526,7 +2526,7 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		$this->_db->setQuery( $query );
 
-		if(!$this->_db->query()) {
+		if(!$this->_db->execute()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -2540,7 +2540,7 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		$this->_db->setQuery( $query );
 
-		if(!$this->_db->query()) {
+		if(!$this->_db->execute()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -2554,7 +2554,7 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		$this->_db->setQuery( $query );
 
-		if(!$this->_db->query()) {
+		if(!$this->_db->execute()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -2568,7 +2568,7 @@ class FlexicontentModelItems extends JModelLegacy
 			;
 		$this->_db->setQuery( $query );
 		
-		if(!$this->_db->query()) {
+		if(!$this->_db->execute()) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
@@ -2899,7 +2899,7 @@ class FlexicontentModelItems extends JModelLegacy
 			. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .'='. $flexi->id
 			;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		return $logs;
 	}
 	

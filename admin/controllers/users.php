@@ -190,7 +190,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 					. ' WHERE member_id = ' . (int)$user->get('id')
 					;
 			$db->setQuery( $query );
-			$db->query();
+			$db->execute();
 			
 			// Save new records
 			foreach ($data['groups'] as $group)
@@ -199,7 +199,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 						. ' SET `group_id` = ' . (int)$group . ', `member_id` = ' . (int)$user->get('id')
 						;
 				$db->setQuery( $query );
-				$db->query();
+				$db->execute();
 			}
 		}
 		// *** EOF FLEXIACCESS INTEGRATION *** //		

@@ -493,7 +493,7 @@ class flexicontent_items extends _flexicontent_items {
 			if ($duplicate_aliases) {
 				$query 	= 'UPDATE #__content SET alias='.$this->_db->Quote($this->alias.'_'.$this->id).' WHERE id='.(int)$this->id;
 				$this->_db->setQuery($query);
-				$this->_db->query();
+				$this->_db->execute();
 			}
 		}
 		// If the table is not set to track assets return true.
@@ -552,7 +552,7 @@ class flexicontent_items extends _flexicontent_items {
 			$query->where( $this->_db->quoteName( $k ) .' = '.(int) $this->$k);
 			$this->_db->setQuery($query);
 
-			if (!$this->_db->query()) {
+			if (!$this->_db->execute()) {
 				$e = new JException(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED_UPDATE_ASSET_ID', $this->_db->getErrorMsg()));
 				$this->setError($e);
 				return false;

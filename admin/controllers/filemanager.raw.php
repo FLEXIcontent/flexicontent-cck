@@ -142,7 +142,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				. '  END '
 				.' WHERE id IN ('.implode(', ',$query_itemids).')';
 			$db->setQuery($query);
-			$db->query();
+			$db->execute();
 		}
 		
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;

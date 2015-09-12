@@ -2312,11 +2312,11 @@ class FlexicontentFields
 			try {
 				// Use sub-query on temporary table
 				$db->setQuery('CREATE TEMPORARY TABLE IF NOT EXISTS '.$tmp_tbl.' (id INT, KEY(`id`))');
-				$db->query();
+				$db->execute();
 				$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
-				$db->query();
+				$db->execute();
 				$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$query);
-				$db->query();
+				$db->execute();
 				$_query = $query;
 				$query = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using temporary table: ".$query." for :".$_query ." <br/><br/>";
 				/*$db->setQuery($query);
@@ -2401,11 +2401,11 @@ class FlexicontentFields
 			try {
 				// Use sub-query on temporary table
 				$db->setQuery('CREATE TEMPORARY TABLE IF NOT EXISTS '.$tmp_tbl.' (id INT, KEY(`id`))');
-				$db->query();
+				$db->execute();
 				$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
-				$db->query();
+				$db->execute();
 				$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$query);
-				$db->query();
+				$db->execute();
 				$_query = $query;
 				$query = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using temporary table: ".$query." for :".$_query ." <br/><br/>";
 				/*$db->setQuery($query);
@@ -3247,11 +3247,11 @@ class FlexicontentFields
 				try {
 					// Use sub-query on temporary table
 					$db->setQuery('CREATE TEMPORARY TABLE IF NOT EXISTS '.$tmp_tbl.' (id INT, KEY(`id`))');
-					$db->query();
+					$db->execute();
 					$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
-					$db->query();
+					$db->execute();
 					$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$view_n_text);
-					$db->query();
+					$db->execute();
 					$iids_subquery[$view_n_text] = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/> FILTER INITIALIZATION - using temporary table: ".$iids_subquery[$view_n_text]." for :".$view_n_text ." <br/><br/>";
 				}
 				catch (Exception $e) {
@@ -3375,11 +3375,11 @@ class FlexicontentFields
 				try {
 					// Use sub-query on temporary table
 					$db->setQuery('CREATE TEMPORARY TABLE IF NOT EXISTS '.$tmp_tbl.' (id INT, KEY(`id`))');
-					$db->query();
+					$db->execute();
 					$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
-					$db->query();
+					$db->execute();
 					$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$view_n_text);
-					$db->query();
+					$db->execute();
 					$iids_subquery[$view_n_text] = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/> FILTER INITIALIZATION - using temporary table: ".$iids_subquery[$view_n_text]." for :".$view_n_text ." <br/><br/>";
 				}
 				catch (Exception $e) {

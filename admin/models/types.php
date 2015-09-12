@@ -227,7 +227,7 @@ class FlexicontentModelTypes extends JModelList
 				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 			;
 			$this->_db->setQuery( $query );
-			if (!$this->_db->query()) {
+			if (!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -283,7 +283,7 @@ class FlexicontentModelTypes extends JModelList
 					. ' WHERE id IN ('. $cids .')'
 					;
 			$this->_db->setQuery( $query );
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -293,7 +293,7 @@ class FlexicontentModelTypes extends JModelList
 					. ' WHERE type_id IN ('. $cids .')'
 					;
 			$this->_db->setQuery( $query );
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -332,7 +332,7 @@ class FlexicontentModelTypes extends JModelList
 				foreach ($rels as $rel) {
 					$query = 'INSERT INTO #__flexicontent_fields_type_relations (`field_id`, `type_id`, `ordering`) VALUES(' . (int)$rel->field_id . ',' . $type->id . ',' . (int)$rel->ordering . ')';
 					$this->_db->setQuery($query);
-					$this->_db->query();
+					$this->_db->execute();
 				}
 			}
 			return true;

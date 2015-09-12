@@ -693,7 +693,7 @@ class ParentClassItem extends JModelAdmin
 				// Overcome possible group concat limitation
 				$query="SET SESSION group_concat_max_len = 9999999";
 				$db->setQuery($query);
-				$db->query();
+				$db->execute();
 				
 				$query = "SELECT f.id, f.name, f.field_type, GROUP_CONCAT(iv.value SEPARATOR ',') as value, count(f.id) as valuecount, iv.field_id"
 					." FROM #__flexicontent_items_versions as iv "
@@ -2071,7 +2071,7 @@ class ParentClassItem extends JModelAdmin
 		// ******************************************************************************************************
 		
 		// Some compatibility steps
-		if (!$isnew) { $db->setQuery( 'UPDATE #__content SET state = '. $jm_state .' WHERE id = '.$item->id );  $db->query(); }
+		if (!$isnew) { $db->setQuery( 'UPDATE #__content SET state = '. $jm_state .' WHERE id = '.$item->id );  $db->execute(); }
 	  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
 		
 		if ( $print_logging_info ) $start_microtime = microtime(true);
@@ -2079,7 +2079,7 @@ class ParentClassItem extends JModelAdmin
 		if ( $print_logging_info ) $fc_run_times['onContentBeforeSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Reverse compatibility steps
-		if (!$isnew) { $db->setQuery( 'UPDATE #__content SET state = '. $fc_state .' WHERE id = '.$item->id );  $db->query(); }
+		if (!$isnew) { $db->setQuery( 'UPDATE #__content SET state = '. $fc_state .' WHERE id = '.$item->id );  $db->execute(); }
 		JRequest::setVar('view', $view);	  JRequest::setVar('option', 'com_flexicontent');
 		
 		if (in_array(false, $result, true))	{ $this->setError($item->getError()); return false; }    // cancel item save
@@ -2098,7 +2098,7 @@ class ParentClassItem extends JModelAdmin
 			{
 				$item->title = $item->id;
 				$this->_db->setQuery('UPDATE #__content SET title=id, alias=id WHERE id=' . (int)$item->id);
-				$this->_db->query();
+				$this->_db->execute();
 			}
 		} else {
 			// ??? Make sure the data of the model are correct  ??? ... maybe this no longer needed
@@ -2138,13 +2138,13 @@ class ParentClassItem extends JModelAdmin
 		if( $result==='abort' ) {
 			if ($isnew) {
 				$db->setQuery('DELETE FROM #__assets WHERE id = (SELECT asset_id FROM #__content WHERE id='.$item->id.')');
-				$db->query();
+				$db->execute();
 				$db->setQuery('DELETE FROM #__content WHERE id ='.$item->id);
-				$db->query();
+				$db->execute();
 				$db->setQuery('DELETE FROM #__flexicontent_items_ext WHERE item_id='.$item->id);
-				$db->query();
+				$db->execute();
 				$db->setQuery('DELETE FROM #__flexicontent_items_tmp WHERE id='.$item->id);
-				$db->query();
+				$db->execute();
 				
 				$this->setId(0);
 				$this->setError( $this->getError().' '.JText::_('FLEXI_NEW_ITEM_NOT_CREATED') );
@@ -2259,7 +2259,7 @@ class ParentClassItem extends JModelAdmin
 					.' AND version!=' . (int)$current_version
 					;
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 
 			$query = 'DELETE'
 					.' FROM #__flexicontent_versions'
@@ -2268,7 +2268,7 @@ class ParentClassItem extends JModelAdmin
 					.' AND version_id!=' . (int)$current_version
 					;
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 		}
 		if ( $print_logging_info ) @$fc_run_times['ver_cleanup_ver_metadata'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
@@ -2477,7 +2477,7 @@ class ParentClassItem extends JModelAdmin
 				// Remove item's old advanced search index entries
 				$query = "DELETE FROM ".$tbl_name." WHERE item_id=". $item->id;
 				$this->_db->setQuery($query);
-				$this->_db->query();
+				$this->_db->execute();
 			}
 		}
 		
@@ -2504,7 +2504,7 @@ class ParentClassItem extends JModelAdmin
 			) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`
 			';
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 		}
 		
 		
@@ -2547,7 +2547,7 @@ class ParentClassItem extends JModelAdmin
 		// Remove item's old advanced search index entries
 		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE item_id=". $item->id;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		// Store item's advanced search index entries
 		$queries = array();
@@ -2557,7 +2557,7 @@ class ParentClassItem extends JModelAdmin
 				." (field_id,item_id,extraid,search_index,value_id) VALUES "
 				.implode(",", $ai_query_vals);
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		}
 		foreach( $ai_query_vals_f as $_field_id => $_query_vals) {  // Current for advanced index only
@@ -2567,7 +2567,7 @@ class ParentClassItem extends JModelAdmin
 		}
 		foreach( $queries as $query ) {
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 		}
 		
 		// Assigned created basic search index into item object
@@ -2594,10 +2594,10 @@ class ParentClassItem extends JModelAdmin
 			//echo "delete __flexicontent_fields_item_relations, item_id: " .$item->id;
 			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 			$query = 'DELETE FROM #__flexicontent_items_versions WHERE item_id='.$item->id.' AND version='.((int)$last_version+1);
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 			
 			$untranslatable_fields = array();
 			if ($fields) foreach($fields as $field)
@@ -2610,7 +2610,7 @@ class ParentClassItem extends JModelAdmin
 					if (! $mval_query) {
 						$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id IN ('.implode(',',$assoc_item_ids).') AND field_id='.$field->id;
 						$this->_db->setQuery($query);
-						$this->_db->query();
+						$this->_db->execute();
 					} else {
 						$untranslatable_fields[] = $field->id;
 					}
@@ -2619,7 +2619,7 @@ class ParentClassItem extends JModelAdmin
 			if ( count($untranslatable_fields) ) {
 				$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id IN ('.implode(',',$assoc_item_ids).') AND field_id IN ('.implode(',',$untranslatable_fields) .')';
 				$this->_db->setQuery($query);
-				$this->_db->query();
+				$this->_db->execute();
 			}
 		}
 		
@@ -2744,7 +2744,7 @@ class ParentClassItem extends JModelAdmin
 					.") VALUES "
 					."\n".implode(",\n", $ver_query_vals);
 				$this->_db->setQuery($query);
-				$this->_db->query();
+				$this->_db->execute();
 				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			}
 			
@@ -2760,7 +2760,7 @@ class ParentClassItem extends JModelAdmin
 					.") VALUES "
 					."\n".implode(",\n", $rel_query_vals);
 				$this->_db->setQuery($query);
-				$this->_db->query();
+				$this->_db->execute();
 				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			}
 			
@@ -2895,12 +2895,12 @@ class ParentClassItem extends JModelAdmin
 		$tags = $data['tags'];
 		$query = 'DELETE FROM #__flexicontent_tags_item_relations WHERE itemid = '.$item->id;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		foreach($tags as $tag)
 		{
 			$query = 'INSERT INTO #__flexicontent_tags_item_relations (`tid`, `itemid`) VALUES(' . $tag . ',' . $item->id . ')';
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 		}
 		
 		// ***********************************************************************************************************
@@ -2912,7 +2912,7 @@ class ParentClassItem extends JModelAdmin
 			. ($cats ? ' AND catid NOT IN (' . implode(', ', $cats) . ')' : '')
 			;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 
 		// Get an array of the item's used categories (already assigned in DB)
 		$query 	= 'SELECT catid'
@@ -2932,7 +2932,7 @@ class ParentClassItem extends JModelAdmin
 		{
 			$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) VALUES ' . implode(",", $cat_vals);
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		}
 		
@@ -3010,7 +3010,7 @@ class ParentClassItem extends JModelAdmin
 			// Delete existing Joom!Fish translation data for the current item
 			$query  = "DELETE FROM  #__".$nn_content_tbl." WHERE language_id={$langs->$shortcode->id} AND reference_table='content' AND reference_id={$item->id}";
 			$db->setQuery($query);
-			$db->query();
+			$db->execute();
 			
 			// Apply new translation data
 			$translated_fields = array('title','alias','introtext','fulltext','metadesc','metakey');
@@ -3022,7 +3022,7 @@ class ParentClassItem extends JModelAdmin
 					"VALUES ( {$langs->$shortcode->id}, {$item->id}, 'content', '$fieldname', ".$db->Quote(@$jfdata[$fieldname]).", '".md5($item->{$fieldname})."', ".$db->Quote($item->{$fieldname}).", '$modified', '$modified_by', 1)";
 				//echo $query."<br/>\n";
 				$db->setQuery($query);
-				$db->query();
+				$db->execute();
 			}
 		}
 		
@@ -3115,7 +3115,7 @@ class ParentClassItem extends JModelAdmin
 		// delete current field values
 		$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.(int)$id;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		// load field values from the version to restore
 		$query 	= 'SELECT item_id, field_id, value, valueorder, suborder, iscore'
@@ -3194,12 +3194,12 @@ class ParentClassItem extends JModelAdmin
 		// Delete main vote type
 		$query = 'DELETE FROM #__content_rating WHERE content_id = '.$id;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		// Delete extra vote types
 		$query = 'DELETE FROM #__flexicontent_items_extravote WHERE content_id = '.$id;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 	}
 	
 	
@@ -3643,7 +3643,7 @@ class ParentClassItem extends JModelAdmin
 				//. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 			;
 			$this->_db->setQuery( $query );
-			$this->_db->query();
+			$this->_db->execute();
 			if ( $this->_db->getErrorNum() )  throw new Exception($this->_db->getErrorMsg(), 500);
 			
 			$query = 'UPDATE #__flexicontent_items_tmp'
@@ -3652,7 +3652,7 @@ class ParentClassItem extends JModelAdmin
 				//. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 			;
 			$this->_db->setQuery( $query );
-			$this->_db->query();
+			$this->_db->execute();
 			if ( $this->_db->getErrorNum() )  throw new Exception($this->_db->getErrorMsg(), 500);
 			
 			$query = 'UPDATE #__flexicontent_items_versions'
@@ -3663,7 +3663,7 @@ class ParentClassItem extends JModelAdmin
 				. ' AND version = ' .(int)$v['version']
 				;
 			$this->_db->setQuery( $query );
-			$this->_db->query();
+			$this->_db->execute();
 			if ( $this->_db->getErrorNum() )  throw new Exception($this->_db->getErrorMsg(), 500);
 		}
 		
@@ -4266,7 +4266,7 @@ class ParentClassItem extends JModelAdmin
 			$this->_db->setQuery( $query );
 			$cids = $this->_db->loadObjectList();
 			
-			if (!$this->_db->query()) {
+			if (!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -4475,7 +4475,7 @@ class ParentClassItem extends JModelAdmin
 				' SET featured = '.(int) $value.
 				' WHERE id IN ('.implode(',', $pks).')'
 			);
-			if (!$db->query()) {
+			if (!$db->execute()) {
 				throw new Exception($db->getErrorMsg());
 			}
 
@@ -4486,7 +4486,7 @@ class ParentClassItem extends JModelAdmin
 					'DELETE FROM #__content_frontpage' .
 					' WHERE content_id IN ('.implode(',', $pks).')'
 				);
-				if (!$db->query()) {
+				if (!$db->execute()) {
 					throw new Exception($db->getErrorMsg());
 				}
 			} else {
@@ -4515,7 +4515,7 @@ class ParentClassItem extends JModelAdmin
 						'INSERT INTO #__content_frontpage ('.$db->quoteName('content_id').', '.$db->quoteName('ordering').')' .
 						' VALUES '.implode(',', $tuples)
 					);
-					if (!$db->query()) {
+					if (!$db->execute()) {
 						$this->setError($db->getErrorMsg());
 						return false;
 					}

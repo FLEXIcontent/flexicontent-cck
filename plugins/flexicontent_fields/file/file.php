@@ -1133,7 +1133,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				. ', expire_on = NOW() + INTERVAL '. (int)$field_params->get('coupon_expiration_days', 15).' DAY'
 				;
 			$db->setQuery( $query );
-			$db->query();
+			$db->execute();
 			$coupon_id = $db->insertid();  // get id of newly created coupon
 			$coupon_vars = '&conid='.$coupon_id.'&contok='.$coupon_token;
 		}

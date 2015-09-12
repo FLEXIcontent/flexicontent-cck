@@ -440,7 +440,7 @@ class FlexicontentModelFields extends JModelList
 				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 			;
 			$this->_db->setQuery( $query );
-			if (!$this->_db->query()) {
+			if (!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -499,7 +499,7 @@ class FlexicontentModelFields extends JModelList
 				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 				;
 			$this->_db->setQuery( $query );
-			if ( !( $result = $this->_db->query() ) ) {
+			if ( !( $result = $this->_db->execute() ) ) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -585,7 +585,7 @@ class FlexicontentModelFields extends JModelList
 
 			$this->_db->setQuery( $query );
 
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -597,7 +597,7 @@ class FlexicontentModelFields extends JModelList
 
 			$this->_db->setQuery( $query );
 
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -609,7 +609,7 @@ class FlexicontentModelFields extends JModelList
 
 			$this->_db->setQuery( $query );
 
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -621,7 +621,7 @@ class FlexicontentModelFields extends JModelList
 
 			$this->_db->setQuery( $query );
 
-			if(!$this->_db->query()) {
+			if(!$this->_db->execute()) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
@@ -734,7 +734,7 @@ class FlexicontentModelFields extends JModelList
 				.' SELECT '.$target_id.', type_id, ordering FROM #__flexicontent_fields_type_relations as rel'
 				.' WHERE rel.field_id='.$source_id;
 			$db->setQuery($query);
-			$db->query();
+			$db->execute();
 			if ( $db->getErrorNum() ) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
@@ -745,7 +745,7 @@ class FlexicontentModelFields extends JModelList
 				.' SELECT '.$target_id.',item_id, valueorder, suborder, value FROM #__flexicontent_fields_item_relations as rel'
 				.' WHERE rel.field_id='.$source_id;
 			$db->setQuery($query);
-			$db->query();
+			$db->execute();
 			if ( $db->getErrorNum() ) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
@@ -858,7 +858,7 @@ class FlexicontentModelFields extends JModelList
 				;
 				$this->_db->setQuery( $query );
 
-				if (!$this->_db->query())
+				if (!$this->_db->execute())
 				{
 					$msg = $this->_db->getErrorMsg();
 					$this->setError( $msg );
@@ -872,7 +872,7 @@ class FlexicontentModelFields extends JModelList
 				;
 				$this->_db->setQuery( $query );
 	
-				if (!$this->_db->query())
+				if (!$this->_db->execute())
 				{
 					$msg = $this->_db->getErrorMsg();
 					$this->setError( $msg );
@@ -890,7 +890,7 @@ class FlexicontentModelFields extends JModelList
 				;
 				$this->_db->setQuery( $query );
 	
-				if (!$this->_db->query())
+				if (!$this->_db->execute())
 				{
 					$msg = $this->_db->getErrorMsg();
 					$this->setError( $msg );
@@ -964,7 +964,7 @@ class FlexicontentModelFields extends JModelList
 
 					$this->_db->setQuery($query);
 
-					if (!$this->_db->query()) {
+					if (!$this->_db->execute()) {
 						$this->setError($this->_db->getErrorMsg());
 						return false;
 					}
@@ -998,7 +998,7 @@ class FlexicontentModelFields extends JModelList
 								. ' AND type_id = '.(int) $filter_type
 								;
 						$this->_db->setQuery( $query);
-						$this->_db->query();
+						$this->_db->execute();
 					}
 				}
 			}

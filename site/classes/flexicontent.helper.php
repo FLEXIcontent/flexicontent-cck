@@ -5435,7 +5435,7 @@ class flexicontent_db
 				AND type = '.(int)$type;
 		$db->setQuery($query);
 		
-		return $db->query();
+		return $db->execute();
 	}
 	
 	
@@ -5528,7 +5528,7 @@ class flexicontent_db
 			if (!$query) continue;
 			
 			$db->setQuery($query);
-			$result = $db->query();
+			$result = $db->execute();
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		}
 	}
