@@ -260,7 +260,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ( FLEXI_J16GE && $menu->language=='' ) {
 			$query 	=	"UPDATE #__menu SET `language`='*' WHERE id=". (int)$default_menu_itemid;
 			$this->_db->setQuery($query);
-			$result = $this->_db->query();
+			$result = $this->_db->execute();
 		}
 		
 		// All checks passed
@@ -392,7 +392,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// Make sure basic CORE fields are published
 		$q = 'UPDATE #__flexicontent_fields SET published=1 WHERE id > 0 AND id < 7';
 		$this->_db->setQuery( $q );
-		$this->_db->query();
+		$this->_db->execute();
 		
 		$tbl   = FLEXI_J16GE ? '#__extensions' : '#__plugins';
 		$idcol = FLEXI_J16GE ? 'extension_id' : 'id';
@@ -544,14 +544,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			." LEFT JOIN #__content AS c ON d.id = c.id"
 			." WHERE c.id IS NULL";
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		// Clear orphan data from the TMP data tables
 		$query = "DELETE d.* FROM #__flexicontent_items_ext AS d"
 			." LEFT JOIN #__content AS c ON d.item_id = c.id"
 			." WHERE c.id IS NULL";
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 
 		// Find columns cached
 		$cache_tbl = "#__flexicontent_items_tmp";
@@ -865,7 +865,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		// create a temporary table to store the positions
 		$this->_db->setQuery( "DROP TABLE IF EXISTS #__flexicontent_positions_tmp" );
-		$this->_db->query();
+		$this->_db->execute();
 		$query = "
 				CREATE TABLE #__flexicontent_positions_tmp (
 				  `field` varchar(100) NOT NULL default '',
@@ -875,7 +875,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8
 				";
 		$this->_db->setQuery( $query );
-		$this->_db->query();
+		$this->_db->execute();
 
 		foreach ($fields as $field) {			
 			$field->positions = explode("\n", $field->positions);	
@@ -883,7 +883,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$pos = explode('.', $pos);
 				$query = 'INSERT INTO #__flexicontent_positions_tmp (`field`, `view`, `folder`, `position`) VALUES(' . $this->_db->Quote($field->name) . ',' . $this->_db->Quote($pos[1]) . ',' . $this->_db->Quote($pos[2]) . ',' . $this->_db->Quote($pos[0]) . ')';
 				$this->_db->setQuery($query);
-				$this->_db->query();
+				$this->_db->execute();
 			}
 		}
 
@@ -912,7 +912,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 							$this->_db->setQuery($query);
 							// By catching SQL error (e.g. layout configuration of template already exists),
 							// we will allow execution to continue, thus clearing "positions" column in fields table
-							try { $this->_db->query(); } catch (Exception $e) { }
+							try { $this->_db->execute(); } catch (Exception $e) { }
 							if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
 						}
 					}
@@ -923,20 +923,20 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// delete the temporary table
 		$query = 'DROP TABLE #__flexicontent_positions_tmp';
 		$this->_db->setQuery( $query );
-		$this->_db->query();
+		$this->_db->execute();
 		
 		// delete the old positions
 		$query 	= "UPDATE #__flexicontent_fields SET positions = ''";
 		$this->_db->setQuery( $query );
-		$this->_db->query();
+		$this->_db->execute();
 		
 		// alter ordering field for releases prior to beta5
 		$query 	= "ALTER TABLE #__flexicontent_cats_item_relations MODIFY `ordering` int(11) NOT NULL default '0'";
 		$this->_db->setQuery( $query );
-		$this->_db->query();
+		$this->_db->execute();
 		$query 	= "ALTER TABLE #__flexicontent_fields_type_relations MODIFY `ordering` int(11) NOT NULL default '0'";
 		$this->_db->setQuery( $query );
-		$this->_db->query();
+		$this->_db->execute();
 		
 		return $return;
 	}
@@ -1017,7 +1017,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 						. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .'='. $flexi->id
 						;
 				$this->_db->setQuery($query);
-				$this->_db->query();
+				$this->_db->execute();
 				return true;
 			}
 		}
@@ -1145,7 +1145,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				if ($clean_database && $fieldsvals) {
 					$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$row->id;
 					$db->setQuery($query);
-					$db->query();
+					$db->execute();
 				}
 				
 				// Delete any existing versioned field values to avoid conflicts, this maybe redudant, since they should not exist,
@@ -1153,7 +1153,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				// NOTE: we do not delete data with field_id negative as these exist only in the versioning table
 				$query = 'DELETE FROM #__flexicontent_items_versions WHERE item_id = '.$row->id .' AND version= '.$row->version.' AND field_id > 0';
 				$db->setQuery($query);
-				$db->query();
+				$db->execute();
 				
 				// Add the 'maintext' field to the fields array for adding to versioning table
 				$f = new stdClass();
@@ -1180,7 +1180,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					$categories = array($catid = $row->catid);
 					$query = "INSERT INTO #__flexicontent_cats_item_relations VALUES('$catid','".$row->id."', '0');";
 					$db->setQuery($query);
-					$db->query();
+					$db->execute();
 				}
 				$f = new stdClass();
 				$f->id 					= 13;
@@ -1272,7 +1272,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			;
 		if ( count($cases) ) {
 			$db->setQuery($query);
-			$db->query();
+			$db->execute();
 			if ($db->getErrorNum()) echo $db->getErrorMsg();
 		}
 		
@@ -1326,7 +1326,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			;
 		if ( count($cases) ) {
 			$db->setQuery($query);
-			$db->query();
+			$db->execute();
 			if ($db->getErrorNum()) echo $db->getErrorMsg();
 		}*/
 	}
@@ -1527,21 +1527,21 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$query = $db->getQuery(true)->delete('#__assets')->where('name LIKE ' . $db->quote('flexicontent.%'));
 		$db->setQuery($query);
 		
-		try { $db->query(); } catch (Exception $e) { }
+		try { $db->execute(); } catch (Exception $e) { }
 		if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
 		// SET Access View Level to public (=1) for fields that do not have their Level set
 		$query = $db->getQuery(true)->update('#__flexicontent_fields')->set('access = 1')->where('access = 0');
 		$db->setQuery($query);
 		
-		try { $db->query(); } catch (Exception $e) { }
+		try { $db->execute(); } catch (Exception $e) { }
 		if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
 		// SET Access View Level to public (=1) for types that do not have their Level set
 		$query = $db->getQuery(true)->update('#__flexicontent_types')->set('access = 1')->where('access = 0');
 		$db->setQuery($query);
 		
-		try { $db->query(); } catch (Exception $e) { }
+		try { $db->execute(); } catch (Exception $e) { }
 		if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
 		// CHECK that we have the same Component Actions in assets DB table with the Actions as in component's access.xml file
@@ -1772,7 +1772,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					->where('id = ' . (int)$category->id);
 				$db->setQuery($query);
 				
-				if (!$db->query()) {
+				if (!$db->execute()) {
 					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
 					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
 					return false;
@@ -1849,7 +1849,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					->where('id = ' . (int)$item->id);
 				$db->setQuery($query);
 				
-				if (!$db->query()) {
+				if (!$db->execute()) {
 					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
 					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
 					return false;
@@ -1914,7 +1914,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					->where('id = ' . (int)$field->id);
 				$db->setQuery($query);
 				
-				if (!$db->query()) {
+				if (!$db->execute()) {
 					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
 					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
 					return false;
@@ -1978,7 +1978,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					->where('id = ' . (int)$type->id);
 				$db->setQuery($query);
 				
-				if (!$db->query()) {
+				if (!$db->execute()) {
 					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
 					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
 					return false;

@@ -92,7 +92,7 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 		$db->setQuery($query);
 		$translations = $db->loadObjectList('language');
 		try {
-			$db->query();
+			$db->execute();
 		}
 		catch (Exception $e) {
 			JError::raiseWarning( 500, $e->getMessage() );
@@ -115,7 +115,7 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 		$db->setQuery($query);
 		$translations = $db->loadObjectList('language');
 		try {
-			$db->query();
+			$db->execute();
 		}
 		catch (Exception $e) {
 			JError::raiseWarning( 500, $e->getMessage() );

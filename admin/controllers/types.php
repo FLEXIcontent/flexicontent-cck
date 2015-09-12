@@ -399,7 +399,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 				$db = JFactory::getDBO();
 				$query = "UPDATE #__flexicontent_types SET attribs=".$db->Quote($attribs) ." WHERE id = ".$id;
 				$db->setQuery($query);
-				$result = $db->query();
+				$result = $db->execute();
 				if ($db->getErrorNum())
 					JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 				else

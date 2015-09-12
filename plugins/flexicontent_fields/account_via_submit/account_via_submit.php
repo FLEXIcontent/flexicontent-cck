@@ -325,13 +325,13 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 				. ', id = ' . $item->id
 				;
 			$db->setQuery( $query );
-			$db->query();
+			$db->execute();
 			$res = $this->sendEditCoupon($item, $field, $email, $token);
 			if (!$res) {
 				// Delete edit coupon and cancel item creation if email coupon sending failed ??
 				$query = 'DELETE FROM #__flexicontent_edit_coupons WHERE id = '.$item->id;
 				$db->setQuery( $query );
-				$db->query();
+				$db->execute();
 				return false;
 			}
 		}
@@ -368,7 +368,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 		$db = JFactory::getDBO();
 		$query = "UPDATE #__flexicontent_fields SET attribs=".$db->Quote($attribs) ." WHERE id = ".$field->id;
 		$db->setQuery($query);
-		$result = $db->query();
+		$result = $db->execute();
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 	}
 	

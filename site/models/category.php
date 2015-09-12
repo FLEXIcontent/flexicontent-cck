@@ -2007,11 +2007,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 				try {
 					// Use sub-query on temporary table
 					$db->setQuery('CREATE TEMPORARY TABLE IF NOT EXISTS '.$tmp_tbl.' (id INT, KEY(`id`))');
-					$db->query();
+					$db->execute();
 					$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
-					$db->query();
+					$db->execute();
 					$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$query);
-					$db->query();
+					$db->execute();
 					$_query = $query;
 					$query = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/>GET FILTERED Items (cat model) -- [".$filter->name."] using temporary table: ".$query." for :".$_query ." <br/><br/>";
 					/*$db->setQuery($query);

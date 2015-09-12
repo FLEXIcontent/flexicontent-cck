@@ -629,7 +629,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		$query="SET SESSION group_concat_max_len = 9999999";
 		$db->setQuery($query);
-		$db->query();
+		$db->execute();
 		
 		
 		

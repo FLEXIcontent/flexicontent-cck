@@ -660,31 +660,31 @@ class FlexicontentControllerImport extends FlexicontentController
 					$item_id = $itemmodel->getId();
 					$q = "UPDATE #__content SET id='".$c_item_id."' WHERE id='".$item_id."'";
 					$db->setQuery($q);
-					$db->query();
+					$db->execute();
 					$q = "UPDATE #__flexicontent_items_ext SET item_id='".$c_item_id."' WHERE item_id='".$item_id."'";
 					$db->setQuery($q);
-					$db->query();
+					$db->execute();
 					$q = "UPDATE #__flexicontent_items_tmp SET id='".$c_item_id."' WHERE id='".$item_id."'";
 					$db->setQuery($q);
-					$db->query();
+					$db->execute();
 					$q = "UPDATE #__flexicontent_tags_item_relations SET itemid='".$c_item_id."' WHERE itemid='".$item_id."'";
 					$db->setQuery($q);
-					$db->query();
+					$db->execute();
 					$q = "UPDATE #__flexicontent_cats_item_relations SET itemid='".$c_item_id."' WHERE itemid='".$item_id."'";
 					$db->setQuery($q);
-					$db->query();
+					$db->execute();
 					$q = "UPDATE #__flexicontent_fields_item_relations SET item_id='".$c_item_id."' WHERE item_id='".$item_id."'";
 					$db->setQuery($q);
-					$db->query();
+					$db->execute();
 					$q = "UPDATE #__flexicontent_items_versions SET item_id='".$c_item_id."' WHERE item_id='".$item_id."'";
 					$db->setQuery($q);
-					$db->query();
+					$db->execute();
 					$q = "UPDATE #__flexicontent_versions SET item_id='".$c_item_id."' WHERE item_id='".$item_id."'";
 					$db->setQuery($q);
-					$db->query();
+					$db->execute();
 					$q = "UPDATE #__flexicontent_favourites SET itemid='".$c_item_id."' WHERE itemid='".$item_id."'";
 					$db->setQuery($q);
-					$db->query();
+					$db->execute();
 					
 					if (FLEXI_J16GE) {
 						$q = "UPDATE #__assets SET id='".$c_item_id."' WHERE id='".$item_id."'";
@@ -695,7 +695,7 @@ class FlexicontentControllerImport extends FlexicontentController
 							. " AND axo='".$item_id."'";
 					}
 					$db->setQuery($q);
-					$db->query();
+					$db->execute();
 				}
 			}
 		}

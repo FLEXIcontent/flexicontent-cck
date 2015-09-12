@@ -131,7 +131,7 @@ class FlexicontentModelTemplates extends JModelLegacy
 				. ' WHERE template = ' . $this->_db->Quote($dir)
 				;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		return true;
 	}

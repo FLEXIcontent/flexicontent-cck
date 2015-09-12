@@ -456,7 +456,7 @@ class FlexicontentModelCategory extends JModelAdmin
 				. ' WHERE id = ' . (int)$id
 				;
 		$this->_db->setQuery( $query );
-		if (!$this->_db->query()) {
+		if (!$this->_db->execute()) {
 			return false;
 		}
 		return true;

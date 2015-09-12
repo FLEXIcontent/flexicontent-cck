@@ -98,7 +98,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		else if ( !count($fields) )
 		{
 			$db->setQuery("UPDATE #__flexicontent_items_ext SET search_index = '' ");
-			$db->query();
+			$db->execute();
 		}
 		
 		
@@ -272,7 +272,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 			}
 			foreach( $queries as $query ) {
 				$db->setQuery($query);
-				$db->query();
+				$db->execute();
 			}
 		}
 		
@@ -286,17 +286,17 @@ class FlexicontentControllerSearch extends FlexicontentController
 				' isadvfilter = CASE isadvfilter WHEN 2 THEN 1   WHEN -1 THEN 0   ELSE isadvfilter   END');
 			$query = 'UPDATE #__flexicontent_fields'. $set_clause	." WHERE published=1";
 			$db->setQuery($query);
-			$db->query();
+			$db->execute();
 			
 			// Force SEARCH properties of unpublished fields to be: normal OFF
 			if ($indexer=='basic') {
 				$query = 'UPDATE #__flexicontent_fields SET issearch = 0 WHERE published=0';
 				$db->setQuery($query);
-				$db->query();
+				$db->execute();
 			}	else {
 				$query = 'UPDATE #__flexicontent_fields SET isadvsearch = 0, isadvfilter = 0  WHERE published=0';
 				$db->setQuery($query);
-				$db->query();
+				$db->execute();
 			}
 		}
 		

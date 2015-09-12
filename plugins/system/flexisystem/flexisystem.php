@@ -980,7 +980,7 @@ class plgSystemFlexisystem extends JPlugin
 			if ( count($checkin_records) ) {
 				$query = 'UPDATE #__'.$tablename.' SET checked_out = 0 WHERE id IN ('.  implode(",", $checkin_records)  .')';
 				$db->setQuery($query);
-				$db->query();
+				$db->execute();
 			}
 		}
 	}
@@ -1026,14 +1026,14 @@ class plgSystemFlexisystem extends JPlugin
 			' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
 		//echo $query;
 		$db->setQuery($query);
-		$db->query();
+		$db->execute();
 		
 		$query = 'UPDATE #__flexicontent_items_tmp SET state = '.$new_state.
 			($clear_publish_down_date ? ', publish_down = '.$db->Quote($nullDate) : '').
 			' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
 		//echo $query;
 		$db->setQuery($query);
-		$db->query();
+		$db->execute();
 	}
 	
 	
@@ -1048,9 +1048,9 @@ class plgSystemFlexisystem extends JPlugin
 			{
 				$db = JFactory::getDBO();
 				$db->setQuery('UPDATE #__content SET hits=hits+1 WHERE id = '.$item_id );
-				$db->query();
+				$db->execute();
 				$db->setQuery('UPDATE #__flexicontent_items_tmp SET hits=hits+1 WHERE id = '.$item_id );
-				$db->query();
+				$db->execute();
 			}
 		} else if ($option=='com_content' && $view=='article') {
 			// Always increment if non FLEXIcontent view
@@ -1064,7 +1064,7 @@ class plgSystemFlexisystem extends JPlugin
 					SET t.hits=i.hits
 					WHERE t.id = '.$item_id
 				);
-				$db->query();
+				$db->execute();
 			}
 		} else if ($option==$this->extension &&  $view=='category') {
 			$cat_id = JRequest::getInt('cid');
@@ -1083,7 +1083,7 @@ class plgSystemFlexisystem extends JPlugin
 					$session->set('cats_hit', $hit_arr, 'flexicontent');
 					$db = JFactory::getDBO();
 					$db->setQuery('UPDATE #__categories SET hits=hits+1 WHERE id = '.$cat_id );
-					$db->query();
+					$db->execute();
 				}
 			}
 		}
@@ -1162,11 +1162,11 @@ class plgSystemFlexisystem extends JPlugin
 			// Try to find matching records for visitor's IP, that is within time limit of unique hit
 			$query = "SELECT COUNT(*) FROM #__flexicontent_hits_log WHERE ip=".$db->quote($visitorip)." AND (timestamp + ".$db->quote($secs_between_unique_hit).") > ".$db->quote($current_secs). " AND item_id=". $item_id;
 			$db->setQuery($query);
-			$result = $db->query();
+			$result = $db->execute();
 			if ($db->getErrorNum()) {
 				$query_create = "CREATE TABLE #__flexicontent_hits_log (item_id INT PRIMARY KEY, timestamp INT NOT NULL, ip VARCHAR(16) NOT NULL DEFAULT '0.0.0.0')";
 				$db->setQuery($query_create);
-				$result = $db->query();
+				$result = $db->execute();
 				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 				return 1; // on select error e.g. table created, count a new hit
 			}
@@ -1179,7 +1179,7 @@ class plgSystemFlexisystem extends JPlugin
 						."  VALUES (".$db->quote($item_id).", ".$db->quote($current_secs).", ".$db->quote($visitorip).")"
 						." ON DUPLICATE KEY UPDATE timestamp=".$db->quote($current_secs).", ip=".$db->quote($visitorip);
 				$db->setQuery($query);
-				$result = $db->query();
+				$result = $db->execute();
 				if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 				return 1;  // last visit not found or is beyond time limit, count a new hit
 			}

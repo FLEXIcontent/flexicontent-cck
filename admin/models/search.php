@@ -436,7 +436,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$query = "DELETE FROM #__flexicontent_advsearch_index WHERE field_id IN (". $del_fieldids_list. ")";
 		}
 		$db->setQuery($query);
-		$db->query();
+		$db->execute();
 		
 		
 		// **********************
@@ -468,7 +468,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 				//$db->setQuery( 'DROP TABLE IF EXISTS '.$tbl_name );
 				$db->setQuery( 'TRUNCATE TABLE '.$tbl_name );
 			
-			$db->query();
+			$db->execute();
 		}
 		
 		// VERIFY all search tables exist
@@ -493,7 +493,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`
 			';
 			$db->setQuery($query);
-			$db->query();
+			$db->execute();
 		}
 		
 	}

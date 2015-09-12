@@ -394,7 +394,7 @@ class FlexicontentController extends JControllerLegacy
 		';
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); }
+		try { $result = $db->execute(); }
 		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 		
 		if (!$result) {
@@ -411,7 +411,7 @@ class FlexicontentController extends JControllerLegacy
 		';
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); }
+		try { $result = $db->execute(); }
 		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 		
 		if (!$result) {
@@ -444,14 +444,14 @@ class FlexicontentController extends JControllerLegacy
 		$flexi_comp_id = $db->loadResult();	
 		
 		$db->setQuery("DELETE FROM #__menu_types WHERE menutype='flexihiddenmenu' ");	
-		$db->query();
+		$db->execute();
 		
 		$db->setQuery("INSERT INTO #__menu_types (`menutype`,`title`,`description`) ".
 			"VALUES ('flexihiddenmenu', 'FLEXIcontent Hidden Menu', 'A hidden menu to host Flexicontent needed links')");
-		$db->query();
+		$db->execute();
 		
 		$db->setQuery("DELETE FROM #__menu WHERE menutype='flexihiddenmenu' ");	
-		$db->query();
+		$db->execute();
 		
 		$query 	=	"INSERT INTO #__menu ("
 			."`menutype`,`title`,`alias`,`path`,`link`,`type`,`published`,`parent_id`,`component_id`,`level`,"
@@ -463,7 +463,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); }
+		try { $result = $db->execute(); }
 		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 		
 		if (!$result) {
@@ -484,7 +484,7 @@ class FlexicontentController extends JControllerLegacy
 				;
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); }
+		try { $result = $db->execute(); }
 		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 		
 		if (!$result) {
@@ -536,7 +536,7 @@ class FlexicontentController extends JControllerLegacy
 		';
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); }
+		try { $result = $db->execute(); }
 		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 		
 		if (!$result) {
@@ -575,7 +575,7 @@ class FlexicontentController extends JControllerLegacy
 				;
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); }
+		try { $result = $db->execute(); }
 		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 		
 		if (!$result) {
@@ -652,7 +652,7 @@ class FlexicontentController extends JControllerLegacy
 				. ' )'
 				;
 		$db->setQuery($query);
-		$result1 = $db->query();
+		$result1 = $db->execute();
 		
 		// Sync language of items_ext table using the language from Joomla content table
 		$query 	= 'UPDATE #__flexicontent_items_ext AS ie'
@@ -661,7 +661,7 @@ class FlexicontentController extends JControllerLegacy
 				. ' WHERE i.language<>ie.language'
 				;
 		$db->setQuery($query);
-		$result1 = $db->query();
+		$result1 = $db->execute();
 	}
 	
 	
@@ -683,21 +683,21 @@ class FlexicontentController extends JControllerLegacy
 				. ' WHERE language = ""'
 				;
 		$db->setQuery($query);
-		$result1 = $db->query();
+		$result1 = $db->execute();
 		
 		$query 	= 'UPDATE #__flexicontent_items_tmp'
 				. ' SET language = ' . $db->Quote($lang)
 				. ' WHERE language = ""'
 				;
 		$db->setQuery($query);
-		$result1a = $db->query();
+		$result1a = $db->execute();
 		
 		$query 	= 'UPDATE #__content'
 				. ' SET language = ' . $db->Quote($lang)
 				. ' WHERE language = ""'
 				;
 		$db->setQuery($query);
-		$result2 = $db->query();
+		$result2 = $db->execute();
 		
 		return $result1 && $result1a && $result2;
 	}
@@ -721,7 +721,7 @@ class FlexicontentController extends JControllerLegacy
 			." WHERE i.id IS NULL";
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); }
+		try { $result = $db->execute(); }
 		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 		
 		if (!$result) {
@@ -741,7 +741,7 @@ class FlexicontentController extends JControllerLegacy
 			.' (catid, itemid, ordering) '.$subquery;
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); }
+		try { $result = $db->execute(); }
 		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 		
 		if (!$result) {
@@ -775,7 +775,7 @@ class FlexicontentController extends JControllerLegacy
 		{
 			$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `language` VARCHAR( 11 ) NOT NULL DEFAULT '' AFTER `type_id`" ;
 			$db->setQuery($query);
-			$result_lang_col = $db->query();
+			$result_lang_col = $db->execute();
 			if (!$result_lang_col) echo "Cannot add language column<br>";
 		} else $result_lang_col = true;
 		
@@ -785,7 +785,7 @@ class FlexicontentController extends JControllerLegacy
 		{
 			$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `lang_parent_id` INT NOT NULL DEFAULT 0 AFTER `language`" ;
 			$db->setQuery($query);
-			$result_tgrp_col = $db->query();
+			$result_tgrp_col = $db->execute();
 			if (!$result_tgrp_col) echo "Cannot add translation group column<br>";
 		} else $result_tgrp_col = true;
 		
@@ -812,10 +812,10 @@ class FlexicontentController extends JControllerLegacy
 			ON DUPLICATE KEY UPDATE id=id";
 		$db->setQuery($query);
 		try {
-			$convert_assocs = $db->query();
+			$convert_assocs = $db->execute();
 			$query 	=	"UPDATE `#__flexicontent_items_ext` SET lang_parent_id = 0";
 			$db->setQuery($query);
-			$clear_assocs = $db->query();
+			$clear_assocs = $db->execute();
 		}
 		catch (Exception $e) {
 			echo "Cannot convert FLEXIcontent associations to Joomla associations<br>";
@@ -889,7 +889,7 @@ class FlexicontentController extends JControllerLegacy
 					$query .= implode(', ', $index_cmds);
 					$db->setQuery($query);
 					
-					try { $result = $db->query(); }
+					try { $result = $db->execute(); }
 					catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 					
 					if (!$result) {
@@ -924,7 +924,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Truncate the table, this will handle redudant columns too
 		$db->setQuery('TRUNCATE TABLE '.$cache_tbl);
-		$db->query();
+		$db->execute();
 		$model = $this->getModel('items');
 		$result = $model->updateItemCountingData($rows = false);
 		
@@ -966,7 +966,7 @@ class FlexicontentController extends JControllerLegacy
 					;
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); }
+		try { $result = $db->execute(); }
 		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 		
 		if (!$result) {
@@ -1002,7 +1002,7 @@ class FlexicontentController extends JControllerLegacy
 					;
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); }
+		try { $result = $db->execute(); }
 		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 		
 		if (!$result) {
@@ -1126,7 +1126,7 @@ class FlexicontentController extends JControllerLegacy
 			;
 		foreach ($queries as $query) {
 			$db->setQuery($query);
-			$db->query();
+			$db->execute();
 		}
 		$query = "SELECT id,version,created,created_by FROM #__content " . (!FLEXI_J16GE ? "WHERE sectionid='".FLEXI_SECTION."'" : "");
 		$db->setQuery($query);
@@ -1157,7 +1157,7 @@ class FlexicontentController extends JControllerLegacy
 				if ($clean_database && $fields) {
 					$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$row->id;
 					$db->setQuery($query);
-					$db->query();
+					$db->execute();
 				}
 				
 				// Add the 'maintext' field to the fields array for adding to versioning table
@@ -1185,7 +1185,7 @@ class FlexicontentController extends JControllerLegacy
 					$categories = array($catid = $row->catid);
 					$query = "INSERT INTO #__flexicontent_cats_item_relations VALUES('$catid','".$row->id."', '0');";
 					$db->setQuery($query);
-					$db->query();
+					$db->execute();
 				}
 				$f = new stdClass();
 				$f->id					= 13;
@@ -1253,7 +1253,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		foreach ($queries as $query) {
 			$db->setQuery($query);
-			$db->query();
+			$db->execute();
 		}
 
 		$catscache = JFactory::getCache('com_flexicontent_cats');

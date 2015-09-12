@@ -408,7 +408,7 @@ class FlexicontentModelField extends JModelAdmin
 			. (!empty($types) ? ' AND type_id NOT IN (' . implode(', ', $types) . ')' : '')
 			;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		// draw an array of the used types
 		$query 	= 'SELECT type_id'
@@ -434,7 +434,7 @@ class FlexicontentModelField extends JModelAdmin
 					.' VALUES(' . $field->id . ',' . $type . ', ' . $ordering . ')'
 					;
 				$this->_db->setQuery($query);
-				$this->_db->query();
+				$this->_db->execute();
 			}
 		}
 	}

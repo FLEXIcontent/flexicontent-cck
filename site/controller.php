@@ -1572,7 +1572,7 @@ class FlexicontentController extends JControllerLegacy
 						. ( (int)$_xid ? ', field_id = '.(int)$_xid : '' );
 						
 					$db->setQuery( $query );
-					$db->query() or die( $db->stderr() );
+					$db->execute() or die( $db->stderr() );
 				}
 			}
 			
@@ -1619,7 +1619,7 @@ class FlexicontentController extends JControllerLegacy
 					. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
 					
 					$db->setQuery( $query );
-					$db->query() or die( $db->stderr() );
+					$db->execute() or die( $db->stderr() );
 				}
 			}
 			
@@ -2016,7 +2016,7 @@ class FlexicontentController extends JControllerLegacy
 					if ( !$slink_valid_coupon ) {
 						$query = ' DELETE FROM #__flexicontent_download_coupons WHERE id='. $coupon->id;
 						$db->setQuery( $query );
-						$db->query();
+						$db->execute();
 					}
 				}
 				
@@ -2186,7 +2186,7 @@ class FlexicontentController extends JControllerLegacy
 					;
 			}
 			$db->setQuery( $query );
-			$db->query();
+			$db->execute();
 			
 			
 			// **************************************************************************************************
@@ -2199,7 +2199,7 @@ class FlexicontentController extends JControllerLegacy
 						.' WHERE id='. $file_node->coupon->id
 						;
 					$db->setQuery( $query );
-					$db->query();
+					$db->execute();
 				}
 			}
 			
@@ -2641,7 +2641,7 @@ class FlexicontentController extends JControllerLegacy
 				;
 		$db->setQuery($query);
 		try {
-			$db->query();
+			$db->execute();
 		}
 		catch (Exception $e) {
 			JError::raiseWarning( 500, $e->getMessage() );

@@ -108,11 +108,11 @@ class FLEXIadvsearchHelper
 				. ' WHERE LOWER( search_term ) = '.$search_term
 				;
 				$db->setQuery( $query );
-				$db->query();
+				$db->execute();
 			} else {
 				$query = 'INSERT INTO #__core_log_searches VALUES ( '.$search_term.', 1 )';
 				$db->setQuery( $query );
-				$db->query();
+				$db->execute();
 			}
 		}
 	}

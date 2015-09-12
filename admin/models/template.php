@@ -208,7 +208,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 			. '  AND layout = ' . $this->_db->Quote($layout)
 			;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		$attribs = json_encode($attribs);
 		
@@ -221,7 +221,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 			')'
 			;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		return true;
 	}
@@ -324,7 +324,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 			. '  AND position = ' . $this->_db->Quote($pos)
 			;
 		$this->_db->setQuery( $query );
-		if (!$this->_db->query()) {
+		if (!$this->_db->execute()) {
 			JError::raiseWarning( 500, $this->_db->getError() );
 		}
 	}
@@ -379,7 +379,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 			. '  AND position IN (' . implode(',', $pos_quoted) . ')'
 			;
 		$this->_db->setQuery($query);
-		$this->_db->query();
+		$this->_db->execute();
 		
 		if ( count($rec_vals) ) {
 			$query 	= 'INSERT INTO #__flexicontent_templates '.
@@ -387,7 +387,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 				.'  VALUES '
 				.implode(",\n", $rec_vals);
 			$this->_db->setQuery($query);
-			$this->_db->query();
+			$this->_db->execute();
 		}
 		
 		return true;
