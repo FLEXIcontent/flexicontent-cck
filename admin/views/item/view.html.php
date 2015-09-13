@@ -224,7 +224,9 @@ class FlexicontentViewItem extends JViewLegacy
 			if ( $isAdmin && !$_sh404sef ) JFactory::$application = JApplication::getInstance('site');
 			
 			// Create the URL
-			$item_url = FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug);
+			$item_url =
+				FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug).
+				($item->language!='*' ? '&lang='.substr($item->language, 0,2) : '');
 			$item_url = $_sh404sef ?
 				Sh404sefHelperGeneral::getSefFromNonSef($item_url, $fullyQualified = true, $xhtml = false, $ssl = null) :
 				JRoute::_($item_url);

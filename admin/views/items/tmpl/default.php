@@ -748,7 +748,10 @@ jQuery(document).ready(function(){
 			<td align="center"><?php echo $cid_checkbox; ?></td>
 			<td align="center">
 				<?php
-				$item_url = str_replace('&', '&amp;', FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, (isset($globalcats[$row->catid]) ? $globalcats[$row->catid]->slug : ''), 0, $row));
+				$item_url = str_replace('&', '&amp;',
+					FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $row->categoryslug, 0, $row).
+					($row->language!='*' ? '&lang='.substr($row->language, 0,2) : '')
+				);
 				$item_url = JRoute::_(JURI::root().$item_url, $xhtml=false); // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
 				$previewlink = $item_url .'&amp;preview=1' .$autologin;
 				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
