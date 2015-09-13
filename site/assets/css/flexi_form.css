@@ -428,13 +428,13 @@ html button {
 	font-size:11px;
 	display:none;
 	padding: 4px 0px 4px 30px;
-	background: white url(../images/ajax-loader.gif) 0px 3px no-repeat;
+	background: transparent url(../images/ajax-loader.gif) 0px 3px no-repeat;
 }
 .fc_loading_msg {
 	font-size: 14px;
 	font-size: times;
 	padding: 4px 0px 4px 30px;
-	background: white url(../images/ajax-loader.gif) 6px 5px no-repeat;
+	background: transparent url(../images/ajax-loader.gif) 6px 5px no-repeat;
 }
 #flexi_form_submit_btns {
 	font-size:11px;
