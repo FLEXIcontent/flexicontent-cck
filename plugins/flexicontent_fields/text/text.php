@@ -351,10 +351,14 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$clean_output = $field->parameters->get('clean_output', 0);
 		$encode_output = $field->parameters->get('encode_output', 0);
 		$format_output = $field->parameters->get('format_output', 0);
-		if ($format_output==1) {
-			$decimal_digits_displayed = (int)$field->parameters->get('decimal_digits_displayed', 2);
+		if ($format_output > 0) {  // 1: decimal, 2: integer
+			$decimal_digits_displayed = $format_output==2 ? 0 : (int)$field->parameters->get('decimal_digits_displayed', 2);
 			$decimal_digits_sep    = $field->parameters->get('decimal_digits_sep', '.');
 			$decimal_thousands_sep = $field->parameters->get('decimal_thousands_sep', ',');
+			$output_prefix = JText::_($field->parameters->get('output_prefix', ''));
+			$output_suffix = JText::_($field->parameters->get('output_suffix', ''));
+		} else if ($format_output == -1) {
+			$output_custom_func = $field->parameters->get('output_custom_func', '');
 		}
 		
 		
@@ -384,12 +388,15 @@ class plgFlexicontent_fieldsText extends JPlugin
 			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
 			{
-				if ($format_output==1) {
-					$value = @ number_format($value, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
-					$value = $value === NULL ? 0 : '';
-				}
-				
 				if ( !strlen($value) ) continue;  // skip further actions
+				
+				if ($format_output > 0) {  // 1: decimal, 2: integer
+					$value = @ number_format($value, $decimal_digits_displayed, $decimal_digits_sep, $decimal_thousands_sep);
+					$value = $value === NULL ? 0 : $value;
+					$value = $output_prefix .$value. $output_suffix;
+				} else if (!empty($output_custom_func)) {
+					$value = eval( "\$value= \"{$value}\";" . $output_custom_func);
+				}
 				
 				if ($lang_filter_values) {
 					$value = JText::_($value);
@@ -530,6 +537,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
+		// Take into consideration client side validation
+		$inputmask	= $field->parameters->get( 'inputmask', false ) ;
+		
 		// Server side validation
 		$validation = $field->parameters->get( 'validation', 'HTML' ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
@@ -542,6 +552,24 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
+			// Unmasking is done via JS code, but try to redo it, to avoid value loss is unmasking was not done
+			if (1) {
+				JFactory::getApplication()->enqueueMessage( print_r($post[$n], true), 'warning');
+				if ($inputmask=="decimal_comma") {
+					$post[$n] = str_replace('.', '', $post[$n]);
+					$post[$n] = str_replace(',', '.', $post[$n]);
+				}
+				else if ($inputmask=="decimal_comma") {
+					$post[$n] = str_replace(',', '', $post[$n]);
+				}
+				else if ($inputmask=="currency" || $inputmask=="currency_euro") {
+					$post[$n] = str_replace('$', '', $post[$n]);
+					$post[$n] = str_replace(chr(0xE2).chr(0x82).chr(0xAC), '', $post[$n]);
+					$post[$n] = str_replace(',', '', $post[$n]);
+				}
+				JFactory::getApplication()->enqueueMessage( print_r($post[$n], true), 'warning');
+			}
+			
 			// Do server-side validation and skip empty values
 			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
 			
