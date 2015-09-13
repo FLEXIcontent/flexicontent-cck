@@ -577,6 +577,7 @@ class flexicontent_html
 		$JQUERY_UI_VER = !$params ? '1.9.2' : $params->get('jquery_ui_ver', '1.9.2');
 		$JQUERY_UI_THEME = !$params ? 'ui-lightness' : $params->get('jquery_ui_theme', 'ui-lightness');
 		$add_remote = (FLEXI_J30GE && $add_remote==2) || (!FLEXI_J30GE && $add_remote);
+		JText::script("FLEXI_FORM_IS_BEING_SUBMITTED", true);
 		
 		
 		// **************
@@ -890,19 +891,119 @@ class flexicontent_html
 				$document->addScript($framework_path.'/jquery.inputmask.bundle.min.js');
 				
 				// Extra inputmask declarations definitions, e.g. ...
-				/*$js .= "
-					jQuery.extend(jQuery.inputmask.defaults.definitions, {
-						'f': {
-								\"validator\": \"[0-9\(\)\.\+/ ]\",
-								\"cardinality\": 1,
-								'prevalidator': null
-						}
-					});
-				";*/
+				$js .= "
+				";
+				
 				
 				// Attach inputmask to all input fields that have appropriate tag parameters
 				$js .= "
 					jQuery(document).ready(function(){
+						Inputmask.extendAliases({
+							decimal: {
+								alias: 'numeric',
+								placeholder: '_',
+								autoGroup: true,
+								radixPoint: '.',
+								groupSeparator: ',',
+								clearMaskOnLostFocus: true,
+								removeMaskOnSubmit: true,
+								unmaskAsNumber: false
+							},
+							decimal_comma: {
+								alias: 'numeric',
+								placeholder: '_',
+								autoGroup: true,
+								radixPoint: ',',
+								groupSeparator: '.',
+								clearMaskOnLostFocus: true,
+								removeMaskOnSubmit: true,
+								unmaskAsNumber: false
+							},
+							currency: {
+								alias: 'numeric',
+								placeholder: '_',
+								prefix: '$ ',
+								groupSeparator: ',',
+								autoGroup: true,
+								digits: 2,
+								digitsOptional: false,
+								clearMaskOnLostFocus: true,
+								removeMaskOnSubmit: true,
+								unmaskAsNumber: false
+							},
+							currency_euro: {
+								alias: 'currency',
+								placeholder: '_',
+								prefix: '\u20ac ',
+								groupSeparator: ',',
+								autoGroup: true,
+								digits: 2,
+								digitsOptional: false,
+								clearMaskOnLostFocus: false,
+								removeMaskOnSubmit: true,
+								unmaskAsNumber: false
+							},
+							percentage_zero_nolimit: {
+								alias: 'percentage',
+								placeholder: '_',
+								digits: 2,
+								radixPoint: '.',
+								autoGroup: true,
+								min: 0,
+								max: '',
+								suffix: ' %',
+								allowPlus: false,
+								allowMinus: false,
+								clearMaskOnLostFocus: true,
+								removeMaskOnSubmit: true,
+								unmaskAsNumber: false
+							},
+							percentage_nolimit_nolimit: {
+								alias: 'percentage',
+								placeholder: '_',
+								digits: 2,
+								radixPoint: '.',
+								autoGroup: true,
+								min: '',
+								max: '',
+								suffix: ' %',
+								allowPlus: false,
+								allowMinus: true,
+								clearMaskOnLostFocus: true,
+								removeMaskOnSubmit: true,
+								unmaskAsNumber: false
+							},
+							integer: {
+								alias: 'numeric',
+								placeholder: '_',
+								digits: 0,
+								radixPoint: '',
+								clearMaskOnLostFocus: true,
+								removeMaskOnSubmit: true,
+								unmaskAsNumber: false
+							},
+							unsigned: {
+								alias: 'numeric',
+								placeholder: '_',
+								digits: 0,
+								radixPoint: '',
+								allowPlus: false,
+								allowMinus: false,
+								clearMaskOnLostFocus: true,
+								removeMaskOnSubmit: true,
+								unmaskAsNumber: false
+							},
+							'mobile': {
+								'mask': '9999 999 999',
+								'autounmask': true,
+								'insertMode': true,
+								placeholder: '_',
+								clearMaskOnLostFocus: true,
+								removeMaskOnSubmit: true,
+								unmaskAsNumber: false
+							}
+						});
+						
 						jQuery('input.has_inputmask').inputmask();
 						jQuery('input.inputmask-regex').inputmask('Regex');
 					});
@@ -5793,7 +5894,7 @@ class flexicontent_db
 					$cf = $sfx == '_2nd' ? 'f2' : 'f';
 					switch(strtolower($order_parts[2])) {
 						case 'int':     $order_col = 'CAST('.$cf.'.value AS SIGNED)';  break;
-						case 'decimal': $order_col = 'CAST('.$cf.'.value AS DECIMAL)'; break;
+						case 'decimal': $order_col = 'CAST('.$cf.'.value AS DECIMAL(65,15))'; break;
 						case 'date':    $order_col = 'CAST('.$cf.'.value AS DATE)'; break;
 						default:        $order_col = $cf.'.value'; break;
 					}
