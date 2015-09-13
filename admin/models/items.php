@@ -992,6 +992,7 @@ class FlexicontentModelItems extends JModelLegacy
 		} else {
 			$query =
 				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' u.name AS editor, rel.catid as rel_catid, '
+				. 'CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
 				. 'GROUP_CONCAT(DISTINCT icats.catid SEPARATOR  ",") AS relcats, '
 				. 'GROUP_CONCAT(DISTINCT tg.tid    SEPARATOR  ",") AS taglist, '
 				. 'level.title AS access_level, '
