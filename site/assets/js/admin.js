@@ -19,13 +19,13 @@
 /**
 * Check the form is valid and if true, submit it (overload the joomla.javascript.js one)
 */
-function fc_submit_form(form, pressbutton) {
+function fc_submit_form(form, task, validate) {
 	var jform = jQuery(form);
 	var doserialized = jform.attr('data-fc_doserialized_submit');
-
+	
 	var match_apply_ajax = new RegExp(/(.|^)apply_ajax$/);  // Do AJAX submit only for 'apply_ajax' button
 	var match_apply      = new RegExp(/(.|^)apply$/);  // Do AJAX submit only for 'apply_ajax' button
-	var doajax = match_apply_ajax.test(pressbutton)  ||  (match_apply.test(pressbutton) && jform.attr('data-fc_doajax_submit'));
+	var doajax = match_apply_ajax.test(task)  ||  (match_apply.test(task) && jform.attr('data-fc_doajax_submit'));
 	
 	var sdata_id = 'fcdata_serialized';
 	
@@ -84,16 +84,32 @@ function fc_submit_form(form, pressbutton) {
 	}
 }
 
-Joomla.submitform = function (pressbutton){
-	var form = document.adminForm;
 
-	var match_cancel = new RegExp(/(.|^)cancel$/);
-	if ( document.formvalidator && !match_cancel.test(pressbutton))
+function fc_admin_progress(percent, element) {
+	var progressBarWidth = percent * element.width() / 100;
+	element.find('div').animate({ width: progressBarWidth }, 5000).html("");
+}
+
+
+// Overload Joomla submit function
+Joomla.submitform = function(task, form, validate)
+{
+	if (!form) {
+		form = document.getElementById('adminForm');
+	}
+	form.noValidate = !!validate;
+	
+	// Do form validation if button task is not 'cancel'
+	var match_cancel = new RegExp(/(.*.|^)cancel$/);
+	var isCancel = match_cancel.test(task);
+	if ( document.formvalidator && !isCancel )
 	{
-		// formvalidator exists and button '*cancel'
-		if (!document.formvalidator.isValid(form))
+		//var start = new Date().getTime();
+		var isValid = document.formvalidator.isValid(form);
+		//alert('Execution time onSubmit events' + (new Date().getTime() - start));
+		
+		if (!isValid) // If form is invalid, then focus the first invalid element
 		{
-			// Form is invalid, focus the first invalid element
 			var invalid = jQuery('.invalid');
 			jQuery('html, body').animate({
 				scrollTop: invalid.offset().top - 80
@@ -102,10 +118,28 @@ Joomla.submitform = function (pressbutton){
 			return;
 		}
 	}
+	if (task) form.task.value=task;    // Set form's TASK field
 	
-	// Submit the form
-	if (pressbutton) form.task.value=pressbutton;  // Store the button task into the form
-	if (typeof form.onsubmit == "function")  form.onsubmit();  // Execute onsubmit
-	if (typeof form.fireEvent == "function") form.fireEvent('submit');  // Execute submit
-	return fc_submit_form(form, pressbutton);  // Submit the form
+	if (!isCancel) {
+		// Submit progress bar
+		jQuery('body').prepend(
+		 	'<span id="fc_filter_form_blocker">' +
+		    '<span class="fc_blocker_opacity"></span>' +
+		    '<span class="fc_blocker_content">' +
+		    	Joomla.JText._('FLEXI_FORM_IS_BEING_SUBMITTED') +
+		    	'<div class="fc_blocker_bar"><div></div></div>' +
+		    '</span>' +
+		  '</span>');
+		var fc_filter_form_blocker = jQuery("#fc_filter_form_blocker");
+		if (fc_filter_form_blocker) {
+			fc_filter_form_blocker.css("display", "block");
+			fc_admin_progress(95, jQuery('#fc_filter_form_blocker .fc_blocker_bar'));
+		}
+		
+		//var start = new Date().getTime();
+		jQuery(form).trigger('submit');    // Trigger submit events
+		//alert('Execution time onSubmit events' + (new Date().getTime() - start));
+	}
+	
+	return fc_submit_form(form, task); // Submit the form
 }

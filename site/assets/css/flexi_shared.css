@@ -1286,7 +1286,7 @@ table.fc-form-tbl td.data {
 
 #fc_filter_form_blocker .fc_blocker_bar {
 	display: block;
-	width: 200px;
+	width: 300px;
 	height: 22px;
 	border: 1px solid #111;
 	background-color: #292929;
