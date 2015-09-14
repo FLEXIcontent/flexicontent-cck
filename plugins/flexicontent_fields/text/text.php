@@ -554,7 +554,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		{
 			// Unmasking is done via JS code, but try to redo it, to avoid value loss is unmasking was not done
 			if (1) {
-				JFactory::getApplication()->enqueueMessage( print_r($post[$n], true), 'warning');
+				//JFactory::getApplication()->enqueueMessage( print_r($post[$n], true), 'warning');
 				if ($inputmask=="decimal_comma") {
 					$post[$n] = str_replace('.', '', $post[$n]);
 					$post[$n] = str_replace(',', '.', $post[$n]);
@@ -567,7 +567,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 					$post[$n] = str_replace(chr(0xE2).chr(0x82).chr(0xAC), '', $post[$n]);
 					$post[$n] = str_replace(',', '', $post[$n]);
 				}
-				JFactory::getApplication()->enqueueMessage( print_r($post[$n], true), 'warning');
+				//JFactory::getApplication()->enqueueMessage( print_r($post[$n], true), 'warning');
 			}
 			
 			// Do server-side validation and skip empty values
