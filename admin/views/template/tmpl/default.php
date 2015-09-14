@@ -606,9 +606,8 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					'your <b>content types / items</b> ' :
 					'your <b>content lists</b> (categories, etc)'
 				);?>
-				will inherit defaults from here, but may <b>override</b> them
-				<br/> -
-				<?php echo JText::_( 'setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
+				will inherit defaults from here, you may <b>override</b> them inside <b>type</b> (but <b>avoid</b> overriding inside the <b>item</b>)
+				<br/> -	<?php echo JText::_( 'setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
 			</span>
 			
 			<div style="max-width:1024px; margin-top:16px;">
