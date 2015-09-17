@@ -3579,7 +3579,7 @@ class flexicontent_html
 	{
 		// Return cached result
 		static $all_types;
-		if ( empty( $type_ids ) && isset( $all_types[$check_perms] ) )   return $all_types[$check_perms];
+		if ( empty( $type_ids ) && isset( $all_types[$check_perms][$published] ) )   return $all_types[$check_perms][$published];
 		
 		// Custom type_ids array given, do the query
 		$type_ids_list = false;
@@ -3612,9 +3612,14 @@ class flexicontent_html
 			}
 			$types = $_types;
 		}
+		if (!$published) {
+			foreach ($types as $type_id => $type) {
+				if ( !$type->published ) $types[$type_id]->name .= ' -U-';
+			}
+		}
 		
 		// Cache function result
-		if ( empty($type_ids ) )  $all_types[$check_perms] = $types;
+		if ( empty($type_ids ) )  $all_types[$check_perms][$published] = $types;
 		return $types;
 	}
 	
