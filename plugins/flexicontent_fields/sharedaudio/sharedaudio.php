@@ -80,7 +80,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			$field->html[$n] = '
 			<table class="admintable"><tbody>
 				<tr>
-					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_URL').'</td>
+					<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_URL').'</td>
 					<td>
 						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" '.$required.' />
 						<input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_FETCH').'" onclick="fetchAudio_'.$field->name.'();" />
@@ -89,7 +89,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				</tr>'
 			.($display_audiotype_form ? '
 				<tr>
-					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_TYPE').'</td>
+					<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_TYPE').'</td>
 					<td>
 						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][audiotype]" value="'.$value['audiotype'].'" size="10" readonly="readonly" style="background-color:#eee" />
 					</td>
@@ -97,7 +97,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				<input type="hidden" name="custom['.$field->name.'][audiotype]" value="'.$value['audiotype'].'" size="10" readonly="readonly" style="background-color:#eee" />')
 			.($display_audioid_form ? '
 				<tr>
-					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_ID').'</td>
+					<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_ID').'</td>
 					<td>
 						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][audioid]" value="'.$value['audioid'].'" size="15" readonly="readonly" style="background-color:#eee" />
 					</td>
@@ -105,7 +105,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				<input type="hidden" name="custom['.$field->name.'][audioid]" value="'.$value['audioid'].'" size="15" readonly="readonly" style="background-color:#eee" />')
 			.($display_title_form ? '
 				<tr>
-					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_TITLE').'</td>
+					<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_TITLE').'</td>
 					<td>
 						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />
 					</td>
@@ -113,7 +113,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				<input type="hidden" name="custom['.$field->name.'][title]" value="'.$value['title'].'" size="60" />')
 			.($display_author_form ? '
 				<tr>
-					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTHOR').'</td>
+					<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTHOR').'</td>
 					<td>
 						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />
 					</td>
@@ -121,7 +121,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				<input type="hidden" name="custom['.$field->name.'][author]" value="'.$value['author'].'" size="60" />')
 			.($display_duration_form ? '
 				<tr>
-					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DURATION').'</td>
+					<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DURATION').'</td>
 					<td>
 						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" />
 					</td>
@@ -129,7 +129,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				<input type="hidden" name="custom['.$field->name.'][duration]" value="'.$value['duration'].'" size="10" />')
 			.($display_description_form ? '
 				<tr>
-					<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DESCRIPTION').'</td>
+					<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DESCRIPTION').'</td>
 					<td>
 						<textarea class="fcfield_textareaval" name="custom['.$field->name.'][description]" rows="7" cols="50">'.$value['description'].'</textarea>
 					</td>
@@ -161,7 +161,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			
 			$field->html[$n] .= '
 				<tr>
-					<td class="key" align="right">
+					<td class="key">
 						'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PREVIEW').'
 					</td>
 					<td>

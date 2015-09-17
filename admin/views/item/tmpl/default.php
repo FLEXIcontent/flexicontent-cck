@@ -58,7 +58,7 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 	$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery('#input-tags').autocomplete('".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1', {
+			jQuery('#input-tags').autocomplete('".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&".JSession::getFormToken()."=1', {
 				width: 260,
 				max: 100,
 				matchContains: false,
@@ -113,7 +113,7 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 		});
 		
 		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: 'index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
+			jQuery.ajax({ url: 'index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&".JSession::getFormToken()."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
 				jQuery(this).html(\"\\
 				<table class='fc-table-list fc-tbl-short' style='margin:10px;'>\\
 				\"+str+\"\\
@@ -172,7 +172,7 @@ $this->document->addScriptDeclaration("
 		}
 	
 		var tag = new itemscreen();
-		tag.addtag( id, tagname, 'index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1');
+		tag.addtag( id, tagname, 'index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&".JSession::getFormToken()."=1');
 	}
 
 	function reseter(task, id, div){
@@ -326,7 +326,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			
 			<div class="fcclear"></div>
 			<span class="label-fcouter">
-			<label id="jform_catid-lbl" for="jform_catid" for_bck="jform_catid" class="label pull-left label-fcinner label-toplevel <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_SEC_FEAT_CATEGORIES_NOTES', 1, 1);?>">
+			<label id="jform_catid-lbl" for="jform_catid" data-for_bck="jform_catid" class="label pull-left label-fcinner label-toplevel <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_SEC_FEAT_CATEGORIES_NOTES', 1, 1);?>">
 				<?php echo JText::_( 'FLEXI_CATEGORY' ); ?>
 			</label>
 			</span>
@@ -377,7 +377,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								<li class="tagitem">
 									<span>'.$tag->name.'</span>
 									<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
-									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
+									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
 								</li>';
 							} else {
 								echo '
@@ -410,7 +410,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			?>
 			<div class="fcclear"></div>
 			<span class="label-fcouter">
-			<label id="jform_type_id-lbl" for="jform_type_id" for_bck="jform_type_id" <?php echo $label_tooltip; ?> >
+			<label id="jform_type_id-lbl" for="jform_type_id" data-for_bck="jform_type_id" <?php echo $label_tooltip; ?> >
 				<?php echo $field ? $field->label : JText::_( 'FLEXI_TYPE' ); ?>
 			</label>
 			</span>
@@ -587,7 +587,7 @@ $tabCnt[$tabSetCnt] = 0;
 			<?php /* description field label will be USED as TAB handle title, with field's description as Tooltip */
 			/*if ($display_label_form > 0): ?>
 				<span class="label-fcouter">
-				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
+				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" data-for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
 					<?php echo $field->label; ?>
 				</label>
 				</span>
@@ -732,7 +732,7 @@ if ($this->row->type_id) {
 				
 				<div class='fcclear'></div>
 				<span class="label-fcouter" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
-				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
+				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" data-for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
 					<?php echo $field->label; ?>
 				</label>
 				</span>
@@ -827,7 +827,7 @@ if ($this->row->type_id) {
 				
 				<div class="fcclear"></div>
 				<span class="label-fcouter">
-				<label id="jform_cid-lbl" for="jform_cid" for_bck="jform_cid" class="label pull-left label-fcinner label-toplevel">
+				<label id="jform_cid-lbl" for="jform_cid" data-for_bck="jform_cid" class="label pull-left label-fcinner label-toplevel">
 					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?>
 				</label>
 				</span>
@@ -840,7 +840,7 @@ if ($this->row->type_id) {
 			<?php if ( !empty($this->lists['featured_cid']) ) : ?>
 				<div class="fcclear"></div>
 				<span class="label-fcouter">
-				<label id="jform_featured_cid-lbl" for="jform_featured_cid" for_bck="jform_featured_cid" class="label pull-left label-fcinner label-toplevel">
+				<label id="jform_featured_cid-lbl" for="jform_featured_cid" data-for_bck="jform_featured_cid" class="label pull-left label-fcinner label-toplevel">
 					<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
 				</label>
 				</span>
@@ -1535,16 +1535,16 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 					<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
 					<td class="versions"><a href="javascript:;" class="hasTip" title="Comment::<?php echo htmlspecialchars($version->comment, ENT_COMPAT, 'UTF-8');?>"><?php echo $commentimage;?></a><?php
 					if((int)$version->nr==(int)$this->row->current_version) { ?>
-						<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&<?php echo $task_items;?>edit&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+						<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;cid=<?php echo $this->row->id;?>&amp;version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 					<?php }else{
 					?>
 						<a class="modal-versions"
-							href="index.php?option=com_flexicontent&view=itemcompare&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component"
+							href="index.php?option=com_flexicontent&amp;view=itemcompare&amp;cid=<?php echo $this->row->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;tmpl=component"
 							title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
 						>
 							<?php echo $viewimage; ?>
 						</a>
-						<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&task=items.edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1');"
+						<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&amp;task=items.edit&amp;cid=<?php echo $this->row->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo JSession::getFormToken();?>=1');"
 							href="javascript:;"
 							title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
 						>

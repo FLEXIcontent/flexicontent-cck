@@ -603,7 +603,8 @@ jQuery(document).ready(function() {
 		var err_cnt = 0;
 		jQuery('label, span.label-fcouter > span').each( function(g) {
 			g = jQuery(this);
-			label_for = g.attr('for_bck');
+			label_for = g.attr('data-for_bck');
+			if ( !label_for ) label_for = g.attr('for_bck');  // compatibility for older form overrides
 			if ( !label_for ) label_for = g.attr('for');
 			if ( label_for )  {
 				fcflabels[ label_for ] = this;
