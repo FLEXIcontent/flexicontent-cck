@@ -130,7 +130,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				if (file.substring(0,7)!='http://' || file.substring(0,8)!='https://') {
 					file = '".str_replace('\\','/', JPATH_ROOT)."/".$mediapath."/'+file;
 				}
-				thumb_src = '".JURI::root(true)."/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
+				thumb_src = '".JURI::root()."components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
 				
 				var lastField = null;
 				var newField = jQuery('\
@@ -222,9 +222,9 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		foreach($files_data as $file_id => $file_data)
 		{
 			$img_path = (substr($file_data->filename, 0,7)!='http://' || substr($file_data->filename, 0,8)!='https://') ?
-				JPATH_ROOT . DS . $mediapath . DS . $file_data->filename :
+				JURI::root(true) . '/' . $mediapath . '/' . $file_data->filename :
 				$file_data->filename ;
-			$src = JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
+			$src = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w=100&amp;h=100&amp;zc=1';
 			
 			$field->html[] = '
 				<img class="thumbs" src="'.$src.'" alt="Thumbnail" />
@@ -431,7 +431,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$usecaptions = (int)$field->parameters->get( 'usecaptions', 1 );
 		$captions = '';
 		if($usecaptions===2)
-			$captions = $field->parameters->get( 'customcaptions', 'This is a caption' );
+			$captions = htmlspecialchars($field->parameters->get( 'customcaptions', 'This is a caption' ), ENT_COMPAT, 'UTF-8');
 		
 		$group_str = 'data-fancybox-group="fcitem_'.$item->id.'_fcfield_'.$field->id.'"';
 		$n = 0;
@@ -441,15 +441,15 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$img_path = (substr($file_data->filename, 0,7)!='http://' || substr($file_data->filename, 0,8)!='https://') ?
 					JURI::root(true) . '/' . $mediapath . '/' . $file_data->filename :
 					$file_data->filename ;
-				$srcs	= JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
-				$srcb	= JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
+				$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
+				$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
 				$ext = pathinfo($img_path, PATHINFO_EXTENSION);
 				if ( in_array( $ext, array('png', 'ico', 'gif') ) ) {
 					$srcs .= '&f='. $ext;
 					$srcb .= '&f='. $ext;
 				}
 
-				if ($usecaptions===1) $captions = $file_data->altname;
+				if ($usecaptions===1) $captions = htmlspecialchars($file_data->altname, ENT_COMPAT, 'UTF-8');
 				if ($usepopup && $popuptype == 4) {
 					$display[] = '
 						<a href="'.$img_path.'" class="fc_image_thumb fancybox" '.$group_str.' title="'.$captions.'" >

@@ -327,7 +327,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			
 			$display_label_form= (int) $field->parameters->get( 'display_label_form', 1 ) ;
 			$placeholder = $display_label_form==-1 ? $field->label : '';
-			$attribs .= $placeholder ? ' placeholder="'.$placeholder.'" ' : '';
+			$attribs .= $placeholder ? ' data-placeholder="'.$placeholder.'" ' : '';
 			
 			if ($exact_values)  {
 				$attribs .= ' data-exact_values="'.$exact_values.'" ';
