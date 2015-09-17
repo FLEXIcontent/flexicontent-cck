@@ -446,7 +446,7 @@ class FlexicontentModelField extends JModelAdmin
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeslist ( $type_ids=false, $check_perms = false, $published=true )
+	function getTypeslist ( $type_ids=false, $check_perms = false, $published=false )
 	{
 		return flexicontent_html::getTypesList( $type_ids, $check_perms, $published);
 	}
