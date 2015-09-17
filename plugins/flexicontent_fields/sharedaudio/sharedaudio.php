@@ -156,7 +156,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 						break;
 				}
 				$val_id = $value['audioid'];  // In case of embed.ly, this is not id but it is full URL
-				$iframecode .= $val_id.'" width="240" height="135" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
+				$iframecode .= $val_id.'" width="240" height="135" style="border:0;" allowFullScreen></iframe>';
 			}
 			
 			$field->html[$n] .= '
@@ -256,7 +256,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				var myregexp = /(http:|ftp:|https:)?\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
 				if(data.html.match(myregexp) != null) {
 					var iframeurl = data.html.match(myregexp)[0];
-					var iframecode = \'<iframe class="sharedaudio" src="\'+iframeurl+\'" width="240" height="135" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>\';
+					var iframecode = \'<iframe class="sharedaudio" src="\'+iframeurl+\'" width="240" height="135" style="border:0;" allowFullScreen></iframe>\';
 					updateValueTypeId_'.$field->name.'("embed.ly:"+data.provider_name.toLowerCase(),iframeurl);
 					updateValueInfo_'.$field->name.'({title: data.title, author: data.author_name, duration: "", description: data.description, thumb: data.thumbnail_url});
 					document.getElementById("'.$field->name.'_thumb").innerHTML = iframecode;
@@ -288,7 +288,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 						iframecode += "//www.dailymotion.com/embed/video/";
 						break;
 				}
-				iframecode += audioID + \'" width="240" height="135" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>\';
+				iframecode += audioID + \'" width="240" height="135" style="border:0;" allowFullScreen></iframe>\';
 				document.getElementById("'.$field->name.'_thumb").innerHTML = iframecode;
 			}
 			else {
@@ -384,7 +384,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			}
 			$val_id = $value['audioid'];  // In case of embed.ly, this is not id but it is full URL
 			$field->{$prop} .= '
-				'.$val_id.'?autoplay='.$autostart.$_show_related.$_show_srvlogo.'" width="'.$width.'" height="'.$height.'" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+				'.$val_id.'?autoplay='.$autostart.$_show_related.$_show_srvlogo.'" width="'.$width.'" height="'.$height.'" style="border:0;" allowFullScreen></iframe>
 				'.($display_title && !empty($value['title'])   ? '<h'.$headinglevel.'>'.$value['title'].'</h'.$headinglevel.'>' : '').'
 				'.($display_author && !empty($value['author']) ? '<div class="author">'.$value['author'].'</div>' : '')
 				;

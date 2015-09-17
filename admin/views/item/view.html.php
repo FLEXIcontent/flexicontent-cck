@@ -240,7 +240,7 @@ class FlexicontentViewItem extends JViewLegacy
 				JFactory::$application = JApplication::getInstance('administrator');
 			}
 			
-			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? '&' : '?') .'preview=1' . $autologin;
+			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? '&amp;' : '?') .'preview=1' . $autologin;
 			//$previewlink     = str_replace('&amp;', '&', $previewlink);
 			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)) .$autologin;
 			

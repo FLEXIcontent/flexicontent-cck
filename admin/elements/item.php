@@ -138,7 +138,7 @@ class JFormFieldItem extends JFormField
 				'.JText::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '
-			<a id="' .$element_id. '_edit" class="btn ' . ($value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&task=items.edit&cid=' . $value . '" target="_blank" title="'.JText::_( 'FLEXI_EDIT_ITEM' ).'">
+			<a id="' .$element_id. '_edit" class="btn ' . ($value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=items.edit&amp;cid=' . $value . '" target="_blank" title="'.JText::_( 'FLEXI_EDIT_ITEM' ).'">
 				<span class="icon-edit"></span>' . JText::_('FLEXI_FORM_EDIT') . '
 			</a>' : '').'
 			'.($allowClear ? '
