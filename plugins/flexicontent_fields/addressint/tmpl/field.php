@@ -328,28 +328,28 @@ foreach ($values as $value)
 	$field->html[$n] = '
 	<table class="admintable"><tbody>
 		<tr>
-			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').':</td>
+			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').':</td>
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][addr1]" value="'.$value['addr1'].'" size="50" maxlength="100"'.$required.' /></td>
 		</tr><tr>
-			<td class="key" align="right">&nbsp;</td>
+			<td class="key">&nbsp;</td>
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][addr2]" value="'.$value['addr2'].'" size="50" maxlength="100" /></td>
 		</tr><tr>
-			<td class="key" align="right">&nbsp;</td>
+			<td class="key">&nbsp;</td>
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][addr3]" value="'.$value['addr3'].'" size="50" maxlength="100" /></td>
 		</tr><tr>
-			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY').':</td>
+			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY').':</td>
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][city]" id="city" value="'.$value['city'].'" size="50" maxlength="100" /></td>
 		</tr><tr>
-			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').':</td>
+			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').':</td>
 			<td>'.JHTML::_('select.genericlist', $list_states, 'custom['.$field->name.'][state]', $required, 'value', 'text', $value['state']).'</td>
 		</tr><tr>
-			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').':</td>
+			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').':</td>
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][province]" value="'.$value['province'].'" size="50" maxlength="100" /></td>
 		</tr><tr>
-			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').':</td>
+			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').':</td>
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][zip]" value="'.$value['zip'].'" size="10" maxlength="10"'.$required.' /></td>
 		</tr><tr>
-			<td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').':</td>
+			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').':</td>
 			<td>'.JHTML::_('select.genericlist', $list_countries, 'custom['.$field->name.'][country]', $required, 'value', 'text', $value['country']).'</td>
 		</tr><tr>
 			<td></td><td><input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GEOLOCATE').'" onclick="geolocateAddr(\'custom['.$field->name.']\', \''.$field->name.'\');" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lat]" value="'.$value['lat'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lon]" value="'.$value['lon'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <div id="'.$field->name.'_map"><img src="http://maps.google.com/maps/api/staticmap?center='.$value['lat'].','.$value['lon'].'&zoom=12&size=320x240&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|'.$value['lat'].','.$value['lon'].'&sensor=false" alt="" /></div></td>

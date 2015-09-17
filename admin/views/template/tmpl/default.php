@@ -624,7 +624,8 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						<?php foreach ($this->layout->params->getFieldset($fsname) as $field) :
 							$fieldname =  $field->__get('fieldname');
 							$value = $this->layout->params->getValue($fieldname, $groupname, @$this->conf->attribs[$fieldname]);
-							echo $this->layout->params->getLabel($fieldname, $groupname);
+							echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+									$this->layout->params->getLabel($fieldname, $groupname));
 							echo
 								str_replace('jform_attribs_', 'jform_layouts_'.$this->layout->name.'_', 
 									str_replace('[attribs]', '[layouts]['.$this->layout->name.']',

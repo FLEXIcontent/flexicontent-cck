@@ -137,7 +137,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				var newSubLabel = fieldval_box.prev('label.sub_label');
 				var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
 				newSubLabel.attr('for', newLabelFor);
-				newSubLabel.attr('for_bck', newLabelFor);
+				newSubLabel.attr('data-for_bck', newLabelFor);
 				fcflabels[ newLabelFor ] = newSubLabel;
 				addField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'), add_params);";
 			$delField_pattern = "
@@ -149,7 +149,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 					var newSubLabel = fieldval_box.prev('label.sub_label');
 					var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
 					newSubLabel.attr('for', newLabelFor);
-					newSubLabel.attr('for_bck', newLabelFor);
+					newSubLabel.attr('data-for_bck', newLabelFor);
 					fcflabels[ newLabelFor ] = newSubLabel;
 				}
 				deleteField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'));
@@ -313,7 +313,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				
 				$field->html[$n] .= '<div class="fcclear"></div>
 				<div class="fcfieldval_container_outer'.($compact_edit && isset($compact_edit_excluded[$field_id]) ? ' fcAlwaysVisibleField' : '').'">
-					<label class="'.$lbl_class.'" title="'.$lbl_title.'" for="custom_'.$grouped_field->name.'_'.$n.'" for_bck="custom_'.$grouped_field->name.'_'.$n.'">'.$grouped_field->label.'</label>
+					<label class="'.$lbl_class.'" title="'.$lbl_title.'" for="custom_'.$grouped_field->name.'_'.$n.'" data-for_bck="custom_'.$grouped_field->name.'_'.$n.'">'.$grouped_field->label.'</label>
 					<div class="fcfieldval_container valuebox fcfieldval_container_'.$grouped_field->id.' container_fcfield_name_'.$grouped_field->name.'" >
 						'.($grouped_field->description && $edithelp==3 ? sprintf( $alert_box, '', 'info', 'fc-nobgimage', $grouped_field->description ) : '').'
 						'.@ $grouped_field->html[$n].'
