@@ -57,6 +57,11 @@ function fc_submit_form(form, task, validate) {
 		sdata.attr('disabled', false);
 	}
 	
+	// Trigger submit events
+	//var start = new Date().getTime();
+	jform.trigger('submit');
+	//alert('onSubmit event execution time: ' + (new Date().getTime() - start));
+	
 	if (doajax) {
 		jform.after('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Saving</span>');
 		jform.hide();
@@ -104,9 +109,9 @@ Joomla.submitform = function(task, form, validate)
 	var isCancel = match_cancel.test(task);
 	if ( document.formvalidator && !isCancel )
 	{
-		//var start = new Date().getTime();
+		var start = new Date().getTime();
 		var isValid = document.formvalidator.isValid(form);
-		//alert('Execution time onSubmit events' + (new Date().getTime() - start));
+		//alert('Form validation time: ' + (new Date().getTime() - start));
 		
 		if (!isValid) // If form is invalid, then focus the first invalid element
 		{
@@ -120,8 +125,9 @@ Joomla.submitform = function(task, form, validate)
 	}
 	if (task) form.task.value=task;    // Set form's TASK field
 	
-	if (!isCancel) {
-		// Submit progress bar
+	// Submit progress bar
+	if ( !isCancel )
+	{
 		jQuery('body').prepend(
 		 	'<span id="fc_filter_form_blocker">' +
 		    '<span class="fc_blocker_opacity"></span>' +
@@ -135,11 +141,9 @@ Joomla.submitform = function(task, form, validate)
 			fc_filter_form_blocker.css("display", "block");
 			fc_admin_progress(95, jQuery('#fc_filter_form_blocker .fc_blocker_bar'));
 		}
-		
-		//var start = new Date().getTime();
-		jQuery(form).trigger('submit');    // Trigger submit events
-		//alert('Execution time onSubmit events' + (new Date().getTime() - start));
 	}
 	
-	return fc_submit_form(form, task); // Submit the form
+	setTimeout(function(){
+		fc_submit_form(form, task); // Submit the form
+	}, 50);
 }

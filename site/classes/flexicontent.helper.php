@@ -4388,6 +4388,11 @@ class flexicontent_tmpl
 		jimport('joomla.filesystem.folder');
 		jimport('joomla.filesystem.file');
 		jimport('joomla.form.form');
+		
+		static $themes;
+		if ($themes) return $themes; // return cached data
+		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+		
 		$themes = new stdClass();
 		$themes->items = new stdClass();
 		$themes->category = new stdClass();
@@ -4402,13 +4407,10 @@ class flexicontent_tmpl
 			if (JFile::exists($tmplxml))
 			{
 				// Parse the XML file
-				if (FLEXI_J30GE) {
-					$xml = simplexml_load_file($tmplxml);
-					$document = & $xml;
-				} else {
-					$xml = JFactory::getXMLParser('Simple');
-					$xml->loadFile($tmplxml);
-					$document = & $xml->document;
+				$document = @simplexml_load_file($tmplxml);
+				if (!$document) {
+					if (JFactory::getApplication()->isAdmin()) JFactory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');
+					continue;
 				}
 
 				$themes->items->{$tmpl} = new stdClass();
@@ -4416,19 +4418,16 @@ class flexicontent_tmpl
 				$themes->items->{$tmpl}->view 		= FLEXI_ITEMVIEW;
 				$themes->items->{$tmpl}->tmplvar 	= '.items.'.$tmpl;
 				$themes->items->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/item.png';
-				if (!FLEXI_J16GE) {
-					$themes->items->{$tmpl}->params	= new JParameter('', $tmplxml);
-				} else {
-					// *** This can be serialized and thus Joomla Cache will work
-					$themes->items->{$tmpl}->params = FLEXI_J30GE ? $document->asXML() : $document->toString();
 
-					// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
-					// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
-					// but serialization is used by Joomla 's cache, causing problem with caching the output of this function
+				// *** This can be serialized and thus Joomla Cache will work
+				$themes->items->{$tmpl}->params = $document->asXML();
 
-					//$themes->items->{$tmpl}->params		= new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
-					//$themes->items->{$tmpl}->params->loadFile($tmplxml);
-				}
+				// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
+				// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
+				// but serialization is used by Joomla 's cache, causing problem with caching the output of this function
+
+				//$themes->items->{$tmpl}->params		= new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+				//$themes->items->{$tmpl}->params->loadFile($tmplxml);
 				
 				$themes->items->{$tmpl}->author 		= @$document->author;
 				$themes->items->{$tmpl}->website 		= @$document->website;
@@ -4476,13 +4475,10 @@ class flexicontent_tmpl
 			if (JFile::exists($tmplxml))
 			{
 				// Parse the XML file
-				if (FLEXI_J30GE) {
-					$xml = simplexml_load_file($tmplxml);
-					$document = & $xml;
-				} else {
-					$xml = JFactory::getXMLParser('Simple');
-					$xml->loadFile($tmplxml);
-					$document = & $xml->document;
+				$document = @simplexml_load_file($tmplxml);
+				if (!$document) {
+					if (JFactory::getApplication()->isAdmin()) JFactory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');
+					continue;
 				}
 
 				$themes->category->{$tmpl} = new stdClass();
@@ -4490,19 +4486,16 @@ class flexicontent_tmpl
 				$themes->category->{$tmpl}->view 		= 'category';
 				$themes->category->{$tmpl}->tmplvar 	= '.category.'.$tmpl;
 				$themes->category->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/category.png';
-				if (!FLEXI_J16GE) {
-					$themes->category->{$tmpl}->params		= new JParameter('', $tmplxml);
-				} else {
-					// *** This can be serialized and thus Joomla Cache will work
-					$themes->category->{$tmpl}->params = FLEXI_J30GE ? $document->asXML() : $document->toString();
 
-					// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
-					// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
-					// but serialization is used by Joomla 's cache, causing problem with caching the output of this function
+				// *** This can be serialized and thus Joomla Cache will work
+				$themes->category->{$tmpl}->params = FLEXI_J30GE ? $document->asXML() : $document->toString();
 
-					//$themes->category->{$tmpl}->params		= new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
-					//$themes->category->{$tmpl}->params->loadFile($tmplxml);
-				}
+				// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
+				// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
+				// but serialization is used by Joomla 's cache, causing problem with caching the output of this function
+
+				//$themes->category->{$tmpl}->params		= new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
+				//$themes->category->{$tmpl}->params->loadFile($tmplxml);
 				
 				$themes->category->{$tmpl}->author 		= @$document->author;
 				$themes->category->{$tmpl}->website 	= @$document->website;
