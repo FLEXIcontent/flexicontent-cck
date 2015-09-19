@@ -68,9 +68,9 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 </script>
 
 <div id="flexicontent">
-<form action="index.php?controller=users" method="post" name="adminForm" autocomplete="off">
+<form action="index.php?controller=users" method="post" name="adminForm" id="adminForm" autocomplete="off">
 	
-	<fieldset id="user-basic_set" class="adminform" style="border:0 !important; margin:0 !important;">
+	<fieldset id="user-basic_set" class="adminform" style="border:0; margin:0;">
 		<table class="admintable" cellspacing="1">
 			<?php foreach($this->form->getFieldset('user_basic') as $field) :?>
 				<tr>

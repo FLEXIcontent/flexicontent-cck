@@ -368,7 +368,7 @@ $js = "
 
 		<?php if ($useAssocs) : ?>
 		<!-- Associations tab -->
-		<div class="tabbertab" id="fcform_tabset_perms_tab" data-icon-class="icon-flag">
+		<div class="tabbertab" id="fcform_tabset_assocs_tab" data-icon-class="icon-flag">
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ASSOCIATIONS' ); ?> </h3>
 			<?php echo $this->loadTemplate('associations'); ?>
 		</div> <!-- end tab -->

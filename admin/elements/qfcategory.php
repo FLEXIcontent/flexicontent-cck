@@ -135,7 +135,7 @@ class JFormFieldQfcategory extends JFormField
 				'.JText::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '
-			<a id="' .$element_id. '_edit" class="btn ' . ($value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&task=category.edit&cid=' . $value . '" target="_blank" title="'.JText::_( 'FLEXI_EDIT_CATEGORY' ).'">
+			<a id="' .$element_id. '_edit" class="btn ' . ($value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=category.edit&amp;cid=' . $value . '" target="_blank" title="'.JText::_( 'FLEXI_EDIT_CATEGORY' ).'">
 				<span class="icon-edit"></span>' . JText::_('FLEXI_FORM_EDIT') . '
 			</a>' : '').'
 			'.($allowClear ? '

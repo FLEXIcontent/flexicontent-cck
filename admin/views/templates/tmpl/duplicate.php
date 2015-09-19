@@ -54,13 +54,11 @@ jQuery(document).ready(function() {
 		<input type="text" id="dest" name="dest" value="<?php echo $this->dest; ?>" size="52" />
 		<input type="hidden" id="source" name="source" value="<?php echo $this->source; ?>" />
 	</fieldset>
-	<table width="100%" align="center">
+	<table width="100%">
 		<tr>
-			<td width="50%" align="right">
-			<input id="import" type="submit" class="fc_button" value="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_BUTTON' ); ?>" />
-			</td>
-			<td width="50%" align="left">
-			<input type="button" class="fc_button" onclick="window.parent.document.adminForm.submit();<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
+			<td>
+			<input id="import" type="submit" class="btn" value="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_BUTTON' ); ?>" />
+			<input type="button" class="btn" onclick="window.parent.document.adminForm.submit();<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
 			</td>
 		</tr>
 	</table>

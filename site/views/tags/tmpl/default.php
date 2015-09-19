@@ -131,7 +131,7 @@ $items	= & $this->items;
 	}
 ?>
 
-<form action="<?php echo $this->action; ?>" method="POST" id="adminForm" name="adminForm" onsubmit="">
+<form action="<?php echo $this->action; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php
 	// Filtering form features not supported, will have been disabled in the view.htmnl.php

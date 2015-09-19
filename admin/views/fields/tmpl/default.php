@@ -133,7 +133,7 @@ function jModalClose() {
 
 <div class="flexicontent">
 
-<form action="index.php?option=<?php echo $this->option; ?>&view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
@@ -207,7 +207,7 @@ function jModalClose() {
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 	
 	<span style="display:none;" class="alert fc-small fc-iblock" id="fcorder_save_warn_box">
-		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' ) : '') ; ?>
+		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder')) : '') ; ?>
 	</span>
 	
 	<table id="adminListTableFCfields" class="adminlist fcmanlist">
@@ -215,13 +215,13 @@ function jModalClose() {
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
-			<th nowrap="nowrap">
+			<th class="nowrap">
 				<?php echo $image_ordering_tip; ?>
 				<?php if ( !$this->filter_type ) : ?>
 					<?php echo JHTML::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					<?php
 					if ($this->permission->CanOrderFields) :
-						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' ) : '';
+						echo $this->ordering ? str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder')) : '';
 					endif;
 					?>
 				<?php else : ?>
@@ -237,7 +237,7 @@ function jModalClose() {
 			<th class="hideOnDemandClass title" colspan="2" style="text-align:left; padding-left:24px;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_LABEL', 't.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass title" style="text-align:left;"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass" nowrap="nowrap">
+			<th class="hideOnDemandClass nowrap">
 				<?php echo '<small class="badge">'.JText::_( 'Content Lists' ).'</small>'; ?><br/>
 				<small>
 					<?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE', 't.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
@@ -245,7 +245,7 @@ function jModalClose() {
 				</small>
 				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.JText::_( 'Content Lists' ).'</small>'; ?></span>
 			</th>
-			<th class="hideOnDemandClass" nowrap="nowrap">
+			<th class="hideOnDemandClass nowrap">
 				<?php echo '<small class="badge">'.JText::_( 'Search view' ).'</small>'; ?><br/>
 				<small>
 					<?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
@@ -255,7 +255,7 @@ function jModalClose() {
 			</th>
 			<th class="hideOnDemandClass left" colspan="2"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass left"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
@@ -310,7 +310,7 @@ function jModalClose() {
 			$canPublish		= in_array('publishfield', $rights);
 			$canDelete		= in_array('deletefield', $rights);
 			
-			$link 		= 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid='. $row->id;
 			if ($row->id < 7) {  // First 6 core field are not unpublishable
 				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ), ' class="fc-man-icon-s" ' );
 			} else if (!$canPublish && $row->published) {   // No privilige published
@@ -397,7 +397,7 @@ function jModalClose() {
 					<span><?php echo $this->pagination->orderDownIcon( $i, $n, true, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
 				<?php endif; ?>
 				
-				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
+				<?php $disabled = $this->ordering ?  '' : 'disabled="disabled"'; ?>
 				<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" <?php echo $disabled; ?> style="text-align: center" />
 				
 				<input type="hidden" name="item_cb[]" style="display:none;" value="<?php echo $row->id; ?>" />
@@ -405,7 +405,7 @@ function jModalClose() {
 				<input type="hidden" name="ord_grp[]" style="display:none;" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
 			</td>
 			<?php else : ?>
-			<td align="center">
+			<td>
 				<?php
 				if ($this->filter_type == '' || $this->filter_type == 0) {
 					echo $row->ordering;
@@ -416,7 +416,7 @@ function jModalClose() {
 			</td>
 			<?php endif; ?>
 
-			<td align="left" style="padding:0px;">
+			<td style="padding:0px;">
 				<?php
 				$translated_label = JText::_($row->label);
 				$original_label_text = ($translated_label != $row->label) ? '<br/><small>'.$row->label.'</small>' : '';
@@ -429,18 +429,18 @@ function jModalClose() {
 				} else if ($field_desc_len) {
 					$field_desc = htmlspecialchars($row->description, ENT_QUOTES, 'UTF-8');
 				}
-				if ($field_desc) echo ' <img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip($_desc_label, $field_desc, 0, 0).'" />';
+				if ($field_desc) echo ' <img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" alt="Note" title="'.flexicontent_html::getToolTip($_desc_label, $field_desc, 0, 0).'" />';
 				?>
 			</td>
 
-			<td align="left">
+			<td>
 				<?php
 				if (isset($row->grouping_field)) {
 					$_r = $row->grouping_field;
-					$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $_r->id;
+					$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid='. $_r->id;
 					echo '
 					<a style="padding:2px;" href="'.$_link.'" title="'.$edit_entry.'">
-						<img align="left" style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/insert_merge_field.png" title="Grouped inside: '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="fc-man-icon-s '.$tip_class.'" />
+						<img style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/insert_merge_field.png" title="Grouped inside: '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="fc-man-icon-s '.$tip_class.'" />
 					</a>';
 				}
 				
@@ -486,19 +486,19 @@ function jModalClose() {
 					if (!empty($row->parameters) && $row->parameters->get('cascade_after'))
 					{
 						$_r = $allrows_byid[ $row->parameters->get('cascade_after') ];
-						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $_r->id;
+						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid='. $_r->id;
 						echo '
 						<a style="padding:2px;" href="'.$_link.'" title="'.$edit_entry.'">
-							<img align="left" style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/relationships.png" title="Cascade after (master field): '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="fc-man-icon-s '.$tip_class.'" />
+							<img style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/relationships.png" title="Cascade after (master field): '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="fc-man-icon-s '.$tip_class.'" />
 						</a>';
 					}
 				}
 				?>
 			</td>
-			<td align="left">
+			<td>
 				<?php echo $row->name; ?>
 			</td>
-			<td align="left">
+			<td>
 				<?php
 				switch ($row->field_type) {
 				case 'fieldgroup':
@@ -507,7 +507,7 @@ function jModalClose() {
 					echo '<span class="alert alert-info" style="display: inline-block; margin: 0px 0px 1px; border-radius: 3px; width: 98%; padding: 4px 1%;">';
 					$_lbls = array();
 					foreach($grouped_fields[$row->id] as $_r) {
-						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid[]='. $_r->id;
+						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid='. $_r->id;
 						$_lbls[] = '<a class="badge" style="border-radius:3px;" href="'.$_link.'" title="'.$edit_entry.'">'.htmlspecialchars(JText::_($_r->label), ENT_QUOTES, 'UTF-8').'</a>';
 					}
 					echo implode(' ', $_lbls);
@@ -529,7 +529,7 @@ function jModalClose() {
 				?>
 			</td>
 			
-			<td align="center">
+			<td>
 				<?php if($supportsearch) :?>
 					<?php if ($canEdit) :?>
 					<a title="Toggle property" onclick="document.adminForm.propname.value='issearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
@@ -555,7 +555,7 @@ function jModalClose() {
 				<?php endif; ?>
 			</td>
 			
-			<td align="center">
+			<td>
 				<?php if($supportadvsearch) :?>
 					<?php if ($canEdit) :?>
 					<a title="Toggle property" onclick="document.adminForm.propname.value='isadvsearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
@@ -580,10 +580,10 @@ function jModalClose() {
 					<span style="display:inline-block; width:16px; height:16px;"></span>
 				<?php endif; ?>
 			</td>
-			<td align="center">
+			<td>
 				<?php echo $row->nrassigned ? '<span class="badge badge-info hasTooltip">'.$row->nrassigned.'</span>' : $orphan_warning; ?>
 			</td>
-			<td align="center">
+			<td>
 				<?php
 				if (count($row->content_types))
 					foreach($row->content_types as $type_id) echo '<span class="badge">'.JText::_($this->types[$type_id]->name).'</span>';
@@ -591,13 +591,13 @@ function jModalClose() {
 					echo '<span class="badge badge-warning">'.JText::_('FLEXI_NONE').'</span>';
 				?>
 			</td>
-			<td align="center">
+			<td>
 				<?php echo $access; ?>
 			</td>
-			<td align="center">
+			<td class="center">
 				<?php echo $published; ?>
 			</td>
-			<td align="center"><?php echo $row->id; ?></td>
+			<td><?php echo $row->id; ?></td>
 		</tr>
 		<?php $k = 1 - $k; } ?>
 	</tbody>

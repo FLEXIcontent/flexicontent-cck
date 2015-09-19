@@ -20,7 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 ?>
 
 <div id="flexicontent" class="flexicontent">
-<form action="index.php" method="post"  name="adminForm" id="adminForm" class="validate">
+<form action="index.php" method="post"  name="adminForm" id="adminForm" class="form-validate">
 
 	<table cellspacing="10" cellpadding="0" border="0" width="100%">
 		<tr>

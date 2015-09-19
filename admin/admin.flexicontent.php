@@ -258,9 +258,9 @@ if ( ($force_print || $print_logging_info) && JRequest::getWord('tmpl')!='compon
 	$fields_render_times = FlexicontentFields::getFieldRenderTimes($fields_render_total);
 	
 	$fc_jprof->mark('END: FLEXIcontent component: '.$_msg);
-	$msg = '<span style="font-family:tahoma!important; font-size:11px!important;">'. implode('<br/>', $fc_jprof->getbuffer()) .'</span>';
+	$msg = '<div style="font-family:tahoma!important; font-size:11px!important;">'. implode('<br/>', $fc_jprof->getbuffer()) .'</div>';
 	
-	$msg .= '<span style="font-family:tahoma!important; font-size:11px!important;">';
+	$msg .= '<div style="font-family:tahoma!important; font-size:11px!important;">';
 		
 	if (isset($fc_run_times['initialize_component']))
 		$msg .= sprintf('<br/>-- [Initialize component: %.2f s] ', $fc_run_times['initialize_component']/1000000);
@@ -386,7 +386,7 @@ if ( ($force_print || $print_logging_info) && JRequest::getWord('tmpl')!='compon
 		$msg .= '<br/><div class="fcclear"></div>';
 	}
 	
-	$msg .= '</span>';
+	$msg .= '</div>';
 	
 	
 	// SYSTEM PLGs

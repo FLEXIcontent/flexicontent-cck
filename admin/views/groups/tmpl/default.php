@@ -67,7 +67,7 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 
 <div class="flexicontent">
 
-<form action="index.php?option=<?php echo $this->option; ?>&view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
@@ -177,10 +177,10 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 					<?php echo JText::_('COM_USERS_DEBUG_GROUP');?></a></div></div></div>
 				<?php endif; ?>
 			</td>
-			<td align="right">
+			<td class="right" style="padding:0px;">
 				<?php echo '<span class="badge badge-info">'.$item->user_count.'</span>'; ?>
 			</td>
-			<td align="left">
+			<td class="left">
 				<?php
 				if ($item->user_count) {
 					echo '

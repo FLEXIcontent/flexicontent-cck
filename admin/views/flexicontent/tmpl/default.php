@@ -422,7 +422,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
+					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
 			?>
 				<tbody>
 				<tr>
@@ -477,7 +477,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
+					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
 			?>
 				<tbody>
 				<tr>
@@ -532,7 +532,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
+					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
 			?>
 				<tbody>
 				<tr>
@@ -587,7 +587,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
-					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
+					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
 			?>
 				<tbody>
 				<tr>

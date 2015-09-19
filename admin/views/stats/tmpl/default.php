@@ -69,14 +69,14 @@ else :
 	<!-- SITE TOTALS -->
 	<div class="row-fluid">
 		<div class="span12">
-			<a href="index.php?option=com_flexicontent&view=items"       class="btn btn-small"><?php echo $this->genstats[0]; ?> <?php echo JText::_( 'FLEXI_ITEMS' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&view=categories"  class="btn btn-small"><?php echo $this->genstats[1]; ?> <?php echo JText::_( 'FLEXI_CATEGORIES' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&view=tags"        class="btn btn-small"><?php echo $this->genstats[2]; ?> <?php echo JText::_( 'FLEXI_TAGS' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&view=filemanager" class="btn btn-small"><?php echo $this->genstats[3]; ?> <?php echo JText::_( 'FLEXI_FILES' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&view=types"       class="btn btn-small"><?php echo $this->genstats[4]; ?> <?php echo JText::_( 'FLEXI_TYPES' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&view=users"       class="btn btn-small"><?php echo $this->genstats[5]; ?> <?php echo JText::_( 'FLEXI_USERS' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&view=templates"   class="btn btn-small"><?php echo $this->genstats[6]; ?> <?php echo JText::_( 'FLEXI_TEMPLATES' ) ?></a> 
-			<a href="index.php?option=com_flexicontent&view=fields"      class="btn btn-small"><?php echo $this->genstats[7]; ?> <?php echo JText::_( 'FLEXI_FIELDS' ) ?></a> 
+			<a href="index.php?option=com_flexicontent&amp;view=items"       class="btn btn-small"><?php echo $this->genstats[0]; ?> <?php echo JText::_( 'FLEXI_ITEMS' ) ?></a> 
+			<a href="index.php?option=com_flexicontent&amp;view=categories"  class="btn btn-small"><?php echo $this->genstats[1]; ?> <?php echo JText::_( 'FLEXI_CATEGORIES' ) ?></a> 
+			<a href="index.php?option=com_flexicontent&amp;view=tags"        class="btn btn-small"><?php echo $this->genstats[2]; ?> <?php echo JText::_( 'FLEXI_TAGS' ) ?></a> 
+			<a href="index.php?option=com_flexicontent&amp;view=filemanager" class="btn btn-small"><?php echo $this->genstats[3]; ?> <?php echo JText::_( 'FLEXI_FILES' ) ?></a> 
+			<a href="index.php?option=com_flexicontent&amp;view=types"       class="btn btn-small"><?php echo $this->genstats[4]; ?> <?php echo JText::_( 'FLEXI_TYPES' ) ?></a> 
+			<a href="index.php?option=com_flexicontent&amp;view=users"       class="btn btn-small"><?php echo $this->genstats[5]; ?> <?php echo JText::_( 'FLEXI_USERS' ) ?></a> 
+			<a href="index.php?option=com_flexicontent&amp;view=templates"   class="btn btn-small"><?php echo $this->genstats[6]; ?> <?php echo JText::_( 'FLEXI_TEMPLATES' ) ?></a> 
+			<a href="index.php?option=com_flexicontent&amp;view=fields"      class="btn btn-small"><?php echo $this->genstats[7]; ?> <?php echo JText::_( 'FLEXI_FIELDS' ) ?></a> 
 		</div>
 	</div>
 	<!-- End of SITE TOTALS -->
@@ -88,7 +88,7 @@ else :
 	<div class="span12">
 		
 		<div class="span2">
-			<a href="index.php?option=com_flexicontent&view=items&filter_state=P" class="btn btn-block btn-large btn-success">
+			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=P" class="btn btn-block btn-large btn-success">
 				<div>
 					<i class="icon-asterisk "></i>
 					<span class="white">
@@ -100,7 +100,7 @@ else :
 		</div>
 		
 		<div class="span2">
-			<a href="index.php?option=com_flexicontent&view=items&filter_state=U" class="btn btn-block btn-large btn-warning">
+			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=U" class="btn btn-block btn-large btn-warning">
 				<div class="white">
 					<i class="icon-file "></i>
 					<span class="">
@@ -112,7 +112,7 @@ else :
 		</div>
 	
 		<div class="span2">
-			<a href="index.php?option=com_flexicontent&view=items&filter_state=PE" class="btn btn-block btn-large btn-danger">
+			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE" class="btn btn-block btn-large btn-danger">
 				<div class="white">
 					<i class="icon-trash "></i>
 					<span class="">
@@ -124,7 +124,7 @@ else :
 		</div>
 		
 		<div class="span2">
-			<a href="index.php?option=com_flexicontent&view=items&filter_state=IP" class="btn btn-block btn-large btn-primary">
+			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP" class="btn btn-block btn-large btn-primary">
 				<div class="white">
 					<i class="icon-archive "></i>
 					<span class="">
@@ -136,7 +136,7 @@ else :
 		</div>
 		
 		<div class="span2">
-			<a href="index.php?option=com_flexicontent&view=items&filter_state=PE" class="btn btn-block btn-large btn-info">
+			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE" class="btn btn-block btn-large btn-info">
 				<div class="white">
 					<i class="icon-list"></i>
 					<span class="">
@@ -148,7 +148,7 @@ else :
 		</div>
 		
 		<div class="span2">
-			<a href="index.php?option=com_flexicontent&view=items&filter_state=IP" class="btn btn-block btn-large btn-inverse">
+			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP" class="btn btn-block btn-large btn-inverse">
 				<div class="white">
 					<i class="icon-tag "></i>
 					<span class="">
@@ -362,13 +362,13 @@ else :
 		<div class="span6">
 			<div class="well">
 				
-				<h3><?php echo JText::_( 'FLEXI_MOST_POPULAR' ); ?> <a href="index.php?option=com_flexicontent&view=items&filter_order=i.hits&filter_order_Dir=desc" class="btn btn-small"><?php echo JText::_( 'FLEXI_VIEW' ); ?></a></h3>
+				<h3><?php echo JText::_( 'FLEXI_MOST_POPULAR' ); ?> <a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_order=i.hits&amp;filter_order_Dir=desc" class="btn btn-small"><?php echo JText::_( 'FLEXI_VIEW' ); ?></a></h3>
 				<hr>
 				<table class="adminlist  table table-hover table-striped">
 					<thead>
 						<tr>
 							<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-							<th class="left"><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
+							<th class="center"><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
 							<th class="left"><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
 						</tr>
 					</thead>
@@ -387,7 +387,7 @@ else :
 									</a>
 								</span>
 							</td>
-							<td style="width:1%" align="center">
+							<td style="width:1%" class="center">
 								<span class="badge badge-info"><?php echo $row->hits; ?></span>
 							</td>
 							<td style="width:34%">
@@ -404,13 +404,13 @@ else :
 		<div class="span6">
 			<div class="well">
 				
-				<h3><?php echo JText::_( 'FLEXI_LESS_POPULAR' ) ?> <a href="index.php?option=com_flexicontent&view=items&filter_order=i.hits&filter_order_Dir=asc" class="btn btn-small"><?php echo JText::_( 'FLEXI_VIEW' ); ?></a></h3>
+				<h3><?php echo JText::_( 'FLEXI_LESS_POPULAR' ) ?> <a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_order=i.hits&amp;filter_order_Dir=asc" class="btn btn-small"><?php echo JText::_( 'FLEXI_VIEW' ); ?></a></h3>
 				<hr>
 				<table class="adminlist  table table-hover table-striped">
 					<thead>
 						<tr>
 							<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-							<th class="left"><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
+							<th class="center"><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
 							<th class="left"><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
 						</tr>
 					</thead>
@@ -429,7 +429,7 @@ else :
 									</a>
 								</span>
 							</td>
-							<td style="width:1%" align="center">
+							<td style="width:1%" class="center">
 								<span class="badge badge-info"><?php echo $row->hits; ?></span>
 							</td>
 							<td style="width:34%">
@@ -455,7 +455,7 @@ else :
 					<thead>
 						<tr>
 							<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-							<th class="left"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+							<th class="center"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -473,7 +473,7 @@ else :
 									</a>
 								</span>
 							</td>
-							<td align="center">
+							<td class="center">
 								<span class="badge badge-success"><?php echo $row->favnr; ?></span>
 							</td>
 						</tr>
@@ -684,7 +684,7 @@ else :
 								<thead>
 									<tr>
 										<th class="left"><?php echo JText::_( 'FLEXI_USER' ); ?></th>
-										<th class="left"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+										<th class="center"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -702,7 +702,7 @@ else :
 												</a>
 											</span>
 										</td>
-										<td align="center">
+										<td class="center">
 											<span class="badge badge-success"><?php echo $row->counter; ?></span>
 										</td>
 									</tr>
@@ -721,7 +721,7 @@ else :
 								<thead>
 									<tr>
 										<th class="left"><?php echo JText::_( 'FLEXI_USER' ); ?></th>
-										<th class="left"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+										<th class="center"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -739,7 +739,7 @@ else :
 												</a>
 											</span>
 										</td>
-										<td align="center">
+										<td class="center">
 											<span class="badge badge-success"><?php echo $row->counter; ?></span>
 										</td>
 									</tr>

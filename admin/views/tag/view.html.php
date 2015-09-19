@@ -51,9 +51,9 @@ class FlexicontentViewTag extends JViewLegacy
 		//flexicontent_html::loadFramework('select2');
 		
 		// Add js function to overload the joomla submitform validation
-		//JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		//$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
-		//$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
 
 		//Get data from the model
 		$model = $this->getModel();

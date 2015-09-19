@@ -72,7 +72,7 @@ function delAllFilters() {
 
 <div class="flexicontent">
 
-<form action="index.php?option=<?php echo $this->option; ?>&view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
@@ -185,7 +185,7 @@ function delAllFilters() {
 		
 		<?php if (count($this->rows) == 0): ?>
 		<tr class="row0">
-			<td align="center" colspan="<?php echo $list_total_cols; ?>">
+			<td class="center" colspan="<?php echo $list_total_cols; ?>">
 				<?php
 				if ($this->total == 0) {
 					echo JText::_('FLEXI_NO_DATA');
@@ -205,14 +205,14 @@ function delAllFilters() {
 			<td>
 				<?php echo $this->pagination->getRowOffset( $n ); ?>
 			</td>
-			<td align="center">
+			<td>
 				<?php echo JHTML::_('grid.id', $n, ($this->isADV ? $row->field_id.'|' : '').$row->item_id); ?>
 			</td>
 			<td>
 				<?php echo $row->item_id; ?>
 			</td>
 			<td>
-				<?php echo '<a target="_blank" href="index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='.$row->id.'" title="'.$edit_entry.'">'.$this->escape($row->title).'</a>'; ?>
+				<?php echo '<a target="_blank" href="index.php?option=com_flexicontent&amp;task=items.edit&amp;cid='.$row->id.'" title="'.$edit_entry.'">'.$this->escape($row->title).'</a>'; ?>
 			</td>
 			
 			<?php if ($this->isADV) : ?>
@@ -222,18 +222,18 @@ function delAllFilters() {
 				<td>
 					<?php echo $this->escape($row->name); ?>
 				</td>
-				<td nowrap="nowrap" style="text-align: center" class="col_fieldtype">
+				<td class="col_fieldtype">
 					<?php echo $row->field_type; ?>
 				</td>
-				<td nowrap="nowrap" style="text-align: center;">
+				<td class="center">
 					<?php echo $row->extraid; ?>
 				</td>
-				<td nowrap="nowrap" style="text-align: center;">
+				<td class="center">
 					<?php echo $row->value_id; ?>
 				</td>
 			<?php endif; ?>
 		
-			<td style="text-align: left;" class="col_search_index">
+			<td class="left col_search_index">
 				<?php
 					$_search_index = !$search_prefix ? $row->search_index : preg_replace('/\b'.$search_prefix.'/u', '', $row->search_index);
 					if(iconv_strlen($row->search_index, "UTF-8")>400)
@@ -242,7 +242,7 @@ function delAllFilters() {
 						echo $_search_index;
 				?>
 			</td>
-			<?php /*<td nowrap="nowrap" style="text-align: center;">
+			<?php /*<td class="center">
 				<?php //echo JHtml::date($row->indexdate, '%Y-%m-%d %H:%M:%S'); ?>
 			</td>*/ ?>
 		</tr>

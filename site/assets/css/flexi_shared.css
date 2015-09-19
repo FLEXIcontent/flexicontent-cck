@@ -319,12 +319,15 @@ table.adminlist thead th {
 	border: none;
 	border-width: 0px !important; /* forced, avoid border of cell overlapping over the border of the row */
 	color: #555;
-	text-align: center;
+	text-align: unset;
 	padding: 6px 8px;
 }
 
-table.adminlist thead th.center { text-align: center !important; } /* forced, apply requested styling */
-table.adminlist thead th.left { text-align: left !important; } /* forced, apply requested styling */
+/* forced, apply requested styling */
+table.adminlist thead th.center, table.adminlist td.center { text-align: center !important; }
+table.adminlist thead th.left, table.adminlist td.left { text-align: left !important; }
+table.adminlist thead th.right, table.adminlist td.right { text-align: right !important; }
+
 table.adminlist thead a:hover { text-decoration: none; }
 table.adminlist thead th img { padding-left:3px; vertical-align:middle; }
 
@@ -366,17 +369,13 @@ table.adminlist tbody tr {
 table.adminlist tbody tr.collapsed_row {
 	visibility: collapse;
 }
-/* ORDER column no wrapping and proper alignment */
-table.adminlist td.order {
-	text-align: right;
-	white-space: nowrap;
-}
 
 /* TR.row0 TR.row1 differences */
 table.adminlist tbody tr td {
 	background: none repeat scroll 0 0 #FFFFFF;
 	border: none;
 	border-width: 0px !important; /* fored, to avoid border of cell overlapping over the border of the row */
+	text-align: unset;
 }
 table.adminlist tbody tr.row1 td {
 	background: none repeat scroll 0 0 #f7f7f7;
@@ -411,9 +410,9 @@ table.adminlist tfoot td, table.adminlist tfoot th {
 
 /* ORDER column no wrapping and proper alignment */
 table.adminlist td.order {
-	text-align: right;
+	text-align: center;
 	white-space: nowrap;
-	width: auto !important;
+	width: auto;
 }
 
 /* IF PAGINATION is inside the table the force center alignment */
