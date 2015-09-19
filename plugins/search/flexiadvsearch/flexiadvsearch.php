@@ -144,12 +144,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$contenttypes = array_unique(array_map('intval', $contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
 		
 		// Force hidden content type selection if only 1 content type was initially configured
-		$canseltypes = count($contenttypes)<=1 ? 0 : $canseltypes;
+		$canseltypes = count($contenttypes)==1 ? 0 : $canseltypes;
 		
 		// Type data and configuration (parameters), if no content types specified then all will be retrieved
-		$types_data = flexicontent_db::getTypeData( implode(",", $contenttypes) );
+		$typeData = flexicontent_db::getTypeData( implode(",", $contenttypes) );
 		$contenttypes = array();
-		foreach($types_data as $tdata) $contenttypes[] = $tdata->id;
+		foreach($typeData as $tdata) $contenttypes[] = $tdata->id;
 		
 		// Get Content Types to use either those currently selected in the Search Form, or those hard-configured in the search menu item
 		if ( $canseltypes ) {
@@ -189,7 +189,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			$txtflds = '';
 			if ( $show_txtfields ) {
 				if ( $show_txtfields==1 ) {
-					$txtflds = $single_contenttype ? $types_data[$single_contenttype]->params->get('searchable', '') : '';
+					$txtflds = $single_contenttype ? $typeData[$single_contenttype]->params->get('searchable', '') : '';
 				} else {
 					$txtflds = $params->get('txtflds', '');
 				}
@@ -224,7 +224,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$filtflds = '';
 		if ( $show_filters ) {
 			if ( $show_filters==1 ) {
-				$filtflds = $single_contenttype ? $types_data[$single_contenttype]->params->get('filters', '') : '';
+				$filtflds = $single_contenttype ? $typeData[$single_contenttype]->params->get('filters', '') : '';
 			} else {
 				$filtflds = $params->get('filtflds', '');
 			}
@@ -617,7 +617,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Execute search query.  NOTE this is skipped it if (a) no text-search and no (b) no filters are active
 		// *****************************************************************************************************
 		
-		if ( !count($filters_where) & !strlen($text) ) return array();
+		if ( !count($filters_where) && !strlen($text) && !strlen($andcontenttypes) ) return array();
 		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
@@ -722,12 +722,14 @@ class plgSearchFlexiadvsearch extends JPlugin
 			$item_cats = FlexicontentFields::_getCategories($list);
 			foreach($list as $key => $item)
 			{
-				if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION ) {
-					$item->categories = isset($item_cats[$item->id])  ?  $item_cats[$item->id] : array();  // in case of item categories missing
-					$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
-					$item->text = preg_replace('/\b'.$search_prefix.'/', '', $item->text);
+				$item->text = preg_replace('/\b'.$search_prefix.'/', '', $item->text);
+				$item->categories = isset($item_cats[$item->id])  ?  $item_cats[$item->id] : array();  // in case of item categories missing
+				
+				// If joomla article view is allowed allowed and then search view may optional create Joomla article links
+				if( $typeData[$item->type_id]->params->get('allow_jview', 0) && $typeData[$item->type_id]->params->get('search_jlinks', 1) ) {
+					$item->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->categoryslug, $item->language));
 				} else {
-					$item->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
+					$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 				}
 				$item->browsernav = $browsernav;
 			}
