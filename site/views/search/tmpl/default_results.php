@@ -115,7 +115,7 @@ if ( $use_infoflds && count($infoflds) ) {
 		
 		<?php if ($this->params->get('show_date', 1)) : ?>
 		<span class="fc_search_result_date">
-			<span class="badge badge-success">
+			<span class="label">
 			<?php echo $result->created; ?>
 			</span>
 		</span>
@@ -125,7 +125,7 @@ if ( $use_infoflds && count($infoflds) ) {
 		
 		<?php if ( $this->params->get( 'show_section', 1 ) && $result->section ) : ?>
 		<span class="fc_search_result_category">
-			<span class="badge badge-info">
+			<span class="fc-mssg-inline fc-info fc-nobgimage">
 				<?php echo $this->escape($result->section); ?>
 			</span>
 		</span>

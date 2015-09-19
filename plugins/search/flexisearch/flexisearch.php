@@ -375,15 +375,20 @@ class plgSearchFlexisearch extends JPlugin
 			if ( $list )
 			{
 				$item_cats = FlexicontentFields::_getCategories($list);
+				$typeData = flexicontent_db::getTypeData();
+				
 				foreach($list as $key => $item)
 				{
 					// echo $item->title." ".$item->tagname."<br/>"; // Before checking for noHTML
-					if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION ) {
-						$item->categories = isset($item_cats[$item->id])  ?  $item_cats[$item->id] : array();  // in case of item categories missing
-						$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug, 0, $item));
+					$item->categories = isset($item_cats[$item->id])  ?  $item_cats[$item->id] : array();  // in case of item categories missing
+					
+					// If joomla article view is allowed allowed and then search view may optional create Joomla article links
+					if( $typeData[$item->type_id]->params->get('allow_jview', 0) && $typeData[$item->type_id]->params->get('search_jlinks', 1) ) {
+						$item->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->language));
 					} else {
-						$item->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
+						$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug, 0, $item));
 					}
+					
 					if (searchHelper::checkNoHTML($item, $searchText, array('title', 'metadesc', 'metakey', 'tagname', 'field', 'text' ))) {
 						$results[$item->id] = $item;
 					}

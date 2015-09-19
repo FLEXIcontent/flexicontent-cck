@@ -208,12 +208,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$contenttypes = array_unique(array_map('intval', $contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
 		
 		// Force hidden content type selection if only 1 content type was initially configured
-		$canseltypes = count($contenttypes)<=1 ? 0 : $canseltypes;
+		$canseltypes = count($contenttypes)==1 ? 0 : $canseltypes;
 		
 		// Type data and configuration (parameters), if no content types specified then all will be retrieved
-		$types_data = flexicontent_db::getTypeData( implode(",", $contenttypes) );
+		$typeData = flexicontent_db::getTypeData( implode(",", $contenttypes) );
 		$contenttypes = array();
-		foreach($types_data as $tdata) $contenttypes[] = $tdata->id;
+		foreach($typeData as $tdata) $contenttypes[] = $tdata->id;
 		
 		// Get Content Types to use either those currently selected in the Search Form, or those hard-configured in the search menu item
 		if ( $canseltypes ) {
@@ -253,7 +253,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$txtflds = '';
 			if ( $show_txtfields ) {
 				if ( $show_txtfields==1 ) {
-					$txtflds = $single_contenttype ? $types_data[$single_contenttype]->params->get('searchable', '') : '';
+					$txtflds = $single_contenttype ? $typeData[$single_contenttype]->params->get('searchable', '') : '';
 				} else {
 					$txtflds = $params->get('txtflds', '');
 				}
@@ -288,7 +288,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$filtflds = '';
 		if ( $show_filters ) {
 			if ( $show_filters==1 ) {
-				$filtflds = $single_contenttype ? $types_data[$single_contenttype]->params->get('filters', '') : '';
+				$filtflds = $single_contenttype ? $typeData[$single_contenttype]->params->get('filters', '') : '';
 			} else {
 				$filtflds = $params->get('filtflds', '');
 			}
@@ -344,7 +344,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		{
 			$types = array();
 			if ($show_filters) $types[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
-			foreach($types_data as $type) {
+			foreach($typeData as $type) {
 				$types[] = JHTML::_('select.option', $type->id, JText::_($type->name));
 			}
 			
@@ -368,7 +368,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$lists['contenttypes'] .= '   -'.JText::_('FLEXI_ALL').'-';
 			$lists['contenttypes'] .= '  </label>';
 			$lists['contenttypes'] .= ' </li>';
-			foreach($types_data as $type) {
+			foreach($typeData as $type) {
 				$checked = in_array($type->value, $form_contenttypes);
 				$checked_attr = $checked ? 'checked=checked' : '';
 				$checked_class = $checked ? ' fc_highlight' : '';
@@ -703,6 +703,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$this->assignRef('params',    $params);
 		$this->assignRef('pageNav',   $pageNav);
 		$this->assignRef('pageclass_sfx', $pageclass_sfx);
+		$this->assignRef('typeData',	$typeData);
 
 		$this->assign('ordering',     $state->get('ordering'));
 		$this->assign('searchword',   $searchword);
