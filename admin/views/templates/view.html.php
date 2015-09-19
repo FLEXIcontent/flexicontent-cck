@@ -53,7 +53,7 @@ class FlexicontentViewTemplates extends JViewLegacy
 		
 		flexicontent_html::loadFramework('select2');
 		JHTML::_('behavior.tooltip');
-		JHTML::_('behavior.modal');
+		//JHTML::_('behavior.modal');
 		
 		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');

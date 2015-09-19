@@ -19,12 +19,12 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 
-<form action="index.php" method="post" name="adminForm" id="adminForm">
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate">
 
 	<table class="fc-form-tbl">
 		<tr>
 			<td class="key">
-				<label class="label" for="id">
+				<label class="label">
 					<?php echo JText::_( 'FLEXI_ID' ).':'; ?>
 				</label>
 			</td>
@@ -51,7 +51,7 @@ defined('_JEXEC') or die('Restricted access');
 			</td>
 		</tr><tr>
 			<td class="key">
-				<label class="label" for="published">
+				<label class="label">
 					<?php echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
 				</label>
 			</td>

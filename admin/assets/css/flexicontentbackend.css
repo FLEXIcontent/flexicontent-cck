@@ -143,7 +143,10 @@ html body#minwidth-body {
 	min-width: 760px;
 }
 
-.col_created.col_revised .input-append { margin:0px; }
+td.col_created, td.col_revised { white-space:nowrap; }
+td.col_created .input-append, td.col_revised .input-append { margin:0px; }
+td.col_title, td.col_template { text-align: left; }
+td.col_edit_layout { text-align: right; }
 
 /* CUSTOMIZE TABS in FORMS */
 dl.tabs dt.user-details:not(.open), dl.tabs dt#user-details:not(.open),

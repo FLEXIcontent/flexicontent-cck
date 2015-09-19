@@ -35,7 +35,6 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 ?>
 
 <div class="flexicontent" id="flexicontent">
-
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data" >
 
 <?php if (!empty( $this->sidebar)) : ?>
@@ -97,7 +96,7 @@ $tabCnt[$tabSetCnt] = 0;
 		<br/><br/>
 		<table style="border-collapse: collapse; border: 0; border-spacing: 0;">
 			<tr>
-				<td valign="top" style="font-family:tahoma; font-size:12px;">
+				<td style="vertical-align:top; font-family:tahoma; font-size:12px;">
 					
 					<fieldset>
 						<legend style='color: darkgreen;'><?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_EXAMPLE' ); ?></legend>
@@ -249,7 +248,7 @@ $tabCnt[$tabSetCnt] = 0;
 			</tr>
 			
 			<tr>
-				<td class="key" align="left">
+				<td class="key" style="text-align:left;">
 					<label class="label" for="maincat_col" style="clear:both;"><?php echo JText::_( 'FLEXI_IMPORT_FILE_OVERRIDE' ); ?> <?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label>
 				</td>
 				<td class="data">
@@ -261,7 +260,7 @@ $tabCnt[$tabSetCnt] = 0;
 			</tr>
 			
 			<tr>
-				<td class="key" align="left">
+				<td class="key" style="text-align:left;">
 					<label class="label" for="seccats_col" style="clear:both;"><?php echo JText::_( 'FLEXI_IMPORT_FILE_OVERRIDE' ); ?> <?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label>
 				</td>
 				<td class="data">
@@ -382,7 +381,9 @@ $tabCnt[$tabSetCnt] = 0;
 					<label class="label" for="csvfile"><?php echo JText::_( 'FLEXI_CSVFILE' ); ?></label>
 				</td>
 				<td class="data">
-					<input type="file" name="csvfile" id="csvfile" value="" class="required" />
+					<input type="file" name="csvfile" id="csvfile" class="required" />
+				</td>
+				<td class="data">
 				</td>
 			</tr>
 			
@@ -529,7 +530,7 @@ $tabCnt[$tabSetCnt] = 0;
 		
 		<table style="border-collapse: collapse; border: 0; border-spacing: 0;">
 			<tr>
-				<td valign="top" style="font-family:tahoma; font-size:12px;">
+				<td style="vertical-align:top; font-family:tahoma; font-size:12px;">
 					<br/>
 					<fieldset>
 						<legend style='color: darkgreen;'><?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_EXAMPLE' ); ?></legend>
@@ -544,7 +545,7 @@ $tabCnt[$tabSetCnt] = 0;
 			</tr>
 			
 			<tr>
-				<td valign="top" style="font-family:tahoma; font-size:12px;">
+				<td style="vertical-align:top; font-family:tahoma; font-size:12px;">
 					<br/>
 					<fieldset>
 						<legend style='color: darkgreen;'><?php echo JText::_( 'FLEXI_IMPORT_CSV_FILE_FORMAT_EXPLANATION' ); ?></legend>
@@ -612,5 +613,7 @@ $tabCnt[$tabSetCnt] = 0;
 	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 	
+</div>
+
 </form>
 </div>

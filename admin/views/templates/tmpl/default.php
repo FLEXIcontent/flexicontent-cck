@@ -90,7 +90,7 @@ $list_total_cols = 8;
 	</div>
 	-->
 	
-	<table class="adminlist" cellspacing="1">
+	<table class="adminlist">
 	
 	<thead>
 		<tr class="header">
@@ -167,15 +167,16 @@ $list_total_cols = 8;
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
 			<td><?php echo $i; ?></td>
 			<td><?php echo $checked; ?></td>
-			<td align="right">
+			<td class="right">
 				<?php if (!in_array($row->name, $basetemplates)) :?>
 					<a style="margin-right: 5px" id="<?php echo 'del-' . $row->name ?>" class="deletable-template" href="javascript:;">
 						<?php echo $deltmpl; ?>
 					</a>
 			 	<?php endif; ?>
-				<a class="modal" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>">  <?php echo $copytmpl; ?> </a>
+				<?php /*<a class="modal" onclick="javascript:;" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copytmpl; ?></a>*/ ?>
+				<a onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300); return false;" href="<?php echo $copylink; ?>"><?php echo $copytmpl; ?></a>
 			</td>
-			<td align="left">
+			<td>
 				<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
 				<?php if (in_array($row->name, $basetemplates)) :?>
 					<!--<span class="icon-lock"></span>-->

@@ -27,8 +27,8 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableF
 
 $edit_entry  = JText::_('FLEXI_EDIT_TYPE', true);
 $edit_layout = JText::_('FLEXI_EDIT_LAYOUT', true);
-$view_fields = JText::_('FLEXI_VIEW_FIELDS', true);
-$view_items  = JText::_('FLEXI_VIEW_ITEMS', true);
+$view_fields = JText::_('FLEXI_VIEW', true); //JText::_('FLEXI_VIEW_FIELDS', true);
+$view_items  = JText::_('FLEXI_VIEW', true); //JText::_('FLEXI_VIEW_ITEMS', true);
 
 $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
@@ -131,13 +131,13 @@ function delAllFilters() {
 			<th class="hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass col_redirect center hidden-tablet hidden-phone"><?php echo $article_viewing_tip . JText::_( 'FLEXI_REDIRECT_ARTICLE_VIEW' )."<br/><small>(".JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REDIRECTED' ).")</small>"; ?></th>
-			<th class="hideOnDemandClass center hidden-phone" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
-			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass col_redirect hidden-tablet hidden-phone"><?php echo $article_viewing_tip . JText::_( 'FLEXI_REDIRECT_ARTICLE_VIEW' )."<br/><small>(".JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REDIRECTED' ).")</small>"; ?></th>
+			<th class="hideOnDemandClass hidden-phone" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
+			<th class="hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<!--th class="hideOnDemandClass"><?php // echo JHTML::_('grid.sort', 'ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
-			<th class="hideOnDemandClass center"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass center hidden-phone"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th class="hideOnDemandClass center hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
@@ -161,7 +161,7 @@ function delAllFilters() {
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
 			$row = & $this->rows[$i];
-			$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;cid='. $row->id;
 			$published 	= JHTML::_('jgrid.published', $row->published, $i, 'types.' );
 			$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')"');
 			
@@ -215,7 +215,7 @@ function delAllFilters() {
 				}
 				?>
 			</td>
-			<td class="col_redirect center hidden-tablet hidden-phone">
+			<td class="col_redirect hidden-tablet hidden-phone">
 				<span style="cursor:pointer;"
 					<?php
 					echo ' class="'.$btn_class.' btn-small" onclick="return listItemTask(\'cb'.$i.'\',\'types.toggle_jview\');">';
@@ -224,18 +224,18 @@ function delAllFilters() {
 				</span>
 			</td>
 			
-			<td class="hidden-phone">
+			<td class="hidden-phone col_edit_layout">
 				<?php if ($this->CanTemplates) : ?>
 				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;" >
 					<?php echo $layout_edit_icon;?>
 				</a>
 				<?php endif; ?>
 			</td>
-			<td class="center hidden-phone">
+			<td class="hidden-phone col_template">
 				<?php echo $row->config->get("ilayout"); ?>
 			</td>
 			
-			<td class="center hidden-tablet hidden-phone">
+			<td class="hidden-tablet hidden-phone">
 				<?php
 				if (JString::strlen($row->alias) > 25) {
 					echo JString::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
@@ -244,19 +244,17 @@ function delAllFilters() {
 				}
 				?>
 			</td>
-			<td class="center">
-				<span class="badge"><?php echo $row->fassigned; ?></span>
-				<a href="<?php echo $fields_url; ?>">
-					[<?php echo $view_fields;?>]
+			<td class="right">
+				<a class="btn btn-small" style="width:100%; box-sizing:border-box;" href="<?php echo $fields_url; ?>">
+					<?php echo $row->fassigned; ?>
 				</a>
 			</td>
-			<td class="center">
-				<span class="badge badge-info"><?php echo $row->iassigned; ?></span>
-				<a href="<?php echo $items_url; ?>">
-					[<?php echo $view_items;?>]
+			<td class="right">
+				<a class="btn btn-small btn-info" style="width:100%; box-sizing:border-box;" href="<?php echo $items_url; ?>">
+					<?php echo $row->iassigned; ?>
 				</a>
 			</td>
-			<td class="center">
+			<td>
 				<?php echo $access; ?>
 			</td>
 			<td class="center hidden-phone">

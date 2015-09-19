@@ -473,9 +473,9 @@ class FlexicontentViewItems extends JViewLegacy
 			$subcats = array();
 			$subcats[] = JHTML::_('select.option', 0, JText::_( 'FLEXI_NO' ) );
 			$subcats[] = JHTML::_('select.option', 1, JText::_( 'FLEXI_YES' ) );
-			$lists['filter_subcats'] = JHTML::_('select.genericlist', $subcats, 'filter_subcats', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_subcats, 'filter_subcats' );
+			$lists['filter_subcats'] = JHTML::_('select.genericlist', $subcats, 'filter_subcats', 'size="1" class="use_select2_lib '.($filter_subcats!=1 ? '' : ' fc_skip_highlight').'" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_subcats, 'filter_subcats' );
 		}
-		$lists['filter_subcats'] = ($filter_subcats || 1 ? '<label class="label'.($filter_subcats!=1 ? ' label-warning' : '').'">'.JText::_('FLEXI_SUBCATEGORIES').'</label>' : '').$lists['filter_subcats'];
+		$lists['filter_subcats'] = ($filter_subcats || 1 ? '<label class="label">'.JText::_('FLEXI_SUBCATEGORIES').'</label>' : '').$lists['filter_subcats'];
 		
 		// build the include non-published cats boolean list
 		$catsinstate[1] = JText::_( 'FLEXI_PUBLISHED' );
@@ -487,8 +487,8 @@ class FlexicontentViewItems extends JViewLegacy
 		foreach ($catsinstate as $i => $v) {
 			$_catsinstate[] = JHTML::_('select.option', $i, $v);
 		}
-		$lists['filter_catsinstate'] = ($filter_catsinstate || 1 ? '<label class="label'.($filter_catsinstate!=1 ? ' label-warning' : '').'">'.JText::_('FLEXI_LIST_ITEMS_IN_CATS').'</label>' : '').
-			JHTML::_('select.genericlist', $_catsinstate, 'filter_catsinstate', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate, 'filter_catsinstate' );
+		$lists['filter_catsinstate'] = ($filter_catsinstate || 1 ? '<label class="label">'.JText::_('FLEXI_LIST_ITEMS_IN_CATS').'</label>' : '').
+			JHTML::_('select.genericlist', $_catsinstate, 'filter_catsinstate', 'size="1" class="use_select2_lib'.($filter_catsinstate!=1 ? '' : ' fc_skip_highlight').'" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate, 'filter_catsinstate' );
 		//$lists['filter_catsinstate'] = JHTML::_('select.radiolist', $_catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_catsinstate );
 		/*$lists['filter_catsinstate']  = '';
 		foreach ($catsinstate as $i => $v) {
@@ -605,10 +605,10 @@ class FlexicontentViewItems extends JViewLegacy
 			}
 			$access_levels = $_levels;
 		}*/  // Above code is maybe problematic (e.g. in multi-sites), need to test more
-		array_unshift($access_levels, JHtml::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/) );
+		//array_unshift($access_levels, JHtml::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/) );
 		$fieldname = 'filter_access[]';  // make multivalue
 		$elementid = 'filter_access';
-		$attribs = 'class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" multiple="multiple';
+		$attribs = 'class="use_select2_lib fcfilter_be" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" multiple="multiple"';
 		$lists['filter_access'] = ($filter_access || 1 ? '<label class="label">'.JText::_('FLEXI_ACCESS').'</label>' : '').
 			JHTML::_('select.genericlist', $access_levels, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
 		
@@ -621,8 +621,8 @@ class FlexicontentViewItems extends JViewLegacy
 				$file_options[] = JHTML::_('select.option', $_file->id, $_file->altname );
 			}
 			flexicontent_html::loadFramework('select2');
-			$lists['filter_fileid'] = ($filter_fileid || 1 ? '<label class="label'.($filter_fileid ? ' label-warning' : '').'">'.JText::_('FLEXI_ITEMS_USING').' '.JText::_('FLEXI_FILE').'</label>' : '').
-				JHTML::_('select.genericlist', $file_options, 'filter_fileid', 'size="1" class="use_select2_lib" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_fileid );
+			$lists['filter_fileid'] = ($filter_fileid || 1 ? '<label class="label">'.JText::_('FLEXI_ITEMS_USING').' '.JText::_('FLEXI_FILE').'</label>' : '').
+				JHTML::_('select.genericlist', $file_options, 'filter_fileid', 'size="1" class="use_select2_lib'.($filter_fileid ? '' : ' fc_skip_highlight').'" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_fileid );
 		}
 		
 		//assign data to template

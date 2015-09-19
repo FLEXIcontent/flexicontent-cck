@@ -31,7 +31,7 @@ $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
-$attribs_preview = ' class="fc-man-icon-s '.$tip_class.'" alt="Preview" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
+$attribs_preview = ' class="fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
 $image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview);
 
 $list_total_cols = 8;
@@ -148,6 +148,7 @@ function delAllFilters() {
 		<?php
 		$canCheckinRecords = $user->authorise('core.admin', 'checkin');
 		$edit_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&amp;task=';
+		$items_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_subcats=0&amp;fcform=1&amp;filter_tag=';
 		
 		$k = 0;
 		
@@ -223,7 +224,9 @@ function delAllFilters() {
 				?>
 			</td>
 			<td class="center">
-				<span class="badge badge-info"><?php echo $row->nrassigned ? $row->nrassigned : 0; ?></span>
+				<a class="btn btn-small" href="<?php echo $items_link.$row->id; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="width:100; box-sizing:border-box;">
+					<?php echo $row->nrassigned ? $row->nrassigned : 0; ?>
+				</a>
 			</td>
 			<td class="center">
 				<?php echo $published; ?>

@@ -77,7 +77,7 @@ function delAllFilters() {
 
 <div class="flexicontent">
 
-<form action="index.php?option=<?php echo $this->option; ?>&view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
@@ -162,38 +162,38 @@ function delAllFilters() {
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
-			<th nowrap="nowrap">&nbsp;</th>
-			<th nowrap="nowrap">&nbsp;</th>
+			<th>&nbsp;</th>
+			<th>&nbsp;</th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'c.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass left" colspan="2"><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
 			<!--th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th-->
 			<th class="hideOnDemandClass">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_P']; ?></small></span>
-				<?php echo '<img src="'.$img_path.$state_imgs['ALL_P'].'" title="'.$state_names['ALL_P'].'">'; ?>
+				<?php echo '<img src="'.$img_path.$state_imgs['ALL_P'].'" alt="'.$state_names['ALL_P'].'" title="'.$state_names['ALL_P'].'">'; ?>
 			</th>
 			<th class="hideOnDemandClass">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['ALL_U']; ?></small></span>
-				<?php echo '<img src="'.$img_path.$state_imgs['ALL_U'].'" title="'.$state_names['ALL_U'].'">'; ?>
+				<?php echo '<img src="'.$img_path.$state_imgs['ALL_U'].'" alt="'.$state_names['ALL_U'].'" title="'.$state_names['ALL_U'].'">'; ?>
 			</th>
 			<th class="hideOnDemandClass">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['A']; ?></small></span>
-				<?php echo '<img src="'.$img_path.$state_imgs['A'].'" title="'.$state_names['A'].'">'; ?>
+				<?php echo '<img src="'.$img_path.$state_imgs['A'].'" alt="'.$state_names['A'].'" title="'.$state_names['A'].'">'; ?>
 			</th>
 			<th class="hideOnDemandClass">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge"><?php echo $state_names['T']; ?></small></span>
-				<?php echo '<img src="'.$img_path.$state_imgs['T'].'" title="'.$state_names['T'].'">'; ?>
+				<?php echo '<img src="'.$img_path.$state_imgs['T'].'" alt="'.$state_names['T'].'" title="'.$state_names['T'].'">'; ?>
 			</th>
-			<th class="hideOnDemandClass" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
+			<th class="hideOnDemandClass"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'c.lft', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php echo $this->orderingx ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'categories.saveorder' ) : ''; ?>
 			</th>
-			<th class="hideOnDemandClass" nowrap="nowrap">
+			<th class="hideOnDemandClass">
 				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
-			<th class="hideOnDemandClass" nowrap="nowrap">
+			<th class="hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'c.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 		</tr>
@@ -233,7 +233,7 @@ function delAllFilters() {
 			$published = JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange );
 			
 			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
-			$link	= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
+			$link	= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid='. $row->id;
 			
 			$inheritcid = $row->config->get('inheritcid', '');
 			$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
@@ -294,7 +294,7 @@ function delAllFilters() {
 				echo '<a class="preview" href="'.$rsslink.'" target="_blank">'.$image_rsslist.'</a>';
 				?>
 			</td>
-			<td align="left" class="col_title">
+			<td style="text-align:left;" class="col_title">
 				<?php
 				if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>";
 				
@@ -352,51 +352,51 @@ function delAllFilters() {
 				}
 				?>
 			</td>
-			<td align="right">
+			<td class="col_edit_layout">
 				<?php if ($this->CanTemplates && $row_clayout) : ?>
 				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;" >
 					<?php echo $image_editlayout;?>
 				</a>
 				<?php endif; ?>
 			</td>
-			<td align="left">
+			<td class="col_template">
 				<?php echo $row->config->get('clayout') ? $row->config->get('clayout') : ($row_clayout ? $row_clayout : '...').'<span class="badge">inherited</span>'; ?>
 			</td>
 			
-			<?php /*<td align="center">
+			<?php /*<td>
 				<a href="<?php echo $items; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset;">
 					<span class="badge badge-info"><?php echo $row->nrassigned; ?></span>
 				</a>
 			</td>*/ ?>
 			
-			<td align="center">
+			<td>
 				<a href="<?php echo $items_link.'ALL_P'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
 					<span class="badge badge-success"><?php $c = (int)@$row->byStateTotals[1] + (int)@$row->byStateTotals[-5]; echo $c ? $c : '.'; ?></span>
 				</a>
 			</td>
-			<td align="center">
+			<td>
 				<a href="<?php echo $items_link.'ALL_U'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
 					<span class="badge badge-warning"><?php $c = (int)@$row->byStateTotals[0] + (int)@$row->byStateTotals[-3] + (int)@$row->byStateTotals[-4]; echo $c ? $c : '.'; ?></span>
 				</a>
 			</td>
-			<td align="center">
+			<td>
 				<a href="<?php echo $items_link.'A'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
 					<span class="badge badge-info"><?php $c = (int)@$row->byStateTotals[2]; echo $c ? $c : '.'; ?></span>
 				</a>
 			</td>
-			<td align="center">
+			<td>
 				<a href="<?php echo $items_link.'T'; ?>" title="<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>" style="color:unset; display:inline-block;">
 					<span class="badge"><?php $c = (int)@$row->byStateTotals[-2]; echo $c ? $c : '.'; ?></span>
 				</a>
 			</td>
 			
-			<td align="center">
+			<td class="center">
 				<?php echo $published; ?>
 			</td>
-			<td align="center">
+			<td>
 				<?php echo $access; ?>
 			</td>
-			<td class="order">
+			<td class="center order">
 			 <?php if ($canChange) : ?>
 				<?php if ($saveOrder) : ?>
 					<span><?php echo $this->pagination->orderUpIcon($i, isset($this->ordering[$row->parent_id][$orderkey - 1]), 'categories.orderup', 'JLIB_HTML_MOVE_UP', $this->orderingx); ?></span>
@@ -404,20 +404,20 @@ function delAllFilters() {
 				<?php endif; ?>
 				
 				<?php $disabled = $saveOrder ?  '' : 'disabled="disabled"'; ?>
-				<input type="text" name="order[]" size="5" value="<?php echo $orderkey + 1;?>" <?php echo $disabled ?> class="text-area-order" />
+				<input type="text" name="order[]" size="5" value="<?php echo $orderkey + 1;?>" <?php echo $disabled ?> class="text-area-order" style="text-align: center" />
 				<?php $originalOrders[] = $orderkey + 1; ?>
 			<?php else : ?>
 				<?php echo $orderkey + 1;?>
 			<?php endif; ?>
 			</td>
-			<td class="center nowrap">
+			<td class="left nowrap">
 			<?php if ($row->language=='*'):?>
 				<?php echo JText::alt('JALL','language'); ?>
 			<?php else:?>
 				<?php echo $row->language_title ? $this->escape($row->language_title) : JText::_('JUNDEFINED'); ?>
 			<?php endif;?>
 			</td>
-			<td align="center">
+			<td>
 				<span title="<?php echo sprintf('%d-%d', $row->lft, $row->rgt);?>">
 				<?php echo $row->id; ?>
 				</span>

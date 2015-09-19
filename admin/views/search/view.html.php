@@ -280,7 +280,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 					.attr('href', '".$popup_load_url."')
 					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
 			";
-			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', false );
+			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_REINDEX_BASIC_CONTENT_LISTS', false );
 			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
 		} else {
 			$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', str_replace('&', '&amp;', $popup_load_url), 500, 240);
@@ -297,7 +297,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 					.attr('href', '".$popup_load_url."')
 					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
 			";
-			JToolBarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', false );
+			JToolBarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW', false );
 			JHtml::_('behavior.modal', '#toolbar-advindex a.toolbar, #toolbar-advindex button');
 		} else {
 			$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', str_replace('&', '&amp;', $popup_load_url), 500, 240);
@@ -312,7 +312,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 					.attr('href', '".$popup_load_url."')
 					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
 			";
-			JToolBarHelper::custom( $btn_task, 'advindexdirty.png', 'advindexdirty_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', false );
+			JToolBarHelper::custom( $btn_task, 'advindexdirty.png', 'advindexdirty_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', false );
 			JHtml::_('behavior.modal', '#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button');
 		} else {
 			$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', str_replace('&', '&amp;', $popup_load_url), 500, 240);

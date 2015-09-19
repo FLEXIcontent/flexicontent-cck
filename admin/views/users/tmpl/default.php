@@ -108,7 +108,7 @@ function delAllFilters() {
 
 <div class="flexicontent">
 
-<form action="index.php?option=<?php echo $this->option; ?>&view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
@@ -168,15 +168,15 @@ function delAllFilters() {
 			<?php echo $this->lists['filter_usergrp']; ?>
 		</span>
 		
-		<span class="fc-filter nowrap_box">
+		<div class="fc-filter nowrap_box">
 			<span class="radio"><?php echo $this->lists['date']; ?></span>
 			<?php echo $this->lists['startdate']; ?>&nbsp;&nbsp;<?php echo $this->lists['enddate']; ?>
-		</span>
+		</div>
 		
-		<span class="fc-filter nowrap_box">
+		<div class="fc-filter nowrap_box">
 			<label class="label"><?php echo JText::_('FLEXI_ID'); ?></label>
 			<input type="text" name="filter_id" id="filter_id" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
-		</span>
+		</div>
 		
 		<div class="icon-arrow-up-2" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 	</div>
@@ -190,7 +190,7 @@ function delAllFilters() {
 		<tr>
 			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_NAME', 'a.name', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->search) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -198,10 +198,10 @@ function delAllFilters() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th class="hideOnDemandClass center" >
+			<th class="hideOnDemandClass nowrap" >
 				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_NAME', 'a.username', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
-			<th class="hideOnDemandClass center" nowrap="nowrap">
+			<th class="hideOnDemandClass nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_LOGIN', 'loggedin', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->filter_logged) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -209,10 +209,10 @@ function delAllFilters() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th class="hideOnDemandClass center" nowrap="nowrap">
+			<th class="hideOnDemandClass nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_ENABLED', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass nowrap">
 				<?php echo JText::_( 'FLEXI_USERGROUPS' ); ?>
 				<?php if ($this->filter_usergrp) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -220,7 +220,7 @@ function delAllFilters() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->filter_itemscount) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -228,7 +228,7 @@ function delAllFilters() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_FILES_MBS', 'uploadssize', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if (@$this->filter_uploadssize) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -236,10 +236,10 @@ function delAllFilters() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_EMAIL', 'a.email', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
-			<th width="110" class="hideOnDemandClass center">
+			<th style="width:110px;" class="hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_REGISTRED_DATE', 'a.registerDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
@@ -253,7 +253,7 @@ function delAllFilters() {
 				endif;
 				?>
 			</th>
-			<th width="110" class="hideOnDemandClass center">
+			<th style="width:110px;" class="hideOnDemandClass nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_USER_LAST_VISIT', 'a.lastvisitDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
@@ -267,7 +267,7 @@ function delAllFilters() {
 				endif;
 				?>
 			</th>
-			<th class="hideOnDemandClass center" nowrap="nowrap">
+			<th class="hideOnDemandClass nowrap">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_ID', 'a.id', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->filter_id) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -304,7 +304,7 @@ function delAllFilters() {
 				$task_block= 'users.' . ($row->block ? 'unblock' : 'block');
 				$users_task = 'task=users.';
 				$alt   = $row->block ? JText::_( 'Enabled' ) : JText::_( 'Blocked' );
-				$link  = 'index.php?option=com_flexicontent&amp;controller=users&amp;view=user&amp;'.$users_task.'edit&amp;cid[]='. $row->id. '';
+				$link  = 'index.php?option=com_flexicontent&amp;controller=users&amp;view=user&amp;'.$users_task.'edit&amp;cid='. $row->id. '';
 
 				if ($row->lastvisitDate == "0000-00-00 00:00:00") {
 					$lvisit = JText::_( 'Never' );
@@ -337,33 +337,33 @@ function delAllFilters() {
 					<?php echo $row->username; ?>
 					<!-- </a> -->
 				</td>
-				<td align="center" class="col_logged">
-					<?php echo $row->loggedin ? '<img src="'.$tick_img.'" width="16" height="16" border="0" class="fc-man-icon-s" alt="" />': ''; ?>
+				<td class="center col_logged">
+					<?php echo $row->loggedin ? '<img src="'.$tick_img.'" width="16" height="16" style="border:0;" class="fc-man-icon-s" alt="" />': ''; ?>
 				</td>
-				<td align="center">
+				<td class="center">
 					<a href="javascript:void(0);" onclick="return listItemTask('cb<?php echo $i;?>','<?php echo $task_block;?>')">
-						<img src="images/<?php echo $block_img;?>" width="16" height="16" border="0" class="fc-man-icon-s" alt="<?php echo $alt; ?>" /></a>
+						<img src="images/<?php echo $block_img;?>" width="16" height="16" style="border:0;" class="fc-man-icon-s" alt="<?php echo $alt; ?>" /></a>
 				</td>
-				<td align="center" class="col_usergrp">
+				<td class="center col_usergrp">
 					<?php echo JText::_( $row->groupname ); ?>
 				</td>
-				<td align="right" class="col_itemscount">
+				<td class="center col_itemscount">
 					<?php echo $itemscount; ?>
 				</td>
-				<td align="right" class="col_uploadssize">
+				<td class="right col_uploadssize">
 					<?php echo number_format(($row->uploadssize / (1024*1024)) , 2); ?>
 				</td>
-				<td align="left">
+				<td class="left">
 					<a href="mailto:<?php echo $row->email; ?>">
 						<?php echo $row->email; ?></a>
 				</td>
-				<td align="center" nowrap="nowrap" class="col_registered">
+				<td class="nowrap col_registered">
 					<?php echo $registered; ?>
 				</td>
-				<td align="center" nowrap="nowrap" class="col_visited">
+				<td class="nowrap col_visited">
 					<?php echo $lvisit; ?>
 				</td>
-				<td class="left col_id">
+				<td class="center col_id">
 					<?php echo $row->id; ?>
 				</td>
 			</tr>
