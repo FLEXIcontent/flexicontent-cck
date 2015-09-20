@@ -471,9 +471,9 @@ class flexicontent_html
 		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
 		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = explode("|", $allowed_tmpls);
 		
-		$_options = $layout_type=='clayout' ? $displayed_tmpls : $allowed_tmpls;
-		// Return if none allowed clayout(s) were configured
-		if (!count($_options))  return false;
+		// Return if none allowed layout(s) were configured / allowed
+		$layout_names = $layout_type=='clayout' ? $displayed_tmpls : $allowed_tmpls;
+		if (!count($layout_names))  return false;
 		
 		$app    = JFactory::getApplication();
 		$option = JRequest::getCmd('option');
@@ -493,6 +493,17 @@ class flexicontent_html
 		$outside_label = $_switcher_label==1 ? '<span class="flexi label limit_override_label">'.JText::_('FLEXI_LAYOUT').'</span>' : '';
 		
 		$tmpls = flexicontent_tmpl::getTemplates();
+		
+		// Get layout parameters and find the layout title
+		foreach($layout_names as $layout_name)
+		{
+			$tmpl = @ $tmpls->$layout_typename->$layout_name;
+			if ( $tmpl && empty($tmpl->parameters) ) {
+				$tmpl->parameters = new JRegistry( flexicontent_tmpl::getLayoutparams($layout_typename, $layout_name) );
+			}
+			$tmpl->customtitle = $tmpl ? JText::_($tmpl->parameters->get('custom_layout_title', @ $tmpl->defaulttitle)) : '';
+		}
+		
 		if ( $params->get('clayout_switcher_display_mode', 1) == 0 )
 		{
 			flexicontent_html::loadFramework('select2');
@@ -501,10 +512,10 @@ class flexicontent_html
 			$attribs  = ' class="'.$classes.'" ' . $onchange;
 			
 			$options = array();
-			foreach($_options as $_option) {
-				$tmpl_desc = JText::_( !empty($tmpls->$layout_typename->$_option) ? @ $tmpls->$layout_typename->$_option->defaulttitle : '');
-				$_text = $tmpl_desc ? $tmpl_desc : $_option;
-				$options[] = JHTML::_('select.option', $_option, $_text .$inside_label);
+			foreach($layout_names as $layout_name) {
+				$tmpl = @ $tmpls->$layout_typename->$layout_name;
+				$tmpl_title = $tmpl ? $tmpl->customtitle : $layout_name;
+				$options[] = JHTML::_('select.option', $layout_name, $tmpl_title .$inside_label);
 			}
 			$html = JHTML::_('select.genericlist', $options, $layout_type, $attribs, 'value', 'text', $layout );
 		}
@@ -515,14 +526,14 @@ class flexicontent_html
 			
 			$n = 0;
 			$options = array();
-			foreach($_options as $_option)
+			foreach($layout_names as $layout_name)
 			{
-				$tmpl_desc = JText::_( !empty($tmpls->$layout_typename->$_option) ? @ $tmpls->$layout_typename->$_option->defaulttitle : '');
-				
-				$checked_attr = $layout==$_option ? ' checked=checked ' : '';
+				$tmpl = @ $tmpls->$layout_typename->$layout_name;
+				$tmpl_title = $tmpl ? $tmpl->customtitle : ''/*$layout_name*/;
+				$checked_attr = $layout==$layout_name ? ' checked=checked ' : '';
 				$options[] =
-					'<input type="radio" name="'.$layout_type.'" value="'.$_option.'" id="'.$layout_type.$n.'" onchange="adminFormPrepare(this.form, 2);" '.$checked_attr.'>'.
-					'<label for="'.$layout_type.$n.'" class="btn '.$tooltip_class.'" title="'.$tmpl_desc.'"><img alt="'.$_option.'" src="'.$tmplurl.$_option.'/clayout.png"></label>'
+					'<input type="radio" name="'.$layout_type.'" value="'.$layout_name.'" id="'.$layout_type.$n.'" onchange="adminFormPrepare(this.form, 2);" '.$checked_attr.'>'.
+					'<label for="'.$layout_type.$n.'" class="btn '.$tooltip_class.'" title="'.$tmpl_title.'"><img alt="'.$layout_name.'" src="'.$tmplurl.$layout_name.'/clayout.png"></label>'
 					;
 				$n++;
 			}
@@ -4488,7 +4499,7 @@ class flexicontent_tmpl
 				$themes->category->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/category.png';
 
 				// *** This can be serialized and thus Joomla Cache will work
-				$themes->category->{$tmpl}->params = FLEXI_J30GE ? $document->asXML() : $document->toString();
+				$themes->category->{$tmpl}->params = $document->asXML();
 
 				// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
 				// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
@@ -4540,7 +4551,32 @@ class flexicontent_tmpl
 		}
 		return $themes;
 	}
-
+	
+	
+	/**
+	 * Method to get the layout parameters of an item
+	 * 
+	 * @return string
+	 * @since 3.0
+	 */
+	static function getLayoutparams($type, $template, $force = false)
+	{
+		static $layoutparams = array();
+		if ( !$force && isset($layoutparams[$type][$template]) ) return $layoutparams[$type][$template];
+		
+		$db = JFactory::getDBO();
+		$query	= 'SELECT attribs, layout, template'
+			. ' FROM #__flexicontent_layouts_conf';
+		$db->setQuery($query);
+		$layout_conf = $db->loadObjectList();
+		
+		foreach ($layout_conf as $data) {
+			$layoutparams[$data->layout][$data->template] = !empty($data->attribs) ? $data->attribs : '';
+		}
+		return $layoutparams[$type][$template];
+	}
+	
+	
 	static function getTemplates($lang_files = 'all')
 	{
 		$flexiparams = JComponentHelper::getParams('com_flexicontent');
@@ -4563,12 +4599,10 @@ class flexicontent_tmpl
 		}
 
 		// Load Template-Specific language file(s) to override or add new language strings
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			if ( $lang_files == 'all' ) foreach ($tmpls->category as $tmpl => $d) FLEXIUtilities::loadTemplateLanguageFile( $tmpl );
-			else if ( is_array($lang_files) )  foreach ($lang_files as $tmpl) FLEXIUtilities::loadTemplateLanguageFile( $tmpl );
-			else if ( is_string($lang_files) && $load_lang ) FLEXIUtilities::loadTemplateLanguageFile( $lang_files );
-		}
-
+		if ( $lang_files == 'all' ) foreach ($tmpls->category as $tmpl => $d) FLEXIUtilities::loadTemplateLanguageFile( $tmpl );
+		else if ( is_array($lang_files) )  foreach ($lang_files as $tmpl) FLEXIUtilities::loadTemplateLanguageFile( $tmpl );
+		else if ( is_string($lang_files) ) FLEXIUtilities::loadTemplateLanguageFile( $lang_files );
+		
 		if ($print_logging_info) $fc_run_times[$cached ? 'templates_parsing_cached' : 'templates_parsing_noncached'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		return $tmpls;
 	}

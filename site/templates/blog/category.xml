@@ -14,7 +14,7 @@
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="custom_layout_title" type="text" size="3" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
+			<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
 			
 			<field name="leadingitems_sep" type="separator" hr="false" default="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" level="level1" menu="hide" />
 			<field name="lead_num" type="text" size="3" default="" label="FLEXI_LEADING_NUM" description="FLEXI_LEADING_NUM_DESC" />

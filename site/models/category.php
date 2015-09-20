@@ -2051,22 +2051,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function getLayoutparams($force = false)
 	{
-		static $layoutparams = array();
-		if ( !$force && isset($layoutparams[$this->_id]) ) return $layoutparams[$this->_id];
-		
-		if ($this->_clayout)
-		{
-			$query	= 'SELECT attribs'
-				. ' FROM #__flexicontent_layouts_conf'
-				. ' WHERE layout = "category"'
-				. '  AND template = ' . $this->_db->Quote($this->_clayout);
-			$this->_db->setQuery($query);
-			$attribs = $this->_db->loadResult();
-		}
-		
-		// Cache and return
-		$layoutparams[$this->_id] = !empty($attribs) ? $attribs : '';
-		return $layoutparams[$this->_id];
+		return $this->_clayout ? flexicontent_tmpl::getLayoutparams('category', $this->_clayout, $force) : '';
 	}
 	
 	
