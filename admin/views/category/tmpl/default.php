@@ -344,6 +344,7 @@ $js = "
 						?>
 						<fieldset class="panelform">
 							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
+								if ($field->getAttribute('not_inherited')) continue;
 								$fieldname =  $field->fieldname;
 								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->params[$fieldname]);
 								echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',

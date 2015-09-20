@@ -3390,26 +3390,11 @@ class ParentClassItem extends JModelAdmin
 	 * Method to get the layout parameters of an item
 	 * 
 	 * @return string
-	 * @since 1.5
+	 * @since 3.0
 	 */
 	function getLayoutparams($force = false)
 	{
-		static $layoutparams = array();
-		if ( !$force && isset($layoutparams[$this->_id]) ) return $layoutparams[$this->_id];
-		
-		if ($this->_ilayout)
-		{
-			$query	= 'SELECT attribs'
-				. ' FROM #__flexicontent_layouts_conf'
-				. ' WHERE layout = "items"'
-				. '  AND template = ' . $this->_db->Quote($this->_ilayout);
-			$this->_db->setQuery($query);
-			$attribs = $this->_db->loadResult();
-		}
-		
-		// Cache and return
-		$layoutparams[$this->_id] = !empty($attribs) ? $attribs : '';
-		return $layoutparams[$this->_id];
+		return $this->_ilayout ? flexicontent_tmpl::getLayoutparams('items', $this->_ilayout, $force) : '';
 	}
 	
 	

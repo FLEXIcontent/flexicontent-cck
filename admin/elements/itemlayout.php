@@ -120,8 +120,7 @@ class JFormFieldItemlayout extends JFormFieldList
 		$lays = implode("','", $lays);
 		
 		if ( @$attributes['enableparam'] ) {
-			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-			if ( !$cparams->get($attributes['enableparam']) ) return FLEXI_J16GE ? '' : JText::_('FLEXI_DISABLED');
+			if ( !$cparams->get($attributes['enableparam']) ) return '';
 		}
 		
 if ( ! @$attributes['skipparams'] ) {
@@ -226,8 +225,7 @@ jQuery(document).ready(function() {
 		$attributes = $attributes['@attributes'];
 		
 		if ( @$attributes['enableparam'] ) {
-			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-			if ( !$cparams->get($attributes['enableparam']) ) return '';
+			if ( !JComponentHelper::getParams( 'com_flexicontent' )->get($attributes['enableparam']) ) return '';
 		}
 		
 		$label = $this->element['label'];
