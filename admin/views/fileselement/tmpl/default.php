@@ -260,7 +260,7 @@ function delAllFilters() {
 					if ($this->folder_mode) {
 						$img_assign_link = "window.parent.qmAssignFile".$this->fieldid."('".$this->targetid."', '".$filename."', '".$file_preview."');document.getElementById('file{$i}').className='striketext';";
 					} else {
-						$img_assign_link = "qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$display_filename."');";
+						$img_assign_link = "qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename."');";
 					}
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">

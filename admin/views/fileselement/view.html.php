@@ -195,7 +195,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$files_selected = $model->getItemFiles($u_item_id);
 		$formfieldname = FLEXI_J16GE ? 'custom['.$fname.'][]' : $fname.'[]';
 		
-		//add js to document
+		// Add JS to document to initialize the file list
+		// eg Find and mark file usage by fileid / filename search (respectively: DB mode / Folder mode)
 		if ($folder_mode) {
 			$js = "
 			jQuery(document).ready(function()
@@ -205,8 +206,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 				var remove_new_files_from_list = 0;
 				
 				// Find and mark file usage by filename search
-				var original_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .originalname');
-				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .existingname');
+				var original_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .originalname');  // newly selected field values, not yet saved in DB
+				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .existingname');  // existing field values, already saved in DB
 				
 				var imgobjs = Array();
 				for(i=0,n=original_objs.length; i<n; i++)  {
