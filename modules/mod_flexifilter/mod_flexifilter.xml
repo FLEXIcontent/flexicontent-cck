@@ -224,7 +224,7 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="2">CSS links inside HTML (allows capturing)</option>
 			</field>
-			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS" description="FLEXI_ADD_TOOLTIPS_DESC" class="btn-group btn-group-yesno">
+			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS_JS" description="FLEXI_ADD_TOOLTIPS_JS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

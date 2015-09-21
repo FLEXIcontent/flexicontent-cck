@@ -148,7 +148,7 @@
 			</field>
 			<field name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule" />
 		</fieldset>
-
+		
 		<fieldset name="FLEXI_MOD_ADVANCED" label="FLEXI_MOD_ADVANCED">
 			
 			<field name="" type="separator" default="FLEXI_CACHING" level="level1" />
@@ -166,6 +166,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">CSS links inside HTML (allows capturing)</option>
+			</field>
+			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS_JS" description="FLEXI_ADD_TOOLTIPS_JS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 		</fieldset>

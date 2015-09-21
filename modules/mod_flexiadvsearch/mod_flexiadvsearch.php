@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  */
 
-//no direct access
+// no direct access
 defined('_JEXEC') or die('Restricted access');
 
 // Decide whether to show module contents
@@ -49,13 +49,13 @@ if ( $show_mod )
 	JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, 'en-GB', true);
 	JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, null, true);
 	
-	// include the helper only once
-	require_once (dirname(__FILE__).DS.'helper.php');  // currently helper class is empty ...
-	
 	// initialize various variables
-	$document	= JFactory::getDocument();
+	$document = JFactory::getDocument();
 	$caching 	= $app->getCfg('caching', 0);
 	$flexiparams = JComponentHelper::getParams('com_flexicontent');
+	
+	// include the helper only once
+	require_once (dirname(__FILE__).DS.'helper.php');
 	
 	// Other parameters
 	$moduleclass_sfx= $params->get('moduleclass_sfx', '');
@@ -94,12 +94,12 @@ if ( $show_mod )
 	
 	
 	// Load needed JS libs & CSS styles
-	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+	//FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 	flexicontent_html::loadFramework('jQuery');
 	flexicontent_html::loadFramework('flexi_tmpl_common');
 	
 	// Add tooltips
-	if ($add_tooltips) JHTML::_('behavior.tooltip');
+	if ($add_tooltips) FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
 	
 	// Add css
 	$modulename = 'mod_flexiadvsearch';

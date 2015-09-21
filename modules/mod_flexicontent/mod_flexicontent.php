@@ -154,12 +154,12 @@ if ( $show_mod )
 	$mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime();
 	
 	// Load needed JS libs & CSS styles
-	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+	//FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 	flexicontent_html::loadFramework('jQuery');
 	flexicontent_html::loadFramework('flexi_tmpl_common');
 	
 	// Add tooltips
-	if ($add_tooltips) JHTML::_('behavior.tooltip');
+	if ($add_tooltips) FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
 	
 	// Add css
 	$modulename = 'mod_flexicontent';

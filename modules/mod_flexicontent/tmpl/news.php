@@ -8,8 +8,6 @@
  * // Display parameters
  * $moduleclass_sfx
  * $layout 
- * $add_ccs
- * $add_tooltips
  * $width
  * $height
  * // standard
