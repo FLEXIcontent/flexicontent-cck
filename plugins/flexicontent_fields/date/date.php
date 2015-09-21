@@ -205,11 +205,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					containment: 'parent',
-					tolerance: 'pointer'
-				});
+				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 			
 			// Show new field, increment counters

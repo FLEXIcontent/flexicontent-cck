@@ -1,4 +1,4 @@
-window.addEvent('domready', function() {
+jQuery(document).ready(function(){
 	//var url = location.href;  // entire url including querystring - also: window.location.href;
 	//var live_site = url.substring(0, url.indexOf('/', 14)) + fcvote_rfolder + '/';
 	

@@ -34,7 +34,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 <!-- BOF buttons -->
 <?php if (JRequest::getCmd('print')) : ?>
 	<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
-		<script type="text/javascript">window.addEvent('domready', function() { window.print(); });</script>
+		<script type="text/javascript">jQuery(document).ready(function(){ window.print(); });</script>
 	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
 		<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 	<?php endif; ?>

@@ -208,7 +208,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			});
 			";
 			
-			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -291,11 +291,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					containment: 'parent',
-					tolerance: 'pointer'
-				});
+				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 			
 			// Show new field, increment counters

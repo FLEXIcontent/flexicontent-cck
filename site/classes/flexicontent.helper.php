@@ -1766,8 +1766,7 @@ class flexicontent_html
 			$js ='				
 				function fc_setitemstate(state, id)
 				{
-					var handler = new fc_statehandler();
-					handler.initialize({task: "'. ($app->isAdmin() ? 'items.setitemstate' : 'setitemstate') .'"});
+					var handler = new fc_statehandler({task: "'. ($app->isAdmin() ? 'items.setitemstate' : 'setitemstate') .'"});
 					handler.setstate( state, id );
 				}';
 			$document->addScriptDeclaration($js);
@@ -2486,19 +2485,9 @@ class flexicontent_html
 		if (!$js_and_css_added)
 		{
 			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-			if ($cparams->get('add_tooltips', 1))
-			{
-				// J3.0+ tooltips (bootstrap based)
-				if (FLEXI_J30GE)
-					JHtml::_('bootstrap.tooltip');
-				else {
-					// Make sure mootools are loaded before our js
-					FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-					
-					// Load J2.5 (non-bootstrap tooltips) tooltips
-					JHTML::_('behavior.tooltip');
-				}
-			}
+			
+			// Load tooltips JS
+			if ($cparams->get('add_tooltips', 1)) FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
 			
 			flexicontent_html::loadFramework('jQuery');
 			flexicontent_html::loadFramework('flexi_tmpl_common');
@@ -2744,28 +2733,23 @@ class flexicontent_html
 
 		if (!$js_and_css_added)
 		{
+			$document	= JFactory::getDocument();
+			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+			
 			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 			$text 		= $user->id ? 'FLEXI_ADDREMOVE_FAVOURITE' : 'FLEXI_FAVOURE';
 			$overlib 	= $user->id ? 'FLEXI_ADDREMOVE_FAVOURITE_TIP' : 'FLEXI_FAVOURE_LOGIN_TIP';
 			$addremove_tip = flexicontent_html::getToolTip($text, $overlib, 1, 1);
 			
 			// Make sure mootools are loaded before our js
-			FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+			//FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 			
-			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-			if ($cparams->get('add_tooltips', 1))
-			{
-				// Load J2.5 (non-bootstrap tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
-				JHTML::_('behavior.tooltip');
-				
-				// J3.0+ tooltips (bootstrap based)
-				if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
-			}
+			// Load tooltips JS
+			if ($cparams->get('add_tooltips', 1)) FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
 			
 			flexicontent_html::loadFramework('jQuery');
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 			
-			$document	= JFactory::getDocument();
 			$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/fcfav.js' );
 			
 			JText::script('FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX',true);

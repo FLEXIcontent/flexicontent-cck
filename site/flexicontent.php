@@ -94,7 +94,7 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 if ( JRequest::getWord('format')!='raw')
 {
 	// Load mootools
-	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+	//FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 	
 	// Load jquery Framework
 	flexicontent_html::loadFramework('jQuery');
@@ -102,7 +102,7 @@ if ( JRequest::getWord('format')!='raw')
 	if ($cparams->get('add_tooltips', 1))
 	{
 		// Load J2.5 (non-bootstrap tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
-		JHTML::_('behavior.tooltip');
+		FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
 		
 		// J3.0+ tooltips (bootstrap based)
 		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');

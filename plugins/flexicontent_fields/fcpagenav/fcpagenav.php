@@ -231,7 +231,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		
 		// Load needed JS/CSS
 		if ($use_tooltip)
-			JHTML::_('behavior.tooltip');
+			FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
 		if ($load_css)
 			JFactory::getDocument()->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');	
 		
