@@ -41,9 +41,7 @@ foreach($files_data as $file_id => $file_data)
 		$file_data	= $this->addIcon( $file_data );
 		$_tooltip_title   = '';
 		$_tooltip_content = JText::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
-		$icon = FLEXI_J30GE ?
-			JHTML::image($file_data->icon, $file_data->ext, 'class="fcicon-mime hasTooltip" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"'):
-			JHTML::image($file_data->icon, $file_data->ext, 'class="fcicon-mime hasTip" title="'.$_tooltip_title.'::'.$_tooltip_content.'"');
+		$icon = JHTML::image($file_data->icon, $file_data->ext, 'class="fcicon-mime hasTooltip" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"');
 		$icon = '<span class="fcfile_mime">'.$icon.'</span>';
 	}
 	
@@ -57,10 +55,8 @@ foreach($files_data as $file_id => $file_data)
 		if ( $add_lang_img && @ $langs->{$file_data->language}->imgsrc ) {
 			if (!$add_lang_txt) {
 				$_tooltip_title   = JText::_( 'FLEXI_LANGUAGE', true );
-				$_tooltip_content = $file_data->language=='*' ? JText::_("All") : $langs->{$file_data->language}->name;
-				$_attribs = FLEXI_J30GE ?
-					'class="hasTooltip fcicon-lang" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"' :
-					'class="hasTip fcicon-lang" title="'.$_tooltip_title.'::'.$_tooltip_content.'"';
+				$_tooltip_content = $file_data->language=='*' ? JText::_("FLEXI_ALL") : $langs->{$file_data->language}->name;
+				$_attribs = 'class="hasTooltip fcicon-lang" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"';
 			} else {
 				$_attribs = ' class="fcicon-lang"';
 			}
@@ -121,13 +117,15 @@ foreach($files_data as $file_id => $file_data)
 	if (!empty($file_data->description)) {
 		if ( !$authorized ) {
 			if ($noaccess_display != 2 ) {
-				$descr_tip    = flexicontent_html::escapeJsText($name_str . '::' . $file_data->description,'s');
-				$descr_icon = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'. $descr_tip .'"/>';
+				$name_escaped = flexicontent_html::escapeJsText($name_str, 's');
+				$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
+				$descr_icon = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 				$descr_inline  = '';
 			}
 		} else if ($display_descr==1 || $prop=='namelist') {   // As tooltip
-			$descr_tip    = flexicontent_html::escapeJsText($name_str . '::' . $file_data->description,'s');
-			$descr_icon = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'. $descr_tip .'"/>';
+				$name_escaped = flexicontent_html::escapeJsText($name_str, 's');
+			$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
+			$descr_icon = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 			$descr_inline  = '';
 		} else if ($display_descr==2) {  // As inline text
 			$descr_inline = ' <span class="fcfile_descr_inline alert alert-info fc-iblock">'. nl2br($file_data->description) . '</span>';

@@ -738,16 +738,16 @@ if ( ( !isset($all_tab_fields['lang']) && $captured['lang'] )  ||  ( flexiconten
 if ( $this->perms['canright'] ) : ob_start(); // perms ?>
 	<?php
 	$this->document->addScriptDeclaration("
-		window.addEvent('domready', function() {
-		var slideaccess = new Fx.Slide('tabacces');
-		var slidenoaccess = new Fx.Slide('notabacces');
-		slideaccess.hide();
+		jQuery(document).ready(function(){
+			var slideaccess = new Fx.Slide('tabacces');
+			var slidenoaccess = new Fx.Slide('notabacces');
+			slideaccess.hide();
 			$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
 				slideaccess.toggle();
 				slidenoaccess.toggle();
-				});
 			});
-		");
+		});
+	");
 	?>
 	
 	<fieldset id="flexiaccess" class="flexiaccess basicfields_set">

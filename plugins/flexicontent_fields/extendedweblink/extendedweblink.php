@@ -147,7 +147,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			});
 			";
 			
-			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -238,11 +238,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					containment: 'parent',
-					tolerance: 'pointer'
-				});
+				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 			
 			// Show new field, increment counters
@@ -252,20 +248,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
 				
 				// Enable tooltips on new element
-				".( FLEXI_J30GE ? "
-					newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
-				" : "
-					var tipped_elements = newField.find('.hasTip');
-					tipped_elements.each(function() {
-						var title = this.get('title');
-						if (title) {
-							var parts = title.split('::', 2);
-							this.store('tip:title', parts[0]);
-							this.store('tip:text', parts[1]);
-						}
-					});
-					var ajax_JTooltips = new Tips($('#sortables_".$field->id."').getNext().getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
-				")."
+				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only

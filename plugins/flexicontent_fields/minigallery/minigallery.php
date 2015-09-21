@@ -82,7 +82,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.'][]';
-		//$elementid = 'custom_'.$field->name;
+		$elementid = 'custom_'.$field->name;
 		
 		$js = "";
 		$css = "";
@@ -98,9 +98,19 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					tolerance: 'pointer'
 				});
 			});
+			
+			jQuery(document).ready(function() {
+				jQuery('a.addfile_".$field->id."').each(function(index, value) {
+					jQuery(this).on('click', function() {
+						var url = jQuery(this).attr('href');
+						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container');
+						return false;
+					});
+				});
+			});
 			";
 			
-			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -153,11 +163,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					containment: 'parent',
-					tolerance: 'pointer'
-				});
+				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 			
 			// Show new field, increment counters
@@ -215,7 +221,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		
 		$field->html = array();
 		$n = 0;
@@ -252,13 +257,15 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		// Add button for popup file selection
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
 		$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$n.'&amp;autoselect='.$autoselect.'&amp;field='.$field->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+
+		$_prompt_txt = JText::_( 'FLEXI_ADD_FILE' );
 		$field->html .= '
 			<span class="fcfield-button-add">
-				<a class="modal_'.$field->id.'" title="'.JText::_( 'FLEXI_ADD_FILE' ).'" href="'.$linkfsel.'" rel="{handler: \'iframe\', size: {x:(MooTools.version>=\'1.2.4\' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>=\'1.2.4\' ? window.getSize().y : window.getSize().size.y)-100}}">'.JText::_( 'FLEXI_ADD_FILE' ).'</a>
+				<a class="addfile_'.$field->id.'" id="'.$elementid.'_addfile" title="'.$_prompt_txt.'" href="'.$linkfsel.'" >
+					'.$_prompt_txt.'
+				</a>
 			</span>
-			';
-		
-		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
+			<input id="'.$field->name.'" class="'.$required.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
 	}
 	
 	
@@ -343,21 +350,15 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		if (empty($values)) return;
 		
-		if (!$js_and_css_added) {
-			if (FLEXI_J16GE) {
-				$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/minigallery/css/minigallery.css');
-			  FLEXI_J16GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-			  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.js');
-			  if($slideshowtype!='slideshow') {
-			  	$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
-			  	$slideshowClass .= '.'.$slideshowtype;
-			  }
-			} else {
-				$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/minigallery/minigallery.css');
-			  FLEXI_J16GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-			  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/backgroundslider.js');
-			  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/slideshow.js');
-			}
+		if (!$js_and_css_added)
+		{
+			$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/minigallery/css/minigallery.css');
+		  FLEXI_J16GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+		  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.js');
+		  if($slideshowtype!='slideshow') {
+		  	$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
+		  	$slideshowClass .= '.'.$slideshowtype;
+		  }
 		  // this allows you to override the default css files
 		  $csspath = JPATH_ROOT.'/templates/'.$mainframe->getTemplate().'/css/minigallery.css';
 		  if(file_exists($csspath)) {

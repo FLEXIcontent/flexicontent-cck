@@ -177,7 +177,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			// WARNING: bellow we also use $field->name which is different than $fieldname
 			
-			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$auto_enable_imgpicker = 0;  // Disabled imagepicker during copy to help performance
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
@@ -298,7 +298,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (remove_previous) lastField.remove();
 				
 				// Add jQuery modal window to the select image file button
-				jQuery('a.addfile_".$field->id."').each(function(index, value) {
+				newField.find('a.addfile_".$field->id."').each(function(index, value) {
 					jQuery(this).on('click', function() {
 						var url = jQuery(this).attr('href');
 						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container');
@@ -309,11 +309,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					containment: 'parent',
-					tolerance: 'pointer'
-				});
+				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 			
 			// Show new field, increment counters
@@ -532,13 +528,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			table.fcfield'.$field->id.'.img_upload_select ul.image_picker_selector { min-height: 400px; max-height: 600px; height: unset; width:100%; box-sizing: border-box; }
 		';
 		
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
-		flexicontent_html::loadFramework('flexi-lib');
-		
 		// Add jQuery modal window to the select image file button, the container will be created if it does not exist already
 		if ( $image_source ) {
-			$js ="
+			$js .= "
 			jQuery(document).ready(function() {
 				jQuery('a.addfile_".$field->id."').each(function(index, value) {
 					jQuery(this).on('click', function() {
@@ -549,10 +541,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				});
 			});
 			";
-			if ($js)  $document->addScriptDeclaration($js);
 		} else {
 			$select = $existing_imgs ? $this->buildSelectList( $field ) : '';
 		}
+		
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
+		flexicontent_html::loadFramework('flexi-lib');
+		
 		
 		$class = ' class="'.$required.' "';
 		$onchange= ' onchange="';
@@ -616,8 +612,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				<input class="existingname fcfield_textval" id="'.$elementid_n.'_existingname" name="'.$fieldname_n.'[existingname]" value="'.$image_name.'" readonly="readonly" style="float:none;" />
 				'.($none_props ? '<br/>' : '').'
 				<span class="fcfield-button-add">
-					<a class="addfile_'.$field->id.'" id="'.$elementid_n.'_addfile" title="'.$_prompt_txt.'" href="'.$linkfsel.'" >'
-						.$_prompt_txt.'
+					<a class="addfile_'.$field->id.'" id="'.$elementid_n.'_addfile" title="'.$_prompt_txt.'" href="'.$linkfsel.'" >
+						'.$_prompt_txt.'
 					</a>
 				</span>';
 			}
@@ -1095,7 +1091,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ($isItemsManager && !in_array('backend',$legendinview)) $uselegend = 0;
 		
 		// load the tooltip library if required
-		if ($uselegend && !FLEXI_J30GE) JHTML::_('behavior.tooltip');
+		if ($uselegend)
+			FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
 		
 		
 		// **************************************
@@ -1150,7 +1147,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				{
 					flexicontent_html::loadFramework('jmultibox');  //echo $field->name.": multiboxadded";
 					$js = "
-					window.addEvent('domready', function(){
+					jQuery(document).ready(function() {
 						jQuery('a.mb').jmultibox({
 							initialWidth: 250,  //(number) the width of the box when it first opens while loading the item. Default: 250
 							initialHeight: 250, //(number) the width of the box when it first opens while loading the item. Default: 250

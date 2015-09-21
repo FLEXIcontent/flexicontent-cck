@@ -33,7 +33,7 @@ $onclick = $display_method == 1  ?  'javascript:return false;'  : '';  // need t
 			$active = $this->limitstart == $i  ?  ' active'  : '';
 		?>
 			<li>
-				<a class="tocLink<?php echo $link_class.$active ?>" id="<?php echo $page->id ?>" href="<?php echo $link; ?>" onclick="<?php echo $onclick ?>" ><?php echo $page->title ?></a>
+				<a class="tocLink<?php echo $link_class.$active ?>" id="<?php echo $page->id ?>_tocLink" href="<?php echo $link; ?>" onclick="<?php echo $onclick ?>" ><?php echo $page->title ?></a>
 			</li>
 		<?php endfor; ?>
 

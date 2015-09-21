@@ -473,10 +473,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// Load custom behaviours: form validation, popup tooltips
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		JHTML::_('behavior.tooltip');
-		if (FLEXI_J30GE) {
-			JHtml::_('bootstrap.tooltip');
-		}
+		FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
 		
 		//JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
 

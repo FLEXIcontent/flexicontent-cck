@@ -53,7 +53,6 @@ class plgFlexicontent_fieldsFile extends FCField
 		$document = JFactory::getDocument();
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		
 		
 		// ****************
@@ -200,24 +199,11 @@ class plgFlexicontent_fieldsFile extends FCField
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
-				
-				// Add jQuery modal window to the select image file button
-				jQuery('a.addfile_".$field->id."').each(function(index, value) {
-					jQuery(this).on('click', function() {
-						var url = jQuery(this).attr('href');
-						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container');
-						return false;
-					});
-				});
 				";
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					containment: 'parent',
-					tolerance: 'pointer'
-				});
+				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
 				";
 			
 			// Show new field, increment counters
@@ -369,12 +355,11 @@ class plgFlexicontent_fieldsFile extends FCField
 			$_prompt_txt = JText::_( 'FLEXI_ADD_FILE' );
 			$field->html .= '
 				<span class="fcfield-button-add">
-					<a class="addfile_'.$field->id.'" id="'.$elementid.'_addfile" title="'.$_prompt_txt.'" href="'.$linkfsel.'" >'
-						.$_prompt_txt.'
+					<a class="addfile_'.$field->id.'" id="'.$elementid.'_addfile" title="'.$_prompt_txt.'" href="'.$linkfsel.'" >
+						'.$_prompt_txt.'
 					</a>
-				</span>';
-			
-			$field->html .= '<input id="'.$field->name.'" class="'.$required_class.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
+				</span>
+				<input id="'.$field->name.'" class="'.$required_class.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
 		}
 		if ($top_notice) $field->html = $top_notice.$field->html;
 	}
@@ -506,9 +491,6 @@ class plgFlexicontent_fieldsFile extends FCField
 		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
 
-		// Description as tooltip
-		if ($display_descr==2) JHTML::_('behavior.tooltip');
-
 		switch($separatorf)
 		{
 			case 0:
@@ -561,9 +543,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			if ($display_hits==1) {
 				$_tooltip_title   = '';
 				$_tooltip_content = '%s '.JText::_( 'FLEXI_HITS', true );
-				$_attribs = FLEXI_J30GE ?
-					'class="hasTooltip fcicon-hits" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"' :
-					'class="hasTip fcicon-hits" title="'.$_tooltip_title.'::'.$_tooltip_content.'"';
+				$_attribs = 'class="hasTooltip fcicon-hits" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"';
 			} else {
 				$_attribs = ' class="fcicon-hits"';
 			}
