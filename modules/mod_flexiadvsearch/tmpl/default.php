@@ -17,7 +17,8 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-JHTML::_('behavior.tooltip');
+
+$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 $action = JRoute::_(FlexicontentHelperRoute::getSearchRoute(0, $itemid), false);
@@ -66,7 +67,7 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		// Search GO button
 		if ($button) :
 			if ($button_as) :
-				$button = '<input type="image" title="'.$button_text.'" class="'.(!$append_buttons ? 'fc_filter_button' : '').' hasTooltip '.$flexi_button_class_go.'" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
+				$button = '<input type="image" title="'.$button_text.'" class="'.(!$append_buttons ? 'fc_filter_button' : '').$tooltip_class.' '.$flexi_button_class_go.'" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
 			else :
 				$button = '<input type="submit" value="'.$button_text.'" class="'.(!$append_buttons ? 'fc_filter_button' : '').' '.$flexi_button_class_go.'" onclick="this.form.searchword.focus();"/>';
 			endif;
@@ -89,7 +90,7 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 				// hidden field, is workaround for image button not being able to submit a value
 				$direct = '
 					<input type="hidden" name="direct" value="" />
-					<input type="image" title="'.$direct_text.'" class="'.(!$append_buttons ? 'fc_filter_button' : '').' hasTooltip '.$flexi_button_class_direct.'" src="'.JURI::base().$direct_image.'" onclick="this.form.direct.value=1; this.form.searchword.focus();"/>
+					<input type="image" title="'.$direct_text.'" class="'.(!$append_buttons ? 'fc_filter_button' : '').$tooltip_class.' '.$flexi_button_class_direct.'" src="'.JURI::base().$direct_image.'" onclick="this.form.direct.value=1; this.form.searchword.focus();"/>
 					';
 			else :
 			 $direct = '<input type="submit" name="direct" value="'.$direct_text.'" class="'.(!$append_buttons ? 'fc_filter_button' : '').' '.$flexi_button_class_direct.'" onclick="this.form.searchword.focus();"/>';

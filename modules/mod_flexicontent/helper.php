@@ -52,12 +52,6 @@ class modFlexicontentHelper
 		if ( empty($ordering) )    $ordering = array('added');
 		if (!is_array($ordering))  $ordering = explode(',', $ordering);
 		
-		// get module display parameters
-		$moduleclass_sfx	= $params->get('moduleclass_sfx');
-		$layout						= $params->get('layout');
-		$add_ccs					= $params->get('add_ccs');
-		$add_tooltips			= $params->get('add_tooltips', 1);
-		
 		// get other module parameters
 		$method_curlang		= (int)$params->get('method_curlang', 0);
 		
