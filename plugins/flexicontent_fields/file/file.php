@@ -53,14 +53,15 @@ class plgFlexicontent_fieldsFile extends FCField
 		$document = JFactory::getDocument();
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		
 		
 		// ****************
 		// Number of values
 		// ****************
-		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 1 ) ;
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 1 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = (int)$field->parameters->get( 'required', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required_class = $required ? ' required' : '';
 		
 		// Input field configuration
@@ -142,7 +143,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$js = "";
 		$css = "";
 		
-		if ($multiple && $inputmode==1) // handle multiple records
+		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
 			if (!$use_ingroup) $js .= "
@@ -160,7 +161,13 @@ class plgFlexicontent_fieldsFile extends FCField
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
-			
+			";
+		}
+		
+		// Popup mode
+		if ($inputmode==1)
+		{
+			$js .= "
 			function qfSelectFile".$field->id."(obj, id, file)
 			{
 				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
@@ -212,6 +219,9 @@ class plgFlexicontent_fieldsFile extends FCField
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
 				
+				// Enable tooltips on new element
+				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
@@ -240,9 +250,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){
-						this.remove();
-					});
+					row.slideUp(400, function(){ this.remove(); });
 					rowCount".$field->id."--;
 				}
 			}
@@ -267,6 +275,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		} else {
 			$remove_button = '';
 			$move2 = '';
+			$add_here = '';
 			$js .= '';
 			$css .= '';
 		}
@@ -572,6 +581,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$field->{$prop} = '';
 		}
 	}
+	
 	
 	
 	// **************************************************************

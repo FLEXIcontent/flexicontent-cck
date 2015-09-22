@@ -342,50 +342,50 @@ $this->document->addScriptDeclaration($js);
 	</div>
 	<div class="span6 full_width_980 padded_wrap_box">
 			
-			<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#777; "><?php echo JText::_( /*'FLEXI_THIS_FIELDTYPE_PROPERTIES'*/'FIELD TYPE specific configuration' ); ?></span>
+		<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#777; "><?php echo JText::_( /*'FLEXI_THIS_FIELDTYPE_PROPERTIES'*/'FIELD TYPE specific configuration' ); ?></span>
 			
-			<div id="fieldspecificproperties">
-				<div class="fctabber fields_tabset" id="field_specific_props_tabset" >
-				<?php
-				$fieldSets = $form->getFieldsets('attribs');
-				$field_type = $form->getValue("field_type", NULL, "text");
-				$prefix_len = strlen('group-'.$field_type.'-');
-				if ($field_type) foreach ($fieldSets as $name => $fieldSet)
-				{
-					if ($name!='basic' && $name!='standard' && (substr($name, 0, $prefix_len)!='group-'.$field_type.'-' || $name==='group-'.$field_type) ) continue;
-					if ($fieldSet->label) $label = JText::_($fieldSet->label);
-					else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
-					
-					if (@$fieldSet->label_prefix) $label = JText::_($fieldSet->label_prefix) .' - '. $label;
-					$icon = @$fieldSet->icon_class ? 'data-icon-class="'.$fieldSet->icon_class.'"' : '';
-					$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.JText::_($fieldSet->prepend_text).'"' : '';
-					
-					$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
-					?>
-					<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
-						<h3 class="tabberheading hasTooltip" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
-						<?php $i = 0; ?>
-						<?php foreach ($form->getFieldset($name) as $field) {
-							$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
-								$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
-							echo '
-							<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-								'.($field->label ? '
-									<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-									<div class="container_fcfield">'.$field->input.'</div>
-								' : $field->input).'
-							</fieldset>
-							';
-							$i++;
-						} ?>
-					</div>
-					<?php
-				} else {
-					echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
-				}
+		<div id="fieldspecificproperties">
+			<div class="fctabber fields_tabset" id="field_specific_props_tabset">
+			<?php
+			$fieldSets = $form->getFieldsets('attribs');
+			$field_type = $form->getValue("field_type", NULL, "text");
+			$prefix_len = strlen('group-'.$field_type.'-');
+			if ($field_type) foreach ($fieldSets as $name => $fieldSet)
+			{
+				if ($name!='basic' && $name!='standard' && (substr($name, 0, $prefix_len)!='group-'.$field_type.'-' || $name==='group-'.$field_type) ) continue;
+				if ($fieldSet->label) $label = JText::_($fieldSet->label);
+				else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
+				
+				if (@$fieldSet->label_prefix) $label = JText::_($fieldSet->label_prefix) .' - '. $label;
+				$icon = @$fieldSet->icon_class ? 'data-icon-class="'.$fieldSet->icon_class.'"' : '';
+				$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.JText::_($fieldSet->prepend_text).'"' : '';
+				
+				$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
 				?>
+				<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
+					<h3 class="tabberheading hasTooltip" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
+					<?php $i = 0; ?>
+					<?php foreach ($form->getFieldset($name) as $field) {
+						$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
+							$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+						echo '
+						<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+							'.($field->label ? '
+								<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+								<div class="container_fcfield">'.$field->input.'</div>
+							' : $field->input).'
+						</fieldset>
+						';
+						$i++;
+					} ?>
 				</div>
+				<?php
+			} else {
+				echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
+			}
+			?>
 			</div>
+		</div>
 
 	</div>
 

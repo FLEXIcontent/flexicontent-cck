@@ -84,40 +84,38 @@ class FlexicontentViewField extends JViewLegacy
 		}*/
 		
 		?>
-		<div class="fctabber fields_tabset" id="field_specific_props_tabset">
-		<?php
-		$fieldSets = $form->getFieldsets('attribs');
-		$prefix_len = strlen('group-'.$field_type.'-');
-		foreach ($fieldSets as $name => $fieldSet) :
-			if ($name!='basic' && $name!='standard' && (substr($name, 0, $prefix_len)!='group-'.$field_type.'-' || $name==='group-'.$field_type) ) continue;
-			if ($fieldSet->label) $label = JText::_($fieldSet->label);
-			else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
-			
-			if (@$fieldSet->label_prefix) $label = JText::_($fieldSet->label_prefix) .' - '. $label;
-			$icon = @$fieldSet->icon_class ? 'data-icon-class="'.$fieldSet->icon_class.'"' : '';
-			$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.JText::_($fieldSet->prepend_text).'"' : '';
-			
-			$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
-			?>
-			<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
-				<h3 class="tabberheading" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
-				<?php
-				$i = 0;
-				foreach ($form->getFieldset($name) as $field) {
-					$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
-						$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
-					echo '
-								<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-								'.($field->label ? '
-									<span class="label-fcouter">'.str_replace((FLEXI_J30GE ? 'hasTooltip' : 'hasTip'), (FLEXI_J30GE ? 'hasTooltip label' : 'hasTip label'), $field->label).'</span>
-									<div class="container_fcfield">'.$field->input.'</div>
-								' : $field->input).'
-							</fieldset>
-							';
-					$i++;
-				}
+			<div class="fctabber fields_tabset" id="field_specific_props_tabset">
+			<?php
+			$fieldSets = $form->getFieldsets('attribs');
+			$prefix_len = strlen('group-'.$field_type.'-');
+			foreach ($fieldSets as $name => $fieldSet) :
+				if ($name!='basic' && $name!='standard' && (substr($name, 0, $prefix_len)!='group-'.$field_type.'-' || $name==='group-'.$field_type) ) continue;
+				if ($fieldSet->label) $label = JText::_($fieldSet->label);
+				else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
+				
+				if (@$fieldSet->label_prefix) $label = JText::_($fieldSet->label_prefix) .' - '. $label;
+				$icon = @$fieldSet->icon_class ? 'data-icon-class="'.$fieldSet->icon_class.'"' : '';
+				$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.JText::_($fieldSet->prepend_text).'"' : '';
+				
+				$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
 				?>
-			</div>
+				<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
+					<h3 class="tabberheading hasTooltip" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
+					<?php $i = 0; ?>
+					<?php foreach ($form->getFieldset($name) as $field) {
+						$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
+							$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+						echo '
+						<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+							'.($field->label ? '
+								<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+								<div class="container_fcfield">'.$field->input.'</div>
+							' : $field->input).'
+						</fieldset>
+						';
+						$i++;
+					} ?>
+				</div>
 		<?php endforeach; ?>
 		</div>
 		
