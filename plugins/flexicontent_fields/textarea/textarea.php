@@ -64,7 +64,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// ****************
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = (int)$field->parameters->get( 'required', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
@@ -254,6 +254,9 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
 				
+				// Enable tooltips on new element
+				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
@@ -365,7 +368,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
-			$field->html =
+			$field->html = !count($field->html) ? '' :
 				'<li class="'.$value_classes.'">'.
 					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
@@ -769,7 +772,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// ****************
 		// Number of values
 		// ****************
-		$required   = (int)$field->parameters->get( 'required', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
 		// **************

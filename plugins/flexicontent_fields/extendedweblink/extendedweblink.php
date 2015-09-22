@@ -421,7 +421,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
-			$field->html =
+			$field->html = !count($field->html) ? '' :
 				'<li class="'.$value_classes.'">'.
 					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
@@ -585,7 +585,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
 		}
 		
-		// initialise property
+		// Initialise property with default value
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)
