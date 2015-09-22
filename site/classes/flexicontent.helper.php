@@ -4557,6 +4557,8 @@ class flexicontent_tmpl
 		foreach ($layout_conf as $data) {
 			$layoutparams[$data->layout][$data->template] = !empty($data->attribs) ? $data->attribs : '';
 		}
+		
+		if ( !isset($layoutparams[$type][$template]) ) $layoutparams[$type][$template] = '';
 		return $layoutparams[$type][$template];
 	}
 	

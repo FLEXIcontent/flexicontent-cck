@@ -313,7 +313,7 @@ class ParentClassItem extends JModelAdmin
 			// Extra Steps for Frontend
 			if ( !$app->isAdmin() )  {
 				// Load item parameters with heritage
-				$this->_loadItemParams();
+				$this->_loadItemParams($no_cache);
 				// Check item viewing access
 				if ( $check_view_access ) $this->_check_viewing_access($force_version);
 			}
@@ -335,7 +335,7 @@ class ParentClassItem extends JModelAdmin
 			$this->_initItem();
 			if ( !$app->isAdmin() )  {
 				// Load item parameters with heritage, (SUBMIT ITEM FORM)
-				$this->_loadItemParams();
+				$this->_loadItemParams($no_cache);
 			}
 		}
 		

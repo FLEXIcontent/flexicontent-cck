@@ -727,7 +727,8 @@ class FlexicontentViewItem  extends JViewLegacy
 			// CREATE action
 			// Get create access, this includes check of creating in at least one category, and type's "create items"
 			$canAdd = $model->getItemAccess()->get('access-create');
-			$not_authorised = !$canAdd;
+			$overrideCategoryACL = $params->get("overridecatperms", 1) && ($params->get("cid") || $params->get("maincatid"));
+			$canAssignToCategory = $canAdd || $overrideCategoryACL;  // can create in any category -OR- category ACL override is enabled
 			
 			// Check if Content Type can be created by current user
 			if ( empty($canCreateType) ) {
@@ -739,18 +740,22 @@ class FlexicontentViewItem  extends JViewLegacy
 					$canCreateType = $model->canCreateType( );  // Can create at least one Content Type
 				}
 			}
-			$not_authorised = $not_authorised || !$canCreateType;
+			
+			// Not authorized if can not assign item to category or can not create type
+			$not_authorised = !$canAssignToCategory || !$canCreateType;
 			
 			// Allow item submission by unauthorized users, ... even guests ...
 			if ($allowunauthorize == 2) $allowunauthorize = ! $user->guest;
 
 			if ($not_authorised && !$allowunauthorize)
 			{
+				$msg = '';
 				if ( !$canCreateType ) {
 					$type_name = isset($types[$new_typeid]) ? '"'.JText::_($types[$new_typeid]->name).'"' : JText::_('FLEXI_ANY');
-					$msg = JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name );
-				} else {
-					$msg = JText::_( 'FLEXI_ALERTNOTAUTH_CREATE' );
+					$msg .= ($msg ? '<br/>' : ''). JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name );
+				}
+				if ( !$canAssignToCategory ) {
+					$msg .= ($msg ? '<br/>' : ''). JText::_( 'FLEXI_ALERTNOTAUTH_CREATE_IN_ANY_CAT' );
 				}
 			} else if ($max_auth_limit) {
 				$db->setQuery('SELECT COUNT(id) FROM #__content WHERE created_by = ' . $user->id);
@@ -1448,18 +1453,19 @@ class FlexicontentViewItem  extends JViewLegacy
 		$postcats  = $params->get("postcats", 0);      // Behavior of override, submit to ONE Or MULTIPLE or to FIXED categories
 		$override  = $params->get("overridecatperms", 1);   // Default to 1 for compatibilty with previous-version saved menu items
 
-		// Check if item is new and overridden cats defined and cat overriding enabled
-		if ( !$isnew || empty($cid) || !$override ) return false;
+		// Check if item is new and overridden cats defined (cid or maincatid) and cat overriding enabled
+		if ( !$isnew || (empty($cid) && empty($maincatid)) || !$override ) return false;
 
 		// DO NOT override user's permission for submitting to multiple categories
 		if ( !$perms['multicat'] && $postcats==2 ) $postcats = 1;
 
 		// OVERRIDE item categories, using the ones specified specified by the MENU item, instead of categories that user has CREATE (=add) Permission
-		$cids = !is_array($cid) ? explode(",", $cid) : $cid;
+		$cids = empty($cid) ? array() : $cid;
+		$cids = !is_array($cids) ? explode(",", $cids) : $cids;
 
 		// Add default main category to the overridden category list if not already there
 		if ($maincatid && !in_array($maincatid, $cids)) $cids[] = $maincatid;
-
+		
 		// Create 2 arrays with category info used for creating the of select list of (a) multi-categories select field (b) main category select field
 		$categories = array();
 		$options 	= array();
@@ -1487,7 +1493,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				} else {
 					$mo_cats = false;
 				}
-
+				
 				$mo_maincat = $globalcats[$maincatid]->title;
 				$mo_maincat .= '<input type="hidden" name="'.$catid_form_fieldname.'" value="'.$maincatid.'" />';
 				$mo_cancid  = false;
@@ -1520,7 +1526,10 @@ class FlexicontentViewItem  extends JViewLegacy
 
 		// Overriden categories list
 		$cid = $params->get("cid");
-		$cids = !is_array($cid) ? explode(",", $cid) : $cid;
+		$maincatid = $params->get("maincatid");
+		
+		$cids = empty($cid) ? array() : $cid;
+		$cids = !is_array($cids) ? explode(",", $cids) : $cids;
 
 		// Behavior of override, submit to ONE Or MULTIPLE or to FIXED categories
 		$postcats = $params->get("postcats");
@@ -1528,7 +1537,7 @@ class FlexicontentViewItem  extends JViewLegacy
 
 		// Default to 1 for compatibilty with previous-version saved menu items
 		$overridecatperms  = $params->get("overridecatperms", 1);
-		if ( empty($cid) ) $overridecatperms = 0;
+		if ( empty($cid) && empty($maincatid) ) $overridecatperms = 0;
 
 		// Get menu parameters override parameters
 		$submit_conf = array(
