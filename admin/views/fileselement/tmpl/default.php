@@ -72,6 +72,12 @@ function delAllFilters() {
 	delFilter('item_id');
 }
 
+var _file_data = new Array();
+<?php
+foreach ($this->rows as $i => $row) :
+	echo '  _file_data['.$i.'] = '.json_encode($row).";\n";
+endforeach;
+?>
 </script>
 
 
@@ -87,7 +93,7 @@ function delAllFilters() {
 	<div class="tabbertab" id="filelist_tab" data-icon-class="icon-list">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FILEMAN_LIST' ); ?> </h3>
 		
-		<form action="index.php?option=<?php echo $this->option; ?>&view=<?php echo $this->view; ?>&field=<?php echo $this->fieldid?>&amp;tmpl=component" method="post" name="adminForm" id="adminForm">
+		<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component" method="post" name="adminForm" id="adminForm">
 		
 		<?php if (!$this->folder_mode) : ?>
 			<div id="fc-filters-header">
@@ -223,44 +229,50 @@ function delAllFilters() {
 				$k = 0;
 				$i = 0;
 				$n = count($this->rows);
-				foreach ($this->rows as $row) {
+				foreach ($this->rows as $row)
+				{
+					$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
+					
 					unset($thumb_or_icon);
-					$filename    = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
+					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 					$filename_original = $this->folder_mode ? '' : str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
-					$fileid = $this->folder_mode ? '' : $row->id;
 					$display_filename  = $filename_original ? $filename_original : $filename;
+					
+					$fileid = $this->folder_mode ? '' : $row->id;
 					
 					if ( !in_array(strtolower($row->ext), $imageexts)) $thumb_or_icon = JHTML::image($row->icon, $row->filename);
 					
-					$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
-					
-					$path		= !empty($row->secure) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-					$file_path = $row->filename;
-					
 					if ($this->folder_mode) {
 						$file_path = $this->img_folder . DS . $row->filename;
-					} else
-					
-					if (!$row->url && substr($row->filename, 0, 7)!='http://') {
+					} else if (!$row->url && substr($row->filename, 0, 7)!='http://') {
+						$path = !empty($row->secure) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
 						$file_path = $path . DS . $row->filename;
 					} else {
+						$file_path = $row->filename;
 						$thumb_or_icon = 'URL';
 					}
 					
 					$file_path = str_replace('\\', '/', $file_path);
 					if ( empty($thumb_or_icon) ) {
 						if (file_exists($file_path)){
-							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$file_path.'&amp;w=60&amp;h=60" alt="'.$display_filename.'" />';
+							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$file_path.'&amp;w=60&amp;h=60&amp;zc=1" alt="'.$display_filename.'" />';
 						} else {
 							$thumb_or_icon = '<span class="badge badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 						}
 					}
-					$file_preview = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&w='.$this->thumb_w.'&h='.$this->thumb_h;
-					$file_preview2 = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&w=120&h=90';
+					
+					if ( in_array(strtolower($row->ext), $imageexts)) {
+						$file_preview  = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1';
+						$file_preview2 = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&amp;w=120&amp;h=90&amp;zc=1';
+					} else {
+						$file_preview  = '';
+						$file_preview2 = '';
+					}
+					
 					if ($this->folder_mode) {
 						$img_assign_link = "window.parent.qmAssignFile".$this->fieldid."('".$this->targetid."', '".$filename."', '".$file_preview."');document.getElementById('file{$i}').className='striketext';";
 					} else {
-						$img_assign_link = "qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename."');";
+						$img_assign_link = "var file_data = _file_data[ '".$i."']; file_data.name = '".$filename."'; file_data.preview = '".$file_preview."';  qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename."', '".$this->targetid."', file_data);";
 					}
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">
@@ -433,7 +445,7 @@ function delAllFilters() {
 							</td>
 							<td id="file-upload-container">
 								<div id="img_preview_msg" style="float:left;"></div>
-								<img id="img_preview" src="javascript:void(0)" alt="Preview image placeholder" style="float:left; display:none;" />
+								<img id="img_preview" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Preview image placeholder" style="float:left; display:none;" />
 								<input type="file" id="file-upload" name="Filedata" onchange="fc_loadImagePreview(this.id,'img_preview', 'img_preview_msg', 100, 0, '-1');" />
 							</td>
 						</tr>
@@ -473,7 +485,7 @@ function delAllFilters() {
 								<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm" class="input-xxlarge"></textarea>
 							</td>
 						</tr>
-							
+						
 			<?php if ($this->target_dir==2) : ?>
 						<tr>
 							<td id="secure-lbl-container" class="key <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">

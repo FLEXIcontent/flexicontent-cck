@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Mini-Gallery (image-only slideshow)</name>
+	<name>FLEXIcontent - Mini-Gallery (inline slideshow with popup zoom)</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>June 2009</creationDate>
 	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
@@ -17,7 +17,6 @@
 	</files>
 	
 	<config>
-	
 	<fields name="attribs">
 		
 		<!--fieldset name="standard" repeat="1">
@@ -39,10 +38,47 @@
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			
-			<field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC" class="btn-group btn-group-yesno">
+			<field name="formlayout" type="fcfilelist" default="" label="Fields Layout" description="" directory="plugins/flexicontent_fields/file/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<!--field name="iform_allowdel" type="radio" default="1" label="FLEXI_FIELD_MGALLERY_ALLOW_FILE_REMOVAL" description="FLEXI_FIELD_MGALLERY_ALLOW_FILE_REMOVAL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
+			<field name="inputmode" type="multilist" subtype="radio" toggle_related="1" default="1" label="Inline editing" description="Select to allow editing file properties elements" class="btn-group group-fcmethod group-fcinfo">
+				<option value="1" show_list="inline-edit-off" hide_list="inline-edit-on">FLEXI_NO</option>
+				<option value="0" show_list="inline-edit-on" hide_list="inline-edit-off">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="Existing file list (popup)" description="" level="level2" depend_class="" />
+			<!--field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC" depend_class="inline-edit-off" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
+			<field name="target_dir" type="radio" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_MEDIA</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_INLINE" description="" level="level2" depend_class="inline-edit-on" />
+			
+			<field name="" type="separator" default="Optional Properties" description="" level="level3" depend_class="inline-edit-on" />
+			<field name="iform_title" type="radio" default="1" label="FLEXI_FILE_DISPLAY_TITLE" description="FLEXI_FILE_DISPLAY_TITLE_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="iform_desc" type="radio" default="1" label="FLEXI_DESCRIPTION" description="FLEXI_FILE_DESCRIPTION_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="iform_lang" type="radio" default="0" label="FLEXI_LANGUAGE" description="FLEXI_FILE_LANGUAGE_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="iform_dir" type="hidden" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno"/>
+			
+			<field name="" type="separator" default="FLEXI_DEFAULT" description="" level="level3" depend_class="inline-edit-on" />
+			<field name="iform_title_default" type="text" default="" label="FLEXI_TITLE" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
+			<field name="iform_desc_default" type="text" default="" label="FLEXI_DESCRIPTION" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
+			<field name="iform_lang_default" type="fclanguage" default="*" label="FLEXI_LANGUAGE" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
+			<field name="iform_dir_default" type="hidden" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno"/>
 			
 		</fieldset>
 		<fieldset name="group-minigallery-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -130,11 +166,12 @@
 				<option value="out:in">FLEXI_FIELD_GALERY_TRANSITION_DIRECTION_OUTIN</option>
 			</field>
 			<field name="otheroptions" type="textarea" default="" cols="40" rows="3" label="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS" description="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS_DESC" />
-
+			
 		</fieldset>
-
+		
 	</fields>
 	</config>
+	
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_minigallery.ini</language>
 	</languages>

@@ -1626,7 +1626,7 @@ class FlexicontentController extends JControllerLegacy
 			if ($_xid=='main') {
 				$result->rating_sum_main  = (@ (int) $db_itemratings->rating_sum)   + ($old_main_rating ? $main_rating_diff : $main_rating);
 				$result->ratingcount_main = (@ (int) $db_itemratings->rating_count) + ($old_main_rating ? 0 : 1);
-				$result->percentage_main  = ($result->rating_sum_main / $result->ratingcount_main) * (100 / $rating_resolution);
+				$result->percentage_main  = !$result->ratingcount_main ? 0 : (($result->rating_sum_main / $result->ratingcount_main) * (100 / $rating_resolution));
 				$result->htmlrating_main  = ($main_counter ?
 					$result->ratingcount_main .($main_counter_show_label ? ' '. JText::_( @ $db_itemratings ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '') .($main_counter_show_percentage ? ' - ' : '')
 					: '')
@@ -1636,7 +1636,7 @@ class FlexicontentController extends JControllerLegacy
 			else if ($_xid==$xid) {
 				$result->rating_sum  = (@ (int) $db_itemratings->rating_sum)   + ($old_main_rating ? $rating_diff : $_rating);
 				$result->ratingcount = (@ (int) $db_itemratings->rating_count) + ($old_main_rating ? 0 : 1);
-				$result->percentage  = ($result->rating_sum / $result->ratingcount) * (100 / $rating_resolution);
+				$result->percentage  = !$result->ratingcount ? 0 : (($result->rating_sum / $result->ratingcount) * (100 / $rating_resolution));
 				$result->htmlrating  = ($extra_counter ?
 					$result->ratingcount . ($extra_counter_show_label ? ' '. JText::_( @ $db_itemratings ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '')	.($extra_counter_show_percentage ? ' - ' : '')
 					: '')

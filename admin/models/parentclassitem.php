@@ -489,6 +489,8 @@ class ParentClassItem extends JModelAdmin
 				// Decide to limit to CURRENT CATEGORY
 				$limit_to_cid = $this->_cid ? ' AND rel.catid = '. (int) $this->_cid : ' AND rel.catid = i.catid';
 				
+				// Get voting resolution
+				$rating_resolution = (int)$this->getVotingResolution();
 				
 				// *******************************
 				// Initialize and create the query
@@ -505,7 +507,7 @@ class ParentClassItem extends JModelAdmin
 				$query->select('u.name AS author');                                       // Author data
 				
 				// Rating count, Rating & Score
-				$query->select('v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score');
+				$query->select('v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score');
 				
 				// Item and Current Category slugs (for URL)
 				$query->select('CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug');
@@ -824,10 +826,13 @@ class ParentClassItem extends JModelAdmin
 				$public_acclevel = 1;
 				$item->type_access = $public_acclevel;
 			}
+			
 			if ( !isset($item->rating_count) ) {
+				$rating_resolution = (int)$this->getVotingResolution();
+				
 				// Get category access for the item's main category, used later to determine viewing of the item
 				$query = 'SELECT '
-					.' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score'
+					.' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score'
 					.' FROM #__content_rating AS v WHERE v.content_id = '. (int) $item->id
 					;
 				$db->setQuery($query);
@@ -3210,13 +3215,54 @@ class ParentClassItem extends JModelAdmin
 	 * @return object
 	 * @since 1.0
 	 */
-	function getvotes($id)
+	function getvotes($id=0)
 	{
+		$id = $id ? $id : $this->_id;
+		
 		$query = 'SELECT rating_sum, rating_count FROM #__content_rating WHERE content_id = '.(int)$id;
 		$this->_db->setQuery($query);
 		$votes = $this->_db->loadObjectlist();
-
+		
 		return $votes;
+	}
+	
+	
+	function getRatingDisplay($id=0)
+	{
+		$id = $id ? $id : $this->_id;
+		
+		$votes = $this->getvotes($id);
+		$rating_resolution = $this->getVotingResolution($id);
+		
+		if ($votes) {
+			$score	= round((((int)$votes[0]->rating_sum / (int)$votes[0]->rating_count) * (100 / $rating_resolution)), 2);
+			$vote	= ((int)$votes[0]->rating_count > 1) ? (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTES' ) : (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTE' );
+			$html = $score.'% | '.$vote;
+		} else {
+			$html = JText::_( 'FLEXI_NOT_RATED_YET' );
+		}
+		
+		return $html;
+	}
+	
+	
+	function getVotingResolution($id=0)
+	{
+		static $rating_resolution = array();
+		$id = $id ? $id : $this->_id;
+		if ( empty($rating_resolution[$id]) ) {
+			$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
+			$field = $this->_db->loadObject();
+			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+			$item->load( $id );
+			FlexicontentFields::loadFieldConfig($field, $item);
+			
+			$_rating_resolution = (int)$field->parameters->get('rating_resolution', 5);
+			$_rating_resolution = $_rating_resolution >= 5   ?  $_rating_resolution  :  5;
+			$_rating_resolution = $_rating_resolution <= 100 ?  $_rating_resolution  :  100;
+			$rating_resolution[$id] = $_rating_resolution;
+		}
+		return $rating_resolution[$id];
 	}
 	
 	

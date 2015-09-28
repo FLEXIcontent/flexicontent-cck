@@ -13,10 +13,12 @@
 			var imageType = /image.*/;
 			if (!input_files[0].type.match(imageType)) {
 		  	if (nonimg_mssg=='-1') ;
-		  	else document.getElementById(msg_id).innerHTML = (nonimg_mssg!='' ? nonimg_mssg : Joomla.JText._('FLEXI_NOT_AN_IMAGE_FILE'));
+		  	else if (nonimg_mssg=='-2') document.getElementById(msg_id).innerHTML = input.value;
+		  	else document.getElementById(msg_id).innerHTML = (nonimg_mssg!='' ? nonimg_mssg : input.value+' <br/> '+Joomla.JText._('FLEXI_NOT_AN_IMAGE_FILE'));
 		  	jQuery('#'+img_id).hide();
 		  } else {
-		  	document.getElementById(msg_id).innerHTML = '';
+		  	if (nonimg_mssg=='-2') document.getElementById(msg_id).innerHTML = input.value;
+		  	else document.getElementById(msg_id).innerHTML = '';
 				var reader = new FileReader();
 				reader.onload = function (e) {
 					var img = jQuery('#'+img_id);

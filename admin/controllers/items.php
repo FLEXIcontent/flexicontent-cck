@@ -1484,30 +1484,14 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function getvotes()
 	{
-		$id 	= JRequest::getInt('id', 0);
-		$model 	= $this->getModel('item');
-		$votes 	= $model->getvotes($id);
-		$db = JFactory::getDBO();
+		$id   = JRequest::getInt('id', 0);
+		$html = 1;
 		
-		$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
-		$field = $db->loadObject();
-		$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
-		$item->load( $id );
-		FlexicontentFields::loadFieldConfig($field, $item);
-		
-		$rating_resolution = (int)$field->parameters->get('rating_resolution', 5);
-		$rating_resolution = $rating_resolution >= 5   ?  $rating_resolution  :  5;
-		$rating_resolution = $rating_resolution <= 100  ?  $rating_resolution  :  100;
-		
+		$model = $this->getModel('item');
+		$votes = $model->getRatingDisplay($id);
 		
 		@ob_end_clean();
-		if ($votes) {
-			$score	= round((((int)$votes[0]->rating_sum / (int)$votes[0]->rating_count) * (100 / $rating_resolution)), 2);
-			$vote	= ((int)$votes[0]->rating_count > 1) ? (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTES' ) : (int)$votes[0]->rating_count . ' ' . JText::_( 'FLEXI_VOTE' );
-			echo $score.'% | '.$vote;
-		} else {
-			echo JText::_( 'FLEXI_NOT_RATED_YET' );
-		}
+		echo $html;
 		exit;
 	}
 

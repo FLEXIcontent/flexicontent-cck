@@ -82,7 +82,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				<tr>
 					<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_VIDEO_URL').'</td>
 					<td>
-						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" '.$required.' />
+						<input type="text" class="fcfield_textval '.$required.'" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" />
 						<input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_FETCH').'" onclick="fetchVideo_'.$field->name.'();" />
 						<span id="fcfield_fetching_msg_'.$field->id.'"></span>
 					</td>

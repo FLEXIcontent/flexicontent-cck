@@ -197,7 +197,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 				elem.attr('data-uniqueRowNum', uniqueRowNum".$field->id.");
 				
-				// Destroy any select2 elements
+				// Re-init any select2 elements
 				var has_select2 = newField.find('div.select2-container').length != 0;
 				if (has_select2) {
 					newField.find('div.select2-container').remove();

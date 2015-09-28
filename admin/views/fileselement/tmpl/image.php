@@ -75,7 +75,15 @@ function delAllFilters() {
 	delFilter('item_id');
 }
 
+var _file_data = new Array();
+<?php
+foreach ($this->rows as $i => $row) :
+	echo '  _file_data['.$i.'] = '.json_encode($row).";\n";
+endforeach;
+?>
 </script>
+
+
 <?php
 // Load plupload JS framework
 $doc = JFactory::getDocument();
@@ -228,7 +236,7 @@ flexicontent_html::loadFramework('flexi-lib');
 
 
 <?php /* echo JHtml::_('tabs.start'); */ ?>
-<div class="fctabber" id="fileman_tabset" style="">
+<div class="fctabber" id="fileman_tabset">
 	
 	<!-- File listing -->
 	
@@ -236,29 +244,25 @@ flexicontent_html::loadFramework('flexi-lib');
 	<div class="tabbertab" id="filelist_tab" data-icon-class="icon-list">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FILEMAN_LIST' ); ?> </h3>
 		
-		<form action="index.php?option=<?php echo $this->option; ?>&view=<?php echo $this->view; ?>&field=<?php echo $this->fieldid?>&amp;tmpl=component&layout=image&filter_secure=M" method="post" name="adminForm" id="adminForm">
+		<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component&amp;layout=image&amp;filter_secure=M" method="post" name="adminForm" id="adminForm">
 		
 		<?php if (!$this->folder_mode) : ?>
 			<div id="fc-filters-header">
 				<span class="fc-filter nowrap_box">
 					<?php echo $this->lists['scope']; ?>
-					<span class="filter-search btn-group">
-						<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
-					</span>
-					<span class="btn-group hidden-phone">
-						<button title="<?php echo JText::_('FLEXI_APPLY_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
-						<button title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
-					</span>
+				</span>
+				<span class="btn-group input-append fc-filter filter-search filter-search">
+					<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
+					<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
+					<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
 				</span>
 				
 				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
-				<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
+				<span class="btn-group input-append fc-filter">
 					<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 					<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-				</div>
-				
-				<div class="fcclear"></div>
-				
+				</span>
+		
 			<?php if (!$this->folder_mode) : ?>
 				<span class="fc-filter nowrap_box">
 					<span class="limit nowrap_box" style="display: inline-block;">
@@ -271,7 +275,7 @@ flexicontent_html::loadFramework('flexi-lib');
 						?>
 					</span>
 					
-					<span class="fc_item_total_data nowrap_box badge badge-info">
+					<span class="fc_item_total_data nowrap_box fc-mssg-inline fc-info fc-nobgimage">
 						<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
 					</span>
 					
@@ -322,9 +326,8 @@ flexicontent_html::loadFramework('flexi-lib');
 			
 			<table id="adminListTableFCfileselement_image<?php echo $this->fieldid; ?>" class="adminlist fcmanlist">
 			<thead>
-				<tr>
+    		<tr class="header">
 					<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-					
 					<?php if (!$this->folder_mode) : ?>
 						<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 					<?php else : ?>
@@ -353,7 +356,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 					
 					<?php if (!$this->folder_mode) : ?>
-						<th class="center hideOnDemandClass" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+						<th class="center hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 					<?php endif; ?>
 				</tr>
 			</thead>
@@ -361,7 +364,7 @@ flexicontent_html::loadFramework('flexi-lib');
 		<?php if (!$this->folder_mode) : ?>
 			<tfoot>
 				<tr>
-					<td colspan="<?php echo $list_total_cols; ?>">
+					<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
 						<?php echo $pagination_footer; ?>
 					</td>
 				</tr>
@@ -375,58 +378,69 @@ flexicontent_html::loadFramework('flexi-lib');
 				$k = 0;
 				$i = 0;
 				$n = count($this->rows);
-				foreach ($this->rows as $row) {
+				foreach ($this->rows as $row)
+				{
+					$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
+					
 					unset($thumb_or_icon);
-					$filename    = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
+					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 					$filename_original = $this->folder_mode ? '' : str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
-					$fileid = $this->folder_mode ? '' : $row->id;
 					$display_filename  = $filename_original ? $filename_original : $filename;
+					
+					$fileid = $this->folder_mode ? '' : $row->id;
 					
 					if ( !in_array(strtolower($row->ext), $imageexts)) continue;  // verify image is in allowed extensions
 					
-					$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
-					
-					$path		= !empty($row->secure) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-					$file_path = $row->filename;
-					
 					if ($this->folder_mode) {
 						$file_path = $this->img_folder . DS . $row->filename;
-					} else
-					
-					if (!$row->url && substr($row->filename, 0, 7)!='http://') {
+					} else if (!$row->url && substr($row->filename, 0, 7)!='http://') {
+						$path = !empty($row->secure) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
 						$file_path = $path . DS . $row->filename;
 					} else {
+						$file_path = $row->filename;
 						$thumb_or_icon = 'URL';
 					}
 					
 					$file_path = str_replace('\\', '/', $file_path);
 					if ( empty($thumb_or_icon) ) {
 						if (file_exists($file_path)){
-							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$file_path.'&w=60&h=60" alt="'.$display_filename.'" />';
+							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$file_path.'&amp;w=60&amp;h=60&amp;zc=1" alt="'.$display_filename.'" />';
 						} else {
 							$thumb_or_icon = '<span class="badge badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 						}
 					}
-					$file_preview = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&w='.$this->thumb_w.'&h='.$this->thumb_h;
-					$file_preview2 = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&w=120&h=90';
+					
+					if ( in_array(strtolower($row->ext), $imageexts)) {
+						$file_preview  = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1';
+						$file_preview2 = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&amp;w=120&amp;h=90&amp;zc=1';
+					} else {
+						$file_preview  = '';
+						$file_preview2 = '';
+					}
+					
 					if ($this->folder_mode) {
 						$img_assign_link = "window.parent.qmAssignFile".$this->fieldid."('".$this->targetid."', '".$filename."', '".$file_preview."');document.getElementById('file{$i}').className='striketext';";
 					} else {
-						$img_assign_link = "qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename."');";
+						$img_assign_link = "var file_data = _file_data[ '".$i."']; file_data.name = '".$filename."'; file_data.preview = '".$file_preview."';  qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename."', '".$this->targetid."', file_data);";
 					}
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">
-					<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
-		<?php if (!$this->folder_mode) : ?>
+					<td>
+						<?php echo $this->pagination->getRowOffset( $i ); ?>
+					</td>
+					
+					<?php if (!$this->folder_mode) : ?>
 					<td><?php echo $checked; ?></td>
-		<?php endif; ?>
-		<?php if ($this->folder_mode) { ?>
+					<?php endif; ?>
+					
+					<?php if ($this->folder_mode) { ?>
 					<td>
 						<a href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo $row->filename;?>'; document.adminForm.controller.value='filemanager'; <?php echo FLEXI_J16GE ? "Joomla." : ""; ?>submitbutton('<?php echo $del_task; ?>'); }" href="#">
 						<?php echo JHTML::image('components/com_flexicontent/assets/images/trash.png', JText::_('FLEXI_REMOVE') ); ?>
 						</a>
 					</td>
-		<?php } ?>
+					<?php } ?>
+					
 					<td align="center">
 						<a style="cursor:pointer" class="<?php echo $tip_class; ?>" onclick="<?php echo $img_assign_link; ?>" title="<?php echo $flexi_select; ?>">
 							<?php echo $thumb_or_icon; ?>
@@ -457,17 +471,19 @@ flexicontent_html::loadFramework('flexi-lib');
 						?>
 					</td>
 					
-					<td align="center"><?php echo $row->size; ?></td>
+					<td class="center"><?php echo $row->size; ?></td>
+					
 					<?php if (!$this->folder_mode) : ?>
-						<td align="center"><span class="badge"><?php echo empty($row->hits) ? 0 : $row->hits; ?></span></td>
-						<td align="center"><span class="badge badge-info"><?php echo JText::_( $row->secure ? 'FLEXI_YES' : 'FLEXI_NO' ); ?></span></td>
+						<td class="center"><span class="badge"><?php echo empty($row->hits) ? 0 : $row->hits; ?></span></td>
+						<td class="center"><span class="badge badge-info"><?php echo JText::_( $row->secure ? 'FLEXI_YES' : 'FLEXI_NO' ); ?></span></td>
 					<?php endif; ?>
 					
-					<td align="center"><?php echo $row->uploader; ?></td>
-					<td align="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC4' )." H:i:s" ); ?></td>
-		<?php if (!$this->folder_mode) { ?>
-					<td align="center"><?php echo $row->id; ?></td>
-		<?php } ?>
+					<td class="center"><?php echo $row->uploader; ?></td>
+					<td class="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC4' )." H:i:s" ); ?></td>
+					
+					<?php if (!$this->folder_mode) : ?>
+					<td class="center"><?php echo $row->id; ?></td>
+					<?php endif; ?>
 				</tr>
 				<?php 
 					$k = 1 - $k;
@@ -518,6 +534,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			$sys_limit_class  = $server_limit_exceeded ? 'badge-important' : '';
 			
 			echo '
+		<div class="well" style="display: inline-block;">
 			<span class="fc-fileman-upload-limits-box">
 				<span class="label label-info">'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span>
 				<span class="fc-sys-upload-limit-box">
@@ -529,6 +546,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					<span class="badge '.$sys_limit_class.'">'.round($phpUploadLimit['value'] / (1024*1024), 2).' M </span>
 				</span>
 			</span>
+		</div>
 			';
 			?>
 			
@@ -541,7 +559,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			<fieldset class="actions" id="filemanager-1" style="display:none;">
 				<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
 					
-					<table class="fc-form-tbl" cellspacing="0" cellpadding="0" border="0" id="file-upload-form-container">
+					<table class="fc-form-tbl" id="file-upload-form-container">
 						
 						<tr>
 							<td id="file-upload-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_FILE', 'FLEXI_CHOOSE_FILE_DESC', 1, 1); ?>">
@@ -551,21 +569,24 @@ flexicontent_html::loadFramework('flexi-lib');
 							</td>
 							<td id="file-upload-container">
 								<div id="img_preview_msg" style="float:left;"></div>
-								<img id="img_preview" src="" style="float:left; display:none;" />
+								<img id="img_preview" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Preview image placeholder" style="float:left; display:none;" />
 								<input type="file" id="file-upload" name="Filedata" onchange="fc_loadImagePreview(this.id,'img_preview', 'img_preview_msg', 100, 0, '');" />
 							</td>
-							
+						</tr>
+						
 		<?php if (!$this->folder_mode) { ?>
+						<tr>
 							<td id="file-title-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
 								<label class="label" id="file-title-lbl" for="file-title">
 								<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 								</label>
 							</td>
 							<td id="file-title-container">
-								<input type="text" id="file-title" size="44" class="required" name="file-title" />
+								<input type="text" id="file-title" size="44" class="required input-xxlarge" name="file-title" />
 							</td>
-		<?php } ?>
 						</tr>
+		<?php } ?>
+
 		<?php if (!$this->folder_mode) { ?>
 						<tr>
 							<td id="file-lang-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
@@ -576,14 +597,16 @@ flexicontent_html::loadFramework('flexi-lib');
 							<td id="file-lang-container">
 								<?php echo $this->lists['file-lang']; ?>
 							</td>
+						</tr>
 							
-							<td id="file-desc-lbl-container" rowspan="2" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
+						<tr>
+							<td id="file-desc-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 								<label class="label" id="file-desc-lbl" for="file-desc_uploadFileForm">
 								<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 								</label>
 							</td>
-							<td id="file-desc-container" valign="top" rowspan="2">
-								<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm"></textarea>
+							<td id="file-desc-container" style="vertical-align: top;">
+								<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm" class="input-xxlarge"></textarea>
 							</td>
 						</tr>
 						
@@ -606,6 +629,7 @@ flexicontent_html::loadFramework('flexi-lib');
 						</tr>
 			<?php endif; ?>
 		<?php } ?>
+
 					</table>
 					
 					<input type="submit" id="file-upload-submit" class="fc_button fcsimple" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>

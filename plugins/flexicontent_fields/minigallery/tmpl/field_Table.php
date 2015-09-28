@@ -1,6 +1,6 @@
 <?php
-$FT = 'FILE';
-$PRV_TYPE='-2';
+$FT = 'MGALLERY';
+$PRV_TYPE='';
 $image_placeholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
 $n = 0;

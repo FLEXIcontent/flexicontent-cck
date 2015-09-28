@@ -2824,19 +2824,19 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildradiochecklist($options, $name, $selected, $buildtype=0, $attribs = '', $tagid=null)
+	static function buildradiochecklist($options, $name, $selected, $buildtype=0, $attribs = '', $tagid=null, $label_class='')
 	{
 		$selected = is_array($selected) ? $selected : array($selected);
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );
 		
 		$n = 0;
 		$html = $buildtype==1 || $buildtype==3 ? '<fieldset class="radio btn-group btn-group-yesno">' : '';
-		$attribs = $buildtype==1 || $buildtype==3  ? ' class="btn" '.$attribs : $attribs;
+		$label_class .= (!$label_class && ($buildtype==1 || $buildtype==3)) ? ' btn': '';
 		foreach ($options as $value => $text) {
 			$tagid_n = $tagid.$n;
 			$html .='
-			<input type="'.($buildtype > 1 ? 'checkbox' : 'radio').'" class="inputbox" '.(in_array($value, $selected) ? ' checked="checked" ' : '').' value="'.$value.'" id="'.$tagid_n.'" name="'.$name.'" />
-			<label id="'.$tagid_n.'-lbl" for="'.$tagid_n.'" '.$attribs.'>'.$text.'</label>
+			<input type="'.($buildtype > 1 ? 'checkbox' : 'radio').'" '.(in_array($value, $selected) ? ' checked="checked" ' : '').' value="'.$value.'" id="'.$tagid_n.'" name="'.$name.'" '.$attribs.'/>
+			<label id="'.$tagid_n.'-lbl" for="'.$tagid_n.'" class="'.$label_class.'">'.$text.'</label>
 			';
 			$n++;
 		}
