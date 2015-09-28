@@ -348,10 +348,10 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$field->html =
 			($field->parameters->get('compact_edit_global', 0) ? '
 			<div class="toggle_all_values_buttons_box">
-				<span id="sortables_'.$field->id.'_hide_vals_btn" class="btn" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).next(), 0); return false;">
+				<span id="sortables_'.$field->id.'_hide_vals_btn" class="btn hide_vals_btn" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).next(), 0); return false;">
 					<i class="icon-uparrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_HIDE_VALUES' ).'
 				</span>
-				<span id="sortables_'.$field->id.'_show_vals_btn" class="btn btn-success" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).prev(), 1); return false;" style="display:none;">
+				<span id="sortables_'.$field->id.'_show_vals_btn" class="btn btn-success show_vals_btn" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).prev(), 1); return false;" style="display:none;">
 					<i class="icon-downarrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_SHOW_VALUES' ).'
 				</span>
 			</div>

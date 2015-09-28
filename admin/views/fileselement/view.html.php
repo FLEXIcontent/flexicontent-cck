@@ -173,7 +173,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 			$rows = $model->getFilesFromPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param, $exts);
 			$img_folder = $model->getFieldFolderPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param);
 			$img_path = str_replace('\\', '/', $img_folder . DS . $newfilename);
-			$thumb = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$thumb_w.'&h='.$thumb_h;
+			$thumb = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$thumb_w.'&amp;h='.$thumb_h.'&amp;zc=1';
 		}
 		$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$u_item_id;
 		$app->setUserState( $upload_path_var, $img_folder );
@@ -243,10 +243,35 @@ class FlexicontentViewFileselement extends JViewLegacy
 				."
 			});
 			";
-		} else {
-			$js = "
-			function qffileselementadd(obj, id, file) {
-				var result = window.parent.qfSelectFile".$fieldid."(obj, id, file);
+		}
+		
+		else {
+			if ($newfileid)
+			{
+				$_newfile = JTable::getInstance('flexicontent_files', '');
+				$_newfile->load($newfileid);
+				
+				if ($folder_mode) {
+					$file_path = $img_folder . DS . $_newfile->filename;
+				} else if (!$_newfile->url && substr($_newfile->filename, 0, 7)!='http://') {
+					$path = !empty($_newfile->secure) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
+					$file_path = $path . DS . $_newfile->filename;
+				} else {
+					$file_path = $_newfile->filename;
+				}
+				$file_path = str_replace('\\', '/', $file_path);
+				
+				$imageexts = array('jpg','gif','png','bmp','jpeg');
+				$file_preview = !in_array(strtolower($_newfile->ext), $imageexts)  ?  ''  :  JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&w='.$thumb_w.'&h='.$thumb_h.'&zc=1';
+			}
+			
+			
+			$js = ($newfileid ?"
+			var newfile_data = ".json_encode($_newfile).";
+			" : "")."
+			
+			function qffileselementadd(obj, id, file, targetid, file_data) {
+				var result = window.parent.qfSelectFile".$fieldid."(obj, id, file, targetid, file_data);
 				if ((typeof result) != 'undefined' && result == 'cancel') return;
 				obj.className = 'striketext';
 				document.adminForm.file.value=id;
@@ -272,7 +297,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 				}
 				
 				"
-				.(($autoselect && $newfileid) ? "qffileselementadd( document.getElementById('file".$newfileid."'), '".$newfileid."', '".$newfilename."');" : "")
+				.(($autoselect && $newfileid) ? "newfile_data.name = '".$newfilename."'; newfile_data.preview = '".$file_preview."';  qffileselementadd( document.getElementById('file".$newfileid."'), '".$newfileid."', '".$newfilename."', '".$targetid."', newfile_data);" : "")
 				."
 			});
 			";

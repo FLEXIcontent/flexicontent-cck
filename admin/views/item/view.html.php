@@ -154,6 +154,9 @@ class FlexicontentViewItem extends JViewLegacy
 		// Finally fetch the version data for versions in current page
 		$versions = $model->getVersionList( ($current_page-1)*$versionsperpage, $versionsperpage );
 		
+		// Create display of average rating 
+		$ratings = $model->getRatingDisplay();
+		
 		
 		// *****************
 		// Type related data
@@ -794,6 +797,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->assignRef('subscribers'	, $subscribers);
 		$this->assignRef('fields'				, $fields);
 		$this->assignRef('versions'			, $versions);
+		$this->assignRef('ratings'			, $ratings);
 		$this->assignRef('pagecount'		, $pagecount);
 		$this->assignRef('params'				, $params);
 		$this->assignRef('tparams'			, $tparams);

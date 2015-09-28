@@ -291,9 +291,16 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 						var txtareas = jQuery(this).find('textarea');
 						txtareas.each(function( i, txtarea) {
 							var areaid = jQuery(txtarea).attr('id');
-							var hasTinyMCE = typeof tinyMCE === 'undefined' ? false : tinyMCE.get(areaid);
+							//window.console.log ('Termlist field, areaid: '+areaid);
+							
+							var hasTinyMCE = !areaid || typeof tinyMCE === 'undefined' ? false : tinyMCE.get(areaid);
+							//window.console.log ('hasTinyMCE: '+hasTinyMCE);
+							//if (hasTinyMCE) window.console.log ('Removing TinyMCE in Termlist Field');
 							if (hasTinyMCE) tinymce.EditorManager.execCommand('mceRemoveEditor', false, areaid);
+							
 							var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : jQuery(txtarea).first().next().hasClass('CodeMirror');
+							//window.console.log ('hasCodeMirror: '+hasCodeMirror);
+							//if (hasCodeMirror) window.console.log ('Removing CodeMirror in Termlist Field');
 							if (hasCodeMirror) jQuery(txtarea).first().next().get(0).CodeMirror.toTextArea();
 						});
 						this.remove();

@@ -331,6 +331,61 @@ table.img_upload_select {
 }
 
 
+/* FIELDs: (file-based fields) */
+#flexicontent .fc_filedata_txt.invalid {
+	color: red;
+	font-weight: normal;
+}
+#flexicontent .fc_filedata_txt {
+	display: inline-block;
+	border: 1px solid lightgray;
+	border-radius: 0;
+	min-height: 1.2em;
+	padding: 4px 8px;
+	margin: 2px;
+	min-width:40px;
+	width: auto;
+	background: #f0f0f0 none repeat scroll 0 0;
+	color: #444;
+	border-radius:4px;
+}
+#flexicontent .fc_filedata_txt.file_unpublished {
+	color: #888;
+	text-decoration: line-through;
+	opacity:0.5;
+	text-style:italic;
+}
+#flexicontent img.fc_preview_thumb {
+	border:1px solid silver;
+	padding:0;
+	margin:0px 4px 6px 0px;
+	float:left;
+	clear:both;
+	border-radius:4px;
+}
+
+
+#flexicontent .inlinefile-data * {
+	vertical-align: top;
+}
+#flexicontent .fc_fileupload_box {
+	position: relative;
+	overflow: hidden;
+	margin: 0px;
+}
+#flexicontent .fc_fileupload_box input.fc_filedata {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	font-size: 20px;
+	cursor: pointer;
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+
+
 /* FIELDs: (compatibility) ADD button used by some OLD fields */
 .button-add a {
 	display: inline-block;

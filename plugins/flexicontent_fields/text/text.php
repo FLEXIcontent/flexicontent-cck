@@ -157,7 +157,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 				var has_inputmask = newField.find('input.has_inputmask').length != 0;
 				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
 				
-				// Destroy any select2 elements
+				// Re-init any select2 elements
 				var has_select2 = newField.find('div.select2-container').length != 0;
 				if (has_select2) {
 					newField.find('div.select2-container').remove();

@@ -153,10 +153,10 @@ $tags_fieldname = 'jform[tag][]';
 $this->document->addScriptDeclaration("
 	jQuery(document).ready(function(){
 		var hits = new itemscreen('hits', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."gethits'});
-		hits.fetchscreen();
+		//hits.fetchscreen();
 	
 		var votes = new itemscreen('votes', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."getvotes'});
-		votes.fetchscreen();
+		//votes.fetchscreen();
 	});
 
 	function addToList(id, name) {
@@ -1397,7 +1397,7 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 				<span <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_HITS' ); ?></span>
 			</td>
 			<td>
-				<div id="hits" style="float:left;"></div> &nbsp;
+				<div id="hits" style="float:left;"><?php echo $this->row->hits; ?></div> &nbsp;
 				<span <?php echo $visibility; ?>>
 					<input name="reset_hits" type="button" class="button btn-small btn-warning" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resethits', '<?php echo $this->row->id; ?>', 'hits')" />
 				</span>
@@ -1416,7 +1416,7 @@ if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 
 				<span <?php echo $label_tooltip; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_SCORE' ); ?></span>
 			</td>
 			<td>
-				<div id="votes" style="float:left;"></div> &nbsp;
+				<div id="votes" style="float:left;"><?php echo $this->ratings; ?></div> &nbsp;
 				<span <?php echo $visibility2; ?>>
 					<input name="reset_votes" type="button" class="button btn-small btn-warning" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resetvotes', '<?php echo $this->row->id; ?>', 'votes')" />
 				</span>

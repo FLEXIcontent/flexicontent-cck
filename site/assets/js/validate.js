@@ -544,9 +544,13 @@ var JFormValidator = new Class({
 		}
 		
 		// Extra code to open the field group that contains the first field to fail the validation
-		if (state === false && tab_focused === false) {
-			jqEL.parent().closest("li.fcfieldval_container").find(".fcfieldval_container_outer").show();
-			jqEL.parent().closest("li.fcfieldval_container").parent().show();
+		if (state === false)
+		{
+			var fieldval_box = jqEL.parent().closest("li.fcfieldval_container");
+			fieldval_box.find(".toggle_group_down").trigger('click');
+			
+			var fieldgroup_box = fieldval_box.parent().parent();
+			if (fieldgroup_box.is(":hidden")) fieldgroup_box.prev().find('.show_vals_btn').trigger('click');
 		}
 		
 		// If it is already invalid

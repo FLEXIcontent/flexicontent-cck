@@ -49,9 +49,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
 		
-		$app      = JFactory::getApplication();
-		$user     = JFactory::getUser();
+		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
 		
 		static $common_js_css_added = false;
 		
@@ -70,7 +71,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
+		$required_class = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		$image_source = $field->parameters->get('image_source', 0);
@@ -288,7 +289,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ($usecust2) $js .= "
 				newField.find('input.imgcust2').val('".$default_cust2."');
 				newField.find('input.imgcust2').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust2]');
-					";
+				";
 			
 			// Add new field to DOM
 			$js .= "
@@ -336,9 +337,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var originalname = row.find( originalfftag ).val();
 				var existingname = row.find( existingfftag ).val();
 				
+				// IF a non-empty container is being removed ... get counter (which is optionally used as 'required' form element and empty it if is 1, or decrement if 2 or more)
 				if ( originalname != '' || existingname != '' )
 				{
-					// A non-empty container is being removed ... get counter (which is optionally used as 'required' form element and empty it if is 1, or decrement if 2 or more)
 					var valcounter = document.getElementById('".$field->name."');
 					valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
@@ -553,7 +554,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		flexicontent_html::loadFramework('flexi-lib');
 		
 		
-		$class = ' class="'.$required.' "';
+		$class = ' class="'.$required_class.' "';
 		$onchange= ' onchange="';
 		
 		$onchange .= " qmAssignFile".$field->id."(this.id, '', '');";
@@ -605,7 +606,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			if ( $image_source )
 			{
-				$linkfsel = JURI::base(true)
+				$addExistingURL = JURI::base(true)
 					.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;folder_mode=1'
 					.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid='.$elementid_n."_existingname&amp;thumb_w=$thumb_w_s&amp;thumb_h=$thumb_h_s&amp;autoassign=".$autoassign
 					.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
@@ -615,7 +616,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				<input class="existingname fcfield_textval" id="'.$elementid_n.'_existingname" name="'.$fieldname_n.'[existingname]" value="'.$image_name.'" readonly="readonly" style="float:none;" />
 				'.($none_props ? '<br/>' : '').'
 				<span class="fcfield-button-add">
-					<a class="addfile_'.$field->id.'" id="'.$elementid_n.'_addfile" title="'.$_prompt_txt.'" href="'.$linkfsel.'" >
+					<a class="addfile_'.$field->id.'" id="'.$elementid_n.'_addfile" title="'.$_prompt_txt.'" href="'.$addExistingURL.'" >
 						'.$_prompt_txt.'
 					</a>
 				</span>';
@@ -645,7 +646,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				
 				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
-				if ($use_ingroup) $originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required : '').'" value="'.$value['originalname'].'" />';
+				if ($use_ingroup) $originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required_class : '').'" value="'.$value['originalname'].'" />';
 				
 				if (!empty($image_name)) {
 					$img_link  = JURI::root(true).'/'.$dir_url;
@@ -663,7 +664,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			} else {
 				
 				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="" />';
-				if ($use_ingroup) $originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required : '').'" value="" />';
+				if ($use_ingroup) $originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required_class : '').'" value="" />';
 				$imgpreview = '<div class="empty_image empty_image'.$field->id.'" id="'.$elementid_n.'_preview_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>';
 			}
 			
@@ -781,7 +782,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// This is field HTML that is created regardless of values
-		$non_value_html = '<input id="'.$field->name.'" class="'.($use_ingroup ? '' : $required).'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
+		$non_value_html = '<input id="'.$field->name.'" class="'.($use_ingroup ? '' : $required_class).'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
 		if ($use_ingroup) {
 			$field->html[-1] = $non_value_html;
 		} else {

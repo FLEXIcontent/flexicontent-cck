@@ -82,7 +82,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				<tr>
 					<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_URL').'</td>
 					<td>
-						<input type="text" class="fcfield_textval" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" '.$required.' />
+						<input type="text" class="fcfield_textval '.$required.'" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" />
 						<input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_FETCH').'" onclick="fetchAudio_'.$field->name.'();" />
 						<span id="fcfield_fetching_msg_'.$field->id.'"></span>
 					</td>

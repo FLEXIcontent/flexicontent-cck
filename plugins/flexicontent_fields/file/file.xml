@@ -17,7 +17,6 @@
 	</files>
 	
 	<config>
-	
 	<fields name="attribs">
 		
 		<!--fieldset name="standard" repeat="1">
@@ -27,72 +26,76 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
-			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level2" />
-			<field name="allow_multiple" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comment.png" class="btn-group group-fcmethod fcoffactive">
+				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
+				<option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
+			<field name="allow_multiple" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
 			</field>
-			<!--field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="multivalue-mode" class="btn-group group-fcinfo">
+			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
 				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
 				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
-			</field-->
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
-			<field name="inputmode" type="multilist" subtype="radio" toggle_related="1" default="1" label="Input mode" description="Select to display file upload elements inline or in modal popup window" class="btn-group group-fcinfo">
-				<option value="0" show_list="db-inline-mode" hide_list="db-popup-mode">FLEXI_INLINE</option>
-				<option value="1" show_list="db-popup-mode" hide_list="db-inline-mode">FLEXI_POPUP</option>
-			</field>
-			<field name="" type="separator" default="Inline mode, supports only single file selection" description="" level="level4" />
 			
-			<field name="" type="separator" default="FLEXI_POPUP" description="" level="level2" depend_class="db-popup-mode" />
-			<field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC" depend_class="db-popup-mode" class="btn-group btn-group-yesno">
+			<field name="formlayout" type="fcfilelist" default="" label="Fields Layout" description="" directory="plugins/flexicontent_fields/file/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<!--field name="iform_allowdel" type="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_FILE_REMOVAL" description="FLEXI_FIELD_FILE_ALLOW_FILE_REMOVAL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field-->
+			<field name="inputmode" type="multilist" subtype="radio" toggle_related="1" default="1" label="Inline editing" description="Select to allow editing file properties elements" class="btn-group group-fcmethod group-fcinfo">
+				<option value="1" show_list="inline-edit-off" hide_list="inline-edit-on">FLEXI_NO</option>
+				<option value="0" show_list="inline-edit-on" hide_list="inline-edit-off">FLEXI_YES</option>
 			</field>
-			<field name="target_dir" type="radio" default="1" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="db-popup-mode" class="btn-group btn-group-yesno">
+			
+			<field name="" type="separator" default="Existing file list (popup)" description="" level="level2" depend_class="" />
+			<!--field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC" depend_class="inline-edit-off" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
+			<field name="target_dir" type="radio" default="1" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_MEDIA</option>
 				<option value="1">FLEXI_SECURE</option>
 				<option value="2">FLEXI_ALLOW_SELECTION</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_INLINE" description="" level="level2" depend_class="db-inline-mode" />
+			<field name="" type="separator" default="FLEXI_INLINE" description="" level="level2" depend_class="inline-edit-on" />
 			
-			<field name="formlayout" type="fcfilelist" default="" label="Fields Layout" description="" directory="plugins/flexicontent_fields/file/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" depend_class="db-inline-mode" labelclass="label-warning" />
-			<field name="iform_allowdel" type="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_FILE_REMOVAL" description="FLEXI_FIELD_FILE_ALLOW_FILE_REMOVAL_DESC" depend_class="db-inline-mode" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="Optional Properties" description="" level="level3" depend_class="inline-edit-on" />
+			<field name="iform_title" type="radio" default="1" label="FLEXI_FILE_DISPLAY_TITLE" description="FLEXI_FILE_DISPLAY_TITLE_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
-			<field name="" type="separator" default="Optional Properties" description="" level="level3" depend_class="db-inline-mode" />
-			<field name="iform_title" type="radio" default="1" label="FLEXI_FILE_DISPLAY_TITLE" description="FLEXI_FILE_DISPLAY_TITLE_DESC" depend_class="db-inline-mode" class="btn-group btn-group-yesno">
+			<field name="iform_desc" type="radio" default="1" label="FLEXI_DESCRIPTION" description="FLEXI_FILE_DESCRIPTION_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="iform_desc" type="radio" default="1" label="FLEXI_DESCRIPTION" description="FLEXI_FILE_DESCRIPTION_DESC" depend_class="db-inline-mode" class="btn-group btn-group-yesno">
+			<field name="iform_lang" type="radio" default="0" label="FLEXI_LANGUAGE" description="FLEXI_FILE_LANGUAGE_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="iform_lang" type="radio" default="0" label="FLEXI_LANGUAGE" description="FLEXI_FILE_LANGUAGE_DESC" depend_class="db-inline-mode" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="iform_dir" type="radio" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="db-inline-mode" class="btn-group btn-group-yesno">
+			<field name="iform_dir" type="radio" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_DEFAULT" description="" level="level3" depend_class="db-inline-mode" />
-			<field name="iform_title_default" type="text" default="" label="FLEXI_TITLE" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="db-inline-mode" class="btn-group btn-group-yesno" />
-			<field name="iform_desc_default" type="text" default="" label="FLEXI_DESCRIPTION" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="db-inline-mode" class="btn-group btn-group-yesno" />
-			<field name="iform_lang_default" type="fclanguage" default="*" label="FLEXI_LANGUAGE" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="db-inline-mode" class="btn-group btn-group-yesno" />
-			<field name="iform_dir_default" type="radio" default="1" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="db-inline-mode" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_DEFAULT" description="" level="level3" depend_class="inline-edit-on" />
+			<field name="iform_title_default" type="text" default="" label="FLEXI_TITLE" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
+			<field name="iform_desc_default" type="text" default="" label="FLEXI_DESCRIPTION" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
+			<field name="iform_lang_default" type="fclanguage" default="*" label="FLEXI_LANGUAGE" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
+			<field name="iform_dir_default" type="radio" default="1" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_MEDIA</option>
 				<option value="1">FLEXI_SECURE</option>
 			</field>
