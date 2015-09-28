@@ -153,7 +153,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// CSS classes of value container
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		$value_classes .= $inputmode!=1 ? '' : ' floated';
+		$value_classes .= $field->parameters->get('fields_box_placing', '1')==1 ? ' floated' : '';
 		
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -265,7 +265,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data');
-				theInput.attr('data-rowno','".$elementid."_'+uniqueRowNum".$field->id.");
+				theInput.attr('data-rowno',uniqueRowNum".$field->id.");
 				
 				newField.find('.inlinefile-data-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-txt').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-data-lbl');
 				
@@ -330,7 +330,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				
 				var theBTN = newField.find('a.addfile_".$field->id."');
 				theBTN.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
-				theBTN.attr('data-rowno','".$elementid."_'+uniqueRowNum".$field->id.");
+				theBTN.attr('data-rowno',uniqueRowNum".$field->id.");
 				theBTN.each(function(index, value) {
 					jQuery(this).on( 'click',  {obj:this},  fc_openFileSelection_".$field->id." );
 				});
@@ -687,16 +687,12 @@ class plgFlexicontent_fieldsFile extends FCField
 		$is_importcsv      = JRequest::getVar('task') == 'importcsv';
 		$import_docs_folder  = JRequest::getVar('import_docs_folder');
 		
-		$iform_allowdel = 0;//$field->parameters->get('iform_allowdel', 1);
+		$iform_allowdel = $field->parameters->get('iform_allowdel', 1);
 		
-		if ($inputmode==0) {
-			$iform_title = $field->parameters->get('iform_title', 1);
-			$iform_desc  = $field->parameters->get('iform_desc',  1);
-			$iform_lang  = $field->parameters->get('iform_lang',  0);
-			$iform_dir   = $field->parameters->get('iform_dir',   0);
-		} else {
-			$target_dir = $field->parameters->get('target_dir', 1);
-		}
+		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
+		$iform_desc  = $inputmode==1 ? 0 : $field->parameters->get('iform_desc',  1);
+		$iform_lang  = $inputmode==1 ? 0 : $field->parameters->get('iform_lang',  0);
+		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		
 		// Execute once
 		static $initialized = null;
@@ -760,7 +756,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				$v['file-title'] = !$iform_title ? '' : flexicontent_html::dataFilter($v['file-title'],  1000,  'STRING', 0);
 				$v['file-desc']  = !$iform_desc  ? '' : flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
 				$v['file-lang']  = !$iform_lang  ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
-				$v['secure']     = !$iform_dir   ? $field->parameters->get('iform_dir_default', '1') : ((int) $v['secure'] ? 1 : 0);
+				$v['secure']     = !$iform_dir   ? 1 : ((int) $v['secure'] ? 1 : 0);
 				
 				// UPDATE existing file
 				if( !$new_file && $file_id ) {
@@ -781,10 +777,11 @@ class plgFlexicontent_fieldsFile extends FCField
 					// Security concern, check file is assigned to current item
 					$isAssigned = $this->checkFileAssignment($field, $file_id, $item);
 					if ( !$isAssigned ) {
-						if ( !$v['file-del'] )
-							JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to update file properties of a file: '".$row->filename_original."', that is not assigned to current item", 'warning' );
-						else
+						if ( $v['file-del'] ) {
 							JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$row->filename_original."', that is not assigned to current item", 'warning' );
+							continue;
+						}
+						JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to update file properties of a file: '".$row->filename_original."', that is not assigned to current item", 'warning' );
 						continue;
 					}
 					
@@ -986,6 +983,54 @@ class plgFlexicontent_fieldsFile extends FCField
 	}
 
 
+	// ************************************************
+	// Returns an array of images that can be deleted
+	// e.g. of a specific field, or a specific uploader
+	// ************************************************
+	function canDeleteFile( &$field, $file_id, &$item )
+	{
+		// Check file exists in DB
+		$db   = JFactory::getDBO();
+		$query = 'SELECT id'
+			. ' FROM #__flexicontent_files'
+			. ' WHERE id='. $db->Quote($file_id)
+			;
+		$db->setQuery($query);
+		$file_id = $db->loadResult();
+		if (!$file_id)  return true;
+		
+		$ignored['item_id'] = $item->id;
+		
+		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');
+		$fm = new FlexicontentModelFilemanager();
+		return $fm->candelete( array($file_id), $ignored );
+	}
+	
+	
+	// *****************************************
+	// Check if file is assigned to current item
+	// *****************************************
+	function checkFileAssignment( &$field, $file_id, &$item )
+	{
+		// Check file exists in DB
+		$db   = JFactory::getDBO();
+		$query = 'SELECT item_id '
+			. ' FROM #__flexicontent_fields_item_relations '
+			. ' WHERE '
+			. '  field_id='. $db->Quote($field->id)
+			. '  AND item_id='. $db->Quote($item->id)
+			. '  AND value='. $db->Quote($file_id)
+			. ' LIMIT 1'
+			;
+		$db->setQuery($query);
+		$db_id = $db->loadResult();
+		return (boolean)$db_id;
+	}
+	
+	
+	// *************************************
+	// Return an icon according to file type
+	// *************************************
 	function addIcon( &$file )
 	{
 		static $icon_exists = array();
@@ -1021,9 +1066,9 @@ class plgFlexicontent_fieldsFile extends FCField
 	
 	
 	
-	// **********************
-	// VARIOUS HELPER METHODS
-	// **********************
+	// *******************************
+	// HELPER METHODS FOR FILE SHARING
+	// *******************************
 	
 	/**
 	 * Create form for sharing the download link of given file
@@ -1346,50 +1391,4 @@ class plgFlexicontent_fieldsFile extends FCField
 		$clauses['and']    = $andacc;
 		return $clauses;
 	}
-	
-	
-	// ************************************************
-	// Returns an array of images that can be deleted
-	// e.g. of a specific field, or a specific uploader
-	// ************************************************
-	function canDeleteFile( &$field, $file_id, &$item )
-	{
-		// Check file exists in DB
-		$db   = JFactory::getDBO();
-		$query = 'SELECT id'
-			. ' FROM #__flexicontent_files'
-			. ' WHERE id='. $db->Quote($file_id)
-			;
-		$db->setQuery($query);
-		$file_id = $db->loadResult();
-		if (!$file_id)  return true;
-		
-		$ignored['item_id'] = $item->id;
-		
-		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');
-		$fm = new FlexicontentModelFilemanager();
-		return $fm->candelete( array($file_id), $ignored );
-	}
-	
-	
-	// *****************************************
-	// Check if file is assigned to current item
-	// *****************************************
-	function checkFileAssignment( &$field, $file_id, &$item )
-	{
-		// Check file exists in DB
-		$db   = JFactory::getDBO();
-		$query = 'SELECT item_id '
-			. ' FROM #__flexicontent_fields_item_relations '
-			. ' WHERE '
-			. '  field_id='. $db->Quote($field->id)
-			. '  AND item_id='. $db->Quote($item->id)
-			. '  AND value='. $db->Quote($file_id)
-			. ' LIMIT 1'
-			;
-		$db->setQuery($query);
-		$db_id = $db->loadResult();
-		return (boolean)$db_id;
-	}
-	
 }

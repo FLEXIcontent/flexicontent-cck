@@ -343,8 +343,8 @@ table.img_upload_select {
 	min-height: 1.2em;
 	padding: 4px 8px;
 	margin: 2px;
-	min-width:40px;
-	width: auto;
+	min-width:220px;
+	width: 94%;
 	background: #f0f0f0 none repeat scroll 0 0;
 	color: #444;
 	border-radius:4px;

@@ -8,17 +8,20 @@
 	{
 		var nonimg_mssg = typeof nonimg_mssg !== 'undefined' ? nonimg_mssg : '';
 		var input = document.getElementById(input_id);
+		var msg_box = document.getElementById(msg_id);
+		var _msg = '';
+		
 		var input_files = input.files;
 		if (input_files && input_files[0]) {
 			var imageType = /image.*/;
 			if (!input_files[0].type.match(imageType)) {
-		  	if (nonimg_mssg=='-1') ;
-		  	else if (nonimg_mssg=='-2') document.getElementById(msg_id).innerHTML = input.value;
-		  	else document.getElementById(msg_id).innerHTML = (nonimg_mssg!='' ? nonimg_mssg : input.value+' <br/> '+Joomla.JText._('FLEXI_NOT_AN_IMAGE_FILE'));
+		  	if (nonimg_mssg=='-1') _msg = '';
+		  	else if (nonimg_mssg=='-2') _msg = input.value;
+		  	else if (nonimg_mssg=='0' || nonimg_mssg=='') _msg = (nonimg_mssg!='' ? nonimg_mssg : input.value+' <br/> '+Joomla.JText._('FLEXI_NOT_AN_IMAGE_FILE'));
 		  	jQuery('#'+img_id).hide();
 		  } else {
-		  	if (nonimg_mssg=='-2') document.getElementById(msg_id).innerHTML = input.value;
-		  	else document.getElementById(msg_id).innerHTML = '';
+		  	if (nonimg_mssg=='-2' || nonimg_mssg=='0') _msg = input.value;
+		  	else _msg = '';
 				var reader = new FileReader();
 				reader.onload = function (e) {
 					var img = jQuery('#'+img_id);
@@ -30,6 +33,7 @@
 				reader.readAsDataURL(input_files[0]);
 			}
 		}
+		msg_box.nodeName == 'INPUT' ? msg_box.value = input.value : msg_box.innerHTML = input.value;
 	}
 	
 	// Load given URL in an open dialog

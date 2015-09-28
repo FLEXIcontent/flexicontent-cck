@@ -2,6 +2,8 @@
 $FT = 'FILE';
 $PRV_TYPE='-2';
 $image_placeholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+$fields_box_placing = $field->parameters->get('fields_box_placing', '1');
+$form_file_preview = $field->parameters->get('form_file_preview', '1');
 
 $n = 0;
 foreach($field->value as $file_id)
@@ -24,18 +26,20 @@ foreach($field->value as $file_id)
 	
 	$info_txt_classes = $file_data->published ? '' : 'file_unpublished hasTooltip';
 	$info_txt_tooltip = $file_data->published ? '' : 'title="'.flexicontent_html::getToolTip('FLEXI_FILE_FIELD_FILE_UNPUBLISHED', 'FLEXI_FILE_FIELD_FILE_UNPUBLISHED_DESC', 1, 1).'"';
+	$_select_file_lbl = '
+			<label class="label inlinefile-data-lbl '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_SELECTED_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_SELECTED_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-data-lbl" for="'.$elementid_n.'_file-data-txt">
+				'.($fields_box_placing==1 ? $field->label.' - ' : ''). JText::_('FLEXI_FIELD_'.$FT.'_SELECTED_FILE').'
+			</label>
+	';
+	
 	$field->html[] = '
 		<div class="nowrap_box inlinefile-data-box">
-			<label class="label inlinefile-data-lbl '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_SELECTED_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_SELECTED_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-data-lbl" for="'.$elementid_n.'_file-data-txt">
-				'.JText::_('FLEXI_FIELD_'.$FT.'_SELECTED_FILE').'
-			</label>
-			<div style="display:inline-block;">
-				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.$filename_original . ($file_data->url ? ' ['.$file_data->altname.']' : '').'" />
-				<br/>
-				<img id="'.$elementid_n.'_img_preview" src="'.$src.'" class="fc_preview_thumb" style="'.$style.'" alt="Preview image placeholder"/>
-			</div>
+		'.($fields_box_placing==1 ? '' : '
+			'.$_select_file_lbl.'
+			').'
 			
 			<span class="inlinefile-data">
+				'.($fields_box_placing==1 ? '<span style="visibility:hidden; z-index:-1; position:absolute;">'.$_select_file_lbl.'</span>' : '').'
 				<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.$file_id.'" class="fc_fileid" />'.'
 				<span class="fc_fileupload_box btn btn-info">
 					<span>'.JText::_('FLEXI_FIELD_'.$FT.'_UPLOAD_NEW').'</span>
@@ -46,12 +50,20 @@ foreach($field->value as $file_id)
 				</a>
 			</span>
 			
+			<br/>
+			<div style="display:inline-block;">
+				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.$filename_original . ($file_data->url ? ' ['.$file_data->altname.']' : '').'" />
+				<br/>
+				'.($form_file_preview==1 ? '<img id="'.$elementid_n.'_img_preview" src="'.$src.'" class="fc_preview_thumb" style="'.$style.'" alt="Preview image placeholder"/>' : '').'
+			</div>
+			
 			'.(0 && !$required ? '
+			<br/>
 			<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onclick="file_fcfield_del_existing_value'.$field->id.'(this);" />
 			<label class="label inlinefile-del-lbl '.$tip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-del-lbl" for="'.$elementid_n.'_file-del" >
 				'.JText::_( 'Remove file' ).'
 			</label>
-			' : (0 && $has_values > $n ? '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
+			' : (0 && $has_values > $n ? '<br/><div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>' : '')).'
 		</div>'.
 	
 	( $iform_title ? '
