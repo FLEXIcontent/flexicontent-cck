@@ -92,7 +92,7 @@ foreach ($this->values as $value)
 		$map .= '<div class="map">';
 		if($link_map==1) $map .= '<a href="'.$map_link.'" target="_blank">';
 		$map .= '<img src="'.$map_url.'" width="'.$map_width.'" height="'.$map_height.'" />';
-		if($link_map==1) $map .= '<br />Click Map for Directions</a>';
+		if($link_map==1) $map .= '<br />'.JText::_('PLG_FC_ADDRESSINT_LINKTODIR').'</a>';
 		$map .= '</div>';
 	}
 	if (
