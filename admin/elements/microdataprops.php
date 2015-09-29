@@ -86,7 +86,8 @@ class JFormFieldMicrodataprops extends JFormField {
 			'publisher'=>'publisher',
 			'bookEdition'=>'bookEdition',
 			'isbn'=>'isbn',
-			'bookFormat'=>'bookFormat'
+			'bookFormat'=>'bookFormat',
+            'color'=>'color'
 		);
 
 		## Initialize array to store dropdown options ##
