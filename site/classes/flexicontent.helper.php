@@ -6111,7 +6111,7 @@ class flexicontent_db
 	 * @access public
 	 * @return object
 	 */
-	static function getTypeData($contenttypes_list)
+	static function getTypeData($contenttypes_list=false)
 	{
 		static $cached = null;
 		if ( isset($cached[$contenttypes_list]) ) return $cached[$contenttypes_list];

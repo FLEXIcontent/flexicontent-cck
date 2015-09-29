@@ -796,6 +796,10 @@ div.fc-fieldgrp-value-box {
 }
 .flexicontent.fcsearch .fc_search_result_fields {
 }
+fc_search_result_date .fc-mssg-inline,
+fc_search_result_category .fc-mssg-inline {
+	font-weight: bold;
+}
 .flexicontent.fcsearch .highlight {
 	background: none repeat scroll 0 0 #FFFFAA;
 	border-radius:5px;

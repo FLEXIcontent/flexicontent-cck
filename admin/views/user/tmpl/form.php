@@ -206,8 +206,8 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				<td class="key">
 					<?php echo JText::_( 'Image' ); ?>
 				</td>
-				<td valign="top">
-					<img src="<?php echo JURI::root() . $cparams->get('image_path') . '/' . $this->contact[0]->image; ?>" align="middle" alt="<?php echo JText::_( 'Contact' ); ?>" />
+				<td style="vertical-align:top; text-align:center;">
+					<img src="<?php echo JURI::root() . $cparams->get('image_path') . '/' . $this->contact[0]->image; ?>" alt="<?php echo JText::_( 'Contact' ); ?>" />
 				</td>
 			</tr>
 			<?php } ?>

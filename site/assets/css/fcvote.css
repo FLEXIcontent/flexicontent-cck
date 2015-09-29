@@ -161,6 +161,7 @@ div.fcvote-count {
 div.fcvote-box-main div.fcvote-count,
 div.fcvote-box-main div.fcvote-count {
 	margin-top: 4px;
+	max-width: unset;
 }
 #flexicontent
 div.fcvote-desc,

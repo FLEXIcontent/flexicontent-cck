@@ -2960,7 +2960,7 @@ class FlexicontentFields
 				
 				// *** PLACE image before label (and e.g. (default) above the label)
 				if ($filter_vals_display == 2)
-					$filter->html .= "<span class='fc_filter_val_img'><img onclick=\"jQuery(this).closest('li').find('input').click();\" src='" .$result->image_url. "' /></span>";
+					$filter->html .= '<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"/></span>';
 				
 				if ($display_filter_as==4) {
 					$filter->html .= ' <input href="javascript:;" onchange="fc_toggleClassGrp(this, \'fc_highlight\');" ';
@@ -2974,16 +2974,16 @@ class FlexicontentFields
 				
 				$filter->html .= '<label class="fc_filter_val fc_cleared '.$checked_class.'" for="'.$filter_ffid.$i.'">';
 				if ($filter_vals_display == 0 || $filter_vals_display == 2)
-					$filter->html .= "<span class='fc_filter_val_lbl'>" .$result->text. "</span>";
+					$filter->html .= '<span class="fc_filter_val_lbl">'.$result->text.'</span>';
 				else if ($add_usage_counters && $result->found)
-					$filter->html .= "<span class='fc_filter_val_lbl'>(".$result->found.")</span>";
+					$filter->html .= '<span class="fc_filter_val_lbl">('.$result->found.')</span>';
 				$filter->html .= '</label>';
 				
 				// *** PLACE image after label (and e.g. (default) next to the label)
 				if ($filter_vals_display == 1)
-					$filter->html .= "<span class='fc_filter_val_img'>"
-					."<img onclick=\"jQuery(this).closest('li').find('input').click();\" src='" .$result->image_url. "' />"
-					."</span>";
+					$filter->html .= '<span class="fc_filter_val_img">'
+					.'<img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"/>'
+					.'</span>';
 				
 				$filter->html .= '</li>';
 				$i++;

@@ -571,8 +571,8 @@ class FlexicontentViewItem extends JViewLegacy
 		$document->addScriptDeclaration('
 			max_cat_assign_fc = '.$max_cat_assign.';
 			existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
-			max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES',true).'";
 		');
+		JText::script('FLEXI_TOO_MANY_ITEM_CATEGORIES',true);
 		
 		
 		// Creating categorories tree for item assignment, we use the 'create' privelege
@@ -624,7 +624,6 @@ class FlexicontentViewItem extends JViewLegacy
 			$document->addScriptDeclaration('
 				max_cat_assign_fc = '.$max_cat_assign.';
 				existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
-				max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES',true).'";
 			');
 			
 			$class  = "mcat use_select2_lib select2_list_selected";

@@ -308,9 +308,13 @@
 	margin: 0;
 	padding: 0;
 	white-space: nowrap;
+	vertical-align:top;
 }
 
 /* force voting to display in same row as label */
+.carousel.mod_flexicontent_wrapper .voting_value_feat,
+.carousel.mod_flexicontent_wrapper .voting_value,
+.carousel.mod_flexicontent_wrapper .voting_value_feat .voting,
 .carousel.mod_flexicontent_wrapper .voting_value .voting {
 	display: inline-block;
 }

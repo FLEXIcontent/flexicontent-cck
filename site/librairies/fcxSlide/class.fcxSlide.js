@@ -191,10 +191,9 @@ Methods:
 	addTouchDrag(): add touch/drag events to the items container
 */
 
-var fcxSlide = new Class({
-
-	initialize: function(params)
-	{
+var fcxSlide = function(params)
+{
+	this.initialize = function(params) {
 		this.mode = params.mode || 'horizontal';
 		this.transition = params.transition || 'scroll';
 		this.fxOptions = params.fxOptions || { duration: 400, easing: 'linear' };
@@ -261,9 +260,9 @@ var fcxSlide = new Class({
 		
 		// Add touch event support (mobile devices, etc), and optionally mouse drag support too
 		this.addTouchDrag();
-	},
+	};
 	
-	bindItemHandles: function(item_handles){
+	this.bindItemHandles = function(item_handles){
 		var slider = this;
 		for(var i=0;i<item_handles.length;i++){
 			jQuery(item_handles[i]).on(
@@ -274,9 +273,9 @@ var fcxSlide = new Class({
 				}
 			);
 		}
-	},
+	};
 
-	bindPageHandles: function(page_handles){
+	this.bindPageHandles = function(page_handles){
 		var slider = this;
 		for(var i=0;i<page_handles.length;i++){
 			jQuery(page_handles[i]).on(
@@ -287,9 +286,9 @@ var fcxSlide = new Class({
 				}
 			);
 		}
-	},
+	};
 
-	bindActionHandles: function(_action_handles){
+	this.bindActionHandles = function(_action_handles){
 		var slider = this;
 		for (var action in _action_handles)
 		{
@@ -315,26 +314,26 @@ var fcxSlide = new Class({
 				this.action_handles[action].push(action_set[i]);
 			}
 		}
-	},
+	};
 	
 	
-	previous_page: function(manual){
+	this.previous_page = function(manual){
 		this.walk('previous_page', manual, false);
-	},
+	};
 	
-	next_page: function(manual){
+	this.next_page = function(manual){
 		this.walk('next_page', manual, false);
-	},
+	};
 	
-	previous: function(manual){
+	this.previous = function(manual){
 		this.walk((this.currentIndex>0 ? this.currentIndex-1 : (!this.edgeWrap ? 0 : this.items.length-1)), manual, false);
-	},
+	};
 	
-	next: function(manual){
+	this.next = function(manual){
 		this.walk((this.currentIndex<this.items.length-1 ? this.currentIndex+1 : (!this.edgeWrap ? this.items.length-1 : 0)), manual, false);
-	},
+	};
 	
-	play: function(interval,direction,wait){
+	this.play = function(interval,direction,wait){
 		// Clear the current pending autoplay timer, because we want to reschedule a new one
 		this.stop();
 		
@@ -351,16 +350,16 @@ var fcxSlide = new Class({
 			interval
 		);
 		this.autoPlay = true;
-	},
+	};
 	
-	stop: function(halt){
+	this.stop = function(halt){
 		clearTimeout(this.autoPlayInterval);
 		if (halt) {
 			this.autoPlay = false;
 		}
-	},
+	};
 	
-	walk: function(item,manual,noFx,force)
+	this.walk = function(item,manual,noFx,force)
 	{
 		/* Detect ITEMs per page for horizontal */
 		var items_per_page_float = this.items_per_page;
@@ -682,17 +681,17 @@ var fcxSlide = new Class({
 				this.onWalk(currentItem, currentPageHandle, currentItemHandle);
 			}
 		}
-	},
+	};
 	
-	resize: function(event){
+	this.resize = function(event){
 		clearTimeout(this.resizeTimeout); // Clear any other pending resizing within the timeout limit e.g. 100 ms
 		var slider = event.data.slider;  // Set this in case it is destroyed by the time timeout function is executed
 		this.resizeTimeout = setTimeout(function(){
 			slider.walk(slider.currentIndex,true,false,true);
 		}, 100);
-	},
+	};
 	
-	addTouchDrag: function(){
+	this.addTouchDrag = function(){
 		if (!this.touch_walk && !this.mouse_walk) return;  // nothing to do
 		
 		var slider = this;
@@ -797,5 +796,7 @@ var fcxSlide = new Class({
 			startPos = 0;
 			setTimeout(function(){ slider.isDragging = false; }, 100);
 		});
-	}
-});
+	};
+	
+	this.initialize(params);
+};

@@ -3,11 +3,11 @@
  * @license		GNU General Public License version 2 or later; see LICENSE.txt
  */
 
+// TODO: check which variables do not need to be global
 var fcform_isValid = false;
 var tab_focused;
 var max_cat_assign_fc = 0;
 var existing_cats_fc  = [];
-var max_cat_overlimit_msg_fc = 'Too many categories selected. You are allowed a maximum number of ';
 var fcflabels = null;
 var popup_msg_done = null;  // Popup-once message for multi-value fields
 var fcpass_element = new Object();  // Validation functions needing element instead of value
@@ -32,8 +32,9 @@ fcpass_element['jform_catid'] = 1;
  * @since		1.5
  */
 var JFormValidator_fc = null;
-var JFormValidator = new Class({
-	initialize: function()
+var JFormValidator = function()
+{
+	this.initialize = function()
 	{
 		// Joomla form validator should be loaded before this script, to avoid potential conflicts
 		// we prevent Joomla form validation JS script to create 2nd validation object
@@ -193,7 +194,7 @@ var JFormValidator = new Class({
 				}
 				existing_only = existing_only && ( jQuery.inArray(value_catid, existing_cats_fc) >= 0 );
 				if (!existing_only) {
-					alert(max_cat_overlimit_msg_fc+max_cat_assign_fc);
+					alert(Joomla.JText._('FLEXI_TOO_MANY_ITEM_CATEGORIES') + max_cat_assign_fc);
 					return false;
 				}
 			}
@@ -287,15 +288,15 @@ var JFormValidator = new Class({
 				return true;
 			}
 		});
-	},
+	};
 
-	setHandler: function(name, fn, en)
+	this.setHandler = function(name, fn, en)
 	{
 		en = (en == '') ? true : en;
 		this.handlers[name] = { enabled: en, exec: fn };
-	},
+	};
 
-	attachToForm: function(form)
+	this.attachToForm = function(form)
 	{
 		// Iterate through the form object and attach the validate method to all input fields.
 		jQuery(form).find('input,textarea,select,button').each(function(){
@@ -341,9 +342,9 @@ var JFormValidator = new Class({
 			}
 			
 		});
-	},
+	};
 
-	validate: function(el)
+	this.validate = function(el)
 	{
 		jqEL = jQuery(el);
 		el_value = jqEL.val();
@@ -454,9 +455,9 @@ var JFormValidator = new Class({
 		// No errors found by method-specific validation handlers:  mark/update element's display as valid and return success
 		this.handleResponse(true, el);
 		return true;
-	},
+	};
 
-	isValid: function(form)
+	this.isValid = function(form)
 	{
  		var valid = true;
 		tab_focused = false; // global variable defined above, we use this to focus the first tab that contains required field
@@ -478,7 +479,7 @@ var JFormValidator = new Class({
 		}
 
 		// Run custom form validators if present
-		new Hash(this.custom).each(function(validator){
+		jQuery.each(this.custom, function(key, validator) {
 			if (validator.exec() != true) {
 				valid = false;
 			}
@@ -520,9 +521,9 @@ var JFormValidator = new Class({
 		
 		fcform_isValid = valid;
 		return valid;
-	},
+	};
 
-	handleResponse: function(state, el)
+	this.handleResponse = function(state, el)
 	{
 		// Extra code for auto-focusing the tab that contains the first field to fail the validation
 		jqEL = jQuery(el);
@@ -583,8 +584,10 @@ var JFormValidator = new Class({
 				jQuery(el.labelref).removeClass('invalid');
 			}
 		}
-	}
-});
+	};
+	
+	this.initialize();
+};
 
 //alert('Loading FLEXIcontent form validator');
 JFormValidator_fc = new JFormValidator();
@@ -594,7 +597,7 @@ jQuery(document).ready(function() {
 	//console.time("timing attachToForm()");
 	document.formvalidator = JFormValidator_fc;
 	jQuery('form.form-validate').each(function(){
-		document.formvalidator.attachToForm($(this));
+		document.formvalidator.attachToForm(this);
 	});
 	//console.timeEnd("timing attachToForm()");
 	

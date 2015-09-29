@@ -115,8 +115,8 @@ if ( $use_infoflds && count($infoflds) ) {
 		
 		<?php if ($this->params->get('show_date', 1)) : ?>
 		<span class="fc_search_result_date">
-			<span class="label">
-			<?php echo $result->created; ?>
+			<span class="fc-mssg-inline fc-success fc-nobgimage">
+				<?php echo $result->created; ?>
 			</span>
 		</span>
 		<?php endif; ?>

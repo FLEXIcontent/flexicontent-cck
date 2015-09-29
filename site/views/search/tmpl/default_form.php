@@ -30,7 +30,7 @@ $js ="";
 
 if($autodisplayadvoptions) {
  $js .= '
-	window.addEvent("domready", function() {
+	jQuery(document).ready(function() {
 	  var status = {
 	    "true": "open",
 	    "false": "close"

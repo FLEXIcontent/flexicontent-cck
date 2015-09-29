@@ -61,13 +61,13 @@ body .fc-mssg-inline.fc-success,
 body .fc-mssg.fc-success {
 	background: #DFF0D8 url(../images/accept.png) no-repeat 10px 50%;
 	color: #468847;
-	border-color: #D6E9C6;
+	border-color: #A6D996;
 }
 body .fc-mssg-inline.fc-info,
 body .fc-mssg.fc-info {
 	background: #D9EDF7 url(../images/information.png) no-repeat 10px 50%;
 	color: #3A87AD;
-	border-color: #BCE8F1;
+	border-color: #9CD8F1;
 }
 
 /* modified backgrounds for alerts */
