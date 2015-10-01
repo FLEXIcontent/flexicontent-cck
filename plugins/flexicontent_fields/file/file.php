@@ -781,8 +781,8 @@ class plgFlexicontent_fieldsFile extends FCField
 							JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$row->filename_original."', that is not assigned to current item", 'warning' );
 							continue;
 						}
-						JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to update file properties of a file: '".$row->filename_original."', that is not assigned to current item", 'warning' );
-						continue;
+						//JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to update file properties of a file: '".$row->filename_original."', that is not assigned to current item", 'warning' );
+						//continue;
 					}
 					
 					// Delete existing file if so requested

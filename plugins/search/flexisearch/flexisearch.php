@@ -179,7 +179,7 @@ class plgSearchFlexisearch extends JPlugin
 
 		// Dates for publish up & down items
 		$date = JFactory::getDate();
-		$nowDate  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+		$nowDate  = $date->toSql();
 		$nullDate = $db->getNullDate();
 		
 		$text = trim($text);
@@ -190,7 +190,7 @@ class plgSearchFlexisearch extends JPlugin
 		$wheres = array();
 		switch ($phrase) {
 			case 'exact':
-				$text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
+				$text = $db->escape($text, true);
 				$text = $db->Quote('%'.$text.'%', false);
 				$wheres2	= array();
 				if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'i.title LIKE '.$text;}
@@ -206,7 +206,7 @@ class plgSearchFlexisearch extends JPlugin
 				$words = explode(' ', $text);
 				$wheres = array();
 				foreach ($words as $word) {
-					$word = FLEXI_J16GE ? $db->escape($word, true) : $db->getEscaped($word, true);
+					$word = $db->escape($word, true);
 					$word = $db->Quote('%'.$word.'%', false);
 					$wheres2	= array();
 					if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'i.title LIKE '.$word;}
@@ -250,61 +250,23 @@ class plgSearchFlexisearch extends JPlugin
 		$select_access .= ',  c.access as category_access, ty.access as type_access';
 		
 		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
-				$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
-				$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$andaccess	.= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
-					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
-				} else {
-					$andaccess  .= ' AND ty.access <= '.$aid;
-					$andaccess  .= ' AND  c.access <= '.$aid;
-					$andaccess  .= ' AND  i.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
+			$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
+			$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
 			$select_access .= ', 1 AS has_access';
 		}
 		else {
 			// Access Flags for: content type, main category, item
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$select_access .= ', '
-					.' CASE WHEN '
-					.'  ty.access IN ('.$aid_list.') AND '
-					.'   c.access IN ('.$aid_list.') AND '
-					.'   i.access IN ('.$aid_list.') '
-					.' THEN 1 ELSE 0 END AS has_access';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$select_access .= ', '
-						.' CASE WHEN '
-						.'  (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') AND '
-						.'  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ') AND '
-						.'  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') '
-						.' THEN 1 ELSE 0 END AS has_access';
-				} else {
-					$select_access .= ', '
-						.' CASE WHEN '
-						.'  (ty.access <= '. (int) $aid . ') AND '
-						.'  ( c.access <= '. (int) $aid . ') AND '
-						.'  ( i.access <= '. (int) $aid . ') '
-						.' THEN 1 ELSE 0 END AS has_access';
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$select_access .= ', '
+				.' CASE WHEN '
+				.'  ty.access IN ('.$aid_list.') AND '
+				.'   c.access IN ('.$aid_list.') AND '
+				.'   i.access IN ('.$aid_list.') '
+				.' THEN 1 ELSE 0 END AS has_access';
 		}
 		
 		
