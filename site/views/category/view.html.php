@@ -824,6 +824,15 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ****************************
 		
 		$pageNav = $this->get('pagination');
+		// URL-encode filter values
+		foreach($_GET as $i => $v) {
+			if (substr($i, 0, 7) === "filter_") {
+				$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
+				$v = str_replace('&', '__amp__', $v);
+				$v = strtr(rawurlencode($v), $_revert);
+				$pageNav->setAdditionalUrlParam($i, $v);
+			}
+		}
 		$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
 		
 		

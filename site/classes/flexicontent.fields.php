@@ -2497,9 +2497,9 @@ class FlexicontentFields
 			if (is_array($value)) $value = @ $value[0];
 		}
 		
-		// Escape values for output
-		if (!is_array($value)) $value = htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
-		else foreach($value as $i => $v) $value[$i] = htmlspecialchars($value[$i], ENT_COMPAT, 'UTF-8');
+		// Escape values for output, moved to HTML code, because it causes problem with value matching (==)
+		//if (!is_array($value)) $value = htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
+		//else foreach($value as $i => $v) $value[$i] = htmlspecialchars($value[$i], ENT_COMPAT, 'UTF-8');
 		
 		// Alter search property name (indexed fields only), remove underscore _ at start & end of it
 		if ($indexed_elements && $search_prop) {
@@ -2882,7 +2882,7 @@ class FlexicontentFields
 					$filter->html	.=
 					($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider"></div><div class="fc_slider_input_box">' : '').'
 						<span class="fc_filter_element">
-							<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value.'" />
+							<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value, ENT_COMPAT, 'UTF-8').'" />
 						</span>
 					'.($isSlider ? '</div>' : '');
 				}
@@ -2901,11 +2901,11 @@ class FlexicontentFields
 					$filter->html	.=
 					($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider"></div><div class="fc_slider_input_box">' : '').'
 						<span class="fc_filter_element">
-							<input name="'.$filter_ffname.'[1]" '.$attribs_str.' id="'.$filter_ffid.'1" type="text" size="'.$size.'" value="'.@ $value[1].'" />
+							<input name="'.$filter_ffname.'[1]" '.$attribs_str.' id="'.$filter_ffid.'1" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[1], ENT_COMPAT, 'UTF-8').'" />
 						</span>
 						<span class="fc_range"></span>
 						<span class="fc_filter_element">
-							<input name="'.$filter_ffname.'[2]" '.$attribs_str.' id="'.$filter_ffid.'2" type="text" size="'.$size.'" value="'.@ $value[2].'" />
+							<input name="'.$filter_ffname.'[2]" '.$attribs_str.' id="'.$filter_ffid.'2" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[2], ENT_COMPAT, 'UTF-8').'" />
 						</span>
 					'.($isSlider ? '</div>' : '');
 				}

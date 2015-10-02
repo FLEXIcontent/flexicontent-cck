@@ -224,7 +224,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				container.find('.fc_fileid').val(id);
 				container.find('.fc_filedata_txt').removeClass('file_unpublished').val(file).blur();
 				container.find('.fc_preview_thumb').attr('src', preview ? preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=').show();
-				container.find('.fc_filetitle').val(altname);
+				container.find('.fc_filetitle').val(altname).blur();
 				container.find('.fc_filelang').val(language).trigger('change');
 				container.find('.fc_filedesc').val(description);
 				
