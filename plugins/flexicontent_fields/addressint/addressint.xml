@@ -40,32 +40,29 @@
 			
 			<field name="" type="separator" default="Form Field Layout" description="" level="level1" />
 			<field name="formlayout" type="fcfilelist" default="" label="Select layout" description="" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="field*" exclude="field.php" stripext="1" hide_none="1" hide_default="" defaultlabel="Table" />
-            
-            <field name="use-streetadress2" type="radio" default="1" label="PLG_FC_ADDRESSINT_STREET2" description="PLG_FC_ADDRESSINT_HIDEFIELD_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			
+			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="" level="level2" />
+			<field name="use_addr2" type="radio" default="1" label="PLG_FC_ADDRESSINT_USE_STREET2" description="PLG_FC_ADDRESSINT_HIDEFIELD_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
-            
-            <field name="use-streetadress3" type="radio" default="1" label="PLG_FC_ADDRESSINT_STREET3" description="PLG_FC_ADDRESSINT_HIDEFIELD_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_addr3" type="radio" default="1" label="PLG_FC_ADDRESSINT_USE_STREET3" description="PLG_FC_ADDRESSINT_HIDEFIELD_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
-            
-            <field name="use-us-state" type="radio" default="1" label="PLG_FC_ADDRESSINT_USSTATE" description="PLG_FC_ADDRESSINT_HIDEFIELD_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_usstate" type="radio" default="1" label="PLG_FC_ADDRESSINT_USE_USSTATE" description="PLG_FC_ADDRESSINT_HIDEFIELD_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
-            
-            <field name="use-stateprovince" type="radio" default="1" label="PLG_FC_ADDRESSINT_PROVINCE" description="PLG_FC_ADDRESSINT_HIDEFIELD_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_province" type="radio" default="1" label="PLG_FC_ADDRESSINT_USE_PROVINCE" description="PLG_FC_ADDRESSINT_HIDEFIELD_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
-            
-            <field name="use-unique-country" type="multilist" subtype="radio" default="0" toggle_related="1" label="PLG_FC_ADDRESSINT_UNIQUECOUNTRY" description="PLG_FC_ADDRESSINT_UNIQUE_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="field-unique-contry">FLEXI_NO</option>
-				<option value="1" show_list="field-unique-contry" hide_list="">FLEXI_YES</option>
+			<field name="use_country" type="multilist" subtype="radio" default="1" toggle_related="1" label="PLG_FC_ADDRESSINT_USE_COUNTRY" description="PLG_FC_ADDRESSINT_UNIQUE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="country-selection-off" hide_list="">FLEXI_HIDE</option>
+				<option value="1" show_list="" hide_list="country-selection-off">FLEXI_SHOW</option>
 			</field>
-            <field name="unique-contry" type="text" default="" label="PLG_FC_ADDRESSINT_COUNTRY" description="PLG_FC_ADDRESSINT_UNIQUE_DESC" depend_class="field-unique-contry"/>
+			<field name="single_country" type="text" default="" label="PLG_FC_ADDRESSINT_COUNTRY_FOR_ALL_ADDRS" description="PLG_FC_ADDRESSINT_COUNTRY_FOR_ALL_ADDRS_DESC" depend_class="country-selection-off" />
 			
 		</fieldset>
 		<fieldset name="group-addressint-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">

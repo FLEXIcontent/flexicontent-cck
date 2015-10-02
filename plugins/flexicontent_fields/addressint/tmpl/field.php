@@ -5,22 +5,11 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $required = $field->parameters->get('required', 0);
 $required = $required ? ' class="required"' : '';
 
-$displayfieldaddr2 = $field->parameters->get('use-streetadress2', 0);
-$displayfieldaddr2 = $displayfieldaddr2 ? '' : 'style="display:none"';
-
-$displayfieldaddr3 = $field->parameters->get('use-streetadress3', 0);
-$displayfieldaddr3 = $displayfieldaddr3 ? '' : 'style="display:none"';
-
-$displayfieldusstate = $field->parameters->get('use-us-state', 0);;
-$displayfieldusstate = $displayfieldusstate ? '' : 'style="display:none"';
-
-$displayfieldprovince = $field->parameters->get('use-stateprovince', 0);
-$displayfieldprovince = $displayfieldprovince ? '' : 'style="display:none"';
-
-$displayfieldcountry = $field->parameters->get('use-unique-country', 0);
-$displayfieldcountry = $displayfieldcountry ? 'style="display:none"' : '';
-
-
+$use_addr2    = $field->parameters->get('use_addr2',    1);
+$use_addr3    = $field->parameters->get('use_addr3',    1);
+$use_usstate  = $field->parameters->get('use_usstate',  1);
+$use_province = $field->parameters->get('use_province', 1);
+$use_country  = $field->parameters->get('use_country',  1);
 
 // States drop down list
 $list_states = array(
@@ -339,39 +328,59 @@ $list_countries = array(
 	'ZW'=>'Zimbabwe'
 );
 
+
+// Check for valid single country
+$single_country = $field->parameters->get('single_country',  '');
+if ($single_country && !$use_country && !isset($list_countries[$single_country]) )
+{
+	$field->html[-1] = '<br/><div class="alert">Invalid (parameter) single country CODE: '.$single_country.'</div> <strong>Valid country codes</strong><br/> '.print_r($list_countries, true);
+	$single_country = '';
+}
+
 $n = 0;
 foreach ($values as $value)
 {
 	$field->html[$n] = '
-	<table class="admintable"><tbody>
+	<table class="fc-form-tbl fcinner fc-addressint-field-tbl"><tbody>
 		<tr>
-			<td class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').':</td>
+			<td class="key"><span class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').'</span></td>
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][addr1]" value="'.$value['addr1'].'" size="50" maxlength="100"'.$required.' /></td>
-		</tr><tr '.$displayfieldaddr2.'>
-			<td class="label label-info">&nbsp;</td>
-			<td><input type="text" class="fcfield_textval"  name="custom['.$field->name.'][addr2]" value="'.$value['addr2'].'" size="50" maxlength="100" /></td>
-		</tr><tr '.$displayfieldaddr3.'>
-			<td class="label label-info">&nbsp;</td>
-			<td><input type="text" class="fcfield_textval"  name="custom['.$field->name.'][addr3]" value="'.$value['addr3'].'" size="50" maxlength="100" /></td>
+		</tr>
+		<tr '.($use_addr2 ?  '' : 'style="display:none;"').'>
+			<td class="key">&nbsp;</td>
+			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][addr2]" value="'.($use_addr2 ? $value['addr2'] : '').'" size="50" maxlength="100" /></td>
+		</tr>
+		<tr '.($use_addr3 ?  '' : 'style="display:none;"').'>
+			<td class="key">&nbsp;</td>
+			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][addr3]" value="'.($use_addr3 ? $value['addr3'] : '').'" size="50" maxlength="100" /></td>
 		</tr><tr>
-			<td class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY').':</td>
+			<td class="key"><span class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY').'</span></td>
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][city]" id="city" value="'.$value['city'].'" size="50" maxlength="100" /></td>
-		</tr><tr '.$displayfieldusstate.'>
-			<td class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').':</td>
-			<td>'.JHTML::_('select.genericlist', $list_states, 'custom['.$field->name.'][state]', $required, 'value', 'text', $value['state']).'</td>
-		</tr><tr '.$displayfieldprovince.'>
-			<td class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').':</td>
-			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][province]" value="'.$value['province'].'" size="50" maxlength="100" /></td>
+		</tr>
+		<tr '.($use_usstate ?  '' : 'style="display:none;"').'>
+			<td class="key"><span class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').'</span></td>
+			<td>'.JHTML::_('select.genericlist', $list_states, 'custom['.$field->name.'][state]', $required, 'value', 'text', ($use_usstate ? $value['state'] : '')).'</td>
+		</tr>
+		<tr '.($use_province ?  '' : 'style="display:none;"').'>
+			<td class="key"><span class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').'</span></td>
+			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][province]" value="'.($use_province ? $value['province'] : '').'" size="50" maxlength="100" /></td>
 		</tr><tr>
-			<td class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').':</td>
+			<td class="key"><span class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').'</span></td>
 			<td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][zip]" value="'.$value['zip'].'" size="10" maxlength="10"'.$required.' /></td>
-		</tr><tr '.$displayfieldcountry.'>
-			<td class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').':</td>
-			<td>'.JHTML::_('select.genericlist', $list_countries, 'custom['.$field->name.'][country]', $required, 'value', 'text', $value['country']).'</td>
-		</tr><tr>
-			<td></td><td><input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GEOLOCATE').'" onclick="geolocateAddr(\'custom['.$field->name.']\', \''.$field->name.'\');" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lat]" value="'.$value['lat'].'" size="5" maxlength="10"'.$required.' readonly="readonly" style="width: 50px !important;
-    min-width: 70px !important;" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lon]" value="'.$value['lon'].'" size="5" maxlength="10"'.$required.' readonly="readonly" style="width: 50px !important;
-    min-width: 70px !important;margin-bottom: 7px;"/> <div id="'.$field->name.'_map"><img src="http://maps.google.com/maps/api/staticmap?center='.$value['lat'].','.$value['lon'].'&amp;zoom=12&amp;size=320x240&amp;maptype=roadmap&amp;markers=size:mid%7Ccolor:red%7C|'.$value['lat'].','.$value['lon'].'&amp;sensor=false" alt="" /></div></td>
+		</tr>
+		<tr '.($use_country ?  '' : 'style="display:none;"').'>
+			<td class="key"><span class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').'</span></td>
+			<td>'.JHTML::_('select.genericlist', $list_countries, 'custom['.$field->name.'][country]', $required, 'value', 'text', ($use_country ? $value['country'] : $single_country)).'</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GEOLOCATE').'" onclick="geolocateAddr(\'custom['.$field->name.']\', \''.$field->name.'\');" />
+				<input type="text" class="fcfield_textval" name="custom['.$field->name.'][lat]" value="'.$value['lat'].'" size="5" maxlength="10"'.$required.' readonly="readonly" style="width:120px; min-width:120px;" />
+				<input type="text" class="fcfield_textval" name="custom['.$field->name.'][lon]" value="'.$value['lon'].'" size="5" maxlength="10"'.$required.' readonly="readonly" style="width:120px; min-width:120px;" />
+				<div id="'.$field->name.'_map">
+					<img src="http://maps.google.com/maps/api/staticmap?center='.$value['lat'].','.$value['lon'].'&amp;zoom=12&amp;size=360x280&amp;maptype=roadmap&amp;markers=size:mid%7Ccolor:red%7C|'.$value['lat'].','.$value['lon'].'&amp;sensor=false" alt="" />
+				</div>
+			</td>
 		</tr>
 	</tbody></table>
 	';

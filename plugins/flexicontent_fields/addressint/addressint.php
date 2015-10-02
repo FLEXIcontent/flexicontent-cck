@@ -105,10 +105,51 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// Check if field has posted data
-		if ( empty($post) ) return;
+		if ( empty($post) || !is_array($post)) return;
+		
+		// Make sure posted data is an array 
+		//echo "<pre>"; print_r($post); exit;
+		$v = reset($post);
+		$post = !is_array($v) ? array($post) : $post;   //echo "<pre>"; print_r($post);
+		
+		$use_addr2    = $field->parameters->get('use_addr2', 1);
+		$use_addr3    = $field->parameters->get('use_addr3', 1);
+		$use_usstate  = $field->parameters->get('use_usstate', 1);
+		$use_province = $field->parameters->get('use_province', 1);
+		$use_country  = $field->parameters->get('use_country', 1);
+		$single_country = $field->parameters->get('single_country', '');
+		
+		$new=0;
+		$newpost = array();
+    foreach ($post as $n => $v)
+    {
+    	if (empty($v)) continue;
+			
+			// validate data or empty/set default values
+			$newpost[$new] = array();
+			
+			$v['country'] = !$use_country ? $single_country : @ $v['country'];  // Force single country
+			$newpost[$new]['addr2']    = !$use_addr2     || !isset($v['addr2'])     ? '' : flexicontent_html::dataFilter($v['addr2'],    4000, 'STRING', 0);
+			$newpost[$new]['addr3']    = !$use_addr3     || !isset($v['addr3'])     ? '' : flexicontent_html::dataFilter($v['addr3'],    4000, 'STRING', 0);
+			$newpost[$new]['state']    = !$use_usstate   || !isset($v['state'])     ? '' : flexicontent_html::dataFilter($v['state'],    200,  'STRING', 0);
+			$newpost[$new]['province'] = !$use_province  || !isset($v['province'])  ? '' : flexicontent_html::dataFilter($v['province'], 200,  'STRING', 0);
+			$newpost[$new]['country']  = !$use_country   || !isset($v['country'])   ? '' : flexicontent_html::dataFilter($v['country'],  2,    'STRING', 0);
+			
+			$newpost[$new]['addr1'] = flexicontent_html::dataFilter($v['addr1'],  4000, 'STRING', 0);
+			$newpost[$new]['city']  = flexicontent_html::dataFilter($v['addr3'],  4000, 'STRING', 0);
+			$newpost[$new]['zip']   = flexicontent_html::dataFilter($v['zip'],    10,   'STRING', 0);
+			
+			$newpost[$new]['lat'] = flexicontent_html::dataFilter(str_replace(',', '.', $v['lat']),  100, 'DOUBLE', 0);
+			$newpost[$new]['lon'] = flexicontent_html::dataFilter(str_replace(',', '.', $v['lon']),  100, 'DOUBLE', 0);
+			
+			$new++;
+		}
+		$post = $newpost;
 		
 		// Serialize multi-property data before storing them into the DB
-		$post = serialize($post);
+		foreach($post as $i => $v) {
+			$post[$i] = serialize($v);
+		}
 	}
 	
 	
