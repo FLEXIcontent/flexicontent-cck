@@ -66,7 +66,7 @@
 			if ( element.type=='select-multiple' ) {
 				for (var p=0; p < element.length; p++) {
 					if ( ! element.options[p].selected ) continue;
-					extra_action += var_sep + element.name.replace("[]","") + '[' + ']=' + element.options[p].value;
+					extra_action += var_sep + element.name.replace("[]","") + '[' + ']=' + encodeURIComponent(element.options[p].value);
 					var_sep = '&';
 				}
 			} else {
@@ -77,7 +77,7 @@
 					if (postprep==2) element.value = date.print(frmt, true);
 					element_value = date.print(frmt, true);
 				}
-				extra_action += var_sep + element.name + '=' + element_value;
+				extra_action += var_sep + element.name + '=' + encodeURIComponent(element_value);
 				var_sep = '&';
 			}
 		}
