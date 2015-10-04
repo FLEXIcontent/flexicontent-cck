@@ -2928,11 +2928,11 @@ class FlexicontentFields
 			$filter->html .= '<li class="fc_checkradio_option fc_checkradio_special'.$checked_class_li.'" style="'.$value_style.'">';
 			$filter->html	.= ($label_filter==2  ? ' <span class="fc_filter_label_inline">'.$filter->label.'</span> ' : '');
 			if ($display_filter_as==4) {
-				$filter->html .= ' <input href="javascript:;" onchange="fc_toggleClassGrp(this, \'fc_highlight\', 1);" ';
+				$filter->html .= ' <input onchange="fc_toggleClassGrp(this, \'fc_highlight\', 1);" ';
 				$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
 				$filter->html .= '  value="" '.$checked_attr.' class="fc_checkradio" />';
 			} else {
-				$filter->html .= ' <input href="javascript:;" onchange="fc_toggleClass(this, \'fc_highlight\', 1);" ';
+				$filter->html .= ' <input onchange="fc_toggleClass(this, \'fc_highlight\', 1);" ';
 				$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'['.$i.']" ';
 				$filter->html .= '  value="" '.$checked_attr.' class="fc_checkradio" />';
 			}
@@ -2963,11 +2963,11 @@ class FlexicontentFields
 					$filter->html .= '<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"/></span>';
 				
 				if ($display_filter_as==4) {
-					$filter->html .= ' <input href="javascript:;" onchange="fc_toggleClassGrp(this, \'fc_highlight\');" ';
+					$filter->html .= ' <input onchange="fc_toggleClassGrp(this, \'fc_highlight\');" ';
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
 					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 				} else {
-					$filter->html .= ' <input href="javascript:;" onchange="fc_toggleClass(this, \'fc_highlight\');" ';
+					$filter->html .= ' <input onchange="fc_toggleClass(this, \'fc_highlight\');" ';
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'['.$i.']" ';
 					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 				}

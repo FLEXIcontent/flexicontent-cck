@@ -4037,7 +4037,7 @@ class flexicontent_html
 		
 		// Category link for single/multiple category(-ies)  --OR--  "current layout" link for myitems/author layouts
 		$non_sef_link = FlexicontentHelperRoute::getCategoryRoute($slug, $Itemid, $urlvars);
-		$category_link = JRoute::_($non_sef_link, false);
+		$category_link = JRoute::_($non_sef_link);
 		
 		return $category_link;
 	}

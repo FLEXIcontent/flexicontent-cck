@@ -80,14 +80,14 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 		
 		<?php if ($filter_instructions == 1) : ?>
 		<legend>
-			<span class="<?php echo $legend_class; ?>" title="<?php echo $legend_tip; ?>">
-				<span><?php echo JText::_('FLEXI_SEARCH_FILTERING'); ?></span>
-			</span>
+			<div class="<?php echo $legend_class; ?>" title="<?php echo $legend_tip; ?>">
+				<div><?php echo JText::_('FLEXI_SEARCH_FILTERING'); ?></div>
+			</div>
 		</legend>
 		<?php endif; ?>
 		
 		<?php if ($filter_instructions == 2) :?>
-			<span class="fc-mssg fc-info"><?php echo $legend_inline; ?></span>
+			<div class="fc-mssg fc-info"><?php echo $legend_inline; ?></div>
 		<?php endif; ?>
 		
 		<?php if ( $use_search ) : /* BOF search */ ?>
@@ -101,7 +101,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			$msg .= $shortwords ? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) .': <b>'.$shortwords.'</b>' : '';
 			?>
 			
-			<span class="<?php echo $filter_container_class; ?> fc_filter_text_search fc_odd">
+			<div class="<?php echo $filter_container_class; ?> fc_filter_text_search fc_odd">
 				<?php
 				$text_search_class = 'fc_text_filter';
 				$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike fc_basic_complete' : ' fc_index_complete_simple fc_basic_complete fc_label_internal') : ' fc_label_internal';
@@ -109,37 +109,37 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				?>
 				
 				<?php if ($show_search_label==1) : ?>
-					<span class="fc_filter_label"><?php echo JText::_('FLEXI_TEXT_SEARCH'); ?></span>
+					<div class="fc_filter_label"><?php echo JText::_('FLEXI_TEXT_SEARCH'); ?></div>
 				<?php endif; ?>
 				
-				<span class="fc_filter_html fc_text_search">
+				<div class="fc_filter_html fc_text_search">
 					<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
 						data-fc_label_text="<?php echo $text_search_label; ?>" name="filter"
 						id="<?php echo $form_id; ?>_filter" value="<?php echo htmlspecialchars($text_search_val, ENT_COMPAT, 'UTF-8');?>" />
 					<?php echo $searchphrase_selector; ?>
 					
 					<?php if ( $filter_placement && ($show_search_go || $show_search_reset) ) : ?>
-					<span class="fc_buttons">
+					<div class="fc_buttons">
 						<?php if ($show_search_go) : ?>
 						<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>">
-							<span class="icon-search"></span><?php echo JText::_( 'FLEXI_GO' ); ?>
+							<div class="icon-search"></div><?php echo JText::_( 'FLEXI_GO' ); ?>
 						</button>
 						<?php endif; ?>
 						
 						<?php if ($show_search_reset) : ?>
 						<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
-							<span class="icon-remove"></span><?php echo JText::_( 'FLEXI_RESET' ); ?>
+							<div class="icon-remove"></div><?php echo JText::_( 'FLEXI_RESET' ); ?>
 						</button>
 						<?php endif; ?>
 						
-					</span>
-					<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
+					</div>
+					<div id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></div>
 					<?php endif; ?>
 				
-					<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>
-				</span>
+					<?php if ( $msg ) : ?><div class="fc-mssg fc-note"><?php echo $msg; ?></div><?php endif; ?>
+				</div>
 				
-			</span>
+			</div>
 			
 		<?php endif; /* EOF search */ ?>
 		
@@ -148,7 +148,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			$msg = '';
 			$msg = implode(' <br/> ', $filter_messages);
 			if ( $msg ) :
-				?><div class="fcclear"></div><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php
+				?><div class="fcclear"></div><div class="fc-mssg fc-note"><?php echo $msg; ?></div><?php
 			endif;
 		?>
 		
@@ -173,7 +173,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				$filt_lbl = $filt->label;
 				if ( isset($fgInfo->field_to_grp[$filt->id]) ) {
 					$fieldgrp_id = $fgInfo->field_to_grp[$filt->id];
-					$filt_lbl = '<span class="label label-info">'.$fgInfo->grps[$fieldgrp_id]->label .'</span><br/>'. $filt_lbl;
+					$filt_lbl = '<div class="label label-info">'.$fgInfo->grps[$fieldgrp_id]->label .'</div><br/>'. $filt_lbl;
 				}
 				
 				// Support for old 3rd party filters, that include an auto-submit statement or include a fixed form name
@@ -207,18 +207,18 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 						<h3 class="tabberheading '.$filter_label_class.'">'.$filt_lbl.($has_filt_vals_array || $has_filt_vals_string ? ' *' : '' ).'</h3>' : '')
 						
 						/* External filter container */.'
-						<span class="'.$filter_container_class.$even_odd_class.' fc_filter_id_'.$filt->id.'" >'.
+						<div class="'.$filter_container_class.$even_odd_class.' fc_filter_id_'.$filt->id.'" >'.
 						
 							/* Optional filter label before filter's HTML */
 							($label_outside ? '
-							<span class="fc_filter_label fc_label_field_'.$filt->id.'">' .$filt_lbl. '</span>' : '')
+							<div class="fc_filter_label fc_label_field_'.$filt->id.'">' .$filt_lbl. '</div>' : '')
 							
 							/* Internal filter container and filter 's HTML */.'
-							<span class="fc_filter_html fc_html_field_'.$filt->id.'">'
+							<div class="fc_filter_html fc_html_field_'.$filt->id.'">'
 								.$filt->html.'
-							</span>
+							</div>
 							
-						</span>
+						</div>
 					'.
 					
 					/* Optional TAB end */
@@ -247,21 +247,21 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			?>
 			
 			<?php if ($show_search_go && !$buttons_added_already) : ?>
-			<span class="fc_filter">
-				<span class="fc_buttons">
+			<div class="fc_filter">
+				<div class="fc_buttons">
 					<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;">
-						<span title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>"><?php echo JText::_( 'FLEXI_GO' ); ?></span>
+						<div title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>"><?php echo JText::_( 'FLEXI_GO' ); ?></div>
 					</button>
 					
 					<?php if ($show_search_reset && !$buttons_added_already) : ?>
 					<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;">
-						<span title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>"><?php echo JText::_( 'FLEXI_RESET' ); ?></span>
+						<div title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>"><?php echo JText::_( 'FLEXI_RESET' ); ?></div>
 					</button>
 					<?php endif; ?>
 					
-				</span>
-				<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
-			</span>
+				</div>
+				<div id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></div>
+			</div>
 			<?php endif; ?>
 			
 		<?php endif; /* EOF filter */ ?>

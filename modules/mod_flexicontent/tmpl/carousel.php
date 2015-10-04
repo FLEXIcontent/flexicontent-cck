@@ -144,15 +144,15 @@ $mod_default_img_path = $params->get('mod_default_img_path', 'components/com_fle
 $img_path = JURI::base(true) .'/'; 
 
 // image of FEATURED items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
-$img_force_dims_feat=" width: 100%; height: auto; display: block !important; border: 0 !important;";
-$img_limit_dims=" max-width:".$mod_width_feat."px; max-height:".$mod_height_feat."px;";
+$img_force_dims_feat=" width: auto; height: auto; display: block !important; border: 0 !important;";
+$img_limit_dims=" max-width:100%; max-height:100%;";
 if ($item_img_fit_feat==0 || $content_layout_feat <= 1) {
 	$img_force_dims_feat .= $img_limit_dims;
 }
 
 // image of STANDARD items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
-$img_force_dims=" width: 100%; height: auto; display: block !important; border: 0 !important;";
-$img_limit_dims=" max-width:".$mod_width."px; max-height:".$mod_height."px;";
+$img_force_dims=" width: auto; height: auto; display: block !important; border: 0 !important;";
+$img_limit_dims=" max-width:100%; max-height:100%;";
 if ($item_img_fit==0 || $content_layout <= 1) {
 	$img_force_dims .= $img_limit_dims;
 }

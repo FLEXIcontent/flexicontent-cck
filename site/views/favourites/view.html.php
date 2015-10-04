@@ -187,12 +187,21 @@ class FlexicontentViewFavourites extends JViewLegacy
 		
 		// Create the pagination object
 		$pageNav = $this->get('pagination');
+		// URL-encode filter values
+		foreach($_GET as $i => $v) {
+			if (substr($i, 0, 6) === "filter") {
+				$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
+				$v = str_replace('&', '__amp__', $v);
+				$v = strtr(rawurlencode($v), $_revert);
+				$pageNav->setAdditionalUrlParam($i, $v);
+			}
+		}
 		
 		// Create links, etc
 		$link = JRoute::_(FlexicontentHelperRoute::getFavsRoute(0, $menu_matches ? $menu->id : 0));
 		
 		//$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
-    $curr_url = $_SERVER['REQUEST_URI'];
+		$curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
     $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 		
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
