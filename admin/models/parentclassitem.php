@@ -3139,7 +3139,7 @@ class ParentClassItem extends JModelAdmin
 		}
 		$query = "UPDATE #__content SET version='$version' WHERE id='$id';";
 		$this->_db->setQuery($query);
-		$this->_db->query($query);
+		$this->_db->execute($query);
 		// handle the maintext not very elegant but functions properly
 		$row = $this->getTable('flexicontent_items', '');
 		$row->load($id);

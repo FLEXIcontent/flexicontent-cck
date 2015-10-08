@@ -527,6 +527,14 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$dl_coupons_tbl_exists = (boolean) count($db->loadObjectList());
 		
+		// Data Types of columns
+		var $tbl_names_arr = array('flexicontent_files', 'flexicontent_fields', 'flexicontent_types');
+		foreach ($tbl_names_arr as $tbl_name) {
+			$full_tbl_name = $app->getCfg('dbprefix') . $tbl_name;
+			$query = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '".$full_tbl_name."'";// ." AND COLUMN_NAME = 'attribs'";
+			$db->setQuery($query);
+			$tbl_datatypes[$tbl_name] = $db->loadAssocList('COLUMN_NAME');
+		}
 		?>
 		
 		
@@ -704,45 +712,57 @@ class com_flexicontentInstallerScript
 					}
 					
 					// Files TABLE
-					if ( $files_tbl_exists && !array_key_exists('filename_original', $tbl_fields['#__flexicontent_files'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `filename_original` VARCHAR(255) NOT NULL DEFAULT '' AFTER `filename`";
+					$tbl_name = 'flexicontent_files';
+					if ( $files_tbl_exists && !array_key_exists('filename_original', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `filename_original` VARCHAR(255) NOT NULL DEFAULT '' AFTER `filename`";
 					}
-					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__flexicontent_files'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL DEFAULT '' AFTER `altname`";
+					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `description` TEXT NOT NULL DEFAULT '' AFTER `altname`";
 					}
-					if ( $files_tbl_exists && !array_key_exists('language', $tbl_fields['#__flexicontent_files'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `language` CHAR(7) NOT NULL DEFAULT '*' AFTER `published`";
+					if ( $files_tbl_exists && !array_key_exists('language', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `language` CHAR(7) NOT NULL DEFAULT '*' AFTER `published`";
 					}
-					if ( $files_tbl_exists && !array_key_exists('size', $tbl_fields['#__flexicontent_files'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `size` INT(11) unsigned NOT NULL default '0' AFTER `hits`";
+					if ( $files_tbl_exists && !array_key_exists('size', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `size` INT(11) unsigned NOT NULL default '0' AFTER `hits`";
+					}
+					if ( isset($tbl_datatypes[$tbl_name]) && $tbl_datatypes[$tbl_name]['attribs'] != 'mediumtext' ) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
 					
 					// Fields TABLE
-					if ( $fields_tbl_exists && !array_key_exists('untranslatable', $tbl_fields['#__flexicontent_fields'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
+					$tbl_name = 'flexicontent_fields';
+					if ( $fields_tbl_exists && !array_key_exists('untranslatable', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
 					}
-					if ( $fields_tbl_exists && !array_key_exists('isadvfilter', $tbl_fields['#__flexicontent_fields'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `isadvfilter` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isfilter`";
+					if ( $fields_tbl_exists && !array_key_exists('isadvfilter', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `isadvfilter` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isfilter`";
 					}
-					if ( $fields_tbl_exists && !array_key_exists('formhidden', $tbl_fields['#__flexicontent_fields'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `formhidden` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `untranslatable`";
+					if ( $fields_tbl_exists && !array_key_exists('formhidden', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `formhidden` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `untranslatable`";
 					}
-					if ( $fields_tbl_exists && !array_key_exists('valueseditable', $tbl_fields['#__flexicontent_fields'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `valueseditable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `formhidden`";
+					if ( $fields_tbl_exists && !array_key_exists('valueseditable', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `valueseditable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `formhidden`";
 					}
-					if ( $fields_tbl_exists && !array_key_exists('edithelp', $tbl_fields['#__flexicontent_fields'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `edithelp` SMALLINT(8) NOT NULL DEFAULT '2' AFTER `formhidden`";
+					if ( $fields_tbl_exists && !array_key_exists('edithelp', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `edithelp` SMALLINT(8) NOT NULL DEFAULT '2' AFTER `formhidden`";
 					}
-					if ( $fields_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_fields']) ) {
-						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
+					if ( $fields_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__'.$tbl_name]) ) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
+					}
+					if ( isset($tbl_datatypes[$tbl_name]) && $tbl_datatypes[$tbl_name]['attribs'] != 'mediumtext' ) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
 					
 					// Types TABLE
-					if ( $types_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_types']) ) {
-						$queries[] = "ALTER TABLE `#__flexicontent_types` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
+					$tbl_name = 'flexicontent_types';
+					if ( $types_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__'.$tbl_name]) ) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
-					if ( $types_tbl_exists && !array_key_exists('itemscreatable', $tbl_fields['#__flexicontent_types'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_types` ADD `itemscreatable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `published`";
+					if ( $types_tbl_exists && !array_key_exists('itemscreatable', $tbl_fields['#__'.$tbl_name])) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `itemscreatable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `published`";
+					}
+					if ( isset($tbl_datatypes[$tbl_name]) && $tbl_datatypes[$tbl_name]['attribs'] != 'mediumtext' ) {
+						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
 					
 					// Templates TABLE
