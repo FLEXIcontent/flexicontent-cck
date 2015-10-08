@@ -528,7 +528,7 @@ class com_flexicontentInstallerScript
 		$dl_coupons_tbl_exists = (boolean) count($db->loadObjectList());
 		
 		// Data Types of columns
-		var $tbl_names_arr = array('flexicontent_files', 'flexicontent_fields', 'flexicontent_types');
+		$tbl_names_arr = array('flexicontent_files', 'flexicontent_fields', 'flexicontent_types');
 		foreach ($tbl_names_arr as $tbl_name) {
 			$full_tbl_name = $app->getCfg('dbprefix') . $tbl_name;
 			$query = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '".$full_tbl_name."'";// ." AND COLUMN_NAME = 'attribs'";
@@ -725,7 +725,7 @@ class com_flexicontentInstallerScript
 					if ( $files_tbl_exists && !array_key_exists('size', $tbl_fields['#__'.$tbl_name])) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `size` INT(11) unsigned NOT NULL default '0' AFTER `hits`";
 					}
-					if ( isset($tbl_datatypes[$tbl_name]) && $tbl_datatypes[$tbl_name]['attribs'] != 'mediumtext' ) {
+					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
 					
@@ -749,7 +749,7 @@ class com_flexicontentInstallerScript
 					if ( $fields_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__'.$tbl_name]) ) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
-					if ( isset($tbl_datatypes[$tbl_name]) && $tbl_datatypes[$tbl_name]['attribs'] != 'mediumtext' ) {
+					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
 					
@@ -761,7 +761,7 @@ class com_flexicontentInstallerScript
 					if ( $types_tbl_exists && !array_key_exists('itemscreatable', $tbl_fields['#__'.$tbl_name])) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` ADD `itemscreatable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `published`";
 					}
-					if ( isset($tbl_datatypes[$tbl_name]) && $tbl_datatypes[$tbl_name]['attribs'] != 'mediumtext' ) {
+					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
 						$queries[] = "ALTER TABLE `#__".$tbl_name."` CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
 					
@@ -783,7 +783,7 @@ class com_flexicontentInstallerScript
 								continue;
 							}
 						}
-						echo '<span class="badge badge-success">table(s) created / upgraded: '.$upgrade_count.'</span>';
+						echo '<span class="badge badge-success">table(s) upgraded: '.$upgrade_count.'</span>';
 					}
 					else echo '<span class="badge badge-info">nothing to do</span>';
 					?>
