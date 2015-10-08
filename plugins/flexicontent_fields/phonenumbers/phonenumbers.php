@@ -438,9 +438,9 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			// Validate phone number, skipping phone number that are empty after validation
 			// ****************************************************************************
 			
-			$newpost[$new]['phone1'] = flexicontent_html::dataFilter(@$post[$n]['phone1'], $phone_maxlength, 'INT', 0);
-			$newpost[$new]['phone2'] = flexicontent_html::dataFilter(@$post[$n]['phone2'], $phone_maxlength, 'INT', 0);
-			$newpost[$new]['phone3'] = flexicontent_html::dataFilter(@$post[$n]['phone3'], $phone_maxlength, 'INT', 0);
+			$newpost[$new]['phone1'] = !strlen($post[$n]['phone1']) ? '' : flexicontent_html::dataFilter(@$post[$n]['phone1'], $phone_maxlength, 'INT', 0);
+			$newpost[$new]['phone2'] = !strlen($post[$n]['phone2']) ? '' : flexicontent_html::dataFilter(@$post[$n]['phone2'], $phone_maxlength, 'INT', 0);
+			$newpost[$new]['phone3'] = !strlen($post[$n]['phone3']) ? '' : flexicontent_html::dataFilter(@$post[$n]['phone3'], $phone_maxlength, 'INT', 0);
 			if (!strlen($post[$n]['phone1']) && !strlen($post[$n]['phone2']) && !strlen($post[$n]['phone3']) && !$use_ingroup ) continue;  // Skip empty values if not in field group
 			
 			// Validate other value properties
