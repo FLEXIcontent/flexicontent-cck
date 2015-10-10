@@ -61,7 +61,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		// Get model
 		$model = $this->getModel();
-
+		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
@@ -116,6 +116,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		
+		$js = "jQuery(document).ready(function(){";
 		
 		
 		// *****************************
@@ -202,7 +203,6 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$pagination = $this->get('Pagination');
 		$limitstart = $this->get('LimitStart');
 
-		$js = "jQuery(document).ready(function(){";
 		if ($filter_fieldtype) {
 			$js .= "jQuery('.col_fieldtype').each(function(){ jQuery(this).addClass('yellow'); });";
 		}		
@@ -266,7 +266,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 	 * @access	public
 	 * @return	void
 	 */
-	function setToolbar() {
+	function setToolbar()
+	{
 		$document = JFactory::getDocument();
 		$js = "jQuery(document).ready(function(){";
 		$toolbar = JToolBar::getInstance('toolbar');
@@ -276,12 +277,10 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
 			$js .= "
 				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
-					.attr('onclick', 'javascript:;')
-					.attr('href', '".$popup_load_url."')
-					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">Reloading ... please wait</span>\'; window.location.reload(true)}); return false;')
+					.attr('href', '".$popup_load_url."');
 			";
 			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_REINDEX_BASIC_CONTENT_LISTS', false );
-			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
 		} else {
 			$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', str_replace('&', '&amp;', $popup_load_url), 500, 240);
 		}
@@ -293,12 +292,10 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
 			$js .= "
 				jQuery('#toolbar-advindex a.toolbar, #toolbar-advindex button')
-					.attr('onclick', 'javascript:;')
-					.attr('href', '".$popup_load_url."')
-					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">Reloading ... please wait</span>\'; window.location.reload(true)}); return false;')
+					.attr('href', '".$popup_load_url."');
 			";
 			JToolBarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW', false );
-			JHtml::_('behavior.modal', '#toolbar-advindex a.toolbar, #toolbar-advindex button');
 		} else {
 			$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', str_replace('&', '&amp;', $popup_load_url), 500, 240);
 		}
@@ -308,12 +305,10 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
 			$js .= "
 				jQuery('#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button')
-					.attr('onclick', 'javascript:;')
-					.attr('href', '".$popup_load_url."')
-					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">Reloading ... please wait</span>\'; window.location.reload(true)}); return false;')
+					.attr('href', '".$popup_load_url."');
 			";
 			JToolBarHelper::custom( $btn_task, 'advindexdirty.png', 'advindexdirty_f2.png', 'FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', false );
-			JHtml::_('behavior.modal', '#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button');
 		} else {
 			$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', str_replace('&', '&amp;', $popup_load_url), 500, 240);
 		}
@@ -335,6 +330,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$js .= "});";
 		$document->addScriptDeclaration($js);
 	}
+	
 	
 	function indexer($tpl)
 	{		

@@ -29,25 +29,27 @@ jimport('joomla.application.component.view');
  */
 class FlexicontentViewFilemanager extends JViewLegacy
 {
-	/**
-	 * Creates the Filemanager view
-	 *
-	 * @since 1.0
-	 */
 	function display( $tpl = null )
 	{
-		//initialise variables
-		$app      = JFactory::getApplication();
-		$document = JFactory::getDocument();
+		// ********************
+		// Initialise variables
+		// ********************
 		
-		$option   = JRequest::getCmd('option');
-		$view     = JRequest::getVar('view');
-		$layout   = JRequest::getVar('layout', 'default');
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
 		
-		$db       = JFactory::getDBO();
-		$user     = JFactory::getUser();
+		$layout  = $jinput->get('layout', '', 'cmd');
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
 		
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		
+		// Get model
+		$model = $this->getModel();
+		
 		//$authorparams = flexicontent_db::getUserConfig($user->id);
 		$langs = FLEXIUtilities::getLanguages('code');
 		
@@ -57,8 +59,13 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		JHTML::_('behavior.tooltip');
 		// Load the form validation behavior
 		JHTML::_('behavior.formvalidation');
-
+		
+		
+		
+		// ***********
 		// Get filters
+		// ***********
+		
 		$count_filters = 0;
 		$_view = $view;
 		
@@ -103,6 +110,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
 		
+		$js = "jQuery(document).ready(function(){";
 		
 		
 		// *****************************
@@ -127,44 +135,14 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
-		JToolBarHelper::deleteList('Are you sure?', 'filemanager.remove');
-		if ($perms->CanConfig) {
-			JToolBarHelper::divider(); JToolBarHelper::spacer();
-			$session = JFactory::getSession();
-			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
-			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
-			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
-			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
-		}
+		$this->setToolbar();
 		
-		
-		$js = "jQuery(document).ready(function(){";
-		$toolbar = JToolBar::getInstance('toolbar');
-		
-		$btn_task = '';
-		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=fileman_default';
-		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
-			$js .= "
-				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
-					.attr('onclick', 'javascript:;')
-					.attr('href', '".$popup_load_url."')
-					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
-			";
-			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'Index file statistics', false );
-			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
-		} else {
-			$toolbar->appendButton('Popup', 'basicindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
-		}
-		$js .= "});";
-		$document->addScriptDeclaration($js);
-		
+
 		
 		// ***********************
 		// Get data from the model
 		// ***********************
 		$folder_mode			= 0;
-		$model   = $this->getModel();
 		if ( !$folder_mode ) {
 			$rows  = $this->get('Data');
 		} else {
@@ -285,7 +263,52 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
+	
+	
+	/**
+	 * Method to configure the toolbar for this view.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	function setToolbar()
+	{
+		$document = JFactory::getDocument();
+		$js = "jQuery(document).ready(function(){";
+		$toolbar = JToolBar::getInstance('toolbar');
 
+		JToolBarHelper::deleteList('Are you sure?', 'filemanager.remove');
+		
+		$btn_task = '';
+		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=filemanager&layout=indexer&tmpl=component&indexer=fileman_default';
+		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
+			$js .= "
+				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
+					.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">Reloading ... please wait</span>\'; window.location.reload(true)}); return false;')
+					.attr('href', '".$popup_load_url."');
+			";
+			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'Index file statistics', false );
+		} else {
+			$toolbar->appendButton('Popup', 'basicindex', 'Index file statistics', str_replace('&', '&amp;', $popup_load_url), 500, 240);
+		}
+		
+		$user  = JFactory::getUser();
+		$perms = FlexicontentHelperPerm::getPerm();
+		if ($perms->CanConfig) {
+			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			$session = JFactory::getSession();
+			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
+			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
+			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+		}
+		
+		$js .= "});";
+		$document->addScriptDeclaration($js);
+	}
+	
+	
 	function indexer($tpl)
 	{		
 		parent::display($tpl);

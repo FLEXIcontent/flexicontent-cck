@@ -244,7 +244,10 @@ $this->document->addScriptDeclaration($js);
 							<td>
 								<?php echo
 									in_array($form->getValue('issearch'),array(-1,2)) ?
-										JText::_($form->getValue('issearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_BASIC_INDEX_PROPERTY_DIRTY') :
+										JText::_($form->getValue('issearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
+										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
+											.JText::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
+										</a>' :
 										$form->getInput('issearch'); ?>
 							</td>
 						</tr>
@@ -278,7 +281,10 @@ $this->document->addScriptDeclaration($js);
 							<td>
 								<?php echo
 									in_array($form->getValue('isadvsearch'),array(-1,2)) ?
-										JText::_($form->getValue('isadvsearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
+										JText::_($form->getValue('isadvsearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
+										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
+											.JText::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
+										</a>' :
 										$form->getInput('isadvsearch'); ?>
 							</td>
 						</tr>
@@ -292,7 +298,10 @@ $this->document->addScriptDeclaration($js);
 							<td>
 								<?php echo
 									in_array($form->getValue('isadvfilter'),array(-1,2)) ?
-										JText::_($form->getValue('isadvfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
+										JText::_($form->getValue('isadvfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
+										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
+											.JText::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
+										</a>' :
 										$form->getInput('isadvfilter'); ?>
 							</td>
 						</tr>

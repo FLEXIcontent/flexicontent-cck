@@ -37,7 +37,7 @@
 	}
 	
 	// Load given URL in an open dialog
-	function fc_showDialog(url, tagid, no_iframe, winwidth, winheight)
+	function fc_showDialog(url, tagid, no_iframe, winwidth, winheight, closeFunc)
 	{
 		// Initialize popup container
 		var winwidth  = typeof winwidth !== 'undefined' && winwidth ? winwidth : jQuery( window ).width() - 80;
@@ -49,6 +49,8 @@
 		var winleft = (jQuery( window ).width() - winwidth) / 2;
 		var wintop  = (jQuery( window ).height() - winheight) / 2 - 5;
 		//window.console.log ('winleft : ' + winleft + ', wintop : ' + wintop);
+		
+		var closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;
 		
 		// Get container creating it if it does not exist
 		var container = jQuery('#'+tagid);
@@ -93,6 +95,10 @@
 				no_iframe ?
 					container.html('') :
 					jQuery('#'+tagid+'_frame').remove();
+				if (typeof closeFunc === 'function') closeFunc();
+				else if (closeFunc == 1) window.location.reload(false);
+				else if (closeFunc == 0) ;
+				else alert('Unknown action'+closeFunc);
 			}
 		});
 		

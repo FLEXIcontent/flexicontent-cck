@@ -117,7 +117,12 @@ class FlexicontentControllerSearch extends FlexicontentController
 		echo '|'.count($fieldids);
 		
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		$_total_runtime = $elapsed_microseconds;
+		$_total_queries = 0;
+		echo sprintf( '|0| Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries;
+		
 		$session->set($indexer.'_total_runtime', $elapsed_microseconds ,'flexicontent');
+		$session->set($indexer.'_total_queries', 0 ,'flexicontent');
 		exit;
 	}
 	
@@ -177,13 +182,28 @@ class FlexicontentControllerSearch extends FlexicontentController
 		}
 		$fields = $_fields;
 		
-		$items_per_query = 50;
-		$items_per_query = $items_per_query > $items_per_call ? $items_per_call : $items_per_query;
+		
+		// Get query size limit
+		$query = "SHOW VARIABLES LIKE 'max_allowed_packet'";
+		$db->setQuery($query);
+		$_dbvariable = $db->loadObject();
+		$max_allowed_packet = flexicontent_upload::parseByteLimit(@ $_dbvariable->Value);
+		$max_allowed_packet = $max_allowed_packet ? $max_allowed_packet : 256*1024;
+		$query_lim = (int) (3 * $max_allowed_packet / 4);
+		//echo 'fail|'.$query_lim; exit;
+		
+		// Get script max
+		$max_execution_time = ini_get("max_execution_time");
+		//echo 'fail|'.$max_execution_time; exit;
+		
+		$query_count = 0;
+		$max_items_per_query = 100;
+		$max_items_per_query = $max_items_per_query > $items_per_call ? $items_per_call : $max_items_per_query;
 		$cnt = $itemcnt;
 		while($cnt < count($itemids) && $cnt < $itemcnt+$items_per_call)
 		{
-			$query_itemids = array_slice($itemids, $cnt, $items_per_query);
-			$cnt += $items_per_query;
+			$query_itemids = array_slice($itemids, $cnt, $max_items_per_query);
+			$cnt += $max_items_per_query;
 			
 			// Item is not needed, later and only if field uses item replacements then it will be loaded
 			$item = null;
@@ -245,35 +265,85 @@ class FlexicontentControllerSearch extends FlexicontentController
 			$queries = array();
 			if ($indexer == 'basic') {
 				if (count($searchindex)) {  // check for zero search index records
-					$query = "UPDATE #__flexicontent_items_ext SET search_index = CASE item_id ";
+					$query_vals = '';  $query_ids = array();  // Start new query
 					foreach ($searchindex as $query_itemid => $search_text)
 					{
+						if (strlen($query_vals) > $query_lim) {
+							$query = "UPDATE #__flexicontent_items_ext SET search_index = CASE item_id "
+								. $query_vals
+								." END "
+								." WHERE item_id IN (". implode(',', $query_ids) .")";
+							$queries[] = $query;
+							$query_vals = '';  $query_ids = array();  // Start new query
+						}
+						
+						$query_ids[] = $query_itemid;
 						$_search_text = implode(' | ', $search_text);
 						if ($search_prefix && $_search_text) $_search_text = preg_replace('/(\b[^\s]+\b)/u', $search_prefix.'$0', trim($_search_text));
-						
-						// Add new search value into the DB
-						$query .= " WHEN $query_itemid THEN ".$db->Quote( $_search_text );
+						$query_vals .= " WHEN $query_itemid THEN ".$db->Quote( $_search_text );
 					}
-					$query .= " END ";
-					$query .= " WHERE item_id IN (". implode(',', array_keys($searchindex)) .")";
+					if (count($query_ids)) {
+						$query = "UPDATE #__flexicontent_items_ext SET search_index = CASE item_id "
+							. $query_vals
+							." END "
+							." WHERE item_id IN (". implode(',', $query_ids) .")";
+						$queries[] = $query;
+					}
 				}
-				$queries[] = $query;
 			} else {
 				if ( count($ai_query_vals) ) {  // check for zero search index records
-					$queries[] = "INSERT INTO #__flexicontent_advsearch_index "
-						." (field_id,item_id,extraid,search_index,value_id) VALUES "
-						.implode(",", $ai_query_vals);
+					$query_vals = '';  // Start new query
+					foreach ($ai_query_vals as &$query_value) {
+						$query_vals .= ($query_vals ? ',' : '').$query_value;
+						if (strlen($query_vals) > $query_lim) {
+							$queries[] = "INSERT INTO #__flexicontent_advsearch_index "
+								." (field_id,item_id,extraid,search_index,value_id) VALUES "
+								.$query_vals;
+							$query_vals = ''; // Start new query
+						}
+					}
+					unset($query_value);
+					if (strlen($query_vals)) {
+						$queries[] = "INSERT INTO #__flexicontent_advsearch_index "
+							." (field_id,item_id,extraid,search_index,value_id) VALUES "
+							.$query_vals;
+					}
 				}
-				foreach( $ai_query_vals_f as $_field_id => $_query_vals) {  // Current for advanced index only
-					$queries[] = "INSERT INTO #__flexicontent_advsearch_index_field_".$_field_id
-						." (field_id,item_id,extraid,search_index,value_id) VALUES "
-						.implode(",", $_query_vals);
+				
+				foreach( $ai_query_vals_f as $_field_id => $_query_vals)  // Per field Table
+				{
+					$query_vals = '';  // Start new query
+					foreach ($_query_vals as &$query_value) {
+						$query_vals .= ($query_vals ? ',' : '').$query_value;
+						if (strlen($query_vals) > $query_lim) {
+							$queries[] = "INSERT INTO #__flexicontent_advsearch_index_field_".$_field_id
+								." (field_id,item_id,extraid,search_index,value_id) VALUES "
+								.$query_vals;
+							$query_vals = ''; // Start new query
+						}
+					}
+					if (strlen($query_vals)) {
+						$queries[] = "INSERT INTO #__flexicontent_advsearch_index_field_".$_field_id
+							." (field_id,item_id,extraid,search_index,value_id) VALUES "
+							.$query_vals;
+						$query_vals = ''; // Start new query
+					}
 				}
 			}
 			foreach( $queries as $query ) {
 				$db->setQuery($query);
-				$db->execute();
+				try {
+					$db->execute();
+				} catch (RuntimeException $e) {
+					echo "fail|".$e->getMessage();
+					exit;
+				}
 			}
+			$query_count += count($queries);
+			
+			$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			$elapsed_seconds = $elapsed_microseconds / 1000000.0;
+			if ($elapsed_seconds > $max_execution_time/3 || $elapsed_seconds > 5) break;
 		}
 		
 		// Check if items have finished, otherwise continue with -next- group of item ids
@@ -320,7 +390,16 @@ class FlexicontentControllerSearch extends FlexicontentController
 		}
 		$_total_runtime += $elapsed_microseconds;
 		$session->set($indexer.'_total_runtime', $_total_runtime ,'flexicontent');
-		echo sprintf( ' [%.2f secs] ', $_total_runtime/1000000);
+		
+		if ( $session->has($indexer.'_total_queries', 'flexicontent')) {
+			$_total_queries = $session->get($indexer.'_total_queries', 0,'flexicontent');
+		} else {
+			$_total_queries = 0;
+		}
+		$_total_queries += $query_count;
+		$session->set($indexer.'_total_queries', $_total_queries ,'flexicontent');
+		
+		echo sprintf( $cnt.' | Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries;
 		exit;
 	}
 	

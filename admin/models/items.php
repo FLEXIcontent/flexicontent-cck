@@ -798,7 +798,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$this->_db->execute();
 		
 		
-		$query = "SHOW VARIABLES LIKE '%max_allowed_packet%'";
+		$query = "SHOW VARIABLES LIKE 'max_allowed_packet'";
 		$this->_db->setQuery($query);
 		$_dbvariable = $this->_db->loadObject();
 		$max_allowed_packet = flexicontent_upload::parseByteLimit(@ $_dbvariable->Value);

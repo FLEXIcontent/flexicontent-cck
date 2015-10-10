@@ -81,7 +81,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		echo '|'.count(array());
 		
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		$_total_runtime = $elapsed_microseconds;
+		$_total_queries = 0;
+		echo sprintf( '|0| Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries;
+		
 		$session->set($indexer.'_total_runtime', $elapsed_microseconds ,'flexicontent');
+		$session->set($indexer.'_total_queries', 0 ,'flexicontent');
 		exit;
 	}
 	
@@ -107,13 +112,29 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Get items ids that have value for any of the searchable fields, but use session to avoid recalculation
 		$itemids = $session->get($indexer.'_items_to_index', array(),'flexicontent');
 		
-		$items_per_query = 50;
-		$items_per_query = $items_per_query > $items_per_call ? $items_per_call : $items_per_query;
+		
+		// Get query size limit
+		$query = "SHOW VARIABLES LIKE 'max_allowed_packet'";
+		$db->setQuery($query);
+		$_dbvariable = $db->loadObject();
+		$max_allowed_packet = flexicontent_upload::parseByteLimit(@ $_dbvariable->Value);
+		$max_allowed_packet = $max_allowed_packet ? $max_allowed_packet : 256*1024;
+		$query_lim = (int) (3 * $max_allowed_packet / 4);
+		//echo 'fail|'.$query_lim; exit;
+		
+		// Get script max
+		$max_execution_time = ini_get("max_execution_time");
+		//echo 'fail|'.$max_execution_time; exit;
+		
+		
+		$query_count = 0;
+		$max_items_per_query = 100;
+		$max_items_per_query = $max_items_per_query > $items_per_call ? $items_per_call : $max_items_per_query;
 		$cnt = $itemcnt;
 		while($cnt < count($itemids) && $cnt < $itemcnt+$items_per_call)
 		{
-			$query_itemids = array_slice($itemids, $cnt, $items_per_query);
-			$cnt += $items_per_query;
+			$query_itemids = array_slice($itemids, $cnt, $max_items_per_query);
+			$cnt += $max_items_per_query;
 			
 			// Get files
 			$data_query = "SELECT * "
@@ -143,6 +164,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				.' WHERE id IN ('.implode(', ',$query_itemids).')';
 			$db->setQuery($query);
 			$db->execute();
+			$query_count++;
+			
+			$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			$elapsed_seconds = $elapsed_microseconds / 1000000.0;
+			if ($elapsed_seconds > $max_execution_time/3 || $elapsed_seconds > 5) break;
 		}
 		
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -153,7 +179,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 		$_total_runtime += $elapsed_microseconds;
 		$session->set($indexer.'_total_runtime', $_total_runtime ,'flexicontent');
-		echo sprintf( ' [%.2f secs] ', $_total_runtime/1000000);
+		
+		if ( $session->has($indexer.'_total_queries', 'flexicontent')) {
+			$_total_queries = $session->get($indexer.'_total_queries', 0,'flexicontent');
+		} else {
+			$_total_queries = 0;
+		}
+		$_total_queries += $query_count;
+		$session->set($indexer.'_total_queries', $_total_queries ,'flexicontent');
+		
+		echo sprintf( $cnt.' | Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries;
 		exit;
 	}
 	
