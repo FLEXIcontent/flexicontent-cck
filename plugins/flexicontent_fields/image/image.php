@@ -2120,7 +2120,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		$filter->parameters->set( 'display_filter_as', 1 );  // Only supports a basic filter of single text search input
+		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
 	
@@ -2131,7 +2131,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a advanced filter of single text search input
+		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}
 	

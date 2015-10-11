@@ -530,8 +530,8 @@ class FlexicontentControllerImport extends FlexicontentController
 		$colcount  = count($conf['columns']);
 		$itemcount = count($conf['contents_parsed']);
 		$items_per_call = JRequest::getInt( 'items_per_call', 0 );
-		JRequest::setVar('media_folder', $conf['media_folder']);
-		JRequest::setVar('docs_folder', $conf['docs_folder']);
+		JRequest::setVar('import_media_folder', $conf['media_folder']);
+		JRequest::setVar('import_docs_folder', $conf['docs_folder']);
 		
 		$lineno  = $task=='testcsv'  ?  1  :  $lineno + 1;
 		$linelim = $items_per_call ?  $lineno + $items_per_call - 1 : $itemcount;

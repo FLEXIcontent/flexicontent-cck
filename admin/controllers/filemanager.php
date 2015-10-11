@@ -441,7 +441,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 *
 	 * @since 1.0
 	 */
-	function addlocal()
+	function addlocal($Fobj=null)
 	{
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
@@ -449,19 +449,23 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$app    = JFactory::getApplication();
 		$db 		= JFactory::getDBO();
 		$user		= JFactory::getUser();
+		$params = JComponentHelper::getParams( 'com_flexicontent' );
 		
-		$return		=  JRequest::getVar( 'return-url', null, 'post', 'base64' );
-		$filesdir	=  JRequest::getVar( 'file-dir-path', '', 'post' );
-		$regexp		=  JRequest::getVar( 'file-filter-re', '.', 'post' );
-		$secure		=  JRequest::getInt( 'secure', 1, 'post' );
-		$secure		= $secure ? 1 : 0;
-		$keep			=  JRequest::getInt( 'keep', 1, 'post' );
-		$params 	= JComponentHelper::getParams( 'com_flexicontent' );
+		$is_importcsv = JRequest::getVar('task') == 'importcsv';
+		static $imported_files = array();
+		
+		$return		= $Fobj ? $Fobj->return_url     : JRequest::getVar( 'return-url', null, 'post', 'base64' );
+		$filesdir	= $Fobj ? $Fobj->file_dir_path  : JRequest::getVar( 'file-dir-path', '', 'post' );
+		$regexp		= $Fobj ? $Fobj->file_filter_re : JRequest::getVar( 'file-filter-re', '.', 'post' );
+		$secure		= $Fobj ? $Fobj->secure         : JRequest::getInt( 'secure', 1, 'post' );
+		$keep			= $Fobj ? $Fobj->keep           : JRequest::getInt( 'keep', 1, 'post' );
+		
+		$secure		= $secure ? 1 : 0;  // A correction for future compatibility, so that secure may have more values
 		$destpath = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
 		
 		$filedesc	=  JRequest::getVar( 'file-desc', '' );
 		$filelang	=  JRequest::getVar( 'file-lang', '');
-
+		
 		// allowed extensions
 		$filterext	=  JRequest::getVar( 'file-filter-ext', '', 'post' );
 		$filterext	= $filterext ? explode(',', $filterext) : array();
@@ -510,6 +514,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$filename		= flexicontent_upload::sanitize($destpath, $filenames[$n]);
 				$destination 	= $destpath . $filename;
 				
+				// Check for file already added by import task and do not re-add the file
+				if ( $is_importcsv && isset($imported_files[$source]) ) {
+					$file_ids[$filename] = $imported_files[$source];
+					continue;
+				}
+				
 				// Copy or move the file
 				$success = $keep  ?  JFile::copy($source, $destination)  :  JFile::move($source, $destination) ;
 				if ($success)
@@ -532,6 +542,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					// Add the record to the DB
 					$db->insertObject('#__flexicontent_files', $obj);
 					$file_ids[$filename] = $db->insertid();
+					
+					// Add file ID to files imported by import task
+					if ( $is_importcsv )  $imported_files[$source] = $file_ids[$filename];
 					
 					$c++;
 				}

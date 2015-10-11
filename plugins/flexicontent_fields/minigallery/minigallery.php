@@ -376,11 +376,11 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				}
 				
 				// Add empty container if last element, instantly removing the given field value container
-				if(rowCount".$field->id ."==1)
+				if(rowCount".$field->id." == 1)
 					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if(rowCount".$field->id .">1) {
+				if(rowCount".$field->id." > 1) {
 					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
 					row.find('.fcfield-delvalue').remove();
 					row.find('.fcfield-insertvalue').remove();
@@ -710,8 +710,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');
 		}
 		
-		$new=0;
 		$newpost = array();
+		$new = 0;
     foreach ($post as $n => $v)
     {
     	if (empty($v)) continue;
@@ -724,12 +724,13 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
 					
 					$fman = new FlexicontentControllerFilemanager();
-					JRequest::setVar( 'return-url', null, 'post' );
-					JRequest::setVar( 'file-dir-path', DS. $import_docs_folder . $sub_folder, 'post' );
-					JRequest::setVar( 'file-filter-re', preg_quote($filename), 'post' );
-					JRequest::setVar( 'secure', 1, 'post' );
-					JRequest::setVar( 'keep', 1, 'post' );
-					$file_ids = $fman->addlocal();
+					$Fobj = new stdClass();
+					$Fobj->return_url     = null;
+					$Fobj->file_dir_path  = DS. $import_docs_folder . $sub_folder;
+					$Fobj->file_filter_re = preg_quote($filename);
+					$Fobj->secure = 0;
+					$Fobj->keep   = 1;
+					$file_ids = $fman->addlocal($Fobj);
 					$v = !empty($file_ids) ? reset($file_ids) : false; // Get fist element
 					//$_filetitle = key($file_ids);  this is the cleaned up filename, currently not needed
 				}

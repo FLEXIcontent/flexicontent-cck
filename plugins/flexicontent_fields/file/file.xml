@@ -86,7 +86,7 @@
 				<option value="0" show_list="inline-edit-on" hide_list="inline-edit-off">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="Optional Properties" description="" level="level3" depend_class="inline-edit-on" />
+			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="" level="level3" depend_class="inline-edit-on" />
 			<field name="iform_title" type="radio" default="1" label="FLEXI_FILE_DISPLAY_TITLE" description="FLEXI_FILE_DISPLAY_TITLE_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
