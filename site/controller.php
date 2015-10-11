@@ -127,7 +127,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		$_words = array();
 		foreach ($words as & $_w)
-			$_words[] = !$search_prefix  ?  trim($_w)  :  preg_replace('/(\b[^\s]+\b)/u', $search_prefix.'$0', trim($_w));
+			$_words[] = !$search_prefix  ?  trim($_w)  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($_w));
 		$newtext = '+' . implode( ' +', $_words ) .'*';  //print_r($_words); exit;
 		
 		// Query CLAUSE for match the given text

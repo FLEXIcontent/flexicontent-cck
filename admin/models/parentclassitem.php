@@ -2578,7 +2578,7 @@ class ParentClassItem extends JModelAdmin
 		// Assigned created basic search index into item object
 		$search_prefix = $cparams->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$item->search_index = implode(' | ', $searchindex);
-		if ($search_prefix && $item->search_index) $item->search_index = preg_replace('/(\b[^\s]+\b)/', $search_prefix.'$0', trim($item->search_index));
+		if ($search_prefix && $item->search_index) $item->search_index = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($item->search_index));
 		
 		// Check if vstate was set to 1 (no approve new version) while versioning is disabled
 		if (!$use_versioning && $data['vstate']!=2) {

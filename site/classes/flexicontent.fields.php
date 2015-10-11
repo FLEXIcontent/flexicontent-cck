@@ -2027,7 +2027,7 @@ class FlexicontentFields
 				foreach ($searchindex as $vi => $search_text)
 				{
 					if ($search_prefix)
-						$search_text = preg_replace('/(\b[^\s]+\b)/u', $search_prefix.'$0', $search_text);
+						$search_text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', $search_text);
 					// Add new search value into the DB
 					$query_val = "( "
 						.$field->id. "," .$itemid. "," .($n++). "," .$db->Quote($search_text). "," .$db->Quote($vi).

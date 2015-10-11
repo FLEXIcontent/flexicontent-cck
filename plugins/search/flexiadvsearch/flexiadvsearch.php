@@ -314,8 +314,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// ****************************************
 		
 		$si_tbl = !$txtmode ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
-		$search_prefix = 'vvv';
-		$text = preg_replace('/(\b[^\s]+\b)/', $search_prefix.'$0', trim($text));
+		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
 		
 		if( strlen($text) )
 		{

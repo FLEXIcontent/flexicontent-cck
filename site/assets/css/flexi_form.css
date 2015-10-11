@@ -386,7 +386,6 @@ html button {
 	padding: 2px 10px !important;
 }
 
-.flexicontent button:not(.btn):hover,
 .fc_button:not(.btn):hover,
 .fc_buttons button:not(.btn):hover,
 .flexi_buttons button:not(.btn):hover {

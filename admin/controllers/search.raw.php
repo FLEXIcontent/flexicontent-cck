@@ -279,7 +279,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 						
 						$query_ids[] = $query_itemid;
 						$_search_text = implode(' | ', $search_text);
-						if ($search_prefix && $_search_text) $_search_text = preg_replace('/(\b[^\s]+\b)/u', $search_prefix.'$0', trim($_search_text));
+						if ($search_prefix && $_search_text) $_search_text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($_search_text));
 						$query_vals .= " WHEN $query_itemid THEN ".$db->Quote( $_search_text );
 					}
 					if (count($query_ids)) {

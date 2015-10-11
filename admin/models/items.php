@@ -818,7 +818,7 @@ class FlexicontentModelItems extends JModelLegacy
 			$ilang = $row->language ? $row->language : $default_lang;
 			
 			if ($search_prefix)
-				$_search_index = preg_replace('/(\b[^\s]+\b)/', $search_prefix.'$0', $row->title.' | '.$row->text_stripped);
+				$_search_index = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', $row->title.' | '.$row->text_stripped);
 			else
 				$_search_index = $row->title.' | '.$row->text_stripped;
 			

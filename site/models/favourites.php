@@ -443,7 +443,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		$si_tbl = 'flexicontent_items_ext';
 		
 		$search_prefix = $cparams->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
-		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s]+\b)/u', $search_prefix.'$0', trim($text));
+		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
 		$words = preg_split('/\s\s*/u', $text);
 		
 		if( strlen($text) )

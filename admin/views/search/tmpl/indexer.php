@@ -104,7 +104,7 @@ jQuery(document).ready(function() {
 			jQuery('div#insideprogress').css('width', width+'px');
 			jQuery('div#updatepercent').html(' '+percent.toFixed(2)+' %');
 			jQuery('div#statuscomment').html(
-				(looper<number?looper:number)+' / '+number+' files  <br/>'
+				(looper<number?looper:number)+' / '+number+' items  <br/>'
 					+ '<br/>' + arr[4]
 					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
 					+ '<br/>' + arr[5]
