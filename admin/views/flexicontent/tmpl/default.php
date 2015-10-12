@@ -402,11 +402,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			
 			<?php if (!isset($ssliders['pending'])): ?>
 			<?php
-			$title = JText::_( 'FLEXI_PENDING_SLIDER' ).' - <span class="badge badge-warning">'.count($this->pending)." / ".$this->totalrows['pending'].'</span>';
+			$title = JText::_( 'FLEXI_PENDING_SLIDER' ).' - <span class="badge badge-warning">'.$this->totalrows['pending'].'</span>';
 			echo JHtml::_('sliders.panel', $title, 'pending' );
 			$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE';
 			?>
 			<table class="fc-table-list">
+				
 				<thead>
 				<tr>
 					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
@@ -414,6 +415,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 				</tr>
 				</thead>
+				
+				<tbody>
 				<?php
 				$k = 0;
 				$n = count($this->pending);
@@ -423,8 +426,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
 					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
-			?>
-				<tbody>
+				?>
 				<tr>
 					<td>
 					<?php
@@ -444,11 +446,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
+				<?php if (count($this->pending) < $this->totalrows['pending']) : ?>
+				<tr>
+					<td colspan="3" style="padding-top:0!important;"> ... </td>
+				</tr>
+				<?php endif; ?>
 				</tbody>
+				
 				<tfoot>
 				<tr>
 					<td colspan="3">
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >Show All</span><br/>'; ?>
+						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >'.JText::_('FLEXI_ITEMS_MANAGER').'</span><br/>'; ?>
 					</td>
 				</tr>
 				</tfoot>
@@ -457,11 +465,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			
 			<?php if (!isset($ssliders['revised'])): ?>
 			<?php
-			$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' ).' - <span class="badge badge-warning">'.count($this->revised)." / ".$this->totalrows['revised'].'</span>';
+			$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' ).' - <span class="badge badge-warning">'.$this->totalrows['revised'].'</span>';
 			echo JHtml::_('sliders.panel', $title, 'revised' );
 			$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=RV';
 			?>
 			<table class="fc-table-list">
+				
 				<thead>
 				<tr>
 					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
@@ -469,6 +478,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<th><?php echo JText::_('FLEXI_NF_MODIFIER'); ?></th>
 				</tr>
 				</thead>
+				
+				<tbody>
 				<?php
 				$k = 0;
 				$n = count($this->revised);
@@ -478,8 +489,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
 					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
-			?>
-				<tbody>
+				?>
 				<tr>
 					<td>
 					<?php
@@ -499,11 +509,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<td><?php echo $row->modifier; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
+				<?php if (count($this->revised) < $this->totalrows['revised']) : ?>
+				<tr>
+					<td colspan="3" style="padding-top:0!important;"> ... </td>
+				</tr>
+				<?php endif; ?>
 				</tbody>
+				
 				<tfoot>
 				<tr>
 					<td colspan="3">
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >Show All</span><br/>'; ?>
+						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >'.JText::_('FLEXI_ITEMS_MANAGER').'</span><br/>'; ?>
 					</td>
 				</tr>
 				</tfoot>
@@ -512,11 +528,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			
 			<?php if (!isset($ssliders['inprogress'])): ?>
 			<?php
-			$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' ).' - <span class="badge badge-info">'.count($this->inprogress)." / ".$this->totalrows['inprogress'].'</span>';
+			$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' ).' - <span class="badge badge-info">'.$this->totalrows['inprogress'].'</span>';
 			echo JHtml::_('sliders.panel', $title, 'inprogress' );
 			$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP';
 			?>
 			<table class="fc-table-list">
+				
 				<thead>
 				<tr>
 					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
@@ -524,6 +541,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 				</tr>
 				</thead>
+				
+				<tbody>
 				<?php
 				$k = 0;
 				$n = count($this->inprogress);
@@ -534,7 +553,6 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
 					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
 			?>
-				<tbody>
 				<tr>
 					<td>
 					<?php
@@ -554,11 +572,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
+				<?php if (count($this->inprogress) < $this->totalrows['inprogress']) : ?>
+				<tr>
+					<td colspan="3" style="padding-top:0!important;"> ... </td>
+				</tr>
+				<?php endif; ?>
 				</tbody>
+				
 				<tfoot>
 				<tr>
 					<td colspan="3">
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >Show All</span><br/>'; ?>
+						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >'.JText::_('FLEXI_ITEMS_MANAGER').'</span><br/>'; ?>
 					</td>
 				</tr>
 				</tfoot>
@@ -567,11 +591,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			
 			<?php if (!isset($ssliders['draft'])): ?>
 			<?php
-			$title = JText::_( 'FLEXI_DRAFT_SLIDER' ).' - <span class="badge badge-info">'.count($this->draft)." / ".$this->totalrows['draft'].'</span>';
+			$title = JText::_( 'FLEXI_DRAFT_SLIDER' ).' - <span class="badge badge-info">'.$this->totalrows['draft'].'</span>';
 			echo JHtml::_('sliders.panel', $title, 'draft' );
 			$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=OQ';
 			?>
 			<table class="fc-table-list">
+				
 				<thead>
 				<tr>
 					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
@@ -579,6 +604,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 				</tr>
 				</thead>
+				
+				<tbody>
 			<?php
 				$k = 0;
 				$n = count($this->draft);
@@ -589,7 +616,6 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					$canEditOwn	= in_array('edit.own', $rights) && $row->created_by == $user->id;
 					$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
 			?>
-				<tbody>
 				<tr>
 					<td>
 					<?php
@@ -609,11 +635,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
+				<?php if (count($this->draft) < $this->totalrows['draft']) : ?>
+				<tr>
+					<td colspan="3" style="padding-top:0!important;"> ... </td>
+				</tr>
+				<?php endif; ?>
 				</tbody>
+				
 				<tfoot>
 				<tr>
 					<td colspan="3">
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >Show All</span><br/>'; ?>
+						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >'.JText::_('FLEXI_ITEMS_MANAGER').'</span><br/>'; ?>
 					</td>
 				</tr>
 				</tfoot>

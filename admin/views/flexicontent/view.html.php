@@ -115,10 +115,12 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// Get data from the model
 		if ( $print_logging_info )  global $fc_run_times;
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$draft      = $model->getDraft();   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['draft'] = $db->loadResult();
-		$pending    = $model->getPending();   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['pending'] = $db->loadResult();
-		$revised    = $model->getRevised();   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['revised'] = $db->loadResult();
-		$inprogress = $model->getInprogress();   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['inprogress'] = $db->loadResult();
+		$totalrows = array();
+		$_total = 0;
+		$draft      = $model->getDraft($_total);       $totalrows['draft'] = $_total;
+		$pending    = $model->getPending($_total);     $totalrows['pending'] = $_total;
+		$revised    = $model->getRevised($_total);     $totalrows['revised'] = $_total;
+		$inprogress = $model->getInprogress($_total);  $totalrows['inprogress'] = $_total;
 		if ( $print_logging_info ) $fc_run_times['quick_sliders'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		

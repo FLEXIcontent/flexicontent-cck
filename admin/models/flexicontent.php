@@ -49,14 +49,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return array
 	 */
-	function getPending()
+	function getPending(&$total=null)
 	{
 		$user = JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
 		$allitems	= $permission->DisplayAllItems;
 		
 		$use_tmp = true;
-		$query_select_ids = 'SELECT c.id'; //SQL_CALC_FOUND_ROWS
+		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
 		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier';
 		
 		$query_from_join = ''
@@ -73,13 +73,20 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
-		$ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$ids = $this->_db->loadColumn();
+		
+		// Get total
+		$this->_db->setQuery("SELECT FOUND_ROWS()");
+		$total = $this->_db->loadResult();
 		
 		$genstats = array();
 		if ( !empty($ids) ) {
 			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')';
 			$this->_db->SetQuery($query, 0, 5);
-			$genstats = $this->_db->loadObjectList();
+			$_data = $this->_db->loadObjectList('id');
+			
+			foreach($ids as $id) $genstats[] = $_data[$id];
+			unset($_data);
 		}
 		return $genstats;
 	}
@@ -90,15 +97,16 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return array
 	 */
-	function getRevised()
+	function getRevised(&$total=null)
 	{
 		$user = JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
 		$allitems	= $permission->DisplayAllItems;
 		
 		$use_tmp = true;
-		$query_select_ids = 'SELECT c.id'.', c.version, MAX(fv.version_id)'; //SQL_CALC_FOUND_ROWS
-		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier'.', c.version, MAX(fv.version_id)';
+		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id'.', c.version, MAX(fv.version_id)';
+		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier'
+			.', c.version, MAX(fv.version_id)';
 		
 		$query_from_join = ''
 				. ' FROM '.($use_tmp ? '#__flexicontent_items_tmp' : '#__content').' as c'
@@ -117,13 +125,21 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
-		$ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$ids = $this->_db->loadColumn();
+		
+		// Get total
+		$this->_db->setQuery("SELECT FOUND_ROWS()");
+		$total = $this->_db->loadResult();
 		
 		$genstats = array();
 		if ( !empty($ids) ) {
-			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')';
+			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')'
+				.' GROUP BY fv.item_id ';
 			$this->_db->SetQuery($query, 0, 5);
-			$genstats = $this->_db->loadObjectList();
+			$_data = $this->_db->loadObjectList('id');
+			
+			foreach($ids as $id) $genstats[] = $_data[$id];
+			unset($_data);
 		}
 		return $genstats;
 	}
@@ -134,7 +150,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return array
 	 */
-	function getDraft()
+	function getDraft(&$total=null)
 	{
 		$user = JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
@@ -142,7 +158,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$requestApproval = @ $permission->RequestApproval;
 		
 		$use_tmp = true;
-		$query_select_ids = 'SELECT c.id'; //SQL_CALC_FOUND_ROWS
+		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
 		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier';
 		
 		$query_from_join = ''
@@ -159,13 +175,20 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
-		$ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$ids = $this->_db->loadColumn();
+		
+		// Get total
+		$this->_db->setQuery("SELECT FOUND_ROWS()");
+		$total = $this->_db->loadResult();
 		
 		$genstats = array();
 		if ( !empty($ids) ) {
 			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')';
 			$this->_db->SetQuery($query, 0, 5);
-			$genstats = $this->_db->loadObjectList();
+			$_data = $this->_db->loadObjectList('id');
+			
+			foreach($ids as $id) $genstats[] = $_data[$id];
+			unset($_data);
 		}
 		return $genstats;
 	}
@@ -176,14 +199,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return array
 	 */
-	function getInprogress()
+	function getInprogress(&$total=null)
 	{
 		$user = JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
 		$allitems	= $permission->DisplayAllItems;
 		
 		$use_tmp = true;
-		$query_select_ids = 'SELECT c.id'; //SQL_CALC_FOUND_ROWS
+		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
 		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier';
 		
 		$query_from_join = ''
@@ -200,13 +223,20 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
-		$ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$ids = $this->_db->loadColumn();
+		
+		// Get total
+		$this->_db->setQuery("SELECT FOUND_ROWS()");
+		$total = $this->_db->loadResult();
 		
 		$genstats = array();
 		if ( !empty($ids) ) {
 			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')';
 			$this->_db->SetQuery($query, 0, 5);
-			$genstats = $this->_db->loadObjectList();
+			$_data = $this->_db->loadObjectList('id');
+			
+			foreach($ids as $id) $genstats[] = $_data[$id];
+			unset($_data);
 		}
 		return $genstats;
 	}
@@ -903,7 +933,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 								. ' AND position = ' . $this->_db->Quote($group)
 								;
 						$this->_db->setQuery( $query );
-						$fieldstopos = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+						$fieldstopos = $this->_db->loadColumn();
 						
 						if ($fieldstopos) {
 							$field = implode(',', $fieldstopos);
@@ -1175,7 +1205,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				// Add the 'categories' field to the fields array for adding to versioning table
 				$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
-				$categories = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$categories = $db->loadColumn();
 				if(!$categories || !count($categories)) {
 					$categories = array($catid = $row->catid);
 					$query = "INSERT INTO #__flexicontent_cats_item_relations VALUES('$catid','".$row->id."', '0');";
@@ -1194,7 +1224,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				// Add the 'tags' field to the fields array for adding to versioning table
 				$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
-				$tags = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$tags = $db->loadColumn();
 				$f = new stdClass();
 				$f->id 					= 14;
 				$f->iscore			= 1;
@@ -1520,7 +1550,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		static $init_required = null;
 		if ( $init_required !== null ) return $init_required;
 		
-		$db = JFactory::getDBO();
+		$db = $this->_db;
 		$component_name = 'com_flexicontent';
 		
 		// DELETE old namespace (flexicontent.*) permissions of v2.0beta, we do not try to rename them ... instead we will use com_content (for some of them),
@@ -1625,7 +1655,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	
 	function initialPermission() {
 		$component_name	= JRequest::getCmd('option');
-		$db 		= JFactory::getDBO();
+		$db     = $this->_db;
 		$asset	= JTable::getInstance('asset');   // Create an asset object
 		
 		/*** Component assets ***/
