@@ -1,3 +1,9 @@
+	function fc_getCookie(name) {
+	  match = document.cookie.match(new RegExp(name + '=([^;]+)'));
+	  if (match) return match[1];
+	  else return '';
+	}
+	
 	function tableOrdering( order, dir, task )
 	{
 		var form = document.getElementById("adminForm");
@@ -50,8 +56,8 @@
 		
 		var var_sep = fcform_action.match(/\?/) ? '&' : '?';
 		
-		for(i=0; i<form.elements.length; i++) {
-			
+		for(i=0; i<form.elements.length; i++)
+		{
 			var element = form.elements[i];
 			if (typeof element.name === "undefined" || element.name === null || !element.name) continue;
 			
@@ -80,6 +86,11 @@
 				extra_action += var_sep + element.name + '=' + encodeURIComponent(element_value);
 				var_sep = '&';
 			}
+		}
+		
+		var fc_uid = fc_getCookie('fc_uid');
+		if (fc_uid!='') {
+			extra_action += var_sep + 'cc' + '=' +fc_uid;
 		}
 		form.action = fcform_action + extra_action;  //alert(form.action);
 		
@@ -330,6 +341,7 @@ jQuery(document).ready(function() {
 				select: function( event, ui ) {
 					//console.log( ui.item  ?  "Selected: " + ui.item.label  :  "Nothing selected, input was " + this.value);
 					var ele = event.target;
+					jQuery(ele).val(ui.item.value); // set value before triggering change
 					jQuery(ele).trigger('change');
 				},
 				open: function() {
@@ -429,3 +441,28 @@ function fc_recalculateWindow()
 	// reset popup overlay containers ... TODO add more ?
 	jQuery('#OverlayContainer').css("height", jQuery('body').css('height'));
 }
+
+
+function fc_replaceUrlParam(url, paramName, paramValue)
+{
+	var pattern = new RegExp('('+paramName+'=).*?(&|$)');
+	return (url.search(pattern)>=0) ?
+		url.replace(pattern,'$1' + paramValue + '$2') :
+		url + (url.indexOf('?')>0 ? '&' : '?') + paramName + '=' + paramValue;
+}
+
+
+
+jQuery(document).ready(function () {
+	
+	var cc = (typeof _FC_GET !="undefined" && 'cc' in _FC_GET ? _FC_GET['cc']: '');
+	var fc_uid = fc_getCookie('fc_uid');
+	
+	if (cc!='' && fc_uid!=cc)
+	{
+		var staleUrl = window.location.href;
+		newUrl = fc_replaceUrlParam(staleUrl, 'cc', fc_uid);
+		window.location.replace(newUrl);
+		document.body.innerHTML = Joomla.JText._('FLEXI_UPDATING_CONTENTS') + ' <img id="loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">';
+	}
+});

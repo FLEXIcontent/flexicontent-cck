@@ -239,12 +239,22 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 			return;
 		}
 		
+		// Check if not inside form
+		$jinput = JFactory::getApplication()->input;
+		if ( $jinput->get('layout', false) != "form" && $jinput->get('task')!='add' && $jinput->get('task')!='edit' )  return; 
+		
 		
 		// Server side validation
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
+		if ( !isset($post[0]) )
+		{
+			JError::raiseWarning(0, 'empty FORM data for field: Account via submit');
+			return false;
+		}
+		
 		
 		// **************************************************************
 		// Validate data, skipping values that are empty after validation
@@ -252,7 +262,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 		$email = flexicontent_html::dataFilter($post[0]['addr'], $maxlength, 'EMAIL', 0);  // Clean bad text/html
 		
 		// Cancel item creation, if email is invalid
-		if (! $email || ! JMailHelper::isEmailAddress($email))
+		if ( !$email || !JMailHelper::isEmailAddress($email) )
 		{
 			$error	=
 				JText::sprintf('FLEXI_ACCOUNT_V_SUBMIT_INVALID_EMAIL', $post[0]['addr']).' '.

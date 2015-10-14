@@ -819,7 +819,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		
 		// Filter the category view with the active language
-		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
+		// But not language filter: favourites
+		if ($filtercat && $this->_layout!='favs') {
 			$lta = FLEXI_J16GE || $use_tmp ? 'i': 'ie';
 			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}

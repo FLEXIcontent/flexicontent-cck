@@ -58,15 +58,17 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		if (JFactory::getApplication()->isAdmin()) $this->handleSerialized();
 		
-		// fix for return urls with unicode aliases
-		$return = JRequest::getVar('return', null);
-		$isfcurl = JRequest::getVar('isfcurl', null);
-		$fcreturn = JRequest::getVar('fcreturn', null);
-		if ($return && ($isfcurl || $fcreturn)) JRequest::setVar('return', strtr($return, '-_,', '+/='));
+		$jinput = JFactory::getApplication()->input;
 		
-		$username	= JRequest::getVar('fcu', null);
-		$password	= JRequest::getVar('fcp', null);
-		$option   = JRequest::getVar('option', null);
+		// Fix for return urls with unicode aliases
+		$return   = $jinput->get('return', null);
+		$isfcurl  = $jinput->get('isfcurl', null);
+		$fcreturn = $jinput->get('fcreturn', null);
+		if ($return && ($isfcurl || $fcreturn)) $jinput->set('return', strtr($return, '-_,', '+/='));
+		
+		$username = $jinput->get('fcu', null);
+		$password = $jinput->get('fcp', null);
+		$option   = $jinput->get('option', null);
 		$session = JFactory::getSession();
 		
 		
@@ -762,18 +764,35 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	/*public function onBeforeCompileHead() {
 	}*/
+
 	public function set_cache_control()
 	{
-		$option = JRequest::getVar('option');
-		$fc_cachable = JFactory::getSession()->get('fc_cachable', null, 'flexicontent');
-		if ($option==$this->extension && $fc_cachable!==null) {
+		$jinput = JFactory::getApplication()->input;
+		$option = $jinput->get('option');
+		$browser_cachable = $jinput->get('browser_cachable', null);
+		if ($option==$this->extension && $browser_cachable!==null)
+		{
+			// Use 1/4 of Joomla cache time for the browser caching
+			$cachetime = (int) JFactory::getConfig()->get('cachetime', 15);
+			$cachetime = $cachetime > 60 ? 60 : ($cachetime < 15 ? 15 : $cachetime);
+			$cachetime = $cachetime * 60;
+			
 			// Try to avoid browser warning message "Page has expired or similar"
 			// This should turning off the 'must-revalidate' directive in the 'Cache-Control' header
-			JResponse::allowCache(false);
-			JResponse::setHeader('Pragma', 'no-cache');
+			JResponse::allowCache($browser_cachable ? true : false);
+			JResponse::setHeader('Pragma', $browser_cachable ? '' :'no-cache');
 			
-			// Ask intermediary (proxy, etc) caches not to cache the response
-			JResponse::setHeader('Cache-Control', 'private');
+			// CONTROL INTERMEDIARY CACHES (PROXY, ETC)
+			// 1:  public content (unlogged user),   2:  private content (logged user)
+			// BUT WE FORCE 'private' to avoid problems with 3rd party plugins and modules, that do cookie-based per visitor content for guests (unlogged users)
+			$cacheControl  = 'private';  // $browser_cachable == 1 ? 'public' : 'private';
+			
+			// SET MAX-AGE, to allow modern browsers to cache the page, despite expires header in the past
+			$cacheControl .= ', max-age=300';
+			JResponse::setHeader('Cache-Control', $cacheControl );
+			
+			// Make sure no legacy proxies any caching !
+			JResponse::setHeader('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
 		}
 	}
 	
@@ -993,8 +1012,8 @@ class plgSystemFlexisystem extends JPlugin
 	 * @return 	void
 	 * @since 1.5
 	 */
-	function changeItemState() {
-		
+	function changeItemState()
+	{
 		$db  = JFactory::getDBO();
 		$app = JFactory::getApplication();
 		
@@ -1447,5 +1466,21 @@ class plgSystemFlexisystem extends JPlugin
 		if ($this->cparams->get('article_jview_fields_placement', 1)!=2) return;
 		
 		return $this->renderFields($context, $row, $params, $page);
+	}
+	
+	
+	// AFTER LOGIN
+	public function onUserAfterLogin($options)
+	{
+		$jcookie = JFactory::getApplication()->input->cookie;
+		$jcookie->set( 'fc_uid', JUserHelper::getShortHashedUserAgent(), 0);
+	}
+	
+	
+	// AFTER LOGOUT
+	public function onUserAfterLogout($options)
+	{
+		$jcookie = JFactory::getApplication()->input->cookie;
+		$jcookie->set( 'fc_uid', 'p', 0);
 	}
 }

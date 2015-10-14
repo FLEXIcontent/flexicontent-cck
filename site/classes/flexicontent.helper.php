@@ -1208,16 +1208,21 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				flexicontent_html::loadFramework('select2');  // make sure select2 is loaded
 				
+				// Make sure user cookie is set
+				$jcookie = $app->input->cookie;
+				$fc_uid = $jcookie->get( 'fc_uid', null);
+				$hashedUA = JFactory::getUser()->id ? JUserHelper::getShortHashedUserAgent() : 'p';
+				if ($fc_uid != $hashedUA)  $jcookie->set( 'fc_uid', $hashedUA, 0);
+				
 				$js .= "
 					var _FC_GET = ".json_encode($_GET).";
 				";
-				//var _FC_POST = ".json_encode($_POST).";
-				//var _FC_REQUEST = ".json_encode($_REQUEST).";
 				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js' );
 				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js' );
 				JText::script("FLEXI_APPLYING_FILTERING", true);
 				JText::script("FLEXI_TYPE_TO_LIST", true);
 				JText::script("FLEXI_TYPE_TO_FILTER", true);
+				JText::script("FLEXI_UPDATING_CONTENTS", true);
 				break;
 			
 			case 'flexi-lib':

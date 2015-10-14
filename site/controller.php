@@ -922,83 +922,117 @@ class FlexicontentController extends JControllerLegacy
 	{
 		// Debuging message
 		//JError::raiseNotice(500, 'IN display()'); // TOREMOVE
+		$CLIENT_CACHEABLE_PUBLIC = 1; $CLIENT_CACHEABLE_PRIVATE = 2;
 		
 		$jinput = JFactory::getApplication()->input;
+		$userid = JFactory::getUser()->get('id');
+		$cc     = $jinput->get('cc', null);
+		$view   = $jinput->get('view');
+		$layout = $jinput->get('layout');
+		
 		
 		// Access checking for --items-- viewing, will be handled by the items model, this is because THIS display() TASK is used by other views too
 		// in future it maybe moved here to the controller, e.g. create a special task item_display() for item viewing, or insert some IF bellow
 		
-		// Compatibility check: Layout is form and task is not set:  this is new item submit ...
+		
+		// ///////////////////////
+		// Display case: ITEM FORM
+		// ///////////////////////
+		
+		// Also a compatibility check: Layout is form and task is not set:  this is new item submit ...
 		if ( $jinput->get('layout', false) == "form" && !$jinput->get('task', false)) {
-			// 0 or 1, will allow browser to store without revalidating, null will let default (Joomla website) HTTP headers, e.g. re-validate
-			JFactory::getSession()->set('fc_cachable', 0, 'flexicontent');
-			
+			$jinput->set('browser_cachable', 0);
 			$jinput->set('task', 'add');
 			$this->add();
+			return;
 		}
 		
-		// Display a FLEXIcontent frontend view (category, item, favourites, etc)
+		
+		
+		// //////////////////////////////////////////////////////////////////////////
+		// Display case: FLEXIcontent frontend view (category, item, favourites, etc)
+		// //////////////////////////////////////////////////////////////////////////
+		
+		
+		// *******************
+		// Handle SERVER Cache
+		// *******************
+		
+		// SHOW RECENT FAVOURED ITEMS IMMEDIATELY: do not cache the view
+		if ($view=='favourites' || ($view=='category' && $layout=='favs')) $cachable = false;
+		
+		// AVOID MAKING TOO LARGE (case 1): search view or other view with TEXT search active
+		else if ($view=='search' || $jinput->get('filter')) $cachable = false;
+				
+		// AVOID MAKING TOO LARGE: (case 2) some field filters are active
 		else {
-			
-			// AVOID MAKING TOO LARGE: (case 1) SEARCH view or OTHER view with TEXT search active
-			if ( $jinput->get('view')=='search' || $jinput->get('filter') ) {
-				$cachable = false;
+			$cachable = true;
+			foreach($_GET as $i => $v) {
+				if (substr($i, 0, 7) === "filter_") {   $cachable = false;   break;   }
 			}
-			
-			// AVOID MAKING TOO LARGE: (case 2) some field filters are active
-			else {
-				$cachable = true;
-				foreach($_GET as $i => $v) {
-					if (substr($i, 0, 7) === "filter_") {
-						$cachable = false;
-						break;
-					}
-				}
-			}
-			
-			// CASE: urlparams were explicitely given
-			if (!empty($urlparams)) $safeurlparams = & $urlparams;
-			
-			// CASE: urlparams are empty, use the FULL URL request array (_GET)
-			else {
-				$safeurlparams = array();
-				// Add menu URL variables
-				$menu = JFactory::getApplication()->getMenu()->getActive();
-				if ($menu) foreach($menu->query as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
-				// Add any existing URL variables (=submitted via GET),  ... we only need variable names, (so can use them unfiltered)
-				foreach($_GET as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
-			}
-			
-			// If component is serving different pages to logged users, this will avoid
-			// having users seeing same page after login/logout when conservative caching is used
-			if ( $userid = JFactory::getUser()->get('id') )
-			{
-				$jinput->set('__fc_user_id__', $userid);
-				$safeurlparams['__fc_user_id__'] = 'STRING';
-			}
-			
-			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-			$use_mobile_layouts  = $cparams->get('use_mobile_layouts', 0);
-			$tabletSameAsDesktop = $cparams->get('force_desktop_layout', 0) == 1;
-			
-			// If component is serving different pages for mobile devices, this will avoid
-			// having users seeing the same page regardless of being on desktop or mobile
-			$mobileDetector = flexicontent_html::getMobileDetector();  //$client = JFactory::getApplication()->client; $isMobile = $client->mobile;
-			$isMobile = $mobileDetector->isMobile();
-			$isTablet = $mobileDetector->isTablet();
-			if ( $use_mobile_layouts && $isMobile && (!$isTablet || !$tabletSameAsDesktop) )
-			{
-				$jinput->set('__fc_client__', 'Mobile' );
-				$safeurlparams['__fc_client__'] = 'STRING';
-			}
-			
-			// Moved code for browser's cache control to system plugin to do at the latest possible point
-			// 0 or 1, will allow browser to store without revalidating, null will let default (Joomla website) HTTP headers, e.g. re-validate
-			JFactory::getSession()->set('fc_cachable', (int)$cachable, 'flexicontent');
-			
-			//echo "cacheable: ".(int)$cachable." - " . print_r($safeurlparams, true) ."<br/>";
-			parent::display($cachable, $safeurlparams);
 		}
+		
+		
+		// ********************
+		// Handle browser Cache
+		// ********************
+		
+		if ( $cc !== null ) {
+			// Currently our plugin will ignore this and force 'private', because of risk to break 3rd party extensions doing cookie-based content per guest
+			$browser_cachable = $userid ? $CLIENT_CACHEABLE_PRIVATE : $CLIENT_CACHEABLE_PUBLIC;
+		} else {
+			$browser_cachable = 0;
+		}
+		
+		
+		// CASE: urlparams were explicitely given
+		if (!empty($urlparams)) $safeurlparams = & $urlparams;
+		
+		// CASE: urlparams are empty, use the FULL URL request array (_GET)
+		else {
+			$safeurlparams = array();
+			// Add menu URL variables
+			$menu = JFactory::getApplication()->getMenu()->getActive();
+			if ($menu) foreach($menu->query as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
+			// Add any existing URL variables (=submitted via GET),  ... we only need variable names, (so can use them unfiltered)
+			foreach($_GET as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
+		}
+		
+		
+		// If component is serving different pages to logged users, this will avoid
+		// having users seeing same page after login/logout when conservative caching is used
+		if ( $userid = JFactory::getUser()->get('id') )
+		{
+			$jinput->set('__fc_user_id__', $userid);
+			$safeurlparams['__fc_user_id__'] = 'STRING';
+		}
+		
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$use_mobile_layouts  = $cparams->get('use_mobile_layouts', 0);
+		$tabletSameAsDesktop = $cparams->get('force_desktop_layout', 0) == 1;
+		
+		// If component is serving different pages for mobile devices, this will avoid
+		// having users seeing the same page regardless of being on desktop or mobile
+		$mobileDetector = flexicontent_html::getMobileDetector();  //$client = JFactory::getApplication()->client; $isMobile = $client->mobile;
+		$isMobile = $mobileDetector->isMobile();
+		$isTablet = $mobileDetector->isTablet();
+		if ( $use_mobile_layouts && $isMobile && (!$isTablet || !$tabletSameAsDesktop) )
+		{
+			$jinput->set('__fc_client__', 'Mobile' );
+			$safeurlparams['__fc_client__'] = 'STRING';
+		}
+		
+		// Moved code for browser's cache control to system plugin to do at the latest possible point
+		// =0, NOT user brower CACHEABLE
+		// >0, user browser CACHEABLE, ask browser to store and redisplay it, without revalidating
+		// *** Intermediary Cache control
+		// 1 means CACHEABLE, PUBLIC  content, proxies can cache: 'Cache-Control:public'
+		// 2 means CACHEABLE, PRIVATE (logged user) content, proxies must not cache: 'Cache-Control:private'
+		// null will let default (Joomla website) HTTP headers, e.g. re-validate
+		$jinput->set('browser_cachable', $browser_cachable);
+		
+		//echo "cacheable: ".(int)$cachable." - " . print_r($safeurlparams, true) ."<br/>";
+		parent::display($cachable, $safeurlparams);
 	}
 
 	/**
