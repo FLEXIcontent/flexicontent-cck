@@ -392,6 +392,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		$itemprop    = $field->parameters->get('microdata_itemprop');
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
@@ -492,6 +493,9 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			// Add prefix / suffix
 			$field->{$prop}[$n]	= $pretext.$date.$posttext;
 			
+			// Add microdata to every value if field -- is -- in a field group
+			if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</span>';
+			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
@@ -502,6 +506,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$field->{$prop} = implode($separatorf, $field->{$prop});
 			if ( $field->{$prop}!=='' ) {
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+				if ( $itemprop )
+				{
+					$field->{$prop} = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}. '</span>';
+				}
 			} else {
 				$field->{$prop} = $no_value_msg;
 			}

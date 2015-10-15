@@ -121,12 +121,19 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			switch ($field->field_type)
 			{
 				case 'created': // created
-					$field->value[] = $item->created;
+					$field->value = array($item->created);
+					
+					// Get date format
 					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;		
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
-					$dateformat = $dateformat ? JText::_($dateformat) :
-						($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
+					$dateformat = $dateformat ? JText::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
+					
+					// Add prefix / suffix
 					$field->{$prop} = $pretext.JHTML::_( 'date', $item->created, $dateformat ).$posttext;
+					
+					// Add microdata to every value if field -- is -- in a field group
+					$itemprop = $field->parameters->get('microdata_itemprop', 'dateCreated');
+					if ($itemprop) $field->{$prop} = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}. '</span>';
 					break;
 				
 				case 'createdby': // created by
@@ -135,12 +142,19 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					break;
 	
 				case 'modified': // modified
-					$field->value[] = $item->modified;
+					$field->value = array($item->modified);
+					
+					// Get date format
 					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;		
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
-					$dateformat = $dateformat ? JText::_($dateformat) :
-						($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
+					$dateformat = $dateformat ? JText::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
+					
+					// Add prefix / suffix
 					$field->{$prop} = $pretext.JHTML::_( 'date', $item->modified, $dateformat ).$posttext;
+					
+					// Add microdata to every value if field -- is -- in a field group
+					$itemprop = $field->parameters->get('microdata_itemprop', 'dateModified');
+					if ($itemprop) $field->{$prop} = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}. '</span>';
 					break;
 				
 				case 'modifiedby': // modified by
