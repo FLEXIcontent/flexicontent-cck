@@ -317,7 +317,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ this.remove(); });
+					row.slideUp(400, function(){ jQuery(this).remove(); });
 					rowCount".$field->id."--;
 				}
 			}

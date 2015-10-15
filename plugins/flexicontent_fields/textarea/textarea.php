@@ -293,7 +293,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 							//if (hasCodeMirror) window.console.log ('Removing CodeMirror in Termlist Field');
 							if (hasCodeMirror) jQuery(txtarea).first().next().get(0).CodeMirror.toTextArea();
 						});
-						this.remove();
+						jQuery(this).remove();
 					});
 					rowCount".$field->id."--;
 				}
