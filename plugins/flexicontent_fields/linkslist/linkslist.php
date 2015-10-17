@@ -107,7 +107,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		
 		$options = array();
 		
-		// Render as mult-select form field
+		// Render as multi-select form field
 		if ( $field->parameters->get( 'editform_field_type', 1 ) == 2 )
 		{
 			foreach ($elements as $li_title => $li_params) {
@@ -123,9 +123,12 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 			foreach ($elements as $li_title => $li_title)
 			{
 				$checked  = in_array($li_title, $field->value) ? ' checked="checked"' : null;
-				$options[] =
-					'<input type="checkbox" class="'.$required.'" name="'.$fieldname.'" value="'.$li_title.'" id="'.$elementid.'_'.$n.'"'.$checked.' />'.
-					'<label for="'.$elementid.'_'.$n.'">'.$li_title.'</label>';
+				$options[] = ''
+					.$pretext
+					.'<input type="checkbox" class="'.$required.'" name="'.$fieldname.'" value="'.$li_title.'" id="'.$elementid.'_'.$n.'"'.$checked.' />'
+					.'<label for="'.$elementid.'_'.$n.'">'.$li_title.'</label>'
+					.$posttext
+					;
 				$n++;
 			}
 			

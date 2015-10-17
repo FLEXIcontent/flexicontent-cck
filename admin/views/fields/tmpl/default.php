@@ -117,16 +117,6 @@ function delAllFilters() {
 	delFilter('filter_fieldtype'); delFilter('filter_state');  delFilter('filter_access');
 }
 
-jQuery(function($) {
-	SqueezeBox.initialize({});
-	SqueezeBox.assign($('a.modal').get(), {
-		parse: 'rel'
-	});
-});
-function jModalClose() {
-	SqueezeBox.close();
-}
-
 </script>
 
 
@@ -460,8 +450,8 @@ function jModalClose() {
 							$_tip_title = JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->editor, $row->checked_out_time);
 						}
 						?>
-						<a class="jgrid <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
-							<img src="components/com_flexicontent/assets/images/lock_delete.png" alt="Check-in" class="fc-man-icon-s" />
+						<a class="btn btn-micro <?php echo $tip_class; ?>" title="<?php echo $_tip_title; ?>" href="javascript:;" onclick="var ccb=document.getElementById('cb<?php echo $i;?>'); ccb.checked=1; ccb.form.task.value='<?php echo $task_str; ?>'; ccb.form.submit();">
+							<span class="icon-checkedout"></span>
 						</a>
 						<?php
 					} else {

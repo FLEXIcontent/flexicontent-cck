@@ -64,6 +64,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field-->
+			<!--field name="autodel_files" type="radio" default="1" label="Auto-delete files" description="Select to auto-delete no longer used files, otherwise it will be up to the user to manually delete no longer used files via the 'my files' file listing" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
 			
 			<field name="" type="separator" default="My Files (popup list)" description="" level="level2" depend_class="" />
 			<field name="use_myfiles" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_ENABLE" description="Enable to allow selecting an existing file that was previously uploaded" class="btn-group group-fcmethod">

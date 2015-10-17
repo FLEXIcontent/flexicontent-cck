@@ -93,7 +93,11 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 	  if ( $use_select2 && $select2_added === null ) $select2_added = flexicontent_html::loadFramework('select2');
 		
 		// Parameters for DISPLAY with / without using select2 JS
-		// ...
+		// ... none such parameters
+		
+		// Custom HTML placed before / after form field
+		$opentag   = $field->parameters->get( 'opentag_form', '' ) ;
+		$closetag  = $field->parameters->get( 'closetag_form', '' ) ;
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
@@ -360,7 +364,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			{
 				$fieldname_n = $fieldname.'['.$n.']'. (self::$valueIsArr ? '[]' : '');
 				$elementid_n = $elementid.'_'.$n;
-				$form_field = JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n);
+				$form_field = $opentag . JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n) . $closetag;
 				
 				$field->html[] = '
 					'.$form_field.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'

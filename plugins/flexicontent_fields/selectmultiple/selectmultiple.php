@@ -102,6 +102,9 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$size = $field->parameters->get( 'size', 6 ) ;
 		$size = $size ? ' size="'.$size.'"' : '';
 		
+		// Custom HTML placed before / after form field
+		$opentag   = $field->parameters->get( 'opentag_form', '' ) ;
+		$closetag  = $field->parameters->get( 'closetag_form', '' ) ;
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
@@ -381,7 +384,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			{
 				$fieldname_n = $fieldname.'['.$n.']'. (self::$valueIsArr ? '[]' : '');
 				$elementid_n = $elementid.'_'.$n;
-				$form_field = JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n);
+				$form_field = $opentag . JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n) . $closetag;
 				
 				$field->html[] = '
 					'.$form_field.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'

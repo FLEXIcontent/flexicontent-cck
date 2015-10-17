@@ -100,11 +100,11 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
 		
 		// Prefix - Suffix - Separator (item FORM) parameters, for the checkbox/radio elements
-		$pretext			= $field->parameters->get( 'pretext_form', '' ) ;
-		$posttext			= $field->parameters->get( 'posttext_form', '' ) ;
-		$separator		= $field->parameters->get( 'separator', 0 ) ;
-		$opentag			= $field->parameters->get( 'opentag_form', '' ) ;
-		$closetag			= $field->parameters->get( 'closetag_form', '' ) ;
+		$pretext   = $field->parameters->get( 'pretext_form', '' ) ;
+		$posttext  = $field->parameters->get( 'posttext_form', '' ) ;
+		$separator = $field->parameters->get( 'separator', 0 ) ;
+		$opentag   = $field->parameters->get( 'opentag_form', '' ) ;
+		$closetag  = $field->parameters->get( 'closetag_form', '' ) ;
 		
 		switch($separator)
 		{
