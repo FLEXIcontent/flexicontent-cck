@@ -1845,12 +1845,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 				if ($debug_inheritcid) array_push($merge_stack, "MERGED CATEGORY PARAMETERS of (current) menu item: ".$menu->id);
 			} else if ($menu_matches) {
 				// Add menu parameters - not - related to category parameters override
-				$params->set( 'item_depth', $menu_params->get('item_depth') );
 				$params->set( 'page_title', $menu_params->get('page_title') );
 				$params->set( 'show_page_heading', $menu_params->get('show_page_heading') );
 				$params->set( 'page_heading', $menu_params->get('page_heading') );
-				$params->set( 'pageclass_sfx', $menu_params->get('pageclass_sfx') );
 			}
+			// Always add these
+			$params->set( 'item_depth', $menu_params->get('item_depth') );
+			$params->set( 'pageclass_sfx', $menu_params->get('pageclass_sfx') );
 		}
 		
 		
