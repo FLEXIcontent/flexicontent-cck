@@ -80,6 +80,10 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
 		$attribs .= ' size="'.$size.'" ';
 		
+		// Custom HTML placed before / after form fields
+		$pretext  = $field->parameters->get( 'pretext_form', '' ) ;
+		$posttext = $field->parameters->get( 'posttext_form', '' ) ;
+		
 		
 		// **********************
 	  // Create validation mask
@@ -96,8 +100,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
-			$field->value = array();
-			$field->value[0] = $default_value;
+			$field->value = array($default_value);
 		}
 		
 		// CSS classes of value container
@@ -141,6 +144,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 					return 'cancel';
 				}
 				
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				";
@@ -300,9 +304,11 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$elementid_n = $elementid.'_'.$n;
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$text_field = '<input value="'
-				.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).
-			'" '. $validate_mask .' id="'.$elementid_n.'" name="'.$fieldname_n.'" class="'.$classes.'" type="text" '.$attribs.' />';
+			$text_field = $pretext.
+				'<input value="'.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).'" '
+					.$validate_mask.' id="'.$elementid_n.'" name="'.$fieldname_n.'" class="'.$classes.'" type="text" '.$attribs.'
+				/>'
+				.$posttext;
 			
 			$field->html[] = '
 				'.$text_field.'
@@ -416,6 +422,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
+		// Microdata (classify the field values for search engines)
 		$itemprop    = $field->parameters->get('microdata_itemprop');
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }

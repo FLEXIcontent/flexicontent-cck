@@ -53,7 +53,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
 		$default_values	= $field->parameters->get( 'default_values', '' ) ;
 		
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		// Prefix - Suffix - Separator (item FORM) parameters
 		$pretext			= $field->parameters->get( 'pretext_form', '' ) ;
 		$posttext			= $field->parameters->get( 'posttext_form', '' ) ;
 		$separator		= $field->parameters->get( 'separator', 0 ) ;

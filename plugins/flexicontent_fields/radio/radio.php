@@ -388,7 +388,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		
 		$field->html = array();
 		$n = $ajax ? $field->valindex : 0;
-		$js = "";
+		$per_val_js = '';
 		foreach ($values as $value)
 		{
 			// Compatibility for serialized values
@@ -457,13 +457,11 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 					';
 				
 				// Listen to the changes of cascade-after field
-				if ($cascade_after && !$ajax) $js .= "
-				jQuery(document).ready(function(){
+				if ($cascade_after && !$ajax) $per_val_js .= "
 					fc_cascade_field_funcs['".$srcELid.'_'.$n."'] = function(){
 						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$n.", input.".$srcELid.'_'.$n."', '".$trgELid.'_'.$n."', '".$cascade_prompt."', ".self::$promptEnabled.", ".$n.");
 					}
 					fc_cascade_field_funcs['".$srcELid.'_'.$n."']();
-				});
 				";
 			} else {
 				$field->html = $form_field;
@@ -472,7 +470,12 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
-		if ($js)  $document->addScriptDeclaration($js);
+		if ($per_val_js)
+			$document->addScriptDeclaration('
+				jQuery(document).ready(function(){
+					'.$per_val_js.'
+				});
+			');
 		
 		
 		if ($ajax) {
