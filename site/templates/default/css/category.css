@@ -48,7 +48,7 @@
 }
 
 
-.fc_item_title {
+.fc_item_title a {
 	display: inline-block;
 	float: left;
 	font-size: 14px;

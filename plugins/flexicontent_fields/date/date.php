@@ -494,7 +494,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$field->{$prop}[$n]	= $pretext.$date.$posttext;
 			
 			// Add microdata to every value if field -- is -- in a field group
-			if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</span>';
+			if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
@@ -508,7 +508,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 				if ( $itemprop )
 				{
-					$field->{$prop} = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}. '</span>';
+					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 				}
 			} else {
 				$field->{$prop} = $no_value_msg;

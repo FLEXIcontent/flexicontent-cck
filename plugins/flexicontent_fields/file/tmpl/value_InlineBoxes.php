@@ -227,10 +227,10 @@ foreach($files_data as $file_id => $file_data)
 			
 			$attribs  = ' class="'. $addtocart_classes .'"';
 			$attribs .= ' title="'. $addtocartinfo .'"';
-			$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filetitle,'s') .'"';
-			$attribs .= ' fieldid="'. $field->id .'"';
-			$attribs .= ' contentid="'. $item->id .'"';
-			$attribs .= ' fileid="'. $file_data->id .'"';
+			$attribs .= ' data-filename="'. flexicontent_html::escapeJsText($_filetitle,'s') .'"';
+			$attribs .= ' data-fieldid="'. $field->id .'"';
+			$attribs .= ' data-contentid="'. $item->id .'"';
+			$attribs .= ' data-fileid="'. $file_data->id .'"';
 			$actions_arr[] =
 				'<input type="button" '. $attribs .' value="'.$addtocarttext.'" />';
 		}
@@ -322,14 +322,14 @@ foreach($files_data as $file_id => $file_data)
 	//Display the buttons "DOWNLOAD, SHARE, ADD TO CART" before or after the filename
 	if ($buttonsposition) {
 		$str .= (count($actions_arr) ?  $infoseptxt : "")
-			.'<span class="fcfile_actions">'
+			.'<div class="fcfile_actions">'
 			.  implode($actions_arr, $actionseptxt)
-			.'</span>';
+			.'</div>';
 	} else {
 		$str = (count($actions_arr) ?  $infoseptxt : "")
-			.'<span class="fcfile_actions">'
+			.'<div class="fcfile_actions">'
 			.  implode($actions_arr, $actionseptxt)
-			.'</span>'.$str;
+			.'</div>'.$str;
 	}
 	
 	// [4]: Add the file description (if displayed inline)

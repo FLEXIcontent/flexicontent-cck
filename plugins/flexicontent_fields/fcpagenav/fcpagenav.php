@@ -158,7 +158,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					<a class="btn btn-info" href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)).'?start='.$start .'">' . htmlspecialchars($category_label, ENT_NOQUOTES, 'UTF-8')
 						.($cat_image ? '
 						<br/>
-						<img src="'.$cat_image.'"/>' : '') .'
+						<img src="'.$cat_image.'" alt="Return"/>' : '') .'
 					</a>
 				</span>';
 			}
@@ -184,7 +184,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8') ).'
 					'.(isset($thumbs[$field->prev->id]) ? '
 						<br/>
-						<img src="'.$thumbs[$field->prev->id].'"/>
+						<img src="'.$thumbs[$field->prev->id].'" alt="Previous"/>
 					' : '').'
 				</a>
 			</span>'
@@ -211,7 +211,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8') ).'
 					'.(isset($thumbs[$field->next->id]) ? '
 						<br/>
-						<img src="'.$thumbs[$field->next->id].'"/>
+						<img src="'.$thumbs[$field->next->id].'" alt="Next"/>
 					' : '').'
 				</a>
 			</span>'

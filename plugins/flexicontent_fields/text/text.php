@@ -475,7 +475,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$field->{$prop}[$n]	= $pretext . $value . $posttext;
 			
 			// Add microdata to every value if field -- is -- in a field group
-			if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</span>';
+			if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
@@ -495,7 +495,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 				// Add microdata once for all values, if field -- is NOT -- in a field group
 				if ( $itemprop )
 				{
-					$field->{$prop} = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}. '</span>';
+					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 				}
 			}
 		}

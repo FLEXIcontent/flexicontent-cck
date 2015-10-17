@@ -151,17 +151,19 @@ foreach ($items as $i => $item) :
 	
 	<?php if ($this->params->get('show_title', 1)) : ?>
 		<!-- BOF item title -->
-		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading"><span class="fc_item_title">
+		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading">
+			<span class="fc_item_title" itemprop="name">
 			<?php $_title = ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) ?
 				mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...' : $item->title; ?>
 			<?php if ($this->params->get('link_titles', 0)) : ?>
-   			<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>">
+   			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>">
 					<?php echo $_title; ?>
 				</a>
  			<?php else : ?>
 				<?php echo $_title; ?>
 			<?php endif; ?>
-		</span><?php echo '</h'.$itemTitleHeaderLevel; ?>>
+			</span>
+		<?php echo '</h'.$itemTitleHeaderLevel; ?>>
 		<!-- EOF item title -->
 	<?php endif; ?>
 	

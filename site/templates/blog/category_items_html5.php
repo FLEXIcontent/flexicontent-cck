@@ -281,15 +281,17 @@ if ($leadnum) :
 			<?php endif; ?>
 			
 			<?php if ($this->params->get('show_title', 1)) : ?>
-				<h2 class="contentheading"><span class="fc_item_title">
+				<!-- BOF item title -->
+				<h2 class="contentheading">
+					<span class="fc_item_title" itemprop="name">
 					<?php if ($this->params->get('link_titles', 0)) : ?>
-					<a href="<?php echo $link_url; ?>"><?php echo $item->title; ?></a>
-					<?php
-					else :
-					echo $item->title;
-					endif;
-					?>
-				</span></h2>
+						<a href="<?php echo $link_url; ?>"><?php echo $item->title; ?></a>
+					<?php else : ?>
+						<?php echo $item->title; ?>
+					<?php endif; ?>
+					</span>
+				</h2>
+				<!-- EOF item title -->
 			<?php endif; ?>	
 			
 			<!-- BOF afterDisplayTitle -->
@@ -646,15 +648,15 @@ if ($count > $leadnum) :
 			<?php endif; ?>
 				
 			<?php if ($this->params->get('show_title', 1)) : ?>
-				<h2 class="contentheading"><span class="fc_item_title">
+				<h2 class="contentheading">
+					<span class="fc_item_title" itemprop="name">
 					<?php if ($this->params->get('link_titles', 0)) : ?>
-					<a href="<?php echo $link_url; ?>"><?php echo $item->title; ?></a>
-					<?php
-					else :
-					echo $item->title;
-					endif;
-					?>
-				</span></h2>
+						<a href="<?php echo $link_url; ?>"><?php echo $item->title; ?></a>
+					<?php else : ?>
+						<?php echo $item->title; ?>
+					<?php endif; ?>
+					</span>
+				</h2>
 			<?php endif; ?>
 				
 			<!-- BOF afterDisplayTitle -->

@@ -255,14 +255,16 @@ foreach ($cat_items as $catid => $items) :
 						
 								<?php if ($this->params->get('show_title', 1)) : ?>
 									<!-- BOF item title -->
+									<span class="fc_item_title" itemprop="name">
 									<?php if ($this->params->get('link_titles', 0)) : ?>
-						   			<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>">
+						   			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>">
 											<?php echo $item->title; ?>
 										</a>
 					   			<?php else : ?>
 										<?php echo $item->title; ?>
 									<?php endif; ?>
-									<!-- BOF item title -->
+									</span>
+									<!-- EOF item title -->
 								<?php endif; ?>
 								
 								<div class="clear"></div>

@@ -131,9 +131,9 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					// Add prefix / suffix
 					$field->{$prop} = $pretext.JHTML::_( 'date', $item->created, $dateformat ).$posttext;
 					
-					// Add microdata to every value if field -- is -- in a field group
+					// Add microdata property
 					$itemprop = $field->parameters->get('microdata_itemprop', 'dateCreated');
-					if ($itemprop) $field->{$prop} = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}. '</span>';
+					if ($itemprop) $field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 					break;
 				
 				case 'createdby': // created by
@@ -152,9 +152,9 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					// Add prefix / suffix
 					$field->{$prop} = $pretext.JHTML::_( 'date', $item->modified, $dateformat ).$posttext;
 					
-					// Add microdata to every value if field -- is -- in a field group
+					// Add microdata property
 					$itemprop = $field->parameters->get('microdata_itemprop', 'dateModified');
-					if ($itemprop) $field->{$prop} = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}. '</span>';
+					if ($itemprop) $field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 					break;
 				
 				case 'modifiedby': // modified by
@@ -178,6 +178,10 @@ class plgFlexicontent_fieldsCore extends JPlugin
 							JFactory::getDocument()->addCustomTag('<meta property="og:title" content="'.$content_val.'" />');
 						}
 					}
+					
+					// Add microdata property (currently no parameter in XML for this field)
+					$itemprop = $field->parameters->get('microdata_itemprop', 'name');
+					if ($itemprop) $field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 					break;
 	
 				case 'hits': // hits
@@ -217,15 +221,15 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$field->value[] = 'button'; // dummy value to force display
 					$favs = flexicontent_html::favoured_userlist( $field, $item, $favourites);
 					$field->{$prop} = $pretext.'
-					<span class="fav-block">
+					<div class="fav-block">
 						'.flexicontent_html::favicon( $field, $favoured, $item ).'
-						<span id="fcfav-reponse_item_'.$item->id.'" class="fcfav-reponse">
+						<div id="fcfav-reponse_item_'.$item->id.'" class="fcfav-reponse-tip">
 							<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage '.($favoured ? 'fcfavs-is-subscriber' : 'fcfavs-isnot-subscriber').'">
 								'.JText::_($favoured ? 'FLEXI_FAVS_YOU_HAVE_SUBSCRIBED' : 'FLEXI_FAVS_CLICK_TO_SUBSCRIBE').'
 							</div>
 							'.$favs.'
-						</span>
-					</span>
+						</div>
+					</div>
 						'.$posttext;
 					break;
 	

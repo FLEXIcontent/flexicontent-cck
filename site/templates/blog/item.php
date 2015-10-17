@@ -102,17 +102,20 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 	<!-- EOF page title -->
 	<?php endif; ?>
 
+	
 	<?php if ($this->params->get('show_title', 1)) : ?>
 	<!-- BOF item title -->
-	<h2 class="contentheading"><span class="fc_item_title">
-		<?php
-		if ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
-			echo mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
-		else :
-			echo $item->title;
-		endif;
-		?>
-	</span></h2>
+	<h2 class="contentheading">
+		<span class="fc_item_title" itemprop="name">
+			<?php
+			if ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
+				echo mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
+			else :
+				echo $item->title;
+			endif;
+			?>
+		</span>
+	</h2>
 	<!-- EOF item title -->
 	<?php endif; ?>
 	
@@ -196,14 +199,14 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 	<!-- BOF beforedescription block -->
 	<div class="customblock beforedescription group">
 		<?php foreach ($item->positions['beforedescription'] as $field) : ?>
-		<span class="element <?php echo $columnmode; ?>">
+		<div class="element <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
 			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<span class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>">
+			<div class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>">
 				<?php echo $field->display; ?>
-			</span>
-		</span>
+			</div>
+		</div>
 		<?php endforeach; ?>
 	</div>
 	<!-- EOF beforedescription block -->
@@ -220,14 +223,14 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 	<!-- BOF afterdescription block -->
 	<div class="customblock afterdescription group">
 		<?php foreach ($item->positions['afterdescription'] as $field) : ?>
-		<span class="element <?php echo $columnmode; ?>">
+		<div class="element <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
 			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<span class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>">
+			<div class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>">
 				<?php echo $field->display; ?>
-			</span>
-		</span>
+			</div>
+		</div>
 		<?php endforeach; ?>
 	</div>
 	<!-- EOF afterdescription block -->
@@ -237,19 +240,19 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 	<!-- BOF item categories, tags -->
 	<div class="itemadditionnal group">
 		<?php if ($this->params->get('show_category', 1)) : ?>
-		<span class="categories">
+		<div class="categories">
 			<?php FlexicontentFields::getFieldDisplay($item, 'categories', $values=null, $method='display'); ?>
 			<span class="flexi label"><?php echo $this->fields['categories']->label; ?></span>
-			<span class="flexi value"><?php echo $this->fields['categories']->display; ?></span>
-		</span>
+			<div class="flexi value"><i class="icon-folder-open"></i> <?php echo $this->fields['categories']->display; ?></div>
+		</div>
 		<?php endif; ?>
 
 		<?php FlexicontentFields::getFieldDisplay($item, 'tags', $values=null, $method='display'); ?>
 		<?php if ($this->params->get('show_tags', 1) && $this->fields['tags']->display) : ?>
-		<span class="tags">
+		<div class="tags">
 			<span class="flexi label"><?php echo $this->fields['tags']->label; ?></span>
-			<span class="flexi value"><?php echo $this->fields['tags']->display; ?></span>
-		</span>
+			<div class="flexi value"><i class="icon-tags"></i> <?php echo $this->fields['tags']->display; ?></div>
+		</div>
 		<?php endif; ?>
 	</div>
 	<!-- EOF item categories, tags  -->

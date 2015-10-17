@@ -1,21 +1,11 @@
 /* Faq Theme : category template CSS file */
 
-#flexicontent .flexi.label,
-#flexicontent .flexi.value
-{
-	display:block;
-	float:left;
-	max-width: 100% !important;  /* Allow responsive width while floating */
-	padding: 0% !important;  /* Allow responsive width while floating */
-}
-
-#flexicontent .flexi.label
-{
-	padding: 3px 3px !important;
+#flexicontent .flexi.label {
+	padding: 3px 3px;
 }
 
 #flexicontent .fc_markup.mu_has_text {
-	margin: 2px 2px 0px 2px !important;
+	margin: 2px 2px 0px 2px;
 }
 
 #flexicontent ul.faqblock {

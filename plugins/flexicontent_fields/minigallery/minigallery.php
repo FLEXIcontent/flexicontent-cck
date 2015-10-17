@@ -628,26 +628,26 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				$img_path = (substr($file_data->filename, 0,7)!='http://' || substr($file_data->filename, 0,8)!='https://') ?
 					JURI::root(true) . '/' . $mediapath . '/' . $file_data->filename :
 					$file_data->filename ;
-				$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
-				$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
+				$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_s.'&amp;h='.$h_s.'&amp;zc=1';
+				$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_l.'&amp;h='.$h_l.'&amp;zc=1';
 				$ext = pathinfo($img_path, PATHINFO_EXTENSION);
 				if ( in_array( $ext, array('png', 'ico', 'gif') ) ) {
-					$srcs .= '&f='. $ext;
-					$srcb .= '&f='. $ext;
+					$srcs .= '&amp;f='. $ext;
+					$srcb .= '&amp;f='. $ext;
 				}
 
 				if ($usecaptions===1) $captions = htmlspecialchars($file_data->altname, ENT_COMPAT, 'UTF-8');
 				if ($usepopup && $popuptype == 4) {
 					$display[] = '
 						<a href="'.$img_path.'" class="fc_image_thumb fancybox" '.$group_str.' title="'.$captions.'" >
-							<img src="'.$srcb.'" id="'.$htmltag_id.'_'.$n.'" alt="'.$captions.'" border="0" itemprop="image" />
+							<img src="'.$srcb.'" id="'.$htmltag_id.'_'.$n.'" alt="'.$captions.'" style="border:0" itemprop="image" />
 						</a>';
 				} else {
 					$display[] = '
-						<a href="javascript:;"><img src="'.$srcb.'" id="'.$htmltag_id.'_'.$n.'" alt="'.$captions.'" border="0" itemprop="image" /></a>';
+						<a href="javascript:;"><img src="'.$srcb.'" id="'.$htmltag_id.'_'.$n.'" alt="'.$captions.'" style="border:0" itemprop="image" /></a>';
 				}
 				$thumbs[] = '
-					<li><a href="#'.$htmltag_id.'_'.$n.'"><img src="'.$srcs.'" border="0" itemprop="image"/></a></li>';
+					<li><a href="#'.$htmltag_id.'_'.$n.'"><img src="'.$srcs.'" style="border:0" itemprop="image" alt="'.$captions.'"/></a></li>';
 				$n++;
 			}
 		}

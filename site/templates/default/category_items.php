@@ -201,13 +201,18 @@ endif;
 			<?php endif; ?>
 			
 			<div class="fcclear fc_afterbutton"></div>
-			<!-- BOF item title -->
+			
 			<?php if ($show_title) : ?>
+				<!-- BOF item title -->
+				<span class="fc_item_title" itemprop="name">
 				<?php if ($link_titles) : ?>
-					<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>"><?php echo $item->title; ?></a>
-				<?php else : echo $item->title; endif; ?>
+					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>"><?php echo $item->title; ?></a>
+   			<?php else : ?>
+					<?php echo $item->title; ?>
+				<?php endif; ?>
+				</span>
+				<!-- EOF item title -->
 			<?php endif; ?>
-			<!-- EOF item title -->
 			
 			<div class="fcclear fc_beforemarkups"></div>
 			<?php echo $markup_tags; ?>

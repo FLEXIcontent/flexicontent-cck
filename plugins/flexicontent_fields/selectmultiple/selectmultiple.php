@@ -762,7 +762,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		// Add microdata to every group of values if field -- is -- in a field group
 		if ($is_ingroup && $itemprop) {
 			foreach($field->{$prop} as $n => $disp_html) {
-				$field->{$prop}[$n] = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</span>';
+				$field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';
 			}
 		}
 		
@@ -783,7 +783,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			// Add microdata once for all values, if field -- is NOT -- in a field group
 			if ( $field->{$prop}!=='' && $itemprop )
 			{
-				$field->{$prop} = '<span itemprop="'.$itemprop.'" >' .$field->{$prop}. '</span>';
+				$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
 			}
 		}
 	}

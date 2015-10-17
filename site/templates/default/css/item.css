@@ -78,21 +78,6 @@
 }
 
 
-/* Field label & values styling */
-span.flexi.label, .flexi.label {
-	display: block;
-	float: left;
-	font-size: 90%;
-	margin-right: 8px;
-}
-span.flexi.value, .flexi.value {
-	display: block;
-	float: left;
-	max-width: 100% !important;  /* Allow responsive width while floating */
-	padding: 0% !important;  /* Allow responsive width while floating */
-}
-
-
 /* Field values into 1 column */
 .onecols ul li.flexi {
 	width: 100%;

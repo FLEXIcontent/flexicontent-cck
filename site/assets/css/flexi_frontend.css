@@ -105,7 +105,8 @@
 /**********************************
  * FLEXIcontent headlines and title
  **********************************/
-#flexicontent .fc_item_title {
+#flexicontent .fc_item_title,
+#flexicontent .fc_item_title a {
 	text-decoration: none;
 }
 #flexicontent .fc_item_title img {
@@ -452,17 +453,17 @@ div table.adminform td {
  *************************/
 
 .fav-block {
-	clear: both;
+	display: inline-block;
 }
-
+.fcfav-reponse-tip {
+	display: inline-block;
+}
 .fav-block img {
 	vertical-align: middle;
 }
-
 .favlink {
 	outline: none;
 }
-
 .fcfav img {
 }
 
@@ -625,6 +626,7 @@ div.current dd {
 	margin: 4px;
 	float:left;
 	clear: both;
+	display:inline-block;
 }
 
 
@@ -1086,17 +1088,17 @@ div.fancybox-wrap a {
 	/*background-color: #999;*/
 }
 /* Field label & values styling */
-span.flexi.label, .flexi.label {
+div.flexi.label, .flexi.label {
 	display: block;
 	float: left;
-	font-size: 90%;
 	margin: 2px 8px 2px 0px;
 }
-span.flexi.value, .flexi.value {
+div.flexi.value, .flexi.value {
 	display: block;
 	float: left;
 	max-width: 100% !important;  /* Allow responsive width while floating */
 	padding: 0% !important;  /* Allow responsive width while floating */
+	margin: 0% !important;  /* Allow responsive width while floating */
 }
 
 /* e.g. in Joomla views */

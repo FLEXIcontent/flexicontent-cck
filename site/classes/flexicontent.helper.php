@@ -2625,7 +2625,7 @@ class flexicontent_html
 			$dovote_class = $has_acclvl ? 'fc_dovote' : '';
 			for ($i=1; $i<=$rating_resolution; $i++) {
 				$html_vote_links .= '
-					<li class="voting-links"><a onclick="'.$onclick.'" href="'.$href.'" title="'.$star_tooltips[$i].'" class="'.$dovote_class.' '.$star_classes[$i].'" rel="'.$id.'_'.$xid.'">'.$i.'</a></li>';
+					<li class="voting-links"><a onclick="'.$onclick.'" href="'.$href.'" title="'.$star_tooltips[$i].'" class="'.$dovote_class.' '.$star_classes[$i].'" data-rel="'.$id.'_'.$xid.'">'.$i.'</a></li>';
 			}
 		}
 		

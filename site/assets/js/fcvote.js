@@ -9,7 +9,7 @@ jQuery(document).ready(function(){
 	{
 		jQuery('.fcvote a.fc_dovote').on('click', function(e){
 			
-			var data_arr = jQuery(this).attr('rel').split("_");
+			var data_arr = jQuery(this).attr('data-rel').split("_");
 			var itemID = data_arr[0];
 			// Extra voting option
 			if (typeof(data_arr[1])!="undefined" && data_arr[1]) {
