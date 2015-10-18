@@ -131,9 +131,9 @@ class JFormFieldFilters extends JFormFieldList
 		
 		$and = ((boolean)@$attributes['isnotcore']) ? ' AND iscore = 0' : '';
 		if ((boolean)@$attributes['fieldnameastext']) {
-			$text = 'CONCAT(label, \'(\', `name`, \')\')';
+			$otext = "CONCAT(label, ' [', `name`, ']')";
 		} else {
-			$text = 'label';
+			$otext = "label";
 		}
 		if ((boolean)@$attributes['fieldnameasvalue']) {
 			$ovalue = 'name';
@@ -183,18 +183,39 @@ class JFormFieldFilters extends JFormFieldList
 			if ($tid) $and .= " AND ftr.type_id=" . $tid;
 		}
 		
-		$query = 'SELECT f.*, f.'.$ovalue.' AS value, f.label AS text '
-		. ' FROM #__flexicontent_fields AS f '
-		.($tid ? ' JOIN #__flexicontent_fields_type_relations AS ftr ON ftr.field_id = f.id' : '')
-		. ' WHERE published = 1'
-		. $and
-		. ' ORDER BY label ASC, id ASC'
+		
+		// Get field data
+		$query = 'SELECT f.*, f.'.$ovalue.' AS value,'.$otext.' AS text, f.id '
+			.' FROM #__flexicontent_fields AS f '
+			.($tid ? ' JOIN #__flexicontent_fields_type_relations AS ftr ON ftr.field_id = f.id' : '')
+			. ' WHERE published = 1'
+			.$and
+			.' ORDER BY label ASC, id ASC'
 		;
 		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList($ovalue);
-		//echo "<pre>"; print_r($fields); exit;
-
+		
+		
+		// Handle fields having the same label
+		$_keys = array_keys($fields);
+		$_total = count($fields);
+		$_dupls = array();
+		foreach($_keys as $i => $key)
+		{
+			if ($i == $_total-1) continue;
+			if ($fields[$key]->text == $fields[ $_keys[$i+1] ]->text)
+			{
+				$_dupls[ $key ] = $_dupls[ $_keys[$i+1] ] = 1;
+			}
+		}
+		foreach($_dupls as $_dkey => $i)
+		{
+			$fields[$_dkey]->text .= ' :: ' .$fields[$_dkey]->id;
+		}
+		
+		
+		// Render parameters if needed
 		$groupables = @$attributes['groupables'];
 		if ($groupables) {
 			$_fields = array();
@@ -205,6 +226,7 @@ class JFormFieldFilters extends JFormFieldList
 			$fields = $_fields;
 		}
 		
+		
 		$values = $this->value;
 		if ( empty($values) ) {
 			$values = array();
@@ -213,6 +235,7 @@ class JFormFieldFilters extends JFormFieldList
 			$values = preg_split("/[\|,]/", $values);
 		}
 		//echo "<pre>"; print_r($values); exit;
+		
 		
 		$issortable = @$attributes['issortable'];
 		// Not set mean make sortable

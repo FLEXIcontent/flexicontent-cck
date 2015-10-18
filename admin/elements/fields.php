@@ -113,15 +113,32 @@ class JFormFieldFields extends JFormField
 		// Retrieve field data for DB
 		// **************************
 		
-		$query = 'SELECT '.$ovalue.' AS value, '.$otext.' AS text'
+		$query = 'SELECT '.$ovalue.' AS value, '.$otext.' AS text, id'
 			.' FROM #__flexicontent_fields'
 			.' WHERE published = 1'
-			. $and
+			.$and
 			.' ORDER BY label ASC, id ASC'
 		;
 		
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
+		
+		// Handle fields having the same label
+		$_keys = array_keys($fields);
+		$_total = count($fields);
+		$_dupls = array();
+		foreach($_keys as $i => $key)
+		{
+			if ($i == $_total-1) continue;
+			if ($fields[$key]->text == $fields[ $_keys[$i+1] ]->text)
+			{
+				$_dupls[ $key ] = $_dupls[ $_keys[$i+1] ] = 1;
+			}
+		}
+		foreach($_dupls as $_dkey => $i)
+		{
+			$fields[$_dkey]->text .= ' :: ' .$fields[$_dkey]->id;
+		}
 		
 		
 		// ***********************************
@@ -136,11 +153,11 @@ class JFormFieldFields extends JFormField
 			$values = preg_split("/[\|,]/", $values);
 		}
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
-		$name = FLEXI_J16GE ? $attributes['name'] : $name;
-		$control_name = FLEXI_J16GE ? str_replace($name, '', $element_id) : $control_name;
+		$name = $attributes['name'];
+		$control_name = str_replace($name, '', $element_id);
 		
 		
 		// *******************************************
@@ -151,7 +168,7 @@ class JFormFieldFields extends JFormField
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
+			$fieldname .= '';  // NOTE: '[]' added automatically in J2.5+
 		} else {
 			if ((boolean) @ $attributes['display_useglobal']) {
 				array_unshift($fields, JHTML::_('select.option', '' , '- '.JText::_('FLEXI_USE_GLOBAL').' -'));
