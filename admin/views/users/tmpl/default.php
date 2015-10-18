@@ -290,7 +290,7 @@ function delAllFilters() {
 			$k = 0;
 			for ($i=0, $n=count( $this->rows ); $i < $n; $i++)
 			{
-				$row 	=& $this->rows[$i];
+				$row = $this->rows[$i];
 				if (!$row->id) continue;
 				$row->groupname = array();
 				foreach($row->usergroups as $row_ugrp_id) {

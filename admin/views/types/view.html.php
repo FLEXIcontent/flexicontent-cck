@@ -134,6 +134,9 @@ class FlexicontentViewTypes extends JViewLegacy
 			'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		
+		// Checkin
+		JToolbarHelper::checkin($contrl.'checkin');
+		
 		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
 		if (file_exists($appsman_path))
 		{

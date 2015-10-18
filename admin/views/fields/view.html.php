@@ -176,6 +176,7 @@ class FlexicontentViewFields extends JViewLegacy
 				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		}
+		JToolbarHelper::checkin($contrl.'checkin');
 		
 		
 		/*

@@ -326,6 +326,8 @@ class FlexicontentViewItems extends JViewLegacy
 			}
 			$add_divider = true;
 		}
+		$btn_task = 'items.checkin';
+		JToolbarHelper::checkin($btn_task);
 		
 		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
 		if ($perms->CanConfig) {

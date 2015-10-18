@@ -6013,7 +6013,6 @@ class flexicontent_db
 	static function checkin($tbl, $redirect_url, & $controller)
 	{
 		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$pk   = (int)$cid[0];
 		$user = JFactory::getUser();
 		$controller->setRedirect( $redirect_url, '' );
 
@@ -6023,33 +6022,44 @@ class flexicontent_db
 		}
 
 		// Only attempt to check the row in if it exists.
-		if ($pk)
+		$checked_in = 0;
+		$diff_user = array();
+		$other_err = array();
+		foreach($cid as $pk)
 		{
+			if (!$pk) continue;
+			
 			// Get an instance of the row to checkin.
 			$table = JTable::getInstance($tbl, '');
 			if (!$table->load($pk))
 			{
-				$controller->setError($table->getError());
-				return;// false;
+				$other_err .= 'ID: '.$pk. ': '.$table->getError();  //$controller->setError($table->getError());  //return; // false;
+				continue;
 			}
 
 			// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
-			if ($table->checked_out) {
-				if ( !$canCheckinRecords && $table->checked_out != $user->id) {
-					$controller->setError(JText::_( 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER'));
-					return;// false;
-				}
-			}
-
-			// Attempt to check the row in.
-			if (!$table->checkin($pk))
+			if (!$table->checked_out) continue;
+			
+			if ( !$canCheckinRecords && $table->checked_out != $user->id )
 			{
-				$controller->setError($table->getError());
-				return;// false;
+				$diff_user[] = $pk;  //$controller->setError(JText::_( 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER'));  //return; // false;
+				continue;
 			}
+			
+			// Attempt to check the row in.
+			if ( !$table->checkin($pk) )
+			{
+				if (count($other_err) < 3)  $other_err[] = 'ID: '.$pk. ': '.$table->getError();  //$controller->setError($table->getError());  //return; // false;
+				continue;
+			}
+			$checked_in++;
 		}
-
-		$controller->setRedirect( $redirect_url, JText::sprintf('FLEXI_RECORD_CHECKED_IN_SUCCESSFULLY', 1) );
+		
+		$msg = JText::sprintf('FLEXI_RECORD_CHECKED_IN_SUCCESSFULLY', $checked_in);
+		if (count($diff_user))  $msg .= '<br/><br/>IDs: '.implode(', ', $diff_user).' -- '.JText::_( 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER');
+		if (count($other_err))  $msg .= '<br/><br/>'.implode('<br/> ', $other_err);
+		
+		$controller->setRedirect( $redirect_url, $msg, ($other_err ? 'error' : 'message') );
 		return;// true;
 	}
 	

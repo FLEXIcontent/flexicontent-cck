@@ -160,13 +160,6 @@ class FlexicontentViewCategories extends JViewLegacy
 			$add_divider = true;
 		}
 		
-		if ( $user->authorise('core.admin', 'checkin') )
-		{
-			JToolBarHelper::checkin($contrl.'checkin');
-			$add_divider = true;
-		}
-		if ($add_divider) JToolBarHelper::divider();
-		
 		$add_divider = false;
 		if ( $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent') ) {
 			JToolBarHelper::publishList($contrl.'publish');
@@ -194,6 +187,9 @@ class FlexicontentViewCategories extends JViewLegacy
 			$add_divider = true;
 		}
 		if ($add_divider) JToolBarHelper::divider();
+		
+		// Checkin
+		JToolBarHelper::checkin($contrl.'checkin');
 
 		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
 		if (file_exists($appsman_path))
