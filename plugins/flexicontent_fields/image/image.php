@@ -648,11 +648,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
 				if ($use_ingroup) $originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required_class : '').'" value="'.$value['originalname'].'" />';
 				
-				if (!empty($image_name)) {
+				if (!empty($image_name))
+				{
 					$img_link  = JURI::root(true).'/'.$dir_url;
-					$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : "");
-					$img_link .= $item->id ? '/s_' .$extra_prefix. $image_name : '/original/'. $image_name;
-					if (isset($value['existingname'])) {
+					$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : '');
+					$img_link .= ($item->id ? '/s_' .$extra_prefix : '/original/') .$image_name;
+					if (isset($value['existingname']))
+					{
+						$ext = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
+						$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
  						$img_link = str_replace('\\','/', $img_link);
  						$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w=120&amp;h=90';
  					}
@@ -2413,7 +2417,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$phpThumb->setParameter('zc', 1);
 		}
 		
-		$ext = pathinfo($filename, PATHINFO_EXTENSION);
+		$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 		if ( in_array( $ext, array('png', 'ico', 'gif') ) )
 		{
 			$phpThumb->setParameter('f', $ext);

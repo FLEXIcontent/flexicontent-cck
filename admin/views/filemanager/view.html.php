@@ -61,13 +61,20 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		JHTML::_('behavior.formvalidation');
 		
 		
+		// Get user's global permissions
+		$perms = FlexicontentHelperPerm::getPerm();
+		
+		// Get folder mode
+		$_view = $view;
+		$folder_mode			= 0;
+		
+		
 		
 		// ***********
 		// Get filters
 		// ***********
 		
 		$count_filters = 0;
-		$_view = $view;
 		
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_order',     'filter_order',    'f.filename', 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_order_Dir', 'filter_order_Dir', '',          'word' );
@@ -113,11 +120,6 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$js = "jQuery(document).ready(function(){";
 		
 		
-		// *****************************
-		// Get user's global permissions
-		// *****************************
-		
-		$perms = FlexicontentHelperPerm::getPerm();
 		
 		
 		
@@ -142,7 +144,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// ***********************
 		// Get data from the model
 		// ***********************
-		$folder_mode			= 0;
+		
 		if ( !$folder_mode ) {
 			$rows  = $this->get('Data');
 		} else {

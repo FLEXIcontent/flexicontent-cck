@@ -273,7 +273,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				$aoe	= '&amp;aoe=1';
 				$q		= '&amp;q=95';
 				$zc		= $params->get($rprefix.'_method') ? '&amp;zc=' . $params->get($rprefix.'_method') : '';
-				$ext = pathinfo($src, PATHINFO_EXTENSION);
+				$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 				$conf	= $w . $h . $aoe . $q . $zc . $f;
 				
@@ -315,7 +315,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
 			$zc		= $params->get($rprefix.'_method') ? '&amp;zc=' . $params->get($rprefix.'_method') : '';
-			$ext = pathinfo($src, PATHINFO_EXTENSION);
+			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
@@ -327,7 +327,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
 			$zc		= $params->get($rprefix.'_method') ? '&amp;zc=' . $params->get($rprefix.'_method') : '';
-			$ext = pathinfo($src, PATHINFO_EXTENSION);
+			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $zc . $f;
 			

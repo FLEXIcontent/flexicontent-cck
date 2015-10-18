@@ -240,7 +240,8 @@ endforeach;
 					
 					$fileid = $this->folder_mode ? '' : $row->id;
 					
-					if ( !in_array(strtolower($row->ext), $imageexts)) $thumb_or_icon = JHTML::image($row->icon, $row->filename);
+					$ext = strtolower($row->ext);
+					if ( !in_array($ext, $imageexts)) $thumb_or_icon = JHTML::image($row->icon, $row->filename);
 					
 					if ($this->folder_mode) {
 						$file_path = $this->img_folder . DS . $row->filename;
@@ -253,17 +254,18 @@ endforeach;
 					}
 					
 					$file_path = str_replace('\\', '/', $file_path);
+					$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					if ( empty($thumb_or_icon) ) {
 						if (file_exists($file_path)){
-							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$file_path.'&amp;w=60&amp;h=60&amp;zc=1" alt="'.$display_filename.'" />';
+							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w=60&amp;h=60&amp;zc=1" alt="'.$display_filename.'" />';
 						} else {
 							$thumb_or_icon = '<span class="badge badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 						}
 					}
 					
-					if ( in_array(strtolower($row->ext), $imageexts)) {
-						$file_preview  = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1';
-						$file_preview2 = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&amp;w=120&amp;h=90&amp;zc=1';
+					if ( in_array($ext, $imageexts)) {
+						$file_preview  = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1';
+						$file_preview2 = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w=120&amp;h=90&amp;zc=1';
 					} else {
 						$file_preview  = '';
 						$file_preview2 = '';
@@ -436,7 +438,7 @@ endforeach;
 				<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
 					
 					<table class="fc-form-tbl" id="file-upload-form-container">
-
+						
 						<tr>
 							<td id="file-upload-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_FILE', 'FLEXI_CHOOSE_FILE_DESC', 1, 1); ?>">
 								<label class="label" id="file-upload-lbl" for="file-upload">
@@ -449,7 +451,7 @@ endforeach;
 								<input type="file" id="file-upload" name="Filedata" onchange="fc_loadImagePreview(this.id,'img_preview', 'img_preview_msg', 100, 0, '-1');" />
 							</td>
 						</tr>
-
+						
 		<?php if (!$this->folder_mode) { ?>
 						<tr>
 							<td id="file-title-lbl-container" class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">

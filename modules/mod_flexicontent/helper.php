@@ -115,7 +115,7 @@ class modFlexicontentHelper
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
 			$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
-			$ext = pathinfo($src, PATHINFO_EXTENSION);
+			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
@@ -128,7 +128,7 @@ class modFlexicontentHelper
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
 			$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
-			$ext = pathinfo($src, PATHINFO_EXTENSION);
+			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
@@ -402,7 +402,7 @@ class modFlexicontentHelper
 							$aoe	= '&amp;aoe=1';
 							$q		= '&amp;q=95';
 							$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
-							$ext = pathinfo($src, PATHINFO_EXTENSION);
+							$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 							$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 							$conf	= $w . $h . $aoe . $q . $zc . $f;
 							
@@ -538,7 +538,7 @@ class modFlexicontentHelper
 							$aoe	= '&amp;aoe=1';
 							$q		= '&amp;q=95';
 							$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
-							$ext = pathinfo($src, PATHINFO_EXTENSION);
+							$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 							$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 							$conf	= $w . $h . $aoe . $q . $zc . $f;
 							
@@ -1905,7 +1905,7 @@ class modFlexicontentHelper
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
 					$zc		= $catconf->image_method ? '&amp;zc=' . $catconf->image_method : '';
-					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
@@ -1917,7 +1917,7 @@ class modFlexicontentHelper
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
 					$zc		= $catconf->image_method ? '&amp;zc=' . $catconf->image_method : '';
-					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 		

@@ -149,7 +149,7 @@ switch ($cols)
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
-			$ext = pathinfo($src, PATHINFO_EXTENSION);
+			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $zc . $f;
 	
@@ -161,7 +161,7 @@ switch ($cols)
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
-			$ext = pathinfo($src, PATHINFO_EXTENSION);
+			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $zc . $f;
 
@@ -227,7 +227,7 @@ switch ($cols)
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
 					$zc		= $subcat_image_method ? '&amp;zc=' . $subcat_image_method : '';
-					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
@@ -239,7 +239,7 @@ switch ($cols)
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
 					$zc		= $subcat_image_method ? '&amp;zc=' . $subcat_image_method : '';
-					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 		

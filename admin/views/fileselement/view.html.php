@@ -39,18 +39,25 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 		
-		//initialise variables
-		$app      = JFactory::getApplication();
-		$document = JFactory::getDocument();
+		// ********************
+		// Initialise variables
+		// ********************
 		
-		$option   = JRequest::getCmd('option');
-		$view     = JRequest::getVar('view');
-		$layout   = JRequest::getVar('layout', 'default');
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
 		
-		$db       = JFactory::getDBO();
-		$user     = JFactory::getUser();
+		$layout  = $jinput->get('layout', 'default', 'cmd');
+		$option  = $jinput->get('option', '', 'cmd');
+		$view    = $jinput->get('view', '', 'cmd');
 		
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		
+		// Get model
+		$model = $this->getModel();
+		
 		//$authorparams = flexicontent_db::getUserConfig($user->id);
 		$langs = FLEXIUtilities::getLanguages('code');
 		
@@ -62,15 +69,20 @@ class FlexicontentViewFileselement extends JViewLegacy
 		JHTML::_('behavior.tooltip');
 		// Load the form validation behavior
 		JHTML::_('behavior.formvalidation');
-
-		// Get filters
-		$_view = $view.$fieldid;
-		$folder_mode			= $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode',      'folder_mode',      0,           'int' );
 		
-		// Get User's Global Permissions
+		
+		// Get user's global permissions
 		$perms = FlexicontentHelperPerm::getPerm();
-		// Get model
-		$model = $this->getModel();
+		
+		// Get folder mode
+		$_view = $view.$fieldid;
+		$folder_mode = $app->getUserStateFromRequest( $option.'.'.$_view.'.folder_mode',      'folder_mode',      0,           'int' );
+		
+		
+		
+		// ***********
+		// Get filters
+		// ***********
 		
 		$count_filters = 0;
 		
@@ -79,7 +91,6 @@ class FlexicontentViewFileselement extends JViewLegacy
 		
 		$filter_lang			= $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_lang',      'filter_lang',      '',          'string' );
 		$filter_url       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_url',       'filter_url',       '',          'word' );
-		
 		$filter_secure    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_secure',    'filter_secure',    '',          'word' );
 		
 		$target_dir = 2;
@@ -127,7 +138,9 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$newfilename	= base64_decode(JRequest::getVar('newfilename', ''));
 		$delfilename	= base64_decode(JRequest::getVar('delfilename', ''));
 		
-		// Add custom css and js to document
+		// **************************
+		// Add css and js to document
+		// **************************
 		
 		if ($app->isSite()) {
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
@@ -171,9 +184,13 @@ class FlexicontentViewFileselement extends JViewLegacy
 		} else {
 			$exts = $cparams->get('upload_extensions', 'bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics');
 			$rows = $model->getFilesFromPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param, $exts);
+			
 			$img_folder = $model->getFieldFolderPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param);
 			$img_path = str_replace('\\', '/', $img_folder . DS . $newfilename);
-			$thumb = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$thumb_w.'&amp;h='.$thumb_h.'&amp;zc=1';
+			
+			$ext = strtolower(pathinfo($newfilename, PATHINFO_EXTENSION));
+			$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+			$thumb = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$img_path.$_f. '&amp;w='.$thumb_w.'&amp;h='.$thumb_h.'&amp;zc=1';
 		}
 		$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$u_item_id;
 		$app->setUserState( $upload_path_var, $img_folder );
@@ -262,7 +279,9 @@ class FlexicontentViewFileselement extends JViewLegacy
 				$file_path = str_replace('\\', '/', $file_path);
 				
 				$imageexts = array('jpg','gif','png','bmp','jpeg');
-				$file_preview = !in_array(strtolower($_newfile->ext), $imageexts)  ?  ''  :  JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&w='.$thumb_w.'&h='.$thumb_h.'&zc=1';
+				$ext = strtolower($_newfile->ext);
+				$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+				$file_preview = !in_array($ext, $imageexts)  ?  ''  :  JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&w='.$thumb_w.'&h='.$thumb_h.'&zc=1';
 			}
 			
 			
