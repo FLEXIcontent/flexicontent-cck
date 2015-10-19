@@ -1315,7 +1315,8 @@ class FlexicontentFields
 		// Set custom label, description or maintain default
 		$field->label       =  isset($fdata[$tindex][$field->name]->label)        ?  $fdata[$tindex][$field->name]->label        :  $field->label;
 		$field->description =  isset($fdata[$tindex][$field->name]->description)  ?  $fdata[$tindex][$field->name]->description  :  $field->description;
-		$field->label = JText::_($field->label);
+		$field->label       = JText::_($field->label);
+		$field->description = JText::_($field->description);
 		
 		// Finally set field's parameters, but to clone ... or not to clone, better clone to allow customizations for individual item fields ...
 		$field->parameters = clone($fdata[$tindex][$field->name]->parameters);

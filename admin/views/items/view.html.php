@@ -144,9 +144,9 @@ class FlexicontentViewItems extends JViewLegacy
 		flexicontent_html::loadFramework('select2');
 		JHTML::_('behavior.calendar');
 		
-		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?v='.FLEXI_VERSION);
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css?v='.FLEXI_VERSION);
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css?v='.FLEXI_VERSION);
 		
 		$js = "jQuery(document).ready(function(){";
 		if ($filter_cats)   $js .= "jQuery('.col_cats').each(function(){ jQuery(this).addClass('yellow'); });";
@@ -698,19 +698,19 @@ class FlexicontentViewItems extends JViewLegacy
 		$document	= JFactory::getDocument();
 		
 		// Add css to document
-		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?v='.FLEXI_VERSION);
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css?v='.FLEXI_VERSION);
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css?v='.FLEXI_VERSION);
 
 		// Add js to document
 		JHTML::_('behavior.tooltip');
 		flexicontent_html::loadFramework('select2');
-		$document->addScript('components/com_flexicontent/assets/js/copymove.js');
+		$document->addScript('components/com_flexicontent/assets/js/copymove.js?v='.FLEXI_VERSION);
 		
 		// Add js function to overload the joomla submitform validation
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js?v='.FLEXI_VERSION);
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js?v='.FLEXI_VERSION);
 		
 		// Create document/toolbar titles
 		if ($behaviour == 'translate') {

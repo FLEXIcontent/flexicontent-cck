@@ -658,8 +658,8 @@ class FlexicontentControllerFields extends FlexicontentController
 		$user	= JFactory::getUser();
 		$document = JFactory::getDocument();
 		
-		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
-		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
+		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?v='.FLEXI_VERSION);
+		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css?v='.FLEXI_VERSION);
 		
 		// Load jquery Framework
 		flexicontent_html::loadJQuery();

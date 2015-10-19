@@ -28,8 +28,8 @@ $tabCnt = array();
 $tabSetStack = array();
 
 // Load JS tabber lib
-$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
-$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
+$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js?v='.FLEXI_VERSION);
+$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css?v='.FLEXI_VERSION);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 ?>

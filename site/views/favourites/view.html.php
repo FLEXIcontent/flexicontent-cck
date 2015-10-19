@@ -70,15 +70,13 @@ class FlexicontentViewFavourites extends JViewLegacy
 		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('flexi_tmpl_common');
 		
-		//add css file
+		// Add css files to the document <head> section (also load CSS joomla template override)
 		if (!$params->get('disablecss', '')) {
-			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
-			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
+			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css?v='.FLEXI_VERSION);
+			//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
-		
-		//allow css override
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css?v='.FLEXI_VERSION);
 		}
 		
 		

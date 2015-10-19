@@ -143,13 +143,13 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// **************************
 		
 		if ($app->isSite()) {
-			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css?v='.FLEXI_VERSION);
 		} else {
-			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css');
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?v='.FLEXI_VERSION);
 		}
 		
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css?v='.FLEXI_VERSION);
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css?v='.FLEXI_VERSION);
 		
 		// This is not included automatically in frontend
 		JFactory::getDocument()->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js' );

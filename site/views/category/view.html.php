@@ -93,15 +93,13 @@ class FlexicontentViewCategory extends JViewLegacy
 		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('flexi_tmpl_common');
 		
-		//add css file
+		// Add css files to the document <head> section (also load CSS joomla template override)
 		if (!$params->get('disablecss', '')) {
-			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
-			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
+			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css?v='.FLEXI_VERSION);
+			//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
-		
-		//allow css override
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css?v='.FLEXI_VERSION);
 		}
 		
 		
@@ -546,7 +544,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';
-		$phpThumbURL = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
+		$phpThumbURL = $this->baseurl.'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
 		
 		
 		
@@ -573,7 +571,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		if ($cat_default_image)
 		{
-			$src = JURI::base(true) ."/". $joomla_image_url . $cat_default_image;
+			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
 			
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
@@ -596,7 +594,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				$cat->fulltext = "";
 				
 				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
-					$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
+					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 					
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
@@ -609,7 +607,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 					
-					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
+					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;
 					
 					$image = $phpThumbURL.$src.$conf;
@@ -652,7 +650,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		if ($cat_default_image)
 		{
-			$src = JURI::base(true) ."/". $joomla_image_url . $cat_default_image;
+			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
 			
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
@@ -678,7 +676,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				$cat->fulltext = "";
 				
 				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
-					$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
+					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 					
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
@@ -691,7 +689,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 					
-					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
+					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;
 					
 					$image = $phpThumbURL.$src.$conf;
@@ -735,7 +733,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		if ($cat_default_image)
 		{
-			$src = JURI::base(true) ."/". $joomla_image_url . $cat_default_image;
+			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
 			
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
@@ -760,7 +758,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				$cat->fulltext = "";
 				
 				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
-					$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
+					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 					
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
@@ -773,7 +771,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 					
-					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
+					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;
 					
 					$image = $phpThumbURL.$src.$conf;

@@ -1133,7 +1133,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$data->desc    = $desc;
 		$data->mailto  = $mailto;
 		
-		$document->addStyleSheet(JURI::base() . 'components/com_flexicontent/assets/css/flexicontent.css');
+		$document->addStyleSheet(JURI::base() . 'components/com_flexicontent/assets/css/flexicontent.css?v='.FLEXI_VERSION);
 		include('file'.DS.'share_form.php');
 		$session->set('com_flexicontent.formtime', time());
 	}
@@ -1352,7 +1352,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			return $this->share_file_form();
 		}
 		
-		$document->addStyleSheet(JURI::base() . 'components/com_flexicontent/assets/css/flexicontent.css');
+		$document->addStyleSheet(JURI::base() . 'components/com_flexicontent/assets/css/flexicontent.css?v='.FLEXI_VERSION);
 		include('file'.DS.'share_result.php');
 	}
 

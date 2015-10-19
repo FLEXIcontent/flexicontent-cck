@@ -77,10 +77,10 @@ if ( $show_mod )
 		// Standards compliant implementation by placing CSS link into the HTML HEAD
 		else {
 			$document->addStyleSheet(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css');
-			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css?v='.FLEXI_VERSION);
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-				$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+				$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css?v='.FLEXI_VERSION);
 			}
 		}
 	}

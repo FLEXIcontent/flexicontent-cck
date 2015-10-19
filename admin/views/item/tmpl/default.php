@@ -44,18 +44,18 @@ if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclarati
 if ($this->params->get('form_extra_js_be'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_be'));
 
 // Load JS tabber lib
-$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
-$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
+$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js?v='.FLEXI_VERSION);
+$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css?v='.FLEXI_VERSION);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 if ($this->perms['cantags'] || $this->perms['canversion']) {
-	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js');
-	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js');
-	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js');
-	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js');     // e.g. pagination for item versions
-	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js');  // e.g. autogrow version comment textarea
+	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js?v='.FLEXI_VERSION);
+	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js?v='.FLEXI_VERSION);
+	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js?v='.FLEXI_VERSION);
+	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js?v='.FLEXI_VERSION);     // e.g. pagination for item versions
+	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js?v='.FLEXI_VERSION);  // e.g. autogrow version comment textarea
 
-	$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css');
+	$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css?v='.FLEXI_VERSION);
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
 			jQuery('#input-tags').autocomplete('".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&".JSession::getFormToken()."=1', {
