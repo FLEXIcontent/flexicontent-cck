@@ -622,9 +622,9 @@ class flexicontent_html
 			} else {
 				if (FLEXI_J30GE) {
 					JHtml::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position
-					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js?v='.FLEXI_VERSION);
-					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.menu.min.js?v='.FLEXI_VERSION);
-					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js?v='.FLEXI_VERSION);
+					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
+					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.menu.min.js');
+					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
 				} else {
 					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
 				}
@@ -716,8 +716,8 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).$lib_path.'/mCSB';
-				$document->addScript($framework_path.'/jquery.mCustomScrollbar.min.js?v='.FLEXI_VERSION);
-				$document->addStyleSheet($framework_path.'/jquery.mCustomScrollbar.css?v='.FLEXI_VERSION);
+				$document->addScript($framework_path.'/jquery.mCustomScrollbar.min.js');
+				$document->addStyleSheet($framework_path.'/jquery.mCustomScrollbar.css');
 				$js .= "
 					jQuery(document).ready(function(){
 						jQuery('.fc_add_scroller').mCustomScrollbar({
@@ -737,36 +737,37 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).$lib_path.'/image-picker';
-				$document->addScript($framework_path.'/image-picker.min.js?v='.FLEXI_VERSION);
-				$document->addStyleSheet($framework_path.'/image-picker.css?v='.FLEXI_VERSION);
+				$document->addScript($framework_path.'/image-picker.min.js');
+				$document->addStyleSheet($framework_path.'/image-picker.css');
 				break;
 			
 			case 'masonry':
 				$framework_path = JURI::root(true).$lib_path.'/masonry';
-				$document->addScript($framework_path.'/masonry.pkgd.min.js?v='.FLEXI_VERSION);
+				$document->addScript($framework_path.'/masonry.pkgd.min.js');
 				
 				break;
 			
 			case 'select2':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
+				$ver = '3.5.4';
 				$framework_path = JURI::root(true).$lib_path.'/select2';
 				$framework_folder = JPATH_SITE .DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
-				$document->addScript($framework_path.'/select2.min.js?v='.FLEXI_VERSION);
-				$document->addStyleSheet($framework_path.'/select2.css?v='.FLEXI_VERSION);
+				$document->addScriptVersion($framework_path.'/select2.min.js', $ver);
+				$document->addStyleSheetVersion($framework_path.'/select2.css', $ver);
 				
 				$lang_code = flexicontent_html::getUserCurrentLang();
 				if ( $lang_code && $lang_code!='en' )
 				{
 					// Try language shortcode
 					if ( file_exists($framework_folder.DS.'select2_locale_'.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/select2_locale_'.$lang_code.'.js?v='.FLEXI_VERSION);
+						$document->addScriptVersion($framework_path.'/select2_locale_'.$lang_code.'.js', $ver);
 					}
 					// Try country language code
 					else {
 						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
 						if ( $country_code && file_exists($framework_folder.DS.'select2_locale_'.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/select2_locale_'.$country_code.'.js?v='.FLEXI_VERSION);
+							$document->addScriptVersion($framework_path.'/select2_locale_'.$country_code.'.js', $ver);
 						}
 					}
 				}
@@ -898,7 +899,7 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).$lib_path.'/inputmask';
-				$document->addScript($framework_path.'/jquery.inputmask.bundle.min.js?v='.FLEXI_VERSION);
+				$document->addScript($framework_path.'/jquery.inputmask.bundle.min.js');
 				
 				// Extra inputmask declarations definitions, e.g. ...
 				$js .= "
@@ -1024,8 +1025,8 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).$lib_path.'/prettyCheckable';
-				$document->addScript($framework_path.'/dev/prettyCheckable.js?v='.FLEXI_VERSION);
-				$document->addStyleSheet($framework_path.'/dist/prettyCheckable.css?v='.FLEXI_VERSION);
+				$document->addScript($framework_path.'/dev/prettyCheckable.js');
+				$document->addStyleSheet($framework_path.'/dist/prettyCheckable.css');
 				$js .= "
 					jQuery(document).ready(function(){
 						jQuery('input.use_prettycheckable').each(function() {
@@ -1049,14 +1050,14 @@ class flexicontent_html
 				$framework_path = JURI::root(true).$lib_path.'/jmultibox';
 				
 				// Add JS
-				$document->addScript($framework_path.'/js/jmultibox.js?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/js/jquery.vegas.js?v='.FLEXI_VERSION);
+				$document->addScript($framework_path.'/js/jmultibox.js');
+				$document->addScript($framework_path.'/js/jquery.vegas.js');
 				
 				// Add CSS
-				$document->addStyleSheet($framework_path.'/styles/multibox.css?v='.FLEXI_VERSION);
-				$document->addStyleSheet($framework_path.'/styles/jquery.vegas.css?v='.FLEXI_VERSION);
+				$document->addStyleSheet($framework_path.'/styles/multibox.css');
+				$document->addStyleSheet($framework_path.'/styles/jquery.vegas.css');
 				if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
-					$document->addStyleSheet($framework_path.'/styles/multibox-ie6.css?v='.FLEXI_VERSION);
+					$document->addStyleSheet($framework_path.'/styles/multibox-ie6.css');
 				}
 				
 				// Attach multibox to ... this will be left to the caller so that it will create a multibox object with custom options
@@ -1065,23 +1066,23 @@ class flexicontent_html
 
 			case 'fancybox':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js?v='.FLEXI_VERSION);
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
 				
 				$framework_path = JURI::root(true).$lib_path.'/fancybox';
 				
 				// Add mousewheel plugin (this is optional)
-				$document->addScript($framework_path.'/lib/jquery.mousewheel-3.0.6.pack.js?v='.FLEXI_VERSION);
+				$document->addScript($framework_path.'/lib/jquery.mousewheel-3.0.6.pack.js');
 				
 				// Add fancyBox CSS / JS
-				$document->addStyleSheet($framework_path.'/source/jquery.fancybox.css?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/source/jquery.fancybox.pack.js?v='.FLEXI_VERSION);
+				$document->addStyleSheet($framework_path.'/source/jquery.fancybox.css');
+				$document->addScript($framework_path.'/source/jquery.fancybox.pack.js');
 				
 				// Optionally add helpers - button, thumbnail and/or media
-				$document->addStyleSheet($framework_path.'/source/helpers/jquery.fancybox-buttons.css?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/source/helpers/jquery.fancybox-buttons.js?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/source/helpers/jquery.fancybox-media.js?v='.FLEXI_VERSION);
-				$document->addStyleSheet($framework_path.'/source/helpers/jquery.fancybox-thumbs.css?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/source/helpers/jquery.fancybox-thumbs.js?v='.FLEXI_VERSION);
+				$document->addStyleSheet($framework_path.'/source/helpers/jquery.fancybox-buttons.css');
+				$document->addScript($framework_path.'/source/helpers/jquery.fancybox-buttons.js');
+				$document->addScript($framework_path.'/source/helpers/jquery.fancybox-media.js');
+				$document->addStyleSheet($framework_path.'/source/helpers/jquery.fancybox-thumbs.css');
+				$document->addScript($framework_path.'/source/helpers/jquery.fancybox-thumbs.js');
 				
 				// Attach fancybox to all elements having a specific CSS class
 				$js .= "
@@ -1101,10 +1102,10 @@ class flexicontent_html
 				//flexicontent_html::loadFramework('fancybox');
 				
 				$framework_path = JURI::root(true).$lib_path.'/galleriffic';
-				//$document->addStyleSheet($framework_path.'/css/basic.css?v='.FLEXI_VERSION);  // This is too generic and should not be loaded
-				$document->addStyleSheet($framework_path.'/css/galleriffic-3.css?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/js/jquery.galleriffic.js?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/js/jquery.opacityrollover.js?v='.FLEXI_VERSION);
+				//$document->addStyleSheet($framework_path.'/css/basic.css');  // This is too generic and should not be loaded
+				$document->addStyleSheet($framework_path.'/css/galleriffic-3.css');
+				$document->addScript($framework_path.'/js/jquery.galleriffic.js');
+				$document->addScript($framework_path.'/js/jquery.opacityrollover.js');
 				
 				break;
 			
@@ -1112,13 +1113,13 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).$lib_path.'/elastislide';
-				$document->addStyleSheet($framework_path.'/css/style.css?v='.FLEXI_VERSION);
-				$document->addStyleSheet($framework_path.'/css/elastislide.css?v='.FLEXI_VERSION);
+				$document->addStyleSheet($framework_path.'/css/style.css');
+				$document->addStyleSheet($framework_path.'/css/elastislide.css');
 				
-				$document->addScript($framework_path.'/js/jquery.tmpl.min.js?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/js/jquery.easing.1.3.js?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/js/jquery.elastislide.js?v='.FLEXI_VERSION);
-				//$document->addScript($framework_path.'/js/gallery.js?v='.FLEXI_VERSION); // replace with field specific: gallery_tmpl.js
+				$document->addScript($framework_path.'/js/jquery.tmpl.min.js');
+				$document->addScript($framework_path.'/js/jquery.easing.1.3.js');
+				$document->addScript($framework_path.'/js/jquery.elastislide.js');
+				//$document->addScript($framework_path.'/js/gallery.js'); // replace with field specific: gallery_tmpl.js
 				break;
 			
 			case 'photoswipe':
@@ -1126,13 +1127,13 @@ class flexicontent_html
 				
 				$framework_path = JURI::root(true).$lib_path.'/photoswipe';
 				
-				//$document->addStyleSheet($framework_path.'/lib/jquery.mobile/jquery.mobile.css?v='.FLEXI_VERSION);
-				$document->addStyleSheet($framework_path.'/photoswipe.css?v='.FLEXI_VERSION);
+				//$document->addStyleSheet($framework_path.'/lib/jquery.mobile/jquery.mobile.css');
+				$document->addStyleSheet($framework_path.'/photoswipe.css');
 				
-				//$document->addScript($framework_path.'/lib/jquery.mobile/jquery.mobile.js?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/lib/simple-inheritance.min.js?v='.FLEXI_VERSION);
-				//$document->addScript($framework_path.'/lib/jquery.animate-enhanced.min.js?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/code.photoswipe.min.js?v='.FLEXI_VERSION);
+				//$document->addScript($framework_path.'/lib/jquery.mobile/jquery.mobile.js');
+				$document->addScript($framework_path.'/lib/simple-inheritance.min.js');
+				//$document->addScript($framework_path.'/lib/jquery.animate-enhanced.min.js');
+				$document->addScript($framework_path.'/code.photoswipe.min.js');
 				
 				$js .= "
 				jQuery(document).ready(function() {
@@ -1145,14 +1146,14 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).$lib_path.'/fcxSlide';
-				$document->addScript($framework_path.'/class.fcxSlide.js?v='.FLEXI_VERSION);
-				$document->addStyleSheet($framework_path.'/fcxSlide.css?v='.FLEXI_VERSION);
-				//$document->addScript($framework_path.'/class.fcxSlide.packed.js?v='.FLEXI_VERSION);
+				$document->addScriptVersion($framework_path.'/class.fcxSlide.js', FLEXI_VERSION);
+				$document->addStyleSheetVersion($framework_path.'/fcxSlide.css', FLEXI_VERSION);
+				//$document->addScriptVersion($framework_path.'/class.fcxSlide.packed.js', FLEXI_VERSION);
 				break;
 			
 			case 'imagesLoaded':
 				$framework_path = JURI::root(true).$lib_path.'/imagesLoaded';
-				$document->addScript($framework_path.'/imagesloaded.pkgd.min.js?v='.FLEXI_VERSION);
+				$document->addScript($framework_path.'/imagesloaded.pkgd.min.js');
 				break;
 			
 			case 'noobSlide':
@@ -1160,35 +1161,35 @@ class flexicontent_html
 				FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 				
 				$framework_path = JURI::root(true).$lib_path.'/noobSlide';
-				//$document->addScript($framework_path.'/_class.noobSlide.js?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/_class.noobSlide.packed.js?v='.FLEXI_VERSION);
+				//$document->addScript($framework_path.'/_class.noobSlide.js');
+				$document->addScript($framework_path.'/_class.noobSlide.packed.js');
 				break;
 			
 			case 'zTree':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).$lib_path.'/zTree';
-				$document->addStyleSheet($framework_path.'/css/flexi_ztree.css?v='.FLEXI_VERSION);
-				$document->addStyleSheet($framework_path.'/css/zTreeStyle/zTreeStyle.css?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/js/jquery.ztree.all-3.5.min.js?v='.FLEXI_VERSION);
-				//$document->addScript($framework_path.'/js/jquery.ztree.core-3.5.js?v='.FLEXI_VERSION);
-				//$document->addScript($framework_path.'/js/jquery.ztree.excheck-3.5.js?v='.FLEXI_VERSION);
-				//$document->addScript($framework_path.'/js/jquery.ztree.exedit-3.5.js?v='.FLEXI_VERSION);
+				$document->addStyleSheet($framework_path.'/css/flexi_ztree.css');
+				$document->addStyleSheet($framework_path.'/css/zTreeStyle/zTreeStyle.css');
+				$document->addScript($framework_path.'/js/jquery.ztree.all-3.5.min.js');
+				//$document->addScript($framework_path.'/js/jquery.ztree.core-3.5.js');
+				//$document->addScript($framework_path.'/js/jquery.ztree.excheck-3.5.js');
+				//$document->addScript($framework_path.'/js/jquery.ztree.exedit-3.5.js');
 				break;
 			
 			case 'plupload':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).$lib_path.'/plupload';
-				$document->addScript($framework_path.'/js/plupload.full.min.js?v='.FLEXI_VERSION);
+				$document->addScript($framework_path.'/js/plupload.full.min.js');
 				
 				if ($mode=='ui') {
-					$document->addStyleSheet($framework_path.'/js/jquery.ui.plupload/css/jquery.ui.plupload.css?v='.FLEXI_VERSION);
-					$document->addScript($framework_path.'/js/jquery.ui.plupload/jquery.ui.plupload.min.js?v='.FLEXI_VERSION);
-					$document->addScript($framework_path.'/js/themeswitcher.js?v='.FLEXI_VERSION);
+					$document->addStyleSheet($framework_path.'/js/jquery.ui.plupload/css/jquery.ui.plupload.css');
+					$document->addScript($framework_path.'/js/jquery.ui.plupload/jquery.ui.plupload.min.js');
+					$document->addScript($framework_path.'/js/themeswitcher.js');
 				} else {
-					$document->addStyleSheet($framework_path.'/js/jquery.plupload.queue/css/jquery.plupload.queue.css?v='.FLEXI_VERSION);
-					$document->addScript($framework_path.'/js/jquery.plupload.queue/jquery.plupload.queue.js?v='.FLEXI_VERSION);
+					$document->addStyleSheet($framework_path.'/js/jquery.plupload.queue/css/jquery.plupload.queue.css');
+					$document->addScript($framework_path.'/js/jquery.plupload.queue/jquery.plupload.queue.js');
 				}
 				
 				$lang_code = flexicontent_html::getUserCurrentLang();
@@ -1196,26 +1197,26 @@ class flexicontent_html
 				{
 					// Try language shortcode
 					if ( file_exists($framework_folder.DS.'js'.DS.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/js/'.$lang_code.'.js?v='.FLEXI_VERSION);
+						$document->addScript($framework_path.'/js/'.$lang_code.'.js');
 					}
 					// Try country language code
 					else {
 						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
 						if ( $country_code && file_exists($framework_folder.DS.'js'.DS.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/js/'.$country_code.'.js?v='.FLEXI_VERSION);
+							$document->addScript($framework_path.'/js/'.$country_code.'.js');
 						}
 					}
 				}
 				// For debugging
-				//$document->addScript($framework_path.'/js/moxie.min.js?v='.FLEXI_VERSION);
-				//$document->addScript($framework_path.'/js/plupload.dev.js?v='.FLEXI_VERSION);
+				//$document->addScript($framework_path.'/js/moxie.min.js');
+				//$document->addScript($framework_path.'/js/plupload.dev.js');
 				break;
 				
 			case 'nouislider':
 				
 				$framework_path = JURI::root(true).$lib_path.'/nouislider';
-				$document->addStyleSheet($framework_path.'/nouislider.min.css?v='.FLEXI_VERSION);
-				$document->addScript($framework_path.'/nouislider.min.js?v='.FLEXI_VERSION);
+				$document->addStyleSheet($framework_path.'/nouislider.min.css');
+				$document->addScript($framework_path.'/nouislider.min.js');
 				break;
 
 			case 'flexi_tmpl_common':
@@ -1231,8 +1232,8 @@ class flexicontent_html
 				$js .= "
 					var _FC_GET = ".json_encode($_GET).";
 				";
-				$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js?v='.FLEXI_VERSION);
-				$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js?v='.FLEXI_VERSION);
+				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', FLEXI_VERSION);
+				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VERSION);
 				JText::script("FLEXI_APPLYING_FILTERING", true);
 				JText::script("FLEXI_TYPE_TO_LIST", true);
 				JText::script("FLEXI_TYPE_TO_FILTER", true);
@@ -1242,7 +1243,7 @@ class flexicontent_html
 			case 'flexi-lib':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js?v='.FLEXI_VERSION);
+				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VERSION);
 				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				break;
 			
@@ -1781,7 +1782,7 @@ class flexicontent_html
 		if (!$js_and_css_added && $canChangeState && $addToggler )
 		{
 			// File exists both in frontend & backend (and is different), so we will use 'base' method and not 'root'
-			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/stateselector.js?v='.FLEXI_VERSION);
+			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VERSION);
 			$js ='				
 				function fc_setitemstate(state, id)
 				{
@@ -2512,8 +2513,8 @@ class flexicontent_html
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 			
 			$document = JFactory::getDocument();
-			$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/fcvote.css?v='.FLEXI_VERSION);
-			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/fcvote.js?v='.FLEXI_VERSION);
+			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/fcvote.css', FLEXI_VERSION);
+			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/fcvote.js', FLEXI_VERSION);
 
 			$document->addScriptDeclaration('var fcvote_rfolder = "'.JURI::root(true).'";');
 
@@ -2767,7 +2768,7 @@ class flexicontent_html
 			flexicontent_html::loadFramework('jQuery');
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 			
-			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/fcfav.js?v='.FLEXI_VERSION);
+			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/fcfav.js', FLEXI_VERSION);
 			
 			JText::script('FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX',true);
 			JText::script('FLEXI_LOADING',true);

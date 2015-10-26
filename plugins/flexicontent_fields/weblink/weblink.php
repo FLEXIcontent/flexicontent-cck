@@ -590,7 +590,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			}
 			
 			$newpost[$new] = array();
-			$newpost[$new]['link'] = $prefix.$link;
+			$newpost[$new]['link'] = empty($link) ? '' : $prefix.$link;
 			
 			// Validate other value properties
 			$newpost[$new]['title']   = flexicontent_html::dataFilter(@$post[$n]['title'], 0, 'STRING', 0);
