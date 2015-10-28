@@ -22,8 +22,16 @@ foreach($files_data as $file_id => $file_data)
 		$is_public  = in_array($public_acclevel,$aid_arr);
 	}
 	
-	// If no access and set not to show then continue
-	if ( !$authorized && !$noaccess_display ) continue;
+	// If no access and set not to show then skip the value, if not in field group
+	if ( !$authorized && !$noaccess_display ) {
+		if (!$is_ingroup) continue; // not in field group
+		
+		$field->{$prop}[]	=  $pretext . $str . $posttext;
+		// Some extra data for developers: (absolute) file URL and (absolute) file path
+		$field->url[] = '';
+		$field->abspath[] = '';
+		$field->file_data[] = $empty_file_data;
+	}
 	
 	// Initialize CSS classes variable
 	$file_classes = !$authorized ? 'fcfile_noauth' : '';
@@ -108,7 +116,7 @@ foreach($files_data as $file_id => $file_data)
 	$filename_original = htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8');
 	
 	$name_str   = $display_filename==2 ? $filename_original : $_filetitle;
-	$name_classes = $file_classes.($file_classes ? ' ' : '').'badge fcfile_title';
+	$name_classes = $file_classes.($file_classes ? ' ' : '').'fcfile_title';
 	$name_html  = '<span class="'.$name_classes.'">'. $name_str . '</span>';
 	
 	
@@ -333,7 +341,7 @@ foreach($files_data as $file_id => $file_data)
 	}
 	
 	// [4]: Add the file description (if displayed inline)
-	if ($descr_inline) $str .= $descr_inline;
+	if ($descr_inline) $str .= '<div class="fcclear"></div>'.$descr_inline;
 	
 	
 	// Values Prefix and Suffix Texts
@@ -344,5 +352,9 @@ foreach($files_data as $file_id => $file_data)
 	$field->abspath[] = $abspath;
 	$field->file_data[] = $file_data;
 	
+	// Add microdata to every value if field -- is -- in a field group
+	if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';
+	
 	$n++;
+	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }

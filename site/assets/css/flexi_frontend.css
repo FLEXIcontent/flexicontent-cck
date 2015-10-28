@@ -629,6 +629,15 @@ div.current dd {
 	display:inline-block;
 }
 
+/* File field viewing: file title */
+.fcfile_title {
+	font-size: 13px;
+	font-weight: normal;
+	margin: 4px 6px 0px 6px;
+	padding: 4px 0px 0px 0px;
+	display: inline-block;
+	border-bottom: 1px dashed gray;
+}
 
 /* Image field viewing: thumbnails */
 img.fc_field_image {

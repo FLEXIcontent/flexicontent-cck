@@ -461,6 +461,11 @@ class plgFlexicontent_fieldsFile extends FCField
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
+		// Some variables
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 1 ) ;
+		
 		static $langs = null;
 		if ($langs === null) $langs = FLEXIUtilities::getLanguages('code');
 		
@@ -487,7 +492,13 @@ class plgFlexicontent_fieldsFile extends FCField
 		$field->label = JText::_($field->label);
 		
 		$values = $values ? $values : $field->value;
-		if ( empty($values) ) { $field->{$prop} = ''; return; }
+		
+		// Check for no values and no default value, and return empty display
+		if ( empty($values) ) {
+			$field->{$prop} = $is_ingroup ? array() : '';
+			return;
+		}
+		
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -496,6 +507,9 @@ class plgFlexicontent_fieldsFile extends FCField
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
+		// Microdata (classify the field values for search engines)
+		$itemprop    = '';//$field->parameters->get('microdata_itemprop');
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
@@ -644,6 +658,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		$show_filename = $display_filename || $prop=='namelist';
 		$public_acclevel = 1;
+		$empty_file_data = array('filename'=>false, 'filename_original'=>false, 'altname'=>false, 'description'=>false, 'ext'=>false, id=>0);
 		
 		
 		$viewlayout = $field->parameters->get('viewlayout', '');
@@ -655,12 +670,22 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		if (!empty($fancybox_needed)) flexicontent_html::loadFramework('fancybox');
 		
-		// Apply seperator and open/close tags
-		if(count($field->{$prop})) {
-			$field->{$prop}  = implode($separatorf, $field->{$prop});
-			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
-		} else {
-			$field->{$prop} = '';
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
+		if (!$is_ingroup)
+		{
+			// Apply values separator
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+			if ( $field->{$prop}!=='' )
+			{
+				// Apply field 's opening / closing texts
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+				
+				// Add microdata once for all values, if field -- is NOT -- in a field group
+				if ( $itemprop )
+				{
+					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
+				}
+			}
 		}
 	}
 	

@@ -1020,10 +1020,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		
-		// *********************************************
-		// Check for no values, and return empty display
-		// *********************************************
-		if ( !count($values) ) {
+		// ******************************************************************
+		// Check for no values and no default value, and return empty display
+		// ******************************************************************
+		if ( empty($values) ) {
 			$field->{$prop} = $is_ingroup ? array() : '';
 			return;
 		}

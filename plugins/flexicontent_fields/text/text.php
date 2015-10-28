@@ -373,7 +373,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		// Get field values
 		$values = $values ? $values : $field->value;
 		
-		// Load default value
+		// Check for no values and no default value, and return empty display
 		if ( empty($values) ) {
 			if (!strlen($default_value)) {
 				$field->{$prop} = $is_ingroup ? array() : '';

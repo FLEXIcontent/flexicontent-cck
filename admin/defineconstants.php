@@ -83,8 +83,10 @@ if ( !class_exists('JViewLegacy') )
 }
 
 // Set a default timezone if web server provider has not done so
-if ( ini_get('date.timezone')=='' && version_compare(PHP_VERSION, '5.1.0', '>'))
+// phpversion() should be used instead of PHP_VERSION, if not inside Joomla code
+if ( ini_get('date.timezone')=='' && version_compare(PHP_VERSION, '5.1.0', '>')) {
 	date_default_timezone_set('UTC');
+}
 
 // Set file manager paths
 $params = JComponentHelper::getParams('com_flexicontent');

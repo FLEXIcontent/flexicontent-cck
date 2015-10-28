@@ -411,7 +411,6 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Value handling parameters
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
@@ -433,7 +432,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		// Get field values
 		$values = $values ? $values : $field->value;
 		
-		// Load default value
+		// Check for no values and no default value, and return empty display
 		if ( empty($values) ) {
 			if (!strlen($default_value)) {
 				$field->{$prop} = $is_ingroup ? array() : '';

@@ -334,7 +334,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		$config = JFactory::getConfig();
 		$user = JFactory::getUser();
 		
@@ -366,7 +365,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$values = array($_value);
 		}
 		
-		// Load default value
+		// Check for no values and no default value, and return empty display
 		if ( empty($values) ) {
 			$field->{$prop} = $is_ingroup ? array() : '';
 			return;
