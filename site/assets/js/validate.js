@@ -337,7 +337,7 @@ var JFormValidator = function()
 			{
 				el.on('blur', function(){ return document.formvalidator.validate(this); });
  	 	 	 	if (tag_name == 'input' && el.hasClass('validate-email') && inputEmail) {
- 	 	 	 	 	el.get(0).type = 'email';
+ 	 	 	 		try { el.get(0).type = 'email'; } catch (e) { /*IE8 or less*/}
  	 	 	 	}
 			}
 			
