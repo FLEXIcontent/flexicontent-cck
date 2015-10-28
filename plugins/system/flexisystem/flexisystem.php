@@ -180,12 +180,21 @@ class plgSystemFlexisystem extends JPlugin
 					jQuery.fn.chosen = function(){};
 				";*/
 			}
+			
+			$max_input_vars = ini_get('max_input_vars');
+			if (extension_loaded('suhosin'))
+			{
+				$suhosin_lim = ini_get('suhosin.post.max_vars');
+				if ($suhosin_lim < $max_input_vars) $max_input_vars = $suhosin_lim;
+				$suhosin_lim = ini_get('suhosin.request.max_vars');
+				if ($suhosin_lim < $max_input_vars) $max_input_vars = $suhosin_lim;
+			}
 			$js .= "
 				jQuery(document).ready(function() {
 					jQuery(document.forms['adminForm']).attr('data-fc_doserialized_submit', '1');
 					//if ('".$option."'=='com_flexicontent') jQuery(document.forms['adminForm']).attr('data-fc_doajax_submit', '1');
 				});
-				var fc_max_input_vars = ".ini_get('max_input_vars').";
+				var fc_max_input_vars = ".$max_input_vars.";
 			";
 		}
 		if ($js) $document->addScriptDeclaration($js);
