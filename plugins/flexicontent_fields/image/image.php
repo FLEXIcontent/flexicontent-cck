@@ -558,7 +558,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$onchange= ' onchange="';
 		
 		$onchange .= " qmAssignFile".$field->id."(this.id, '', '');";
-		$js_submit = FLEXI_J16GE ? "Joomla.submitbutton('items.apply')" : "submitbutton('apply')";
+		$js_submit = "Joomla.submitbutton('items.apply')";
 		$onchange .= ($autoupload && $app->isAdmin()) ? $js_submit : '';
 		$onchange .= ' "';
 		
@@ -988,6 +988,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ($values) foreach ($values as $index => $value) {
 			$value	= unserialize($value);
 			if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item) )  $usable_values[] = $values[$index];
+			else if ($is_ingroup) $usable_values[] = $values[$index]; // ADD empty value if in fieldgroup
 		}
 		$values = & $usable_values;
 		
@@ -1426,7 +1427,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			// Create a popup url link
 			$urllink = @$value['urllink'] ? $value['urllink'] : '';
-			if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
+			//if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
 			
 			// Create a popup tooltip (legend)
 			$class = 'fc_field_image';
@@ -2046,12 +2047,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$v['originalname'] = $v['existingname'];
 					$v['existingname'] = '';
 				} else if ( $v['delete'] || $v['remove'] ) {
-					$v = '';
+					// Deleting or unloading current value: Skip current image row, but allow empty value if in fieldgroup
+					$v = $use_ingroup ? array('originalname'=>'') : false;
 				}
 				
 			} else {
-				// No original file posted discard current image row
-				$v = '';
+				// No new file posted and no existing selected: Skip current image row, but allow empty value if in fieldgroup
+				$v = $use_ingroup ? array('originalname'=>'') : false;
 			}
 			
 			// Add image entry to a new array skipping empty image entries
@@ -2283,8 +2285,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$obj->secure		= 1;
 				$obj->ext				= $ext;
 				$obj->hits			= 0;
-				$obj->uploaded			= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
-				$obj->uploaded_by		= $user->get('id');
+				$obj->uploaded		= $date->toSql();
+				$obj->uploaded_by	= $user->get('id');
 				
 				if ($format == 'json') {
 					jimport('joomla.error.log');
@@ -2495,7 +2497,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// Done nothing more to clean
 		} else {
 			$query = 'DELETE FROM #__flexicontent_files'
-				. ' WHERE ' . (FLEXI_J16GE ? $db->quoteName('filename') : $db->nameQuote('filename') ) . ' = ' . $db->Quote($filename);
+				. ' WHERE ' . $db->quoteName('filename') . ' = ' . $db->Quote($filename);
 			$db->setQuery( $query );
 			if(!$db->execute())
 			{
@@ -2732,7 +2734,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				;
 		}
 		$db->setQuery($query);
-		$values = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+		$values = $db->loadColumn();
 		
 		// Create original filenames array skipping any empty records, 
 		// NOTE: if all_media is ON the we already retrieved filenames above
