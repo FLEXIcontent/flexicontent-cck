@@ -53,7 +53,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$_value = ($date_source == 1) ? $item->publish_up : $item->publish_down;
 			$field->html =
 				 '<div style="float:left">'
-				.' <div class="alert alert-info fc-small fc-iblock">'.$date_source_str.'</div>'
+				.' <div class="alert alert-info fc-small fc-iblock">'.$date_source_str.'</div><div class="clear"></div>'
 				. $_value
 				.'</div>';
 			return;
@@ -316,7 +316,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		}
 		
 		if (!$use_ingroup)
-			$field->html = (($show_usage && $append_str) ? ' <div class="alert alert-info fc-small fc-iblock">'.$append_str.'</div>' : '')  .  $field->html;
+			$field->html = (($show_usage && $append_str) ? ' <div class="alert alert-info fc-small fc-iblock">'.$append_str.'</div><div class="clear"></div>' : '')  .  $field->html;
 		
 		if ( count($skipped_vals) )
 			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );

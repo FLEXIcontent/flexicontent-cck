@@ -1079,7 +1079,7 @@ if ($this->fields && $typeid) :
 		
 		<?php
 		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar');
-		$noplugin = sprintf( $alert_box, '', 'warning', 'fc-nobgimage', JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) );
+		$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 4px 6px 4px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 		$row_k = 0;
 		foreach ($this->fields as $field_name => $field)
 		{
@@ -1195,7 +1195,7 @@ if ($this->fields && $typeid) :
 				<!-- tabber end -->
 				<?php $tabSetCnt = array_pop($tabSetStack); ?>
 				
-			<?php elseif ( !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
+			<?php elseif ( !isset($field->html) || !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
 				
 				<?php echo isset($field->html) ? $field->html : $noplugin; ?>
 				

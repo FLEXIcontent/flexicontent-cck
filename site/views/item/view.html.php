@@ -794,7 +794,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Check if saving an item that translates an original content in site's default language
 		$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
 		$is_content_default_lang = $site_default == substr($item->language, 0,2);
-		//$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang; // && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
 		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$fields = $this->get( 'Extrafields' );
@@ -824,8 +823,10 @@ class FlexicontentViewItem  extends JViewLegacy
 				
 				if ($is_editable) {
 					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
-					if (/*$modify_untraslatable_values &&*/ $field->untranslatable) {
-						$field->html = '<div class="alert alert-info fc-small fc-iblock">'. JText::_('FLEXI_FIELD_VALUE_IS_NON_TRANSLATABLE') . '</div>'."\n".$field->html;
+					if ($field->untranslatable) {
+						$field->html =
+							(!isset($field->html) ? '<div class="fc-mssg-inline fc-warning" style="margin:0 4px 6px 4px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div><div class="clear"></div>' : '').
+							'<div class="alert alert-info fc-small fc-iblock" style="margin:0 4px 6px 4px; max-width: unset;">'. JText::_('FLEXI_FIELD_VALUE_IS_NON_TRANSLATABLE') . '</div>'. "\n" . (isset($field->html) ? '<div class="clear"></div>'.$field->html : '');
 					}
 				}
 				

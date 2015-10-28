@@ -35,7 +35,7 @@ $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : 
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-$noplugin = '<div class="fc-mssg fc-warning">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 4px 6px 4px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 
 // add extra css/js for the edit form
 if ($this->params->get('form_extra_css'))    $this->document->addStyleDeclaration($this->params->get('form_extra_css'));
@@ -743,7 +743,7 @@ if ($this->row->type_id) {
 				<div style="<?php echo $container_width; ?>" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
 					<?php echo ($field->description && $edithelp==3) ? '<div class="alert fc-small fc-iblock">'.$field->description.'</div>' : ''; ?>
 				
-				<?php if ( !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
+				<?php if ( !isset($field->html) || !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
 					
 					<?php echo isset($field->html) ? $field->html : $noplugin; ?>
 					
