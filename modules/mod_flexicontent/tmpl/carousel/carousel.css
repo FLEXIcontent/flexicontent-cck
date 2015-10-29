@@ -61,11 +61,11 @@
 	/* can be overriden via user 's CSS */
 	margin: 4px;
 	padding: 0;
-	border-width: 1px;
+	/*border-width: 1px;
 	border-style: solid;
 	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
 	border-radius:0px;
-	background-color: #EFEFEF;
+	background-color: #EFEFEF;*/
 }
 
 
@@ -166,7 +166,7 @@
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover .mod_flexicontent_featured_wrapper_innerbox,*/
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_fc_activeitem:hover .mod_flexicontent_standard_wrapper_innerbox,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover .mod_flexicontent_standard_wrapper_innerbox {
-	background-color: #D0D0D0;
+	/*background-color: #D0D0D0;
 	border-color: #888 #555 #555 #888;
 	/*box-shadow: 4px 4px 2px darkgray;*/
 }
@@ -218,14 +218,14 @@
 /* item title styling (link, etc) */
 .carousel.mod_flexicontent_wrapper .fcitem_title a {
 	background-color: transparent;
-	color: #08c;
+	/*color: #08c;*/
 	text-decoration:none;
 	-webkit-transition: all 0.4s; transition: all 0.4s;
 }
 .carousel.mod_flexicontent_wrapper .fcitem_title:hover a,
 .carousel.mod_flexicontent_wrapper .fcitem_title a:hover {
 	background-color: transparent;
-	color: darkred;
+	/*color: darkred;*/
 	text-decoration: none;
 }
 .carousel.mod_flexicontent_wrapper .fc_overlayed .fcitem_title a {
@@ -281,7 +281,7 @@
 }
 .carousel.mod_flexicontent_wrapper .image_featured img,
 .carousel.mod_flexicontent_wrapper .image_standard img {
-  padding:1px; border:1px solid #cccccc;  
+  padding:1px; /*border:1px solid #cccccc;*/  
 }
 .carousel.mod_flexicontent_wrapper .image_standard a:hover img,
 .carousel.mod_flexicontent_wrapper .image_featured a:hover img {
@@ -356,9 +356,9 @@
 	-webkit-transition: all 0.4s; transition: all 0.4s;
 }
 .carousel.mod_flexicontent_wrapper .fcitem_readon:hover {
-	background-color: rgba(255, 255, 255, 0.6);
+	/*background-color: rgba(255, 255, 255, 0.6);
 	border: solid gray;
-	border-width:1px 0px;
+	border-width:1px 0px;*/
 	padding: 1px 6px 1px 20px;
 	margin: 3px 3px 3px 4px;
 	display:inline-block;
@@ -493,15 +493,15 @@
 /* CURRENTLY ACTIVATED item container */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.mod_fc_activeitem .mod_flexicontent_featured_wrapper_innerbox,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.mod_fc_activeitem .mod_flexicontent_standard_wrapper_innerbox {
-	background-color: #E0E0E0;
+	/*background-color: #E0E0E0;
 	border-color: #afafaf #8f8f8f #8f8f8f #afafaf;
-	/*box-shadow: 4px 4px 2px darkgray;*/
+	box-shadow: 4px 4px 2px darkgray;*/
 }
 /* image of CURRENTLY ACTIVATED item container */
 .carousel.mod_flexicontent_wrapper .mod_fc_activeitem .image_standard img,
 .carousel.mod_flexicontent_wrapper .mod_fc_activeitem .image_featured img
 {
-  border:1px solid #444444;
+  /*border:1px solid #444444;*/
 }
 
 /* image of CURRENTLY ACTIVATED item container */
@@ -678,7 +678,7 @@
 	filter:alpha(opacity=100);
 }
 .carousel.mod_flexicontent_wrapper .mod_fc_item_handles span.mod_fc_item_handle.active {
-	border-color: #555 #333 #333 #555;
+	/*border-color: #555 #333 #333 #555;*/
 }
 
 
@@ -783,7 +783,7 @@
 	background-attachment: scroll !important;
 	-webkit-background-clip: border-box !important;
 	background-clip: border-box !important;
-	background-color: #fff !important;
+	background-color: transparent !important;
 	background-image: url("images/nav.png") !important;
 	-webkit-background-origin: padding-box !important;
 	background-origin: padding-box !important;
@@ -791,31 +791,33 @@
 	background-repeat: no-repeat !important;
 	-webkit-background-size: auto auto !important;
 	background-size: auto auto !important;
-	-moz-border-radius: 10px 0 0 10px !important;
+	/*-moz-border-radius: 10px 0 0 10px !important;
 	-webkit-border-radius: 10px 0 0 10px !important;
 	border-radius: 10px 0 0 10px !important;
 	-moz-box-shadow: 1px 1px 5px #ccc;
 	-webkit-box-shadow: 1px 1px 5px #ccc;
-	box-shadow: 1px 1px 5px #ccc;
+	box-shadow: 1px 1px 5px #ccc;*/
 	height: 33px !important;
-	margin-left: 3px;
-	margin-right: 3px;
+	margin-left: 37px;
+	margin-right: 37px;
 	position: absolute !important;
-	top: 37%;
+	top: 40%;
 	width: 28px;
+    z-index:11;
 }
 .carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_vertical {
-	background: url("images/nav_vertical.png") no-repeat scroll 50% -20% #fff !important;
-	-moz-border-radius: 10px 10px 0 0 !important;
+	background: url("images/nav_vertical.png") no-repeat scroll 50% -20% transparent !important;
+	/*-moz-border-radius: 10px 10px 0 0 !important;
 	-webkit-border-radius: 10px 10px 0 0 !important;
 	border-radius: 10px 10px 0 0 !important;
 	-moz-box-shadow: 0 0 5px #ccc;
 	-webkit-box-shadow: 0 0 5px #ccc;
-	box-shadow: 0 0 5px #ccc;
-	margin-left: 48%;
+	box-shadow: 0 0 5px #ccc;*/
+	margin-left: 45%;
 	position: relative !important;
 	height: 31px;
 	width: 41px;
+    z-index:11;
 }
 .carousel.mod_flexicontent_wrapper span.mod_fc_nav {
 	display: block !important;
@@ -831,15 +833,15 @@
 }
 .carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_horizontal.fc_next {
 	background-position: 115% 50% !important;
-	border-radius: 0 10px 10px 0 !important;
+	/*border-radius: 0 10px 10px 0 !important;*/
 	left: auto !important;
 	right: 0 !important;
 }
 .carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_vertical.fc_next {
 	background-position: 50% 115% !important;
-	-moz-border-radius: 0 0 10px 10px !important;
+	/*-moz-border-radius: 0 0 10px 10px !important;
 	-webkit-border-radius: 0 0 10px 10px !important;
-	border-radius: 0 0 10px 10px !important;
+	border-radius: 0 0 10px 10px !important;*/
 	left: auto !important;
 	right: 0 !important;
 	top: -6px;

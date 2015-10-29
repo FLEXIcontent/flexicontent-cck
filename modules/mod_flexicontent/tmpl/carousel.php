@@ -916,9 +916,6 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 	
 	/* The MASK that contains the CAROUSEL (mask clips it) */'
 	#mod_fc_carousel_mask_'.$uniq_ord_id.' {
-		border: 5px solid #fff;
-		border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px;
-		box-shadow: 1px 1px 5px #ccc; -webkit-box-shadow: 1px 1px 5px #ccc; -moz-box-shadow: 1px 1px 5px #ccc;
 		z-index: 10
 	}'.
 	
