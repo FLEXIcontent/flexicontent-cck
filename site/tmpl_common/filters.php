@@ -117,11 +117,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 						data-fc_label_text="<?php echo $text_search_label; ?>" name="filter"
 						id="<?php echo $form_id; ?>_filter" value="<?php echo htmlspecialchars($text_search_val, ENT_COMPAT, 'UTF-8');?>" />
 					<?php echo $searchphrase_selector; ?>
-						
-					</div>
-					<div id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></div>
-					<?php endif; ?>
-				
+					
 					<?php if ( $msg ) : ?><div class="fc-mssg fc-note"><?php echo $msg; ?></div><?php endif; ?>
 				</div>
 				
@@ -228,46 +224,34 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			// Create HTML of filters
 			echo $opentag . implode($separatorf, $filters_html) . $closetag;
 			unset ($filters_html);
-			
-			$buttons_added_already = $filter_placement && $use_search;
 			?>
 			
-			<?php if ($show_search_go && !$buttons_added_already) : ?>
-			<div class="fc_filter">
-				<div class="fc_buttons">
-					<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;">
-						<div title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>"><?php echo JText::_( 'FLEXI_GO' ); ?></div>
-					</button>
-					
-					<?php if ($show_search_reset && !$buttons_added_already) : ?>
-					<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;">
-						<div title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>"><?php echo JText::_( 'FLEXI_RESET' ); ?></div>
-					</button>
-					<?php endif; ?>
-					
-				</div>
-				<div id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></div>
-			</div>
-			<?php endif; ?>
 			
 		<?php endif; /* EOF filter */ ?>
 
+
+		<?php if ($show_search_go || $show_search_reset) : ?>
+		<div class="fc_filter">
+			<div class="fc_buttons">
+				<?php if ($show_search_go) : ?>
+				<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>">
+					<div class="icon-search"></div><?php echo JText::_( 'FLEXI_GO' ); ?>
+				</button>
+				<?php endif; ?>
+					
+				<?php if ($show_search_reset) : ?>
+				<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
+					<div class="icon-remove"></div><?php echo JText::_( 'FLEXI_RESET' ); ?>
+				</button>
+				<?php endif; ?>
+					
+			</div>
+			<div id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></div>
+		</div>
+		<?php endif; ?>
+
 	</fieldset>
 		
-<?php if ( $filter_placement && ($show_search_go || $show_search_reset) ) : ?>
-					<div class="fc_buttons">
-						<?php if ($show_search_go) : ?>
-						<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>">
-							<div class="icon-search"></div><?php echo JText::_( 'FLEXI_GO' ); ?>
-						</button>
-						<?php endif; ?>
-						
-						<?php if ($show_search_reset) : ?>
-						<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
-							<div class="icon-remove"></div><?php echo JText::_( 'FLEXI_RESET' ); ?>
-						</button>
-						<?php endif; ?>
-
 </div>
 
 <?php endif; /* EOF search and filter block */
