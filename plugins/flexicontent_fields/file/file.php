@@ -658,7 +658,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		$show_filename = $display_filename || $prop=='namelist';
 		$public_acclevel = 1;
-		$empty_file_data = array('filename'=>false, 'filename_original'=>false, 'altname'=>false, 'description'=>false, 'ext'=>false, id=>0);
+		$empty_file_data = array('filename'=>false, 'filename_original'=>false, 'altname'=>false, 'description'=>false, 'ext'=>false, 'id'=>0);
 		
 		
 		$viewlayout = $field->parameters->get('viewlayout', '');

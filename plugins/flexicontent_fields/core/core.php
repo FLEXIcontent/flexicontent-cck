@@ -582,9 +582,13 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' tags.id AS value, tags.name AS text';
-				$filter->filter_valuesjoin   =
-					 ' JOIN #__flexicontent_tags_item_relations AS tagsrel ON tagsrel.itemid = i.id '
-					.' JOIN #__flexicontent_tags AS tags ON tags.id =  tagsrel.tid ';
+				if (!$faceted_filter) {
+					$filter->filter_valuesfrom = ' FROM #__flexicontent_tags AS tags ';
+				} else {
+					$filter->filter_valuesjoin   =
+						 ' JOIN #__flexicontent_tags_item_relations AS tagsrel ON tagsrel.itemid = i.id '
+						.' JOIN #__flexicontent_tags AS tags ON tags.id =  tagsrel.tid ';
+				}
 				$filter->filter_valueswhere  = ' ';  // ... a space, (indicates not needed and prevents using default)
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY tags.id ';

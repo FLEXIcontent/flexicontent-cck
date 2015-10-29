@@ -285,61 +285,7 @@ jQuery(document).ready(function(){
 </script>
 <div id="flexicontent" class="flexicontent">
 
-<?php if ($this->unassociated && !$this->badcatitems) : ?>
-	<div class="fc-mssg fc-warning">
-	<table>
-		<tr>
-			<td>
-			<span style="font-size:115%;">
-			<?php echo JText::_( 'FLEXI_UNASSOCIATED_WARNING' ); ?>
-			</span>
-			</td>
-			<td width="35%">
-				<span style="font-size:150%;"><span id="orphan_items_count"><?php echo $this->unassociated; ?></span></span>
-				<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>
-				<div id="log-bind"></div>
-				<form action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>bindextdata&amp;tmpl=component&amp;format=raw" method="post" name="bindForm" id="bindForm">
-					<?php echo $this->lists['bind_limits']; ?>
-					<?php
-						$types = $this->get( 'Typeslist' );
-						echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"', 'typeid');
-					?>
-					<input id="button-bind" type="button" class="<?php echo $btn_class; ?> btn-primary" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_BIND' ); ?>"
-					onclick="jQuery(this.form).hide(); bindItems();" />
-				</form>
-			</td>
-		</tr>
-	</table>
-	</div>
-<?php endif; ?>
 
-
-<?php if ($this->badcatitems) : ?>
-<form action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>fixmaincat&amp;tmpl=component&amp;format=raw" method="post" name="fixcatForm" id="fixcatForm">
-	<div class="fc-mssg fc-warning">
-	<table>
-		<tr>
-			<td>
-			<span style="font-size:115%;">
-			<?php echo JText::_( 'Item with invalid or missing main category' ); ?>
-			</span>
-			</td>
-			<td width="35%">
-				<span style="font-size:150%;"><span id="badcat_items_count"><?php echo $this->badcatitems; ?></span></span>&nbsp;
-				<br/>
-				<?php echo JText::_( 'FLEXI_DEFAULT_CAT_FOR_NO_CAT_ITEMS' ).': '.$this->lists['default_cat']; ?>
-				<input id="button-fixcat" type="submit" class="<?php echo $btn_class; ?>" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_FIX' ); ?>"
-				onclick="" />
-				<div id="log-fixcat"></div>
-			</td>
-		</tr>
-	</table>
-	</div>
-</form>
-<?php endif; ?>
-
-
-<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
@@ -350,6 +296,63 @@ jQuery(document).ready(function(){
 	<div id="j-main-container">
 <?php endif;?>
 
+
+	<?php if ($this->unassociated && !$this->badcatitems) : ?>
+		<div class="fc-mssg fc-warning">
+		<table>
+			<tr>
+				<td>
+				<span style="font-size:115%;">
+				<?php echo JText::_( 'FLEXI_UNASSOCIATED_WARNING' ); ?>
+				</span>
+				</td>
+				<td width="35%">
+					<span style="font-size:150%;"><span id="orphan_items_count"><?php echo $this->unassociated; ?></span></span>
+					<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>
+					<div id="log-bind"></div>
+					<form action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>bindextdata&amp;tmpl=component&amp;format=raw" method="post" name="bindForm" id="bindForm">
+						<?php echo $this->lists['bind_limits']; ?>
+						<?php
+							$types = $this->get( 'Typeslist' );
+							echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"', 'typeid');
+						?>
+						<input id="button-bind" type="button" class="<?php echo $btn_class; ?> btn-primary" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_BIND' ); ?>"
+						onclick="jQuery(this.form).hide(); bindItems();" />
+					</form>
+				</td>
+			</tr>
+		</table>
+		</div>
+	<?php endif; ?>
+
+
+	<?php if ($this->badcatitems) : ?>
+	<form action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>fixmaincat&amp;tmpl=component&amp;format=raw" method="post" name="fixcatForm" id="fixcatForm">
+		<div class="fc-mssg fc-warning">
+		<table>
+			<tr>
+				<td>
+				<span style="font-size:115%;">
+				<?php echo JText::_( 'Item with invalid or missing main category' ); ?>
+				</span>
+				</td>
+				<td width="35%">
+					<span style="font-size:150%;"><span id="badcat_items_count"><?php echo $this->badcatitems; ?></span></span>&nbsp;
+					<br/>
+					<?php echo JText::_( 'FLEXI_DEFAULT_CAT_FOR_NO_CAT_ITEMS' ).': '.$this->lists['default_cat']; ?>
+					<input id="button-fixcat" type="submit" class="<?php echo $btn_class; ?>" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_FIX' ); ?>"
+					onclick="" />
+					<div id="log-fixcat"></div>
+				</td>
+			</tr>
+		</table>
+		</div>
+	</form>
+	<?php endif; ?>
+
+
+	<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>" method="post" name="adminForm" id="adminForm">
+	
 	<div id="fc-filters-header">
 		<?php echo $this->lists['scope']; ?>
 		<span class="btn-group input-append filter-search fc-filter">
@@ -1093,6 +1096,7 @@ jQuery(document).ready(function(){
 	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 	
+	</form>
 	</div>
-</form>
+
 </div>
