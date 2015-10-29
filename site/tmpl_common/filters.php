@@ -117,20 +117,6 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 						data-fc_label_text="<?php echo $text_search_label; ?>" name="filter"
 						id="<?php echo $form_id; ?>_filter" value="<?php echo htmlspecialchars($text_search_val, ENT_COMPAT, 'UTF-8');?>" />
 					<?php echo $searchphrase_selector; ?>
-					
-					<?php if ( $filter_placement && ($show_search_go || $show_search_reset) ) : ?>
-					<div class="fc_buttons">
-						<?php if ($show_search_go) : ?>
-						<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>">
-							<div class="icon-search"></div><?php echo JText::_( 'FLEXI_GO' ); ?>
-						</button>
-						<?php endif; ?>
-						
-						<?php if ($show_search_reset) : ?>
-						<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
-							<div class="icon-remove"></div><?php echo JText::_( 'FLEXI_RESET' ); ?>
-						</button>
-						<?php endif; ?>
 						
 					</div>
 					<div id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></div>
@@ -169,7 +155,6 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			$filters_html = array();
 			foreach ($filters as $filt) :
 				if (empty($filt->html)) continue;
-				
 				$filt_lbl = $filt->label;
 				if ( isset($fgInfo->field_to_grp[$filt->id]) ) {
 					$fieldgrp_id = $fgInfo->field_to_grp[$filt->id];
@@ -230,6 +215,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				
 				$filters_html[] = $_filter_html;
 			endforeach;
+
 			
 			// (if) Using separator
 			$separatorf = '';
@@ -265,9 +251,23 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			<?php endif; ?>
 			
 		<?php endif; /* EOF filter */ ?>
-		
+
 	</fieldset>
 		
+<?php if ( $filter_placement && ($show_search_go || $show_search_reset) ) : ?>
+					<div class="fc_buttons">
+						<?php if ($show_search_go) : ?>
+						<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>">
+							<div class="icon-search"></div><?php echo JText::_( 'FLEXI_GO' ); ?>
+						</button>
+						<?php endif; ?>
+						
+						<?php if ($show_search_reset) : ?>
+						<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
+							<div class="icon-remove"></div><?php echo JText::_( 'FLEXI_RESET' ); ?>
+						</button>
+						<?php endif; ?>
+
 </div>
 
 <?php endif; /* EOF search and filter block */
