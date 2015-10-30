@@ -396,7 +396,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		}
 		
-		$indexed_elements = in_array($filter->field_type, array('tags', 'createdby', 'modifiedby', 'created', 'modified', 'type'));
+		$indexed_elements = false;//in_array($filter->field_type, array('tags', 'createdby', 'modifiedby', 'created', 'modified', 'type'));
 		
 		if ($filter->field_type == 'categories' || $filter->field_type == 'title') {
 			plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName, $isSearchView=1);
@@ -408,7 +408,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		}
 		
 		else {
-			$filter->filter_orderby_adv = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
+			$filter->filter_orderby_adv = null;   // default will order by value and not by label
 			FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
 		}
 	}
@@ -424,7 +424,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		
 		$_s = $isSearchView ? '_s' : '';
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
-		$faceted_filter = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
+		$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 0 );  // Filter Type of Display
 		$disable_keyboardinput = $filter->parameters->get('disable_keyboardinput', 0);
 		$filter_as_range = in_array($display_filter_as, array(2,3,8)) ;
 		
@@ -458,7 +458,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY i.created_by ';
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty
-				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
+				$filter->filter_orderby = ' ORDER by text';   // default will order by value and not by label
 				
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
@@ -472,7 +472,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY i.modified_by ';
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty
-				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
+				$filter->filter_orderby = ' ORDER by text';   // default will order by value and not by label
 				
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
@@ -489,7 +489,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY ict.id';
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty
-				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
+				$filter->filter_orderby = ' ORDER by text';   // default will order by value and not by label
 				
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
@@ -593,7 +593,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY tags.id ';
 				$filter->filter_having  = null;   // this indicates to use default, space is use empty
-				$filter->filter_orderby = null;   // use default, no ordering done to improve speed, it will be done inside PHP code
+				$filter->filter_orderby = ' ORDER by text';   // default will order by value and not by label
 				
 				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
