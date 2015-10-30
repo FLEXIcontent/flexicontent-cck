@@ -54,7 +54,7 @@
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="allow_relative_addrs" type="radio" default="0" label="FLEXI_EXTWL_RELATIVE_ADDRESSES" description="FLEXI_EXTWL_RELATIVE_ADDRESSES_DESC">
+			<field name="allow_relative_addrs" type="radio" default="0" label="FLEXI_EXTWL_RELATIVE_ADDRESSES" description="FLEXI_EXTWL_RELATIVE_ADDRESSES_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_USER_CAN_SELECT</option>
