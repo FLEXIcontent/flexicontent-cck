@@ -1079,7 +1079,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Optionally group images from all image fields of current item ... or of all items in view too
 		$grouptype  = $field->parameters->get( 'grouptype', 1 ) ;
-		$grouptype = $multiple ? 0 : $grouptype;  // Field in gallery mode: Force grouping of images per field (current item)
+		//$grouptype = $multiple ? 0 : $grouptype;  // Field in gallery mode: Force grouping of images per field (current item)
 		
 		// Needed by some js galleries
 		$thumb_w_s = $field->parameters->get( 'w_s', 120);
@@ -1458,9 +1458,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// Create a grouping name
 			switch ($grouptype)
 			{
+				// This field only
 				case 0: $group_name = 'fcview_'.$view.'_fcitem_'.$item->id.'_fcfield_'.$field->id; break;
+				
+				// All fields of the item
 				case 1: $group_name = 'fcview_'.$view.'_fcitem_'.$item->id; break;
+				
+				// Per view:  all items of category page, or search page
 				case 2: $group_name = 'fcview_'.$view; break;
+				
+				// No group
 				default: $group_name = ''; break;
 			}
 			

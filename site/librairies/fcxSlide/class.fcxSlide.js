@@ -393,7 +393,8 @@ var fcxSlide = function(params)
 		if (width_changed && (this.responsive==1 || !this.item_height_px_OLD)) {
 			this.item_height_px_OLD = 0; // Force updating height
 			var maxHeight = 0;
-			this.items.each(function() { this.style.height = "auto"; });
+			jQuery(this.items).css('height', 'auto');
+			jQuery(this.items_inner).css('height', 'auto');
 			this.items.each(function() { maxHeight = Math.max(maxHeight, this.clientHeight); });
 			//alert('Setting item height to:' + maxHeight);
 			

@@ -31,6 +31,10 @@
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
+			<field name="carousel_hl_items_onnav_feat" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes">
+				<option value="0">FLEXI_NO</option>
+				<option value="2">On Hover</option>
+			</field>
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
 			<field name="carousel_content_layout_feat" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part">
@@ -113,6 +117,12 @@
 			<field name="carousel_items_per_page" type="text" default="2" label="# items" description="Number of items that will be displayed, use 1 for 'slideshow' effect" />
 			
 			<field name="" type="separator" default="Navigation" level="level1" />
+			<field name="carousel_hl_items_onnav" type="radio" default="1" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Active</option>
+				<option value="2">On Hover</option>
+				<option value="3">Both</option>
+			</field>
 			<field name="carousel_edgewrap" type="radio" default="1" label="Edge wrap around" description="When an edge is reached wrap around to the other edge">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

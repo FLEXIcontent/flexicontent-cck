@@ -26,9 +26,13 @@
 				<option value="7">7</option>
 				<option value="8">8</option>
 			</field>
-			<field name="news_item_placement_feat" type="radio" default="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
+			<field name="news_item_placement_feat" type="radio" default="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
+			</field>
+			<field name="news_hl_items_onnav_feat" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes">
+				<option value="0">FLEXI_NO</option>
+				<option value="2">On Hover</option>
 			</field>
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
@@ -75,9 +79,13 @@
 				<option value="7">7</option>
 				<option value="8">8</option>
 			</field>
-			<field name="news_item_placement" type="radio" default="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
+			<field name="news_item_placement" type="radio" default="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
+			</field>
+			<field name="news_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes">
+				<option value="0">FLEXI_NO</option>
+				<option value="2">On Hover</option>
 			</field>
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />

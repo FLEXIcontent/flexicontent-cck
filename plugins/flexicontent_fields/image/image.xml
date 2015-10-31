@@ -260,7 +260,7 @@
 				<option value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
 				<option value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
 			</field>
-			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_WITH_OTHER_IMAGE_FIELDS" description="FLEXI_FIELD_GROUP_WITH_OTHER_IMAGE_FIELDS_DESC">
+			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_THUMBS_WITH_OTHER_IMAGE_FIELDS" description="FLEXI_FIELD_GROUP_THUMBS_WITH_OTHER_IMAGE_FIELDS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_FIELD_GROUP_PER_ITEM</option>
 				<option value="2">FLEXI_FIELD_GROUP_PER_VIEW</option>
