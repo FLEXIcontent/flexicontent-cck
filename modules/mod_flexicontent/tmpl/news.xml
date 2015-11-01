@@ -26,7 +26,7 @@
 				<option value="7">7</option>
 				<option value="8">8</option>
 			</field>
-			<field name="news_item_placement_feat" type="radio" default="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
+			<field name="news_item_placement_feat" type="radio" default="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
@@ -36,13 +36,13 @@
 			</field>
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
-			<field name="news_content_layout_feat" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
+			<field name="news_content_layout_feat" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
 				<option value="2">Cleared (Above)</option>
 				<option value="3">Cleared (Below)</option>
 				<option value="4">Overlayed (Top)</option>
-				<option value="5">Overlayed (Bottom **)</option>
+				<option value="5">Overlayed (Bottom)</option>
 				<option value="6">Overlayed (Full)</option>
 			</field>
 			<field name="news_content_display_feat" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
@@ -50,7 +50,7 @@
 				<!--option value="1">On mouse over / item active</option-->
 				<option value="2">On mouse over</option>
 			</field>
-			<field name="news_img_fit_feat" type="radio" default="0" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="news_img_fit_feat" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
@@ -89,7 +89,7 @@
 			</field>
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
-			<field name="news_content_layout" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
+			<field name="news_content_layout" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
 				<option value="2">Cleared (Above)</option>
@@ -103,7 +103,7 @@
 				<!--option value="1">On mouse over / item active</option-->
 				<option value="2">On mouse over</option>
 			</field>
-			<field name="news_img_fit" type="radio" default="0" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="news_img_fit" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>

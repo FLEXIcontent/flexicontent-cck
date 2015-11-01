@@ -88,8 +88,8 @@ $border_width = (int)$params->get($layout.'_border_width', 1);
 // Content placement and default image of featured items
 // *****************************************************
 $content_display_feat = $params->get($layout.'_content_display_feat', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
-$content_layout_feat = $params->get($layout.'_content_layout_feat', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
-$item_img_fit_feat = $params->get($layout.'_img_fit_feat', 0);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
+$content_layout_feat = $params->get($layout.'_content_layout_feat', 3);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+$item_img_fit_feat = $params->get($layout.'_img_fit_feat', 1);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
 
 switch ($content_layout_feat) {
 	case 0: case 1:
@@ -119,8 +119,8 @@ switch ($content_layout_feat) {
 // Content placement and default image of standard items
 // *****************************************************
 $content_display = $params->get($layout.'_content_display', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
-$content_layout = $params->get($layout.'_content_layout', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
-$item_img_fit = $params->get($layout.'_img_fit', 0);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
+$content_layout = $params->get($layout.'_content_layout', 3);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+$item_img_fit = $params->get($layout.'_img_fit', 1);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
 
 switch ($content_layout) {
 	case 0: case 1:
@@ -223,7 +223,7 @@ $duration    = (int)$params->get('carousel_duration', 800);
 $easing       = $params->get('carousel_easing', 'quart');
 $easing_inout = $params->get('carousel_easing_inout', 'easeOut');
 // Moving duration for already visible items
-$transition_visible_duration = (int)$params->get('carousel_transition_visible_duration', 100);
+$transition_visible_duration = (int)$params->get('carousel_transition_visible_duration', 150);
 
 // ... calculate name of easing function
 $easing_name = ($easing == 'linear' || $easing == 'swing') ?  $easing  :  $easing_inout . ucfirst($easing);
@@ -236,13 +236,35 @@ $_fcx_edgeWrap     = $edgewrap ? "true" : "false";
 $_fcx_touch_walk   = $touch_walk ? "true" : "false";
 $_fcx_mouse_walk   = $mouse_walk ? "true" : "false";
 $_fcx_autoPlay     = $autoplay ? "true" : "false";
-$_fcx_fxOptions    = '{ duration:'.$duration.', easing: "'.$easing_name.'" }';
+
+$_fcx_fxOptions    = 'duration:'.$duration.', easing: "'.$easing_name.'"';
+
+if ($transition=='blind')
+	$_fcx_fxOptions .= ', direction: "'.$params->get('carousel_jqe_direction_blind', 'up').'"';
+if ($transition=='bounce' || $transition=='clip')
+	$_fcx_fxOptions .= ', direction: "'.$params->get('carousel_jqe_direction', 'horizontal').'"';
+if ($transition=='drop' || $transition=='slide' || $transition=='shake')
+	$_fcx_fxOptions .= ', direction: "'.$params->get('carousel_jqe_direction_arrow', 'up').'"';
+
+if ($transition=='bounce' || $transition=='pulsate' || $transition=='shake')
+	$_fcx_fxOptions .= ', times: "'.(int)$params->get('carousel_jqe_times', 5).'"';
+if ($transition=='bounce' || $transition=='shake')
+	$_fcx_fxOptions .= ', distance: "'.(int)$params->get('carousel_jqe_distance', 20).'"';  // not setting distance for -$transition=='slide'- will use the width/height of the element as slide distance
+
+if ($transition=='explode')
+	$_fcx_fxOptions .= ', pieces: "'.(int)$params->get('carousel_jqe_pieces', 4).'"';
+	
+if ($transition=='fold')
+	$_fcx_fxOptions .= ', size: "'.(int)$params->get('carousel_jqe_size_folded', 15).'"';
+
+$_fcx_fxOptions    = '{ '.$_fcx_fxOptions.' }';
+
 $_fcx_responsive   = $responsive;  // 0: px, 1: percentage
 $_fcx_item_size    = $item_size_px;  // item width (horizontal) OR height (vertical) in case of fixed item size
 $_fcx_items_per_page = $items_per_page;  // ZERO for horizontal, this value will be overwritten by auto-calulation, after page load ends
 
 if ($interval < $duration) {
-	echo "autoplay interval must not be smaller than the EFFECT (scroll/fade/etc) duration (even if autoplay is disabled), please correct in module configuration";
+	echo '<div class="alert">autoplay interval must not be smaller than the EFFECT (scroll/fade/etc) duration (even if autoplay is disabled), please correct in module configuration</div>';
 }
 
 
@@ -271,11 +293,14 @@ if ( ($item_placement_feat == 1 && $item_columns_feat > 1) || ($item_placement_s
 	flexicontent_html::loadFramework('imagesLoaded');
 }
 
-/*if ($transition)
+if ($transition)
 {
-	$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
-	$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-explode.min.js');
-}*/
+	$file_path = JPath::clean(JPATH_SITE.'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
+	if (file_exists($file_path)) {
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
+	}
+}
 $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata->id : '');
 ?>
 

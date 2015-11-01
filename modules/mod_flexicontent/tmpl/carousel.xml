@@ -14,7 +14,7 @@
 	<fields name="params">
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" level="level2" default="NOTE: Only standard items are placed inside the carousel. &lt;br/&gt; -- the featured items are display statically above the carousel. Set featured items to zero to only show items inside carousel" />
+			<field name="" type="separator" level="level3" default="NOTE: Only standard items are placed inside the carousel. &lt;br/&gt; -- the featured items are display statically above the carousel. Set featured items to zero to only show items inside carousel" class="alert fcpadded" />
 			
 			<field name="" type="separator" default="Featured items (non-carousel items)" description="Placed before the carousel" level="level0" />
 			<field name="item_columns_feat" type="list" default="1" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC">
@@ -37,7 +37,7 @@
 			</field>
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
-			<field name="carousel_content_layout_feat" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part">
+			<field name="carousel_content_layout_feat" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
 				<option value="2">Cleared (Above)</option>
@@ -51,7 +51,7 @@
 				<!--option value="1">On mouse over / item active</option-->
 				<option value="2">On mouse over</option>
 			</field>
-			<field name="carousel_img_fit_feat" type="radio" default="0" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="carousel_img_fit_feat" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
@@ -72,7 +72,7 @@
 			
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
-			<field name="carousel_content_layout" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part">
+			<field name="carousel_content_layout" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
 				<option value="2">Cleared (Above)</option>
@@ -86,7 +86,7 @@
 				<option value="1">On mouse over / item active</option>
 				<option value="2">On mouse over</option>
 			</field>
-			<field name="carousel_img_fit" type="radio" default="0" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="carousel_img_fit" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
@@ -98,7 +98,7 @@
 			</field>
 			<field name="carousel_padding_top_bottom" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="carousel_padding_left_right" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
-			<field name="carousel_border_width" type="text" default="1" label="border width" description="This is the border width applied around the items" />
+			<field name="carousel_border_width" type="text" default="0" label="border width" description="This is the border width applied around the items" />
 			<field name="carousel_margin_top_bottom" type="text" default="0" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
 			<field name="carousel_margin_left_right" type="text" default="0" label="margin left/right" description="This is the margin applied at left and right of the items" />
 			
@@ -117,7 +117,7 @@
 			<field name="carousel_items_per_page" type="text" default="2" label="# items" description="Number of items that will be displayed, use 1 for 'slideshow' effect" />
 			
 			<field name="" type="separator" default="Navigation" level="level1" />
-			<field name="carousel_hl_items_onnav" type="radio" default="1" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes">
+			<field name="carousel_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Active</option>
 				<option value="2">On Hover</option>
@@ -223,14 +223,51 @@
 			</field>
 			
 			<field name="" type="separator" default="Transition Effects" level="level1" />
-			<field name="carousel_transition" type="list" default="scroll" label="Enable" description="Select the effect to be used when carousel updates" >
-				<option value="0">No, instant</option>
-				<option value="scroll">Scroll</option>
-				<option value="fade">Fade</option>
-				<option value="slide">Slide</option>
-				<option value="fade-slide">Fade + Slide</option>
+			<field name="carousel_transition" type="multilist" subtype="list" default="scroll" toggle_related="1" label="Use effect" description="Select the effect to be used when carousel updates" >
+				<option value="0"          hide_list="jqe-pieces,jqe-dir-bl,jqe-dir-arrow,jqe-dir,jqe-times,jqe-dist,jqe-fold-size,jqe-nobtns" show_list="" >No, instant</option>
+				<option value="scroll"     hide_list="jqe-pieces,jqe-dir-bl,jqe-dir-arrow,jqe-dir,jqe-times,jqe-dist,jqe-fold-size,jqe-nobtns" show_list="" >Scroll</option>
+				<option value="fade"       hide_list="jqe-pieces,jqe-dir-bl,jqe-dir-arrow,jqe-dir,jqe-times,jqe-dist,jqe-fold-size,jqe-nobtns" show_list="" >Fade</option>
+				<option value="slide"      hide_list="jqe-pieces,jqe-dir-bl,jqe-dir,jqe-times,jqe-dist,jqe-fold-size,jqe-nobtns"               show_list="jqe-dir-arrow" >Slide</option>
+				<option value="fade-slide" hide_list="jqe-pieces,jqe-dir-bl,jqe-dir-arrow,jqe-dir,jqe-times,jqe-dist,jqe-fold-size,jqe-nobtns" show_list="" >Fade + Slide</option>
+				<option value="clip"       hide_list="jqe-pieces,jqe-dir-bl,jqe-dir-arrow,jqe-times,jqe-dist,jqe-fold-size,jqe-nobtns"         show_list="jqe-dir">Clip</option>	
+				<option value="scale"      hide_list="jqe-pieces,jqe-dir-bl,jqe-dir-arrow,jqe-dir,jqe-times,jqe-dist,jqe-fold-size,jqe-nobtns" show_list="">Scale</option>
+				<option value="drop"       hide_list="jqe-pieces,jqe-dir-bl,jqe-dir,jqe-times,jqe-dist,jqe-fold-size,jqe-nobtns"               show_list="jqe-dir-arrow">Drop</option>
+				<group label="Experimental ('Item Buttons' not supported)">
+					<option value="blind"      hide_list="jqe-pieces,jqe-dir,jqe-dir-arrow,jqe-times,jqe-dist,jqe-fold-size"            show_list="jqe-dir-bl,jqe-nobtns">Blind</option>
+					<option value="bounce"     hide_list="jqe-pieces,jqe-dir-bl,jqe-dir-arrow,jqe-fold-size"                            show_list="jqe-dir,jqe-times,jqe-dist,jqe-nobtns">Bounce</option>
+					<option value="explode"    hide_list="jqe-dir-bl,jqe-dir-arrow,jqe-dir,jqe-times,jqe-dist,jqe-fold-size"            show_list="jqe-pieces,jqe-nobtns">Explode</option>
+					<option value="fold"       hide_list="jqe-pieces,jqe-dir-bl,jqe-dir-arrow,jqe-dir,jqe-times,jqe-dist"               show_list="jqe-fold-size,jqe-nobtns">Fold</option>
+					<!--option value="highlight"  hide_list="jqe-pieces,jqe-dir-bl,jqe-dir-arrow,jqe-dir,jqe-times,jqe-dist,jqe-fold-size,jqe-nobtns" show_list="jqe-nobtns">Highlight</option-->
+					<!--option value="puff"    hide_list="jqe-pieces,jqe-dir-bl,jqe-dir-arrow,jqe-dir,jqe-times,jqe-dist,jqe-fold-size,jqe-nobtns" show_list="jqe-nobtns">Puff</option-->
+					<option value="pulsate"    hide_list="jqe-pieces,jqe-dir-bl,jqe-dir-arrow,jqe-dir,jqe-dist,jqe-fold-size"           show_list="jqe-times,jqe-nobtns">Pulsate</option>
+					<option value="shake"      hide_list="jqe-pieces,jqe-dir-bl,jqe-dir,jqe-fold-size"                                  show_list="jqe-dir-arrow,jqe-times,jqe-dist,jqe-nobtns">Shake</option>
+				</group>
 			</field>
-			<field name="carousel_duration" type="text" default="1500" label="Duration (ms)" description="Milliseconds that a carousel change will last" />
+			<field name="" type="separator" default="Warning: Chosen transition may not work well with items buttons (disable them)" level="level3" depend_class="jqe-nobtns" class="alert fcpadded"/>
+			<field name="carousel_duration" type="text" default="800" label="Duration (ms)" description="Milliseconds that a carousel change will last" />
+			
+			<field name="carousel_jqe_size_folded" type="text" default="20" label="Folded element size" description="The size of the folded element" depend_class="jqe-fold-size"/>
+			<field name="carousel_jqe_times" type="text" default="5" label="Effect times" description="Number of times to bounce" depend_class="jqe-times"/>
+			<field name="carousel_jqe_distance" type="text" default="20" label="Distance" description="Distance of bouncing" depend_class="jqe-dist"/>
+			<field name="carousel_jqe_pieces" type="text" default="4" label="Explode pieces" description="Number of explosion pieces" depend_class="jqe-pieces"/>
+			<field name="carousel_jqe_direction" type="radio" default="horizontal" label="Effect direction" description="Effect direction: horizontally, vertically" depend_class="jqe-dir">
+				<option value="horizontal">Horizontal</option>
+				<option value="vertical">Vertical</option>	
+			</field>
+			<field name="carousel_jqe_direction_arrow" type="radio" default="right" label="Effect direction" description="Effect direction: up, down, left, right" depend_class="jqe-dir-arrow">
+				<option value="up">Up</option>
+				<option value="down">Down</option>	
+				<option value="left">Left</option>
+				<option value="right">Right</option>	
+			</field>
+			<field name="carousel_jqe_direction_blind" type="radio" default="up" label="Effect direction" description="Effect direction: up, down, left, right, vertical, horizontal" depend_class="jqe-dir-bl">
+				<option value="up">Up</option>
+				<option value="down">Down</option>	
+				<option value="left">Left</option>
+				<option value="right">Right</option>	
+				<option value="horizontal">Horizontal</option>
+				<option value="vertical">Vertical</option>	
+			</field>
 			
 			<field name="" type="separator" default="Transition smoothing" level="level2" />
 			<field name="carousel_easing" type="groupedlist" default="quart" label="Method" description="Select the method for easing the above selected effect" >
@@ -257,8 +294,9 @@
 				<option value="easeInOut">easeInOut</option>
 			</field>
 			
-			<field name="" type="separator" default="Already visible items handling (for fade/slide effects)" level="level2" />
-			<field name="carousel_transition_visible_duration" type="text" default="100" label="Moving Duration (ms)" description="Already visible item will be moved instead of fading, select the moving duration in milliseconds. NOTE: this is for non-scroll transitions" />
+			<field name="" type="separator" default="Already visible items (used for all transition effects except 'Scroll')" level="level2" />
+			<field name="" type="separator" default="NOTE: already visible items exist only if displaying more than 1 item and NOT transitioning a FULL page of items" level="level3" class="alert fcpadded"/>
+			<field name="carousel_transition_visible_duration" type="text" default="150" label="Moving Duration (ms)" description="Already visible items will be moved instead of using the chosen effect, select the moving duration in milliseconds. NOTE: this is for all transition effects, except 'Scroll'" />
 			
 		</fieldset>
 		

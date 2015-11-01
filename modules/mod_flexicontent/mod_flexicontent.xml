@@ -30,7 +30,7 @@
 		
 		<fieldset name="basic">
 			
-			<field name="" type="separator" default="FLEXI_UMOD_BASIC_PARAMETERS_DESC" level="level4" />
+			<field name="" type="separator" default="FLEXI_UMOD_BASIC_PARAMETERS_DESC" level="level3" class="alert fcpadded" />
 			<field name="" type="separator" default="FLEXI_UMOD_FEATURED_STANDARD_ITEMS" level="level1" />
 			<field name="count" type="text" default="5" size="3" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
 			<field name="count_feat" type="text" default="1" size="3" label="FLEXI_COUNT_FEAT" description="FLEXI_COUNT_FEAT_DESC" />
@@ -41,8 +41,8 @@
 						hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_"
 						tmpl_container="mod_tmpl_layout" params_source="file"
 						/> <!-- params_source="inline" -->
-			<field name="" type="separator" default="Please set layout parameters in Layout TAB/Slider" level="level3" />
-			<field name="" type="separator" default="CSS/HTML developers please read: &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-template-for-universal-content-module.html' target='_blank' a&gt;Custom templates HOW-TO&lt;/a&gt;" level="level3" />
+			<field name="" type="separator" default="Please set layout parameters in Layout TAB/Slider" level="level3" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="CSS/HTML developers please read: &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-template-for-universal-content-module.html' target='_blank' a&gt;Custom templates HOW-TO&lt;/a&gt;" level="level3" class="alert alert-info fcpadded" />
 			
 			<field name="" type="separator" default="FLEXI_MENU_ITEM" level="level1" />
 			<field name="itemid_force" type="multilist" subtype="radio" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC" toggle_related="1" class="btn-group btn-group-yesno">

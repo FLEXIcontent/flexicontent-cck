@@ -66,7 +66,7 @@
 	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
 	border-radius:0px;
 	background-color: unset;
-	box-shadow: 1px 1px 1px darkgray;
+	/*box-shadow: 1px 1px 1px darkgray;*/
 }
 
 
@@ -200,8 +200,8 @@
 /* ITEM BASIC FIELDS STYLES (FOR CUSTOM FIELDS see below, FOR IMAGE AND DATE see more below) */
 /*********************************************************************************************/
 
-.carousel.mod_flexicontent_wrapper .content_standard {padding: 4px 12px;}  /* container of basic elements of standard items excluding title & image */
-.carousel.mod_flexicontent_wrapper .content_featured {padding: 4px 12px;}  /* container of basic elements of featured items excluding title & image */
+.carousel.mod_flexicontent_wrapper .content_standard {padding: 12px 12px 0 12px;}  /* container of basic elements of standard items excluding title & image */
+.carousel.mod_flexicontent_wrapper .content_featured {padding: 12px 12px 0 12px;}  /* container of basic elements of featured items excluding title & image */
 
 
 /* CONTAINER of item title */
@@ -404,8 +404,8 @@
 .carousel.mod_flexicontent_wrapper .fc_overlayed {
 	/* Fallback for web browsers that don't support RGBa */
 	background-color: rgb(0, 0, 0);
-	/* RGBa with 0.6 opacity */
-	background-color: rgba(0, 0, 0, 0.6);
+	/* RGBa with 0.4 opacity */
+	background-color: rgba(0, 0, 0, 0.4);
 	/* For IE 5.5 - 7 */
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000);
 	/* For IE 8+ */
@@ -416,6 +416,7 @@
 	margin: 0%;
 	position: absolute;
 	left: 0px;
+	box-shadow: 1px 1px 8px black;
 }
 .carousel.mod_flexicontent_wrapper .fc_overlayed .fc_block {
 	/*font-family: Raleway;

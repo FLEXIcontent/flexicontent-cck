@@ -28,11 +28,9 @@ Description:
 		
 		- Walk either items OR pages or both (!)
 		
-		- Walking methods (for both items and pages) based on jQuery effects:
-			a. scroll
-			b. fade
-			c. slide
-			d. fade-slide
+		- Walking methods based on jQuery transition effects:
+			For both items and pages: scroll, fade, slide, fade-slide clip, scale, drop
+			For pages only: blind, bounce, fold, pulsate, shake
 			
 		- jQuery EASING support for all (?) WALK methods
 		
@@ -359,7 +357,22 @@ var fcxSlide = function(params)
 		}
 	};
 	
-	this.walk = function(item,manual,noFx,force)
+	this.debounce = function(func, wait, immediate) {
+		var timeout;
+		return function() {
+			var context = this, args = arguments;
+			var later = function() {
+				timeout = null;
+				if (!immediate) func.apply(context, args);
+			};
+			var callNow = immediate && !timeout;
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+			if (callNow) func.apply(context, args);
+		};
+	};
+	
+	this.walk_now = function(item,manual,noFx,force)
 	{
 		/* Detect ITEMs per page for horizontal */
 		var items_per_page_float = this.items_per_page;
@@ -487,7 +500,7 @@ var fcxSlide = function(params)
 		{
 			// Stop current jQuery animation on the items box, forcing it to complete
 			// NOTE: this -NOT- the stop() method of the slider (that stops the scheduled autoplay)
-			// cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump
+			// Cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
 			jQuery(this.items_box).stop(true, false);
 			
 			
@@ -611,11 +624,13 @@ var fcxSlide = function(params)
 				// make total duration according to item show, is using pages
 				limit = noFx ? this.items.length - offSetIndex : this.items_per_page + (items_per_page_float - this.items_per_page > 0.2 ? 1 : 0);
 				
-				//alert('offSetIndex: ' + offSetIndex + ' , limit: ' + limit + ' , items_per_page: ' + items_per_page_float);
-				// Stop any running animations on the items, and complete them
+				//window.console.log('offSetIndex: ' + offSetIndex + ' , limit: ' + limit + ' , items_per_page: ' + items_per_page_float);
+				// Cancel all animations without completing them, but force current to complete, to allow new one to start from proper point
 				for(i=0; i<this.items.length; i++) {
 					jQuery(this.items[i]).stop(false, true);
 				}
+				
+				// Hide items not inside current page
 				for(i=0; i<offSetIndex; i++) {
 					if (i >= this.items.length) break;
 					jQuery(this.items[i]).hide();
@@ -625,11 +640,11 @@ var fcxSlide = function(params)
 					jQuery(this.items[i]).hide();
 				}
 				
+				jQuery(this.items).css('position', 'absolute');
 				for(i=0; i<limit; i++) {
 					if (offSetIndex+i >= this.items.length) break;
 					
-					//alert(offSetIndex+i);
-					jQuery(this.items[offSetIndex+i]).css('position', 'absolute');
+					//window.console.log((this.mode=='horizontal' ? 'left' : 'top') +': ' + (offSetIndex+i) + ' - '+(i*this.item_size) + 'px');
 					if (scrollPage) {
 						this.mode=='horizontal' ?
 							jQuery(this.items[offSetIndex+i]).css('left', '' + (i*this.item_size) + 'px') :
@@ -640,22 +655,14 @@ var fcxSlide = function(params)
 							jQuery(this.items[offSetIndex+i]).animate( {top : (i*this.item_size)}, this.transition_visible_duration );
 					}
 					
-					//alert('' + (offSetIndex+i) + ' ' + jQuery(this.items[offSetIndex+i]).css('display'));
-					if ( jQuery(this.items[offSetIndex+i]).css('display') != 'none' ) {
-						jQuery(this.items[offSetIndex+i]).stop(false, true);  // Stop current animation forcing it to complete, but do not remove pending animations
-						continue;
-					}
-					
 					if (noFx) {
 						jQuery(this.items[offSetIndex+i]).show();
 					} else if (this.transition=='fade') {
 						jQuery(this.items[offSetIndex+i]).fadeIn(this.fxOptions);
-					} else if (this.transition=='slide') {
-						jQuery(this.items[offSetIndex+i]).slideDown(this.fxOptions);
 					} else if (this.transition=='fade-slide') {
 						jQuery(this.items[offSetIndex+i]).show(this.fxOptions);
-					} else {  // unknown just show them instantly
-						jQuery(this.items[offSetIndex+i]).show();
+					} else {  // Other transition: clip, drag, explode, etc
+						jQuery(this.items[offSetIndex+i]).show(this.transition, this.fxOptions);
 					}
 				}
 				
@@ -727,7 +734,7 @@ var fcxSlide = function(params)
 			jQuery(slider.items_box).css('cursor', "pointer" );
 			
 			// Stop all jQuery animations and force them to complete, to get proper current position of the slider
-			jQuery(slider.items_box).stop(true, true);
+			jQuery(slider.items_box).finish();
 			boxPos = parseInt(jQuery(slider.items_box).css(slider.mode=='horizontal' ? 'left' : 'top'));
 			startPos = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY);
 			//if ( window.console && window.console.log ) window.console.log ('Status: mousedown<br /> Start coordinate: ' + startPos + 'px');
@@ -751,7 +758,7 @@ var fcxSlide = function(params)
 			slider.isDragging = true;
 			
 			// Touch/Mouse Drag is at new point, retarget to new point,
-			// cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
+			// Cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
 			jQuery(slider.items_box).stop(true, false);
 			(slider.mode=='horizontal') ?
 				jQuery(slider.items_box).animate({ left: boxPos+travelDist }, "fast") :
@@ -777,7 +784,7 @@ var fcxSlide = function(params)
 			if (Math.abs(travelDist) > slider.dragwalk_margin)
 			{
 				// Drag is under walk threshold, walk the slider to proper direction,
-				// cancel all animations without completing them, to allow walking from current position, thus avoiding position jump to last touch position
+				// Cancel all animations without completing them, to allow walking from current position, thus avoiding position jump to last touch position
 				jQuery(slider.items_box).stop(true, false);
 				slider.stop(true);  // Cancel autoplay, to avoid confusion to the user
 			  (travelDist < 0) ?        // Walk the slider
@@ -798,6 +805,8 @@ var fcxSlide = function(params)
 			setTimeout(function(){ slider.isDragging = false; }, 100);
 		});
 	};
+	
+	this.walk = this.debounce(this.walk_now, 50, false);
 	
 	this.initialize(params);
 };
