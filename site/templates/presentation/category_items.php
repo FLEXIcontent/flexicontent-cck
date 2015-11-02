@@ -156,7 +156,7 @@ foreach ($items as $i => $item) :
 			<?php $_title = ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) ?
 				mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...' : $item->title; ?>
 			<?php if ($this->params->get('link_titles', 0)) : ?>
-   			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>">
+   			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" itemprop="url">
 					<?php echo $_title; ?>
 				</a>
  			<?php else : ?>
@@ -428,7 +428,7 @@ foreach ($items as $i => $item) :
 	
 	<?php if ( $readmore_shown ) : ?>
 	<span class="readmore group">
-		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="readon">
+		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="readon" itemprop="url">
 			<?php echo ' ' . ($item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title)); ?>
 		</a>
 	</span>

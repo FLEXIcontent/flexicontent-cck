@@ -206,7 +206,7 @@ endif;
 				<!-- BOF item title -->
 				<span class="fc_item_title" itemprop="name">
 				<?php if ($link_titles) : ?>
-					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>"><?php echo $item->title; ?></a>
+					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" itemprop="url"><?php echo $item->title; ?></a>
    			<?php else : ?>
 					<?php echo $item->title; ?>
 				<?php endif; ?>

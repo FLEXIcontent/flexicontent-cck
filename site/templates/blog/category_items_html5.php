@@ -460,7 +460,7 @@ if ($leadnum) :
 				echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>';
 				*/
 				?>
-				<a href="<?php echo $link_url; ?>" class="readon">
+				<a href="<?php echo $link_url; ?>" class="readon" itemprop="url">
 					<?php echo ' ' . ($item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title)); ?>
 				</a>
 				<?php //echo '<script>document.write(\'</a> <div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.$item->title.'</div>\')</script>'; ?>
@@ -826,7 +826,7 @@ if ($count > $leadnum) :
 				echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>';
 				*/
 				?>
-				<a href="<?php echo $link_url; ?>" class="readon">
+				<a href="<?php echo $link_url; ?>" class="readon" itemprop="url">
 				<?php
 				if ($item->params->get('readmore')) :
 					echo ' ' . $item->params->get('readmore');

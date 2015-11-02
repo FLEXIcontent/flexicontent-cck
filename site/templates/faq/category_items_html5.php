@@ -173,7 +173,7 @@ foreach ($cat_items as $catid => $items) :
 				<!-- EOF subcategory image -->
 			<?php endif; ?>
 
-			<?php if ($catid!=$currcatid) { ?> <a class='fc_cat_title' href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>"> <?php } else { echo "<span class='fc_cat_title'>"; } ?>
+			<?php if ($catid!=$currcatid) { ?> <a class='fc_cat_title' href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>" itemprop="url"> <?php } else { echo "<span class='fc_cat_title'>"; } ?>
 				<!-- BOF subcategory title -->
 				<?php echo $sub->title; ?>
 				<!-- EOF subcategory title -->
@@ -259,7 +259,7 @@ foreach ($cat_items as $catid => $items) :
 									<!-- BOF item title -->
 									<span class="fc_item_title" itemprop="name">
 									<?php if ($this->params->get('link_titles', 0)) : ?>
-						   			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>">
+						   			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" itemprop="url">
 											<?php echo $item->title; ?>
 										</a>
 					   			<?php else : ?>
