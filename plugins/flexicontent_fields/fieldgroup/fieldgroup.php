@@ -468,11 +468,19 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				unset($grouped_field->ingroup);
 			}
 			
+			// Get labels to hide on empty values
+			$hide_lbl_ifnoval = $this->getHideLabelsOnEmpty($field);
+			
 			// Render the list of groups
 			$field->{$prop} = array();
 			for($n=0; $n < $max_count; $n++) {
 				$default_html = array();
-				foreach($grouped_fields as $grouped_field) {
+				foreach($grouped_fields as $grouped_field)
+				{
+					// Skip (hide) label for field without value (is such behaviour was configured)
+					if ( (!isset($grouped_field->{$prop}[$n]) || !strlen($grouped_field->{$prop}[$n]))  &&  isset($hide_lbl_ifnoval[$grouped_field->id]) ) continue;
+					
+					// Add field's HTML (optionally including label)
 					$_values = null;
 					$default_html[] = '
 					<div class="fc-field-box">
@@ -481,7 +489,9 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 						(isset($grouped_field->{$prop}[$n]) ? '<div class="flexi value">'.$grouped_field->{$prop}[$n].'</div>' : '').'
 					</div>';
 				}
-				$field->{$prop}[] = $pretext . implode('<div class="clear"></div>', $default_html).'<div class="clear"></div>' . $posttext;
+				if (count($default_html)) {
+					$field->{$prop}[] = $pretext . implode('<div class="clear"></div>', $default_html).'<div class="clear"></div>' . $posttext;
+				}
 			}
 			
 			// Unset display of fields in case they need to be rendered again
@@ -543,14 +553,14 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$gf_props = array();
 			foreach($gf_names as $pos => $grp_field_name)
 			{
-				// Check if display method is 'label' aka nothing to render
-				if ( $gf_methods[$pos] == 'label' ) continue;
 				
-				// Check that field exists and is assgined the fieldgroup field
+				// Check that field exists and is assigned the fieldgroup field
 				$grouped_field = $_name_to_field[$grp_field_name];
 				if ( ! isset($_name_to_field[$grp_field_name]) ) continue;
-				
 				$_rendered_fields[$pos] = $grouped_field;
+				
+				// Check if display method is 'label' aka nothing to render
+				if ( $gf_methods[$pos] == 'label' ) continue;
 				
 				// Optional use custom display method
 				$method = $gf_methods[$pos] ? $gf_methods[$pos] : 'display';
@@ -568,6 +578,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				
 				FlexicontentFields::renderField($item, $grouped_field, $_values, $method, $view);  // Includes content plugins triggering
 				//print_r($grouped_field->$method);
+				$grouped_field->_method = $method;  // This is used to decide if field does not have value and hide label (if configured to hide on empty values)
+				
 				unset($grouped_field->ingroup);
 			}
 		}
@@ -577,6 +589,9 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		// Render the value list of the fieldgroup, using custom HTML for each
 		// value-set of the fieldgroup, and performing the field replacements
 		// *******************************************************************
+		
+		// Get labels to hide on empty values
+		$hide_lbl_ifnoval = $this->getHideLabelsOnEmpty($field);
 		
 		$custom_display = array();
 		//echo "<br/>max_count: ".$max_count."<br/>";
@@ -588,8 +603,15 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				//echo 'Replacing: '. $_rendered_field->name . ', method: ' . $method . ', index: ' .$n. '<br/>';
 				if ($method!='label')
 					$_html = isset($_rendered_field->{$method}[$n]) ? $_rendered_field->{$method}[$n] : '';
-				else
-					$_html = $_rendered_field->label;
+				else {
+					$_method = isset($_rendered_field->_method) ? $_rendered_field->_method : 'display';
+					
+					if ( (!isset($_rendered_field->{$_method}[$n]) || !strlen($_rendered_field->{$_method}[$n]))  &&  isset($hide_lbl_ifnoval[$_rendered_field->id]) ) {
+						$_html = ''; // Skip (hide) label for field without value (is such behaviour was configured)
+					} else {
+						$_html = $_rendered_field->label;
+					}
+				}
 				$rendered_html = str_replace($gf_reps[$pos], $_html, $rendered_html);
 			}
 			$custom_display[$n] = $pretext . $rendered_html . $posttext;
@@ -643,7 +665,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	// VARIOUS HELPER METHODS
 	// **********************
 	
-	
+	// Retrieves the fields that are part of the given 'fieldgroup' field
 	function getGroupFields(&$field)
 	{
 		static $grouped_fields = array();
@@ -688,6 +710,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	}
 	
 	
+	// Retrieves and add values to the given field objects
 	function getGroupFieldsValues(&$grouped_fields, &$item, &$max_count)
 	{
 		// Retrieve values of fields in the group if not already retrieved
@@ -722,6 +745,21 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			$grouped_field->value = $vals;
 			//echo "<pre>"; print_r($grouped_field->value); echo "</pre>";
 		}
+	}
+	
+	
+	// Return the fields (ids) that will hide their labels if they have no value
+	function getHideLabelsOnEmpty(&$field)
+	{
+		static $hide_lbl_ifnoval_arr = array();
+		if (isset($hide_lbl_ifnoval_arr[$field->id])) return $hide_lbl_ifnoval_arr[$field->id];
+		
+		$hide_lbl_ifnoval = $field->parameters->get('hide_lbl_ifnoval', array());
+		if ( empty($hide_lbl_ifnoval) )  $hide_lbl_ifnoval = array();
+		if ( !is_array($hide_lbl_ifnoval) )  $hide_lbl_ifnoval = preg_split("/[\|,]/", $hide_lbl_ifnoval);
+		$hide_lbl_ifnoval_arr[$field->id] = array_flip($hide_lbl_ifnoval);
+		
+		return $hide_lbl_ifnoval_arr[$field->id];
 	}
 	
 }

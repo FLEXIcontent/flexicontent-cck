@@ -598,7 +598,7 @@
 				<option value="0">FLEXI_SEARCH_FILTER_FORM_INLINE</option>
 				<option value="1">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
 			</field>
-			<field name="ff_slider_title" type="text" size="20" default="" label="FLEXI_SLIDER_NAME" description="FLEXI_SLIDER_NAME_DESC" />
+			<field name="ff_toggle_search_title" type="text" size="20" default="" label="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE" description="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE_DESC" class="searchform_inslider" />
 			<field name="show_search_go" type="multilist" subtype="radio" default="" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" class="btn-group group-fcsuccess">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_AUTO</option>

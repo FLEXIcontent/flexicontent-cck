@@ -4154,22 +4154,7 @@ class flexicontent_upload
 	 */
 	static function getExt($file)
 	{
-		$params = JComponentHelper::getParams( 'com_flexicontent' );
-		
-		$allowed_exts = $params->get('upload_extensions', 'bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics');
-		$allowed_exts = preg_split("/[\s]*,[\s]*/", $allowed_exts);
-		
-		$ext = '';
-		$len = strlen($file);
-		for($i=$len-1;$i>=0;$i--) {
-			$c = $file[$i];
-			if($c=='.' && in_array($ext, $allowed_exts)) {
-				return $ext;
-			}
-			$ext = $c . $ext;
-		}
-		$dot = strpos($file, '.') + 1;
-		return substr($file, $dot);
+		return pathinfo($filename, PATHINFO_EXTENSION);
 	}
 
 
@@ -4208,7 +4193,7 @@ class flexicontent_upload
 		
 		$format = strtolower(flexicontent_upload::getExt($file['name']));
 		
-		$allowed_exts = $params->get('upload_extensions', 'bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics');
+		$allowed_exts = $params->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics');
 		$allowed_exts = preg_split("/[\s]*,[\s]*/", $allowed_exts);
 
 		foreach($allowed_exts as $a => $allowed_ext) $allowed_exts[$a] = strtolower($allowed_ext);

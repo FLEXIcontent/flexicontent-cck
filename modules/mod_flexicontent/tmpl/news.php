@@ -57,6 +57,15 @@ $mod_height 			= (int)$params->get('mod_height', 80);
 $hide_label_onempty_feat = (int)$params->get('hide_label_onempty_feat', 0);
 $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 
+$hl_items_onnav_feat = (int)$params->get($layout.'_hl_items_onnav_feat', 0);
+$mod_do_hlight_feat = '';
+$mod_do_hlight_feat .= $hl_items_onnav_feat == 1 || $hl_items_onnav_feat == 3 ? ' mod_hl_active' : '';
+$mod_do_hlight_feat .= $hl_items_onnav_feat == 2 || $hl_items_onnav_feat == 3 ? ' mod_hl_hover' : '';
+
+$hl_items_onnav = (int)$params->get($layout.'_hl_items_onnav', 0);
+$mod_do_hlight = '';
+$mod_do_hlight .= $hl_items_onnav == 1 || $hl_items_onnav == 3 ? ' mod_hl_active' : '';
+$mod_do_hlight .= $hl_items_onnav == 2 || $hl_items_onnav == 3 ? ' mod_hl_hover' : '';
 
 // Item Dimensions featured
 $inner_inline_css_feat = (int)$params->get($layout.'_inner_inline_css_feat', 0);
@@ -79,8 +88,8 @@ $border_width = (int)$params->get($layout.'_border_width', 1);
 // Content placement and default image of featured items
 // *****************************************************
 $content_display_feat = $params->get($layout.'_content_display_feat', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
-$content_layout_feat = $params->get($layout.'_content_layout_feat', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
-$item_img_fit_feat = $params->get($layout.'_img_fit_feat', 0);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
+$content_layout_feat = $params->get($layout.'_content_layout_feat', 3);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+$item_img_fit_feat = $params->get($layout.'_img_fit_feat', 1);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
 
 switch ($content_layout_feat) {
 	case 0: case 1:
@@ -110,8 +119,8 @@ switch ($content_layout_feat) {
 // Content placement and default image of standard items
 // *****************************************************
 $content_display = $params->get($layout.'_content_display', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
-$content_layout = $params->get($layout.'_content_layout', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
-$item_img_fit = $params->get($layout.'_img_fit', 0);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
+$content_layout = $params->get($layout.'_content_layout', 3);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+$item_img_fit = $params->get($layout.'_img_fit', 1);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
 
 switch ($content_layout) {
 	case 0: case 1:
@@ -144,14 +153,14 @@ $mod_default_img_path = $params->get('mod_default_img_path', 'components/com_fle
 $img_path = JURI::base(true) .'/'; 
 
 // image of FEATURED items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
-$img_force_dims_feat=" width: auto; height: auto; display: block !important; border: 0 !important;";
+$img_force_dims_feat=" width: 100%; height: auto; display: block !important; border: 0 !important;";
 $img_limit_dims=" max-width:100%; max-height:100%;";
 if ($item_img_fit_feat==0 || $content_layout_feat <= 1) {
 	$img_force_dims_feat .= $img_limit_dims;
 }
 
 // image of STANDARD items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
-$img_force_dims=" width: auto; height: auto; display: block !important; border: 0 !important;";
+$img_force_dims=" width: 100%; height: auto; display: block !important; border: 0 !important;";
 $img_limit_dims=" max-width:100%; max-height:100%;";
 if ($item_img_fit==0 || $content_layout <= 1) {
 	$img_force_dims .= $img_limit_dims;
@@ -170,6 +179,8 @@ $item_columns_std = $params->get('item_columns', 2);
 $cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
 
 $document = JFactory::getDocument();
+
+// Add masonry JS
 if ( ($item_placement_feat == 1 && $item_columns_feat > 1) || ($item_placement_std == 1 && $item_columns_std > 1) )
 {
 	flexicontent_html::loadFramework('masonry');
@@ -244,7 +255,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_featured_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_feat ? ' '.$cols_class_feat : ''); ?>">
+			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_feat ? ' '.$cols_class_feat : ''); ?>">
 			<div class="mod_flexicontent_featured_wrapper_innerbox">
 			
 				<!-- BOF current item's title -->	
@@ -411,7 +422,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_standard_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_std ? ' '.$cols_class_std : ''); ?>"
+			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_std ? ' '.$cols_class_std : ''); ?>"
 				onmouseover=""
 				onmouseout=""
 			>

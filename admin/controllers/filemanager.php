@@ -471,7 +471,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$filterext	= $filterext ? explode(',', $filterext) : array();
 		foreach($filterext as $_i => $_ext) $filterext[$_i] = strtolower($_ext);
 		
-		$confext = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics')));
+		$confext = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics')));
 		
 		// (optionally) Limit COMPONENT configured extensions, to those extensions requested by the FORM/URL variable
 		$allowed	= $filterext ? array_intersect($filterext, $confext) : $confext;

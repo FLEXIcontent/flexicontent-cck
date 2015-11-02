@@ -120,19 +120,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 		
 		<div id="fc-dash-boardbtns">
 		<?php
-		$config_not_saved =
-			(!FLEXI_J16GE && !$this->params->get('flexi_section')) ||
-			(FLEXI_J16GE && !$this->params->get('flexi_cat_extension'));
+		$config_saved = $this->params->get('flexi_cat_extension');
 		if (!$this->dopostinstall)
 		{
 			echo '<div class="fc-mssg fc-warning">';
 			echo JText::_( 'FLEXI_DO_POSTINSTALL' );
 			echo '</div>';
 		}
-		else if ( !$this->existmenu || !$this->existcat || $config_not_saved )
+		else if ( !$this->existmenu || !$this->existcat || !$config_saved )
 		{
 			echo '<div class="fc-mssg fc-warning">';
-			if ( $config_not_saved )
+			if ( !$config_saved )
 			{
 				if ( FLEXI_J16GE ) {
 					$session = JFactory::getSession();
@@ -141,8 +139,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 					$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
 					$conf_link = 'index.php?option=com_config&view=component&component=com_flexicontent&path=';
-					$conf_link = FLEXI_J30GE ? "<a href='".$conf_link."' style='color: red;'>" :
-						"<a class='modal' rel=\"{handler: 'iframe', size: {x: ".$_width.", y: ".$_height."}, onClose: function() {}}\" href='".$conf_link."&tmpl=component' style='color: red;'>" ;
+					$conf_link = '<a href="'.$conf_link.'" class="btn btn-warning">';
 					$msg = JText::sprintf( 'FLEXI_CONFIGURATION_NOT_SAVED', $conf_link.JText::_("FLEXI_CONFIG")."</a>" );
 				} else {
 					$msg = str_replace('"_QQ_"', '"', JText::_( 'FLEXI_NO_SECTION_CHOOSEN' ));
@@ -154,7 +151,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			echo '</div>';
 		}
 
-		if ($this->dopostinstall) {
+		if ($this->dopostinstall && $config_saved) {
 			?><?php if (empty($skip_content_fieldset)): ?><fieldset class="fc-board-set"><legend class="fc-board-header-content-editing"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></legend><div class="fc-board-set-inner"><?php
 			$link = 'index.php?option='.$option.'&amp;view=items';
 			if (!isset($sbtns['items'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-items.png', JText::_( 'FLEXI_ITEMS' ) );
@@ -372,7 +369,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 		endif;
 		?>
 		
-		<?php if (!$skip_sliders) : ?>
+		<?php if (!$skip_sliders && $config_saved) : ?>
 			
 			<?php if (!$this->dopostinstall || !$this->allplgpublish) : ?>
 			<?php

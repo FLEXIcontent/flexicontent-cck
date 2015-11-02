@@ -57,6 +57,15 @@ $mod_height 			= (int)$params->get('mod_height', 80);
 $hide_label_onempty_feat = (int)$params->get('hide_label_onempty_feat', 0);
 $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 
+$hl_items_onnav_feat = (int)$params->get($layout.'_hl_items_onnav_feat', 0);
+$mod_do_hlight_feat = '';
+$mod_do_hlight_feat .= $hl_items_onnav_feat == 1 || $hl_items_onnav_feat == 3 ? ' mod_hl_active' : '';
+$mod_do_hlight_feat .= $hl_items_onnav_feat == 2 || $hl_items_onnav_feat == 3 ? ' mod_hl_hover' : '';
+
+$hl_items_onnav = (int)$params->get($layout.'_hl_items_onnav', 0);
+$mod_do_hlight = '';
+$mod_do_hlight .= $hl_items_onnav == 1 || $hl_items_onnav == 3 ? ' mod_hl_active' : '';
+$mod_do_hlight .= $hl_items_onnav == 2 || $hl_items_onnav == 3 ? ' mod_hl_hover' : '';
 
 // Item Dimensions featured
 $inner_inline_css_feat = (int)$params->get($layout.'_inner_inline_css_feat', 0);
@@ -79,8 +88,8 @@ $border_width = (int)$params->get($layout.'_border_width', 1);
 // Content placement and default image of featured items
 // *****************************************************
 $content_display_feat = $params->get($layout.'_content_display_feat', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
-$content_layout_feat = $params->get($layout.'_content_layout_feat', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
-$item_img_fit_feat = $params->get($layout.'_img_fit_feat', 0);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
+$content_layout_feat = $params->get($layout.'_content_layout_feat', 3);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+$item_img_fit_feat = $params->get($layout.'_img_fit_feat', 1);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
 
 switch ($content_layout_feat) {
 	case 0: case 1:
@@ -110,8 +119,8 @@ switch ($content_layout_feat) {
 // Content placement and default image of standard items
 // *****************************************************
 $content_display = $params->get($layout.'_content_display', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
-$content_layout = $params->get($layout.'_content_layout', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
-$item_img_fit = $params->get($layout.'_img_fit', 0);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
+$content_layout = $params->get($layout.'_content_layout', 3);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+$item_img_fit = $params->get($layout.'_img_fit', 1);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
 
 switch ($content_layout) {
 	case 0: case 1:
@@ -144,14 +153,14 @@ $mod_default_img_path = $params->get('mod_default_img_path', 'components/com_fle
 $img_path = JURI::base(true) .'/'; 
 
 // image of FEATURED items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
-$img_force_dims_feat=" width: auto; height: auto; display: block !important; border: 0 !important;";
+$img_force_dims_feat=" width: 100%; height: auto; display: block !important; border: 0 !important;";
 $img_limit_dims=" max-width:100%; max-height:100%;";
 if ($item_img_fit_feat==0 || $content_layout_feat <= 1) {
 	$img_force_dims_feat .= $img_limit_dims;
 }
 
 // image of STANDARD items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
-$img_force_dims=" width: auto; height: auto; display: block !important; border: 0 !important;";
+$img_force_dims=" width: 100%; height: auto; display: block !important; border: 0 !important;";
 $img_limit_dims=" max-width:100%; max-height:100%;";
 if ($item_img_fit==0 || $content_layout <= 1) {
 	$img_force_dims .= $img_limit_dims;
@@ -214,7 +223,7 @@ $duration    = (int)$params->get('carousel_duration', 800);
 $easing       = $params->get('carousel_easing', 'quart');
 $easing_inout = $params->get('carousel_easing_inout', 'easeOut');
 // Moving duration for already visible items
-$transition_visible_duration = (int)$params->get('carousel_transition_visible_duration', 100);
+$transition_visible_duration = (int)$params->get('carousel_transition_visible_duration', 150);
 
 // ... calculate name of easing function
 $easing_name = ($easing == 'linear' || $easing == 'swing') ?  $easing  :  $easing_inout . ucfirst($easing);
@@ -227,13 +236,35 @@ $_fcx_edgeWrap     = $edgewrap ? "true" : "false";
 $_fcx_touch_walk   = $touch_walk ? "true" : "false";
 $_fcx_mouse_walk   = $mouse_walk ? "true" : "false";
 $_fcx_autoPlay     = $autoplay ? "true" : "false";
-$_fcx_fxOptions    = '{ duration:'.$duration.', easing: "'.$easing_name.'" }';
+
+$_fcx_fxOptions    = 'duration:'.$duration.', easing: "'.$easing_name.'"';
+
+if ($transition=='blind')
+	$_fcx_fxOptions .= ', direction: "'.$params->get('carousel_jqe_direction_blind', 'up').'"';
+if ($transition=='bounce' || $transition=='clip')
+	$_fcx_fxOptions .= ', direction: "'.$params->get('carousel_jqe_direction', 'horizontal').'"';
+if ($transition=='drop' || $transition=='slide' || $transition=='shake')
+	$_fcx_fxOptions .= ', direction: "'.$params->get('carousel_jqe_direction_arrow', 'up').'"';
+
+if ($transition=='bounce' || $transition=='pulsate' || $transition=='shake')
+	$_fcx_fxOptions .= ', times: "'.(int)$params->get('carousel_jqe_times', 5).'"';
+if ($transition=='bounce' || $transition=='shake')
+	$_fcx_fxOptions .= ', distance: "'.(int)$params->get('carousel_jqe_distance', 20).'"';  // not setting distance for -$transition=='slide'- will use the width/height of the element as slide distance
+
+if ($transition=='explode')
+	$_fcx_fxOptions .= ', pieces: "'.(int)$params->get('carousel_jqe_pieces', 4).'"';
+	
+if ($transition=='fold')
+	$_fcx_fxOptions .= ', size: "'.(int)$params->get('carousel_jqe_size_folded', 15).'"';
+
+$_fcx_fxOptions    = '{ '.$_fcx_fxOptions.' }';
+
 $_fcx_responsive   = $responsive;  // 0: px, 1: percentage
 $_fcx_item_size    = $item_size_px;  // item width (horizontal) OR height (vertical) in case of fixed item size
 $_fcx_items_per_page = $items_per_page;  // ZERO for horizontal, this value will be overwritten by auto-calulation, after page load ends
 
 if ($interval < $duration) {
-	echo "autoplay interval must not be smaller than the EFFECT (scroll/fade/etc) duration (even if autoplay is disabled), please correct in module configuration";
+	echo '<div class="alert">autoplay interval must not be smaller than the EFFECT (scroll/fade/etc) duration (even if autoplay is disabled), please correct in module configuration</div>';
 }
 
 
@@ -262,11 +293,14 @@ if ( ($item_placement_feat == 1 && $item_columns_feat > 1) || ($item_placement_s
 	flexicontent_html::loadFramework('imagesLoaded');
 }
 
-/*if ($transition)
+if ($transition)
 {
-	$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
-	$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-explode.min.js');
-}*/
+	$file_path = JPath::clean(JPATH_SITE.'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
+	if (file_exists($file_path)) {
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
+	}
+}
 $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata->id : '');
 ?>
 
@@ -336,7 +370,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_featured_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_feat ? ' '.$cols_class_feat : ''); ?>">
+			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_feat ? ' '.$cols_class_feat : ''); ?>">
 			<div class="mod_flexicontent_featured_wrapper_innerbox">
 			
 				<!-- BOF current item's title -->	
@@ -515,7 +549,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_standard_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>"
+			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>"
 				onmouseover="mod_fc_carousel_<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel_<?php echo $uniq_ord_id; ?>.autoPlay=false;"
 				onmouseout="if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 			>

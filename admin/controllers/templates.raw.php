@@ -198,14 +198,24 @@ class FlexicontentControllerTemplates extends FlexicontentController
 				echo $form->render('params', 'layout' );
 			} else {
 				?>
-				<fieldset class="panelform"><ul class="adminformlist">
+				<fieldset class="panelform"><?php /*<ul class="adminformlist">*/ ?>
 					<?php
 					$grpname = 'params'; // this is the name of <fields> container
 					foreach ($jform->getGroup($grpname) as $field) {
-						echo '<li>'. $field->label . $field->input .'</li>';
+						//echo '<li>'. $field->label . $field->input .'</li>';
+						$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
+							$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
+
+						echo '
+						<fieldset class="panelform '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+							'.($field->label ? '
+								<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+								<div class="container_fcfield">'.$field->input.'</div>
+							' : $field->input).'
+						</fieldset>';
 					}
 					?>
-				</ul></fieldset>
+				<?php /*</ul>*/?></fieldset>
 				<?php
 			}
 		} else {

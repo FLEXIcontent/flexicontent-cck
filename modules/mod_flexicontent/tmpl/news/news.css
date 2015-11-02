@@ -59,13 +59,14 @@
 	overflow: hidden;
 	
 	/* can be overriden via user 's CSS */
-	margin: 4px;
-	padding: 0;
-	border-width: 1px;
+	margin: 0px;
+	padding: 0px;
+	border-width: 0px;
 	border-style: solid;
 	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
 	border-radius:0px;
-	background-color: #EFEFEF;
+	background-color: unset;
+	/*box-shadow: 1px 1px 1px darkgray;*/
 }
 
 
@@ -164,10 +165,10 @@
 
 /*.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_fc_activeitem:hover .mod_flexicontent_featured_wrapper_innerbox,
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover .mod_flexicontent_featured_wrapper_innerbox,*/
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_fc_activeitem:hover .mod_flexicontent_standard_wrapper_innerbox,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover .mod_flexicontent_standard_wrapper_innerbox {
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_hl_hover.mod_fc_activeitem:hover .mod_flexicontent_standard_wrapper_innerbox,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_hl_hover:hover .mod_flexicontent_standard_wrapper_innerbox {
 	background-color: #D0D0D0;
-	/*border-color: #888 #555 #555 #888;*/
+	border-color: #888 #555 #555 #888;
 	/*box-shadow: 4px 4px 2px darkgray;*/
 }
 
@@ -199,8 +200,8 @@
 /* ITEM BASIC FIELDS STYLES (FOR CUSTOM FIELDS see below, FOR IMAGE AND DATE see more below) */
 /*********************************************************************************************/
 
-.news.mod_flexicontent_wrapper .content_standard {padding: 4px 12px;}  /* container of basic elements of standard items excluding title & image */
-.news.mod_flexicontent_wrapper .content_featured {padding: 4px 12px;}  /* container of basic elements of featured items excluding title & image */
+.news.mod_flexicontent_wrapper .content_standard {padding: 12px 12px 0 12px;}  /* container of basic elements of standard items excluding title & image */
+.news.mod_flexicontent_wrapper .content_featured {padding: 12px 12px 0 12px;}  /* container of basic elements of featured items excluding title & image */
 
 
 /* CONTAINER of item title */
@@ -225,8 +226,10 @@
 .news.mod_flexicontent_wrapper .fcitem_title:hover a,
 .news.mod_flexicontent_wrapper .fcitem_title a:hover {
 	background-color: transparent;
-	color: darkred;
 	text-decoration: none;
+	color: gray;
+	cursor:pointer;
+	/*text-shadow: 1px 1px 0px;*/
 }
 .news.mod_flexicontent_wrapper .fc_overlayed .fcitem_title a {
 	/*text-shadow: 1px 1px 2px #000, -1px -1px #000, 1px 1px #000;*/
@@ -281,7 +284,11 @@
 }
 .news.mod_flexicontent_wrapper .image_featured img,
 .news.mod_flexicontent_wrapper .image_standard img {
-  padding:1px; border:1px solid #cccccc;  
+  padding:0px; /* disabled item border thus padding too */
+	border-width: 0px; /* disabled item border */
+	border-style: solid;
+	border-color: #cccccc #cccccc #cccccc #cccccc;
+	border-radius:0px;
 }
 .news.mod_flexicontent_wrapper .image_standard a:hover img,
 .news.mod_flexicontent_wrapper .image_featured a:hover img {
@@ -356,9 +363,10 @@
 	-webkit-transition: all 0.4s; transition: all 0.4s;
 }
 .news.mod_flexicontent_wrapper .fcitem_readon:hover {
-	background-color: rgba(255, 255, 255, 0.6);
-	border: solid gray;
+	background-color: rgba(255, 255, 255, 0.2);
+	border-color: transparent;
 	border-width:1px 0px;
+	border-radius: 0px;
 	padding: 1px 6px 1px 20px;
 	margin: 3px 3px 3px 4px;
 	display:inline-block;
@@ -396,8 +404,8 @@
 .news.mod_flexicontent_wrapper .fc_overlayed {
 	/* Fallback for web browsers that don't support RGBa */
 	background-color: rgb(0, 0, 0);
-	/* RGBa with 0.6 opacity */
-	background-color: rgba(0, 0, 0, 0.6);
+	/* RGBa with 0.4 opacity */
+	background-color: rgba(0, 0, 0, 0.4);
 	/* For IE 5.5 - 7 */
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000);
 	/* For IE 8+ */
@@ -408,6 +416,7 @@
 	margin: 0%;
 	position: absolute;
 	left: 0px;
+	box-shadow: 1px 1px 8px black;
 }
 .news.mod_flexicontent_wrapper .fc_overlayed .fc_block {
 	/*font-family: Raleway;
@@ -432,12 +441,12 @@
 }
 .news.mod_flexicontent_wrapper .fc_float_left {
 	float: left !important;
-	margin: 0px 6px 6px 0;
+	margin: 0px 12px 8px 0;
 	display: block;
 }
 .news.mod_flexicontent_wrapper .fc_float_right {
 	float: right !important;
-	margin: 0px 0 6px 6px;
+	margin: 0px 0 8px 12px;
 	display: block;
 }
 .news.mod_flexicontent_wrapper .fc_floated {}

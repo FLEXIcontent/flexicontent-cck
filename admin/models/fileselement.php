@@ -208,7 +208,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 	 * @return integer
 	 * @since 1.0
 	 */
-	function getFilesFromPath($itemid, $fieldid, $append_item=1, $append_field=0, $folder_param_name='dir', $exts='bmp,csv,doc,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,swf,txt,xcf,xls,zip,ics')
+	function getFilesFromPath($itemid, $fieldid, $append_item=1, $append_field=0, $folder_param_name='dir', $exts='bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics')
 	{
 		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
