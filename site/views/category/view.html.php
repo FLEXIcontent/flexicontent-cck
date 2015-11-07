@@ -50,7 +50,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		$format   = JRequest::getCmd('format', 'html');
 		$document = JFactory::getDocument();
 		
-		if ($format && $document->getType() != strtolower($format)) {
+		// Check for Joomla issue with system plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
+		if ($format && $document->getType() != strtolower($format))
+		{
 			echo '<div class="alert">WARNING: &nbsp; Document format should be: <b>'.$format.'</b> but current document is: <b>'. $document->getType().'</b> <br/>Some system plugin may have forced current document type</div>';
 		}
 		
@@ -155,7 +157,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			$authordescr_itemid = $params->get('authordescr_itemid');
 		}
 		
-		// Bind Fields
+		// Bind Fields to items and render their display HTML, but check for document type, due to Joomla issue 
+		// with system plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
 		if ($format != 'feed') {
 			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
 		}

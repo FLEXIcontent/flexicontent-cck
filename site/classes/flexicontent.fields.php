@@ -142,17 +142,7 @@ class FlexicontentFields
 			// ... now retrieved CACHED ... code removed ...
 		}*/
 		
-		// This is optimized regarding the use of SINGLE QUERY to retrieve the core item data
-		$vars['tags']       = FlexicontentFields::_getTags($items, $view);
-		$vars['cats']       = FlexicontentFields::_getCategories($items, $view);
-		$vars['favourites'] = FlexicontentFields::_getFavourites($items, $view);
-		$vars['favoured']   = FlexicontentFields::_getFavoured($items, $view);
-		$vars['authors']    = FlexicontentFields::_getAuthors($items, $view);
-		$vars['modifiers']  = FlexicontentFields::_getModifiers($items, $view);
-		$vars['typenames']  = FlexicontentFields::_getTypenames($items, $view);
-		$vars['votes']      = FlexicontentFields::_getVotes($items, $view);
-		$vars['custom']     = FlexicontentFields::_getCustomValues($items, $view);
-		
+		$vars = null;
 		FlexicontentFields::getItemFields($items, $vars, $view, $aid);
 		
 		if ( $print_logging_info )  @$fc_run_times['field_values_params'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -299,7 +289,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function & getItemFields(&$items, &$vars, $view=FLEXI_ITEMVIEW, $aid=false)
+	static function & getItemFields(&$items, &$vars=null, $view=FLEXI_ITEMVIEW, $aid=false)
 	{
 		if ( empty($items) ) return;
 		
@@ -308,6 +298,20 @@ class FlexicontentFields
 		$dispatcher = JDispatcher::getInstance();
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
+		
+		// This is optimized regarding the use of SINGLE QUERY to retrieve the core item data
+		if ($vars==null)
+		{
+			$vars['tags']       = FlexicontentFields::_getTags($items, $view);
+			$vars['cats']       = FlexicontentFields::_getCategories($items, $view);
+			$vars['favourites'] = FlexicontentFields::_getFavourites($items, $view);
+			$vars['favoured']   = FlexicontentFields::_getFavoured($items, $view);
+			$vars['authors']    = FlexicontentFields::_getAuthors($items, $view);
+			$vars['modifiers']  = FlexicontentFields::_getModifiers($items, $view);
+			$vars['typenames']  = FlexicontentFields::_getTypenames($items, $view);
+			$vars['votes']      = FlexicontentFields::_getVotes($items, $view);
+			$vars['custom']     = FlexicontentFields::_getCustomValues($items, $view);
+		}
 		
 		foreach ($items as $i => $item)
 		{

@@ -361,6 +361,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		global $fc_list_items;
 		foreach ($this->_data as $_item) $fc_list_items[$_item->id] = $_item;
 		
+		// Remove search prefix from 'search_index' column
+		//$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		//if ($search_prefix) foreach ($this->_data as $_item) $_item->search_index = preg_replace('/\b'.$search_prefix.'/u', '', $_item->search_index);
+		
 		return $this->_data;
 	}
 
