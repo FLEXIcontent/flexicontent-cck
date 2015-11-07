@@ -55,13 +55,17 @@ class FlexicontentViewCategory extends JViewLegacy
 		$_vars = null;
 		FlexicontentFields::getItemFields($items, $_vars, $_view='category', $aid);
 		
-		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		// Zero unneeded search index text
+		foreach ($items as $item) $item->search_index = '';
 		
-		//HERE WE NEED TO PRINT THE DATA || But I think it is not protected yet
-		$item = reset($items);
-		//echo "<pre>"; print_r($item); exit;
+		// Use &test=1 to test / preview item data of first item
+		if (JRequest::getCmd('test', 0))
+		{
+			$item = reset($items); echo "<pre>"; print_r($item); exit;
+		}
 		
-		echo @json_encode( $items);
+		// Output items in JSON FORMAT
+		echo @json_encode( $items );
 	}
 }
 ?>
