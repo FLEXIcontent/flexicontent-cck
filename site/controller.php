@@ -2099,7 +2099,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			$field_type = $fields_props[$field_id]->field_type;
 			
-			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url'
+			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits'
 					. ', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email'
 					. ', i.access as item_access, i.language as item_language, ie.type_id as item_type_id'
 					

@@ -4152,7 +4152,7 @@ class flexicontent_upload
 	 * @return string The file extension
 	 * @since 1.5
 	 */
-	static function getExt($file)
+	static function getExt($filename)
 	{
 		return pathinfo($filename, PATHINFO_EXTENSION);
 	}

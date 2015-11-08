@@ -150,6 +150,7 @@
 	float: none ;
 	clear: none ;
 	display: inline-block ;
+	cursor: pointer;
 	
 	/* style these */
 	color: #444;
@@ -327,7 +328,9 @@ table.img_upload_select {
 /* FIELDs: (image field) preview image */
 .fcimg_preview_box img.preview_image {
 	border-radius: 4px;
-	border: 1px solid gray;
+	border: 1px solid silver;
+	float: left;
+	min-width:120px;
 }
 
 

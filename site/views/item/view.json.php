@@ -40,28 +40,8 @@ class FlexicontentViewItem  extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		// Get Content Types with no category links in item view pathways, and for unroutable (non-linkable) categories
-		global $globalnoroute, $globalnopath, $globalcats;
-		if (!is_array($globalnopath))  $globalnopath  = array();
-		if (!is_array($globalnoroute)) $globalnoroute = array();
-		
-		//initialize variables
-		$dispatcher = JDispatcher::getInstance();
-		$app      = JFactory::getApplication();
-		$session  = JFactory::getSession();
-		$document = JFactory::getDocument();
-		$menus = $app->getMenu();
-		$menu  = $menus->getActive();
-		$uri   = JFactory::getURI();
-		$user  = JFactory::getUser();
-		$aid   = JAccess::getAuthorisedViewLevels($user->id);
-		$db    = JFactory::getDBO();
-		$nullDate = $db->getNullDate();
-		
-		
-		// ******************************************************
-		// Get item, model and create form (that loads item data)
-		// ******************************************************
+		$user     = JFactory::getUser();
+		$aid      = JAccess::getAuthorisedViewLevels($user->id);
 		
 		// Get model
 		$model  = $this->getModel();

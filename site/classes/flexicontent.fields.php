@@ -255,7 +255,7 @@ class FlexicontentFields
 		$query = 'SELECT item_id, field_id, value, valueorder, suborder'
 				.( $version ? ' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
 				.' WHERE item_id IN ('.implode(",", $item_ids).') '
-				.' AND field_id IN ('.implode(",", $field_ids).') '
+				.($field_ids ? ' AND field_id IN ('.implode(",", $field_ids).') ' : '')
 				.( $version ? ' AND version=' . (int)$version:'')
 				.' AND value > "" '
 				.' ORDER BY field_id, valueorder, suborder'
