@@ -639,7 +639,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		// Get All file information at once (Data maybe cached already)
 		// TODO (maybe) e.g. contentlists should could call this function ONCE for all file fields,
 		// This may be done by adding a new method to fields to prepare multiple fields with a single call
-		$files_data = $this->getFileData( $values, $published=true );   //print_r($files_data); exit;
+		$files_data = $this->getFileData( $values, $published=true );   //if ($field->id==NNN) { echo "<pre>"; print_r($files_data); exit; }
 		
 		// Optimization, do some stuff outside the loop
 		static $hits_icon = null;
@@ -700,8 +700,8 @@ class plgFlexicontent_fieldsFile extends FCField
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
-		// Check if field has posted data
-		if ( empty($post) ) return;
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
 		// Make sure posted data is an array 
 		//echo "<pre>"; print_r($post); exit;
@@ -735,7 +735,13 @@ class plgFlexicontent_fieldsFile extends FCField
 		$new = 0;
     foreach ($post as $n => $v)
     {
-    	if (empty($v)) continue;
+    	if (empty($v)) {
+    		if ($use_ingroup) {  // empty value for group
+					$newpost[$new] = '';
+					$new++;
+				}
+    		continue;
+    	}
 			
 			// support for basic CSV import / export
 			if ( $is_importcsv ) {
@@ -757,6 +763,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				}
 			}
 			
+			// Using inline property editing
 			else if ( $inputmode==0 ) {
 				$file_id = (int) $v['file-id'];
 				
@@ -870,11 +877,24 @@ class plgFlexicontent_fieldsFile extends FCField
 					// no existing file and no new file uploaded
 					$v = 0;
 				}
-			}
+				
+			// Without inline property editing
+	    } else {
+	    	$v = isset($v['file-id']) ? $v['file-id'] : $v;
+	    	$v = is_array($v) ? 0 : (int)$v;
+	    }
 			
-			if ( !empty ($v) && is_numeric($v) ) $newpost[$v] = $new++;
+	    if (!$use_ingroup) {
+	    	// NOT inside field group, add it only if not empty reverse the file array, indexing it by file IDs, to add each file only once
+				if ( !empty($v) && is_numeric($v) ) $newpost[(int)$v] = $new++;
+			} else {
+				// Inside fieldgroup, allow same file multiple times
+				$newpost[$new++] = (int)$v;
+			}
     }
-    $post = array_flip($newpost);
+    
+    // IF NOT inside field group, the file array was reversed (indexed by file IDs), so that the same file can be added once
+   	$post = !$use_ingroup ? array_flip($newpost) : $newpost;  
 	}
 	
 	

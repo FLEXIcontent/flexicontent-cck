@@ -2,8 +2,19 @@
 $field->url = array();
 $field->abspath = array();
 $field->file_data = array();
-foreach($files_data as $file_id => $file_data)
+
+foreach($values as $file_id)
 {
+	if (empty($file_id) || !isset($files_data[$file_id]))
+	{
+		if ($is_ingroup) {
+			$field->{$prop}[$n] = '';
+			$n++;
+		}
+		continue;
+	}
+	$file_data = $files_data[$file_id];
+	
 	// Check if it exists and get file size
 	$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
 	$abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file_data->filename));
