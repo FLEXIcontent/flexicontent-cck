@@ -743,8 +743,9 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			}
 			
 			// Using inline property editing
-			else if ( $inputmode==0 ) {
-				$file_id = (int) $v['file-id'];
+			else {
+	    	$file_id = isset($v['file-id']) ? (int) $v['file-id'] : $v;
+	    	$file_id = is_numeric($file_id) ? (int) $file_id : 0;  // if $v is not an array
 				
 				$err_code = $_FILES["custom"]["error"][$field->name][$n]['file-data'];
 				$new_file = $err_code == 0;
@@ -856,11 +857,6 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					// no existing file and no new file uploaded
 					$v = 0;
 				}
-				
-			// Without inline property editing
-	    } else {
-	    	$v = isset($v['file-id']) ? $v['file-id'] : $v;
-	    	$v = is_array($v) ? 0 : (int)$v;
 	    }
 			
 	    if (!$use_ingroup) {

@@ -251,7 +251,13 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		// Upload Failed
 		//echo "\n". $file['tmp_name'] ." => ". $filepath ."\n";
-		$move_success = $chunks ? rename($file['tmp_name'], $filepath) : JFile::upload($file['tmp_name'], $filepath);
+		$move_success = $chunks ?
+			rename($file['tmp_name'], $filepath) :
+			JFile::upload($file['tmp_name'], $filepath, false, false,
+				// - Valid extensions are checked by our helper function
+				// - also we allow all extensions and php inside content, FLEXIcontent will never execute "include" files evening when doing "in-browser viewing"
+				array('null_byte'=>true, 'forbidden_extensions'=>array(), 'php_tag_in_content'=>true, 'shorttag_in_content'=>true, 'shorttag_extensions'=>array(), 'fobidden_ext_in_content'=>false, 'php_ext_content_extensions'=>array() )
+			);
 		if (!$move_success) {
 			if ($format == 'json') {
 				jimport('joomla.error.log');

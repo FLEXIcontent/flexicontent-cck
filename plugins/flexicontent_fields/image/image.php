@@ -2274,8 +2274,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			//get the extension to record it in the DB
 			$ext		= strtolower(JFile::getExt($filename));
-
-			if (!JFile::upload($file['tmp_name'], $filepath)) {
+			
+			// - we allow Joomla default security to execute
+			// - if user really uploads an image file, it should not be trigger anyway
+			$upload_success = JFile::upload($file['tmp_name'], $filepath);
+			if ( !$upload_success )
+			{
 				if ($format == 'json') {
 					jimport('joomla.error.log');
 					$log = JLog::getInstance('com_flexicontent.error.php');
