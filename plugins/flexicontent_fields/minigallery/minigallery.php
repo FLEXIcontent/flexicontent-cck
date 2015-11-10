@@ -701,7 +701,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		// Execute once
 		static $initialized = null;
 		static $srcpath_original = '';
-		if ( ($is_importcsv || $inputmode==0) && !$initialized ) {
+		if ( !$initialized ) {
 			$initialized = 1;
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.jpath');
