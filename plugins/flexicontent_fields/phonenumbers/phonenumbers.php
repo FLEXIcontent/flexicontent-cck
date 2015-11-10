@@ -111,7 +111,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			});
 			";
 			
-			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -173,7 +173,11 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
-				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
+				jQuery('#sortables_".$field->id."').sortable({
+					handle: '.fcfield-drag-handle',
+					containment: 'parent',
+					tolerance: 'pointer'
+				});
 				";
 			
 			// Show new field, increment counters
@@ -181,9 +185,6 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
-				
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
@@ -205,7 +206,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ jQuery(this).remove(); });
+					row.slideUp(400, function(){ this.remove(); });
 					rowCount".$field->id."--;
 				}
 			}
@@ -306,7 +307,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
-			$field->html = !count($field->html) ? '' :
+			$field->html =
 				'<li class="'.$value_classes.'">'.
 					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
@@ -329,6 +330,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
@@ -341,6 +343,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		$display_phone_label		= $field->parameters->get( 'display_phone_label', 1 ) ;
 		$display_country_code		= $field->parameters->get( 'display_country_code', 1 ) ;
 		$display_area_code		= $field->parameters->get( 'display_area_code', 1 ) ;
+		$add_tel_link		= $field->parameters->get( 'add_tel_link', 0 ) ;
 		
 		// Property Separators
 		$label_prefix = $field->parameters->get( 'label_prefix', '' ) ;
@@ -372,14 +375,23 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			}
 			if (empty($value['phone1']) && empty($value['phone2']) && empty($value['phone3']) && !$is_ingroup ) continue;  // Skip empty values if not in field group
 			
-			$field->{$prop}[] = ''
-				.$opentag
-				.($display_phone_label  ? $label_prefix.$value['label'].$label_suffix : '')
-				.($display_country_code ? $country_code_prefix.$value['cc'].$separator_cc_phone1 : '')
-				.($display_area_code    ? $value['phone1'].$separator_phone1_phone2 : '')
-				.$value['phone2'].$separator_phone2_phone3.$value['phone3']
-				.$closetag
-				;
+			$html = $opentag
+					.($display_phone_label  ? $label_prefix.$value['label'] . $label_suffix : '');
+			
+			if ($add_tel_link) {
+				$html .= '<a href="tel:' 
+						. ($display_country_code ? $country_code_prefix . $value['cc'] : '')
+						. ($display_area_code    ? $value['phone1'] : '')
+						. $value['phone2'] . $value['phone3']
+						. '">';
+			}
+			$html .= ($display_country_code ? $country_code_prefix . $value['cc'] . $separator_cc_phone1 : '')
+					. ($display_area_code    ? $value['phone1'] . $separator_phone1_phone2 : '')
+					. $value['phone2'] . $separator_phone2_phone3 . $value['phone3']
+					. ($add_tel_link ? '</a>' : '')
+					. $closetag;
+					
+			$field->{$prop}[] = $html;
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
@@ -437,9 +449,9 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			// Validate phone number, skipping phone number that are empty after validation
 			// ****************************************************************************
 			
-			$newpost[$new]['phone1'] = !strlen($post[$n]['phone1']) ? '' : flexicontent_html::dataFilter(@$post[$n]['phone1'], $phone_maxlength, 'INT', 0);
-			$newpost[$new]['phone2'] = !strlen($post[$n]['phone2']) ? '' : flexicontent_html::dataFilter(@$post[$n]['phone2'], $phone_maxlength, 'INT', 0);
-			$newpost[$new]['phone3'] = !strlen($post[$n]['phone3']) ? '' : flexicontent_html::dataFilter(@$post[$n]['phone3'], $phone_maxlength, 'INT', 0);
+			$newpost[$new]['phone1'] = flexicontent_html::dataFilter(@$post[$n]['phone1'], $phone_maxlength, 'INT', 0);
+			$newpost[$new]['phone2'] = flexicontent_html::dataFilter(@$post[$n]['phone2'], $phone_maxlength, 'INT', 0);
+			$newpost[$new]['phone3'] = flexicontent_html::dataFilter(@$post[$n]['phone3'], $phone_maxlength, 'INT', 0);
 			if (!strlen($post[$n]['phone1']) && !strlen($post[$n]['phone2']) && !strlen($post[$n]['phone3']) && !$use_ingroup ) continue;  // Skip empty values if not in field group
 			
 			// Validate other value properties
