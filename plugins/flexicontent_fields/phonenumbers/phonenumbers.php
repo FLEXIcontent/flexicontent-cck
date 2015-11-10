@@ -341,6 +341,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		$display_phone_label		= $field->parameters->get( 'display_phone_label', 1 ) ;
 		$display_country_code		= $field->parameters->get( 'display_country_code', 1 ) ;
 		$display_area_code		= $field->parameters->get( 'display_area_code', 1 ) ;
+		$add_tel_link		= $field->parameters->get( 'add_tel_link', 0 ) ;
 		
 		// Property Separators
 		$label_prefix = $field->parameters->get( 'label_prefix', '' ) ;
@@ -372,14 +373,23 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			}
 			if (empty($value['phone1']) && empty($value['phone2']) && empty($value['phone3']) && !$is_ingroup ) continue;  // Skip empty values if not in field group
 			
-			$field->{$prop}[] = ''
-				.$opentag
-				.($display_phone_label  ? $label_prefix.$value['label'].$label_suffix : '')
-				.($display_country_code ? $country_code_prefix.$value['cc'].$separator_cc_phone1 : '')
-				.($display_area_code    ? $value['phone1'].$separator_phone1_phone2 : '')
-				.$value['phone2'].$separator_phone2_phone3.$value['phone3']
-				.$closetag
-				;
+			$html = $opentag
+					.($display_phone_label  ? $label_prefix.$value['label'] . $label_suffix : '');
+			
+			if ($add_tel_link) {
+				$html .= '<a href="tel:' 
+						. ($display_country_code ? $country_code_prefix . $value['cc'] : '')
+						. ($display_area_code    ? $value['phone1'] : '')
+						. $value['phone2'] . $value['phone3']
+						. '">';
+			}
+			$html .= ($display_country_code ? $country_code_prefix . $value['cc'] . $separator_cc_phone1 : '')
+					. ($display_area_code    ? $value['phone1'] . $separator_phone1_phone2 : '')
+					. $value['phone2'] . $separator_phone2_phone3 . $value['phone3']
+					. ($add_tel_link ? '</a>' : '')
+					. $closetag;
+					
+			$field->{$prop}[] = $html;
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
