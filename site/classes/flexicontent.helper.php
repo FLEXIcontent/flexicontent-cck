@@ -5989,6 +5989,10 @@ class flexicontent_db
 				$order_col = $c_as.'.lft';
 				$order_dir = 'ASC';
 				break;
+			case 'random':
+				$order_col	= 'RAND()';
+				$order_dir	= '';
+				break;
 			case 'default' :
 			default:
 				$order_col = $default_order_col ? $default_order_col : $i_as.'.title';
