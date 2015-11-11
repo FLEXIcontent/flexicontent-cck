@@ -378,7 +378,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			
 			if ($add_tel_link) {
 				$html .= '<a href="tel:' 
-						. ($display_country_code ? $country_code_prefix . $value['cc'] : '')
+						. ($display_country_code ? '+' . $value['cc'] : '')
 						. ($display_area_code    ? $value['phone1'] : '')
 						. $value['phone2'] . $value['phone3']
 						. '">';
