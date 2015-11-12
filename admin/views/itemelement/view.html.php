@@ -47,14 +47,13 @@ class FlexicontentViewItemelement extends JViewLegacy
 
 		$assocs_id   = JRequest::getInt( 'assocs_id', 0 );
 		
-		$language    = !$assocs_id ? JRequest::getCmd('language') : $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
-		$type_id     = !$assocs_id ? JRequest::getCmd('type_id') : $app->getUserStateFromRequest( $option.'.'.$view.'.type_id', 'type_id', 0, 'int' );
-		$created_by  = !$assocs_id ? JRequest::getCmd('created_by') : $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
-		
-		$type_data = $model->getTypeData( $assocs_id, $type_id );
-		
 		if ($assocs_id)
 		{
+			$language    = $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
+			$type_id     = $app->getUserStateFromRequest( $option.'.'.$view.'.type_id', 'type_id', 0, 'int' );
+			$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
+			
+			$type_data = $model->getTypeData( $assocs_id, $type_id );
 			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
 			if (!$assocanytrans && !$created_by)  $created_by = $user->id;
 		}

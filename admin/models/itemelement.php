@@ -198,14 +198,15 @@ class FlexicontentModelItemelement extends JModelLegacy
 		$view   = JRequest::getVar('view');
 		
 		$assocs_id   = JRequest::getInt( 'assocs_id', 0 );
-		$type_id     = $app->getUserStateFromRequest( $option.'.'.$view.'.type_id', 'type_id', 0, 'int' );
-		$language    = $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
-		$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
-		
-		$type_data = $this->getTypeData( $assocs_id, $type_id );
 		
 		if ($assocs_id)
 		{
+			$type_id     = $app->getUserStateFromRequest( $option.'.'.$view.'.type_id', 'type_id', 0, 'int' );
+			$language    = $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
+			$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
+			
+			$type_data = $this->getTypeData( $assocs_id, $type_id );
+			
 			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
 			if (!$assocanytrans && !$created_by) {
 				$created_by = $user->id;
@@ -229,9 +230,9 @@ class FlexicontentModelItemelement extends JModelLegacy
 		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author','filter_author','', 'cmd' );
 		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access','filter_access','', 'int' );
 		
-		$filter_type = $type_id ? $type_id : $filter_type;
-		$filter_lang = $language ? $language : $filter_lang;
-		$filter_author = $created_by ? $created_by : $filter_author;
+		$filter_type   = $assocs_id && $type_id    ? $type_id    : $filter_type;
+		$filter_lang   = $assocs_id && $language   ? $language   : $filter_lang;
+		$filter_author = $assocs_id && $created_by ? $created_by : $filter_author;
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
 		$search = trim( JString::strtolower( $search ) );
@@ -243,9 +244,9 @@ class FlexicontentModelItemelement extends JModelLegacy
 		if (is_numeric($filter_state)) {
 			$where[] = 'i.state = ' . (int) $filter_state;
 		}
-		elseif ( $filter_state === '') {
+		/*elseif ( $filter_state === '') {
 			$where[] = 'i.state IN (0, 1)';
-		}
+		}*/
 		elseif ( $filter_state ) {
 			if ( $filter_state == 'P' ) {
 				$where[] = 'i.state = 1';
