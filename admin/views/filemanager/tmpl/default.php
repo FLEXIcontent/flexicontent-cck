@@ -57,7 +57,11 @@ $list_total_cols = 14;
 <script type="text/javascript">
 
 jQuery(document).ready(function() {
+	//jQuery('#filemanager-2').show();
+	//showUploader();
+	//jQuery('#multiple_uploader').height(330);
 	fctabber['fileman_tabset'].tabShow(0);
+	//jQuery('#filemanager-1').hide();
 });
 
 // delete active filter
@@ -81,6 +85,175 @@ function delAllFilters() {
 
 </script>
 
+
+<?php
+// Load plupload JS framework
+$doc = JFactory::getDocument();
+$pluploadlib = JURI::root(true).'/components/com_flexicontent/librairies/plupload/';
+$plupload_mode = 'runtime';  // 'runtime,ui'
+flexicontent_html::loadFramework('plupload', $plupload_mode);
+
+// Initialize a plupload Queue
+$upload_maxsize = (int)$cparams->get('upload_maxsize', '10000000');
+$js ='
+var uploader = 0;
+function showUploader() {
+	if (uploader) {
+		// Already initialized, re-initialize and empty it
+		uploader.init();
+		uploader.splice();
+	} else if ("'.$plupload_mode.'"=="ui") {
+    jQuery("#multiple_uploader").plupload({
+			// General settings
+			runtimes : "html5,html4,flash,silverlight",
+			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'",
+			unique_names : true,
+			
+			// Set maximum file size and chunking to 1 MB
+			max_file_size : "'.$upload_maxsize.'",
+			chunk_size: "1mb",
+			
+			// Resize images on clientside if we can
+			/*resize : {width : 320, height : 240, quality : 90, crop: true},*/
+			
+			// Specify what files to browse for
+			filters : {
+				max_file_size : "'.$upload_maxsize.'",
+				mime_types: [
+					{title : "Image files", extensions : "jpg,jpeg,gif,png"},
+					{title : "Zip files", extensions : "zip,avi"}
+				]
+			},
+			
+			// Rename files by clicking on their titles
+			rename: true,
+			 
+			// Sort files
+			sortable: true,
+			
+			// Enable ability to drag n drop files onto the widget (currently only HTML5 supports that)
+			dragdrop: true,
+			
+			// Views to activate
+			views: {
+				list: true,
+				thumbs: true, // Show thumbs
+				active: "list"
+			},
+			
+			// Flash settings
+			flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf",
+			
+			// Silverlight settings
+			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap",
+			
+			init: {
+				BeforeUpload: function (up, file) {
+					// Called right before the upload for a given file starts, can be used to cancel it if required
+					up.settings.multipart_params = {
+						filename: file.name
+					};
+				}
+				/*,
+				UploadComplete: function (up, files) {
+					if(window.console) window.console.log("All Files Uploaded");
+					//window.location.reload();
+					window.location.replace(window.location.href);
+				}*/
+			}
+    })
+    
+		.bind(\'complete\',function(){
+			if(window.console) window.console.log("All Files Uploaded");
+			//window.location.reload();
+			window.location.replace(window.location.href);
+		});
+		
+	} else {
+		uploader = jQuery("#multiple_uploader").pluploadQueue({
+			// General settings
+			runtimes : "html5,html4,flash,silverlight",
+			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'",
+			unique_names : true,
+			
+			// Set maximum file size and chunking to 1 MB
+			max_file_size : "'.$upload_maxsize.'",
+			chunk_size: "1mb",
+			
+			// Resize images on clientside if we can
+			/*resize : {width : 320, height : 240, quality : 90, crop: true},*/
+			
+			// Specify what files to browse for
+			filters : {
+				max_file_size : "'.$upload_maxsize.'",
+				mime_types: [
+					{title : "Image files", extensions : "jpg,jpeg,gif,png"},
+					{title : "Zip files", extensions : "zip,avi"}
+				]
+			},
+			
+			// Rename files by clicking on their titles
+			rename: true,
+			 
+			// Sort files
+			sortable: true,
+			
+			// Enable ability to drag n drop files onto the widget (currently only HTML5 supports that)
+			dragdrop: true,
+			
+			// Views to activate
+			views: {
+				list: true,
+				thumbs: true, // Show thumbs
+				active: "thumbs"
+			},
+			
+			// Resize images on clientside if we can
+			/*resize : {width : 320, height : 240, quality : 90, crop: true},*/
+			
+			// Flash settings
+			flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf",
+			
+			// Silverlight settings
+			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap",
+			
+			init: {
+				BeforeUpload: function (up, file) {
+					// Called right before the upload for a given file starts, can be used to cancel it if required
+					up.settings.multipart_params = {
+						filename: file.name
+					};
+				}
+				/*,
+				UploadComplete: function (up, files) {
+					if(window.console) window.console.log("All Files Uploaded");
+					//window.location.reload();
+					window.location.replace(window.location.href);
+				}*/
+			}
+		});
+		
+		uploader = jQuery("#multiple_uploader").pluploadQueue();
+		
+		uploader.bind(\'UploadComplete\',function(){
+			if(window.console) window.console.log("All Files Uploaded");
+			//window.location.reload();
+			window.location.replace(window.location.href);
+		});
+	}
+};
+';
+
+//$doc->addScriptDeclaration($js);
+//flexicontent_html::loadFramework('flexi-lib');
+
+/*<div id="themeswitcher" class="pull-right"> </div>
+<script>
+	jQuery(function() {
+		jQuery.fn.themeswitcher && jQuery('#themeswitcher').themeswitcher({cookieName:''});
+	});
+</script>*/
+?>
 
 <div id="flexicontent" class="flexicontent">
 
@@ -477,7 +650,6 @@ function delAllFilters() {
 			$sys_limit_class  = $server_limit_exceeded ? 'badge-important' : '';
 			
 			echo '
-		<div class="well" style="display: inline-block;">
 			<span class="fc-fileman-upload-limits-box">
 				<span class="label label-info">'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span>
 				<span class="fc-sys-upload-limit-box">
@@ -489,7 +661,6 @@ function delAllFilters() {
 					<span class="badge '.$sys_limit_class.'">'.round($phpUploadLimit['value'] / (1024*1024), 2).' M </span>
 				</span>
 			</span>
-		</div>
 			';
 			?>
 			
@@ -575,6 +746,15 @@ function delAllFilters() {
 				</form>
 				
 			</fieldset>
+			
+			<fieldset class="actions" id="filemanager-2" style="display:none;">
+				<div id="multiple_uploader" class="" style="width: auto; height: 0px;">
+					<div id="multiple_uploader" class="alert alert-warning">
+						There was some JS error or JS issue, plupload script failed to start
+					</div>
+				</div>
+			</fieldset>
+			
 		</fieldset>
 		
 		<?php endif; /*CanUpload*/ ?>

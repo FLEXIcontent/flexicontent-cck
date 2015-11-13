@@ -50,9 +50,11 @@ $flexi_select = JText::_('FLEXI_SELECT');
 <script type="text/javascript">
 
 jQuery(document).ready(function() {
+	jQuery('#filemanager-2').show();
 	showUploader();
-	jQuery('#flash_uploader').height(330);
+	jQuery('#multiple_uploader').height(330);
 	fctabber['fileman_tabset'].tabShow(0);
+	jQuery('#filemanager-1').hide();
 });
 
 // delete active filter
@@ -101,10 +103,11 @@ function showUploader() {
 		uploader.init();
 		uploader.splice();
 	} else if ("'.$plupload_mode.'"=="ui") {
-    jQuery("#flash_uploader").plupload({
+    jQuery("#multiple_uploader").plupload({
 			// General settings
-			runtimes : "html5,flash,silverlight,html4",
+			runtimes : "html5,html4,flash,silverlight",
 			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1",
+			unique_names : true,
 			
 			// Set maximum file size and chunking to 1 MB
 			max_file_size : "'.$upload_maxsize.'",
@@ -114,10 +117,13 @@ function showUploader() {
 			/*resize : {width : 320, height : 240, quality : 90, crop: true},*/
 			
 			// Specify what files to browse for
-			filters : [
-				{title : "Image files", extensions : "jpg,jpeg,gif,png"},
-				{title : "Zip files", extensions : "zip,avi"}
-			],
+			filters : {
+				max_file_size : "'.$upload_maxsize.'",
+				mime_types: [
+					{title : "Image files", extensions : "jpg,jpeg,gif,png"},
+					{title : "Zip files", extensions : "zip,avi"}
+				]
+			},
 			
 			// Rename files by clicking on their titles
 			rename: true,
@@ -138,7 +144,7 @@ function showUploader() {
 			// Flash settings
 			flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf",
 			
-			// Flash settings
+			// Silverlight settings
 			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap",
 			
 			init: {
@@ -151,25 +157,33 @@ function showUploader() {
 				/*,
 				UploadComplete: function (up, files) {
 					if(window.console) window.console.log("All Files Uploaded");
-					window.location.reload();
+					//window.location.reload();
+					window.location.replace(window.location.href);
 				}*/
 			}
     })
     
 		.bind(\'complete\',function(){
 			if(window.console) window.console.log("All Files Uploaded");
-			window.location.reload();
+			//window.location.reload();
+			window.location.replace(window.location.href);
 		});
 		
 	} else {
-		uploader = jQuery("#flash_uploader").pluploadQueue({
+		uploader = jQuery("#multiple_uploader").pluploadQueue({
 			// General settings
-			runtimes : "html5,flash,silverlight,html4",
+			runtimes : "html5,html4,flash,silverlight",
 			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1",
 			unique_names : true,
 			
 			// Set maximum file size and chunking to 1 MB
+			max_file_size : "'.$upload_maxsize.'",
 			chunk_size: "1mb",
+			
+			// Resize images on clientside if we can
+			/*resize : {width : 320, height : 240, quality : 90, crop: true},*/
+			
+			// Specify what files to browse for
 			filters : {
 				max_file_size : "'.$upload_maxsize.'",
 				mime_types: [
@@ -178,6 +192,16 @@ function showUploader() {
 				]
 			},
 			
+			// Rename files by clicking on their titles
+			rename: true,
+			 
+			// Sort files
+			sortable: true,
+			
+			// Enable ability to drag n drop files onto the widget (currently only HTML5 supports that)
+			dragdrop: true,
+			
+			// Views to activate
 			views: {
 				list: true,
 				thumbs: true, // Show thumbs
@@ -190,10 +214,7 @@ function showUploader() {
 			// Flash settings
 			flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf",
 			
-			// Flash settings
-			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap",
-			
-			// Flash settings
+			// Silverlight settings
 			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap",
 			
 			init: {
@@ -206,16 +227,18 @@ function showUploader() {
 				/*,
 				UploadComplete: function (up, files) {
 					if(window.console) window.console.log("All Files Uploaded");
-					window.location.reload();
+					//window.location.reload();
+					window.location.replace(window.location.href);
 				}*/
 			}
 		});
 		
-		uploader = jQuery("#flash_uploader").pluploadQueue();
+		uploader = jQuery("#multiple_uploader").pluploadQueue();
 		
 		uploader.bind(\'UploadComplete\',function(){
 			if(window.console) window.console.log("All Files Uploaded");
-			window.location.reload();
+			//window.location.reload();
+			window.location.replace(window.location.href);
 		});
 	}
 };
@@ -536,7 +559,6 @@ flexicontent_html::loadFramework('flexi-lib');
 			$sys_limit_class  = $server_limit_exceeded ? 'badge-important' : '';
 			
 			echo '
-		<div class="well" style="display: inline-block;">
 			<span class="fc-fileman-upload-limits-box">
 				<span class="label label-info">'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span>
 				<span class="fc-sys-upload-limit-box">
@@ -548,17 +570,16 @@ flexicontent_html::loadFramework('flexi-lib');
 					<span class="badge '.$sys_limit_class.'">'.round($phpUploadLimit['value'] / (1024*1024), 2).' M </span>
 				</span>
 			</span>
-		</div>
 			';
 			?>
 			
-			<span class="label label-info" style="margin-left:64px;"><?php echo JText::_( 'Problem ? use single uploader' ); ?></span>
-			<button id="single_multi_uploader" class="<?php echo $btn_class; ?> btn-primary" onclick="jQuery('#filemanager-1').toggle(); jQuery('#filemanager-2').toggle(); jQuery('#flash_uploader').height(330); setTimeout(function(){showUploader()}, 100);">
+			<span class="alert alert-info" style="margin-left:64px;"><?php echo JText::_( 'Problem ? use single uploader' ); ?></span>
+			<button id="single_multi_uploader" class="<?php echo $btn_class; ?> btn-warning" onclick="jQuery('#filemanager-1').toggle(); jQuery('#filemanager-2').toggle(); jQuery('#multiple_uploader').height(330); setTimeout(function(){showUploader()}, 100);">
 				<?php echo JText::_( 'FLEXI_SINGLE_MULTIPLE_UPLOADER' ); ?>
 			</button>
 			<div class="fcclear"></div>
 			
-			<fieldset class="actions" id="filemanager-1" style="display:none;">
+			<fieldset class="actions" id="filemanager-1">
 				<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
 					
 					<table class="fc-form-tbl" id="file-upload-form-container">
@@ -647,8 +668,12 @@ flexicontent_html::loadFramework('flexi-lib');
 				
 			</fieldset>
 			
-			<fieldset class="actions" id="filemanager-2">
-				<div id="flash_uploader" style="width: auto; height: 0px;">Your browser doesn't have Flash installed.</div>
+			<fieldset class="actions" id="filemanager-2" style="display:none;">
+				<div id="multiple_uploader" class="" style="width: auto; height: 0px;">
+					<div id="multiple_uploader" class="alert alert-warning">
+						There was some JS error or JS issue, plupload script failed to start
+					</div>
+				</div>
 			</fieldset>
 			
 		</fieldset>
