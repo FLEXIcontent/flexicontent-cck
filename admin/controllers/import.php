@@ -60,10 +60,9 @@ class FlexicontentControllerImport extends FlexicontentController
 		// Check for request forgeries
 		if (JRequest::getCmd( 'task' )!='importcsv') {
 			JRequest::checkToken() or jexit( 'Invalid Token' );	
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css" />';
-			if      (FLEXI_J30GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
-			else if (FLEXI_J16GE) $fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j25.css';
-			echo '<link rel="stylesheet" href="'.$fc_css.'" />';
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?'.FLEXI_VERSION.'" />';
+			$fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
+			echo '<link rel="stylesheet" href="'.$fc_css.'?'.FLEXI_VERSION.'" />';
 		} else {
 			// output this before every other output
 			echo 'success||||'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()) .'||||';

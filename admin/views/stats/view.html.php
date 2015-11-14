@@ -69,15 +69,14 @@ class FlexicontentViewStats extends JViewLegacy
 		// Add css and js to document
 		// **************************
 		
-		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?v='.FLEXI_VERSION);
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css?v='.FLEXI_VERSION);
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css?v='.FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VERSION);
 
 
 
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
-		$document->addStyleSheet('//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css?v='.FLEXI_VERSION);
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/esl/esl.js?v='.FLEXI_VERSION);
+		$document->addStyleSheet('//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/esl/esl.js');
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		
 		

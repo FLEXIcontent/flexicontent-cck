@@ -40,8 +40,8 @@ $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : 
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 
 // Load JS tabber lib
-$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js?v='.FLEXI_VERSION);
-$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css?v='.FLEXI_VERSION);
+$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VERSION);
+$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VERSION);
 $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 $list_total_cols = $this->folder_mode ? 7 : 10;
@@ -311,7 +311,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			<?php endif; ?>
 				
 			<?php if ($this->CanViewAllFiles) : ?>
-				<span class="fc-filter nowrap_box fc-mssg-inline">
+				<span class="fc-filter nowrap_box">
 					<?php echo $this->lists['uploader']; ?>
 				</span>
 			<?php endif; ?>

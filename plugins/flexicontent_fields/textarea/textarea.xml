@@ -78,12 +78,13 @@
 			<field name="cols" type="text" default="80" size="3" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" depend_class="using-html-editor" />
-			<field name="" type="separator" default= "NOTE: for multi-value, only editors based on: &lt;b&gt;tinyMCE&lt;/b&gt; are supported, otherwise the editor on new values will appear only after saving" description="" level="level4" depend_class="using-html-editor" />
-			<field name="width" type="text" default="98%" size="6" label="FLEXI_FIELD_WIDTH" description="FLEXI_FIELD_WIDTH_DESC" depend_class="using-html-editor" />
-			<field name="height" type="text" default="250px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" depend_class="using-html-editor" />
+			<field name="" type="separator" default="NOTE: about multi-value support" description="Only editors based on: &lt;b&gt;tinyMCE&lt;/b&gt; and &lt;b&gt;codemirror&lt;/b&gt; are supported, otherwise the editor on new values will appear only after saving" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
+			<field name="" type="separator" default="NOTE: prefer to use Joomla default" description="Adding 2 different editors on same page will break, XTD editor buttons like read-more" level="level4" class="alert alert-warning fcpadded fcinlineblock" depend_class="using-html-editor" />
 			<field name="editor" type="plugins" folder="editors" label="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" depend_class="using-html-editor">
 				<option value="">FLEXI_JOOMLA_DEFAULT</option>
 			</field>
+			<field name="width" type="text" default="98%" size="6" label="FLEXI_FIELD_WIDTH" description="FLEXI_FIELD_WIDTH_DESC" depend_class="using-html-editor" />
+			<field name="height" type="text" default="250px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" depend_class="using-html-editor" />
 			
 			<field name="" type="separator" default="FLEXI_EDITOR_BUTTONS" description="" level="level3" depend_class="using-html-editor" />
 			<field name="show_buttons" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SHOW_EDITOR_BUTTONS" description="FLEXI_SHOW_EDITOR_BUTTONS_DESC" depend_class="using-html-editor" class="btn-group btn-group-yesno">

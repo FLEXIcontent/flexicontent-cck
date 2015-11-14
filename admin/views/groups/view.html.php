@@ -64,9 +64,8 @@ class FlexicontentViewGroups extends JViewLegacy
 		// Add css and js to document
 		// **************************
 		
-		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?v='.FLEXI_VERSION);
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css?v='.FLEXI_VERSION);
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css?v='.FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VERSION);
 		
 		
 		

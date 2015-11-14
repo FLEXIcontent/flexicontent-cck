@@ -24,6 +24,8 @@ class FlexicontentViewGroup extends JViewLegacy
 	 */
 	public function display($tpl = null)
 	{
+		$document = JFactory::getDocument();
+		
 		$this->state	= $this->get('State');
 		$this->item		= $this->get('Item');
 		$this->form		= $this->get('Form');
@@ -33,7 +35,12 @@ class FlexicontentViewGroup extends JViewLegacy
 			JError::raiseError(500, implode("\n", $errors));
 			return false;
 		}
-
+		
+		// Add css and js to document
+		
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VERSION);
+		
 		$this->addToolbar();
 		parent::display($tpl);
 	}
@@ -51,7 +58,7 @@ class FlexicontentViewGroup extends JViewLegacy
 		$isNew		= ($this->item->id == 0);
 		$canDo		= UsersHelper::getActions();
 
-		JToolBarHelper::title(JText::_($isNew ? 'COM_USERS_VIEW_NEW_GROUP_TITLE' : 'COM_USERS_VIEW_EDIT_GROUP_TITLE'), 'groups-add');
+		JToolBarHelper::title(JText::_($isNew ? 'COM_USERS_VIEW_NEW_GROUP_TITLE' : 'COM_USERS_VIEW_EDIT_GROUP_TITLE'), 'groupedit');
 
 		if ($canDo->get('core.edit')||$canDo->get('core.create')) {
 			JToolBarHelper::apply('group.apply');

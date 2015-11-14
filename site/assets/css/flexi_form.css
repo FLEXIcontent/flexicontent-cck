@@ -548,9 +548,9 @@ div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-o
 	font-weight: normal;
 	font-style: italic;
 	font-size: 12px;
-	border: 1px dashed #777 !important;
+	border: 1px solid #777;
 	padding: 2px 16px 2px 16px !important;
-	margin: 5px 10% 1px;
+	margin: 5px 10% 1px !important;
 	display: block;
 	border-radius: 5px;
 	clear: both;

@@ -66,21 +66,21 @@ if ( $show_mod )
 	if ($add_ccs) {
 		// Work around for extension that capture module's HTML 
 		if ($add_ccs==2) {
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css">';
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css?'.FLEXI_VERSION.'">';
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css?'.FLEXI_VERSION.'">';
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css?'.FLEXI_VERSION.'">';
 			}
 		}
 		
 		// Standards compliant implementation by placing CSS link into the HTML HEAD
 		else {
-			$document->addStyleSheet(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css');
-			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css?v='.FLEXI_VERSION);
+			$document->addStyleSheetVersion(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css', FLEXI_VERSION);
+			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VERSION);
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-				$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css?v='.FLEXI_VERSION);
+				$document->addStyleSheetVersion(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VERSION);
 			}
 		}
 	}

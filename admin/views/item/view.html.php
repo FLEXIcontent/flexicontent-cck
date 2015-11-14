@@ -72,13 +72,12 @@ class FlexicontentViewItem extends JViewLegacy
 		// *****************
 		
 		// Add css to document
-		$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?v='.FLEXI_VERSION);
-		FLEXI_J30GE ?
-			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css') :
-			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/j25.css') ;
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexi_shared.css', FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VERSION);
 		
 		// Fields common CSS
-		$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css?v='.FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VERSION);
 		
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
@@ -87,11 +86,11 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		// Add js function to overload the joomla submitform validation
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js?v='.FLEXI_VERSION);
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js?v='.FLEXI_VERSION);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VERSION);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VERSION);
 		
 		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/itemscreen.js?v='.FLEXI_VERSION);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VERSION);
 		
 		
 		// ***********************

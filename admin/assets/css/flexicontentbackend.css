@@ -75,12 +75,15 @@ HEADER ICONS
 	content: "\22";
 }
 .fcsb-icon-groups:before,
-.icon-groups:before, .icon-groupedit:before, .icon-groups-add:before {
+.icon-groups:before, .icon-groupedit:before, .icon-groupadd:before {
 	content: "\e01f";
 }
 .fcsb-icon-filemanager:before,
 .icon-files:before {
 	content: "\30";
+}
+.icon-fileedit:before, .icon-fileadd:before {
+	content: "\e239";
 }
 .fcsb-icon-search:before,
 .icon-searchtext:before {

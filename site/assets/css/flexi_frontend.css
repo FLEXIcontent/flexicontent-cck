@@ -1156,21 +1156,22 @@ div.fc-field-box {
 	text-align: right;
 	max-width: 150px;
 	min-width: auto;
-	border-radius: 10px;
+	border-radius: 6px;
 	line-height: 100%;
 	
 	border-width: 0px;
-	margin: 0px;
+	margin: 0px 6px 6px 0px;
 	padding: 0px;
 	background-color: #F2F2F2;
 	color: #555;
+	box-shadow: 2px 4px 4px gray;
 }
 
 #flexicontent .fc_markup.mu_has_text {
 	border-bottom: 1px solid #AAA;
 	border-right: 1px solid #AAA;
-	margin: 2px 2px 2px 12px;
-	padding: 4px 6px;
+	margin: 2px 6px 6px 12px;
+	padding: 6px;
 }
 
 #flexicontent .fc_markup.mu_featured_cat.mu_has_text {
@@ -1201,8 +1202,7 @@ div.fc-field-box {
 
 #flexicontent .fc_markup.mu_obtained_acclvl.mu_has_text {
 	padding-left: 28px;
-	background: url(../images/lock-unlock.png) 6px 50% no-repeat transparent;
-	background-color: darkgreen;
+	background: url(../images/lock-unlock.png) 6px 50% no-repeat darkgreen;
 	color: white;
 }
 
