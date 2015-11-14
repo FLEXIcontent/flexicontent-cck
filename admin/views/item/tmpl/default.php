@@ -1208,14 +1208,17 @@ if ($this->perms['canparams']) : ?>
 // *********************
 // JOOMLA IMAGE/URLS TAB
 // *********************
-if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 0) ) : ?>
+$show_jui = JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 0);
+if ( $this->params->get('use_jimages_be', $show_jui) || $this->params->get('use_jurls_be', $show_jui) ) : ?>
 	
 	<!-- Joomla images/urls tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-joomla" >
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_COMPATIBILITY'); ?> </h3>
 		
 		<?php
-		$fields_grps_compatibility = array('images', 'urls');
+		$fields_grps_compatibility = array();
+		if ( $this->params->get('use_jimages_be', $show_jui) )  $fields_grps_compatibility[] = 'images';
+		if ( $this->params->get('use_jurls_be', $show_jui) )    $fields_grps_compatibility[] = 'urls';
 		foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
 		?>
 		

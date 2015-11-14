@@ -808,7 +808,6 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 #flexicontent fieldset.panelform > label,
 #flexicontent label.fckey,
 #flexicontent .flexi_label {
-	display: inline-block;
 	color: white;
 	background-color: #999;
 	border-radius: 3px;
@@ -817,16 +816,17 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	font-weight: bold;
 	text-align: right;
 	
-	width: 18%;
-	max-width:150px;
-	
 	border: 0px solid;
-	float: left;
-	clear: left;
-	min-width:auto;
-	margin: 0px 1% 1px 0%;
-	padding: 8px 1%;
 	white-space: normal;
+
+	display: inline-block;
+	width: 15%;
+	min-width: 90px;
+	max-width: 150px;
+	float: left;
+	margin: 2px 1% 3px 0% !important;
+	padding: 8px 8px 8px 8px !important;
+	box-sizing: border-box;
 }
 #flexicontent .label-fcouter {
 	display: inline-block;
