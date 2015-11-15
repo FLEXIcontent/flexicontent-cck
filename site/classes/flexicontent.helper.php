@@ -2354,8 +2354,9 @@ class flexicontent_html
 		{
 			$vote_label = JText::_($field->parameters->get('main_label', 'FLEXI_VOTE_AVERAGE_RATING'));
 			$counter_show_label = $field->parameters->get('main_counter_show_label', 1);
+			$add_review_form = $field->parameters->get('allow_reviews', 0);
 			$html .= flexicontent_html::ItemVoteDisplay( $field, $item_id, $vote->rating_sum, $vote->rating_count, 'main', $vote_label,
-				$stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label, $add_review_form=0, $xids );
+				$stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label, $add_review_form, $xids, $review_type='item' );
 		}
 		
 		if ( $xid=='all' || $xid=='extra' || ($int_xid && isset($xids[$xid])) )
@@ -2403,7 +2404,7 @@ class flexicontent_html
 	 * @param int or string 	$xid
 	 * @since 1.0
 	 */
-	static function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $xiddata='', $stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label=true, $add_review_form=0, $xids=array() )
+	static function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $xiddata='', $stars_override=0, $allow_vote=true, $vote_counter='default', $counter_show_label=true, $add_review_form=0, $xids=array(), $review_type='item' )
 	{
 		static $acclvl_names  = null;
 		static $star_tooltips = null;
@@ -2666,32 +2667,10 @@ class flexicontent_html
 			</div>
 			'.($add_review_form ? '
 			<input type="button" class="btn fcvote_toggle_review_form" style="vertical-align:top;"
-				onclick="fcvote_open_review_form(jQuery(\'#fcvote_review_form_box_'.$id.'\').attr(\'id\'), '.$id.', 0)"
+				onclick="fcvote_open_review_form(jQuery(\'#fcvote_review_form_box_'.$id.'\').attr(\'id\'), '.$id.', \''.$review_type.'\')"
 				value="'.JText::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
 			<span class="fcclear"></span>
-			<div id="fcvote_review_form_box_'.$id.'" class="fcvote_review_form_box" style="display:none;">'.
-			/*
-				<form id="fcvote_review_form_'.$id.'" name="fcvote_review_form_'.$id.'">
-					<table class="fc-form-tbl">
-						<tr class="fcvote_review_form_title">
-							<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TITLE').'</label></td>
-							<td><input type="text" name="title" size="120"/></td>
-						</tr>
-						<tr class="fcvote_review_form_email">
-							<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_EMAIL').'</label></td>
-							<td><input type="email" name="email" size="120"/></td>
-						</tr>
-						<tr class="fcvote_review_form_text">
-							<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TEXT').'</label></td>
-							<td class="top"><textarea name="text" rows="12" cols="120"></textarea></td>
-						</tr>
-						<tr class="fcvote_review_form_text">
-							<td colspan="2"><input type="submit" class="btn btn-primary fcvote_review_form_submit_btn" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/></td>
-						</tr>
-					</table>
-					<input type="hidden" name="content_id" value="'.$id.'"/>
-				</form>*/
-			'</div>' : '').'
+			<div id="fcvote_review_form_box_'.$id.'" class="fcvote_review_form_box" style="display:none;"></div>' : '').'
 		</div>';
 	}
 	

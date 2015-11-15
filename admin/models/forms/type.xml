@@ -238,6 +238,13 @@
 				<option value="1">FLEXI_ENABLE</option>
 			</field>
 			
+			<!--field name="" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS" description="FLEXI_FIELD_VOTE_REVIEWS_DESC" level="level2" />
+			<field name="allow_reviews" type="radio" default="" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
+			
 		</fieldset>
 		<fieldset name="customize_field-favourites" label="FLEXI_FIELD_FAVOURITES">
 			

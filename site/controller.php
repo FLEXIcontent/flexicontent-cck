@@ -1237,10 +1237,11 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function getreviewform()
 	{
-		$content_id = JRequest::getInt('content_id', '' );
-		$type    = JRequest::getInt('review_type', '' );
-		$user_id = $user = JFactory::getUser()->id;
+		$tagid = JRequest::getCmd('tagid', '' );
+		$content_id  = JRequest::getInt('content_id', '' );
+		$review_type = JRequest::getCmd('review_type', 'item' );
 		
+		$user = JFactory::getUser();
 		$db	= JFactory::getDBO();
 		
 		
@@ -1248,18 +1249,20 @@ class FlexicontentController extends JControllerLegacy
 		// Get voting field configuration
 		// ******************************
 		
-		if (!$content_id) {
-			$error = "Content_id is zero";
-		}
+		if (!$content_id)  $error = "Content_id is zero";
+		else if ($review_type!='item')  $error = "review_type <> item is not yet supported";
 		else {
-			$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
-			$field = $db->loadObject();
+			// Check content item exists
 			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
-			$item->load( $content_id );
-			FlexicontentFields::loadFieldConfig($field, $item);
-			$allow_reviews = (int)$field->parameters->get('allow_reviews', 1);
-			if (!$allow_reviews) {
-				$error = "Reviews are disabled";
+			if ( !$item->load( $content_id ) )  $error = 'ID: '.$pk. ': '.$table->getError();
+			
+			// Check voting is enabled
+			else {
+				$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
+				$field = $db->loadObject();
+				FlexicontentFields::loadFieldConfig($field, $item);  // This will also load type configuration
+				$allow_reviews = (int)$field->parameters->get('allow_reviews', 1);
+				if (!$allow_reviews)  $error = "Reviews are disabled";
 			}
 		}
 		
@@ -1275,38 +1278,118 @@ class FlexicontentController extends JControllerLegacy
 			jexit();
 		}
 		
-		if ($user_id)
+		// Load review of a logged user
+		$review = false;
+		if ($user->id)
 		{
 			$query = "SELECT * "
-				." FROM #__flexicontent_review AS r"
+				." FROM #__flexicontent_reviews_ratings AS r"
 				." WHERE r.content_id=" . $content_id
-				."  AND r.type=". $type
-				."  AND r.user_id=". $user_id;				
+				."  AND r.type=". $db->Quote($review_type)
+				."  AND r.user_id=". $user->id;				
 			$db->setQuery($query);
-			$review = $db->loadColumn();
+			$review = $db->loadObject();
 		}
 		
 		$result	= new stdClass();
 		$result->html = '
 		<form id="fcvote_review_form_'.$content_id.'" name="fcvote_form_'.$content_id.'">
+			<input type="hidden" name="content_id"  value="'.$content_id.'"/>
+			<input type="hidden" name="review_type" value="'.$review_type.'"/>
 			<table class="fc-form-tbl">
 				<tr class="fcvote_review_form_title">
 					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TITLE').'</label></td>
-					<td><input type="text" name="title" size="120"/></td>
+					<td>
+						<input type="text" name="title" size="200" value="'.htmlspecialchars( ($review ? $review->title : ''), ENT_COMPAT, 'UTF-8' ).'" />
+					</td>
 				</tr>
 				<tr class="fcvote_review_form_email">
 					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_EMAIL').'</label></td>
-					<td><input type="email" name="email" size="120"/></td>
+					<td>'.( !$user->id ? '
+						<input type="text" name="email" size="200" value="'.htmlspecialchars( ($review ? $review->email : ''), ENT_COMPAT, 'UTF-8' ).'" />
+						' : '<span class=badge>'.$user->email.'</span>' ).'
+					</td>
 				</tr>
 				<tr class="fcvote_review_form_text">
 					<td class="key"><label class="label">'.JText::_('FLEXI_VOTE_REVIEW_TEXT').'</label></td>
-					<td class="top"><textarea name="text" rows="12" cols="120"></textarea></td>
+					<td class="top">
+						<textarea name="text" rows="4" cols="200">'.($review ? $review->text : '').'</textarea>
+					</td>
 				</tr>
 				<tr class="fcvote_review_form_text">
-					<td colspan="2"><input type="submit" class="btn btn-primary fcvote_review_form_submit_btn" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/></td>
+					<td></td>
+					<td><input type="button" class="btn btn-primary fcvote_review_form_submit_btn" onclick="fcvote_submit_review_form(\''.$tagid.'\', this.form)" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/></td>
 				</tr>
 			</table>
 		</form>';
+		
+		echo json_encode($result);
+		jexit();
+	}
+	
+	
+	function storereviewform()
+	{
+		$content_id  = JRequest::getInt('content_id', '' );
+		$review_type = JRequest::getCmd('review_type', 'item' );
+		
+		$user = JFactory::getUser();
+		$db	= JFactory::getDBO();
+		
+		// Validate email
+		$email = $user->id ? $user->email : flexicontent_html::dataFilter(JRequest::getVar('email'), $maxlength=255, 'EMAIL', 0);  // Clean bad text/html
+		JRequest::setVar('email', $email);
+		
+		
+		// ******************************
+		// Get voting field configuration
+		// ******************************
+		
+		if (!$content_id)  $error = "Content_id is zero";
+		else if (!$email)  $error = "Email is invalid or empty";
+		else if ($review_type!='item')  $error = "review_type <> item is not yet supported";
+		else {
+			// Check content item exists
+			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+			if ( !$item->load( $content_id ) )  $error = 'ID: '.$pk. ': '.$table->getError();
+			
+			// Check voting is enabled
+			else {
+				$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
+				$field = $db->loadObject();
+				FlexicontentFields::loadFieldConfig($field, $item);  // This will also load type configuration
+				$allow_reviews = (int)$field->parameters->get('allow_reviews', 1);
+				if (!$allow_reviews)  $error = "Reviews are disabled";
+			}
+		}
+		
+		if (!empty($error)) {
+			$result	= new stdClass();
+			$error = '
+			<div class="fc-mssg fc-warning fc-nobgimage">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				'.$error.'
+			</div>';
+			$result->html = $error;
+			echo json_encode($result);
+			jexit();
+		}
+		
+		// Load review of a logged user
+		$review = false;
+		if ($user->id)
+		{
+			$query = "SELECT * "
+				." FROM #__flexicontent_reviews_ratings AS r"
+				." WHERE r.content_id=" . $content_id
+				."  AND r.type=". $db->Quote($review_type)
+				."  AND r.user_id=". $user->id;				
+			$db->setQuery($query);
+			$review = $db->loadObject();
+		}
+		
+		$result	= new stdClass();
+		$result->html = '<pre>'.print_r($_REQUEST, true).'</pre>';
 		
 		echo json_encode($result);
 		jexit();

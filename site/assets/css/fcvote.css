@@ -183,6 +183,12 @@ div.fcvote .ajax-loader {
 
 /* Review form */
 #flexicontent
+.fcvote_review_form_submit_btn {
+	width:100%;
+	box-sizing: border-box;
+}
+
+#flexicontent
 .fcvote_toggle_review_form,
 .fcvote_toggle_review_form * {
 	vertical-align:top;
@@ -190,7 +196,7 @@ div.fcvote .ajax-loader {
 #flexicontent
 .fcvote_review_form_box label ,
 .fcvote_review_form_box label {
-	font-size:14px;
+	font-size:12px;
 }
 #flexicontent
 .fcvote_review_form_box table td,

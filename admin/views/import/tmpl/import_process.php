@@ -96,9 +96,6 @@ jQuery(document).ready(function() {
 		}
 	});
 });
-window.parent.SqueezeBox.addEvent('onClose',function(){
-	window.parent.location.reload(true);
-});
 </script>
 <style>
 div#advancebar{

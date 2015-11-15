@@ -68,7 +68,6 @@ class FlexicontentViewImport extends JViewLegacy
 		// **************************
 		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VERSION);
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexi_shared.css', FLEXI_VERSION);
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VERSION);
 		
 		// Add JS frameworks

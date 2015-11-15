@@ -102,12 +102,6 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 .cid_loading > *{
 	vertical-align: middle;
 }
-.ajax-loader {
-	background: url("../images/ajax-loader.gif") no-repeat scroll left center transparent;
-	height: 16px;
-	padding: 0 0 0 20px;
-	display: inline-block;
-}
 
 
 /*****************/

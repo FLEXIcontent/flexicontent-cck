@@ -144,9 +144,9 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_extravote` (
   KEY `extravote_idx` (`content_id`)
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
+/*CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_ratings` (
   `content_id` int(11) NOT NULL,
-  `type` int(11) NOT NULL DEFAULT '1',
+  `type` varchar(255) NOT NULL DEFAULT 'item',
   `average_rating` mediumtext NOT NULL,
   `custom_ratings` mediumtext NOT NULL DEFAULT '',
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -158,9 +158,10 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   `submit_date` datetime NOT NULL,
   `update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `custom_fields` mediumtext NULL,
-  PRIMARY KEY (`content_id`, `type`),
-  KEY `user_id` (`user_id`)
-) ENGINE=MyISAM;
+  KEY (`content_id`, `type`),
+  UNIQUE KEY (`content_id`, `type`, `email`)
+  KEY `user_id` (`user_id`),
+) ENGINE=MyISAM;*/
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_versions` (
   `version` int(11) NOT NULL default '0',

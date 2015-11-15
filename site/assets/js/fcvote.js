@@ -104,12 +104,12 @@ jQuery(document).ready(function(){
 
 	function fcvote_open_review_form(tagid, content_id, review_type)
 	{
-		var box = jQuery('#'+tagid)
+		var box = jQuery('#'+tagid);
 		box.empty().css('display', '').addClass('ajax-loader');
 		
 		var currentURL = window.location;
 		var live_site = currentURL.protocol + '//' + currentURL.host + fcvote_rfolder;
-		var url = live_site + "/index.php?option=com_flexicontent&format=raw&task=getreviewform&content_id=" + content_id + "&review_type=" + review_type;
+		var url = live_site + "/index.php?option=com_flexicontent&format=raw&task=getreviewform&tagid="+tagid +"&content_id="+content_id +"&review_type="+review_type;
 
 		jQuery.ajax({
 			url: url,
@@ -117,6 +117,33 @@ jQuery(document).ready(function(){
 			data: {
 				lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: '')
 			},
+			success: function( data )
+			{
+				box.removeClass('ajax-loader');
+				if (typeof(data.html) && data.html) {
+					box.html(data.html).show();
+				}
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+			}
+		});
+	}
+
+
+	function fcvote_submit_review_form(tagid, form)
+	{
+		var box = jQuery('#'+tagid);
+		box.empty().css('display', '').addClass('ajax-loader');
+		
+		var currentURL = window.location;
+		var live_site = currentURL.protocol + '//' + currentURL.host + fcvote_rfolder;
+		var url = live_site + "/index.php?option=com_flexicontent&format=raw&task=storereviewform";
+
+		jQuery.ajax({
+			url: url,
+			dataType: "json",
+			data: jQuery(form).serialize(),
 			success: function( data )
 			{
 				box.removeClass('ajax-loader');
