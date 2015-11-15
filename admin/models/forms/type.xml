@@ -589,6 +589,28 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_ITEM_FORM_LAYOUT" label="" level="level1" />
+
+			<field name="form_layout_configs" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod" labelclass="label-success">
+				<option value="">FLEXI_CUSTOMIZE</option>
+				<option value="1" fcconfigs="{
+					'form_tab_titles':'1:FLEXI_DESCRIPTION, 2:__TYPE_NAME__, 3:FLEXI_ASSIGNMENTS, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE',
+					'form_tab_icons':'1:icon-file-2, 2:icon-signup, 3:icon-tree-2, 4:icon-calendar, 5:icon-bookmark, 6:icon-eye-open, 7:icon-palette',
+					'form_tabs_above':'title, alias, category, lang, type, state, disable_comments, notify_subscribers',
+					'form_tabs_below':'_skip_',
+					'form_tab01_fields':'text',
+					'form_tab02_fields':'fields_manager',
+					'form_tab03_fields':'categories, tags, language, perms',
+					'form_tab04_fields':'timezone_info, created, created_by, created_by_alias, publish_up, publish_down, access',
+					'form_tab05_fields':'metadata, seoconf',
+					'form_tab06_fields':'display_params',
+					'form_tab07_fields':'layout_selection, layout_params',
+					'form_tabs_fieldsman':''
+				}">FLEXI_LOAD_DEFAULTS_N_CUSTOMIZE</option>
+				<option value="2" fcconfigs="{
+					'form_tab_titles':'', 'form_tab_icons':'', 'form_tabs_above':'', 'form_tabs_below':'', 'form_tab01_fields':'', 'form_tab02_fields':'', 'form_tab03_fields':'', 'form_tab04_fields':'', 'form_tab05_fields':'', 'form_tab06_fields':'', 'form_tab07_fields':'', 'form_tabs_fieldsman':''
+				}">FLEXI_USE_COMPONENT_SETTINGS_CLEAR</option>
+			</field>
+			
 			<field name="form_tab_titles" type="textarea" rows="3" cols="36" label="FLEXI_FORM_TAB_TITLES" description="FLEXI_FORM_TAB_TITLES_DESC" default="" />
 			<field name="form_tab_icons" type="textarea" rows="3" cols="36" label="FLEXI_FORM_TAB_ICONS" description="FLEXI_FORM_TAB_ICONS_DESC" default="" />
 			
