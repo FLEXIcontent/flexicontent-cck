@@ -755,10 +755,13 @@ class flexicontent_html
 				$js .= "
 				if (typeof jQuery.fn.chosen == 'function') { 
 					jQuery.fn.chosen_fc = jQuery.fn.chosen;
-					jQuery.fn.chosen = function(){};
-					jQuery(document).ready(function() {
-						jQuery('select:not(.use_select2_lib)').chosen_fc();
-					});
+					jQuery.fn.chosen = function(){
+						var args = arguments;
+						jQuery(this).each(function() {
+							if (jQuery(this).hasClass('use_select2_lib')) return;
+							jQuery(this).chosen_fc(args);
+						});
+					};
 				}
 				";
 				
