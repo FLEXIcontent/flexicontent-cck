@@ -136,7 +136,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$newpost[$new]['country']  = !$use_country   || !isset($v['country'])   ? '' : flexicontent_html::dataFilter($v['country'],  2,    'STRING', 0);
 			
 			$newpost[$new]['addr1'] = flexicontent_html::dataFilter($v['addr1'],  4000, 'STRING', 0);
-			$newpost[$new]['city']  = flexicontent_html::dataFilter($v['addr3'],  4000, 'STRING', 0);
+			$newpost[$new]['city']  = flexicontent_html::dataFilter($v['city'],   4000, 'STRING', 0);
 			$newpost[$new]['zip']   = flexicontent_html::dataFilter($v['zip'],    10,   'STRING', 0);
 			
 			$newpost[$new]['lat'] = flexicontent_html::dataFilter(str_replace(',', '.', $v['lat']),  100, 'DOUBLE', 0);
