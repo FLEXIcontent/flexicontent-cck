@@ -175,8 +175,10 @@
 				<option value="DESC">FLEXI_DESC</option>
 			</field>
 			<field name="orderbycustomfieldint" type="list" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" >
-				<option value="0">FLEXI_ALPHANUMERIC</option>
-				<option value="1">FLEXI_NUMERIC</option>
+				<option value="0">FLEXI_TEXT</option>
+				<option value="1">FLEXI_INTEGER</option>
+				<option value="2">FLEXI_FLOAT</option>
+				<option value="3">FLEXI_DATE</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_HTML" level="level1" />

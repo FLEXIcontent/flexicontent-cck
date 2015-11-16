@@ -396,8 +396,10 @@
 			</field>
 			<field name="orderbycustomfieldint" type="radio" default="" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_ALPHANUMERIC</option>
-				<option value="1">FLEXI_NUMERIC</option>
+				<option value="0">FLEXI_TEXT</option>
+				<option value="1">FLEXI_INTEGER</option>
+				<option value="2">FLEXI_FLOAT</option>
+				<option value="3">FLEXI_DATE</option>
 			</field>
 			
 			<field name="sep_items_order_2nd" type="separator" default="FLEXI_ITEMS_ORDER_2ND_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
@@ -435,8 +437,10 @@
 			</field>
 			<field name="orderbycustomfieldint_2nd" type="radio" default="" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_ALPHANUMERIC</option>
-				<option value="1">FLEXI_NUMERIC</option>
+				<option value="0">FLEXI_TEXT</option>
+				<option value="1">FLEXI_INTEGER</option>
+				<option value="2">FLEXI_FLOAT</option>
+				<option value="3">FLEXI_DATE</option>
 			</field>
 			
 			<field name="sep_items_retrieval" type="separator" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level2" />

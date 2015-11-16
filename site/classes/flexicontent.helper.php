@@ -5873,7 +5873,12 @@ class flexicontent_db
 			// SPECIAL case custom field
 			case 'field':
 				$cf = $sfx == '_2nd' ? 'f2' : 'f';
-				$order_col	= $params->get('orderbycustomfieldint'.$sfx, 0) ? 'CAST('.$cf.'.value AS SIGNED)' : $cf.'.value';
+				switch( $params->get('orderbycustomfieldint'.$sfx, 0) ) {
+					case 1:  $order_col = 'CAST('.$cf.'.value AS SIGNED)';  break;  // Integer
+					case 2:  $order_col = 'CAST('.$cf.'.value AS DECIMAL(65,15))'; break; // Decimal
+					case 3:  $order_col = 'CAST('.$cf.'.value AS DATE)';  break;  // Date
+					default: $order_col = $cf.'.value'; break;  // Text
+				}
 				$order_dir	= $params->get('orderbycustomfielddir'.$sfx, 'ASC');
 				break;
 
@@ -5920,6 +5925,7 @@ class flexicontent_db
 				}
 				break;
 		}
+		//echo "<br/>".$order_col." ".$order_dir."<br/>";
 	}
 
 

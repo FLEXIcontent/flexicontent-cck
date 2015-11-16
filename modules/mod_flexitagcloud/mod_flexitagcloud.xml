@@ -165,7 +165,9 @@
 			</field>
 			<field name="orderbycustomfieldint" type="radio" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_TYPE" description="..." class="btn-group group-fcinfo">
 				<option value="0">FLEXI_TEXT</option>
-				<option value="1">FLEXI_INT</option>
+				<option value="1">FLEXI_INTEGER</option>
+				<option value="2">FLEXI_FLOAT</option>
+				<option value="3">FLEXI_DATE</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level1" />

@@ -824,6 +824,7 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	min-width: 90px;
 	max-width: 150px;
 	float: left;
+	clear: left;
 	margin: 2px 1% 3px 0% !important;
 	padding: 8px 8px 8px 8px !important;
 	box-sizing: border-box;
