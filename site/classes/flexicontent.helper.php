@@ -750,6 +750,18 @@ class flexicontent_html
 			case 'select2':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
+				// Replace chosen function (if loaded)
+				//JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
+				$js .= "
+				if (typeof jQuery.fn.chosen == 'function') { 
+					jQuery.fn.chosen_fc = jQuery.fn.chosen;
+					jQuery.fn.chosen = function(){};
+					jQuery(document).ready(function() {
+						jQuery('select:not(.use_select2_lib)').chosen_fc();
+					});
+				}
+				";
+				
 				$ver = '3.5.4';
 				$framework_path = JURI::root(true).$lib_path.'/select2';
 				$framework_folder = JPATH_SITE .DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
