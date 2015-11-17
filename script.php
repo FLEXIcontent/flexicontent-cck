@@ -919,6 +919,7 @@ class com_flexicontentInstallerScript
 					if ( $reviews_beta_tbl_exists ) {
 						$queries[] = "DROP TABLE `#__flexicontent_reviews`";
 					}
+					// TODO add this in installation SQL file when feature is finished
 					/*if ( !$reviews_ratings_tbl_exists ) {
 						$queries[] = "
 						CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_ratings` (
