@@ -117,15 +117,17 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		// ******************************
 		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {
+		
+		//if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {  // Do not cache to allow configuration changes
 			$db = JFactory::getDBO();
 			$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
 			$_dbvariable = $db->loadObject();
 			$min_word_len = (int) @ $_dbvariable->Value;
 			$minchars = $params->get('minchars', 3);
-			$min_word_len = $min_word_len > $minchars  ?  $min_word_len : $minchars;
+			$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+			$min_word_len = !$search_prefix && $min_word_len > $minchars  ?  $min_word_len : $minchars;
 			$app->setUserState($option.'.min_word_len', $min_word_len);
-		}
+		//}
 	}
 	
 	

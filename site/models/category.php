@@ -217,13 +217,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('filter_order_Dir', JRequest::getCmd('filter_order_Dir', 'ASC', 'default'));
 		
 		// Get minimum word search length
-		if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {
+		//if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {  // Do not cache to allow configuration changes
 			$db = JFactory::getDBO();
 			$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
 			$_dbvariable = $db->loadObject();
 			$min_word_len = (int) @ $_dbvariable->Value;
+			$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+			$min_word_len = !$search_prefix ?  $min_word_len : 1;
 			$app->setUserState($option.'.min_word_len', $min_word_len);
-		}
+		//}
 	}
 	
 	
