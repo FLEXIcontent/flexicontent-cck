@@ -714,17 +714,19 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	function getGroupFieldsValues(&$grouped_fields, &$item, &$max_count)
 	{
 		// Retrieve values of fields in the group if not already retrieved
-		if (!isset($item->fieldvalues)) {
+		/*if (!isset($item->fieldvalues)) {
 			$itemmodel = new FlexicontentModelItem();
-			$item->fieldvalues = $itemmodel->getCustomFieldsValues($item->id);
-		}
+			$item->fieldvalues = $itemmodel->getCustomFieldsValues($item->id, $item->version);
+		}*/
 		//echo "<pre>"; print_r($item->fieldvalues); echo "</pre>"; exit;
 		
 		foreach($grouped_fields as $field_id => $grouped_field)
 		{
 			// Set field values
-			if ( isset($item->fieldvalues[$field_id]) ) {
+			if ( isset($item->fieldvalues[$field_id]) ) {   // Item viewing
 				$grouped_field->value = is_array($item->fieldvalues[$field_id])  ?  $item->fieldvalues[$field_id]  :  array($item->fieldvalues[$field_id]);
+			} else if ( isset($item->fields[$grouped_field->name]->value) ) {    // Item form
+				$grouped_field->value = $item->fields[$grouped_field->name]->value;
 			} else {
 				$grouped_field->value = null;
 			}
