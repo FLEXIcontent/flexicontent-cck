@@ -369,17 +369,15 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 		endif;
 		?>
 		
-		<?php if (!$skip_sliders && $config_saved) : ?>
-			
-			<?php if (!$this->dopostinstall || !$this->allplgpublish) : ?>
+		<?php if (!$this->dopostinstall || !$this->allplgpublish) : ?>
 			<?php
 			$title = JText::_( 'FLEXI_POST_INSTALL' );
 			echo JHtml::_('sliders.panel', $title, 'postinstall' );
 			echo $this->loadTemplate('postinstall');
 			?>
-			<?php endif; ?>
-			
-			
+		<?php endif; ?>
+		
+		<?php if (!$skip_sliders && $config_saved) : ?>
 			<?php ob_start(); ?>
 			<?php
 				echo JHtml::_('sliders.panel', $_title, 'requirements' );
