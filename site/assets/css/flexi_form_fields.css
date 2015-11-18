@@ -40,7 +40,11 @@
 /* FIELD: multiple-value (sortable) container (not cleared) */
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.floated {
 	clear: none;
-	width: unset;
+	display: block;
+	float: left;
+	max-width: 100% !important;  /* Allow responsive width while floating */
+	width:auto;
+	box-sizing: border-box;
 }
 /* FIELD: single-value container */
 #flexicontent div.fcfieldval_container.valuebox {

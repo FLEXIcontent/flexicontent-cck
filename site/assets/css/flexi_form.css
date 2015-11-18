@@ -568,6 +568,16 @@ body .alert.fcpadded {
 body .alert.fcinlineblock {
 	display: inline-block;
 }
+body .nowrap_hidden {
+	display:block;
+	visibility:hidden;
+	height: 1px;
+	overflow: hidden;
+	padding: 0;
+	margin: -1px 0 0 0;
+	white-space:nowrap;
+}
+
 
 #flexicontent div.input-append > input { margin:0px !important; border-top-right-radius:0px !important;  border-bottom-right-radius:0px !important; }
 #flexicontent div.input-prepend > input { margin:0px !important; border-top-left-radius:0px !important;  border-bottom-left-radius:0px !important; }
