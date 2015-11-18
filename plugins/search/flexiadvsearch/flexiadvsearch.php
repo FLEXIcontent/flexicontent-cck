@@ -159,7 +159,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 			$form_contenttypes = !is_array($form_contenttypes)  ?  array($form_contenttypes)  :  $form_contenttypes;
 			$form_contenttypes = array_unique(array_map('intval', $form_contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
 			
-			$contenttypes = array_intersect($contenttypes, $form_contenttypes);
+			$_contenttypes = array_intersect($contenttypes, $form_contenttypes);
+			if (!empty($_contenttypes)) $contenttypes = $_contenttypes;  // catch empty case: no content types were given or not-allowed content types were passed
 		}
 		
 		// Check for zero content type (can occur during sanitizing content ids to integers)
@@ -617,7 +618,9 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Execute search query.  NOTE this is skipped it if (a) no text-search and no (b) no filters are active
 		// *****************************************************************************************************
 		
-		if ( !count($filters_where) && !strlen($text) && !strlen($andcontenttypes) ) return array();
+		// Do not check for 'contentypes' this are based on configuration and not on form submitted data,
+		// considering contenttypes or other configuration based parameters, will return all items on initial search view display !
+		if ( !count($filters_where) && !strlen($text) /*&& !strlen($andcontenttypes)*/ ) return array();
 		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }

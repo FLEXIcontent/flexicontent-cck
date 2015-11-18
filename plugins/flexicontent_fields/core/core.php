@@ -396,7 +396,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		}
 		
-		$indexed_elements = false;//in_array($filter->field_type, array('tags', 'createdby', 'modifiedby', 'created', 'modified', 'type'));
+		// This will make filter values to be retrieved from the value_id DB column
+		$indexed_elements = in_array($filter->field_type, array('tags', 'createdby', 'modifiedby', 'created', 'modified', 'type'));
 		
 		if ($filter->field_type == 'categories' || $filter->field_type == 'title') {
 			plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName, $isSearchView=1);

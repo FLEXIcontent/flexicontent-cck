@@ -221,7 +221,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$form_contenttypes = !is_array($form_contenttypes)  ?  array($form_contenttypes)  :  $form_contenttypes;
 			$form_contenttypes = array_unique(array_map('intval', $form_contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
 			
-			$contenttypes = array_intersect($contenttypes, $form_contenttypes);
+			$_contenttypes = array_intersect($contenttypes, $form_contenttypes);
+			if (!empty($_contenttypes)) $contenttypes = $_contenttypes;  // catch empty case: no content types were given or not-allowed content types were passed
 		}
 		
 		// Check for zero content type (can occur during sanitizing content ids to integers)
@@ -580,6 +581,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		if(!$error)
 		{
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+			
 			$results	= $this->get('data' );
 			$total		= $this->get('total');
 			$pageNav  = $this->get('pagination');
@@ -594,9 +597,6 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				}
 			}
 			
-			//require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-
 			if ($state->get('match') == 'exact') {
 				$searchwords = array($searchword);
 				//$needle = $searchword;
