@@ -426,26 +426,30 @@ class flexicontent_html
 		$orderby_custom = $params->get('orderby_custom'.$sfx, '');
 		$orderby_custom = preg_split("/\s*,\s*/u", $orderby_custom);
 		
+		$field_ids = array();
 		$custom_ops = array();
-		$_p = array();
 		$n = 0;
 		foreach ($orderby_custom as $custom_option) {
 			$order_parts = preg_split("/:/", $custom_option);
 			if (count($order_parts)!=3 && count($order_parts)!=4) continue;
 			$_field_id = (int) @ $order_parts[0];
 			if (!$_field_id) continue;
-			$custom_ops[$_field_id] = $custom_option;
-			$_p[$_field_id] = $order_parts;
+			$field_ids[$_field_id] = 1;
+			$custom_ops[$n] = $order_parts;
+			$n++;
 		}
 		
-		$fields = FlexicontentFields::getFieldsByIds(array_keys($custom_ops));
-		foreach($fields as $id => $field)
+		$fields = FlexicontentFields::getFieldsByIds(array_keys($field_ids));
+		foreach($custom_ops as $op)
 		{
-			$value = 'custom:'.$_p[$id][0].':'.$_p[$id][1].':'.$_p[$id][2];
-			if (count($_p[$id])==4) {
-				$text = JText::_( $_p[$id][3] );
+			$field_id = $op[0];
+			$field    = $fields[$field_id];
+			
+			$value = 'custom:'.$op[0].':'.$op[1].':'.$op[2];
+			if (count($op)==4) {
+				$text = JText::_( $op[3] );
 			} else {
-				$text = JText::_( $field->label ) .' '. JText::_(strtolower($_p[$id][2])=='asc' ? 'FLEXI_INCREASING' : 'FLEXI_DECREASING');
+				$text = JText::_( $field->label ) .' '. JText::_(strtolower($op[2])=='asc' ? 'FLEXI_INCREASING' : 'FLEXI_DECREASING');
 			}
 			$ordering[] = JHTML::_('select.option', $value,  $text);
 		}
