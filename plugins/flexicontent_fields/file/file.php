@@ -47,6 +47,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ($use_ingroup) $field->formhidden = 3;
 		if ($use_ingroup && empty($field->ingroup)) return;
+		$is_ingroup  = !empty($field->ingroup);
 		
 		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
@@ -161,30 +162,18 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		$js = "
 			var fc_field_dialog_handle_".$field->id.";
-		";
-		$css = "";
-		
-		if ($multiple) // handle multiple records
-		{
-			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .= "
-			jQuery(document).ready(function(){
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					containment: 'parent',
-					tolerance: 'pointer'
-				});
-			});
-			";
 			
-			$js .= "
 			function file_fcfield_del_existing_value".$field->id."(el)
 			{
-				var el = jQuery(el);
-				if ( el.prop('checked') )
-					el.parent().find('.inlinefile-data-txt').css('text-decoration', 'line-through');
-				else
-					el.parent().find('.inlinefile-data-txt').css('text-decoration', '');
+				var el  = jQuery(el);
+				var box = jQuery(el).closest('.fcfieldval_container');
+				if ( el.prop('checked') ) {
+					box.find('.fc_preview_thumb').css('opacity', 0.4);
+					box.find('.fc_filedata_txt').css('text-decoration', 'line-through');
+				} else {
+					box.find('.fc_preview_thumb').css('opacity', 1);
+					box.find('.fc_filedata_txt').css('text-decoration', '');
+				}
 			}
 			
 			function fc_openFileSelection_".$field->id."(event) {
@@ -197,19 +186,6 @@ class plgFlexicontent_fieldsFile extends FCField
 				fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container');
 				return false;
 			}
-			
-			jQuery(document).ready(function() {
-				jQuery('a.addfile_".$field->id."').each(function(index, value) {
-					jQuery(this).on( 'click',  {obj:this},  fc_openFileSelection_".$field->id." );
-				});
-			});
-			";
-			
-			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
 			
 			function qfSelectFile".$field->id."(obj, id, file, targetid, file_data)
 			{
@@ -237,8 +213,38 @@ class plgFlexicontent_fieldsFile extends FCField
 				}
 				
 				if (targetid) fc_field_dialog_handle_".$field->id.".dialog('close');
+				
+				var remove_obj = container.find('.inlinefile-del');
+				remove_obj.removeAttr('checked').trigger('change');
 				return result;
 			}
+						
+			jQuery(document).ready(function() {
+				jQuery('a.addfile_".$field->id."').each(function(index, value) {
+					jQuery(this).on( 'click',  {obj:this},  fc_openFileSelection_".$field->id." );
+				});
+			});
+		";
+		$css = "";
+		
+		if ($multiple) // handle multiple records
+		{
+			// Add the drag and drop sorting feature
+			if (!$use_ingroup) $js .= "
+			jQuery(document).ready(function(){
+				jQuery('#sortables_".$field->id."').sortable({
+					handle: '.fcfield-drag-handle',
+					containment: 'parent',
+					tolerance: 'pointer'
+				});
+			});
+			";
+			
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			$js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
 			
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
@@ -807,24 +813,27 @@ class plgFlexicontent_fieldsFile extends FCField
 					// Load file data from DB
 					$row = JTable::getInstance('flexicontent_files', '');
 					$row->load( $file_id );
+					$_filename = $file->filename_original ? $file->filename_original : $file->filename;
 					$dbdata['secure'] = $row->secure ? 1 : 0;  // !! Do not change media/secure -folder- for existing files
 					
 					// Security concern, check file is assigned to current item
 					$isAssigned = $this->checkFileAssignment($field, $file_id, $item);
-					if ( !$isAssigned ) {
-						if ( $v['file-del'] ) {
-							JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$row->filename_original."', that is not assigned to current item", 'warning' );
-							continue;
+					if ( $v['file-del'] ) {
+						if ( !$isAssigned ) {
+							//JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );
+						} else {
+							//JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to update file properties of a file: '".$_filename."', that is not assigned to current item", 'warning' );
 						}
-						//JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to update file properties of a file: '".$row->filename_original."', that is not assigned to current item", 'warning' );
-						//continue;
 					}
 					
 					// Delete existing file if so requested
-					if ( $v['file-del'] && $this->canDeleteFile($field, $file_id, $item) ) {
-						$fm = new FlexicontentModelFilemanager();
-						$fm->delete( array($file_id) );
-						continue;
+					if ( $v['file-del'] ) {
+						$canDelete = $this->canDeleteFile($field, $file_id, $item);
+						if ($isAssigned && $canDelete) {
+							$fm = new FlexicontentModelFilemanager();
+							$fm->delete( array($file_id) );
+						}
+						continue;  // Skip file since unloading / removal was requested
 					}
 					
 					// Set the changed data into the object
@@ -847,10 +856,12 @@ class plgFlexicontent_fieldsFile extends FCField
 					if ($file_id)
 					{
 						// Security concern, check file is assigned to current item
-						if ( !$this->checkFileAssignment($field, $file_id, $item) ) {
-							$row = JTable::getInstance('flexicontent_files', '');
+						$isAssigned = $this->checkFileAssignment($field, $file_id, $item);
+						if ( !$isAssigned ) {
+							/*$row = JTable::getInstance('flexicontent_files', '');
 							$row->load( $file_id );
-							JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$row->filename_original."', that is not assigned to current item", 'warning' );
+							$_filename = $file->filename_original ? $file->filename_original : $file->filename;
+							JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );*/
 						}
 						
 						// Delete previous file if no longer used
@@ -859,6 +870,10 @@ class plgFlexicontent_fieldsFile extends FCField
 							$fm->delete( array($file_id) );
 						}
 					}
+					
+					// Skip file if unloading / removal was requested
+					if ( $v['file-del'] )  continue;  
+					
 					$fman = new FlexicontentControllerFilemanager();   // Controller will do the data filter too
 					JRequest::setVar( 'return-url', null, 'post' );  // needed !
 					JRequest::setVar( 'secure', $v['secure'], 'post' );

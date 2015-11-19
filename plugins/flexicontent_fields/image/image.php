@@ -632,13 +632,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			// Add current image or add an empty image container
 			$remove = $change = '';
-			if ( !$multiple || $is_ingroup )
+			if ( (!$multiple || $is_ingroup) && !$image_source )
 			{
 				if ( !$required_class ) {
 					$remove  = '<div id="'.$elementid_n.'_imgremove" class="imgremove">';
-					$remove .= ' <input class="imgremove" type="checkbox" name="'.$fieldname_n.'[remove]" id="'.$elementid_n.'_remove" value="1" onchange="var img_preview = jQuery(this).closest(\'.fcimg_preview_box\'); img_preview.find(\'.preview_image\').css(\'opacity\', (jQuery(this).parent().find(\'input\').prop(\'checked\') ? 0.4 : 1));" />';
+					$remove .= ' <input class="imgremove" type="checkbox" name="'.$fieldname_n.'[remove]" id="'.$elementid_n.'_remove" value="1" onchange="var img_preview = jQuery(this).closest(\'.fcimg_preview_box\'); img_preview.find(\'.preview_image\').css(\'opacity\', (jQuery(this).parent().find(\'input\').prop(\'checked\') ? 0.4 : 1)); var preview_msg = jQuery(this).closest(\'.fcfieldval_container\').find(\'.preview_msg\'); preview_msg.css(\'text-decoration\', (jQuery(this).parent().find(\'input\').prop(\'checked\') ? \'line-through\' : \'\')); " />';
 					$remove .= ' <label style="display:inline;" for="'.$elementid_n.'_remove" class="hasTooltip" title="'.JText::_( 'FLEXI_FIELD_UNLOAD_IMAGE_DESC' ).'">'.JText::_( 'FLEXI_FIELD_UNLOAD_IMAGE' ).'</label>';
 					$remove .= '</div>';
+				} else {
+					$remove = '<span class="fc-mssg-inline fc-note fc-iblock fc-nobgimage">'.JText::_('FLEXI_REQUIRED').'</span>';
 				}
 			}
 			
@@ -727,7 +729,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			<div class="fcclear"></div>
 			<div class="fcimg_preview_box" style="float:left!important; clear:none!important; margin-right:5px!important;">
 				'.$imgpreview.'
-				<div style="float:left; clear:both;" class="imgactions_box">
+				<div style="float:left; clear:both; display:inline-block; min-height:4px;" class="imgactions_box">
 					'.($remove ? $remove : '').'
 				</div>
 				<div class="fcclear"></div>
