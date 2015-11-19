@@ -270,7 +270,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		// Return (only) the area of advanced search plugin, when search areas selector is not shown
 		$params = & $this->_params;
 		if( !$params->get('show_searchareas', 0) ) {
-			$this->_areas['search'] = array('flexicontent');
+			$this->_areas['search'] = array('flexicontent' => 'FLEXICONTENT');
 			return $this->_areas;
 		}
 		

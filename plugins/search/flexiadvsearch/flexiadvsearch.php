@@ -94,8 +94,11 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$app->setUserState('fc_view_total_'.$view, 0);
 		$app->setUserState('fc_view_limit_max_'.$view, 0);
 		
-		// Check if not search inside this search plugin areas
-		if ( is_array($areas) && !array_intersect( $areas, array_keys($this->onContentSearchAreas()) ) )  return array();
+		// Check if not requested search areas, inside this search areas of this plugin
+		if ( is_array($areas) && !array_intersect($areas, array_keys($this->onContentSearchAreas())) )
+		{
+			return array();
+		}
 		
 		// Initialize some variables
 		$db    = JFactory::getDBO();
@@ -566,7 +569,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		} else {
 			$onBasic_textsearch    = '';
 			$onAdvanced_textsearch = $text_where;
-			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id AND ts.field_id IN ('. implode(',',array_keys($fields_text)) .')';
+			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id '.(count($fields_text) ? 'AND ts.field_id IN ('. implode(',',array_keys($fields_text)) .')' : '');
 			$join_textfields = ' JOIN #__flexicontent_fields as f ON f.id=ts.field_id';
 		}
 		
