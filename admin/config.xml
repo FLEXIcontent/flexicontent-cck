@@ -4,134 +4,17 @@
 	
 		<fieldset name="component" label="Options" description="">
 		
-		<field name="" type="separator" default="FLEXI_GENERAL_CONF" label="" level="level0" />
+		<field name="" type="separator" default="FLEXI_TEXT_SEARCH" label="" level="level0" />
 			
-			<field name="flexi_cat_extension" type="hidden" size="1" default="com_content" label="Category Type" description="Please save configuration once" />
-			<field name="fcdata_serialized" type="hidden" size="1" default="" label=".." description="..." />
-			
-			<field name="add_search_prefix" type="radio" default="0" label="Text search of small/common words" description="Enable this to be able to include small or very common words in the text search" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_IGNORE</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<!--field name="draggable_reordering" type="radio" default="1" label="FLEXI_DRAG_AND_DROP_ORDERING" description="FLEXI_DRAG_AND_DROP_ORDERING_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field-->
-			<field name="print_logging_info" type="radio" default="0" label="FLEXI_DISPLAY_STATS_INFO" description="FLEXI_DISPLAY_STATS_INFO_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="2">FLEXI_YES</option>
-				<option value="1">FLEXI_YES_VIA_FCDEBUG_URLVAR</option>
-			</field>
-			<field name="debug_initial_perms" type="radio" default="0" label="FLEXI_DEBUG_INITIAL_PERMS_CREATION" description="FLEXI_DEBUG_INITIAL_PERMS_CREATION_DESC" class="btn-group btn-group-yesno">
+			<field name="add_search_prefix" type="multilist" subtype="radio" default="0" label="Text search of small/common words" description="Enable this to be able to include small or very common words in the text search" class="btn-group group-fcmethod" inline_tip="Please re-index the search indexes, after enabling this" tip_class="" tip_img="note.gif" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="cats_always_astree" type="hidden" default="1" label="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE" description="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE_DESC"/>
-			<!--field name="cats_always_astree" type="radio" default="1" label="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE" description="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field-->
-			<!--field name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="2" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" class="input-xxlarge" /-->
-			
-			<field name="" type="separator" default="FLEXI_FRONTEND_BACKEND" description="" level="level3" />
-			<field name="disablecss" type="radio" default="0" label="FLEXI_LOAD_FLEXICONTENT_CSS" description="FLEXI_LOAD_FLEXICONTENT_CSS_DESC" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_BOTH</option>
-				<option value="1">FLEXI_DISABLE_IN_FRONTEND</option>
-			</field>
-			<field name="add_tooltips" type="radio" default="1" label="FLEXI_LOAD_FRAMEWORK_TOOLTIPS" description="FLEXI_LOAD_FRAMEWORK_TOOLTIPS_DESC" class="btn-group group-fcinfo">
-				<option value="1">FLEXI_BOTH</option>
-				<option value="0">FLEXI_DISABLE_IN_FRONTEND</option>
-			</field>
-						
-		<field name="" type="separator" default="FLEXI_BROWSER_FRAMEWORKS" label="" level="level0" />
-
-			<field name="" type="separator" default="FLEXI_USE_BROWSER_FRAMEWORKS" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" level="level3" />
-			<!--field name="load_frameworks" type="fccheckbox" default="" display_useglobal="0" 
-				checkoptions="jQuery,(jQuery) image-picker,(jQuery) masonry,(jQuery) select2,(jQuery) inputmask,(jQuery) prettyCheckable,(jQuery) fancybox"
-				checkvals="jQuery,image-picker,masonry,select2,inputmask,prettyCheckable,fancybox"
-				defaultvals="jQuery,image-picker,masonry,select2,inputmask,prettyCheckable,fancybox"
-				label="FLEXI_LOAD_BROWSER_FRAMEWORKS" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" /-->
-			<field name="loadfw_jquery" type="radio" default="1" label="jQuery" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno"> 
-				<option value="1">FLEXI_BOTH</option>
-				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
-			</field>
-			<field name="loadfw_image_picker" type="radio" default="1" label="image-picker" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_BOTH</option>
-				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
-			</field>
-			<field name="loadfw_masonry" type="radio" default="1" label="masonry" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_BOTH</option>
-				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
-			</field>
-			<field name="loadfw_select2" type="radio" default="1" label="select2" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_BOTH</option>
-				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
-			</field>
-			<field name="loadfw_inputmask" type="radio" default="1" label="inputmask" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_BOTH</option>
-				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
-			</field>
-			<field name="loadfw_prettycheckable" type="radio" default="1" label="prettyCheckable" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_BOTH</option>
-				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
-				<option value="0">FLEXI_NO</option>
-			</field>
-			<field name="loadfw_fancybox" type="radio" default="1" label="fancybox" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_BOTH</option>
-				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
-			</field>
-			<field name="loadfw_bootstrap_css" type="radio" default="2" label="bootstrap.css" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_BOTH</option>
-				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
-			</field>
-				
-		<field name="" type="separator" default="FLEXI_PERFORMANCE_CONF" label="" level="level0" />
-			
-			<field name="always_create_fields_display" type="list" default="0" label="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY" description="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY_DESC">
-				<option value="0">FLEXI_ONLY_WHEN_NEEDED</option>
-				<option value="1">FLEXI_ALWAYS_NOT_RECOMMENDED</option>
-				<option value="2">FLEXI_ONLY_IN_ITEM_VIEW</option>
-				<option value="3">FLEXI_NEVER_UNLESS_IN_POSITION</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_CACHE_CONF" label="" level="level3" />
-			
-			<field name="advcache" type="radio" default="1" label="FLEXI_ADV_CACHE" description="FLEXI_ADV_CACHE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="advcache_time" type="text" default="3600" label="FLEXI_ADV_CACHE_TIME" description="FLEXI_ADV_CACHE_TIME_DESC" />
-			<field name="purge_gc" type="radio" default="1" label="FLEXI_GC" description="FLEXI_GC_DESC" class="btn-group btn-group-yesno">
+			<field name="filter_word_like_any" type="multilist" subtype="radio" default="0" label="FLEXI_FILTER_WORD_LIKE_ANY" description="FLEXI_FILTER_WORD_LIKE_ANY_DESC" class="txtsearch_display btn-group group-fcmethod" inline_tip="This will have big performance impact on large websites 5000+ items" tip_class="" tip_img="warning.png" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-		<field name="" type="separator" default="FLEXI_SEF_URL_OPTIONS" label="" level="level0" />
-			
-			<field name="default_menu_itemid" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" />
-			<field name="default_menuitem_preference" type="list" default="2" label="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS" description="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS_DESC">
-				<option value="2">FLEXI_DMI_ID_YES</option>
-				<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
-				<option value="0">FLEXI_DMI_ID_NO</option>
-			</field>
-			<field name="default_menuitem_nopathway" type="radio" default="1" label="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY" description="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="automatic_pathways" type="radio" default="0" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="add_canonical" type="radio" default="1" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="add_item_sef_segment" type="radio" default="1" label="FLEXI_ADD_ITEM_TO_ITEM_SEF_URLS" description="FLEXI_ADD_ITEM_TO_ITEM_SEF_URLS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-						
 		<field name="" type="separator" default="FLEXI_MULTILINGUAL_CONF" label="" level="level0" />
 			
 			<field name="" type="separator" default="FLEXI_NON_NATIVE_TRANSLATIONS" label="" level="level3" />
@@ -160,13 +43,145 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+
+		<!--field name="" type="separator" default="FLEXI_GENERAL_CONF" label="" level="level0" /-->
 			
+			<field name="flexi_cat_extension" type="hidden" size="1" default="com_content" label="Category Type" description="Please save configuration once" />
+			<field name="fcdata_serialized" type="hidden" size="1" default="" label=".." description="..." />
+			<field name="cats_always_astree" type="hidden" default="1" label="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE" description="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE_DESC"/>
 			
+			<!--field name="draggable_reordering" type="radio" default="1" label="FLEXI_DRAG_AND_DROP_ORDERING" description="FLEXI_DRAG_AND_DROP_ORDERING_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
+			<!--field name="cats_always_astree" type="radio" default="1" label="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE" description="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
+			<!--field name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="2" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" class="input-xxlarge" /-->
+			
+		<field name="" type="separator" default="FLEXI_BROWSER_FRAMEWORKS" label="" level="level0" />
+
+			<field name="" type="separator" default="FLEXI_USE_BROWSER_FRAMEWORKS" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" level="level3" />
+			<!--field name="load_frameworks" type="fccheckbox" default="" display_useglobal="0" 
+				checkoptions="jQuery,(jQuery) image-picker,(jQuery) masonry,(jQuery) select2,(jQuery) inputmask,(jQuery) prettyCheckable,(jQuery) fancybox"
+				checkvals="jQuery,image-picker,masonry,select2,inputmask,prettyCheckable,fancybox"
+				defaultvals="jQuery,image-picker,masonry,select2,inputmask,prettyCheckable,fancybox"
+				label="FLEXI_LOAD_BROWSER_FRAMEWORKS" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" /-->
+			<field name="disablecss" type="radio" default="0" label="FLEXI_LOAD_FLEXICONTENT_CSS" description="FLEXI_LOAD_FLEXICONTENT_CSS_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_BOTH</option>
+				<option value="1">FLEXI_DISABLE_IN_FRONTEND</option>
+			</field>
+			<field name="add_tooltips" type="radio" default="1" label="FLEXI_LOAD_FRAMEWORK_TOOLTIPS" description="FLEXI_LOAD_FRAMEWORK_TOOLTIPS_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_BOTH</option>
+				<option value="0">FLEXI_DISABLE_IN_FRONTEND</option>
+			</field>
+			<field name="loadfw_jquery" type="radio" default="1" label="jQuery" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group group-fcinfo"> 
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</field>
+			<field name="loadfw_image_picker" type="radio" default="1" label="image-picker" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</field>
+			<field name="loadfw_masonry" type="radio" default="1" label="masonry" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</field>
+			<field name="loadfw_select2" type="radio" default="1" label="select2" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</field>
+			<field name="loadfw_inputmask" type="radio" default="1" label="inputmask" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</field>
+			<field name="loadfw_prettycheckable" type="radio" default="1" label="prettyCheckable" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			<field name="loadfw_fancybox" type="radio" default="1" label="fancybox" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</field>
+			<field name="loadfw_bootstrap_css" type="radio" default="2" label="bootstrap.css" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group group-fcinfo">
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</field>
+				
+	</fieldset>
+	<fieldset name="debug_perf_fset" label="Debug / performance" description="" >
+		
+		<field name="" type="separator" default="Debug" label="" level="level0" />
+		
+			<field name="print_logging_info" type="radio" default="0" label="FLEXI_DISPLAY_STATS_INFO" description="FLEXI_DISPLAY_STATS_INFO_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_NO</option>
+				<option value="2">FLEXI_YES</option>
+				<option value="1">FLEXI_YES_VIA_FCDEBUG_URLVAR</option>
+			</field>
+			<field name="debug_initial_perms" type="radio" default="0" label="FLEXI_DEBUG_INITIAL_PERMS_CREATION" description="FLEXI_DEBUG_INITIAL_PERMS_CREATION_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		<field name="" type="separator" default="FLEXI_PERFORMANCE_CONF" label="" level="level0" />
+			
+			<field name="always_create_fields_display" type="list" default="0" label="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY" description="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY_DESC">
+				<option value="0">FLEXI_ONLY_WHEN_NEEDED</option>
+				<option value="1">FLEXI_ALWAYS_NOT_RECOMMENDED</option>
+				<option value="2">FLEXI_ONLY_IN_ITEM_VIEW</option>
+				<option value="3">FLEXI_NEVER_UNLESS_IN_POSITION</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_CACHE_CONF" label="" level="level3" />
+			
+			<field name="advcache" type="radio" default="1" label="FLEXI_ADV_CACHE" description="FLEXI_ADV_CACHE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="advcache_time" type="text" default="3600" label="FLEXI_ADV_CACHE_TIME" description="FLEXI_ADV_CACHE_TIME_DESC" />
+			<field name="purge_gc" type="radio" default="1" label="FLEXI_GC" description="FLEXI_GC_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+	</fieldset>
+	<fieldset name="redirects_sef_url_fset" label="Redirections/SEF/URL" description="" >
+		
 		<field name="" type="separator" default="FLEXI_REDIRECTIONS_CONF" label="" level="level0" />
 			
 			<field name="login_page" type="text" size="50" default="index.php?option=com_users&amp;view=login" label="FLEXI_LOGIN_PAGE" description="FLEXI_LOGIN_PAGE_DESC" class="input-xxlarge" />
 			<field name="unauthorized_page" type="text" size="50" default="" label="FLEXI_UNAUTHORIZED_URL" description="FLEXI_UNAUTHORIZED_URL_DESC" class="input-xxlarge" />
+
+		<field name="" type="separator" default="FLEXI_SEF_URL_OPTIONS" label="" level="level0" />
 			
+			<field name="default_menu_itemid" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" />
+			<field name="default_menuitem_preference" type="list" default="2" label="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS" description="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS_DESC">
+				<option value="2">FLEXI_DMI_ID_YES</option>
+				<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
+				<option value="0">FLEXI_DMI_ID_NO</option>
+			</field>
+			<field name="default_menuitem_nopathway" type="radio" default="1" label="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY" description="FLEXI_REMOVE_DEFAULT_MENU_ITEM_FROM_PATHWAY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="automatic_pathways" type="radio" default="0" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="add_canonical" type="radio" default="1" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="add_item_sef_segment" type="radio" default="1" label="FLEXI_ADD_ITEM_TO_ITEM_SEF_URLS" description="FLEXI_ADD_ITEM_TO_ITEM_SEF_URLS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+						
+	</fieldset>
+	<fieldset name="files_conf_fset" label="FLEXI_FILES" description="" >
+		
 		<field name="" type="separator" default="FLEXI_FILES_CONF" label="" level="level0" />
 			
 			<field name="upload_extensions" type="textarea" rows="2" default="bmp,csv,doc,docx,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,swf,txt,xcf,xls,xlsx,zip,ics" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" class="input-xxlarge" />
@@ -841,10 +856,6 @@
 				<option value="0" show_list="" hide_list="txtsearch_display">FLEXI_NO</option>
 				<option value="1" show_list="txtsearch_display" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="filter_word_like_any" type="radio" default="0" label="FLEXI_FILTER_WORD_LIKE_ANY" description="FLEXI_FILTER_WORD_LIKE_ANY_DESC" class="txtsearch_display btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<field name="show_search_label" type="radio" default="1" label="FLEXI_TEXT_SEARCH_LABEL" description="FLEXI_TEXT_SEARCH_LABEL_DESC" class="txtsearch_display btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_OUTSIDE_INPUT</option>
@@ -860,11 +871,11 @@
 				<option value="1" show_list="txtsearch_combine" hide_list="">FLEXI_SHOW</option>
 			</field>
 			<field name="default_searchphrase" type="list" default="all" label="FLEXI_SEARCHWORD_DEFAULT_COMBINATION" description="FLEXI_SEARCHWORD_DEFAULT_COMBINATION_DESC" class="txtsearch_display txtsearch_combine">
-				<option value="natural">FLEXI_NATURAL_PHRASE</option>
-				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_GUESS_RELEVANT</option>
 				<option value="all">FLEXI_ALL_WORDS</option>
 				<option value="any">FLEXI_ANY_WORDS</option>
 				<option value="exact">FLEXI_EXACT_PHRASE</option>
+				<option value="natural">FLEXI_NATURAL_PHRASE</option>
+				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_GUESS_RELEVANT</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level1" />

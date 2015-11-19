@@ -554,8 +554,7 @@ class flexicontent_html
 		if($show_searchphrase = $params->get('show_searchphrase', 1)) {
 			$default_searchphrase = $params->get('default_searchphrase', 'all');
 			$searchphrase = JRequest::getWord('searchphrase', JRequest::getWord('p', $default_searchphrase));
-			$searchphrase_names = array('natural'=>'FLEXI_NATURAL_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT', 
-				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'exact'=>'FLEXI_EXACT_PHRASE');
+			$searchphrase_names = array('all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'exact'=>'FLEXI_EXACT_PHRASE', 'natural'=>'FLEXI_NATURAL_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT');
 		
 			$searchphrases = array();
 			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name) {

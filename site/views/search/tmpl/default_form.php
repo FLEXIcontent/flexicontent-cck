@@ -392,10 +392,10 @@ $r = 0;
 	</tr>
 </table> */ ?>
 
-
-<?php if( !$show_searchphrase ) : ?>
-	<input type="hidden" name="searchphrase" value="<?php echo $default_searchphrase;?>" />
-<?php endif; ?>
+<?php /* Disabled no need to add 'default_searchphrase' to the form/URL since we will get proper default from menu item */ ?>
+<?php /*if( !$show_searchphrase ) : ?>
+	<input type="hidden" name="p" value="<?php echo $default_searchphrase;?>" />
+<?php endif;*/ ?>
 
 <?php /*if( $autodisplayadvoptions && !$show_filtersop ) : ?>
 	<input type="hidden" name="filtersop" value="<?php echo $default_filtersop;?>" />

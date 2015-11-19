@@ -62,9 +62,9 @@ class FCPagination extends JPagination
 			
 			$html =
 				 "<span class='flexi label item_total_label'>".JText::_( 'FLEXI_TOTAL')."</span> "
-				."<span class='flexi value item_total_value'>".$fc_view_total." " .JText::_( $items_total_msg )."</span>"
+				."<span class='flexi item_total_value'>".$fc_view_total." " .JText::_( $items_total_msg )."</span>"
 				."<span class='flexi label item_total_label'>".JText::_( 'FLEXI_DISPLAYING')."</span> "
-				."<span class='flexi value item_total_value'>".$fromResult ." - " .$toResult ." " .JText::_( 'FLEXI_ITEM_S')."</span>"
+				."<span class='flexi item_total_value'>".$fromResult ." - " .$toResult ." " .JText::_( 'FLEXI_ITEM_S')."</span>"
 				;
 		} else {
 			$html .= "\n" . JText::_('JLIB_HTML_NO_RECORDS_FOUND');
