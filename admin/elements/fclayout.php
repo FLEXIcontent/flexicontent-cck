@@ -301,7 +301,7 @@ function fc_getLayout(el)
 			panel.html(str);
 			jQuery('.hasTooltip').tooltip({'html': true,'container': panel});
 			//tabberAutomatic(tabberOptions, panel_name);
-			fc_bind_form_togglers('#'+panel_name, 0, '');
+			fc_bindFormDependencies('#'+panel_name, 0, '');
 		}
 	});
 }

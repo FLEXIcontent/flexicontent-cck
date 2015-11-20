@@ -320,36 +320,37 @@
 			<!-- DYNAMIC METHOD -->
 			<field name="" type="separator" default="FLEXI_UMOD_DYNAMIC_SET_TO_STATIC_TO_DISABLE" level="level3" class="dateDynamic" />
 			<field name="behaviour_dates" type="multilist" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE_DESC" toggle_related="1">
-				<option value="0" show_list="dateStatic,dateDataSrc,cDateLims,emptyDates" hide_list="dateDynamic,dynDateOffsets,startOfWeek" refsh_list="date_custom_on,date_custom_fld">FLEXI_UMOD_STATIC_USE_SPECIFIC_DATES</option>
+				<option value="0" show_list="dateStatic,date_custom_on,dateDataSrc,emptyDates,cDateLims" hide_list="dateDynamic,dynDateOffsets,startOfWeek" refsh_list=".method_dates_CLASS">FLEXI_UMOD_STATIC_USE_SPECIFIC_DATES</option>
 				<group label="FLEXI_DYNAMIC_CMP_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
-					<option value="1" show_list="dateDynamic,dynDateOffsets,date_custom_on" force_list="dateDataSrc,cDateLims,emptyDates" hide_list="dateStatic,startOfWeek">FLEXI_UMOD_DATE_OFFSET_OF_COMPARE_WITH</option>
+					<option value="1" show_list="dateDynamic,dynDateOffsets,date_custom_on" force_list="dateDataSrc,emptyDates,cDateLims" hide_list="dateStatic,startOfWeek"
+						fcconfigs="{'method_dates':'3'}" >FLEXI_UMOD_DATE_OFFSET_OF_COMPARE_WITH</option>
 				</group>
 				<group label="FLEXI_DYNAMIC_SAME_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
-					<option value="8" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_SAME_DAY</option>
-					<option value="2" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_SAME_MONTH</option>
-					<option value="3" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_SAME_YEAR</option>
+					<option value="8" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_SAME_DAY</option>
+					<option value="2" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_SAME_MONTH</option>
+					<option value="3" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_SAME_YEAR</option>
 				</group>
 				<group label="FLEXI_DYNAMIC_PREV_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
-					<option value="9" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_PREVIOUS_DAY</option>
-					<option value="4" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_PREVIOUS_MONTH</option>
-					<option value="5" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_PREVIOUS_YEAR</option>
+					<option value="9" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_PREVIOUS_DAY</option>
+					<option value="4" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_PREVIOUS_MONTH</option>
+					<option value="5" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_PREVIOUS_YEAR</option>
 				</group>
 				<group label="FLEXI_DYNAMIC_NEXT_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
-					<option value="10" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_NEXT_DAY</option>
-					<option value="6"  show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_NEXT_MONTH</option>
-					<option value="7"  show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_NEXT_YEAR</option>
+					<option value="10" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_NEXT_DAY</option>
+					<option value="6"  show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_NEXT_MONTH</option>
+					<option value="7"  show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_NEXT_YEAR</option>
 				</group>
 				<group label="FLEXI_DYNAMIC_SAME_IGN_Y_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
-					<option value="11" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_SAME_DAY_OF_MONTH</option>
-					<option value="12" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_M3D_P4D_OF_MONTH</option>
-					<option value="13" show_list="dateDynamic,date_custom_on,startOfWeek" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets">FLEXI_SAME_WEEK_OF_MONTH</option>
-					<option value="14" show_list="dateDynamic,date_custom_on,startOfWeek" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets">FLEXI_SAME_WEEK_OF_YEAR</option>
-					<option value="15" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_SAME_MONTH_OF_YEAR</option>
+					<option value="11" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_SAME_DAY_OF_MONTH</option>
+					<option value="12" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_M3D_P4D_OF_MONTH</option>
+					<option value="13" show_list="dateDynamic,date_custom_on,startOfWeek" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_SAME_WEEK_OF_MONTH</option>
+					<option value="14" show_list="dateDynamic,date_custom_on,startOfWeek" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_SAME_WEEK_OF_YEAR</option>
+					<option value="15" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_SAME_MONTH_OF_YEAR</option>
 				</group>
 				<group label="FLEXI_DYNAMIC_SAME_IGN_MY_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
-					<option value="16" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_SAME_DAY_OF_MONTH</option>
-					<option value="17" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek">FLEXI_M3D_P4D_OF_MONTH</option>
-					<option value="18" show_list="dateDynamic,date_custom_on,startOfWeek" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets">FLEXI_SAME_WEEK_OF_MONTH</option>
+					<option value="16" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_SAME_DAY_OF_MONTH</option>
+					<option value="17" show_list="dateDynamic,date_custom_on" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,startOfWeek,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_M3D_P4D_OF_MONTH</option>
+					<option value="18" show_list="dateDynamic,date_custom_on,startOfWeek" force_list="dateDataSrc" hide_list="dateStatic,dynDateOffsets,emptyDates,cDateLims" fcconfigs="{'method_dates':'3'}" >FLEXI_SAME_WEEK_OF_MONTH</option>
 				</group>
 			</field>
 			<field name="method_date_dyn_ignored" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DYNAMIC_DESC" toggle_related="1" class="dateDynamic btn-group group-fcwarning">
@@ -358,14 +359,14 @@
 			
 			<!-- STATIC METHOD -->
 			<field name="" type="separator" default="FLEXI_UMOD_STATIC_SET_TO_ALL_TO_DISABLE" level="level3" class="dateStatic" />
-			<field name="method_dates" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1" class="dateStatic btn-group group-fcmethod">
-				<option value="1" show_list="" hide_list="method_dates_ops,staticCustomDates,cDateLims,emptyDates,date_custom_on">FLEXI_ALL</option>
-				<option value="2" show_list="method_dates_ops,staticCustomDates,cDateLims,emptyDates,date_custom_on" hide_list="">FLEXI_EXCLUDE</option>
-				<option value="3" show_list="method_dates_ops,staticCustomDates,cDateLims,emptyDates,date_custom_on" hide_list="">FLEXI_INCLUDE</option>
+			<field name="method_dates" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1" class="dateStatic method_dates_CLASS btn-group group-fcmethod">
+				<option value="1" show_list="" hide_list="method_dates_ops,staticCustomDates,date_custom_on">FLEXI_ALL</option>
+				<option value="2" show_list="method_dates_ops,staticCustomDates,date_custom_on" hide_list="">FLEXI_EXCLUDE</option>
+				<option value="3" show_list="method_dates_ops,staticCustomDates,date_custom_on" hide_list="">FLEXI_INCLUDE</option>
 			</field>
 			
 			<!-- DATE SCOPE: COMMON -->
-			<field name="date_type" type="multilist" subtype="radio" default="0" label="FLEXI_DATE_DATA" description="FLEXI_DATE_DATA_DESC" toggle_related="1" class="method_dates_ops dateStatic dateDataSrc btn-group group-fcinfo" >
+			<field name="date_type" type="multilist" subtype="radio" default="0" label="FLEXI_DATE_DATA" description="FLEXI_DATE_DATA_DESC" toggle_related="1" class="method_dates_ops dateDataSrc btn-group group-fcinfo" >
 				<option value="0" show_list="" hide_list="date_custom_fld">FLEXI_DATE_CREATED</option>
 				<option value="1" show_list="" hide_list="date_custom_fld">FLEXI_DATE_MODIFIED</option>
 				<option value="2" show_list="" hide_list="date_custom_fld">FLEXI_UMOD_DATE_PUBLISH_UP</option>
@@ -373,7 +374,7 @@
 				<option value="3" show_list="date_custom_fld" hide_list="">FLEXI_CUSTOM_DATE_FIELD</option>
 			</field>
 			<field name="datecomp_field" type="fields" fieldnameastext="true" default="" multiple="false" field_type="date" label="FLEXI_CUSTOM_FIELD_AS_DATE_DATA" description="FLEXI_CUSTOM_FIELD_AS_DATE_DATA_DESC" class="date_custom_on date_custom_fld" />
-			<field name="nulldates" type="radio" default="0" label="FLEXI_NULL_EMPTY_DATES" description="FLEXI_NULL_EMPTY_DATES_DESC" class="method_dates_ops dateStatic emptyDates btn-group group-fcinfo">
+			<field name="nulldates" type="radio" default="0" label="FLEXI_NULL_EMPTY_DATES" description="FLEXI_NULL_EMPTY_DATES_DESC" class="method_dates_ops emptyDates btn-group group-fcinfo">
 				<option value="0">FLEXI_EXCLUDE</option>
 				<option value="1">FLEXI_INCLUDE</option>
 			</field>
@@ -388,8 +389,8 @@
 			<field name="" type="separator" default="Custom offsets that shift the DYNAMIC date, e.g. -5 d (minus 5 days) &lt;br/&gt;- to enter &lt;b&gt;CURRENT date (now)&lt;/b&gt; use: 0 d" level="alert alert-info" class="dynDateOffsets alert alert-info fcpadded fcinlineblock" />
 			<field name="" type="separator" default="Compare to specific dates (YYYY-MM-DD) e.g. 2015-01-23 &lt;br/&gt;- to enter &lt;b&gt;CURRENT date (now)&lt;/b&gt; use: CURDATE() &lt;nbsp;&gt; , and set date type to 'SQL date expression'" level="" class="staticCustomDates dateStatic alert alert-info fcpadded fcinlineblock" />
 			
-			<field name="bdate" type="fcdate" size="50" label="FLEXI_UMOD_BDATE_FROM" description="FLEXI_UMOD_BDATE_FROM_DESC" placeholder="No limit" class="method_dates_ops dateStatic cDateLims" />
-			<field name="edate" type="fcdate" size="50" label="FLEXI_UMOD_EDATE_TO" description="FLEXI_UMOD_EDATE_TO_DESC" placeholder="No limit" class="method_dates_ops dateStatic cDateLims" />
+			<field name="bdate" type="fcdate" size="50" label="FLEXI_UMOD_BDATE_FROM" description="FLEXI_UMOD_BDATE_FROM_DESC" placeholder="No limit" class="method_dates_ops cDateLims" />
+			<field name="edate" type="fcdate" size="50" label="FLEXI_UMOD_EDATE_TO" description="FLEXI_UMOD_EDATE_TO_DESC" placeholder="No limit" class="method_dates_ops cDateLims" />
 			<field name="raw_bdate" type="radio" default="0" label="FLEXI_TREAT_BDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC" class="method_dates_ops dateStatic btn-group group-fcinfo">
 				<option value="0">FLEXI_SPECIFIC_DATE</option>
 				<option value="1">FLEXI_SQL_DATE_EXPRESSION</option>

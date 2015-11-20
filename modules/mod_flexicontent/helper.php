@@ -1324,8 +1324,9 @@ class modFlexicontentHelper
 				case '1' : // custom offset
 					if ($edate) {
 						$edate = array(
-							0 => preg_replace("/[^-+0-9]/", "", $edate),
-							1=> preg_replace("/[0-9-+]/", "", $edate)
+							// \s will remove spaces too
+							0 => preg_replace("/[^-+0-9\s]/", "", $edate),
+							1=> preg_replace("/[0-9-+\s]/", "", $edate)
 						);
 						if (empty($edate[1])) {
 							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d (DO NOT FORGET the space between e.g. '-5 d')<br/>";

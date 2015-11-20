@@ -146,8 +146,8 @@ class JFormFieldMultiList extends JFormField
 				$js = "
 				jQuery(document).ready(function(){
 					".(FLEXI_J30GE ?
-						"fc_bind_form_togglers('body', 2, '.control-group');" :
-						"fc_bind_form_togglers('body', 1, 'li');"
+						"fc_bindFormDependencies('body', 2, '.control-group');" :
+						"fc_bindFormDependencies('body', 1, 'li');"
 					)."
 				});
 				";

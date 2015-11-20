@@ -135,16 +135,18 @@
 	}
 	
 	
-	function toggleDepentParams(el, toggleParent, toggleParentSelector, field)
+	function fc_findFormDependencies(el, toggleParent, toggleParentSelector, field)
 	{
-		var seton_list = el.data('seton_list');
-		var setoff_list= el.data('setoff_list');
-		var show_list  = el.data('show_list');
-		var hide_list  = el.data('hide_list');
-		var force_list = el.data('force_list');
-		var refsh_list = el.data('refsh_list');
-		var fcreadonly = el.data('fcreadonly');
-		var fcconfigs  = el.data('fcconfigs');
+		var seton_list = el.data('seton_list');   // (selector comma list) show elements by selector
+		var setoff_list= el.data('setoff_list');  // (selector comma list) hide elements by selector
+		var refsh_list = el.data('refsh_list');   // (selector comma list) trigger change on elements
+		
+		var show_list  = el.data('show_list');    // (classnames comma list) grant  display dependency to elements (container shown  when dependencies are zero)
+		var hide_list  = el.data('hide_list');    // (classnames comma list) revoke display dependency to elements (container hidden when dependencies non-zero)
+		var force_list = el.data('force_list');   // (classnames comma list) show regardless of display dependencies (this is non-persistent -and- element's dependencies are not cleared)
+		
+		var fcreadonly = el.data('fcreadonly');   // (JSON format, element name : value) set readonly property of elements, 1:ON , 2:OFF
+		var fcconfigs  = el.data('fcconfigs');    // (JSON format, element name : value) set value of elements
 		
 		var _d;
 		if (!seton_list) {
@@ -156,6 +158,11 @@
 			setoff_list = {};
 			setoff_list[0] = el.attr('setoff_list')  ? el.attr('setoff_list')  : null;
 			el.data('setoff_list', setoff_list);
+		}
+		if (!refsh_list) {
+			refsh_list = {};
+			refsh_list[0] = el.attr('refsh_list')  ? el.attr('refsh_list')  : null;
+			el.data('refsh_list', refsh_list);
 		}
 		
 		if (!fcreadonly) {
@@ -176,28 +183,22 @@
 		}
 		
 		if (!show_list) {
-			_d  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
 			show_list = {};
+			_d  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
 			for (var i = 0; i<_d.length; i++) show_list[_d[i]] = 1;
 			el.data('show_list', show_list);
 		}
 		if (!hide_list) {
-			_d = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
 			hide_list = {};
+			_d = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
 			for (var i = 0; i<_d.length; i++) hide_list[_d[i]] = 1;
 			el.data('hide_list', hide_list);
 		}
 		if (!force_list) {
-			_d = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
 			force_list = {};
+			_d = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
 			for (var i = 0; i<_d.length; i++) force_list[_d[i]] = 1;
 			el.data('force_list', force_list);
-		}
-		if (!refsh_list) {
-			_d = el.attr('refsh_list') ? el.attr('refsh_list').split(',') : Array();
-			refsh_list = {};
-			for (var i = 0; i<_d.length; i++) refsh_list[_d[i]] = 1;
-			el.data('refsh_list', refsh_list);
 		}
 		
 		var toBeUpdated = Array();
@@ -235,8 +236,12 @@
 		// Display fields / enable input on them ( removeAttr + css ),  force them to update display ( trigger:click ), and to validate new value ( trigger:blur )
 		if (fcconfigs) for (var fieldname in fcconfigs) {
 			if (fcconfigs.hasOwnProperty(fieldname)) {
-				var jf_field = jQuery('#'+'jform_attribs_'+fieldname).first();
-				if (!jf_field.length) continue;
+				var jf_field = jQuery('#'+'jform_attribs_'+fieldname); // first try 'attribs' 
+				if (!jf_field.length) {
+					jf_field = jQuery('#'+'jform_params_'+fieldname);  // then try params
+					if (!jf_field.length) continue;
+				}
+				jf_field = jf_field.first();
 				
 				if (jf_field.is('fieldset')) {
 					jf_field.find('input').removeAttr('disabled').removeAttr('readonly');
@@ -313,20 +318,24 @@
 		
 		
 		if (!fc_init_hide_dependent) {
-			var noFX = fc_refreshing_dependent ? 1 : 0;
-			fc_applyDependencies(toBeUpdated, toggleParent, toggleParentSelector, 0);
+			fc_applyFormDependencies(toBeUpdated, toggleParent, toggleParentSelector, 0);
 			
 			if (!fc_refreshing_dependent) {
 				fc_refreshing_dependent = 1;
 				
 				// Refresh needed dependencies
-				if (typeof refsh_list != 'string') jQuery.each( refsh_list, function( cname, val ) {
-					jQuery.each( fc_dependent_params[cname], function( index, elem ) {
-						if (elem.is('select'))
-							elem.trigger('change');
-						else if (elem.is('input[type="radio"]'))
-							elem.closest('.fcform_toggler_element').find('input[type="radio"]:checked').trigger('click');
-					});
+				if (typeof refsh_list != 'string') jQuery.each( refsh_list, function( i, selector ) {
+					if (selector) {
+						jQuery(selector).each(function( index ) {
+							var c = jQuery(this);
+							if (c.is('select'))
+								c.trigger('change');
+							else if (c.is('input[type="radio"]'))
+								c.closest('.fcform_toggler_element').find('input[type="radio"]:checked').trigger('click');
+							else if (c.is('fieldset') && c.hasClass('radio'))
+								c.find('input[type="radio"]:checked').trigger('click');
+						});
+					}
 				});
 			}
 			fc_refreshing_dependent = 0;
@@ -363,39 +372,45 @@
 	
 	
 	// Add toggling of dependent form elements
-	function fc_bind_form_togglers(container, toggleParent, toggleParentSelector)
+	function fc_bindFormDependencies(container, toggleParent, toggleParentSelector)
 	{
 		var toBeUpdated_ALL = Array();
 		var k = 0;
 		
-		// Bind select elements
+		// Bind dependencies of select elements
 		jQuery(container+' select.fcform_toggler_element').change(function() {
-			var toBeUpdated = toggleDepentParams( jQuery('option:selected', this), toggleParent, toggleParentSelector, jQuery(this) );
+			var toBeUpdated = fc_findFormDependencies( jQuery('option:selected', this), toggleParent, toggleParentSelector, jQuery(this) );
 			for (var i = 0; i < toBeUpdated.length; i++) {
 				toBeUpdated_ALL[k++] = toBeUpdated[i];
 			}
 		});
 		
-		// Bind radio elements
+		// Bind dependencies of radio elements
 		jQuery(document).on('click', container+' .fcform_toggler_element input:radio', function(event) {
-			var toBeUpdated = toggleDepentParams( jQuery(this), toggleParent, toggleParentSelector, jQuery(this).parent('.fcform_toggler_element') );
+			var toBeUpdated = fc_findFormDependencies( jQuery(this), toggleParent, toggleParentSelector, jQuery(this).parent('.fcform_toggler_element') );
 			for (var i = 0; i < toBeUpdated.length; i++) {
 				toBeUpdated_ALL[k++] = toBeUpdated[i];
 			}
 		});
 		
-		// Update the form
+		// *** Update the form
+		
+		// Enqueue dependencies by triggering change on select elements
 		jQuery('form select.fcform_toggler_element').trigger('change');
+		// Enqueue dependencies by triggering change on radio elements
 		jQuery('form .fcform_toggler_element input[type="radio"]:checked').trigger('click');
 		
 		//alert(toBeUpdated_ALL.length);
-		fc_applyDependencies(toBeUpdated_ALL, toggleParent, toggleParentSelector, 1);
+		// Apply form changes according to dependencies
+		fc_applyFormDependencies(toBeUpdated_ALL, toggleParent, toggleParentSelector, 1);
+		
+		// Clear this flag to indicate that form initialization is done
 		fc_init_hide_dependent = 0;
 		
 		/*setTimeout(function(){ }, 20);*/
 	}
 	
-	function fc_applyDependencies(toBeUpdated, toggleParent, toggleParentSelector, noFX)
+	function fc_applyFormDependencies(toBeUpdated, toggleParent, toggleParentSelector, noFX)
 	{
 		jQuery.each( toBeUpdated, function( i, val ) {
 			var c = jQuery(this);

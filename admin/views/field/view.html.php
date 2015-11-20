@@ -164,7 +164,7 @@ class FlexicontentViewField extends JViewLegacy
 								var ajax_JTooltips = new Tips($('fieldspecificproperties').getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
 								")."
 								tabberAutomatic(tabberOptions, 'fieldspecificproperties');
-								fc_bind_form_togglers('#fieldspecificproperties', 0, '');
+								fc_bindFormDependencies('#fieldspecificproperties', 0, '');
 								jQuery('#field_typename').html(jQuery('#".$_field_id."').val());
 							}
 						});
