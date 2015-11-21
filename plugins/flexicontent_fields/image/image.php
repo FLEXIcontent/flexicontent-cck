@@ -2812,8 +2812,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$js .= "
 					function fcimgfld_toggle_image_picker(obj) {
 						var has_imagepicker = jQuery(obj).parent().find('ul.image_picker_selector').length != 0;
+						var has_select2     = jQuery(obj).parent().find('div.select2-container').length != 0;
 						if (has_imagepicker) jQuery(obj).parent().find('ul.image_picker_selector').remove();
-						else                 jQuery(obj).parent().find('select.image-picker').imagepicker({ hide_select:false, show_label:true })
+						else                 jQuery(obj).parent().find('select.image-picker').imagepicker({ hide_select:has_select2, show_label:true })
 					}
 					";
 			}
