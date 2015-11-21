@@ -310,11 +310,13 @@
 			<field name="myitems_using_catview" type="multilist" subtype="radio" default="1" label="My Items" description="FLEXI_RENDER_VIA_CAT_VIEW_NOTES" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="tags_using_catview" type="multilist" subtype="radio" default="0" label="Tags" description="FLEXI_RENDER_VIA_CAT_VIEW_NOTES" class="btn-group btn-group-yesno" >
+			
+			<field name="" type="separator" default="If you use menu-based, then please &lt;br/&gt; - create default menu items for tags and favourites, &lt;br/&gt; - and select them in the 'Other views' TAB of this form" label="" level="level3" class="alert alert-info fcpadded" />
+			<field name="tags_using_catview" type="multilist" subtype="radio" default="0" label="Tags" description="FLEXI_RENDER_VIA_CAT_VIEW_NOTES" class="btn-group group-fcinfo" >
 				<option value="0">FLEXI_NO_USE_MENU_BASED_ONLY</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="favs_using_catview" type="multilist" subtype="radio" default="0" label="Favourites" description="FLEXI_RENDER_VIA_CAT_VIEW_NOTES" class="btn-group btn-group-yesno" >
+			<field name="favs_using_catview" type="multilist" subtype="radio" default="0" label="Favourites" description="FLEXI_RENDER_VIA_CAT_VIEW_NOTES" class="btn-group group-fcinfo" >
 				<option value="0">FLEXI_NO_USE_MENU_BASED_ONLY</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -324,7 +326,7 @@
 				<option value="0">FLEXI_COMPONENT_ONLY</option>
 				<option value="-1">FLEXI_PARENT_CAT_MULTI_LEVEL</option>
 			</field>
-			<field name="debug_inheritcid" type="radio" default="0" label="FLEXI_CATS_INHERIT_PARAMS_DEBUG" description="FLEXI_CATS_INHERIT_PARAMS_DEBUG_DESC" class="btn-group btn-group-yesno">
+			<field name="debug_inheritcid" type="radio" default="0" label="FLEXI_CATS_INHERIT_PARAMS_DEBUG" description="FLEXI_CATS_INHERIT_PARAMS_DEBUG_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

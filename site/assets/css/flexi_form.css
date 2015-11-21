@@ -564,6 +564,7 @@ div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-o
 body .alert.fcpadded {
 	margin: 0px 48px;
 	box-sizing: border-box;
+	max-width: 92%;
 }
 body .alert.fcinlineblock {
 	display: inline-block;

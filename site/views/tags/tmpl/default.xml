@@ -9,7 +9,8 @@
 	
 	<fields name="request">
 		<fieldset name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="id" type="fctag" default="0" label="FLEXI_SELECT_TAG" required="required" description="FLEXI_SELECT_TAG_DESC" />
+			<field name="" type="separator" default="To create a menu item for DEFAULT DISPLAY -configuration- (for all tags that do not have a menu item) &lt;br/&gt;&lt;br/&gt;1. Select no tag here &lt;br/&gt; 2. Set a generic title/alias (as alias will be show in the URLs) and configure menu item parameters &lt;br/&gt; 3. Go to component parameters, open TAB 'Other views'and select this menu item as default menu item for tags" description="" level="level2" class="alert alert-warning fcpadded" />
+			<field name="id" type="fctag" default="0" label="FLEXI_SELECT_TAG" description="FLEXI_SELECT_TAG_DESC" />
 		</fieldset> 
 	</fields>
 	

@@ -161,7 +161,8 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		}
 		
 		$pad = '';
-		if ($level=='level0') $pad .= ' ';
+		if ($class) $pad .= ' ';
+		else if ($level=='level0') $pad .= ' ';
 		else if ($level=='level1') $pad .= ' &nbsp; ';
 		else if ($level=='level2') $pad .= ' &nbsp; &nbsp; ';
 		else if ($level=='level3') $pad .= '';
