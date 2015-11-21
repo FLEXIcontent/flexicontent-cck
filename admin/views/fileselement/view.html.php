@@ -315,7 +315,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 				}
 				
 				"
-				.(($autoselect && $newfileid) ? "newfile_data.name = '".$newfilename."'; newfile_data.preview = '".$file_preview."';  qffileselementadd( document.getElementById('file".$newfileid."'), '".$newfileid."', '".$newfilename."', '".$targetid."', newfile_data);" : "")
+				.(($autoselect && $newfileid) ? "newfile_data.displayname = '".$newfilename."'; newfile_data.preview = '".$file_preview."';  qffileselementadd( document.getElementById('file".$newfileid."'), '".$newfileid."', '".$newfilename."', '".$targetid."', newfile_data);" : "")
 				."
 			});
 			";

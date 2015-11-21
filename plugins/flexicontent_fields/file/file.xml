@@ -56,9 +56,10 @@
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_FLOATED_LEFT</option>
 			</field>
-			<field name="form_file_preview" type="radio" default="1" label="File preview" description="You can enable file preview box, e.g. it will show image thumbnail if selected file is an image" class="btn-group btn-group-yesno">
+			<field name="form_file_preview" type="radio" default="0" label="File preview" description="You can enable file preview box, e.g. it will show image thumbnail if selected file is an image" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
+				<option value="2">FLEXI_AUTO</option>
 			</field>
 			<!--field name="iform_allowdel" type="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_FILE_REMOVAL" description="FLEXI_FIELD_FILE_ALLOW_FILE_REMOVAL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

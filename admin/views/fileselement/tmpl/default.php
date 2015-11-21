@@ -410,7 +410,7 @@ function showUploader() {
 					unset($thumb_or_icon);
 					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 					$filename_original = $this->folder_mode ? '' : str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
-					$display_filename  = $filename_original ? $filename_original : $filename;
+					$filename_original = $filename_original ? $filename_original : $filename;
 					
 					$fileid = $this->folder_mode ? '' : $row->id;
 					
@@ -431,7 +431,7 @@ function showUploader() {
 					$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					if ( empty($thumb_or_icon) ) {
 						if (file_exists($file_path)){
-							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w=60&amp;h=60&amp;zc=1" alt="'.$display_filename.'" />';
+							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w=60&amp;h=60&amp;zc=1" alt="'.$filename_original.'" />';
 						} else {
 							$thumb_or_icon = '<span class="badge badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 						}
@@ -448,7 +448,7 @@ function showUploader() {
 					if ($this->folder_mode) {
 						$img_assign_link = "window.parent.qmAssignFile".$this->fieldid."('".$this->targetid."', '".$filename."', '".$file_preview."');document.getElementById('file{$i}').className='striketext';";
 					} else {
-						$img_assign_link = "var file_data = _file_data[ '".$i."']; file_data.name = '".$filename."'; file_data.preview = '".$file_preview."';  qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename."', '".$this->targetid."', file_data);";
+						$img_assign_link = "var file_data = _file_data[ '".$i."']; file_data.displayname = '".$filename_original."'; file_data.preview = '".$file_preview."';  qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename_original."', '".$this->targetid."', file_data);";
 					}
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">
@@ -475,10 +475,10 @@ function showUploader() {
 					</td>
 					<td align="left">
 						<?php
-							if (JString::strlen($display_filename) > 100) {
-								$filename_cut = JString::substr( htmlspecialchars($display_filename, ENT_QUOTES, 'UTF-8'), 0 , 100).'...';
+							if (JString::strlen($filename_original) > 100) {
+								$filename_cut = JString::substr( htmlspecialchars($filename_original, ENT_QUOTES, 'UTF-8'), 0 , 100).'...';
 							} else {
-								$filename_cut = htmlspecialchars($display_filename, ENT_QUOTES, 'UTF-8');
+								$filename_cut = htmlspecialchars($filename_original, ENT_QUOTES, 'UTF-8');
 							}
 						?>
 						<?php echo '

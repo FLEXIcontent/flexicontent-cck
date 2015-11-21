@@ -73,6 +73,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$top_notice = '';//$use_ingroup ? '<div class="alert alert-warning">Field group mode is not implenent in current version, please disable</div>' : '';
 		
 		$iform_allowdel = 0;//$field->parameters->get('iform_allowdel', 1);
+		$form_file_preview = $field->parameters->get('form_file_preview', '2');
 		
 		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
 		$iform_desc  = $inputmode==1 ? 0 : $field->parameters->get('iform_desc',  1);
@@ -195,12 +196,23 @@ class plgFlexicontent_fieldsFile extends FCField
 				var description = typeof file_data.description !== 'undefined' ? file_data.description : '';
 				var language    = typeof file_data.language    !== 'undefined' ? file_data.language    : '';
 				
+				var altname = typeof file_data.altname !== 'undefined' ? file_data.altname : '';
+				var displaytitle = altname && (altname!=file) ? altname : '-';
+				var hidden_text  = altname && (altname!=file) ? file+'<br/>'+altname : '';
+				
 				var container = jQuery('#'+targetid).closest('.fcfieldval_container');
-				//alert(container.length);
 				container.find('.fc_fileid').val(id);
+				
+				container.find('.fc_filedata_txt_nowrap').html(hidden_text).show();
 				container.find('.fc_filedata_txt').removeClass('file_unpublished').val(file).blur();
-				container.find('.fc_filedata_txt_nowrap').html(file);
-				container.find('.fc_preview_thumb').attr('src', preview ? preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=').show();
+				container.find('.fc_filedata_title').html(displaytitle);
+				
+				container.find('.fc_preview_thumb').attr('src', preview ? preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+				
+				".($form_file_preview == 2 ? "
+				preview ? container.find('.fc_preview_thumb').show() : container.find('.fc_preview_thumb').hide();
+				" : "")."
+				
 				container.find('.fc_filetitle').val(altname).blur();
 				container.find('.fc_filelang').val(language).trigger('change');
 				container.find('.fc_filedesc').val(description);

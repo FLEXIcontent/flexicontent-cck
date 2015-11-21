@@ -3,7 +3,7 @@ $FT = 'MGALLERY';
 $PRV_TYPE='0';
 $image_placeholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 $fields_box_placing = $field->parameters->get('fields_box_placing', '1');
-$form_file_preview = $field->parameters->get('form_file_preview', '1');
+$form_file_preview = $field->parameters->get('form_file_preview', '2');
 
 $n = 0;
 foreach($field->value as $file_id)
@@ -13,15 +13,15 @@ foreach($field->value as $file_id)
 	$elementid_n = $elementid.'_'.$n;
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
 	
+	$preview_css = 'width:100px; height:100px;';
 	if ( !in_array(strtolower($file_data->ext), $imageexts)) {
-		$src = $image_placeholder;
-		$style = 'display:none;';
+		$preview_src = $image_placeholder;
+		if ($form_file_preview==2) $preview_css .= 'display:none;';  // 2: Automatic, so if not an image hide the preview elements
 	} else {
 		$img_path = (substr($file_data->filename, 0,7)!='http://' || substr($file_data->filename, 0,8)!='https://') ?
 			JURI::root(true) . '/' . (empty($file_data->secure) ? $mediapath : $docspath) . '/' . $file_data->filename :
 			$file_data->filename ;
-		$src = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w=100&amp;h=100&amp;zc=1';
-		$style = 'width:100px; height:100px;';
+		$preview_src = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w=100&amp;h=100&amp;zc=1';
 	}
 	
 	$info_txt_classes = $file_data->published ? '' : 'file_unpublished hasTooltip';
@@ -52,10 +52,11 @@ foreach($field->value as $file_id)
 			
 			<br/>
 			<div style="display:inline-block;">
-				<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$filename_original . ($file_data->url ? ' ['.$file_data->altname.']' : '').'</div>
-				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.$filename_original . ($file_data->url ? ' ['.$file_data->altname.']' : '').'" />
+				<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$filename_original.'</div>
+				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.$filename_original.'" />
+				'.(!$iform_title ? '<br/><span class="badge">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</span><div class="fc_filedata_title">'. ($file_data->altname && $filename_original!=$file_data->altname ? $file_data->altname : '-').'</div>' : '').'
 				<br/>
-				'.($form_file_preview==1 ? '<img id="'.$elementid_n.'_img_preview" src="'.$src.'" class="fc_preview_thumb" style="'.$style.'" alt="Preview image placeholder"/>' : '').'
+				'.($form_file_preview ? '<img id="'.$elementid_n.'_img_preview" src="'.$preview_src.'" class="fc_preview_thumb" style="'.$preview_css.'" alt="Preview image placeholder"/>' : '').'
 			</div>
 			
 			'.( (!$multiple || $is_ingroup) && !$required_class ? '

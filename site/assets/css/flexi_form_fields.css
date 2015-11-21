@@ -339,6 +339,12 @@ table.img_upload_select {
 
 
 /* FIELDs: (file-based fields) */
+#flexicontent .fc_filedata_title {
+	font-size:90%;
+	display:inline-block;
+	margin:0;
+	padding: 2px 0px 0px 12px;
+}
 #flexicontent .fc_filedata_txt.invalid {
 	color: red;
 	font-weight: normal;

@@ -434,7 +434,7 @@ function showUploader() {
 					unset($thumb_or_icon);
 					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 					$filename_original = $this->folder_mode ? '' : str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
-					$display_filename  = $filename_original ? $filename_original : $filename;
+					$filename_original  = $filename_original ? $filename_original : $filename;
 					
 					$fileid = $this->folder_mode ? '' : $row->id;
 					
@@ -455,7 +455,7 @@ function showUploader() {
 					$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					if ( empty($thumb_or_icon) ) {
 						if (file_exists($file_path)){
-							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w=60&amp;h=60&amp;zc=1" alt="'.$display_filename.'" />';
+							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w=60&amp;h=60&amp;zc=1" alt="'.$filename_original.'" />';
 						} else {
 							$thumb_or_icon = '<span class="badge badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 						}
