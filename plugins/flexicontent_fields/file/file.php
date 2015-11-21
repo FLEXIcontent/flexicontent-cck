@@ -293,6 +293,9 @@ class plgFlexicontent_fieldsFile extends FCField
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-id]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_file-id');
 				
+				newField.find('.fc_filedata_txt_nowrap').html('-');
+				newField.find('.fc_filedata_title').html('-');
+				
 				var theInput = newField.find('input.fc_filedata_txt').first();
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][file-data-txt]');

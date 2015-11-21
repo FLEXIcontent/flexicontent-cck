@@ -1190,12 +1190,12 @@ class com_flexicontentInstallerScript
 		// @copyright Copyright (C) 2007 - 2009 YOOtheme GmbH
 		// @license   http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 only
 		$manifest = isset($parent) ? $parent->getParent()->manifest : $this->manifest;
-		$additional = & $manifest->xpath('additional');
+		$additional = $manifest->xpath('additional');
 		$additional = count($additional) ? reset($additional) : NULL;
 		
 		if ( is_object($additional) && count( $additional->children() ) )
 		{
-			$exts = & $additional->children();
+			$exts = $additional->children();
 			foreach ($exts as $ext)
 			{
 				// set query
