@@ -30,6 +30,12 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 </style>
 
 <script language="javascript" type="text/javascript">
+	/*jQuery(document).ready(function() {
+		jQuery('input[type=password]').each(function() {
+			jQuery(this).val('');
+		});
+	});*/
+	
 	function submitbutton(pressbutton) {
 		var form = document.adminForm;
 		if (pressbutton == 'cancel') {
@@ -74,8 +80,15 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		<table class="admintable" cellspacing="1">
 			<?php foreach($this->form->getFieldset('user_basic') as $field) :?>
 				<tr>
-					<td width="150" class="key"><?php echo $field->label; ?></td>
-					<td><?php echo $field->input; ?></td>
+					<td width="150" class="key">
+						<?php echo $field->label; ?>
+					</td>
+					<td>
+						<?php if ($field->fieldname == 'password') : ?>
+							<?php // Disables autocomplete ?> <input type="password" style="display:none">
+						<?php endif; ?>
+						<?php echo $field->input; ?>
+					</td>
 				</tr>
 			<?php endforeach; ?>
 		</table>
