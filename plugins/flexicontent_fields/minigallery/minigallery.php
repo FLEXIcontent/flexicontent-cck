@@ -199,7 +199,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				//alert(container.length);
 				container.find('.fc_fileid').val(id);
 				container.find('.fc_filedata_txt').removeClass('file_unpublished').val(file).blur();
-				container.find('.fc_filedata_txt').prev('.fc_filedata_txt_nowrap').html(file);
+				container.find('.fc_filedata_txt_nowrap').html(file);
 				container.find('.fc_preview_thumb').attr('src', preview ? preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=').show();
 				container.find('.fc_filetitle').val(altname).blur();
 				container.find('.fc_filelang').val(language).trigger('change');

@@ -34,7 +34,7 @@ foreach($field->value as $file_id)
 	
 	$field->html[] = '
 	<div class="fcclear"></div>
-	<div style="display:block;">
+	<div style="display:inline-block;">
 		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$filename_original . ($file_data->url ? ' ['.$file_data->altname.']' : '').'</div>
 		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.$filename_original . ($file_data->url ? ' ['.$file_data->altname.']' : '').'" />
 		<br/>

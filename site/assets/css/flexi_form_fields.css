@@ -343,15 +343,19 @@ table.img_upload_select {
 	color: red;
 	font-weight: normal;
 }
+#flexicontent .fc_filedata_txt_nowrap {
+	padding:0 11px;
+}
 #flexicontent .fc_filedata_txt {
 	display: inline-block;
 	border: 1px solid lightgray;
+	box-sizing: border-box;
 	border-radius: 0;
 	min-height: 1.2em;
 	padding: 4px 8px;
-	margin: 2px;
+	margin: 2px 0;
 	min-width:220px;
-	width: 94%;
+	width: 100%;
 	background: #f0f0f0 none repeat scroll 0 0;
 	color: #444;
 	border-radius:4px;
