@@ -111,9 +111,10 @@ Dependencies:
 					var src = img.src,
 						caption = img.alt || img.title,
 						href = img.getParent().href,
-						thumbnail = thumbnails[i] ? thumbnails[i].src 
-							: '';
-					data[src] = {'caption': caption, 'href': href, 'thumbnail': thumbnail};
+						thumbnail = thumbnails[i] ? thumbnails[i].src : '',
+						tagid = img.id ? img.id : ''
+						;
+					data[src] = {'caption': caption, 'href': href, 'thumbnail': thumbnail, 'tagid': tagid};
 				});
 			}
 			var loaded = this.load(data);
@@ -326,7 +327,7 @@ Dependencies:
 				this.options.captions = false;			
 				data = new Array(data.length).associate(data.map(function(image, i){ return image + '?' + i })); 
 			}
-			this.data = {'images': [], 'captions': [], 'hrefs': [], 'thumbnails': [], 'targets': [], 'titles': []};
+			this.data = {'images': [], 'captions': [], 'hrefs': [], 'thumbnails': [], 'targets': [], 'titles': [], 'tagids': []};
 			for (var image in data){
 				var obj = data[image] || {},
 					image = this.options.hu + image,
@@ -339,13 +340,16 @@ Dependencies:
 						: '_self',
 					thumbnail = obj.thumbnail ? this.options.hu + obj.thumbnail.trim() 
 						: image.replace(this.options.replace[0], this.options.replace[1]),
-					title = caption.replace(/<.+?>/gm, '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, "'");
+					title = caption.replace(/<.+?>/gm, '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, "'"),
+					tagid = obj.tagid ? obj.tagid : ''
+					;
 				this.data.images.push(image);
 				this.data.captions.push(caption);
 				this.data.hrefs.push(href);
 				this.data.targets.push(target);
 				this.data.thumbnails.push(thumbnail);
 				this.data.titles.push(title);
+				this.data.tagids.push(tagid);
 			}
 			if (this.options.random)
 				this.slide = this._slide = Number.random(0, this.data.images.length - 1);
@@ -414,11 +418,13 @@ Dependencies:
 			if (loaded && Date.now() > this.timeToNextTransition && Date.now() > this.timeToTransitionComplete){
 				//var src = this.data.images[this._slide].replace(/([^?]+).*/, '$1');
 				var src = this.data.images[this._slide];
+				var tagid = this.data.tagids[this._slide];
 				if (this.preloader){
 					this.cache[src] = {
 						'height': this.preloader.get('height'),
 						'src': src,
-						'width': this.preloader.get('width')
+						'width': this.preloader.get('width'),
+						'tagid': tagid
 					}
 				}
 				if (this.stopped){
@@ -434,6 +440,7 @@ Dependencies:
 					: this.a;
 				this.image.set('styles', {'display': 'block', 'height': null, 'visibility': 'hidden', 'width': null, 'zIndex': this.counter});
 				this.image.set(this.cache[src]);
+				this.image.id = this.cache[src].tagid;
 				this.image.width = this.cache[src].width;
 				this.image.height = this.cache[src].height;
 				this.options.resize && this._resize(this.image);
