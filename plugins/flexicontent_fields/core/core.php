@@ -397,7 +397,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		}
 		
 		// This will make filter values to be retrieved from the value_id DB column
-		$indexed_elements = in_array($filter->field_type, array('tags', 'createdby', 'modifiedby', 'created', 'modified', 'type'));
+		$indexed_elements = in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
 		
 		if ($filter->field_type == 'categories' || $filter->field_type == 'title') {
 			plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName, $isSearchView=1);
@@ -719,7 +719,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			$filter->filter_valuesjoin = ' ';   // ... a space, (indicates not needed)
 			$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);
 			
-			// Dates are given in user calendar convert them to valid SQL dates
+			// 'isindexed' is not applicable for basic index and CORE fields
+			$filter->isindexed = 0; //in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
 			return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 		} else {
 			return $return_sql ? ' AND i.id IN (0) ' : array(0);
@@ -756,7 +757,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=1);
 		$filter_func = $field->field_type == 'maintext' ? 'strip_tags' : null;
 		
-		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func);
+		$field->isindexed = in_array($field->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
+		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func);
 		return true;
 	}
 	
@@ -767,10 +769,14 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		if ( !$field->iscore ) return;
 		if ( !$field->issearch ) return;
 		
-		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=0);
+		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=0);  // if post is null, indexer is running
 		$filter_func = $field->field_type == 'maintext' ? 'strip_tags' : null;
 		
-		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func);
+		// 'isindexed' is not applicable for basic index and CORE fields
+		$field->isindexed = 0; //in_array($field->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
+		
+		// if values is null means retrieve data from the DB
+		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func);
 		return true;
 	}
 	
@@ -784,14 +790,28 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	function _prepareForSearchIndexing(&$field, &$post, $for_advsearch=0)
 	{
 		static $nullDate = null;
+		static $state_names = null;
+		if (!$state_names) $state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'));
 		
-		if ($post===null || !isset($post[0]))  return null;
+		if ($post===null) {
+			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
+			// for CORE fields, we do not set the query clauses, these are inside the fields helper file
+			return null;
+		}
+		
+		if (empty($post)) {
+			// no data posted, nothing to index
+			return array();
+		}
 		
 		$db = JFactory::getDBO();
 		$values = array();
 		if ($field->field_type=='type') {
 			$textcol = 't.name';
 			$query 	= ' SELECT t.id AS value_id, '.$textcol.' AS value FROM #__flexicontent_types AS t WHERE t.id<>0 AND t.id = '.(int)$post[0];
+			
+		} else if ($field->field_type=='state') {
+			$values[$post[0]] = $state_names[$post[0]];
 			
 		} else if ($field->field_type=='categories') {
 			$query 	= ' SELECT c.id AS value_id, c.title AS value FROM #__categories AS c WHERE c.id<>0 AND c.id IN ('.implode(",",$post).')';
@@ -822,8 +842,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				.' FROM #__content AS i'
 				.' WHERE i.'.$field->name.'<>'.$db->Quote($nullDate).' AND i.id='.$field->item_id;
 			$db->setQuery($query);
-			$value = $db->loadResult();
-			$values = !$value ? false : array( $value => $value) ;
+			$obj = $db->loadObject();
+			$values = !$obj ? false : array( $obj->value_id => $obj->value) ;
 			unset($query);
 			
 		} else {

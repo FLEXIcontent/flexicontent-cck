@@ -811,7 +811,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					// Load file data from DB
 					$row = JTable::getInstance('flexicontent_files', '');
 					$row->load( $file_id );
-					$_filename = $file->filename_original ? $file->filename_original : $file->filename;
+					$_filename = $row->filename_original ? $row->filename_original : $row->filename;
 					$dbdata['secure'] = $row->secure ? 1 : 0;  // !! Do not change media/secure -folder- for existing files
 					
 					// Security concern, check file is assigned to current item
@@ -858,7 +858,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 						if ( !$isAssigned ) {
 							/*$row = JTable::getInstance('flexicontent_files', '');
 							$row->load( $file_id );
-							$_filename = $file->filename_original ? $file->filename_original : $file->filename;
+							$_filename = $row->filename_original ? $row->filename_original : $row->filename;
 							JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );*/
 						}
 						

@@ -1453,7 +1453,7 @@ class com_flexicontentInstallerScript
 						$tbl_names = $db->loadColumn();
 						
 						$count_removed = 0;
-						if (!count($tbl_names)) {
+						if (count($tbl_names)) {
 							foreach($tbl_names as $tbl_name) {
 								$db->setQuery( 'DROP TABLE '.$tbl_name );
 								try {

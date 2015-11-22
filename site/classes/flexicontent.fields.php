@@ -1546,6 +1546,13 @@ class FlexicontentFields
 			$posttext	= $remove_space ? $posttext : ' ' . $posttext;
 		}
 		
+		// Handle multiple sub-values per value
+		if (is_array(reset($value_indexes))) {
+			$_v = array();
+			foreach($value_indexes as $v) $_v[] = $v;
+			$value_indexes = $v;
+		}
+		
 		// Get the labels of used values in an display[] array
 		$values = array();
 		foreach($value_indexes as $val_index) {
@@ -1954,7 +1961,8 @@ class FlexicontentFields
 				return;
 		}
 		
-		// A null indicates to retrieve values
+		// A null indicates that we do not have posted data,
+		// instead indexer is running and we should retrieve values from the DB executing an SQL query
 		if ($values===null) {
 			$items_values = FlexicontentFields::searchIndex_getFieldValues($field, $item, $for_advsearch);
 		} else {
@@ -1979,7 +1987,7 @@ class FlexicontentFields
 			$lang_handler = $lang_handlers[$language];
 			
 			
-			if ( @$field->isindexed ) {
+			if ( !empty($field->isindexed) && !$field->iscore ) {
 				// Get Elements of the field these will be cached if they do not depend on the item ...
 				$field->item_id = $itemid;   // in case it needs to be loaded to replace item properties in a SQL query
 				$item_pros = false;
@@ -2052,7 +2060,10 @@ class FlexicontentFields
 	{
 		$db = JFactory::getDBO();
 		static $nullDate = null;
-		if ($nullDate===null) $nullDate	= $db->getNullDate();
+		static $valuecols = array();
+		static $textcols = array();
+		static $state_names = null;
+		if (!$state_names) $state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'));
 		
 		// Create DB query to retrieve field values
 		$values = null;
@@ -2092,18 +2103,36 @@ class FlexicontentFields
 				.' WHERE t.id<>0 AND ext.item_id IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')';
 		break;
 		
+		case 'state':
+			$textcol = ', CASE i.state';
+			foreach($state_names as $_id => $_name)  $textcol .= ' WHEN '.$_id.' THEN '.$db->Quote($_name);
+			$textcol .= ' ELSE '.$db->Quote("unknown").' END';
+			$query 	= ' SELECT i.state AS value_id '.$textcol.', i.id AS itemid'
+				.' FROM #__content AS i'
+				.' WHERE i.id IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')';
+		break;
+		
 		case 'created': case 'modified':
-			if (!isset($valuecols[$field->field_type])) {
-				$date_filter_group = $field->parameters->get('date_filter_group', 'month');
+			if ($nullDate===null) $nullDate	= $db->getNullDate();
+			
+			if (!isset($valuecols[$field->field_type]))
+			{
+				$date_filter_group = $field->parameters->get( $for_advsearch ? 'date_filter_group_s' : 'date_filter_group', 'month');
 				if ($date_filter_group=='year') { $date_valformat='%Y'; }
 				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
 				else { $date_valformat='%Y-%m-%d'; }
 				
+				// Display date 'label' can be different than the (aggregated) date value
+				$date_filter_label_format = $field->parameters->get('date_filter_label_format_s', '');
+				$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
+				
 				$valuecols[$field->field_type] = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_valformat);
+				$textcols[$field->field_type]  = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_txtformat);
 			}
 			$valuecol = $valuecols[$field->field_type];
+			$textcol  = $textcols[$field->field_type];
 			
-			$query 	= 'SELECT '.$valuecol.' AS value_id, i.id AS itemid'
+			$query 	= 'SELECT '.$valuecol.' AS value_id, '.$textcol.' AS value, i.id AS itemid'
 				.' FROM #__content AS i'
 				.' WHERE i.'.$field->name.'<>'.$db->Quote($nullDate).' AND i.id IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')';
 		break;

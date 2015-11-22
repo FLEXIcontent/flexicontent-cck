@@ -828,7 +828,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					// Load file data from DB
 					$row = JTable::getInstance('flexicontent_files', '');
 					$row->load( $file_id );
-					$_filename = $file->filename_original ? $file->filename_original : $file->filename;
+					$_filename = $row->filename_original ? $row->filename_original : $row->filename;
 					$dbdata['secure'] = $row->secure ? 1 : 0;  // !! Do not change media/secure -folder- for existing files
 					
 					// Security concern, check file is assigned to current item
@@ -875,7 +875,7 @@ class plgFlexicontent_fieldsFile extends FCField
 						if ( !$isAssigned ) {
 							/*$row = JTable::getInstance('flexicontent_files', '');
 							$row->load( $file_id );
-							$_filename = $file->filename_original ? $file->filename_original : $file->filename;
+							$_filename = $row->filename_original ? $row->filename_original : $row->filename;
 							JFactory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );*/
 						}
 						
@@ -972,17 +972,19 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
-		if ($post) {
-			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
-			$values = array();
-			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
-		} else {
+		if ($post===null) {
+			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
+			$values = null;
 			$field->field_rawvalues = 1;
 			$field->field_valuesselect = ' file.id AS value_id, file.altname, file.description, file.filename';
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
+		} else {
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
+			$values = array();
+			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
-		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('filename'), $search_properties=array('altname', 'description'), $properties_spacer=' ', $filter_func='strip_tags');
+		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('altname', 'description'), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
 	

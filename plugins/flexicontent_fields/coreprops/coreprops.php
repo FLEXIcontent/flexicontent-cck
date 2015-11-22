@@ -187,7 +187,6 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 				$filter->filter_valuesjoin = ' ';   // ... a space, (indicates not needed)
 				$filter->filter_valueformat = ' ';
 				
-				// Dates are given in user calendar convert them to valid SQL dates
 				$query = FlexicontentFields::getFiltered($filter, $value, $return_sql);
 				break;
 			default:

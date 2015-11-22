@@ -733,7 +733,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
-		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	
@@ -752,7 +752,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
-		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	
@@ -775,8 +775,9 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$date_txtformat = $date_filter_label_format ? $date_filter_label_format : $date_valformat;  // If empty then same as value
 		
 		if ($post===null) {
+			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
 			$valuecol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_valformat);
-			$textcol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_txtformat);
+			$textcol  = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_txtformat);
 			
 			$field->field_valuesselect = ' '.$valuecol.' AS value_id, '.$textcol.' AS value';
 			$field->field_groupby = ' GROUP BY '.$valuecol;
