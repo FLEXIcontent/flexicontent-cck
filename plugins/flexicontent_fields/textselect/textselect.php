@@ -150,7 +150,8 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	// *************************
 	
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item) {
+	function onIndexAdvSearch(&$field, &$post, &$item)
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		

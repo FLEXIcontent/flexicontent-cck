@@ -1156,6 +1156,48 @@ class com_flexicontentInstallerScript
 					</td>
 				</tr>
 				
+		<?php
+		// Decide if search re-indexing is needed
+		?>
+				<tr class="row1">
+					<td class="key" style="font-size:11px;">Set re-index needed flag to fields</td>
+					<td>
+					<?php
+					
+			    $queries = array();
+					if ( $fields_tbl_exists ) {
+						$db->setQuery('SELECT COUNT(*) FROM #__flexicontent_items_ext LIMIT 1');
+						$has_items = $db->loadResult();
+						if ($has_items) {
+							// Set dirty SEARCH properties of published fields to be ON
+							$set_clause = ' SET'.
+								' issearch = CASE issearch WHEN 1 THEN 2   ELSE issearch   END,'.
+								' isadvsearch = CASE isadvsearch WHEN 1 THEN 2   ELSE isadvsearch   END,'.
+								' isadvfilter = CASE isadvfilter WHEN 1 THEN 2   ELSE isadvfilter   END';
+							$queries[] = 'UPDATE #__flexicontent_fields'. $set_clause	." WHERE published=1";
+						}
+					}
+					
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							try {
+								$db->execute();
+								echo ($count_rows = $db->getAffectedRows()) ?
+									'<span class="badge badge-success">'.$count_rows.' effected rows </span>' :
+									'<span class="badge badge-info">no changes</span>' ;
+							}
+							catch (Exception $e) {
+								echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+								continue;
+							}
+						}
+					}
+					else echo '<span class="badge badge-info">nothing to do</span>';
+					?>
+					</td>
+				</tr>
+				
 			</tbody>
 		</table>
 		<?php

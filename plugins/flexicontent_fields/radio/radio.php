@@ -976,7 +976,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		
 		$field->isindexed = true;
 		$field->extra_props = self::$extra_props;
-		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	
@@ -989,7 +989,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		
 		$field->isindexed = true;
 		$field->extra_props = self::$extra_props;
-		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	

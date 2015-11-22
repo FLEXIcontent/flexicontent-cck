@@ -189,7 +189,8 @@ class FCField extends JPlugin
 	// *************************
 	
 	// Method to create (insert) advanced search index DB records for the field values
-	public function onIndexAdvSearch(&$field, &$post, &$item) {
+	public function onIndexAdvSearch(&$field, &$post, &$item)
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
@@ -199,7 +200,8 @@ class FCField extends JPlugin
 	
 	
 	// Method to create basic search index (added as the property field->search)
-	public function onIndexSearch(&$field, &$post, &$item) {
+	public function onIndexSearch(&$field, &$post, &$item)
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		

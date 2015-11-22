@@ -733,7 +733,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
-		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	
@@ -752,7 +752,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
-		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	

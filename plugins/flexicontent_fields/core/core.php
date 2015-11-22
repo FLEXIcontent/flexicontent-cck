@@ -756,7 +756,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=1);
 		$filter_func = $field->field_type == 'maintext' ? 'strip_tags' : null;
 		
-		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func);
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func);
 		return true;
 	}
 	
@@ -770,7 +770,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=0);
 		$filter_func = $field->field_type == 'maintext' ? 'strip_tags' : null;
 		
-		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func);
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func);
 		return true;
 	}
 	
