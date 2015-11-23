@@ -213,14 +213,23 @@ foreach ($this->values as $n => $value) {
                     rotateControl: false,
                 });
             
+                
+                var myContent = \'<div class="address">'.str_replace("'", "\'", $addr).'</div>'.str_replace("'", "\'", $map_directions).'\';
+
+                var myInfoWindow = new google.maps.InfoWindow({
+                    content: myContent
+                });
+
                 myMarker = new google.maps.Marker({
                     map: myMap_'.$field->name.$n.',
-                    position: myLatLon_'.$field->name.$n.'
+                    position: myLatLon_'.$field->name.$n.',
+                    title: "'.$value['addr1'].'"
                 });
-/*
-                myInfoWindow = new google.maps.InfoWindow({content: \'<div class="address">'.str_replace("'", "\'", $addr).'</div>'.str_replace("'", "\'", $map_directions).'\'});
-                myMarker.addListener("click", function(){myInfoWindow.open(myMap_'.$field->name.$n.',myMarker);});
-*/                
+                
+                myMarker.addListener("click", function() {
+                    myInfoWindow.open(myMap_'.$field->name.$n.', myMarker);
+                });
+                
             }
 
             jQuery(document).ready(function(){initMap_'.$field->name.$n.'();});
