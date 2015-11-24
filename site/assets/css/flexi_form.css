@@ -25,6 +25,9 @@
 	padding: 0px;
 }
 
+body .fc_isselect.fc_ismobile {
+	min-width: 140px;
+}
 
 
 /********

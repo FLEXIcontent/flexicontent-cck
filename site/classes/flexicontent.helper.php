@@ -790,8 +790,19 @@ class flexicontent_html
 					}
 				}
 				
+				// Disable select2 JS in mobile devices
+				$mobileDetector = flexicontent_html::getMobileDetector();
+				$isMobile = $mobileDetector->isMobile();
+				
 				$js .= "
 					jQuery(document).ready(function() {
+						
+						"/* Skip select2 JS in mobiles */."
+						".($isMobile ? "
+						jQuery('select.use_select2_lib')
+							//.filter(function(){return !jQuery(this).attr('multiple');})
+							.removeClass('use_select2_lib').addClass('fc_isselect').addClass('fc_ismobile');"
+						: "")."
 						
 						"/* Attach select2 to specific to select elements having specific CSS class, show selected values as both: unselectable and disabled */."
 						jQuery('select.use_select2_lib').select2({
