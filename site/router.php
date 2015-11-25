@@ -140,7 +140,11 @@ function FLEXIcontentBuildRoute(&$query)
 				// IMPLICIT view ('item' NOT contained in the url), because according to configuration,
 				// the 1-segment implies --item-- view so we do not need to add /item/ segment (1st segment is view)
 			}
+			if ($cid==23) { // id for cetegory profile
+			$segments[] = 'id'.$id;
+			} else {
 			$segments[] = @$query['id'];  // suppress error since it may not be set e.g. for new item form
+			}
 		}
 		unset($query['view']);
 		unset($query['cid']);
