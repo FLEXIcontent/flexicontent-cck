@@ -97,7 +97,7 @@ foreach ($this->values as $n => $value)
 	// generate address html
 	$addr = '';
 	
-	if ($addr_display_mode == 'plaintext')
+	if ($addr_display_mode == 'plaintext' && !empty($value['addr_display']))
 	{
 		$addr = '<div class="address">' . str_replace("\n", '<br />', $value['addr_display']) . '</div>';
 	}
@@ -138,9 +138,9 @@ foreach ($this->values as $n => $value)
 		
 		$addr = '<div class="address">' . $addr . '</div>';
 	}
-
+	
 	// generate link to google maps directions
-	$map_link = $value['url'];
+	$map_link = empty($value['url'])  ?  false  :  $value['url'];
 	
 	// if no url, compatibility with old values
 	if (empty($map_link))

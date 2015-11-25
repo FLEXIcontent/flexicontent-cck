@@ -124,7 +124,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$field->value = array($item->created);
 					
 					// Get date format
-					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;		
+					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
 					$dateformat = $dateformat ? JText::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
 					
@@ -145,7 +145,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$field->value = array($item->modified);
 					
 					// Get date format
-					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;		
+					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
 					$dateformat = $dateformat ? JText::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
 					
@@ -243,6 +243,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 						// Get categories that should be excluded from linking
 						global $globalnoroute;
 						if ( !is_array($globalnoroute) ) $globalnoroute = array();
+						$link_to_view = $field->parameters->get( 'link_to_view', 1 ) ;
 						
 						// Create list of category links, excluding the "noroute" categories
 						$field->{$prop} = array();
@@ -254,7 +255,9 @@ class plgFlexicontent_fieldsCore extends JPlugin
 								$cat_links[$cat_id] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
 							}
 							$cat_link = & $cat_links[$cat_id];
-							$display = '<a class="fc_categories fc_category_' .$cat_id. ' link_' .$field->name. '" href="' . $cat_link . '">' . $category->title . '</a>';
+							$display = $link_to_view ?
+								'<a class="fc_categories fc_category_' .$cat_id. ' link_' .$field->name. '" href="' . $cat_link . '">' . $category->title . '</a>' :
+								'<span class="fc_categories fc_category_' .$cat_id. ' nolink_' .$field->name. '">' . $category->title . '</span>' ;
 							$field->{$prop}[] = $pretext. $display .$posttext;
 							$field->value[] = $category->title;
 						}
@@ -271,6 +274,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					else $tags = & $_tags;
 					
 					if ($tags) :
+						$link_to_view = $field->parameters->get( 'link_to_view', 1 ) ;
+						
 						// Create list of tag links
 						$field->{$prop} = array();
 						foreach ($tags as $tag) :
@@ -281,7 +286,9 @@ class plgFlexicontent_fieldsCore extends JPlugin
 									JRoute::_( FlexicontentHelperRoute::getTagRoute($tag->slug) ) ;
 							}
 							$tag_link = & $tag_links[$tag_id];
-							$display = '<a class="fc_tags fc_tag_' .$tag->id. ' link_' .$field->name. '" href="' . $tag_link . '">' . $tag->name . '</a>';
+							$display = $link_to_view ?
+								'<a class="fc_tags fc_tag_' .$tag->id. ' link_' .$field->name. '" href="' . $tag_link . '">' . $tag->name . '</a>' :
+								'<span class="fc_tags fc_tag_' .$tag->id. ' nolink_' .$field->name. '">' . $tag->name . '</span>' ;
 							$field->{$prop}[] = $pretext. $display .$posttext;
 							$field->value[] = $tag->name; 
 						endforeach;

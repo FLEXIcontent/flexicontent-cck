@@ -80,6 +80,13 @@
 			<field name="categories_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
 			<field name="categories_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
+			<field name="" type="separator" default="FLEXI_FIELD_LINKS" description="" level="level2" />
+			<field name="categories_link_to_view" type="radio" default="" label="FLEXI_FIELD_LINK_TO_VIEW" description="FLEXI_FIELD_LINK_TO_VIEW_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 		</fieldset>
 		<fieldset name="customize_field-created" label="FLEXI_FIELD_CREATED" icon_class="icon-calendar">
 			
@@ -271,6 +278,13 @@
 			<field name="tags_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
 			<field name="tags_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 	
+			<field name="" type="separator" default="FLEXI_FIELD_LINKS" description="" level="level2" />
+			<field name="tags_link_to_view" type="radio" default="" label="FLEXI_FIELD_LINK_TO_VIEW" description="FLEXI_FIELD_LINK_TO_VIEW_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 		</fieldset>
 		<fieldset name="editing" label="FLEXI_AUTHORING" icon_class="icon-lock">
 			

@@ -675,6 +675,12 @@ div .fc_img_tooltip_desc {
 	line-height:1em;
 }
 
+/* Core fields: categories, tags */
+div span.fc_categories, div span.fc_tags {
+	border-bottom: 1px dashed gray;
+}
+div a.fc_categories, div a.fc_tags {}
+
 
 /* Radio/checkbox/select/etc (indexed fields) viewing: the non-selected values */
 div .fc_field_unsused_val {
