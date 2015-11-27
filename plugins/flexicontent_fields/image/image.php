@@ -344,11 +344,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var existingfftag = '".($image_source ? "input" :"select")."' + '.existingname';
 				var originalname = row.find( originalfftag ).val();
 				var existingname = row.find( existingfftag ).val();
+				var newfile  = row.find( 'input.newfile' ).length ? row.find( 'input.newfile' ).val() : '';
+				var hasvalue = row.find( 'input.hasvalue').val();
 				
 				// IF a non-empty container is being removed ... get counter (which is optionally used as 'required' form element and empty it if is 1, or decrement if 2 or more)
-				if ( originalname != '' || existingname != '' )
+				//if ( originalname != '' || existingname != '' || newfile != '' )
+				if (hasvalue!='')
 				{
-					var valcounter = document.getElementById('".$field->name."');
+					var valcounter = document.getElementById('".$elementid."');
 					valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
 				}
@@ -410,6 +413,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				// Get TAG ID of the main form element of this field
 				var action = typeof action!== 'undefined' ? action : '0';
 				var ff_suffix = (tagid.indexOf('_existingname') > -1) ? '_existingname' : '_newfile';
+				//alert(tagid); alert(ff_suffix);
 				var elementid = tagid.replace(ff_suffix,'');
 				
 				// Get current value of new / existing filename fields
@@ -426,7 +430,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				// a flag if file URL was given
 				var fileUrlGiven = file_url!='';
 				
-				if (file=='')  // DB-mode
+				if (".($image_source==0 ? 1 : 0).")  // DB-mode
 				{
 					var newfile_obj = jQuery('#' + elementid + '_newfile' );
 					var newfilename = newfile_obj.val();
@@ -463,7 +467,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					}
 					
 					// Increment/decrement the form field used as value counter, we do not use ZERO in case of decrement, instead we set to empty string, so that is-required validation works
-					var valcounter = document.getElementById('".$field->name."');
+					var valcounter = document.getElementById('".$elementid."');
 					if (modify>0)
 					{
 						if ( typeof valcounter.value === 'undefined' || valcounter.value=='' ) valcounter.value = '1';
@@ -482,7 +486,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					
 					if ( originalname=='' && existingname=='' ) {
 						// Increment/Make non-empty the form field used as value counter, so that is-required validation works
-						var valcounter = document.getElementById('".$field->name."');
+						var valcounter = document.getElementById('".$elementid."');
 						if ( valcounter.value=='' ) valcounter.value = '1';
 						else valcounter.value = parseInt(valcounter.value) + 1;
 					}
@@ -524,6 +528,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (action!='1' && fc_field_dialog_handle_".$field->id.")
 					fc_field_dialog_handle_".$field->id.".dialog('close');
 			}
+			
+			
+			function clearField".$field->id."(el)
+			{
+				var box = jQuery(el).closest('.fcfieldval_container');
+				box.find('.originalname').val('');
+				box.find('.existingname').val('');
+				box.find('.hasvalue').val('');
+				box.find('input, textarea').val('');
+				box.find('.preview_image').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+				var valcounter = document.getElementById('".$elementid."');
+				valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
+			}
+			
 		";
 		$css .='
 			table.fcfield'.$field->id.'.img_upload_select li { min-height:'.($thumb_h_s+56).'px; }
@@ -625,9 +643,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						'.$_prompt_txt.'
 					</a>
 				';
-				if ($is_ingroup) {
-					$select_existing .= '<span class="btn btn-warning btn-small" onclick="var box = jQuery(this).closest(\'.fcfieldval_container\'); box.find(\'.originalname\').val(\'\'); box.find(\'.existingname\').val(\'\'); box.find(\'input, textarea\').val(\'\'); box.find(\'.preview_image\').attr(\'src\', \'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=\');">'.JText::_( 'FLEXI_CLEAR' ).'</span>';
-				}
+				$select_existing .= '<span class="btn btn-warning btn-small" onclick="clearField'.$field->id.'(this);">'.JText::_( 'FLEXI_CLEAR' ).'</span>';
 			}
 			
 			// Add current image or add an empty image container
@@ -791,7 +807,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// This is field HTML that is created regardless of values
-		$non_value_html = '<input id="'.$field->name.'" class="'.($use_ingroup ? '' : $required_class).'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
+		$non_value_html = '<input id="'.$elementid.'" class="'.($use_ingroup ? '' : $required_class).'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
 		if ($use_ingroup) {
 			$field->html[-1] = $non_value_html;
 		} else {
