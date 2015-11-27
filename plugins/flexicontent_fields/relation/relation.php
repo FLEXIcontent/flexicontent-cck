@@ -661,7 +661,9 @@ jQuery(document).ready(function() {
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		self::onDisplayFilter($filter, $value, $formName, $isSearchView=1);
+		// No special SQL query, default query is enough since index data were formed as desired, during indexing
+		$indexed_elements = true;
+		FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
 	}
 	
 	
@@ -671,11 +673,12 @@ jQuery(document).ready(function() {
 		
 		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 		// partial SQL clauses
-		$filter->filter_valuesselect = ' i.id AS value, i.title AS text';
-		$filter->filter_valuesjoin   = null;  // use default
+		$filter->filter_valuesselect = ' ct.id AS value, ct.title AS text';
+		$filter->filter_valuesfrom   = null;  // use default
+		$filter->filter_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED)';
 		$filter->filter_valueswhere  = null;  // use default
 		// full SQL clauses
-		$filter->filter_groupby = null;  // use default, which is 'value'
+		$filter->filter_groupby = ' GROUP BY CAST(fi.value AS UNSIGNED) '; // * will be be appended with , fi.item_id
 		$filter->filter_having  = null;  // use default
 		$filter->filter_orderby = null;  // use default, no ordering done to improve speed, it will be done inside PHP code
 		
@@ -689,6 +692,10 @@ jQuery(document).ready(function() {
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		
+		$filter->filter_colname     = ' CAST(rel.value AS UNSIGNED)';
+		$filter->filter_valuesjoin  = null;   // use default
+		$filter->filter_valueformat = null;   // use default
 		
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
@@ -704,4 +711,63 @@ jQuery(document).ready(function() {
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}
 	
+	
+	
+	// *************************
+	// SEARCH / INDEXING METHODS
+	// *************************
+	
+	// Method to create (insert) advanced search index DB records for the field values
+	function onIndexAdvSearch(&$field, &$post, &$item)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
+		
+		if ($post===null) {
+			$values = null;
+			$field->field_valuesselect = ' CAST(fi.value AS UNSIGNED) AS value_id, ct.title AS value';
+			$field->field_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED)';
+			$field->field_groupby      = ' GROUP BY CAST(fi.value AS UNSIGNED) ';
+		} else {
+			$_ids = array();
+			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID
+			$db = JFactory::getDBO();
+			$query = 'SELECT i.id AS value_id, i.title AS value FROM #__content AS i WHERE i.id IN ('.implode($_ids, ',').')';
+			$db->setQuery($query);
+			$_values = $db->loadAssocList();
+			$values = array();
+			foreach ($_values as $v)  $values[$v['value_id']] = $v['value'];
+		}
+		
+		//JFactory::getApplication()->enqueueMessage('ADV: '.print_r($values, true), 'notice');
+		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+	// Method to create basic search index (added as the property field->search)
+	function onIndexSearch(&$field, &$post, &$item)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !$field->issearch ) return;
+		
+		if ($post===null) {
+			$values = null;
+			$field->field_valuesselect = ' CAST(fi.value AS UNSIGNED) AS value_id, ct.title AS value';
+			$field->field_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED)';
+			$field->field_groupby      = ' GROUP BY CAST(fi.value AS UNSIGNED) ';
+		} else {
+			$_ids = array();
+			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID 
+			$db = JFactory::getDBO();
+			$query = 'SELECT i.id AS value_id, i.title AS value FROM #__content AS i WHERE i.id IN ('.implode($_ids, ',').')';
+			$db->setQuery($query);
+			$_values = $db->loadAssocList();
+			$values = array();
+			foreach ($_values as $v)  $values[$v['value_id']] = $v['value'];
+		}
+		
+		//JFactory::getApplication()->enqueueMessage('BAS: '.print_r($values, true), 'notice');
+		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
 }
