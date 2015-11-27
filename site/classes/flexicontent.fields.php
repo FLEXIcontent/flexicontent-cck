@@ -2050,8 +2050,8 @@ class FlexicontentFields
 			}
 		}
 		
-		//echo $field->name . ": "; print_r($values);echo "<br/>";
-		//echo if ( !empty($searchindex) ) implode(' | ', $searchindex) ."<br/><br/>";
+		//if ($field->id==NN) echo $field->name . ": " . print_r($values, true) . "<br/>";
+		//if ($field->id==NN) if ( !empty($searchindex) ) implode(' | ', $searchindex) ."<br/><br/>";
 	}
 	
 	
@@ -2148,16 +2148,27 @@ class FlexicontentFields
 		default:
 			if ($field->iscore) $values=array(); //die('Field Type: '.$field->field_type.' does not support FLEXIcontent Advanced Search Indexing');
 			$valuesselect = @$field->field_valuesselect ? $field->field_valuesselect : ' fi.value AS value ';
-			$valuesjoin = @$field->field_valuesjoin ? $field->field_valuesjoin : '';
-			$groupby = @$field->field_groupby ? $field->field_groupby .', fi.item_id' : ' GROUP BY fi.value, fi.item_id ';
-			$query = 'SELECT '.$valuesselect.', fi.item_id AS itemid'
-				.' FROM #__flexicontent_fields_item_relations as fi'
-				.' JOIN #__content as i ON i.id=fi.item_id'
+			$valuesjoin   = @$field->field_valuesjoin   ? $field->field_valuesjoin : '';
+			$valueswhere  = @$field->field_valueswhere  ? $field->field_valueswhere  : ' AND fi.field_id ='.$field->id;
+			
+			$item_id_col = @$field->field_item_id_col ? $field->field_item_id_col : ' fi.item_id ';
+			$groupby     = @$field->field_groupby ? $field->field_groupby .', '.$item_id_col : ' GROUP BY fi.value, '.$item_id_col;
+			
+			$valuesfrom = @$field->field_valuesfrom ? $field->field_valuesfrom :
+				' FROM #__flexicontent_fields_item_relations as fi ' .
+				' JOIN #__content as i ON i.id=fi.item_id ';
+			
+			$query = 'SELECT '.$valuesselect.', '.$item_id_col.' AS itemid'
+				. $valuesfrom 
 				. $valuesjoin
-				.' WHERE fi.field_id='.$field->id.' AND fi.item_id IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')'
-				.$groupby;
+				.' WHERE 1 '
+				. $valueswhere
+				.' AND '.$item_id_col.' IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')'
+				. $groupby;
 		break;
 		}
+		//if ($field->id==NN) echo $query;
+		//if ($field->id==NN) exit;
 		
 		// Execute query if not already done to load a single value column with no value id
 		$_raw = !empty($field->field_rawvalues);
@@ -3302,7 +3313,10 @@ class FlexicontentFields
 			}
 			//if ($filter->id==NN) echo "<br/><br/> FILTER INITIALIZATION - using temporary table: ".$iids_subquery[$view_n_text]." for :".$view_n_text ." <br/><br/>";
 			
-			$item_id_col = ($filter->iscore || $filter->field_type=='coreprops') ? 'i.id' : 'fi.item_id';
+			$item_id_col = !empty($filter->filter_item_id_col) ?
+				$filter->filter_item_id_col :
+				($filter->iscore || $filter->field_type=='coreprops') ? 'i.id' : 'fi.item_id' ;
+			
 			$filter_where_curr = $filter->iscore ? $filter_where_curr : str_replace('i.id', 'fi.item_id', $filter_where_curr);
 			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT '.$item_id_col.') as found ' : '')."\n"
 				//.', GROUP_CONCAT('.$item_id_col.' SEPARATOR ",") AS idlist '   // enable FOR DEBUG purposes only

@@ -614,7 +614,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		self::onDisplayFilter($filter, $value, $formName, $isSearchView=1);
+		$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 	}
 	
 	
@@ -652,8 +652,16 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
-		$filter->filter_valuesjoin   = null;  // use default
-		$filter->filter_valueswhere  = null;  // use default
+		if ($date_source) {
+			$filter->filter_valuesfrom = ' FROM #__content AS i ';
+			$filter->filter_item_id_col = ' i.id ';
+			$filter->filter_valuesjoin   = null; // use default
+			$filter->filter_valueswhere  = ' ';  // space to remove default
+		} else {
+			$filter->filter_valuesfrom   = null;  // use default
+			$filter->filter_valuesjoin   = null;  // use default
+			$filter->filter_valueswhere  = null;  // use default
+		}
 		// full SQL clauses
 		$filter->filter_groupby = ' GROUP BY '.$valuecol;
 		$filter->filter_having  = null;  // use default
@@ -682,14 +690,14 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		if ( ! $date_source ) {
 			$filter->filter_colname    = sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat);
+			$filter->filter_valuesjoin = null;   // use default query
 		} else {
 			$_value_col = ($date_source == 1) ? 'c.publish_up' : 'c.publish_down';
 			$filter->filter_colname    = sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_valformat);
+			$filter->filter_valuesjoin = ' '; // a space to prevent using default query and instead use content table
 		}
 		
-		$filter->filter_colname    = sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat);
-		$filter->filter_valuesjoin = null;   // use default
-		$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);
+		$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);   // format of given values must be same as format of the value-column
 		
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
@@ -702,10 +710,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		$date_source = $filter->parameters->get('date_source', 0);
-		if ( $date_source ) {
+		/*if ( $date_source ) {
 			JFactory::getApplication()->enqueueMessage( "Field: '".$filter->label."' is using start/end publication dates and cannot be used as filter in search view" , 'notice' );
 			return;
-		}
+		}*/
 		
 		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
 	}
@@ -722,7 +730,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
-		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=1);
+		$values = $this->_prepareForSearchIndexing($field, $item, $post, $for_advsearch=1);
 		
 		// a. Each of the values of $values array will be added to the advanced search index as searchable text (column value)
 		// b. Each of the indexes of $values will be added to the column 'value_id',
@@ -744,7 +752,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
-		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=0);
+		$values = $this->_prepareForSearchIndexing($field, $item, $post, $for_advsearch=0);
 		
 		// a. Each of the values of $values array will be added to the basic search index (one record per item)
 		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
@@ -763,8 +771,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	// **********************
 	
 	// Method to prepare for indexing, either preparing SQL query (if post is null) or formating/preparing given $post data for usage bu index
-	function _prepareForSearchIndexing(&$field, &$post, $for_advsearch=0)
+	function _prepareForSearchIndexing(&$field, &$item, &$post, $for_advsearch=0)
 	{
+		$date_source = $field->parameters->get('date_source', 0);
+		
 		$date_filter_group = $field->parameters->get( $for_advsearch ? 'date_filter_group_s' : 'date_filter_group', 'month');
 		if ($date_filter_group=='year') { $date_valformat='%Y'; }
 		else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
@@ -776,15 +786,24 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		if ($post===null) {
 			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
-			$valuecol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_valformat);
-			$textcol  = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_txtformat);
+			$_value_col = !$date_source ? 'fi.value' : ($date_source == 1 ? 'i.publish_up' : 'i.publish_down');
+			$valuecol = sprintf(' DATE_FORMAT('.$_value_col.', "%s") ', $date_valformat);
+			$textcol  = sprintf(' DATE_FORMAT('.$_value_col.', "%s") ', $date_txtformat);
 			
 			$field->field_valuesselect = ' '.$valuecol.' AS value_id, '.$textcol.' AS value';
+			if ($date_source) {
+				$field->field_valuesfrom = ' FROM #__content AS i ';
+				$field->field_item_id_col = ' i.id ';
+				$field->field_valueswhere = ' ';  // a space to remove default
+			}
 			$field->field_groupby = ' GROUP BY '.$valuecol;
 			$values = null;
 		} else {
 			$values = array();
 			$db = JFactory::getDBO();
+			if ($date_source) {
+				$post = array($date_source ? $item->publish_up : $item->publish_down);
+			}
 			if ($post) foreach ($post as $v) {
 				$valuecol = sprintf(' DATE_FORMAT("%s", "%s") ', $v, $date_valformat);
 				$textcol = sprintf(' DATE_FORMAT("%s", "%s") ', $v, $date_txtformat);

@@ -218,7 +218,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				container.find('.fc_filedesc').val(description);
 				
 				// Increment value counter (which is optionally used as 'required' form element)
-				var valcounter = document.getElementById('".$field->name."');
+				var valcounter = document.getElementById('".$elementid."');
 				if (valcounter) {
 					valcounter.value = valcounter.value=='' ? '1' : parseInt(valcounter.value) + 1;
 					//if (window.console) window.console.log ('valcounter.value: ' + valcounter.value);
@@ -391,7 +391,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				
 				if ( 1 ) // A deleted container always has a value, thus decrement (or empty) the counter value in the 'required' form element
 				{
-					var valcounter = document.getElementById('".$field->name."');
+					var valcounter = document.getElementById('".$elementid."');
 					if (valcounter) {
 						valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 					}
@@ -473,7 +473,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// Button for popup file selection
 		/*if (!$use_ingroup) $field->html .= '
-			<input id="'.$field->name.'" class="'.$required_class.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';*/
+			<input id="'.$elementid.'" class="'.$required_class.'" type="hidden" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';*/
 		if ($top_notice) $field->html = $top_notice.$field->html;
 	}
 	
