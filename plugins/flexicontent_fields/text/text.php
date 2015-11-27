@@ -613,7 +613,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		self::onDisplayFilter($filter, $value, $formName);
+		$this->onDisplayFilter($filter, $value, $formName);
 	}
 	
 	

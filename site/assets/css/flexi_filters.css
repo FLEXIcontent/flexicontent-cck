@@ -345,6 +345,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	border-top-right-radius:0px;
 	border-bottom-right-radius:0px;
 }
+.fc_filter_html .input-append .select2-container .select2-choices { margin-right:0px !important; } /* fix append to multi-select2 */
 .fc_filter_html .input-prepend > input.fc_text_filter,
 .fc_filter_html .input-prepend > input.fc_field_filter,
 .fc_filter_html .input-prepend > input.fc_text_filter:focus,

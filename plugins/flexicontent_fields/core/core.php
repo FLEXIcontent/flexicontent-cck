@@ -407,7 +407,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$indexed_elements = in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));
 		
 		if ($filter->field_type == 'categories' || $filter->field_type == 'title') {
-			plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName, $isSearchView=1);
+			$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 		}
 		
 		else if ($filter->field_type == 'created' || $filter->field_type == 'modified') {
@@ -724,7 +724,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			
 			$filter->filter_colname    = sprintf(' DATE_FORMAT(c.%s, "%s") ', $filter->field_type, $date_valformat);
 			$filter->filter_valuesjoin = ' ';   // ... a space, (indicates not needed)
-			$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);
+			$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);   // format of given values must be same as format of the value-column
 			
 			// 'isindexed' is not applicable for basic index and CORE fields
 			$filter->isindexed = 0; //in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'));

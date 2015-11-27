@@ -478,50 +478,21 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 	// *********************************
 	
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	/*function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		plgFlexicontent_fieldsText::onDisplayFilter($filter, $value, $formName);
-	}
+		$this->onDisplayFilter($filter, $value, $formName);
+	}*/
 	
 	
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
+	/*function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 
-		// ** some parameter shortcuts
-		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
-		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('FLEXI_ALL');
 		$filter->html = '';
-		
-		
-		if ( !$filter->parameters->get( 'range', 0 ) ) {
-			
-			// *** Retrieve values
-			// *** Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
-			$force = JRequest::getVar('view')=='search' ? 'all' : 'default';
-			$results = flexicontent_cats::getFilterValues($filter, $force);
-			
-			
-			// *** Create the select form field used for filtering
-			$options = array();
-			$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-			
-			foreach($results as $result) {
-				if ( !strlen($result->value) ) continue;
-				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
-			}
-			if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-			$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
-		} else {
-			//print_r($value);
-			$size = (int)($filter->parameters->get( 'size', 30 ) / 2);
-			$filter->html	.='<input name="filter_'.$filter->id.'[1]" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value[1].'" /> - ';
-			$filter->html	.='<input name="filter_'.$filter->id.'[2]" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value[2].'" />'."\n";
-		}
-	}
+	}*/
 	
 	
 	
@@ -530,7 +501,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 	// *************************
 	
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item)
+	/*function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
@@ -546,11 +517,11 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
-	}
+	}*/
 	
 	
 	// Method to create basic search index (added as the property field->search)
-	function onIndexSearch(&$field, &$post, &$item)
+	/*function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
@@ -563,6 +534,6 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
-	}
-	
+	}*/
+		
 }

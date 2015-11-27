@@ -9,7 +9,7 @@
 	<fields name="params">
 		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
-		<field name="" type="separator" level="level3" default="Please note these reasons for some results not being included:&lt;small&gt; &lt;br/&gt;- word is less than 4 characters (default for MySql DBs)&lt;br/&gt;- word is too common e.g. appears in about half of the articles&lt;br/&gt;- wrong language or article not publish or article has expired&lt;/small&gt;" />
+	<field name="" type="separator" level="level3" default="Please note these reasons for some results not being included: &lt;br/&gt;- you have not enabled short word search in component and word is &lt; 4 characters &lt;br/&gt; - word is too common e.g. appears in about half of the articles&lt;br/&gt;- wrong language or article not publish or article has expired" class="alert alert-info fcpadded" />
 		
 		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Content Types&lt;/small&gt;" description="The content types the search will include, selecting none will include ALL. &lt;br/&gt; NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here &lt;br/&gt; NOTE: if only 1 content type is selected below, then selector will be hidden"/>
 			
@@ -60,27 +60,27 @@
 				<option value="1">FLEXI_YES_INITIALLY_CLOSED</option>
 				<option value="2">FLEXI_YES_INITIALLY_OPENED</option>
 			</field>
-			<field name="txtmode" type="multilist" default="0" label="Search using" description="Using the basic search index is faster and is recommended for LARGE SITES, (test to see evaluate performance difference)" toggle_related="1">
-				<option value="0" hide_list="use_adv_fields" show_list="">Basic Index (faster, fields not selectable)</option>
-				<option value="1" hide_list="" show_list="use_adv_fields">Advanced Index (use configured fields)</option>
-				<option value="2" hide_list="" show_list="use_adv_fields">Advanced Index (use configured fields, allow user selection)</option>
+			<field name="txtmode" type="multilist" default="0" label="Text search using" description="Using the basic search index is faster and is recommended for LARGE SITES, (test to see evaluate performance difference)" toggle_related="1">
+				<option value="0" hide_list="use_adv_txtsearch" show_list="">Basic Index (faster, fields not selectable)</option>
+				<option value="1" hide_list="" show_list="use_adv_txtsearch">Advanced Index (use configured fields)</option>
+				<option value="2" hide_list="" show_list="use_adv_txtsearch">Advanced Index (use configured fields, allow user selection)</option>
 			</field>
 			
-			<field name="" type="separator" level="level2" default="PER content type configuration (ADVANCED Index)" description="1. Fields manager: mark -fields- as ADVANCED text-searchable and filterable &lt;br/&gt; 2. Indexes manager: rebuild advanced index &lt;br/&gt; 3. Type manager: in each content type, select text-search fields and filters &lt;br/&gt;&lt;br/&gt; NOTE: if this is enabled content type selector becomes -visible- and -single- value" class="use_adv_fields"/>
+			<field name="" type="separator" level="level2" default="PER content type configuration (ADVANCED Index)" description="1. Fields manager: mark -fields- as ADVANCED text-searchable and filterable &lt;br/&gt; 2. Indexes manager: rebuild advanced index &lt;br/&gt; 3. Type manager: in each content type, select text-search fields and filters &lt;br/&gt;&lt;br/&gt; NOTE: if this is enabled content type selector becomes -visible- and -single- value" class=""/>
 			
-			<field name="show_txtfields" type="multilist" subtype="radio" default="1" label="FLEXI_TEXT_SEARCH_FIELDS" description="FLEXI_TEXT_SEARCH_FIELDS_DESC" toggle_related="1" class="use_adv_fields btn-group group-fcmethod">
+			<field name="show_txtfields" type="multilist" subtype="radio" default="1" label="FLEXI_TEXT_SEARCH_FIELDS" description="FLEXI_TEXT_SEARCH_FIELDS_DESC" toggle_related="1" class="use_adv_txtsearch btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="disp_txtflds">Use all searchable</option>
 				<option value="1" show_list="" hide_list="disp_txtflds">FLEXI_ACCORDING_TO_TYPE</option>
 				<option value="2" show_list="disp_txtflds" hide_list="">FLEXI_CONFIGURE_BELOW</option>
 			</field>
-			<field name="txtflds" type="filters" isadvsearch="1" fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index text-searchable are listed" class="use_adv_fields disp_txtflds" />
+			<field name="txtflds" type="filters" isadvsearch="1" fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index text-searchable are listed" class="use_adv_txtsearch disp_txtflds" />
 			
-			<field name="show_filters" type="multilist" subtype="radio" default="1" label="FLEXI_FIELDS_AS_FILTERS" description="FLEXI_FIELDS_AS_FILTERS_DESC" toggle_related="1" class="use_adv_fields btn-group group-fcmethod">
+			<field name="show_filters" type="multilist" subtype="radio" default="1" label="FLEXI_FIELDS_AS_FILTERS" description="FLEXI_FIELDS_AS_FILTERS_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="disp_filtflds">Use all filterable</option>
 				<option value="1" show_list="" hide_list="disp_filtflds">FLEXI_ACCORDING_TO_TYPE</option>
 				<option value="2" show_list="disp_filtflds" hide_list="">FLEXI_CONFIGURE_BELOW</option>
 			</field>
-			<field name="filtflds" type="filters" isadvfilter="1" fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index filters are listed" class="use_adv_fields disp_filtflds" />
+			<field name="filtflds" type="filters" isadvfilter="1" fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index filters are listed" class="disp_filtflds" />
 			<!--field name="show_filtersop" type="radio" default="1" label="Filters Combination" description="Allow users to select method of combining the search filters, e.g. any filter, all filters">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>

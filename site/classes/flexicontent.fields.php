@@ -2106,7 +2106,7 @@ class FlexicontentFields
 		case 'state':
 			$textcol = ', CASE i.state';
 			foreach($state_names as $_id => $_name)  $textcol .= ' WHEN '.$_id.' THEN '.$db->Quote($_name);
-			$textcol .= ' ELSE '.$db->Quote("unknown").' END';
+			$textcol .= ' ELSE '.$db->Quote("unknown").' END AS value';
 			$query 	= ' SELECT i.state AS value_id '.$textcol.', i.id AS itemid'
 				.' FROM #__content AS i'
 				.' WHERE i.id IN ('.(@$field->query_itemids ? implode(',', $field->query_itemids) : $field->item_id) .')';
@@ -3300,10 +3300,12 @@ class FlexicontentFields
 				}
 				$fc_run_times['_create_filter_init'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
+			//if ($filter->id==NN) echo "<br/><br/> FILTER INITIALIZATION - using temporary table: ".$iids_subquery[$view_n_text]." for :".$view_n_text ." <br/><br/>";
 			
 			$item_id_col = ($filter->iscore || $filter->field_type=='coreprops') ? 'i.id' : 'fi.item_id';
 			$filter_where_curr = $filter->iscore ? $filter_where_curr : str_replace('i.id', 'fi.item_id', $filter_where_curr);
 			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT '.$item_id_col.') as found ' : '')."\n"
+				//.', GROUP_CONCAT('.$item_id_col.' SEPARATOR ",") AS idlist '   // enable FOR DEBUG purposes only
 				. $valuesfrom."\n"
 				. $valuesjoin."\n"
 				. ' WHERE 1 '."\n"
@@ -3334,12 +3336,10 @@ class FlexicontentFields
 		$db->setQuery($query);
 		try {
 			$results = $db->loadObjectList('value');
-			if ($db->getErrorNum()) {
-				$filter->html .= __FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br/>" .nl2br( $db->getErrorMsg() ) ."<br/>";
-			}
+			//if ($filter->id==NN) { echo "<pre>"; print_r($results); echo "</pre>"; }
 		}
 		catch (Exception $e) {
-			$filter->html = __FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br />" .$e->getMessage() ."<br/>";
+			JFactory::getApplication()->enqueueMessage(__FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br />" .nl2br(JDEBUG ? $e->getMessage() : 'Joomla Debug is OFF'), 'warning');
 			return array();
 		}
 		
@@ -3438,6 +3438,7 @@ class FlexicontentFields
 				. ' GROUP BY ai.search_index, ai.value_id'."\n"
 				. $orderby
 				;
+			//if ($filter->id==NN) echo $query."<br/><br/>";
 		}
 		
 		// Non FACETED filter (according to view but without acounting for filtering and without counting items)
@@ -3456,12 +3457,10 @@ class FlexicontentFields
 		$db->setQuery($query);
 		try {
 			$results = $db->loadObjectList('value');
-			if ($db->getErrorNum()) {
-				$filter->html .= __FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br/>" .nl2br( $db->getErrorMsg() ) ."<br/>";
-			}
+			//if ($filter->id==NN) { echo "<pre>"; print_r($results); echo "</pre>"; }
 		}
 		catch (Exception $e) {
-			$filter->html = __FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br />" .$e->getMessage() ."<br/>";
+			JFactory::getApplication()->enqueueMessage(__FUNCTION__."() Filter for : ".$filter->label." cannot be displayed, SQL QUERY ERROR:<br />" .nl2br(JDEBUG ? $e->getMessage() : 'Joomla Debug is OFF'), 'warning');
 			return array();
 		}
 		
@@ -3702,10 +3701,14 @@ class FlexicontentFields
 		$db = JFactory::getDBO();
 		$query = FlexicontentFields::createItemsListSQL($params, $_item_data, $isform, $reverse_field, $parentfield, $parentitem, $states);
 		$db->setQuery($query);
-		$item_list = $db->loadObjectList('id');
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		try {
+			$item_list = $db->loadObjectList('id');
+		}
+		catch (Exception $e) {
+			JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br(JDEBUG ? $e->getMessage() : 'Joomla Debug is OFF'), 'warning');
+		}
 		
-		// Item list must be returned too ...
+		// Return item ids list instead of rendering their HTML
 		if ($return_item_list)  $return_item_list = & $item_list;
 		
 		// No published related items or SQL query failed, return

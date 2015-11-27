@@ -816,12 +816,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
 		
 		if (!$ignoreState && $this->_layout!='myitems') {
+			$OR_isOwner = $user->id ? ' OR i.created_by = '.$user->id : '';
+			//$OR_isModifier = $user->id ? ' OR i.modified_by = '.$user->id : '';
+			
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( i.state IN (1, -5) '.$OR_isOwner.')';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 			
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) '.$OR_isOwner.')';       // $OR_isModifier
+			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) '.$OR_isOwner.')';   // $OR_isModifier
 		}
 		
 		// Filter the category view with the active language

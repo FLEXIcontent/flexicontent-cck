@@ -77,7 +77,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 		
 		$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 		//if ($props_type =='...') {
-		//	plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName);
+		//	$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 		//} else {
 		//	FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
 		//}
@@ -114,7 +114,9 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' i.language AS value, CONCAT_WS(\': \', lg.title, lg.title_native) AS text';
 				$filter->filter_valuesfrom   = ' FROM #__content AS i ';
-				$filter->filter_valuesjoin   = ' JOIN #__languages AS lg ON i.language = lg.lang_code';
+				$filter->filter_valuesjoin   =
+					' JOIN #__languages AS lg ON i.language = lg.lang_code'.
+					' JOIN #__flexicontent_fields_item_relations as fi ON i.id=fi.item_id';
 				$filter->filter_valueswhere  = ' AND lg.published <> 0';
 				// full SQL clauses
 				$filter->filter_groupby = ' GROUP BY i.language ';
