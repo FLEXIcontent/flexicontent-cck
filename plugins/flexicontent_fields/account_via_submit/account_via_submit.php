@@ -259,6 +259,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 		// **************************************************************
 		// Validate data, skipping values that are empty after validation
 		// **************************************************************
+		
 		$email = flexicontent_html::dataFilter($post[0]['addr'], $maxlength, 'EMAIL', 0);  // Clean bad text/html
 		
 		// Cancel item creation, if email is invalid

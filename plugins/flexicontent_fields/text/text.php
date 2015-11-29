@@ -382,7 +382,11 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$values = array($default_value);
 		}
 		
+		
+		// ******************************************
 		// Language filter, clean output, encode HTML
+		// ******************************************
+		
 		if ($clean_output) {
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
@@ -460,7 +464,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			break;
 		}
 		
-		// Initialise property with default value
+		// Create field's HTML
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)
@@ -575,10 +579,18 @@ class plgFlexicontent_fieldsText extends JPlugin
 				//JFactory::getApplication()->enqueueMessage( print_r($post[$n], true), 'warning');
 			}
 			
-			// Do server-side validation and skip empty values
+			// **************************************************************
+			// Validate data, skipping values that are empty after validation
+			// **************************************************************
+			
 			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
 			
-			if (!strlen($post[$n]) && !$use_ingroup) continue; // skip empty values
+			// Skip empty value, but if in group increment the value position
+			if (!strlen($post[$n]))
+			{
+				if ($use_ingroup) $newpost[$new++] = null;
+				continue;
+			}
 			
 			$newpost[$new] = $post[$n];
 			$new++;
@@ -613,12 +625,12 @@ class plgFlexicontent_fieldsText extends JPlugin
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		$this->onDisplayFilter($filter, $value, $formName);
+		$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 	}
 	
 	
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		

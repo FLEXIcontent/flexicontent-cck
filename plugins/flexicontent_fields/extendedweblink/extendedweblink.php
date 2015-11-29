@@ -687,11 +687,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		foreach ($post as $n => $v)
 		{
 			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($post[$n]) ) {
-				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
-					$post[$n] = unserialize($post[$n]);
+			if ( $is_importcsv && !is_array($v) ) {
+				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
+					$v = unserialize($v);
 				} else {
-					$post[$n] = array('link' => $post[$n], 'title' => '', 'id' => '', 'class' => '', 'linktext' => '', 'hits'=>0);
+					$v = array('link' => $v, 'title' => '', 'id' => '', 'class' => '', 'linktext' => '', 'hits'=>0);
 				}
 			}
 			
@@ -700,11 +700,17 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			// Validate URL, skipping URLs that are empty after validation
 			// ***********************************************************
 			
-			$link = flexicontent_html::dataFilter($post[$n]['link'], 0, 'URL', 0);  // Clean bad text/html
-			if ( empty($link) && !$use_ingroup ) continue;  // Skip empty values if not in field group
+			$link = flexicontent_html::dataFilter($v['link'], 0, 'URL', 0);  // Clean bad text/html
+			
+			// Skip empty value, but if in group increment the value position
+			if (empty($link))
+			{
+				if ($use_ingroup) $newpost[$new++] = null;
+				continue;
+			}
 			
 			// Sanitize the URL as absolute or relative
-			$force_absolute = $allow_relative_addrs==0 || ($allow_relative_addrs==2 && (int)$post[$n]['autoprefix']);
+			$force_absolute = $allow_relative_addrs==0 || ($allow_relative_addrs==2 && (int)$v['autoprefix']);
 			
 			// Has protocol nothing to do
 			if ( parse_url($link, PHP_URL_SCHEME) ) $prefix = '';
@@ -722,19 +728,20 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$newpost[$new]['link'] = empty($link) ? '' : $prefix.$link;
 			
 			// Validate other value properties
-			$newpost[$new]['title']   = flexicontent_html::dataFilter(@$post[$n]['title'], 0, 'STRING', 0);
-			$newpost[$new]['id']      = flexicontent_html::dataFilter(@$post[$n]['id'], 0, 'STRING', 0);
-			$newpost[$new]['class']   = flexicontent_html::dataFilter(@$post[$n]['class'], 0, 'STRING', 0);
-			$newpost[$new]['linktext']= flexicontent_html::dataFilter(@$post[$n]['linktext'], 0, 'STRING', 0);
-			$newpost[$new]['hits']    = (int) @ $post[$n]['hits'];
+			$newpost[$new]['title']   = flexicontent_html::dataFilter(@$v['title'], 0, 'STRING', 0);
+			$newpost[$new]['id']      = flexicontent_html::dataFilter(@$v['id'], 0, 'STRING', 0);
+			$newpost[$new]['class']   = flexicontent_html::dataFilter(@$v['class'], 0, 'STRING', 0);
+			$newpost[$new]['linktext']= flexicontent_html::dataFilter(@$v['linktext'], 0, 'STRING', 0);
+			$newpost[$new]['hits']    = (int) @ $v['hits'];
 			
 			$new++;
 		}
 		$post = $newpost;
 		
-		// Serialize multi-property data before storing them into the DB
+		// Serialize multi-property data before storing them into the DB,
+		// null indicates to increment valueorder without adding a value
 		foreach($post as $i => $v) {
-			$post[$i] = serialize($v);
+			if ($v!==null) $post[$i] = serialize($v);
 		}
 		/*if ($use_ingroup) {
 			$app = JFactory::getApplication();

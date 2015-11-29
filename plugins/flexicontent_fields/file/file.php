@@ -726,7 +726,6 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
 		// Make sure posted data is an array 
-		//echo "<pre>"; print_r($post); exit;
 		$post = !is_array($post) ? array($post) : $post;   //echo "<pre>"; print_r($post);
 		
 		// Get configuration
@@ -755,15 +754,13 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		$newpost = array();
 		$new = 0;
-    foreach ($post as $n => $v)
-    {
-    	if (empty($v)) {
-    		if ($use_ingroup) {  // empty value for group
-					$newpost[$new] = '';
-					$new++;
-				}
-    		continue;
-    	}
+		foreach ($post as $n => $v)
+		{
+			if (empty($v)) {
+				// skip empty value, but allow empty (null) placeholder value if in fieldgroup
+				if ($use_ingroup) $newpost[$new++] = null;
+				continue;
+			}
 			
 			// support for basic CSV import / export
 			if ( $is_importcsv ) {
@@ -804,6 +801,7 @@ class plgFlexicontent_fieldsFile extends FCField
 						UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload'
 					);
 					JFactory::getApplication()->enqueueMessage("FILE FIELD: ".$err_msg[$err_code], 'warning' );
+					if ($use_ingroup) $newpost[$new++] = null;
 					continue;
 				}
 				
@@ -848,6 +846,7 @@ class plgFlexicontent_fieldsFile extends FCField
 							$fm = new FlexicontentModelFilemanager();
 							$fm->delete( array($file_id) );
 						}
+						if ($use_ingroup) $newpost[$new++] = null;
 						continue;  // Skip file since unloading / removal was requested
 					}
 					
@@ -857,6 +856,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					// Update DB data of the file 
 					if ( !$row->check() || !$row->store() ) {
 						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDBO()->getErrorMsg(), 'warning' );
+						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}
 					
@@ -887,7 +887,10 @@ class plgFlexicontent_fieldsFile extends FCField
 					}
 					
 					// Skip file if unloading / removal was requested
-					if ( $v['file-del'] )  continue;  
+					if ( $v['file-del'] ) {
+						if ($use_ingroup) $newpost[$new++] = null;
+						continue;
+					}
 					
 					$fman = new FlexicontentControllerFilemanager();   // Controller will do the data filter too
 					JRequest::setVar( 'return-url', null, 'post' );  // needed !
@@ -902,12 +905,12 @@ class plgFlexicontent_fieldsFile extends FCField
 					JRequest::setVar( 'fname_level2', $n, 'post' );
 					JRequest::setVar( 'fname_level3', 'file-data', 'post' );
 					$file_id = $fman->upload();
-					$v = !empty($file_id) ? $file_id : false;
+					$v = !empty($file_id) ? $file_id : ($use_ingroup ? null : false);
 				}
 				
 				else {
 					// no existing file and no new file uploaded
-					$v = 0;
+					$v = $use_ingroup ? null : false;
 				}
 	    }
 			
@@ -916,7 +919,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				if ( !empty($v) && is_numeric($v) ) $newpost[(int)$v] = $new++;
 			} else {
 				// Inside fieldgroup, allow same file multiple times
-				$newpost[$new++] = (int)$v;
+				$newpost[$new++] = $v===null ? null : (int)$v;  // null means skip value but increment value position
 			}
     }
     

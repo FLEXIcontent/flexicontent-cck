@@ -515,11 +515,15 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		if (!$is_ingroup)  // do not convert the array to string if field is in a group
+		
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
+		if (!$is_ingroup)
 		{
-			// Apply separator and open/close tags
+			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' ) {
+			if ( $field->{$prop}!=='' )
+			{
+				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 			} else {
 				$field->{$prop} = '';
@@ -589,10 +593,15 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			// **************************************************************
 			
 			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
-			if (!strlen($post[$n]) && !$use_ingroup) continue; // skip empty values
+			
+			// Skip empty value, but if in group increment the value position
+			if (!strlen($post[$n]))
+			{
+				if ($use_ingroup) $newpost[$new++] = null;
+				continue;
+			}
 			
 			$newpost[$new] = $post[$n];
-			
 			$new++;
 		}
 		$post = $newpost;

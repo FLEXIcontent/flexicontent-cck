@@ -103,12 +103,12 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		$this->onDisplayFilter($filter, $value, $formName);
+		$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 	}
 	
 	
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
@@ -125,7 +125,8 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	}	
 	
 	
-	// Get item ids having the value(s) of filter
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for content lists e.g. category view, and not for search view
 	function getFiltered(&$filter, $value, $return_sql=true)
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
@@ -133,7 +134,7 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql);
 	}
 	
-		
+	
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
 	function getFilteredSearch(&$filter, $value, $return_sql=true)

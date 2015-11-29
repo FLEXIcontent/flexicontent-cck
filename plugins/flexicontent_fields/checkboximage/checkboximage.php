@@ -150,6 +150,8 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
 		
 		// Field name and HTML TAG id
+		$valueholder_nm = 'custom[_fcfield_valueholder_]['.$field->name.']';
+		$valueholder_id = 'custom__fcfield_valueholder__'.$field->name;
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 		
@@ -244,6 +246,10 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 				});
 				prettyContainers.remove();
 				
+				// Update value holder
+				newField.find('.fcfield_value_holder')
+					.attr('id', '".$valueholder_id."_'+uniqueRowNum".$field->id.")
+					.attr('name', '".$valueholder_nm."['+uniqueRowNum".$field->id."+']');
 				
 				// Update INPUT SET container id
 				newField.find('.fc_input_set').attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
@@ -258,6 +264,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
 					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
 					elem.attr('class', '".$elementid."_'+uniqueRowNum".$field->id." + js_class);
+					elem.removeAttr('checked');
 					".($use_prettycheckable && $prettycheckable_added ?
 						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" :
 						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" )."
@@ -484,7 +491,9 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			if (!$ajax)
 			{
 				$field->html[] = '
-					'.'<div id="'.$elementid_n.'" class="fc_input_set">'.$form_field.'</div>'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
+					'.'<div id="'.$elementid_n.'" class="fc_input_set">'.$form_field.'</div>
+					'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
+					'.($use_ingroup   ? '<input type="hidden" class="fcfield_value_holder" name="'.$valueholder_nm.'['.$n.']" id="'.$valueholder_id.'_'.$n.'" value="-">' : '').'
 					'.($use_ingroup ? '' : $move2).'
 					'.($use_ingroup ? '' : $remove_button).'
 					'.($use_ingroup || !$add_position ? '' : $add_here).'
@@ -914,10 +923,24 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$v = reset($post);
 		$post = (!is_array($v) && @unserialize($v)=== false)  ?  array($post)  :  $post;
 		
+		// Account for fact that ARRAY form elements are not submitted if they do not have a value
+		if ( $use_ingroup )
+		{
+			$custom = JFactory::getApplication()->input->get('custom', array(), 'post', 'array');
+			if ( isset($custom['_fcfield_valueholder_'][$field->name]) ) 
+			{
+				$holders = $custom['_fcfield_valueholder_'][$field->name];
+				$vals = array();
+				foreach($holders as $i => $v)  $vals[]  =  isset($post[(int)$i]) ? $post[(int)$i] : array();
+				$post = $vals;
+			}
+		}
+		
 		// Reformat the posted data
 		$newpost = array();
 		$new = 0;
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
+		
 		foreach ($post as $n => $v)
 		{
 			// support for basic CSV import / export
@@ -936,8 +959,13 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 				if ( $element ) $vals[] = $nv;  // include value
 			}
 			
-			// Skip empty value ARRAY if not in group
-			if (empty($vals) && !$use_ingroup) continue;
+			// Skip empty value, but if in group increment the value position
+			if (empty($vals))
+			{
+				if ($use_ingroup) $newpost[$new++] = array();
+				continue;
+			}
+			
 			// If multiple disabled, use 1st value ARRAY only
 			if (!$multiple) {  $newpost = $vals;  break;  }
 			

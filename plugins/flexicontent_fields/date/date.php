@@ -391,6 +391,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
+		// Microdata (classify the field values for search engines)
 		$itemprop    = $field->parameters->get('microdata_itemprop');
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
@@ -466,7 +468,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
 		}
 		
-		// initialise property
+		// Create field's HTML
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)
@@ -499,12 +501,18 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		if (!$is_ingroup)  // do not convert the array to string if field is in a group
+		
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
+		if (!$is_ingroup)
 		{
-			// Apply separator and open/close tags
+			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' ) {
+			if ( $field->{$prop}!=='' )
+			{
+				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+				
+				// Add microdata once for all values, if field -- is NOT -- in a field group
 				if ( $itemprop )
 				{
 					$field->{$prop} = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}. '</div>';
@@ -555,8 +563,13 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			// Do server-side validation and skip empty values
 			$post[$n] = flexicontent_html::dataFilter($post[$n], 200, 'STRING', 0);
 			
-			if (!strlen($post[$n]) && !$use_ingroup) continue; // skip empty values
-
+			// Skip empty value, but if in group increment the value position
+			if (!strlen($post[$n]))
+			{
+				if ($use_ingroup) $newpost[$new++] = null;
+				continue;
+			}
+			
 			// Check if dates are allowed to have time part
 			@list($date, $time) = preg_split('#\s+#', $post[$n], $limit=2);
 			$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
@@ -596,11 +609,13 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 	}
 	
 	
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 	}
 	
 	

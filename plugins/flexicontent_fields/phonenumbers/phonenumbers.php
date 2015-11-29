@@ -434,11 +434,11 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		foreach ($post as $n => $v)
 		{
 			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($post[$n]) ) {
-				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
-					$post[$n] = unserialize($post[$n]);
+			if ( $is_importcsv && !is_array($v) ) {
+				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
+					$v = unserialize($v);
 				} else {
-					$post[$n] = array('label'=>'', 'cc'=>'', 'phone1'=>'', 'phone2'=>$post[$n], 'phone3'=>'');
+					$v = array('label'=>'', 'cc'=>'', 'phone1'=>'', 'phone2'=>$v, 'phone3'=>'');
 				}
 			}
 			
@@ -447,14 +447,14 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 			// Validate phone number, skipping phone number that are empty after validation
 			// ****************************************************************************
 			
-			$newpost[$new]['phone1'] = !strlen($post[$n]['phone1']) ? '' : flexicontent_html::dataFilter(@$post[$n]['phone1'], $phone_maxlength, 'INT', 0);
-			$newpost[$new]['phone2'] = !strlen($post[$n]['phone2']) ? '' : flexicontent_html::dataFilter(@$post[$n]['phone2'], $phone_maxlength, 'INT', 0);
-			$newpost[$new]['phone3'] = !strlen($post[$n]['phone3']) ? '' : flexicontent_html::dataFilter(@$post[$n]['phone3'], $phone_maxlength, 'INT', 0);
-			if (!strlen($post[$n]['phone1']) && !strlen($post[$n]['phone2']) && !strlen($post[$n]['phone3']) && !$use_ingroup ) continue;  // Skip empty values if not in field group
+			$newpost[$new]['phone1'] = !strlen($v['phone1']) ? '' : flexicontent_html::dataFilter(@$v['phone1'], $phone_maxlength, 'INT', 0);
+			$newpost[$new]['phone2'] = !strlen($v['phone2']) ? '' : flexicontent_html::dataFilter(@$v['phone2'], $phone_maxlength, 'INT', 0);
+			$newpost[$new]['phone3'] = !strlen($v['phone3']) ? '' : flexicontent_html::dataFilter(@$v['phone3'], $phone_maxlength, 'INT', 0);
+			if (!strlen($v['phone1']) && !strlen($v['phone2']) && !strlen($v['phone3']) && !$use_ingroup ) continue;  // Skip empty values if not in field group
 			
 			// Validate other value properties
-			$newpost[$new]['label']  = flexicontent_html::dataFilter(@$post[$n]['label'],  $label_maxlength, 'STRING', 0);
-			$newpost[$new]['cc']     = flexicontent_html::dataFilter(@$post[$n]['cc'],     $cc_maxlength,    'STRING', 0);
+			$newpost[$new]['label']  = flexicontent_html::dataFilter(@$v['label'],  $label_maxlength, 'STRING', 0);
+			$newpost[$new]['cc']     = flexicontent_html::dataFilter(@$v['cc'],     $cc_maxlength,    'STRING', 0);
 			
 			$new++;
 		}

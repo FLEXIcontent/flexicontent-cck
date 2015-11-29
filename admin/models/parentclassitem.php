@@ -2682,7 +2682,8 @@ class ParentClassItem extends JModelAdmin
 							}
 							unset($v);
 						}
-						else if ( isset($obj->value) && ($use_ingroup || strlen(trim($obj->value))) )
+						else if ( isset($obj->value) && strlen(trim($obj->value)) )    // ISSET will also skip -null-, but valueorder will be incremented (e.g. we want this for fields in a field group)
+						//else if ( isset($obj->value) && ($use_ingroup || strlen(trim($obj->value))) )
 						{
 							if (! $mval_query) $this->_db->insertObject('#__flexicontent_items_versions', $obj);
 							else $ver_query_vals[] = "("
@@ -2710,7 +2711,8 @@ class ParentClassItem extends JModelAdmin
 							}
 							unset($v);
 						}
-						else if ( isset($obj->value) && ($use_ingroup || strlen(trim($obj->value))) )
+						else if ( isset($obj->value) && strlen(trim($obj->value)) )    // ISSET will also skip -null-, but valueorder will be incremented (e.g. we want this for fields in a field group)
+						//else if ( isset($obj->value) && ($use_ingroup || strlen(trim($obj->value))) )
 						{
 							if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 							else $rel_query_vals[] = "("

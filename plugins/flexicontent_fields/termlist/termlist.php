@@ -589,11 +589,11 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		foreach ($post as $n => $v)
 		{
 			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($post[$n]) ) {
-				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
-					$post[$n] = unserialize($post[$n]);
+			if ( $is_importcsv && !is_array($v) ) {
+				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
+					$v = unserialize($v);
 				} else {
-					$post[$n] = array('title' => $post[$n], 'text' => '');
+					$v = array('title' => $v, 'text' => '');
 				}
 			}
 			
@@ -602,20 +602,27 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			// Validate data, skipping values that are empty after validation
 			// **************************************************************
 			
-			$title = flexicontent_html::dataFilter($post[$n]['title'], $maxlength, 'HTML', 0);
-			if (!strlen($title) && !$use_ingroup) continue; // Skip empty values
+			$title = flexicontent_html::dataFilter($v['title'], $maxlength, 'HTML', 0);
+			
+			// Skip empty value, but if in group increment the value position
+			if (!strlen($title))
+			{
+				if ($use_ingroup) $newpost[$new++] = null;
+				continue;
+			}
 			
 			$newpost[$new] = array();
 			$newpost[$new]['title'] = $title;
-			$newpost[$new]['text']  = flexicontent_html::dataFilter($post[$n]['text'], $maxlength, $validation, 0);
+			$newpost[$new]['text']  = flexicontent_html::dataFilter($v['text'], $maxlength, $validation, 0);
 			
 			$new++;
 		}
 		$post = $newpost;
 		
-		// Serialize multi-property data before storing them into the DB
+		// Serialize multi-property data before storing them into the DB,
+		// null indicates to increment valueorder without adding a value
 		foreach($post as $i => $v) {
-			$post[$i] = serialize($v);
+			if ($v!==null) $post[$i] = serialize($v);
 		}
 		/*if ($use_ingroup) {
 			$app = JFactory::getApplication();

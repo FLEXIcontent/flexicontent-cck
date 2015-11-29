@@ -412,7 +412,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			break;
 		}
 		
-		// initialise property
+		// Create field's HTML
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)
@@ -490,11 +490,11 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		foreach ($post as $n => $v)
 		{
 			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($post[$n]) ) {
-				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
-					$post[$n] = unserialize($post[$n]);
+			if ( $is_importcsv && !is_array($v) ) {
+				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
+					$v = unserialize($v);
 				} else {
-					$post[$n] = array('addr' => $post[$n], 'text' => '');
+					$v = array('addr' => $v, 'text' => '');
 				}
 			}
 			
@@ -503,20 +503,27 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			// Validate data, skipping values that are empty after validation
 			// **************************************************************
 			
-			$addr = flexicontent_html::dataFilter($post[$n]['addr'], $maxlength, 'EMAIL', 0);  // Clean bad text/html
-			if (!strlen($addr) && !$use_ingroup) continue; // Skip empty values
+			$addr = flexicontent_html::dataFilter($v['addr'], $maxlength, 'EMAIL', 0);  // Clean bad text/html
+			
+			// Skip empty value, but if in group increment the value position
+			if (!strlen($addr))
+			{
+				if ($use_ingroup) $newpost[$new++] = array();
+				continue;
+			}
 			
 			$newpost[$new] = array();
 			$newpost[$new]['addr'] = $addr;
-			$newpost[$new]['text'] = flexicontent_html::dataFilter(@$post[$n]['text'], 0, 'STRING', 0);
+			$newpost[$new]['text'] = flexicontent_html::dataFilter(@$v['text'], 0, 'STRING', 0);
 			
 			$new++;
 		}
 		$post = $newpost;
 		
-		// Serialize multi-property data before storing them into the DB
+		// Serialize multi-property data before storing them into the DB,
+		// null indicates to increment valueorder without adding a value
 		foreach($post as $i => $v) {
-			$post[$i] = serialize($v);
+			if ($v!==null) $post[$i] = serialize($v);
 		}
 		/*if ($use_ingroup) {
 			$app = JFactory::getApplication();

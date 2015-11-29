@@ -90,9 +90,6 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		// Render Form HTML of the field
 		foreach($grouped_fields as $field_id => $grouped_field)
 		{
-			for($n=count($grouped_field->value); $n < $max_count; $n++) {
-				$grouped_field->value[$n] = null;
-			}
 			$grouped_field->ingroup = 1;
 			$grouped_field->item_id = $item->id;
 			FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayField', array(&$grouped_field, &$item));
@@ -713,40 +710,109 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	// Retrieves and add values to the given field objects
 	function getGroupFieldsValues(&$grouped_fields, &$item, &$max_count)
 	{
-		// Retrieve values of fields in the group if not already retrieved
-		/*if (!isset($item->fieldvalues)) {
-			$itemmodel = new FlexicontentModelItem();
-			$item->fieldvalues = $itemmodel->getCustomFieldsValues($item->id, $item->version);
-		}*/
-		//echo "<pre>"; print_r($item->fieldvalues); echo "</pre>"; exit;
+		$do_compact = true;
 		
+		// ****************
+		// Get field values
+		// ****************
+		$max_index = 0;
 		foreach($grouped_fields as $field_id => $grouped_field)
 		{
-			// Set field values
-			if ( isset($item->fieldvalues[$field_id]) ) {   // Item viewing
+			// Item viewing
+			if ( isset($item->fieldvalues[$field_id]) ) {
 				$grouped_field->value = is_array($item->fieldvalues[$field_id])  ?  $item->fieldvalues[$field_id]  :  array($item->fieldvalues[$field_id]);
-			} else if ( isset($item->fields[$grouped_field->name]->value) ) {    // Item form
+			}
+			// Item form
+			else if ( isset($item->fields[$grouped_field->name]->value) ) {
 				$grouped_field->value = $item->fields[$grouped_field->name]->value;
-			} else {
+			}
+			// Value not set
+			else {
 				$grouped_field->value = null;
 			}
 			
-			// Update max value count
-			$value_count = is_array($grouped_field->value) ? count($grouped_field->value) : 0;
-			$max_count = $value_count > $max_count ? $value_count : $max_count;
+			// Update max value index
+			$last_index = !is_array($grouped_field->value) || !count($grouped_field->value) ? 0 : max(array_keys($grouped_field->value));
+			$max_index = $last_index > $max_index ? $last_index : $max_index;
 		}
+		//echo "<br/><br/><br/>DB DATA<br/><pre>"; foreach($grouped_fields as $field_id => $grouped_field) { echo "\n[".$grouped_field->id."] - ".$grouped_field->name; print_r($grouped_field->value); } echo "</pre>";
 		
-		// COMPATIBILITY: in every field add (aka pad with) NULL values for groups that a field value was not given
-		// every field will create an empty display instead of skipping an NULL value, thus field group will display properly
+		
+		// ***********************************************************************************
+		// (Compatibility) For groups that have fields with non-set values, add NULL values
+		// This way the field will not skip the value and instead will create an empty display
+		// ***********************************************************************************
+		$null_count = array();
+		for ($n=0; $n <= $max_index; $n++) $null_count[$n] = 0;
 		foreach($grouped_fields as $field_id => $grouped_field)
 		{
 			$vals = array();
-			for ($n=0; $n < $max_count; $n++) {
-				$vals[$n] = isset($grouped_field->value[$n]) ? $grouped_field->value[$n] : null;
+			for ($n=0; $n <= $max_index; $n++) {
+				if ( isset($grouped_field->value[$n]) )
+				{
+					$vals[$n] = $grouped_field->value[$n];
+				} else {
+					$vals[$n] = null;
+					++$null_count[$n];
+				}
 			}
 			$grouped_field->value = $vals;
-			//echo "<pre>"; print_r($grouped_field->value); echo "</pre>";
 		}
+		//echo "<br/><br/><br/>NULLED<br/><pre>"; foreach($grouped_fields as $field_id => $grouped_field) { echo "\n[".$grouped_field->id."] - ".$grouped_field->name; print_r($grouped_field->value); } echo "</pre>";
+		//echo "<pre>"; print_r($null_count); echo "</pre>";
+		
+		
+		// *********************************
+		// Find groups that had empty values
+		// *********************************
+		$grp_isempty = array();
+		for($n=0; $n <= $max_index; $n++) {
+			if ( isset($null_count[$n]) && $null_count[$n]==count($grouped_fields) )  $grp_isempty[$n] = 1;
+		}
+		//print_r($grp_isempty); exit;
+		
+		
+		// *************************************************************************
+		// Compact FIELD GROUP values by removing groups that are (ALL values) empty
+		// *************************************************************************
+		
+		// Make sure we have some empty fieldgroups, if this was requested (= that is the max_count that was passed to the function)
+		$start_at = $max_count + count($grp_isempty) - ($max_index+1);
+		if ($start_at < 0) $start_at = 0;
+		
+		if ($do_compact) foreach($grouped_fields as $field_id => $grouped_field)
+		{
+			$i = $start_at;
+			for ($n = $start_at; $n <= $max_index; $n++)
+			{
+				//echo $n." - ".$i."<br/>";
+				// Move down to fill empty gaps, if current index is not in sync, meaning 1 empty group was encountered -before-, and also if current (value) group is non-empty
+				if ( $n > $i && !isset($grp_isempty[$n]) )
+				{
+					$grouped_field->value[$i] = $grouped_field->value[$n];
+					if ( isset($grouped_field->value[$n]) )
+					{
+						if ( isset($item->fieldvalues[$field_id]) )               $item->fieldvalues[$field_id][$i] = $grouped_field->value[$n];
+						if ( isset($item->fields[$grouped_field->name]->value) )  $item->fields[$grouped_field->name]->value[$i] = $grouped_field->value[$n];
+					}
+				}
+				
+				// Unset moved groups or group with ALL-empty values
+				if ( $n > $i || isset($grp_isempty[$n]) )
+				{
+					unset($grouped_field->value[$n]);
+					if ( isset($item->fieldvalues[$field_id]) ) unset($item->fieldvalues[$field_id][$n]);
+					if ( isset($item->fields[$grouped_field->name]->value) ) unset($item->fields[$grouped_field->name]->value[$n]);
+				}
+				
+				// Increment adding position if group was not empty
+				if ( !isset($grp_isempty[$n]) ) $i++;
+			}
+		}
+		//echo "<br/><br/><br/>COMPACTED<br/><pre>"; foreach($grouped_fields as $field_id => $grouped_field) { echo "\n[".$grouped_field->id."] - ".$grouped_field->name; print_r($grouped_field->value); } echo "</pre>";
+		
+		$max_count = $max_index + 1;
+		if ($do_compact) $max_count -= count($grp_isempty);
 	}
 	
 	

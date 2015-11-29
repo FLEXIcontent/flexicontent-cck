@@ -108,6 +108,8 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
 		
 		// Field name and HTML TAG id
+		$valueholder_nm = 'custom[_fcfield_valueholder_]['.$field->name.']';
+		$valueholder_id = 'custom__fcfield_valueholder__'.$field->name;
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 		
@@ -193,6 +195,11 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
+				
+				// Update value holder
+				newField.find('.fcfield_value_holder')
+					.attr('id', '".$valueholder_id."_'+uniqueRowNum".$field->id.")
+					.attr('name', '".$valueholder_nm."['+uniqueRowNum".$field->id."+']');
 				
 				// Update the new select field
 				var elem= newField.find('select.fcfield_textselval').first();
@@ -367,7 +374,9 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 				$form_field = $opentag . JHTML::_('select.genericlist', $options, $fieldname_n, $attribs.' data-uniqueRowNum="'.$n.'"', 'value', 'text', $value, $elementid_n) . $closetag;
 				
 				$field->html[] = '
-					'.$form_field.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
+					'.$form_field.'
+					'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
+					'.($use_ingroup   ? '<input type="hidden" class="fcfield_value_holder" name="'.$valueholder_nm.'['.$n.']" id="'.$valueholder_id.'_'.$n.'" value="-">' : '').'
 					'.($use_ingroup ? '' : $move2).'
 					'.($use_ingroup ? '' : $remove_button).'
 					'.($use_ingroup || !$add_position ? '' : $add_here).'
@@ -781,23 +790,42 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
 		
+		// Account for fact that ARRAY form elements are not submitted if they do not have a value
+		if ( $use_ingroup )
+		{
+			$custom = JFactory::getApplication()->input->get('custom', array(), 'post', 'array');
+			if ( isset($custom['_fcfield_valueholder_'][$field->name]) ) 
+			{
+				$holders = $custom['_fcfield_valueholder_'][$field->name];
+				$vals = array();
+				foreach($holders as $i => $v)  $vals[]  =  isset($post[(int)$i]) ? $post[(int)$i] : null;
+				$post = $vals;
+			}
+		}
+		
 		// Reformat the posted data
 		$newpost = array();
 		$new = 0;
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
+		
 		foreach ($post as $n => $v)
 		{
 			// Do server-side validation and skip empty/invalid values
 			$element = !strlen($post[$n]) ? false : @$elements[ $post[$n] ];
 			if ( !$element )  $post[$n] = '';  // clear invalid value
 			
-			// Skip empty value if not in group
-			if (!strlen($post[$n]) && !$use_ingroup) continue;
-			// If multiple disabled, use 1st value only
-			if (!$multiple) {  $newpost[0] = $post[0];  break;  }
+			// Skip empty value, but if in group increment the value position
+			if (!strlen($post[$n]))
+			{
+				if ($use_ingroup) $newpost[$new++] = null;
+				continue;
+			}
 			
 			$newpost[$new] = $post[$n];
 			$new++;
+			
+			// If multiple disabled, do not add more values
+			if (!$multiple) break;
 			
 			// max values limitation (*if in group, this was zeroed above)
 			if ($max_values && $new >= $max_values) continue;

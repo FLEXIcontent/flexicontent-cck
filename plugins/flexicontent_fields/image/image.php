@@ -771,7 +771,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				<table class="admintable fcfield'.$field->id.' img_upload_select" id="'.$field->name.'_upload_select_tbl_'.$n.'" style="'.($image_name && $imgsel_visible==0 ? "display:none;" : "").($multiple ? '' : 'width:auto;').'" >
 				<tbody>
 					<tr class="img_newfile_row">
-						'.($curr_select ? '<td class="key fckey_high">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>' : '').'
+						'.($curr_select ? '<td class="key">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).'</td>' : '').'
 						<td style="white-space: normal;">'.
 							'<input name="'.$field->name.'['.$n.']" id="'.$elementid_n.'_newfile" class="newfile no_value_selected" '.$onchange.' type="file" /><br/>' .
 							$uploadLimitsTxt.
@@ -781,7 +781,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					</tr>
 					'.($curr_select ? '
 					<tr class="img_existingfile_row">
-						<td class="key fckey_high">'.JText::_( !$image_source ? 'FLEXI_FIELD_EXISTINGFILE' : 'FLEXI_SELECT' ).':</td>
+						<td class="key">'.JText::_( !$image_source ? 'FLEXI_FIELD_EXISTINGFILE' : 'FLEXI_SELECT' ).'</td>
 						<td>'.$curr_select.'</td>
 					</tr>
 					' : '').'
@@ -1969,16 +1969,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$new_filenames = array();
 		$newpost = array();
 		$new = 0;
-    foreach ($post as $n => $v)
-    {
-    	if (empty($v)) {
-    		if ($use_ingroup) {  // empty value for group
-					$newpost[$new] = array('originalname' => '');
-					$new++;
-				}
-    		continue;
-    	}
-    	
+		foreach ($post as $n => $v)
+		{
+			if (empty($v)) {
+				// skip empty value, but allow empty (null) placeholder value if in fieldgroup
+				if ($use_ingroup) $newpost[$new++] = null;
+				continue;
+			}
+			
 			// support for basic CSV import / export
 			if ( $is_importcsv && !is_array($v) ) {
 				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
@@ -2053,18 +2051,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$v['originalname'] = $v['existingname'];
 					$v['existingname'] = '';
 				} else if ( $v['remove'] ) {
-					// Deleting or unloading current value: Skip current image row, but allow empty value if in fieldgroup
-					$v = $use_ingroup ? array('originalname'=>'') : false;
+					// Deleting or unloading current value: Skip current image row, but allow empty (null) placeholder value if in fieldgroup
+					$v = $use_ingroup ? null : false; //$use_ingroup ? array('originalname'=>'') : null;
 				}
 				
 			} else {
-				// No new file posted and no existing selected: Skip current image row, but allow empty value if in fieldgroup
-				$v = $use_ingroup ? array('originalname'=>'') : false;
+				// No new file posted and no existing selected: Skip current image row, but allow empty (null) placeholder value if in fieldgroup
+				$v = $use_ingroup ? null : false; //$use_ingroup ? array('originalname'=>'') : null;
 			}
 			
 			// Add image entry to a new array skipping empty image entries
-			if ($v) {
-				$new_filenames[$v['originalname']] = 1;
+			if ($v!==false)
+			{
+				if ($v) $new_filenames[$v['originalname']] = 1;
 				$newpost[$new] = $v;
 				$new++;
 			}
@@ -2099,9 +2098,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 		}
 		
-		// Serialize multi-property data before storing them into the DB
+		// Serialize multi-property data before storing them into the DB,
+		// null indicates to increment valueorder without adding a value
 		foreach($post as $i => $v) {
-			$post[$i] = serialize($v);
+			if ($v!==null) $post[$i] = serialize($v);
 		}
 	}
 	

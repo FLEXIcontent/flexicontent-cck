@@ -429,41 +429,47 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 		foreach ($post as $n => $v)
 		{
 			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($post[$n]) ) {
-				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
-					$post[$n] = unserialize($post[$n]);
+			if ( $is_importcsv && !is_array($v) ) {
+				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
+					$v = unserialize($v);
 				} else {
-					$post[$n] = array('url' => $post[$n]);
+					$v = array('url' => $v);
 				}
 			}
 			
 			
-			// ***********************************************************
-			// Validate URL, skipping URLs that are empty after validation
-			// ***********************************************************
+			// **************************************************************
+			// Validate data, skipping values that are empty after validation
+			// **************************************************************
 			
-			$url = flexicontent_html::dataFilter($post[$n]['url'], 0, 'URL', 0);  // Clean bad text/html
-			if ( empty($url) && !$use_ingroup ) continue;  // Skip empty values if not in field group
+			$url = flexicontent_html::dataFilter($v['url'], 0, 'URL', 0);  // Clean bad text/html
+			
+			// Skip empty value, but if in group increment the value position
+			if (empty($url))
+			{
+				if ($use_ingroup) $newpost[$new++] = null;
+				continue;
+			}
 			
 			$newpost[$new] = array();
 			$newpost[$new]['url'] = $url;
 			
 			// Validate other value properties
-			$newpost[$new]['audiotype'] = flexicontent_html::dataFilter(@$post[$n]['audiotype'], 0, 'STRING', 0);
-			$newpost[$new]['audioid'] = flexicontent_html::dataFilter(@$post[$n]['audioid'], 0, 'STRING', 0);
-			$newpost[$new]['title'] = flexicontent_html::dataFilter(@$post[$n]['title'], 0, 'STRING', 0);
-			$newpost[$new]['author'] = flexicontent_html::dataFilter(@$post[$n]['author'], 0, 'STRING', 0);
-			$newpost[$new]['duration'] = flexicontent_html::dataFilter(@$post[$n]['duration'], 0, 'INT', 0);
-			$newpost[$new]['description'] = flexicontent_html::dataFilter(@$post[$n]['description'], 0, 'STRING', 0);
+			$newpost[$new]['audiotype'] = flexicontent_html::dataFilter(@$v['audiotype'], 0, 'STRING', 0);
+			$newpost[$new]['audioid'] = flexicontent_html::dataFilter(@$v['audioid'], 0, 'STRING', 0);
+			$newpost[$new]['title'] = flexicontent_html::dataFilter(@$v['title'], 0, 'STRING', 0);
+			$newpost[$new]['author'] = flexicontent_html::dataFilter(@$v['author'], 0, 'STRING', 0);
+			$newpost[$new]['duration'] = flexicontent_html::dataFilter(@$v['duration'], 0, 'INT', 0);
+			$newpost[$new]['description'] = flexicontent_html::dataFilter(@$v['description'], 0, 'STRING', 0);
 
 			$new++;
 		}
-		
 		$post = $newpost;
 		
-		// Serialize multi-property data before storing them into the DB
+		// Serialize multi-property data before storing them into the DB,
+		// null indicates to increment valueorder without adding a value
 		foreach($post as $i => $v) {
-			$post[$i] = serialize($v);
+			if ($v!==null) $post[$i] = serialize($v);
 		}
 	}
 	
