@@ -578,12 +578,23 @@ jQuery(document).ready(function() {
 			if ( !$values || !count($values) ) return;
 			
 			$_itemids_catids = array();
-			foreach($values as $i => $val) {
-				list ($itemid,$catid) = explode(":", $val);
+
+			// set upper limit as $values array length
+			$itemcount = count ($values);
+
+			// change upper limit if itemcount is set and error checked
+			if (is_numeric($field->parameters->get( 'itemcount', 0)) &&  
+				$field->parameters->get( 'itemcount', 0) > 0 && 
+				$field->parameters->get( 'itemcount', 0) < $itemcount
+			) $itemcount = $field->parameters->get( 'itemcount', 0);
+
+			// use 'for' instead of 'foreach' to limit count
+			for($i = 0; $i < $itemcount; $i++){
+				list ($itemid,$catid) = explode(":", $values[$i]);
 				$_itemids_catids[$itemid] = new stdClass();
 				$_itemids_catids[$itemid]->itemid = $itemid;
 				$_itemids_catids[$itemid]->catid = $catid;
-				$_itemids_catids[$itemid]->value  = $val;
+				$_itemids_catids[$itemid]->value  = $values[$i];
 			}
 		}
 		

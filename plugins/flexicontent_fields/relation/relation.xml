@@ -149,6 +149,7 @@
 			<!--field name="" type="separator" default="FLEXI_ITEMS_LIST" level="level0" /-->
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEM_LIST" level="level0" />
+			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_ITEM_COUNT_LABEL" description="FLEXI_RIFLD_ITEM_COUNT_DESC" />
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
 			<field name="orderby" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
 				<option value="">FLEXI_ORDER_DEFAULT</option>

@@ -3738,6 +3738,7 @@ class FlexicontentFields
 	static function createItemsListSQL(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, $states=array(1,-5,2))
 	{
 		$db = JFactory::getDBO();
+		$user = JFactory::getUser();
 		$sfx = $isform ? '_form' : '';
 		
 		// Get data like aliases and published state
@@ -3768,6 +3769,25 @@ class FlexicontentFields
 		// item IDs via a given list (relation field and ... maybe other cases too)
 		else {
 			$item_where = ' AND i.id IN ('. implode(",", array_keys($_item_data)) .')';
+		}
+		// reverse category scope
+		if($params->get('reverse_scope_category', 0)){
+			$cat_where = ' AND i.catid IN ('. implode(",", array_values($params->get('reverse_scope_category', 0))) .')';
+		}
+		// reverse type scope
+		if($params->get('reverse_scope_types', 0)){
+			$type_where = ' AND ext.type_id IN ('. implode(",", array_values($params->get('reverse_scope_types', 0))) .')';
+		}
+		// reverse owner scope
+		if($params->get('ownedbyuser', 0)){
+			//if item owned by editing user/logged in user currently editing the field
+			if ($params->get('ownedbyuser', 0) == 1) $itemowned_where = ' AND i.created_by=' . $user->id;
+			//if item owned by the reversing item's item owner
+			else if ($params->get('ownedbyuser', 0) == 2) $itemowned_where = ' AND i.created_by=' . $parentitem->created_by;
+		}
+		// item count limit
+		if($params->get('itemcount', 0) && is_numeric($params->get('itemcount', 0)) && $params->get('itemcount', 0) > 0){
+			$limit = ' LIMIT ' . $params->get('itemcount', 0);
 		}
 		
 		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
@@ -3817,9 +3837,13 @@ class FlexicontentFields
 			.' LEFT JOIN #__categories AS c ON c.id=rel.catid '
 			.' WHERE 1 '
 			. @ $item_where
+			. @ $type_where
+			. @ $cat_where
+			. @ $itemowned_where
 			. $publish_where
 			.' GROUP BY i.id '
 			. $orderby
+			.@ $limit
 			;
 		//echo "<pre>".$query."</pre>";
 		return $query;
