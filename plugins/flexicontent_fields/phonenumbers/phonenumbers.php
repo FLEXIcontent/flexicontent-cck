@@ -371,7 +371,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
 					array('label'=>'', 'cc'=>'', 'phone1'=>$value, 'phone2'=>'', 'phone3'=>'');
 			}
-			if (empty($value['phone1']) && empty($value['phone2']) && empty($value['phone3']) && !$is_ingroup ) continue;  // Skip empty values if not in field group
+			if (empty($value['phone1']) && empty($value['phone2']) && empty($value['phone3']) && !$is_ingroup ) continue; // Skip empty if not in field group
 			
 			$html = $opentag
 					.($display_phone_label  ? $label_prefix.$value['label'] . $label_suffix : '');

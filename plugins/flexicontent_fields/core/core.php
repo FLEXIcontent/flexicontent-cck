@@ -16,8 +16,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsCore extends JPlugin
+class plgFlexicontent_fieldsCore extends FCField
 {
 	// ***********
 	// CONSTRUCTOR
@@ -239,28 +240,19 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					if ($_categories===false) $categories = & $item->cats;
 					else $categories = & $_categories;
 					
+					
 					if ($categories) :
 						// Get categories that should be excluded from linking
 						global $globalnoroute;
 						if ( !is_array($globalnoroute) ) $globalnoroute = array();
 						$link_to_view = $field->parameters->get( 'link_to_view', 1 ) ;
 						
-						// Create list of category links, excluding the "noroute" categories
+						$viewlayout = $field->parameters->get('viewlayout', '');
+						$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+						
+						// Create categories HTML
 						$field->{$prop} = array();
-						foreach ($categories as $category) {
-							$cat_id = $category->id;
-							if ( in_array($cat_id, @$globalnoroute) )  continue;
-							
-							if ( !isset($cat_links[$cat_id]) ) {
-								$cat_links[$cat_id] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
-							}
-							$cat_link = & $cat_links[$cat_id];
-							$display = $link_to_view ?
-								'<a class="fc_categories fc_category_' .$cat_id. ' link_' .$field->name. '" href="' . $cat_link . '">' . $category->title . '</a>' :
-								'<span class="fc_categories fc_category_' .$cat_id. ' nolink_' .$field->name. '">' . $category->title . '</span>' ;
-							$field->{$prop}[] = $pretext. $display .$posttext;
-							$field->value[] = $category->title;
-						}
+						include(self::getFormPath('core', $viewlayout, 'categories'));
 						$field->{$prop} = implode($separatorf, $field->{$prop});
 						$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 					endif;
@@ -276,22 +268,12 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					if ($tags) :
 						$link_to_view = $field->parameters->get( 'link_to_view', 1 ) ;
 						
-						// Create list of tag links
+						$viewlayout = $field->parameters->get('viewlayout', '');
+						$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
+						
+						// Create tags HTML
 						$field->{$prop} = array();
-						foreach ($tags as $tag) :
-							$tag_id = $tag->id;
-							if ( !isset($tag_links[$tag_id]) ) {
-								$tag_links[$tag_id] = $use_catlinks ?
-									JRoute::_( FlexicontentHelperRoute::getCategoryRoute(0, 0, array('layout'=>'tags','tagid'=>$tag->slug)) ) :
-									JRoute::_( FlexicontentHelperRoute::getTagRoute($tag->slug) ) ;
-							}
-							$tag_link = & $tag_links[$tag_id];
-							$display = $link_to_view ?
-								'<a class="fc_tags fc_tag_' .$tag->id. ' link_' .$field->name. '" href="' . $tag_link . '">' . $tag->name . '</a>' :
-								'<span class="fc_tags fc_tag_' .$tag->id. ' nolink_' .$field->name. '">' . $tag->name . '</span>' ;
-							$field->{$prop}[] = $pretext. $display .$posttext;
-							$field->value[] = $tag->name; 
-						endforeach;
+						include(self::getFormPath('core', $viewlayout, 'tags'));
 						$field->{$prop} = implode($separatorf, $field->{$prop});
 						$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 					endif;

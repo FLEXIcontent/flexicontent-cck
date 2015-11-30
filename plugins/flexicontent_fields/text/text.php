@@ -15,8 +15,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.event.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsText extends JPlugin
+class plgFlexicontent_fieldsText extends FCField
 {
 	static $field_types = array('text', 'textselect');
 	
@@ -464,27 +465,15 @@ class plgFlexicontent_fieldsText extends JPlugin
 			break;
 		}
 		
-		// Create field's HTML
-		$field->{$prop} = array();
-		$n = 0;
-		foreach ($values as $value)
-		{
-			if ( !strlen($value) && !$is_ingroup ) continue; // Skip empty if not in field group
-			if ( !strlen($value) ) {
-				$field->{$prop}[$n++]	= '';
-				continue;
-			}
-			
-			// Add prefix / suffix
-			$field->{$prop}[$n]	= $pretext . $value . $posttext;
-			
-			// Add microdata to every value if field -- is -- in a field group
-			if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';
-			
-			$n++;
-			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
-		}
+		// Get layout name
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 		
+		// Create field's HTML, using layout file
+		$field->{$prop} = array();
+		//$this->values = $values;
+		//$this->displayFieldValue( $prop, $viewlayout );
+		include(self::getFormPath($this->fieldtypes[0], $viewlayout));
 		
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
 		if (!$is_ingroup)

@@ -38,11 +38,11 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FORM_FIELD_FORM_FIELD_LAYOUT" description="" level="level1" />
-			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FORM_FIELD_SELECT_LAYOUT" description="" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="field*" exclude="field.php" stripext="1" hide_none="1" hide_default="" defaultlabel="Table" />
+			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
+			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="field*" exclude="field.php" stripext="1" hide_none="1" hide_default="" defaultlabel="Table" labelclass="" />
 			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORM_SETTINGS" description="" level="level1" />
-			<field name="addr_edit_mode" type="multilist" subtype="radio" default="plaintext" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE_DESC" toggle_related="1">
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORM_SETTINGS" description="" level="level2" />
+			<field name="addr_edit_mode" type="multilist" subtype="radio" default="plaintext" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_EDIT_MODE_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value="plaintext" show_list="" hide_list="addr-formatted-mode">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLAINTEXT_MODE</option>
 				<option value="formatted" show_list="addr-formatted-mode" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_MODE</option>
 			</field>
@@ -70,7 +70,7 @@
 				<option value="0" show_list="country-selection-off" hide_list="">FLEXI_HIDE</option>
 				<option value="1" show_list="" hide_list="country-selection-off">FLEXI_SHOW</option>
 			</field>
-			<field name="single_country" type="text" default="" label="PLG_FC_ADDRESSINT_COUNTRY_FOR_ALL_ADDRS" description="PLG_FC_ADDRESSINT_COUNTRY_FOR_ALL_ADDRS_DESC" depend_class="country-selection-off" />
+			<!--field name="single_country" type="text" default="" label="PLG_FC_ADDRESSINT_COUNTRY_FOR_ALL_ADDRS" description="PLG_FC_ADDRESSINT_COUNTRY_FOR_ALL_ADDRS_DESC" depend_class="country-selection-off addr-formatted-mode" /-->
 			<field name="edit_latlon" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_EDIT_LATLON" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_EDIT_LATLON_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

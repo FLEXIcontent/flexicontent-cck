@@ -50,8 +50,9 @@
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			
-			<field name="" type="separator" default="Layout" description="" level="level2" />
-			<field name="formlayout" type="fcfilelist" default="" label="Fields Layout" description="" directory="plugins/flexicontent_fields/file/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
+			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/file/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="" />
+			
 			<field name="fields_box_placing" type="radio" default="1" label="Fields Container" description="You can save space by floating the form fields container" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_FLOATED_LEFT</option>
@@ -154,7 +155,7 @@
 			
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
-			<field name="viewlayout" type="fcfilelist" default="" label="Values Layout" description="" directory="plugins/flexicontent_fields/file/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/file/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
 			
 			<field name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

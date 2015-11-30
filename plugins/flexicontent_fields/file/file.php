@@ -649,9 +649,6 @@ class plgFlexicontent_fieldsFile extends FCField
 			break;
 		}
 		
-		// Initialise property with default value
-		$field->{$prop} = array();
-
 		// Get user access level (these are multiple for J2.5)
 		$user = JFactory::getUser();
 		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
@@ -682,10 +679,12 @@ class plgFlexicontent_fieldsFile extends FCField
 		$public_acclevel = 1;
 		$empty_file_data = array('filename'=>false, 'filename_original'=>false, 'altname'=>false, 'description'=>false, 'ext'=>false, 'id'=>0);
 		
-		
+		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_InlineBoxes';
 		
+		// Create field's HTML, using layout file
+		$field->{$prop} = array();
 		//$this->values = $values;
 		//$this->displayFieldValue( $prop, $viewlayout );
 		include(self::getFormPath($this->fieldtypes[0], $viewlayout));

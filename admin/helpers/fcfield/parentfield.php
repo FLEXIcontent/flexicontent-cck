@@ -215,12 +215,12 @@ class FCField extends JPlugin
 	// Calculate and return the layout path for a field
 	// ************************************************
 	
-	public static function getLayoutPath($plg, $layout = 'field')
+	public static function getLayoutPath($plg, $layout = 'field', $plg_subtype='')
 	{
 		static $paths = array();
-		if ( isset($paths[$plg][$layout]) )  // return cached
+		if ( isset($paths[$plg][$layout][$plg_subtype]) )  // return cached
 		{
-			return $paths[$plg][$layout];
+			return $paths[$plg][$layout][$plg_subtype];
 		}
 		
 		$template = JFactory::getApplication('site')->getTemplate();
@@ -235,9 +235,9 @@ class FCField extends JPlugin
 		}
 
 		// Build the template and base path for the layout
-		$tPath = JPATH_ROOT . '/templates/' . $template . '/html/flexicontent_fields/' . $plg . '/' . $layout . '.php';
-		$fPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . $defaultLayout . '.php';
-		$dPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/field.php';
+		$tPath = JPATH_ROOT . '/templates/' . $template . '/html/flexicontent_fields/' . $plg . '/' . ($plg_subtype ? $plg_subtype.'/' : '') . $layout . '.php';
+		$fPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . ($plg_subtype ? $plg_subtype.'/' : '') . $defaultLayout . '.php';
+		$dPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . ($plg_subtype ? $plg_subtype.'/' : '') . 'field.php';
 
 		if (file_exists($tPath))
 			// Layout via Joomla template override, in /templates/ folder
@@ -251,19 +251,19 @@ class FCField extends JPlugin
 			// Default fallback
 			$return = $dPath;
 		
-		$paths[$plg][$layout] = $return;  // Cache result
+		$paths[$plg][$layout][$plg_subtype] = $return;  // Cache result
 		return $return;
 	}
 	
 	
 	// Get Layout paths for editing, this is a wrapper to getLayoutPath()
-	public function getFormPath($plg, $layout) {
-		return $this->getLayoutPath($plg, $layout);
+	public function getFormPath($plg, $layout, $plg_subtype='') {
+		return $this->getLayoutPath($plg, $layout, $plg_subtype);
 	}
 	
 	// Get Layout paths for viewing, this is a wrapper to getLayoutPath()
-	public function getViewPath($plg, $layout) {
-		return $this->getLayoutPath($plg, $layout);
+	public function getViewPath($plg, $layout, $plg_subtype='') {
+		return $this->getLayoutPath($plg, $layout, $plg_subtype);
 	}
 	
 	
