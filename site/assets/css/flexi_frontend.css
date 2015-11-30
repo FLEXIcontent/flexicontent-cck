@@ -679,7 +679,15 @@ div .fc_img_tooltip_desc {
 div span.fc_categories, div span.fc_tags {
 	border-bottom: 1px dashed gray;
 }
-div a.fc_categories, div a.fc_tags {}
+div a.fc_categories, div a.fc_tags {
+}
+div .fc_categories.fc_ismain_cat {
+	font-weight: bold;
+}
+div .fc_categories:not(.fc_ismain_cat) {
+	font-weight: normal;
+}
+
 
 
 /* Radio/checkbox/select/etc (indexed fields) viewing: the non-selected values */

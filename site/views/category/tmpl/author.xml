@@ -739,7 +739,7 @@
 			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" />
 
 			<field name="sep_locked_filters" type="separator" default="FLEXI_LOCKED_FILTERS" description="" level="level3" />
-			<field name="use_persistent_filters" type="radio" default="" label="FLEXI_USE_LOCKED_FILTERS" description="FLEXI_USE_LOCKED_FILTERS_DESC" class="btn-group btn-group-yesno">
+			<field name="use_persistent_filters" type="multilist" subtype="radio" inline_tip="FLEXI_FIELDS_MUST_BE_SET_AS_FILTERABLE" tip_class="" tip_img="note.gif" default="" label="FLEXI_USE_LOCKED_FILTERS" description="FLEXI_USE_LOCKED_FILTERS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

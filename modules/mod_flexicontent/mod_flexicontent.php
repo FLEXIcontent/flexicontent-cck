@@ -174,7 +174,7 @@ if ( $show_mod )
 			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css?'.FLEXI_VERSION.'">';
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css?'.FLEXI_VERSION.'">';
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
 			}
 		}
 		
@@ -188,7 +188,7 @@ if ( $show_mod )
 			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VERSION);
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-				$document->addStyleSheetVersion(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VERSION);
+				$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 			}
 		}
 	}

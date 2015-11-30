@@ -346,13 +346,18 @@ var JFormValidator = function()
 
 	this.validate = function(el)
 	{
-		jqEL = jQuery(el);
-		el_value = jqEL.val();
-		el_name  = jqEL.attr('name');
+		var jqEL = jQuery(el);
+		var el_value = jqEL.val();
+		var el_name  = jqEL.attr('name');
+		var el_id    = jqEL.attr('id');
+		var el_grpid = jqEL.attr('data-element-grpid');  // prefer this for radio/checkbox or other fields, if it is set
+		
+		if (el_id && el_id.substring(0,11) == 'jform_rules') {
+			this.handleResponse(true, el);
+			return true;
+		}
 		
 		// (try to) Find the label for the given form element, trying various indexes for our label array
-		var el_id = jqEL.attr('id');
-		var el_grpid = jqEL.attr('data-element-grpid');  // prefer this for radio/checkbox or other fields, if it is set
 		if ( !el.labelref && (el_id || el_grpid) )
 		{
 			el.labelfor = null;
