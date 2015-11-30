@@ -12,6 +12,7 @@
 	<files>
 		<filename plugin="core">core.php</filename>
 		<filename>index.html</filename>
+		<folder>tmpl</folder>
 	</files>
 	<config>
 	<fields name="attribs">
