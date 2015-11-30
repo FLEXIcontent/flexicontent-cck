@@ -365,9 +365,10 @@ foreach ($values as $value)
 	$elementid_n = $elementid.'_'.$n;
 	
 	$field_html = '
-	<table class="fc-form-tbl fcinner fc-addressint-field-tbl"><tbody>
+	<div style="float:left; width:480px; max-width:100%">
+	<table class="fc-form-tbl fcinner fc-addressint-field-tbl" style="width:100%"><tbody>
 		<tr>
-			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH_ADDRESS').'</td>
+			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH_ADDRESS').'</span></td>
 			<td>
 				<div id="locationField">
 					<input id="'.$elementid_n.'_autocomplete" placeholder="" class="fcfield_textval" name="'.$fieldname_n.'[autocomplete]" type="text" />
@@ -378,7 +379,7 @@ foreach ($values as $value)
 	if($addr_edit_mode == 'plaintext') {
 		$field_html .= '
 		<tr>
-			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_ADDRESS').':</td>
+			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_ADDRESS').'</span></td>
 			<td><textarea class="fcfield_textval" id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" rows="5" cols="120" '.$required.' />'
 			.($value['addr_display'] ? $value['addr_display'] :
 			((!empty($value['addr1']) && !empty($value['city']) && (!empty($value['province']) || !empty($value['state']))  && !empty($value['zip'])) ?
@@ -400,7 +401,7 @@ foreach ($values as $value)
 	if($addr_edit_mode == 'formatted') {
 		$field_html .= '
 		<tr>
-			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').':</td>
+			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').'</span></td>
 			<td>
 				<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" value="'.$value['addr1'].'" size="10" maxlength="10" '.$required.' />'
 				.($use_addr2 ? '<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" value="'.$value['addr2'].'" size="10" maxlength="10" />' : '')
@@ -409,27 +410,27 @@ foreach ($values as $value)
 			</td>
 		</tr>
 		<tr>
-			<td class="key"><span class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY').'</span></td>
+			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY').'</span></td>
 			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_city" name="'.$fieldname_n.'[city]" value="'.$value['city'].'" size="50" maxlength="100" '.$required.' /></td>
 		</tr>
 		<tr '.($use_usstate ? '' : 'style="display:none;"').'>
-			<td class="key"><span class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').'</span></td>
-			<td>'.JHTML::_('select.genericlist', $list_states, $fieldname_n.'[state]', 0, 'value', 'text', $value['state']).'</td>
+			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').'</span></td>
+			<td>'.JHTML::_('select.genericlist', $list_states, $fieldname_n.'[state]', 0, 'value', 'text', $value['state'], $elementid_n.'_state').'</td>
 		</tr>
 		<tr '.($use_province ? '' : 'style="display:none;"').'>
-			<td class="key"><span class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').'</span></td>
+			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').'</span></td>
 			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_province" name="'.$fieldname_n.'[province]" value="'.$value['province'].'" size="50" maxlength="100" /></td>
 		</tr>
 		<tr>
-			<td class="key"><span class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').'</span></td>
+			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').'</span></td>
 			<td>
 				<input type="text" class="fcfield_textval" id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" value="'.$value['zip'].'" size="10" maxlength="10" '.$required.' />
 				<span '.($use_zip_suffix ? '' : 'style="display:none"').'>-<input type="text" class="fcfield_textval" id="'.$elementid_n.'_zip_suffix" name="'.$fieldname_n.'[zip_suffix]" value="'.$value['zip_suffix'].'" size="5" maxlength="10" /></span>
 			</td>
 		</tr>
 		<tr '.($use_country ? '' : 'style="display:none;"').'>
-			<td class="key"><span class="label label-info">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').'</span></td>
-			<td>'.JHTML::_('select.genericlist', $list_countries, $fieldname_n.'[country]', $required, 'value', 'text', ($use_country ? $value['country'] : $single_country)).'</td>
+			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').'</span></td>
+			<td>'.JHTML::_('select.genericlist', $list_countries, $fieldname_n.'[country]', $required, 'value', 'text', ($use_country ? $value['country'] : $single_country), $elementid_n.'_country').'</td>
 		</tr>
 		';
 	}
@@ -437,26 +438,29 @@ foreach ($values as $value)
 	if($edit_latlon) {
 		$field_html .= '
 		<tr>
-			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LATITUDE').':</td>
+			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LATITUDE').'</span></td>
 			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_lat" name="'.$fieldname_n.'[lat]" value="'.$value['lat'].'" size="10" maxlength="10" '.$required.' /></td>
 		</tr>
 		<tr>
-			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LONGITUDE').':</td>
+			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LONGITUDE').'</span></td>
 			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.$value['lon'].'" size="10" maxlength="10" '.$required.' /></td>
 		</tr>
 		';
 	}
 	
 	$field_html .= '
+	</tbody></table>
+	</div>
+	<div style="float:left; width:320px; max-width:100%">
+	<table width="100%"><tbody>
 		<tr>
-			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PREVIEW').':</td>
-			<td><div style="width:100%; max-width:480px;"><div id="map_canvas_'.$field->name.$n.'" style="width:100%; height:0; padding-bottom:56.25%;"></div></div></td>
+			<td><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PREVIEW').'</span><div style="width:100%; max-width:480px;"><div id="map_canvas_'.$field->name.$n.'" style="width:100%; height:0; padding-bottom:56.25%;"></div></div></td>
 		</tr>
 		<tr>
-			<td class="key">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').':</td>
-			<td><span id="'.$elementid_n.'_zoom_label">'.$value['zoom'].'</span></td>
+			<td><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').'</span> <span id="'.$elementid_n.'_zoom_label">'.$value['zoom'].'</span></td>
 		</tr>
 	</tbody></table>
+	</div>
 	
 	<input type="hidden" id="'.$elementid_n.'_addr_formatted" name="'.$fieldname_n.'[addr_formatted]" value="'.$value['addr_formatted'].'" />
 	<input type="hidden" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" value="'.$value['url'].'" />
