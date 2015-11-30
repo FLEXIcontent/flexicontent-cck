@@ -27,6 +27,17 @@ if ($html5) {  /* BOF html5  */
 	echo $this->loadTemplate('html5');
 } else {
 
+
+// Create description field if not already created
+FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
+
+// Find if description is placed via template position
+$_text_via_pos = false;
+foreach ($item->positions as $posName => $posFields) {
+	if ($posName == 'renderonly') continue;
+	foreach($posFields as $field) if ($field->name=='text') { $_text_via_pos = true; break; }
+}
+
 // Prepend toc (Table of contents) before item's description (toc will usually float right)
 // By prepend toc to description we make sure that it get's displayed at an appropriate place
 if (isset($item->toc)) {
@@ -211,13 +222,14 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 	</div>
 	<!-- EOF beforedescription block -->
 	<?php endif; ?>
-
+	
+	<?php if (!$_text_via_pos): ?>
 	<!-- BOF description block -->
 	<div class="description group">
-	<?php FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display'); ?>
-	<?php echo JFilterOutput::ampReplace($this->fields['text']->display); ?>
+	<?php echo $this->fields['text']->display; ?>
 	</div>
 	<!-- EOF description block -->
+	<?php endif; ?>
 
 	<?php if (isset($item->positions['afterdescription'])) : ?>
 	<!-- BOF afterdescription block -->

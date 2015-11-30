@@ -37,6 +37,7 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
  */
 class plgContentFlexiBreak extends JPlugin
 {
+	static $rowLinks = array();
 	var $pattern = '#(<hr[^>]*?class=[\"|\']system-pagebreak[\"|\'][^(>|/>)]*?/?>)#iU';
 	var $pluginPath;
 
@@ -58,34 +59,44 @@ class plgContentFlexiBreak extends JPlugin
 	 */
 	public function onContentPrepare($context, &$row, &$params, $page = 0)
 	{
-		//simple performance check to determine whether bot should process further
-		if (strpos($row->text, 'class="system-pagebreak') === false && strpos($row->text, 'class=\'system-pagebreak') === false)
+		// Simple performance check to determine whether bot should process further
+		if (
+			strpos($row->text, 'class="system-pagebreak') === false &&
+			strpos($row->text, 'class=\'system-pagebreak') === false
+		)
 			return true;
 		
-		if ( empty($row->id) && empty($row->slug) ) return;  // modify nothing
+		// Sanity check property slug or id exists
+		if ( empty($row->id) && empty($row->slug) ) return;  // nothing to do
 
 		// Remove page markers when article in popup (printing)
-		$print = JRequest::getBool('pop');
-		if ($print) {
+		if ( JRequest::getBool('pop') )
+		{
 			$row->text = preg_replace( $this->pattern, '', $row->text );
 			return;
 		}
 		
-		// Find all instances of plugin
+		// Find all instances of plugin inside the description text
 		$pagescount = preg_match_all( $this->pattern, $row->text, $pages, PREG_SET_ORDER );
-		$texts		= preg_split( $this->pattern, $row->text );
-		$textscount	= count($texts);
+		$texts      = preg_split( $this->pattern, $row->text );
+		$textscount = count($texts);   // Number of breaks
+
+		// If there are no breaks then don't alter the article
+		if ($textscount <= 1) return;
 		
-		$display_method = $this->params->get('display_method', 1);
-		
+		// Get slug and limitstart (current page) and use them to create next / previous links
 		$row->slug = @ $row->slug ? $row->slug : $row->id;
 		$limitstart = JRequest::getInt('limitstart', 0);
-		$type_id = isset($row->type_id) ? $row->type_id : 0;
+		
+		// Create item's SEF link without limitstart
+		if ( !isset(self::$rowLinks[$row->slug]) )
+			self::$rowLinks[$row->slug] = FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid, 0, $row);
+		
 		$prev_link = $limitstart > 0 ?
-			JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid, 0, $row).'&showall=&limitstart='. ($limitstart-1)) :
+			JRoute::_(self::$rowLinks[$row->slug].'&showall=&limitstart='. ($limitstart-1)) :
 			'';
 		$next_link = $limitstart < $textscount - 1 ?
-			JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid, 0, $row).'&showall=&limitstart='. ($limitstart+1)) :
+			JRoute::_(self::$rowLinks[$row->slug].'&showall=&limitstart='. ($limitstart+1)) :
 			'';
 		
 		$this->assignRef('pages', $pages);
@@ -96,94 +107,104 @@ class plgContentFlexiBreak extends JPlugin
 		$this->assignRef('row', $row);
 		$this->assignRef('prev_link', $prev_link);
 		$this->assignRef('next_link', $next_link);
-
-		// If there are no breaks then don't alter the article
-		if ($this->textscount <= 1)
-			return;
-			
-		$document	= JFactory::getDocument();
-		$base = JURI::root(true).'/plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.(FLEXI_J16GE ? '/'.$this->_name : '');
-		$pagenav = $this->params->get('pagination', 3);
 		
-		// Add Javascript instant navigation
+		// Plugin base folder
+		$document = JFactory::getDocument();
+		$plgbase  = JURI::root(true).'/plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.'/'.$this->_name;
+		
+		// Display configuration
+		$display_method = $this->params->get('display_method', 1);
+		$pagenav        = $this->params->get('pagination', 3);
+		$toc_placement  = $this->params->get('toc_placement', 1);
+		
+		// Add JS code for JS based navigation
 		if ($display_method == 1 || $display_method == 0)
 		{
-			FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-			if (class_exists('flexicontent_html')) {
+			if (class_exists('flexicontent_html'))
+			{
 				require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 				flexicontent_html::loadFramework('jQuery');
 			}
-			if ($this->params->get('plugin_css', 1))
-				$document->addScript($base.'.js');
+			$document->addScript($plgbase.'.js');
 		}
 		
-		// Add CSS rules file
-		$document->addStyleSheet($base.'.css');
+		// Add CSS
+		$document->addStyleSheet($plgbase.'.css');
 		
-		// Clear article's text
+		// Clear article's text, so that we re-construct with appropriate containers
 		$row->text = '';
 		
-		// Page navigation at article's start
+		// Add page navigation (next / previous) at article's start
 		if (2 == $pagenav && $display_method != 0) $row->text .= $this->loadTemplate('pagination_js');
 		
-		// Table of Contents
-		$toc_placement = $pagenav = $this->params->get('toc_placement', 1);
+		// Create Table Of Contents (TOC). This will also create the text of all pages, encapsulated in containers
+		// (having anchor IDs), and assign it to: $this->_text, so that it can be re-assigned to article's text below
 		if ($toc_placement) {
 			$row->text .= $this->loadTemplate('default_js');
 		} else {
 			$row->toc = $this->loadTemplate('default_js');
 		}
 		
-		// Concatenated text of all pages encapsulated in containers (or e.g. having anchors)
+		// Append the text of all pages encapsulated in containers (having anchor IDs too)
 		$row->text .= $this->_text;
 		
-		// Page navigation at article's end
+		// Add page navigation (next / previous) at article's end
 		if (3 == $pagenav && $display_method != 0) $row->text .= $this->loadTemplate('pagination_js');
 	}
+
 
 	function _generateToc( &$row, $index )
 	{
 		$display_method = $this->params->get('display_method', 1);
 		$limitstart = JRequest::getInt('limitstart', 0);
 		
-		$result = new stdClass();
-
+		$page = new stdClass();
+		
+		// If intro text exists, then increment pages-counter by 1, and make page ZERO to be the intro-text page
 		if (0 == $index && $this->texts[$index] != "")
 		{
-			//$result->title	= $this->params->get('intro_text') != "" ? $this->params->get('intro_text') : $this->article->title ;
-			$result->title = ' - '. JText::_($this->params->get('custom_introtext', 'FLEXIBREAK_INTRO_TEXT')) .' - ';
-			$result->name = $result->id = 'start';
-			$result->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid, 0, $row).'&showall=&limitstart=');
 			$this->pagescount++;
+			
+			$page->title = ' - '. JText::_($this->params->get('custom_introtext', 'FLEXIBREAK_INTRO_TEXT')) .' - ';
+			$page->name = 'start';
+			$page->link = JRoute::_(self::$rowLinks[$row->slug].'&showall=&limitstart=');
+			$page->id = str_replace('"', '', str_replace("'", "", $page->name));
 		}
 		else
 		{
-			if ($this->texts[0] == "")
-				$attrs = JUtility::parseAttributes($this->pages[$index][0]);
-			else
-				$attrs = JUtility::parseAttributes($this->pages[$index-1][0]);
-			$result->title	= isset($attrs['title']) ? $attrs['title'] : 'unknown';
-			$result->name	= isset($attrs['name']) ? $attrs['name'] : preg_replace('/[ \t]+/u', '', $result->title);
-			$result->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid, 0, $row).'&showall=&limitstart='. ($index));
-			
-			$result->id		= $result->name ? $result->name : 'start';
+			$attrs = $this->texts[0] == "" ?
+				JUtility::parseAttributes($this->pages[$index][0]) :
+				JUtility::parseAttributes($this->pages[$index-1][0]) ;
+			$page->title = isset($attrs['title']) ? $attrs['title'] : 'unknown';
+			$page->name	= isset($attrs['name']) ? $attrs['name'] : preg_replace('/[ \t]+/u', '', $page->title);
+			$page->link = JRoute::_(self::$rowLinks[$row->slug].'&showall=&limitstart='. ($index));
+			$page->id		= $page->name ? str_replace('"', '', str_replace("'", "", $page->name)) : 'start';
 		}
 		
 		$curr_index = $this->texts[0] == "" ? $index+1 : $index;
 		if ( !isset($this->_text) ) $this->_text = '';
+		
 		switch ($display_method) {
+			
+		// Add an anchor link for scrolling,
 		case 0:
-			$this->_text .= '<a id="'.$result->id.'_toc_page"></a>'.$this->texts[$curr_index];  // add an anchor link for scrolling
+			$this->_text .= '<a id="'.$page->id.'_toc_page"></a>'.$this->texts[$curr_index];
 			break;
+		
+		// Add a DIV container for JS based navigation
 		case 1:
-			$this->_text .= '<div class="articlePage" id="'.$result->id.'"> '.$this->texts[$curr_index].'</div>';
+			$this->_text .= '<div class="articlePage" id="'.$page->id.'"> '.$this->texts[$curr_index].'</div>';
 			break;
+		
+		// Nor scrolled, neither JS based navigation:  Only ADD page's text, if it is the current page
 		case 2:
 			if ($limitstart == $curr_index) $this->_text .= $this->texts[$curr_index];
 			break;
+		
 		}
-		return $result;
+		return $page;
 	}
+
 
 	function assignRef($key, &$val)
 	{
@@ -196,10 +217,11 @@ class plgContentFlexiBreak extends JPlugin
 		return false;
 	}
 
+
 	function loadTemplate($name = 'default')
 	{
 		$app = JFactory::getApplication();
-		$override = JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'plg_'.$this->_type.'_'.$this->_name.DS.(FLEXI_J16GE ? $this->_name.DS : '').$name.'.php';
+		$override = JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'plg_'.$this->_type.'_'.$this->_name.DS.$this->_name.DS.$name.'.php';
 		ob_start();
 		if (is_readable($override))
 		{

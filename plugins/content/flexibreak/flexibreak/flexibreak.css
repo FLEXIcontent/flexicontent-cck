@@ -51,29 +51,46 @@ div#articleTOC p.tocHeader {
 
 .tocNav {
 	text-align: left;
-	display: block;
 	border: 0px solid;
-	display: block;
-	width: 100%;
+	display: inline-block;
+	float: right;
+	margin: 2px 4px 2px 8px;
 }
 
 .tocNav .tocNext,
-.tocNav .tocPrevNextCnt,
 .tocNav .tocPrev {
-	margin-right: 20px;
+	margin: 0;
 	display: inline-block;
+	float: left;
+	min-width: 120px;
+}
+.tocNav .tocPrevNextCnt {
+	font-weight: bold;
+	margin: 6px 0px 0 16px;
+	display: inline-block;
+	float:left;
 }
 .tocNav .tocPrev {
 	padding-left: 20px !important;
-	background: url(icons/resultset_previous.png) no-repeat 0 center !important;
+	background-color: #eeeeee !important;
+	background: url(icons/resultset_previous.png) no-repeat 0 center, -moz-linear-gradient(top,#eeeeee,#dddddd) !important;
+	background: url(icons/resultset_previous.png) no-repeat 0 center, -webkit-gradient(linear,0 0,0 100%,from(#eeeeee),to(#dddddd)) !important;
+	background: url(icons/resultset_previous.png) no-repeat 0 center, -webkit-linear-gradient(top,#eeeeee,#dddddd) !important;
+	background: url(icons/resultset_previous.png) no-repeat 0 center, -o-linear-gradient(top,#eeeeee,#dddddd) !important;
+	background: url(icons/resultset_previous.png) no-repeat 0 center, linear-gradient(to bottom,#eeeeee,#dddddd) !important;
+	border-radius: 6px 0 0 6px;
+	text-align: center;
 }
 .tocNav .tocNext {
 	padding-right: 20px !important;
-	background: url(icons/resultset_next.png) no-repeat 99% center !important;
-}
-
-.tocNav .tocPrevNextCnt {
-	font-weight: bold;
+	background-color: #eeeeee !important;
+	background: url(icons/resultset_next.png) no-repeat 99% center, -moz-linear-gradient(top,#eeeeee,#dddddd) !important;
+	background: url(icons/resultset_next.png) no-repeat 99% center, -webkit-gradient(linear,0 0,0 100%,from(#eeeeee),to(#dddddd)) !important;
+	background: url(icons/resultset_next.png) no-repeat 99% center, -webkit-linear-gradient(top,#eeeeee,#dddddd) !important;
+	background: url(icons/resultset_next.png) no-repeat 99% center, -o-linear-gradient(top,#eeeeee,#dddddd) !important;
+	background: url(icons/resultset_next.png) no-repeat 99% center, linear-gradient(to bottom,#eeeeee,#dddddd) !important;
+	border-radius: 0 6px 6px 0;
+	text-align: center;
 }
 
 .tocNav span.tocNoPrevNext {
@@ -93,17 +110,32 @@ div#articleTOC p.tocHeader {
 .tocNav a {
 	text-decoration: none !important;
 	display: inline-block;
-	border: 1px solid gray;
+	border: 1px solid lightgray;
   border-radius: 6px;
-  background: none;
-  color: darkblue !important;
+  color: #555;
   padding: 3px 6px;
 	font-weight: bold;
+	box-shadow: 1px 2px 4px gray;
 }
-
-.tocNav a:hover {
-  background-color: #dddddd !important;
-  color: darkred !important;
+.tocNav a.tocPrev:hover {
+	padding-left: 20px !important;
+	background-color: #dddddd !important;
+	background: url(icons/resultset_previous.png) no-repeat 0 center, -moz-linear-gradient(top,#dddddd,#bbbbbb) !important;
+	background: url(icons/resultset_previous.png) no-repeat 0 center, -webkit-gradient(linear,0 0,0 100%,from(#dddddd),to(#bbbbbb)) !important;
+	background: url(icons/resultset_previous.png) no-repeat 0 center, -webkit-linear-gradient(top,#dddddd,#bbbbbb) !important;
+	background: url(icons/resultset_previous.png) no-repeat 0 center, -o-linear-gradient(top,#dddddd,#bbbbbb) !important;
+	background: url(icons/resultset_previous.png) no-repeat 0 center, linear-gradient(to bottom,#dddddd,#bbbbbb) !important;
+	border: 1px solid #aaa;
+}
+.tocNav a.tocNext:hover {
+	padding-right: 20px !important;
+	background-color: #dddddd !important;
+	background: url(icons/resultset_next.png) no-repeat 99% center, -moz-linear-gradient(top,#dddddd,#bbbbbb) !important;
+	background: url(icons/resultset_next.png) no-repeat 99% center, -webkit-gradient(linear,0 0,0 100%,from(#dddddd),to(#bbbbbb)) !important;
+	background: url(icons/resultset_next.png) no-repeat 99% center, -webkit-linear-gradient(top,#dddddd,#bbbbbb) !important;
+	background: url(icons/resultset_next.png) no-repeat 99% center, -o-linear-gradient(top,#dddddd,#bbbbbb) !important;
+	background: url(icons/resultset_next.png) no-repeat 99% center, linear-gradient(to bottom,#dddddd,#bbbbbb) !important;
+	border: 1px solid #aaa;
 }
 
 .tocNav {

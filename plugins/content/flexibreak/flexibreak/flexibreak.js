@@ -27,7 +27,8 @@ var flexibreak = function(element, options)
 	{
 		// Check if page not valid, by searching inside the page collection
 		var found = this.pages.filter('#'+jQuery(page).attr('id'));
-		if (found.length!=1) return;
+		if (found.length==0) { alert("Page id: " + jQuery(page).attr('id') + "not found"); return; }
+		else if (found.length > 1) { found = found.first(); }
 		
 		// Check if page already active
 		if(page == this.currentPage) return;

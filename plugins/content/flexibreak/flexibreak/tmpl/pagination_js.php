@@ -11,11 +11,12 @@ $display_method = $this->params->get('display_method', 1);
 	else if ($display_method==2) echo '
 		<span class="tocNoPrevNext" >'. JText::_( 'FLEXIBREAK_NEXT_PAGE' ) .'</span>';
 	
-	echo $this->params->get('show_prevnext_count',1) ? '<span class="tocPrevNextCnt">['.($this->limitstart+1).'/'.$this->textscount.']</span>' : '';
-	
 	if ($this->limitstart < $this->textscount - 1 || $display_method==1) echo '
 		<a href="'.($display_method==2 ? $this->next_link : 'javascript:;').'" class="tocNext" onclick="'.($display_method==1 ? 'flexibreak.next();' : '').'">'. JText::_( 'FLEXIBREAK_NEXT_PAGE' ) .'</a>';
 	else if ($display_method==2) echo '
 		<span class="tocNoPrevNext" >'. JText::_( 'FLEXIBREAK_NEXT_PAGE' ) .'</span>';
+	
+	if ($this->params->get('show_prevnext_count',1)) echo '
+		<span class="tocPrevNextCnt badge badge-info">'.($this->limitstart+1).' / '.$this->textscount.'</span>';
 	?>
 </div>
