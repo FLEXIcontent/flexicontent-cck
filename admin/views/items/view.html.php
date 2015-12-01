@@ -522,14 +522,17 @@ class FlexicontentViewItems extends JViewLegacy
 		//search filter
 		$scopes = array();
 		$scopes[1] = JText::_( 'FLEXI_TITLE' );
-		$scopes[2] = JText::_( 'FLEXI_INTROTEXT' );
-		$scopes[4] = JText::_( 'FLEXI_INDEXED_CONTENT' );
+		$scopes[2] = JText::_( 'FLEXI_DESCRIPTION' );
+		$scopes[4] = JText::_( 'FLEXI_FIELDS_IN_BASIC_SEARCH_INDEX' );
 		$_scopes = array();
 		foreach ($scopes as $i => $v) {
 			$_scopes[] = JHTML::_('select.option', $i, $v);
 		}
 		//$lists['scope'] = JHTML::_('select.radiolist', $_scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );
-		$lists['scope'] = JHTML::_('select.genericlist', $_scopes, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"', 'value', 'text', $scope, 'scope' );
+		$lists['scope'] = '
+			<div class="hasTooltip" style="display:inline-block; padding:0; margin:0;" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"><i class="icon-info"></i></div>
+			'.JHTML::_('select.genericlist', $_scopes, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope, 'scope' );
+		
 		/*$lists['scope']  = '';
 		foreach ($scopes as $i => $v) {
 			$checked = $scope == $i ? ' checked="checked" ' : '';

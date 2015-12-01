@@ -496,16 +496,22 @@ class FlexicontentModelFileselement extends JModelLegacy
 			$where[] = ' ext = ' . $this->_db->Quote( $filter_ext );
 		}
 		
-		if ($search && $scope == 1) {
-			$search_escaped = $this->_db->escape( $search, true );
-			$where[] = ' (LOWER(f.filename) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false ).
-				' OR LOWER(f.filename_original) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false ).')'
-				;
-		}
-
-		if ($search && $scope == 2) {
-			$search_escaped = $this->_db->escape( $search, true );
-			$where[] = ' LOWER(f.altname) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
+		if ($search)
+		{
+			$escaped_search = $this->_db->escape( $search, true );
+			
+			$search_where = array();
+			if ($scope == 1 || $scope == 0) {
+				$search_where[] = ' LOWER(f.filename) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
+				$search_where[] = ' LOWER(f.filename_original) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
+			}
+			if ($scope == 2 || $scope == 0) {
+				$search_where[] = ' LOWER(f.altname) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
+			}
+			if ($scope == 3 || $scope == 0) {
+				$search_where[] = ' LOWER(f.description) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
+			}
+			$where[] = '( '. implode( ' OR ', $search_where ) .' )';
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );

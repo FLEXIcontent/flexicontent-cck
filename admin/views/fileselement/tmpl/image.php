@@ -271,7 +271,7 @@ flexicontent_html::loadFramework('flexi-lib');
 		
 		<?php if (!$this->folder_mode) : ?>
 			<div id="fc-filters-header">
-				<span class="fc-filter nowrap_box">
+				<span class="fc-filter nowrap_box" style="margin:0;">
 					<?php echo $this->lists['scope']; ?>
 				</span>
 				<span class="btn-group input-append fc-filter filter-search filter-search">

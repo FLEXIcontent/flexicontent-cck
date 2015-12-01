@@ -360,8 +360,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		}
 
 		if ($search) {
-			$search_escaped = $this->_db->escape( $search, true );
-			$where[] = ' LOWER(' .($isADV ? 'ai' : 'ext'). '.search_index) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
+			$escaped_search = $this->_db->escape( $search, true );
+			$where[] = ' LOWER(' .($isADV ? 'ai' : 'ext'). '.search_index) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
 		}
 		
 		if ($search_itemtitle) {

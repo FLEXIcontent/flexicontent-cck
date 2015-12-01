@@ -270,6 +270,9 @@ function showUploader() {
 		
 		<?php if (!$this->folder_mode) : ?>
 			<div id="fc-filters-header">
+				<span class="fc-filter nowrap_box" style="margin:0;">
+					<?php echo $this->lists['scope']; ?>
+				</span>
 				<span class="btn-group input-append fc-filter filter-search filter-search">
 					<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
 					<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>

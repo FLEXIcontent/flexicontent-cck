@@ -1331,20 +1331,21 @@ class FlexicontentModelItems extends JModelLegacy
 		// *********************
 		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		
-		if ($search) {
+		if ($search)
+		{
 			$escaped_search = $this->_db->escape( $search, true );
-		}
-		
-		if ($search && $scope == 1) {
-			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
-		}
-
-		if ($search && $scope == 2) {
-			$where[] = ' LOWER(i.introtext) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
-		}
-
-		if ($search && $scope == 4) {
-			$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $search_prefix.$escaped_search.'*', false ).' IN BOOLEAN MODE)';
+			
+			if ($scope == 1) {
+				$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false );
+			}
+			
+			if ($scope == 2) {
+				$where[] = '(LOWER(i.introtext) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false ) . ' OR LOWER(i.fulltext)  LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false ) . ') ';
+			}
+			
+			if ($scope == 4) {
+				$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $search_prefix.$escaped_search.'*', false ).' IN BOOLEAN MODE)';
+			}
 		}
 		
 		
