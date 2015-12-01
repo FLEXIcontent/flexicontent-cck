@@ -365,8 +365,9 @@ foreach ($values as $value)
 	$elementid_n = $elementid.'_'.$n;
 	
 	$field_html = '
-	<div style="float:left; width:480px; max-width:100%">
-	<table class="fc-form-tbl fcinner fc-addressint-field-tbl" style="width:100%"><tbody>
+	<div class="fcfield_addressint_data">
+	
+	<table class="fc-form-tbl fcinner fc-addressint-field-tbl"><tbody>
 		<tr>
 			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH_ADDRESS').'</span></td>
 			<td>
@@ -451,16 +452,27 @@ foreach ($values as $value)
 	$field_html .= '
 	</tbody></table>
 	</div>
-	<div style="float:left; width:320px; max-width:100%">
+	
+	<div class="fcfield_addressint_map">
 	<table width="100%"><tbody>
 		<tr>
-			<td><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PREVIEW').'</span><div style="width:100%; max-width:480px;"><div id="map_canvas_'.$field->name.$n.'" style="width:100%; height:0; padding-bottom:56.25%;"></div></div></td>
+			<td>
+				<span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PREVIEW').'</span>
+				<div style="width:100%; max-width:800px;">
+					<div id="map_canvas_'.$field->name.$n.'" style="width:100%; height:0; padding-bottom:56.25%;"></div>
+				</div>
+			</td>
 		</tr>
 		<tr>
-			<td><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').'</span> <span id="'.$elementid_n.'_zoom_label">'.$value['zoom'].'</span></td>
+			<td>
+				<span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').'</span>
+				<span id="'.$elementid_n.'_zoom_label">'.$value['zoom'].'</span>
+			</td>
 		</tr>
 	</tbody></table>
+	
 	</div>
+	
 	
 	<input type="hidden" id="'.$elementid_n.'_addr_formatted" name="'.$fieldname_n.'[addr_formatted]" value="'.$value['addr_formatted'].'" />
 	<input type="hidden" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" value="'.$value['url'].'" />
