@@ -85,7 +85,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		// Get values of fields making sure that also empty values are created too
 		$max_count = 1;
-		$this->getGroupFieldsValues($grouped_fields, $item, $max_count);
+		$this->getGroupFieldsValues($field, $item, $grouped_fields, $max_count);
 		
 		// Render Form HTML of the field
 		foreach($grouped_fields as $field_id => $grouped_field)
@@ -429,7 +429,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		// Get values of fields making sure that also empty values are created too
 		$max_count = 0;
-		$this->getGroupFieldsValues($grouped_fields, $item, $max_count);
+		$this->getGroupFieldsValues($field, $item, $grouped_fields, $max_count);
 		
 		
 		// **********************************************
@@ -708,7 +708,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	
 	
 	// Retrieves and add values to the given field objects
-	function getGroupFieldsValues(&$grouped_fields, &$item, &$max_count)
+	function getGroupFieldsValues(&$field, &$item, &$grouped_fields, &$max_count)
 	{
 		$do_compact = true;
 		
@@ -812,7 +812,8 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		//echo "<br/><br/><br/>COMPACTED<br/><pre>"; foreach($grouped_fields as $field_id => $grouped_field) { echo "\n[".$grouped_field->id."] - ".$grouped_field->name; print_r($grouped_field->value); } echo "</pre>";
 		
 		$max_count = $max_index + 1;
-		if ($do_compact) $max_count -= count($grp_isempty);
+		if ($do_compact) $max_count -= (count($grp_isempty) - $start_at);
+		//echo $field->label.": max_count = $max_count <br/>";
 	}
 	
 	

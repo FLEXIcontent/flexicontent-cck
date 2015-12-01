@@ -225,7 +225,7 @@ class plgFlexicontent_fieldsCore extends FCField
 					<div class="fav-block">
 						'.flexicontent_html::favicon( $field, $favoured, $item ).'
 						<div id="fcfav-reponse_item_'.$item->id.'" class="fcfav-reponse-tip">
-							<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage '.($favoured ? 'fcfavs-is-subscriber' : 'fcfavs-isnot-subscriber').'">
+							<div class="fc-mssg fc-info fc-iblock fc-nobgimage '.($favoured ? 'fcfavs-is-subscriber' : 'fcfavs-isnot-subscriber').'">
 								'.JText::_($favoured ? 'FLEXI_FAVS_YOU_HAVE_SUBSCRIBED' : 'FLEXI_FAVS_CLICK_TO_SUBSCRIBE').'
 							</div>
 							'.$favs.'
