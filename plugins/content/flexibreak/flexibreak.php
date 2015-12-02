@@ -165,7 +165,7 @@ class plgContentFlexiBreak extends JPlugin
 		{
 			$this->pagescount++;
 			
-			$page->title = ' - '. JText::_($this->params->get('custom_introtext', 'FLEXIBREAK_INTRO_TEXT')) .' - ';
+			$page->title = JText::_($this->params->get('custom_introtext', 'FLEXIBREAK_INTRO_TEXT'));
 			$page->name = 'start';
 			$page->link = JRoute::_(self::$rowLinks[$row->slug].'&showall=&limitstart=');
 			$page->id = str_replace('"', '', str_replace("'", "", $page->name));

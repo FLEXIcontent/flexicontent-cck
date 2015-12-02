@@ -31,7 +31,7 @@ var flexibreak = function(element, options)
 		else if (found.length > 1) { found = found.first(); }
 		
 		// Check if page already active
-		if(page == this.currentPage) return;
+		if (page == this.currentPage) return;
 		
 		// Set new active page and new page index
 		this.currentPage = page;
@@ -39,32 +39,33 @@ var flexibreak = function(element, options)
 		
 		if(typeof skipAnim === 'undefined') skipAnim = false;
 		
-		// Hide all pages and all TOC entries
+		// Show (activate) the new current page, hide all other pages 
 		jQuery(this.pages).removeClass('active');
-		jQuery(this.tocLinksPaginated).removeClass('active');
-		jQuery(this.tocLinkAll).removeClass('active');
+		jQuery(this.currentPage).addClass('active');
+		jQuery(this.currentPage).css('opacity', '0.01').animate({'opacity': '1'}, 600, 'swing');
+		
+		// Activate new TOC entry
+		jQuery(this.tocLinksPaginated).parent().removeClass('active');
+		jQuery(this.tocLinkAll).parent().removeClass('active');
 		
 		// Show previous/next buttons container
 		jQuery('.tocNav').css('display', 'block');
 		
-		// Show (activate) the new current page
-		jQuery(this.currentPage).addClass('active');
-		jQuery(this.currentPage).css('opacity', '0.01').animate({'opacity': '1'}, 600, 'linear');
 		
 		// Highlight current TOC entry
-		jQuery(this.tocLinksPaginated[this.currentIndex]).addClass('active');
+		jQuery(this.tocLinksPaginated[this.currentIndex]).parent().addClass('active');
 		
 		// Show previous/next buttons if appropriate, if wrapping at ends this code is not needed because buttons will be always visible
 		if (this.options.wrap == false) {
 			if (this.currentIndex == 0) {
-				jQuery('.tocPrev').css('display', 'none');
-				jQuery('.tocNext').css('display', 'inline-block');
+				jQuery('.tocPrev').addClass('tocNoPrevNext');
+				jQuery('.tocNext').removeClass('tocNoPrevNext');
 			} else if (this.currentIndex == this.pages.length - 1) {
-				jQuery('.tocNext').css('display', 'none');
-				jQuery('.tocPrev').css('display', 'inline-block');
+				jQuery('.tocNext').addClass('tocNoPrevNext');
+				jQuery('.tocPrev').removeClass('tocNoPrevNext');
 			} else {
-				jQuery('.tocPrev').css('display', 'inline-block');
-				jQuery('.tocNext').css('display', 'inline-block');
+				jQuery('.tocPrev').removeClass('tocNoPrevNext');
+				jQuery('.tocNext').removeClass('tocNoPrevNext');
 			}
 		}
 		
@@ -101,8 +102,8 @@ var flexibreak = function(element, options)
 			}, 900, 'swing', function () {
 				window.location.hash = target;
 			});
-			jQuery(flexibreak.tocLinksScrolled).removeClass('active');
-			jQuery(tocAnchor).addClass('active');
+			jQuery(flexibreak.tocLinksScrolled).parent().removeClass('active');
+			jQuery(tocAnchor).parent().addClass('active');
 		});
 	});
 	
@@ -138,14 +139,15 @@ var flexibreak = function(element, options)
 	};
 	
 	
-	this.showall = function(page){
+	this.showall = function(page)
+	{
 		jQuery('.tocNav').css('display', 'none');
 		
 		jQuery(this.pages).addClass('active');
-		jQuery(this.pages).css('opacity', '0.01').animate({'opacity': '1'}, 600, 'linear');
+		jQuery(this.pages).css('opacity', '0.01').animate({'opacity': '1'},  600, 'swing');
 		
-		jQuery(this.tocLinksPaginated).removeClass('active');
-		jQuery(page).addClass('active');
+		jQuery(this.tocLinksPaginated).parent().removeClass('active');
+		jQuery(page).parent().addClass('active');
 		this.currentPage = page;
 	};
 };

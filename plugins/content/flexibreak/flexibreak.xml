@@ -41,10 +41,10 @@
 					<option value="1">Yes</option>
 				</field>
 				
-				<field name="display_method" type="list" default="1" label="Display method" description="Select display method, (a) Show all pages and scroll to the desired one, (b and c) Show active page only via Javascript or via page reload">
-					<option value="0">All Pages :: Scroll</option>
-					<option value="1">Active page :: Paginate via JS</option>
-					<option value="2">Active page :: Paginate via Reload</option>
+				<field name="display_method" type="multilist" subtype="radio" toggle_related="1" default="1" label="Display method" description="Select display method, (a) Show all pages and scroll to the desired one, (b and c) Show active page only via Javascript or via page reload">
+					<option value="0" show_list="" hide_list="all_pages_link">All Pages :: Scroll</option>
+					<option value="1" show_list="all_pages_link" hide_list="">Active page :: Paginate via JS</option>
+					<option value="2" show_list="" hide_list="all_pages_link">Active page :: Paginate via Reload</option>
 				</field>
 				
 				<field name="" type="separator" default="Table of contents configuration" level="level2" />
@@ -52,7 +52,7 @@
 					<option value="0">Output via item->toc variable</option>
 					<option value="1">Prepend to description</option>
 				</field>
-				<field name="allpages_link" type="radio" default="1" label="Show all pages link" description="Display a link to allow user to display all content pages at once">
+				<field name="allpages_link" type="radio" default="1" label="Show all pages link" description="Display a link to allow user to display all content pages at once" class="all_pages_link">
 					<option value="0">No</option>
 					<option value="1">Yes</option>
 				</field>
