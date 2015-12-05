@@ -415,6 +415,7 @@
 		jQuery.each( toBeUpdated, function( i, val ) {
 			var c = jQuery(this);
 			var dlist = c.data('fc_depend_list');
+			if (!dlist) dlist = {};
 			var forced = c.attr('data-fc_forced_display');
 			
 			jQuery.each(dlist, function( i, val ) { if(val<=0) delete dlist[i]; if(val>=1) dlist[i]=1 ;});

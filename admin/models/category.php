@@ -636,6 +636,7 @@ class FlexicontentModelCategory extends JModelAdmin
 					$field->addAttribute('extension', $extension);
 					$field->addAttribute('edit', 'true');
 					$field->addAttribute('clear', 'true');
+					$field->addAttribute('filter', 'INT');  // also enforced later, but better to have it here too
 				}
 			}
 

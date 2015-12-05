@@ -1120,6 +1120,7 @@ class ParentClassItem extends JModelAdmin
 					$field->addAttribute('translate_label', 'false');
 					$field->addAttribute('edit', 'true');
 					$field->addAttribute('clear', 'true');
+					$field->addAttribute('filter', 'INT');  // also enforced later, but better to have it here too
 				}
 			}
 			if ($add)

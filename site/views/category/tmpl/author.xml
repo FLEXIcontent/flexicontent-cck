@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
 	
-	<layout title="FLEXICONTENT_AUTHOR">
-		<help key="FLEXICONTENT_AUTHOR_DESC" />
+	<layout title="FLEXICONTENT_AUTHORED_ITEMS">
+		<help key="FLEXICONTENT_AUTHORED_ITEMS_DESC" />
 		<message>
-			<![CDATA[FLEXICONTENT_AUTHOR_TIP]]>
+			<![CDATA[FLEXICONTENT_AUTHORED_ITEMS_TIP]]>
 		</message>
 	</layout>
 	
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
 			<field name="layout" type="hidden" default="author" label="Layout" description="" />
-			<field name="authorid" type="author" default="0" label="FLEXI_SELECT_ONE_AUTHOR" description="FLEXI_SELECT_ONE_AUTHOR_DESC" />
+			<field name="" type="separator" default="To create a menu item for DEFAULT DISPLAY -configuration- (for all authors that do not have a menu item) &lt;br/&gt; 1. Select no author here &lt;br/&gt; 2. Set a generic title/alias e.g. 'authored' (as alias will be show in the URLs) and configure menu item parameters &lt;br/&gt; 3. Go to component parameters, open TAB 'Lists' and select this menu item as default menu item for (category-based view) 'Tagged items'" description="" level="level4" class="alert alert-warning fcpadded" />
+			<field name="authorid" type="fcauthor" default="0" label="FLEXI_SELECT_ONE_AUTHOR" description="FLEXI_SELECT_ONE_AUTHOR_DESC">
+				<option value="">FLEXI_SELECT</option>
+			</field> 
 			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_AUTHOR_CATEGORY" description="FLEXI_SELECT_AUTHOR_CATEGORY_DESC" />
 		</fieldset> 
 	</fields>

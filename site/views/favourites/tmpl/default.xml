@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
 	
-	<layout title="FLEXICONTENT_FAVOURITES">
+	<layout title="FLEXICONTENT_FAVOURED_LEGACY_VIEW">
+		<help key="FLEXICONTENT_FAVOURED_LEGACY_VIEW_DESC" />
 		<message>
-			<![CDATA[FLEXICONTENT_FAVOURITES_TIP]]>
+			<![CDATA[FLEXICONTENT_FAVOURED_LEGACY_VIEW_TIP]]>
 		</message>
 	</layout>
 	

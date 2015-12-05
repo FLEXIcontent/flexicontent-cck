@@ -73,59 +73,50 @@ class JFormFieldFctag extends JFormField
 			$value = "";  // clear possible invalid value
 		}
 		
-		$required_js = "";
-		$required_param = "";
+		$required_param = $required ? ' required="required" class="required" aria-required="true" ' : '';
 		
-		// J1.5 does not have required, we implement it via custom JS
-		if (!FLEXI_J16GE) {
-			if ( @$attributes['required'] ) {
-				$required_js ="
-					$$('#toolbar-apply a.toolbar').setProperty('onclick',
-						\" if ( $('a_id').getProperty('value') != '' ) { $('urlparams".$attributes["name"]."-lbl').setStyle('color',''); submitbutton('apply'); } else { alert('".$prompt_str."'); $('urlparams".$attributes["name"]."-lbl').setStyle('color','red'); } \"
-					);
-
-					$$('#toolbar-save a.toolbar').setProperty('onclick',
-						\" if ( $('a_id').getProperty('value') != '' ) { $('urlparams".$attributes["name"]."-lbl').setStyle('color',''); submitbutton('save'); } else { alert('".$prompt_str."'); $('urlparams".$attributes["name"]."-lbl').setStyle('color','red'); } \"
-					);
-				";
+		static $js_added = false;
+		if (!$js_added) {
+			$js = "
+			function qfClearSelectedTag(element_id)
+			{
+				jQuery('#'+element_id+'_name').val('');
+				jQuery('#'+element_id+'_name').attr('placeholder', '".JText::_( 'FLEXI_FORM_SELECT',true )."');
+				jQuery('#'+element_id).val('');
+				jQuery('#'+element_id + '_clear').addClass('hidden');
+				jQuery('#'+element_id + '_edit').addClass('hidden');
+				return false;
+			};
+			
+			var fc_select_tag_element_id;
+			function qfSelectTag(id, title) {
+				document.getElementById(fc_select_tag_element_id).value = id;
+				document.getElementById(fc_select_tag_element_id+'_name').value = title;
+				jQuery('#'+fc_select_tag_element_id+'_edit').removeClass('hidden');
+				jQuery('#'+fc_select_tag_element_id+'_clear').removeClass('hidden');
+				$('sbox-btn-close').fireEvent('click');
 			}
+			";
+			$doc->addScriptDeclaration($js);
+			JHTML::_('behavior.modal', 'a.modal');
 		}
-		
-		// J1.6+ does have required form capability, add a HTML tag parameter
-		else {
-			$required_param = $required ? ' required="required" class="required" aria-required="true" ' : '';
-		}
-		
-		$js = "
-		window.addEvent( 'domready', function()
-		{
-			$('remove').addEvent('click', function(){
-				$('a_name').setProperty('value', '');
-				$('".$element_id."').setProperty('value', '');
-			});
-			".$required_js."
-		});
-
-		function qfSelectTag(id, title) {
-			document.getElementById('".$element_id."').value = id;
-			document.getElementById('a_name').value = title;
-			".(!FLEXI_J16GE ?
-				"document.getElementById('sbox-window').close();" :
-				"$('sbox-btn-close').fireEvent('click');"
-			)."
-		}";
 
 		$link = 'index.php?option=com_flexicontent&amp;view=tagelement&amp;tmpl=component';
-		$doc->addScriptDeclaration($js);
-
-		JHTML::_('behavior.modal', 'a.modal');
-
-		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"a_name\" value=\"{$title}\" ".$required_param." readonly=\"readonly\" /></div>";
-		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal btn btn-small btn-success\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x: 800, y: 500}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
-		$html .= "\n<input type=\"hidden\" id=\"".$element_id."\" name=\"".$fieldname."\" ".$required_param." value=\"{$value}\" />";
-		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"btn btn-small btn-danger\" id=\"remove\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\"  href=\"#\"\">".JText::_( 'FLEXI_REMOVE_VALUE' )."</a></div></div>\n";
-
-		return $html;
+		
+		$rel = '{handler: \'iframe\', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}';
+		return '
+		<span class="input-append">
+			<input type="text" id="'.$element_id.'_name" placeholder="'.JText::_( 'FLEXI_FORM_SELECT',true ).'" value="'.$title.'" '.$required_param.' readonly="readonly" />
+			<a class="modal btn btn-success hasTooltip" onclick="fc_select_tag_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.JText::_( 'FLEXI_SELECT_TAG' ).'" >
+				'.JText::_( 'FLEXI_SELECT' ).'
+			</a>
+			<button id="' .$element_id. '_clear" class="btn'.($value ? '' : ' hidden').'" onclick="return qfClearSelectedTag(\''.$element_id . '\')">
+				<span class="icon-remove"></span>
+				'.JText::_( 'FLEXI_CLEAR' ).'
+			</button>
+		</span>
+		<input type="hidden" id="'.$element_id.'" name="'.$fieldname.'" '.$required_param.' value="'.$value.'" />
+		';
 	}
 }
 ?>

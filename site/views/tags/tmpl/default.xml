@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
 	
-	<layout title="FLEXICONTENT_TAGS">
+	<layout title="FLEXICONTENT_TAGGED_LEGACY_VIEW">
+		<help key="FLEXICONTENT_TAGGED_LEGACY_VIEW_DESC" />
 		<message>
-			<![CDATA[FLEXICONTENT_TAGS_TIP]]>
+			<![CDATA[FLEXICONTENT_TAGGED_LEGACY_VIEW_TIP]]>
 		</message>
 	</layout>
 	
 	<fields name="request">
 		<fieldset name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" default="To create a menu item for DEFAULT DISPLAY -configuration- (for all tags that do not have a menu item) &lt;br/&gt;&lt;br/&gt;1. Select no tag here &lt;br/&gt; 2. Set a generic title/alias (as alias will be show in the URLs) and configure menu item parameters &lt;br/&gt; 3. Go to component parameters, open TAB 'Other views'and select this menu item as default menu item for tags" description="" level="level2" class="alert alert-warning fcpadded" />
+			<field name="" type="separator" default="To create a menu item for DEFAULT DISPLAY -configuration- (for all tags that do not have a menu item) &lt;br/&gt; 1. Select no tag here &lt;br/&gt; 2. Set a generic title/alias e.g. 'tagged_items' (as alias will be show in the URLs) and configure menu item parameters &lt;br/&gt; 3. Go to component parameters, open TAB 'Lists' and select this menu item as default menu item for LEGACY VIEW 'Tagged items'" description="" level="level4" class="alert alert-warning fcpadded" />
 			<field name="id" type="fctag" default="0" label="FLEXI_SELECT_TAG" description="FLEXI_SELECT_TAG_DESC" />
 		</fieldset> 
 	</fields>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
 	
-	<layout title="FLEXICONTENT_FAVOURITES_CATVIEW">
-		<help key="FLEXICONTENT_FAVOURITES_CATVIEW_DESC" />
+	<layout title="FLEXICONTENT_FAVOURED_CATVIEW">
+		<help key="FLEXICONTENT_FAVOURED_CATVIEW_DESC" />
 		<message>
-			<![CDATA[FLEXICONTENT_FAVOURITES_CATVIEW_TIP]]>
+			<![CDATA[FLEXICONTENT_FAVOURED_CATVIEW_TIP]]>
 		</message>
 	</layout>
 	

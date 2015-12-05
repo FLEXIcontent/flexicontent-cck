@@ -318,6 +318,8 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function decideLayout(&$compParams, &$typeParams, &$itemParams)
 	{
+		$app = JFactory::getApplication();
+		
 		// Decide to use mobile or normal item template layout
 		$useMobile = $compParams->get('use_mobile_layouts', 0 );
 		if ($useMobile) {

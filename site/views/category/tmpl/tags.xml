@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
 	
-	<layout title="FLEXICONTENT_TAGS_CATVIEW">
-		<help key="FLEXICONTENT_TAGS_CATVIEW_DESC" />
+	<layout title="FLEXICONTENT_TAGGED_CATVIEW">
+		<help key="FLEXICONTENT_TAGGED_CATVIEW_DESC" />
 		<message>
-			<![CDATA[FLEXICONTENT_TAGS_CATVIEW_TIP]]>
+			<![CDATA[FLEXICONTENT_TAGGED_CATVIEW_TIP]]>
 		</message>
 	</layout>
 	
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
 			<field name="layout" type="hidden" default="tags" label="Layout" description="" />
+			<field name="" type="separator" default="To create a menu item for DEFAULT DISPLAY -configuration- (for all tags that do not have a menu item) &lt;br/&gt; 1. Select no tag here &lt;br/&gt; 2. Set a generic title/alias e.g. 'tagged' (as alias will be show in the URLs) and configure menu item parameters &lt;br/&gt; 3. Go to component parameters, open TAB 'Lists' and select this menu item as default menu item for (category-based view) 'Tagged items'" description="" level="level4" class="alert alert-warning fcpadded" />
 			<field name="tagid" type="fctag" default="0" label="FLEXI_SELECT_TAG" description="FLEXI_SELECT_TAG_DESC" />
-			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_TAGS_CATEGORY" required="required" description="FLEXI_SELECT_TAGS_CATEGORY_DESC" />
+			<field name="cid" type="qfcategory" default="0" label="FLEXI_SELECT_TAGS_CATEGORY" description="FLEXI_SELECT_TAGS_CATEGORY_DESC" />
 		</fieldset> 
 	</fields>
 	

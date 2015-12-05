@@ -25,15 +25,16 @@ class modFlexiTagCloudHelper
 {
 	static function getTags(&$params, &$module)
 	{
-		$mainframe = JFactory::getApplication();
-
 		// Initialize
+		$app = JFactory::getApplication();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$db				= JFactory::getDBO();
 		$user			= JFactory::getUser();
+		
+		//$now    = FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
+		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate	= $db->getNullDate();
-		$now			= FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
-		$fparams 	= $mainframe->getParams('com_flexicontent');
-		$show_noauth 	= $fparams->get('show_noauth', 0);
+		$show_noauth = $cparams->get('show_noauth', 0);
 
 		// Get parameters
 		$minsize 	= (int)$params->get('min_size', '1');
@@ -46,28 +47,16 @@ class modFlexiTagCloudHelper
 
 		$where 	= !FLEXI_J16GE ? ' WHERE i.sectionid = ' . FLEXI_SECTION : ' WHERE 1 ';
 		$where .= ' AND i.state IN ( 1, -5 )';
-		$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )';
-		$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
+		$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )';
+		$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )';
 		$where .= ' AND c.published = 1';
 		$where .= ' AND tag.published = 1';
 
 		// filter by permissions
 		if (!$show_noauth) {
-			if (FLEXI_J16GE) {
-				$aid_arr  = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$where  .= ' AND i.access IN ('.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-				}
-				if ( !empty($readperms['item']) ) {
-					$where .= ' AND ( i.access <= '.$aid.' OR i.id IN ('.implode(",", $readperms['item']).') )';
-				} else {
-					$where .= ' AND i.access <= '.$aid;
-				}
-			}
+			$aid_arr  = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$where  .= ' AND i.access IN ('.$aid_list.')';
 		}
 
 		// category scope
@@ -115,7 +104,8 @@ class modFlexiTagCloudHelper
 		
 		$db->setQuery($query, 0, $limit);
 		$rows = $db->loadObjectList();
-
+		
+		$use_catlinks = $cparams->get('tags_using_catview', 0);
 		$i		= 0;
 		$lists	= array();
 		foreach ( $rows as $row )
@@ -124,13 +114,11 @@ class modFlexiTagCloudHelper
 			$lists[$i]->size 			= modFlexiTagCloudHelper::sizer($min, $max, $row->no, $minsize, $maxsize);
 			$lists[$i]->name 			= $row->name;
 			$lists[$i]->screenreader	= JText::sprintf('FLEXI_NR_ITEMS_TAGGED', $row->no);
-			if ($tagitemid) {
-				$lists[$i]->link 		= FlexicontentHelperRoute::getTagRoute($row->slug, $tagitemid);
-			} else {
-				$lists[$i]->link 		= FlexicontentHelperRoute::getTagRoute($row->slug);
-			}
-			
-			$lists[$i]->link 		= JRoute::_($lists[$i]->link.'&module='.$module->id);
+
+			$lists[$i]->link = $use_catlinks ?
+				FlexicontentHelperRoute::getCategoryRoute(0, $tagitemid, array('layout'=>'tags','tagid'=>$row->slug)) :
+				FlexicontentHelperRoute::getTagRoute($row->slug, $tagitemid) ;
+			$lists[$i]->link = JRoute::_($lists[$i]->link.'&module='.$module->id);
 
 			$i++;
 		}

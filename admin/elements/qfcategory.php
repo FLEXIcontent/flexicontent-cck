@@ -68,7 +68,7 @@ class JFormFieldQfcategory extends JFormField
 		if ($value) {
 			$item->load($value);
 		} else {
-			$item->title = JText::_( 'FLEXI_FORM_SELECT' );
+			$item->title = '';
 		}
 		
 		// J1.6+ does have required field capability, add a HTML tag parameter
@@ -87,15 +87,15 @@ class JFormFieldQfcategory extends JFormField
 				return false;
 			};
 			
-			var fc_select_element_id;
+			var fc_select_cat_element_id;
 			function qfSelectCategory(id, title)
 			{
-				document.getElementById(fc_select_element_id).value = id;
-				document.getElementById(fc_select_element_id+'_name').value = title;"
+				document.getElementById(fc_select_cat_element_id).value = id;
+				document.getElementById(fc_select_cat_element_id+'_name').value = title;"
 			.($allowEdit  ? "
-				jQuery('#'+fc_select_element_id+'_edit').removeClass('hidden');" : '')
+				jQuery('#'+fc_select_cat_element_id+'_edit').removeClass('hidden');" : '')
 			.($allowClear ? "
-				jQuery('#'+fc_select_element_id+'_clear').removeClass('hidden');" :'')
+				jQuery('#'+fc_select_cat_element_id+'_clear').removeClass('hidden');" :'')
 			."
 				$('sbox-btn-close').fireEvent('click');
 			}
@@ -130,8 +130,8 @@ class JFormFieldQfcategory extends JFormField
 		$rel = '{handler: \'iframe\', size: {x:((window.getSize().x<1100)?window.getSize().x-100:1000), y: window.getSize().y-100}}';
 		return '
 		<span class="input-append">
-			<input type="text" id="'.$element_id.'_name" value="'.$item->title.'" '.$required_param.' readonly="readonly" />
-			<a class="modal btn hasTooltip" onclick="fc_select_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.JText::_( 'FLEXI_SELECT_CATEGORY' ).'" >
+			<input type="text" id="'.$element_id.'_name" placeholder="'.JText::_( 'FLEXI_FORM_SELECT',true ).'" value="'.$item->title.'" '.$required_param.' readonly="readonly" />
+			<a class="modal btn hasTooltip" onclick="fc_select_cat_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.JText::_( 'FLEXI_SELECT_CATEGORY' ).'" >
 				'.JText::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '
@@ -140,8 +140,8 @@ class JFormFieldQfcategory extends JFormField
 			</a>' : '').'
 			'.($allowClear ? '
 			<button id="' .$element_id. '_clear" class="btn'.($value ? '' : ' hidden').'" onclick="return qfClearSelectedCategory(\''.$element_id . '\')">
-				<span class="icon-remove"></span>'
-				.JText::_('FLEXI_CLEAR').'
+				<span class="icon-remove"></span>
+				'.JText::_('FLEXI_CLEAR').'
 			</button>' : '').'
 		</span>
 		<input type="hidden" id="'.$element_id.'" name="'.$fieldname.'" value="'.$value.'" />

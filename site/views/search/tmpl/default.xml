@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="FLEXICONTENT_SEARCH">
-		<help key="FLEXICONTENT_SEARCH_DESC" />
+	<layout title="FLEXICONTENT_SEARCH_VIEW">
+		<help key="FLEXICONTENT_SEARCH_VIEW_DESC" />
 		<message>
-			<![CDATA[FLEXICONTENT_SEARCH_TIP]]>
+			<![CDATA[FLEXICONTENT_SEARCH_VIEW_TIP]]>
 		</message>
 	</layout>
 	<fields name="params">
