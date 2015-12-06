@@ -161,12 +161,15 @@ body .fc-mssg.fc-noborder  {
 
 #flexicontent ul.statetoggler > li.topLevel > .options ul {
 	display: none;
-	padding: 24px;
-	margin: 2px 0px;
+	float: left;
 	background: white;
 	border: 1px solid lightgray;
 	border-radius:4px;
-	width: auto;
+	box-shadow: 2px 4px 4px gray;
+	box-sizing: border-box;
+	padding: 0px;
+	margin: 2px 0px;
+	width: 100%;
 }
 
 #flexicontent ul.statetoggler > li.topLevel,
@@ -174,11 +177,12 @@ body .fc-mssg.fc-noborder  {
 	background: none repeat scroll 0 0 transparent;
 	overflow: visible;
 	min-height: 20px;
-	width: auto;
-	display: inline-block;
 	vertical-align: top;
+	display: inline-block;
+	box-sizing: border-box;
 	padding: 0;
 	margin: 0;
+	width: 100%;
 }
 
 #flexicontent ul.statetoggler > li.topLevel span.btn,
@@ -188,14 +192,16 @@ body .fc-mssg.fc-noborder  {
 }
 
 #flexicontent ul.statetoggler > li.topLevel ul > li a {
-	margin: 2px;
 	display: inline-block;
+	box-sizing: border-box;
+	margin: 0px;
+	padding: 2px 8px;
+	width:100%;
 }
-/*
 #flexicontent ul.statetoggler > li.topLevel ul > li a:hover {
 	background-image: linear-gradient(to bottom, #f0f0f0, #d7d7d7);
 	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0, endColorstr=#d7d7d7);
-}*/
+}
 
 #flexicontent ul.statetoggler > li.topLevel ul > li img {
 	padding: 4px 6px;
@@ -209,9 +215,10 @@ body .fc-mssg.fc-noborder  {
 }
 
 #flexicontent ul.statetoggler > li.topLevel > a.stateopener img {
-	padding: 2px 0px;
+	padding: 0;
 	margin: 0;
 	border: none;
+	vertical-align:middle;
 }
 
 #flexicontent ul.statetoggler .ajax-loader {

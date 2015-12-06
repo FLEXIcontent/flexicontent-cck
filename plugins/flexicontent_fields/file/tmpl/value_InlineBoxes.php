@@ -75,7 +75,7 @@ foreach($values as $file_id)
 			if (!$add_lang_txt) {
 				$_tooltip_title   = JText::_( 'FLEXI_LANGUAGE', true );
 				$_tooltip_content = $file_data->language=='*' ? JText::_("FLEXI_ALL") : $langs->{$file_data->language}->name;
-				$_attribs = 'class="hasTooltip fcicon-lang" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"';
+				$_attribs = 'class="hasTooltip fcicon-lang" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'" alt="'.$_tooltip_title.'" ';
 			} else {
 				$_attribs = ' class="fcicon-lang"';
 			}

@@ -80,9 +80,9 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 		
 		<?php if ($filter_instructions == 1) : ?>
 		<legend>
-			<div class="<?php echo $legend_class; ?>" title="<?php echo $legend_tip; ?>">
-				<div><?php echo JText::_('FLEXI_SEARCH_FILTERING'); ?></div>
-			</div>
+			<span class="<?php echo $legend_class; ?>" title="<?php echo $legend_tip; ?>">
+				<span><?php echo JText::_('FLEXI_SEARCH_FILTERING'); ?></span>
+			</span>
 		</legend>
 		<?php endif; ?>
 		
@@ -235,13 +235,13 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			<div class="fc_buttons">
 				<?php if ($show_search_go) : ?>
 				<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>">
-					<div class="icon-search"></div><?php echo JText::_( 'FLEXI_GO' ); ?>
+					<i class="icon-search"></i><?php echo JText::_( 'FLEXI_GO' ); ?>
 				</button>
 				<?php endif; ?>
 					
 				<?php if ($show_search_reset) : ?>
 				<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
-					<div class="icon-remove"></div><?php echo JText::_( 'FLEXI_RESET' ); ?>
+					<i class="icon-remove"></i><?php echo JText::_( 'FLEXI_RESET' ); ?>
 				</button>
 				<?php endif; ?>
 					

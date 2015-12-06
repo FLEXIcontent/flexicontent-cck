@@ -17,16 +17,17 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-// first define the template name
-$tmpl = $this->tmpl; // for backwards compatiblity
-$item = $this->item;  // an alias
 
 // USE HTML5 or XHTML
-$html5			= $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
+$html5 = $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
 if ($html5) {  /* BOF html5  */
 	echo $this->loadTemplate('html5');
 } else {
 
+// first define the template name
+$tmpl = $this->tmpl;
+$item = $this->item;
+$menu = JFactory::getApplication()->getMenu()->getActive();
 
 // Create description field if not already created
 FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
@@ -50,18 +51,34 @@ switch ($this->params->get( 'columnmode', 2 )) {
 	case 1: $columnmode = 'doublecol'; break;
 	default: $columnmode = ''; break;
 }
+// ***********
+// DECIDE TAGS 
+// ***********
+$page_heading_shown =
+	$this->params->get( 'show_page_heading', 1 ) &&
+	$this->params->get('page_heading') != $item->title &&
+	$this->params->get('show_title', 1);
 
-$page_classes  = '';
+// Main container
+$mainAreaTag = 'div';
+
+// SEO, header level of title tag
+$itemTitleHeaderLevel = '2';
+
+$page_classes  = 'flexicontent';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcitems fcitem'.$item->id;
 $page_classes .= ' fctype'.$item->type_id;
 $page_classes .= ' fcmaincat'.$item->catid;
+if ($menu) $page_classes .= ' menuitem'.$menu->id; 
+
+// SEO
 $microdata_itemtype = $this->params->get( 'microdata_itemtype');
 $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>
 
-<div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" <?php echo $microdata_itemtype_code; ?> >
-
+<?php echo '<'.$mainAreaTag; ?> id="flexicontent" class="<?php echo $page_classes; ?>" <?php echo $microdata_itemtype_code; ?> >
+	
 	
   <?php if ($item->event->beforeDisplayContent) : ?>
 		<!-- BOF beforeDisplayContent -->
@@ -92,42 +109,59 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 		?>
 		
 		<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) : ?>
-		<!-- BOF buttons -->
-		<div class="buttons">
-			<?php echo $pdfbutton; ?>
-			<?php echo $mailbutton; ?>
-			<?php echo $printbutton; ?>
-			<?php echo $editbutton; ?>
-			<?php echo $statebutton; ?>
-			<?php echo $approvalbutton; ?>
-		</div>
-		<!-- EOF buttons -->
+		
+			<!-- BOF buttons -->
+			<?php if ($this->params->get('btn_grp_dropdown')) : ?>
+			
+			<div class="buttons btn-group">
+			  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+			    <span class="<?php echo $this->params->get('btn_grp_dropdown_class', 'icon-options'); ?>"></span>
+			  </button>
+			  <ul class="dropdown-menu" role="menu">
+			    <?php echo $pdfbutton    ? '<li>'.$pdfbutton.'</li>' : ''; ?>
+			    <?php echo $mailbutton   ? '<li>'.$mailbutton.'</li>' : ''; ?>
+			    <?php echo $printbutton  ? '<li>'.$printbutton.'</li>' : ''; ?>
+			    <?php echo $editbutton   ? '<li>'.$editbutton.'</li>' : ''; ?>
+			    <?php echo $approvalbutton  ? '<li>'.$approvalbutton.'</li>' : ''; ?>
+			  </ul>
+		    <?php echo $statebutton; ?>
+			</div>
+
+			<?php else : ?>
+			<div class="buttons">
+				<?php echo $pdfbutton; ?>
+				<?php echo $mailbutton; ?>
+				<?php echo $printbutton; ?>
+				<?php echo $editbutton; ?>
+				<?php echo $statebutton; ?>
+				<?php echo $approvalbutton; ?>
+			</div>
+			<?php endif; ?>
+			<!-- EOF buttons -->
+			
 		<?php endif; ?>
 	<?php endif; ?>
 	
-	<?php if ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $item->title ) : ?>
-	<!-- BOF page title -->
-	<h1 class="componentheading">
-		<?php echo $this->params->get('page_heading'); ?>
-	</h1>
-	<!-- EOF page title -->
+	<?php if ( $page_heading_shown ) : ?>
+		<!-- BOF page heading -->
+		<h1 class="componentheading">
+			<?php echo $this->params->get('page_heading'); ?>
+		</h1>
+		<!-- EOF page heading -->
 	<?php endif; ?>
-
+	
 	
 	<?php if ($this->params->get('show_title', 1)) : ?>
-	<!-- BOF item title -->
-	<h2 class="contentheading">
-		<span class="fc_item_title" itemprop="name">
+		<!-- BOF item title -->
+		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading">
+			<span class="fc_item_title" itemprop="name">
 			<?php
-			if ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
-				echo mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
-			else :
-				echo $item->title;
-			endif;
+				echo ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) ?
+					mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...'  :  $item->title;
 			?>
-		</span>
-	</h2>
-	<!-- EOF item title -->
+			</span>
+		<?php echo '</h'.$itemTitleHeaderLevel; ?>>
+		<!-- EOF item title -->
 	<?php endif; ?>
 	
   <?php if ($item->event->afterDisplayTitle) : ?>
@@ -300,6 +334,6 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 	<!-- EOF afterDisplayContent -->
 	<?php endif; ?>
 	
-</div>
+<?php echo '</'.$mainAreaTag.'>'; ?>
 
 <?php } /* EOF if html5  */ ?>

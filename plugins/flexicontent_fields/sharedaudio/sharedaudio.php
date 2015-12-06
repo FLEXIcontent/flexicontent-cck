@@ -442,7 +442,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			// Validate data, skipping values that are empty after validation
 			// **************************************************************
 			
-			$url = flexicontent_html::dataFilter($v['url'], 0, 'URL', 0);  // Clean bad text/html
+			$url = flexicontent_html::dataFilter($v['url'], 4000, 'URL', 0);  // Clean bad text/html
 			
 			// Skip empty value, but if in group increment the value position
 			if (empty($url))

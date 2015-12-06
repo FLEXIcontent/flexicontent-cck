@@ -36,9 +36,9 @@ var fc_statehandler = function( options )
 
 function fc_toggleStateSelector(el){
 	if ( jQuery(el).parent().find("ul").is(":hidden") ) {
-		jQuery(el).closest("ul.statetoggler").find(".stateopener").addClass("btn-warning");
+		jQuery(el).closest("ul.statetoggler").find(".stateopener").addClass("active");
 	} else {
-		jQuery(el).closest("ul.statetoggler").find(".stateopener").removeClass("btn-warning");
+		jQuery(el).closest("ul.statetoggler").find(".stateopener").removeClass("active");
 	}
-	jQuery(el).parent().find("ul").slideToggle();
+	jQuery(el).parent().find("ul").slideToggle(200);
 }

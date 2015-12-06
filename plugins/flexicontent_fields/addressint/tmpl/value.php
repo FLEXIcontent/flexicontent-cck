@@ -169,17 +169,17 @@ foreach ($this->values as $n => $value)
 		if($map_embed_type == 'img')
 		{
 			$map_url = "https://maps.google.com/maps/api/staticmap?center=".$value['lat'].",".$value['lon']
-				."&zoom=".($value['zoom'] ? $value['zoom'] : $map_zoom)
-				."&size=".$map_width."x".$map_height
-				."&maptype=".$map_type
-				."&markers=size:".$marker_size."%7Ccolor:".$marker_color."%7C|".$value['lat'].",".$value['lon']
-				."&sensor=false"
-				.($google_maps_static_api_key ? '&key=' . $google_maps_static_api_key : '');
+				."&amp;zoom=".($value['zoom'] ? $value['zoom'] : $map_zoom)
+				."&amp;size=".$map_width."x".$map_height
+				."&amp;maptype=".$map_type
+				."&amp;markers=size:".$marker_size."%7Ccolor:".$marker_color."%7C|".$value['lat'].",".$value['lon']
+				."&amp;sensor=false"
+				.($google_maps_static_api_key ? '&amp;key=' . $google_maps_static_api_key : '');
 				
 			$map .= '<div class="map"><div class="image">';
 			
 			if($link_map == 1) $map .= '<a href="'.$map_link.'" target="_blank">';
-			$map .= '<img src="'.$map_url.'" width="'.$map_width.'" height="'.$map_height.'" />';
+			$map .= '<img src="'.$map_url.'" width="'.$map_width.'" height="'.$map_height.'" alt="Map" />';
 			if($link_map == 1) $map .= '</a>';
 			
 			$map .= '</div></div>';

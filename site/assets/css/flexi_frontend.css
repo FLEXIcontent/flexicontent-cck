@@ -35,20 +35,63 @@
  **********************************************************************/
 #flexicontent .buttons {
 	display: block;
-	float: right;
 	margin: 0px;
 	padding: 0px;
+	float: right;
+}
+#flexicontent .buttons.fcleft { float: left;}
+#flexicontent .buttons.fcright { float: right; }
+
+#flexicontent .buttons:not(.fcright)  ul.statetoggler > li.topLevel > .options,
+#flexicontent .buttons.fcleft  ul.statetoggler > li.topLevel > .options,
+#flexicontent .buttons:not(.fcright)  ul.dropdown-menu,
+#flexicontent .buttons.fcleft  ul.dropdown-menu { left:auto; right:0; }
+
+#flexicontent .buttons.fcright ul.dropdown-menu,
+#flexicontent .buttons.fcright ul.statetoggler > li.topLevel > .options { left:0; right:auto; }
+
+#flexicontent .buttons.btn-group > ul.statetoggler {margin-left:8px;}
+#flexicontent .buttons:not(.btn-group ) > ul.statetoggler a,
+#flexicontent .buttons > a > i {
+	vertical-align:middle;
+	font-size: 14px;
+	margin:0 8px 0 0;
+}
+#flexicontent .buttons > a:not(.btn),
+#flexicontent .buttons:not(.btn-group ) > ul.statetoggler a {
+	line-height: 2em;
+	font-size: 14px;
+	color: black;
+	background-color: #eeeeee;
+	background: -webkit-gradient(linear, left top, left bottom, from(#eeeeee), to(#dddddd));
+	background: -webkit-linear-gradient(top, #eeeeee, #dddddd);
+	background: -moz-linear-gradient(top, #eeeeee, #dddddd);
+	background: -ms-linear-gradient(top, #eeeeee, #dddddd);
+	background: -o-linear-gradient(top, #eeeeee, #dddddd);
+	background: linear-gradient(to bottom, #eeeeee, #dddddd);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee, endColorstr=#dddddd);
+	border-radius: 4px;
+	border: 1px solid #cccccc;
+	padding: 0px 8px;
+	vertical-align:top;
+	display: inline-block;
+}
+#flexicontent .buttons > a:not(.btn):hover,
+#flexicontent .buttons:not(.btn-group ) > ul.statetoggler a:hover {
+	background-color: #dddddd;
+	background: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#cccccc));
+	background: -webkit-linear-gradient(top, #dddddd, #cccccc);
+	background: -moz-linear-gradient(top, #dddddd, #cccccc);
+	background: -ms-linear-gradient(top, #dddddd, #cccccc);
+	background: -o-linear-gradient(top, #dddddd, #cccccc);
+	background: linear-gradient(to bottom, #dddddd, #cccccc);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee, endColorstr=#cccccc);
+	border: 1px solid #bbbbbb;
 }
 
 #flexicontent .fc_editbutton,
 #flexicontent .buttons > a {
 	text-decoration:none;
-	margin: 0px 4px; /* ignored for inline-* elements*/
 }
-#flexicontent .fc_editbutton,
-#flexicontent .buttons > a.btn {
-	margin: 0px 4px; /* ignored for inline-* elements*/
-}
+
 #flexicontent .fc_editbutton > img,
 #flexicontent .buttons > a > img {
 	border: none;
@@ -57,12 +100,6 @@
 }
 #flexicontent .fc_editbutton > img {
 	margin-top: 0px;
-}
-#flexicontent .fc_editbutton:not(.btn),
-#flexicontent .buttons > a:not(.btn) {
-	height: 1.4em;
-	line-height: 1.4em;
-	padding: 0 0 0 5px;
 }
 
 .fc_comments_count {

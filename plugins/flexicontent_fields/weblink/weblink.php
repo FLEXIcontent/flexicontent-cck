@@ -574,7 +574,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			// Validate URL, skipping URLs that are empty after validation
 			// ***********************************************************
 			
-			$link = flexicontent_html::dataFilter($v['link'], 0, 'URL', 0);  // Clean bad text/html
+			$link = flexicontent_html::dataFilter($v['link'], 4000, 'URL', 0);  // Clean bad text/html
 			
 			// Skip empty value, but if in group increment the value position
 			if (empty($link))

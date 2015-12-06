@@ -37,17 +37,14 @@ if (isset($item->toc)) {
 // ***********
 $page_heading_shown =
 	$this->params->get( 'show_page_heading', 1 ) &&
-	$this->params->get('page_heading') != $item->title;
+	$this->params->get('page_heading') != $item->title &&
+	$this->params->get('show_title', 1);
 
 // Main container
 $mainAreaTag = $page_heading_shown  ?  'section' : 'article';
 
 // SEO, header level of title tag
-$itemTitleHeaderLevel = (
-	$this->params->get( 'show_page_heading', 1 ) &&
-	$this->params->get('page_heading') != $item->title &&
-	$this->params->get('show_title', 1)
-	) ? '2' : '1'; 
+$itemTitleHeaderLevel = $page_heading_shown ? '2' : '1'; 
 	
 // SEO, header level of tab title tag
 $tabsHeaderLevel = $itemTitleHeaderLevel == '2'  ?  '3' : '2';  	
@@ -58,6 +55,8 @@ $page_classes .= ' fcitems fcitem'.$item->id;
 $page_classes .= ' fctype'.$item->type_id;
 $page_classes .= ' fcmaincat'.$item->catid;
 if ($menu) $page_classes .= ' menuitem'.$menu->id; 
+
+// SEO
 $microdata_itemtype = $this->params->get( 'microdata_itemtype');
 $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>
@@ -95,20 +94,41 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 		?>
 		
 		<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) : ?>
-		<!-- BOF buttons -->
-		<div class="buttons">
-			<?php echo $pdfbutton; ?>
-			<?php echo $mailbutton; ?>
-			<?php echo $printbutton; ?>
-			<?php echo $editbutton; ?>
-			<?php echo $statebutton; ?>
-			<?php echo $approvalbutton; ?>
-		</div>
-		<!-- EOF buttons -->
+		
+			<!-- BOF buttons -->
+			<?php if ($this->params->get('btn_grp_dropdown')) : ?>
+			
+			<div class="buttons btn-group">
+		    <?php echo $statebutton; ?>
+		    
+			  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+			    <span class="<?php echo $this->params->get('btn_grp_dropdown_class', 'icon-options'); ?>"></span>
+			  </button>
+			  <ul class="dropdown-menu" role="menu">
+			    <?php echo $pdfbutton    ? '<li>'.$pdfbutton.'</li>' : ''; ?>
+			    <?php echo $mailbutton   ? '<li>'.$mailbutton.'</li>' : ''; ?>
+			    <?php echo $printbutton  ? '<li>'.$printbutton.'</li>' : ''; ?>
+			    <?php echo $editbutton   ? '<li>'.$editbutton.'</li>' : ''; ?>
+			    <?php echo $approvalbutton  ? '<li>'.$approvalbutton.'</li>' : ''; ?>
+			  </ul>
+			</div>
+
+			<?php else : ?>
+			<div class="buttons">
+				<?php echo $pdfbutton; ?>
+				<?php echo $mailbutton; ?>
+				<?php echo $printbutton; ?>
+				<?php echo $editbutton; ?>
+				<?php echo $statebutton; ?>
+				<?php echo $approvalbutton; ?>
+			</div>
+			<?php endif; ?>
+			<!-- EOF buttons -->
+			
 		<?php endif; ?>
 	<?php endif; ?>
 	
-	<?php if ( $this->params->get( 'show_page_heading', 1 ) ) : ?>
+	<?php if ( $page_heading_shown ) : ?>
 		<!-- BOF page heading -->
 		<h1 class="componentheading">
 			<?php echo $this->params->get('page_heading'); ?>
@@ -145,11 +165,11 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 	
 	
   <?php if ($item->event->afterDisplayTitle) : ?>
-	  <!-- BOF afterDisplayTitle -->
+		<!-- BOF afterDisplayTitle -->
 		<div class="fc_afterDisplayTitle group">
 			<?php echo $item->event->afterDisplayTitle; ?>
 		</div>
-	  <!-- EOF afterDisplayTitle -->
+		<!-- EOF afterDisplayTitle -->
 	<?php endif; ?>
 	
 	

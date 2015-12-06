@@ -59,6 +59,22 @@ if (!function_exists('json_encode')) { // PHP < 5.2 lack support for json
 
 class flexicontent_html
 {
+	static $use_bootstrap = true;
+	static $icon_classes = null;
+	
+	static function load_class_config()
+	{
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$icon_classes = $cparams->get('font_icon_classes');
+		$icon_classes = $icon_classes ? preg_split("/[\s]*,[\s]*/", $icon_classes) : array();
+		self::$icon_classes = array();
+		foreach ($icon_classes as $d) {
+			$data = preg_split("/[\s]*:[\s]*/", $d);
+			if (count($data)!=2) { echo "Misconfigured parameter 'Icon classes': ".$d; continue; }
+			self::$icon_classes[$data[0]] = $data[1];
+		}
+	}
+	
 	static function get_system_messages_html($add_containers=false)
 	{
 		$msgsByType = array();  // Initialise variables.
@@ -526,7 +542,7 @@ class flexicontent_html
 		else
 		{
 			$tmplurl = 'components/com_flexicontent/templates/';
-			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$tooltip_class = ' hasTooltip';
 			
 			$n = 0;
 			$options = array();
@@ -1573,8 +1589,17 @@ class flexicontent_html
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
 		
 		// This checks template image directory for image, if none found, default image is returned
-		$show_icons = $params->get('show_icons');
-		if ( $show_icons ) {
+		$show_icons = $params->get('show_icons', 2);
+		$use_font   = $params->get('use_font_icons', 1);
+		if ( $show_icons && $use_font ) {
+			static $icon_class = null;
+			if ($icon_class == null) {
+				if (self::$icon_classes==null) self::load_class_config();
+				$icon_class = empty(self::$icon_classes['feed']) ? 'icon-feed' : self::$icon_classes['feed'];
+			}
+			$attribs = '';
+			$image = '<i class="'.$icon_class.'"></i>';
+		} else if ( $show_icons ) {
 			$attribs = '';
 			$image = JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), $attribs);
 		} else {
@@ -1590,9 +1615,9 @@ class flexicontent_html
 			$button_classes .= '';
 		} else {
 			$caption = $text;
-			$button_classes .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
-		$button_classes .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		// $link as set above
@@ -1625,8 +1650,17 @@ class flexicontent_html
 		}
 		
 		// This checks template image directory for image, if none found, default image is returned
-		$show_icons = $params->get('show_icons');
-		if ( $show_icons ) {
+		$show_icons = $params->get('show_icons', 2);
+		$use_font   = $params->get('use_font_icons', 1);
+		if ( $show_icons && $use_font ) {
+			static $icon_class = null;
+			if ($icon_class == null) {
+				if (self::$icon_classes==null) self::load_class_config();
+				$icon_class = empty(self::$icon_classes['print']) ? 'icon-print' : self::$icon_classes['print'];
+			}
+			$attribs = '';
+			$image = '<i class="'.$icon_class.'"></i>';
+		} else if ( $show_icons ) {
 			$attribs = '';
 			$image = JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), $attribs);
 		} else {
@@ -1642,9 +1676,9 @@ class flexicontent_html
 			$button_classes .= '';
 		} else {
 			$caption = $text;
-			$button_classes .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
-		$button_classes .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		// $link as set above
@@ -1702,8 +1736,17 @@ class flexicontent_html
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
 		
 		// This checks template image directory for image, if none found, default image is returned
-		$show_icons = $params->get('show_icons');
-		if ( $show_icons ) {
+		$show_icons = $params->get('show_icons', 2);
+		$use_font   = $params->get('use_font_icons', 1);
+		if ( $show_icons && $use_font ) {
+			static $icon_class = null;
+			if ($icon_class == null) {
+				if (self::$icon_classes==null) self::load_class_config();
+				$icon_class = empty(self::$icon_classes['mail']) ? 'icon-mail' : self::$icon_classes['mail'];
+			}
+			$attribs = '';
+			$image = '<i class="'.$icon_class.'"></i>';
+		} else if ( $show_icons ) {
 			$attribs = '';
 			$image = JHTML::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), $attribs);
 		} else {
@@ -1719,9 +1762,9 @@ class flexicontent_html
 			$button_classes .= '';
 		} else {
 			$caption = $text;
-			$button_classes .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
-		$button_classes .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		// emailed link was set above
@@ -1743,8 +1786,17 @@ class flexicontent_html
 	{
 		if ( FLEXI_J16GE || !$params->get('show_pdf_icon') || JRequest::getCmd('print') ) return;
 		
-		$show_icons = $params->get('show_icons');
-		if ( $show_icons ) {
+		$show_icons = $params->get('show_icons', 2);
+		$use_font   = $params->get('use_font_icons', 1);
+		if ( $show_icons && $use_font ) {
+			static $icon_class = null;
+			if ($icon_class == null) {
+				if (self::$icon_classes==null) self::load_class_config();
+				$icon_class = empty(self::$icon_classes['pdf']) ? 'icon-book' : self::$icon_classes['pdf'];
+			}
+			$attribs = '';
+			$image = '<i class="'.$icon_class.'"></i>';
+		} else if ( $show_icons ) {
 			$attribs = '';
 			$image = JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), $attribs);
 		} else {
@@ -1760,9 +1812,9 @@ class flexicontent_html
 			$button_classes .= '';
 		} else {
 			$caption = $text;
-			$button_classes .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
-		$button_classes .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		$link 	= JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf');
@@ -1836,16 +1888,19 @@ class flexicontent_html
 			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_STATE_AS_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_STATE_AS_PENDING'), -4=>JText::_('FLEXI_SET_STATE_AS_TO_WRITE'), 2=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
 			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', 2=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
 			
-			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$tooltip_class = ' hasTooltip';
 			$state_tips = array();
 			$title_header = '';//JText::_( 'FLEXI_ACTION' );
 			foreach ($state_names as $state_id => $i) {
-				$state_tips[$state_id] = flexicontent_html::getToolTip($title_header, $state_names[$state_id], 0);
+				$state_tips[$state_id] = flexicontent_html::getToolTip($title_header, $state_descrs[$state_id], 0);
 			}
 			
 			$button_classes = 'fc_statebutton';
-			$button_classes .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
-			$button_classes .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			if ( !$params || !$params->get('btn_grp_dropdown', 0) )
+				$button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			else
+				$button_classes .= ' btn';
+			$button_classes .= ' hasTooltip';
 			$icon_sep = JText::_( 'FLEXI_ICON_SEP' );
 		}
 		
@@ -1903,14 +1958,14 @@ class flexicontent_html
 			$allowed_states = array();
 			foreach ($state_ids as $i => $state_id) {
 				$allowed_states[] ='
-						<li>
-							<a href="javascript:void(0);" onclick="fc_setitemstate(\''.$state_id.'\', \''.$item->id.'\')" class="btn setstate_btn '.$tooltip_class.'" title="'.$state_tips[$state_id].'">
-								<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="'.$state_names[$state_id].'" />
+						<li style="display:inline-block; float:left; clear:both;">
+							<a href="javascript:void(0);" onclick="fc_setitemstate(\''.$state_id.'\', \''.$item->id.'\')" class="setstate_btn" style="text-decoration:none;">
+								<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" style="border-width:0;" alt="State" /> '.$state_tips[$state_id].'
 							</a>
 						</li>';
 			}
 			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
-			$output ='
+			$output = '
 			<ul class="statetoggler">
 				<li class="topLevel">
 					<a href="javascript:void(0);" onclick="fc_toggleStateSelector(this)" id="row'.$item->id.'" class="stateopener '.$button_classes.'" title="'.$tooltip_title.'">
@@ -1918,6 +1973,7 @@ class flexicontent_html
 					</a>
 					<div class="options" style="'.$box_css.'" onclick="fc_toggleStateSelector(this)">
 						<ul>
+						<li style="text-align:center;"><b>'.JText::_( 'FLEXI_ACTION' ).'</b></li>
 						'.implode('', $allowed_states).'
 						</ul>
 					</div>
@@ -1981,8 +2037,17 @@ class flexicontent_html
 		// Create the approval button only if user cannot edit the item (**note check at top of this method)
 		if ( $has_edit_state ) return;
 		
-		$show_icons = 2; //$params->get('show_icons');
-		if ( $show_icons ) {
+		$show_icons = $params->get('show_icons', 2);
+		$use_font   = $params->get('use_font_icons', 1);
+		if ( $show_icons && $use_font ) {
+			static $icon_class = null;
+			if ($icon_class == null) {
+				if (self::$icon_classes==null) self::load_class_config();
+				$icon_class = empty(self::$icon_classes['approval']) ? 'icon-key' : self::$icon_classes['approval'];
+			}
+			$attribs = '';
+			$image = '<i class="'.$icon_class.'"></i>';
+		} else if ( $show_icons ) {
 			$attribs = '';
 			$image = JHTML::image('components/com_flexicontent/assets/images/'.'key_add.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs);
 		} else {
@@ -1998,9 +2063,9 @@ class flexicontent_html
 			$button_classes .= '';
 		} else {
 			$caption = $text;
-			$button_classes .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
-		$button_classes .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		$link = 'index.php?option=com_flexicontent&task=approval&cid='.$item->id;
@@ -2035,8 +2100,17 @@ class flexicontent_html
 		// Create the edit button only if user can edit the give item
 		if ( !$has_edit_state ) return;
 		
-		$show_icons = $params->get('show_icons');
-		if ( $show_icons ) {
+		$show_icons = $params->get('show_icons', 2);
+		$use_font   = $params->get('use_font_icons', 1);
+		if ( $show_icons && $use_font ) {
+			static $icon_class = null;
+			if ($icon_class == null) {
+				if (self::$icon_classes==null) self::load_class_config();
+				$icon_class = empty(self::$icon_classes['edit']) ? 'icon-pencil' : self::$icon_classes['edit'];
+			}
+			$attribs = '';
+			$image = '<i class="'.$icon_class.'"></i>';
+		} else if ( $show_icons ) {
 			$attribs = '';
 			$image = JHTML::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), $attribs);
 		} else {
@@ -2052,9 +2126,9 @@ class flexicontent_html
 			$button_classes .= '';
 		} else {
 			$caption = $text;
-			$button_classes .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
-		$button_classes .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		if ( $params->get('show_editbutton', 1) == '1') {
@@ -2147,17 +2221,17 @@ class flexicontent_html
 		// ... menu item URL variables from given menu item ID will be appended if SEF URLs are OFF
 		$menu_itemid = $menu_itemid ? $menu_itemid : (int)$params->get('addbutton_menu_itemid', 0);
 		$link  = 'index.php?option=com_flexicontent';
-		$link .= $menu_itemid  ? '&Itemid='.$menu_itemid  :  '&view='.FLEXI_ITEMVIEW.'&task=add';
+		$link .= $menu_itemid  ? '&amp;Itemid='.$menu_itemid  :  '&amp;view='.FLEXI_ITEMVIEW.'&amp;task=add';
 		$link  = JRoute::_($link);
 		
 		// Add main category ID (if given)
 		if ($submit_cat && $submit_cat->id) {
-			$link .= (strstr($link, '?') ? '&' : '?') . 'maincat='.$submit_cat->id;
+			$link .= (strstr($link, '?') ? '&amp;' : '?') . 'maincat='.$submit_cat->id;
 		}
 		
 		// Append autorelate information to the URL (if given)
 		if ($auto_relations) foreach ( $auto_relations as $auto_relation ) {
-			$link .= (strstr($link, '?') ? '&' : '?') . 'autorelation_'.$auto_relation->fieldid.'='.$auto_relation->itemid;
+			$link .= (strstr($link, '?') ? '&amp;' : '?') . 'autorelation_'.$auto_relation->fieldid.'='.$auto_relation->itemid;
 		}
 		
 		
@@ -2168,8 +2242,18 @@ class flexicontent_html
 		$overlib = $submit_lbl;
 		$text = JText::_( 'FLEXI_ADD' );
 		
-		$show_icons = 2; //$params->get('show_icons');
-		if ( $show_icons && !$auto_relations ) {
+		
+		$show_icons = $params->get('show_icons', 2);
+		$use_font   = $params->get('use_font_icons', 1);
+		if ( $show_icons && $use_font && !$auto_relations ) {
+			static $icon_class = null;
+			if ($icon_class == null) {
+				if (self::$icon_classes==null) self::load_class_config();
+				$icon_class = empty(self::$icon_classes['new']) ? 'icon-new' : self::$icon_classes['new'];
+			}
+			$attribs = '';
+			$image = '<i class="'.$icon_class.'"></i>';
+		} else if ( $show_icons && !$auto_relations ) {
 			$attribs = '';
 			$image = JHTML::image('components/com_flexicontent/assets/images/'.'plus-button.png', $submit_lbl, $attribs);
 		} else {
@@ -2182,11 +2266,11 @@ class flexicontent_html
 			$button_classes .= '';
 		} else {
 			$caption = $text;
-			$button_classes .=
-				(FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall')
+			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .=
+				(self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall')
 				.($auto_relations ? ' btn-success' : '');
 		}
-		$button_classes .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		$output	= '<a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
@@ -2244,7 +2328,7 @@ class flexicontent_html
 				$attribs = '';
 				break;
 			case 'full': default:
-				$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+				$tooltip_class = ' hasTooltip';
 				$attribs = 'class="fc_stateicon '.$tooltip_class.'" title="'.$state_fulltips[$state].'"';
 				break;
 		}
@@ -2280,7 +2364,7 @@ class flexicontent_html
 		//we do the rounding here and not in the query to get better ordering results
 		$rating = round($item->votes);
 
-		$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$tooltip_class = ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip(JText::_('FLEXI_RATING'), JText::_( 'FLEXI_SCORE' ).': '.$rating.'%', 0, 1);
 		$output = '<span class="qf_ratingbarcontainer'.$tooltip_class.'" title="'.$tooltip_title.'">';
 		$output .= '<span class="qf_ratingbar" style="width:'.$rating.'%;">&nbsp;</span></span>';
@@ -2300,7 +2384,7 @@ class flexicontent_html
 		static $voteup, $votedown, $tooltip_class, $tip_vote_up, $tip_vote_down;
 		if (!$tooltip_class)
 		{
-			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$tooltip_class = ' hasTooltip';
 			$show_icons = $params->get('show_icons');
 			if ( $show_icons ) {
 				$voteup = JHTML::image('components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ), NULL);
@@ -2762,7 +2846,7 @@ class flexicontent_html
 			$document	= JFactory::getDocument();
 			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 			
-			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$tooltip_class = ' hasTooltip';
 			$text 		= $user->id ? 'FLEXI_ADDREMOVE_FAVOURITE' : 'FLEXI_FAVOURE';
 			$overlib 	= $user->id ? 'FLEXI_ADDREMOVE_FAVOURITE_TIP' : 'FLEXI_FAVOURE_LOGIN_TIP';
 			$addremove_tip = flexicontent_html::getToolTip($text, $overlib, 1, 1);
@@ -3220,7 +3304,7 @@ class flexicontent_html
 				
 				$checked = $selected==='' ? 'checked="checked"' : '';
 				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="'.$required.'" value="" '.$checked.' data-element-grpid="'.$tagid.'" />';
-				$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+				$tooltip_class = ' hasTooltip';
 				$tooltip_title = flexicontent_html::getToolTip('FLEXI_USE_LANGUAGE_COLUMN', 'FLEXI_USE_LANGUAGE_COLUMN_TIP', 1, 1);
 				$list 	.= '<label class="lang_box'.$tooltip_class.'" for="lang9999" title="'.$tooltip_title.'">';
 				$list 	.= JText::_( 'FLEXI_USE_LANGUAGE_COLUMN' );
@@ -3289,7 +3373,7 @@ class flexicontent_html
 			
 			$checked = $selected==='' ? ' checked="checked"' : '';
 			$list 	.= '<input id="state9999" type="radio" name="state" class="state" value="" '.$checked.'/>';
-			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$tooltip_class = ' hasTooltip';
 			$tooltip_title = flexicontent_html::getToolTip('FLEXI_USE_STATE_COLUMN', 'FLEXI_USE_STATE_COLUMN_TIP', 1, 1);
 			$list 	.= '<label class="state_box'.$tooltip_class.'" for="state9999" title="'.$tooltip_title.'">';
 			$list 	.= JText::_( 'FLEXI_USE_STATE_COLUMN' );

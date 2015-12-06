@@ -23,23 +23,56 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fccategory fccat'.$this->category->id;
 $menu = JFactory::getApplication()->getMenu()->getActive();
 if ($menu) $page_classes .= ' menuitem'.$menu->id; 
+
 ?>
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
 <!-- BOF buttons -->
 <?php if (JRequest::getCmd('print')) : ?>
+
 	<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
 		<script type="text/javascript">jQuery(document).ready(function(){ window.print(); });</script>
 	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
 		<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 	<?php endif; ?>
-<?php elseif ( $this->params->get('show_print_icon') || $this->params->get('show_email_icon') || $this->params->get('show_feed_icon', 1) || $this->params->get('show_addbutton', 1) ) : ?>
-	<div class="buttons">
-		<?php echo flexicontent_html::addbutton( $this->params, $this->category ); ?>
-		<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
-		<?php echo flexicontent_html::mailbutton( 'category', $this->params, $this->category->slug ); ?>
-		<?php echo flexicontent_html::feedbutton( 'category', $this->params, $this->category->slug ); ?>
-	</div>
+
+<?php else : ?>
+	<?php
+	$_add_btn   = flexicontent_html::addbutton( $this->params, $this->category );
+	$_print_btn = flexicontent_html::printbutton( $this->print_link, $this->params );
+	$_mail_btn  = flexicontent_html::mailbutton( 'category', $this->params, $this->category->slug );
+	$_feed_btn  = flexicontent_html::feedbutton( 'category', $this->params, $this->category->slug );
+	?>
+
+	<?php if ( $_add_btn || $_print_btn || $_mail_btn || $_feed_btn ) : ?>
+	
+		<?php if ($this->params->get('btn_grp_dropdown')) : ?>
+		
+		<div class="buttons btn-group">
+		  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+		    <span class="<?php echo $this->params->get('btn_grp_dropdown_class', 'icon-options'); ?>"></span>
+		  </button>
+		  <ul class="dropdown-menu" role="menu">
+		    <?php echo $_add_btn   ? '<li>'.$_add_btn.'</li>' : ''; ?>
+		    <?php echo $_print_btn ? '<li>'.$_print_btn.'</li>' : ''; ?>
+		    <?php echo $_mail_btn  ? '<li>'.$_mail_btn.'</li>' : ''; ?>
+		    <?php echo $_feed_btn  ? '<li>'.$_feed_btn.'</li>' : ''; ?>
+		  </ul>
+		</div>
+		
+	  <?php else : ?>
+	  
+		<div class="buttons">
+	    <?php echo $_add_btn; ?>
+	    <?php echo $_print_btn; ?>
+	    <?php echo $_mail_btn; ?>
+	    <?php echo $_feed_btn; ?>
+		</div>
+		
+		<?php endif; ?>
+		
+	<?php endif; ?>
+	
 <?php endif; ?>
 <!-- EOF buttons -->
 

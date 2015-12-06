@@ -224,12 +224,8 @@
 	</fieldset>
 	<fieldset name="views_all_views_fset" label="FLEXI_ALL_VIEWS_CONF" description="" >
 		
-		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level1" />
-			<field name="show_icons" type="radio" default="2" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_TEXT</option>
-				<option value="1">FLEXI_ICONS</option>
-				<option value="2">FLEXI_BOTH</option>
-			</field>
+		<field name="" type="separator" default="FLEXI_BUTTONS" label="" level="level0" />
+			
 			<!--field name="show_pdf_icon" type="radio" default="1" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -259,6 +255,22 @@
 				<option value="button">FLEXI_BUTTON</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMS_LABEL" label="" level="level1" />
+			<field name="show_icons" type="radio" default="2" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_TEXT</option>
+				<option value="1">FLEXI_ICONS</option>
+				<option value="2">FLEXI_BOTH</option>
+			</field>
+			<field name="use_font_icons" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_ICON_TYPE" description="FLEXI_ICON_TYPE_DESC" class="btn-group group-fcmethod" >
+				<option value="0" show_list="" hide_list="disp_icon_classes">FLEXI_IMAGE</option>
+				<option value="1" show_list="disp_icon_classes" hide_list="disp_title">FLEXI_FONT_ICONS</option>
+			</field>
+			<field name="font_icon_classes" type="textarea" rows="2" default="pdf:icon-book, print:icon-print, mail:icon-mail, feed:icon-feed, edit:icon-pencil, new:icon-new, approval:icon-key" label="FLEXI_FONT_ICONS" description="FLEXI_FONT_ICONS_DESC" class="disp_icon_classes input-xxlarge" />
+			<field name="btn_grp_dropdown" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_BTN_GROUP_AS_DROPDOWN" description="FLEXI_BTN_GROUP_AS_DROPDOWN_DESC" class="btn-group btn-group-yesno" >
+				<option value="0" show_list="" hide_list="disp_btn_grp_dropdown">FLEXI_NO</option>
+				<option value="1" show_list="disp_btn_grp_dropdown" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="btn_grp_dropdown_class" type="text" default="icon-options" label="FLEXI_BTN_GROUP_TOGGLE_BTN_CLASS" description="FLEXI_BTN_GROUP_TOGGLE_BTN_CLASS_DESC" class="disp_btn_grp_dropdown" />
 	</fieldset>
 	<fieldset name="item_view_fset" label="FLEXI_ITEM_VIEW" description="" >
 		
@@ -343,10 +355,12 @@
 			<field name="cat_tags_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=tags%%tagid=0%%cid=0" default="" disable="separator" state="1" published="1" label="Tagged items" description="FLEXI_CATEGORY_BASED_VIEWS">
 				<option value="">FLEXI_NONE</option>
 			</field>
-			<field name="cat_favs_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=favs%%cid=0" default="" disable="separator" state="1" published="1" label="Favoured items" description="FLEXI_CATEGORY_BASED_VIEWS">
+			<field name="cat_author_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=author%%cid=0" default="" disable="separator" state="1" published="1" label="Authored items" description="FLEXI_CATEGORY_BASED_VIEWS">
 				<option value="">FLEXI_NONE</option>
 			</field>
-			<field name="cat_author_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=author%%cid=0" default="" disable="separator" state="1" published="1" label="Authored items" description="FLEXI_CATEGORY_BASED_VIEWS">
+			
+			<field name="" type="separator" default="FLEXI_OPTIONAL" label="" level="level3"/>
+			<field name="cat_favs_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=favs%%cid=0" default="" disable="separator" state="1" published="1" label="Favoured items" description="FLEXI_CATEGORY_BASED_VIEWS">
 				<option value="">FLEXI_NONE</option>
 			</field>
 			<field name="cat_myitems_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=myitems%%cid=0" default="" disable="separator" state="1" published="1" label="My items" description="FLEXI_CATEGORY_BASED_VIEWS">
