@@ -38,6 +38,7 @@
 	margin: 0px;
 	padding: 0px;
 	float: right;
+	position: relative; /* needed for absolute placed elements inside */
 }
 #flexicontent .buttons.fcleft { float: left;}
 #flexicontent .buttons.fcright { float: right; }
@@ -51,14 +52,12 @@
 #flexicontent .buttons.fcright ul.statetoggler > li.topLevel > .options { left:0; right:auto; }
 
 #flexicontent .buttons.btn-group > ul.statetoggler {margin-left:8px;}
-#flexicontent .buttons:not(.btn-group ) > ul.statetoggler a,
 #flexicontent .buttons > a > i {
 	vertical-align:middle;
 	font-size: 14px;
 	margin:0 8px 0 0;
 }
-#flexicontent .buttons > a:not(.btn),
-#flexicontent .buttons:not(.btn-group ) > ul.statetoggler a {
+#flexicontent .buttons > a:not(.btn) {
 	line-height: 2em;
 	font-size: 14px;
 	color: black;
@@ -75,8 +74,7 @@
 	vertical-align:top;
 	display: inline-block;
 }
-#flexicontent .buttons > a:not(.btn):hover,
-#flexicontent .buttons:not(.btn-group ) > ul.statetoggler a:hover {
+#flexicontent .buttons > a:not(.btn):hover {
 	background-color: #dddddd;
 	background: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#cccccc));
 	background: -webkit-linear-gradient(top, #dddddd, #cccccc);

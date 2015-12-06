@@ -584,7 +584,12 @@ class FlexicontentFields
 			$no_acc_msg = JText::_( $no_acc_msg ? $no_acc_msg : 'FLEXI_FIELD_NO_ACCESS');
 			foreach($items as $item) {
 				$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
-				$field->$method = $show_acc_msg ? '<span class="fc-noauth fcfield_inaccessible_'.$field->id.'">'.$no_acc_msg.'</span>' : '';
+				// Only add no access message if field has a value
+				if (!empty($field->value)) {
+					$field->$method = $show_acc_msg ? '<span class="fc-noauth fcfield_inaccessible_'.$field->id.'">'.$no_acc_msg.'</span>' : '';
+				} else {
+					$field->$method = '';
+				}
 			}
 			
 			// Return field only if single item was given (with a field object)

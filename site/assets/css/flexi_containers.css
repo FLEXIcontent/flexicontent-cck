@@ -192,6 +192,7 @@ body .fc-mssg.fc-noborder  {
 }
 
 #flexicontent ul.statetoggler > li.topLevel ul > li a {
+	white-space: nowrap;
 	display: inline-block;
 	box-sizing: border-box;
 	margin: 0px;
