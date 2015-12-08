@@ -55,8 +55,12 @@
 #flexicontent .buttons > a > i {
 	vertical-align:middle;
 	font-size: 14px;
-	margin:0 8px 0 0;
+	margin:0;
 }
+#flexicontent .buttons > a > i.fcIconPadRight {
+	margin: 0 8px 0 0;
+}
+
 #flexicontent .buttons > a:not(.btn) {
 	line-height: 2em;
 	font-size: 14px;

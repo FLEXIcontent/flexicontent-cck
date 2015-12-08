@@ -1596,6 +1596,7 @@ class flexicontent_html
 			if ($icon_class == null) {
 				if (self::$icon_classes==null) self::load_class_config();
 				$icon_class = empty(self::$icon_classes['feed']) ? 'icon-feed' : self::$icon_classes['feed'];
+				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
 			}
 			$attribs = '';
 			$image = '<i class="'.$icon_class.'"></i>';
@@ -1657,6 +1658,7 @@ class flexicontent_html
 			if ($icon_class == null) {
 				if (self::$icon_classes==null) self::load_class_config();
 				$icon_class = empty(self::$icon_classes['print']) ? 'icon-print' : self::$icon_classes['print'];
+				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
 			}
 			$attribs = '';
 			$image = '<i class="'.$icon_class.'"></i>';
@@ -1743,6 +1745,7 @@ class flexicontent_html
 			if ($icon_class == null) {
 				if (self::$icon_classes==null) self::load_class_config();
 				$icon_class = empty(self::$icon_classes['mail']) ? 'icon-mail' : self::$icon_classes['mail'];
+				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
 			}
 			$attribs = '';
 			$image = '<i class="'.$icon_class.'"></i>';
@@ -1793,6 +1796,7 @@ class flexicontent_html
 			if ($icon_class == null) {
 				if (self::$icon_classes==null) self::load_class_config();
 				$icon_class = empty(self::$icon_classes['pdf']) ? 'icon-book' : self::$icon_classes['pdf'];
+				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
 			}
 			$attribs = '';
 			$image = '<i class="'.$icon_class.'"></i>';
@@ -2044,6 +2048,7 @@ class flexicontent_html
 			if ($icon_class == null) {
 				if (self::$icon_classes==null) self::load_class_config();
 				$icon_class = empty(self::$icon_classes['approval']) ? 'icon-key' : self::$icon_classes['approval'];
+				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
 			}
 			$attribs = '';
 			$image = '<i class="'.$icon_class.'"></i>';
@@ -2107,6 +2112,7 @@ class flexicontent_html
 			if ($icon_class == null) {
 				if (self::$icon_classes==null) self::load_class_config();
 				$icon_class = empty(self::$icon_classes['edit']) ? 'icon-pencil' : self::$icon_classes['edit'];
+				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
 			}
 			$attribs = '';
 			$image = '<i class="'.$icon_class.'"></i>';
@@ -2250,6 +2256,7 @@ class flexicontent_html
 			if ($icon_class == null) {
 				if (self::$icon_classes==null) self::load_class_config();
 				$icon_class = empty(self::$icon_classes['new']) ? 'icon-new' : self::$icon_classes['new'];
+				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
 			}
 			$attribs = '';
 			$image = '<i class="'.$icon_class.'"></i>';
