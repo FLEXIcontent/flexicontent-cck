@@ -728,7 +728,7 @@ jQuery(document).ready(function() {
 			$field->field_valuesselect = ' CAST(fi.value AS UNSIGNED) AS value_id, ct.title AS value';
 			$field->field_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED)';
 			$field->field_groupby      = ' GROUP BY CAST(fi.value AS UNSIGNED) ';
-		} else {
+		} else if (!empty($post)) {
 			$_ids = array();
 			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID
 			$db = JFactory::getDBO();
@@ -755,7 +755,7 @@ jQuery(document).ready(function() {
 			$field->field_valuesselect = ' CAST(fi.value AS UNSIGNED) AS value_id, ct.title AS value';
 			$field->field_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED)';
 			$field->field_groupby      = ' GROUP BY CAST(fi.value AS UNSIGNED) ';
-		} else {
+		} else if (!empty($post)) {
 			$_ids = array();
 			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID 
 			$db = JFactory::getDBO();
