@@ -35,15 +35,18 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		
-		$use_ingroup = $field->parameters->get('use_ingroup', 0);
-		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
-		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$use_ingroup  = $field->parameters->get('use_ingroup', 0);
+		$value_classes= 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$multiple     = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		// some parameter shortcuts
 		$required = $field->parameters->get('required',0);
 		$required = $required ? ' required' : '';
-		$embedly_key = $field->parameters->get('embedly_key','') ;
+		
+		$embedly_key = $field->parameters->get('embedly_key', '');
+		$youtube_key = $field->parameters->get('youtube_key', '');
+		$use_native_apis = (int) $field->parameters->get('use_native_apis', 0);
 		
 		$display_audiotype_form = $field->parameters->get('display_audiotype_form',1) ;
 		$display_audioid_form   = $field->parameters->get('display_audioid_form',1) ;
@@ -67,7 +70,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 		$value = $values[0];
 		
 		$field->html = array();
-		foreach($values as $n => $value)
+		foreach ($values as $n => $value)
 		{
 			if (!isset($value['url']))         $value['url'] = '';
 			if (!isset($value['audiotype']))   $value['audiotype'] = '';
@@ -177,6 +180,7 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 		$css = "";
 		
 		$js = '
+		var fc_audioID_'.$field->name.';
 		function fetchAudio_'.$field->name.'() {
 			var fieldname = \'custom['.$field->name.']\';
 			var url = fieldname+"[url]";
@@ -187,72 +191,164 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			var _loading_img = "<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">";
 			jQuery("#fcfield_fetching_msg_'.$field->id.'").html(_loading_img);
 			
-			if(window.console) window.console.log("Fetching "+url);
-			// try youtube
-			var myregexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
-			if(url.match(myregexp) != null) {
-				audioID = url.match(myregexp)[1];
-				audioType = "youtube";
-			}
-			// try vimeo
-			var myregexp = /http:\/\/(www\.)?vimeo.com\/(\d+)($|\/)/;
-			if(url.match(myregexp) != null) {
-				audioID = url.match(myregexp)[2];
-				audioType = "vimeo";
-			}
-			// try dailymotion
-			var myregexp = /^.+dailymotion.com\/(video|hub)\/([^_]+)[^#]*(#video=([^_&]+))?/;
-			if(url.match(myregexp) != null) {
-				audioID = url.match(myregexp)[4]!== undefined ? url.match(myregexp)[4] : url.match(myregexp)[2];
-				audioType = "dailymotion";
-			}
-			var jsonurl;
-			updateValueInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
-			updateValueTypeId_'.$field->name.'(audioType,audioID);
-			if(audioID && audioType){
-				if(window.console) window.console.log("Audio type: "+audioType);
-				if(window.console) window.console.log("Audio ID: "+audioID);
-				switch(audioType) {
-					case "youtube":
-						jsonurl = "//gdata.youtube.com/feeds/api/videos/"+audioID+"?v=2&alt=json-in-script&callback=youtubeCallback_'.$field->name.'";
-						break;
-					case "vimeo":
-						jsonurl = "//vimeo.com/api/v2/video/"+audioID+".json?callback=vimeoCallback_'.$field->name.'";
-						break;
-					case "dailymotion":
-						jsonurl = "https://api.dailymotion.com/video/"+audioID+"?fields=description,duration,owner.screenname,thumbnail_60_url,title&callback=dailymotionCallback_'.$field->name.'";
-						break;
+			if (window.console) window.console.log("Fetching "+url);
+			
+			if ('.$use_native_apis.') {
+				// try youtube
+				var myregexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+				if(url.match(myregexp) != null) {
+					audioID = url.match(myregexp)[1];
+					audioType = "youtube";
+				}
+				
+				// Try vimeo
+				var myregexp = /https?:\/\/(www\.)?vimeo.com\/(\d+)($|\/)/;
+				if(url.match(myregexp) != null) {
+					audioID = url.match(myregexp)[2];
+					audioType = "vimeo";
+				}
+				
+				// Try dailymotion
+				var myregexp = /^.+dailymotion.com\/(video|hub)\/([^_]+)[^#]*(#video=([^_&]+))?/;
+				if(url.match(myregexp) != null) {
+					audioID = url.match(myregexp)[4]!== undefined ? url.match(myregexp)[4] : url.match(myregexp)[2];
+					audioType = "dailymotion";
 				}
 			}
-			else { 
-				// try embed.ly
-				jsonurl = "http://api.embed.ly/1/oembed?url="+encodeURIComponent(url)+"&key='.$embedly_key.'&callback=embedlyCallback_'.$field->name.'";
+			
+			fc_audioID_'.$field->name.' = audioID;
+			
+			// Clear existing data
+			updateValueInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
+			updateValueTypeId_'.$field->name.'("","");
+			
+			var jsonurl;
+			if (audioID && audioType) {
+				if(window.console) window.console.log("Audio type: "+audioType);
+				if(window.console) window.console.log("Audio ID: "+audioID);
+				switch(audioType)
+				{
+					case "youtube"    : jsonurl = "https://www.googleapis.com/youtube/v3/videos?id="+audioID+"&key='.$youtube_key.'&part=snippet,contentDetails,statistics,status";/*&callback=youtubeCallback_'.$field->name.'";*/  break;
+					case "vimeo"      : jsonurl = "//vimeo.com/api/v2/video/"+audioID+".json";/*?callback=vimeoCallback_'.$field->name.'";*/  break;
+					case "dailymotion": jsonurl = "https://api.dailymotion.com/video/"+audioID+"?fields=description,duration,owner.screenname,thumbnail_60_url,title";/*&callback=dailymotionCallback_'.$field->name.'";*/  break;
+				}
 			}
-			if(url!="") {
-				var jsonscript = document.createElement("script");
-				jsonscript.setAttribute("type","text/javascript");
-				jsonscript.setAttribute("src",jsonurl);
-				document.body.appendChild(jsonscript);
+			else {
+				// try embed.ly
+				jsonurl = "http://api.embed.ly/1/oembed?url="+encodeURIComponent(url)+"&key='.$embedly_key.'";//&callback=embedlyCallback_'.$field->name.'";
+			}
+			if (url!="") {
+				jQuery.ajax({
+					url: jsonurl,
+					dataType: "json",
+					success: function(data) {
+						window.console.log("Received Server response");
+						var response;
+						try {
+							response = typeof data !== "object" ? jQuery.parseJSON( data ) : data;
+							window.console.log("Calling callback function on data:");
+							window.console.log(response);
+							if (audioID && audioType)
+							{
+								switch(audioType)
+								{
+									case "youtube"     : youtubeCallback_'.$field->name.'(response);  break;
+									case "vimeo"       : vimeoCallback_'.$field->name.'(response);  break;
+									case "dailymotion" : dailymotionCallback_'.$field->name.'(response);  break;
+								}
+							}
+							else {
+								embedlyCallback_'.$field->name.'(response);
+							}
+						} catch(err) {
+							jQuery("#fcfield_fetching_msg_'.$field->id.'").html("<span class=\"alert alert-warning fc-iblock\">"+response+"</span>");
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						window.console.log("Error, responseText is:");
+						window.console.log(jqXHR.responseText);
+						var response;
+						try {
+							response = jQuery.parseJSON( jqXHR.responseText );
+						} catch(err) {
+							response = jqXHR.responseText;
+						}
+						var errorText = typeof response !== "object" ? response : (audioID && (audioType=="dailymotion" || audioType=="youtube")  ? response.error.message : response.error_message);
+						if (audioType=="youtube") errorText += " Reason: "  +response.error.errors[0].reason;
+						//document.getElementById("'.$field->name.'_thumb").innerHTML = "<span class=\"alert alert-warning fc-iblock\">"+errorText+"</span>";
+						jQuery("#fcfield_fetching_msg_'.$field->id.'").html("<span class=\"alert alert-warning fc-iblock\">"+errorText+"</span>");
+					}
+				});
 			}
 			else {
 				updateValueInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
-				updateValueTypeId_'.$field->name.'("","");				
+				updateValueTypeId_'.$field->name.'("","");
 			}
 		}
-		function youtubeCallback_'.$field->name.'(data){
-			updateValueInfo_'.$field->name.'({title: data.entry.title.$t, author: data.entry.author[0].name.$t, duration: data.entry.media$group.yt$duration.seconds, description: data.entry.media$group.media$description.$t, thumb: data.entry.media$group.media$thumbnail[0].url});
-			jQuery("#fcfield_fetching_msg_'.$field->id.'").html("");
+		
+		
+		function youtubeDurationToSeconds_'.$field->name.'(duration)
+		{
+		  var match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+		  var hours = (parseInt(match[1]) || 0);
+		  var minutes = (parseInt(match[2]) || 0);
+		  var seconds = (parseInt(match[3]) || 0);
+			return hours * 3600 + minutes * 60 + seconds;
 		}
-		function vimeoCallback_'.$field->name.'(data){
-			updateValueInfo_'.$field->name.'({title: data[0].title, author: data[0].user_name, duration: data[0].duration, description: data[0].description, thumb: data[0].thumbnail_small});
-			jQuery("#fcfield_fetching_msg_'.$field->id.'").html("");
+		
+		
+		function youtubeCallback_'.$field->name.'(data, audioID)
+		{
+			if (typeof data === "object" && typeof data.error === "undefined" ) {
+				if (data.items.length == 0) {
+					jQuery("#fcfield_fetching_msg_'.$field->id.'").html("<span class=\"alert alert-warning fc-iblock\">Not found</span>");
+					return;
+				}
+				updateValueTypeId_'.$field->name.'("youtube", audioID);
+				updateValueInfo_'.$field->name.'({title: data.items[0].snippet.title, author: data.items[0].snippet.channelTitle, duration: youtubeDurationToSeconds_'.$field->name.'(data.items[0].contentDetails.duration), description: data.items[0].snippet.description, thumb: data.items[0].snippet.thumbnails.medium.url});
+				jQuery("#fcfield_fetching_msg_'.$field->id.'").html("");
+			} else {
+				alert("'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_UNABLE_TO_PARSE').'");
+				var errorText = typeof data === "object" ? data.error.message : data;
+				jQuery("#fcfield_fetching_msg_'.$field->id.'").html("<span class=\"alert alert-warning fc-iblock\">"+errorText+"</span>");
+				updateValueTypeId_'.$field->name.'("","");
+			}
 		}
-		function dailymotionCallback_'.$field->name.'(data){
-			updateValueInfo_'.$field->name.'({title: data.title, author: data["owner.screenname"], duration: data.duration, description: data.description, thumb: data.thumbnail_60_url});
-			jQuery("#fcfield_fetching_msg_'.$field->id.'").html("");
+		
+		
+		function vimeoCallback_'.$field->name.'(data, audioID)
+		{
+			if (typeof data === "object" && data.type != "error") {
+				updateValueTypeId_'.$field->name.'("vimeo", audioID);
+				updateValueInfo_'.$field->name.'({title: data[0].title, author: data[0].user_name, duration: data[0].duration, description: data[0].description, thumb: data[0].thumbnail_small});
+				jQuery("#fcfield_fetching_msg_'.$field->id.'").html("");
+			} else {
+				var errorText = typeof data === "object" ? data.error_message : data;
+				alert("'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_UNABLE_TO_PARSE').'");
+				jQuery("#fcfield_fetching_msg_'.$field->id.'").html("<span class=\"alert alert-warning fc-iblock\">"+errorText+"</span>");
+				updateValueTypeId_'.$field->name.'("","");
+			}
 		}
-		function embedlyCallback_'.$field->name.'(data){
-			if(data.type!="error") {
+		
+		
+		function dailymotionCallback_'.$field->name.'(data, audioID)
+		{
+			if (typeof data === "object" && typeof data.error === "undefined") {
+				updateValueTypeId_'.$field->name.'("dailymotion", audioID);
+				updateValueInfo_'.$field->name.'({title: data.title, author: data["owner.screenname"], duration: data.duration, description: data.description, thumb: data.thumbnail_60_url});
+				jQuery("#fcfield_fetching_msg_'.$field->id.'").html("");
+			} else {
+				alert("'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_UNABLE_TO_PARSE').'");
+				var errorText = typeof data === "object" ? data.error_message : data;
+				jQuery("#fcfield_fetching_msg_'.$field->id.'").html("<span class=\"alert alert-warning fc-iblock\">"+data.error.message+"</span>");
+				updateValueTypeId_'.$field->name.'("","");
+			}
+		}
+		
+		
+		function embedlyCallback_'.$field->name.'(data)
+		{
+			if (typeof data === "object" && data.type != "error") {
 				var myregexp = /(http:|ftp:|https:)?\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
 				if(data.html.match(myregexp) != null) {
 					var iframeurl = data.html.match(myregexp)[0];
@@ -263,30 +359,33 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				}
 			}
 			else {
-				alert("'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_UNABLE_TO_PARSE').'"); 
-				updateValueInfo_'.$field->name.'({title:"", author:"", duration:"", description:"", thumb:""});
-				updateValueTypeId_'.$field->name.'("","");				
+				alert("'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_UNABLE_TO_PARSE').'");
+				var errorText = typeof data === "object" ? data.error_message : data;
+				jQuery("#fcfield_fetching_msg_'.$field->id.'").html("<span class=\"alert alert-warning fc-iblock\">"+errorText+"</span>");
+				updateValueTypeId_'.$field->name.'("","");
 			}
 			jQuery("#fcfield_fetching_msg_'.$field->id.'").html("");
 		}
-		function updateValueTypeId_'.$field->name.'(audioType,audioID){
+		
+		
+		function updateValueTypeId_'.$field->name.'(audioType, audioID)
+		{
+			audioID = typeof audioID === "undefined" || !audioID  ?  fc_audioID_'.$field->name.' : audioID;
+			if (audioType=="") audioID = "";
+			
 			var fieldname = \'custom['.$field->name.']\';
 			field = fieldname+"[audiotype]";
 			document.forms["adminForm"].elements[field].value = audioType;
 			field = fieldname+"[audioid]";
 			document.forms["adminForm"].elements[field].value = audioID;
-			if(audioType!="" && audioID!="") {
+
+			if (audioType!="" && audioID!="")
+			{
 				var iframecode = \'<iframe class="sharedaudio" src="\';
-				switch(audioType){
-					case "youtube":
-						iframecode += "//www.youtube.com/embed/";
-						break;
-					case "vimeo":
-						iframecode += "//player.vimeo.com/video/";
-						break;
-					case "dailymotion":
-						iframecode += "//www.dailymotion.com/embed/video/";
-						break;
+				switch(audioType) {
+					case "youtube"    :  iframecode += "//www.youtube.com/embed/";   break;
+					case "vimeo"      :  iframecode += "//player.vimeo.com/video/";  break;
+					case "dailymotion":  iframecode += "//www.dailymotion.com/embed/video/"; break;
 				}
 				iframecode += audioID + \'" width="240" height="135" style="border:0;" allowFullScreen></iframe>\';
 				document.getElementById("'.$field->name.'_thumb").innerHTML = iframecode;
@@ -294,18 +393,17 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			else {
 				document.getElementById("'.$field->name.'_thumb").innerHTML = "";
 			}
-
 		}
-		function updateValueInfo_'.$field->name.'(data){
+		
+		
+		function updateValueInfo_'.$field->name.'(data)
+		{
 			var fieldname = \'custom['.$field->name.']\';
-			field = fieldname+"[title]";
-			document.forms["adminForm"].elements[field].value = data.title;
-			field = fieldname+"[author]";
-			document.forms["adminForm"].elements[field].value = data.author;
-			field = fieldname+"[duration]";
-			document.forms["adminForm"].elements[field].value = data.duration;
-			field = fieldname+"[description]";
-			document.forms["adminForm"].elements[field].value = data.description;
+			
+			document.forms["adminForm"].elements[  fieldname+"[title]"  ].value = data.title;
+			document.forms["adminForm"].elements[  fieldname+"[author]"  ].value = data.author;
+			document.forms["adminForm"].elements[  fieldname+"[duration]"  ].value = data.duration;
+			document.forms["adminForm"].elements[  fieldname+"[description]"  ].value = data.description;
 		}
 		';
 		
@@ -346,18 +444,18 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			if ( empty($value['audioid']) ) continue;
 			
 			// some parameter shortcuts
-			$display_title = $field->parameters->get('display_title',1) ;
+			$display_title  = $field->parameters->get('display_title',1) ;
 			$display_author = $field->parameters->get('display_author',0) ;
 			$display_duration = $field->parameters->get('display_duration',0) ;
 			$display_description = $field->parameters->get('display_description',0) ;
 			
-			$pretext = $field->parameters->get('pretext','') ;
+			$pretext  = $field->parameters->get('pretext','') ;
 			$posttext = $field->parameters->get('posttext','') ;
 			
-			$headinglevel = $field->parameters->get('headinglevel',3) ;
-			$width = $field->parameters->get('width',480) ;
-			$height = $field->parameters->get('height',270) ;
-			$autostart = $field->parameters->get('autostart',0) ;
+			$headinglevel = $field->parameters->get('headinglevel', 3);
+			$width        = $field->parameters->get('width', 960);
+			$height       = $field->parameters->get('height', 540);
+			$autostart    = $field->parameters->get('autostart', 0);
 			
 			// generate html output
 			$field->{$prop} .= $pretext;

@@ -165,7 +165,7 @@ foreach($values as $file_id)
 	if ( !$authorized ) {
 		$dl_link = $noaccess_url;
 		if ($noaccess_msg) {
-			$str = '<span class="fcfile_noauth_msg alert">' .$noaccess_msg. '</span> ';
+			$str = '<span class="fcfile_noauth_msg alert fc-iblock">' .$noaccess_msg. '</span> ';
 		}
 	} else {
 		$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$item->id.'&fid='.$field->id.'&task=download' );

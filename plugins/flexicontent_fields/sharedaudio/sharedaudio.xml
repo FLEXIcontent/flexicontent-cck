@@ -17,8 +17,19 @@
 	<config>
 	<fields name="attribs">
 	
-		<!--fieldset name="standard" repeat="1">
-		</fieldset-->
+		<fieldset name="group-sharedaudio-apis" repeat="1" icon_class="icon-cog" label="APIs" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="Embeding method" level="level2"/>
+			<field name="" type="separator" default="Either use embed.ly only, - or - also use native APIs: youtube, vimeo, dailymotion" level="level4" class="alert alert-info fcpadded"/>
+			<field name="" type="separator" default="Note this will not change embeding method of already saved values" level="level4" class="alert alert-info fcpadded"/>
+			<field name="use_native_apis" type="multilist" subtype="radio" toggle_related="1" default="1" label="Embed with" description="Disable to also use native APIs" class="btn-group group-fcmethod">
+				<option value="0" show_list="" hide_list="disp-native-apis">embed.ly API only</option>
+				<option value="1" show_list="disp-native-apis" hide_list="">embed.ly API and native APIs</option>
+			</field>
+			<field name="embedly_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEDLY_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEDLY_KEY_DESC" />
+			<field name="youtube_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_YOUTUBE_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_YOUTUBE_KEY_DESC" depend_class="disp-native-apis" />
+			
+		</fieldset>
+		
 		<fieldset name="group-sharedaudio-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
 			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
@@ -113,7 +124,6 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="embedly_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEDLY_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEDLY_KEY_DESC" />
 		</fieldset>
 		
 	</fields>

@@ -2806,7 +2806,7 @@ class flexicontent_html
 		$userlisttype = $field->parameters->get('display_favoured_userlist', 0);
 		$maxusercount = $field->parameters->get('display_favoured_max', 12);
 
-		$favuserlist = $favourites ? '<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage fcfavs-subscribers-count">'.JText::_('FLEXI_TOTAL').': '.$favourites.' '.JText::_('FLEXI_USERS') : '';
+		$favuserlist = $favourites ? '<div class="fc-mssg fc-info fc-iblock fc-nobgimage fcfavs-subscribers-count">'.JText::_('FLEXI_TOTAL').': '.$favourites.' '.JText::_('FLEXI_USERS') : '';
 
 		if ( !$userlisttype ) return $favuserlist ? $favuserlist.'</div>' : '';
 		else if ($userlisttype==1) $uname="u.username";

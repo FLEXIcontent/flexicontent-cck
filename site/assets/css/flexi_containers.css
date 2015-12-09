@@ -208,6 +208,8 @@ body .fc-mssg.fc-noborder  {
 	padding: 4px 6px;
 	margin: 0;
 	border: none;
+	display:unset;
+	box-sizing:unset;
 }
 
 #flexicontent ul.statetoggler > li.topLevel > a.stateopener {
@@ -220,6 +222,8 @@ body .fc-mssg.fc-noborder  {
 	margin: 0;
 	border: none;
 	vertical-align:middle;
+	display:unset;
+	box-sizing:unset;
 }
 
 #flexicontent ul.statetoggler .ajax-loader {

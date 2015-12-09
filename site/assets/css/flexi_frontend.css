@@ -654,6 +654,8 @@ div.current dd {
  * File / image Field and other Plugins
  **************************************/
 
+/*[class^="fcfile_"], [class*=" fcfile_"] {}*/
+
 /* File field viewing: property icons */
 .fcfile_mime .fcicon-mime,
 .fcfile_hits .fcicon-hits,
