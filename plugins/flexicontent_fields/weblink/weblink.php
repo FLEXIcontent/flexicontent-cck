@@ -463,7 +463,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
 		}
 		
-		// Initialise property with default value
+		// Create field's HTML
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)

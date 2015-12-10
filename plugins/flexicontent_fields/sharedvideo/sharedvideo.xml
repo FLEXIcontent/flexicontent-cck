@@ -16,11 +16,12 @@
 	
 	<config>
 	<fields name="attribs">
-	
+		
 		<!--fieldset name="standard" repeat="1">
 		</fieldset-->
-		<fieldset name="group-sharedvideo-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
+		<fieldset name="group-sharedvideo-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
 			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comment.png" class="btn-group group-fcmethod fcoffactive">
@@ -50,6 +51,18 @@
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			
 			<field name="" type="separator" default="Display field on form" level="level1" />
+			<!--field name="display_videtype_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TYPE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TYPE_FORM_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
+			<!--field name="display_videoid_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_ID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_ID_FORM_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
+			<!--field name="display_duration_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_FORM_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
 			<field name="display_title_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TITLE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TITLE_FORM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -99,6 +112,23 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
+			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" class="btn-group group-fcmethod">
+				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
+				<option value="1" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ol&gt;','closetag':'&lt;/ol&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List: numbered</option>
+				<option value="2" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:disc\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (bullets)</option>
+				<option value="3" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:circle\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (circle)</option>
+				<option value="4" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:square\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (square)</option>
+				<option value="5" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:none\'&gt;','closetag':'&lt;/oul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (no marking)</option>
+				<option value="6" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge</option>
+				<option value="7" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-success\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge success</option>
+				<option value="8" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-info\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge info</option>
+				<option value="9" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-warning\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge warning</option>
+				<option value="10" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-important\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge important</option>
+			</field>
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			
@@ -139,6 +169,14 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<!--field name="display_duration" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
+			
+			<field name="" type="separator" default="Video player" level="level2" />
+			<field name="width" type="text" default="480" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_WIDTH" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_WIDTH_DESC" />
+			<field name="height" type="text" default="270" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_HEIGHT" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_HEIGHT_DESC" />
 			<field name="player_position" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_POSITION" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_POSITION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_POSITION_BEFORE</option>
 				<option value="1">PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_POSITION_AFTER</option>
