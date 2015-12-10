@@ -285,21 +285,21 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 					</td>
 				</tr>' 
 				: '<input type="hidden" id="' . $elementid_n . '_author" name="' . $fieldname_n . '[author]" value="' . $value['author'] . '" />') 
-                            . ($display_edit_size_form ? 
-				'<tr>
-					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_SIZE_HEIGHT') . '</span></td>
-					<td>
-						<input type="text" class="fcfield_textval" id="' . $elementid_n . '_heightvideo" name="' . $fieldname_n . '[heightvideo]" value="' . $value['heightvideo'] . '" size="60" />
-					</td>
-				</tr>
-                               <tr>
+				. ($display_edit_size_form ? 
+                '<tr>
 					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_SIZE_WIDTH') . '</span></td>
 					<td>
 						<input type="text" class="fcfield_textval" id="' . $elementid_n . '_widthvideo" name="' . $fieldname_n . '[widthvideo]" value="' . $value['widthvideo'] . '" size="60" />
 					</td>
-				</tr>' 
-				: '<input type="hidden" id="' . $elementid_n . '_heightvideo" name="' . $fieldname_n . '[heightvideo]" value="' . $value['heightvideo'] . '" />
-                   <input type="hidden" id="' . $elementid_n . '_widthvideo" name="' . $fieldname_n . '[widthvideo]" value="' . $value['widthvideo'] . '" />')
+				</tr> 
+				<tr>
+					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_SIZE_HEIGHT') . '</span></td>
+					<td>
+						<input type="text" class="fcfield_textval" id="' . $elementid_n . '_heightvideo" name="' . $fieldname_n . '[heightvideo]" value="' . $value['heightvideo'] . '" size="60" />
+					</td>
+				</tr>'
+				: '<input type="hidden" id="' . $elementid_n . '_widthvideo" name="' . $fieldname_n . '[widthvideo]" value="' . $value['widthvideo'] . '" />
+				   <input type="hidden" id="' . $elementid_n . '_heightvideo" name="' . $fieldname_n . '[heightvideo]" value="' . $value['heightvideo'] . '" />')
 				. ($display_description_form ? 
 				'<tr>
 					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DESCRIPTION') . '</span></td>
@@ -531,12 +531,15 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				}
 			}
             //$width $height
-            if ($display_edit_size_form ==1){
+            if ($display_edit_size_form ==1)
+            {
                 $widthdisplay = $value['widthvideo'];
                 $heightdisplay = $value['heightvideo'];
-            }else{
+            }
+            else
+            {
                 $widthdisplay = $width;
-                $heightdisplay = $width;
+                $heightdisplay = $height;
             }
 			$html_video .= $embed_url . '" style="border: none;" scrolling="no" seamless="seamless" allowFullScreen width="' . $widthdisplay . '" height="'. $heightdisplay .'"></iframe></div>';
 			
