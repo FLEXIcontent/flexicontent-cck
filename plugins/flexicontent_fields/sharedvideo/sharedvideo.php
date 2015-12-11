@@ -146,6 +146,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_heightvideo').val('');
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_widthvideo').val('');
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_title, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_widthvideo, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_heightvideo, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_author, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_description, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_preview').parents('tr').hide('fast');
+				jQuery('#fcfield_fetching_msg_" . $elementid . "_' + uniqueRowNum" . $field->id . "').html('');
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -262,12 +263,15 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 					<td>
 						<input type="text" class="fcfield_textval' . $required . '" id="' . $elementid_n . '_url" name="' . $fieldname_n . '[url]" value="' . $value['url'] . '" size="60" />
 						<input class="fcfield-button" type="button" value="' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_FETCH') . '" onclick="fetchVideo_' . $elementid_n . '();" />
-						<span id="fcfield_fetching_msg_' . $elementid_n . '"></span>
 						'.($use_ingroup ? '' : $move2).'
 						'.($use_ingroup ? '' : $remove_button).'
 						'.($use_ingroup || !$add_position ? '' : $add_here).'
 						<input type="hidden" id="' . $elementid_n . '_embed_url" name="' . $fieldname_n . '[embed_url]" value="' . $value['embed_url'] . '" />
 					</td>
+				</tr>
+				<tr>
+					<td colspan="2" style="padding:0"><span id="fcfield_fetching_msg_' . $elementid_n . '"></span></td>
+				<tr>
 				</tr>' 
 				. ($display_title_form ? 
 				'<tr>
@@ -320,7 +324,6 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				</tr>
 			</tbody>
 			</table>
-			<div id="fcfield_error_msg_' . $elementid_n . '"></div>
 			
 			<script>
 			function fetchVideo_' . $elementid_n . '() 
@@ -343,14 +346,13 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 					jsonscript.setAttribute("src",jsonurl);
 					jsonscript.onerror = function(evt)
 					{
-						jQuery("#fcfield_error_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_HTTP_ERROR').'</div>");
-						jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("");
+						jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_HTTP_ERROR').'</div>");
 					};
 					document.body.appendChild(jsonscript);
 				}
 				else 
 				{
-					jQuery("#fcfield_error_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_INVALID_URL').'</div>");
+					jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_INVALID_URL').'</div>");
 					jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_widthvideo, #' . $elementid_n . '_heightvideo").parents("tr").hide("fast");
 				}
 			}
@@ -369,20 +371,20 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 							updateValueInfo_' . $elementid_n . '({title: data.title, author: data.author_name, description: data.description, thumb: data.thumbnail_url, embed_url: data.html.match(urlregex)[0]});
 							jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_widthvideo, #' . $elementid_n . '_heightvideo").parents("tr").show("fast");
 						}
+						jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("");
 					}
 					else 
 					{
-						jQuery("#fcfield_error_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_URL_NOT_VIDEO').'</div>");
-						jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview").parents("tr").hide("fast");
+						jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_URL_NOT_VIDEO').'</div>");
+						jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_widthvideo, #' . $elementid_n . '_heightvideo").parents("tr").hide("fast");
 					}
 				}
 				else {
-					jQuery("#fcfield_error_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_UNABLE_TO_PARSE').'</div>");
+					jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_UNABLE_TO_PARSE').'</div>");
 					var errorText = typeof data === "object" ? data.error_message : data;
 					jQuery("#fcfield_fetching_msg_'.$elementid_n.'").html("<span class=\"alert alert-warning fc-iblock\">"+errorText+"</span>");
-					jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview").parents("tr").hide("fast");
+					jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_widthvideo, #' . $elementid_n . '_heightvideo").parents("tr").hide("fast");
 				}
-				jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("");
 			}
 			function updateValueInfo_' . $elementid_n . '(data)
 			{
