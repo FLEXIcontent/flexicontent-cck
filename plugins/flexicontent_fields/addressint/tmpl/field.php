@@ -404,9 +404,9 @@ foreach ($values as $value)
 		<tr>
 			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').'</span></td>
 			<td>
-				<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" value="'.$value['addr1'].'" size="10" maxlength="10" '.$required.' />'
-				.($use_addr2 ? '<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" value="'.$value['addr2'].'" size="10" maxlength="10" />' : '')
-				.($use_addr3 ? '<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" value="'.$value['addr3'].'" size="10" maxlength="10" />' : '')
+				<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" value="'.$value['addr1'].'" size="100" maxlength="100" '.$required.' />'
+				.($use_addr2 ? '<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" value="'.$value['addr2'].'" size="100" maxlength="100" />' : '')
+				.($use_addr3 ? '<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" value="'.$value['addr3'].'" size="100" maxlength="100" />' : '')
 				.'
 			</td>
 		</tr>
