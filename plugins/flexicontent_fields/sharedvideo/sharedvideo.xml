@@ -75,10 +75,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-					<field name="display_edit_size_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EDIT_SIZE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EDIT_SIZE_FORM_DESC" class="btn-group btn-group-yesno">
+			<field name="display_edit_size_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EDIT_SIZE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EDIT_SIZE_FORM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-            </field>
+			</field>
 		</fieldset>
 		
 		

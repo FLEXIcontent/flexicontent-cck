@@ -99,8 +99,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$autoassign = $field->parameters->get('autoassign', 0);
 		$imgsel_visible = $field->parameters->get('imgsel_visible', 0);
 		
-		$thumb_w_b = $field->parameters->get( 'w_b', 120 );
-		$thumb_h_b = $field->parameters->get( 'h_b', 90 );
+		$preview_thumb_w = $field->parameters->get( 'preview_w', 120 );
+		$preview_thumb_h = $field->parameters->get( 'preview_h', 90 );
 		
 		// optional properies configuration
 		$linkto_url  = $field->parameters->get('linkto_url', 0 );
@@ -242,7 +242,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				").
 			"
 				newField.find('a.addfile_".$field->id."').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
-				newField.find('a.addfile_".$field->id."').attr('href','".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$thumb_w_b.'&thumb_h='.$thumb_h_b.'&autoassign='.$autoassign."');
+				newField.find('a.addfile_".$field->id."').attr('href','".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JSession::getFormToken().'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$preview_thumb_w.'&thumb_h='.$preview_thumb_h.'&autoassign='.$autoassign."');
 				
 				// COPY an preview box
 				var img_preview = newField.find('img.preview_image');
@@ -388,7 +388,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				position: relative;  .'/* do not make important */.'
 			}
 			.fcfieldval_container_'.$field->id.' input { cursor:text; }
-			.fcfieldval_container_'.$field->id.' .fcimg_preview_box { min-width:'.($thumb_w_b+6).'px; min-height:'.($thumb_h_b+8).'px; }
+			.fcfieldval_container_'.$field->id.' .fcimg_preview_box { min-width:'.($preview_thumb_w+6).'px; min-height:'.($preview_thumb_h+8).'px; }
+			.fcfieldval_container_'.$field->id.' .fcimg_preview_box img.preview_image { width:'.$preview_thumb_w.'; height:'.$preview_thumb_h.'; }
 			';
 			
 			$remove_button = '<span class="fcfield-delvalue" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
@@ -520,7 +521,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					
 					if (file || (fileUrlGiven && existingAllowed && !existing_obj.hasClass('no_value_selected')) || action!='0') {
 					} else {
-						fc_loadImagePreview(tagid, elementid+'_preview_image', elementid+'_preview_msg', ".$thumb_w_b.", "./*$thumb_h_b*/'0'.");
+						fc_loadImagePreview(tagid, elementid+'_preview_image', elementid+'_preview_msg', ".$preview_thumb_w.", "./*$preview_thumb_h*/'0'.");
 					}
 					remove_obj.removeAttr('checked').trigger('change');
 				}
@@ -544,9 +545,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 		";
 		$css .='
-			table.fcfield'.$field->id.'.img_upload_select li { min-height:'.($thumb_h_b+56).'px; }
-			table.fcfield'.$field->id.'.img_upload_select ul { height:'.($thumb_h_b+96).'px; }
-			table.fcfield'.$field->id.'.img_upload_select ul { width:'.(2*($thumb_w_b+64)).'px; }
+			table.fcfield'.$field->id.'.img_upload_select li { min-height:'.($preview_thumb_h+56).'px; }
+			table.fcfield'.$field->id.'.img_upload_select ul { height:'.($preview_thumb_h+96).'px; }
+			table.fcfield'.$field->id.'.img_upload_select ul { width:'.(2*($preview_thumb_w+64)).'px; }
 			table.fcfield'.$field->id.'.img_upload_select ul.image_picker_selector { min-height: 400px; max-height: 600px; height: unset; width:100%; box-sizing: border-box; }
 		';
 		
@@ -630,8 +631,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			{
 				$addExistingURL = JURI::base(true)
 					.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;folder_mode=1'
-					.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid='.$elementid_n."_existingname&amp;thumb_w=$thumb_w_b&amp;thumb_h=$thumb_h_b&amp;autoassign=".$autoassign
-					.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+					.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid='.$elementid_n."_existingname&amp;thumb_w=$preview_thumb_w&amp;thumb_h=$preview_thumb_h&amp;autoassign=".$autoassign
+					.'&amp;'.JSession::getFormToken().'=1';
 				
 				$_prompt_txt = JText::_( 'FLEXI_SELECT_IMAGE' );
 				$existingname = '
@@ -669,13 +670,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				{
 					$img_link  = JURI::root(true).'/'.$dir_url;
 					$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : '');
-					$img_link .= ($item->id ? '/s_' .$extra_prefix : '/original/') .$image_name;
+					$img_link .= ($item->id ? '/m_' .$extra_prefix : '/original/') .$image_name;
 					if (isset($value['existingname']))
 					{
 						$ext = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
 						$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
  						$img_link = str_replace('\\','/', $img_link);
- 						$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$thumb_w_b.'&amp;h='.$thumb_h_b;
+ 						$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h;
  					}
 				} else {
 					$img_link = '';
@@ -1375,7 +1376,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		} else {
 			// db-mode
 			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-			$orig_urlpath  = str_replace('\\','/', JPath::clean($cparams->get('file_path', 'components/com_flexicontent/uploads')) );
+			$orig_urlpath  = str_replace('\\','/', $cparams->get('file_path', 'components/com_flexicontent/uploads'));
 		}
 		
 		// Initialize value handling arrays and loop's common variables

@@ -57,7 +57,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 		$display_title_form       = $field->parameters->get('display_title_form', 1);
 		$display_author_form      = $field->parameters->get('display_author_form', 1);
 		$display_description_form = $field->parameters->get('display_description_form', 1);
-        $display_edit_size_form = $field->parameters->get('display_edit_size_form', 1);
+		$display_edit_size_form = $field->parameters->get('display_edit_size_form', 1);
 		
 		// Initialise value property
 		if (empty($field->value)) 
@@ -68,8 +68,8 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 			$field->value[0]['title'] = '';
 			$field->value[0]['author'] = '';
 			$field->value[0]['description'] = '';
-            $field->value[0]['heightvideo'] = '';
-            $field->value[0]['widthvideo'] = '';
+			$field->value[0]['heightvideo'] = '';
+			$field->value[0]['widthvideo'] = '';
 			$field->value[0]['thumb'] = '';
 			$field->value[0] = serialize($field->value[0]);
 		}
@@ -143,8 +143,8 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				window[updFun]({title:'', author:'', description:'', thumb:'', embed_url:''});
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_preview').html('');
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_url').val('');
-                jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_heightvideo').val('');
-                jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_widthvideo').val('');
+				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_heightvideo').val('');
+				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_widthvideo').val('');
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_title, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_author, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_description, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_preview').parents('tr').hide('fast');
 				";
 			
@@ -248,8 +248,8 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 			if (!isset($value['embed_url']))   $value['embed_url'] = '';
 			if (!isset($value['title']))       $value['title'] = '';
 			if (!isset($value['author']))      $value['author'] = '';
-            if (!isset($value['heightvideo'])) $value['heightvideo'] = '';
-            if (!isset($value['widthvideo'])) $value['widthvideo'] = '';
+			if (!isset($value['heightvideo'])) $value['heightvideo'] = '';
+			if (!isset($value['widthvideo'])) $value['widthvideo'] = '';
 			if (!isset($value['description'])) $value['description'] = '';
 			if (!isset($value['thumb']))       $value['thumb'] = '';
 			
@@ -387,8 +387,8 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 			{
 				jQuery("#' . $elementid_n . '_title").val(data.title);
 				jQuery("#' . $elementid_n . '_author").val(data.author);
-                jQuery("#' . $elementid_n . '_heightvideo").val(data.heightvideo);
-                jQuery("#' . $elementid_n . '_widthvideo").val(data.widthvideo);
+				jQuery("#' . $elementid_n . '_heightvideo").val(data.heightvideo);
+				jQuery("#' . $elementid_n . '_widthvideo").val(data.widthvideo);
 				jQuery("#' . $elementid_n . '_description").val(data.description);
 				jQuery("#' . $elementid_n . '_thumb").val(data.thumb);
 				jQuery("#' . $elementid_n . '_embed_url").val(data.embed_url);
@@ -447,8 +447,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 		$height       = $field->parameters->get('height', 540);
 		$autostart    = $field->parameters->get('autostart', 0);
 		$player_position = $field->parameters->get('player_position', 0);
-        
-        $display_edit_size_form = $field->parameters->get('display_edit_size_form', 1);
+		$display_edit_size_form = $field->parameters->get('display_edit_size_form', 1);
 
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -530,17 +529,17 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 					default            :  $embed_url = $value['videoid'];  break;
 				}
 			}
-            //$width $height
-            if ($display_edit_size_form ==1)
-            {
-                $widthdisplay = $value['widthvideo'];
-                $heightdisplay = $value['heightvideo'];
-            }
-            else
-            {
-                $widthdisplay = $width;
-                $heightdisplay = $height;
-            }
+			//$width $height
+			if ($display_edit_size_form ==1)
+			{
+				$widthdisplay = $value['widthvideo'];
+				$heightdisplay = $value['heightvideo'];
+			}
+			else
+			{
+				$widthdisplay = $width;
+				$heightdisplay = $height;
+			}
 			$html_video .= $embed_url . '" style="border: none;" scrolling="no" seamless="seamless" allowFullScreen width="' . $widthdisplay . '" height="'. $heightdisplay .'"></iframe></div>';
 			
 			$field->{$prop}[$n] = $pretext 
@@ -625,8 +624,8 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 			$newpost[$new]['title']       = flexicontent_html::dataFilter(@$v['title'], 0, 'STRING', 0);
 			$newpost[$new]['author']      = flexicontent_html::dataFilter(@$v['author'], 0, 'STRING', 0);
 			$newpost[$new]['description'] = flexicontent_html::dataFilter(@$v['description'], 0, 'STRING', 0);
-            $newpost[$new]['heightvideo']      = flexicontent_html::dataFilter(@$v['heightvideo'], 0, 'STRING', 0);
-			$newpost[$new]['widthvideo'] = flexicontent_html::dataFilter(@$v['widthvideo'], 0, 'STRING', 0);
+			$newpost[$new]['heightvideo'] = flexicontent_html::dataFilter(@$v['heightvideo'], 0, 'STRING', 0);
+			$newpost[$new]['widthvideo']  = flexicontent_html::dataFilter(@$v['widthvideo'], 0, 'STRING', 0);
 			
 			$new++;
 		}

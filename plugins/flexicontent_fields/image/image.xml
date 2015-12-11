@@ -57,6 +57,11 @@
 			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png,BMP,GIF,JPG,JPEG,PNG" size="60" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
 			<field name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			
+			<field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" description="" level="level1" />
+			<field name="" type="separator" default="Sizes must be smaller than medium thumbnail size (at Thumbnails TAB)" description="" level="level4" class="alert alert-info fcpadded"/>
+			<field name="preview_w" type="text" default="120" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
+			<field name="preview_h" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_HEIGHT" description="FLEXI_FIELD_IMAGE_HEIGHT_DESC" />
+			
 		</fieldset>
 		<fieldset name="group-image-source" repeat="1" icon_class="icon-wrench" label="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			

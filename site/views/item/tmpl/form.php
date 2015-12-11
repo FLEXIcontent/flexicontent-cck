@@ -354,7 +354,7 @@ if ( !$this->params->get('auto_title', 0) || $this->params->get('usetitle_fe', 1
 		JText::_(FLEXI_J16GE ? $this->form->getField('title')->description : 'TIPTITLEFIELD');
 	$label_tooltip = 'class="'.$tip_class.' label" title="'.flexicontent_html::getToolTip(trim($field->label, ':'), $field_description, 0, 1).'"';
 	?>
-	<span class="label-fcouter">
+	<span class="label-fcouter" id="jform_title-lbl-outer">
 		<label id="jform_title-lbl" for="jform_title" data-for_bck="jform_title" <?php echo $label_tooltip; ?> >
 			<?php echo $field->label; //JText::_( 'FLEXI_TITLE' ); ?>
 		</label>
@@ -408,7 +408,7 @@ if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 	$field_description = JText::_(FLEXI_J16GE ? $this->form->getField('alias')->description : 'ALIASTIP');
 	$label_tooltip = 'class="'.$tip_class.' label" title="'.flexicontent_html::getToolTip(trim(JText::_( 'FLEXI_ALIAS' ), ':'), $field_description, 0, 1).'"';
 	?>
-	<span class="label-fcouter">
+	<span class="label-fcouter" id="jform_alias-lbl-outer">
 		<label id="jform_alias-lbl" for="jform_alias" data-for_bck="jform_alias" <?php echo $label_tooltip; ?> >
 			<?php echo JText::_( 'FLEXI_ALIAS' ); ?>
 		</label>
@@ -460,7 +460,7 @@ if ($typeid==0) : ob_start();  // type ?>
 		JText::_(FLEXI_J16GE ? $this->form->getField('type_id')->description : 'FLEXI_TYPE_DESC');
 	$label_tooltip = 'class="'.$tip_class.' label" title="'.flexicontent_html::getToolTip(trim(@$field->label ? $field->label : JText::_( 'FLEXI_TYPE' ), ':'), $field_description, 0, 1).'"';
 	?>
-	<span class="label-fcouter">
+	<span class="label-fcouter" id="jform_type_id-lbl-outer">
 		<label id="jform_type_id-lbl" for="jform_type_id" data-for_bck="jform_type_id" <?php echo $label_tooltip; ?> >
 			<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_TYPE' ); ?>
 		</label>
@@ -490,7 +490,7 @@ if ( $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new i
 		JText::_(FLEXI_J16GE ? $this->form->getField('state')->description : 'FLEXI_STATE_DESC');
 	$label_tooltip = 'class="'.$tip_class.' label" title="'.flexicontent_html::getToolTip(trim(@$field->label ? $field->label : JText::_( 'FLEXI_STATE' ), ':'), $field_description, 0, 1).'"';
 	?>
-	<span class="label-fcouter">
+	<span class="label-fcouter" id="jform_state-lbl-outer">
 		<label id="jform_state-lbl" for="jform_state" data-for_bck="jform_state" <?php echo $label_tooltip; ?> >
 			<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_STATE' ); ?>
 		</label>
@@ -511,7 +511,7 @@ if ( $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new i
 				//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
 				$label_tooltip = 'class="'.$tip_class.' label fcdualline" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
 			?>
-			<span class="label-fcouter">
+			<span class="label-fcouter" id="jform_vstate-lbl-outer">
 				<label id="jform_vstate-lbl" for="jform_vstate" data-for_bck="jform_vstate" <?php echo $label_tooltip; ?> >
 					<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
 				</label>
@@ -544,7 +544,7 @@ if ( $typeid && $this->params->get('allowdisablingcomments_fe') ) : ob_start(); 
 	<?php
 	$label_tooltip = 'class="'.$tip_class.' label label-info" title="'.flexicontent_html::getToolTip('FLEXI_ALLOW_COMMENTS', 'FLEXI_ALLOW_COMMENTS_DESC', 1, 1).'"';
 	?>
-	<span class="label-fcouter">
+	<span class="label-fcouter" id="jform_attribs_comments-title-outer">
 		<label id="jform_attribs_comments-title" <?php echo $label_tooltip; ?> >
 			<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
 		</label>
@@ -561,7 +561,7 @@ if ( $typeid && $this->params->get('allow_subscribers_notify_fe', 0) && $this->s
 	<?php
 	$label_tooltip = 'class="'.$tip_class.' label label-info" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_FAVOURING_USERS', 'FLEXI_NOTIFY_NOTES', 1, 1).'"';
 	?>
-	<span class="label-fcouter">
+	<span class="label-fcouter" id="jform_notify-msg-outer">
 		<label id="jform_notify-msg" <?php echo $label_tooltip; ?> >
 			<?php echo JText::_( 'FLEXI_NOTIFY_FAVOURING_USERS' ); ?>
 		</label>
@@ -575,7 +575,7 @@ if ( $typeid && $this->params->get('allow_subscribers_notify_fe', 0) && $this->s
 
 
 ob_start();  // category ?>
-	<span class="label-fcouter">
+	<span class="label-fcouter" id="jform_catid-lbl-outer">
 		<label id="jform_catid-lbl" for="jform_catid" data-for_bck="jform_catid" class="label">
 			<?php echo JText::_( !$secondary_displayed || isset($all_tab_fields['category']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' ); ?>
 		</label>
@@ -602,7 +602,7 @@ ob_start();  // category ?>
 
 
 if ($this->params->get('uselang_fe', 1)) : ob_start();  // lang ?>
-	<span class="label-fcouter">
+	<span class="label-fcouter" id="jform_language-lbl-outer">
 		<?php echo str_replace('class="', 'class="label ', $this->form->getLabel('language')); ?>
 	</span>
 	
@@ -631,7 +631,7 @@ if ($secondary_displayed || !empty($this->lists['featured_cid']) || !isset($all_
 		<?php if ($secondary_displayed) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 			
 			<div class="fcclear"></div>
-			<span class="label-fcouter">
+			<span class="label-fcouter" id="jform_cid-lbl-outer">
 				<label id="jform_cid-lbl" for="jform_cid" data-for_bck="jform_cid" class="label">
 					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
 				</label>
@@ -645,7 +645,7 @@ if ($secondary_displayed || !empty($this->lists['featured_cid']) || !isset($all_
 
 		<?php if ( !empty($this->lists['featured_cid']) ) : ?>
 			<div class="fcclear"></div>
-			<span class="label-fcouter">
+			<span class="label-fcouter" id="jform_featured_cid-lbl-outer">
 				<label id="jform_featured_cid-lbl" for="jform_featured_cid" data-for_bck="jform_featured_cid" class="label">
 					<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
 				</label>
@@ -669,7 +669,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 		$field = $this->fields['tags'];
 		$label_tooltip = $field->description ? 'class="'.$tip_class.' label" title="'.flexicontent_html::getToolTip(trim($field->label, ':'), $field->description, 0, 1).'"':'class="label"';
 		?>
-		<span class="label-fcouter">
+		<span class="label-fcouter" id="jform_tag-lbl-outer">
 			<label id="jform_tag-lbl" for="jform_tag" <?php echo $label_tooltip; ?> >
 				<?php echo $field->label; ?>
 				<?php /*echo JText::_( 'FLEXI_TAGS' );*/ ?>
@@ -1149,7 +1149,7 @@ if ($this->fields && $typeid) :
 			?>
 			
 			<div class='fcclear'></div>
-			<span class="label-fcouter">
+			<span class="label-fcouter" id="label_outer_fcfield_<?php echo $field->id; ?>">
 				<label id="label_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>" for="<?php echo 'custom_'.$field->name;?>" data-for_bck="<?php echo 'custom_'.$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
 					<?php echo $field->label; ?>
 				</label>
