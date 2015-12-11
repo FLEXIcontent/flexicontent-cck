@@ -145,7 +145,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_url').val('');
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_heightvideo').val('');
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_widthvideo').val('');
-				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_title, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_author, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_description, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_preview').parents('tr').hide('fast');
+				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_title, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_widthvideo, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_heightvideo, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_author, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_description, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_preview').parents('tr').hide('fast');
 				";
 			
 			// Add new element to sortable objects (if field not in group)
@@ -321,6 +321,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 			</tbody>
 			</table>
 			<div id="fcfield_error_msg_' . $elementid_n . '"></div>
+			
 			<script>
 			function fetchVideo_' . $elementid_n . '() 
 			{
@@ -350,7 +351,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				else 
 				{
 					jQuery("#fcfield_error_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_INVALID_URL').'</div>");
-					jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview").parents("tr").hide("fast");
+					jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_widthvideo, #' . $elementid_n . '_heightvideo").parents("tr").hide("fast");
 				}
 			}
 			function embedlyCallback_' . $elementid_n . '(data)
@@ -366,7 +367,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 							var iframecode = \'<iframe class="sharedvideo" src="\'+iframeurl+\'" style="width: 240px; height: 140px; border: none;" scrolling="no" seamless="seamless" allowFullScreen></iframe>\';
 							jQuery("#' . $elementid_n . '_preview").html(iframecode);
 							updateValueInfo_' . $elementid_n . '({title: data.title, author: data.author_name, description: data.description, thumb: data.thumbnail_url, embed_url: data.html.match(urlregex)[0]});
-							jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview").parents("tr").show("fast");
+							jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_widthvideo, #' . $elementid_n . '_heightvideo").parents("tr").show("fast");
 						}
 					}
 					else 
@@ -398,7 +399,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				// if field is empty, hide fields
 				if(jQuery("#' . $elementid_n . '_url").val() == "") 
 				{
-					jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview").parents("tr").hide();
+					jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_heightvideo, #' . $elementid_n . '_widthvideo").parents("tr").hide();
 				}
 			});
 			</script>';

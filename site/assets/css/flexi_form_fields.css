@@ -437,26 +437,35 @@ table.img_upload_select {
 
 
 /* FIELDs: (addessint field) */
+table.fc-addressint-field-tbl .fcfield_textval:not(.inlineval) {
+	box-sizing: border-box;
+	width: 100% !important;
+}
+
 .fcfield_addressint_data {
-	float:left; min-width:380px; width:unset; max-width:unset; padding:0; margin:0; box-sizing:border-box;
+	float:left; min-width:580px; width:unset; max-width:unset; padding:0; margin:0; box-sizing:border-box;
 }
 .fcfield_addressint_map {
-	float:left; min-width:50%;   width:unset; max-width:unset; padding:0; margin:0; box-sizing:border-box;
+	float:left; min-width:50%;   width:unset; max-width:800px; padding:0; margin:0; box-sizing:border-box;
+}
+.fcfield_addressint_canvas_outer {
+	width: 100%;
+	max-width: 800px;
+	min-width:580px;
 }
 
 @media only screen and (min-width: 1671px) {
-	.fcfield_addressint_data { min-width:380px; }
-	.fcfield_addressint_map  { min-width:70%; }
+	.fcfield_addressint_data { min-width:580px; }
+	.fcfield_addressint_map  { min-width:52%; }
 }
-@media only screen and (min-width: 1270px) and (max-width: 1670px) {
-	.fcfield_addressint_data { min-width:380px; }
-	.fcfield_addressint_map  { min-width:60%; }
+@media only screen and (min-width: 1220px) and (max-width: 1670px) {
+	.fcfield_addressint_data { min-width:100%; }
+	.fcfield_addressint_map  { min-width:80%; }
 }
-@media only screen and (min-width: 1020px) and (max-width: 1269px)  {
-	.fcfield_addressint_data { min-width:380px; }
-	.fcfield_addressint_map  { min-width:50%; }
+@media only screen and (min-width: 1020px) and (max-width: 1219px) {
+	.fcfield_addressint_data { min-width:100%; }
+	.fcfield_addressint_map  { min-width:90%; }
 }
-
 @media only screen and (max-width: 1019px) {
 	.fcfield_addressint_data { min-width:100%; }
 	.fcfield_addressint_map  { min-width:100%; }

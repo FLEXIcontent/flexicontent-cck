@@ -367,7 +367,7 @@ foreach ($values as $value)
 	$field_html = '
 	<div class="fcfield_addressint_data">
 	
-	<table class="fc-form-tbl fcinner fc-addressint-field-tbl"><tbody>
+	<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
 		<tr>
 			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH_ADDRESS').'</span></td>
 			<td>
@@ -404,9 +404,9 @@ foreach ($values as $value)
 		<tr>
 			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').'</span></td>
 			<td>
-				<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" value="'.$value['addr1'].'" size="100" maxlength="100" '.$required.' />'
-				.($use_addr2 ? '<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" value="'.$value['addr2'].'" size="100" maxlength="100" />' : '')
-				.($use_addr3 ? '<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" value="'.$value['addr3'].'" size="100" maxlength="100" />' : '')
+				<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" value="'.$value['addr1'].'" maxlength="400" '.$required.' />'
+				.($use_addr2 ? '<br/><input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" value="'.$value['addr2'].'" maxlength="400" />' : '')
+				.($use_addr3 ? '<br/><input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" value="'.$value['addr3'].'" maxlength="400" />' : '')
 				.'
 			</td>
 		</tr>
@@ -425,8 +425,8 @@ foreach ($values as $value)
 		<tr>
 			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').'</span></td>
 			<td>
-				<input type="text" class="fcfield_textval" id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" value="'.$value['zip'].'" size="10" maxlength="10" '.$required.' />
-				<span '.($use_zip_suffix ? '' : 'style="display:none"').'>-<input type="text" class="fcfield_textval" id="'.$elementid_n.'_zip_suffix" name="'.$fieldname_n.'[zip_suffix]" value="'.$value['zip_suffix'].'" size="5" maxlength="10" /></span>
+				<input type="text" class="fcfield_textval inlineval" id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" value="'.$value['zip'].'" size="10" maxlength="10" '.$required.' />
+				<span '.($use_zip_suffix ? '' : 'style="display:none"').'>&nbsp;<input type="text" class="fcfield_textval inlineval" id="'.$elementid_n.'_zip_suffix" name="'.$fieldname_n.'[zip_suffix]" value="'.$value['zip_suffix'].'" size="5" maxlength="10" /></span>
 			</td>
 		</tr>
 		<tr '.($use_country ? '' : 'style="display:none;"').'>
@@ -458,7 +458,7 @@ foreach ($values as $value)
 		<tr>
 			<td>
 				<span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PREVIEW').'</span>
-				<div style="width:100%; max-width:800px;">
+				<div class="fcfield_addressint_canvas_outer">
 					<div id="map_canvas_'.$field->name.$n.'" style="width:100%; height:0; padding-bottom:56.25%;"></div>
 				</div>
 			</td>

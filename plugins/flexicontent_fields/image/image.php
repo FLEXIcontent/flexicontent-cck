@@ -99,8 +99,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$autoassign = $field->parameters->get('autoassign', 0);
 		$imgsel_visible = $field->parameters->get('imgsel_visible', 0);
 		
-		$preview_thumb_w = $field->parameters->get( 'preview_w', 120 );
-		$preview_thumb_h = $field->parameters->get( 'preview_h', 90 );
+		$preview_thumb_w = $field->parameters->get( 'preview_w', 120 ) < $field->parameters->get( 'w_m', 400 ) ? $field->parameters->get( 'preview_w', 120 ) : $field->parameters->get( 'w_m', 400 );
+		$preview_thumb_h = $field->parameters->get( 'preview_h', 90 ) < $field->parameters->get( 'h_m', 300 ) ? $field->parameters->get( 'preview_h', 90 ) : $field->parameters->get( 'h_m', 300 );
 		
 		// optional properies configuration
 		$linkto_url  = $field->parameters->get('linkto_url', 0 );
@@ -389,7 +389,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			.fcfieldval_container_'.$field->id.' input { cursor:text; }
 			.fcfieldval_container_'.$field->id.' .fcimg_preview_box { min-width:'.($preview_thumb_w+6).'px; min-height:'.($preview_thumb_h+8).'px; }
-			.fcfieldval_container_'.$field->id.' .fcimg_preview_box img.preview_image { width:'.$preview_thumb_w.'; height:'.$preview_thumb_h.'; }
+			.fcfieldval_container_'.$field->id.' .fcimg_preview_box img.preview_image { width:'.$preview_thumb_w.'px; height:'.$preview_thumb_h.'px; }
 			';
 			
 			$remove_button = '<span class="fcfield-delvalue" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
