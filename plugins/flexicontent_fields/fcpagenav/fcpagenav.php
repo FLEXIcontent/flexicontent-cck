@@ -50,9 +50,12 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		$field->{$prop} = '';
 		
+		global $globalcats;
+		$app  = JFactory::getApplication();
+		$db   = JFactory::getDBO();
 		$option = JRequest::getCmd('option');
-		$view  = JRequest::getString('view', FLEXI_ITEMVIEW);
-		$print = JRequest::getCMD('print');
+		$view   = JRequest::getString('view', FLEXI_ITEMVIEW);
+		$print  = JRequest::getCMD('print');
 		
 		// No output if it is not FLEXIcontent item view or view is "print"
 		if ($view != FLEXI_ITEMVIEW || $option != 'com_flexicontent' || $print) return;
@@ -69,24 +72,74 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		$next_label			= JText::_($field->parameters->get('next_label', 'FLEXI_FIELDS_PAGENAV_GOTONEXT'));
 		$category_label	= JText::_($field->parameters->get('category_label', 'FLEXI_FIELDS_PAGENAV_CATEGORY'));
 		
-		$cid = JRequest::getInt('cid');
-		$cid = $cid ? $cid : (int)$item->catid;
+		$use_model = true;
+		if ($use_model)
+		{
+			$cid = (int) $app->getUserState( $option.'.nav_catid', 0 );
+			$_item_cats = array();
+			foreach ($item->categories as $_cat) $_item_cats[$_cat->id] = 1;
+			$_item_cats = array();
+			if ( !isset( $_item_cats[$cid] ) && !in_array($cid, $globalcats[$cid]->descendantsarray) )  $cid = JRequest::getInt('cid');
+			if ( !isset( $_item_cats[$cid] ) && !in_array($cid, $globalcats[$cid]->descendantsarray) )  $cid = (int)$item->catid;
+			
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.php');
+	
+			$saved_cid = JRequest::getVar('cid', '');   // save cid ...
+			$saved_layout = JRequest::getVar('layout'); // save layout ...
+			$saved_option = JRequest::getVar('option'); // save option ...
+			$saved_view = JRequest::getVar('view'); // save layout ...
+			
+			//$target_layout = $mcats_selection || !$catid ? 'mcats' : '';
+			//JRequest::setVar('layout', $target_layout);
+			//JRequest::setVar($target_layout=='mcats' ? 'cids' : 'cid', $limit_filters_to_cat ? $catid : 0);
+			JRequest::setVar('layout', '');
+			JRequest::setVar('cid', $cid);
+			JRequest::setVar('option', 'com_flexicontent');
+			JRequest::setVar('view', 'category');
+			
+			// Get/Create current category model ... according to configuaration set above into the JRequest variables ...
+			$catmodel = new FlexicontentModelCategory();
+			$catparams = $catmodel->getParams();  // Get current's view category parameters this will if needed to get category specific filters ...
+			$catmodel->_buildItemWhere($wherepart='where', $counting=true);
+			$catmodel->_buildItemFromJoin($counting=true);
+			
+			$catdata = $catmodel->getCategory();
 		
-		// Get active category parameters
-		$db = JFactory::getDBO();
-		$query 	= 'SELECT * FROM #__categories WHERE id = ' . $cid;
-		$db->setQuery($query);
-		$catdata = $db->loadObject();
-		$catdata->parameters = FLEXI_J16GE ? new JRegistry($catdata->params) : new JParameter($catdata->params);
+			// Get list of ids of selected, null indicates to return item ids array. TODO retrieve item ids from view: 
+			// This will allow special navigating layouts "mcats,author,myitems,tags,favs" and also utilize current filtering
+			$ids = null;  
+			
+			$query = $catmodel->_buildQuery(false, $count_total=false);
+			$db->setQuery($query, 0, 50000);
+			$list = $db->loadColumn();
+			
+			// Restore variables
+			JRequest::setVar('cid', $saved_cid); // restore cid
+			JRequest::setVar('layout', $saved_layout); // restore layout
+			JRequest::setVar('option', $saved_option); // restore option
+			JRequest::setVar('view', $saved_view); // restore view
+		}
 		
-		// Get list of ids of selected, TODO retrieve item ids from view:
-		// --> this will allow special navigating layouts "mcats,author,myitems,tags,favs" and also utilize current filtering
-		$ids = null;
-		$list = $this->getItemList($field, $item, $ids, $cid, $catdata->parameters);
+		else {
+			$cid = JRequest::getInt('cid');
+			$cid = $cid ? $cid : (int)$item->catid;
+				
+			// Get active category parameters
+			$query 	= 'SELECT * FROM #__categories WHERE id = ' . $cid;
+			$db->setQuery($query);
+			$catdata = $db->loadObject();
+			$catdata->parameters = new JRegistry($catdata->params);
+		
+			// Get list of ids of selected, null indicates to return item ids array. TODO retrieve item ids from view: 
+			// This will allow special navigating layouts "mcats,author,myitems,tags,favs" and also utilize current filtering
+			$ids = null;  
+			$list = $this->getItemList($field, $item, $ids, $cid, $catdata->parameters);
+		}
 		
 		// Location of current content item in array list
-		$loc_to_ids = array_keys($list);
-		$ids_to_loc = array_flip($loc_to_ids);
+		$loc_to_ids = & $list;
+		$ids_to_loc = array_flip($list);
 		$location = isset($ids_to_loc[$item->id]) ? $ids_to_loc[$item->id] : false;
 		
 		// Get previous and next item data
@@ -345,18 +398,20 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		$gparams   = JFactory::getApplication()->getParams('com_flexicontent');
 		$filtercat = $gparams->get('filtercat', 0); // If language filtering is enabled in category view
 		
-		$db    = JFactory::getDBO();
-		$user  = JFactory::getUser();
+		$app    = JFactory::getApplication();
+		$option = JRequest::getCmd('option');
+		$db     = JFactory::getDBO();
+		$user   = JFactory::getUser();
 		$date     = JFactory::getDate();
-		$nowDate  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+		$nowDate  = $date->toSql();
 		$nullDate	= $db->getNullDate();
 		
 		if ($ids===null)
 		{
-			$select = 'SELECT a.id';
+			$select = 'SELECT i.id';
 			$join = ''
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = a.id'
-				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
+				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
+				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id '
 				;
 			
 			// Get the site default language in case no language is set in the url
@@ -368,59 +423,78 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$types_to_exclude	= $field->parameters->get('type_to_exclude', '');
 			
 			// filter depending on permissions
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$andaccess = ' AND a.access IN ('.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-					if ( isset($readperms['item']) && count($readperms['item']) ) {
-						$andaccess = ' AND ( ( a.access <= '.$aid.' OR a.id IN ('.implode(",", $readperms['item']).') OR a.created_by = '.$user->id.' OR ( a.modified_by = '.$user->id.' AND a.modified_by != 0 ) ) )';
-					} else {
-						$andaccess = ' AND ( a.access <= '.$aid.' OR a.created_by = '.$user->id.' OR ( a.modified_by = '.$user->id.' AND a.modified_by != 0 ) )';
-					}
-				} else {
-					$andaccess = ' AND ( a.access <= '.$aid.' OR a.created_by = '.$user->id.' OR ( a.modified_by = '.$user->id.' AND a.modified_by != 0 ) )';
-				}
-			}
-	
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$andaccess = ' AND i.access IN ('.$aid_list.')';
+			
+			
 			// Determine sort order
-			$order = $cparams->get('orderby', '');    // TODO: finish using category ORDERING, now we ignore: commented, rated
-			$orderby = '';
+			$orderby_col = '';
 			$orderby_join = '';
-			if ((int)$cparams->get('orderbycustomfieldid', 0) != 0) {
-				if ($cparams->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
-				$orderby		= 'f.value'.$int.' '.$cparams->get('orderbycustomfielddir', 'ASC');
-				$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = a.id AND f.field_id = '.(int)$cparams->get('orderbycustomfieldid', 0);
-			} else {
-				switch ($order)
-				{
-					case 'date'    : $orderby = 'a.created';  break;
-					case 'rdate'   : $orderby = 'a.created DESC';  break;
-					case 'modified': $orderby = 'a.modified DESC';  break;
-					case 'alpha'   : $orderby = 'a.title'; break;
-					case 'ralpha'  : $orderby = 'a.title DESC'; break;
-					case 'author'  : $orderby = 'u.name';  break;
-					case 'rauthor' : $orderby = 'u.name DESC';  break;
-					case 'hits'    : $orderby = 'a.hits';  break;
-					case 'rhits'   : $orderby = 'a.hits DESC';  break;
-					case 'order'   : $orderby = 'rel.ordering';  break;
-				}
-				
-				// Create JOIN for ordering items by a most rated
-				if ($order=='author' || $order=='rauthor') {
-					$orderby_join = ' LEFT JOIN #__users AS u ON u.id = a.created_by';
-				}
+
+			// ***********************************************
+			// Item retrieving query ... CREATE ORDERBY CLAUSE
+			// ***********************************************
+			//$filter_order = $app->getUserStateFromRequest( 'filter_order', 'filter_order', '', 'CMD' );
+			//$filter_order_Dir = $app->getUserStateFromRequest( 'filter_order_Dir', 'filter_order_Dir', '', 'CMD' );
+			$nav_catid = (int) $app->getUserState( $option.'.nav_catid', 0 );
+			$order = null;
+			if ($nav_catid == $cid) {
+				$order = $app->getUserState( $option.'.'.$cid.'.nav_orderby',  $order);
+				if ( is_array($order) ) $order = reset($order);
 			}
-			$orderby = $orderby ? $orderby.', a.title' : 'a.title';
-			$orderby = ' ORDER BY '.$orderby;
+			echo $orderby = flexicontent_db::buildItemOrderBy(
+				$field->parameters,
+				$order, $request_var='', $config_param='',
+				$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
+				$default_order='', $default_order_dir='', $sfx='', $support_2nd_lvl=true
+			);
+			
+			// Create JOIN for ordering items by a custom field (Level 1)
+			if ( 'field' == $order[1] ) {
+				$orderbycustomfieldid = (int)$cparams->get('orderbycustomfieldid', 0);
+				$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
+			}
+			if ( 'custom:' == substr($order[1], 0, 7) ) {
+				$order_parts = preg_split("/:/", $order[1]);
+				$_field_id = (int) @ $order_parts[1];
+				if ($_field_id && count($order_parts)==4) $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$_field_id;
+			}
+			
+			// Create JOIN for ordering items by a custom field (Level 2)
+			if ( 'field' == $order[2] ) {
+				$orderbycustomfieldid_2nd = (int)$cparams->get('orderbycustomfieldid'.'_2nd', 0);
+				$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
+			}
+			if ( 'custom:' == substr($order[2], 0, 7) ) {
+				$order_parts = preg_split("/:/", $order[2]);
+				$_field_id = (int) @ $order_parts[1];
+				if ($_field_id && count($order_parts)==4) $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$_field_id;
+			}
+			
+			// Create JOIN for ordering items by author's name
+			if ( in_array('author', $order) || in_array('rauthor', $order) ) {
+				$orderby_col   = '';
+				$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
+			}
+			
+			// Create JOIN for ordering items by a most commented
+			if ( in_array('commented', $order) ) {
+				$orderby_col   = ', COUNT(DISTINCT com.id) AS comments_total';
+				$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id AND com.object_group="com_flexicontent" AND com.published="1"';
+			}
+			
+			// Create JOIN for ordering items by a most rated
+			if ( in_array('rated', $order) ) {
+				$orderby_col   = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
+				$orderby_join .= ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
+			}
 			
 			$types = is_array($types_to_exclude) ? implode(',', $types_to_exclude) : $types_to_exclude;
-	
-			$where  = ' WHERE rel.catid = ' . $cid;
-			$where .=	' AND ( a.state = 1 OR a.state = -5 )' .
+			
+			$_cat_ids = $this->_getDataCats( array($cid), $cparams );
+			$where  = ' WHERE rel.catid IN ('. implode(', ', $_cat_ids) .')';
+			$where .=	' AND ( i.state = 1 OR i.state = -5 )' .
 						' AND ( publish_up = '.$db->Quote($nullDate).' OR publish_up <= '.$db->Quote($nowDate).' )' .
 						' AND ( publish_down = '.$db->Quote($nullDate).' OR publish_down >= '.$db->Quote($nowDate).' )' . 
 						($types_to_exclude ? ' AND ie.type_id NOT IN (' . $types . ')' : '')
@@ -433,21 +507,21 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		
 		// Retrieving specific item data
 		else {
-			$select = 'SELECT a.*, ie.*,'
-				. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(":", a.id, a.alias) ELSE a.id END as slug,'
+			$select = 'SELECT i.*, ie.*,'
+				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(":", i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(":", cc.id, cc.alias) ELSE cc.id END as categoryslug'
 				;
-			$join = ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = a.id'
+			$join = ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 				.' JOIN #__categories AS cc ON cc.id = '. $cid;
 			$orderby = '';
 			$orderby_join = '';
-			$where = ' WHERE a.id IN ('. implode(',', $ids) .')';
+			$where = ' WHERE i.id IN ('. implode(',', $ids) .')';
 			$andaccess = '';
 		}
 		
 		// array of articles in same category correctly ordered
-		$query 	= $select
-				. ' FROM #__content AS a'
+		$query 	= $select . @ $orderby_col
+				. ' FROM #__content AS i'
 				. $join
 				. $orderby_join
 				. $where
@@ -455,7 +529,11 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				. $orderby
 				;
 		$db->setQuery($query);
-		$list = $db->loadObjectList('id');
+		if ($ids===null) {
+			$list = $db->loadColumn('id');
+		} else {
+			$list = $db->loadObjectList('id');
+		}
 		if ($db->getErrorNum()) {
 			JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br />".$query."<br />");
 		}
@@ -463,5 +541,81 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		// this check needed if incorrect Itemid is given resulting in an incorrect result
 		if ( !is_array($list) )  $list = array();
 		return $list;
+	}
+	
+	
+	
+	/**
+	 * Retrieve subcategory ids of a given category
+	 *
+	 * @access public
+	 * @return string
+	 */
+	function &_getDataCats($id_arr, &$cparams)
+	{
+		global $globalcats;
+		$db   = JFactory::getDBO();
+		$user = JFactory::getUser();
+		$ordering = 'c.lft ASC';
+
+		$show_noauth = $cparams->get('show_noauth', 0);   // show unauthorized items
+		$display_subcats = $cparams->get('display_subcategories_items', 2);   // include subcategory items
+		
+		// Select only categories that user has view access, if listing of unauthorized content is not enabled
+		$joinaccess = '';
+		$andaccess = '';
+		if (!$show_noauth) {
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
+		}
+		
+		// Calculate categories to use for retrieving items
+		$query_catids = array();
+		foreach ($id_arr as $id)
+		{
+			$query_catids[$id] = 1;
+			if ( $display_subcats==2 && !empty($globalcats[$id]->descendantsarray) ) {
+				foreach ($globalcats[$id]->descendantsarray as $subcatid) $query_catids[$subcatid] = 1;
+			}
+		}
+		$query_catids = array_keys($query_catids);
+		
+		// Items in featured categories
+		/*$cats_featured = $cparams->get('display_cats_featured', 0);
+		$featured_cats_parent = $cparams->get('featured_cats_parent', 0);
+		$query_catids_exclude = array();
+		if ($cats_featured && $featured_cats_parent) {
+			foreach ($globalcats[$featured_cats_parent]->descendantsarray as $subcatid) $query_catids_exclude[$subcatid] = 1;
+		}*/
+		
+		// filter by depth level
+		if ($display_subcats==0) {
+			// Include categories
+			$anddepth = ' AND c.id IN (' .implode(',', $query_catids). ')';
+		} else if ($display_subcats==1) {
+			// Include categories and their subcategories
+			$anddepth  = ' AND ( c.parent_id IN (' .implode(',', $query_catids). ')  OR  c.id IN (' .implode(',', $query_catids). ') )';
+		} else {
+			// Include categories and their descendants
+			$anddepth = ' AND c.id IN (' .implode(',', $query_catids). ')';
+		}
+		
+		// Finally create the query to get the category ids.
+		// NOTE: this query is not just needed to get 1st level subcats, but it always needed TO ALSO CHECK the ACCESS LEVEL
+		$query = 'SELECT c.id'
+			. ' FROM #__categories AS c'
+			. $joinaccess
+			. ' WHERE c.published = 1'
+			. $andaccess
+			. $anddepth
+			. ' ORDER BY '.$ordering
+			;
+		
+		$db->setQuery($query);
+		$this->_data_cats = $db->loadColumn();
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		
+		return $this->_data_cats;
 	}
 }
