@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Date / Publish Up-Down Dates</name>
+	<name>FLEXIcontent - Date / Timestamp / Publish Up-Down Dates</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>March 2009</creationDate>
 	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
@@ -50,18 +50,20 @@
 
 			<field name="date_source" type="multilist" subtype="list" default="0" label="FLEXI_FIELD_DATE_SOURCE" description="FLEXI_FIELD_DATE_SOURCE_DESC" class="btn-group group-fcinfo" toggle_related="1"
 				inline_tip="You may want to set microdate type in SEO Tab" tip_class="itemprop_tip_date" tip_img="information.png" 
-				inline_tip2="You may want to set microdate type to 'datePublished' in SEO Tab" tip_class2="itemprop_tip_datepublished" tip_img2="warning.png">
+				inline_tip2="You may want to set microdate type to 'datePublished' in SEO Tab" tip_class2="itemprop_tip_datepublished" tip_img2="warning.png" labelclass="label-warning">
 				<option value="0" show_list="itemprop_tip_date" hide_list="itemprop_tip_datepublished">FLEXI_FIELD_NORMAL_DATE_EDITABLE</option>
 				<option value="1" show_list="itemprop_tip_datepublished" hide_list="itemprop_tip_date">FLEXI_FIELD_SHOW_START_PUBLICATION</option>
 				<option value="2" show_list="itemprop_tip_date" hide_list="itemprop_tip_datepublished">FLEXI_FIELD_SHOW_END_PUBLICATION</option>
+				<option value="3" show_list="itemprop_tip_date" hide_list="itemprop_tip_datepublished">FLEXI_FIELD_DATE_TIMESTAMP</option>
 			</field>
-			<field name="date_allowtime" type="list" default="1" label="FLEXI_DATE_ALLOWTIME" description="FLEXI_DATE_ALLOWTIME_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-				<option value="2">FLEXI_YES_FORCE_ZERO_TIME</option>
+			<field name="date_allowtime" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_DATE_ALLOWTIME" description="FLEXI_DATE_ALLOWTIME_DESC" class="btn-group btn-group-yesno"
+				 inline_tip="Enable time to be able to use user timezones" tip_class="disp_tz_off" tip_img="comment.png" >
+				<option value="0" show_list="disp_tz_off" hide_list="disp_tz_on">FLEXI_NO</option>
+				<option value="1" show_list="disp_tz_on" hide_list="disp_tz_off">FLEXI_YES</option>
+				<option value="2" show_list="disp_tz_on" hide_list="disp_tz_off">FLEXI_YES_FORCE_ZERO_TIME</option>
 			</field>
-			<field name="use_editor_tz" type="radio" default="0" label="FLEXI_DATE_TIMEZONE_EDITORS" description="FLEXI_DATE_TIMEZONE_EDITORS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
+			<field name="use_editor_tz" type="radio" default="0" label="FLEXI_DATE_USE_USER_TIMEZONE" description="FLEXI_DATE_USE_USER_TIMEZONE_DESC" class="btn-group btn-group-yesno" depend_class="disp_tz_on" >
+				<option value="0">FLEXI_NO_USE_UTC_0</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			

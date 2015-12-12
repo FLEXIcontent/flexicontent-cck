@@ -47,10 +47,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		if ($use_ingroup && empty($field->ingroup)) return;
 		
 		$date_source = $field->parameters->get('date_source', 0);
-		if ( $date_source ) {
+		if ( $date_source==1 || $date_source==2 )
+		{
 			$date_source_str = 'Automatic field (shows this content \'s %s publication date)';
 			$date_source_str = sprintf($date_source_str, ($date_source == 1) ? '<b>start</b>' :  '<b>end</b>');
-			$_value = ($date_source == 1) ? $item->publish_up : $item->publish_down;
+			$_value = $date_source == 1 ? $item->publish_up : $item->publish_down;
 			$field->html =
 				 '<div style="float:left">'
 				.' <div class="alert alert-info fc-small fc-iblock">'.$date_source_str.'</div><div class="clear"></div>'
@@ -89,34 +90,51 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$show_usage     = $field->parameters->get( 'show_usage', 0 ) ;
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
-		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
+		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
+		$customdate     = $field->parameters->get( 'custom_date', $date_source!=3 ? 'Y-m-d' : 'Y M d, H:i:s' ) ;
+		$dateformat     = $field->parameters->get( 'date_format', '' ) ;
+		$dateformat = $dateformat ? JText::_($dateformat) :
+			($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
 		
 		$timezone = 'UTC'; // Default is not to use TIMEZONE
-		$append_str = '';
-		if ($date_allowtime)
-		{
-			$append_str = JText::_('FLEXI_DATE_CAN_ENTER_TIME');
-			$append_str .= ($date_allowtime==2) ? '<br/>'.JText::_('FLEXI_DATE_USE_ZERO_TIME_ON_EMPTY') : '';
-			
-			if ($use_editor_tz == 0)
-			{
-				// Raw date storing, ignoring timezone. NOTE: this is OLD BEHAVIOUR
-				$timezone = 'UTC';
-				$append_str .= '<br/>'.JText::_('FLEXI_DATE_TIMEZONE_USAGE_DISABLED');
-			}
-			else
-			{
-				$append_str .= '<br/>'.JText::_('FLEXI_DATE_TIMEZONE_USAGE_ENABLED');
-				// Use timezone of editor, unlogged editor will use site's default timezone
-				$timezone = $user->getParam('timezone', $config->get('offset'));
-				$tz = new DateTimeZone($timezone);
-				$tz_offset = $tz->getOffset(new JDate()) / 3600;
-				$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
-
-				$append_str .= '<br/>'.JText::_($user->id ? 'FLEXI_DATE_ENTER_HOURS_IN_YOUR_TIMEZONE' : 'FLEXI_DATE_ENTER_HOURS_IN_TIMEZONE').': '.$tz_info;
-			}
+		$tz_info  = '';    // Default is not to show TIMEZONE info
+		$field_notes = '';
+		
+		
+		// Time is allowed
+		if ($date_allowtime) {
+			if ($date_source!=3) $field_notes .= JText::_('FLEXI_DATE_CAN_ENTER_TIME') .($date_allowtime==2 ? '<br/>'.JText::_('FLEXI_DATE_USE_ZERO_TIME_ON_EMPTY') : '');
 		}
-		$append_str = $append_str ? '<b>'.JText::_('FLEXI_NOTES').'</b>: '.$append_str : '';
+		
+		if (!$use_editor_tz)  // ** timezone is disabled above, if time usage is disabled
+		{
+			// Raw date storing, ignoring timezone. NOTE: this is OLD BEHAVIOUR
+			$timezone = 'UTC';
+			$field_notes .= '<br/>'.JText::_('FLEXI_DATE_TIMEZONE_USAGE_DISABLED');
+			$tz_info = $date_allowtime ? ' &nbsp; UTC' : '';
+		}
+		else
+		{
+			$timezone = $user->getParam('timezone', $config->get('offset'));   // Use timezone of editor, unlogged editor will use site's default timezone
+			$tz = new DateTimeZone($timezone);
+			$tz_offset = $tz->getOffset(new JDate()) / 3600;
+			$tz_info =  $tz_offset > 0 ? ' &nbsp; UTC +'.$tz_offset : ' UTC '.$tz_offset;
+			
+			$field_notes .= '
+				<br/>'.JText::_('FLEXI_DATE_TIMEZONE_USAGE_ENABLED').'
+				<br/>'.JText::_($user->id ? 'FLEXI_DATE_ENTER_HOURS_IN_YOUR_TIMEZONE' : 'FLEXI_DATE_ENTER_HOURS_IN_TIMEZONE').': '.$tz_info;
+		}
+
+		// Timestamp mode (Current time), which will be displayed as user time but saved as 'UTC 0'
+		if ( $date_source==3 )
+		{
+			$tz = new DateTimeZone($timezone);
+			$date_now = JFactory::getDate('now');
+			$date_now->setTimezone($tz);
+			$date_now_str = $date_now->format($dateformat, $local = true);
+		}
+		
+		$field_notes = $field_notes ? '<b>'.JText::_('FLEXI_NOTES').'</b>: '.$field_notes : '';
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
@@ -169,7 +187,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				var newField  = lastField.clone();
 				
 				// Update the new text field
-				var theInput = newField.find('input.fcfield_textval').first();
+				var theInput = newField.find('input.fcfield_date').first();
 				theInput.val('');
 				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theInput.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
@@ -177,7 +195,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				// Update date picker
 				var thePicker = theInput.next();
 				thePicker.attr('id', '".$elementid."_' +uniqueRowNum".$field->id." +'_img');
+				";
 				
+			if ($date_source==3) $js .= "
+				newField.find('.fcfield_timestamp_value_new').css('display', '');
+				newField.find('.fcfield_timestamp_value_existing').html('').css('display', 'none');
 				";
 			
 			// Disable keyboard input if so configured
@@ -192,7 +214,9 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
 					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
+				";
 				
+			if ($date_source!=3) $js .= "
 				// This needs to be after field is added to DOM (unlike e.g. select2 / inputmask JS scripts)
 				Calendar.setup({
 					inputField:	theInput.attr('id'),
@@ -277,15 +301,36 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
-			$calendar = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
-			if (!$calendar) {
-				$skipped_vals[] = $value;
-				if (!$use_ingroup) continue;
-				$calendar = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
+			if ( $date_source==3 ) {
+				// Use indexes of existing values to keep track of field values being re-ordered, this (partly) avoids form tampering
+				if ($value) {
+					try {
+						$timestamp = '<span class="alert alert-info fc-small fc-iblock fcfield_timestamp_value_existing">'. JHTML::_('date', $value, $dateformat, $timezone ).$tz_info.'</span> ';
+					} catch ( Exception $e ) {
+						$timestamp = '';
+					}
+				}
+				else $timestamp = '';
+				
+				$timestamp .= 
+						'<span class="alert alert-info fc-small fc-iblock fcfield_timestamp_value_new" style="'.($timestamp ? 'display:none;' : '').'">'.JText::_('FLEXI_FIELD_DATE_NOW').', '. // ' - '$date_now_str.' - '
+						'<span class="fcfield_timestamp_note">'.JText::_( 'FLEXI_AUTO' ).'</span></span>'; 
+				
+				$html = $timestamp .'
+					<input type="hidden" class="fcfield_date" readonly="readonly" value="'.($value ? $n : '').'" id="'.$elementid_n.'" name="'.$fieldname_n.'" />
+				';
+			}
+			else {
+				$html = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
+				if (!$html) {
+					$skipped_vals[] = $value;
+					if (!$use_ingroup) continue;
+					$html = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
+				}
 			}
 			
 			$field->html[] = '
-				'.$calendar.'
+				'.$html.'
 				'.($use_ingroup ? '' : $move2).'
 				'.($use_ingroup ? '' : $remove_button).'
 				'.($use_ingroup || !$add_position ? '' : $add_here).'
@@ -316,7 +361,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		}
 		
 		if (!$use_ingroup)
-			$field->html = (($show_usage && $append_str) ? ' <div class="alert alert-info fc-small fc-iblock">'.$append_str.'</div><div class="clear"></div>' : '')  .  $field->html;
+			$field->html = (($show_usage && $field_notes) ? ' <div class="alert alert-info fc-small fc-iblock">'.$field_notes.'</div><div class="clear"></div>' : '')  .  $field->html;
 		
 		if ( count($skipped_vals) )
 			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
@@ -348,7 +393,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$values = $values ? $values : $field->value;
 		
 		// Load publish_up/publish_down values if so configured
-		if ( $date_source )
+		if ( $date_source==1 || $date_source==2 )
 		{
 			static $nullDate, $never_date;
 			if ($nullDate == null) {
@@ -356,7 +401,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				$never_date = ''; //JText::_('FLEXI_NEVER');
 			}
 			
-			$_value = ($date_source == 1) ? $item->publish_up : $item->publish_down;
+			$_value = $date_source == 1 ? $item->publish_up : $item->publish_down;
 			if ($_value == $nullDate) {
 				$field->{$prop} = $date_source==2 ? $never_date : '';
 				return;
@@ -374,8 +419,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// Timezone configuration
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
-		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
-		$customdate     = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;
+		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
+		$customdate     = $field->parameters->get( 'custom_date', $date_source!=3 ? 'Y-m-d' : 'Y-M-d, H:i:s' ) ;
 		$dateformat     = $field->parameters->get( 'date_format', '' ) ;
 		$dateformat = $dateformat ? JText::_($dateformat) :
 			($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
@@ -534,6 +579,19 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
+		$date_source = $field->parameters->get('date_source', 0);
+		
+		// Timestamp mode (Current time), which will be displayed as user time but saved as 'UTC 0'
+		if ( $date_source==3 ) {
+			// Dates are always stored using 'UTC 0' timezone
+			$tz = new DateTimeZone('UTC');
+			
+			$date_now = JFactory::getDate('now');
+			$date_now->setTimezone($tz);
+			
+			$date_now_value = $date_now->toSql();
+		}
+		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
@@ -542,7 +600,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
-		$use_editor_tz = $date_allowtime ? $use_editor_tz : 0;
+		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
 		
 		if ($use_editor_tz == 0) {
 			// Raw date input, ignore timezone, NOTE: this is OLD BEHAVIOUR of this field
@@ -560,6 +618,18 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
+			if ($date_source==3) {
+				if (!strlen($v)) {
+					// New timestamp
+					$newpost[$new++] = $date_now_value;
+				} else {
+					// Existing timestamps
+					$v = (int) $v;
+					$newpost[$new++] = isset($item->fieldvalues[$field->id][$v]) ? $item->fieldvalues[$field->id][$v] : $date_now_value;
+				}
+				continue;
+			}
+			
 			// Do server-side validation and skip empty values
 			$post[$n] = flexicontent_html::dataFilter($post[$n], 200, 'STRING', 0);
 			
@@ -655,28 +725,33 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$filter_as_range = in_array($display_filter_as, array(2,3,8));  // We don't want null date if using a range
 		$date_source = $filter->parameters->get('date_source', 0);
 		
-		if ( ! $date_source ) {
+		if ( !$date_source || $date_source==3 ) {
 			$valuecol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_valformat);
 			$textcol  = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_txtformat);
-		} else {
+		} else if ( $date_source==1 || $date_source==2 ) {
 			$_value_col = ($date_source == 1) ? 'i.publish_up' : 'i.publish_down';
 			$valuecol = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN '.(!$filter_as_range ? $nullDate_quoted : $db->Quote('')).' ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_valformat);
 			$textcol  = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_txtformat);
+		} else {
+			return "date_source: ".$date_source." not implemented";
 		}
 		
 		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
-		if ($date_source) {
+		if ( $date_source==1 || $date_source==2 ) {
 			$filter->filter_valuesfrom = ' FROM #__content AS i ';
 			$filter->filter_item_id_col = ' i.id ';
 			$filter->filter_valuesjoin   = null; // use default
 			$filter->filter_valueswhere  = ' ';  // space to remove default
-		} else {
+		} else if ( !$date_source || $date_source==3 ) {
 			$filter->filter_valuesfrom   = null;  // use default
 			$filter->filter_valuesjoin   = null;  // use default
 			$filter->filter_valueswhere  = null;  // use default
+		} else {
+			return "date_source: ".$date_source." not implemented";
 		}
+		
 		// full SQL clauses
 		$filter->filter_groupby = ' GROUP BY '.$valuecol;
 		$filter->filter_having  = null;  // use default
@@ -703,13 +778,15 @@ class plgFlexicontent_fieldsDate extends JPlugin
 
 		$date_source = $filter->parameters->get('date_source', 0);
 		
-		if ( ! $date_source ) {
+		if ( !$date_source || $date_source==3 ) {
 			$filter->filter_colname    = sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat);
 			$filter->filter_valuesjoin = null;   // use default query
-		} else {
+		} else if ( $date_source==1 || $date_source==2 ) {
 			$_value_col = ($date_source == 1) ? 'c.publish_up' : 'c.publish_down';
 			$filter->filter_colname    = sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_valformat);
 			$filter->filter_valuesjoin = ' '; // a space to prevent using default query and instead use content table
+		} else {
+			JFactory::getApplication()->enqueueMessage( __FUNCTION__." for field: '".$filter->label.", date_source: ".$date_source." not implemented" , 'notice' );
 		}
 		
 		$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);   // format of given values must be same as format of the value-column
@@ -725,7 +802,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		$date_source = $filter->parameters->get('date_source', 0);
-		/*if ( $date_source ) {
+		/*if ( $date_source==1 || $date_source==2 ) {
 			JFactory::getApplication()->enqueueMessage( "Field: '".$filter->label."' is using start/end publication dates and cannot be used as filter in search view" , 'notice' );
 			return;
 		}*/
@@ -801,12 +878,12 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		if ($post===null) {
 			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
-			$_value_col = !$date_source ? 'fi.value' : ($date_source == 1 ? 'i.publish_up' : 'i.publish_down');
+			$_value_col = !$date_source || $date_source==3 ? 'fi.value' : ($date_source == 1 ? 'i.publish_up' : 'i.publish_down');
 			$valuecol = sprintf(' DATE_FORMAT('.$_value_col.', "%s") ', $date_valformat);
 			$textcol  = sprintf(' DATE_FORMAT('.$_value_col.', "%s") ', $date_txtformat);
 			
 			$field->field_valuesselect = ' '.$valuecol.' AS value_id, '.$textcol.' AS value';
-			if ($date_source) {
+			if ( $date_source==1 || $date_source==2 ) {
 				$field->field_valuesfrom = ' FROM #__content AS i ';
 				$field->field_item_id_col = ' i.id ';
 				$field->field_valueswhere = ' ';  // a space to remove default
@@ -816,8 +893,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		} else {
 			$values = array();
 			$db = JFactory::getDBO();
-			if ($date_source) {
-				$post = array($date_source ? $item->publish_up : $item->publish_down);
+			if ( $date_source==1 || $date_source==2 ) {
+				$post = array($date_source == 1 ? $item->publish_up : $item->publish_down);
 			}
 			if ($post) foreach ($post as $v) {
 				$valuecol = sprintf(' DATE_FORMAT("%s", "%s") ', $v, $date_valformat);

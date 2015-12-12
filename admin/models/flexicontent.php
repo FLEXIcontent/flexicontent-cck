@@ -1313,7 +1313,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'checkbox'=>'FLEXIcontent - Checkbox',
 			'checkboximage'=>'FLEXIcontent - Checkbox Image',
 			'core'=>'FLEXIcontent - Core Fields (Joomla article properties)',
-			'date'=>'FLEXIcontent - Date / Publish Up-Down Dates',
+			'date'=>'FLEXIcontent - Date / Timestamp / Publish Up-Down Dates',
 			'email'=>'FLEXIcontent - Email',
 			'extendedweblink'=>'FLEXIcontent - Extended Weblink',
 			'fcloadmodule'=>'FLEXIcontent - Load Module / Module position',

@@ -178,7 +178,7 @@
 		<plugin name="checkboximage"      folder="plugins/flexicontent_fields/checkboximage"      instfolder="flexicontent_fields">FLEXIcontent - Checkbox Image</plugin>
 		<plugin name="core"               folder="plugins/flexicontent_fields/core"               instfolder="flexicontent_fields">FLEXIcontent - Core Fields (Joomla article properties)</plugin>
 		<plugin name="coreprops"          folder="plugins/flexicontent_fields/coreprops"          instfolder="flexicontent_fields">FLEXIcontent - Item Form CORE property placer</plugin>
-		<plugin name="date"               folder="plugins/flexicontent_fields/date"               instfolder="flexicontent_fields">FLEXIcontent - Date / Publish Up-Down Dates</plugin>
+		<plugin name="date"               folder="plugins/flexicontent_fields/date"               instfolder="flexicontent_fields">FLEXIcontent - Date / Timestamp / Publish Up-Down Dates</plugin>
 		<plugin name="email"              folder="plugins/flexicontent_fields/email"              instfolder="flexicontent_fields">FLEXIcontent - Email</plugin>
 		<plugin name="extendedweblink"    folder="plugins/flexicontent_fields/extendedweblink"    instfolder="flexicontent_fields">FLEXIcontent - Extended Weblink</plugin>
 		<plugin name="fcloadmodule"       folder="plugins/flexicontent_fields/fcloadmodule"       instfolder="flexicontent_fields">FLEXIcontent - Load Module / Module position</plugin>
