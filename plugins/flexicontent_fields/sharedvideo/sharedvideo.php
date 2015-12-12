@@ -146,7 +146,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_heightvideo').val('');
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_widthvideo').val('');
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_title, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_widthvideo, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_heightvideo, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_author, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_description, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_preview').parents('tr').hide('fast');
-				jQuery('#fcfield_fetching_msg_" . $elementid . "_' + uniqueRowNum" . $field->id . "').html('');
+				jQuery('#fcfield_fetching_msg_" . $elementid . "_' + uniqueRowNum" . $field->id . ").html('');
 				";
 			
 			// Add new element to sortable objects (if field not in group)

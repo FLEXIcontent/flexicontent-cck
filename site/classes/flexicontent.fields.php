@@ -3322,7 +3322,7 @@ class FlexicontentFields
 				$filter->filter_item_id_col :
 				($filter->iscore || $filter->field_type=='coreprops') ? 'i.id' : 'fi.item_id' ;
 			
-			$filter_where_curr = $filter->iscore ? $filter_where_curr : str_replace('i.id', 'fi.item_id', $filter_where_curr);
+			$filter_where_curr = $filter->iscore ? $filter_where_curr : str_replace('i.id', $item_id_col, $filter_where_curr);
 			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT '.$item_id_col.') as found ' : '')."\n"
 				//.', GROUP_CONCAT('.$item_id_col.' SEPARATOR ",") AS idlist '   // enable FOR DEBUG purposes only
 				. $valuesfrom."\n"

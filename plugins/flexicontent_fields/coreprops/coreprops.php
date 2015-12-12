@@ -112,7 +112,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 			case 'language':     // Authors
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
-				$filter->filter_valuesselect = ' i.language AS value, CONCAT_WS(\': \', lg.title, lg.title_native) AS text';
+				$filter->filter_valuesselect = ' i.language AS value, CASE WHEN CHAR_LENGTH(lg.title_native) THEN lg.title_native ELSE lg.title END as text';
 				$filter->filter_valuesfrom   = ' FROM #__content AS i ';
 				$filter->filter_valuesjoin   =
 					' JOIN #__languages AS lg ON i.language = lg.lang_code'.
@@ -203,7 +203,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			return $filtered;
 		} else {
-			return ' AND i.id IN ('. $query .')';
+			return $query;
 		}
 	}
 	

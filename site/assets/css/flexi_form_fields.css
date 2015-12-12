@@ -470,3 +470,9 @@ table.fc-addressint-field-tbl .fcfield_textval:not(.inlineval) {
 	.fcfield_addressint_data { min-width:100%; }
 	.fcfield_addressint_map  { min-width:100%; }
 }
+
+/* FIELDs: (date field) */
+[class^="fcfield_timestamp_value"], [class*="fcfield_timestamp_value"] {
+	display: inline-block;
+	min-width:240px;
+}

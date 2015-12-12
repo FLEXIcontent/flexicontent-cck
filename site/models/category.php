@@ -200,6 +200,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('authorid', $this->_authorid);
 		$this->setState('cids', $this->_ids);
 		$this->setState('clayout', $this->_clayout);
+		if ($this->_id) $app->setUserState( $option.'.nav_catid',  $this->_id );
 		
 		// We load parameters here, AFTER populating category ID and author ID, etc variables 
 		$this->_loadCategoryParams();
@@ -273,8 +274,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function getData()
 	{
-		$format	= JRequest::getCmd('format', null);
-		
 		$cparams = $this->_params;
 		
 		$print_logging_info = $cparams->get('print_logging_info');
@@ -431,8 +430,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access public
 	 * @return string
 	 */
-	function _buildQuery( $query_ids=false )
+	function _buildQuery( $query_ids=false, $count_total = true )
 	{
+		$app     = JFactory::getApplication();
+		$jinput  = $app->input;
+		$option  = $jinput->get('option', '', 'cmd');
 		$params  = $this->_params;
 		$counting=true;
 		
@@ -454,6 +456,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$order = '';
 			$orderby = $this->_buildItemOrderBy($order);
 			$orderby_join = '';
+			
+			if ($this->_id) $app->setUserState( $option.'.'.$this->_id.'.nav_orderby',  $order );
 			
 			// Set order array (2-level) in case it is later needed
 			$this->_category->_order_arr = $order;
@@ -515,7 +519,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( $query_ids==-1 ) {
 			$query = ' SELECT count(i.id) ';
 		} else if ( !$query_ids ) {
-			$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id ';  // SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
+			$query = 'SELECT '.($count_total ? 'SQL_CALC_FOUND_ROWS' : '').' DISTINCT i.id ';  // SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
 			$query .= @ $orderby_col;
 		} else {
 			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, ty.alias AS typealias, rel.catid as rel_catid,'
@@ -766,7 +770,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		global $globalcats, $fc_catview;
 		if ( isset($fc_catview[$wherepart]) ) return $fc_catview[$wherepart];
 		
-		$option = JRequest::getVar('option');
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
 		$user		= JFactory::getUser();
 		$db     = JFactory::getDBO();
 		
@@ -1915,47 +1921,65 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		$field_type = $filter->field_type;
 		
-		// Sanitize filter values as integers for field that use integer values
-		if ( in_array($field_type, array('createdby','modifiedby','type','categories','tags')) ) {
+		if ( in_array($field_type, array('createdby','modifiedby','type','categories','tags')) )
+		{
 			$values = is_array($value) ? $value : array($value);
-			foreach ($values as $i => $v) $values[$i] = (int)$v;
 		}
 		
 		switch($field_type) 
 		{
+			case 'language':
+				$values_quoted = array();
+				foreach ($values as $v) $values_quoted[] = $db->Quote($v);
+				$query  = 'SELECT id'
+						. ' FROM #__flexicontent_items_tmp'
+						. ' WHERE language IN ('. implode(",", $values_quoted) .')';
+				//$filter_query = ' AND i.created_by IN ('. implode(",", $values_quoted) .')';
+				break;
+				
 			case 'createdby':
-				$filter_query = ' AND i.created_by IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
-			break;
+				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				$query  = 'SELECT id'
+						. ' FROM #__flexicontent_items_tmp'
+						. ' WHERE created_by IN ('. implode(",", $values) .')';
+				//$filter_query = ' AND i.created_by IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
+				break;
 
 			case 'modifiedby':
-				$filter_query = ' AND i.modified_by IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
-			break;
+				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				$query  = 'SELECT id'
+						. ' FROM #__flexicontent_items_tmp'
+						. ' WHERE modified_by IN ('. implode(",", $values) .')';
+				//$filter_query = ' AND i.modified_by IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
+				break;
 			
 			case 'type':
-				//$filter_query = ' AND ie.type_id IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
-				$query  = 'SELECT item_id'
-						. ' FROM #__flexicontent_items_ext'
+				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
+				$query  = 'SELECT id'
+						. ' FROM #__flexicontent_items_tmp'
 						. ' WHERE type_id IN ('. implode(",", $values) .')';
-						;
-				//$filter_query = ' AND i.id IN (' . $query . ')';
-			break;
+				//$filter_query = ' AND ie.type_id IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
+				break;
 			
 			case 'state':
-				$stateids = array ( 'PE' => -3, 'OQ' => -4, 'IP' => -5, 'P' => 1, 'U' => 0, 'A' => (FLEXI_J16GE ? 2:-1), 'T' => -2 );
+				$stateids = array ( 'PE' => -3, 'OQ' => -4, 'IP' => -5, 'P' => 1, 'U' => 0, 'A' => 2, 'T' => -2 );
 				$values = is_array($value) ? $value : array($value);
 				$filt_states = array();
 				foreach ($values as $i => $v) if (isset($stateids[$v])) $filt_states[] = $stateids[$v];
-				$filter_query = !count($values) ? ' AND 0 ' : ' AND i.state IN ('. implode(",", $filt_states) .')';   // no db quoting needed since these were typecasted to ints
-			break;
+				$query  = 'SELECT id'
+						. ' FROM #__flexicontent_items_tmp'
+						. ' WHERE state IN ('. implode(",", $filt_states) .')';
+				//$filter_query = !count($values) ? ' AND 1 ' : ' AND i.state IN ('. implode(",", $filt_states) .')';   // no db quoting needed since these were typecasted to ints
+				break;
 			
 			case 'categories':
-				//$filter_query = ' AND rel.catid IN ('. implode(",", $values) .')';
+				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				global $globalcats;
-				$cparams  = $this->_params;
-				$display_subcats = $cparams->get('display_subcategories_items', 2);   // include subcategory items
+				$display_subcats = $this->_params->get('display_subcategories_items', 2);   // include subcategory items
 				$query_catids = array();
 				foreach ($values as $id)
 				{
+					if (!$id) continue;
 					$query_catids[$id] = 1;
 					if ( $display_subcats==2 && !empty($globalcats[$id]->descendantsarray) ) {
 						foreach ($globalcats[$id]->descendantsarray as $subcatid) $query_catids[$subcatid] = 1;
@@ -1966,16 +1990,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 						. ' FROM #__flexicontent_cats_item_relations'
 						. ' WHERE catid IN ('. implode(",", $query_catids) .')';
 						;
-				//$filter_query = ' AND i.id IN (' . $query . ')';
-			break;
+				//$filter_query = ' AND rel.catid IN ('. implode(",", $values) .')';
+				break;
 			
 			case 'tags':
+				JArrayHelper::toInteger($values);  // Sanitize filter values as integers
 				$query  = 'SELECT itemid'
 						. ' FROM #__flexicontent_tags_item_relations'
-						. ' WHERE tid IN ('. implode(",", $values) .')';
+						. ' WHERE tid IN ('. implode(",", $values) .')';  // no db quoting needed since these were typecasted to ints
 						;
-				//$filter_query = ' AND i.id IN (' . $query . ')';
-			break;
+				//$filter_query = ' AND tag.tid IN ('. implode(",", $values) .')';
+				break;
 			
 			default:
 				// Make sure plugin file of current file is loaded and then check if custom filtering function exists
@@ -1990,7 +2015,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$filtered = ! @ $method_exists ?
 					FlexicontentFields::getFiltered($filter, $value, $return_sql) :
 					FLEXIUtilities::call_FC_Field_Func($field_type_file, 'getFiltered', array( &$filter, &$value, &$return_sql ));
-			break; 
+				break; 
 		}
 		
 		if ( !isset($filter_query) )
@@ -2032,7 +2057,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					exit;*/
 				}
 				catch (Exception $e) {
-					// Ignore table creation error
+					// Ignore table creation error, we will handle it below by creating a subquery
 					//if ($db->getErrorNum())  echo 'SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 					//echo "<br/><br/>GET FILTERED Items (cat model) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
 				}
@@ -2040,6 +2065,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				//echo "<br/><br/>GET FILTERED Items (cat model) -- [".$filter->name."] using subquery: ".$query." <br/><br/>";
 			}
 			
+			// Create subquery if temporary table creation failed
 			if ( !isset($filtered) && isset($query) )  $filtered = ' AND i.id IN (' . $query . ')';
 			
 			// An empty return value means no matching values were found
