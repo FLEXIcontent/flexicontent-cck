@@ -6,14 +6,15 @@
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
  * 
- * FLEXIcontent module is universal Content Listing Module for flexicontent.
+ * Universal Content Listing Module for flexicontent.
+ *
  * FLEXIcontent is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
 
-//no direct access
+// no direct access
 defined('_JEXEC') or die('Restricted access');
 
 // Decide whether to show module contents
@@ -51,9 +52,19 @@ if ( $show_mod )
 	global $fc_content_plg_microtime;
 	$fc_content_plg_microtime = 0;
 	
-	// load english language file for 'mod_flexicontent' module then override with current language file
-	JFactory::getLanguage()->load('mod_flexicontent', JPATH_SITE, 'en-GB', true);
-	JFactory::getLanguage()->load('mod_flexicontent', JPATH_SITE, null, true);
+	static $mod_initialized = null;
+	$modulename = 'mod_flexicontent';
+	if ($mod_initialized === null)
+	{
+		// Load english language file for current module then override (forcing a reload) with current language file
+		JFactory::getLanguage()->load($modulename, JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+		JFactory::getLanguage()->load($modulename, JPATH_SITE, null, $force_reload = true, $load_default = true);
+		
+		// Load english language file for 'com_flexicontent' and then override with current language file. Do not force a reload for either (not needed)
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = false, $load_default = true);
+		$mod_initialized = true;
+	}
 	
 	// initialize various variables
 	global $globalcats;
@@ -162,7 +173,6 @@ if ( $show_mod )
 	if ($add_tooltips) FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
 	
 	// Add css
-	$modulename = 'mod_flexicontent';
 	if ($add_ccs && $layout) {
 		// Work around for extension that capture module's HTML 
 		if ($add_ccs==2) {

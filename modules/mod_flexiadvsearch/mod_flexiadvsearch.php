@@ -6,7 +6,8 @@
  * @copyright (C) 2011 flexicontent.org
  * @license GNU/GPL v3
  * 
- * FLEXIadvsearch module is an advanced search module for flexicontent.
+ * Search Module for flexicontent.
+ *
  * FLEXIcontent is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -45,9 +46,19 @@ if ( $show_mod )
 	$modfc_jprof = new JProfiler();
 	$modfc_jprof->mark('START: FLEXIcontent Adv Search Module');
 	
-	// load english language file for 'mod_flexiadvsearch' module then override with current language file
-	JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, 'en-GB', true);
-	JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, null, true);
+	static $mod_initialized = null;
+	$modulename = 'mod_flexiadvsearch';
+	if ($mod_initialized === null)
+	{
+		// Load english language file for current module then override (forcing a reload) with current language file
+		JFactory::getLanguage()->load($modulename, JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+		JFactory::getLanguage()->load($modulename, JPATH_SITE, null, $force_reload = true, $load_default = true);
+		
+		// Load english language file for 'com_flexicontent' and then override with current language file. Do not force a reload for either (not needed)
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = false, $load_default = true);
+		$mod_initialized = true;
+	}
 	
 	// initialize various variables
 	$document = JFactory::getDocument();
@@ -102,7 +113,6 @@ if ( $show_mod )
 	if ($add_tooltips) FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
 	
 	// Add css
-	$modulename = 'mod_flexiadvsearch';
 	if ($add_ccs && $layout) {
 		// Work around for extension that capture module's HTML 
 		if ($add_ccs==2) {

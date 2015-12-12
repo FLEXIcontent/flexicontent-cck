@@ -231,8 +231,8 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 
 
 		<?php if ($show_search_go || $show_search_reset) : ?>
-		<div class="fc_filter">
-			<div class="fc_buttons">
+		<div class="<?php echo $filter_container_class; ?> fc_filter_buttons_box">
+			<div class="fc_buttons btn-group">
 				<?php if ($show_search_go) : ?>
 				<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>">
 					<i class="icon-search"></i><?php echo JText::_( 'FLEXI_GO' ); ?>

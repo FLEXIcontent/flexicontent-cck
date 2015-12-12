@@ -30,7 +30,7 @@ if ($ff_placement){
 	$ff_slider_id = 
 		($module->id     ? '_'.$module->id : '')
 		;
-	$ff_toggle_search_title = JText::_($params->get('ff_toggle_search_title', 'FLEXI_SEARCH_FORM_TOGGLE'));
+	$ff_toggle_search_title = JText::_($params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'));
 	echo JHtml::_('sliders.start', 'fcfilter_form_slider'.$ff_slider_id, array('useCookie'=>1, 'show'=>-1, 'display'=>-1, 'startOffset'=>-1, 'startTransition'=>1));
 	echo JHtml::_('sliders.panel', $ff_toggle_search_title, 'fcfilter_form_togglebtn'.$ff_slider_id);
 }

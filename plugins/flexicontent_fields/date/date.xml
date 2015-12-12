@@ -63,7 +63,7 @@
 				<option value="2" show_list="disp_tz_on" hide_list="disp_tz_off">FLEXI_YES_FORCE_ZERO_TIME</option>
 			</field>
 			<field name="use_editor_tz" type="radio" default="0" label="FLEXI_DATE_USE_USER_TIMEZONE" description="FLEXI_DATE_USE_USER_TIMEZONE_DESC" class="btn-group btn-group-yesno" depend_class="disp_tz_on" >
-				<option value="0">FLEXI_NO_USE_UTC_0</option>
+				<option value="0">FLEXI_DATE_NO_USE_UTC_0</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			

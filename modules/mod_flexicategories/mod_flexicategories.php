@@ -7,7 +7,8 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-defined('_JEXEC') or die;
+// no direct access
+defined('_JEXEC') or die('Restricted access');
 
 // Include the helper functions only once
 require_once __DIR__ . '/helper.php';

@@ -6,14 +6,15 @@
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
  * 
- * FLEXItagcloud module is a tag cloud module module for flexicontent.
+ * Tags Cloud Module for flexicontent.
+ *
  * FLEXIcontent is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
 
-//no direct access
+// no direct access
 defined('_JEXEC') or die('Restricted access');
 
 // Decide whether to show module contents
@@ -44,16 +45,26 @@ if ( $show_mod )
 	jimport( 'joomla.error.profiler' );
 	$modfc_jprof = new JProfiler();
 	$modfc_jprof->mark('START: FLEXIcontent Tags Cloud Module');
-
-	// load english language file for 'mod_flexitagcloud' module then override with current language file
-	JFactory::getLanguage()->load('mod_flexitagcloud', JPATH_SITE, 'en-GB', true);
-	JFactory::getLanguage()->load('mod_flexitagcloud', JPATH_SITE, null, true);
-
+	
+	static $mod_initialized = null;
+	$modulename = 'mod_flexitagcloud';
+	if ($mod_initialized === null)
+	{
+		// Load english language file for current module then override (forcing a reload) with current language file
+		JFactory::getLanguage()->load($modulename, JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+		JFactory::getLanguage()->load($modulename, JPATH_SITE, null, $force_reload = true, $load_default = true);
+		
+		// Load english language file for 'com_flexicontent' and then override with current language file. Do not force a reload for either (not needed)
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = false, $load_default = true);
+		$mod_initialized = true;
+	}
+	
 	// initialize various variables
 	$document = JFactory::getDocument();
 	$caching 	= $app->getCfg('caching', 0);
 	$flexiparams = JComponentHelper::getParams('com_flexicontent');
-
+	
 	// include the helper only once
 	require_once (dirname(__FILE__).DS.'helper.php');
 
@@ -62,7 +73,6 @@ if ( $show_mod )
 	$layout 				= $params->get('layout', 'default');
 
 	// Add css
-	$modulename = 'mod_flexitagcloud';
 	if ($add_ccs) {
 		// Work around for extension that capture module's HTML 
 		if ($add_ccs==2) {

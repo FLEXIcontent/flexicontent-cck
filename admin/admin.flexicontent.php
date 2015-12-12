@@ -85,20 +85,21 @@ JPluginHelper::importPlugin('flexicontent');
 // Language handling
 // *****************
 
-// Load english language file for 'com_content' component then override with current language file
-JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
-JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
+// Load english language file for 'com_content' component, and the override (forcing a reload) with current language file
+JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
+JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
 
-// Load english language file for 'com_flexicontent' component then override with current language file
-JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+
+// Load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
+JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
+JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
-$overrideDir = JPATH_ADMINISTRATOR .DS. 'languages' .DS. 'overrides' .DS;
+/*$overrideDir = JPATH_ADMINISTRATOR .DS. 'languages' .DS. 'overrides' .DS;
 if (!FLEXI_J16GE) {
-	JFactory::getLanguage()->load('override', $overrideDir, 'en-GB', true);
-	JFactory::getLanguage()->load('override', $overrideDir, null, true);
-}
+	JFactory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
+	JFactory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
+}*/
 
 
 // ********************************
