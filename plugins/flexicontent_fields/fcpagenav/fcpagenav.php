@@ -14,10 +14,10 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsFcpagenav extends JPlugin
+class plgFlexicontent_fieldsFcpagenav extends FCField
 {
 	static $field_types = array('fcpagenav');
 	
@@ -73,24 +73,26 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		$next_label			= JText::_($field->parameters->get('next_label', 'FLEXI_FIELDS_PAGENAV_GOTONEXT'));
 		$category_label	= JText::_($field->parameters->get('category_label', 'FLEXI_FIELDS_PAGENAV_CATEGORY'));
 		
+		$field->{$prop} = null;
 		$use_model_state = true;
 		if ($use_model_state)
 		{
 			$cid = (int) $app->getUserState( $option.'.nav_catid', 0 );
-			$_item_cats = array();
-			foreach ($item->categories as $_cat) $_item_cats[$_cat->id] = 1;
-			$_item_cats = array();
-			if ( !isset( $_item_cats[$cid] ) && !in_array($cid, $globalcats[$cid]->descendantsarray) )  $cid = JRequest::getInt('cid');
-			if ( !isset( $_item_cats[$cid] ) && !in_array($cid, $globalcats[$cid]->descendantsarray) )  $cid = (int)$item->catid;
 		}
-		else {
-			$cid = JRequest::getInt('cid');
-			$cid = $cid ? $cid : (int)$item->catid;
-		}
-
+		$cid = !$cid || !isset($globalcats[$cid])  ?  JRequest::getInt('cid')  :  $cid;
+		$cid = !$cid || !isset($globalcats[$cid])  ?  (int)$item->catid  :  $cid;
+		
 		$item_count = $app->getUserState( $option.'.'.$cid.'nav_item_count', 0);
 		$loc_to_ids = $app->getUserState( $option.'.'.$cid.'nav_loc_to_ids', array());
 		$ids_to_loc = array_flip($loc_to_ids);
+		
+		
+		// Get category parameters
+		$query 	= 'SELECT * FROM #__categories WHERE id = ' . $cid;
+		$db->setQuery($query);
+		$category = $db->loadObject();
+		$category->parameters = new JRegistry($category->params);
+		
 		
 		if ( isset($ids_to_loc[$item->id]) )
 		{
@@ -98,12 +100,6 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		}
 		
 		else {
-			// Get active category parameters
-			$query 	= 'SELECT * FROM #__categories WHERE id = ' . $cid;
-			$db->setQuery($query);
-			$category = $db->loadObject();
-			$category->parameters = new JRegistry($category->params);
-			
 			// Get list of ids of selected, null indicates to return item ids array. TODO retrieve item ids from view: 
 			// This will allow special navigating layouts "mcats,author,myitems,tags,favs" and also utilize current filtering
 			$ids = null;
@@ -180,100 +176,31 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		// Check if displaying nothing and stop
 		if (!$field->prev && !$field->next && !$use_category_link) return;
 		
-		$html = '<span class="flexi fc-pagenav">';
-		$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-		
-		// CATEGORY back link
-		if ($use_category_link)
-		{
-			$cat_image = $this->getCatThumb($category, $field->parameters);
-			$limit = $item_count;
-			$limit = $limit ? $limit : 10;
-			$start = floor($location / $limit)*$limit;
-			if (!empty($rows[$item->id]->categoryslug)) {
-				$html .= '
-				<span class="fc-pagenav-return">
-					<a class="btn btn-info" href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)).'?start='.$start .'">' . htmlspecialchars($category_label, ENT_NOQUOTES, 'UTF-8')
-						.($cat_image ? '
-						<br/>
-						<img src="'.$cat_image.'" alt="Return"/>' : '') .'
-					</a>
-				</span>';
-			}
-		}
-		
-		// Item location and total count
-		$html .= $show_prevnext_count ? '<span class="fc-pagenav-items-cnt badge badge-info">'.($location+1).'/'.$item_count.'</span>' : '';
-		
 		// Get images
 		$items_arr = array();
 		if ($field->prev) $items_arr[$field->prev->id] = $field->prev;
 		if ($field->next) $items_arr[$field->next->id] = $field->next;
 		$thumbs = $this->getItemThumbs($field->parameters, $items_arr);
 		
-		// Next item linking
-		if ($field->prev)
-		{
-			$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($tooltip_title_prev, $field->prevtitle, 0) .'"' : '';
-			$html .= '
-			<span class="fc-pagenav-prev' . ($use_tooltip ? $tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . '>
-				<a class="btn" href="'. $field->prevurl .'">
-					<i class="icon-previous"></i>
-					' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8') ).'
-					'.(isset($thumbs[$field->prev->id]) ? '
-						<br/>
-						<img src="'.$thumbs[$field->prev->id].'" alt="Previous"/>
-					' : '').'
-				</a>
-			</span>'
-			;
-		} else {
-			$html .= '
-			<span class="fc-pagenav-prev">
-				<span class="btn disabled">
-					<i class="icon-previous"></i>
-					'.htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8').'
-				</span>
-			</span>'
-			;
-		}
+		$field->prevThumb = isset($thumbs[$field->prev->id]) ? $thumbs[$field->prev->id] : '';
+		$field->nextThumb = isset($thumbs[$field->next->id]) ? $thumbs[$field->next->id] : '';
 		
-		// Previous item linking
-		if ($field->next)
-		{
-			$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($tooltip_title_next, $field->nexttitle, 0) .'"' : '';
-			$html .= '
-			<span class="fc-pagenav-next' . ($use_tooltip ? $tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . '>
-				<a class="btn" href="'. $field->nexturl .'">
-					<i class="icon-next"></i>
-					' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8') ).'
-					'.(isset($thumbs[$field->next->id]) ? '
-						<br/>
-						<img src="'.$thumbs[$field->next->id].'" alt="Next"/>
-					' : '').'
-				</a>
-			</span>'
-			;
-		} else {
-			$html .= '
-			<span class="fc-pagenav-next">
-				<span class="btn disabled">
-					<i class="icon-next"></i>
-					'.htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8').'
-				</span>
-			</span>'
-			;
-		}
+		// Get layout name
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 		
-		$html .= '</span>';
+		//$this->values = $values;
+		//$this->displayFieldValue( $prop, $viewlayout );
+		include(self::getFormPath($this->fieldtypes[0], $viewlayout));
+		
 		
 		// Load needed JS/CSS
 		if ($use_tooltip)
-			FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
+			JHtml::_('bootstrap.tooltip');
 		if ($load_css)
 			JFactory::getDocument()->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');	
 		
-		$field->{$prop} = $html;		
+		$field->{$prop} = $html;
 	}
 	
 	

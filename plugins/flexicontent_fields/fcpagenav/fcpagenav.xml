@@ -13,6 +13,7 @@
 		<filename plugin="fcpagenav">fcpagenav.php</filename>
 		<filename>index.html</filename>
 		<folder>fcpagenav</folder>
+		<folder>tmpl</folder>
 	</files>
 	
 	<config>
@@ -32,14 +33,16 @@
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
-			<field name="frontend_hidden" type="hidden" default="1" />
-			<field name="backend_hidden" type="hidden" default="1" />
-			
-			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
+
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/fcpagenav/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
 			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_CSS" description="FLEXI_FIELD_PAGENAV_CSS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			
+			<field name="frontend_hidden" type="hidden" default="1" />
+			<field name="backend_hidden" type="hidden" default="1" />
 			
 		</fieldset>	
 		<fieldset name="group-fcpagenav-viewing-links" repeat="1" icon_class="icon-link" label_prefix="FLEXI_FIELD_VIEWING" label="Links" addfieldpath="/administrator/components/com_flexicontent/elements">

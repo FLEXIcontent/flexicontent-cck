@@ -1,3 +1,29 @@
+
+.fcpagenav-items-cnt.btn {
+	font-style: italic;
+	white-space: nowrap !important;
+}
+.fcpagenav.btn-group {
+	max-width: 80%;
+	box-sizing: border-box !important;
+}
+
+.fcpagenav a img {
+	margin: 8px 4px 4px 4px;
+	border-radius: 4px;
+	border: 1px solid #d0d0d0;
+}
+
+.fcpagenav.btn-group > .btn {
+	height:100% !important;
+	box-sizing: border-box !important;
+	display: table-cell !important;
+	vertical-align: middle !important;
+	white-space: normal;
+}
+
+
+/* LEGACY */
 .flexi.fc-pagenav {
 	text-align: center;
 	display: block;
