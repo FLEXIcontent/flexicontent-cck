@@ -1463,26 +1463,45 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$cparams = $this->_params;
 		if ($pk) $this->_id = $pk;  // Set a specific id
 		
-		$cat_usable = !$this->_layout || $this->_layout!='mcats';
-		if ($this->_id && $cat_usable)
+		$cat_required = $this->_layout == '';
+		$cat_usable   = !$this->_layout || $this->_layout!='mcats';
+		
+		// Clear category id, if current layout cannot be limited to a specific category
+		$this->_id = $cat_usable ? $this->_id : 0;
+		
+		if ( $this->_id )
 		{
-			// ************************************************************************************************************
-			// Retrieve category data, but ONLY if current layout can use it, ('mcats' does not since it uses multiple ids)
-			// ************************************************************************************************************
+			$catshelper = new flexicontent_cats($this->_id);
+			$parents    = $catshelper->getParentlist($all_cols=false);
 			
-			$query 	= 'SELECT c.*,'
-				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
-				. ' FROM #__categories AS c'
-				. ' WHERE c.id = '.$this->_id
-				. ' AND c.published = 1 '.(FLEXI_J16GE ? ' AND c.extension='.$this->_db->Quote(FLEXI_CAT_EXTENSION) : '')
-				;
-			$this->_db->setQuery($query);
-			$_category = $this->_db->loadObject();
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+			$parents_published = true;
+			foreach($parents as $parent) if ( !$parent->published )
+				{ $parents_published = false; break; }
+			
+			if ($parents_published)
+			{
+				// ************************************************************************************************************
+				// Retrieve category data, but ONLY if current layout can use it, ('mcats' does not since it uses multiple ids)
+				// ************************************************************************************************************
+				
+				$query 	= 'SELECT c.*,'
+					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
+					. ' FROM #__categories AS c'
+					. ' WHERE c.id = '.$this->_id
+					. ' AND c.published = 1 AND c.extension=' . $this->_db->Quote(FLEXI_CAT_EXTENSION)
+					;
+				$this->_db->setQuery($query);
+				$_category = $this->_db->loadObject();   // False if not found or unpublished
+				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+			}
+			
+			else {
+				$_category = false;  // A parent category is unpublished
+			}
 		}
 		
 		else {
-			$_category = false;
+			$_category = false;   // No category id given, or category id is not applicable for current layout
 		}
 		
 		
@@ -1491,7 +1510,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// layout means single category view, so raise an error if category id is missing
 		// *******************************************************************************
 		
-		if (($this->_id || $this->_layout=='') && $cat_usable && !$_category) {
+		if (($this->_id || $cat_required) && !$_category)
+		{
 			$err_mssg = $err_type = false;
 			if (!$_category) {
 				$err_mssg = JText::sprintf( 'FLEXI_CONTENT_CATEGORY_NOT_FOUND_OR_NOT_PUBLISHED', $this->_id );
@@ -1597,13 +1617,22 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		if (!$checkAccess) return $this->_category;
 		
+		// Check access level of category and of its parents
 		$canread = true;
-		if ($this->_id) {
+		if ( $this->_id )
+		{
 			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-			$canread = in_array($this->_category->access, $aid_arr);
+			$allowed_levels = array_flip($aid_arr);
+			$canread = isset($allowed_levels[$this->_category->access]);
+			
+			if ($canread) {
+				foreach($parents as $parent) if ( !isset($allowed_levels[$parent->access]) )
+					{ $canread = false; break; }
+			}
 		}
 		
-		if (!$canread && $this->_id!=0)
+		// Handle unreadable category (issue 403 unauthorized error, redirecting unlogged users to login)
+		if ( $this->_id && !$canread )
 		{
 			if($user->guest) {
 				// Redirect to login

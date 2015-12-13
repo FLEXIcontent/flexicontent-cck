@@ -1066,7 +1066,7 @@ class FlexicontentHelperRoute
 			$i_name = $view_varnames[$view];
 			
 			if ( empty($menuitem->query[$i_name]) && ! $layout ) continue;
-			$i_val  = !empty($menuitem->query[$i_name]) ? $menuitem->query[$i_name] : 0;
+			$i_val  = !empty($menuitem->query[$i_name]) ? (int)$menuitem->query[$i_name] : 0;
 			
 			if ( $layout )
 			{

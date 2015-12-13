@@ -68,7 +68,7 @@ class flexicontent_cats
 		$this->parentcats_data = array();
 		if (empty($this->parentcats_ids)) return;
 		
-		$query = 'SELECT ' .($all_cols ? '*,' : 'id, title, published,')
+		$query = 'SELECT ' .($all_cols ? '*,' : 'id, title, published, access,')
 				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				.' FROM #__categories'
 				.' WHERE id IN ('.implode($this->parentcats_ids, ',').')'

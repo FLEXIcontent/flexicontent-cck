@@ -712,12 +712,18 @@ form div fieldset > button
 form div fieldset > textarea,
 form div fieldset > select,
 form div fieldset > img {
-	margin: 0px;
+	margin: 0 0 2px 0;
 	float: left;
 }
+
 #flexicontent div fieldset .input-append,
 #flexicontent div fieldset .input-prepend {
 	margin-bottom: 0px;
+}
+
+#flexicontent div fieldset.panelform .input-append,
+#flexicontent div fieldset.panelform .input-prepend {
+	float: left;
 }
 
 #flexicontent div fieldset.panelform .input-append > input,

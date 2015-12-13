@@ -114,7 +114,7 @@ function FLEXIcontentBuildRoute(&$query)
 	switch ($view)
 	{
 	case FLEXI_ITEMVIEW:
-		$mcid = @$menu->query['cid']; // not set returns null
+		$mcid = !isset($menu->query['cid']) ? null : (int)$menu->query['cid'];
 		$cid  = !isset($query['cid']) ? null : (int)$query['cid'];
 		$mid = @$menu->query['id']; // not set returns null
 		$id  = !isset($query['id']) ? null : (int)$query['id'];
@@ -147,7 +147,7 @@ function FLEXIcontentBuildRoute(&$query)
 		break;
 	
 	case 'category':
-		$mcid = @$menu->query['cid']; // not set returns null
+		$mcid = !isset($menu->query['cid']) ? null : (int)$menu->query['cid'];
 		$cid  = !isset($query['cid']) ? null : (int)$query['cid'];
 
 		$mlayout = @$menu->query['layout'];

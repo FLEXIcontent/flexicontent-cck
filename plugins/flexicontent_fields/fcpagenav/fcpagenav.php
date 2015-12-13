@@ -182,8 +182,8 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		if ($field->next) $items_arr[$field->next->id] = $field->next;
 		$thumbs = $this->getItemThumbs($field->parameters, $items_arr);
 		
-		$field->prevThumb = isset($thumbs[$field->prev->id]) ? $thumbs[$field->prev->id] : '';
-		$field->nextThumb = isset($thumbs[$field->next->id]) ? $thumbs[$field->next->id] : '';
+		$field->prevThumb = $field->prev && isset($thumbs[$field->prev->id]) ? $thumbs[$field->prev->id] : '';
+		$field->nextThumb = $field->next && isset($thumbs[$field->next->id]) ? $thumbs[$field->next->id] : '';
 		
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
@@ -328,7 +328,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			
 			// Get/Create current category model ... according to configuaration set above into the JRequest variables ...
 			$catmodel = new FlexicontentModelCategory();
-			$category = $catmodel->getCategory();
+			$category = $catmodel->getCategory($pk=null, $raiseErrors=false, $checkAccess=false);
 			
 			$query = $catmodel->_buildQuery(false, $count_total=false);
 			$db->setQuery($query, 0, 50000);

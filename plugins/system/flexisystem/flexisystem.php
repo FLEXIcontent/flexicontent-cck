@@ -553,6 +553,7 @@ class plgSystemFlexisystem extends JPlugin
 				$list[$id]->treename 	= "$indent$txt";
 				$list[$id]->title 		= $v->title;
 				$list[$id]->slug 			= $v->slug;
+				$list[$id]->access		= $v->access;
 				$list[$id]->ancestors = $ancestors;
 				$list[$id]->childrenarray = @$children[$id];
 				$list[$id]->children 	= count( @$children[$id] );

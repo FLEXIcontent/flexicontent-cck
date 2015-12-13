@@ -96,14 +96,29 @@ class FlexicontentModelItem extends ParentClassItem
 				}
 			}
 			
-			// (c) Calculate read access ... 
-			$canviewitem = $params->get('access-view');
+			// (c) Calculate read access ... also considering the access level of parent categories
+			$_cid_ = $cid ? $cid : $this->_item->catid;
+			if ( !isset($this->_item->ancestor_cats_accessible) )
+			{
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+				$allowed_levels = array_flip($aid_arr);
+				
+				$catshelper = new flexicontent_cats($_cid_);
+				$parents    = $catshelper->getParentlist($all_cols=false);
+				
+				$ancestor_cats_accessible = true;
+				foreach($parents as $parent) if ( !isset($allowed_levels[$parent->access]) )
+					{ $ancestor_cats_accessible = false; break; }
+				$this->_item->ancestor_cats_accessible = $ancestor_cats_accessible;
+			}
+			$canviewitem = $params->get('access-view') && $this->_item->ancestor_cats_accessible;
 			
 			
-			// *********************************************************************************
+			// *********************************************************************************************
 			// STEP B: Calculate SOME ITEM PUBLICATION STATE FLAGS, used to decide if current item is active
-			// FLAGS: item_is_published, item_is_scheduled, item_is_expired, cats_are_published
-			// *********************************************************************************
+			// FLAGS: item_is_published, item_is_scheduled, item_is_expired, ancestor_cats_published
+			// *********************************************************************************************
+
 			$item_is_published = $this->_item->state == 1 || $this->_item->state == -5 || $this->_item->state == (FLEXI_J16GE ? 2:-1);
 			$item_is_scheduled = $this->_item->publication_scheduled;
 			$item_is_expired   = $this->_item->publication_expired;
@@ -116,28 +131,28 @@ class FlexicontentModelItem extends ParentClassItem
 					foreach($globalcats[$cid]->ancestorsarray as $pcid)    $ancestor_cats_published = $ancestor_cats_published && ($globalcats[$pcid]->published==1);
 					$this->_item->ancestor_cats_published = $ancestor_cats_published;
 				}
-				$cats_are_published = $this->_item->ancestor_cats_published;  //$this->_item->catpublished;
+				$ancestor_cats_published = $this->_item->ancestor_cats_published;  //$this->_item->catpublished;
 				$cats_np_err_mssg = JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_CURRCAT_UNPUBLISHED', $cid);
 			}
 			else
 			{
 				// cid is not set, we have no current category, the item is visible if it belongs to at one published category
 				$itemcats = $this->_item->categories;
-				$cats_are_published = true;
+				$ancestor_cats_published = true;
 				foreach ($itemcats as $catid)
 				{
 					if (!isset($globalcats[$catid])) continue;
-					$cats_are_published |= $globalcats[$catid]->published;
+					$ancestor_cats_published |= $globalcats[$catid]->published;
 					
 					// For J1.6+ check all ancestor categories from current one to the root
-					foreach($globalcats[$catid]->ancestorsarray as $pcid)    $cats_are_published = $cats_are_published && ($globalcats[$pcid]->published==1);
+					foreach($globalcats[$catid]->ancestorsarray as $pcid)    $ancestor_cats_published = $ancestor_cats_published && ($globalcats[$pcid]->published==1);
 				}
 				$cats_np_err_mssg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_ALLCATS_UNPUBLISHED');
 			}
 			
 			// Calculate if item is active ... and viewable is also it's (current or All) categories are published
 			$item_active          = $item_is_published && !$item_is_scheduled && !$item_is_expired;
-			$item_n_cat_active    = $item_active && $cats_are_published;
+			$item_n_cat_active    = $item_active && $ancestor_cats_published;
 			$previewing_and_unlogged = ($version && $user->guest); // this is a flag indicates to redirect to login instead of 404 error
 			$ignore_publication   = $canedititem || $caneditstate || $isOwner || $previewing_and_unlogged;
 			$inactive_notice_set = false;
@@ -194,11 +209,11 @@ class FlexicontentModelItem extends ParentClassItem
 			}
 			
 			// (d) Check that current item category or all items categories are published
-			if ( !$cats_are_published && !$ignore_publication ) {
+			if ( !$ancestor_cats_published && !$ignore_publication ) {
 				// Terminate execution with a HTTP not-found Server Error
 				$msg = $cats_np_err_mssg . $title_str;
 				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
-			} else if( !$cats_are_published && !$inactive_notice_set ) {
+			} else if( !$ancestor_cats_published && !$inactive_notice_set ) {
 				// Item edittable, set warning that item's (ancestor) category is unpublished
 				JError::raiseNotice( 404, $cats_np_err_mssg );
 				$inactive_notice_set = true;
@@ -269,8 +284,9 @@ class FlexicontentModelItem extends ParentClassItem
 					$app->redirect( $url );
 				} else {
 					$msg  = JText::_( 'FLEXI_ALERTNOTAUTH_VIEW');
-					$msg .= $item->type_id && !$item->has_type_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_TYPE") : '';
-					$msg .= $item->catid   && !$item->has_mcat_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
+					$msg .= $item->type_id && !$this->_item->has_type_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_TYPE") : '';
+					$msg .= $item->catid   && !$this->_item->has_mcat_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
+					$msg .= $cid  && !$this->_item->ancestor_cats_accessible ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
 					if ($cparams->get('unauthorized_page', '')) {
 						// (d) redirect unauthorized logged user to the unauthorized page (if this is set)
 						JError::raiseNotice( 403, $msg);
