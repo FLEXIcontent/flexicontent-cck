@@ -200,7 +200,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('authorid', $this->_authorid);
 		$this->setState('cids', $this->_ids);
 		$this->setState('clayout', $this->_clayout);
+		
+		// Other
 		if ($this->_id) $app->setUserState( $option.'.nav_catid',  $this->_id );
+		$this->setState('option', $option);
 		
 		// We load parameters here, AFTER populating category ID and author ID, etc variables 
 		$this->_loadCategoryParams();
@@ -434,7 +437,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
-		$option  = $jinput->get('option', '', 'cmd');
+		$option  = $this->getState('option');
 		$params  = $this->_params;
 		$counting=true;
 		
@@ -772,7 +775,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$option = $jinput->get('option', '', 'cmd');
+		$option = $this->getState('option');
 		$user		= JFactory::getUser();
 		$db     = JFactory::getDBO();
 		
@@ -891,7 +894,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		global $fc_catview;
 		$app      = JFactory::getApplication();
-		$option   = JRequest::getVar('option');
+		$option   = $this->getState('option');
 		$cparams  = $this->_params;
 		$db = $this->_db;
 		
@@ -1023,7 +1026,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		global $fc_catview;
 		$app      = JFactory::getApplication();
-		$option   = JRequest::getVar('option');
+		$option   = $this->getState('option');
 		$cparams  = $this->_params;
 		$db = $this->_db;
 		

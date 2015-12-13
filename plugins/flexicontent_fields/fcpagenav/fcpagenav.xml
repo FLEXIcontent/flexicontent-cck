@@ -40,7 +40,6 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="type_to_exclude" type="types" default="" multiple="true" size="5" label="FLEXI_FIELD_PAGENAV_TYPES_TO_EXCLUDE" description="FLEXI_FIELD_PAGENAV_TYPES_TO_EXCLUDE_DESC" class="use_select2_lib" />
 			
 		</fieldset>	
 		<fieldset name="group-fcpagenav-viewing-links" repeat="1" icon_class="icon-link" label_prefix="FLEXI_FIELD_VIEWING" label="Links" addfieldpath="/administrator/components/com_flexicontent/elements">

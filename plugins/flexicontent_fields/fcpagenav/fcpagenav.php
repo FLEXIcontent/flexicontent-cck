@@ -53,6 +53,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		global $globalcats;
 		$app  = JFactory::getApplication();
 		$db   = JFactory::getDBO();
+		$user = JFactory::getUser();
 		$option = JRequest::getCmd('option');
 		$view   = JRequest::getString('view', FLEXI_ITEMVIEW);
 		$print  = JRequest::getCMD('print');
@@ -72,8 +73,8 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		$next_label			= JText::_($field->parameters->get('next_label', 'FLEXI_FIELDS_PAGENAV_GOTONEXT'));
 		$category_label	= JText::_($field->parameters->get('category_label', 'FLEXI_FIELDS_PAGENAV_CATEGORY'));
 		
-		$use_model = true;
-		if ($use_model)
+		$use_model_state = true;
+		if ($use_model_state)
 		{
 			$cid = (int) $app->getUserState( $option.'.nav_catid', 0 );
 			$_item_cats = array();
@@ -81,66 +82,50 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$_item_cats = array();
 			if ( !isset( $_item_cats[$cid] ) && !in_array($cid, $globalcats[$cid]->descendantsarray) )  $cid = JRequest::getInt('cid');
 			if ( !isset( $_item_cats[$cid] ) && !in_array($cid, $globalcats[$cid]->descendantsarray) )  $cid = (int)$item->catid;
-			
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.php');
-	
-			$saved_cid = JRequest::getVar('cid', '');   // save cid ...
-			$saved_layout = JRequest::getVar('layout'); // save layout ...
-			$saved_option = JRequest::getVar('option'); // save option ...
-			$saved_view = JRequest::getVar('view'); // save layout ...
-			
-			//$target_layout = $mcats_selection || !$catid ? 'mcats' : '';
-			//JRequest::setVar('layout', $target_layout);
-			//JRequest::setVar($target_layout=='mcats' ? 'cids' : 'cid', $limit_filters_to_cat ? $catid : 0);
-			JRequest::setVar('layout', '');
-			JRequest::setVar('cid', $cid);
-			JRequest::setVar('option', 'com_flexicontent');
-			JRequest::setVar('view', 'category');
-			
-			// Get/Create current category model ... according to configuaration set above into the JRequest variables ...
-			$catmodel = new FlexicontentModelCategory();
-			$catparams = $catmodel->getParams();  // Get current's view category parameters this will if needed to get category specific filters ...
-			$catmodel->_buildItemWhere($wherepart='where', $counting=true);
-			$catmodel->_buildItemFromJoin($counting=true);
-			
-			$catdata = $catmodel->getCategory();
-		
-			// Get list of ids of selected, null indicates to return item ids array. TODO retrieve item ids from view: 
-			// This will allow special navigating layouts "mcats,author,myitems,tags,favs" and also utilize current filtering
-			$ids = null;  
-			
-			$query = $catmodel->_buildQuery(false, $count_total=false);
-			$db->setQuery($query, 0, 50000);
-			$list = $db->loadColumn();
-			
-			// Restore variables
-			JRequest::setVar('cid', $saved_cid); // restore cid
-			JRequest::setVar('layout', $saved_layout); // restore layout
-			JRequest::setVar('option', $saved_option); // restore option
-			JRequest::setVar('view', $saved_view); // restore view
 		}
-		
 		else {
 			$cid = JRequest::getInt('cid');
 			$cid = $cid ? $cid : (int)$item->catid;
-				
+		}
+
+		$item_count = $app->getUserState( $option.'.'.$cid.'nav_item_count', 0);
+		$loc_to_ids = $app->getUserState( $option.'.'.$cid.'nav_loc_to_ids', array());
+		$ids_to_loc = array_flip($loc_to_ids);
+		
+		if ( isset($ids_to_loc[$item->id]) )
+		{
+			$location = $ids_to_loc[$item->id];
+		}
+		
+		else {
 			// Get active category parameters
 			$query 	= 'SELECT * FROM #__categories WHERE id = ' . $cid;
 			$db->setQuery($query);
-			$catdata = $db->loadObject();
-			$catdata->parameters = new JRegistry($catdata->params);
-		
+			$category = $db->loadObject();
+			$category->parameters = new JRegistry($category->params);
+			
 			// Get list of ids of selected, null indicates to return item ids array. TODO retrieve item ids from view: 
 			// This will allow special navigating layouts "mcats,author,myitems,tags,favs" and also utilize current filtering
-			$ids = null;  
-			$list = $this->getItemList($field, $item, $ids, $cid, $catdata->parameters);
+			$ids = null;
+			$loc_to_ids = $this->getItemList($ids, $cid, $user->id);
+			
+			$ids_to_loc = array_flip($loc_to_ids);  // Item ID to location MAP
+			$item_count = count($loc_to_ids);    // Total items in category
+			$location   = isset($ids_to_loc[$item->id]) ? $ids_to_loc[$item->id] : false;  // Location of current content item in array list
+			
+			if ($location!==false) {
+				$offset = $location-50 > 0 ? $location-50 : 0;
+				$length = $offset+100 < $item_count ? 100 : $item_count-$offset;
+				$nav_loc_to_ids = array_slice( $loc_to_ids, $offset, $length, true);
+				
+				$app->setUserState( $option.'.'.$cid.'nav_item_count', $item_count);
+				$app->setUserState( $option.'.'.$cid.'nav_loc_to_ids', $nav_loc_to_ids);
+			}
+			else {
+				$app->setUserState( $option.'.'.$cid.'nav_item_count', null);
+				$app->setUserState( $option.'.'.$cid.'nav_loc_to_ids', null);
+			}
 		}
-		
-		// Location of current content item in array list
-		$loc_to_ids = & $list;
-		$ids_to_loc = array_flip($list);
-		$location = isset($ids_to_loc[$item->id]) ? $ids_to_loc[$item->id] : false;
 		
 		// Get previous and next item data
 		$field->prev = null;
@@ -160,7 +145,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		if ($location !== false)
 		{
 			$prev_id = ($location - 1) >= 0 ? $loc_to_ids[$location - 1] : null;
-			$next_id = ($location + 1) < count($list) ? $loc_to_ids[$location + 1] : null;
+			$next_id = ($location + 1) < $item_count ? $loc_to_ids[$location + 1] : null;
 			
 			$ids = array();
 			
@@ -174,7 +159,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			if ($next_id) $ids[] = $next_id;
 			
 			// Query specific ids
-			$rows = $this->getItemList($field, $item, $ids, $cid, $catdata->parameters);
+			$rows = $this->getItemList($ids, $cid, $user->id);
 			
 			// previous content item
 			if ($prev_id) {
@@ -201,8 +186,8 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		// CATEGORY back link
 		if ($use_category_link)
 		{
-			$cat_image = $this->getCatThumb($catdata, $field->parameters);
-			$limit = count($list);
+			$cat_image = $this->getCatThumb($category, $field->parameters);
+			$limit = $item_count;
 			$limit = $limit ? $limit : 10;
 			$start = floor($location / $limit)*$limit;
 			if (!empty($rows[$item->id]->categoryslug)) {
@@ -218,7 +203,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		}
 		
 		// Item location and total count
-		$html .= $show_prevnext_count ? '<span class="fc-pagenav-items-cnt badge badge-info">'.($location+1).'/'.count($list).'</span>' : '';
+		$html .= $show_prevnext_count ? '<span class="fc-pagenav-items-cnt badge badge-info">'.($location+1).'/'.$item_count.'</span>' : '';
 		
 		// Get images
 		$items_arr = array();
@@ -392,155 +377,68 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 	}
 	
 	
-	function getItemList(&$field, &$item, &$ids=null, $cid=null, &$cparams=null)
+	function getItemList(&$ids=null, $cid=null, &$userid=0)
 	{
-		// Global parameters
-		$gparams   = JFactory::getApplication()->getParams('com_flexicontent');
-		$filtercat = $gparams->get('filtercat', 0); // If language filtering is enabled in category view
-		
-		$app    = JFactory::getApplication();
-		$option = JRequest::getCmd('option');
-		$db     = JFactory::getDBO();
-		$user   = JFactory::getUser();
-		$date     = JFactory::getDate();
-		$nowDate  = $date->toSql();
-		$nullDate	= $db->getNullDate();
+		$db = JFactory::getDBO();
 		
 		if ($ids===null)
 		{
-			$select = 'SELECT i.id';
-			$join = ''
-				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
-				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id '
-				;
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.php');
 			
-			// Get the site default language in case no language is set in the url
-			$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
-			$urlLang  = JRequest::getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
-			$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
+			$saved_cid = JRequest::getVar('cid', '');   // save cid ...
+			$saved_layout = JRequest::getVar('layout'); // save layout ...
+			$saved_option = JRequest::getVar('option'); // save option ...
+			$saved_view = JRequest::getVar('view'); // save layout ...
 			
-			// parameters shortcuts
-			$types_to_exclude	= $field->parameters->get('type_to_exclude', '');
+			//$target_layout = $mcats_selection || !$catid ? 'mcats' : '';
+			//JRequest::setVar('layout', $target_layout);
+			//JRequest::setVar($target_layout=='mcats' ? 'cids' : 'cid', $limit_filters_to_cat ? $catid : 0);
+			JRequest::setVar('layout', '');
+			JRequest::setVar('cid', $cid);
+			JRequest::setVar('option', 'com_flexicontent');
+			JRequest::setVar('view', 'category');
 			
-			// filter depending on permissions
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-			$aid_list = implode(",", $aid_arr);
-			$andaccess = ' AND i.access IN ('.$aid_list.')';
+			// Get/Create current category model ... according to configuaration set above into the JRequest variables ...
+			$catmodel = new FlexicontentModelCategory();
+			$category = $catmodel->getCategory();
 			
+			$query = $catmodel->_buildQuery(false, $count_total=false);
+			$db->setQuery($query, 0, 50000);
+			$list = $db->loadColumn();
+			$list = is_array($list) ? $list : array();
 			
-			// Determine sort order
-			$orderby_col = '';
-			$orderby_join = '';
-
-			// ***********************************************
-			// Item retrieving query ... CREATE ORDERBY CLAUSE
-			// ***********************************************
-			//$filter_order = $app->getUserStateFromRequest( 'filter_order', 'filter_order', '', 'CMD' );
-			//$filter_order_Dir = $app->getUserStateFromRequest( 'filter_order_Dir', 'filter_order_Dir', '', 'CMD' );
-			$nav_catid = (int) $app->getUserState( $option.'.nav_catid', 0 );
-			$order = null;
-			if ($nav_catid == $cid) {
-				$order = $app->getUserState( $option.'.'.$cid.'.nav_orderby',  $order);
-				if ( is_array($order) ) $order = reset($order);
-			}
-			echo $orderby = flexicontent_db::buildItemOrderBy(
-				$field->parameters,
-				$order, $request_var='', $config_param='',
-				$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
-				$default_order='', $default_order_dir='', $sfx='', $support_2nd_lvl=true
-			);
+			// Restore variables
+			JRequest::setVar('cid', $saved_cid); // restore cid
+			JRequest::setVar('layout', $saved_layout); // restore layout
+			JRequest::setVar('option', $saved_option); // restore option
+			JRequest::setVar('view', $saved_view); // restore view
 			
-			// Create JOIN for ordering items by a custom field (Level 1)
-			if ( 'field' == $order[1] ) {
-				$orderbycustomfieldid = (int)$cparams->get('orderbycustomfieldid', 0);
-				$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
-			}
-			if ( 'custom:' == substr($order[1], 0, 7) ) {
-				$order_parts = preg_split("/:/", $order[1]);
-				$_field_id = (int) @ $order_parts[1];
-				if ($_field_id && count($order_parts)==4) $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$_field_id;
-			}
-			
-			// Create JOIN for ordering items by a custom field (Level 2)
-			if ( 'field' == $order[2] ) {
-				$orderbycustomfieldid_2nd = (int)$cparams->get('orderbycustomfieldid'.'_2nd', 0);
-				$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
-			}
-			if ( 'custom:' == substr($order[2], 0, 7) ) {
-				$order_parts = preg_split("/:/", $order[2]);
-				$_field_id = (int) @ $order_parts[1];
-				if ($_field_id && count($order_parts)==4) $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$_field_id;
-			}
-			
-			// Create JOIN for ordering items by author's name
-			if ( in_array('author', $order) || in_array('rauthor', $order) ) {
-				$orderby_col   = '';
-				$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
-			}
-			
-			// Create JOIN for ordering items by a most commented
-			if ( in_array('commented', $order) ) {
-				$orderby_col   = ', COUNT(DISTINCT com.id) AS comments_total';
-				$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id AND com.object_group="com_flexicontent" AND com.published="1"';
-			}
-			
-			// Create JOIN for ordering items by a most rated
-			if ( in_array('rated', $order) ) {
-				$orderby_col   = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
-				$orderby_join .= ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
-			}
-			
-			$types = is_array($types_to_exclude) ? implode(',', $types_to_exclude) : $types_to_exclude;
-			
-			$_cat_ids = $this->_getDataCats( array($cid), $cparams );
-			$where  = ' WHERE rel.catid IN ('. implode(', ', $_cat_ids) .')';
-			$where .=	' AND ( i.state = 1 OR i.state = -5 )' .
-						' AND ( publish_up = '.$db->Quote($nullDate).' OR publish_up <= '.$db->Quote($nowDate).' )' .
-						' AND ( publish_down = '.$db->Quote($nullDate).' OR publish_down >= '.$db->Quote($nowDate).' )' . 
-						($types_to_exclude ? ' AND ie.type_id NOT IN (' . $types . ')' : '')
-						;
-			if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-				$where .= ' AND ( ie.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
-			}
-			
+			return $list;
 		}
 		
-		// Retrieving specific item data
 		else {
-			$select = 'SELECT i.*, ie.*,'
-				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(":", i.id, i.alias) ELSE i.id END as slug,'
-				. ' CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(":", cc.id, cc.alias) ELSE cc.id END as categoryslug'
-				;
-			$join = ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
-				.' JOIN #__categories AS cc ON cc.id = '. $cid;
-			$orderby = '';
-			$orderby_join = '';
-			$where = ' WHERE i.id IN ('. implode(',', $ids) .')';
-			$andaccess = '';
+			// Retrieving specific item data
+			$query 	= 'SELECT i.*, ie.*,'
+					. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(":", i.id, i.alias) ELSE i.id END as slug,'
+					. ' CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(":", cc.id, cc.alias) ELSE cc.id END as categoryslug'
+					. ' FROM #__content AS i'
+					. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
+					. ' JOIN #__categories AS cc ON cc.id = '. $cid
+					. ' WHERE i.id IN ('. implode(',', $ids) .')';
+			$db->setQuery($query);
+			
+			try {
+				$list = $db->loadObjectList('id');
+			}
+			catch (Exception $e) {
+				if ($db->getErrorNum()) JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br />".$query."<br />");
+				return array();
+			}
+			
+			$list = is_array($list) ? $list : array();
+			return $list;
 		}
-		
-		// array of articles in same category correctly ordered
-		$query 	= $select . @ $orderby_col
-				. ' FROM #__content AS i'
-				. $join
-				. $orderby_join
-				. $where
-				. $andaccess
-				. $orderby
-				;
-		$db->setQuery($query);
-		if ($ids===null) {
-			$list = $db->loadColumn('id');
-		} else {
-			$list = $db->loadObjectList('id');
-		}
-		if ($db->getErrorNum()) {
-			JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br />".$query."<br />");
-		}
-
-		// this check needed if incorrect Itemid is given resulting in an incorrect result
-		if ( !is_array($list) )  $list = array();
-		return $list;
 	}
 	
 	
