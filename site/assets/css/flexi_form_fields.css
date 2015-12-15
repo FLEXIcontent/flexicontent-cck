@@ -84,10 +84,12 @@
 
 
 /* FIELD: (sortable) currently having single value, disable drag handle */
+#flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle:not(.fcfont-icon) {
+	background: url(../images/move3.png) 4px 4px no-repeat white;
+}
 #flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle {
 	cursor: default !important;
-	background: url(../images/move3.png) 4px 4px no-repeat white;
-	border: 1px solid lightgray;
+	color: #aaa;
 }
 
 
@@ -144,6 +146,10 @@
 
 
 /* FIELDs: various buttons */
+#flexicontent ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon,
+#flexicontent ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon {
+	margin:0px 0px 2px 0px;
+}
 #flexicontent .fcfield-drag-handle,
 #flexicontent .fcfield-list-add, #flexicontent .fcfield-list-del,
 #flexicontent .fcfield-placement-h, #flexicontent .fcfield-placement-v,
@@ -157,23 +163,24 @@
 	cursor: pointer;
 	
 	/* style these */
-	color: #444;
+	color: #777;
 	font-size: 11px;
 	line-height: 100%;
 	font-weight: bold;
 	
 	border-radius: 4px;
-	border: 1px solid lightgray;
+	border: 1px solid #d0d0d0;
 	vertical-align: top;
 	padding: 6px 8px;
 	margin: 0px 2px 0px 6px;
 
-	background-color: white; background-image: -webkit-gradient(linear, left top, left bottom, from(white), to(lightgray));
-	background-image: -webkit-linear-gradient(top, white, lightgray);
-	background-image: -moz-linear-gradient(top, white, lightgray);
-	background-image: -ms-linear-gradient(top, white, lightgray);
-	background-image: -o-linear-gradient(top, white, lightgray);
-	background-image: linear-gradient(to bottom, white, lightgray);/*filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=lightgray);*//*filter prevents background image in ie8/ie9*/
+	background-color: white;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(white), to(#d0d0d0));
+	background-image: -webkit-linear-gradient(top, white, #d0d0d0);
+	background-image: -moz-linear-gradient(top, white, #d0d0d0);
+	background-image: -ms-linear-gradient(top, white, #d0d0d0);
+	background-image: -o-linear-gradient(top, white, #d0d0d0);
+	background-image: linear-gradient(to bottom, white, #d0d0d0);/*filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=#d0d0d0);*//*filter prevents background image in ie8/ie9*/
 }
 /* default hover styling which we make more specific below */
 #flexicontent .fcfield-drag-handle:hover,
@@ -181,21 +188,26 @@
 #flexicontent .fcfield-placement-h:hover, #flexicontent .fcfield-placement-v:hover,
 #flexicontent .fcfield-addvalue:hover, #flexicontent .fcfield-insertvalue:hover,
 #flexicontent .fcfield-delvalue:hover,
-#flexicontent .fcfield-button-add:hover a {
-	background-color: lightgray;
-	color: white;
-	border: 1px solid transparent;
-}
 #flexicontent .fcfield-button:hover,
-#flexicontent .fcfield-button-add:hover a { 
-	color: white;
-	border: 1px solid transparent;
-	background-color: green; background-image: -webkit-gradient(linear, left top, left bottom, from(green), to(darkgreen));
-	background-image: -webkit-linear-gradient(top, green, darkgreen);
-	background-image: -moz-linear-gradient(top, green, darkgreen);
-	background-image: -ms-linear-gradient(top, green, darkgreen);
-	background-image: -o-linear-gradient(top, green, darkgreen);
-	background-image: linear-gradient(to bottom, green, darkgreen);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=green, endColorstr=darkgreen);
+#flexicontent .fcfield-button-add:hover a {
+	background-color: #f0f0f0;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#f0f0f0), to(#c0c0c0));
+	background-image: -webkit-linear-gradient(top, #f0f0f0, #c0c0c0);
+	background-image: -moz-linear-gradient(top, #f0f0f0, #c0c0c0);
+	background-image: -ms-linear-gradient(top, #f0f0f0, #c0c0c0);
+	background-image: -o-linear-gradient(top, #f0f0f0, #c0c0c0);
+	background-image: linear-gradient(to bottom, #f0f0f0, #c0c0c0); /*filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0, endColorstr=#c0c0c0);*/
+}
+/* Override hover background color if not using font icons */
+#flexicontent .fcfield-drag-handle:not(.fcfont-icon):hover,
+#flexicontent .fcfield-list-add:not(.fcfont-icon):hover, #flexicontent .fcfield-list-del:not(.fcfont-icon):hover,
+#flexicontent .fcfield-placement-h:not(.fcfont-icon):hover, #flexicontent .fcfield-placement-v:not(.fcfont-icon):hover,
+#flexicontent .fcfield-addvalue:not(.fcfont-icon):hover,
+#flexicontent .fcfield-insertvalue.fc_after:not(.fcfont-icon):hover, #flexicontent .fcfield-insertvalue.fc_before:not(.fcfont-icon):hover,
+#flexicontent .fcfield-delvalue:not(.fcfont-icon):hover,
+#flexicontent .fcfield-button:not(.fcfont-icon):hover,
+#flexicontent .fcfield-button-add:hover a:not(.fcfont-icon) {
+	background-color: #e0e0e0;
 }
 
 
@@ -228,10 +240,20 @@
 	padding: 5px 12px 6px;
 	margin: 4px 2px 0px 6px;
 }
-#flexicontent span.fcfield-addvalue {
-	margin: 4px 2px 0px 6px;
-	padding: 12px;
+#flexicontent span.fcfield-addvalue:not(.fcfont-icon) {
+	margin: 0px 2px 6px 6px;
+	padding: 6px 12px 6px 28px;
 	background: url(../images/plus-button.png) 4px 4px no-repeat white;
+}
+#flexicontent span.fcfield-addvalue.fcfont-icon:before {
+	padding: 0 4px;
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: "*";
+}
+#flexicontent span.fcfield-addvalue:before {
+	color: LimeGreen;
 }
 #flexicontent .fcfield-addvalue.fccleared {
 	clear: both !important;
@@ -254,53 +276,80 @@
 #flexicontent .fcfield-list-add.fc_horizontal { background: url(../images/list_add_h.png) 4px 4px no-repeat white; }
 #flexicontent .fcfield-list-del.fc_horizontal { background: url(../images/list_del_h.png) 4px 4px no-repeat white; }
 
-#flexicontent .fcfield-placement-h:hover, #flexicontent .fcfield-placement-v:hover,
-#flexicontent .fcfield-list-add:hover, #flexicontent .fcfield-list-del:hover {
-	background-color: lightgray;
-	color: white;
-}
-
 
 /* FIELDs: Insert value button */
-#flexicontent .fcfield-insertvalue {
+#flexicontent .fcfield-insertvalue:not(.fcfont-icon) {
 	margin:0px 0px 2px 0px;
 	padding: 12px;
 	background: url(../images/plus-button.png) 4px 4px no-repeat white;
 }
-#flexicontent .fcfield-insertvalue.fc_after {
+#flexicontent .fcfield-insertvalue.fc_after:not(.fcfont-icon) {
 	background: url(../images/insert_after_180.png) 4px 4px no-repeat white;
 }
-#flexicontent .fcfield-insertvalue.fc_before {
+#flexicontent .fcfield-insertvalue.fc_before:not(.fcfont-icon) {
 	background: url(../images/insert_before_180.png) 4px 4px no-repeat white;
 }
-#flexicontent .fcfield-insertvalue:hover {
-	background-color: lightgray;
-	color: white;
+#flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_after.fcfont-icon:before {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: "]";
+}
+#flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_before.fcfont-icon:before {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	/*content: "\e009";*/ content: "\e207";
+}
+#flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_after.fcfont-icon:after {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	/*content: "\e00b";*/ content: " \6c";
+}
+#flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_before.fcfont-icon:after {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: " ]";
+}
+#flexicontent span.fcfield-insertvalue:before,
+#flexicontent span.fcfield-insertvalue:after {
+	color: LimeGreen;
 }
 
-
 /* FIELDs: Delete value button */
-#flexicontent .fcfield-delvalue {
+#flexicontent .fcfield-delvalue:not(.fcfont-icon) {
 	margin:0px 0px 2px 0px;
 	padding: 12px;
 	background: url(../images/delete.png) 4px 4px no-repeat white;
 }
-#flexicontent .fcfield-delvalue:hover {
-	background-color: lightgray;
-	color: white;
+#flexicontent ul.fcfield-sortables > li span.fcfield-delvalue.fcfont-icon:before {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: "I";
+}
+#flexicontent span.fcfield-delvalue:before {
+	color: FireBrick;
 }
 
 
 /* FIELDs: DRAG (sort) handle */
-#flexicontent .fcfield-drag-handle {
+#flexicontent .fcfield-drag-handle:not(.fcfont-icon) {
 	cursor: move;
 	margin:0px 0px 2px 0px;
 	padding: 12px;
 	background: url(../images/move2.png) 4px 4px no-repeat white;
 }
-#flexicontent .fcfield-drag-handle:hover {
-	background-color: lightgray;
-	color: white;
+#flexicontent ul.fcfield-sortables > li span.fcfield-drag-handle.fcfont-icon:before {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: "z";
+}
+#flexicontent span.fcfield-drag-handle:before {
+	color: black;
 }
 
 
@@ -322,6 +371,7 @@ table.img_upload_select {
 	border-radius: 2px;
 	margin-bottom:16px;
 }
+
 
 /* FIELDs: (image field) preview image container */
 .fcimg_preview_box {

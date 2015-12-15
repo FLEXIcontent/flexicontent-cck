@@ -271,6 +271,14 @@
 				<option value="1" show_list="disp_btn_grp_dropdown" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="btn_grp_dropdown_class" type="text" default="icon-options" label="FLEXI_BTN_GROUP_TOGGLE_BTN_CLASS" description="FLEXI_BTN_GROUP_TOGGLE_BTN_CLASS_DESC" class="disp_btn_grp_dropdown" />
+			
+		<field name="" type="separator" default="FLEXI_ITEM_FORM" label="" level="level0" />
+		
+			<field name="form_font_icons" type="multilist" subtype="radio" toggle_related="0" default="1" label="FLEXI_ICON_TYPE" description="FLEXI_ICON_TYPE_DESC" class="btn-group group-fcmethod" >
+				<option value="0">FLEXI_IMAGE</option>
+				<option value="1">FLEXI_FONT_ICONS</option>
+			</field>
+
 	</fieldset>
 	<fieldset name="item_view_fset" label="FLEXI_ITEM_VIEW" description="" >
 		

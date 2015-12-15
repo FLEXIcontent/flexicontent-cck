@@ -66,11 +66,3 @@ if ($field->next)
 }
 		
 $html .= '</span>';
-
-$js = "
-jQuery(document).ready(function(){
-	var container = jQuery('.fcpagenav.btn-group');
-	jQuery('.fcpagenav.btn-group').css('height', container.height());
-});
-";
-if ($js)  JFactory::getDocument()->addScriptDeclaration($js);
