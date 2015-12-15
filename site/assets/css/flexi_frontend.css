@@ -716,6 +716,22 @@ div .fc_img_tooltip_desc {
 	line-height:1em;
 }
 
+
+/* Address international field, map container */
+div .fc_addressint_map {
+	box-sizing: border-box;
+	max-width:100%;
+	margin:0;
+	padding:0;
+}
+div .fc_addressint_map_canvas {
+	box-sizing: border-box;
+	max-width:100%;
+	margin:0;
+	padding:0;
+}
+
+
 /* Core fields: categories, tags */
 div span.fc_categories, div span.fc_tags {
 	border-bottom: 1px dashed gray;

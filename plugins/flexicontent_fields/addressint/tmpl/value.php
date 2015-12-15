@@ -189,12 +189,15 @@ foreach ($this->values as $n => $value)
 		{
 			$document = JFactory::getDocument();
 			$document->addScript('https://maps.googleapis.com/maps/api/js' . ($google_maps_js_api_key ? '?key=' . $google_maps_js_api_key : ''));
-			$map .= '<div class="map"><div class="map_canvas" id="map_canvas_'.$field->name.$n.'"></div></div>';
-			$map .= '<script>
+			$map .= '
+			<div class="fc_addressint_map">
+				<div class="fc_addressint_map_canvas" id="map_canvas_'.$field->name.$n.'" style="width:'.$map_width.'px; height:'.$map_height.'px;"></div>
+			</div>
 			
+			<script>
 			// map object   
 			var myMap_'.$field->name.$n.';
-			var myLatLon_'.$field->name.$n.' = {lat: '.($value['lat']?$value['lat']:0).', lng: '.($value['lon']?$value['lon']:0).'};
+			var myLatLon_'.$field->name.$n.' = {lat: '.($value['lat'] ? $value['lat'] : 0).', lng: '.($value['lon'] ? $value['lon'] : 0).'};
 			
 			function initMap_'.$field->name.$n.'()
 			{

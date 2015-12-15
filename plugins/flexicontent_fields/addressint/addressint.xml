@@ -116,38 +116,38 @@
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" depend_class="plg-trigger-mode" />
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDRESS_CONFIGURATION" description="" level="level2" />
-			<field name="show_address" type="multilist" subtype="list" default="both" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_ADDRESS" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_ADDRESS_DESC" toggle_related="1">
+			<field name="show_address" type="multilist" subtype="radio" default="both" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_ADDRESS" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_ADDRESS_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="none" show_list="" hide_list="addr-settings">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NEVER</option>
 				<option value="category" show_list="addr-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CATEGORY_VIEW</option>
 				<option value="item" show_list="addr-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ITEM_VIEW</option>
 				<option value="both" show_list="addr-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALWAYS</option>
 			</field>
-			<field name="addr_display_mode" type="multilist" subtype="radio" default="plaintext" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_DISPLAY_MODE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_DISPLAY_MODE_DESC" depend_class="addr-settings" toggle_related="1">
+			<field name="addr_display_mode" type="multilist" subtype="radio" default="plaintext" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_DISPLAY_MODE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDR_DISPLAY_MODE_DESC" depend_class="addr-settings" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="plaintext" show_list="" hide_list="addr-format">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLAINTEXT_MODE</option>
 				<option value="formatted" show_list="addr-format" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_MODE</option>
 			</field>
 			<field name="addr_format_tmpl" type="textarea" default="&lt;span class=&quot;street-address&quot;&gt;{{addr1}}&lt;br /&gt;[[addr2|{{addr2}}&lt;br /&gt;]][[addr3|{{addr3}}&lt;/span&gt;&lt;br /&gt;]]&lt;span class=&quot;city&quot;&gt;{{city}}&lt;/span&gt; &lt;span class=&quot;state&quot;&gt;[[state|{{state}}]][[province|{{province}}]]&lt;/span&gt;, &lt;span class=&quot;postal-code&quot;&gt;{{zip}}[[zip_suffix|-{{zip_suffix}}]]&lt;/span&gt;&lt;br /&gt;&lt;span class=&quot;country&quot;&gt;{{country}}&lt;/span&gt;" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMAT_TEMPLATE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMAT_TEMPLATE_DESC" depend_class="addr-settings addr-format" />
-			<field name="directions_position" type="multilist" subtype="radio" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DIRECTIONS_POSITION" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DIRECTIONS_POSITION_DESC" depend_class="addr-settings" toggle_related="1">
-				<option value="" show_list="" hide_list="addr-directions-label">FLEXI_NONE</option>
+			<field name="directions_position" type="multilist" subtype="radio" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DIRECTIONS_POSITION" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DIRECTIONS_POSITION_DESC" depend_class="addr-settings" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="addr-directions-label">FLEXI_NONE</option>
 				<option value="before" show_list="addr-directions-label" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BEFORE_ADDR</option>
 				<option value="after" show_list="addr-directions-label" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AFTER_ADDR</option>
 			</field>
 			<field name="directions_link_label" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DIRECTIONS_LINK_LABEL" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DIRECTIONS_LINK_LABEL_DESC" depend_class="addr-settings addr-directions-label" />
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_CONFIGURATION" description="" level="level2" />
-			<field name="show_map" type="multilist" subtype="list" default="none" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_MAP" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_MAP_DESC" toggle_related="1">
+			<field name="show_map" type="multilist" subtype="radio" default="none" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_MAP" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_MAP_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="none" show_list="" hide_list="map-settings">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NEVER</option>
 				<option value="category" show_list="map-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CATEGORY_VIEW</option>
 				<option value="item" show_list="map-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ITEM_VIEW</option>
 				<option value="both" show_list="map-settings" hide_list="">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALWAYS</option>
 			</field>
-			<field name="map_embed_type" type="multilist" subtype="list" default="int" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_EMBED_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_EMBED_TYPE_DESC" depend_class="map-settings" toggle_related="1">
+			<field name="map_embed_type" type="multilist" subtype="radio" default="int" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_EMBED_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_EMBED_TYPE_DESC" depend_class="map-settings" toggle_related="1" class="btn-group group-fcinfo">
 				<option value="int" show_list="map-settings-int" hide_list="map-settings-img">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_INTERACTIVE_MAP</option>
 				<option value="img" show_list="map-settings-img" hide_list="map-settings-int">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_IMAGE_MAP</option>
 			</field>
-			<field name="map_width" type="text" default="640" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH_DESC" depend_class="map-settings map-settings-img" />
-			<field name="map_height" type="text" default="360" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT_DESC" depend_class="map-settings map-settings-img" />
-			<field name="map_type" type="list" default="roadmap" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE_DESC" depend_class="map-settings">
+			<field name="map_width" type="text" default="640" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH_DESC" depend_class="map-settings" />
+			<field name="map_height" type="text" default="360" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT_DESC" depend_class="map-settings" />
+			<field name="map_type" type="radio" default="roadmap" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE_DESC" depend_class="map-settings" class="btn-group group-fcinfo">
 				<option value="roadmap">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ROADMAP</option>
 				<option value="satellite">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SATELLITE</option>
 				<option value="hybrid">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_HYBRID</option>
@@ -192,7 +192,7 @@
 				<option value="red">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_RED</option>
 				<option value="white">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_WHITE</option>
 			</field>
-			<field name="marker_size" type="list" default="mid" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_SIZE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_SIZE_DESC" depend_class="map-settings">
+			<field name="marker_size" type="radio" default="mid" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_SIZE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_SIZE_DESC" depend_class="map-settings" class="btn-group group-fcinfo">
 				<option value="tiny">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_TINY</option>
 				<option value="mid">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MID</option>
 				<option value="small">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SMALL</option>
@@ -200,7 +200,7 @@
 			</field>
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LAYOUT" description="" level="level2"  depend_class="map-settings"/>
-			<field name="map_position" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_POSITION" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_POSITION_DESC" depend_class="map-settings">
+			<field name="map_position" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_POSITION" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_POSITION_DESC" depend_class="map-settings" class="btn-group group-fcinfo">
 				<option value="0">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BEFORE_ADDR</option>
 				<option value="1">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AFTER_ADDR</option>
 			</field>
