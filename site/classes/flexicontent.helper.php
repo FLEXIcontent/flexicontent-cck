@@ -270,7 +270,7 @@ class flexicontent_html
 		$allowed_redirecturls = $cparams->get('allowed_redirecturls', 'internal_base');  // Parameter does not exist YET
 
 		// prefix the URL if needed so that parse_url will work
-		$has_prefix = preg_match("#^http|^https|^ftp#i", $url);
+		$has_prefix = preg_match("#^http|^https|^ftp|^ftps#i", $url);
 		$url = (!$has_prefix ? "http://" : "") . $url;
 
 		// Require baseonly internal url: (HOST only)

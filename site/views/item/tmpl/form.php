@@ -63,11 +63,8 @@ $tip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 
 // Calculate refer parameter for returning to this page when user ends editing/submitting
 $return = JRequest::getString('return', '', 'get');
-if ($return) {
-	$referer = base64_decode( $return );
-} else {
-	$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
-}
+$referer = $return ? base64_decode( $return ) : @ $_SERVER['HTTP_REFERER'];
+$referer_encoded = htmlspecialchars($referer, ENT_COMPAT, 'UTF-8');
 
 // Print message about zero allowed categories
 if ( !$this->lists['catid'] && !$this->menuCats ) {
@@ -1578,7 +1575,7 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 		<?php echo JHTML::_( 'form.token' ); ?>
 		<input type="hidden" name="task" id="task" value="" />
 		<input type="hidden" name="option" value="com_flexicontent" />
-		<input type="hidden" name="referer" value="<?php echo $referer; ?>" />
+		<input type="hidden" name="referer" value="<?php echo $referer_encoded; ?>" />
 		<?php if ( $isnew && $typeid ) : ?>
 			<input type="hidden" name="jform[type_id]" value="<?php echo $typeid; ?>" />
 		<?php endif;?>

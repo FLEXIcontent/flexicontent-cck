@@ -171,7 +171,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				}
 				
 				// Find last container of fields and clone it to create a new container of fields
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
+				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().find('ul.fcfield-sortables').children().last();
 				var newField  = lastField.clone();
 				
 				// Need to at least change FORM field names and HTML tag IDs before adding the container to the DOM

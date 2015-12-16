@@ -364,6 +364,12 @@ foreach ($values as $value)
 	$fieldname_n = $fieldname.'['.$n.']';
 	$elementid_n = $elementid.'_'.$n;
 	
+	$value['addr_display']   = @ $value['addr_display'];
+	$value['addr_formatted'] = @ $value['addr_formatted'];
+	$value['zip_suffix']     = @ $value['zip_suffix'];
+	$value['url']  = @ $value['url'];
+	$value['zoom'] = @ $value['zoom'];
+	
 	$field_html = '
 	<div class="fcfield_addressint_data">
 	
