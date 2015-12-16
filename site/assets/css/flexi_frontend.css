@@ -720,13 +720,15 @@ div .fc_img_tooltip_desc {
 /* Address international field, map container */
 div .fc_addressint_map {
 	box-sizing: border-box;
-	max-width:100%;
+	width:100%;
+	height:100%;
 	margin:0;
 	padding:0;
 }
 div .fc_addressint_map_canvas {
 	box-sizing: border-box;
-	max-width:100%;
+	width:100%;
+	height:100%;
 	margin:0;
 	padding:0;
 }

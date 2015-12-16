@@ -179,7 +179,7 @@ foreach ($this->values as $n => $value)
 			$map .= '<div class="map"><div class="image">';
 			
 			if($link_map == 1) $map .= '<a href="'.$map_link.'" target="_blank">';
-			$map .= '<img src="'.$map_url.'" width="'.$map_width.'" height="'.$map_height.'" alt="Map" />';
+			$map .= '<img src="'.$map_url.'" '.($map_width || $map_height  ?  'style="min-width:'.$map_width.'px; min-height:'.$map_height.'px;"' : '').' alt="Map" />';
 			if($link_map == 1) $map .= '</a>';
 			
 			$map .= '</div></div>';
@@ -191,7 +191,7 @@ foreach ($this->values as $n => $value)
 			$document->addScript('https://maps.googleapis.com/maps/api/js' . ($google_maps_js_api_key ? '?key=' . $google_maps_js_api_key : ''));
 			$map .= '
 			<div class="fc_addressint_map">
-				<div class="fc_addressint_map_canvas" id="map_canvas_'.$field->name.$n.'" style="width:'.$map_width.'px; height:'.$map_height.'px;"></div>
+				<div class="fc_addressint_map_canvas" id="map_canvas_'.$field->name.$n.'" '.($map_width || $map_height  ?  'style="min-width:'.$map_width.'px; min-height:'.$map_height.'px;"' : '').'></div>
 			</div>
 			
 			<script>

@@ -83,7 +83,7 @@ $code_btn_rawcode = array(
 <div class="flexi lineinfo <?php echo $_position_name; ?> group">
 	
 		<?php foreach ($item->positions[$_position_name] as $field) : /* LOOP through fields of the position */?>
-		<div class="flexi element">
+		<div class="flexi element field_<?php echo $field->name; ?>">
 		
 			<?php if ($field->label) : /* Display label according to configuration */ ?>
 				<span class="flexi label field_<?php echo $field->name; ?>">

@@ -43,7 +43,7 @@ if (isset($item->toc)) {
 switch ($this->params->get( 'columnmode', 2 )) {
 	case 0: $columnmode = 'singlecol'; break;
 	case 1: $columnmode = 'doublecol'; break;
-	default: $columnmode = ''; break;
+	default: $columnmode = 'variablecol'; break;
 }
 // ***********
 // DECIDE TAGS 
@@ -252,7 +252,7 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 	<!-- BOF beforedescription block -->
 	<div class="customblock beforedescription group">
 		<?php foreach ($item->positions['beforedescription'] as $field) : ?>
-		<div class="element <?php echo $columnmode; ?>">
+		<div class="flexi element field_<?php echo $field->name; ?> <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
 			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
@@ -277,7 +277,7 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 	<!-- BOF afterdescription block -->
 	<div class="customblock afterdescription group">
 		<?php foreach ($item->positions['afterdescription'] as $field) : ?>
-		<div class="element <?php echo $columnmode; ?>">
+		<div class="flexi element field_<?php echo $field->name; ?> <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
 			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>

@@ -191,7 +191,7 @@ foreach ($items as $i => $item) :
 		<!-- BOF subtitle1 block -->
 		<div class="flexi lineinfo subtitle1 group">
 			<?php foreach ($item->positions['subtitle1'] as $field) : ?>
-			<div class="flexi element">
+			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
 				<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 				<?php endif; ?>
@@ -207,7 +207,7 @@ foreach ($items as $i => $item) :
 		<!-- BOF subtitle2 block -->
 		<div class="flexi lineinfo subtitle2 group">
 			<?php foreach ($item->positions['subtitle2'] as $field) : ?>
-			<div class="flexi element">
+			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
 				<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 				<?php endif; ?>
@@ -223,7 +223,7 @@ foreach ($items as $i => $item) :
 		<!-- BOF subtitle3 block -->
 		<div class="flexi lineinfo subtitle3 group">
 			<?php foreach ($item->positions['subtitle3'] as $field) : ?>
-			<div class="flexi element">
+			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
 				<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 				<?php endif; ?>
@@ -267,7 +267,7 @@ foreach ($items as $i => $item) :
 				<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
 				<div class="flexi lineinfo">
 					<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
-					<div class="flexi element">
+					<div class="flexi element field_<?php echo $field->name; ?>">
 						<?php if ($field->label) : ?>
 						<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 						<?php endif; ?>
@@ -387,7 +387,7 @@ foreach ($items as $i => $item) :
 				<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
 				<div class="flexi lineinfo">
 					<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
-					<div class="flexi element">
+					<div class="flexi element field_<?php echo $field->name; ?>">
 						<?php if ($field->label) : ?>
 						<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 						<?php endif; ?>
