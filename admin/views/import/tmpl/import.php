@@ -28,8 +28,8 @@ $tabCnt = array();
 $tabSetStack = array();
 
 // Load JS tabber lib
-$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VERSION);
-$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VERSION);
+$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 ?>
@@ -39,7 +39,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
-		<?php echo $this->sidebar; ?>
+		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
 	<div id="j-main-container" class="span10">
 <?php else : ?>

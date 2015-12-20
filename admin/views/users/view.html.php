@@ -127,8 +127,8 @@ class FlexicontentViewUsers extends JViewLegacy
 		JHTML::_('behavior.calendar');
 		JHTML::_('behavior.tooltip');
 		
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VERSION);
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 		
 		$js = "jQuery(document).ready(function(){";
 		if ($search)            $js .= "jQuery('.col_title').each(function(){ jQuery(this).addClass('yellow'); });";

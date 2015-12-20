@@ -1294,9 +1294,9 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).$lib_path.'/fcxSlide';
-				$document->addScriptVersion($framework_path.'/class.fcxSlide.js', FLEXI_VERSION);
-				$document->addStyleSheetVersion($framework_path.'/fcxSlide.css', FLEXI_VERSION);
-				//$document->addScriptVersion($framework_path.'/class.fcxSlide.packed.js', FLEXI_VERSION);
+				$document->addScriptVersion($framework_path.'/class.fcxSlide.js', FLEXI_VHASH);
+				$document->addStyleSheetVersion($framework_path.'/fcxSlide.css', FLEXI_VHASH);
+				//$document->addScriptVersion($framework_path.'/class.fcxSlide.packed.js', FLEXI_VHASH);
 				break;
 			
 			case 'imagesLoaded':
@@ -1380,8 +1380,8 @@ class flexicontent_html
 				$js .= "
 					var _FC_GET = ".json_encode($_GET).";
 				";
-				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', FLEXI_VERSION);
-				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VERSION);
+				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', FLEXI_VHASH);
+				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
 				JText::script("FLEXI_APPLYING_FILTERING", true);
 				JText::script("FLEXI_TYPE_TO_LIST", true);
 				JText::script("FLEXI_TYPE_TO_FILTER", true);
@@ -1391,7 +1391,7 @@ class flexicontent_html
 			case 'flexi-lib':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VERSION);
+				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH);
 				JText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				break;
 			
@@ -1970,7 +1970,7 @@ class flexicontent_html
 		if (!$js_and_css_added && $canChangeState && $addToggler )
 		{
 			// File exists both in frontend & backend (and is different), so we will use 'base' method and not 'root'
-			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VERSION);
+			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/stateselector.js', FLEXI_VHASH);
 			$js ='				
 				function fc_setitemstate(state, id)
 				{
@@ -2737,8 +2737,8 @@ class flexicontent_html
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 			
 			$document = JFactory::getDocument();
-			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/fcvote.css', FLEXI_VERSION);
-			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/fcvote.js', FLEXI_VERSION);
+			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/fcvote.css', FLEXI_VHASH);
+			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/fcvote.js', FLEXI_VHASH);
 
 			$document->addScriptDeclaration('var fcvote_rfolder = "'.JURI::root(true).'";');
 
@@ -2970,7 +2970,7 @@ class flexicontent_html
 			flexicontent_html::loadFramework('jQuery');
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 			
-			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/fcfav.js', FLEXI_VERSION);
+			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/fcfav.js', FLEXI_VHASH);
 			
 			JText::script('FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX',true);
 			JText::script('FLEXI_LOADING',true);

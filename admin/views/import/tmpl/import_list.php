@@ -12,7 +12,7 @@ foreach($_levels as $_level) {
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
-		<?php echo $this->sidebar; ?>
+		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
 	<div id="j-main-container" class="span10">
 <?php else : ?>

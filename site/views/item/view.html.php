@@ -112,11 +112,11 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// Add css files to the document <head> section (also load CSS joomla template override)
 		if (!$params->get('disablecss', '')) {
-			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VERSION);
+			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 			//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VERSION);
+			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
 		}
 		
 		
@@ -476,26 +476,26 @@ class FlexicontentViewItem  extends JViewLegacy
 		//JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
 
 		// Add css files to the document <head> section (also load CSS joomla template override)
-		$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VERSION);
+		$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 		//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VERSION);
+			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
 		}
 		
 		// Fields common CSS
-		$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VERSION);
+		$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
 		
 		// Load backend / frontend shared and Joomla version specific CSS (different for frontend / backend)
 		FLEXI_J30GE ?
-			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VERSION) :
-			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/j25.css', FLEXI_VERSION) ;
+			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH) :
+			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/j25.css', FLEXI_VHASH) ;
 		
 		// Add js function to overload the joomla submitform
-		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/admin.js', FLEXI_VERSION);
-		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/validate.js', FLEXI_VERSION);
+		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
 		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VERSION);
+		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
 		
 		
 		// *********************************************************

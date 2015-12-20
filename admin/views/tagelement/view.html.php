@@ -51,7 +51,7 @@ class FlexicontentViewTagelement extends JViewLegacy {
 		//prepare the document
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
 		$document->addStyleSheet(JURI::root(true).'/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
-		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 
 		//Get data from the model
 		$rows    = $this->get( 'Data');

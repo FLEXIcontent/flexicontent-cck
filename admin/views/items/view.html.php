@@ -144,8 +144,8 @@ class FlexicontentViewItems extends JViewLegacy
 		flexicontent_html::loadFramework('select2');
 		JHTML::_('behavior.calendar');
 		
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VERSION);
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 		
 		$js = "jQuery(document).ready(function(){";
 		if ($filter_cats)   $js .= "jQuery('.col_cats').each(function(){ jQuery(this).addClass('yellow'); });";
@@ -530,7 +530,7 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 		//$lists['scope'] = JHTML::_('select.radiolist', $_scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );
 		$lists['scope'] = '
-			<div class="hasTooltip" style="display:inline-block; padding:0; margin:0;" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"><i class="icon-info"></i></div>
+			<span class="hasTooltip" style="display:inline-block; padding:0; margin:0;" title="'.JText::_('FLEXI_SEARCH_TEXT_INSIDE').'"><i class="icon-info"></i></span>
 			'.JHTML::_('select.genericlist', $_scopes, 'scope', 'size="1" class="use_select2_lib fc_skip_highlight" onchange="jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text());" ', 'value', 'text', $scope, 'scope' );
 		
 		/*$lists['scope']  = '';
@@ -700,18 +700,18 @@ class FlexicontentViewItems extends JViewLegacy
 		$document	= JFactory::getDocument();
 		
 		// Add css to document
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VERSION);
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VERSION);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 
 		// Add js to document
 		JHTML::_('behavior.tooltip');
 		flexicontent_html::loadFramework('select2');
-		$document->addScriptVersion(JURI::base(true).'/components/com_flexicontent/assets/js/copymove.js', FLEXI_VERSION);
+		$document->addScriptVersion(JURI::base(true).'/components/com_flexicontent/assets/js/copymove.js', FLEXI_VHASH);
 		
 		// Add js function to overload the joomla submitform validation
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VERSION);
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VERSION);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
 		// Create document/toolbar titles
 		if ($behaviour == 'translate') {

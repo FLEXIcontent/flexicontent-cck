@@ -178,10 +178,10 @@ if ( $show_mod )
 		if ($add_ccs==2) {
 			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
 				// active layout css
-				echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css?'.FLEXI_VERSION.'">';
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css?'.FLEXI_VHASH.'">';
 			}
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl_common/module.css?'.FLEXI_VERSION.'">';
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css?'.FLEXI_VERSION.'">';
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/'.$modulename.'/tmpl_common/module.css?'.FLEXI_VHASH.'">';
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css?'.FLEXI_VHASH.'">';
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
@@ -192,10 +192,10 @@ if ( $show_mod )
 		else {
 			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
 				// active layout css
-				$document->addStyleSheetVersion(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', FLEXI_VERSION);
+				$document->addStyleSheetVersion(JURI::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', FLEXI_VHASH);
 			}
-			$document->addStyleSheetVersion(JURI::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', FLEXI_VERSION);
-			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VERSION);
+			$document->addStyleSheetVersion(JURI::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', FLEXI_VHASH);
+			$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
 			//allow css override
 			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 				$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');

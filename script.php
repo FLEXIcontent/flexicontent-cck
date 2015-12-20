@@ -437,7 +437,7 @@ class com_flexicontentInstallerScript
 			'warning'
 		);
 		
-		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VERSION.'" rel="stylesheet">';
+		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VHASH.'" rel="stylesheet">';
 		echo '
 		<link type="text/css" href="components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">
 		<div class="alert alert-info" style="margin:32px 0px 8px 0px; width:50%;">' .JText::_('Performing after installation tasks ... '). '</div>
@@ -1213,7 +1213,7 @@ class com_flexicontentInstallerScript
 		$app = JFactory::getApplication();
 		
 		// Extra CSS needed for J3.x+
-		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VERSION.'" rel="stylesheet">';
+		echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css?'.FLEXI_VHASH.'" rel="stylesheet">';
 		
 		// Installed component manifest file version
 		$this->release = $parent->get( "manifest" )->version;

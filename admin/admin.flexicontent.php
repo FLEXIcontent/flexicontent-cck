@@ -161,8 +161,8 @@ if ( JRequest::getWord('format')!='raw')
 		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
 	}
 	// Add flexi-lib JS
-	JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VERSION );  // Frontend/backend script
-	JFactory::getDocument()->addScriptVersion( JURI::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VERSION );  // Backend only script
+	JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
+	JFactory::getDocument()->addScriptVersion( JURI::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Backend only script
 }
 
 

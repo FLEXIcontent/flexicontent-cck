@@ -215,8 +215,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			$fc_css = JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css';
 			echo '
-			<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?'.FLEXI_VERSION.'" />
-			<link rel="stylesheet" href="'.$fc_css.'?'.FLEXI_VERSION.'" />
+			<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css?'.FLEXI_VHASH.'" />
+			<link rel="stylesheet" href="'.$fc_css.'?'.FLEXI_VHASH.'" />
 			<link rel="stylesheet" href="'.JURI::root(true).'/media/jui/css/bootstrap.min.css" />
 			';
 			?>
