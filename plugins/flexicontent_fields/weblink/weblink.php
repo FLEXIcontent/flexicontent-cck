@@ -15,8 +15,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.event.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsWeblink extends JPlugin
+class plgFlexicontent_fieldsWeblink extends FCField
 {
 	static $field_types = array('weblink');
 	
@@ -147,6 +148,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 					return 'cancel';
 				}
 				
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				";
@@ -397,18 +399,22 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$values[0] = serialize($values[0]);
 		}
 		
-		// (* BECAUSE OF THIS, the value display loop expects unserialized values)
-		foreach ($values as &$value)
+		$unserialize_vals = true;
+		if ($unserialize_vals)
 		{
-			// Compatibility for unserialized values or for NULL values in a field group
-			if ( !is_array($value) )
+			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
+			foreach ($values as &$value)
 			{
-				$v = !empty($value) ? @unserialize($value) : false;
-				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-					array('link' => $value, 'title' => '', 'hits'=>0);
+				// Compatibility for unserialized values or for NULL values in a field group
+				if ( !is_array($value) )
+				{
+					$v = !empty($value) ? @unserialize($value) : false;
+					$value = ( $v !== false || $v === 'b:0;' ) ? $v :
+						array('link' => $value, 'title' => '', 'hits'=>0);
+				}
 			}
+			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		}
-		unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
@@ -453,84 +459,25 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			break;
 		}
 		
-		// Optimization, do some stuff outside the loop
-		static $hits_icon = null;
-		if ($hits_icon===null && ($display_hits==1 || $display_hits==3)) {
-			$_hits_tip = flexicontent_html::getToolTip(null, '%s '.JText::_( 'FLEXI_HITS', true ), 0, 0);
-			$_attribs = $display_hits==1 ? 'class="'.(FLEXI_J30GE ? 'hasTooltip' : 'hasTip').'" title="'.$_hits_tip.'"' : '';
-			$hits_icon = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) :
-				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
-		}
+		// Get layout name
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 		
-		// Create field's HTML
+		// Create field's HTML, using layout file
 		$field->{$prop} = array();
-		$n = 0;
-		foreach ($values as $value)
-		{
-			if ( empty($value['link']) && !$is_ingroup ) continue; // Skip empty if not in field group
-			if ( empty($value['link']) ) {
-				$field->{$prop}[$n++]	= '';
-				continue;
-			}
-			
-			// If not using property or property is empty, then use default property value
-			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
-			$title    = ($usetitle && @$value['title']   )  ?  $value['title']    : $default_title;
-			$linktext = '';  // no linktext for weblink for extended web link field if this is needed
-			$hits     = (int) @ $value['hits'];
-			
-			$link_params  = $title ? ' title="'.$title.'"' : '';
-			$link_params .= $target_param;
-			$link_params .= $rel_nofollow;
-			
-			if ( $field->parameters->get( 'use_direct_link', 0 ) )
-				// Direct access to the web-link, hits counting not possible
-				$href = $value['link'];
-			else 
-				// Indirect access to the web-link, via calling FLEXIcontent component, thus counting hits too
-				$href = JRoute::_( 'index.php?option=com_flexicontent&fid='. $field->id .'&cid='.$item->id.'&ord='.($n+1).'&task=weblink' );
-			
-			// Create indirect link to web-link address with custom displayed text
-			if( empty($linktext) )
-				$linktext = $title ? $title : $this->cleanurl(
-					(FLEXI_J30GE ? JStringPunycode::urlToUTF8($value['link']) : $value['link'])    // If using URL convert from Punycode to UTF8
-				);
-			$html = '<a href="' .$href. '" '.$link_params.' itemprop="url">' .$linktext. '</a>';
-			
-			// HITS: either as icon or as inline text or both
-			$hits_html = '';
-			if ($display_hits && $hits)
-			{
-				$hits_html = '<span class="fcweblink_hits">';
-				if ( $add_hits_img && @ $hits_icon ) {
-					$hits_html .= sprintf($hits_icon, $hits);
-				}
-				if ( $add_hits_txt ) {
-					$hits_html .= '('.$hits.'&nbsp;'.JTEXT::_('FLEXI_HITS').')';
-				}
-				$hits_html .= '</span>';
-				if ($prop == 'display_hitsonly')
-					$html = $hits_html;
-				else
-					$html .= ' '. $hits_html;
-			}
-			
-			// Add prefix / suffix
-			$field->{$prop}[$n]	= $pretext . $html . $posttext;
-			
-			$n++;
-			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
-		}
+		//$this->values = $values;
+		//$this->displayFieldValue( $prop, $viewlayout );
+		include(self::getFormPath($this->fieldtypes[0], $viewlayout));
 		
-		if (!$is_ingroup)  // do not convert the array to string if field is in a group
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
+		if (!$is_ingroup)
 		{
-			// Apply separator and open/close tags
+			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' ) {
+			if ( $field->{$prop}!=='' )
+			{
+				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-			} else {
-				$field->{$prop} = '';
 			}
 		}
 	}

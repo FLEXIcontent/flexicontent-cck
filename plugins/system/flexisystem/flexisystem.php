@@ -749,7 +749,7 @@ class plgSystemFlexisystem extends JPlugin
 		global $fc_performance_msg;
 		if ($fc_performance_msg) {
 			$html = JResponse::getBody();
-			$inline_css = 'margin:12px 1% 48px !important; text-align:left !important; float:none !important; width:auto!important; display:block !important;';
+			$inline_css = 'margin:12px 1% 48px; text-align:left; float:none; width:auto; display:block; clear:both;';
 			$inline_js_close_btn = !FLEXI_J30GE ? 'onclick="this.parentNode.parentNode.removeChild(this.parentNode);"' : '';
 			$inline_css_close_btn = !FLEXI_J30GE ? 'float:right; display:block; font-size:18px; cursor: pointer;' : '';
 			$html = str_replace('</body>',

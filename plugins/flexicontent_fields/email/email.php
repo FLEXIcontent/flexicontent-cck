@@ -15,8 +15,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.event.plugin');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsEmail extends JPlugin
+class plgFlexicontent_fieldsEmail extends FCField
 {
 	static $field_types = array('email');
 	
@@ -151,6 +152,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 					return 'cancel';
 				}
 				
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				";
@@ -356,18 +358,22 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$values[0] = serialize($values[0]);
 		}
 		
-		// (* BECAUSE OF THIS, the value display loop expects unserialized values)
-		foreach ($values as &$value)
+		$unserialize_vals = true;
+		if ($unserialize_vals)
 		{
-			// Compatibility for unserialized values or for NULL values in a field group
-			if ( !is_array($value) )
+			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
+			foreach ($values as &$value)
 			{
-				$v = !empty($value) ? @unserialize($value) : false;
-				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
-					array('addr' => $value, 'text' => '');
+				// Compatibility for unserialized values or for NULL values in a field group
+				if ( !is_array($value) )
+				{
+					$v = !empty($value) ? @unserialize($value) : false;
+					$value = ( $v !== false || $v === 'b:0;' ) ? $v :
+						array('addr' => $value, 'text' => '');
+				}
 			}
+			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		}
-		unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
@@ -412,51 +418,25 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			break;
 		}
 		
-		// Create field's HTML
-		$field->{$prop} = array();
-		$n = 0;
-		foreach ($values as $value)
-		{
-			if ( empty($value['addr']) && !$is_ingroup ) continue; // Skip empty if not in field group
-			if ( empty($value['addr']) ) {
-				$field->{$prop}[$n++]	= '';
-				continue;
-			}
-			
-			// If not using property or property is empty, then use default property value
-			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
-			$addr = $value['addr'];
-			$text = @$value['text'];
-			$text = ($usetitle && strlen($text))  ?  $text  :  $default_title;
-			
-			if ( !strlen($text) || !$usetitle ) {
-				$text = FLEXI_J30GE ? JStringPunycode::emailToUTF8($addr) : $addr;  // email in Punycode to UTF8, for the purpose of displaying it
-				$text_is_email = 1;
-			} else {
-				$text_is_email = strpos($text,'@') !== false;
-			}
-			
-			// Create field's display
-			// A cloacked email address with custom linking text
-			$html = $format != 'feed' ?
-				JHTML::_('email.cloak', $addr, 1, $text, $text_is_email) :
-				'<a href="mailto:'.$addr.'" target="_blank" itemprop="email">' .$text. '</a>';
-			
-			// Add prefix / suffix
-			$field->{$prop}[$n]	= $pretext . $html . $posttext;
-			
-			$n++;
-			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
-		}
+		// Get layout name
+		$viewlayout = $field->parameters->get('viewlayout', '');
+		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 		
-		if (!$is_ingroup)  // do not convert the array to string if field is in a group
+		// Create field's HTML, using layout file
+		$field->{$prop} = array();
+		//$this->values = $values;
+		//$this->displayFieldValue( $prop, $viewlayout );
+		include(self::getFormPath($this->fieldtypes[0], $viewlayout));
+		
+		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator
+		if (!$is_ingroup)
 		{
-			// Apply separator and open/close tags
+			// Apply values separator
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			if ( $field->{$prop}!=='' ) {
+			if ( $field->{$prop}!=='' )
+			{
+				// Apply field 's opening / closing texts
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-			} else {
-				$field->{$prop} = '';
 			}
 		}
 	}

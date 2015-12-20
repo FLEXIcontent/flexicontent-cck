@@ -1725,7 +1725,7 @@ class flexicontent_html
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		// $link as set above
-		$output	= '<a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -1787,7 +1787,7 @@ class flexicontent_html
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		// $link as set above
-		$output	= '<a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -1874,7 +1874,7 @@ class flexicontent_html
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		// emailed link was set above
-		$output	= '<a href="'.$mail_to_url.'" class="'.$button_classes.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$mail_to_url.'" class="'.$button_classes.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 		
 		return $output;
@@ -1925,7 +1925,7 @@ class flexicontent_html
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		$link 	= JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf');
-		$output	= '<a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -2177,7 +2177,7 @@ class flexicontent_html
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		$link = 'index.php?option=com_flexicontent&task=approval&cid='.$item->id;
-		$output	= '<a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 		
 		return $output;
@@ -2251,7 +2251,7 @@ class flexicontent_html
 			$link = JURI::base(true).'/administrator/index.php?option=com_flexicontent&task=items.edit&cid[]='.$item->id;
 			$targetLink = "_blank";
 		}
-		$output	= '<a href="'.$link.'" class="'.$button_classes.'" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 		
 		return $output;
@@ -2383,7 +2383,7 @@ class flexicontent_html
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
-		$output	= '<a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		if (!$auto_relations) {
 			$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 		}
