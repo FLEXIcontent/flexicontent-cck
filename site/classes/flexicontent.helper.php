@@ -61,6 +61,7 @@ class flexicontent_html
 {
 	static $use_bootstrap = true;
 	static $icon_classes = null;
+	static $option = 'com_flexicontent';
 	
 	static function load_class_config()
 	{
@@ -152,6 +153,108 @@ class flexicontent_html
 			</span>';
 		}
 		return $result;
+	}
+	
+	
+	static function checkedLessCompile($files, $path, $inc_path=null, $force=false)
+	{
+		jimport('joomla.filesystem.path' );
+		jimport('joomla.filesystem.folder');
+		jimport('joomla.filesystem.file');
+		
+		static $_inc_arr = array();
+		$debug = JDEBUG || JComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
+		$app   = JFactory::getApplication();
+		
+		// Validate paths
+		$path     = JPath::clean($path);
+		$inc_path = $inc_path ? JPath::clean($inc_path) : null;
+		
+		// Find if any "include" file has changed and set FLAG
+		if ( !$inc_path )
+			$_inc = false;
+		else if ( !JFolder::exists($inc_path) )
+			$_inc_arr[$inc_path] = $_inc = false;
+		else
+			$_inc = isset($_inc_arr[$inc_path]) ? $_inc_arr[$inc_path] : null;
+		
+		if ($_inc === null) {
+			$_inc = false;
+			$inc_files = glob($inc_path.'*.{less}', GLOB_BRACE);  //print_r($inc_files);
+			foreach ($inc_files as $confFile) {
+				//echo $confFile . " time: ".filemtime($confFile) ."<br/>";
+				if (!JFile::exists($inc_path.'_config_ts') || filemtime($confFile) > filemtime($inc_path.'_config_ts')) {
+					$_inc = true;
+					touch($inc_path.'_config_ts');
+					break;
+				}
+			}
+			$_inc_arr[$inc_path] = $_inc;
+		}
+		
+		// Find which LESS have changed
+		$stale = array();
+		foreach ($files as $inFile)
+		{
+			//$inFile   = urldecode(base64_decode($inFile));
+			$inSubPath  = explode('/', $inFile);
+			$inFilename = end($inSubPath);
+			$inParts    = explode('.', $inFilename);
+			$nameOnly   = reset($inParts);
+			$outFile    = 'css/' . $nameOnly . '.css';
+			
+			if (!JFile::exists($path.$inFile)) {
+				if ($debug) $app->enqueueMessage('Path not found: '.$path.$inFiles, 'warning');
+			} else if ( $_inc || $force || !is_file($path.$outFile) || filemtime($path.$inFile) > filemtime($path.$outFile) ) {
+				$stale[$inFile] = $outFile;
+			}
+		}
+		
+		//print_r($stale);
+		// We are done if no files need to be updated
+		if (empty($stale)) return array();
+		
+		static $prev_path = null;
+		if ( $prev_path != $path && $debug )  $app->enqueueMessage('Compiling LESS files in: ' .$path, 'message');
+		
+		$framework_path = '/components/com_flexicontent/librairies/lessphp';
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'lessphp'.DS.'lessc.inc.php');
+		
+		//$less = JLess($fname = null, new JLessFormatterJoomla);
+		$less = new \FLEXIcontent\lessc();
+		$formater = new \FLEXIcontent\lessc_formatter_classic();
+		$formater->disableSingle = true;
+		$formater->breakSelectors = true;
+		$formater->assignSeparator = ": ";
+		$formater->selectorSeparator = ",";
+		$formater->indentChar="\t";
+		$less->setFormatter($formater);
+		
+		$compiled = array();
+		$msg = ''; $error = false;
+		
+		foreach ($stale as $in => $out)
+		{
+			try
+			{
+				$wasCompiled = $less->compileFile($path.$in, $path.$out);  // $less->checkedCompile($path.$in, $path.$out);   // consider modification times
+				if ($wasCompiled)  $compiled[$in] = $out;
+			}
+			catch (Exception $e)
+			{
+				$error = true;
+				if ($debug || $app->isAdmin()) $app->enqueueMessage('- LESS to CSS halted ... CSS file was not changed ... please edit LESS file(s) find offending <b>lines</b> and fix or remove<br/>'. str_replace($path.$in, '<br/><b>'.$path.$in.'</b>', $e->getMessage()), 'notice');
+				continue;
+			}
+		}
+		
+		if ( count($compiled) && $debug ) {
+			foreach($compiled as $inPath => $outPath) $msg .= '<tr><td style="min-width:300px; text-align:left;">' . $inPath . '</td><td style="min-width:300px; text-align:left;">' .$outPath . '</td></tr>';
+			$app->enqueueMessage('<table>'.($prev_path != $path ? '<tr><th style="text-align:left;">LESS</th><th style="text-align:left;">CSS</th></tr>' : '').$msg.'</table>', 'message');
+		}
+		
+		$prev_path = $path;
+		return !$error ? $stale : false;
 	}
 	
 	
@@ -4549,12 +4652,19 @@ class flexicontent_tmpl
 					}
 				}
 
+				$tmpl_path = 'components/com_flexicontent/templates/'.$tmpl.'/';
+				$less_path = JPath::clean(JPATH_SITE.DS .$tmpl_path.DS);
+				
 				$css     = & $document->cssitem;
 				$cssfile = & $css->file;
 				if ($cssfile) {
 					$themes->items->{$tmpl}->css = new stdClass();
 					for ($n=0; $n<count($cssfile); $n++) {
 						$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$cssfile[$n];
+						$less_file = str_replace( 'css', 'less', (string)$cssfile[$n] );
+						if ( JFile::exists($less_path . $less_file) ) {
+							flexicontent_html::checkedLessCompile(array($less_file), $less_path, $less_path.'less/include/', $force=false);
+						}
 					}
 				}
 				$js 		= & $document->jsitem;
@@ -4562,7 +4672,7 @@ class flexicontent_tmpl
 				if ($jsfile) {
 					$themes->items->{$tmpl}->js = new stdClass();
 					for ($n=0; $n<count($jsfile); $n++) {
-						$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$jsfile[$n];
+						$themes->items->{$tmpl}->js->$n = $tmpl_path. (string)$jsfile[$n];
 					}
 				}
 			}
@@ -4616,20 +4726,29 @@ class flexicontent_tmpl
 						$themes->category->{$tmpl}->positions[$n] = (string)$pos[$n];
 					}
 				}
+				
+				$tmpl_path = 'components/com_flexicontent/templates/'.$tmpl.'/';
+				$less_path = JPath::clean(JPATH_SITE.DS .$tmpl_path.DS);
+				
 				$css     = & $document->csscategory;
 				$cssfile = & $css->file;
 				if ($cssfile) {
 					$themes->category->{$tmpl}->css = new stdClass();
 					for ($n=0; $n<count($cssfile); $n++) {
-						$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$cssfile[$n];
+						$themes->category->{$tmpl}->css->$n = $tmpl_path. (string)$cssfile[$n];
+						$less_file = str_replace( 'css', 'less', (string)$cssfile[$n] );
+						if ( JFile::exists($less_path . $less_file) ) {
+							flexicontent_html::checkedLessCompile(array($less_file), $less_path, $less_path.'less/include/', $force=false);
+						}
 					}
 				}
+				
 				$js     = & $document->jscategory;
 				$jsfile = & $js->file;
 				if ($jsfile) {
 					$themes->category->{$tmpl}->js = new stdClass();
 					for ($n=0; $n<count($jsfile); $n++) {
-						$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$jsfile[$n];
+						$themes->category->{$tmpl}->js->$n = $tmpl_path. (string)$jsfile[$n];
 					}
 				}
 				
@@ -4745,6 +4864,7 @@ class flexicontent_images
 	 */
 	static function BuildIcons($rows)
 	{
+		jimport('joomla.filesystem.path' );
 		jimport('joomla.filesystem.file');
 
 		for ($i=0, $n=count($rows); $i < $n; $i++) {

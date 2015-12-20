@@ -11,22 +11,28 @@ $google_maps_static_api_key = $field->parameters->get('google_maps_static_api_ke
 
 $show_address = $field->parameters->get('show_address','both');
 $show_address = false || $show_address == 'both' || ($view != 'item' && $show_address == 'category') || ($view == 'item' && $show_address == 'item');
+
 $addr_display_mode = $field->parameters->get('addr_display_mode','plaintext');
 $addr_format_tmpl = $field->parameters->get('addr_format_tmpl','<span class="street-address">{{addr1}}<br />[[addr2|{{addr2}}<br />]][[addr3|{{addr3}}</span><br />]]<span class="city">{{city}}</span> <span class="state">[[state|{{state}}]][[province|{{province}}]]</span>, <span class="postal-code">{{zip}}[[zip_suffix|-{{zip_suffix}}]]</span><br /><span class="country">{{country}}</span>');
+
 $directions_position = $field->parameters->get('directions_position','after');
 $directions_link_label = $field->parameters->get('directions_link_label', JText::_('PLG_FC_ADDRESSINT_GET_DIRECTIONS'));
 
 $show_map = $field->parameters->get('show_map','none');
 $show_map = false || $show_map == 'both' || ($view != 'item' && $show_map == 'category') || ($view == 'item' && $show_map == 'item');
+
 $map_embed_type = $field->parameters->get('map_embed_type','img'); // defaults to img for backward compatibility
-$map_width = $field->parameters->get('map_width',200);
-$map_height = $field->parameters->get('map_height',150);
 $map_type = $field->parameters->get('map_type','roadmap');
-$map_zoom = $field->parameters->get('map_zoom',16);
-$link_map = $field->parameters->get('link_map',1);
-$map_position = $field->parameters->get('map_position',0);
+$map_zoom = (int) $field->parameters->get('map_zoom',16);
+$link_map = (int) $field->parameters->get('link_map',1);
+
+$map_position = (int) $field->parameters->get('map_position',0);
 $marker_color = $field->parameters->get('marker_color','red');
-$marker_size = $field->parameters->get('marker_size','mide');
+$marker_size  = $field->parameters->get('marker_size','mide');
+
+$map_width  = (int) $field->parameters->get('map_width',200);
+$map_height = (int) $field->parameters->get('map_height',150);
+
 $field_prefix = $field->parameters->get('field_prefix','');
 $field_suffix = $field->parameters->get('field_suffix','');
 

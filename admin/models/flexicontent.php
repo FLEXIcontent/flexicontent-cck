@@ -789,7 +789,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($return!==null) return $return;
 		
 		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.jpath');
+		jimport('joomla.filesystem.path');
 		
 		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
 		

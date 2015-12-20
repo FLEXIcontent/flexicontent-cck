@@ -47,6 +47,10 @@ class FlexicontentViewTemplate extends JViewLegacy {
 
 		//Get data from the model
 		$layout  = $this->get( 'Data');
+		if (!$layout)
+		{
+			$app->redirect('index.php?option=com_flexicontent', JText::_( 'Template not found: <b>' ).JRequest::getVar('folder',  'default', '', 'cmd').'</b>');
+		}
 		$conf    = $this->get( 'LayoutConf');
 		
 		$fields  = $this->get( 'Fields');

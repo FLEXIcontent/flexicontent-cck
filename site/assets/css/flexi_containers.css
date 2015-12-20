@@ -1,8 +1,3 @@
-
-/******************************************
- * Flexicontent messages, (placed anywhere)
- ******************************************/
-
 body .fc-close {
 	color: #000000;
 	float: right;
@@ -20,8 +15,6 @@ body .fc-close:hover {
 	text-decoration: none;
 	background: none;
 }
-
-
 body .fc-mssg,
 body .fc-mssg-inline {
 	border: 1px solid;
@@ -29,7 +22,7 @@ body .fc-mssg-inline {
 	margin: 1px 0 5px 0;
 	padding: 8px 10px 12px 36px;
 	border-radius: 6px;
-	font-size:12px;
+	font-size: 12px;
 	white-space: normal;
 	line-height: 140%;
 }
@@ -38,7 +31,6 @@ body .fc-mssg-inline {
 	margin: 1px 0 2px 12px;
 	max-width: 62%;
 }
-
 body .fc-mssg-inline.fc-note,
 body .fc-mssg.fc-note {
 	background: #FCF8E3 url(../images/note.gif) no-repeat 10px 50%;
@@ -48,7 +40,7 @@ body .fc-mssg.fc-note {
 body .fc-mssg-inline.fc-error,
 body .fc-mssg.fc-error {
 	background: #F2DEDE url(../images/error.png) no-repeat 10px 50%;
-  color: #B94A48;
+	color: #B94A48;
 	border-color: #EED3D7;
 }
 body .fc-mssg-inline.fc-warning,
@@ -69,8 +61,6 @@ body .fc-mssg.fc-info {
 	color: #3A87AD;
 	border-color: #9CD8F1;
 }
-
-/* modified backgrounds for alerts */
 body .alert.fc-error {
 	background: #F2DEDE url(../images/error.png) no-repeat 10px 50%;
 	padding-left: 36px;
@@ -87,8 +77,6 @@ body .alert.fc-info {
 	background: #D9EDF7 url(../images/information.png) no-repeat 10px 50%;
 	padding-left: 36px;
 }
-
-/* modified styling for alerts */
 body .alert.fc-small {
 	padding: 2px 8px;
 	margin: 2px 8px;
@@ -100,8 +88,6 @@ body .alert.fc-small.fc-iblock {
 	display: inline-block;
 	margin: 0px 4px;
 }
-
-/* some special cases */
 body .fc-noauth {
 	display: inline-block;
 	background: #FCF8CA url(../images/warning.png) no-repeat 10px 50%;
@@ -110,29 +96,19 @@ body .fc-noauth {
 	border: 1px solid #FBEED5;
 	border-radius: 6px;
 	margin: 0 0 5px 0;
-	font-size:12px;
+	font-size: 12px;
 	white-space: normal;
 	line-height: 140%;
 }
-
-/* place last since it is of same importance */
 body .fc-mssg-inline.fc-nobgimage,
 body .fc-mssg.fc-nobgimage {
 	background-image: none;
 	padding: 4px 8px;
 }
 body .fc-mssg-inline.fc-noborder,
-body .fc-mssg.fc-noborder  {
+body .fc-mssg.fc-noborder {
 	border-width: 0;
 }
-
-
-
-
-/****************
- * State Toggler
- ****************/
-
 #flexicontent ul.statetoggler {
 	float: none;
 	margin: 0;
@@ -142,36 +118,32 @@ body .fc-mssg.fc-noborder  {
 	padding: 0;
 	width: auto;
 }
-
 #flexicontent ul.statetoggler > li.topLevel > .options {
 	padding: 0px;
 	margin: 0;
 	background: white;
 	position: absolute;
-	font-size:14px;
+	font-size: 14px;
 	width: auto;
 	height: 0;
 	z-index: 1;
 }
-
 #flexicontent ul.statetoggler > li.topLevel > .options > div {
 	display: inline-block;
-	padding:0px;
+	padding: 0px;
 }
-
 #flexicontent ul.statetoggler > li.topLevel > .options ul {
 	display: none;
 	float: left;
 	background: white;
 	border: 1px solid lightgray;
-	border-radius:4px;
+	border-radius: 4px;
 	box-shadow: 2px 4px 4px gray;
 	box-sizing: border-box;
 	padding: 0px;
 	margin: 2px 0px;
 	width: 100%;
 }
-
 #flexicontent ul.statetoggler > li.topLevel,
 #flexicontent ul.statetoggler > li.topLevel ul > li {
 	background: none repeat scroll 0 0 transparent;
@@ -184,60 +156,47 @@ body .fc-mssg.fc-noborder  {
 	margin: 0;
 	width: 100%;
 }
-
 #flexicontent ul.statetoggler > li.topLevel span.btn,
-#flexicontent ul.statetoggler > li.topLevel span.fcbutton  {
-	padding-left:4px;
-	padding-right:4px;
+#flexicontent ul.statetoggler > li.topLevel span.fcbutton {
+	padding-left: 4px;
+	padding-right: 4px;
 }
-
 #flexicontent ul.statetoggler > li.topLevel ul > li a {
 	white-space: nowrap;
 	display: inline-block;
 	box-sizing: border-box;
 	margin: 0px;
 	padding: 2px 8px;
-	width:100%;
+	width: 100%;
 }
 #flexicontent ul.statetoggler > li.topLevel ul > li a:hover {
-	background-image: linear-gradient(to bottom, #f0f0f0, #d7d7d7);
-	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0, endColorstr=#d7d7d7);
+	background-image: linear-gradient(to bottom,#f0f0f0,#d7d7d7);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0,endColorstr=#d7d7d7);
 }
-
 #flexicontent ul.statetoggler > li.topLevel ul > li img {
 	padding: 4px 6px;
 	margin: 0;
 	border: none;
-	display:unset;
-	box-sizing:unset;
+	display: unset;
+	box-sizing: unset;
 }
-
 #flexicontent ul.statetoggler > li.topLevel > a.stateopener {
-	outline:none;
+	outline: none;
 	text-decoration: none;
 }
-
 #flexicontent ul.statetoggler > li.topLevel > a.stateopener img {
 	padding: 0;
 	margin: 0;
 	border: none;
-	vertical-align:middle;
-	display:unset;
-	box-sizing:unset;
+	vertical-align: middle;
+	display: unset;
+	box-sizing: unset;
 }
-
 #flexicontent ul.statetoggler .ajax-loader {
 	background: url("../images/ajax-loader.gif") no-repeat scroll center center transparent;
 	height: 20px;
 	width: 16px;
 }
-
-
-
-/************
- * Rating bar
- ************/
-
 #flexicontent .qf_ratingbarcontainer {
 	border: 1px solid #999999;
 	height: 10px;
@@ -250,59 +209,40 @@ body .fc-mssg.fc-noborder  {
 	height: 10px;
 	display: block;
 }
-
-
-
-/**************************************************
- * Pager Container, e.g. flexicontent item versions
- **************************************************/
- 
 #flexicontent #fc_pager ul.pages {
-	float:left;
-	left:50%;
-	list-style-type:none;
-	margin:0 auto;
-	padding:0;
-	position:relative;
+	float: left;
+	left: 50%;
+	list-style-type: none;
+	margin: 0 auto;
+	padding: 0;
+	position: relative;
 }
-
 #flexicontent #fc_pager ul.pages li {
-	float:left;
-	position:relative;
-	right:50%;
-	margin-left:5px;
-	padding:2px 4px;
-	border:1px solid #ddd;
-	list-style:none;
-	text-decoration:none;
+	float: left;
+	position: relative;
+	right: 50%;
+	margin-left: 5px;
+	padding: 2px 4px;
+	border: 1px solid #ddd;
+	list-style: none;
+	text-decoration: none;
 }
-
 #flexicontent #fc_pager ul.pages li:hover {
-	border:1px solid #aaa;
+	border: 1px solid #aaa;
 }
-
 #flexicontent #fc_pager ul.pages li.pgEmpty {
-	border:1px solid #ddd;
-	color:#ddd;
+	border: 1px solid #ddd;
+	color: #ddd;
 }
-
 #flexicontent #fc_pager ul.pages li.pgCurrent {
-	border:1px solid #aaa;
-	color:#000;
-	font-weight:bold;
-	background-color:#eee;
+	border: 1px solid #aaa;
+	color: #000;
+	font-weight: bold;
+	background-color: #eee;
 }
-
-
-
-/********************
- * CSS for JS sliders
- ********************/
- 
-.fc_slider_input_box { /* hide connected fields */
+.fc_slider_input_box {
 	display: none;
 }
-
 .fc-sliderTooltip.fc-left {
 	right: 18px;
 	left: unset;
@@ -312,7 +252,6 @@ body .fc-mssg.fc-noborder  {
 	left: unset;
 	top: 0px;
 }
-
 .fc-sliderTooltip.fc-right {
 	right: unset;
 	left: 18px;
@@ -322,7 +261,6 @@ body .fc-mssg.fc-noborder  {
 	left: 33px;
 	top: 0px;
 }
-
 .fc-sliderTooltip {
 	display: block;
 	position: absolute;
@@ -342,16 +280,9 @@ body .fc-mssg.fc-noborder  {
 	display: block;
 	padding: 2px;
 }
-
-
-
-/********************
- * Various Containers
- ********************/
- 
 #flexicontent .nowrap_box,
 .flexicontent .nowrap_box {
-	white-space: nowrap !important;  /* FORCED (this is the purpose of the class) */
+	white-space: nowrap !important;
 	vertical-align: top;
 	display: inline-block;
 	float: none;
@@ -364,5 +295,3 @@ body .fc-mssg.fc-noborder  {
 .flexicontent .filterbuttons_head .nowrap_box .label {
 	vertical-align: middle;
 }
-
-.fc-tooltip-img {}

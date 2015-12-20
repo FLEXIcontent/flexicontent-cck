@@ -745,7 +745,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ( !$initialized ) {
 			$initialized = 1;
 			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.jpath');
+			jimport('joomla.filesystem.path');
 			$srcpath_original  = JPath::clean( JPATH_SITE .DS. $import_docs_folder .DS );
 			require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');
 			require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');

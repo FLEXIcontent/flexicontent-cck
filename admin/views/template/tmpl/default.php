@@ -18,6 +18,12 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+jimport('joomla.filesystem.folder');
+jimport('joomla.filesystem.file');
+jimport('joomla.filesystem.path');
+
+if ( !$this->layout->name ) die('Template folder does not exist');
+
 // Load JS tabber lib
 $this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VERSION);
 $this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VERSION);
@@ -647,13 +653,42 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					<span class="badge"><?php echo JText::_( 'FLEXI_LAYOUT_FILES' ); ?></span>
 				</span>
 				<?php
+				
 				$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$this->layout->name;
-				$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir)), '#'.$this->layout->view.'(_.*\.|\.)(php|xml|css|js)#i');
+				
+				// Create less folders if they do not exist already
+				if ( !JFolder::exists( $tmpldir . '/less' ) ) if ( !JFolder::create( $tmpldir . '/less') )  JError::raiseWarning(100, JText::_('Unable to create "/less/" folder'));
+				
+				if ( JFolder::exists( $tmpldir . '/less' ) )
+				{
+					if ( !JFolder::exists( $tmpldir . '/less/include' ) ) if ( !JFolder::create( $tmpldir . '/less/include') )  JError::raiseWarning(100, JText::_('Unable to create "/less/include" folder'));
+					if ( !JFile::exists($tmpldir . '/less/include/config.less') ) {
+						file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n");
+					}
+					
+					$less_files = array('/css/item.css'=>'/less/item.less', '/css/category.css'=>'/less/category.less');
+					foreach($less_files as $css_name => $less_name) {
+						if ( !JFile::exists($tmpldir . $less_name) ) {
+							if ( !JFile::copy($tmpldir.$css_name, $tmpldir.$less_name) ) {
+								JError::raiseWarning(100, JText::_('Unable to create file: "'.$tmpldir.$less_name.'"'));
+							} else {
+								$file_data = "@import 'include/config.less';\n\n";
+								$file_data .= file_get_contents($tmpldir.$less_name);
+								file_put_contents($tmpldir.$less_name, $file_data);
+							}
+						}
+					}
+				}
+				
+				$it = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir)), '#('.$this->layout->view.'(_.*\.|\.)(php|xml|less|css|js)|include.*less)#i');
 				//$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpldir));
 				$it->rewind();
-				$ext_badge = array('php'=>'success', 'xml'=>'info', 'css'=>'warning', 'js'=>'important', 'ini'=>'info');
+				$ext_badge = array('php'=>'success', 'xml'=>'info', 'css'=>'warning', 'js'=>'important', 'ini'=>'info', 'less'=>'inverse');
 				$file_tip = array(
+					'config.less'=>'Contains your less configuration variables, mixins',
+					'item.less'=>'Contains LESS directives, used to create CSS of this item layout',
 					'item.css'=>'Contains CSS specific to this item layout',
+					'category.less'=>'Contains LESS directives, used to create CSS of this category layout',
 					'category.css'=>'Contains CSS specific to this category layout',
 					'item.xml'=>'Layout\'s structure: including display parameters, field positions, file list, etc',
 					'category.xml'=>'Layout\'s structure: including display parameters, field positions, file list, etc',
@@ -677,6 +712,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				
 				
 				$file_tip_extra = array(
+					'config.less'=>'NOTE:<br/>- this is automatically imported by item.less and category.less <br/> - if you need to import extra less files, then files must be in same folder (less/include/) for automatic compiling to be triggered',
 					'item.xml'=>'This file contains layout\' s structure: including <br/> - <b>display parameters, field positions, file list, etc</b>, <br/> - you can add extra parameters/positions, <br/>-- if you add a new position, you will need to also add the dispay -LOOP- of the new position inside files: <br/><b>item.php</b> <br/><b>item_html5.php</b> <br/><br/>(click to edit file and then use the code button)',
 					'category.xml'=>'This file contains layout\' s structure: including <br/> - <b>display parameters, field positions, file list, etc</b>, <br/> - you can add extra parameters/positions, <br/>-- if you add a new position, you will need to also add the dispay -LOOP- of the new position inside files: <br/><b>category_items.php</b> <br/><b>category_items_html5.php</b> <br/><br/>(click to edit file and then use the code button)',
 					'item.php'=>'This file display the item, thus has display LOOPs of for every position to show fields of every position, if you add new position in the XML file, then make sure that you ADD the display loop here <br/><br/>(click to edit file and then use the code button)',
@@ -702,10 +738,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						//echo ' -- <span class="label">SubPath</span> '. $it->getSubPath();
 						//echo ' -- <span class="label">Key</span> '. $it->key();
 						$subpath = $it->getSubPath();
-						$subpath_highlighted = $subpath ? '<span class="label">'.$subpath.'/</span>' : '';
+						$subpath_highlighted = $subpath ? '<span class="label">'.str_replace('\\', '/', $subpath).'/</span>' : '';
 						
 						$subpath_file = $it->getSubPathName();
-						$filename = preg_replace('#^'.$subpath.'\\'.DS.'#', '', $subpath_file);
+						$filename = basename( $subpath_file ); //preg_replace('#^'.$subpath.'\\'.DS.'#', '', $subpath_file);
 						
 						$pi = pathinfo($it->key());
 						$ext = $pi['extension'];
@@ -719,11 +755,11 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						echo '
 						'.$file_type.
 						(!isset($file_tip_extra[$filename]) ? '<img src="components/com_flexicontent/assets/images/tick_f2.png" alt="Edit file">' :
-							'<img src="components/com_flexicontent/assets/images/comment.png" data-placement="bottom" class="'.$tip_class.'" title="'.$file_tip_extra[$filename].'" alt="Edit file"/>'
+							'<img src="components/com_flexicontent/assets/images/comments.png" data-placement="bottom" class="'.$tip_class.'" title="'.$file_tip_extra[$filename].'" alt="Edit file"/>'
 						).'
 						<a href="javascript:;" class="'.$tip_class.'" data-placement="right" onclick="load_layout_file(\''.addslashes($this->layout->name).'\', \''.addslashes($it->getSubPathName()).'\', \'0\', \''.implode($btn_allowed, ' ').'\'); return false;"
 						title="'.(isset($file_tip[$filename]) ? $file_tip[$filename] : $ext.' file').'">'
-							.$subpath_highlighted.$filename.
+							.$subpath_highlighted.'&nbsp;'.$filename.
 						'</a>'
 						;
 						echo "<br/>";

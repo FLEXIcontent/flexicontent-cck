@@ -1915,7 +1915,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ( !$initialized ) {
 			$initialized = 1;
 			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.jpath');
+			jimport('joomla.filesystem.path');
 			if ( $is_importcsv ) {
 				$srcpath_original = JPath::clean( JPATH_SITE .DS. $import_media_folder .DS );
 				require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');
@@ -2138,7 +2138,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ( $image_source > 0 ) {
 			jimport('joomla.filesystem.file');
 			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.jpath');
+			jimport('joomla.filesystem.path');
 			
 			// Delete image folder if it exists
 			$destpath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id   . '_field_'.$field->id .DS);
@@ -2365,9 +2365,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	function create_thumb( &$field, $filename, $size, $origpath='', $destpath='', $copy_original=0, $extra_prefix='' ) {
 		static $destpaths_arr = array();
 		
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.jpath');
+		// Execute once
+		static $initialized = null;
+		if ( !$initialized ) {
+			$initialized = 1;
+			jimport('joomla.filesystem.file');
+			jimport('joomla.filesystem.folder');
+			jimport('joomla.filesystem.path');
+		}
 		
 		// (DB/Folder) Mode of image field
 		$image_source = $field->parameters->get('image_source', 0);
@@ -2487,7 +2492,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	function removeOriginalFile( $field, $filename )
 	{
 		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.jpath');
+		jimport('joomla.filesystem.path');
 		
 		$db = JFactory::getDBO();
 		$image_source = $field->parameters->get('image_source', 0);

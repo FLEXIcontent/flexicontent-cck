@@ -1,7 +1,6 @@
-/* Blog Theme : category template CSS file */
-
 #flexicontent .clear {
-	border: 0; clear: both;
+	border: 0;
+	clear: both;
 	float: none;
 	font-size: 1px;
 	height: 0;
@@ -10,97 +9,51 @@
 	padding: 0;
 	visibility: hidden;
 }
-
-/**
- * @section buttons
- *
- * print, pdf, ...
- */
 #flexicontent .buttons {
 	float: right;
 }
-
-#flexicontent .buttons > a > img {
-}
-
-#flexicontent .buttons > a {
-}
-
-
-/**
- * @section headlines
- *
- */
-#flexicontent h2 {
-}
-
 #flexicontent h2 img {
 	border: none;
 }
-
-
-/**
- * @section Categoryview
- *
- */
 #flexicontent .catimg {
 	margin: 0 0.5em 0.5em 0;
 	float: left;
 	position: relative;
 }
-
 #flexicontent .catimg p {
-	font-size: 0.9em; line-height: 180%;
+	font-size: 0.9em;
+	line-height: 180%;
 	margin: 0 0 0.5em 0;
 }
-
 #flexicontent .catdescription {
 	margin: 0 0 0.5em 0;
 }
-
 #flexicontent .subcategories {
-	/* font-size: 1.2em; font-weight: bold; */
 	border-bottom: 2px solid #ddd;
-	padding:0.5em 0.3em; margin: 0.8em 0;
+	padding: 0.5em 0.3em;
+	margin: 0.8em 0;
 }
-
-/**
- * @section FLEXIcontent Item
- *
- */
 #flexicontent .taglist {
-	margin: 5px 0 10px; padding: 0 5px;
+	margin: 5px 0 10px;
+	padding: 0 5px;
 }
-
-
-/**
- * @section flexicontent Table Filter Form
- *
- */
 div.subcategorieslist {
 	margin: 0 0 1em 0;
 }
-
 #flexicontent #fc_filter {
-	margin: 0 0 1em 0; padding: 0.5em;
+	margin: 0 0 1em 0;
+	padding: 0.5em;
 	border: solid 1px #ddd;
 }
-
 #flexicontent .fc_fleft {
 	float: left;
 }
-
 #flexicontent .fc_fright {
 	float: right;
 }
 #flexicontent .fc_fright .filter {
 	margin-left: 10px;
 }
-
-
-/**
- * Comments for JComments only ;-)
- */
 div.comments {
 	margin-top: 15px;
 }
@@ -128,7 +81,6 @@ div.comments {
 	background: none;
 	border: none;
 }
-
 .comments .rbox {
 	border: 1px #ccc solid;
 }
@@ -141,16 +93,22 @@ div.comments {
 .comments #comments-list-footer {
 	margin: 0 0 10px 0;
 }
-#comments-form p, #comments-form #comments-form-buttons, #comments-form #comments-form-error {
+#comments-form p,
+#comments-form #comments-form-buttons,
+#comments-form #comments-form-error {
 	margin-left: 0px !important;
 }
-#comments-form #comments-form-message, #comments-inline-edit #comments-form-message {padding: 5px 5px 5px 25px;display: block;}
-.comments-form-message-error {background: #FFD86F url(../images/error.png) no-repeat 4px 50%;}
-.comments-form-message-info {background: #DFEEFF url(../images/information.png) no-repeat 4px 50%;}
-
-/**
- * blog block
- */
+#comments-form #comments-form-message,
+#comments-inline-edit #comments-form-message {
+	padding: 5px 5px 5px 25px;
+	display: block;
+}
+.comments-form-message-error {
+	background: #FFD86F url(../images/error.png) no-repeat 4px 50%;
+}
+.comments-form-message-info {
+	background: #DFEEFF url(../images/information.png) no-repeat 4px 50%;
+}
 #flexicontent ul.leadingblock,
 #flexicontent ul.introblock {
 	margin: 0;
@@ -167,8 +125,6 @@ div.comments {
 	display: inline-block;
 	vertical-align: top;
 	zoom: 1;
-	*display: inline;
-	_height: 10px;
 	line-height: inherit;
 }
 #flexicontent ul.introblock > li {
@@ -182,11 +138,8 @@ div.comments {
 	display: inline-block;
 	vertical-align: top;
 	zoom: 1;
-	*display: inline;
-	_height: 10px;
 	line-height: inherit;
 }
-
 #flexicontent ul.leadingblock.two > li,
 #flexicontent ul.introblock.two > li {
 	width: 48.6%;
@@ -201,10 +154,6 @@ div.comments {
 #flexicontent ul.introblock.four > li {
 	width: 23.4%;
 	margin-left: 1%;
-}
-
-
-@media only screen and (min-width: 960px) and (max-width: 1160px) {
 }
 @media only screen and (min-width: 768px) and (max-width: 959px) {
 	#flexicontent ul.leadingblock.two > li,
@@ -233,23 +182,18 @@ div.comments {
 		margin-left: 0%;
 	}
 }
-
-
-
 #flexicontent figure.image.right,
 #flexicontent div.image.right {
 	float: right !important;
 	margin: 8px 2px 0px 10px !important;
-	width:auto !important;
+	width: auto !important;
 }
-
 #flexicontent figure.image.left,
 #flexicontent div.image.left {
 	float: left !important;
 	margin: 8px 10px 0px 2px !important;
-	width:auto !important;
+	width: auto !important;
 }
-
 #flexicontent figure.image.right img,
 #flexicontent figure.image.left img,
 #flexicontent div.image.right img,
@@ -257,14 +201,11 @@ div.comments {
 	padding: 1px;
 	border: 1px solid lightgray;
 }
-
-/* lines */
 #flexicontent .lineinfo {
 	display: block;
-	float:left;
-	clear:both;
+	float: left;
+	clear: both;
 	margin: 0 0 0.5em 0;
-	*width: 100%; /* IE6/IE7 */
 }
 #flexicontent .lineinfo {
 	vertical-align: middle;
@@ -283,54 +224,22 @@ div.comments {
 #flexicontent .lineinfo .element .value {
 	display: inline-block;
 	float: left;
-	/*min-width: 90px;*/
 }
-
 #flexicontent .readmore {
 	display: inline-block;
-	float:left;
-	clear:both;
-}
-
-/* =============================================
-   Bootstrap adjustments
-============================================= */
-#fc_alpha .btn.fc_alpha_index,
-#fc_alpha .btn.fc_alpha_index_sep {
-	margin-top:0;
-	margin-bottom:0;
-}
-
-/* ===============================================
-   "micro" clearfix 
-   http://nicolasgallagher.com/micro-clearfix-hack/
-   =============================================== */
-
-/**
- * For modern browsers
- * 1. The space content is one way to avoid an Opera bug when the
- *    contenteditable attribute is included anywhere else in the document.
- *    Otherwise it causes space to appear at the top and bottom of elements
- *    that are clearfixed.
- * 2. The use of `table` rather than `block` is only necessary if using
- *    `:before` to contain the top-margins of child elements.
- */
-.group:before,
-.group:after {
-	content: " "; /* 1 */
-	display: table; /* 2 */
-}
-
-.group:after {
+	float: left;
 	clear: both;
 }
-
-/**
- * Include this rule to trigger hasLayout and contain floats.
- */
-.group {
-	/* for IE 6/7 */
-	*zoom: expression(this.runtimeStyle.zoom="1", this.appendChild(document.createElement("br")).style.cssText="clear:both;font:0/0 serif");
-	/* non-JS fallback */
-	*zoom: 1;
+#fc_alpha .btn.fc_alpha_index,
+#fc_alpha .btn.fc_alpha_index_sep {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.group:before,
+.group:after {
+	content: " ";
+	display: table;
+}
+.group:after {
+	clear: both;
 }

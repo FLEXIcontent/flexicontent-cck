@@ -1,0 +1,1358 @@
+@import 'include/config.less';
+
+/***********************
+/* FLEXIcontent base CSS
+ ***********************/
+
+/******************************************
+ * Flexicontent General Utility CSS Classes
+ ******************************************/
+#flexicontent {}
+
+.fcclear,
+#flexicontent .fcclear,
+#flexicontent .clear {
+	border: 0;
+	clear: both;
+	float: none;
+	font-size: 1px;
+	height: 0;
+	line-height: 1px;
+	margin: 0;
+	padding: 0;
+	visibility: hidden;
+}
+
+#flexicontent .floattext {
+	display: block;
+	margin: 0 0 0.5em; /* safari */
+}
+
+#flexicontent .fcright {
+	float: right;
+	margin-left: 8px;
+}
+#flexicontent .fcleft {
+	float: left;
+	margin-right: 8px;
+}
+#flexicontent .fceven {
+	background-color: #e7e7e7;
+}
+#flexicontent .fcodd {
+	background-color: #f2f2f2;
+}
+
+
+/**********************************************************************
+ * FLEXIcontent buttons for links: print, pdf, email, rss, approval etc
+ **********************************************************************/
+#flexicontent .buttons {
+	display: block;
+	margin: 0px;
+	padding: 0px;
+	float: right;
+	position: relative; /* needed for absolute placed elements inside */
+}
+#flexicontent .buttons.fcleft {
+	float: left;
+}
+#flexicontent .buttons.fcright {
+	float: right;
+}
+#flexicontent .buttons:not(.fcright)  ul.statetoggler > li.topLevel > .options,
+#flexicontent .buttons.fcleft  ul.statetoggler > li.topLevel > .options,
+#flexicontent .buttons:not(.fcright)  ul.dropdown-menu,
+#flexicontent .buttons.fcleft  ul.dropdown-menu {
+	left: auto;
+	right: 0;
+}
+
+#flexicontent .buttons.fcright ul.dropdown-menu,
+#flexicontent .buttons.fcright ul.statetoggler > li.topLevel > .options {
+	left: 0;
+	right: auto;
+}
+
+#flexicontent .buttons.btn-group > ul.statetoggler {
+	margin-left: 8px;
+}
+#flexicontent .buttons > a > i {
+	vertical-align: middle;
+	font-size: 14px;
+	margin: 0;
+}
+#flexicontent .buttons > a > i.fcIconPadRight {
+	margin: 0 8px 0 0;
+}
+
+#flexicontent .buttons > a:not(.btn) {
+	line-height: 2em;
+	font-size: 14px;
+	color: black;
+	background-color: #eeeeee;
+	background: -webkit-gradient(linear,left top,left bottom,from(#eeeeee),to(#dddddd));
+	background: -webkit-linear-gradient(top,#eeeeee,#dddddd);
+	background: -moz-linear-gradient(top,#eeeeee,#dddddd);
+	background: -ms-linear-gradient(top,#eeeeee,#dddddd);
+	background: -o-linear-gradient(top,#eeeeee,#dddddd);
+	background: linear-gradient(to bottom,#eeeeee,#dddddd);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
+	.fc.rounded.corners(4px);
+	border: 1px solid #cccccc;
+	padding: 0px 8px;
+	vertical-align: top;
+	display: inline-block;
+}
+#flexicontent .buttons > a:not(.btn):hover {
+	background-color: #dddddd;
+	background: -webkit-gradient(linear,left top,left bottom,from(#dddddd),to(#cccccc));
+	background: -webkit-linear-gradient(top,#dddddd,#cccccc);
+	background: -moz-linear-gradient(top,#dddddd,#cccccc);
+	background: -ms-linear-gradient(top,#dddddd,#cccccc);
+	background: -o-linear-gradient(top,#dddddd,#cccccc);
+	background: linear-gradient(to bottom,#dddddd,#cccccc);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#cccccc);
+	border: 1px solid #bbbbbb;
+}
+
+#flexicontent .fc_editbutton,
+#flexicontent .buttons > a {
+	text-decoration: none;
+}
+
+#flexicontent .fc_editbutton > img,
+#flexicontent .buttons > a > img {
+	border: none;
+	vertical-align: top;
+	margin: 1px 6px 0px 0px;
+}
+#flexicontent .fc_editbutton > img {
+	margin-top: 0px;
+}
+
+.fc_comments_count {
+	background: url(../images/comments.png) no-repeat;
+	color: green;
+	padding-left: 20px;
+	height: 16px;
+	margin: 5px 5px 0px 0px;
+	float: left;
+}
+.fc_comments_count_nopad {
+	background: url(../images/comments.png) no-repeat;
+	color: green;
+	padding-left: 20px;
+	height: 16px;
+	margin: 0px 5px 0px 0px;
+	float: left;
+}
+
+.fc_edit_link {
+	float: left;
+	margin: 5px 0px 0px 0px;
+}
+.fc_edit_link_nopad {
+	float: left;
+	margin: 0px 0px 0px 0px;
+}
+
+.fc_state_toggle_link {
+	float: left;
+	margin: 5px 0px 0px 5px;
+}
+.fc_state_toggle_link_nopad {
+	float: left;
+	margin: 0px 0px 0px 0px;
+}
+
+
+
+/**********************************
+ * FLEXIcontent headlines and title
+ **********************************/
+#flexicontent .fc_item_title,
+#flexicontent .fc_item_title a {
+	text-decoration: none;
+}
+#flexicontent .fc_item_title img {
+	border: none;
+}
+
+
+
+/*****************
+ * Pagination CSS
+ *****************
+ * NOTE: WE AVOID setting styling here to allow Joomla templates to style the pagination area
+ */
+#flexicontent .pagination {
+	text-align: center;
+}
+
+#flexicontent .pageslinks {
+	text-align: center;
+}
+
+#flexicontent .pageslinks ul {
+	text-align: center;
+}
+
+#flexicontent .pageslinks ul li a {
+	text-decoration: none;
+}
+
+#flexicontent .pagescounter {
+	text-align: center;
+}
+
+
+
+/****************************
+ * FLEXIcontent category view
+ ****************************/
+#flexicontent .catimg {
+	float: left;
+	margin: 0 0.5em 0.5em 0;
+	position: relative;
+}
+
+#flexicontent .catimg p {
+	font-size: 0.9em;
+	line-height: 180%;
+	margin: 0 0 0.5em 0;
+}
+
+#flexicontent .catimg img {
+	padding: 1px;
+	border: 1px solid lightgray;
+	.fc.rounded.corners(5px);
+}
+
+#flexicontent .catdescription {
+	margin: 0 0 0.5em 0;
+}
+
+#flexicontent .subcategorieslabel,
+#flexicontent .peercategorieslabel {
+	display: inline-block;
+	margin: 0px 0px 6px;
+	font-weight: bold;
+	border-bottom: 1px dashed gray;
+}
+
+#flexicontent .subcategorieslist,
+#flexicontent .peercategorieslist {
+	margin: 0 0 1em 0;
+}
+
+#flexicontent .subcat,
+#flexicontent .peercat {
+	margin: 0px;
+}
+
+
+
+/*********************
+ * FLEXIcontent Tables
+ *********************/
+ 
+div table.adminform {
+	font-size: 11px;
+	background-color: #FFFFFF;
+	border: 1px solid #D5D5D5;
+	border-collapse: collapse;
+	margin: 8px 0 15px;
+	width: 100%;
+}
+div table.adminform td {
+	font-size: 11px;
+	padding: 2px 2px;
+	text-align: left;
+	border: 0px solid;
+}
+
+#flexicontent table.flexitable {
+	border: 1px solid #e5e5e5;
+	border-collapse: collapse;
+	clear: both;
+	font-size: 1em;
+	margin: 1em 1px;
+	width: 99%;
+}
+
+#flexicontent table.flexitable th {
+	background-color: #efefef;
+	border-bottom: 1px solid #e5e5e5;
+	border-right: 1px solid #e5e5e5;
+	color: #000000;
+	font-weight: bold;
+	font-size: 11px;
+	padding: 0.4em;
+	text-align: left;
+}
+
+#flexicontent table.flexitable th.table-titles {
+	background-color: inherit;
+	font-weight: normal;
+}
+
+#flexicontent table.flexitable th img {
+	border: none;
+	margin: 0 0 5px 5px;
+	vertical-align: middle;
+}
+
+#flexicontent table.flexitable td {
+	border-bottom: 1px solid #e5e5e5;
+	border-right: 1px solid #e5e5e5;
+	padding: 0.4em;
+	vertical-align: top;
+}
+
+#flexicontent table.flexitable tr.sectiontableentry2 td {
+	background: #f4f4f4;
+}
+
+#flexicontent table.flexitable tr:hover td,
+#flexicontent table.flexitable tr:hover th {
+	background: #f8f8f8;
+}
+
+
+
+/********************************************************************************************************
+ * Frontend templates, FORM CSS for: SEARCH/FILTER/ALPHA-INDEX/SELECTORS(e.g. per page, orderby) FORM CSS
+ ********************************************************************************************************/
+.fcfilter_form_outer > div > .panel > .title a {
+	color: unset;
+}
+.fcfilter_form_outer > div > .panel > .title {
+	background-color: #dddddd;
+	background: url('../images/search.png') no-repeat 2px 5px, -webkit-gradient(linear,left top,left bottom,from(#eeeeee),to(#dddddd));
+	background: url('../images/search.png') no-repeat 2px 5px, -webkit-linear-gradient(top,#eeeeee,#dddddd);
+	background: url('../images/search.png') no-repeat 2px 5px, -moz-linear-gradient(top,#eeeeee,#dddddd);
+	background: url('../images/search.png') no-repeat 2px 5px, -ms-linear-gradient(top,#eeeeee,#dddddd);
+	background: url('../images/search.png') no-repeat 2px 5px, -o-linear-gradient(top,#eeeeee,#dddddd);
+	background: url('../images/search.png') no-repeat 2px 5px, linear-gradient(to bottom,#eeeeee,#dddddd);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#eeeeee,endColorstr=#dddddd);
+	border: 1px solid lightgray;
+	.fc.rounded.corners(4px);
+	padding: 4px 4px 4px 25px;
+	cursor: pointer;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.fcfilter_form_outer > div > .panel > .title:hover {
+	background-color: #cccccc;
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -webkit-gradient(linear,left top,left bottom,from(#dddddd),to(#cccccc));
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -webkit-linear-gradient(top,#dddddd,#cccccc);
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -moz-linear-gradient(top,#dddddd,#cccccc);
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -ms-linear-gradient(top,#dddddd,#cccccc);
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, -o-linear-gradient(top,#dddddd,#cccccc);
+	background: url('../images/toggle_blue.png') no-repeat 2px 5px, linear-gradient(to bottom,#dddddd,#cccccc);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#dddddd,endColorstr=#cccccc);
+}
+.fcfilter_form_outer > div > .panel > .pane-slider.content {
+	margin: 12px 0px;
+	padding: 0px 0px;
+}
+
+
+
+/***************/
+/* Alpha Index */
+/***************/
+
+/* Top Container */
+#fc_alpha {
+	clear: both;
+	float: left;
+	margin: 0 0 12px 0;
+	overflow: hidden;
+	width: 100%;
+}
+
+/* A group of alpha-index character elements */
+#fc_alpha .aichargrp {
+	clear: both;
+	float: left;
+	left: 50%;
+	margin-bottom: 5px;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+}
+
+/* Default groups of  alpha-index character elements */
+#fc_alpha .letters, #fc_alpha .numbers {
+}
+
+/* An enabled individual alpha-index character element */
+#fc_alpha .fc_alpha_index {
+	background: #efefef;
+	border: 1px solid #c0c0c0;
+	.fc.rounded.corners(5px);
+	float: left;
+	margin-right: 2px;
+	padding: 6px;
+	position: relative;
+	right: 50%;
+	text-decoration: none;
+}
+
+/* A disabled individual alpha-index character element */
+#fc_alpha span.fc_alpha_index {
+	color: #c0c0c0;
+}
+
+/* Seperator */
+#fc_alpha .fc_alpha_index_sep {
+	background: none;
+	border: 0px solid silver;
+	float: left;
+	margin-right: 0px;
+	padding: 1px 0px;
+	position: relative;
+	right: 50%;
+	text-decoration: none;
+}
+
+/* The active (selected) individual alpha-index character element */
+#fc_alpha .fc_alpha_index.current {
+	margin-left: 12px;
+	margin-right: 12px;
+	color: darkred;
+}
+
+
+
+/****************************************************/
+/* ITEMs TOTAL Container, also contains selectors:  */
+/* # pages, ordering selector, layout selector, etc */
+/****************************************************/
+
+#flexicontent .item_total {
+	border: 1px solid lightgray;
+	margin: 0px 0px 12px 0px;
+	padding: 4px 8px;
+	width: 100%;
+	clear: both;
+	float: left;
+	box-sizing: border-box;
+}
+#flexicontent #searchForm .item_total {
+	margin-top: 24px;
+}
+
+#flexicontent .fc_item_total_data.labelclear .flexi.label {
+	clear: left;
+}
+#flexicontent .item_total .fc_clayout_box {
+	margin: 0px 12px 0px 0px;
+	float: left;
+}
+#flexicontent .item_total .fc_clayout_box fieldset {
+	margin-top: 0px;
+}
+#flexicontent .item_total .fc_clayout_box label {
+	padding: 1px 2px;
+	opacity: 0.8;
+}
+#flexicontent .item_total .fc_clayout_box label:hover {
+	opacity: 1;
+}
+#flexicontent .item_total .fc_clayout_box img {
+	height: 48px;
+}
+
+#flexicontent .item_total .fc_item_total_data {
+	display: inline-block;
+	float: left;
+	padding: 6px 0px 5px 0px;
+	margin: 0px 0px 0px 0px;
+}
+
+#flexicontent .item_total .flexi.item_total_label {
+	display: inline-block;
+	float: left;
+	font-weight: bold;
+	margin-right: 6px;
+	margin-top: 0px;
+}
+#flexicontent .fc_limit_selector .flexi.limit_override_label {
+	display: inline-block;
+	float: left;
+	font-weight: bold;
+	margin-right: 4px;
+	margin-top: 8px;
+}
+
+#flexicontent .item_total .flexi.item_total_value {
+	display: inline-block;
+	float: left;
+	margin-right: 24px;
+}
+
+/* Containers of per page limit selector and order by selector */
+#flexicontent .item_total .fc_limit_box,
+#flexicontent .item_total .fc_orderby_box,
+#flexicontent .item_total .fc_clayout_box {
+	display: inline-block;
+	float: left;
+	margin-top: 4px;
+	margin-bottom: 4px;
+}
+
+#flexicontent .item_total .fc_pages_counter {
+	display: inline-block;
+	float: right;
+	padding: 8px 4px;
+}
+
+
+/*****************************************************************************/
+/* (e) Generic Display of Rendered Field Values, used e.g. by search results */
+/*****************************************************************************/
+
+#flexicontent .fc_search_field_container {
+	display: block;
+	float: left;
+}
+#flexicontent .fc_search_field_label {
+	display: inline-block;
+	vertical-align: top;
+	font-size: 90%;
+}
+#flexicontent .fc_search_field_value {
+	display: inline-block;
+}
+
+
+/*************************
+ * FLEXIcontent Favourites
+ *************************/
+
+.fav-block {
+	display: inline-block;
+}
+.fcfav-reponse-tip {
+	display: inline-block;
+}
+.fav-block img {
+	vertical-align: middle;
+}
+.favlink {
+	outline: none;
+}
+.fcfav img {
+}
+
+
+
+/***********
+ * JComments
+ ***********/
+
+div.comments {
+	margin-top: 15px;
+}
+
+.comments #jc h4 {
+	color: inherit;
+	font-weight: normal;
+	margin-top: 0px;
+}
+
+.comments #comments a {
+	color: inherit;
+}
+
+.comments #comments a:hover {
+	color: #578e13;
+}
+
+.comments #comments div.comments-list {
+	margin-left: 0;
+}
+
+.comments .rbox_tr,
+.comments .rbox_tl,
+.comments .rbox_t,
+.comments .rbox_br,
+.comments .rbox_bl,
+.comments .rbox_b,
+.comments .rbox_m {
+	background: none;
+	border: none;
+}
+
+.comments .rbox {
+	border: 1px #cccccc solid;
+}
+
+.comments .even .rbox {
+	background: #ffffff;
+}
+
+.comments .odd .rbox {
+	background: #f0f0f0;
+}
+
+.comments #comments-list-footer {
+	margin: 0 0 10px 0;
+}
+
+#comments-form p,
+#comments-form #comments-form-buttons,
+#comments-form #comments-form-error {
+	margin-left: 0px;
+}
+
+#comments-form #comments-form-message,
+#comments-inline-edit #comments-form-message {
+	display: block;
+	padding: 5px 5px 5px 25px;
+}
+
+.comments-form-message-error {
+	background: url(../images/error.png) #ffd86f no-repeat 4px 50%;
+}
+
+.comments-form-message-info {
+	background: url(../images/information.png) #dfeeff no-repeat 4px 50%;
+}
+
+.comments .votes {
+	margin-left: -4px;
+}
+
+.comments .favs {
+	margin: 5px 0 15px;
+}
+
+
+
+/*****************
+ * Joomla Tabs CSS
+ *****************/
+dl.tabs,
+.flexicontent dl.tabs {
+	float: left;
+	margin: 10px 0 -1px 0;
+	z-index: 50;
+}
+
+dl.tabs dt,
+.flexicontent dl.tabs dt {
+	background: #f0f0f0;
+	border-left: 1px solid #cccccc;
+	border-right: 1px solid #cccccc;
+	border-top: 1px solid #cccccc;
+	color: #666666;
+	float: left;
+	margin-left: 3px;
+	padding: 10px;
+	display: block;
+}
+
+dl.tabs dt.open,
+.flexicontent dl.tabs dt.open {
+	background: #f9f9f9;
+	border-bottom: 1px solid #f9f9f9;
+	color: #000000;
+	z-index: 100;
+	padding: 10px;
+}
+
+dl.tabs dt:hover,
+.flexicontent dl.tabs dt:hover {
+	background: #c9c9c9;
+}
+
+dl.tabs dt a:link,
+.flexicontent dl.tabs dt a:link {
+	color: black;
+	outline: medium none;
+	text-decoration: none;
+	background: none;
+}
+
+
+div.current {
+	border: 1px solid #cccccc;
+	clear: both;
+	padding: 10px 10px;
+}
+
+div.current dd {
+	margin: 0;
+	padding: 0;
+}
+
+#bottom-block {
+	margin: 0 auto;
+	width: 373px;
+}
+
+
+
+/**************************************
+ * File / image Field and other Plugins
+ **************************************/
+
+/*[class^="fcfile_"], [class*=" fcfile_"] {}*/
+
+/* File field viewing: property icons */
+.fcfile_mime .fcicon-mime,
+.fcfile_hits .fcicon-hits,
+.fcfile_lang .fcicon-lang {
+	vertical-align: middle;
+	margin-bottom: 2px;
+}
+.fcfile_actions {
+	margin: 4px;
+	float: left;
+	clear: both;
+	display: inline-block;
+}
+
+/* File field viewing: file title */
+.fcfile_title {
+	font-size: 13px;
+	font-weight: normal;
+	margin: 4px 6px 0px 6px;
+	padding: 4px 0px 0px 0px;
+	display: inline-block;
+	border-bottom: 1px dashed gray;
+}
+
+/* Image field viewing: thumbnails */
+img.fc_field_image {
+	display: inline-block;
+	margin: 0px 4px 6px 0px;
+	padding: 1px;
+	border: 1px solid lightgray;
+	.fc.rounded.corners(5px);
+}
+div .fc_image_thumb {
+	display: inline-block;
+	text-decoration: none;
+}
+
+/* Image field viewing: thumbnail container */
+div .fc_img_container {
+	display: inline-block;
+	margin: 2px 8px 2px 0px;
+}
+
+
+/* Image field viewing: inline tooltip */
+div .fc_img_tooltip_data {
+	display: inline-block;
+	vertical-align: top;
+	margin: 2px 12px 6px 4px;
+}
+div .fc_img_tooltip_title {
+	line-height: 1em;
+	font-weight: bold;
+}
+div .fc_img_tooltip_desc {
+	line-height: 1em;
+}
+
+
+/* Address international field, map container */
+div .fc_addressint_map {
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+div .fc_addressint_map_canvas {
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+
+/* Core fields: categories, tags */
+div span.fc_categories, div span.fc_tags {
+	border-bottom: 1px dashed gray;
+}
+div a.fc_categories, div a.fc_tags {
+}
+div .fc_categories.fc_ismain_cat {
+	font-weight: bold;
+}
+div .fc_categories:not(.fc_ismain_cat) {
+	font-weight: normal;
+}
+
+
+
+/* Radio/checkbox/select/etc (indexed fields) viewing: the non-selected values */
+div .fc_field_unsused_val {
+ text-decoration: line-through;
+}
+div .fc_field_unsused_val img {
+ opacity:0.4;
+ filter:alpha(opacity=40); /* For IE8 and earlier */
+}
+
+
+/* fieldgroup field viewing: default container for values */
+div.fc-fieldgrp-value-box {
+	.fc.rounded.corners(4px);
+	border: 1px solid lightgray;
+	display: block;
+	float: left;
+	
+	box-sizing: border-box;
+	/*max-width: 98%;
+	min-width: 48%;*/
+	width: 100%;
+	margin: 4px 1%;
+	padding: 6px 4px;
+	vertical-align: top;
+}
+
+/* favourites field viewing: information containers */
+[class*="fcfavs-"].fc-mssg-inline {
+	position: relative;
+	margin: 1px 2px;
+}
+
+
+/************************************
+ * FLEXIcontent Advanced Search View
+ ************************************/
+
+/* Search view content header, float it left to allow placing print, etc buttons at the right */
+.flexicontent.search  h2.contentheading {
+	float: left;
+	display: block;
+}
+
+/* search form */
+.flexicontent.search form#searchForm {
+	clear: both;
+	float: none;
+}
+
+/* Search (field) filters TABLE */
+.flexicontent.fcsearch table.fc_search_tbl {
+	border-collapse: separate;
+	border-spacing: 1px;
+	width: 100%;
+}
+
+/* Container of TEXT search label */
+.flexicontent.fcsearch table.fc_search_tbl .fc_search_label_cell {
+	text-align: right;
+	vertical-align: middle;
+	padding: 4px 6px 4px 4px;
+	font-weight: bold;
+	background-color: #eeeeee;
+	font-size: 11px;
+	white-space: nowrap;
+	width: 5%;
+}
+
+/* Container of TEXT search form field */
+.flexicontent.fcsearch table.fc_search_tbl .fc_search_option_cell {
+	padding: 2px 4px 2px 6px;
+	font-size: 11px;
+}
+
+/* Search Filter ROW */
+.flexicontent.fcsearch table.fc_search_tbl .fc_search_row_0 td {
+	background-color: #f0f0f0;
+}
+
+/* Search Filter CELL */
+.flexicontent.fcsearch table.fc_search_tbl .fc_search_row_1 td {
+	background-color: #e7e7e7;
+}
+
+
+/* Search (field) filters CELLs */
+.flexicontent.fcsearch table.fc_search_tbl td {
+	border-width: 0px;
+	border-spacing: 1px;
+}
+
+.flexicontent.fcsearch .inputbox {
+	border: 1px solid lightgray;
+	.fc.rounded.corners(5px);
+	padding: 2px;
+	height: auto;
+}
+
+.flexicontent.fcsearch  fieldset.fc_search_result {
+	padding: 16px 4px 16px 4px;
+	margin: 0px;
+	border: 1px solid transparent;
+}
+
+.flexicontent.fcsearch  fieldset.fc_search_result.fcodd {
+	background-color: #f0f0f0;
+}
+
+.flexicontent.fcsearch  fieldset.fc_search_result.fceven {
+	background-color: #f7f7f7;
+}
+
+.flexicontent.fcsearch fieldset.fc_search_result:hover {
+	border: 1px dashed gray;
+}
+
+.flexicontent.fcsearch .fc_search_result_title {
+	float: left;
+}
+.flexicontent.fcsearch .fc_search_result_text {
+}
+.flexicontent.fcsearch .fc_search_result_image {
+	display: inline-block;
+}
+.flexicontent.fcsearch .fc_search_result_image.fcleft {
+	float: left;
+	margin: 0px 16px 0px 8px;
+}
+.flexicontent.fcsearch .fc_search_result_image.fcright {
+	float: right;
+	margin: 0px 8px 0px 16px;
+}
+.flexicontent.fcsearch .fc_search_result_image img {
+	padding: 1px;
+	border: 1px solid #aaaaaa;
+	.fc.rounded.corners(4px);
+}
+.flexicontent.fcsearch .fc_search_result_filters {
+}
+.flexicontent.fcsearch .fc_search_result_fields {
+}
+fc_search_result_date .fc-mssg-inline,
+fc_search_result_category .fc-mssg-inline {
+	font-weight: bold;
+}
+.flexicontent.fcsearch .highlight {
+	background: none repeat scroll 0 0 #FFFFAA;
+	.fc.rounded.corners(5px);
+	color: darkred;
+	font-weight: normal;
+	padding: 3px 5px;
+}
+.flexicontent.fcsearch  .fc_mublock {
+	display: block;
+	float: right;
+}
+
+
+/************************************************************************
+ * Frontend templates: Some CSS HACKS/RULES (to fix alignment & wrapping)
+ ************************************************************************/
+
+#flexicontent .fc_inline_block {
+	display: inline-block;
+	float: none;
+	vertical-align: top;
+	width: auto;
+}
+
+#flexicontent .fc_block {
+	display: block;
+}
+
+#flexicontent .fc_inline {
+	display: inline;
+}
+
+#flexicontent .fc_inline_clear {
+	display: inline;
+}
+
+#flexicontent .fc_inline_clear:after {
+	content: "\a";
+	white-space: pre-wrap;
+}
+
+#flexicontent .fc_clearfix {
+	clear: both;
+}
+
+
+
+/****************************
+ * ITEM FORM: Some CSS rules
+ ****************************/
+
+table.admintable {
+	border-collapse: separate;
+	border-spacing: 2px;
+}
+
+table.admintable td.key,
+table.admintable td.paramlist_key {
+	background-color: #F2F2F2;
+	border-bottom: 1px solid #D0D0D0;
+	border-right: 1px solid #D0D0D0;
+	color: #666666;
+	font-family: arial;
+	font-size: 11px;
+	font-weight: normal;
+	padding: 2px 4px;
+	text-align: right;
+	width: 140px;
+}
+table.admintable td {
+	border: 1px solid #F0F0F0;
+	font-weight: normal;
+	text-align: left;
+	padding: 6px 4px 6px 4px;
+}
+
+/* CONTAINER of message for item having default content template layout */
+#__content_type_default_layout__ {
+	margin: 12px 4px 4px 32px;
+}
+
+
+
+/****************
+ * Directory view
+ ****************/
+
+#flexicontent.fcdirectory .fccatcolumn {
+	float: left;
+	margin: 0% 1% 0% 0%;
+	padding: 0px;
+}
+
+#flexicontent.fcdirectory h2.fccat_title_box {
+	background-color: #dddddd;
+	border: 1px solid #ffffff;
+	color: #ffffff;
+	margin: -3px 0 0;
+	padding: 1px 0;
+	width: auto;
+}
+
+#flexicontent.fcdirectory .fccat_title {
+	border: 2px solid #dddddd;
+	display: block;
+	font-size: 14px;
+	font-weight: bold;
+	margin: 0 -1px;
+	padding: 2px 0 1px 4px;
+	position: relative;
+}
+
+#flexicontent.fcdirectory span.fccat_title {
+	color: darkred;
+}
+
+#flexicontent.fcdirectory .fccat_title:hover {
+	text-decoration: none;
+}
+
+#flexicontent.fcdirectory .fccat_assigned {
+}
+
+#flexicontent.fcdirectory .fccat_image {
+	border: 1px solid #dddddd;
+	.fc.rounded.corners(5px);
+	float: left;
+	margin: 2px 6px 1px 0px;
+	padding: 1px;
+}
+
+#flexicontent.fcdirectory .fccat_descr {
+}
+
+#flexicontent.fcdirectory ul.fcsubcats_list {
+	border-top: 1px dashed #dddddd;
+	list-style: none;
+	margin: 3px 0 7px;
+	padding: 0 7px;
+}
+
+#flexicontent.fcdirectory li.fcsubcat {
+	border-bottom: 1px dashed #dddddd;
+	margin: 2px 0px 2px 0px;
+}
+
+#flexicontent.fcdirectory li.fcsubcat.odd {
+}
+
+#flexicontent.fcdirectory li.fcsubcat.even {
+}
+
+#flexicontent.fcdirectory a.fcsubcat_title {
+}
+
+#flexicontent.fcdirectory a.fcsubcat_title:hover {
+	text-decoration: none;
+}
+
+#flexicontent.fcdirectory .fcsubcat_assigned {
+}
+
+#flexicontent.fcdirectory .fcsubcat_image {
+	border: 1px solid #dddddd;
+	.fc.rounded.corners(5px);
+	float: left;
+	margin: 2px 6px 1px 0px;
+	padding: 1px;
+}
+
+#flexicontent.fcdirectory .fcsubcat_descr {
+}
+
+
+
+/********************************
+ * ITEM FORM: CSS FIXES for J1.6+
+ ********************************/
+
+/* PANELs */
+#flexicontent .pane-sliders .pane-toggler span {
+	/*background: url("../../../../administrator/templates/bluestork/images/j_arrow.png") no-repeat scroll 5px 50% transparent;*/
+	padding-left: 20px;
+}
+#flexicontent .pane-sliders .pane-toggler-down span {
+	/*background: url("../../../../administrator/templates/bluestork/images/j_arrow_down.png") no-repeat scroll 5px 50% transparent;*/
+	padding-left: 20px;
+}
+
+
+/* FIELDs */
+#flexicontent fieldset.adminform fieldset.radio,
+#flexicontent fieldset.panelform fieldset.radio,
+#flexicontent fieldset.adminform-legacy fieldset.radio {
+	border: 0 none;
+	float: left;
+	margin: 2px 0px 5px 2px;
+	padding: 0;
+}
+
+#flexicontent .pane-sliders .panel .pane-slider fieldset.panelform select {
+	min-width: 200px;
+	font-size: 90%;
+}
+
+/* Field containing TABLE */
+#flexicontent table.admintable td {
+	margin: 0px;
+	padding: 0.2em 0.4em;
+}
+
+#flexicontent table.admintable table td {
+	margin: 0px;
+	padding: 0px;
+}
+
+#flexicontent table.admintable td.paramlist_key {
+	padding: 0px 4px 0px 4px;
+}
+
+
+
+/*******************************************************
+ * TAB appearance customizations per content Type
+ * prepend: #flexicontent.fctypeNN to customize per type
+ *******************************************************/
+ 
+#fc_subtitle_tabset ul.tabbernav li a {
+	padding-left: 20px;
+}
+a#fc_subtitle_tabset_nav_1,
+a#fc_subtitle_tabset_nav_2,
+a#fc_subtitle_tabset_nav_3,
+a#fc_subtitle_tabset_nav_4,
+a#fc_subtitle_tabset_nav_5,
+a#fc_subtitle_tabset_nav_6,
+a#fc_subtitle_tabset_nav_7,
+a#fc_subtitle_tabset_nav_8,
+a#fc_subtitle_tabset_nav_9,
+a#fc_subtitle_tabset_nav_10,
+a#fc_subtitle_tabset_nav_11,
+a#fc_subtitle_tabset_nav_12 {
+	background-position: 1px 2px;
+	background-repeat: no-repeat;
+}
+
+#fc_bottom_tabset ul.tabbernav li a {
+	padding-left: 20px;
+}
+a#fc_bottom_tabset_nav_1,
+a#fc_bottom_tabset_nav_2,
+a#fc_bottom_tabset_nav_3,
+a#fc_bottom_tabset_nav_4,
+a#fc_bottom_tabset_nav_5,
+a#fc_bottom_tabset_nav_6,
+a#fc_bottom_tabset_nav_7,
+a#fc_bottom_tabset_nav_8,
+a#fc_bottom_tabset_nav_9,
+a#fc_bottom_tabset_nav_10,
+a#fc_bottom_tabset_nav_11,
+a#fc_bottom_tabset_nav_12 {
+	background-position: 1px 2px;
+	background-repeat: no-repeat;
+}
+
+
+
+/***************************
+ * Other unsorted CSS Rules
+ ***************************/
+
+div.fancybox-wrap a {
+	background: none;
+}
+
+#flexicontent .content {
+	float: none;
+	clear: both;
+}
+
+/* field container inside a tabbed position */
+.tabbertab .flexi.element {
+}
+
+.readon, .readon a {
+}
+
+
+
+/**********************************************************
+ * Common styling (all templates) of field labels and value
+ **********************************************************/
+
+/* Field label & values styling */
+div.flexi.label,
+.flexi.label {
+	display: block;
+	float: left;
+	margin: 2px 8px 2px 0px;
+}
+div.flexi.value,
+.flexi.value {
+	display: block;
+	float: left;
+	max-width: 100% !important;  /* Allow responsive width while floating */
+	padding: 0% !important;  /* Allow responsive width while floating */
+	margin: 0% !important;  /* Allow responsive width while floating */
+}
+
+/* e.g. in Joomla views */
+div.fc-custom-fields-box {
+	.fc.rounded.corners(4px);
+	border: 1px solid #dddddd;
+	display: block;
+	float: left;
+	clear: both;
+	box-sizing: border-box;
+	width: 100%;
+	margin: 12px 0px;
+	padding: 12px 4px;
+}
+div.fc-field-box {
+	display: block;
+	float: left;
+	margin: 0 1%;
+	max-width: 98%;
+	min-width: 48%;
+	padding: 2px;
+	box-sizing: border-box;
+	vertical-align: top;
+}
+
+
+/********************************
+ * Content / Content List Markups
+ ********************************/
+
+#flexicontent .fc_mublock {
+	display: block;
+	float: right;
+	clear: none;
+	margin-bottom: 6px;
+}
+
+#flexicontent .fc_markup {
+	float: right;
+	display: block;
+	font-style: normal;
+	font-size: 11px;
+	font-family: arial;
+	font-weight: bold;
+	text-align: right;
+	max-width: 150px;
+	min-width: auto;
+	.fc.rounded.corners(5px);
+	line-height: 100%;
+	
+	border-width: 0px;
+	margin: 0px 6px 6px 0px;
+	padding: 0px;
+	background-color: #F2F2F2;
+	color: #555;
+	box-shadow: 2px 4px 4px gray;
+}
+
+#flexicontent .fc_markup.mu_has_text {
+	border-bottom: 1px solid #AAA;
+	border-right: 1px solid #AAA;
+	margin: 2px 6px 6px 12px;
+	padding: 6px;
+}
+
+#flexicontent .fc_markup.mu_featured_cat.mu_has_text {
+	padding-left: 28px;
+	background: url(../images/star.png) 6px 50% no-repeat lightgoldenrodyellow;
+}
+
+#flexicontent .fc_markup.mu_normal_cat.mu_has_text {
+	padding-left: 28px;
+	background: url(../images/star-empty.png) 6px 50% no-repeat lightgoldenrodyellow;
+}
+
+#flexicontent .fc_markup.mu_item_no_access.mu_has_text {
+	padding-left: 28px;
+	background: url(../images/eye-half.png) 6px 50% no-repeat #FFD700;
+}
+
+#flexicontent .fc_markup.mu_item_free_access.mu_has_text {
+	padding-left: 28px;
+	background: url(../images/eye.png) 6px 50% no-repeat #50EE90;
+}
+
+#flexicontent .fc_markup.mu_needed_acclvl.mu_has_text {
+	padding-left: 28px;
+	background: url(../images/lock.png) 6px 50% no-repeat darkorange;
+	color: white;
+}
+
+#flexicontent .fc_markup.mu_obtained_acclvl.mu_has_text {
+	padding-left: 28px;
+	background: url(../images/lock-unlock.png) 6px 50% no-repeat darkgreen;
+	color: white;
+}
+
+#flexicontent .fc_markup.mu_ra_timeframe.mu_has_text {
+	padding-left: 28px;
+	background: url(../images/calendar-select-days-span.png) 6px 50% no-repeat lightskyblue;
+}
+
+#flexicontent .fc_markup.mu_ru_timeframe.mu_has_text {
+	padding-left: 28px;
+	background: url(../images/calendar-select-days-span.png) 6px 50% no-repeat lightskyblue;
+}

@@ -131,8 +131,8 @@ class FlexicontentModelTemplate extends JModelLegacy
 	function _getLayout()
 	{
 		$tmpl	= flexicontent_tmpl::getTemplates();
-
-		$layout = $tmpl->{$this->_type}->{$this->_folder};
+		
+		$layout = !isset($tmpl->{$this->_type}->{$this->_folder})  ?  false  :  $tmpl->{$this->_type}->{$this->_folder};
 		
 		return $layout;
 	}

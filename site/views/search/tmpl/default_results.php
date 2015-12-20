@@ -69,7 +69,7 @@ if ( $use_infoflds && count($infoflds) ) {
 ?>
 
 
-<div class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
+<div class="fc_search_results_list page<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>">
 
 <?php $count = -1; ?>
 <?php foreach($this->results as $i => $result) : ?>

@@ -1,0 +1,596 @@
+@import 'include/config.less';
+
+/**********************/
+/* FLEXIContent FIELD */
+/**********************/
+
+/* FIELD: List container of sortable values */
+#flexicontent ul.fcfield-sortables {
+	display: inline-block;
+	list-style: none !important;
+	position: static;
+	float: left;
+	padding: 0% !important;  /* FORCED */
+	margin: 0% !important;  /* FORCED */
+	box-sizing: border-box;
+	width: 100%;
+}
+
+
+/* FIELD: value containers */
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox, /* multiple values (li, orderable) */
+#flexicontent div.fcfieldval_container.valuebox { /* single value (div) */
+	clear: both;
+	height: auto;
+	position: relative;
+	background: transparent;
+	border: 0px solid lightgray;
+	margin: 0 4px 4px 0;
+	padding: 4px;
+	box-sizing: border-box;
+	width: 100%;
+	display: inline-block;
+	float: left;
+}
+
+
+/* FIELD: multiple-value (sortable) container */
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox {
+	list-style: none !important;
+}
+/* FIELD: multiple-value (sortable) container (not cleared) */
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.floated {
+	clear: none;
+	display: block;
+	float: left;
+	max-width: 100% !important;  /* Allow responsive width while floating */
+	width: auto;
+	box-sizing: border-box;
+}
+/* FIELD: single-value container */
+#flexicontent div.fcfieldval_container.valuebox {
+}
+
+.toggle_all_values_buttons_box {
+	display: block;
+	margin: 0 0 6px 0;
+}
+
+
+/* FIELD: (sortable) special cases alignment, etc */
+#flexicontent ul.fcfield-sortables > li .input-append,
+#flexicontent ul.fcfield-sortables > li .input-prepend {
+	float: left;
+	margin-bottom: 0px;
+}
+#flexicontent ul.fcfield-sortables > li .input-append {
+	margin-right: 10px;
+}
+#flexicontent ul.fcfield-sortables > li .use_select2_lib {
+	vertical-align: top;
+}
+#flexicontent ul.fcfield-sortables > li > * {
+	vertical-align: top;
+}
+#flexicontent ul.fcfield-sortables > li > [class^="fcfield-"],
+#flexicontent ul.fcfield-sortables > li > [class*=" fcfield-"] {
+	cursor: pointer;
+}
+
+/* FIELD: (sortable) having multi-property value displayed in a table */
+#flexicontent ul.fcfield-sortables > li table.admintable {
+	text-align: left;
+	width: 100%;
+}
+
+
+/* FIELD: (sortable) value container while dragging */
+#flexicontent ul.fcfield-sortables > li.ui-sortable-helper {
+	background-color: white !important;
+	border-radius: 4px;
+	border: 1px solid #d0d0d0 !important;
+	moz-box-shadow: 10px 10px 5px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 10px 10px 5px rgba(0,0,0,0.5);
+	box-shadow: 10px 10px 5px rgba(0,0,0,0.5);
+}
+
+
+/* FIELD: (sortable) currently having single value, disable drag handle */
+#flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle:not(.fcfont-icon) {
+	background: url(../images/move3.png) 4px 4px no-repeat white;
+}
+#flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle {
+	cursor: default !important;
+	color: #aaa;
+}
+
+
+
+/* FIELD-GROUP: list container of sortable values */
+#flexicontent ul.fcfield-sortables.fcfield-group {
+	width: 100%;
+}
+/* FIELD-GROUP: value container (contains grouped fields) */
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox {
+	border: 1px solid #e0e0e0;
+	moz-box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+	-webkit-box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+	box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+	border-radius: 2px;
+	width: 100%;
+	margin: 0 4px 16px 0;
+	padding: 12px;
+}
+/* FIELD-GROUP: label of grouped field */
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label {
+	box-sizing: border-box;
+	max-width: 150px;
+	width: 20%;
+	padding: 4px 6px 4px 6px;
+	margin: 1px 1% 2px 0;
+	float: none;
+	clear: none;
+	display: inline-block;
+	vertical-align: top;
+	border-width: 0px !important;
+}
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label.fc_tooltip_icon {
+	padding: 4px 6px 4px 20px !important;
+	background-image: url(../images/comment.png);
+	background-position: 2px 2px;
+	background-repeat: no-repeat;
+}
+/* FIELD-GROUP: value of grouped field */
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+	/* important to allow only specific overrides, (remember to do value label too!) */
+	/* padding, margin, border, width must be percentage and must be a total of 100% (including label) */
+	border-width: 0 !important;
+	width: 79% !important;
+	padding: 0px 0% 6px !important;
+	margin: 0% !important;
+	float: none !important;
+	clear: none;
+	display: inline-block;
+}
+
+
+
+/* FIELDs: various buttons */
+#flexicontent ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon,
+#flexicontent ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon {
+	margin: 0px 0px 2px 0px;
+}
+#flexicontent .fcfield-drag-handle,
+#flexicontent .fcfield-list-add,
+#flexicontent .fcfield-list-del,
+#flexicontent .fcfield-placement-h,
+#flexicontent .fcfield-placement-v,
+#flexicontent .fcfield-addvalue,
+#flexicontent .fcfield-insertvalue,
+#flexicontent .fcfield-delvalue,
+#flexicontent .fcfield-button,
+#flexicontent .fcfield-button-add a {
+	/* avoid overriding these */
+	float: none;
+	clear: none;
+	display: inline-block;
+	cursor: pointer;
+	
+	/* style these */
+	color: #777;
+	font-size: 11px;
+	line-height: 100%;
+	font-weight: bold;
+	
+	border-radius: 4px;
+	border: 1px solid #d0d0d0;
+	vertical-align: top;
+	padding: 6px 8px;
+	margin: 0px 2px 0px 6px;
+
+	background-color: white;
+	background-image: -webkit-gradient(linear,left top,left bottom,from(white),to(#d0d0d0));
+	background-image: -webkit-linear-gradient(top,white,#d0d0d0);
+	background-image: -moz-linear-gradient(top,white,#d0d0d0);
+	background-image: -ms-linear-gradient(top,white,#d0d0d0);
+	background-image: -o-linear-gradient(top,white,#d0d0d0);
+	background-image: linear-gradient(to bottom,white,#d0d0d0);
+	/*filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=#d0d0d0);*//*filter prevents background image in ie8/ie9*/
+}
+/* default hover styling which we make more specific below */
+#flexicontent .fcfield-drag-handle:hover,
+#flexicontent .fcfield-list-add:hover,
+#flexicontent .fcfield-list-del:hover,
+#flexicontent .fcfield-placement-h:hover,
+#flexicontent .fcfield-placement-v:hover,
+#flexicontent .fcfield-addvalue:hover,
+#flexicontent .fcfield-insertvalue:hover,
+#flexicontent .fcfield-delvalue:hover,
+#flexicontent .fcfield-button:hover,
+#flexicontent .fcfield-button-add:hover a {
+	background-color: #f0f0f0;
+	background-image: -webkit-gradient(linear,left top,left bottom,from(#f0f0f0),to(#c0c0c0));
+	background-image: -webkit-linear-gradient(top,#f0f0f0,#c0c0c0);
+	background-image: -moz-linear-gradient(top,#f0f0f0,#c0c0c0);
+	background-image: -ms-linear-gradient(top,#f0f0f0,#c0c0c0);
+	background-image: -o-linear-gradient(top,#f0f0f0,#c0c0c0);
+	background-image: linear-gradient(to bottom,#f0f0f0,#c0c0c0);
+	/*filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0, endColorstr=#c0c0c0);*/
+}
+/* Override hover background color if not using font icons */
+#flexicontent .fcfield-drag-handle:not(.fcfont-icon):hover,
+#flexicontent .fcfield-list-add:not(.fcfont-icon):hover,
+#flexicontent .fcfield-list-del:not(.fcfont-icon):hover,
+#flexicontent .fcfield-placement-h:not(.fcfont-icon):hover,
+#flexicontent .fcfield-placement-v:not(.fcfont-icon):hover,
+#flexicontent .fcfield-addvalue:not(.fcfont-icon):hover,
+#flexicontent .fcfield-insertvalue.fc_after:not(.fcfont-icon):hover,
+#flexicontent .fcfield-insertvalue.fc_before:not(.fcfont-icon):hover,
+#flexicontent .fcfield-delvalue:not(.fcfont-icon):hover,
+#flexicontent .fcfield-button:not(.fcfont-icon):hover,
+#flexicontent .fcfield-button-add:hover a:not(.fcfont-icon) {
+	background-color: #e0e0e0;
+}
+
+
+/* FIELDs: ADD link container */
+#flexicontent .fcfield-button-add {
+	/* allow only explicitely coded override, since normally style must be done only at the inner link */
+	vertical-align: top !important;
+	float: none !important;
+	margin: 0px !important;
+	padding: 0px !important;
+}
+/* FIELDs: ADD link */
+/* we do not want joomla template link styling here !!!, allow only explicitly coded override */
+#flexicontent .fcfield-button-add a {
+	padding: 6px 8px;
+	margin: 0px 2px 0px 6px;
+	text-decoration: none !important;
+	background-color: white !important;
+	color: gray !important;
+}
+#flexicontent .fcfield-button-add:hover a {
+	background-color: darkgreen !important;
+	color: white !important;
+	border: 1px solid transparent !important;
+}
+
+
+/* FIELDs: ADD (append value) button */
+#flexicontent input.fcfield-addvalue {
+	padding: 5px 12px 6px;
+	margin: 4px 2px 0px 6px;
+}
+#flexicontent span.fcfield-addvalue:not(.fcfont-icon) {
+	margin: 0px 2px 6px 6px;
+	padding: 6px 12px 6px 28px;
+	background: url(../images/plus-button.png) 4px 4px no-repeat white;
+}
+#flexicontent span.fcfield-addvalue.fcfont-icon:before {
+	padding: 0 4px;
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: "*";
+}
+#flexicontent span.fcfield-addvalue:before {
+	color: LimeGreen;
+}
+#flexicontent .fcfield-addvalue.fccleared {
+	clear: both !important;
+	float: left !important;
+}
+
+
+/* FIELDs: add/del to/from list */
+#flexicontent .fcfield-list-add,
+#flexicontent .fcfield-list-del,
+#flexicontent .fcfield-placement-h,
+#flexicontent .fcfield-placement-v {
+	margin: 0px 0px 2px 0px;
+	padding: 12px;
+}
+#flexicontent .fcfield-placement-h {
+	background: url(../images/arrow-resize.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-placement-v {
+	background: url(../images/arrow-resize-090.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-placement-h.fc_toggle,
+#flexicontent .fcfield-placement-v.fc_toggle {
+	background: url(../images/arrow-in-out.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-list-add {
+	background: url(../images/list_add_v.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-list-del {
+	background: url(../images/list_del_v.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-list-add.fc_horizontal {
+	background: url(../images/list_add_h.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-list-del.fc_horizontal {
+	background: url(../images/list_del_h.png) 4px 4px no-repeat white;
+}
+
+
+/* FIELDs: Insert value button */
+#flexicontent .fcfield-insertvalue:not(.fcfont-icon) {
+	margin: 0px 0px 2px 0px;
+	padding: 12px;
+	background: url(../images/plus-button.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-insertvalue.fc_after:not(.fcfont-icon) {
+	background: url(../images/insert_after_180.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-insertvalue.fc_before:not(.fcfont-icon) {
+	background: url(../images/insert_before_180.png) 4px 4px no-repeat white;
+}
+#flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_after.fcfont-icon:before {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: "]";
+}
+#flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_before.fcfont-icon:before {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: "\e207"; /*content: "\e009";*/
+}
+#flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_after.fcfont-icon:after {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: " \6c"; /*content: "\e00b";*/
+}
+#flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_before.fcfont-icon:after {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: " ]";
+}
+#flexicontent span.fcfield-insertvalue:before,
+#flexicontent span.fcfield-insertvalue:after {
+	color: LimeGreen;
+}
+
+/* FIELDs: Delete value button */
+#flexicontent .fcfield-delvalue:not(.fcfont-icon) {
+	margin: 0px 0px 2px 0px;
+	padding: 12px;
+	background: url(../images/delete.png) 4px 4px no-repeat white;
+}
+#flexicontent ul.fcfield-sortables > li span.fcfield-delvalue.fcfont-icon:before {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: "I";
+}
+#flexicontent span.fcfield-delvalue:before {
+	color: FireBrick;
+}
+
+
+/* FIELDs: DRAG (sort) handle */
+#flexicontent .fcfield-drag-handle:not(.fcfont-icon) {
+	cursor: move;
+	margin: 0px 0px 2px 0px;
+	padding: 12px;
+	background: url(../images/move2.png) 4px 4px no-repeat white;
+}
+#flexicontent ul.fcfield-sortables > li span.fcfield-drag-handle.fcfont-icon:before {
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	content: "z";
+}
+#flexicontent span.fcfield-drag-handle:before {
+	color: black;
+}
+
+
+/* FIELDs: (image field) Empty image container */
+div.empty_image {
+	display: block;
+	background: #F9F9F9 url(../images/image_add.png) no-repeat 50% 50%;
+	border: 1px solid silver;
+	margin-bottom: 3px;
+	word-wrap: break-word;
+}
+table.img_upload_select {
+	float: left;
+	clear: none;
+	border: 1px solid #e0e0e0;
+	moz-box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+	-webkit-box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+	box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+	border-radius: 2px;
+	margin-bottom: 16px;
+}
+
+
+/* FIELDs: (image field) preview image container */
+.fcimg_preview_box {
+	float: left !important;
+	clear: none !important;
+	margin-right: 5px !important;
+}
+/* FIELDs: (image field) preview image */
+.fcimg_preview_box img.preview_image {
+	border-radius: 4px;
+	border: 1px solid silver;
+	float: left;
+}
+
+
+/* FIELDs: (file-based fields) */
+#flexicontent .fc_filedata_title {
+	font-size: 90%;
+	display: inline-block;
+	margin: 0;
+	padding: 2px 0px 0px 12px;
+}
+#flexicontent .fc_filedata_txt.invalid {
+	color: red;
+	font-weight: normal;
+}
+#flexicontent .fc_filedata_txt_nowrap {
+	padding: 0 11px;
+}
+#flexicontent .fc_filedata_txt {
+	display: inline-block;
+	border: 1px solid lightgray;
+	box-sizing: border-box;
+	border-radius: 0;
+	min-height: 1.2em;
+	padding: 4px 8px;
+	margin: 2px 0;
+	min-width: 220px;
+	width: 100%;
+	background: #f0f0f0 none repeat scroll 0 0;
+	color: #444;
+	border-radius: 4px;
+}
+#flexicontent .fc_filedata_txt.file_unpublished {
+	color: #888;
+	text-decoration: line-through;
+	opacity: 0.5;
+	text-style: italic;
+}
+#flexicontent img.fc_preview_thumb {
+	border: 1px solid silver;
+	padding: 0;
+	margin: 0px 4px 6px 0px;
+	float: left;
+	clear: both;
+	border-radius: 4px;
+}
+
+
+#flexicontent .inlinefile-data * {
+	vertical-align: top;
+}
+#flexicontent .fc_fileupload_box {
+	position: relative;
+	overflow: hidden;
+	margin: 0px;
+}
+#flexicontent .fc_fileupload_box input.fc_filedata {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	font-size: 20px;
+	cursor: pointer;
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+
+
+/* FIELDs: (compatibility) ADD button used by some OLD fields */
+.button-add a {
+	display: inline-block;
+	padding: 1px 8px;
+	border: 1px solid #ccc;
+	background: #efefef;
+}
+.button-add a,
+.button-add a:visited,
+.button-add a:link,
+.button-add a:hover {
+	color: black;
+	text-decoration: none;
+}
+
+
+/* FIELDs: (compatibility) DRAG button used by some OLD fields */
+#flexicontent .fcfield-drag {
+	float:none !important; /* do not override breaks dragging */
+	margin: 0px;
+	padding: 0px;
+	vertical-align: top;
+}
+#flexicontent .fcfield-drag img {
+	margin: 0px 1px -3px 1px !important;
+	padding: 4px;
+	border: 1px solid lightgray;
+	border-radius: 4px;
+	cursor: move !important;
+	float: none !important;
+	display: inline !important;
+	background-color: white;
+}
+
+
+/* FIELDs: (addessint field) */
+table.fc-addressint-field-tbl .fcfield_textval:not(.inlineval) {
+	box-sizing: border-box;
+	width: 100% !important;
+}
+
+.fcfield_addressint_data {
+	float: left;
+	min-width: 580px;
+	width: unset;
+	max-width: unset;
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+.fcfield_addressint_map {
+	float: left;
+	min-width: 50%;
+	width: unset;
+	max-width: 800px;
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+.fcfield_addressint_canvas_outer {
+	width: 100%;
+	max-width: 800px;
+	min-width: 580px;
+}
+
+@media only screen and (min-width: 1671px) {
+	.fcfield_addressint_data {
+		min-width: 580px;
+	}
+	.fcfield_addressint_map {
+		min-width: 52%;
+	}
+}
+@media only screen and (min-width: 1220px) and (max-width: 1670px) {
+	.fcfield_addressint_data {
+		min-width: 100%;
+	}
+	.fcfield_addressint_map {
+		min-width: 80%;
+	}
+}
+@media only screen and (min-width: 1020px) and (max-width: 1219px) {
+	.fcfield_addressint_data {
+		min-width: 100%;
+	}
+	.fcfield_addressint_map {
+		min-width: 90%;
+	}
+}
+@media only screen and (max-width: 1019px) {
+	.fcfield_addressint_data {
+		min-width: 100%;
+	}
+	.fcfield_addressint_map {
+		min-width: 100%;
+	}
+}
+
+/* FIELDs: (date field) */
+[class^="fcfield_timestamp_value"],
+[class*="fcfield_timestamp_value"] {
+	display: inline-block;
+	min-width: 240px;
+}

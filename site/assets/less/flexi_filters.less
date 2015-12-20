@@ -1,0 +1,484 @@
+@import 'include/config.less';
+
+/*********************************************/
+/* CONTAINERs of text-search & field filters */
+/*********************************************/
+
+/* Outer container of (a) text search, (b) field filters */
+#fc_filter_box {
+	display: block;
+	clear: both;
+	border: solid 0px #dddddd;
+	margin: 0px 0px 12px 0px;
+	padding: 0%;
+	width: 100%;
+}
+
+fieldset.fc_search_set,    /* SEARCH view */
+fieldset.fc_filter_set {   /* CATEGORY view */
+	border: 1px solid #cccccc;
+	margin: 12px 0 0 0;
+	padding: 1%;
+	width: 100%;
+	box-sizing: border-box;
+	min-width: inherit !important; /* workaround for chrome fieldset width bug */
+	display: block;
+}
+/* TITLE OF CONTAINER of search (field) filters */
+fieldset.fc_search_set legend,
+fieldset.fc_filter_set legend {
+	width: auto;
+	border: 0px solid;
+	padding: 0px;
+	margin: 0px;
+}
+fieldset.fc_search_set legend .fc_legend_text,
+fieldset.fc_filter_set legend .fc_legend_text {
+	background: transparent;
+	border: 1px solid lightgray;
+	color: gray;
+	display: block;
+	margin: 0 0 5px 0;
+	padding: 8px 10px 8px 10px;
+	border-radius: 6px;
+	display: inline-block;
+	line-height: 0.5em;
+	position: relative;
+	top: 0px;
+}
+fieldset.fc_search_set legend .fc_legend_text.hasTip,
+fieldset.fc_filter_set legend .fc_legend_text.hasTip {
+	background: lightyellow url(../images/note.gif) no-repeat 10px 50%;
+	border: 1px solid lightgray;
+	color: gray;
+	display: block;
+	margin: 0 0 5px 0;
+	padding-left: 36px;
+	border-radius: 6px;
+}
+fieldset.fc_search_set legend .fc_legend_text span,
+fieldset.fc_filter_set legend .fc_legend_text span {
+	font-weight: bold;
+	font-size: 12px;
+	padding: 0px;
+	margin: 0px;
+	display: inline-block;
+	line-height: 1em;
+}
+
+fieldset.fc_search_set .fc-mssg.fc-info,
+fieldset.fc_filter_set .fc-mssg.fc-info {
+	margin: 4px 16px 16px 16px;
+	font-size: 12px;
+}
+
+
+
+/***************/
+/* TEXT SEARCH */
+/***************/
+
+/* the container */
+.fc_filter_text_search {}
+
+/* the label */
+.fc_filter.fc_filter_text_search .fc_filter_label,
+.fc_filter_line.fc_filter_text_search .fc_filter_label {}
+
+/* text-search autocomplete */
+.ui-autocomplete {
+	z-index:1000 !important;  /* FORCED autocomplete list it to be over elements */
+}
+.ui-autocomplete-loading {
+	background: #eee url('../images/ajax-loader.gif') no-repeat 96% center;
+}
+
+
+/* form submiting */
+.cid_loading {
+	color: darkred;
+	font-weight: bold;
+}
+.cid_loading > * {
+	vertical-align: middle;
+}
+
+
+/*****************/
+/* FIELD FILTERs */
+/*****************/
+
+/* displayed between ranges */
+.fc_range {
+	background: url("../images/arrow_double.png") no-repeat scroll 0px 0px transparent;
+	width: 16px;
+	height: 16px;
+	border: 0px solid;
+	padding: 0px;
+	margin: 0px 0px 0px 2px;
+	display: inline-block;
+	vertical-align: middle;
+}
+/* highlight labels of active filters*/
+#flexicontent ul.tabbernav li a.tabberheading.fc_filter_inactive {}
+#flexicontent ul.tabbernav li a.tabberheading.fc_filter_active {
+	color: orange;
+}
+#flexicontent ul.tabbernav li:hover a.tabberheading.fc_filter_active {
+	color: red;
+}
+
+/* handle input append / prepend */
+.fc_filter_html .input-append,
+.fc_filter_html .input-prepend {
+	margin: 0px 4px 0px 0px;
+}
+
+/* removing filter choices */
+.fc_field_filter .fc_delall_filters {
+	background: url("../images/delete.png") no-repeat scroll 0px 0px transparent;
+	width: 16px;
+	height: 16px;
+	border: 0px solid;
+	padding: 0px;
+	margin: 4px 0px -4px 0px;
+	display: inline-block;
+	vertical-align: baseline;
+}
+
+/* Container of each individual field filter (both label and html) */
+.fc_filter,
+.fc_filter_line {
+	display: inline-block;
+	float: none;
+	white-space: normal;
+	border: 0px solid lightgray;
+	border-radius: 2px;
+}
+.fc_filter {
+	clear: none;
+	margin: 0px 2px 2px 0px;
+	padding: 1px 0% 1px 0%;
+	width: auto;
+	position: relative;
+	vertical-align: top;
+}
+.fc_filter_line {
+	clear: both;
+	margin: 0px 0% 1px 0%;
+	padding: 0px 1%;
+	width: 98%;
+}
+.fc_filter.fc_even, .fc_filter_line.fc_even { /*background: #E0E0E0;*/ }
+.fc_filter.fc_odd,  .fc_filter_line.fc_odd { /*background: #EEEEEE;*/ }
+
+form > .fc_filter_line {  /* filters placed directly inside form aka outside the filter_box */
+	margin: 0px 1% 0px 1%;
+	width: 96%;
+}
+
+.fc_filter .fc_filter_label_inline,
+.fc_filter_line .fc_filter_label_inline {
+	color: #FFFFFF;
+	display: inline-block;
+	font-size: 10.998px;
+	font-weight: bold;
+	line-height: 14px;
+	padding: 4px 4px;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+	vertical-align: baseline;
+	white-space: nowrap;
+	border-radius: 5px;
+	margin: 0px 2px 0px 4px;
+}
+.fc_filter .fc_filter_label_inline,
+.fc_filter_line .fc_filter_label_inline {
+	background-color: #555;
+}
+.fc_filter .fc_filter_tip_inline,
+.fc_filter_line .fc_filter_tip_inline {
+}
+
+/* Container of each individual field filter LABEL */
+.fc_filter .fc_filter_label,
+.fc_filter_line .fc_filter_label {
+	float: left;
+	display: inline-block;
+	color: white;
+	background-color: #909090;
+	border-width: 0px;
+	font-weight: normal;
+	font-size: 12px;
+	font-family: georgia, arial;
+	text-align: right;
+	border-radius: 3px;
+	text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
+}
+.fc_filter .fc_filter_label .label,
+.fc_filter_line .fc_filter_label .label {
+	font-size: 11px;
+}
+
+
+.fc_filter .fc_filter_label {
+	clear: both;
+	width: auto;
+	max-width: 150px;
+	padding: 3px 4px;
+	margin: 2px 8px 3px 8px;
+}
+.fc_filter_line .fc_filter_label {
+	clear: none;
+	width: 15%;
+	max-width: 200px;
+	padding: 6px 1%;
+	margin: 2px 2px 0px 0px;
+	text-align: left;
+}
+
+/* Container of each individual field filter HTML, either compact view (floating with separator element) or per line */
+.fc_filter .fc_filter_html,
+.fc_filter_line .fc_filter_html {
+	display: inline-block;
+	float: left;
+	font-size: 90%;
+	padding: 0px 0% 0px 0%;
+	margin: 0px 0% 0px 0%;
+}
+.fcfilter_with_nouislider { /* make sure slider filter has a container of non-zero width */
+	min-width: 120px;
+}
+.fc_filter_html {
+	position: relative;
+	display: inline-block;
+}
+.fc_search_option_cell .fc_filter_html { /* allow inner filter HTML to auto-expand */
+	width: 100%;
+	box-sizing: border-box;
+}
+.fc_filter_line .fc_filter_html {
+	clear: none;
+	width: 80%;
+}
+
+/* defaults for filter's inner elements */
+.fc_filter_html > *,
+.fc_filter_html > * {
+	vertical-align: middle;
+	margin: 2px 0 2px 4px;
+}
+
+/* Clear filter label from filter html*/
+.fc_filter_line.fc_clear_label .fc_filter_label {
+	width: auto;
+}
+.fc_filter_line.fc_clear_label .fc_filter_html {
+	clear: both;
+	width: 100%;
+}
+
+/* Slider filter container */
+.fc_filter_html > .noUi-target {
+	margin: 24px 24px 6px 24px;
+}
+
+/* Highlight date calendar inside FC filters */
+.fc_filter_html .calendar {
+	vertical-align: bottom;
+	margin: 0px 6px 9px 2px;
+	cursor: pointer;
+}
+.fc_filter_html .calendar:hover {
+	border: 1px solid darkred;
+}
+
+/* Mulitple form field elements inside a filter area */
+.fc_filter_html .fc_filter_element {
+	display: inline-block;
+	white-space: nowrap;
+	position: relative;
+}
+
+/* The form element(s) of each field filter inside filter's HTML */
+.fc_field_filter label,
+.flexicontent .fc_field_filter {
+	font-size: 11px;
+}
+.fc_filter_html .fc_text_filter,
+.fc_filter_html .fc_field_filter {
+	color: black;
+	font-weight: normal;
+	display: inline-block;
+	width: auto;
+}
+.fc_filter_html .fc_text_filter.select2-container.select2-container-multi,
+.fc_filter_html .fc_field_filter.select2-container.select2-container-multi {
+	margin: 2px 0px 2px 4px;
+}
+.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter,
+.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	padding: 2px 0px 2px 4px;
+	margin: 2px 0px 2px 4px;
+	font-size: 11px;
+}
+.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_text_filter,
+.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_field_filter,
+.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_text_filter:focus,
+.fc_filter_html not(.input-prepend):not(.input-append) > input.fc_field_filter:focus {
+	height: auto;
+	line-height: 150%;
+	padding: 5px 4px 6px 4px;
+	margin: 3px 4px 3px 8px;
+	position: relative;
+	/* background: transparent; ... does not work properly with ie8/9, it causes: */
+	/* any element with less z-index to be placed above this element, */
+	/* e.g. the span element for showing an inner is placed above, thus preventing focusing of the input !! */
+	border: 1px solid gray;
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+	min-width: 120px;
+	vertical-align: top;
+}
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter,
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus,
+.fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
+	padding: 5px 26px 6px 4px;
+	background: url(../images/magnifier-left.png) 98% 6px no-repeat white;
+}
+
+.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_text_filter,
+.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_field_filter,
+.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_text_filter:focus,
+.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_field_filter:focus {
+}
+
+.fc_filter_html .input-append > input.fc_text_filter,
+.fc_filter_html .input-append > input.fc_field_filter,
+.fc_filter_html .input-append > input.fc_text_filter:focus,
+.fc_filter_html .input-append > input.fc_field_filter:focus {
+	margin-top: 0px;
+	margin-right: 0px;
+	border-top-right-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+.fc_filter_html .input-append .select2-container .select2-choices {
+	margin-right: 0px !important; /* fix append to multi-select2 */
+}
+.fc_filter_html .input-prepend > input.fc_text_filter,
+.fc_filter_html .input-prepend > input.fc_field_filter,
+.fc_filter_html .input-prepend > input.fc_text_filter:focus,
+.fc_filter_html .input-prepend > input.fc_field_filter:focus {
+	margin-left: 0px;
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+}
+/* enlarge field in views ... (non-module) */
+input.fc_text_filter:not(.fc_iscalendar),
+input.fc_text_filter:not(.fc_iscalendar):focus,
+input.fc_field_filter:not(.fc_iscalendar),
+input.fc_field_filter:not(.fc_iscalendar):focus {
+	min-width: 180px;
+}
+input.fc_text_filter.fc_iscalendar,
+input.fc_field_filter.fc_iscalendar {
+	min-width: 60px;
+}
+
+label.fc_filter_val.fc_cleared {
+	display: inline-block;
+	float: left;
+	clear: both;
+}
+.fc_filter_val_lbl {}
+.fc_filter_val_img {
+	display: inline-block;
+	float: left;
+}
+/*.fc_filter_val_img:after { content: '\A'; white-space: pre; }*/
+.fc_filter_val_img > img {
+	margin: 2px 12px 2px 4px;
+	vertical-align: top;
+}
+label.fc_filter_val + .fc_filter_val_img > img {
+	margin: 4px 12px 2px -8px;
+}
+
+
+form.fc_instant_filter {
+	display: block;
+	margin: 0px;
+	padding: 0px;
+	position: relative;
+}
+select.fc_field_filter {
+	margin: 2px 2px 2px 2px;
+}
+input.fc_text_filter {
+	vertical-align: top;
+}
+input.fc_field_filter {
+	vertical-align: top;
+}
+span.fc_field_filter {
+	border-width: 0px;
+}
+
+.fc_filter > .fc_filter_html > .fc_checkradio_group_wrapper > ul.fc_field_filter.fc_checkradio_group {
+	margin: 0px 0px 0px 4px;
+	padding: 3px 4px 3px 2px;
+	height: auto;
+	max-height: auto;
+	position: static;
+	float: left;
+	text-align: left;
+}
+.fc_filter > .fc_filter_html > .fc_checkradio_group_wrapper > ul.fc_field_filter.fc_checkradio_group label {
+	margin: 6px 6px 4px 0px;
+	display: inline-block;
+}
+
+/* Text search box (in component OR filtering module) */
+.fc_filter_html.fc_text_search * {
+	vertical-align: top;
+}
+.fc_filter_html.fc_text_search .fc_field_filter {
+	padding-top: 0px;
+}
+.fc_filter_html.fc_text_search input.fc_text_filter {
+	margin: 3px 0px;
+}
+.fc_filter_html.fc_text_search .fc_filter_button {
+	margin: 3px 0px;
+}
+.fc_filter_html input.fc_text_filter {
+	margin: 3px 0px;
+}
+
+
+/* Inner Labels */
+.fc_has_inner_label,
+.fc_has_inner_prompt {
+	color: gray;
+	position: absolute;
+	display: block;
+	padding: 0px 0px 0px 4px;
+	font-size: 12px;
+}
+
+.fc_has_inner_label.fc_has_inner_label_input,
+.fc_has_inner_prompt.fc_has_inner_prompt_input {
+	left: 14px;
+	top: 6px;
+	color: black;
+	line-height: 150%;
+	padding: 0px 0px 0px 4px;
+}
+.fc_has_inner_label.fc_has_inner_label_select2,
+.fc_has_inner_prompt.fc_has_inner_prompt_select2 {
+	left: 4px;
+	top: 8px;
+}

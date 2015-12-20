@@ -1,169 +1,180 @@
-
-/**************
- * Header icons
- **************/
-
-.icon-48-flexicontent	{ background-image: url(../images/icon-48-dashboard.png); }
-.icon-48-items				{ background-image: url(../images/icon-48-items.png); }
-.icon-48-itemadd			{ background-image: url(../images/icon-48-item-add.png); }
-.icon-48-itemedit			{ background-image: url(../images/icon-48-item-edit.png); }
-.icon-48-types				{ background-image: url(../images/icon-48-types.png); }
-.icon-48-typeadd			{ background-image: url(../images/icon-48-type-add.png); }
-.icon-48-typeedit			{ background-image: url(../images/icon-48-type-edit.png); }
-.icon-48-fields				{ background-image: url(../images/icon-48-fields.png); }
-.icon-48-fieldadd			{ background-image: url(../images/icon-48-field-add.png); }
-.icon-48-fieldedit		{ background-image: url(../images/icon-48-field-edit.png); }
-.icon-48-tags					{ background-image: url(../images/icon-48-tags.png); }
-.icon-48-tagadd				{ background-image: url(../images/icon-48-tag-add.png); }
-.icon-48-tagedit			{ background-image: url(../images/icon-48-tag-edit.png); }
-.icon-48-fc_categories		{ background-image: url(../images/icon-48-categories.png); }
-.icon-48-fc_categoryadd		{ background-image: url(../images/icon-48-category-add.png); }
-.icon-48-fc_categoryedit	{ background-image: url(../images/icon-48-category-edit.png); }
-.icon-48-archive			{ background-image: url(../images/icon-48-archive.png); }
-.icon-48-editacl			{ background-image: url(../images/icon-48-permissions.png); }
-.icon-48-files				{ background-image: url(../images/icon-48-files.png); }
-.icon-48-fileedit			{ background-image: url(../images/icon-48-file-edit.png); }
-.icon-48-stats				{ background-image: url(../images/icon-48-statistics.png); }
-.icon-48-templates		{ background-image: url(../images/icon-48-templates.png); }
-.icon-48-authors			{ background-image: url(../images/icon-48-authors.png); }
-.icon-48-authoradd		{ background-image: url(../images/icon-48-author-add.png); }
-.icon-48-authoredit		{ background-image: url(../images/icon-48-author-edit.png); }
-.icon-48-import				{ background-image: url(../images/icon-48-import.png); }
-.icon-48-searchindex	{ background-image: url(../images/icon-48-searchindex.png); }
-
-
-
-/***************
- * Toolbar icons
- ***************/
-
-.icon-32-person2			{ background-image: url(../images/icon-32-person2_f2.png); }
-.icon-32-savenew			{ background-image: url(../images/icon-32-savenew.png); }
-.icon-32-translate		{ background-image: url(../images/icon-32-country-flags.png); }
-.icon-32-go						{ background-image: url(../../../../images/go_f2.png); }
-.icon-32-download			{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-export.png); }
-.icon-32-language			{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-html.png); }
-.icon-32-params				{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png); }
-.icon-32-import				{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-upload.png); }
-.icon-32-duplicate		{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png); }
-.icon-32-copy_wvalues	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png); }
-.icon-32-test,
-.icon-32-preview			{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-preview.png); }
-@media (min-width: 1020px) {
-	.btn.spaced-btn { margin-left; }
+.icon-48-flexicontent {
+	background-image: url(../images/icon-48-dashboard.png);
 }
-
-/*.icon-32-basicindex		{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png); }
-.icon-32-basicfilter	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-refresh.png); }
-.icon-32-advindex			{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png); }
-.icon-32-advfilter		{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-refresh.png); }*/
-
-.icon-32-advindexdirty	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png); }
-.icon-32-advindexpurge	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-purge.png); }
-
-/* preview icon */
-.icon-32-test, .icon-32-preview	{ background: none; }
-.icon-32-test:before, .icon-32-preview:before	{ content: "\3c"; }
-
-
-/**************
- * Small labels
- **************/
-
-.label, .badge, .flexicontent label.label {
+.icon-48-items {
+	background-image: url(../images/icon-48-items.png);
+}
+.icon-48-itemadd {
+	background-image: url(../images/icon-48-item-add.png);
+}
+.icon-48-itemedit {
+	background-image: url(../images/icon-48-item-edit.png);
+}
+.icon-48-types {
+	background-image: url(../images/icon-48-types.png);
+}
+.icon-48-typeadd {
+	background-image: url(../images/icon-48-type-add.png);
+}
+.icon-48-typeedit {
+	background-image: url(../images/icon-48-type-edit.png);
+}
+.icon-48-fields {
+	background-image: url(../images/icon-48-fields.png);
+}
+.icon-48-fieldadd {
+	background-image: url(../images/icon-48-field-add.png);
+}
+.icon-48-fieldedit {
+	background-image: url(../images/icon-48-field-edit.png);
+}
+.icon-48-tags {
+	background-image: url(../images/icon-48-tags.png);
+}
+.icon-48-tagadd {
+	background-image: url(../images/icon-48-tag-add.png);
+}
+.icon-48-tagedit {
+	background-image: url(../images/icon-48-tag-edit.png);
+}
+.icon-48-fc_categories {
+	background-image: url(../images/icon-48-categories.png);
+}
+.icon-48-fc_categoryadd {
+	background-image: url(../images/icon-48-category-add.png);
+}
+.icon-48-fc_categoryedit {
+	background-image: url(../images/icon-48-category-edit.png);
+}
+.icon-48-archive {
+	background-image: url(../images/icon-48-archive.png);
+}
+.icon-48-editacl {
+	background-image: url(../images/icon-48-permissions.png);
+}
+.icon-48-files {
+	background-image: url(../images/icon-48-files.png);
+}
+.icon-48-fileedit {
+	background-image: url(../images/icon-48-file-edit.png);
+}
+.icon-48-stats {
+	background-image: url(../images/icon-48-statistics.png);
+}
+.icon-48-templates {
+	background-image: url(../images/icon-48-templates.png);
+}
+.icon-48-authors {
+	background-image: url(../images/icon-48-authors.png);
+}
+.icon-48-authoradd {
+	background-image: url(../images/icon-48-author-add.png);
+}
+.icon-48-authoredit {
+	background-image: url(../images/icon-48-author-edit.png);
+}
+.icon-48-import {
+	background-image: url(../images/icon-48-import.png);
+}
+.icon-48-searchindex {
+	background-image: url(../images/icon-48-searchindex.png);
+}
+.icon-32-person2 {
+	background-image: url(../images/icon-32-person2_f2.png);
+}
+.icon-32-savenew {
+	background-image: url(../images/icon-32-savenew.png);
+}
+.icon-32-translate {
+	background-image: url(../images/icon-32-country-flags.png);
+}
+.icon-32-go {
+	background-image: url(../../../../images/go_f2.png);
+}
+.icon-32-download {
+	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-export.png);
+}
+.icon-32-language {
+	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-html.png);
+}
+.icon-32-params {
+	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png);
+}
+.icon-32-import {
+	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-upload.png);
+}
+.icon-32-duplicate {
+	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png);
+}
+.icon-32-copy_wvalues {
+	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png);
+}
+.icon-32-test,
+.icon-32-preview {
+	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-preview.png);
+}
+.icon-32-advindexdirty {
+	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png);
+}
+.icon-32-advindexpurge {
+	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-purge.png);
+}
+.icon-32-test,
+.icon-32-preview {
+	background: none;
+}
+.icon-32-test:before,
+.icon-32-preview:before {
+	content: "\3c";
+}
+.label,
+.badge,
+.flexicontent label.label {
 	margin: 0px 2px 2px 4px;
 }
-.label.highlight, .badge.highlight {
+.label.highlight,
+.badge.highlight {
 	color: darkred;
 }
-
-
-/**************
- * Other layout
- **************/
-
 ul.adminformlist {
 	list-style-position: outside !important;
 	list-style-type: none !important;
 	margin: 0px !important;
 	padding: 0px !important;
 }
-
 div.toolbar-box {
 	background: none repeat scroll 0 0 #FFFFFF;
 	border: 1px solid #C7C8B2;
 	margin-top: -1px;
 	padding: 4px 16px;
 }
-.form-horizontal div.control-label {
-}
 .form-horizontal div.control-group {
 	margin-bottom: 2px;
 }
-
-fieldset legend {
-	/**/
-}
-
-/*input, */select {
+select {
 	width: auto !important;
 }
-
-#user-groups legend + .control-group, #user-groups .control-group {
+#user-groups legend + .control-group,
+#user-groups .control-group {
 	margin: 0px;
 }
-
-
-/* Fix fitting issues e.g. with chosen enhanced selects */
-.form-horizontal .chzn-container {
-	width: 90% !important;
-	max-width: 500px !important;
-}
-.form-horizontal .chzn-container .chzn-drop {
-	width: 100% !important;
-	max-width: 500px !important;
-	/*border: 1px solid lightgray !important; */
-}
-.form-horizontal .controls {
-	margin:0px !important;
-}
-.form-horizontal div.control-label {
-	padding-top:0;
-	padding-bottom:0;
-}
-.form-horizontal .chzn-container-single .chzn-single {
-	width:auto;
-	float:left;
-}
-
-
-
-/********************
- * Permissions slider
- ********************/
-
-
-
-/***********************
- * pane TABS and sliders
- ***********************/
-
 .tab-pane.active table {
 	width: auto;
 }
-
 .pane-sliders .panel {
 	margin-bottom: 3px;
 }
 .pane-sliders .panel h3 {
-	-webkit-border-radius: 3px; -moz-border-radius: 3px;border-radius: 3px;
-	font-size:12px;
-	font-weight:bold;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	font-size: 12px;
+	font-weight: bold;
 	text-shadow: 1px 1px 1px rgba(0,0,0,0.6);
 	background-color: #9C9D9E;
 }
-.pane-sliders .panel h3  a{
-	color:#fff !important;
+.pane-sliders .panel h3 a {
+	color: #fff !important;
 }
 .pane-sliders .title {
 	color: #666666;
@@ -173,12 +184,14 @@ fieldset legend {
 }
 .pane-sliders .content {
 	box-shadow: 0 0 4px #cccccc;
-	border-radius:2px;
+	border-radius: 2px;
 	padding: 12px 0px 0px 12px;
 	background: none repeat scroll 0 0 white;
 }
-.pane-toggler-down a:hover, .pane-toggler-down a:focus,
-.pane-toggler a:hover, .pane-toggler a:focus {
+.pane-toggler-down a:hover,
+.pane-toggler-down a:focus,
+.pane-toggler a:hover,
+.pane-toggler a:focus {
 	text-decoration: none !important;
 }
 .pane-toggler > a > span {
@@ -194,13 +207,6 @@ fieldset legend {
 	padding-left: 20px;
 	font-size: 14px;
 }
-
-
-
-/******************
- * Fieldsets layout
- ******************/
-
 .controls fieldset.radio,
 .controls fieldset.checkbox,
 fieldset.adminform fieldset.radio,
@@ -211,25 +217,22 @@ fieldset.adminform-legacy fieldset.radio {
 	margin: 2px 0 0 0px;
 	padding: 0px 0px !important;
 }
-
 div fieldset label.radiobtn {
-	display:inline-block;
-	white-space:nowrap;
+	display: inline-block;
+	white-space: nowrap;
 	padding-right: 8px;
-	min-width:0px;
+	min-width: 0px;
 	margin: 0px 0px 0px 2px;
 	float: left;
-	clear:none;
+	clear: none;
 }
-
 div fieldset.adminform fieldset.radio label,
 div fieldset.panelform fieldset.radio label {
-	float:left;
-	min-width:0px;
-	margin-top:4px;
-	width:auto!important;
+	float: left;
+	min-width: 0px;
+	margin-top: 4px;
+	width: auto !important;
 }
-
 div fieldset.panelform {
 	padding: 0px !important;
 	margin: 0px !important;
@@ -239,13 +242,14 @@ div fieldset.panelform ul.adminformlist > li {
 }
 div fieldset.panelform ul.adminformlist > li .input-append,
 div fieldset.panelform ul.adminformlist > li .input-prepend {
-	margin:0px;
+	margin: 0px;
 }
-
-#jform_tid-lbl, #jform_attribs_ilayout-lbl,
-div fieldset.panelform :not(.label-fcouter) label.hasTip, div fieldset.panelform :not(.label-fcouter) label.hasTooltip,
-.fc_fieldset label.hasTip, .fc_fieldset label.hasTooltip
- {
+#jform_tid-lbl,
+#jform_attribs_ilayout-lbl,
+div fieldset.panelform :not(.label-fcouter) label.hasTip,
+div fieldset.panelform :not(.label-fcouter) label.hasTooltip,
+.fc_fieldset label.hasTip,
+.fc_fieldset label.hasTooltip {
 	clear: both;
 	padding: 5px 3px !important;
 	margin: 2px 4px 0px 4px !important;
@@ -256,10 +260,9 @@ div fieldset.panelform :not(.label-fcouter) label.hasTip, div fieldset.panelform
 	font-weight: normal;
 	text-align: right;
 	width: 132px;
-	overflow:hidden;
+	overflow: hidden;
 	display: inline-block;
 }
-
 div fieldset label:not(.btn) {
 	margin: 2px 8px 2px 2px;
 	clear: none;
@@ -267,7 +270,6 @@ div fieldset label:not(.btn) {
 div fieldset label.btn {
 	margin: 0px 0px !important;
 }
-
 div.fieldset_value,
 div.panel fieldset textarea,
 div.panel fieldset select,
@@ -278,7 +280,8 @@ fieldset.panelform :not(.label-fcouter) label:not(.btn),
 fieldset.panelform textarea,
 fieldset.panelform select,
 fieldset.panelform :not(.input-prepend):not(.input-append) > input:not(.input-small),
-fieldset.panelform img, fieldset.panelform :not(.input-prepend):not(.input-append) > button {
+fieldset.panelform img,
+fieldset.panelform :not(.input-prepend):not(.input-append) > button {
 	float: left !important;
 	margin: 2px 8px 0px 0px;
 	padding: 3px !important;
@@ -287,49 +290,34 @@ fieldset.panelform img, fieldset.panelform :not(.input-prepend):not(.input-appen
 	font-family: arial;
 	height: auto;
 }
-
-div.width-20 fieldset, div.width-30 fieldset, div.width-35 fieldset, div.width-40 fieldset, div.width-45 fieldset, div.width-50 fieldset, div.width-55 fieldset, div.width-60 fieldset, div.width-65 fieldset, div.width-70 fieldset, div.width-80 fieldset, div.width-100 fieldset {
+div.width-20 fieldset,
+div.width-30 fieldset,
+div.width-35 fieldset,
+div.width-40 fieldset,
+div.width-45 fieldset,
+div.width-50 fieldset,
+div.width-55 fieldset,
+div.width-60 fieldset,
+div.width-65 fieldset,
+div.width-70 fieldset,
+div.width-80 fieldset,
+div.width-100 fieldset {
 	background-color: #FFFFFF !important;
 	padding: 5px 8px 8px 5px !important;
 }
-
-div fieldset.panelform textarea {
-}
-
 div fieldset.panelform :not(.label-fcouter) label {
-	min-width:132px;
+	min-width: 132px;
 	text-align: right;
 }
-
 div fieldset.panelform td {
-	border:1px solid #e0e0e0;
+	border: 1px solid #e0e0e0;
 	background-color: #efefef;
 }
-
 div fieldset.panelform table {
-	width:100%;
+	width: 100%;
 }
-
-/*div #jform_params_target { width: 170px; }
-div #jform_params_image { width: 60px; }
-div #jform_params_show_print_icon,
-div #jform_params_show_email_icon {	width:140px; }
-div #jformtid {	scroll: visible;	height:60px;	width:60%;  }
-div #jform_params_filters { display:block; width:50%; float:left; }
-
-#jform_attribs_separator1-lbl, #jform_attribs_separator2-lbl, #jform_attribs_separator3-lbl, #jform_attribs_separator4-lbl, #jform_attribs_separator5-lbl,
-#jform_attribs_separator6-lbl, #jform_attribs_separator7-lbl, #jform_attribs_separator8-lbl, #jform_attribs_separator9-lbl, #jform_attribs_separator10-lbl, 
-#jform_attribs_separator11-lbl, #jform_attribs_separator12-lbl { font-weight:bold;}
-.panel .panelform .spacer {border-top:1px dashed gray; border-bottom:1px dashed lightgray; display:block; margin:6px; float:left; clear:both; width:94%; height:0px;}*/
-
-
-
-/***************
- * Tables layout
- ***************/
-
 div table.adminform {
-	font-size:11px;
+	font-size: 11px;
 	background-color: #FFFFFF;
 	border: 1px solid #D5D5D5;
 	border-collapse: collapse;
@@ -337,29 +325,25 @@ div table.adminform {
 	width: 100%;
 }
 div table.adminform td {
-	font-size:11px;
-	padding:2px 2px;
-	text-align:left;
+	font-size: 11px;
+	padding: 2px 2px;
+	text-align: left;
 }
-
-
 td.key label {
-	float:none;
-	display:inline;
+	float: none;
+	display: inline;
 }
 table.admintable td .controls label {
-	float:left;
-	display:inline-block;
+	float: left;
+	display: inline-block;
 	padding: 0px !important;
 }
-
 div table.admintable {
-	font-size:11px;
+	font-size: 11px;
 	border-collapse: separate;
 	border-spacing: 2px !important;
 }
 div table.admintable td {
-	/*background-color:#F9F9F9;*/
 	border: 0px solid #F0F0F0;
 	font-weight: normal;
 	text-align: left;
@@ -378,17 +362,12 @@ div table.admintable td.paramlist_key {
 	width: 140px;
 	padding: 2px 4px 2px 4px;
 }
-
 table.admintable fieldset {
 	border: 0 none;
 	float: left;
 	margin: 0 !important;
 	padding: 0 !important;
 }
-
-
-/* joomla TABS */
-
 dl.tabs {
 	float: left;
 	margin: 10px 0 -1px;
@@ -425,7 +404,6 @@ div.current dd {
 dl#content-pane.tabs {
 	margin: 1px 0 0;
 }
-
 .blank {
 	display: inline-block;
 }
@@ -433,25 +411,52 @@ dl#content-pane.tabs {
 	display: inline-block;
 	margin: 2px 0 0 4px;
 }
-
 [class^="fcsbnav-"] {
-	width:90%;
-	font-size:16px;
-	margin:12px 0 2px -10px;
+	width: 90%;
+	font-size: 16px;
+	margin: 12px 0 2px -10px;
 	padding: 4px 0 0 20px;
 	border-top: 0px dashed;
 	border-bottom: 1px dashed;
-	border-color:gray;
+	border-color: gray;
 	color: #555;
 	background-repeat: no-repeat;
 }
-.fcsbnav-content-editing {color: #777; margin-top:-4px; }
-.fcsbnav-type-fields {color: #777; }
-.fcsbnav-content-viewing {color: #777; }
-.fcsbnav-users {color: #777; }
-.fcsbnav-expert {color:#777; }
-
-/* Fix size of prompt for choosen */
+.fcsbnav-content-editing {
+	color: #777;
+	margin-top: -4px;
+}
+.fcsbnav-type-fields {
+	color: #777;
+}
+.fcsbnav-content-viewing {
+	color: #777;
+}
+.fcsbnav-users {
+	color: #777;
+}
+.fcsbnav-expert {
+	color: #777;
+}
+.form-horizontal .chzn-container {
+	width: 90% !important;
+	max-width: 500px !important;
+}
+.form-horizontal .chzn-container .chzn-drop {
+	width: 100% !important;
+	max-width: 500px !important;
+}
+.form-horizontal .controls {
+	margin: 0px !important;
+}
+.form-horizontal div.control-label {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+.form-horizontal .chzn-container-single .chzn-single {
+	width: auto;
+	float: left;
+}
 .chzn-container-multi .chzn-choices li.search-field {
 	width: 100% !important;
 }

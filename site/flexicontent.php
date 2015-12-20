@@ -19,6 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+
 // *************************
 // Initialize some variables
 // *************************
@@ -26,15 +27,24 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 global $is_fc_component;
 $is_fc_component = 1;
 
-// Get component parameters and add tooltips css and js code
 $cparams = JComponentHelper::getParams('com_flexicontent');
-if (FLEXI_J30GE && $cparams->get('loadfw_bootstrap_css', 2)==1 ) JHtml::_('bootstrap.loadCss', true);
+$jinput  = JFactory::getApplication()->input;
+$format  = $jinput->get('format', 'html', 'cmd');
 
+if ($cparams->get('loadfw_bootstrap_css', 2)==1 ) JHtml::_('bootstrap.loadCss', true);
+
+// Logging
+global $fc_run_times;
+$fc_run_times['render_field'] = array();
+$fc_run_times['render_subfields'] = array();
+$fc_run_times['create_filter'] = array();
+
+$force_print = false || JDEBUG;
+if ($force_print) $cparams->set('print_logging_info', 1);
 $print_logging_info = $cparams->get('print_logging_info');
-if ( $print_logging_info ) {
-	global $fc_run_times;
-	$fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
-	$fc_run_times['create_filter'] = array();
+
+if ( $print_logging_info && $format=='html')
+{
 	$start_microtime = microtime(true);
 	global $fc_jprof;
 	jimport( 'joomla.error.profiler' );
@@ -87,6 +97,37 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reloa
 }*/
 
 
+
+// ******************************************************************
+// (If needed) Compile LESS files as CSS (call the less proprocessor)
+// ******************************************************************
+if ( $format == 'html' )
+{
+	// Files in frontend assets folder
+	$path = JPATH_COMPONENT_SITE.DS.'assets'.DS;
+	$inc_path = $path.'less/include/';
+	$less_files = array(
+		'less/flexi_form.less',
+		'less/flexi_containers.less',
+		'less/flexi_shared.less',
+		'less/flexi_frontend.less'
+	);
+	
+	$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	$force = $stale_frontend && count($stale_frontend);
+	$less_files = array('less/flexicontent.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+	
+	$less_files = array(
+		'less/flexi_form_fields.less',
+		'less/flexi_filters.less',
+		'less/j3x.less',
+		'less/fcvote.less'
+	);
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+}
+
+
 // ********************************
 // Load common js libs / frameworks
 // ********************************
@@ -101,13 +142,14 @@ if ( JRequest::getWord('format')!='raw')
 	
 	if ($cparams->get('add_tooltips', 1))
 	{
-		// Load J2.5 (non-bootstrap tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
+		// Load J2.5 (mootools tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
 		FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
 		
 		// J3.0+ tooltips (bootstrap based)
 		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
 	}
 }
+
 
 
 // ***********************************
@@ -144,6 +186,11 @@ if ($controller) {
 }
 
 
+// initialization done ... log stats for initialization
+if ( $print_logging_info && $format=='html')
+	@$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
 // ****************************
 // Create a controller instance
 // ****************************
@@ -152,8 +199,6 @@ $classname	= 'FlexicontentController'.ucfirst($controller);
 $controller = new $classname();
 
 
-// initialization done ... log stats for initialization
-if ( $print_logging_info ) @$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
 
@@ -351,7 +396,7 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 		$msg = sprintf('** [Flexisystem PLG: Auto Checkin/Auto state(e.g. archive): %.2f s] ', $fc_run_times['auto_checkin_auto_state']/1000000) .'<br/>'.$msg.'<br/>';
 	
 	if (isset($fc_run_times['global_replacements']))
-		$msg = sprintf('** [Flexisystem PLG: Replace Field/Items/etc Times Times: %.2f s] ', $fc_run_times['global_replacements']/1000000) .'<br/>'.$msg.'<br/>';
+		$msg = sprintf('** [Flexisystem PLG: Replace Field/Items/etc Times: %.2f s] ', $fc_run_times['global_replacements']/1000000) .'<br/>'.$msg.'<br/>';
 	
 	global $fc_performance_msg;
 	$fc_performance_msg .= $msg . '<div class="fcclear"></div>';
