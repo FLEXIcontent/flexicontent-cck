@@ -456,6 +456,9 @@ table.fc-addressint-field-tbl .fcfield_textval:not(.inlineval) {
 	margin: 0;
 	box-sizing: border-box;
 }
+.fcfield_addressint_map table {
+	width: 100%;
+}
 .fcfield_addressint_canvas_outer {
 	width: 100%;
 	max-width: 800px;

@@ -271,7 +271,6 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				</tr>
 				<tr>
 					<td colspan="2" style="padding:0"><span id="fcfield_fetching_msg_' . $elementid_n . '"></span></td>
-				<tr>
 				</tr>' 
 				. ($display_title_form ? 
 				'<tr>
@@ -317,7 +316,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 					</td>
 					<td>
 						<div id="' . $elementid_n . '_preview">
-							<iframe class="sharedvideo" src="' . $value['embed_url'] . '" style="width: 240px; height: 140px; border: none;" scrolling="no" seamless="seamless" allowFullScreen></iframe>
+							<iframe class="sharedvideo seamless" src="'.($value['embed_url'] ? $value['embed_url'] : 'about:blank').'" style="width: 240px; height: 140px; border: none; overflow:hidden;" allowFullScreen></iframe>
 						</div>
 						<input type="hidden" id="' . $elementid_n . '_thumb" name="' . $fieldname_n . '[thumb]" value="' . $value['thumb'] . '" />
 					</td>
@@ -366,7 +365,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 						if(data.html.match(urlregex) != null) 
 						{
 							var iframeurl = data.html.match(urlregex)[0];
-							var iframecode = \'<iframe class="sharedvideo" src="\'+iframeurl+\'" style="width: 240px; height: 140px; border: none;" scrolling="no" seamless="seamless" allowFullScreen></iframe>\';
+							var iframecode = \'<iframe class="sharedvideo seamless" src="\'+iframeurl+\'" style="width: 240px; height: 140px; border: none;" scrolling="no" allowFullScreen></iframe>\';
 							jQuery("#' . $elementid_n . '_preview").html(iframecode);
 							updateValueInfo_' . $elementid_n . '({title: data.title, author: data.author_name, description: data.description, thumb: data.thumbnail_url, embed_url: data.html.match(urlregex)[0]});
 							jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_widthvideo, #' . $elementid_n . '_heightvideo").parents("tr").show("fast");
@@ -515,7 +514,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				. ($display_author && !empty($value['author']) ? '<div class="author">' . $value['author'] . '</div>' : '') 
 				. ($display_description && !empty($value['description']) ? '<div class="description">' . $value['description'] . '</div>' : '');
 			
-			$html_video = '<div class="videoplayer"><iframe class="sharedvideo" src="';
+			$html_video = '<div class="videoplayer"><iframe class="sharedvideo seamless" src="';
 
 			// backward compatibility
 			if (!empty($value['embed_url']))
@@ -543,7 +542,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 				$widthdisplay = $width;
 				$heightdisplay = $height;
 			}
-			$html_video .= $embed_url . '" style="border: none;" scrolling="no" seamless="seamless" allowFullScreen width="' . $widthdisplay . '" height="'. $heightdisplay .'"></iframe></div>';
+			$html_video .= $embed_url . '" style="border: none;" scrolling="no" allowFullScreen width="' . $widthdisplay . '" height="'. $heightdisplay .'"></iframe></div>';
 			
 			$field->{$prop}[$n] = $pretext 
 				. ($player_position ? '' : $html_video)

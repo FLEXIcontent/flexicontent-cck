@@ -32,6 +32,8 @@ foreach($field->value as $file_id)
 			</label>
 	';
 	
+	$cols2_exist = $iform_title || $iform_lang || $iform_desc || $iform_dir;
+	
 	$field->html[] = '
 	<div class="fcclear"></div>
 	<div style="display:inline-block;">
@@ -47,7 +49,7 @@ foreach($field->value as $file_id)
 		<td class="key inlinefile-data-lbl-cell">
 			'.$_select_file_lbl.'
 		</td>').'
-		<td class="inlinefile-data-cell" '.($fields_box_placing==1 ? 'colspan="2"' : '').'>
+		<td class="inlinefile-data-cell" '.($fields_box_placing==1 && $cols2_exist ? 'colspan="2"' : '').'>
 			<span class="inlinefile-data">
 				'.($fields_box_placing==1 ? '<span style="visibility:hidden; z-index:-1; position:absolute;">'.$_select_file_lbl.'</span>' : '').'
 				<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.$file_id.'" class="fc_fileid" />'.'

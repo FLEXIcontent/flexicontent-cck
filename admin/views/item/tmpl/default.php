@@ -934,12 +934,12 @@ if ($this->perms['canparams']) : ?>
 			</fieldset>	
 			
 			<fieldset class="panelform">
-				<span class="label-fcouter" id="publish_down-lbl-outer">><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('publish_down')); ?></span>
+				<span class="label-fcouter" id="publish_down-lbl-outer"><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('publish_down')); ?></span>
 				<div class="container_fcfield"><?php echo $this->form->getInput('publish_down'); ?></div>
 			</fieldset>	
 			
 			<fieldset class="panelform">
-				<span class="label-fcouter" id="access-lbl-outer">><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('access')); ?></span>
+				<span class="label-fcouter" id="access-lbl-outer"><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('access')); ?></span>
 				<?php if ($this->perms['canacclvl']) :?>
 					<div class="container_fcfield"><?php echo $this->form->getInput('access'); ?></div>
 				<?php else :?>

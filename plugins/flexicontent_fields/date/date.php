@@ -317,7 +317,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 						'<span class="fcfield_timestamp_note">'.JText::_( 'FLEXI_AUTO' ).'</span></span>'; 
 				
 				$html = $timestamp .'
-					<input type="hidden" class="fcfield_date" readonly="readonly" value="'.($value ? $n : '').'" id="'.$elementid_n.'" name="'.$fieldname_n.'" />
+					<input type="hidden" class="fcfield_date" value="'.($value ? $n : '').'" id="'.$elementid_n.'" name="'.$fieldname_n.'" />
 				';
 			}
 			else {

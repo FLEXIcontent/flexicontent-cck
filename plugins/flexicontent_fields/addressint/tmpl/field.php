@@ -422,7 +422,7 @@ foreach ($values as $value)
 		</tr>
 		<tr '.($use_usstate ? '' : 'style="display:none;"').'>
 			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').'</span></td>
-			<td>'.JHTML::_('select.genericlist', $list_states, $fieldname_n.'[state]', 0, 'value', 'text', $value['state'], $elementid_n.'_state').'</td>
+			<td>'.JHTML::_('select.genericlist', $list_states, $fieldname_n.'[state]', '', 'value', 'text', $value['state'], $elementid_n.'_state').'</td>
 		</tr>
 		<tr '.($use_province ? '' : 'style="display:none;"').'>
 			<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').'</span></td>
@@ -460,7 +460,7 @@ foreach ($values as $value)
 	</div>
 	
 	<div class="fcfield_addressint_map">
-	<table width="100%"><tbody>
+	<table><tbody>
 		<tr>
 			<td>
 				<span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PREVIEW').'</span>

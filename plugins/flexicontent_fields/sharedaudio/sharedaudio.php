@@ -143,23 +143,22 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			$iframecode = '';
 			if($value['audiotype']!="" && $value['audioid'] != '')
 			{
-				$iframecode = '<iframe class="sharedaudio" src="';
 				switch($value['audiotype']){
 					case "youtube":
-						$iframecode .= "//www.youtube.com/embed/";
+						$embed_url = '//www.youtube.com/embed/' . $value['audioid'];
 						break;
 					case "vimeo":
-						$iframecode .= "//player.vimeo.com/video/";
+						$embed_url = '//player.vimeo.com/video/' . $value['audioid'];
 						break;
 					case "dailymotion":
-						$iframecode .= "//www.dailymotion.com/embed/video/";
+						$embed_url = '//www.dailymotion.com/embed/video/' . $value['audioid'];
 						break;
 					default:
-						// For embed.ly we will have added 'URL' into our 'id' variable (below)
+						// For embed.ly , the full URL is inside audio ID
+						$embed_url = $value['audioid'];
 						break;
 				}
-				$val_id = $value['audioid'];  // In case of embed.ly, this is not id but it is full URL
-				$iframecode .= $val_id.'" width="240" height="135" style="border:0;" allowFullScreen></iframe>';
+				$iframecode = '<iframe class="sharedaudio" src="'.($embed_url ? $embed_url : 'about:blank').'" width="240" height="135" style="border:0;" allowFullScreen></iframe>';
 			}
 			
 			$field->html[$n] .= '
@@ -458,31 +457,31 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			$autostart    = $field->parameters->get('autostart', 0);
 			
 			// generate html output
-			$field->{$prop} .= $pretext;
-			$field->{$prop} .= '<iframe class="sharedaudio" src="';
 			switch($value['audiotype']){
 				case 'youtube':
-					$field->{$prop} .= '//www.youtube.com/embed/';
+					$embed_url = '//www.youtube.com/embed/' . $value['audioid'];
 					$_show_related = '&rel=0';
-					$_show_srvlogo = '&modestbranding=1';
+					$_show_srvlogo = '&modestbranding=1' . $value['audioid'];
 					break;
 				case 'vimeo':
-					$field->{$prop} .= '//player.vimeo.com/video/';
+					$embed_url = '//player.vimeo.com/video/' . $value['audioid'];
 					$_show_related = '';
 					$_show_srvlogo = '';
 					break;
 				case 'dailymotion':
-					$field->{$prop} .= '//www.dailymotion.com/embed/video/';
+					$embed_url = '//www.dailymotion.com/embed/video/' . $value['audioid'];
 					$_show_related = '&related=0';
 					$_show_srvlogo = '&logo=0';
 					break;
 				default:
-					// For embed.ly we will have added 'URL' into our 'id' variable (below)
+					// For embed.ly , the full URL is inside audio ID
+					$embed_url = $value['audioid'];
+					$_show_related = '';
+					$_show_srvlogo = '';
 					break;
 			}
-			$val_id = $value['audioid'];  // In case of embed.ly, this is not id but it is full URL
-			$field->{$prop} .= '
-				'.$val_id.'?autoplay='.$autostart.$_show_related.$_show_srvlogo.'" width="'.$width.'" height="'.$height.'" style="border:0;" allowFullScreen></iframe>
+			$field->{$prop} .= $pretext .'
+			<iframe class="sharedaudio" src="'.($embed_url ? $embed_url : 'about:blank').'?autoplay='.$autostart.$_show_related.$_show_srvlogo.'" width="'.$width.'" height="'.$height.'" style="border:0;" allowFullScreen></iframe>
 				'.($display_title && !empty($value['title'])   ? '<h'.$headinglevel.'>'.$value['title'].'</h'.$headinglevel.'>' : '').'
 				'.($display_author && !empty($value['author']) ? '<div class="author">'.$value['author'].'</div>' : '')
 				;

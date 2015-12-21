@@ -663,7 +663,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				if ($usecaptions===1) $captions = htmlspecialchars($file_data->altname, ENT_COMPAT, 'UTF-8');
 				if ($usepopup && $popuptype == 4)
 				{
-					$pimages[] = '<img src="'.$img_path.'" id="'.$htmltag_id.'_'.$n.'_popup_img" class="fc_image_thumb fancybox" '.$group_str.' title="'.$captions.'" >';
+					$pimages[] = '<img src="'.$img_path.'" id="'.$htmltag_id.'_'.$n.'_popup_img" class="fc_image_thumb fancybox" '.$group_str.' alt="'.$captions.'" title="'.$captions.'" >';
 				}
 				$tag_params = $usepopup && $popuptype == 4  ?  ' onclick="jQuery(\'#\' + jQuery(this).find(\'img\').last().attr(\'id\') + \'_popup_img\').trigger(\'click\'); return false;" ' : '';
 				$display[] = '

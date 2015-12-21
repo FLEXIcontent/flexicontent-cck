@@ -117,6 +117,15 @@ if ( $format == 'html' )
 {
 	// Files in frontend assets folder
 	$path = JPATH_COMPONENT_SITE.DS.'assets'.DS;
+	
+	$less_files = array(
+		'less/flexi_form_fields.less',
+		'less/flexi_filters.less',
+		'less/j3x.less',
+		'less/fcvote.less'
+	);
+	flexicontent_html::checkedLessCompile($less_files, $path, $path.'less/include/', $force=false);
+	
 	$less_files = array(
 		'less/flexi_form.less',
 		'less/flexi_containers.less',

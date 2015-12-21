@@ -21,7 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-$action = JRoute::_(FlexicontentHelperRoute::getSearchRoute(0, $itemid), false);
+$action = JRoute::_(FlexicontentHelperRoute::getSearchRoute(0, $itemid), true);
 $form_id = "default_form_".$module->id;
 $form_name = "default_form_".$module->id;
 
@@ -62,7 +62,7 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		$output = '
 			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
 				id="mod_search_searchword-'.$module->id.'" class="'.$text_search_class.'"
-				data-fc_label_text="'.$search_inner_prompt.'" name="q" size="'.$search_inner_width.'" maxlength="'.$maxchars.'" value="" />';
+				data-fc_label_text="'.$search_inner_prompt.'" name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="" />';
 		
 		// Search GO button
 		if ($button) :

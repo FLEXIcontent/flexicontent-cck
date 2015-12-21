@@ -624,7 +624,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			
 			$preview_msg = '
-				<input class="preview_msg fcfield_textval"  id="'.$elementid_n.'_preview_msg"  name="'.$elementid_n.'_preview_msg"   type="text"   value="'.$image_name.'" readonly=\"readonly\" />
+				<input type="text" class="preview_msg fcfield_textval"  id="'.$elementid_n.'_preview_msg"  name="'.$elementid_n.'_preview_msg" value="'.$image_name.'" readonly="readonly" />
 				';
 			$existingname = '';
 			if ( $image_source )
@@ -636,7 +636,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				$_prompt_txt = JText::_( 'FLEXI_SELECT_IMAGE' );
 				$existingname = '
-					<input class="existingname fcfield_textval" id="'.$elementid_n.'_existingname" name="'.$fieldname_n.'[existingname]" type="hidden" value="'.(!empty($value['existingname']) ? $value['existingname'] : '').'" readonly="readonly" style="float:none;" />
+					<input type="hidden" class="existingname fcfield_textval" id="'.$elementid_n.'_existingname" name="'.$fieldname_n.'[existingname]" value="'.(!empty($value['existingname']) ? $value['existingname'] : '').'" />
 				';
 				$select_existing = '
 				'.($none_props ? '<br/>' : '').'
