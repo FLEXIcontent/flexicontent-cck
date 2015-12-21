@@ -825,14 +825,10 @@ jQuery(document).ready(function(){
 
 				if ( !empty($this->lang_assocs[$row->id]) )
 				{
-					$row_modified = 0;
+					$row_modified = strtotime($row->modified);
+					if (!$row_modified)  $row_modified = strtotime($row->created);
+					
 					foreach($this->lang_assocs[$row->id] as $assoc_item) {
-						if ($assoc_item->id == $row->id) continue; // skip current item
-						$row_modified = strtotime($assoc_item->modified);
-						if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
-					}
-
-					foreach($this->lang_assocs[$row->lang_parent_id] as $assoc_item) {
 						if ($assoc_item->id==$row->id) continue;
 
 						$assoc_modified = strtotime($assoc_item->modified);
