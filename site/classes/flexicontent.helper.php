@@ -156,79 +156,114 @@ class flexicontent_html
 	}
 	
 	
-	static function checkedLessCompile($files, $path, $inc_path=null, $force=false)
+	/* Returns true if any LESS file has changed in the LESS include folders */
+	static function dirty_less_incPath_exists($inc_paths, $check_global = true)
+	{
+		static $_dirty_arr = array();
+		static $less_folders = null;
+		
+		if (!is_array($inc_paths)) $inc_paths = array($inc_paths);
+		
+		// Get global include folders
+		if ($check_global) {
+			if ($less_folders===null) {
+				$less_folders = JComponentHelper::getParams('com_flexicontent')->get('less_folders', 'JPATH_COMPONENT_SITE/assets/less ;; ACTIVE_JTEMPLATE_SITE/less/com_flexicontent/ ;;');
+				$less_folders = preg_split("/[\s]*::[\s]*/", $less_folders);
+				foreach($less_folders as $k => $v)  if (empty($v))  unset($less_folders[$k]);
+			}
+			$inc_paths_all = array_merge($inc_paths, $less_folders);
+		}
+		
+		$_dirty_any = false;  // This FLAG is set in flag for all folders
+		foreach ($inc_paths_all as $inc_path)
+		{
+			// Find if any "include" file has changed and set FLAG
+			if ( !$inc_path )
+				$_dirty = false;
+			else if ( !JFolder::exists($inc_path) )
+				$_dirty_arr[$inc_path] = $_dirty = false;
+			else
+				$_dirty = isset($_dirty_arr[$inc_path]) ? $_dirty_arr[$inc_path] : null;
+			
+			// Examine folder if not already examined
+			if ($_dirty===null)
+			{
+				$_dirty = false;
+				$inc_files = glob($inc_path.'*.{less}', GLOB_BRACE);  //print_r($inc_files);
+				foreach ($inc_files as $confFile) {
+					//echo $confFile . " time: ".filemtime($confFile) ."<br/>";
+					if (!JFile::exists($inc_path.'_config_fc_ts') || filemtime($confFile) > filemtime($inc_path.'_config_fc_ts')) {
+						touch($inc_path.'_config_fc_ts');
+						$_dirty = true;
+						break;
+					}
+				}
+			}
+			$_dirty_arr[$inc_path] = $_dirty;
+			$_dirty_any = $_dirty_any || $_dirty;
+		}
+		
+		return $_dirty_any;
+	}
+	
+	
+	/* Checks and if needed compiles LESS files to CSS files*/
+	static function checkedLessCompile($files, $path, $inc_paths=null, $force=false, $check_global_inc = true)
 	{
 		jimport('joomla.filesystem.path' );
 		jimport('joomla.filesystem.folder');
 		jimport('joomla.filesystem.file');
 		
-		static $_inc_arr = array();
+		$app = JFactory::getApplication();
 		$debug = JDEBUG || JComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
-		$app   = JFactory::getApplication();
 		
 		// Validate paths
 		$path     = JPath::clean($path);
-		$inc_path = $inc_path ? JPath::clean($inc_path) : null;
+		if (!is_array($inc_paths)) $inc_paths = $inc_paths ? array($inc_paths) : array();
+		foreach($inc_paths as $k => $v)  $inc_paths[$k] = JPath::clean($v);
 		
-		// Find if any "include" file has changed and set FLAG
-		if ( !$inc_path )
-			$_inc = false;
-		else if ( !JFolder::exists($inc_path) )
-			$_inc_arr[$inc_path] = $_inc = false;
-		else
-			$_inc = isset($_inc_arr[$inc_path]) ? $_inc_arr[$inc_path] : null;
+		// Check if LESS include paths have modified less files
+		$_dirty = flexicontent_html::dirty_less_incPath_exists($inc_paths, $check_global_inc);
 		
-		if ($_inc === null) {
-			$_inc = false;
-			$inc_files = glob($inc_path.'*.{less}', GLOB_BRACE);  //print_r($inc_files);
-			foreach ($inc_files as $confFile) {
-				//echo $confFile . " time: ".filemtime($confFile) ."<br/>";
-				if (!JFile::exists($inc_path.'_config_ts') || filemtime($confFile) > filemtime($inc_path.'_config_ts')) {
-					$_inc = true;
-					touch($inc_path.'_config_ts');
-					break;
-				}
-			}
-			$_inc_arr[$inc_path] = $_inc;
-		}
-		
-		// Find which LESS have changed
+		// Find which LESS files have changed
 		$stale = array();
 		foreach ($files as $inFile)
 		{
 			//$inFile   = urldecode(base64_decode($inFile));
-			$inSubPath  = explode('/', $inFile);
-			$inFilename = end($inSubPath);
-			$inParts    = explode('.', $inFilename);
-			$nameOnly   = reset($inParts);
+			$inFilename = basename($inFile);
+			$nameOnly   = basename($inFilename, '.less');
 			$outFile    = 'css/' . $nameOnly . '.css';
 			
 			if (!JFile::exists($path.$inFile)) {
 				if ($debug) $app->enqueueMessage('Path not found: '.$path.$inFiles, 'warning');
-			} else if ( $_inc || $force || !is_file($path.$outFile) || filemtime($path.$inFile) > filemtime($path.$outFile) ) {
+			} else if ( $_dirty || $force || !is_file($path.$outFile) || filemtime($path.$inFile) > filemtime($path.$outFile) ) {
 				$stale[$inFile] = $outFile;
 			}
 		}
-		
 		//print_r($stale);
-		// We are done if no files need to be updated
+		
+		// We are done if no CSS files need to be updated
 		if (empty($stale)) return array();
 		
 		static $prev_path = null;
 		if ( $prev_path != $path && $debug )  $app->enqueueMessage('Compiling LESS files in: ' .$path, 'message');
 		
-		$framework_path = '/components/com_flexicontent/librairies/lessphp';
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'lessphp'.DS.'lessc.inc.php');
-		
-		//$less = JLess($fname = null, new JLessFormatterJoomla);
-		$less = new \FLEXIcontent\lessc();
-		$formater = new \FLEXIcontent\lessc_formatter_classic();
-		$formater->disableSingle = true;
-		$formater->breakSelectors = true;
-		$formater->assignSeparator = ": ";
-		$formater->selectorSeparator = ",";
-		$formater->indentChar="\t";
-		$less->setFormatter($formater);
+		static $less;
+		if ($less===null)
+		{
+			$framework_path = '/components/com_flexicontent/librairies/lessphp';
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'lessphp'.DS.'lessc.inc.php');
+			
+			//$less = JLess($fname = null, new JLessFormatterJoomla);
+			$less = new \FLEXIcontent\lessc();
+			$formater = new \FLEXIcontent\lessc_formatter_classic();
+			$formater->disableSingle = true;
+			$formater->breakSelectors = true;
+			$formater->assignSeparator = ": ";
+			$formater->selectorSeparator = ",";
+			$formater->indentChar="\t";
+			$less->setFormatter($formater);
+		}
 		
 		$compiled = array();
 		$msg = ''; $error = false;
@@ -4603,7 +4638,7 @@ class flexicontent_tmpl
 		foreach ($templates as $tmpl)
 		{
 			// Parse & Load ITEM layout of current template
-			$tmplxml = $tmpldir.DS.$tmpl.DS.'item.xml';
+			$tmplxml = JPath::clean($tmpldir.DS.$tmpl.DS.'item.xml');
 			if (JFile::exists($tmplxml))
 			{
 				// Parse the XML file
@@ -4614,10 +4649,12 @@ class flexicontent_tmpl
 				}
 
 				$themes->items->{$tmpl} = new stdClass();
-				$themes->items->{$tmpl}->name 		= $tmpl;
-				$themes->items->{$tmpl}->view 		= FLEXI_ITEMVIEW;
-				$themes->items->{$tmpl}->tmplvar 	= '.items.'.$tmpl;
-				$themes->items->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/item.png';
+				$themes->items->{$tmpl}->name     = $tmpl;
+				$themes->items->{$tmpl}->xmlpath  = $tmplxml;
+				$themes->items->{$tmpl}->xmlmtime = filemtime($tmplxml);
+				$themes->items->{$tmpl}->view     = FLEXI_ITEMVIEW;
+				$themes->items->{$tmpl}->tmplvar  = '.items.'.$tmpl;
+				$themes->items->{$tmpl}->thumb    = 'components/com_flexicontent/templates/'.$tmpl.'/item.png';
 
 				// *** This can be serialized and thus Joomla Cache will work
 				$themes->items->{$tmpl}->params = $document->asXML();
@@ -4629,16 +4666,16 @@ class flexicontent_tmpl
 				//$themes->items->{$tmpl}->params		= new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
 				//$themes->items->{$tmpl}->params->loadFile($tmplxml);
 				
-				$themes->items->{$tmpl}->author 		= @$document->author;
-				$themes->items->{$tmpl}->website 		= @$document->website;
-				$themes->items->{$tmpl}->email 			= @$document->email;
-				$themes->items->{$tmpl}->license 		= @$document->license;
-				$themes->items->{$tmpl}->version 		= @$document->version;
-				$themes->items->{$tmpl}->release 		= @$document->release;
-				$themes->items->{$tmpl}->microdata_support	= @$document->microdata_support;
+				$themes->items->{$tmpl}->author 		= (string) @$document->author;
+				$themes->items->{$tmpl}->website 		= (string) @$document->website;
+				$themes->items->{$tmpl}->email 			= (string) @$document->email;
+				$themes->items->{$tmpl}->license 		= (string) @$document->license;
+				$themes->items->{$tmpl}->version 		= (string) @$document->version;
+				$themes->items->{$tmpl}->release 		= (string) @$document->release;
+				$themes->items->{$tmpl}->microdata_support	= (string) @$document->microdata_support;
 				
-				$themes->items->{$tmpl}->defaulttitle = @$document->defaulttitle;
-				$themes->items->{$tmpl}->description  = @$document->description;
+				$themes->items->{$tmpl}->defaulttitle = (string) @$document->defaulttitle;
+				$themes->items->{$tmpl}->description  = (string) @$document->description;
 				
 				$groups = & $document->fieldgroups;
 				$pos    = & $groups->group;
@@ -4653,18 +4690,15 @@ class flexicontent_tmpl
 				}
 
 				$tmpl_path = 'components/com_flexicontent/templates/'.$tmpl.'/';
-				$less_path = JPath::clean(JPATH_SITE.DS .$tmpl_path.DS);
 				
-				$css     = & $document->cssitem;
-				$cssfile = & $css->file;
-				if ($cssfile) {
+				$cssfiles = & $document->cssitem->file;
+				if ($cssfiles) {
 					$themes->items->{$tmpl}->css = new stdClass();
-					for ($n=0; $n<count($cssfile); $n++) {
-						$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$cssfile[$n];
-						$less_file = str_replace( 'css', 'less', (string)$cssfile[$n] );
-						if ( JFile::exists($less_path . $less_file) ) {
-							flexicontent_html::checkedLessCompile(array($less_file), $less_path, $less_path.'less/include/', $force=false);
-						}
+					$themes->items->{$tmpl}->less_files = array();
+					for ($n=0; $n<count($cssfiles); $n++) {
+						$themes->items->{$tmpl}->css->$n = $tmpl_path. (string)$cssfiles[$n];
+						$less_file = JPath::clean( preg_replace('/^css|css$/', 'less', (string)$cssfiles[$n]) );
+						$themes->items->{$tmpl}->less_files[] = $less_file;
 					}
 				}
 				$js 		= & $document->jsitem;
@@ -4678,7 +4712,7 @@ class flexicontent_tmpl
 			}
 
 			// Parse & Load CATEGORY layout of current template
-			$tmplxml = $tmpldir.DS.$tmpl.DS.'category.xml';
+			$tmplxml = JPath::clean($tmpldir.DS.$tmpl.DS.'category.xml');
 			if (JFile::exists($tmplxml))
 			{
 				// Parse the XML file
@@ -4689,10 +4723,12 @@ class flexicontent_tmpl
 				}
 
 				$themes->category->{$tmpl} = new stdClass();
-				$themes->category->{$tmpl}->name 		= $tmpl;
-				$themes->category->{$tmpl}->view 		= 'category';
-				$themes->category->{$tmpl}->tmplvar 	= '.category.'.$tmpl;
-				$themes->category->{$tmpl}->thumb		= 'components/com_flexicontent/templates/'.$tmpl.'/category.png';
+				$themes->category->{$tmpl}->name     = $tmpl;
+				$themes->category->{$tmpl}->xmlpath  = $tmplxml;
+				$themes->category->{$tmpl}->xmlmtime = filemtime($tmplxml);
+				$themes->category->{$tmpl}->view     = 'category';
+				$themes->category->{$tmpl}->tmplvar  = '.category.'.$tmpl;
+				$themes->category->{$tmpl}->thumb    = 'components/com_flexicontent/templates/'.$tmpl.'/category.png';
 
 				// *** This can be serialized and thus Joomla Cache will work
 				$themes->category->{$tmpl}->params = $document->asXML();
@@ -4704,16 +4740,16 @@ class flexicontent_tmpl
 				//$themes->category->{$tmpl}->params		= new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
 				//$themes->category->{$tmpl}->params->loadFile($tmplxml);
 				
-				$themes->category->{$tmpl}->author 		= @$document->author;
-				$themes->category->{$tmpl}->website 	= @$document->website;
-				$themes->category->{$tmpl}->email 		= @$document->email;
-				$themes->category->{$tmpl}->license 	= @$document->license;
-				$themes->category->{$tmpl}->version 	= @$document->version;
-				$themes->category->{$tmpl}->release 	= @$document->release;
-				$themes->category->{$tmpl}->microdata_support	= @$document->microdata_support;
+				$themes->category->{$tmpl}->author 		= (string) @$document->author;
+				$themes->category->{$tmpl}->website 	= (string) @$document->website;
+				$themes->category->{$tmpl}->email 		= (string) @$document->email;
+				$themes->category->{$tmpl}->license 	= (string) @$document->license;
+				$themes->category->{$tmpl}->version 	= (string) @$document->version;
+				$themes->category->{$tmpl}->release 	= (string) @$document->release;
+				$themes->category->{$tmpl}->microdata_support	= (string) @$document->microdata_support;
 
-				$themes->category->{$tmpl}->defaulttitle = @$document->defaulttitle;
-				$themes->category->{$tmpl}->description  = @$document->description;
+				$themes->category->{$tmpl}->defaulttitle = (string) @$document->defaulttitle;
+				$themes->category->{$tmpl}->description  = (string) @$document->description;
 
 				$groups = & $document->fieldgroups;
 				$pos    = & $groups->group;
@@ -4728,18 +4764,15 @@ class flexicontent_tmpl
 				}
 				
 				$tmpl_path = 'components/com_flexicontent/templates/'.$tmpl.'/';
-				$less_path = JPath::clean(JPATH_SITE.DS .$tmpl_path.DS);
 				
-				$css     = & $document->csscategory;
-				$cssfile = & $css->file;
-				if ($cssfile) {
+				$cssfiles = & $document->csscategory->file;
+				if ($cssfiles) {
 					$themes->category->{$tmpl}->css = new stdClass();
-					for ($n=0; $n<count($cssfile); $n++) {
-						$themes->category->{$tmpl}->css->$n = $tmpl_path. (string)$cssfile[$n];
-						$less_file = str_replace( 'css', 'less', (string)$cssfile[$n] );
-						if ( JFile::exists($less_path . $less_file) ) {
-							flexicontent_html::checkedLessCompile(array($less_file), $less_path, $less_path.'less/include/', $force=false);
-						}
+					$themes->category->{$tmpl}->less_files = array();
+					for ($n=0; $n<count($cssfiles); $n++) {
+						$themes->category->{$tmpl}->css->$n = $tmpl_path. (string)$cssfiles[$n];
+						$less_file = JPath::clean( preg_replace('/^css|css$/', 'less', (string)$cssfiles[$n]) );
+						$themes->category->{$tmpl}->less_files[] = $less_file;
 					}
 				}
 				
@@ -4755,6 +4788,42 @@ class flexicontent_tmpl
 			}
 		}
 		return $themes;
+	}
+	
+	
+	static function checkCompileLess($tmpls)
+	{
+		jimport('joomla.filesystem.path' );
+		jimport('joomla.filesystem.file');
+		
+		$templates_path = JPath::clean(JPATH_SITE.DS.'components/com_flexicontent/templates/');
+		foreach($tmpls as $tmpl_type => $tmpls) {
+			foreach($tmpls as $tmpl) {
+				foreach($tmpl->less_files as $less_file) {
+					$tmpl_path = $templates_path.$tmpl->name.DS;
+					if ( JFile::exists($tmpl_path.$less_file) ) {
+						flexicontent_html::checkedLessCompile(array($less_file), $tmpl_path, $tmpl_path.'less/include/', $force=false);
+					}
+				}
+			}
+		}
+	}
+	
+	
+	static function checkXmlModified($tmpls, $return_one=true)
+	{
+		jimport('joomla.filesystem.file');
+		
+		$modified = array();
+		foreach($tmpls as $tmpl_type => $tmpls) {
+			foreach($tmpls as $tmpl) {
+				if (!JFile::exists($tmpl->xmlpath) || filemtime($tmpl->xmlpath) > $tmpl->xmlmtime) {
+					if ($return_one) return $tmpl->xmlpath;
+					else $modified[] = $tmpl->xmlpath;
+				}
+			}
+		}
+		return $return_one ? false : $modified;
 	}
 	
 	
@@ -4786,34 +4855,50 @@ class flexicontent_tmpl
 	
 	static function getTemplates($lang_files = 'all')
 	{
+		static $tmpls = null;
+		if ($tmpls !== null) return $tmpls;
+		
 		$flexiparams = JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $flexiparams->get('print_logging_info');
 
 		// Log content plugin and other performance information
 		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
-
-		if ( !FLEXI_J30GE ) {  // && FLEXI_CACHE  ,  Ignore cache settings since XML parsing in J1.5/J2.5 is costly
-			// add the templates to templates cache
-			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');
-			$tmplcache->setCaching(1);         // Force cache ON
-			$tmplcache->setLifeTime(24*3600);  // Set expire time (hard-code this to 1 day), since it is costly
+		
+		$apply_cache = FLEXI_CACHE;
+		if ( $apply_cache ) {
+			// Get templates from cache
+			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');  // Get Joomla Cache of '...tmpl' Caching Group
+			$tmplcache->setCaching(1); 		              // Force cache ON
+			$tmplcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 			$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates'));
-			$cached = 1;
+			
+			// Check, clean, update cache if needed
+			$xml_modified = flexicontent_tmpl::checkXmlModified($tmpls);
+			if ( !empty($xml_modified) )
+			{
+				JFactory::getApplication()->enqueueMessage("Re-reading XMLs, XML file modified: ".print_r($xml_modified, true), 'message');
+				$tmplcache->clean();
+				$tmplcache->gc();
+				$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates'));
+			}
 		}
 		else {
 			$tmpls = flexicontent_tmpl::parseTemplates();
-			$cached = 0;
 		}
-
+		
+		// Compile LESS to CSS, if files have been modified
+		flexicontent_tmpl::checkCompileLess($tmpls);
+		
 		// Load Template-Specific language file(s) to override or add new language strings
 		if ( $lang_files == 'all' ) foreach ($tmpls->category as $tmpl => $d) FLEXIUtilities::loadTemplateLanguageFile( $tmpl );
 		else if ( is_array($lang_files) )  foreach ($lang_files as $tmpl) FLEXIUtilities::loadTemplateLanguageFile( $tmpl );
 		else if ( is_string($lang_files) ) FLEXIUtilities::loadTemplateLanguageFile( $lang_files );
 		
-		if ($print_logging_info) $fc_run_times[$cached ? 'templates_parsing_cached' : 'templates_parsing_noncached'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ($print_logging_info) $fc_run_times[$apply_cache ? 'templates_parsing_cached' : 'templates_parsing_noncached'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		return $tmpls;
 	}
-
+	
+	
 	static function getThemes($tmpldir='')
 	{
 		jimport('joomla.filesystem.folder');
