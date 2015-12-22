@@ -1,9 +1,6 @@
-.flexicontent :not(.input-prepend):not(.input-append) > input[type="text"] {
-	font-size: 11px;
+.flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
 	display: inline-block;
 	margin: 1px 2px 1px 3px;
-	padding: 4px 2px 5px;
-	border-radius: 4px;
 }
 .flexicontent select {
 	font-size: 12px;
@@ -468,4 +465,10 @@ body .nowrap_hidden {
 	border: 0px none transparent;
 	padding: 0px;
 	overflow: hidden;
+}
+.flexicontent .fc_less_parameter::before {
+	background-color: darkcyan !important;
+	border-radius: 4px;
+	content: "less";
+	padding: 2px 4px;
 }

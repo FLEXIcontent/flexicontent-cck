@@ -273,22 +273,19 @@ div fieldset label.btn {
 div.fieldset_value,
 div.panel fieldset textarea,
 div.panel fieldset select,
-div.panel fieldset input:not(.input-small),
+div.panel fieldset input:not(.input-small):not(.minicolors),
 div.panel fieldset img,
 div.panel fieldset button,
 fieldset.panelform :not(.label-fcouter) label:not(.btn),
 fieldset.panelform textarea,
 fieldset.panelform select,
-fieldset.panelform :not(.input-prepend):not(.input-append) > input:not(.input-small),
+fieldset.panelform :not(.input-prepend):not(.input-append) > input:not(.input-small):not(.minicolors),
 fieldset.panelform img,
 fieldset.panelform :not(.input-prepend):not(.input-append) > button {
+	display: inline-block;
+	height: auto;
 	float: left !important;
 	margin: 2px 8px 0px 0px;
-	padding: 3px !important;
-	display: inline-block;
-	font-size: 12px;
-	font-family: arial;
-	height: auto;
 }
 div.width-20 fieldset,
 div.width-30 fieldset,

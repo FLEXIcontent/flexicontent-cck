@@ -688,15 +688,6 @@ div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"],
 div fieldset td textarea {
 	min-width: 80%;
 }
-#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input,
-#flexicontent div fieldset.panelform textarea,
-#flexicontent div fieldset.panelform select,
-div fieldset td input,
-div fieldset td textarea,
-div fieldset td select {
-	border-radius: 4px;
-	padding: 2px 4px;
-}
 fieldset.panelform ul.adminformlist input,
 fieldset.panelform ul.adminformlist button,
 fieldset.panelform ul.adminformlist textarea,

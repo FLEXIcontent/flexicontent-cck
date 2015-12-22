@@ -256,21 +256,12 @@ class flexicontent_html
 		static $prev_path = null;
 		if ( $prev_path != $path && $debug )  $app->enqueueMessage('Compiling LESS files in: ' .$path, 'message');
 		
-		static $less;
-		if ($less===null)
+		static $initialized;
+		if ($initialized===null)
 		{
 			$framework_path = '/components/com_flexicontent/librairies/lessphp';
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'lessphp'.DS.'lessc.inc.php');
-			
-			//$less = JLess($fname = null, new JLessFormatterJoomla);
-			$less = new \FLEXIcontent\lessc();
-			$formater = new \FLEXIcontent\lessc_formatter_classic();
-			$formater->disableSingle = true;
-			$formater->breakSelectors = true;
-			$formater->assignSeparator = ": ";
-			$formater->selectorSeparator = ",";
-			$formater->indentChar="\t";
-			$less->setFormatter($formater);
+			$initialized = 1;
 		}
 		
 		$compiled = array();
@@ -278,6 +269,16 @@ class flexicontent_html
 		
 		foreach ($stale as $in => $out)
 		{
+			// *** WARNING: Always create new object on every call, otherwise files needed more than one place, will may NOT be include
+			$less = new \FLEXIcontent\lessc();  // JLess($fname = null, new JLessFormatterJoomla);
+			$formater = new \FLEXIcontent\lessc_formatter_classic();
+			$formater->disableSingle = true;
+			$formater->breakSelectors = true;
+			$formater->assignSeparator = ": ";
+			$formater->selectorSeparator = ",";
+			$formater->indentChar="\t";
+			$less->setFormatter($formater);
+			
 			try
 			{
 				$wasCompiled = $less->compileFile($path.$in, $path.$out);  // $less->checkedCompile($path.$in, $path.$out);   // consider modification times

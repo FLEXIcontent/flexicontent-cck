@@ -697,9 +697,9 @@ body .group-fcmethod .btn.active:not(.btn-primary):first-of-type { background-co
 body .group-fcmethod .btn.active:not(.btn-primary) { background-color: #faa732; border-color: #f89406 #f89406 #ad6704; }
 
 
-/*#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append):not(.btn-group) > input,
-#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append):not(.btn-group) > button,*/
-#flexicontent form div fieldset.panelform > div.input-append, #flexicontent form div fieldset.panelform > div.input-prepend, #flexicontent form div fieldset.panelform > div.inpubtn-group,
+#flexicontent form div fieldset.panelform > div.input-append,
+#flexicontent form div fieldset.panelform > div.input-prepend,
+#flexicontent form div fieldset.panelform > div.inpubtn-group,
 #flexicontent form div fieldset.panelform > div.select2-container, 
 #flexicontent form div fieldset.panelform > input,
 #flexicontent form div fieldset.panelform > button,
@@ -740,12 +740,11 @@ form div fieldset > img {
 div fieldset td :not(.input-prepend):not(.input-append) > input[type="text"], div fieldset td textarea {
 	min-width: 80%;
 }
-#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input,
+#flexicontent div fieldset.panelform :not(.input-prepend):not(.input-append) > input:not(.minicolors),
 #flexicontent div fieldset.panelform textarea,
 #flexicontent div fieldset.panelform select,
 div fieldset td input, div fieldset td textarea, div fieldset td select {
-	border-radius:4px;
-	padding:2px 4px;
+	/*padding:2px 4px;*/
 }
 fieldset.panelform ul.adminformlist input,   fieldset.panelform ul.adminformlist button,
 fieldset.panelform ul.adminformlist textarea,fieldset.panelform ul.adminformlist select,

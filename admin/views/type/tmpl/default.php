@@ -210,6 +210,7 @@ $this->document->addScriptDeclaration($js);
 						<fieldset class="panelform">
 							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
 								if ($field->getAttribute('not_inherited')) continue;
+								if ($field->getAttribute('cssprep')) continue;
 								$fieldname =  $field->__get('fieldname');
 								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->attribs[$fieldname]);
 								echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',

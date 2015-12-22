@@ -1034,6 +1034,7 @@ if ( $typeid && $this->perms['cantemplates'] && $this->params->get('selecttheme_
 				<fieldset class="panelform params_set">
 					<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
 						if ($field->getAttribute('not_inherited')) continue;
+						if ($field->getAttribute('cssprep')) continue;
 						$fieldname =  $field->fieldname;
 						$value = $tmpl->params->getValue($fieldname, $groupname, $this->item->itemparams->get($fieldname));
 						echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',

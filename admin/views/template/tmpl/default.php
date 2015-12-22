@@ -629,9 +629,14 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					<fieldset class="panelform">
 						<?php foreach ($this->layout->params->getFieldset($fsname) as $field) :
 							$fieldname =  $field->__get('fieldname');
+							$_labelclass = $field->getAttribute('cssprep')=='less' ? 'fc_less_parameter' : '';
 							$value = $this->layout->params->getValue($fieldname, $groupname, @$this->conf->attribs[$fieldname]);
-							echo str_replace('jform_attribs_', 'jform_layouts_'.$this->layout->name.'_',
-									$this->layout->params->getLabel($fieldname, $groupname));
+							echo
+								str_replace('class="', 'class="'.$_labelclass.' ',
+									str_replace('jform_attribs_', 'jform_layouts_'.$this->layout->name.'_',
+										$this->layout->params->getLabel($fieldname, $groupname)
+									)
+								);
 							echo
 								str_replace('jform_attribs_', 'jform_layouts_'.$this->layout->name.'_', 
 									str_replace('[attribs]', '[layouts]['.$this->layout->name.']',
@@ -666,10 +671,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n@import 'config_auto_item.less';\n@import 'config_auto_category.less';\n");
 					}
 					if ( !JFile::exists($tmpldir . '/less/include/config_auto_item.less') ) {
-						file_put_contents($tmpldir . '/less/include/config_auto_item.less', "/* This is created automatically, do NOT edit this manually!\n The item layout edit screen will save parameters, here as less variables. \nNOTE: Make sure that this is imported by 'config.less'*/\n\n");
+						file_put_contents($tmpldir . '/less/include/config_auto_item.less', "/* This is created automatically, do NOT edit this manually! \nThis is used by item layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' */\n\n");
 					}
 					if ( !JFile::exists($tmpldir . '/less/include/config_auto_category.less') ) {
-						file_put_contents($tmpldir . '/less/include/config_auto_category.less', "/* This is created automatically, do NOT edit this manually!\n The item layout edit screen will save parameters, here as less variables. \nNOTE: Make sure that this is imported by 'config.less'*/\n\n");
+						file_put_contents($tmpldir . '/less/include/config_auto_category.less', "/* This is created automatically, do NOT edit this manually! \nThis is used by category layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' */\n\n");
 					}
 					
 					$less_files = array('/css/item.css'=>'/less/item.less', '/css/category.css'=>'/less/category.less');

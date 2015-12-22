@@ -404,8 +404,39 @@ class FlexicontentModelTemplate extends JModelLegacy
 	 */
 	function storeLessConf($folder, $cfgname, $layout, $attribs)
 	{
-		//$tmpl_path = JPath::clean(JPATH_COMPONENT_SITE.'/templates/'.$folder.'/');
+		// Load the XML file into a JForm object
+		$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
+		$jform->load($this->_getLayout()->params);   // params is the XML file contents as a string
+		
+
+		$layout_type = $layout=='items'? 'item' : 'category';
+		$tmpldir = JPath::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates');
+		$less_path = JPath::clean($tmpldir.DS.$folder.DS.'less/include/config_auto_'.$layout_type.'.less');
+		//echo "<pre>".$less_path."<br/>";
+
+		$var_pfx = '@FC'. ($layout == 'items' ? 'I' : 'C').'_';
+		
+		// Get 'attribs' fieldset
+		$fieldSets = $jform->getFieldsets($groupname = 'attribs');
+		
+		// Iterate though the form elements and only use parameters with cssprep="less"
+		$less_data = "/* This is created automatically, do NOT edit this manually! \nThis is used by ".$layout_type." layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' */\n\n";
+		foreach($jform->getFieldsets($groupname) as $fsname => $fieldSet)
+		{
+			foreach($jform->getFieldset($fsname) as $field)
+			{
+				if ($field->getAttribute('cssprep')!='less') continue;  // Only add parameters meant to be less variables
+				if (is_array($attribs[$field->fieldname])) continue;  // array parameters not supported
+				$v = trim($attribs[$field->fieldname]);
+				if ( !strlen($v) ) {
+					$v = $field->getAttribute('default');
+					if ( !strlen($v) ) continue;  // do not add empty parameters
+				}
+				$less_data .= $var_pfx.$field->fieldname.': '.$v.";\n";
+			}
+		}
+		file_put_contents($less_path, $less_data);
 		
 		return true;
-	}	
+	}
 }
