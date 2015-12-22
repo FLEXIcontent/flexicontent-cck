@@ -76,6 +76,8 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		// Store Layout configurations (template parameters)
 		$model->storeLayoutConf($folder, $cfgname, $type, $attribs);
 		
+		// Store LESS configuration (less variables)
+		$model->storeLessConf($folder, $cfgname, $type, $attribs);
 		
 		switch ($task)
 		{

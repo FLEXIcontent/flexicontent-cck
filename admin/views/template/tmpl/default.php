@@ -691,7 +691,9 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				$it->rewind();
 				$ext_badge = array('php'=>'success', 'xml'=>'info', 'css'=>'warning', 'js'=>'important', 'ini'=>'info', 'less'=>'inverse');
 				$file_tip = array(
-					'config.less'=>'Contains your less configuration variables, mixins',
+					'config.less'=>'Contains your LESS imports, variables, mixins, etc',
+					'config_auto_item.less'=>'Auto-created LESS variables (every save of this form), <br/> saves layout parameters as LESS variables',
+					'config_auto_category.less'=>'Auto-created LESS variables (every save of this form), <br/> saves layout parameters as LESS variables',
 					'item.less'=>'Contains LESS directives, used to create CSS of this item layout',
 					'item.css'=>'Contains CSS specific to this item layout',
 					'category.less'=>'Contains LESS directives, used to create CSS of this category layout',

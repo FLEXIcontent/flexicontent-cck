@@ -161,13 +161,21 @@ class flexicontent_html
 	{
 		static $_dirty_arr = array();
 		static $less_folders = null;
+		$app = JFactory::getApplication();
 		
 		if (!is_array($inc_paths)) $inc_paths = array($inc_paths);
 		
 		// Get global include folders
 		if ($check_global) {
 			if ($less_folders===null) {
-				$less_folders = JComponentHelper::getParams('com_flexicontent')->get('less_folders', 'JPATH_COMPONENT_SITE/assets/less ;; ACTIVE_JTEMPLATE_SITE/less/com_flexicontent/ ;;');
+				$JTEMPLATE_SITE = JPATH_SITE.'/templates/'.(!$app->isAdmin() ? $app->getTemplate() : JFactory::getDBO()->setQuery("SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1")->loadResult());
+				$less_folders = JComponentHelper::getParams('com_flexicontent')->get('less_folders', 'JPATH_COMPONENT_SITE/assets/less :: JTEMPLATE_SITE/less/com_flexicontent/ ::');
+				$_reps = array(
+					'JPATH_COMPONENT_SITE' => JPATH_COMPONENT_SITE, 'JPATH_COMPONENT_ADMINISTRATOR' => JPATH_COMPONENT_ADMINISTRATOR,
+					'JPATH_SITE' => JPATH_SITE, 'JPATH_ADMINISTRATOR' => JPATH_ADMINISTRATOR,
+					'JTEMPLATE_SITE' => $JTEMPLATE_SITE
+				);
+				$less_folders = str_replace(array_keys($_reps), $_reps, $less_folders);
 				$less_folders = preg_split("/[\s]*::[\s]*/", $less_folders);
 				foreach($less_folders as $k => $v)  if (empty($v))  unset($less_folders[$k]);
 			}

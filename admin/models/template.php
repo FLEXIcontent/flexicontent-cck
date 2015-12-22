@@ -211,6 +211,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 		$this->_db->execute();
 		
 		$attribs = json_encode($attribs);
+		//echo "<pre>"; print_r($attribs); echo "</pre>";
 		
 		$query 	= 'INSERT INTO #__flexicontent_layouts_conf (`template`, `cfgname`, `layout`, `attribs`)'
 			.' VALUES(' .
@@ -393,5 +394,18 @@ class FlexicontentModelTemplate extends JModelLegacy
 		return true;
 	}
 	
+	
+	/**
+	 * Method to store parameters as LESS variables
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.5
+	 */
+	function storeLessConf($folder, $cfgname, $layout, $attribs)
+	{
+		//$tmpl_path = JPath::clean(JPATH_COMPONENT_SITE.'/templates/'.$folder.'/');
+		
+		return true;
+	}	
 }
-?>
