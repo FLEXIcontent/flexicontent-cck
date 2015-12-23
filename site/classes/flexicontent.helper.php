@@ -4798,7 +4798,9 @@ class flexicontent_tmpl
 		foreach($tmpls as $tmpl_type => $tmpls) {
 			foreach($tmpls as $tmpl) {
 				$tmpl_path = $templates_path.$tmpl->name.DS;
-				flexicontent_html::checkedLessCompile($tmpl->less_files, $tmpl_path, $tmpl_path.'less/include/', $force=false);
+				if ( !empty($tmpl->less_files) ) {
+					flexicontent_html::checkedLessCompile($tmpl->less_files, $tmpl_path, $tmpl_path.'less/include/', $force=false);
+				}
 			}
 		}
 	}

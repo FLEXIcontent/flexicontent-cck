@@ -233,7 +233,7 @@ foreach($values as $file_id)
 		
 		if ($authorized && $allowview && !$file_data->url) {
 			$actions_arr[] = '
-				<a href="'.$dl_link.'?method=view" class="fancybox '.$file_classes.' btn-info fcfile_viewFile" data-fancybox-type="iframe" title="'.$viewinfo.'" style="line-height:1.3em;" >
+				<a href="'.$dl_link.(strpos($dl_link,'?')!==false ? '&amp;' : '?').'method=view" class="fancybox '.$file_classes.' btn-info fcfile_viewFile" data-fancybox-type="iframe" title="'.$viewinfo.'" style="line-height:1.3em;" >
 					'.$viewtext.'
 				</a>';
 			$fancybox_needed = 1;
@@ -299,7 +299,7 @@ foreach($values as $file_id)
 		
 		if ($authorized && $allowview && !$file_data->url) {
 			$actions_arr[] = '
-				<a href="'.$dl_link.'?method=view" class="fancybox '.$file_classes.' fcfile_viewFile" data-fancybox-type="iframe" title="'.$viewinfo.'" >
+				<a href="'.$dl_link.(strpos($dl_link,'?')!==false ? '&amp;' : '?').'method=view" class="fancybox '.$file_classes.' fcfile_viewFile" data-fancybox-type="iframe" title="'.$viewinfo.'" >
 					'.$viewtext.'
 				</a>';
 			$fancybox_needed = 1;
