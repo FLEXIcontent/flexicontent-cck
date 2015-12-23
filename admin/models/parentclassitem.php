@@ -502,7 +502,8 @@ class ParentClassItem extends JModelAdmin
 				if ($version) $query->select('ver.version_id');           // Versioned item viewing
 				$query->select('c.id AS catid, i.catid as maincatid');    // Current category id and Main category id
 				$query->select(
-					'c.title AS category_title, c.alias AS category_alias, c.lft,c.rgt');   // Current category data
+					'c.title AS category_title, c.alias AS category_alias, c.lft,c.rgt, '.  // Current category data
+					'mc.title AS maincat_title, mc.alias AS maincat_alias');                // Main category data
 				$query->select('ty.name AS typename, ty.alias as typealias');             // Content Type data, and author data
 				$query->select('u.name AS author');                                       // Author data
 				

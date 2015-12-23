@@ -38,24 +38,101 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		static $all_langs = null;
+		static $cat_links = array();
+		static $acclvl_names = null;
+		
+		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
+		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
+		// Microdata (classify the field values for search engines)
+		$itemprop    = $field->parameters->get('microdata_itemprop');
+		
+		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
+		
+		switch($separatorf)
+		{
+			case 0:
+			$separatorf = '&nbsp;';
+			break;
+
+			case 1:
+			$separatorf = '<br />';
+			break;
+
+			case 2:
+			$separatorf = '&nbsp;|&nbsp;';
+			break;
+
+			case 3:
+			$separatorf = ',&nbsp;';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
+			break;
+
+			case 5:
+			$separatorf = '';
+			break;
+
+			default:
+			$separatorf = '&nbsp;';
+			break;
+		}
 		
 		$props_type = $field->parameters->get('props_type');
-		if ($props_type == 'language')
+		switch($props_type)
 		{
-			if ($all_langs===null) {
-				$all_langs= FLEXIUtilities::getLanguages($hash='code');
-			}
-			$lang_data = $all_langs->{$item->language};
+			case 'language':
+				if ($all_langs===null) {
+					$all_langs= FLEXIUtilities::getLanguages($hash='code');
+				}
+				$lang_data = $all_langs->{$item->language};
+				
+				$field->{$prop} = @$lang_data->title_native ? $lang_data->title_native : $lang_data->name;
+				break;
 			
-			$field->{$prop} = @$lang_data->title_native ? $lang_data->title_native : $lang_data->name;
+			case 'alias':
+				$field->{$prop} = $item->{$props_type};
+				break;
+			
+			case 'category':
+				$link_maincat = $field->parameters->get('link_maincat', 1);
+				if ($link_maincat)
+				{
+					$maincatid = isset($item->maincatid) ? $item->maincatid : $item->catid;   // maincatid is used by item view
+					if ( !isset($cat_links[$maincatid]) )
+					{
+						$maincat_slug = $item->maincatid  ?  $item->maincatid.':'.$item->maincat_alias : $item->catid;
+						$cat_links[$maincatid] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($maincat_slug));
+					}
+				}
+				
+				$maincat_title =  !empty($item->maincat_title) ? $item->maincat_title : 'catid: '.$item->catid;
+				$field->{$prop} = $link_maincat ?
+					'<a class="fc_coreprop fc_maincat link_' .$field->name. '" href="' . $cat_links[$maincatid] . '">' . $maincat_title . '</a>' :
+					$maincat_title;
+				break;
+			
+			case 'access':
+				if ($acclvl_names===null) {
+					$acclvl_names = flexicontent_db::getAccessNames();
+				}
+				$field->{$prop} = isset($acclvl_names[$item->access])  ?  $acclvl_names[$item->access]  :  'unknown access level id: '.$item->access;
+				break;
+			
+			default:
+				$field->{$prop} = $props_type;
+				break;
 		}
-		
-		else if ($props_type == 'alias') {
-			$field->{$prop} = $item->{$props_type};
-		}
-		
-		else {
-			$field->{$prop} = $props_type;
+			
+		if (strlen($field->{$prop})) {
+			$field->{$prop} = $opentag.$pretext. $field->{$prop} .$posttext.$closetag;
 		}
 	}
 	
@@ -109,7 +186,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 		$props_type = $filter->parameters->get('props_type');
 		switch ($props_type)
 		{
-			case 'language':     // Authors
+			case 'language':
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
 				$filter->filter_valuesselect = ' i.language AS value, CASE WHEN CHAR_LENGTH(lg.title_native) THEN lg.title_native ELSE lg.title END as text';

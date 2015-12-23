@@ -336,6 +336,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		$query = 'SELECT i.id, i.*, ie.* '
 			. $orderby_col
 			. $select_access
+			. ', c.title AS maincat_title, c.alias AS maincat_alias'  // Main category data
 			. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 			. ' FROM #__content AS i'

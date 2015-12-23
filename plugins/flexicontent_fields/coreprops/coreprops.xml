@@ -22,42 +22,44 @@
 		
 		<fieldset name="group-coreprops-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="Custom place (in frontend Item Form) this selected CORE property via field manager ordering" level="level1"/>
-			<field name="" type="separator" default="FLEXI_CORE_PROPS_DESCRIPTION" level="level3"/>
+			<field name="" type="separator" default="FLEXI_CORE_PROPS_DESCRIPTION" level="level2 alert alert-info fcpadded"/>
+			<field name="" type="separator" default="Frontend Item Form only" level="level1"/>
 			
-			<field name="props_type" type="groupedlist" default="" label="FLEXI_COREPRPS_PROPRI" description="FLEXI_COREPRPS_PROPRI_DESC">
+			<field name="" type="separator" default="Custom place this selected CORE property via field manager ordering" level="level4 alert alert-info"/>
+			
+			<field name="props_type" type="multilist" toggle_related="1" default="" label="FLEXI_COREPRPS_PROPRI" description="FLEXI_COREPRPS_PROPRI_DESC">
 				<group label="FLEXI_BASIC_SINGLE_PROPS">
-					<option value="alias"             >FLEXI_ALIAS</option>
-					<option value="lang"              >FLEXI_COREPROPS_LANGUAGE</option>
-					<option value="language"          >FLEXI_COREPROPS_LANGUAGE_N_ASSOCS</option>
-					<option value="category"          >FLEXI_COREPROPS_CATEGORY_MAIN</option>
-					<option value="disable_comments"  >FLEXI_COREPROPS_DISABLE_COMMENTS</option>
-					<option value="notify_subscribers">FLEXI_COREPROPS_NOTIFY_SUBSCRIBERS</option>
-					<option value="captcha"           >FLEXI_COREPROPS_CAPTCHA</option>
+					<option value="alias"             show_list="" hide_list="maincat_conf">FLEXI_ALIAS</option>
+					<option value="lang"              show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LANGUAGE</option>
+					<option value="language"          show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LANGUAGE_N_ASSOCS</option>
+					<option value="category"          show_list="maincat_conf" hide_list="">FLEXI_COREPROPS_CATEGORY_MAIN</option>
+					<option value="disable_comments"  show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_DISABLE_COMMENTS</option>
+					<option value="notify_subscribers" show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_NOTIFY_SUBSCRIBERS</option>
+					<option value="captcha"           show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_CAPTCHA</option>
 				</group>
 				<group label="FLEXI_COREPROPS_PUBLISHING_PROPS">
-					<option value="timezone_info"     >FLEXI_COREPROPS_TIMEZONE</option>
-					<option value="created_by_alias"  >FLEXI_COREPROPS_CREATE_BY_ALIAS</option>
-					<option value="publish_up"        >FLEXI_COREPROPS_PUBLISH_UP</option>
-					<option value="publish_down"      >FLEXI_COREPROPS_PUBLISH_DOWN</option>
-					<option value="access"            >FLEXI_COREPROPS_VIEW_ACCESS</option>
+					<option value="timezone_info"     show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_TIMEZONE</option>
+					<option value="created_by_alias"  show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_CREATE_BY_ALIAS</option>
+					<option value="publish_up"        show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_PUBLISH_UP</option>
+					<option value="publish_down"      show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_PUBLISH_DOWN</option>
+					<option value="access"            show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_VIEW_ACCESS</option>
 				</group>
 				<group label="FLEXI_COREPROPS_PROP_GROUPS">
-					<option value="perms"             >FLEXI_PERMISSIONS</option>
-					<option value="metadata"          >FLEXI_COREPROPS_META</option>
-					<option value="seoconf"           >FLEXI_COREPROPS_SEO</option>
-					<option value="display_params"    >FLEXI_COREPROPS_DISP_PARAMS</option>
-					<option value="layout_selection"  >FLEXI_COREPROPS_LAYOUT_SELECT</option>
-					<option value="layout_params"     >FLEXI_COREPROPS_LAYOUT_PARAMS</option>
+					<option value="perms"             show_list="" hide_list="maincat_conf">FLEXI_PERMISSIONS</option>
+					<option value="metadata"          show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_META</option>
+					<option value="seoconf"           show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_SEO</option>
+					<option value="display_params"    show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_DISP_PARAMS</option>
+					<option value="layout_selection"  show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LAYOUT_SELECT</option>
+					<option value="layout_params"     show_list="" hide_list="maincat_conf">FLEXI_COREPROPS_LAYOUT_PARAMS</option>
 				</group>
 			</field>
-			
-			<field name="" type="separator" default="NOTE, fields: language, alias can also be displayed in frontend. For displaying 'publish_up', 'publish_down' please use date field in appropriate mode" level="level4"/>
 			
 		</fieldset>
 		<fieldset name="group-coreprops-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
+			
+			<field name="" type="separator" default="NOTE: &lt;br/&gt; - Fields that can be displayed are: language, alias, main category, access, &lt;br/&gt; - for displaying 'publish_up', 'publish_down' please use date field in appropriate mode" level="level3 alert alert-info"/>
 			
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -68,6 +70,44 @@
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class="field-acc-msg"/>
+			
+			<field name="" type="separator" default="FLEXI_COREPROPS_CATEGORY_MAIN" description="" level="level2" depend_class="maincat_conf" />
+			<field name="link_maincat" type="radio" default="1" label="FLEXI_FIELD_LINK_TO_VIEW" description="FLEXI_FIELD_LINK_TO_VIEW_DESC" class="btn-group btn-group-yesno" depend_class="maincat_conf">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
+			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" class="btn-group group-fcmethod">
+				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
+				<option value="1" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ol&gt;','closetag':'&lt;/ol&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List: numbered</option>
+				<option value="2" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:disc\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (bullets)</option>
+				<option value="3" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:circle\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (circle)</option>
+				<option value="4" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:square\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (square)</option>
+				<option value="5" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:none\'&gt;','closetag':'&lt;/oul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (no marking)</option>
+				<option value="6" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge</option>
+				<option value="7" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-success\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge success</option>
+				<option value="8" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-info\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge info</option>
+				<option value="9" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-warning\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge warning</option>
+				<option value="10" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-important\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge important</option>
+			</field>
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			
+			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+			</field>
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC"/>
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC"/>
 			
 		</fieldset>
 		<fieldset name="group-coreprops-filtering" repeat="1" icon_class="icon-filter" label="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">

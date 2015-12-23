@@ -1691,7 +1691,7 @@ class modFlexicontentHelper
 
 		if ( empty($items_query) ) {  // If a custom query has not been set above then use the default one ...
 			$items_query 	= 'SELECT '
-				.' i.id '
+				. ' i.id '
 				. (in_array('commented', $ordering) ? $select_comments : '')
 				. (in_array('rated', $ordering) ? $select_rated : '')
 				. ' FROM #__flexicontent_items_tmp AS i'
@@ -1717,9 +1717,10 @@ class modFlexicontentHelper
 			$_cl = (!$behaviour_cat && $method_cat == 3) ? 'c' : 'mc';
 			
 			$items_query_data 	= 'SELECT '
-				.' i.*, ie.*, ty.name AS typename'
+				. ' i.*, ie.*, ty.name AS typename'
 				. $select_comments
 				. $select_rated
+				. ', mc.title AS maincat_title, mc.alias AS maincat_alias'   // Main category data
 				. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
 				. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', '.$_cl.'.id, '.$_cl.'.alias) ELSE '.$_cl.'.id END as categoryslug'
 				. ', GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats'

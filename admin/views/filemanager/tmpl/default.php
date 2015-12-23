@@ -437,7 +437,7 @@ function showUploader() {
 					unset($thumb_or_icon);
 					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 					$filename_original = $this->folder_mode ? '' : str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
-					$filename_original  = $filename_original ? $filename_original : $filename;
+					$filename_original = $filename_original ? $filename_original : $filename;
 					
 					$fileid = $this->folder_mode ? '' : $row->id;
 					
@@ -493,7 +493,7 @@ function showUploader() {
 					</td>
 					
 					<?php if (!$this->folder_mode) : ?>
-						<td class="center"><?php echo $checked; ?></td>
+					<td class="center"><?php echo $checked; ?></td>
 					<?php endif; ?>
 					
 					<td class="center">
@@ -585,7 +585,7 @@ function showUploader() {
 					<td class="center hidden-tablet hidden-phone"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC2' ) ); ?></td>
 					
 					<?php if (!$this->folder_mode) : ?>
-						<td class="center hidden-tablet hidden-phone"><?php echo $row->id; ?></td>
+					<td class="center hidden-tablet hidden-phone"><?php echo $row->id; ?></td>
 					<?php endif; ?>
 				</tr>
 				<?php 
@@ -752,7 +752,7 @@ function showUploader() {
 			
 			<fieldset class="actions" id="filemanager-2" style="display:none;">
 				<div id="multiple_uploader" class="" style="width: auto; height: 0px;">
-					<div id="multiple_uploader" class="alert alert-warning">
+					<div id="multiple_uploader_failed" class="alert alert-warning">
 						There was some JS error or JS issue, plupload script failed to start
 					</div>
 				</div>
@@ -773,7 +773,7 @@ function showUploader() {
 		
 		<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="addUrlForm" id="addUrlForm" method="post">
 			<fieldset class="filemanager-tab" >
-				<fieldset class="actions" id="filemanager-2">
+				<fieldset class="actions" id="filemanager-3">
 					
 					<table class="fc-form-tbl" id="file-url-form-container">
 						
@@ -851,7 +851,7 @@ function showUploader() {
 		
 		<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="addFileForm" id="addFileForm" method="post">
 			<fieldset class="filemanager-tab" >
-				<fieldset class="actions" id="filemanager-3">
+				<fieldset class="actions" id="filemanager-4">
 	
 					<table class="fc-form-tbl" id="add-files-form-container">
 						

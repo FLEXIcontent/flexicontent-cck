@@ -297,6 +297,7 @@ class plgSearchFlexisearch extends JPlugin
 				.' i.metakey AS metakey,'
 				.' i.metadesc AS metadesc,'
 				.' i.modified AS created,'     // TODO ADD a PARAMETER FOR CONTROLING the use of modified by or created by date as "created"
+				.' c.title AS maincat_title, c.alias AS maincat_alias,'  // Main category data
 				.' t.name AS tagname,'
 				.' fir.value as field,'
 				.' i.access, ie.type_id,'

@@ -40,7 +40,7 @@ $fc_run_times['render_subfields'] = array();
 $fc_run_times['create_filter'] = array();
 
 $force_print = false || JDEBUG;
-if ($force_print) $cparams->set('print_logging_info', 1);
+if ($force_print) $cparams->set('print_logging_info', 2);
 $print_logging_info = $cparams->get('print_logging_info');
 
 if ( $print_logging_info && $format=='html')
@@ -96,36 +96,6 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reloa
 	JFactory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
 
-
-
-// ******************************************************************
-// (If needed) Compile LESS files as CSS (call the less proprocessor)
-// ******************************************************************
-if ( $format == 'html' )
-{
-	// Files in frontend assets folder
-	$path = JPATH_COMPONENT_SITE.DS.'assets'.DS;
-	$inc_path = $path.'less/include/';
-	$less_files = array(
-		'less/flexi_form.less',
-		'less/flexi_containers.less',
-		'less/flexi_shared.less',
-		'less/flexi_frontend.less'
-	);
-	
-	$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-	$force = $stale_frontend && count($stale_frontend);
-	$less_files = array('less/flexicontent.less');
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
-	
-	$less_files = array(
-		'less/flexi_form_fields.less',
-		'less/flexi_filters.less',
-		'less/j3x.less',
-		'less/fcvote.less'
-	);
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
-}
 
 
 // ********************************
@@ -189,6 +159,39 @@ if ($controller) {
 // initialization done ... log stats for initialization
 if ( $print_logging_info && $format=='html')
 	@$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
+// ******************************************************************
+// (If needed) Compile LESS files as CSS (call the less proprocessor)
+// ******************************************************************
+if ( $format == 'html' )
+{
+	$start_microtime = microtime(true);
+	// Files in frontend assets folder
+	$path = JPATH_COMPONENT_SITE.DS.'assets'.DS;
+	$inc_path = $path.'less/include/';
+	$less_files = array(
+		'less/flexi_form.less',
+		'less/flexi_containers.less',
+		'less/flexi_shared.less',
+		'less/flexi_frontend.less'
+	);
+	
+	$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	$force = $stale_frontend && count($stale_frontend);
+	$less_files = array('less/flexicontent.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
+	
+	$less_files = array(
+		'less/flexi_form_fields.less',
+		'less/flexi_filters.less',
+		'less/j3x.less',
+		'less/fcvote.less'
+	);
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	if ( $print_logging_info)
+		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+}
 
 
 // ****************************
@@ -320,10 +323,13 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	// **** EOF: ITEM FORM SAVING
 	
 	if (isset($fc_run_times['templates_parsing_cached']))
-		$msg .= sprintf('<br/>-- [FC Templates XML Parsing (cacheable): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
+		$msg .= sprintf('<br/>-- [FC Templates XML/LESS Parsing (cacheable): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
 	
 	if (isset($fc_run_times['templates_parsing_noncached']))
-		$msg .= sprintf('<br/>-- [FC Templates XML Parsing (not cacheable) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
+		$msg .= sprintf('<br/>-- [FC Templates XML/LESS Parsing (not cacheable) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
+	
+	if (isset($fc_run_times['core_less_recompile']))
+		$msg .= sprintf('<br/>-- [FC core LESS checked re-compile: %.2f s] ', $fc_run_times['core_less_recompile']/1000000);
 	
 	// **** BOF: FRONTEND SPECIFIC
 	if (isset($fc_run_times['search_query_runtime']))

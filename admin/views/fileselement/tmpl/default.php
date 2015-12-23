@@ -455,12 +455,12 @@ function showUploader() {
 					}
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">
-					<td>
+					<td class="center">
 						<?php echo $this->pagination->getRowOffset( $i ); ?>
 					</td>
 					
 					<?php if (!$this->folder_mode) : ?>
-					<td><?php echo $checked; ?></td>
+					<td class="center"><?php echo $checked; ?></td>
 					<?php endif; ?>
 					
 					<?php if ($this->folder_mode) { ?>
@@ -539,7 +539,9 @@ function showUploader() {
 						<td class="center"><span class="badge badge-info"><?php echo JText::_( $row->secure ? 'FLEXI_YES' : 'FLEXI_NO' ); ?></span></td>
 					<?php endif; ?>
 					
-					<td class="center"><?php echo $row->uploader; ?></td>
+					<td class="center">
+						<?php echo $row->uploader; ?>
+					</td>
 					<td class="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC4' )." H:i:s" ); ?></td>
 					
 					<?php if (!$this->folder_mode) : ?>
@@ -707,7 +709,7 @@ function showUploader() {
 			
 			<fieldset class="actions" id="filemanager-2" style="display:none;">
 				<div id="multiple_uploader" class="" style="width: auto; height: 0px;">
-					<div id="multiple_uploader" class="alert alert-warning">
+					<div id="multiple_uploader_failed" class="alert alert-warning">
 						There was some JS error or JS issue, plupload script failed to start
 					</div>
 				</div>
@@ -728,7 +730,7 @@ function showUploader() {
 		
 		<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="addUrlForm" id="addUrlForm" method="post">
 			<fieldset class="filemanager-tab" >
-				<fieldset class="actions" id="filemanager-2">
+				<fieldset class="actions" id="filemanager-3">
 					
 					<table class="fc-form-tbl" id="file-url-form-container">
 						

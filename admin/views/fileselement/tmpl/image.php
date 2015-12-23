@@ -288,10 +288,7 @@ flexicontent_html::loadFramework('flexi-lib');
 		
 			<?php if (!$this->folder_mode) : ?>
 				<span class="fc-filter nowrap_box">
-					<span class="limit nowrap_box" style="display: inline-block;">
-						<label class="label">
-							<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
-						</label>
+					<span class="limit nowrap_box">
 						<?php
 						$pagination_footer = $this->pagination->getListFooter();
 						if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
@@ -408,7 +405,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					unset($thumb_or_icon);
 					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 					$filename_original = $this->folder_mode ? '' : str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
-					$filename_original  = $filename_original ? $filename_original : $filename;
+					$filename_original = $filename_original ? $filename_original : $filename;
 					
 					$fileid = $this->folder_mode ? '' : $row->id;
 					
@@ -450,12 +447,12 @@ flexicontent_html::loadFramework('flexi-lib');
 					}
 		   		?>
 				<tr class="<?php echo "row$k"; ?>">
-					<td>
+					<td class="center">
 						<?php echo $this->pagination->getRowOffset( $i ); ?>
 					</td>
 					
 					<?php if (!$this->folder_mode) : ?>
-					<td><?php echo $checked; ?></td>
+					<td class="center"><?php echo $checked; ?></td>
 					<?php endif; ?>
 					
 					<?php if ($this->folder_mode) { ?>
@@ -503,7 +500,9 @@ flexicontent_html::loadFramework('flexi-lib');
 						<td class="center"><span class="badge badge-info"><?php echo JText::_( $row->secure ? 'FLEXI_YES' : 'FLEXI_NO' ); ?></span></td>
 					<?php endif; ?>
 					
-					<td class="center"><?php echo $row->uploader; ?></td>
+					<td class="center">
+						<?php echo $row->uploader; ?>
+					</td>
 					<td class="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC4' )." H:i:s" ); ?></td>
 					
 					<?php if (!$this->folder_mode) : ?>
@@ -670,7 +669,7 @@ flexicontent_html::loadFramework('flexi-lib');
 			
 			<fieldset class="actions" id="filemanager-2" style="display:none;">
 				<div id="multiple_uploader" class="" style="width: auto; height: 0px;">
-					<div id="multiple_uploader" class="alert alert-warning">
+					<div id="multiple_uploader_failed" class="alert alert-warning">
 						There was some JS error or JS issue, plupload script failed to start
 					</div>
 				</div>

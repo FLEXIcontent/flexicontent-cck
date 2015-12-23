@@ -8,7 +8,7 @@ foreach ($categories as $category)
 	if ( in_array($catid, @$globalnoroute) ) continue;
 	
 	// Performance concern, only do routing once per category
-	if ( !isset($cat_links[$catid]) )
+	if ( $link_to_view && !isset($cat_links[$catid]) )
 	{
 		$cat_links[$catid] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
 	}

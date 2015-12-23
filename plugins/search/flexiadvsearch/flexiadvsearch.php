@@ -686,6 +686,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// *****************
 		
 		$query_data = 'SELECT i.id, i.title AS title, i.created, i.id AS fc_item_id, i.access, ie.type_id, i.language'
+			. ', c.title AS maincat_title, c.alias AS maincat_alias'  // Main category data
 			. ( !$txtmode ?
 				', ie.search_index AS text' :
 				', GROUP_CONCAT(ts.search_index ORDER BY f.ordering ASC SEPARATOR \' \') AS text'

@@ -136,7 +136,7 @@
 			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			
 			<field name="opentag_closetag_separatorf_disabled_ingroup" type="separator" label="" default="FLEXI_OPENTAG_CLOSETAG_SEPARATORF_DISABLED_INGROUP" description="" class="alert fcpadded" depend_class="fieldgroupon" />
-			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC" depend_class="fieldgroupoff" >
+			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC" >
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>
@@ -144,8 +144,8 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" depend_class="fieldgroupoff" />
-			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" depend_class="fieldgroupoff" />
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
 		</fieldset>	
 		<fieldset name="group-sharedvideo-v-playback" repeat="1" icon_class="icon-camera" label_prefix="FLEXI_FIELD_VIEWING" label="Playback" addfieldpath="/administrator/components/com_flexicontent/elements">

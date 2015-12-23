@@ -526,6 +526,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$query .= @ $orderby_col;
 		} else {
 			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, ty.alias AS typealias, rel.catid as rel_catid,'
+				. ' c.title AS maincat_title, c.alias AS maincat_alias,'  // Main category data
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 				. @ $feed_img_col      // optional

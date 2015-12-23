@@ -218,9 +218,15 @@ class flexicontent_html
 	/* Checks and if needed compiles LESS files to CSS files*/
 	static function checkedLessCompile($files, $path, $inc_paths=null, $force=false, $check_global_inc = true)
 	{
-		jimport('joomla.filesystem.path' );
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.file');
+		static $initialized;
+		if ($initialized===null)
+		{
+			jimport('joomla.filesystem.path' );
+			jimport('joomla.filesystem.folder');
+			jimport('joomla.filesystem.file');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'lessphp'.DS.'lessc.inc.php');
+			$initialized = 1;
+		}
 		
 		$app = JFactory::getApplication();
 		$debug = JDEBUG || JComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
@@ -256,13 +262,6 @@ class flexicontent_html
 		static $prev_path = null;
 		if ( $prev_path != $path && $debug )  $app->enqueueMessage('Compiling LESS files in: ' .$path, 'message');
 		
-		static $initialized;
-		if ($initialized===null)
-		{
-			$framework_path = '/components/com_flexicontent/librairies/lessphp';
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'lessphp'.DS.'lessc.inc.php');
-			$initialized = 1;
-		}
 		
 		$compiled = array();
 		$msg = ''; $error = false;
@@ -293,8 +292,8 @@ class flexicontent_html
 		}
 		
 		if ( count($compiled) && $debug ) {
-			foreach($compiled as $inPath => $outPath) $msg .= '<tr><td style="min-width:300px; text-align:left;">' . $inPath . '</td><td style="min-width:300px; text-align:left;">' .$outPath . '</td></tr>';
-			$app->enqueueMessage('<table>'.($prev_path != $path ? '<tr><th style="text-align:left;">LESS</th><th style="text-align:left;">CSS</th></tr>' : '').$msg.'</table>', 'message');
+			foreach($compiled as $inPath => $outPath) $msg .= '<span class="row" style="display:block; margin:0;"><span class="span4">' . $inPath . '</span><span class="span4">' .$outPath . '</span></span>';
+			$app->enqueueMessage(($prev_path != $path ? '<span class="row" style="display:block; margin:0;"><span class="span4">LESS</span><span class="span4">CSS</span></span>' : '').$msg, 'message');
 		}
 		
 		$prev_path = $path;
@@ -2739,10 +2738,7 @@ class flexicontent_html
 				// Find name of required Access Level
 				$acclvl_name = '';
 				if ($acclvl && empty($acclvl_names)) {  // Retrieve this ONCE (static var)
-					$db->setQuery('SELECT title,id FROM #__viewlevels as level');
-					$_lvls = $db->loadObjectList();
-					$acclvl_names = array();
-					if (!empty($_lvls)) foreach ($_lvls as $_lvl) $acclvl_names[$_lvl->id] = $_lvl->title;
+					$acclvl_names = flexicontent_db::getAccessNames();
 				}
 				$acclvl_name =  !empty($acclvl_names[$acclvl]) ? $acclvl_names[$acclvl] : "Access Level: ".$acclvl." not found/was deleted";
 				$no_acc_msg = JText::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
@@ -4093,14 +4089,7 @@ class flexicontent_html
 		// b. Get Access Level names (language filter them)
 		if ( $add_needed_acc || $add_obtained_acc )
 		{
-			if (FLEXI_J16GE) {
-				$db->setQuery('SELECT id, title FROM #__viewlevels');
-				$_arr = $db->loadObjectList();
-				$access_names = array(0=>'Public');  // zero does not exist in J2.5+ but we set it for compatibility
-				foreach ($_arr as $o) $access_names[$o->id] = JText::_($o->title);
-			} else {
-				$access_names = array(0=>'Public', 1=>'Registered', 2=>'Special', 3=>'Privileged');
-			}
+			$access_names = flexicontent_db::getAccessNames();
 		}
 		
 		
@@ -4808,12 +4797,8 @@ class flexicontent_tmpl
 		$templates_path = JPath::clean(JPATH_SITE.DS.'components/com_flexicontent/templates/');
 		foreach($tmpls as $tmpl_type => $tmpls) {
 			foreach($tmpls as $tmpl) {
-				foreach($tmpl->less_files as $less_file) {
-					$tmpl_path = $templates_path.$tmpl->name.DS;
-					if ( JFile::exists($tmpl_path.$less_file) ) {
-						flexicontent_html::checkedLessCompile(array($less_file), $tmpl_path, $tmpl_path.'less/include/', $force=false);
-					}
-				}
+				$tmpl_path = $templates_path.$tmpl->name.DS;
+				flexicontent_html::checkedLessCompile($tmpl->less_files, $tmpl_path, $tmpl_path.'less/include/', $force=false);
 			}
 		}
 	}
@@ -5772,6 +5757,31 @@ class FLEXIUtilities
  */
 class flexicontent_db
 {
+	/**
+	 * Method to get the (language filtered) name of all access levels
+	 * 
+	 * @return string
+	 * @since 1.5
+	 */
+	static function getAccessNames($accessid=null)
+	{
+		static $access_names = array();
+		
+		if ( $accessid!==null && isset($access_names[$accessid]) ) return $access_names[$accessid];
+		
+		$db = JFactory::getDBO();
+		$db->setQuery('SELECT id, title FROM #__viewlevels');
+		$_arr = $db->loadObjectList();
+		$access_names = array(0=>'Public');  // zero does not exist in J2.5+ but we set it for compatibility
+		foreach ($_arr as $o) $access_names[$o->id] = JText::_($o->title);
+		
+		if ( $accessid )
+			return isset($access_names[$accessid]) ? $access_names[$accessid] : 'not found access id: '.$accessid;
+		else
+			return $access_names;
+	}
+	
+	
 	/**
 	 * Method to get the type parameters of an item
 	 * 
