@@ -229,7 +229,7 @@ class flexicontent_html
 		}
 		
 		$app = JFactory::getApplication();
-		$debug = JDEBUG || JComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
+		$debug = JDEBUG || JComponentHelper::getParams('com_flexicontent')->get('print_logging_info')==2;
 		
 		// Validate paths
 		$path     = JPath::clean($path);
@@ -249,7 +249,7 @@ class flexicontent_html
 			$outFile    = 'css/' . $nameOnly . '.css';
 			
 			if (!JFile::exists($path.$inFile)) {
-				if ($debug) $app->enqueueMessage('Path not found: '.$path.$inFiles, 'warning');
+				//if ($debug) $app->enqueueMessage('Path not found: '.$path.$inFile, 'warning');
 			} else if ( $_dirty || $force || !is_file($path.$outFile) || filemtime($path.$inFile) > filemtime($path.$outFile) ) {
 				$stale[$inFile] = $outFile;
 			}
@@ -4288,7 +4288,7 @@ class flexicontent_html
 		if ($layout_vars['tagid'])    $urlvars['tagid']    = $layout_vars['tagid'];
 		if ($layout_vars['cids'])     $urlvars['cids']     = $layout_vars['cids'];
 		
-		// Category link for single/multiple category(-ies)  --OR--  "current layout" link for myitems/author layouts
+		// Category link for single/multiple category(-ies)  --OR--  "current layout" link for myitems/author/favs/tags layouts
 		$non_sef_link = FlexicontentHelperRoute::getCategoryRoute($slug, $Itemid, $urlvars);
 		$category_link = JRoute::_($non_sef_link);
 		

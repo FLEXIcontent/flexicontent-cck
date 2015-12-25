@@ -320,8 +320,10 @@ class FlexicontentHelperRoute
 	/**
 	 * Get routed links for content items
 	 */
-	static function getItemRoute($id, $catid = 0, $Itemid = 0, $item = null)
+	static function getItemRoute($id, $catid = 0, $_Itemid = 0, $item = null)
 	{
+		$Itemid = $_Itemid == -1  ?  0  :  $_Itemid;  // -1 indicates to return the found menu Itemid instead of the produced link
+		
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
 		
 		static $current_language = null;
@@ -351,10 +353,23 @@ class FlexicontentHelperRoute
 		// *****************************************************************
 		
 		// Compatibility with calls not passing item data, check for item data in global object, avoiding an extra SQL call
-		if ( !$item ) {
+		if ( !$item )
+		{
 			global $fc_list_items;
-			if ( !empty($fc_list_items) && isset($fc_list_items[$_id]) ) {
-				$item = $fc_list_items[$_id];
+			if ( !empty($fc_list_items) && isset($fc_list_items[$_id]) )  $item = $fc_list_items[$_id];
+			
+			// Finally last fallback, make a DB query to load the item
+			if ( !$item )
+			{
+				$db = JFactory::getDbo();
+				$query = $db->getQuery(true)
+					->select('i.*, ie.type_id')
+					->from('#__content AS i')
+					->join('#__flexicontent_items_ext ON')
+					->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id')
+					->where('i.id='.$_id);
+				$db->setQuery( $query );
+				$fc_list_items[$_id] = $item = $db->loadObject();
 			}
 		}
 		
@@ -462,26 +477,32 @@ class FlexicontentHelperRoute
 		
 		// Try to find the most appropriate/relevant menu item, using the priority set via needles array
 		else if ($menuitem = FlexicontentHelperRoute::_findItem($needles, $data)) {
-			$link .= '&Itemid='.$menuitem->id;
+			$Itemid = $menuitem->id;
+			$link .= '&Itemid='.$Itemid;
 		}
 		
 		// Try to use component's default menu item, this is according to COMPONENT CONFIGURATION and includes ACTIVE menu item if appropriate
 		else {
 			if ($component_default_menuitem_id === null)
 				$component_default_menuitem_id = FlexicontentHelperRoute::_setDefaultMenuitemId();
-			if ($component_default_menuitem_id)
-				$link .= '&Itemid='.$component_default_menuitem_id;
+			if ($component_default_menuitem_id) {
+				$Itemid = $component_default_menuitem_id;
+				$link .= '&Itemid='.$Itemid;
+			}
 		}
 		
-		return $link;
+		// Return menu Itemid or the produced link
+		return $_Itemid == -1 ? $Itemid : $link;
 	}
 	
 	
 	/**
 	 * Get routed links for categories
 	 */
-	static function getCategoryRoute($catid, $Itemid = 0, $urlvars = array(), $category = null)
+	static function getCategoryRoute($catid, $_Itemid = 0, $urlvars = array(), $category = null)
 	{
+		$Itemid = $_Itemid == -1  ?  0  :  $_Itemid;  // -1 indicates to return the found menu Itemid instead of the produced link
+		
 		// Calculate later only if needed
 		static $component_default_menuitem_id = null;
 		static $layout_default_menuitem_ids = null;
@@ -582,7 +603,8 @@ class FlexicontentHelperRoute
 		
 		// Try to find the most appropriate/relevant menu item, using the priority set via needles array
 		else if ($menuitem = FlexicontentHelperRoute::_findCategory($needles, $data)) {
-			$link .= '&Itemid='.$menuitem->id;
+			$Itemid = $menuitem->id;
+			$link .= '&Itemid='.$Itemid;
 			// Special handly if directory view was matched
 			if ( $menuitem->query['view'] == 'flexicontent' )
 			{
@@ -600,25 +622,30 @@ class FlexicontentHelperRoute
 				$layout_default_menuitem_ids = FlexicontentHelperRoute::_setLayoutDefaultMenuitemIds();
 			
 			if ( $layout && !empty($layout_default_menuitem_ids[$layout]) ) {
-				$link .= '&Itemid='.$layout_default_menuitem_ids[$layout];
+				$Itemid = $layout_default_menuitem_ids[$layout];
 			}
 			else {
 				if ($component_default_menuitem_id === null)
 					$component_default_menuitem_id = FlexicontentHelperRoute::_setDefaultMenuitemId();
-				if ($component_default_menuitem_id)
-					$link .= '&Itemid='.$component_default_menuitem_id;
+				
+				$Itemid = (int) $component_default_menuitem_id;  // if false (aka not set) then it will be typecasted to ZERO
 			}
+			
+			if ($Itemid) $link .= '&Itemid='.$Itemid;
 		}
 		
-		return $link;
+		// Return menu Itemid or the produced link
+		return $_Itemid == -1 ? $Itemid : $link;
 	}
 	
 	
 	/**
 	 * Get routed link for search view
 	 */
-	static function getSearchRoute($reserved=0, $Itemid = 0)
+	static function getSearchRoute($reserved=0, $_Itemid = 0)
 	{
+		$Itemid = $_Itemid == -1  ?  0  :  $_Itemid;  // -1 indicates to return the found menu Itemid instead of the produced link
+		
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
 		
 		// Get default menu item for 'search' view
@@ -643,26 +670,31 @@ class FlexicontentHelperRoute
 		
 		// Fallback to default menu item for the view
 		else if ($_search_default_menuitem_id) {
-			$link .= '&Itemid='.$_search_default_menuitem_id;
+			$Itemid = $_search_default_menuitem_id;
+			$link .= '&Itemid='.$Itemid;
 		}
 		
 		// Try to use component's default menu item, this is according to COMPONENT CONFIGURATION and includes ACTIVE menu item if appropriate
 		else {
 			if ($component_default_menuitem_id === null)
 				$component_default_menuitem_id = FlexicontentHelperRoute::_setDefaultMenuitemId();
-			if ($component_default_menuitem_id)
-				$link .= '&Itemid='.$component_default_menuitem_id;
+			
+			$Itemid = (int) $component_default_menuitem_id;  // if false (aka not set) then it will be typecasted to ZERO
+			if ($Itemid) $link .= '&Itemid='.$Itemid;
 		}
 		
-		return $link;
+		// Return menu Itemid or the produced link
+		return $_Itemid == -1 ? $Itemid : $link;
 	}
 	
 	
 	/**
 	 * Get routed link for favourites view
 	 */
-	static function getFavsRoute($reserved=0, $Itemid = 0)
+	static function getFavsRoute($reserved=0, $_Itemid = 0)
 	{
+		$Itemid = $_Itemid == -1  ?  0  :  $_Itemid;  // -1 indicates to return the found menu Itemid instead of the produced link
+		
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
 		
 		// Get default menu item for 'favourites' view
@@ -687,26 +719,31 @@ class FlexicontentHelperRoute
 		
 		// Fallback to default menu item for the view
 		else if ($_favs_default_menuitem_id) {
-			$link .= '&Itemid='.$_favs_default_menuitem_id;
+			$Itemid = $_favs_default_menuitem_id;
+			$link .= '&Itemid='.$Itemid;
 		}
 		
 		// Try to use component's default menu item, this is according to COMPONENT CONFIGURATION and includes ACTIVE menu item if appropriate
 		else {
 			if ($component_default_menuitem_id === null)
 				$component_default_menuitem_id = FlexicontentHelperRoute::_setDefaultMenuitemId();
-			if ($component_default_menuitem_id)
-				$link .= '&Itemid='.$component_default_menuitem_id;
+			
+			$Itemid = (int) $component_default_menuitem_id;  // if false (aka not set) then it will be typecasted to ZERO
+			if ($Itemid) $link .= '&Itemid='.$Itemid;
 		}
 		
-		return $link;
+		// Return menu Itemid or the produced link
+		return $_Itemid == -1 ? $Itemid : $link;
 	}
 	
 	
 	/**
 	 * Get routed links for tags
 	 */
-	static function getTagRoute($id, $Itemid = 0)
+	static function getTagRoute($id, $_Itemid = 0)
 	{
+		$Itemid = $_Itemid == -1  ?  0  :  $_Itemid;  // -1 indicates to return the found menu Itemid instead of the produced link
+		
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
 		
 		static $current_language = null;
@@ -779,23 +816,27 @@ class FlexicontentHelperRoute
 		
 		// Try to find the most appropriate/relevant menu item, using the priority set via needles array
 		else if ($menuitem = FlexicontentHelperRoute::_findTag($needles, $data)) {
-			$link .= '&Itemid='.$menuitem->id;
+			$Itemid = $menuitem->id;
+			$link .= '&Itemid='.$Itemid;
 		}
 		
 		// Fallback to default menu item for the view
 		else if ($_tags_default_menuitem_id) {
-			$link .= '&Itemid='.$_tags_default_menuitem_id;
+			$Itemid = $_tags_default_menuitem_id;
+			$link .= '&Itemid='.$Itemid;
 		}
 		
 		// Try to use component's default menu item, this is according to COMPONENT CONFIGURATION and includes ACTIVE menu item if appropriate
 		else {
 			if ($component_default_menuitem_id === null)
 				$component_default_menuitem_id = FlexicontentHelperRoute::_setDefaultMenuitemId();
-			if ($component_default_menuitem_id)
-				$link .= '&Itemid='.$component_default_menuitem_id;
+			
+			$Itemid = (int) $component_default_menuitem_id;  // if false (aka not set) then it will be typecasted to ZERO
+			if ($Itemid) $link .= '&Itemid='.$Itemid;
 		}
 		
-		return $link;
+		// Return menu Itemid or the produced link
+		return $_Itemid == -1 ? $Itemid : $link;
 	}
 	
 	

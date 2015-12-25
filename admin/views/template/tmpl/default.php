@@ -670,11 +670,13 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					if ( !JFile::exists($tmpldir . '/less/include/config.less') ) {
 						file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n@import 'config_auto_item.less';\n@import 'config_auto_category.less';\n");
 					}
+					
+					$less_data = "/* This is created automatically, do NOT edit this manually! \nThis is used by _layout_type_ layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' \n to make a parameter be a LESS variable, edit parameter in _layout_type_.xml and add cssprep=\"less\" \n created parameters will be like: @FCLL_parameter_name: value; */\n\n";
 					if ( !JFile::exists($tmpldir . '/less/include/config_auto_item.less') ) {
-						file_put_contents($tmpldir . '/less/include/config_auto_item.less', "/* This is created automatically, do NOT edit this manually! \nThis is used by item layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' */\n\n");
+						file_put_contents($tmpldir . '/less/include/config_auto_item.less', str_replace("FCLL_", "FCI_", str_replace("_layout_type_", "item", $less_data)));
 					}
 					if ( !JFile::exists($tmpldir . '/less/include/config_auto_category.less') ) {
-						file_put_contents($tmpldir . '/less/include/config_auto_category.less', "/* This is created automatically, do NOT edit this manually! \nThis is used by category layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' */\n\n");
+						file_put_contents($tmpldir . '/less/include/config_auto_category.less', str_replace("FCLL_", "FCC_", str_replace("_layout_type_", "category", $less_data)));
 					}
 					
 					$less_files = array('/css/item.css'=>'/less/item.less', '/css/category.css'=>'/less/category.less');

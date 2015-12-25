@@ -218,11 +218,11 @@ class FlexicontentViewCategory extends JViewLegacy
 			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
 			switch($layout) {
 				case ''        :  $default_heading = $category->title;  break;
-				case 'myitems' :  $default_heading = JText::_('FLEXICONTENT_MYITEMS');  break;
-				case 'author'  :  $default_heading = JText::_('FLEXICONTENT_AUTHOR')  .': '. JFactory::getUser($authorid)->get('name');  break;
+				case 'myitems' :  $default_heading = JText::_('FLEXI_MY_CONTENT');  break;
+				case 'author'  :  $default_heading = JText::_('FLEXI_CONTENT_BY_AUTHOR')  .': '. JFactory::getUser($authorid)->get('name');  break;
 				case 'tags'    :  $default_heading = JText::_('FLEXI_ITEMS_WITH_TAG') .': '. $tag->name;  break;
 				case 'favs'    :  $default_heading = JText::_('FLEXI_YOUR_FAVOURED_ITEMS');  break;
-				default        :  $default_heading = JText::_('FLEXICONTENT_CATEGORY');
+				default        :  $default_heading = JText::_('FLEXI_CONTENT_IN_CATEGORY');
 			}
 			if ($layout && $cid) { // Non-single category listings, limited to a specific category
 				$default_heading .= ', '.JText::_('FLEXI_IN_CATEGORY').': '.$category->title;

@@ -420,7 +420,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 		$fieldSets = $jform->getFieldsets($groupname = 'attribs');
 		
 		// Iterate though the form elements and only use parameters with cssprep="less"
-		$less_data = "/* This is created automatically, do NOT edit this manually! \nThis is used by ".$layout_type." layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' */\n\n";
+		$less_data = "/* This is created automatically, do NOT edit this manually! \nThis is used by ".$layout_type." layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' \n to make a parameter be a LESS variable, edit parameter in ".$layout_type.".xml and add cssprep=\"less\" \n created parameters will be like: @FC".($layout=='items'? 'I' : 'C')."_parameter_name: value; */\n\n";
 		foreach($jform->getFieldsets($groupname) as $fsname => $fieldSet)
 		{
 			foreach($jform->getFieldset($fsname) as $field)

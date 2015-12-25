@@ -260,7 +260,7 @@ function FLEXIcontentBuildRoute(&$query)
 		break;
 	
 	case 'tags':
-	case 'tag':
+	case 'tag':  // legacy 'tags' view
 		// EXPLICIT view (will be contained in the url)
 		$segments[] = 'tag';
 		$segments[] = @$query['id'];  // Required ...
@@ -281,7 +281,7 @@ function FLEXIcontentBuildRoute(&$query)
 		break;
 	
 	case 'search':
-	case 'favourites':
+	case 'favourites':    // legacy 'favourites' view
 	case 'fileselement':
 	default:
 		// EXPLICIT view (will be contained in the url)
