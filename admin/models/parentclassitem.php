@@ -366,6 +366,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// This is ITEM cache. NOTE: only unversioned items are cached
 		static $items = array();
+		global $fc_list_items;    // Global item cache (unversioned items)
 		
 		// Clear item to make sure it is reloaded
 		if ( $no_cache ) {
@@ -441,8 +442,8 @@ class ParentClassItem extends JModelAdmin
 		
 		// Only unversioned items are cached, use cache if no specific version was requested
 		if ( !$version && isset($items[$this->_id]) ) {
-			//echo "********************************<br/>\n RETURNING CAHCED item: {$this->_id}<br/> ********************************<br/><br/><br/>";
-			$this->_item = & $items[$this->_id];
+			//echo "********************************<br/>\n RETURNING CACHED item: {$this->_id}<br/> ********************************<br/><br/><br/>";
+			$this->_item = $items[$this->_id];
 			return (boolean) $this->_item;
 		}
 		
@@ -462,7 +463,10 @@ class ParentClassItem extends JModelAdmin
 				$result = $item->load($this->_id);  // try loading existing item data
 				if ($result===false) {
 					$this->_item = false;
-					if (!$version) $items[$this->_id] = & $this->_item;
+					if (!$version) {
+						$items[$this->_id] = $this->_item;
+						$fc_list_items[$this->_id] = $this->_item;
+					}
 					return false; // item not found, return
 				}
 			}
@@ -579,7 +583,10 @@ class ParentClassItem extends JModelAdmin
 				if (!$data) {
 					$this->_item = false;
 					$this->_typeid = 0;
-					if (!$version) $items[$this->_id] = & $this->_item;
+					if (!$version) {
+						$items[$this->_id] = $this->_item;
+						$fc_list_items[$this->_id] = $this->_item;
+					}
 					return false; // item not found, return
 				}
 				
@@ -872,7 +879,10 @@ class ParentClassItem extends JModelAdmin
 			// Assign to the item data member variable and cache it if loaded an unversioned item data
 			// ***************************************************************************************
 			$this->_item = & $item;
-			if (!$version) $items[$this->_id] = & $this->_item;
+			if (!$version) {
+				$items[$this->_id] = $this->_item;
+				$fc_list_items[$this->_id] = $this->_item;
+			}
 			
 			// ******************************************************************************************************
 			// Detect if current version doesnot exist in version table and add it !!! e.g. after enabling versioning 
@@ -910,7 +920,10 @@ class ParentClassItem extends JModelAdmin
 		}*/
 		
 		// Add to cache if it is non-version data
-		if (!$version) $items[$this->_id] = & $this->_item;
+		if (!$version) {
+			$items[$this->_id] = $this->_item;
+			$fc_list_items[$this->_id] = $this->_item;
+		}
 		
 		// return true if item was loaded successfully
 		return (boolean) $this->_item;
@@ -1385,7 +1398,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function canEditState($item=null, $check_cat_perm=true)
 	{
-		if ( empty($item) ) $item = & $this->_item;
+		if ( empty($item) ) $item = $this->_item;
 		$user = JFactory::getUser();
 		$session = JFactory::getSession();
 		
@@ -3471,7 +3484,7 @@ class ParentClassItem extends JModelAdmin
 		if ($old_item) {
 			$item = & $old_item;
 		} else if (isset($this->_item)) {
-			$item = & $this->_item;
+			$item = $this->_item;
 		} else {
 			$item = $this->getItem();  // This fuction calls the load item function for existing item and init item function in the case of new item
 		}

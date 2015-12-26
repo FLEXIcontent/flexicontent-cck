@@ -1707,7 +1707,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function feedbutton($view, &$params, $slug = null, $itemslug = null, $item = null)
+	static function feedbutton($view, &$params, $slug = null, $itemslug = null, $reserved=null, $item = null)
 	{
 		if ( !$params->get('show_feed_icon', 1) || JRequest::getCmd('print') ) return;
 		
@@ -1844,7 +1844,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function mailbutton($view, &$params, $slug = null, $itemslug = null, $item = null)
+	static function mailbutton($view, &$params, $slug = null, $itemslug = null, $reserved=null, $item = null)
 	{
 		static $initialize = null;
 		static $uri, $base;

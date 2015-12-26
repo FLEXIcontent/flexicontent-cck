@@ -318,6 +318,36 @@ class FlexicontentHelperRoute
 	
 	
 	/**
+	 * Load an item
+	 */
+	static function _loadItem($_id, $doQuery = true)
+	{
+		global $fc_list_items;
+		static $items = array();
+		
+		//echo "FlexicontentHelperRoute::_loadItem(".$_id .")<br/>";
+		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+		
+		if ( isset($fc_list_items[$_id]) )  return $fc_list_items[$_id];
+		if ( isset($items[$_id]) )  return $fc_list_items[$_id];
+		if (!$doQuery) return false;
+		
+		// Finally last fallback, make a DB query to load the item
+		//echo "FlexicontentHelperRoute::_loadItem(".$_id .") doing query<br/>";
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true)
+			->select('i.*, ie.type_id')
+			->from('#__content AS i')
+			->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id')
+			->where('i.id='.$_id);
+		$db->setQuery( $query );
+		$items[$_id] = $db->loadObject();
+		
+		return $items[$_id];
+	}
+	
+	
+	/**
 	 * Get routed links for content items
 	 */
 	static function getItemRoute($id, $catid = 0, $_Itemid = 0, $item = null)
@@ -353,25 +383,7 @@ class FlexicontentHelperRoute
 		// *****************************************************************
 		
 		// Compatibility with calls not passing item data, check for item data in global object, avoiding an extra SQL call
-		if ( !$item )
-		{
-			global $fc_list_items;
-			if ( !empty($fc_list_items) && isset($fc_list_items[$_id]) )  $item = $fc_list_items[$_id];
-			
-			// Finally last fallback, make a DB query to load the item
-			if ( !$item )
-			{
-				$db = JFactory::getDbo();
-				$query = $db->getQuery(true)
-					->select('i.*, ie.type_id')
-					->from('#__content AS i')
-					->join('#__flexicontent_items_ext ON')
-					->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id')
-					->where('i.id='.$_id);
-				$db->setQuery( $query );
-				$fc_list_items[$_id] = $item = $db->loadObject();
-			}
-		}
+		if ( !$item ) $item = FlexicontentHelperRoute::_loadItem($_id, $doQuery = false);
 		
 		// Get language
 		$language = (!$item || @!$item->language) ? $current_language : $item->language;
