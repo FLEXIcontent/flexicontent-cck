@@ -1472,6 +1472,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		if ( $this->_id )
 		{
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');  // If category model is loaded from 3rd party code
 			$catshelper = new flexicontent_cats($this->_id);
 			$parents    = $catshelper->getParentlist($all_cols=false);
 			

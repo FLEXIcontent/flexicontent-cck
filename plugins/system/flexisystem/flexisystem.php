@@ -108,8 +108,8 @@ class plgSystemFlexisystem extends JPlugin
 			$fcdebug = JRequest::getVar('fcdebug', '');
 			$fcdebug = strlen($fcdebug) ? (int)$fcdebug : $session->get('fcdebug', 0, 'flexicontent');
 			// Enable/Disable debugging
-			$session->set('fcdebug', $fcdebug, 'flexicontent');
-			$this->cparams->set('print_logging_info', $fcdebug);
+			$session->set('fcdebug', ($fcdebug ? 1 : 0), 'flexicontent');
+			$this->cparams->set('print_logging_info', ($fcdebug ? 2 : 0));
 		}
 		
 		$print_logging_info = $this->cparams->get('print_logging_info');

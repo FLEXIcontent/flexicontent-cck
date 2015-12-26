@@ -229,7 +229,10 @@ class flexicontent_html
 		}
 		
 		$app = JFactory::getApplication();
-		$debug = JDEBUG || JComponentHelper::getParams('com_flexicontent')->get('print_logging_info')==2;
+		$flexiparams = JComponentHelper::getParams('com_flexicontent');
+		
+		$print_logging_info = $flexiparams->get('print_logging_info');
+		$debug = JDEBUG || $print_logging_info;
 		
 		// Validate paths
 		$path     = JPath::clean($path);
@@ -4855,7 +4858,9 @@ class flexicontent_tmpl
 		if ($tmpls !== null) return $tmpls;
 		
 		$flexiparams = JComponentHelper::getParams('com_flexicontent');
+		
 		$print_logging_info = $flexiparams->get('print_logging_info');
+		$debug = JDEBUG || $print_logging_info;
 
 		// Log content plugin and other performance information
 		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
@@ -4872,7 +4877,7 @@ class flexicontent_tmpl
 			$xml_modified = flexicontent_tmpl::checkXmlModified($tmpls);
 			if ( !empty($xml_modified) )
 			{
-				JFactory::getApplication()->enqueueMessage("Re-reading XMLs, XML file modified: ".print_r($xml_modified, true), 'message');
+				if ($debug) JFactory::getApplication()->enqueueMessage("Re-reading XMLs, XML file modified: ".print_r($xml_modified, true), 'message');
 				$tmplcache->clean();
 				$tmplcache->gc();
 				$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates'));

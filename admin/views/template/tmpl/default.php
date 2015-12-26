@@ -681,6 +681,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					
 					$less_files = array('/css/item.css'=>'/less/item.less', '/css/category.css'=>'/less/category.less');
 					foreach($less_files as $css_name => $less_name) {
+						if ( !JFile::exists($tmpldir . $css_name) )  continue;  // Do not try to copy CSS file that does not exist
 						if ( !JFile::exists($tmpldir . $less_name) ) {
 							if ( !JFile::copy($tmpldir.$css_name, $tmpldir.$less_name) ) {
 								JError::raiseWarning(100, JText::_('Unable to create file: "'.$tmpldir.$less_name.'"'));
