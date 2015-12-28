@@ -343,6 +343,10 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
 		$default_title = $default_title ? JText::_($default_title) : '';
 		
+		// Rendering options
+		$email_cloaking = $field->parameters->get( 'email_cloaking', 1 ) ;
+		$mailto_link    = $field->parameters->get( 'mailto_link', 1 ) ;
+				
 		// Get field values
 		$values = $values ? $values : $field->value;
 		
