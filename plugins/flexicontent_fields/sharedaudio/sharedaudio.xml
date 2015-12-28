@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Shared Audio (SoundCloud,Spotify,Last.fm,etc)</name>
+	<name>FLEXIcontent - Shared Audio (SoundCloud, last.fm, etc)</name>
 	<author>Lyquix, ggppdk</author>
 	<creationDate>July 2013</creationDate>
 	<copyright>Copyright (C) 2013 Lyquix</copyright>
@@ -16,22 +16,33 @@
 	
 	<config>
 	<fields name="attribs">
-	
-		<fieldset name="group-sharedaudio-apis" repeat="1" icon_class="icon-cog" label="APIs" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="" type="separator" default="Embeding method" level="level2"/>
-			<field name="" type="separator" default="Either use embed.ly only, - or - also use native APIs: youtube, vimeo, dailymotion" level="level4" class="alert alert-info fcpadded"/>
-			<field name="" type="separator" default="Note this will not change embeding method of already saved values" level="level4" class="alert alert-info fcpadded"/>
-			<field name="use_native_apis" type="multilist" subtype="radio" toggle_related="1" default="1" label="Embed with" description="Disable to also use native APIs" class="btn-group group-fcmethod">
-				<option value="0" show_list="" hide_list="disp-native-apis">embed.ly API only</option>
-				<option value="1" show_list="disp-native-apis" hide_list="">embed.ly API and native APIs</option>
-			</field>
-			<field name="embedly_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEDLY_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEDLY_KEY_DESC" />
-			<field name="youtube_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_YOUTUBE_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_YOUTUBE_KEY_DESC" depend_class="disp-native-apis" />
-			
-		</fieldset>
+		
+		<!--fieldset name="standard" repeat="1">
+		</fieldset-->
 		
 		<fieldset name="group-sharedaudio-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
-		
+			
+			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
+			
+			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comment.png" class="btn-group group-fcmethod fcoffactive">
+				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
+				<option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
+			<field name="allow_multiple" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
+				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
+				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
+				<option value="2">FLEXI_FIELD_INLINE_PREPEND_BTN</option>
+				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
+			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_FLOATED_LEFT</option>
@@ -40,14 +51,18 @@
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			
 			<field name="" type="separator" default="Display field on form" level="level1" />
-			<field name="display_audiotype_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TYPE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_display_audiotype_form_DESC" class="btn-group btn-group-yesno">
+			<!--field name="display_videtype_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TYPE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TYPE_FORM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_audioid_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_ID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_display_audioid_form_DESC" class="btn-group btn-group-yesno">
+			</field-->
+			<!--field name="display_audioid_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_ID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_ID_FORM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</field>
+			</field-->
+			<!--field name="display_duration_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_FORM_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
 			<field name="display_title_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_FORM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -56,15 +71,31 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="display_duration_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_FORM_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<field name="display_description_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION_FORM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="display_edit_size_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EDIT_SIZE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EDIT_SIZE_FORM_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+		</fieldset>
 		
+		
+		<fieldset name="group-sharedaudio-config" repeat="1" icon_class="icon-wrench" label="FLEXI_CONFIG" addfieldpath="/administrator/components/com_flexicontent/elements">
+		    
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEDLY_CONFIG" level="level1" />
+			
+			<field name="embedly_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEDLY_API_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEDLY_API_KEY_DESC" />
+			<field name="autostart" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTOSTART" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTOSTART_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="force_ssl" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_FORCESSL" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_FORCESSL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 		</fieldset>
 		
 		<fieldset name="group-sharedaudio-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -84,11 +115,40 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
-			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
-			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" class="btn-group group-fcmethod">
+				<option value=""  fcreadonly="{'opentag':0,'closetag':0,'pretext':0,'posttext':0,'separatorf':0,'remove_space':0}" >FLEXI_CUSTOMIZE</option>
+				<option value="1" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ol&gt;','closetag':'&lt;/ol&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List: numbered</option>
+				<option value="2" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:disc\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (bullets)</option>
+				<option value="3" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:circle\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (circle)</option>
+				<option value="4" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:square\'&gt;','closetag':'&lt;/ul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (square)</option>
+				<option value="5" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'&lt;ul style=\'list-style-type:none\'&gt;','closetag':'&lt;/oul&gt;','pretext':'&lt;li&gt;','posttext':'&lt;/li&gt;','separatorf':'5','remove_space':'0'}">List (no marking)</option>
+				<option value="6" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge</option>
+				<option value="7" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-success\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge success</option>
+				<option value="8" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-info\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge info</option>
+				<option value="9" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-warning\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge warning</option>
+				<option value="10" fcreadonly="{'opentag':1,'closetag':1,'pretext':1,'posttext':1,'separatorf':1,'remove_space':1}" fcconfigs="{'opentag':'','closetag':'','pretext':'&lt;span class=\'badge badge-important\'&gt;','posttext':'&lt;/span&gt;','separatorf':'5','remove_space':'0'}">Badge important</option>
+			</field>
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			
+			<field name="opentag_closetag_separatorf_disabled_ingroup" type="separator" label="" default="FLEXI_OPENTAG_CLOSETAG_SEPARATORF_DISABLED_INGROUP" description="" class="alert fcpadded" depend_class="fieldgroupon" />
+			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC" >
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+			</field>
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
 		</fieldset>	
-		<fieldset name="group-sharedaudio-v-playback" repeat="1" icon_class="icon-music" label_prefix="FLEXI_FIELD_VIEWING" label="Playback" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-sharedaudio-v-playback" repeat="1" icon_class="icon-camera" label_prefix="FLEXI_FIELD_VIEWING" label="Playback" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="Audio" level="level1" />
 			<field name="" type="separator" default="Audio Info" level="level2" />
@@ -108,22 +168,23 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="display_duration" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<field name="display_description" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<!--field name="display_duration" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
 			
 			<field name="" type="separator" default="Audio player" level="level2" />
 			<field name="width" type="text" default="480" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_WIDTH" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_WIDTH_DESC" />
-			<field name="height" type="text" default="170" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_HEIGHT" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_HEIGHT_DESC" />
-			<field name="autostart" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTOSTART" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTOSTART_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="height" type="text" default="270" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_HEIGHT" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_HEIGHT_DESC" />
+			<field name="player_position" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_POSITION" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_POSITION_DESC" class="btn-group btn-group-yesno">
+				<option value="0">PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_POSITION_BEFORE</option>
+				<option value="1">PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PLAYER_POSITION_AFTER</option>
 			</field>
+			
 		</fieldset>
 		
 	</fields>
