@@ -34,8 +34,8 @@ if ($ff_placement){
 <?php echo $filter_form_body; ?>
 
 	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
-	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['filter_order_Dir']; ?>" />
+	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
+	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['filter_order_Dir']; ?>" />
 	<input type="hidden" name="view" value="category" />
 	<input type="hidden" name="letter" value="<?php echo JRequest::getVar('letter');?>" id="alpha_index" />
 	<input type="hidden" name="task" value="" />

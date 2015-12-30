@@ -876,23 +876,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->assignRef('alpha',     $alpha);
 		$this->assignRef('tmpl',      $tmpl);
 
-		/*
-		 * Set template paths : this procedure is issued from K2 component
-		 *
-		 * "K2" Component by JoomlaWorks for Joomla! 1.5.x - Version 2.1
-		 * Copyright (c) 2006 - 2009 JoomlaWorks Ltd. All rights reserved.
-		 * Released under the GNU/GPL license: http://www.gnu.org/copyleft/gpl.html
-		 * More info at http://www.joomlaworks.gr and http://k2.joomlaworks.gr
-		 * Designed and developed by the JoomlaWorks team
-		 */
-		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates');
-		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates');
-		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.'default');
-		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.'default');
-		if ($clayout) {
-			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$clayout);
-			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout);
-		}
+		// Moved decision of layout into the model, function decideLayout() $ilayout should never be empty
+		// It will consider things like: template exists, is allowed, client is mobile, current frontend user override, etc
+		// The following is Joomla legacy view loading of templates, TODO: use JLayout ?? (examine if template file need to be re-used)
+		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$clayout);
+		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout);
 		
 		
 		// **************************************************

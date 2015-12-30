@@ -143,8 +143,8 @@ $items	= & $this->items;
 ?>
 
 <input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
-<input type="hidden" name="filter_order_Dir" value="" />
+<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
+<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="" />
 <input type="hidden" name="view" value="tags" />
 <input type="hidden" name="task" value="" />
 <input type="hidden" name="id" value="<?php echo $this->tag->id; ?>" />

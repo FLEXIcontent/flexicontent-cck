@@ -323,7 +323,9 @@ class flexicontent_html
 		
 		$domain = $pluginParams->get('domain');
 		
-		if ($domain === null || $domain === '')
+		$jversion = new JVersion;
+		$is_j35ge = version_compare( $jversion->getShortVersion(), '3.5.0', 'ge' );
+		if ( ($is_j35ge && $domain === false) || (!$is_j35ge && $domain === null) || $domain === '')
 		{
 			$domain = $uri->toString(array('scheme', 'host', 'port'));
 		}

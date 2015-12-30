@@ -75,6 +75,9 @@ class FlexicontentModelFavourites extends JModelLegacy
 		// Set the pagination variables into state (We get them from http request OR use view's parameters)
 		$limit = strlen(JRequest::getVar('limit')) ? JRequest::getInt('limit') : $this->_params->get('limit');
 		$limitstart	= JRequest::getInt('limitstart', JRequest::getInt('start', 0, '', 'int'), '', 'int');
+		
+		// In case limit has been changed, adjust limitstart accordingly
+		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
 		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
 		
 		$this->setState('limit', $limit);
