@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Shared Video (YouTube,Vimeo,DailyMotion,etc)</name>
+	<name>FLEXIcontent - Shared Video (YouTube, Vimeo, DailyMotion, etc)</name>
 	<author>Lyquix, ggppdk</author>
 	<creationDate>July 2013</creationDate>
 	<copyright>Copyright (C) 2013 Lyquix</copyright>
@@ -19,6 +19,31 @@
 		
 		<!--fieldset name="standard" repeat="1">
 		</fieldset-->
+		
+		<fieldset name="group-sharedvideo-apis" repeat="1" icon_class="icon-cog" label="APIs" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="autostart" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_AUTOSTART" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_AUTOSTART_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<!--field name="" type="separator" default="Embeding method" level="level2"/>
+			<field name="" type="separator" default="Either use embed.ly only, - or - also use native APIs: youtube, vimeo, dailymotion" level="level4" class="alert alert-info fcpadded"/>
+			<field name="" type="separator" default="Note this will not change embeding method of already saved values" level="level4" class="alert alert-info fcpadded"/>
+			<field name="use_native_apis" type="multilist" subtype="radio" toggle_related="1" default="0" label="Embed with" description="Disable to also use native APIs" class="btn-group group-fcmethod">
+				<option value="0" show_list="" hide_list="disp-native-apis">embed.ly API only</option>
+				<option value="1" show_list="disp-native-apis" hide_list="">embed.ly API and native APIs</option>
+			</field>
+			<field name="youtube_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_YOUTUBE_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_YOUTUBE_KEY_DESC" depend_class="disp-native-apis" labelclass="label-info" /-->
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EMBEDLY_CONFIG" level="level1" />
+			
+			<field name="embedly_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EMBEDLY_API_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EMBEDLY_API_KEY_DESC" labelclass="label-info" />
+			<field name="force_ssl" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_FORCESSL" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_FORCESSL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		</fieldset>
 		
 		<fieldset name="group-sharedvideo-editing" repeat="1" icon_class="icon-pencil" label="FLEXI_FIELD_EDITING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
@@ -51,15 +76,11 @@
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			
 			<field name="" type="separator" default="Display field on form" level="level1" />
-			<!--field name="display_videtype_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TYPE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TYPE_FORM_DESC" class="btn-group btn-group-yesno">
+			<!--field name="display_videtype_form" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TYPE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TYPE_FORM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field-->
-			<!--field name="display_videoid_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_ID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_ID_FORM_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field-->
-			<!--field name="display_duration_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_FORM_DESC" class="btn-group btn-group-yesno">
+			<!--field name="display_videoid_form" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_ID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_ID_FORM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field-->
@@ -71,27 +92,15 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<!--field name="display_duration_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_FORM_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
 			<field name="display_description_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DESCRIPTION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DESCRIPTION_FORM_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="display_edit_size_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EDIT_SIZE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EDIT_SIZE_FORM_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-		</fieldset>
-		
-		
-		<fieldset name="group-sharedvideo-config" repeat="1" icon_class="icon-wrench" label="FLEXI_CONFIG" addfieldpath="/administrator/components/com_flexicontent/elements">
-		    
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EMBEDLY_CONFIG" level="level1" />
-			
-			<field name="embedly_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EMBEDLY_API_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EMBEDLY_API_KEY_DESC" />
-			<field name="autostart" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_AUTOSTART" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_AUTOSTART_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="force_ssl" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_FORCESSL" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_FORCESSL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

@@ -418,7 +418,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 	// **************************************************************
 	
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField($field, &$post, $file)
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 	}

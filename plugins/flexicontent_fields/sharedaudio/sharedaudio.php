@@ -48,16 +48,24 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		// API key and other form configuration
+		$use_native_apis = (int) $field->parameters->get('use_native_apis', 0);
 		$embedly_key = $field->parameters->get('embedly_key','') ;
+		$youtube_key = $field->parameters->get('youtube_key', '');
 		
 		$autostart   = $field->parameters->get('autostart', 0);
 		$autostart   = $autostart ? 'true' : 'false';
 		$force_ssl   = $field->parameters->get('force_ssl', 1);
 		$force_ssl   = $force_ssl ? 'true' : 'false';
+		
+		$display_audiotype_form = $field->parameters->get('display_audiotype_form', 0);
+		$display_audioid_form   = $field->parameters->get('display_audioid_form', 0);
+		
 		$display_title_form       = $field->parameters->get('display_title_form', 1);
 		$display_author_form      = $field->parameters->get('display_author_form', 1);
+		$display_duration_form    = $field->parameters->get('display_duration_form', 0);
+		
 		$display_description_form = $field->parameters->get('display_description_form', 1);
-		$display_edit_size_form = $field->parameters->get('display_edit_size_form', 1);
+		$display_edit_size_form   = $field->parameters->get('display_edit_size_form', 1);
 		
 		// Initialise value property
 		if (empty($field->value)) 
@@ -65,11 +73,14 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			$field->value = array();
 			$field->value[0]['url'] = '';
 			$field->value[0]['embed_url'] = '';
+			$field->value[0]['audiotype'] = '';
+			$field->value[0]['audioid'] = '';
 			$field->value[0]['title'] = '';
 			$field->value[0]['author'] = '';
+			$field->value[0]['duration'] = '';
 			$field->value[0]['description'] = '';
-			$field->value[0]['heightaudio'] = '';
-			$field->value[0]['widthaudio'] = '';
+			$field->value[0]['height'] = '';
+			$field->value[0]['width'] = '';
 			$field->value[0]['thumb'] = '';
 			$field->value[0] = serialize($field->value[0]);
 		}
@@ -143,9 +154,11 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				window[updFun]({title:'', author:'', description:'', thumb:'', embed_url:''});
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_preview').html('');
 				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_url').val('');
-				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_heightaudio').val('');
-				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_widthaudio').val('');
-				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_title, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_widthaudio, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_heightaudio, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_author, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_description, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_preview').parents('tr').hide('fast');
+				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_height').val('');
+				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_width').val('');
+				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_audiotype').val('');
+				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_audioid').val('');
+				jQuery('#" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_title, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_author, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_description, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_audiotype, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_audioid, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_preview, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_width, #" . $elementid . "_' + uniqueRowNum" . $field->id . " + '_height').parents('tr').hide('fast');
 				jQuery('#fcfield_fetching_msg_" . $elementid . "_' + uniqueRowNum" . $field->id . ").html('');
 				";
 			
@@ -223,34 +236,37 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			$elementid_n = $elementid.'_'.$n;
 			
 			// only for backward compatibility:
-			if (!empty($value['audiotype']) && !empty($value['audioid'])) 
+			if (!empty($value['audiotype']) && !empty($value['audioid']))
 			{
-				switch($value['audiotype']) 
+				$content_id = $value['audioid'];
+				switch($value['audiotype'])
 				{
 					case 'youtube' :
-						$value['embed_url'] = '//www.youtube.com/embed/' . $value['audioid'];
+						$value['embed_url'] = '//www.youtube.com/embed/' . $content_id;
 						break;
-
 					case 'vimeo' :
-						$value['embed_url'] = '//player.vimeo.com/audio/' . $value['audioid'];
+						$value['embed_url'] = '//player.vimeo.com/video/' . $content_id;
 						break;
-
 					case 'dailymotion' :
-						$value['embed_url'] = '//www.dailymotion.com/embed/audio/' . $value['audioid'];
+						$value['embed_url'] = '//www.dailymotion.com/embed/video/' . $content_id;
 						break;
-
-					default :
-						$value['embed_url'] = $value['audioid'];
+					default:
+						// For embed.ly , the full URL is inside content ID
+						$value['embed_url'] = $content_id;
 						break;
 				}
 			}
+			$iframecode = '<iframe class="sharedaudio seamless" src="'.($value['embed_url'] ? $value['embed_url'] : 'about:blank').'" style="width: 240px; height: 140px; border: none; overflow:hidden;" allowFullScreen></iframe>';
 
 			if (!isset($value['url']))         $value['url'] = '';
 			if (!isset($value['embed_url']))   $value['embed_url'] = '';
+			if (!isset($value['audiotype']))   $value['audiotype'] = '';
+			if (!isset($value['audioid']))     $value['audioid'] = '';
 			if (!isset($value['title']))       $value['title'] = '';
 			if (!isset($value['author']))      $value['author'] = '';
-			if (!isset($value['heightaudio'])) $value['heightaudio'] = '';
-			if (!isset($value['widthaudio'])) $value['widthaudio'] = '';
+			if (!isset($value['duration']))    $value['duration'] = '';
+			if (!isset($value['height']))      $value['height'] = '';
+			if (!isset($value['width']))       $value['width'] = '';
 			if (!isset($value['description'])) $value['description'] = '';
 			if (!isset($value['thumb']))       $value['thumb'] = '';
 			
@@ -261,101 +277,125 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				<tr>
 					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_URL') . '</span></td>
 					<td>
-						<input type="text" class="fcfield_textval' . $required . '" id="' . $elementid_n . '_url" name="' . $fieldname_n . '[url]" value="' . $value['url'] . '" size="60" />
-						<input class="fcfield-button" type="button" value="' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_FETCH') . '" onclick="fetchAudio_' . $elementid_n . '();" />
+						<input type="text" class="fcfield_textval' . $required . '" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" value="' . $value['url'] . '" size="60" />
+						<input class="fcfield-button" type="button" value="' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_FETCH') . '" onclick="fetchAudio_'.$elementid_n.'();" />
 						'.($use_ingroup ? '' : $move2).'
 						'.($use_ingroup ? '' : $remove_button).'
 						'.($use_ingroup || !$add_position ? '' : $add_here).'
-						<input type="hidden" id="' . $elementid_n . '_embed_url" name="' . $fieldname_n . '[embed_url]" value="' . $value['embed_url'] . '" />
+						<input type="hidden" id="'.$elementid_n.'_embed_url" name="'.$fieldname_n.'[embed_url]" value="' . $value['embed_url'] . '" />
 					</td>
 				</tr>
 				<tr>
-					<td colspan="2" style="padding:0"><span id="fcfield_fetching_msg_' . $elementid_n . '"></span></td>
-				</tr>' 
-				. ($display_title_form ? 
-				'<tr>
+					<td colspan="2" style="padding:0"><span id="fcfield_fetching_msg_'.$elementid_n.'"></span></td>
+				</tr>'
+			.($display_audiotype_form ? '
+				<tr>
+					<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_TYPE').'</span></td>
+					<td>
+						<input type="text" class="fcfield_textval" id="'.$elementid_n.'_audiotype" name="'.$fieldname_n.'[audiotype]" value="'.$value['audiotype'].'" size="10" readonly="readonly" />
+					</td>
+				</tr>' : '
+				<input type="hidden" id="'.$elementid_n.'_audiotype" name="'.$fieldname_n.'[audiotype]" value="'.$value['audiotype'].'" style="background-color:#eee" />')
+			.($display_audioid_form ? '
+				<tr>
+					<td class="key"><span class="flexi label sub_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_ID').'</span></td>
+					<td>
+						<input type="text" class="fcfield_textval" id="'.$elementid_n.'_audioid" name="'.$fieldname_n.'[audioid]" value="'.$value['audioid'].'" size="15" readonly="readonly" />
+					</td>
+				</tr>' : '
+				<input type="hidden" id="'.$elementid_n.'_audioid" name="'.$fieldname_n .'[audioid]" value="'.$value['audioid'].'" style="background-color:#eee" />')
+			.($display_title_form ? '
+				<tr>
 					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_TITLE') . '</span></td>
 					<td>
-						<input type="text" class="fcfield_textval" id="' . $elementid_n . '_title" name="' . $fieldname_n . '[title]" value="' . $value['title'] . '" size="60" />
+						<input type="text" class="fcfield_textval" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" value="' . $value['title'] . '" size="60" />
 					</td>
-				</tr>' 
-				: '<input type="hidden" id="' . $elementid_n . '_title" name="' . $fieldname_n . '[title]" value="' . $value['title'] . '" />') 
-				. ($display_author_form ? 
-				'<tr>
+				</tr>
+				' : '<input type="hidden" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" value="' . $value['title'] . '" />')
+			.($display_author_form ? '
+				<tr>
 					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUTHOR') . '</span></td>
 					<td>
-						<input type="text" class="fcfield_textval" id="' . $elementid_n . '_author" name="' . $fieldname_n . '[author]" value="' . $value['author'] . '" size="60" />
+						<input type="text" class="fcfield_textval" id="'.$elementid_n.'_author" name="'.$fieldname_n.'[author]" value="' . $value['author'] . '" size="60" />
 					</td>
-				</tr>' 
-				: '<input type="hidden" id="' . $elementid_n . '_author" name="' . $fieldname_n . '[author]" value="' . $value['author'] . '" />') 
-				. ($display_edit_size_form ? 
-                '<tr>
+				</tr>
+				' : '<input type="hidden" id="'.$elementid_n.'_author" name="'.$fieldname_n.'[author]" value="' . $value['author'] . '" />')
+			.($display_duration_form ? '
+				<tr>
+					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DURATION') . '</span></td>
+					<td>
+						<input type="text" class="fcfield_textval" id="'.$elementid_n.'_duration" name="'.$fieldname_n.'[duration]" value="'.$value['duration'].'" size="10" readonly="readonly" />
+					</td>
+				</tr>' : '
+				<input type="hidden" id="'.$elementid_n.'_duration" name="'.$fieldname_n.'[duration]" value="' . $value['duration'] . '" />')
+			.($display_edit_size_form ? '
+				<tr>
 					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_SIZE_WIDTH') . '</span></td>
 					<td>
-						<input type="text" class="fcfield_textval" id="' . $elementid_n . '_widthaudio" name="' . $fieldname_n . '[widthaudio]" value="' . $value['widthaudio'] . '" size="60" />
+						<input type="text" class="fcfield_textval" id="'.$elementid_n.'_width" name="'.$fieldname_n.'[width]" value="' . $value['width'] . '" size="60" />
 					</td>
 				</tr> 
 				<tr>
 					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_SIZE_HEIGHT') . '</span></td>
 					<td>
-						<input type="text" class="fcfield_textval" id="' . $elementid_n . '_heightaudio" name="' . $fieldname_n . '[heightaudio]" value="' . $value['heightaudio'] . '" size="60" />
+						<input type="text" class="fcfield_textval" id="'.$elementid_n.'_height" name="'.$fieldname_n.'[height]" value="' . $value['height'] . '" size="60" />
 					</td>
-				</tr>'
-				: '<input type="hidden" id="' . $elementid_n . '_widthaudio" name="' . $fieldname_n . '[widthaudio]" value="' . $value['widthaudio'] . '" />
-				   <input type="hidden" id="' . $elementid_n . '_heightaudio" name="' . $fieldname_n . '[heightaudio]" value="' . $value['heightaudio'] . '" />')
-				. ($display_description_form ? 
-				'<tr>
+				</tr>' : '
+					<input type="hidden" id="'.$elementid_n.'_width" name="'.$fieldname_n.'[width]" value="' . $value['width'] . '" />
+					<input type="hidden" id="'.$elementid_n.'_height" name="'.$fieldname_n.'[height]" value="' . $value['height'] . '" />')
+			.($display_description_form ? '
+				<tr>
 					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DESCRIPTION') . '</span></td>
 					<td>
-						<textarea class="fcfield_textareaval" id="' . $elementid_n . '_description" name="' . $fieldname_n . '[description]" rows="7" cols="50">' . $value['description'] . '</textarea>
+						<textarea class="fcfield_textareaval" id="'.$elementid_n.'_description" name="'.$fieldname_n.'[description]" rows="7" cols="50">' . $value['description'] . '</textarea>
 					</td>
-				</tr>' : 
-				'<input type="hidden" id="' . $elementid_n . '_description" name="' . $fieldname_n . '[description]" value="'. $value['description'] . '" />') 
-				. '<tr>
-					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PREVIEW') . '</span>
-					</td>
+				</tr>
+				' : '<input type="hidden" id="'.$elementid_n.'_description" name="'.$fieldname_n.'[description]" value="' . $value['description'] . '" />')
+				. '
+				<tr>
+					<td class="key"><span class="flexi label sub_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_PREVIEW') . '</span></td>
 					<td>
-						<div id="' . $elementid_n . '_preview">
-							<iframe class="sharedaudio seamless" src="'.($value['embed_url'] ? $value['embed_url'] : 'about:blank').'" style="width: 240px; height: 140px; border: none; overflow:hidden;" allowFullScreen></iframe>
+						<div id="'.$elementid_n.'_preview">
+							'.$iframecode.'
 						</div>
-						<input type="hidden" id="' . $elementid_n . '_thumb" name="' . $fieldname_n . '[thumb]" value="' . $value['thumb'] . '" />
+						<input type="hidden" id="'.$elementid_n.'_thumb" name="'.$fieldname_n.'[thumb]" value="' . $value['thumb'] . '" />
 					</td>
 				</tr>
 			</tbody>
 			</table>
 			
 			<script>
-			function fetchAudio_' . $elementid_n . '() 
+			function fetchAudio_'.$elementid_n.'() 
 			{
-				updateValueInfo_' . $elementid_n . '({title:"", author:"", description:"", thumb:"", embed_url:""});
-				jQuery("#' . $elementid_n . '_preview").html("");
+				updateValueInfo_'.$elementid_n.'({title:"", author:"", description:"", thumb:"", embed_url:""});
+				jQuery("#'.$elementid_n.'_preview").html("");
 				
 				var urlregex = /(http:|ftp:|https:)?\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
-				var audiourl = jQuery("#' . $elementid_n . '_url").val();
+				var audiourl = jQuery("#'.$elementid_n.'_url").val();
 				if(audiourl.match(urlregex) != null)
 				{
 					var jsonurl = "";
 					
-					jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">");
+					jQuery("#fcfield_fetching_msg_'.$elementid_n.'").html("<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">");
 					
 					// try embed.ly
-					jsonurl = "https://api.embed.ly/1/oembed?url="+encodeURIComponent(audiourl)'. ($embedly_key ? '+"&key='.$embedly_key.'"' : '') .'+"&maxwidth=1280&wmode=transparent&secure=' . $force_ssl . '&autoplay=' . $autostart . '&callback=embedlyCallback_' . $elementid_n . '";
+					jsonurl = "https://api.embed.ly/1/oembed?url="+encodeURIComponent(audiourl)'. ($embedly_key ? '+"&key='.$embedly_key.'"' : '') .'+"&maxwidth=1280&wmode=transparent&secure=' . $force_ssl . '&autoplay=' . $autostart . '&callback=embedlyCallback_'.$elementid_n.'";
 					var jsonscript = document.createElement("script");
 					jsonscript.setAttribute("type","text/javascript");
 					jsonscript.setAttribute("src",jsonurl);
 					jsonscript.onerror = function(evt)
 					{
-						jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_HTTP_ERROR').'</div>");
+						jQuery("#fcfield_fetching_msg_'.$elementid_n.'").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_HTTP_ERROR').'</div>");
 					};
 					document.body.appendChild(jsonscript);
 				}
 				else 
 				{
-					jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_INVALID_URL').'</div>");
-					jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_widthaudio, #' . $elementid_n . '_heightaudio").parents("tr").hide("fast");
+					jQuery("#fcfield_fetching_msg_'.$elementid_n.'").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_INVALID_URL').'</div>");
+					jQuery("#'.$elementid_n.'_title, #'.$elementid_n.'_author, #'.$elementid_n.'_description, #'.$elementid_n.'_preview, #'.$elementid_n.'_width, #'.$elementid_n.'_height").parents("tr").hide("fast");
 				}
 			}
-			function embedlyCallback_' . $elementid_n . '(data)
+			function embedlyCallback_'.$elementid_n.'(data)
 			{
 				if(typeof data === "object" && data.type != "error") 
 				{
@@ -365,42 +405,42 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 						if(data.html.match(urlregex) != null) 
 						{
 							var iframeurl = data.html.match(urlregex)[0];
-							var iframecode = \'<iframe class="sharedaudio seamless" src="\'+iframeurl+\'" style="width: 240px; height: 140px; border: none;" scrolling="no" allowFullScreen></iframe>\';
-							jQuery("#' . $elementid_n . '_preview").html(iframecode);
-							updateValueInfo_' . $elementid_n . '({title: data.title, author: data.author_name, description: data.description, thumb: data.thumbnail_url, embed_url: data.html.match(urlregex)[0]});
-							jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_widthaudio, #' . $elementid_n . '_heightaudio").parents("tr").show("fast");
+							var iframecode = \'<iframe class="sharedaudio seamless" src="\'+iframeurl+\'" style="width: 240px; height: 140px; border: none; overflow:hidden;" allowFullScreen></iframe>\';
+							jQuery("#'.$elementid_n.'_preview").html(iframecode);
+							updateValueInfo_'.$elementid_n.'({title: data.title, author: data.author_name, description: data.description, thumb: data.thumbnail_url, embed_url: data.html.match(urlregex)[0]});
+							jQuery("#'.$elementid_n.'_title, #'.$elementid_n.'_author, #'.$elementid_n.'_description, #'.$elementid_n.'_audiotype, #'.$elementid_n.'_audioid, #'.$elementid_n.'_preview, #'.$elementid_n.'_width, #'.$elementid_n.'_height").parents("tr").show("fast");
 						}
-						jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("");
+						jQuery("#fcfield_fetching_msg_'.$elementid_n.'").html("");
 					}
 					else 
 					{
-						jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_URL_NOT_AUDIO').'</div>");
-						jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_widthaudio, #' . $elementid_n . '_heightaudio").parents("tr").hide("fast");
+						jQuery("#fcfield_fetching_msg_'.$elementid_n.'").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_URL_NOT_AUDIO').'</div>");
+						jQuery("#'.$elementid_n.'_title, #'.$elementid_n.'_author, #'.$elementid_n.'_description, #'.$elementid_n.'_audiotype, #'.$elementid_n.'_audioid, #'.$elementid_n.'_preview, #'.$elementid_n.'_width, #'.$elementid_n.'_height").parents("tr").hide("fast");
 					}
 				}
 				else {
-					jQuery("#fcfield_fetching_msg_' . $elementid_n . '").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_UNABLE_TO_PARSE').'</div>");
+					jQuery("#fcfield_fetching_msg_'.$elementid_n.'").html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_UNABLE_TO_PARSE').'</div>");
 					var errorText = typeof data === "object" ? data.error_message : data;
 					jQuery("#fcfield_fetching_msg_'.$elementid_n.'").html("<span class=\"alert alert-warning fc-iblock\">"+errorText+"</span>");
-					jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_widthaudio, #' . $elementid_n . '_heightaudio").parents("tr").hide("fast");
+					jQuery("#'.$elementid_n.'_title, #'.$elementid_n.'_author, #'.$elementid_n.'_description, #'.$elementid_n.'_audiotype, #'.$elementid_n.'_audioid, #'.$elementid_n.'_preview, #'.$elementid_n.'_width, #'.$elementid_n.'_height").parents("tr").hide("fast");
 				}
 			}
-			function updateValueInfo_' . $elementid_n . '(data)
+			function updateValueInfo_'.$elementid_n.'(data)
 			{
-				jQuery("#' . $elementid_n . '_title").val(data.title);
-				jQuery("#' . $elementid_n . '_author").val(data.author);
-				jQuery("#' . $elementid_n . '_heightaudio").val(data.heightaudio);
-				jQuery("#' . $elementid_n . '_widthaudio").val(data.widthaudio);
-				jQuery("#' . $elementid_n . '_description").val(data.description);
-				jQuery("#' . $elementid_n . '_thumb").val(data.thumb);
-				jQuery("#' . $elementid_n . '_embed_url").val(data.embed_url);
+				jQuery("#'.$elementid_n.'_title").val(data.title);
+				jQuery("#'.$elementid_n.'_author").val(data.author);
+				jQuery("#'.$elementid_n.'_height").val(data.height);
+				jQuery("#'.$elementid_n.'_width").val(data.width);
+				jQuery("#'.$elementid_n.'_description").val(data.description);
+				jQuery("#'.$elementid_n.'_thumb").val(data.thumb);
+				jQuery("#'.$elementid_n.'_embed_url").val(data.embed_url);
 			}
 			jQuery(document).ready(function()
 			{
 				// if field is empty, hide fields
-				if(jQuery("#' . $elementid_n . '_url").val() == "") 
+				if(jQuery("#'.$elementid_n.'_url").val() == "") 
 				{
-					jQuery("#' . $elementid_n . '_title, #' . $elementid_n . '_author, #' . $elementid_n . '_description, #' . $elementid_n . '_preview, #' . $elementid_n . '_heightaudio, #' . $elementid_n . '_widthaudio").parents("tr").hide();
+					jQuery("#'.$elementid_n.'_title, #'.$elementid_n.'_author, #'.$elementid_n.'_description, #'.$elementid_n.'_audiotype, #'.$elementid_n.'_audioid, #'.$elementid_n.'_preview, #'.$elementid_n.'_height, #'.$elementid_n.'_width").parents("tr").hide();
 				}
 			});
 			</script>';
@@ -428,10 +468,8 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// displays the field in the frontend
-
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		$field->label = JText::_($field->label);
-		if (!in_array($field->field_type, self::$field_types)) return;
 
 		// Get field values
 		$values = $values ? $values : $field->value;
@@ -440,9 +478,12 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$display_title 			= $field->parameters->get('display_title', 1);
-		$display_author 		= $field->parameters->get('display_author', 0);
-		$display_description 	= $field->parameters->get('display_description', 0);
+		
+		// Meta DATA that will be displayed
+		$display_title    = $field->parameters->get('display_title', 1);
+		$display_author   = $field->parameters->get('display_author', 0);
+		$display_duration = $field->parameters->get('display_duration',0) ;
+		$display_description = $field->parameters->get('display_description', 0);
 
 		$headinglevel = $field->parameters->get('headinglevel', 3);
 		$width        = $field->parameters->get('width', 960);
@@ -509,45 +550,74 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 				continue;
 			}
 			
-			// generate html output
-			$html_meta = ($display_title && !empty($value['title']) ? '<h' . $headinglevel . '>' . $value['title'] . '</h' . $headinglevel . '>' : '') 
-				. ($display_author && !empty($value['author']) ? '<div class="author">' . $value['author'] . '</div>' : '') 
-				. ($display_description && !empty($value['description']) ? '<div class="description">' . $value['description'] . '</div>' : '');
+			$duration = intval($value['duration']);
+			if ($display_duration && $duration && empty($value['embed_url']))
+			{
+				if ($duration >= 3600) $h = intval($duration/3600);
+				if ($duration >= 60)   $m = intval($duration/60 - $h*60);
+				$s = $duration - $m*60 -$h*3600;
+				if ($h>0) $h .= ":";
+				$m = str_pad($m,2,'0',STR_PAD_LEFT).':';
+				$s = str_pad($s,2,'0',STR_PAD_LEFT);
+				$duration_str = $h.$m.$s;
+			}
+			else $duration_str = '';
 			
-			$html_audio = '<div class="audioplayer"><iframe class="sharedaudio seamless" src="';
-
+			// Create field's html
+			$html_meta = '
+				'.($display_title  && !empty($value['title'])  ? '<h'.$headinglevel.'>' . $value['title']  . '</h'.$headinglevel.'>' : '') .'
+				'.($display_author && !empty($value['author']) ? '<div class="author">' . $value['author'] . '</div>' : '') .'
+				'.($duration_str ? '<div class="duration">'.$duration_str.'</div>' : '') .'
+				'.($display_description && !empty($value['description']) ? '<div class="description">' . $value['description'] . '</div>' : '');
+			
 			// backward compatibility
 			if (!empty($value['embed_url']))
 			{
 				$embed_url = $value['embed_url'];
+				$_show_related = '';
+				$_show_srvlogo = '';
 			}
 			else
 			{
+				$content_id = $value['audioid'];
 				switch($value['audiotype'])
 				{
-					case 'youtube'     :  $embed_url = '//www.youtube.com/embed/' . $value['audioid'] . '?autoplay=' . $autostart .'&rel=0&modestbranding=1&maxwidth=0&modestbranding=1';  break;
-					case 'vimeo'       :  $embed_url = '//player.vimeo.com/audio/' . $value['audioid'] . '?autoplay=' . $autostart;  break;
-					case 'dailymotion' :  $embed_url = '//www.dailymotion.com/embed/audio/' . $value['audioid'] . '?autoplay=' . $autostart . '&related=0&logo=0';  break;
-					default            :  $embed_url = $value['audioid'];  break;
+					case 'youtube':
+						$embed_url = '//www.youtube.com/embed/' . $content_id;
+						$_show_related = '&rel=0';
+						$_show_srvlogo = '&modestbranding=1&maxwidth=0&modestbranding=1';
+						break;
+					case 'vimeo':
+						$embed_url = '//player.vimeo.com/video/' . $content_id;
+						$_show_related = '';
+						$_show_srvlogo = '';
+						break;
+					case 'dailymotion':
+						$embed_url = '//www.dailymotion.com/embed/video/' . $content_id;
+						$_show_related = '&related=0';
+						$_show_srvlogo = '&logo=0';
+						break;
+					default:  // For embed.ly , the full URL is inside content ID
+						$embed_url = $content_id;
+						$_show_related = '';
+						$_show_srvlogo = '';
+						break;
 				}
 			}
-			//$width $height
-			if ($display_edit_size_form ==1)
-			{
-				$widthdisplay = $value['widthaudio'];
-				$heightdisplay = $value['heightaudio'];
-			}
-			else
-			{
-				$widthdisplay = $width;
-				$heightdisplay = $height;
-			}
-			$html_audio .= $embed_url . '" style="border: none;" scrolling="no" allowFullScreen width="' . $widthdisplay . '" height="'. $heightdisplay .'"></iframe></div>';
+			$player_url = ($embed_url ? $embed_url : 'about:blank').'?autoplay='.$autostart.$_show_related.$_show_srvlogo;
 			
-			$field->{$prop}[$n] = $pretext 
-				. ($player_position ? '' : $html_audio)
+			$_width  = $display_edit_size_form ? $value['width']  : $width;
+			$_height = $display_edit_size_form ? $value['height'] : $height;
+			
+			$player_html = '
+			<div class="audioplayer">
+				<iframe class="sharedaudio seamless" src="'.$player_url.'" style="border: none;" scrolling="no" allowFullScreen width="' . $_width . '" height="'. $_height .'" allowFullScreen></iframe>
+			</div>';
+			
+			$field->{$prop}[$n] = $pretext
+				. ($player_position ? '' : $player_html)
 				. $html_meta
-				. ($player_position ? $html_audio : '')
+				. ($player_position ? $player_html : '')
 				. $posttext;
 			
 			$n++;
@@ -618,16 +688,16 @@ class plgFlexicontent_fieldsSharedaudio extends FCField
 			$newpost[$new]['url'] = $url;
 			
 			// Validate other value properties
-			//$newpost[$new]['audiotype']   = flexicontent_html::dataFilter(@$v['audiotype'], 0, 'STRING', 0);
-			//$newpost[$new]['audioid']     = flexicontent_html::dataFilter(@$v['audioid'], 0, 'STRING', 0);
-			//$newpost[$new]['duration']    = flexicontent_html::dataFilter(@$v['duration'], 0, 'INT', 0);
+			$newpost[$new]['audiotype']   = flexicontent_html::dataFilter(@$v['audiotype'], 0, 'STRING', 0);
+			$newpost[$new]['audioid']     = flexicontent_html::dataFilter(@$v['audioid'], 0, 'STRING', 0);
 			$newpost[$new]['embed_url']   = flexicontent_html::dataFilter(@$v['embed_url'], 0, 'STRING', 0);
 			$newpost[$new]['thumb']       = flexicontent_html::dataFilter(@$v['thumb'], 0, 'STRING', 0);
 			$newpost[$new]['title']       = flexicontent_html::dataFilter(@$v['title'], 0, 'STRING', 0);
 			$newpost[$new]['author']      = flexicontent_html::dataFilter(@$v['author'], 0, 'STRING', 0);
+			$newpost[$new]['duration']    = flexicontent_html::dataFilter(@$v['duration'], 0, 'INT', 0);
 			$newpost[$new]['description'] = flexicontent_html::dataFilter(@$v['description'], 0, 'STRING', 0);
-			$newpost[$new]['heightaudio'] = flexicontent_html::dataFilter(@$v['heightaudio'], 0, 'STRING', 0);
-			$newpost[$new]['widthaudio']  = flexicontent_html::dataFilter(@$v['widthaudio'], 0, 'STRING', 0);
+			$newpost[$new]['height']      = flexicontent_html::dataFilter(@$v['height'], 0, 'STRING', 0);
+			$newpost[$new]['width']       = flexicontent_html::dataFilter(@$v['width'], 0, 'STRING', 0);
 			
 			$new++;
 		}
