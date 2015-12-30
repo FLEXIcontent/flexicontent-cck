@@ -52,6 +52,7 @@ class FlexicontentViewTypes extends JViewLegacy
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		
+		
 		// ***********
 		// Get filters
 		// ***********
@@ -59,17 +60,18 @@ class FlexicontentViewTypes extends JViewLegacy
 		$count_filters = 0;
 		
 		// various filters
-		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 		'filter_state',     '', 'word' );
-		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
+		$filter_state   = $model->getState('filter_state');
+		$filter_access  = $model->getState('filter_access');
 		if ($filter_state) $count_filters++; if ($filter_access) $count_filters++;
 		
-		// ordering filters
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     't.name', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', '', 'word' );
+		// Order and order direction
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
 		
-		// text search		
-		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
+		// Text search
+		$search = $model->getState( 'search' );
 		$search = $db->escape( trim(JString::strtolower( $search ) ) );
+		
 		
 		
 		// ****************************

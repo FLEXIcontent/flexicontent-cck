@@ -74,6 +74,7 @@ function delAllFilters() {
 	delFilter('search');  delFilter('filter_lang');  delFilter('filter_uploader');
 	delFilter('filter_url');  delFilter('filter_secure');  delFilter('filter_ext');
 	delFilter('item_id');
+	delFilter('filter_order'); delFilter('filter_order_Dir');
 }
 
 var _file_data = new Array();
@@ -556,14 +557,17 @@ function showUploader() {
 			</tbody>
 			
 			</table>
-			<?php echo JHTML::_( 'form.token' ); ?>
+			
 			<input type="hidden" name="boxchecked" value="0" />
 			<input type="hidden" name="controller" value="filemanager" />
 			<input type="hidden" name="task" value="" />
 			<input type="hidden" name="file" value="" />
 			<input type="hidden" name="files" value="<?php echo $this->files; ?>" />
-			<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
-			<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+			<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
+			<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+			<input type="hidden" name="fcform" value="1" />
+			<?php echo JHTML::_( 'form.token' ); ?>
+			
 			<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 			<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 			<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />

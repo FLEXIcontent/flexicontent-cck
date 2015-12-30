@@ -75,6 +75,50 @@ class FlexicontentModelTags extends JModelLegacy
 		$p      = $option.'.'.$view.'.';
 		
 		
+		
+		// ****************************************
+		// Ordering: filter_order, filter_order_Dir
+		// ****************************************
+		
+		$default_order     = 't.name';
+		$default_order_dir = 'ASC';
+		
+		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
+		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
+		
+		if (!$filter_order)     $filter_order     = $default_order;
+		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
+		
+		$this->setState('filter_order', $filter_order);
+		$this->setState('filter_order_Dir', $filter_order_Dir);
+		
+		$app->setUserState($p.'filter_order', $filter_order);
+		$app->setUserState($p.'filter_order_Dir', $filter_order_Dir);
+		
+		
+		
+		// **************
+		// view's Filters
+		// **************
+		
+		// Various filters
+		$filter_state    = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',    '', 'string' );
+		$filter_assigned = $fcform ? $jinput->get('filter_assigned', '',   'word')  :  $app->getUserStateFromRequest( $p.'filter_assigned', 'filter_assigned',  '',  'word' );
+		
+		$this->setState('filter_state', $filter_state);
+		$this->setState('filter_assigned', $filter_assigned);
+		
+		$app->setUserState($p.'filter_state', $filter_state);
+		$app->setUserState($p.'filter_assigned', $filter_assigned);
+		
+		
+		// Text search
+		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
+		$this->setState('search', $search);
+		$app->setUserState($p.'search', $search);
+		
+		
+		
 		// *****************************
 		// Pagination: limit, limitstart
 		// *****************************
@@ -97,7 +141,8 @@ class FlexicontentModelTags extends JModelLegacy
 		$array = $jinput->get('cid', array(0), 'array');
 		$this->setId((int)$array[0]);
 	}
-
+	
+	
 	/**
 	 * Method to set the Tag identifier
 	 *
@@ -119,7 +164,8 @@ class FlexicontentModelTags extends JModelLegacy
 	 * @return	string
 	 * @since	1.6
 	 */
-	function getAssignedItems($tids) {
+	function getAssignedItems($tids)
+	{
 		if (empty($tids)) return array();
 		
 		$db = JFactory::getDBO();
@@ -153,10 +199,11 @@ class FlexicontentModelTags extends JModelLegacy
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
 		}
-
+		
 		return $this->_data;
 	}
-
+	
+	
 	/**
 	 * Method to get the total nr of the tags
 	 *
@@ -174,7 +221,8 @@ class FlexicontentModelTags extends JModelLegacy
 
 		return $this->_total;
 	}
-
+	
+	
 	/**
 	 * Method to get a pagination object for the tags
 	 *
@@ -192,7 +240,8 @@ class FlexicontentModelTags extends JModelLegacy
 
 		return $this->_pagination;
 	}
-
+	
+	
 	/**
 	 * Method to build the query for the tags
 	 *
@@ -202,16 +251,13 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function _buildQuery()
 	{
-		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
 		
-		$filter_order    = $app->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_assigned = $app->getUserStateFromRequest( $option.'.tags.filter_assigned', 'filter_assigned', '', 'word' );
+		$filter_order     = $this->getState( 'filter_order' );
+		$filter_assigned	= $this->getState( 'filter_assigned' );
 		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor'
 			// because of multi-multi tag-item relations it is faster to calculate this with a single seperate query
@@ -239,12 +285,9 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function _buildContentOrderBy()
 	{
-		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$filter_order     = $this->getState( 'filter_order' );
+		$filter_order_Dir	= $this->getState( 'filter_order_Dir' );
 		
-		$filter_order		= $app->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.tags.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
 
 		return $orderby;
@@ -262,10 +305,12 @@ class FlexicontentModelTags extends JModelLegacy
 		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$filter_state = $app->getUserStateFromRequest( $option.'.tags.filter_state', 'filter_state', '', 'word' );
-		$search = $app->getUserStateFromRequest( $option.'.tags.search', 'search', '', 'string' );
-		$search = trim( JString::strtolower( $search ) );
-
+		$filter_state	= $this->getState( 'filter_state' );
+		
+		// text search
+		$search  = $this->getState( 'search' );
+		$search  = trim( JString::strtolower( $search ) );
+		
 		$where = array();
 
 		if ( $filter_state ) {
@@ -286,6 +331,7 @@ class FlexicontentModelTags extends JModelLegacy
 		return $where;
 	}
 	
+	
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
@@ -295,10 +341,7 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function _buildContentHaving()
 	{
-		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		
-		$filter_assigned	= $app->getUserStateFromRequest( $option.'.tags.filter_assigned', 'filter_assigned', '', 'word' );
+		$filter_assigned	= $this->getState( 'filter_assigned' );
 		
 		$having = '';
 		

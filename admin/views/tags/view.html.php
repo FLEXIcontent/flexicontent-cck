@@ -40,31 +40,51 @@ class FlexicontentViewTags extends JViewLegacy
 		$option   = JRequest::getCmd('option');
 		$view     = JRequest::getVar('view');
 		
+		// Get model
+		$model = $this->getModel();
+		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
-		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.tooltip');
-
+		
+		
+		// ***********
 		// Get filters
+		// ***********
+		
 		$count_filters = 0;
 		
-		// Get filter vars
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     't.name', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', '', 'word' );
+		// Order and order direction
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
 		
-		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 		'filter_state',     '', 'word' );
-		$filter_assigned  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_assigned', 	'filter_assigned','', 'word' );
+		// Get filter vars
+		$filter_state    = $model->getState('filter_state');
+		$filter_assigned = $model->getState('filter_assigned');
 		if ($filter_state) $count_filters++; if ($filter_assigned) $count_filters++;
 		
-		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
-		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		// Text search
+		$search = $model->getState( 'search' );
+		$search = $db->escape( trim(JString::strtolower( $search ) ) );
+		
+		
+		
+		// ****************************
+		// Important usability messages
+		// ****************************
+		
+		if ( $cparams->get('show_usability_messages', 1) )
+		{
+		}
 		
 		
 		
 		// **************************
 		// Add css and js to document
 		// **************************
+		
+		flexicontent_html::loadFramework('select2');
+		JHTML::_('behavior.tooltip');
 		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);

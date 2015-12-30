@@ -66,6 +66,7 @@ function delFilter(name)
 function delAllFilters() {
 	delFilter('filter_fieldtype'); delFilter('filter_itemtype'); delFilter('filter_itemstate');
 	delFilter('search'); delFilter('search_itemtitle'); delFilter('search_itemid');
+	delFilter('filter_order'); delFilter('filter_order_Dir');
 }
 
 </script>
@@ -257,8 +258,8 @@ function delAllFilters() {
 	<input type="hidden" name="controller" value="search" />
 	<input type="hidden" name="view" value="search" />
 	<input type="hidden" name="task" value="" />
-	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
-	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
+	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 

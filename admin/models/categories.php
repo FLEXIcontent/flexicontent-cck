@@ -98,9 +98,14 @@ class FlexicontentModelCategories extends JModelList
 		// Ordering: filter_order, filter_order_Dir
 		// ****************************************
 		
-		$filter_order      = $fcform ? $jinput->get('filter_order',     'c.lft', 'cmd')   :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     'c.lft', 'cmd' );
-		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', '',      'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', '',      'word' );
-		if ($filter_order_Dir && $filter_order_Dir!='asc') $filter_order_Dir = 'asc';
+		$default_order     = 'c.lft';
+		$default_order_dir = 'ASC';
+		
+		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
+		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
+		
+		if (!$filter_order)     $filter_order     = $default_order;
+		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
 		
 		$this->setState('filter_order', $filter_order);
 		$this->setState('filter_order_Dir', $filter_order_Dir);
@@ -259,8 +264,8 @@ class FlexicontentModelCategories extends JModelList
 		$filter_id = $this->getState( 'filter_id' );
 		
 		// text search
-		$search  = $this->getState( 'search' );
-		$search  = trim( JString::strtolower( $search ) );
+		$search = $this->getState( 'search' );
+		$search = trim( JString::strtolower( $search ) );
 		
 		// ordering filters
 		$filter_order     = $this->getState( 'filter_order' );

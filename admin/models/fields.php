@@ -110,8 +110,14 @@ class FlexicontentModelFields extends JModelList
 		// Ordering: filter_order, filter_order_Dir
 		// ****************************************
 		
-		$filter_order      = $fcform ? $jinput->get('filter_order',     't.ordering', 'cmd')   :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     't.ordering', 'cmd' );
-		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', 'ASC',        'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', 'ASC',        'word' );
+		$default_order     = 't.ordering';
+		$default_order_dir = 'ASC';
+		
+		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
+		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
+		
+		if (!$filter_order)     $filter_order     = $default_order;
+		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
 		
 		if ($filter_type && $filter_order == 't.ordering') {
 			$filter_order = 'typeordering';

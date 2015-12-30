@@ -119,12 +119,16 @@ class FlexicontentModelItems extends JModelLegacy
 		// Ordering: filter_order_type, filter_order, filter_order_Dir
 		// ***********************************************************
 		
-		$default_order     = $this->cparams->get('items_manager_order', 'i.ordering');
-		$default_order_dir = $this->cparams->get('items_manager_order_dir', 'ASC');
+		$default_order     = $this->cparams->get('items_manager_order', 'i.id');
+		$default_order_dir = $this->cparams->get('items_manager_order_dir', 'DESC');
+		$default_order = $default_order !== '1' ? $default_order : '';   // '1' is 'unordered'
 		
-		$filter_order_type = $fcform ? $jinput->get('filter_order_type', 1, 'int')  :  $app->getUserStateFromRequest( $p.'filter_order_type',	'filter_order_type', 1, 'int' );
-		$filter_order      = $fcform ? $jinput->get('filter_order', $default_order)         :  $app->getUserStateFromRequest( $p.'filter_order', 'filter_order', $default_order, 'cmd' );
-		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir) :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
+		$filter_order_type = $fcform ? $jinput->get('filter_order_type', 1,                  'int')  :  $app->getUserStateFromRequest( $p.'filter_order_type',	'filter_order_type', 1, 'int' );
+		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
+		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
+		
+		if (!$filter_order)     $filter_order     = $default_order;
+		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
 		
 		// Filter order is selected via current setting of filter_order_type selector
 		$filter_order	= ($filter_order_type && ($filter_order == 'i.ordering')) ? 'catsordering' : $filter_order;
@@ -1061,14 +1065,20 @@ class FlexicontentModelItems extends JModelLegacy
 		$filter_order     = $this->getState( 'filter_order' );
 		$filter_order_Dir = $this->getState( 'filter_order_Dir' );
 		
-		if ($filter_order == 'ie.lang_parent_id') {
-			$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir .", i.id ASC";
-		} else if ($filter_order == 'i.ordering') {
-			$orderby 	= ' ORDER BY i.catid, state_order, i.language, '. $filter_order .' '. $filter_order_Dir .", i.id DESC";
-		} else if ($filter_order == 'catsordering') {
-			$orderby 	= ' ORDER BY rel.catid, state_order, i.language, '. $filter_order.' '.$filter_order_Dir .", i.id DESC";
-		} else {
-			$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
+		switch ($filter_order)
+		{
+			case 'ie.lang_parent_id':
+				$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir .", i.id ASC";
+				break;
+			case 'i.ordering':
+				$orderby 	= ' ORDER BY i.catid, state_order, i.language, '. $filter_order .' '. $filter_order_Dir .", i.id DESC";
+				break;
+			case 'catsordering':
+				$orderby 	= ' ORDER BY rel.catid, state_order, i.language, '. $filter_order.' '.$filter_order_Dir .", i.id DESC";
+				break;
+			default:
+				$orderby 	= empty($filter_order) ? '' : ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
+				break;
 		}
 		
 		return $orderby;
@@ -1137,9 +1147,9 @@ class FlexicontentModelItems extends JModelLegacy
 		$filter_id = $this->getState( 'filter_id' );
 		
 		// text search and search scope
-		$scope     = $this->getState( 'scope' );
-		$search    = $this->getState( 'search' );
-		$search    = trim( JString::strtolower( $search ) );
+		$scope  = $this->getState( 'scope' );
+		$search = $this->getState( 'search' );
+		$search = trim( JString::strtolower( $search ) );
 		
 		// date filters
 		$date      = $this->getState( 'date' );

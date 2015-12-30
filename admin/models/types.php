@@ -75,6 +75,50 @@ class FlexicontentModelTypes extends JModelList
 		$p      = $option.'.'.$view.'.';
 		
 		
+		
+		// ****************************************
+		// Ordering: filter_order, filter_order_Dir
+		// ****************************************
+		
+		$default_order     = 't.name';
+		$default_order_dir = 'ASC';
+		
+		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
+		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
+		
+		if (!$filter_order)     $filter_order     = $default_order;
+		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
+		
+		$this->setState('filter_order', $filter_order);
+		$this->setState('filter_order_Dir', $filter_order_Dir);
+		
+		$app->setUserState($p.'filter_order', $filter_order);
+		$app->setUserState($p.'filter_order_Dir', $filter_order_Dir);
+		
+		
+		
+		// **************
+		// view's Filters
+		// **************
+		
+		// Various filters
+		$filter_state    = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',    '', 'string' );
+		$filter_access   = $fcform ? $jinput->get('filter_access',   '',    'int')  :  $app->getUserStateFromRequest( $p.'filter_access',   'filter_access',   '',    'int' );
+		
+		$this->setState('filter_state', $filter_state);
+		$this->setState('filter_access', $filter_access);
+		
+		$app->setUserState($p.'filter_state', $filter_state);
+		$app->setUserState($p.'filter_access', $filter_access);
+		
+		
+		// Text search
+		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
+		$this->setState('search', $search);
+		$app->setUserState($p.'search', $search);
+		
+		
+		
 		// *****************************
 		// Pagination: limit, limitstart
 		// *****************************
@@ -129,11 +173,13 @@ class FlexicontentModelTypes extends JModelList
 		$option = JRequest::getVar('option');
 		$view   = JRequest::getVar('view');
 		
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order', 		'filter_order',     't.name', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir',	'filter_order_Dir', 'ASC', 'word' );
-		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',     'filter_state',     '', 'string' );
-		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
-		$search  = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
+		$filter_order     = $this->getState( 'filter_order' );
+		$filter_order_Dir	= $this->getState( 'filter_order_Dir' );
+		$filter_state     = $this->getState( 'filter_state' );
+		$filter_access    = $this->getState( 'filter_access' );
+		
+		// text search
+		$search  = $this->getState( 'search' );
 		$search  = trim( JString::strtolower( $search ) );
 		
 		// Create a new query object.
@@ -179,33 +225,7 @@ class FlexicontentModelTypes extends JModelList
 		return $query;
 	}
 	
-	/**
-	 * Method to build the having clause of the query for the files
-	 *
-	 * @access private
-	 * @return string
-	 * @since 1.0
-	 */
-	function _buildContentHaving()
-	{
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		
-		$filter_assigned = $app->getUserStateFromRequest( $option.'.types.filter_assigned', 'filter_assigned', '', 'word' );
-		
-		$having = '';
-		
-		if ( $filter_assigned ) {
-			if ( $filter_assigned == 'O' ) {
-				$having = ' HAVING COUNT(rel.tid) = 0';
-			} else if ($filter_assigned == 'A' ) {
-				$having = ' HAVING COUNT(rel.tid) > 0';
-			}
-		}
-		
-		return $having;
-	}
-
+	
 	/**
 	 * Method to (un)publish a type
 	 *

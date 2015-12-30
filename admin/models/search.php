@@ -119,9 +119,11 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$default_order     = $this->cparams->get('search_manager_order', 'a.title');  // Parameter does not exist
 		$default_order_dir = $this->cparams->get('search_manager_order_dir', 'ASC');  // Parameter does not exist
 				
-		$filter_order      = $fcform ? $jinput->get('filter_order',         $default_order, 'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,     'cmd' );
-		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word') :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
+		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
+		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
 		
+		if (!$filter_order)     $filter_order     = $default_order;
+		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
 		if (!$isADV && !in_array($filter_order, array('a.id', 'a.title', 'ext.search_index'))) $filter_order = 'a.title';
 		
 		$this->setState('filter_order', $filter_order);

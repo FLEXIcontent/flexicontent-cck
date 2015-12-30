@@ -204,8 +204,8 @@ JText::script('COM_USERS_GROUPS_CONFIRM_DELETE');
 	<input type="hidden" name="controller" value="group" />
 	<input type="hidden" name="view" value="group" />
 	<input type="hidden" name="task" value="" />
-	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>" />
-	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>" />
+	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $listOrder; ?>" />
+	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $listDirn; ?>" />
 	<?php echo JHtml::_('form.token'); ?>
 	
 	</div>

@@ -67,24 +67,81 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	function __construct()
 	{
 		parent::__construct();
-
+		
 		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$fcform = $jinput->get('fcform', 0, 'int');
+		$p      = $option.'.'.$view.'.';
 		
 		$this->fieldid = '';
 		$this->viewid  = $view.$this->fieldid;
 		
-		$limit      = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.limit',      'limit',      $app->getCfg('list_limit'),  'int');
-		$limitstart = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.limitstart', 'limitstart',  0,                          'int' );
-
+		
+		
+		// ****************************************
+		// Ordering: filter_order, filter_order_Dir
+		// ****************************************
+		
+		$default_order     = 'f.id';
+		$default_order_dir = 'DESC';
+		
+		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
+		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
+		
+		if (!$filter_order)     $filter_order     = $default_order;
+		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
+		
+		$this->setState('filter_order', $filter_order);
+		$this->setState('filter_order_Dir', $filter_order_Dir);
+		
+		$app->setUserState($p.'filter_order', $filter_order);
+		$app->setUserState($p.'filter_order_Dir', $filter_order_Dir);
+		
+		
+		
+		// **************
+		// view's Filters
+		// **************
+		
+		
+		// Text search
+		$scope  = $fcform ? $jinput->get('scope',  1,  'int')     :  $app->getUserStateFromRequest( $p.'scope',   'scope',   1,   'int' );
+		$search = $fcform ? $jinput->get('search', '', 'string')  :  $app->getUserStateFromRequest( $p.'search',  'search',  '',  'string' );
+		
+		$this->setState('scope', $scope);
+		$this->setState('search', $search);
+		
+		$app->setUserState($p.'scope', $scope);
+		$app->setUserState($p.'search', $search);
+		
+		
+		
+		// *****************************
+		// Pagination: limit, limitstart
+		// *****************************
+		
+		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int')  :  $app->getUserStateFromRequest( $p.'limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $fcform ? $jinput->get('limitstart',                     0, 'int')  :  $app->getUserStateFromRequest( $p.'limitstart', 'limitstart', 0, 'int' );
+		
+		// In case limit has been changed, adjust limitstart accordingly
+		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
+		$jinput->set( 'limitstart',	$limitstart );
+		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
-
-		$array = JRequest::getVar('cid',  0, '', 'array');
+		
+		$app->setUserState($p.'limit', $limit);
+		$app->setUserState($p.'limitstart', $limitstart);
+		
+		
+		// For some model function that use single id
+		$array = $jinput->get('cid', array(0), 'array');
 		$this->setId((int)$array[0]);
 	}
-
+	
+	
 	/**
 	 * Method to set the files identifier
 	 *
@@ -99,6 +156,13 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	}
 	
 	
+	/**
+	 * Method to load the configuration parameters of specific field
+	 *
+	 * @access public
+	 * @return	string
+	 * @since	1.6
+	 */
 	function & getFieldParams($fieldid)
 	{
 		static $field_params = array();
@@ -182,7 +246,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		
 		return $this->_data;
 	}
-
+	
+	
 	/**
 	 * Method to get the total nr of the files
 	 *
@@ -200,7 +265,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 
 		return $this->_total;
 	}
-
+	
+	
 	/**
 	 * Method to get a pagination object for the files
 	 *
@@ -315,11 +381,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function _buildContentOrderBy()
 	{
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
-		$filter_order     = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_order', 		'filter_order', 	'f.filename', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_order     = $this->getState( 'filter_order' );
+		$filter_order_Dir = $this->getState( 'filter_order_Dir' );
 		
 		if ($filter_order=='f.filename_displayed') $filter_order = ' CASE WHEN f.filename_original<>"" THEN f.filename_original ELSE f.filename END ';
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', f.filename';
@@ -340,10 +403,10 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
-
-		$scope		= $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.scope',            'scope',            1,           'int' );
-		$search   = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.search',           'search',           '',          'string' );
-		$search 	= trim( JString::strtolower( $search ) );
+		
+		$scope  = $this->getState( 'scope' );
+		$search = $this->getState( 'search' );
+		$search = trim( JString::strtolower( $search ) );
 		
 		$filter_lang			= $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_lang',      'filter_lang',      '',          'string' );
 		$filter_uploader  = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_uploader',  'filter_uploader',  0,           'int' );

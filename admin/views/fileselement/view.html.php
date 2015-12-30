@@ -86,9 +86,10 @@ class FlexicontentViewFileselement extends JViewLegacy
 		
 		$count_filters = 0;
 		
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_order',     'filter_order',    'f.filename', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_order_Dir', 'filter_order_Dir', '',          'word' );
-		
+		// Order and order direction
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
+				
 		$filter_lang			= $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_lang',      'filter_lang',      '',          'string' );
 		$filter_url       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_url',       'filter_url',       '',          'word' );
 		$filter_secure    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_secure',    'filter_secure',    '',          'word' );
@@ -128,9 +129,11 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$thumb_w					= $app->getUserStateFromRequest( $option.'.'.$_view.'.thumb_w',    			 'thumb_w',     		 120, 				'int' );
 		$thumb_h					= $app->getUserStateFromRequest( $option.'.'.$_view.'.thumb_h',    			 'thumb_h',     		 90, 				  'int' );
 		
-		$scope   = $app->getUserStateFromRequest( $option.'.'.$_view.'.scope',            'scope',            1,           'int' );
-		$search  = $app->getUserStateFromRequest( $option.'.'.$_view.'.search',           'search',           '',          'string' );
-		$search  = $db->escape( trim(JString::strtolower( $search ) ) );
+		// Text search
+		$scope  = $model->getState( 'scope' );
+		$search = $model->getState( 'search' );
+		$search = $db->escape( trim(JString::strtolower( $search ) ) );
+		
 		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
 		$filter_item      = $filter_item ? $filter_item : '';
 		

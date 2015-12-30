@@ -122,8 +122,14 @@ class FlexicontentModelUsers extends JModelList
 		// Ordering: filter_order, filter_order_Dir
 		// ****************************************
 		
-		$filter_order      = $fcform ? $jinput->get('filter_order',     'a.name', 'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     'a.name', 'cmd' );
-		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', '',       'word') :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', '',       'word' );
+		$default_order     = 'a.id';
+		$default_order_dir = 'DESC';
+		
+		$filter_order      = $fcform ? $jinput->get('filter_order',     $default_order,      'cmd')  :  $app->getUserStateFromRequest( $p.'filter_order',     'filter_order',     $default_order,      'cmd' );
+		$filter_order_Dir  = $fcform ? $jinput->get('filter_order_Dir', $default_order_dir, 'word')  :  $app->getUserStateFromRequest( $p.'filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
+		
+		if (!$filter_order)     $filter_order     = $default_order;
+		if (!$filter_order_Dir) $filter_order_Dir = $default_order_dir;
 		
 		$this->setState('filter_order', $filter_order);
 		$this->setState('filter_order_Dir', $filter_order_Dir);

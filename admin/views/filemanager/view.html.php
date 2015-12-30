@@ -76,8 +76,9 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		
 		$count_filters = 0;
 		
-		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_order',     'filter_order',    'f.filename', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_order_Dir', 'filter_order_Dir', '',          'word' );
+		// Order and order direction
+		$filter_order      = $model->getState('filter_order');
+		$filter_order_Dir  = $model->getState('filter_order_Dir');
 		
 		$filter_lang			= $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_lang',      'filter_lang',      '',          'string' );
 		$filter_url       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_url',       'filter_url',       '',          'word' );
@@ -96,9 +97,11 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		if ($filter_uploader) $count_filters++;
 		if ($filter_item) $count_filters++;
 		
-		$scope   = $app->getUserStateFromRequest( $option.'.'.$_view.'.scope',            'scope',            1,           'int' );
-		$search  = $app->getUserStateFromRequest( $option.'.'.$_view.'.search',           'search',           '',          'string' );
-		$search  = $db->escape( trim(JString::strtolower( $search ) ) );
+		// Text search
+		$scope  = $model->getState( 'scope' );
+		$search = $model->getState( 'search' );
+		$search = $db->escape( trim(JString::strtolower( $search ) ) );
+		
 		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
 		$filter_item      = $filter_item ? $filter_item : '';
 		

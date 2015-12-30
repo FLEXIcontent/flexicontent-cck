@@ -193,6 +193,7 @@ function delAllFilters() {
 	delFilter('startdate'); delFilter('enddate'); delFilter('filter_lang');
 	delFilter('filter_tag'); delFilter('filter_access');
 	delFilter('filter_fileid');
+	delFilter('filter_order'); delFilter('filter_order_Dir');
 	jQuery('#filter_subcats').val('1');  // default: include subcats
 	jQuery('#filter_catsinstate').val('1');	  // default: published categories
 }
@@ -1089,8 +1090,8 @@ jQuery(document).ready(function(){
 	<input type="hidden" name="view" value="items" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="newstate" id="newstate" value="" />
-	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
-	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
+	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 	
