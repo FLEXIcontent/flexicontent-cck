@@ -2,14 +2,14 @@
 <extension type="component" version="3.2.0" method="upgrade">
 	<name>FLEXIcontent</name>
 	<!-- The following elements are optional and free of formatting constraints -->
-	<creationDate>23 December 2015</creationDate>
+	<creationDate>2 January 2015</creationDate>
 	<author>Emmanuel Danan, Georgios Papadakis, Yannick Berges, FLEXIcontent Team</author>
 	<authorEmail>noreply@flexicontent.org</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<copyright>(C) 2009-2015 Emmanuel Danan, Georgios Papadakis</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<!--  The version string is recorded in the components table -->
-	<version>3.0.10-rc</version>
+	<version>3.0.10-rc2</version>
 	<!-- The description is optional and defaults to the name -->
 	<description>COM_FLEXICONTENT_DESCRIPTION</description>
 	
@@ -197,8 +197,7 @@
 		<plugin name="relation_reverse"   folder="plugins/flexicontent_fields/relation_reverse"   instfolder="flexicontent_fields">FLEXIcontent - Relation - Reverse</plugin>
 		<plugin name="select"             folder="plugins/flexicontent_fields/select"             instfolder="flexicontent_fields">FLEXIcontent - Select</plugin>
 		<plugin name="selectmultiple"     folder="plugins/flexicontent_fields/selectmultiple"     instfolder="flexicontent_fields">FLEXIcontent - Select Multiple</plugin>
-		<plugin name="sharedaudio"        folder="plugins/flexicontent_fields/sharedaudio"        instfolder="flexicontent_fields">FLEXIcontent - Shared Audio (SoundCloud,Spotify,Last.fm,etc)</plugin>
-		<plugin name="sharedvideo"        folder="plugins/flexicontent_fields/sharedvideo"        instfolder="flexicontent_fields">FLEXIcontent - Shared Video (YouTube,Vimeo,DailyMotion,etc)</plugin>
+		<plugin name="sharedmedia"        folder="plugins/flexicontent_fields/sharedmedia"        instfolder="flexicontent_fields">FLEXIcontent - Shared Video/Audio (Youtube,etc / SoundCloud,Last.fm,etc)</plugin>
 		<plugin name="termlist"           folder="plugins/flexicontent_fields/termlist"           instfolder="flexicontent_fields">FLEXIcontent - List of terms</plugin>
 		<plugin name="text"               folder="plugins/flexicontent_fields/text"               instfolder="flexicontent_fields">FLEXIcontent - Text (number/time/etc/custom validation)</plugin>
 		<plugin name="textarea"           folder="plugins/flexicontent_fields/textarea"           instfolder="flexicontent_fields">FLEXIcontent - Textarea</plugin>

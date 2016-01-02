@@ -4,18 +4,18 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport('joomla.event.plugin');
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsSharedvideo extends FCField
+class plgFlexicontent_fieldsSharedmedia extends FCField
 {
-	static $field_types = array('sharedvideo');
+	static $field_types = array('sharedmedia');
 	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsSharedvideo( &$subject, $params )
+	function plgFlexicontent_fieldsSharedmedia( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		JPlugin::loadLanguage('plg_flexicontent_fields_sharedvideo', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_sharedmedia', JPATH_ADMINISTRATOR);
 	}
 	
 	
@@ -36,7 +36,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 		
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
-		$_MEDIA_ = 'VIDEO';
+		$_MEDIA_ = 'MEDIA';
 		
 		
 		// ****************
@@ -575,8 +575,9 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 		{
 			$value = unserialize($value);
 			
-			$value['api_type'] = @ $value['videotype'];
-			$value['media_id']  = @ $value['videoid'];
+			// Compatibility with deprecated fields
+			if (empty($value['api_type'])) $value['api_type'] = isset($value['videotype']) ? $value['videotype'] : (isset($value['audiotype']) ? $value['audiotype'] : '');
+			if (empty($value['media_id']))  $value['media_id']  = isset($value['videoid'])   ? $value['videoid']   : (isset($value['audioid'])   ? $value['audioid']   : '');
 			
 			$is_empty = (empty($value['api_type']) || empty($value['media_id'])) && empty($value['embed_url']);
 			if ( $is_empty && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
@@ -757,7 +758,7 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$_MEDIA_ = 'VIDEO';
+		$_MEDIA_ = 'MEDIA';
 		
 		// Meta DATA that will be displayed
 		$display_title    = $field->parameters->get('display_title', 1);
@@ -826,8 +827,9 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 			}
 			$value = unserialize($value);
 			
-			$value['api_type'] = @ $value['videotype'];
-			$value['media_id']  = @ $value['videoid'];
+			// Compatibility with deprecated fields
+			if (empty($value['api_type'])) $value['api_type'] = isset($value['videotype']) ? $value['videotype'] : (isset($value['audiotype']) ? $value['audiotype'] : '');
+			if (empty($value['media_id']))  $value['media_id']  = isset($value['videoid'])   ? $value['videoid']   : (isset($value['audioid'])   ? $value['audioid']   : '');
 			
 			if ((empty($value['api_type']) || empty($value['media_id'])) && empty($value['embed_url'])) {
 				if ($is_ingroup) $field->{$prop}[$n] = '';
@@ -972,8 +974,8 @@ class plgFlexicontent_fieldsSharedvideo extends FCField
 			$newpost[$new]['url'] = $url;
 			
 			// Validate other value properties
-			$newpost[$new]['videotype']   = flexicontent_html::dataFilter(@$v['api_type'], 0, 'STRING', 100);
-			$newpost[$new]['videoid']     = flexicontent_html::dataFilter(@$v['media_id'], 0, 'STRING', 1000);
+			$newpost[$new]['api_type']    = flexicontent_html::dataFilter(@$v['api_type'], 0, 'STRING', 100);
+			$newpost[$new]['media_id']    = flexicontent_html::dataFilter(@$v['media_id'], 0, 'STRING', 1000);
 			$newpost[$new]['embed_url']   = flexicontent_html::dataFilter(@$v['embed_url'], 0, 'STRING', 1000);  // 'URL' strips needed characters ?
 			$newpost[$new]['thumb']       = flexicontent_html::dataFilter(@$v['thumb'], 0, 'STRING', 1000);  // 'URL' strips needed characters ?
 			$newpost[$new]['title']       = flexicontent_html::dataFilter(@$v['title'], 0, 'STRING', 1000);

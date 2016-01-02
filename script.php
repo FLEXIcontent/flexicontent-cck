@@ -463,7 +463,7 @@ class com_flexicontentInstallerScript
 			<tbody>
 			
 		<?php
-		$deprecated_fields = array('hidden'=>'text', 'relateditems'=>'relation', 'relateditems_backlinks'=>'relation_reverse');
+		$deprecated_fields = array('hidden'=>'text', 'relateditems'=>'relation', 'relateditems_backlinks'=>'relation_reverse', 'sharedaudio'=>'sharedmedia', 'sharedvideo'=>'sharedmedia');
 		
 		// Get DB table information
 		
