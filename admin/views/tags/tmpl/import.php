@@ -49,7 +49,7 @@ window.addEvent('domready', function(){
 	<fieldset>
 		<legend style="font-size:12px; font-style:arial;" >
 			<?php echo JText::_( 'FLEXI_IMPORT_TAGS' ); ?>
-			<img class="editlinktip hasTip tags" title="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_DESC' ); ?>" style="float:none; margin:0 0 -4px 4px;" src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
+			<img class="hasTooltip tags" title="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_DESC', true ); ?>" style="float:none; margin:0 0 -4px 4px;" src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
 		</legend>
 		<textarea id="taglist" name="taglist" rows="20" cols="51" style="font-size:11px; font-style:arial;"></textarea>
 	</fieldset>

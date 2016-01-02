@@ -18,6 +18,9 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
+
 $ctrl_items = FLEXI_J16GE ? "task=items." : "controller=items&amp;task=";
 $ctrl_users = FLEXI_J16GE ? "task=users." : "controller=users&amp;task=";
 ?>
@@ -381,7 +384,7 @@ else :
 						?>
 						<tr>
 							<td style="width:65%">
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
+								<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
 									<a href="<?php echo $link; ?>">
 										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 									</a>
@@ -423,7 +426,7 @@ else :
 						?>
 						<tr>
 							<td style="width:65%">
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' ); ?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
+								<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
 									<a href="<?php echo $link; ?>">
 										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 									</a>
@@ -467,7 +470,7 @@ else :
 						?>
 						<tr>
 							<td>
-								<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
+								<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
 									<a href="<?php echo $link; ?>">
 										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 									</a>
@@ -526,7 +529,7 @@ else :
 								?>
 								<tr>
 									<td>
-										<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
+										<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
 											<a href="<?php echo $link; ?>">
 												<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 											</a>
@@ -564,7 +567,7 @@ else :
 										?>
 										<tr>
 											<td>
-												<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>">
+												<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
 													<a href="<?php echo $link; ?>">
 														<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 													</a>
@@ -696,7 +699,7 @@ else :
 									?>
 									<tr>
 										<td>
-											<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8'); ?>">
+											<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
 												<a href="<?php echo $link; ?>">
 													<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
 												</a>
@@ -733,7 +736,7 @@ else :
 									?>
 									<tr>
 										<td>
-											<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_USER' );?>::<?php echo htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8'); ?>">
+											<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
 												<a href="<?php echo $link; ?>">
 													<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
 												</a>

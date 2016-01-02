@@ -48,7 +48,7 @@ window.addEvent('domready', function(){
 	<fieldset>
 		<legend>
 			<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
-			<span class="editlinktip hasTip tags" title="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_DESC' ); ?>" style="text-decoration: none; color: #333;">
+			<span class="editlinktip hasTooltip" title="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_DESC', true ); ?>" style="text-decoration: none; color: #333;">
 				<img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
 			</span>
 		</legend>

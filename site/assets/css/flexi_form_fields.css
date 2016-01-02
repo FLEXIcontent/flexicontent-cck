@@ -74,6 +74,9 @@
 	cursor: default !important;
 	color: #aaa;
 }
+#flexicontent .fcfieldval_container.valuebox td > .flexi.label.prop_label {
+	margin: 1px 8px 2px 0;
+}
 #flexicontent ul.fcfield-sortables.fcfield-group {
 	width: 100%;
 }
@@ -85,7 +88,7 @@
 	border-radius: 2px;
 	width: 100%;
 	margin: 0 4px 16px 0;
-	padding: 12px;
+	padding: 12px 0 12px 12px;
 }
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label {
 	box-sizing: border-box;
@@ -106,13 +109,79 @@
 	background-repeat: no-repeat;
 }
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-	border-width: 0 !important;
-	width: 79% !important;
-	padding: 0px 0% 6px !important;
+	box-sizing: border-box;
+	border-width: 0;
+	width: 78% !important;
+	padding: 0px 0% 6px;
 	margin: 0% !important;
 	float: none !important;
 	clear: none;
 	display: inline-block;
+}
+@media only screen and (min-width: 2090px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 90% !important;
+	}
+}
+@media only screen and (min-width: 1860px) and (max-width: 2090px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 89% !important;
+	}
+}
+@media only screen and (min-width: 1720px) and (max-width: 1860px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 88% !important;
+	}
+}
+@media only screen and (min-width: 1590px) and (max-width: 1720px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 87% !important;
+	}
+}
+@media only screen and (min-width: 1490px) and (max-width: 1590px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 86% !important;
+	}
+}
+@media only screen and (min-width: 1390px) and (max-width: 1490px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 85% !important;
+	}
+}
+@media only screen and (min-width: 1310px) and (max-width: 1390px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 84% !important;
+	}
+}
+@media only screen and (min-width: 1250px) and (max-width: 1310px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 83% !important;
+	}
+}
+@media only screen and (min-width: 1190px) and (max-width: 1250px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 82% !important;
+	}
+}
+@media only screen and (min-width: 1130px) and (max-width: 1190px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 81% !important;
+	}
+}
+@media only screen and (min-width: 1100px) and (max-width: 1130px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 80% !important;
+	}
+}
+@media only screen and (min-width: 1050px) and (max-width: 1100px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 79% !important;
+	}
+}
+@media only screen and (max-width: 800px) {
+	#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+		width: 100% !important;
+	}
 }
 #flexicontent ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon {
@@ -139,7 +208,7 @@
 	border-radius: 4px;
 	border: 1px solid #d0d0d0;
 	vertical-align: top;
-	padding: 6px 8px;
+	padding: 7px 12px;
 	margin: 0px 2px 0px 6px;
 	background-color: white;
 	background-image: -webkit-gradient(linear,left top,left bottom,from(white),to(#d0d0d0));
@@ -208,7 +277,7 @@
 	background: url(../images/plus-button.png) 4px 4px no-repeat white;
 }
 #flexicontent span.fcfield-addvalue.fcfont-icon:before {
-	padding: 0 4px;
+	padding: 0 6px 0 2px;
 	background: none;
 	font-family: "IcoMoon";
 	font-style: normal;
@@ -225,30 +294,30 @@
 #flexicontent .fcfield-list-del,
 #flexicontent .fcfield-placement-h,
 #flexicontent .fcfield-placement-v {
-	margin: 0px 0px 2px 0px;
-	padding: 12px;
+	margin: 0 4px 6px 0;
+	padding: 16px;
 }
 #flexicontent .fcfield-placement-h {
-	background: url(../images/arrow-resize.png) 4px 4px no-repeat white;
+	background: url(../images/arrow-resize.png) 8px 8px no-repeat white;
 }
 #flexicontent .fcfield-placement-v {
-	background: url(../images/arrow-resize-090.png) 4px 4px no-repeat white;
+	background: url(../images/arrow-resize-090.png) 8px 8px no-repeat white;
 }
 #flexicontent .fcfield-placement-h.fc_toggle,
 #flexicontent .fcfield-placement-v.fc_toggle {
-	background: url(../images/arrow-in-out.png) 4px 4px no-repeat white;
+	background: url(../images/arrow-in-out.png) 8px 8px no-repeat white;
 }
-#flexicontent .fcfield-list-add {
-	background: url(../images/list_add_v.png) 4px 4px no-repeat white;
+#flexicontent .fcfield-list-add.fc_vertical {
+	background: url(../images/list_add_v.png) 8px 8px no-repeat white;
 }
-#flexicontent .fcfield-list-del {
-	background: url(../images/list_del_v.png) 4px 4px no-repeat white;
+#flexicontent .fcfield-list-del.fc_vertical {
+	background: url(../images/list_del_v.png) 8px 8px no-repeat white;
 }
 #flexicontent .fcfield-list-add.fc_horizontal {
-	background: url(../images/list_add_h.png) 4px 4px no-repeat white;
+	background: url(../images/list_add_h.png) 8px 8px no-repeat white;
 }
 #flexicontent .fcfield-list-del.fc_horizontal {
-	background: url(../images/list_del_h.png) 4px 4px no-repeat white;
+	background: url(../images/list_del_h.png) 8px 8px no-repeat white;
 }
 #flexicontent .fcfield-insertvalue:not(.fcfont-icon) {
 	margin: 0px 0px 2px 0px;
@@ -434,20 +503,21 @@ table.img_upload_select {
 	display: inline !important;
 	background-color: white;
 }
-table.fc-addressint-field-tbl .fcfield_textval:not(.inlineval) {
-	box-sizing: border-box;
+.fcfield_field_data_box table.fc-form-tbl .fcfield_textareaval:not(.inlineval),
+.fcfield_field_data_box table.fc-form-tbl .fcfield_textval:not(.inlineval) {
+	box-sizing: border-box !important;
 	width: 100% !important;
 }
-.fcfield_addressint_data {
+.fcfield_field_data_box {
 	float: left;
-	min-width: 580px;
+	min-width: 540px;
 	width: unset;
 	max-width: unset;
 	padding: 0;
 	margin: 0;
 	box-sizing: border-box;
 }
-.fcfield_addressint_map {
+.fcfield_field_preview_box {
 	float: left;
 	min-width: 50%;
 	width: unset;
@@ -456,43 +526,38 @@ table.fc-addressint-field-tbl .fcfield_textval:not(.inlineval) {
 	margin: 0;
 	box-sizing: border-box;
 }
-.fcfield_addressint_map table {
+.fcfield_field_preview_box table {
 	width: 100%;
 }
-.fcfield_addressint_canvas_outer {
-	width: 100%;
-	max-width: 800px;
-	min-width: 580px;
-}
-@media only screen and (min-width: 1671px) {
-	.fcfield_addressint_data {
+@media only screen and (min-width: 1670px) {
+	.fcfield_field_data_dox {
 		min-width: 580px;
 	}
-	.fcfield_addressint_map {
+	.fcfield_field_preview_box {
 		min-width: 52%;
 	}
 }
 @media only screen and (min-width: 1220px) and (max-width: 1670px) {
-	.fcfield_addressint_data {
-		min-width: 100%;
+	.fcfield_field_data_dox {
+		min-width: 480px;
 	}
-	.fcfield_addressint_map {
-		min-width: 80%;
+	.fcfield_field_preview_box {
+		min-width: 48%;
 	}
 }
-@media only screen and (min-width: 1020px) and (max-width: 1219px) {
-	.fcfield_addressint_data {
+@media only screen and (min-width: 1020px) and (max-width: 1220px) {
+	.fcfield_field_data_dox {
 		min-width: 100%;
 	}
-	.fcfield_addressint_map {
+	.fcfield_field_preview_box {
 		min-width: 90%;
 	}
 }
-@media only screen and (max-width: 1019px) {
-	.fcfield_addressint_data {
+@media only screen and (max-width: 1020px) {
+	.fcfield_field_data_dox {
 		min-width: 100%;
 	}
-	.fcfield_addressint_map {
+	.fcfield_field_preview_box {
 		min-width: 100%;
 	}
 }
@@ -500,4 +565,12 @@ table.fc-addressint-field-tbl .fcfield_textval:not(.inlineval) {
 [class*="fcfield_timestamp_value"] {
 	display: inline-block;
 	min-width: 240px;
+}
+.fcfield_addressint_canvas_outer {
+	width: 100%;
+	max-height: 520px;
+	min-width: 580px;
+}
+iframe.sharedmedia {
+	max-height: 420px;
 }

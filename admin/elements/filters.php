@@ -322,23 +322,22 @@ class JFormFieldFilters extends JFormFieldList
 			if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 		}
 		
-		$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', ($issortable ? array() : $values), $element_id);
-		/*if ($ordertip = @$attributes['ordertip']) {
-			if ($ordertip != -1) {
-				$style = 'display:inline-block; float:left; margin: 0px 0px 0px 18px;';
-				$tip = 
-					'<span class="editlinktip hasTip" style="'.$style.'" title="'
-						.htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_SETTING_DEFAULT_FILTER_ORDER' ), ENT_COMPAT, 'UTF-8').'">'
-						.JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) )
-					.'</span>';
-			}
+		/*if ($ordertip = @$attributes['ordertip'])
+		{
+			$style = 'display:inline-block; float:left; margin: 0px 0px 0px 18px;';
+			$tip = '
+			<span class="editlinktip hasTooltip" style="'.$style.'" title="'.JHtml::tooltipText('FLEXI_NOTES', 'FLEXI_SETTING_DEFAULT_FILTER_ORDER', 1, 1).'">
+				'.JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) ).'
+			</span>';
 		}*/
 		
-		$html =
-		'<div style="border-width:0px; margin:0px; padding:0px; width:68%; float:left;">'.
-			$html.$tip.$sorter_html.
-		'</div>';
-		return $html;
+		return '
+		<div style="border-width:0px; margin:0px; padding:0px; width:68%; float:left;">
+			'.JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', ($issortable ? array() : $values), $element_id).'
+			'.$tip.'
+			'.$sorter_html.'
+		</div>
+		';
 	}
 }
 ?>

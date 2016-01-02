@@ -17,6 +17,10 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
+
 $ctrl = FLEXI_J16GE ? 'archive.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp;task=';
@@ -85,7 +89,7 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 					echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
 				} else {
 				?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+					<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
 					<a href="<?php echo $link; ?>">
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
@@ -112,7 +116,7 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 					$catlink	= 'index.php?option=com_flexicontent&amp;'.$categories_task.'edit&amp;cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 				?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $title; ?>">
+					<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText( JText::_( 'FLEXI_EDIT_CATEGORY' ), $title, 0, 1); ?>">
 					<a href="<?php echo $catlink; ?>">
 						<?php 
 						if (JString::strlen($title) > 20) {

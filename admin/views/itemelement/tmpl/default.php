@@ -174,14 +174,15 @@ function delAllFilters() {
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			
 			<td align="left">
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
-					<?php if(JRequest::getVar('object','')==''): ?>
+				<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
+				<?php if(JRequest::getVar('object','')==''): ?>
 					<a style="cursor:pointer" onclick="window.parent.qfSelectItem('<?php echo $row->id; ?>', '<?php echo $this->filter_cats ? $this->filter_cats : $row->catid; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>');">
-					<?php else: ?>
+				<?php else: ?>
 					<a style="cursor:pointer" onclick="window.parent.jSelectArticle('<?php echo $row->id; ?>', '<?php echo str_replace( array("'", "\""), array("\\'", ""), $row->title ); ?>', '<?php echo JRequest::getVar('object',''); ?>');">
-					<?php endif; ?>
-					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-					</a></span>
+				<?php endif; ?>
+						<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+					</a>
+				</span>
 			</td>
 			
 			<td align="center" class="col_type"><?php echo $row->type_name; ?></td>
