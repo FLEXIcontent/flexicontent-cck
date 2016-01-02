@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Shared Audio (SoundCloud, last.fm, etc)</name>
+	<name>FLEXIcontent - Shared Audio (SoundCloud,Last.fm,etc)</name>
 	<author>Lyquix, ggppdk</author>
 	<creationDate>July 2013</creationDate>
 	<copyright>Copyright (C) 2013 Lyquix</copyright>
@@ -50,36 +50,40 @@
 			</field>
 			<field name="no_acc_msg_form" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC" depend_class=""/>
 			
-			<field name="" type="separator" default="Displayed fields / info" level="level1" />
-			<field name="display_datatype_form" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TYPE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TYPE_FORM_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="display_dataid_form" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_ID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_ID_FORM_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
+			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" level="level2" />
 			<field name="display_title_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_FORM_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="2">FLEXI_SHOW</option>
+				<option value="1">FLEXI_FORM_EDIT</option>
 			</field>
 			<field name="display_author_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_AUTHOR_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_AUTHOR_FORM_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="2">FLEXI_SHOW</option>
+				<option value="1">FLEXI_FORM_EDIT</option>
 			</field>
 			<field name="display_description_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DESCRIPTION_FORM_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="2">FLEXI_SHOW</option>
+				<option value="1">FLEXI_FORM_EDIT</option>
 			</field>
-			<field name="display_edit_size_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EDIT_SIZE_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EDIT_SIZE_FORM_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_edit_size_form" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DIMENSIONS_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DIMENSIONS_FORM_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="2">FLEXI_SHOW</option>
+				<option value="1">FLEXI_FORM_EDIT</option>
 			</field>
 			
-			<field name="" type="separator" default="Native APIs only" level="level2" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_SHOW_ADVANCED_INFO" level="level3" />
+			<field name="display_api_type_form" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_EMBED_METHOD_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_EMBED_METHOD_FORM_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="2">FLEXI_SHOW</option>
+			</field>
+			<field name="display_media_id_form" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_MEDIAID_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_MEDIAID_FORM_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="2">FLEXI_SHOW</option>
+			</field>
 			<field name="display_duration_form" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_FORM" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_FORM_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="2">FLEXI_SHOW</option>
 			</field>
 			
 		</fieldset>
@@ -138,11 +142,11 @@
 			
 			<field name="" type="separator" default="Media" level="level1" />
 			<field name="" type="separator" default="Media Info" level="level2" />
-			<field name="display_title" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="display_title" type="multilist" subtype="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp-title">FLEXI_NO</option>
+				<option value="1" show_list="disp-title" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="headinglevel" type="list" default="3" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_TITLE_HEADING" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_TITLE_HEADING_DESC">
+			<field name="headinglevel" type="list" default="3" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_TITLE_TAG" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_TITLE_TAG_DESC" depend_class="disp-title" >
 				<option value="1">H1</option>
 				<option value="2">H2</option>
 				<option value="3">H3</option>
@@ -159,7 +163,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="Native APIs only" level="level2" />
+			<field name="" type="separator" default="Native APIs only" level="level3" />
 			<field name="display_duration" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_DURATION_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -175,9 +179,9 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-sharedaudio-apis" repeat="1" icon_class="icon-cog" label="APIs" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-sharedaudio-apis" repeat="1" icon_class="icon-cog" label="APIs (keys, etc)" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBEED_METHOD_DESC" level="level4" class="alert alert-info fcpadded"/>
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_EMBED_METHOD_DESC" level="level4" class="alert alert-info fcpadded"/>
 			<field name="use_native_apis" type="multilist" subtype="radio" toggle_related="1" default="0" label="Embed with" description="Disable to also use native APIs" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="disp-native-apis">embed.ly API only</option>
 				<option value="1" show_list="disp-native-apis" hide_list="">embed.ly API and native APIs</option>

@@ -716,7 +716,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ($usedesc) $desc =
 				'<tr>
 					<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': <br/>('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
-					<td><textarea class="imgdesc" name="'.$fieldname_n.'[desc]" rows="3" cols="28" >'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea></td>
+					<td><textarea class="imgdesc" name="'.$fieldname_n.'[desc]" rows="3" cols="24" >'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea></td>
 				</tr>';
 			if ($usecust1) $cust1 =
 				'<tr>
