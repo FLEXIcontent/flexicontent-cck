@@ -49,6 +49,10 @@ class FlexicontentControllerSearch extends FlexicontentController
 	 */
 	function countrows()
 	{
+		$jversion = new JVersion();
+		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
+		$b64_srlz = version_compare( $jversion->getShortVersion(), '3.4.7', 'lt' );
+		
 		// Test counting with limited memory
 		//ini_set("memory_limit", "20M");
 		
@@ -73,16 +77,38 @@ class FlexicontentControllerSearch extends FlexicontentController
 			
 			// Get the field ids of the fields removed from searching
 			$del_fieldids = array_unique( array_merge(array_keys($nse_fields), array_keys($nsp_fields), array_keys($fields)) ) ;
-			
-			$session->set($indexer.'_nse_fields', $nse_fields, 'flexicontent');
-			$session->set($indexer.'_nsp_fields', $nsp_fields, 'flexicontent');
 		} else {  // INDEX: basic or advanced fully rebuilt
 			$fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='all-search');
 			$del_fieldids = null;
 		}
 		
+		
+		// Check is session table DATA column is not mediumtext (16MBs, it can be 64 KBs ('text') in some sites that were not properly upgraded)
+		$full_tbl_name = $app->getCfg('dbprefix') . 'session';
+		$query = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '".$full_tbl_name."'";
+		$db->setQuery($query);
+		$jession_coltypes = $db->loadAssocList('COLUMN_NAME');
+		$legacy_size = strtolower($jession_coltypes['data']['DATA_TYPE']) != 'mediumtext';
+		
 		// Set field information into session to avoid recalculation ...
-		$session->set($indexer.'_fields', $fields, 'flexicontent');
+		$_compressed = $has_zlib ? zlib_encode(serialize($fields), -15) : ($b64_srlz ? serialize($fields) : $fields);
+		$_sz_encoded = $b64_srlz ? base64_encode($_compressed) : $_compressed;
+		if ( !$legacy_size || strlen($_sz_encoded) < 30000 ) {
+			$session->set($indexer.'_fields', $_sz_encoded, 'flexicontent');
+		} else {
+			$session->set($indexer.'_fields', null, 'flexicontent');
+		}
+		
+		
+		// Set field IDs of fields that are advanced-index "filters"
+		if ($rebuildmode=='quick' && $indexer=='advanced') {
+			$filterables = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='filter');
+			$filterable_ids = array_flip( array_keys($filterables) );
+		} else {
+			$filterable_ids = array();
+		}
+		$session->set($indexer.'_filterable_ids',  $filterable_ids,  'flexicontent');  // this is both <3.4.7 session safe and also small, so do not compress
+		
 		
 		// Get the field ids of the searchable fields that will be re-indexed, These are all ones ('all-search') or just the new ones ('dirty-search')
 		$fieldids = array_keys($fields);
@@ -129,6 +155,10 @@ class FlexicontentControllerSearch extends FlexicontentController
 	
 	function index()
 	{
+		$jversion = new JVersion();
+		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
+		$b64_srlz = version_compare( $jversion->getShortVersion(), '3.4.7', 'lt' );
+		
 		$start_microtime = microtime(true);
 		$session = JFactory::getSession();
 		$db = JFactory::getDBO();
@@ -146,27 +176,28 @@ class FlexicontentControllerSearch extends FlexicontentController
 		
 		// TAKE CARE: this code depends on countrows() to set session variables
 		// Retrieve fields, that are assigned as (advanced/basic) searchable/filterable
-		if ($rebuildmode=='quick' && $indexer=='advanced') {
-			$nse_fields = $session->get($indexer.'_nse_fields', array(),'flexicontent');
-			$nsp_fields = $session->get($indexer.'_nsp_fields', array(),'flexicontent');
-			$fields     = $session->get($indexer.'_fields', array(),'flexicontent');
-			//echo 'fail|'; print_r(array_keys($fields)); exit;
-			// Get the field ids of the fields removed from searching
-			$del_fieldids = array_unique( array_merge(array_keys($nse_fields), array_keys($nsp_fields), array_keys($fields)) ) ;
-		} else {
-			$fields = $session->get($indexer.'_fields', array(),'flexicontent');
-			//echo 'fail|'; print_r(array_keys($fields)); exit;
+		$fields = $session->get($indexer.'_fields', array(),'flexicontent');
+		if ( empty($fields) ) {  // if missing from session then calculate them
+			if ($rebuildmode=='quick' && $indexer=='advanced') {
+				$fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='dirty-search');
+			} else {  // INDEX: basic or advanced fully rebuilt
+				$fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='all-search');
+			}
 		}
+		else if ( !is_array($fields) ) {
+			$fields = $b64_srlz  ?  base64_decode($fields) : $fields;
+			$fields = $has_zlib  ?  unserialize(zlib_decode($fields))  :  ($b64_srlz ? unserialize($fields) : $fields);
+		}
+		//echo 'fail|'; print_r(array_keys($fields)); exit;
+		
 		// Get the field ids of the searchable fields
 		$fieldids = array_keys($fields);
 		
 		// Get fields that will have atomic search tables, (current for advanced index only)
 		if ($indexer=='advanced')
 		{
-			$filterables = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='filter');
-			$filterables = array_keys($filterables);
-			$filterables = array_flip($filterables);
-		} else $filterables = array();
+			$filterable_ids = $session->get($indexer.'_filterable_ids', array(),'flexicontent');
+		} else $filterable_ids = array();
 		
 		// Get items ids that have value for any of the searchable fields, but use session to avoid recalculation
 		$itemids = $session->get($indexer.'_items_to_index', array(),'flexicontent');
@@ -247,7 +278,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 					//print_r($field->ai_query_vals);
 					if ( isset($field->ai_query_vals) ) {
 						foreach ($field->ai_query_vals as $query_val) $ai_query_vals[] = $query_val;
-						if ( isset($filterables[$field->id]) ) {  // Current for advanced index only
+						if ( isset($filterable_ids[$field->id]) ) {  // Current for advanced index only
 							foreach ($field->ai_query_vals as $query_val) $ai_query_vals_f[$field->id][] = $query_val;
 						}
 					} //else echo "Not set for : ". $field->name;

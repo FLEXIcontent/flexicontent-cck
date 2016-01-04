@@ -53,7 +53,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$model = $this->getModel();
 		
 		// Some flags
-		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
+		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
 		
 		// Get session information
 		$conf  = $session->get('csvimport_config', "", 'flexicontent');

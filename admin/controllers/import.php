@@ -79,7 +79,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
 		$session = JFactory::getSession();
-		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
+		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
 		
 		$parse_log = "\n\n\n".'<b>please click</b> <a href="'.$link.'">here</a> to return previous page'."\n\n\n";
 		$log_filename = 'importcsv_'.($user->id).'.php';
