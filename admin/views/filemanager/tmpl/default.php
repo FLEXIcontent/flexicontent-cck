@@ -748,7 +748,8 @@ function showUploader() {
 					<span id="upload-clear"></span>
 					
 					<?php echo JHTML::_( 'form.token' ); ?>
-					<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&amp;view=filemanager'); ?>" />
+					<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>
+					<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 				</form>
 				
 			</fieldset>
@@ -840,7 +841,8 @@ function showUploader() {
 					<input type="submit" id="file-url-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>"/>
 				</fieldset>
 			</fieldset>
-			<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&amp;view=filemanager'); ?>" />
+			<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>
+			<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 		</form>
 		
 	</div>
@@ -955,7 +957,8 @@ function showUploader() {
 					<input type="submit" id="file-dir-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_DIR' ); ?>"/>
 				</fieldset>
 			</fieldset>
-			<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&amp;view=filemanager'); ?>" />
+			<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>
+			<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 		</form>
 		
 	</div>

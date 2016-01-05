@@ -666,6 +666,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 					<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 					<input type="hidden" name="secure" value="0" />
+					<?php /* NOTE: return URL should use & and not &amp; for variable seperation as these will be re-encoded on redirect */ ?>
 					<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
 				</form>
 				
