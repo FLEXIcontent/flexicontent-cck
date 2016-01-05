@@ -242,6 +242,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		}
 		//}
 		
+		
+		
 		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('lists',	$lists);
 		$this->assignRef('pagination',	$pagination);

@@ -348,7 +348,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 					// Return Success JSON-RPC response
 					die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
 				} else {
-					jexit('Upload complete');
+					jexit('FLEXI_UPLOAD_COMPLETE');
 				}
 			// Normal output: Redirect setting a message
 			} else {

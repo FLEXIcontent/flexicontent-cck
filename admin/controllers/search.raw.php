@@ -51,7 +51,6 @@ class FlexicontentControllerSearch extends FlexicontentController
 	{
 		$jversion = new JVersion();
 		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
-		$b64_srlz = version_compare( $jversion->getShortVersion(), '3.4.7', 'lt' );
 		
 		// Test counting with limited memory
 		//ini_set("memory_limit", "20M");
@@ -84,16 +83,28 @@ class FlexicontentControllerSearch extends FlexicontentController
 		
 		
 		// Check is session table DATA column is not mediumtext (16MBs, it can be 64 KBs ('text') in some sites that were not properly upgraded)
-		$full_tbl_name = $app->getCfg('dbprefix') . 'session';
-		$query = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '".$full_tbl_name."'";
-		$db->setQuery($query);
+		$tblname  = 'session';
+		$dbprefix = $app->getCfg('dbprefix');
+		$dbname   = $app->getCfg('db');
+		$db->setQuery("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$dbprefix.$tblname."'");
 		$jession_coltypes = $db->loadAssocList('COLUMN_NAME');
-		$legacy_size = strtolower($jession_coltypes['data']['DATA_TYPE']) != 'mediumtext';
+		$_dataColType = strtolower($jession_coltypes['data']['DATA_TYPE']);
+		$_dataCol_wrongSize = ($_dataColType != 'mediumtext') && ($_dataColType != 'longtext');
+		
+		// If data type is "text" it is safe to assume that it can be converted to "mediumtext",
+		// since "text" means that session table is not memory storage,
+		// plus it is already stored externally aka operation will be quick ?
+		/*if ($_dataCol_wrongSize && $_dataColType == 'text')
+		{
+			$db->setQuery("ALTER TABLE `#__session` MODIFY `data` MEDIUMTEXT");
+			$db->execute();
+			$_dataCol_wrongSize = false;
+		}*/
+		
 		
 		// Set field information into session to avoid recalculation ...
-		$_compressed = $has_zlib ? zlib_encode(serialize($fields), -15) : ($b64_srlz ? serialize($fields) : $fields);
-		$_sz_encoded = $b64_srlz ? base64_encode($_compressed) : $_compressed;
-		if ( !$legacy_size || strlen($_sz_encoded) < 30000 ) {
+		$_sz_encoded = base64_encode( $has_zlib ? zlib_encode(serialize($fields), -15) : serialize($fields) );
+		if ( !$_dataCol_wrongSize || strlen($_sz_encoded) < 16000 ) {
 			$session->set($indexer.'_fields', $_sz_encoded, 'flexicontent');
 		} else {
 			$session->set($indexer.'_fields', null, 'flexicontent');
@@ -101,13 +112,15 @@ class FlexicontentControllerSearch extends FlexicontentController
 		
 		
 		// Set field IDs of fields that are advanced-index "filters"
-		if ($rebuildmode=='quick' && $indexer=='advanced') {
+		if ($indexer=='advanced') {
 			$filterables = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='filter');
 			$filterable_ids = array_flip( array_keys($filterables) );
 		} else {
 			$filterable_ids = array();
 		}
-		$session->set($indexer.'_filterable_ids',  $filterable_ids,  'flexicontent');  // this is both <3.4.7 session safe and also small, so do not compress
+		
+		$_sz_encoded = base64_encode( $has_zlib ? zlib_encode(serialize($filterable_ids), -15) : serialize($filterable_ids) );
+		$session->set($indexer.'_filterable_ids',  $_sz_encoded,  'flexicontent');  // this is both <3.4.7 session safe and also small, so do not compress
 		
 		
 		// Get the field ids of the searchable fields that will be re-indexed, These are all ones ('all-search') or just the new ones ('dirty-search')
@@ -130,10 +143,11 @@ class FlexicontentControllerSearch extends FlexicontentController
 		
 		// Get ids of searchable and ids of item having values for these fields
 		$itemsmodel = $this->getModel('items');          // Get items model to call needed methods
-		$itemids	= $itemsmodel->getFieldsItems($fieldids);        // Get the items ids that have value for any of the searchable fields
+		$itemids    = $itemsmodel->getFieldsItems($fieldids);
 		
 		// Set item ids into session to avoid recalculation ...
-		$session->set($indexer.'_items_to_index', $itemids, 'flexicontent');
+		$_sz_encoded = base64_encode( $has_zlib ? zlib_encode(serialize($itemids), -15) : serialize($itemids) );
+		$session->set($indexer.'_items_to_index', $_sz_encoded, 'flexicontent');
 		
 		echo 'success';  //echo count($fieldids)*count($itemids).'|';
 		// WARNING: json_encode will output object if given an array with gaps in the indexing
@@ -157,7 +171,6 @@ class FlexicontentControllerSearch extends FlexicontentController
 	{
 		$jversion = new JVersion();
 		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
-		$b64_srlz = version_compare( $jversion->getShortVersion(), '3.4.7', 'lt' );
 		
 		$start_microtime = microtime(true);
 		$session = JFactory::getSession();
@@ -184,23 +197,27 @@ class FlexicontentControllerSearch extends FlexicontentController
 				$fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='all-search');
 			}
 		}
-		else if ( !is_array($fields) ) {
-			$fields = $b64_srlz  ?  base64_decode($fields) : $fields;
-			$fields = $has_zlib  ?  unserialize(zlib_decode($fields))  :  ($b64_srlz ? unserialize($fields) : $fields);
+		else {
+			$fields = unserialize( $has_zlib ? zlib_decode(base64_decode($fields)) : base64_decode($fields) );
 		}
 		//echo 'fail|'; print_r(array_keys($fields)); exit;
 		
 		// Get the field ids of the searchable fields
 		$fieldids = array_keys($fields);
 		
+		
 		// Get fields that will have atomic search tables, (current for advanced index only)
-		if ($indexer=='advanced')
-		{
+		if ($indexer=='advanced') {
 			$filterable_ids = $session->get($indexer.'_filterable_ids', array(),'flexicontent');
-		} else $filterable_ids = array();
+			$filterable_ids = unserialize( $has_zlib ? zlib_decode(base64_decode($filterable_ids)) : base64_decode($filterable_ids) );
+		} else
+			$filterable_ids = array();
+		
 		
 		// Get items ids that have value for any of the searchable fields, but use session to avoid recalculation
 		$itemids = $session->get($indexer.'_items_to_index', array(),'flexicontent');
+		$itemids = unserialize( $has_zlib ? zlib_decode(base64_decode($itemids)) : base64_decode($itemids) );
+		
 		
 		$_fields = array();
 		foreach($fields as $field_id => $field)

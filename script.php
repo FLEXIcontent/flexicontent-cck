@@ -416,6 +416,8 @@ class com_flexicontentInstallerScript
 	{
 		$app = JFactory::getApplication();
 		$db = JFactory::getDBO();
+		$dbprefix = $app->getCfg('dbprefix');
+		$dbname   = $app->getCfg('db');
 		
 		/*
 		// always create or modify these parameters
@@ -467,75 +469,75 @@ class com_flexicontentInstallerScript
 		
 		// Get DB table information
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_fields_item_relations"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_fields_item_relations"';
 		$db->setQuery($query);
 		$fi_rels_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_items_versions"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_versions"';
 		$db->setQuery($query);
 		$fi_vers_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_favourites"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_favourites"';
 		$db->setQuery($query);
 		$favs_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_files"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_files"';
 		$db->setQuery($query);
 		$files_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_fields"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_fields"';
 		$db->setQuery($query);
 		$fields_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_types"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_types"';
 		$db->setQuery($query);
 		$types_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_items_ext"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_ext"';
 		$db->setQuery($query);
 		$iext_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_advsearch_index"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_advsearch_index"';
 		$db->setQuery($query);
 		$advsearch_index_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_authors_ext"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_authors_ext"';
 		$db->setQuery($query);
 		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_reviews"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews"';
 		$db->setQuery($query);
 		$reviews_beta_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_reviews_ratings"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_ratings"';
 		$db->setQuery($query);
 		$reviews_ratings_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_templates"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_templates"';
 		$db->setQuery($query);
 		$templates_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_layouts_conf"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_layouts_conf"';
 		$db->setQuery($query);
 		$layouts_conf_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_items_tmp"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_tmp"';
 		$db->setQuery($query);
 		$content_cache_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_download_history"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_history"';
 		$db->setQuery($query);
 		$dl_history_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_download_coupons"';
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_coupons"';
 		$db->setQuery($query);
 		$dl_coupons_tbl_exists = (boolean) count($db->loadObjectList());
 		
 		// Data Types of columns
 		$tbl_names_arr = array('flexicontent_files', 'flexicontent_fields', 'flexicontent_types');
 		foreach ($tbl_names_arr as $tbl_name) {
-			$full_tbl_name = $app->getCfg('dbprefix') . $tbl_name;
-			$query = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '".$full_tbl_name."'";// ." AND COLUMN_NAME = 'attribs'";
+			$full_tbl_name = $dbprefix . $tbl_name;
+			$query = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$full_tbl_name."'";// ." AND COLUMN_NAME = 'attribs'";
 			$db->setQuery($query);
 			$tbl_datatypes[$tbl_name] = $db->loadAssocList('COLUMN_NAME');
 		}
@@ -1223,6 +1225,8 @@ class com_flexicontentInstallerScript
 		$error = false;
 		$extensions = array();
 		$db = JFactory::getDBO();
+		$dbprefix = $app->getCfg('dbprefix');
+		$dbname   = $app->getCfg('db');
 		
 		// Uninstall additional flexicontent modules/plugins found in Joomla DB,
 		// This code part (for uninstalling additional extensions) originates from Zoo J1.5 Component:
@@ -1444,10 +1448,10 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Remove search tables</td>
 					<td>
 						<?php
-						$tbl_prefix = $app->getCfg('dbprefix').'flexicontent_advsearch_index_field_';
+						$tbl_prefix = $dbprefix.'flexicontent_advsearch_index_field_';
 						$query = "SELECT TABLE_NAME
 							FROM INFORMATION_SCHEMA.TABLES
-							WHERE TABLE_NAME LIKE '".$tbl_prefix."%'
+							WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME LIKE '".$tbl_prefix."%'
 							";
 						$db->setQuery($query);
 						$tbl_names = $db->loadColumn();

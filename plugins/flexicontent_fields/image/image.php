@@ -2334,11 +2334,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$log->addEntry(array('comment' => $filepath));
 					
 					$db->insertObject('#__flexicontent_files', $obj);
-					jexit('Upload complete');
+					jexit('FLEXI_UPLOAD_COMPLETE');
 				}
 				else {
 					$db->insertObject('#__flexicontent_files', $obj);
-					$app->enqueueMessage($field->label . ' : ' . JText::_('Upload complete'));
+					$app->enqueueMessage($field->label . ' : ' . JText::_('FLEXI_UPLOAD_COMPLETE'));
 					
 					$sizes = array('l','m','s','b');
 					foreach ($sizes as $size) {

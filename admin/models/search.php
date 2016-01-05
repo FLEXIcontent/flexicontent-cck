@@ -449,10 +449,12 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$filterables = array_keys($filterables);
 		$filterables = array_flip($filterables);
 		
-		$tbl_prefix = $app->getCfg('dbprefix').'flexicontent_advsearch_index_field_';
+		$dbprefix = $app->getCfg('dbprefix');
+		$dbname   = $app->getCfg('db');
+		$tbl_prefix = $dbprefix.'flexicontent_advsearch_index_field_';
 		$query = "SELECT TABLE_NAME
 			FROM INFORMATION_SCHEMA.TABLES
-			WHERE TABLE_NAME LIKE '".$tbl_prefix."%'
+			WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME LIKE '".$tbl_prefix."%'
 			";
 		$db->setQuery($query);
 		$tbl_names = $db->loadColumn();

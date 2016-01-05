@@ -670,7 +670,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		jimport('joomla.filesystem.file');
 		$app = JFactory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
-		$dbname = $app->getCfg('db');
+		$dbname   = $app->getCfg('db');
 		
 		$tblname_indexnames = array(
 			'flexicontent_items_ext'=>array('lang_parent_id'=>0, 'type_id'=>0),
@@ -725,7 +725,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			foreach($indexnames as $indexname => $iconf) {
 				$query = "SELECT COUNT(1) AS IndexIsThere "
 					." FROM INFORMATION_SCHEMA.STATISTICS"
-					." WHERE table_schema='".$dbname."' AND table_name='".$dbprefix.$tblname."' AND index_name='".$indexname."'"
+					." WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$dbprefix.$tblname."' AND index_name='".$indexname."'"
 					.(is_array($iconf) && !empty($iconf['cols'])  ? 
 						" AND COLUMN_NAME IN ('".implode("','", array_keys($iconf['cols']))."')".
 						" HAVING IndexIsThere = ".count($iconf['cols'])

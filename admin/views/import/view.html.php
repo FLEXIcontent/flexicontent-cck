@@ -177,6 +177,29 @@ class FlexicontentViewImport extends JViewLegacy
 		// else ...
 		
 		
+		// Check is session table DATA column is not mediumtext (16MBs, it can be 64 KBs ('text') in some sites that were not properly upgraded)
+		$tblname  = 'session';
+		$dbprefix = $app->getCfg('dbprefix');
+		$dbname   = $app->getCfg('db');
+		$db->setQuery("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$dbprefix.$tblname."'");
+		$jession_coltypes = $db->loadAssocList('COLUMN_NAME');
+		$_dataColType = strtolower($jession_coltypes['data']['DATA_TYPE']);
+		$_dataCol_wrongSize = ($_dataColType != 'mediumtext') && ($_dataColType != 'longtext');
+		
+		// If data type is "text" it is safe to assume that it can be converted to "mediumtext",
+		// since "text" means that session table is not memory storage,
+		// plus it is already stored externally aka operation will be quick ?
+		/*if ($_dataCol_wrongSize && $_dataColType == 'text')
+		{
+			$db->setQuery("ALTER TABLE `#__session` MODIFY `data` MEDIUMTEXT");
+			$db->execute();
+			$_dataCol_wrongSize = false;
+		}*/
+		if ($_dataCol_wrongSize) {
+			$app->enqueueMessage("Joomla DB table: <b>'session'</b> has a <b>'data'</b> column with type: <b>'".$_dataColType."'</b>, instead of expected type <b>'mediumtext'</b>. Trying to import large data files may fail", "notice");
+		}
+		
+		
 		$formvals = array();
 		
 		// Retrieve Basic configuration
