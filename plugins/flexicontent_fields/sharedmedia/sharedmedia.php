@@ -533,7 +533,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			jQuery("#"+element_id+"_thumb").val(data.thumb);
 		}
 		
-		function toggleMETArows_'.$field->name.'(element_id, action=1)
+		function toggleMETArows_'.$field->name.'(element_id, action)
 		{
 			action = typeof action === "undefined" ? 0 : action;
 			if (action==1)
