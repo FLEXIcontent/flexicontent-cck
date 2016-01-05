@@ -687,7 +687,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 								JError::raiseWarning(100, JText::_('Unable to create file: "'.$tmpldir.$less_name.'"'));
 							} else {
 								$file_data = "@import 'include/config.less';\n\n";
-								$file_data .= file_get_contents($tmpldir.$less_name);
+								$file_data .= preg_replace("/[ \t]*\*zoom[\s]*:[\s]*expression[^\r\n]+[\r\n]+/u", "", file_get_contents($tmpldir.$less_name));  // copy and replace old invalid code
 								file_put_contents($tmpldir.$less_name, $file_data);
 							}
 						}
