@@ -20,7 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('joomla.application.component.model');
-jimport('joomla.filesystem.file');
+
 
 /**
  * FLEXIcontent Component Filemanager Model
@@ -765,8 +765,9 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	{
 		if (count( $cid ))
 		{
+			jimport('joomla.filesystem.path');
 			jimport('joomla.filesystem.file');
-		
+			
 			$cids = implode( ',', $cid );
 		
 			$query = 'SELECT f.filename, f.url, f.secure'

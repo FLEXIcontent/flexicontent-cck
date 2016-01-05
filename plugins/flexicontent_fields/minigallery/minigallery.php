@@ -16,6 +16,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.event.plugin');
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+JLoader::register('FlexicontentControllerFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');  // we use JPATH_BASE since controller exists in frontend too
+JLoader::register('FlexicontentModelFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');  // we use JPATH_BASE since model exists in frontend too
 
 class plgFlexicontent_fieldsMinigallery extends FCField
 {
@@ -732,8 +734,6 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.path');
 			$srcpath_original  = JPath::clean( JPATH_SITE .DS. $import_docs_folder .DS );
-			require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');
-			require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');
 		}
 		
 		$newpost = array();
@@ -983,7 +983,6 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		
 		$ignored['item_id'] = $item->id;
 		
-		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');
 		$fm = new FlexicontentModelFilemanager();
 		return $fm->candelete( array($file_id), $ignored );
 	}

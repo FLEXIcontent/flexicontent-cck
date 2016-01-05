@@ -14,8 +14,9 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
+JLoader::register('FlexicontentControllerFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');  // we use JPATH_BASE since controller exists in frontend too
+JLoader::register('FlexicontentModelFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');  // we use JPATH_BASE since model exists in frontend too
 
 class plgFlexicontent_fieldsImage extends JPlugin
 {
@@ -1918,7 +1919,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			jimport('joomla.filesystem.path');
 			if ( $is_importcsv ) {
 				$srcpath_original = JPath::clean( JPATH_SITE .DS. $import_media_folder .DS );
-				require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');
 			}
 		}
 
@@ -2900,7 +2900,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$ignored['item_id'] = $item->id;
 		
-		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');
 		$fm = new FlexicontentModelFilemanager();
 		return $fm->candelete( array($file_id), $ignored );
 	}
