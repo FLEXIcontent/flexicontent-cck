@@ -72,7 +72,8 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		$phone2_maxlength = (int) $field->parameters->get( 'phone2_maxlength', 0 ) ;  // client/server side enforced
 		$phone3_size = (int) $field->parameters->get( 'phone3_size', 12 ) ;
 		$phone3_maxlength = (int) $field->parameters->get( 'phone3_maxlength', 0 ) ;  // client/server side enforced
-		
+		$allow_letters = (int) $field->parameters->get( 'allow_letters', 0 ) ? '' : ' validate-numeric';  // class for enabling javascript validation 
+				
 		// Create extra HTML TAG parameters for the form field(s)
 		if ($use_label) $label_attribs = ' size="'.$label_size.'"'. ($label_maxlength ? ' maxlength="'.$label_maxlength.'" ' : '');
 		if ($use_cc)    $cc_attribs    = ' size="'.$cc_size.'"'.    ($cc_maxlength ? ' maxlength="'.$cc_maxlength.'" ' : '');
@@ -270,21 +271,21 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 				<tr><td class="key">' .JText::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER' ). '</td><td>
 					<div class="nowrap_box">
 						'.($show_part_labels && $part1_lbl ? '<label class="label phonenum1-lbl" for="'.$elementid_n.'_phone1" >'.JText::_($part1_lbl).'</label><br/>' : '').'
-						<input class="phonenum1 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone1]" id="'.$elementid_n.'_phone1" type="text" value="'.$value['phone1'].'" '.$phone1_attribs.' />
+						<input class="phonenum1 fcfield_textval inlineval'.$allow_letters.$required.'" name="'.$fieldname_n.'[phone1]" id="'.$elementid_n.'_phone1" type="text" value="'.$value['phone1'].'" '.$phone1_attribs.' />
 						'.($use_phone > 1 ? '-' : '').'
 					</div>
 					
 					'.($use_phone >= 2 ? '
 					<div class="nowrap_box">
 						'.($show_part_labels && $part2_lbl ? '<label class="label phonenum2-lbl" for="'.$elementid_n.'_phone2" >'.JText::_($part2_lbl).'</label><br/>' : '').'
-						<input class="phonenum2 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone2]" id="'.$elementid_n.'_phone2" type="text" value="'.$value['phone2'].'" '.$phone2_attribs.' />
+						<input class="phonenum2 fcfield_textval inlineval'.$allow_letters.$required.'" name="'.$fieldname_n.'[phone2]" id="'.$elementid_n.'_phone2" type="text" value="'.$value['phone2'].'" '.$phone2_attribs.' />
 						'.($use_phone > 2 ? '-' : '').'
 					</div>' : '').'
 					
 					'.($use_phone > 2 ? '
 					<div class="nowrap_box">
 						'.($show_part_labels && $part3_lbl ? '<label class="label phonenum3-lbl" for="'.$elementid_n.'_phone3" >'.JText::_($part3_lbl).'</label><br/>' : '').'
-						<input class="phonenum3 fcfield_textval inlineval validate-numeric'.$required.'" name="'.$fieldname_n.'[phone3]" id="'.$elementid_n.'_phone3" type="text" value="'.$value['phone3'].'" '.$phone3_attribs.' />
+						<input class="phonenum3 fcfield_textval inlineval'.$allow_letters.$required.'" name="'.$fieldname_n.'[phone3]" id="'.$elementid_n.'_phone3" type="text" value="'.$value['phone3'].'" '.$phone3_attribs.' />
 					</div>' : '').'
 				</td></tr>';
 			
@@ -423,8 +424,11 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		$label_maxlength = (int) $field->parameters->get( 'label_maxlength', 0 ) ;  // client/server side enforced
 		$cc_maxlength    = (int) $field->parameters->get( 'cc_maxlength', 0 ) ;     // client/server side enforced
-		$phone_maxlength = (int) $field->parameters->get( 'phone_maxlength', 0 ) ;  // client/server side enforced
-		
+		$phone1_maxlength = (int) $field->parameters->get( 'phone1_maxlength', 0 ) ;  // client/server side enforced
+		$phone2_maxlength = (int) $field->parameters->get( 'phone2_maxlength', 0 ) ;  // client/server side enforced
+		$phone3_maxlength = (int) $field->parameters->get( 'phone3_maxlength', 0 ) ;  // client/server side enforced
+		$allow_letters = (int) $field->parameters->get( 'allow_letters', 0 ); // allow letters during validation
+			
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
 		
@@ -442,14 +446,22 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 				}
 			}
 			
-			
 			// ****************************************************************************
 			// Validate phone number, skipping phone number that are empty after validation
 			// ****************************************************************************
+
+			$regex = $allow_letters ? '/[^0-9A-Z]/' : '/[^0-9]/';	// allow letters?
+			 
+			// force string to uppercase, remove any forbiden characters
+			$v['phone1'] = preg_replace($regex, '', strtoupper($v['phone1']));
+			$v['phone2'] = preg_replace($regex, '', strtoupper($v['phone2']));
+			$v['phone3'] = preg_replace($regex, '', strtoupper($v['phone3']));
 			
-			$newpost[$new]['phone1'] = !strlen($v['phone1']) ? '' : flexicontent_html::dataFilter(@$v['phone1'], $phone_maxlength, 'INT', 0);
-			$newpost[$new]['phone2'] = !strlen($v['phone2']) ? '' : flexicontent_html::dataFilter(@$v['phone2'], $phone_maxlength, 'INT', 0);
-			$newpost[$new]['phone3'] = !strlen($v['phone3']) ? '' : flexicontent_html::dataFilter(@$v['phone3'], $phone_maxlength, 'INT', 0);
+			// enforce max length
+			$newpost[$new]['phone1'] = $phone1_maxlength ? $v['phone1'] : substr($v['phone1'], 0, $phone1_maxlength);
+			$newpost[$new]['phone2'] = $phone2_maxlength ? $v['phone2'] : substr($v['phone2'], 0, $phone2_maxlength);
+			$newpost[$new]['phone3'] = $phone3_maxlength ? $v['phone3'] : substr($v['phone3'], 0, $phone3_maxlength);
+			
 			if (!strlen($v['phone1']) && !strlen($v['phone2']) && !strlen($v['phone3']) && !$use_ingroup ) continue;  // Skip empty values if not in field group
 			
 			// Validate other value properties

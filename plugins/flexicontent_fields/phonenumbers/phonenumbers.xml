@@ -89,6 +89,12 @@
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_PART_3" description="" level="level3" />
 			<field name="phone3_maxlength" type="text" default="12" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="phone3_size" type="text" default="12" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_ALLOW_LETTERS_SEP" description="" level="level3" />
+			<field name="allow_letters" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_ALLOW_LETTERS" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_ALLOW_LETTERS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 		</fieldset>
 		<fieldset name="group-phonenumbers-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
