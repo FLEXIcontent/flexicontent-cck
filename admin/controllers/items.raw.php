@@ -149,40 +149,33 @@ class FlexicontentControllerItems extends FlexicontentController
 	 * 
 	 * @since 1.5
 	 */
-	function viewtags() {
+	function viewtags()
+	{
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
-
-		$user	= JFactory::getUser();
 		
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$CanUseTags = $permission->CanUseTags;
-		} else if (FLEXI_ACCESS) {
-			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
+		@ob_end_clean();
+		//header("Content-type:text/json");
+		//header('Content-type: application/json');
+		//header('Content-type: text/plain; charset=utf-8');  // this text/plain is browser's default
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Cache-Control: no-cache");
+		header("Pragma: no-cache");
+		
+		if ( !FlexicontentHelperPerm::getPerm()->CanUseTags ){
+			$array =  array("{\"id\":\"0\",\"name\":\"You have no access\"}");
 		} else {
-			// no FLEXIAccess everybody can create / use tags
-			$CanUseTags = 1;
-		}
-		if($CanUseTags) {
-			//header('Content-type: application/json');
-			@ob_end_clean();
-			//header('Content-type: text/plain; charset=utf-8');  // this text/plain is browser's default
-			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-			header("Cache-Control: no-cache");
-			header("Pragma: no-cache");
-			//header("Content-type:text/json");
-			$model 		=  $this->getModel('item');
-			$tagobjs 	=  $model->gettags(JRequest::getVar('q'));
-			$array = array();
-			echo "[";
+			$model   = $this->getModel(FLEXI_ITEMVIEW);
+			$tagobjs = $model->gettags(JRequest::getVar('q'));
+			$array   = array();
 			if ($tagobjs) foreach($tagobjs as $tag) {
 				$array[] = "{\"id\":\"".$tag->id."\",\"name\":\"".$tag->name."\"}";
 			}
-			echo implode(",", $array);
-			echo "]";
-			exit;
+			if (empty($array)) $array   = array("{\"id\":\"0\",\"name\":\"No tags found\"}");
 		}
+		
+		echo "[\n" . implode(",\n", $array) . "\n]";
+		exit;
 	}
 
 
@@ -191,26 +184,16 @@ class FlexicontentControllerItems extends FlexicontentController
 	 * 
 	 * @since 1.5
 	 */
-	function selectstate() {
-		$user	= JFactory::getUser();
-		
+	function selectstate()
+	{
 		// General permission since we do not have a specific item yet
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$auth_publish = $permission->CanPublish || $permission->CanPublishOwn;
-			$auth_delete  = $permission->CanDelete  || $permission->CanDeleteOwn;
-			$auth_archive = $permission->CanArchives;
-		} else if (FLEXI_ACCESS) {
-			$auth_publish  = ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)) : 1;
-			$auth_delete   = ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'delete', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'deleteown', 'users', $user->gmid)) : 1;
-			$auth_archive  = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
-		} else {
-			$auth_publish = $user->authorize('com_content', 'publish', 'content', 'all');
-			$auth_delete  = $user->gid >= 23; // is at least manager
-			$auth_archive = $user->gid >= 23; // is at least manager
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$auth_publish = $permission->CanPublish || $permission->CanPublishOwn;
+		$auth_delete  = $permission->CanDelete  || $permission->CanDeleteOwn;
+		$auth_archive = $permission->CanArchives;
 		
-		if($auth_publish || $auth_archive || $auth_delete) {
+		if($auth_publish || $auth_archive || $auth_delete)
+		{
 			//header('Content-type: application/json');
 			@ob_end_clean();
 			header('Content-type: text/html; charset=utf-8');

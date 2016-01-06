@@ -51,54 +51,83 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 if ($this->perms['cantags'] || $this->perms['canversion']) {
 	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', FLEXI_VHASH);
 	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', FLEXI_VHASH);
-	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', FLEXI_VHASH);
+	//$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', FLEXI_VHASH);
 	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js', FLEXI_VHASH);     // e.g. pagination for item versions
 	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js', FLEXI_VHASH);  // e.g. autogrow version comment textarea
 
-	$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', FLEXI_VHASH);
+	//$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', FLEXI_VHASH);
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery('#input-tags').autocomplete('".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&".JSession::getFormToken()."=1', {
-				width: 260,
-				max: 100,
-				matchContains: false,
-				mustMatch: false,
-				selectFirst: false,
-				dataType: 'json',
-				parse: function(data) {
-					return jQuery.map(data, function(row) {
-						return {
-							data: row,
-							value: row.name,
-							result: row.name
-						};
-					});
-				},
-				formatItem: function(row) {
-					return row.name;
-				}
-			}).result(function(e, row) {
-				jQuery('#input-tags').attr('data-tagid',row.id);
-				jQuery('#input-tags').attr('data-tagname',row.name);
-				addToList(row.id, row.name);
-			}).keydown(function(event) {
-				if((event.keyCode==13)&&(jQuery('#input-tags').attr('data-tagid')=='0') ) {//press enter button
-					addtag(0, jQuery('#input-tags').attr('value'));
-					resetField();
-					return false;
-				}else if(event.keyCode==13) {
-					resetField();
+			
+			jQuery('.deletetag').click(function(e){
+				jQuery(this).parent().remove();
+				return false;
+			});
+			
+			var tagInput = jQuery('#input-tags');
+			
+			tagInput.keydown(function(event) {
+				if( (event.keyCode==13) )
+				{
+					var el = jQuery(event.target);
+					window.console.log( 'Enter, adding tag' + el.val() );
+					addtag(0, el.val());
+					el.val('');
 					return false;
 				}
 			});
-			function resetField() {
-				jQuery('#input-tags').attr('data-tagid',0);
-				jQuery('#input-tags').attr('data-tagname','');
-				jQuery('#input-tags').attr('value','');
-			}
-		});
-		
-		jQuery(document).ready(function() {
+			
+			jQuery.ui.autocomplete( {
+				source: function( request, response ) {
+					el = jQuery(this.element);
+					jQuery.ajax({
+						url: '".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&".JSession::getFormToken()."=1',
+						dataType: 'json',
+						data: {
+							q: request.term
+						},
+						success: function( data ) {
+							window.console.log( '... done' );
+							response( jQuery.map( data, function( item ) {
+								return {
+									/*label: item.item_id +': '+ item.name,*/
+									label: item.name,
+									value: item.id
+								}
+							}));
+						}
+					});
+				},
+				delay: 200,
+				minLength: 1,
+				select: function( event, ui ) {
+					window.console.log( (ui.item  ?  'Selected: ' + ui.item.label  :  'Nothing selected') + ', input was \'' + this.value + '\'');
+					
+					// Prevent default behaviour of setting 'ui.item.value' and triggering change event, and also clear existing value
+					event.preventDefault();
+					
+					var ele = jQuery(event.target);
+					if (ui.item.value!='' && ui.item.value!='0') {
+						addToList(ui.item.value, ui.item.label);
+						ele.val('');
+					}
+					
+					//ele.trigger('change');
+				},
+				open: function() {
+					jQuery(this).removeClass( 'ui-corner-all' ).addClass( 'ui-corner-top' );
+					//jQuery(this).removeClass('working');
+				},
+				close: function() {
+					jQuery(this).removeClass( 'ui-corner-top' ).addClass( 'ui-corner-all' );
+				},
+				search: function() {
+					window.console.log( 'quering ... ' );
+					jQuery(this).addClass('working');
+				}
+			}, tagInput.get(0) );
+			
+			
 			// For the initially displayed versions page:  Add onclick event that opens compare in popup 
 			jQuery('a.modal-versions').each(function(index, value) {
 				jQuery(this).on('click', function() {
@@ -195,7 +224,7 @@ $this->document->addScriptDeclaration("
 
 
 // Create info images
-$infoimage    = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/information.png', JText::_( 'FLEXI_NOTES' ) );
+$infoimage    = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ) );
 $revertimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
 $viewimage    = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
 $commentimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ) );
@@ -358,9 +387,9 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					<?php /*<label for="input-tags">
 						<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 					</label> */ ?> 
-					<input type="text" id="input-tags" name="tagname" data-tagid="0" data-tagname="" />
-					<span id='input_new_tag' ></span>
+					<input type="text" id="input-tags" name="tagname" />
 					<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_TAG_EDDITING_FULL', 1, 1);?>">
+						<span id='input_new_tag' ></span>
 						<?php echo $infoimage; ?>
 					</span>
 				</div>

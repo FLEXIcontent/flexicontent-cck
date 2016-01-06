@@ -769,6 +769,12 @@ body .fc-mssg.fc-noborder {
 .flexicontent .filterbuttons_head .nowrap_box .label {
 	vertical-align: middle;
 }
+.ui-autocomplete {
+	z-index: 1000 !important;
+}
+.ui-autocomplete-loading {
+	background: #eee url('../images/ajax-loader.gif') no-repeat 96% center;
+}
 .calendar {
 	vertical-align: middle;
 }

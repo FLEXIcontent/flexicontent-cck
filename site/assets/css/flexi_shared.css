@@ -1,4 +1,10 @@
-.calendar {
+.flexicontent .ui-autocomplete {
+	z-index: 1000 !important;
+}
+.flexicontent .ui-autocomplete-loading {
+	background: #eee url('../images/ajax-loader.gif') no-repeat 96% center;
+}
+.flexicontent .calendar {
 	vertical-align: middle;
 }
 table#version_tbl td.versions-first {

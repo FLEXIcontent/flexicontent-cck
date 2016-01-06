@@ -3178,11 +3178,11 @@ class ParentClassItem extends JModelAdmin
 	 * @return object
 	 * @since 1.0
 	 */
-	function gettags($mask="")
+	function gettags($mask="", $limit=100)
 	{
 		$escaped_mask = $this->_db->escape( $mask, true );
 		$where = ($mask!="")?" name like ".$this->_db->Quote( '%'.$escaped_mask.'%', false )." AND":"";
-		$query = 'SELECT * FROM #__flexicontent_tags WHERE '.$where.' published = 1 ORDER BY name';
+		$query = 'SELECT * FROM #__flexicontent_tags WHERE '.$where.' published = 1 ORDER BY name LIMIT 0,'.((int)$limit);
 		$this->_db->setQuery($query);
 		$tags = $this->_db->loadObjectlist();
 		return $tags;

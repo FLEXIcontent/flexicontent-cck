@@ -55,7 +55,7 @@ $usetags_fe = $this->params->get('usetags_fe', 1);
 $tags_displayed = $typeid && ( ($this->perms['cantags'] && $usetags_fe) || (count(@$this->usedtagsdata) && $usetags_fe==2) ) ;
 
 // Create reusable html code
-$infoimage = JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_( 'FLEXI_NOTES' ) );
+$infoimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ) );
 $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
@@ -98,64 +98,82 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', FLEXI_VHASH);
 	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', FLEXI_VHASH);
-	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', FLEXI_VHASH);
+	//$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', FLEXI_VHASH);
 	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js', FLEXI_VHASH);     // e.g. pagination for item versions
 	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js', FLEXI_VHASH);  // e.g. autogrow version comment textarea
 
-	$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', FLEXI_VHASH);
+	//$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', FLEXI_VHASH);
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery('#input-tags').autocomplete('".JURI::base(true)."/index.php?option=com_flexicontent&view=item&task=viewtags&tmpl=component&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1', {
-				width: 260,
-				max: 100,
-				matchContains: false,
-				mustMatch: false,
-				selectFirst: false,
-				dataType: 'json',
-				parse: function(data) {
-					return jQuery.map(data, function(row) {
-						return {
-							data: row,
-							value: row.name,
-							result: row.name
-						};
+			
+			jQuery('.deletetag').click(function(e){
+				jQuery(this).parent().remove();
+				return false;
+			});
+			
+			var tagInput = jQuery('#input-tags');
+			
+			tagInput.keydown(function(event) {
+				if( (event.keyCode==13) )
+				{
+					var el = jQuery(event.target);
+					window.console.log( 'Enter, adding tag' + el.val() );
+					addtag(0, el.val());
+					el.val('');
+					return false;
+				}
+			});
+			
+			jQuery.ui.autocomplete( {
+				source: function( request, response ) {
+					el = jQuery(this.element);
+					jQuery.ajax({
+						url: '".JURI::base(true)."/index.php?option=com_flexicontent&task=viewtags&format=raw&".JSession::getFormToken()."=1',
+						dataType: 'json',
+						data: {
+							q: request.term
+						},
+						success: function( data ) {
+							window.console.log( '... done' );
+							response( jQuery.map( data, function( item ) {
+								return {
+									/*label: item.item_id +': '+ item.name,*/
+									label: item.name,
+									value: item.id
+								}
+							}));
+						}
 					});
 				},
-				formatItem: function(row) {
-					return row.name;
+				delay: 200,
+				minLength: 1,
+				select: function( event, ui ) {
+					window.console.log( (ui.item  ?  'Selected: ' + ui.item.label  :  'Nothing selected') + ', input was \'' + this.value + '\'');
+					
+					// Prevent default behaviour of setting 'ui.item.value' and triggering change event, and also clear existing value
+					event.preventDefault();
+					
+					var ele = jQuery(event.target);
+					if (ui.item.value!='' && ui.item.value!='0') {
+						addToList(ui.item.value, ui.item.label);
+						ele.val('');
+					}
+					
+					//ele.trigger('change');
+				},
+				open: function() {
+					jQuery(this).removeClass( 'ui-corner-all' ).addClass( 'ui-corner-top' );
+					//jQuery(this).removeClass('working');
+				},
+				close: function() {
+					jQuery(this).removeClass( 'ui-corner-top' ).addClass( 'ui-corner-all' );
+				},
+				search: function() {
+					window.console.log( 'quering ... ' );
+					jQuery(this).addClass('working');
 				}
-			}).result(function(e, row) {
-				jQuery('#input-tags').attr('data-tagid',row.id);
-				jQuery('#input-tags').attr('data-tagname',row.name);
-				addToList(row.id, row.name);
-			}).keydown(function(event) {
-				if((event.keyCode==13)&&(jQuery('#input-tags').attr('data-tagid')=='0') ) {//press enter button
-					addtag(0, jQuery('#input-tags').attr('value'));
-					resetField();
-					return false;
-				}else if(event.keyCode==13) {
-					resetField();
-					return false;
-				}
-			});
-			function resetField() {
-				jQuery('#input-tags').attr('data-tagid',0);
-				jQuery('#input-tags').attr('data-tagname','');
-				jQuery('#input-tags').attr('value','');
-			}
-			jQuery('.deletetag').click(function(e){
-				parent = jQuery(jQuery(this).parent());
-				parent.remove();
-				return false;
-			});
-		});
-	");
-} else {
-	$this->document->addScriptDeclaration("
-		jQuery(document).ready(function () {
-			jQuery(\".deletetag\").click(function(e){
-				return false;
-			});
+			}, tagInput.get(0) );
+			
 		});
 	");
 }
@@ -465,7 +483,7 @@ if ($typeid==0) : ob_start();  // type ?>
 	
 	<div class="container_fcfield container_fcfield_id_8 container_fcfield_name_type" id="container_fcfield_8">
 		<?php echo $this->lists['type']; ?>
-		<span class="editlinktip <?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" style="display:inline-block;" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_( 'FLEXI_NOTES' ), ':'), JText::_( 'FLEXI_TYPE_CHANGE_WARNING' ), 0):htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_TYPE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8'); ?>">
+		<span class="editlinktip <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_( 'FLEXI_NOTES' ), ':'), JText::_( 'FLEXI_TYPE_CHANGE_WARNING' ), 0):htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_TYPE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8'); ?>">
 			<?php echo $infoimage; ?>
 		</span>
 		<?php echo sprintf( $alert_box, 'id="fc-change-warning" style="display:none;"', 'warning', '', '<h4>'.JText::_( 'FLEXI_WARNING' ).'</h4> '.JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ) ); ?>
@@ -498,7 +516,7 @@ if ( $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new i
 		<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state fcdualline" id="container_fcfield_10" style="margin-right:4% !important;" >
 			<?php echo $this->lists['state']; ?>
 			<?php //echo $this->form->getInput('state'); ?>
-			<span class="editlinktip <?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" style="display:inline-block;" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_( 'FLEXI_NOTES' ), ':'), JText::_( 'FLEXI_STATE_CHANGE_WARNING' ), 0):htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_STATE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8'); ?>">
+			<span class="editlinktip <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_( 'FLEXI_NOTES' ), ':'), JText::_( 'FLEXI_STATE_CHANGE_WARNING' ), 0):htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_STATE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8'); ?>">
 				<?php echo $infoimage; ?>
 			</span>
 		</div>
@@ -704,8 +722,8 @@ if ($tags_displayed) : ob_start();  // tags ?>
 					<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 				</label>
 				<input type="text" id="input-tags" name="tagname" data-tagid="0" data-tagname="" />
-				<span id='input_new_tag' ></span>
-				<span class="editlinktip <?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" style="display:inline-block;" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_NOTES'), ':'), htmlspecialchars(JText::_( 'FLEXI_TAG_EDDITING_FULL' ), ENT_COMPAT, 'UTF-8'), 0):htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_TAG_EDDITING_FULL' ), ENT_COMPAT, 'UTF-8'); ?>">
+				<span class="editlinktip <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_TAG_EDDITING_FULL', 1, 1);?>">
+					<span id='input_new_tag' ></span>
 					<?php echo $infoimage; ?>
 				</span>
 			</div>

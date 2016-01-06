@@ -2818,33 +2818,35 @@ class FlexicontentController extends JControllerLegacy
 	 * 
 	 * @since 1.5
 	 */
-	function viewtags() {
+	function viewtags()
+	{
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
-
-		$user = JFactory::getUser();
-		$CanUseTags = FlexicontentHelperPerm::getPerm()->CanUseTags;
 		
-		if($CanUseTags) {
-			//header('Content-type: application/json');
-			@ob_end_clean();
-			//header('Content-type: text/plain; charset=utf-8');  // this text/plain is browser's default
-			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-			header("Cache-Control: no-cache");
-			header("Pragma: no-cache");
-			//header("Content-type:text/json");
-			$model 		=  $this->getModel(FLEXI_ITEMVIEW);
-			$tagobjs 	=  $model->gettags(JRequest::getVar('q'));
-			$array = array();
-			echo "[";
-			foreach($tagobjs as $tag) {
+		@ob_end_clean();
+		//header("Content-type:text/json");
+		//header('Content-type: application/json');
+		//header('Content-type: text/plain; charset=utf-8');  // this text/plain is browser's default
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Cache-Control: no-cache");
+		header("Pragma: no-cache");
+		
+		if ( !FlexicontentHelperPerm::getPerm()->CanUseTags ){
+			$array =  array("{\"id\":\"0\",\"name\":\"You have no access\"}");
+		} else {
+			$model   = $this->getModel(FLEXI_ITEMVIEW);
+			$tagobjs = $model->gettags(JRequest::getVar('q'));
+			$array   = array();
+			if ($tagobjs) foreach($tagobjs as $tag) {
 				$array[] = "{\"id\":\"".$tag->id."\",\"name\":\"".$tag->name."\"}";
 			}
-			echo implode(",", $array);
-			echo "]";
-			jexit();
+			if (empty($array)) $array   = array("{\"id\":\"0\",\"name\":\"No tags found\"}");
 		}
+		
+		echo "[\n" . implode(",\n", $array) . "]";
+		exit;
 	}
+	
 	
 	function search()
 	{
