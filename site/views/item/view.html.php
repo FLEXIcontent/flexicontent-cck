@@ -1159,12 +1159,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		// build field for notifying subscribers
 		if ( !$subscribers )
 		{
-			$lists['notify'] = !$isnew ? JText::_('FLEXI_NO_SUBSCRIBERS_EXIST') : '';
+			$lists['notify'] = !$isnew ? '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_NO_SUBSCRIBERS_EXIST').'</div>' : '';
 		} else {
 			// b. Check if notification emails to subscribers , were already sent during current session
 			$subscribers_notified = $session->get('subscribers_notified', array(),'flexicontent');
 			if ( !empty($subscribers_notified[$item->id]) ) {
-				$lists['notify'] = JText::_('FLEXI_SUBSCRIBERS_ALREADY_NOTIFIED');
+				$lists['notify'] = '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_SUBSCRIBERS_ALREADY_NOTIFIED').'</div>';
 			} else {
 				// build favs notify field
 				$fieldname = 'jform[notify]';
@@ -1385,6 +1385,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$perms['isSuperAdmin'] = $permission->SuperAdmin;
 		$perms['multicat']     = $permission->MultiCat;
 		$perms['cantags']      = $permission->CanUseTags;
+		$perms['cancreatetags']= $permission->CanCreateTags;
 		$perms['canparams']    = $permission->CanParams;
 		$perms['cantemplates'] = $permission->CanTemplates;
 		$perms['canarchive']   = $permission->CanArchives;

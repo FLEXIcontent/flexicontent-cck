@@ -89,11 +89,10 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
-
+		
 		// Set filter order variables into state
 		$this->setState('filter_order', JRequest::getCmd('filter_order', 'i.modified', 'default'));
 		$this->setState('filter_order_Dir', JRequest::getCmd('filter_order_Dir', 'DESC', 'default'));
-		
 	}
 	
 	
@@ -383,7 +382,8 @@ class FlexicontentModelTags extends JModelLegacy
 		$filtertag = $cparams->get('filtertag', 0);
 		
 		// Filter the tag view with the active language
-		if ((FLEXI_FISH || FLEXI_J16GE) && $filtertag) {
+		if ($filtertag)
+		{
 			$lta = FLEXI_J16GE ? 'i': 'ie';
 			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
@@ -581,58 +581,6 @@ class FlexicontentModelTags extends JModelLegacy
     }
     
 		return $this->_tag;
-	}
-	
-	
-	/**
-	 * Method to store the tag
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function storetag($data)
-	{
-		$row  = $this->getTable('flexicontent_tags', '');
-		
-		// bind it to the table
-		if (!$row->bind($data)) {
-			$msg = $this->_db->getErrorMsg();
-			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
-		}
-		
-		// Make sure the data is valid
-		if (!$row->check()) {
-			$this->setError($row->getError());
-			return false;
-		}
-		
-		// Store it in the db
-		if (!$row->store()) {
-			$msg = $this->_db->getErrorMsg();
-			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
-		}
-		$this->_tag = &$row;
-		return $row->id;
-	}
-	
-	
-	/**
-	 * Method to add a tag
-	 *
-	 * @access	public
-	 * @return	boolean	True on success
-	 * @since	1.0
-	 */
-	function addtag($name) {
-		$obj = new stdClass();
-		$obj->name	 	= $name;
-		$obj->published	= 1;
-		
-		if($this->storetag($obj)) {
-			return true;
-		}
-		return false;
 	}
 }
 ?>

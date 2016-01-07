@@ -1822,7 +1822,7 @@ class FlexicontentController extends JControllerLegacy
 	function getajaxtags()
 	{
 		$user = JFactory::getUser();
-		$authorized = $user->authorise('com_flexicontent', 'newtags');
+		$authorized = $user->authorise('flexicontent.createtags',	'com_flexicontent');
 
 		if (!$authorized) return;
 		
@@ -1874,7 +1874,7 @@ class FlexicontentController extends JControllerLegacy
 
 		$user = JFactory::getUser();
 		$name = JRequest::getString('name', '');
-		$authorized = $user->authorise('com_flexicontent', 'newtags');
+		$authorized = $user->authorise('flexicontent.createtags',	'com_flexicontent');
 
 		if (!$authorized) return;
 		
@@ -1887,29 +1887,54 @@ class FlexicontentController extends JControllerLegacy
 	 *  Add new Tag from item screen
 	 *
 	 */
-	function addtag() {
+	function addtag()
+	{
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
-
+		
 		$name 	= JRequest::getString('name', '');
-		$model 	= $this->getModel('tags');
 		$array = JRequest::getVar('cid',  0, '', 'array');
-		$cid = (int)$array[0];
+		$cid   = (int)$array[0];
+		
+		// Check if tag exists (id exists or name exists)
+		JLoader::register("FlexicontentModelTag", JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php');
+		$model 	= new FlexicontentModelTag();
+		//$model 	= $this->getModel('tag');
 		$model->setId($cid);
-		if($cid==0) {
-			// Add the new tag and output it so that it gets loaded by the form
-			$result = $model->addtag($name);
-			if($result)
-				echo $model->_tag->id."|".$model->_tag->name;
-		} else {
-			// Since an id was given, just output the loaded tag, instead of adding a new one
-			$id = $model->get('id');
+		$tag = $model->getTag($name);
+		
+		if ($tag && $tag->id)
+		{
+			// Since tag was found just output the loaded tag
+			$id   = $model->get('id');
 			$name = $model->get('name');
 			echo $id."|".$name;
+			jexit();
+		}
+		
+		if ($cid)
+		{
+			echo "0|Tag not found";
+			jexit();
+		}
+		
+		if (!FlexicontentHelperPerm::getPerm()->CanCreateTags)
+		{
+			echo "0|".JText::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS');
+			jexit();
+		}
+		
+		// Add the new tag and output it so that it gets loaded by the form
+		try {
+			$result = $model->addtag($name);
+			echo  $result  ?  $model->_tag->id."|".$model->_tag->name :  "0|New tag was not created" ;
+		} catch (Exception $e) {
+			echo "0|New tag creation failed";
 		}
 		jexit();
 	}
-
+	
+	
 	/**
 	 * Add favourite
 	 * deprecated to ajax favs 
@@ -2831,7 +2856,8 @@ class FlexicontentController extends JControllerLegacy
 		header("Cache-Control: no-cache");
 		header("Pragma: no-cache");
 		
-		if ( !FlexicontentHelperPerm::getPerm()->CanUseTags ){
+		$perms = FlexicontentHelperPerm::getPerm();
+		if ( !$perms->CanUseTags ) {
 			$array =  array("{\"id\":\"0\",\"name\":\"You have no access\"}");
 		} else {
 			$model   = $this->getModel(FLEXI_ITEMVIEW);
@@ -2840,10 +2866,10 @@ class FlexicontentController extends JControllerLegacy
 			if ($tagobjs) foreach($tagobjs as $tag) {
 				$array[] = "{\"id\":\"".$tag->id."\",\"name\":\"".$tag->name."\"}";
 			}
-			if (empty($array)) $array   = array("{\"id\":\"0\",\"name\":\"No tags found\"}");
+			if (empty($array)) $array   = array("{\"id\":\"0\",\"name\":\"".($perms->CanCreateTags ? 'New tag, click enter to create' : 'No tags found')."\"}");
 		}
 		
-		echo "[\n" . implode(",\n", $array) . "]";
+		echo "[\n" . implode(",\n", $array) . "\n]";
 		exit;
 	}
 	

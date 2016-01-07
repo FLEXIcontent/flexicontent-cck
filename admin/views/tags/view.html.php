@@ -137,7 +137,9 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		JToolBarHelper::publishList($contrl.'publish');
 		JToolBarHelper::unpublishList($contrl.'unpublish');
-		JToolBarHelper::addNew($contrl.'add');
+		if ($perms->CanCreateTags) {
+			JToolBarHelper::addNew($contrl.'add');
+		}
 		JToolBarHelper::editList($contrl.'edit');
 		
 		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');

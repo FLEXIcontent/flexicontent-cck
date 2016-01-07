@@ -54,12 +54,12 @@ if (!FLEXI_J16GE) {
 	$auth->addACL('com_flexicontent', 'state', 'users', 'manager');
 	$auth->addACL('com_flexicontent', 'state', 'users', 'editor');
 
-	//Who can add new tags?
+	//Who can create new tags?
 	/*
-	$auth->addACL('com_flexicontent', 'newtags', 'users', 'super administrator');
-	$auth->addACL('com_flexicontent', 'newtags', 'users', 'administrator');
-	$auth->addACL('com_flexicontent', 'newtags', 'users', 'manager');
-	$auth->addACL('com_flexicontent', 'newtags', 'users', 'editor');
+	$auth->addACL('com_flexicontent', 'createtags', 'users', 'super administrator');
+	$auth->addACL('com_flexicontent', 'createtags', 'users', 'administrator');
+	$auth->addACL('com_flexicontent', 'createtags', 'users', 'manager');
+	$auth->addACL('com_flexicontent', 'createtags', 'users', 'editor');
 	*/
 
 	//Who can upload files?

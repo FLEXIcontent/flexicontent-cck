@@ -81,23 +81,47 @@ class FlexicontentControllerTags extends FlexicontentController
 	function addtag()
 	{
 		// Check for request forgeries
-		// JRequest::checkToken('request') or jexit( 'Invalid Token' );
-
+		JRequest::checkToken('request') or jexit( 'Invalid Token' );
+		
 		$name 	= JRequest::getString('name', '');
-		$model 	= $this->getModel('tag');
 		$array = JRequest::getVar('cid',  0, '', 'array');
-		$cid = (int)$array[0];
+		$cid   = (int)$array[0];
+		
+		// Check if tag exists (id exists or name exists)
+		JLoader::register("FlexicontentModelTag", JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php');
+		$model 	= new FlexicontentModelTag();
+		//$model 	= $this->getModel('tag');
 		$model->setId($cid);
-		if($cid==0) {
-			$result = $model->addtag($name);
-			if($result)
-				echo $model->_tag->id."|".$model->_tag->name;
-			//else echo "|";
-		} else {
-			$id = $model->get('id');
+		$tag = $model->getTag($name);
+		
+		if ($tag && $tag->id)
+		{
+			// Since tag was found just output the loaded tag
+			$id   = $model->get('id');
 			$name = $model->get('name');
 			echo $id."|".$name;
+			jexit();
 		}
+		
+		if ($cid)
+		{
+			echo "0|Tag not found";
+			jexit();
+		}
+		
+		if (!FlexicontentHelperPerm::getPerm()->CanCreateTags)
+		{
+			echo "0|".JText::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS');
+			jexit();
+		}
+		
+		// Add the new tag and output it so that it gets loaded by the form
+		try {
+			$result = $model->addtag($name);
+			echo  $result  ?  $model->_tag->id."|".$model->_tag->name :  "0|New tag was not created" ;
+		} catch (Exception $e) {
+			echo "0|New tag creation failed";
+		}
+		jexit();
 	}
-
 }

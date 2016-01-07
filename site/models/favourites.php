@@ -225,61 +225,23 @@ class FlexicontentModelFavourites extends JModelLegacy
 		$select_access .= ', c.access as category_access, ty.access as type_access';
 		
 		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
-				$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
-				$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$andaccess	.= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
-					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
-				} else {
-					$andaccess  .= ' AND ty.access <= '.$aid;
-					$andaccess  .= ' AND  c.access <= '.$aid;
-					$andaccess  .= ' AND  i.access <= '.$aid;
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
+			$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
+			$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
 			$select_access .= ', 1 AS has_access';
 		}
 		else {
 			// Access Flags for: content type, main category, item
-			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
-				$aid_list = implode(",", $aid_arr);
-				$select_access .= ', '
-					.' CASE WHEN '
-					.'  ty.access IN (0,'.$aid_list.') AND '
-					.'   c.access IN (0,'.$aid_list.') AND '
-					.'   i.access IN (0,'.$aid_list.') '
-					.' THEN 1 ELSE 0 END AS has_access';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$select_access .= ', '
-						.' CASE WHEN '
-						.'  (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') AND '
-						.'  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ') AND '
-						.'  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') '
-						.' THEN 1 ELSE 0 END AS has_access';
-				} else {
-					$select_access .= ', '
-						.' CASE WHEN '
-						.'  (ty.access <= '. (int) $aid . ') AND '
-						.'  ( c.access <= '. (int) $aid . ') AND '
-						.'  ( i.access <= '. (int) $aid . ') '
-						.' THEN 1 ELSE 0 END AS has_access';
-				}
-			}
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$select_access .= ', '
+				.' CASE WHEN '
+				.'  ty.access IN (0,'.$aid_list.') AND '
+				.'   c.access IN (0,'.$aid_list.') AND '
+				.'   i.access IN (0,'.$aid_list.') '
+				.' THEN 1 ELSE 0 END AS has_access';
 		}
 		
 		// Create sql WHERE clause
@@ -408,12 +370,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
-		if ( FLEXI_J16GE )
-			$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
-		else if (FLEXI_ACCESS)
-			$ignoreState = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'ignoreviewstate', 'users', $user->gmid) : 1;
-		else
-			$ignoreState = $user->gid  > 19;  // author has 19 and editor has 20
+		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
 		
 		if (!$ignoreState) {
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user

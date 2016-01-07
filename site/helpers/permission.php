@@ -169,8 +169,8 @@ class FlexicontentHelperPerm
 		
 		// TAGS: management tab and usage
 		$permission->CanTags			= $user->authorise('flexicontent.managetags',	'com_flexicontent'); // (backend) Allow management of Item Types
-		$permission->CanUseTags		= $user->authorise('flexicontent.usetags', 		'com_flexicontent'); // edit already assigned Tags of items
-		$permission->CanNewTags		= $user->authorise('flexicontent.newtags',		'com_flexicontent'); // add new Tags to items
+		$permission->CanUseTags		= $user->authorise('flexicontent.usetags', 		'com_flexicontent'); // edit tag assignments (item form)
+		$permission->CanCreateTags= $user->authorise('flexicontent.createtags',	'com_flexicontent'); // create new tags
 		
 		// VARIOUS management TABS: types, archives, statistics, templates, tags
 		$permission->CanTypes			= $user->authorise('flexicontent.managetypes',			'com_flexicontent'); // (backend) Allow management of Item Types

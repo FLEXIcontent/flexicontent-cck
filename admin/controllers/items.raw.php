@@ -162,7 +162,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		header("Cache-Control: no-cache");
 		header("Pragma: no-cache");
 		
-		if ( !FlexicontentHelperPerm::getPerm()->CanUseTags ){
+		$perms = FlexicontentHelperPerm::getPerm();
+		if ( !$perms->CanUseTags ) {
 			$array =  array("{\"id\":\"0\",\"name\":\"You have no access\"}");
 		} else {
 			$model   = $this->getModel(FLEXI_ITEMVIEW);
@@ -171,14 +172,14 @@ class FlexicontentControllerItems extends FlexicontentController
 			if ($tagobjs) foreach($tagobjs as $tag) {
 				$array[] = "{\"id\":\"".$tag->id."\",\"name\":\"".$tag->name."\"}";
 			}
-			if (empty($array)) $array   = array("{\"id\":\"0\",\"name\":\"No tags found\"}");
+			if (empty($array)) $array   = array("{\"id\":\"0\",\"name\":\"".($perms->CanCreateTags ? 'New tag, click enter to create' : 'No tags found')."\"}");
 		}
 		
 		echo "[\n" . implode(",\n", $array) . "\n]";
 		exit;
 	}
-
-
+	
+	
 	/**
 	 * Method to select new state for many items
 	 * 

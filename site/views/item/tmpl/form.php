@@ -104,7 +104,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 
 	//$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', FLEXI_VHASH);
 	$this->document->addScriptDeclaration("
-		jQuery(document).ready(function () {
+		jQuery(document).ready(function(){
 			
 			jQuery('.deletetag').click(function(e){
 				jQuery(this).parent().remove();
@@ -113,20 +113,40 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 			
 			var tagInput = jQuery('#input-tags');
 			
-			tagInput.keydown(function(event) {
+			tagInput.keydown(function(event){
 				if( (event.keyCode==13) )
 				{
 					var el = jQuery(event.target);
-					window.console.log( 'Enter, adding tag' + el.val() );
-					addtag(0, el.val());
-					el.val('');
+					if (el.val()=='') return false; // No tag to assign / create
+					
+					var selection_isactive = jQuery('.ui-autocomplete .ui-state-focus').length != 0;
+					if (selection_isactive) return false; // Enter pressed, while autocomplete item is focused, autocomplete \'select\' event handler will handle this
+					
+					var data_id   = el.data('tagid');
+					var data_name = el.data('tagname');
+					//window.console.log( 'User input: '+el.val() + ' data-tagid: ' + data_id + ' data-tagname: \"'+ data_name + '\"');
+					
+					if (el.val() == data_name && data_id!='' && data_id!='0') {
+						//window.console.log( 'Assigning found tag: (' + data_id + ', \"' + data_name + '\")');
+						addToList(data_id, data_name);
+						el.autocomplete('close');
+					}
+					else {
+						//window.console.log( 'Retrieving (create-if-missing) tag: \"' + el.val() + '\"');
+						addtag(0, el.val());
+						el.autocomplete('close');
+					}
+					
+					el.val('');  //clear existing value
 					return false;
 				}
 			});
 			
 			jQuery.ui.autocomplete( {
 				source: function( request, response ) {
-					el = jQuery(this.element);
+					var el   = jQuery(this.element);
+					var term = request.term;
+					//window.console.log( 'Getting tags for \"' + term + '\" ...');
 					jQuery.ajax({
 						url: '".JURI::base(true)."/index.php?option=com_flexicontent&task=viewtags&format=raw&".JSession::getFormToken()."=1',
 						dataType: 'json',
@@ -134,90 +154,106 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 							q: request.term
 						},
 						success: function( data ) {
-							window.console.log( '... done' );
+							//window.console.log( '... received tags for \"' + term + '\"');
 							response( jQuery.map( data, function( item ) {
-								return {
-									/*label: item.item_id +': '+ item.name,*/
-									label: item.name,
-									value: item.id
+								if (el.val()==item.name) {
+									//window.console.log( 'Found exact TAG match, (' + item.id + ', \"' + item.name + '\")');
+									el.data('tagid',   item.id);
+									el.data('tagname', item.name);
 								}
+								return { label: item.name, value: item.id };
 							}));
 						}
 					});
 				},
 				delay: 200,
 				minLength: 1,
+				focus: function ( event, ui ) {
+					//window.console.log( (ui.item  ?  'current ID: ' + ui.item.value + 'current Label: ' + ui.item.label :  'Nothing selected') );
+					
+					var el = jQuery(event.target);
+					if (ui.item.value!='' && ui.item.value!='0')
+					{
+						el.val(ui.item.label);
+					}
+					el.data('tagid',   ui.item.value);
+					el.data('tagname', ui.item.label);
+					
+					event.preventDefault();  // Prevent default behaviour of setting 'ui.item.value' into the input
+				},
 				select: function( event, ui ) {
-					window.console.log( (ui.item  ?  'Selected: ' + ui.item.label  :  'Nothing selected') + ', input was \'' + this.value + '\'');
+					//window.console.log( 'Selected: ' + ui.item.label + ', input was \'' + this.value + '\'');
 					
-					// Prevent default behaviour of setting 'ui.item.value' and triggering change event, and also clear existing value
-					event.preventDefault();
-					
-					var ele = jQuery(event.target);
+					var el = jQuery(event.target);
 					if (ui.item.value!='' && ui.item.value!='0') {
 						addToList(ui.item.value, ui.item.label);
-						ele.val('');
+						el.val('');  //clear existing value
 					}
 					
-					//ele.trigger('change');
+					event.preventDefault();  // Prevent default behaviour of setting 'ui.item.value' into the input and triggering change event
 				},
-				open: function() {
-					jQuery(this).removeClass( 'ui-corner-all' ).addClass( 'ui-corner-top' );
-					//jQuery(this).removeClass('working');
-				},
-				close: function() {
-					jQuery(this).removeClass( 'ui-corner-top' ).addClass( 'ui-corner-all' );
-				},
-				search: function() {
-					window.console.log( 'quering ... ' );
-					jQuery(this).addClass('working');
-				}
+				//change: function( event, ui ) { window.console.log( 'autocomplete change()' ); },
+				//open: function() { window.console.log( 'autocomplete open()' ); },
+				//close: function() { window.console.log( 'autocomplete close()' ); },
+				//search: function() { window.console.log( 'autocomplete search()' ); }
 			}, tagInput.get(0) );
 			
 		});
+		
+		
+		function addToList(id, name)
+		{
+			var obj = jQuery('#ultagbox');
+			if (obj.find('input[value=\"'+id+'\"]').length > 0) return;
+			obj.append('<li class=\"tagitem\"><span>'+name+'</span><input type=\"hidden\" name=\"jform[tag][]\" value=\"'+id+'\" /><a href=\"javascript:;\" class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"".JText::_('FLEXI_DELETE_TAG',true)."\"></a></li>');
+		}
+		
+		function addtag(id, tagname)
+		{
+			if (id==null) id = 0;
+		
+			/*".( !$this->perms['cancreatetags'] ? '
+				alert("'.JText::_( 'FLEXI_NO_AUTH_CREATE_NEW_TAGS', true).'");
+				return;
+			' : ''
+			)."*/
+			if (tagname == '') {
+				alert('".JText::_( 'FLEXI_ENTER_TAG', true)."');
+				return;
+			}
+			
+			var tag = new itemscreen();
+			tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&".JSession::getFormToken()."=1');
+		}
+		
+		function deleteTag(obj)
+		{
+			var parent = obj.parentNode;
+			parent.innerHTML = '';
+			parent.parentNode.removeChild(parent);
+		}
+		
+		
+		jQuery(document).ready(function(){
+			document.formvalidator.setHandler('cid',
+				function (value) {
+					if(value == -1) {
+						return true;
+					} else {
+						timer = new Date();
+						time = timer.getTime();
+						regexp = new Array();
+						regexp[time] = new RegExp('^[1-9]{1}[0-9]{0,}$');
+						return regexp[time].test(value);
+					}
+				}
+			);
+		});
+
 	");
 }
 ?>
-<script language="javascript" type="text/javascript">
-jQuery(document).ready(function() {
-	document.formvalidator.setHandler('cid',
-		function (value) {
-			if(value == -1) {
-				return true;
-			} else {
-				timer = new Date();
-				time = timer.getTime();
-				regexp = new Array();
-				regexp[time] = new RegExp('^[1-9]{1}[0-9]{0,}$');
-				return regexp[time].test(value);
-			}
-		}
-	);
-});
-function addToList(id, name) {
-	obj = jQuery('#ultagbox');
-	obj.append("<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='jform[tag][]' value='"+id+"' /><a href=\"javascript:;\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG' ); ?>\"></a></li>");
-}
-function addtag(id, tagname) {
-	if(id==null) {
-		id=0;
-	}
-	if(tagname == '') {
-		alert('<?php echo JText::_( 'FLEXI_ENTER_TAG', true); ?>' );
-		return;
-	}
-	if(id) return;
-	var tag = new itemscreen();
-	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1');
-}
 
-function deleteTag(obj) {
-	var parent = obj.parentNode;
-	parent.innerHTML = "";
-	parent.parentNode.removeChild(parent);
-}
-
-</script>
 
 <?php
 $page_classes  = 'flexi_edit';
@@ -719,12 +755,13 @@ if ($tags_displayed) : ob_start();  // tags ?>
 			<div class="fcclear"></div>
 			<div id="tags">
 				<label for="input-tags">
-					<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
+					<?php echo JText::_( 'FLEXI_SELECT_TAG' ); ?>
 				</label>
-				<input type="text" id="input-tags" name="tagname" data-tagid="0" data-tagname="" />
-				<span class="editlinktip <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_TAG_EDDITING_FULL', 1, 1);?>">
-					<span id='input_new_tag' ></span>
-					<?php echo $infoimage; ?>
+				<input type="text" id="input-tags" name="tagname" class="fcfield_textval <?php echo $tip_class; ?>"
+					placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>" 
+					title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"
+				/>
+				<span id='input_new_tag' ></span>
 				</span>
 			</div>
 			<?php endif; ?>
@@ -1027,7 +1064,7 @@ if ( $typeid && $this->perms['cantemplates'] && $this->params->get('selecttheme_
 		<?php endforeach; ?>
 		
 		<div class="fcclear"></div>
-		<blockquote id='__content_type_default_layout__'>
+		<blockquote id="__content_type_default_layout__">
 			<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $this->tparams->get('ilayout') ); ?>
 		</blockquote>
 	
@@ -1080,7 +1117,7 @@ ob_start();
 if ($this->fields && $typeid) :
 	
 	$this->document->addScriptDeclaration("
-		jQuery(document).ready(function() {
+		jQuery(document).ready(function(){
 			jQuery('#jform_type_id').change(function() {
 				if (jQuery('#jform_type_id').val() != '".$typeid."')
 					jQuery('#fc-change-warning').css('display', 'block');
@@ -1104,7 +1141,7 @@ if ($this->fields && $typeid) :
 				// Print any CORE fields that are placed by field manager
 				if ( isset($captured[ $field->field_type ]) ) {
 					echo $captured[ $field->field_type ]; unset($captured[ $field->field_type ]);
-					echo "\n<div class='fcclear'></div>\n";
+					echo "\n".'<div class="fcclear"></div>'."\n";
 				}
 				continue;
 			}
@@ -1129,7 +1166,7 @@ if ($this->fields && $typeid) :
 				if ( isset($tab_fields['fman'][$props_type]) ) {
 					if ( !isset($captured[ $props_type ]) ) continue;
 					echo $captured[ $props_type ]; unset($captured[ $props_type ]);
-					echo "\n<div class='fcclear'></div>\n";
+					echo "\n".'<div class="fcclear"></div>'."\n";
 				}
 				continue;
 			}
@@ -1164,14 +1201,14 @@ if ($this->fields && $typeid) :
 			$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
 			?>
 			
-			<div class='fcclear'></div>
+			<div class="fcclear"></div>
 			<span class="label-fcouter" id="label_outer_fcfield_<?php echo $field->id; ?>">
 				<label id="label_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>" for="<?php echo 'custom_'.$field->name;?>" data-for_bck="<?php echo 'custom_'.$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
 					<?php echo $field->label; ?>
 				</label>
 			</span>
 			<?php if($display_label_form==2):  ?>
-				<div class='fcclear'></div>
+				<div class="fcclear"></div>
 			<?php endif; ?>
 			
 			<div style="<?php echo $container_width; ?>" class="<?php echo $container_class; ?>" id="container_fcfield_<?php echo $field->id; ?>">

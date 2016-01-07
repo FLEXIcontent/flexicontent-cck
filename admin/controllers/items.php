@@ -1433,8 +1433,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		$permission = FlexicontentHelperPerm::getPerm();
-		$CanNewTags = $permission->CanNewTags;
-		$CanUseTags = $permission->CanUseTags;
+		$CanCreateTags = $permission->CanCreateTags;
+		$CanUseTags    = $permission->CanUseTags;
 
 		$CanUseTags = $CanUseTags ? '' : ' disabled="disabled"';
 		$n = count($tags);
@@ -1464,7 +1464,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$rsp .= '</div>';
 			$rsp .= '<div class="clear"></div>';
 		}
-		if ($CanNewTags)
+		if ($CanCreateTags)
 		{
 			$rsp .= '
 			<div class="qf_addtag">

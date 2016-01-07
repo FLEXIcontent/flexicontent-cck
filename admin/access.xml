@@ -41,8 +41,8 @@
 		
 		<!-- TAGs: management tab and usage -->
 		<action name="flexicontent.managetags" title="&lt;b&gt;Tags: -- manage --&lt;/b&gt;" description="Allow users in the group to have FULL access to the Tags Management" />
-		<action name="flexicontent.usetags" title="&lt;b&gt;Tags (&lt;span style&#61;&#34;color:blue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; edit item tags" description="Allow users in the group to edit the tags assigned to items" />
-		<!--action name="flexicontent.newtags" title="&lt;b&gt;Tags (&lt;span style&#61;&#34;color:blue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; add new tags to item" description="Allow users in the group to add new Tags to items" /-->
+		<action name="flexicontent.usetags" title="&lt;b&gt;Tags (&lt;span style&#61;&#34;color:blue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; edit tags assignments (item form)" description="Allow users in the group to edit the tags assigned to items" />
+		<action name="flexicontent.createtags" title="&lt;b&gt;Tags (&lt;span style&#61;&#34;color:blue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; create new tags" description="Allow users in the group to create new tags" />
 		
 		<!-- VARIOUS management tabs -->
 		<action name="flexicontent.manageimport" title="&lt;b&gt;Import: -- manage --&lt;/b&gt;" description="Allow users in the group to have access to the (Content) Import Management." />

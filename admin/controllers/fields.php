@@ -70,10 +70,10 @@ class FlexicontentControllerFields extends FlexicontentController
 		$field_id		= (int)$cid[0];
 		
 		// calculate access
-		$asset = 'com_flexicontent.field.' . $field_id;
 		if (!$field_id) {
 			$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
 		} else {
+			$asset = 'com_flexicontent.field.' . $field_id;
 			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
 		}
 		
@@ -387,10 +387,10 @@ class FlexicontentControllerFields extends FlexicontentController
 		$field_id = (int)$cid[0];
 
 		// calculate access
-		$asset = 'com_flexicontent.field.' . $field_id;
 		if (!$field_id) {
 			$is_authorised = $user->authorise('flexicontent.createfield', 'com_flexicontent');
 		} else {
+			$asset = 'com_flexicontent.field.' . $field_id;
 			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
 		}
 		

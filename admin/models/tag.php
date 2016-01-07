@@ -59,8 +59,8 @@ class FlexicontentModelTag extends JModelLegacy
 	function setId($id)
 	{
 		// Set tag id and wipe data
-		$this->_id	    = $id;
-		$this->_tag	= null;
+		$this->_id  = $id;
+		$this->_tag = null;
 	}
 	
 	/**
@@ -89,9 +89,9 @@ class FlexicontentModelTag extends JModelLegacy
 	 * @return	array
 	 * @since	1.0
 	 */
-	function &getTag()
+	function & getTag($name = null)
 	{
-		if ($this->_loadTag())
+		if ($this->_loadTag($name))
 		{
 
 		}
@@ -108,23 +108,33 @@ class FlexicontentModelTag extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function _loadTag()
+	function _loadTag($name = null)
 	{
 		// Lets load the tag if it doesn't already exist
 		if (empty($this->_tag))
 		{
-			$query = 'SELECT *'
-					. ' FROM #__flexicontent_tags'
-					. ' WHERE id = '.$this->_id
-					;
-			$this->_db->setQuery($query);
-			$this->_tag = $this->_db->loadObject();
-
+			$name_quoted = $name && strlen($name) ? $this->_db->Quote($name) : null;
+			if (!$name_quoted && !$this->_id) {
+				$this->_tag = false;
+			} else {
+				
+				$query = 'SELECT *'
+						. ' FROM #__flexicontent_tags'
+						. ' WHERE '
+						.(!$name_quoted ? ' id='.$this->_id : '')
+						.($name_quoted  ? ' name='.$name_quoted : '')
+						;
+				$this->_db->setQuery($query);
+				$this->_tag = $this->_db->loadObject();
+			}
+			
+			if ($this->_tag) $this->_id = $this->_tag->id;
 			return (boolean) $this->_tag;
 		}
 		return true;
 	}
-
+	
+	
 	/**
 	 * Method to initialise the tag data
 	 *
@@ -253,16 +263,17 @@ class FlexicontentModelTag extends JModelLegacy
 		return true;
 	}
 	
-	function addtag($name){
-		
+	function addtag($name)
+	{	
 		$obj = new stdClass();
 		$obj->name	 	= $name;
 		$obj->published	= 1;
 		
-		if($this->store($obj)) {
+		if ($this->store($obj))
+		{
 			return true;
 		}
-
+		
 		return false;
 	}
 

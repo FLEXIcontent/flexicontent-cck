@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  */
 
-defined('_JEXEC') or die('Restricted access');
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $task_items = 'task=items.';
 $ctrl_items = 'items.';
@@ -57,7 +57,7 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 
 	//$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', FLEXI_VHASH);
 	$this->document->addScriptDeclaration("
-		jQuery(document).ready(function () {
+		jQuery(document).ready(function(){
 			
 			jQuery('.deletetag').click(function(e){
 				jQuery(this).parent().remove();
@@ -66,20 +66,40 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 			
 			var tagInput = jQuery('#input-tags');
 			
-			tagInput.keydown(function(event) {
+			tagInput.keydown(function(event){
 				if( (event.keyCode==13) )
 				{
 					var el = jQuery(event.target);
-					window.console.log( 'Enter, adding tag' + el.val() );
-					addtag(0, el.val());
-					el.val('');
+					if (el.val()=='') return false; // No tag to assign / create
+					
+					var selection_isactive = jQuery('.ui-autocomplete .ui-state-focus').length != 0;
+					if (selection_isactive) return false; // Enter pressed, while autocomplete item is focused, autocomplete \'select\' event handler will handle this
+					
+					var data_id   = el.data('tagid');
+					var data_name = el.data('tagname');
+					//window.console.log( 'User input: '+el.val() + ' data-tagid: ' + data_id + ' data-tagname: \"'+ data_name + '\"');
+					
+					if (el.val() == data_name && data_id!='' && data_id!='0') {
+						//window.console.log( 'Assigning found tag: (' + data_id + ', \"' + data_name + '\")');
+						addToList(data_id, data_name);
+						el.autocomplete('close');
+					}
+					else {
+						//window.console.log( 'Retrieving (create-if-missing) tag: \"' + el.val() + '\"');
+						addtag(0, el.val());
+						el.autocomplete('close');
+					}
+					
+					el.val('');  //clear existing value
 					return false;
 				}
 			});
 			
 			jQuery.ui.autocomplete( {
 				source: function( request, response ) {
-					el = jQuery(this.element);
+					var el   = jQuery(this.element);
+					var term = request.term;
+					//window.console.log( 'Getting tags for \"' + term + '\" ...');
 					jQuery.ajax({
 						url: '".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&".JSession::getFormToken()."=1',
 						dataType: 'json',
@@ -87,59 +107,85 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 							q: request.term
 						},
 						success: function( data ) {
-							window.console.log( '... done' );
+							//window.console.log( '... received tags for \"' + term + '\"');
 							response( jQuery.map( data, function( item ) {
-								return {
-									/*label: item.item_id +': '+ item.name,*/
-									label: item.name,
-									value: item.id
+								if (el.val()==item.name) {
+									//window.console.log( 'Found exact TAG match, (' + item.id + ', \"' + item.name + '\")');
+									el.data('tagid',   item.id);
+									el.data('tagname', item.name);
 								}
+								return { label: item.name, value: item.id };
 							}));
 						}
 					});
 				},
 				delay: 200,
 				minLength: 1,
+				focus: function ( event, ui ) {
+					//window.console.log( (ui.item  ?  'current ID: ' + ui.item.value + 'current Label: ' + ui.item.label :  'Nothing selected') );
+					
+					var el = jQuery(event.target);
+					if (ui.item.value!='' && ui.item.value!='0')
+					{
+						el.val(ui.item.label);
+					}
+					el.data('tagid',   ui.item.value);
+					el.data('tagname', ui.item.label);
+					
+					event.preventDefault();  // Prevent default behaviour of setting 'ui.item.value' into the input
+				},
 				select: function( event, ui ) {
-					window.console.log( (ui.item  ?  'Selected: ' + ui.item.label  :  'Nothing selected') + ', input was \'' + this.value + '\'');
+					//window.console.log( 'Selected: ' + ui.item.label + ', input was \'' + this.value + '\'');
 					
-					// Prevent default behaviour of setting 'ui.item.value' and triggering change event, and also clear existing value
-					event.preventDefault();
-					
-					var ele = jQuery(event.target);
+					var el = jQuery(event.target);
 					if (ui.item.value!='' && ui.item.value!='0') {
 						addToList(ui.item.value, ui.item.label);
-						ele.val('');
+						el.val('');  //clear existing value
 					}
 					
-					//ele.trigger('change');
+					event.preventDefault();  // Prevent default behaviour of setting 'ui.item.value' into the input and triggering change event
 				},
-				open: function() {
-					jQuery(this).removeClass( 'ui-corner-all' ).addClass( 'ui-corner-top' );
-					//jQuery(this).removeClass('working');
-				},
-				close: function() {
-					jQuery(this).removeClass( 'ui-corner-top' ).addClass( 'ui-corner-all' );
-				},
-				search: function() {
-					window.console.log( 'quering ... ' );
-					jQuery(this).addClass('working');
-				}
+				//change: function( event, ui ) { window.console.log( 'autocomplete change()' ); },
+				//open: function() { window.console.log( 'autocomplete open()' ); },
+				//close: function() { window.console.log( 'autocomplete close()' ); },
+				//search: function() { window.console.log( 'autocomplete search()' ); }
 			}, tagInput.get(0) );
 			
-			
-			// For the initially displayed versions page:  Add onclick event that opens compare in popup 
-			jQuery('a.modal-versions').each(function(index, value) {
-				jQuery(this).on('click', function() {
-					// Load given URL in an popup dialog
-					var url = jQuery(this).attr('href');
-					fc_showDialog(url, 'fc_modal_popup_container');
-					return false;
-				});
-			});
-			// Attach pagination for versions listing
-			jQuery('#fc_pager').pager({ pagenumber: ".$this->current_page.", pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		});
+		
+		
+		function addToList(id, name)
+		{
+			var obj = jQuery('#ultagbox');
+			if (obj.find('input[value=\"'+id+'\"]').length > 0) return;
+			obj.append('<li class=\"tagitem\"><span>'+name+'</span><input type=\"hidden\" name=\"jform[tag][]\" value=\"'+id+'\" /><a href=\"javascript:;\" class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"".JText::_('FLEXI_DELETE_TAG',true)."\"></a></li>');
+		}
+		
+		function addtag(id, tagname)
+		{
+			if (id==null) id = 0;
+		
+			/*".( !$this->perms['cancreatetags'] ? '
+				alert("'.JText::_( 'FLEXI_NO_AUTH_CREATE_NEW_TAGS', true).'");
+				return;
+			' : ''
+			)."*/
+			if (tagname == '') {
+				alert('".JText::_( 'FLEXI_ENTER_TAG', true)."');
+				return;
+			}
+			
+			var tag = new itemscreen();
+			tag.addtag( id, tagname, 'index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&".JSession::getFormToken()."=1');
+		}
+		
+		function deleteTag(obj)
+		{
+			var parent = obj.parentNode;
+			parent.innerHTML = '';
+			parent.parentNode.removeChild(parent);
+		}
+		
 		
 		PageClick = function(pageclickednumber) {
 			jQuery.ajax({ url: 'index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&".JSession::getFormToken()."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
@@ -166,19 +212,31 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 		}
 		
 		jQuery(document).ready(function(){
+			
+			// For the initially displayed versions page:  Add onclick event that opens compare in popup 
+			jQuery('a.modal-versions').each(function(index, value) {
+				jQuery(this).on('click', function() {
+					// Load given URL in an popup dialog
+					var url = jQuery(this).attr('href');
+					fc_showDialog(url, 'fc_modal_popup_container');
+					return false;
+				});
+			});
+			// Attach pagination for versions listing
+			jQuery('#fc_pager').pager({ pagenumber: ".$this->current_page.", pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
+			
 			jQuery('#versioncomment').autogrow({
 				minHeight: 26,
 				maxHeight: 250,
 				lineHeight: 12
 			});
+			
 		})
 		
 	");
 }
 
 // version variables
-$tags_fieldname = 'jform[tag][]';
-
 $this->document->addScriptDeclaration("
 	jQuery(document).ready(function(){
 		var hits = new itemscreen('hits', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."gethits'});
@@ -187,39 +245,20 @@ $this->document->addScriptDeclaration("
 		var votes = new itemscreen('votes', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."getvotes'});
 		//votes.fetchscreen();
 	});
-
-	function addToList(id, name) {
-		obj = jQuery('#ultagbox');
-		obj.append(\"<li class='tagitem'><span>\"+name+\"</span><input type='hidden' name='".$tags_fieldname."' value='\"+id+\"' /><a href='javascript:;' class='deletetag' onclick='javascript:deleteTag(this);' title='". JText::_( 'FLEXI_DELETE_TAG',true ) ."'></a></li>\");
-	}
-	function addtag(id, tagname) {
-		if (id==null) id = 0;
 	
-		if(tagname == '') {
-			alert('".JText::_( 'FLEXI_ENTER_TAG', true)."');
-			return;
-		}
-	
-		var tag = new itemscreen();
-		tag.addtag( id, tagname, 'index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&".JSession::getFormToken()."=1');
-	}
-
 	function reseter(task, id, div){
 		var res = new itemscreen();
 		task = '".$ctrl_items."' + task;
 		res.reseter( task, id, div, 'index.php?option=com_flexicontent&controller=items' );
 	}
+	
 	function clickRestore(link) {
 		if(confirm('".JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE',true )."')) {
 			location.href=link;
 		}
 		return false;
 	}
-	function deleteTag(obj) {
-		var parent = obj.parentNode;
-		parent.innerHTML = '';
-		parent.parentNode.removeChild(parent);
-	}
+	
 ");
 
 
@@ -387,11 +426,11 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					<?php /*<label for="input-tags">
 						<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 					</label> */ ?> 
-					<input type="text" id="input-tags" name="tagname" />
-					<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_TAG_EDDITING_FULL', 1, 1);?>">
-						<span id='input_new_tag' ></span>
-						<?php echo $infoimage; ?>
-					</span>
+					<input type="text" id="input-tags" name="tagname" class="fcfield_textval <?php echo $tip_class; ?>"
+						placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>" 
+						title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"
+					/>
+					<span id='input_new_tag' ></span>
 				</div>
 				<?php endif; ?>
 				
@@ -621,7 +660,7 @@ $tabCnt[$tabSetCnt] = 0;
 				</label>
 				</span>
 				<?php if($display_label_form==2):  ?>
-					<div class='fcclear'></div>
+					<div class="fcclear"></div>
 				<?php endif; ?>
 			<?php endif; */?>
 			
@@ -759,14 +798,14 @@ if ($this->row->type_id) {
 				$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
 				?>
 				
-				<div class='fcclear'></div>
+				<div class="fcclear"></div>
 				<span class="label-fcouter" id="label_outer_fcfield_<?php echo $field->id; ?>" style="<?php echo $display_label_form < 1 ? 'display:none;' : '' ?>">
 				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo 'custom_'.$field->name;?>" data-for_bck="<?php echo 'custom_'.$field->name;?>" <?php echo $label_tooltip;?> >
 					<?php echo $field->label; ?>
 				</label>
 				</span>
 				<?php if($display_label_form==2):  ?>
-					<div class='fcclear'></div>
+					<div class="fcclear"></div>
 				<?php endif; ?>
 								
 				<div style="<?php echo $container_width; ?>" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
@@ -1228,7 +1267,7 @@ if ( $this->params->get('use_jimages_be', $show_jui) || $this->params->get('use_
 			
 			<div class="fcclear"></div>
 			<?php $type_default_layout = $this->tparams->get('ilayout'); ?>
-			<span class="fc-success fc-nobgimage fc-mssg-inline" id='__content_type_default_layout__'>
+			<span class="fc-success fc-nobgimage fc-mssg-inline" id="__content_type_default_layout__">
 				<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
 				<?php echo "<br/><br/>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
 			</span>

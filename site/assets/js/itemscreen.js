@@ -61,7 +61,10 @@ var itemscreen = new Class(
 		    onSuccess: function(responseText){
 					myvar = responseText[0].wholeText.split("|");
 					if( ((typeof myvar[0])!="undefined") && (typeof myvar[1]!="undefined") ) {
-						addToList(myvar[0], myvar[1]);
+						if (myvar[0]!='0')
+							addToList(myvar[0], myvar[1]);
+						else
+							alert(myvar[1]);
 					}
 		    },
 		    onFailure: function(){
