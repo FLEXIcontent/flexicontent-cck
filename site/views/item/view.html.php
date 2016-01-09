@@ -110,6 +110,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Load needed JS libs & CSS styles
 		// ********************************
 		
+		flexicontent_html::loadFramework('jQuery');  // for other views this is done at entry point
+		
 		// Add css files to the document <head> section (also load CSS joomla template override)
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
@@ -449,50 +451,13 @@ class FlexicontentViewItem  extends JViewLegacy
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		
-		// *****************
-		// Load JS/CSS files
-		// *****************
-		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		flexicontent_html::loadFramework('jQuery');
-		flexicontent_html::loadFramework('select2');
-		flexicontent_html::loadFramework('flexi-lib');
-		
-		// Load custom behaviours: form validation, popup tooltips
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
-		
-		//JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
-
-		// Add css files to the document <head> section (also load CSS joomla template override)
-		$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
-		//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
-		}
-		
-		// Fields common CSS
-		$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
-		
-		// Load backend / frontend shared and Joomla version specific CSS (different for frontend / backend)
-		FLEXI_J30GE ?
-			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH) :
-			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/j25.css', FLEXI_VHASH) ;
-		
-		// Add js function to overload the joomla submitform
-		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
-		
-		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
-		
 		
 		// *********************************************************
 		// Get item data and create item form (that loads item data)
 		// *********************************************************
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-
+		
 		$model = $this->getModel();
 		// Indicate to model that current view IS item form
 		$model->isForm = true;
@@ -537,6 +502,19 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
+		
+		
+		// **************************************************************
+		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
+		// **************************************************************
+		
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		
+		$fields = $this->get( 'Extrafields' );
+		$item->fields = & $fields;
+		
+		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
 		// Load permissions (used by form template)
 		$perms = $this->_getItemPerms($item);
 		
@@ -550,6 +528,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		$isnew = !$item->id;
 		$isOwner = ( $item->created_by == $user->get('id') );
 		
+		
+		
+		// *****************
+		// Type related data
+		// *****************
+		
 		// Get available types and the currently selected/requested type
 		$types         = $model->getTypeslist();
 		$typesselected = $model->getTypesselected();
@@ -557,6 +541,56 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Get type parameters, these are needed besides the 'merged' item parameters, e.g. to get Type's default layout
 		$tparams = $this->get( 'Typeparams' );
 		$tparams = new JRegistry($tparams);
+		
+		
+		
+		// *****************
+		// Load JS/CSS files
+		// *****************
+		
+		$has_J2S = false;
+		foreach ($fields as $field) {
+			$has_J2S = $has_J2S || $field->field_type == 'j2store';
+			if ($has_J2S) break;
+		}
+		$_params = new JRegistry();
+		$_params->set('load-ui-dialog', 1);
+		$_params->set('load-ui-menu', $has_J2S ? 0 : 1);
+		$_params->set('load-ui-autocomplete', $has_J2S ? 0 : 1);
+		
+		//FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+		flexicontent_html::loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1, $add_remote = 1, $_params);   //flexicontent_html::loadFramework('jQuery');
+		flexicontent_html::loadFramework('select2');
+		flexicontent_html::loadFramework('prettyCheckable');
+		flexicontent_html::loadFramework('flexi-lib');
+		
+		// Load custom behaviours: form validation, popup tooltips
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
+		
+		//JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
+
+		// Add css files to the document <head> section (also load CSS joomla template override)
+		$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+		//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
+		}
+		
+		// Fields common CSS
+		$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
+		
+		// Load backend / frontend shared and Joomla version specific CSS (different for frontend / backend)
+		FLEXI_J30GE ?
+			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH) :
+			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/j25.css', FLEXI_VHASH) ;
+		
+		// Add js function to overload the joomla submitform
+		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		
+		// Add js function for custom code used by FLEXIcontent item form
+		$document->addScriptVersion($this->baseurl.'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
 		
 		
 		
@@ -775,20 +809,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		
 		// *****************************************************************************
-		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
 		// (a) Apply Content Type Customization to CORE fields (label, description, etc)
 		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
 		// *****************************************************************************
 		
-		// Check if saving an item that translates an original content in site's default language
-		$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
-		$is_content_default_lang = $site_default == substr($item->language, 0,2);
-		
-		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$fields = $this->get( 'Extrafields' );
-		$item->fields = & $fields;
-		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$jcustom = $app->getUserState('com_flexicontent.edit.item.custom');   //print_r($jcustom);
 		foreach ($fields as $field)
@@ -1081,9 +1105,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		// First clean form data, we do this after creating the description field which may contain HTML
 		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES );
 		
-		flexicontent_html::loadFramework('select2');
-		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		$lists = array();
+		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');  // Get if prettyCheckable was loaded
 		
 		// build state list
 		$non_publishers_stategrp    = $perms['isSuperAdmin'] || $item->state==-3 || $item->state==-4 ;
@@ -1111,16 +1134,18 @@ class FlexicontentViewItem  extends JViewLegacy
 			$state[] = JHTML::_('select.optgroup', '' );
 			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_SPECIAL_ACTION_STATES' ) );
 		}
-		if ($item->state==2  || $perms['canarchive']) $state[] = JHTML::_('select.option',  2,  JText::_( 'FLEXI_ARCHIVED' ) );
-		if ($item->state==-2 || $perms['candelete'])  $state[] = JHTML::_('select.option', -2,  JText::_( 'FLEXI_TRASHED' ) );
+		if ($item->state==2  || $perms['canarchive']) $state[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_ARCHIVED' ) );
+		if ($item->state==-2 || $perms['candelete'])  $state[] = JHTML::_('select.option', -2, JText::_( 'FLEXI_TRASHED' ) );
 		
 		// Close last <select> group
 		if ($non_publishers_stategrp || $special_privelege_stategrp)
 			$state[] = JHTML::_('select.optgroup', '');
 		
+		$fieldname = 'jform[state]';
+		$elementid = 'jform_state';
 		$class = 'use_select2_lib';
 		$attribs = 'class="'.$class.'"';
-		$lists['state'] = JHTML::_('select.genericlist', $state, 'jform[state]', $attribs, 'value', 'text', $item->state, 'jform_state' );
+		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
 		if (!FLEXI_J16GE) $lists['state'] = str_replace('<optgroup label="">', '</optgroup>', $lists['state']);
 		
 		// *** BOF: J2.5 SPECIFIC SELECT LISTS

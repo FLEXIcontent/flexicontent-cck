@@ -879,74 +879,74 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	box-sizing: border-box;
 }
 @media only screen and (min-width: 2090px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
 		width: 91.2% !important;
 	}
 }
 @media only screen and (min-width: 1960px) and (max-width: 2090px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
 		width: 90.6% !important;
 	}
 }
 @media only screen and (min-width: 1880px) and (max-width: 1960px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
 		width: 90% !important;
 	}
 }
 @media only screen and (min-width: 1680px) and (max-width: 1880px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
-		width: 89.4% !important;
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
+		width: 89.2% !important;
 	}
 }
 @media only screen and (min-width: 1600px) and (max-width: 1680px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
-		width: 88.8% !important;
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
+		width: 88.7% !important;
 	}
 }
 @media only screen and (min-width: 1490px) and (max-width: 1600px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
-		width: 88% !important;
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
+		width: 87.7% !important;
 	}
 }
 @media only screen and (min-width: 1390px) and (max-width: 1490px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
 		width: 87% !important;
 	}
 }
 @media only screen and (min-width: 1290px) and (max-width: 1390px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
 		width: 86% !important;
 	}
 }
 @media only screen and (min-width: 1190px) and (max-width: 1290px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
-		width: 85% !important;
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
+		width: 84.5% !important;
 	}
 }
 @media only screen and (min-width: 1120px) and (max-width: 1190px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
 		width: 84% !important;
 	}
 }
 @media only screen and (min-width: 800px) and (max-width: 1120px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
 		width: 83% !important;
 	}
 }
 @media only screen and (max-width: 800px) {
-	.container_fcfield.fcfield_row0,
-	.container_fcfield.fcfield_row1 {
+	.full_body_box .container_fcfield.fcfield_row0,
+	.full_body_box .container_fcfield.fcfield_row1 {
 		width: 100% !important;
 	}
 }

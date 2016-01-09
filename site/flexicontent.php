@@ -78,7 +78,7 @@ if (!FLEXI_ONDEMAND)
 JPluginHelper::importPlugin('flexicontent');
 
 // No PDF support in J2.5
-//if ( JRequest::getVar('format') == 'pdf' ) JRequest::setVar('format', 'html');
+//if ( $format == 'pdf' ) $jinput->set('format', $format='html');  // too late to do this here, it must be done before JDocument instatiated
 
 
 // *****************
@@ -98,45 +98,27 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reloa
 
 
 
-// ********************************
-// Load common js libs / frameworks
-// ********************************
-
-if ( JRequest::getWord('format')!='raw')
-{
-	// Load mootools
-	//FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-	
-	// Load jquery Framework
-	flexicontent_html::loadFramework('jQuery');
-	
-	if ($cparams->get('add_tooltips', 1))
-	{
-		// Load J2.5 (mootools tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
-		FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
-		
-		// J3.0+ tooltips (bootstrap based)
-		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
-	}
-}
-
-
-
 // ***********************************
 // PREPARE Calling the controller task
 // ***********************************
 
-$view = JRequest::getCmd('view');
-$task = JRequest::getCmd('task');
+// a. Get view, task, controller REQUEST variables
+$view = $jinput->get('view', '', 'cmd');
+$task = $jinput->get('task', '', 'cmd');
+
+// b. In J1.6+ controller can be set via task variable ... split task from controller name
 $tasks = explode(".", $task);
 if(count($tasks)>=2) {
 	$controller = @$controller ? $controller : $tasks[0];
 	$task = $tasks[1];
-	JRequest::setVar('task', $tasks[1]);
+	$jinput->set('task', $tasks[1]);
 } else {
-	$controller = JRequest::getWord('controller');
+	$controller = $jinput->get('controller', '', 'cmd');
 }
-$ctrlname = $controller;
+$ctrl_name = $controller;
+
+
+
 
 
 // **************************************************************************************************************
@@ -151,7 +133,7 @@ if ($controller) {
 	if ( file_exists($path) ) {
 		require_once $path;
 	} else {
-		JRequest::setVar('controller', $controller = '');
+		$jinput->set('controller', $controller = '');
 	}
 }
 
@@ -161,15 +143,26 @@ if ( $print_logging_info && $format=='html')
 	@$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
+
 // ******************************************************************
 // (If needed) Compile LESS files as CSS (call the less proprocessor)
 // ******************************************************************
 if ( $format == 'html' )
 {
 	$start_microtime = microtime(true);
+	
 	// Files in frontend assets folder
 	$path = JPATH_COMPONENT_SITE.DS.'assets'.DS;
 	$inc_path = $path.'less/include/';
+	
+	$less_files = array(
+		'less/flexi_form_fields.less',
+		'less/flexi_filters.less',
+		'less/j3x.less',
+		'less/fcvote.less'
+	);
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	
 	$less_files = array(
 		'less/flexi_form.less',
 		'less/flexi_containers.less',
@@ -182,16 +175,10 @@ if ( $format == 'html' )
 	$less_files = array('less/flexicontent.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
 	
-	$less_files = array(
-		'less/flexi_form_fields.less',
-		'less/flexi_filters.less',
-		'less/j3x.less',
-		'less/fcvote.less'
-	);
-	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 	if ( $print_logging_info)
 		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 }
+
 
 
 // ****************************
@@ -230,22 +217,46 @@ if ( $cparams->get('default_menuitem_nopathway',1) ) {
 }
 
 
+
+// ********************************
+// Load common js libs / frameworks
+// ********************************
+
+$view   = $jinput->get('view', '', 'cmd');  // Re-get view it may have changed
+$layout = $jinput->get('layout', '', 'string');
+if ( $format == 'html' )
+{
+	// Load mootools
+	//FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+	
+	// Load jquery Framework, but let some views decide for themselves, so that they can choose not to load some parts of jQuery.ui JS
+	if ($view != 'item') flexicontent_html::loadFramework('jQuery');
+	
+	if ($cparams->get('add_tooltips', 1))
+	{
+		// Load J2.5 (mootools tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
+		FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
+		
+		// J3.0+ tooltips (bootstrap based)
+		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
+	}
+}
+
+
+
 // *********************************************************************************************
 // Enqueue PERFORMANCE statistics as a message BUT  NOT if in RAW FORMAT or COMPONENT only views
 // *********************************************************************************************
 
-if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::getWord('format')!='raw')
+if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $format=='html')
 {
 	
 	// ***************************************
 	// Total performance stats of current view
 	// ***************************************
 	
-	$app = JFactory::getApplication();
-	$_view = JRequest::getWord('view','flexicontent');
-	$_layout = JRequest::getWord('layout','');
-	if ($task) $_msg = ' (TASK: '.(!FLEXI_J16GE ? $ctrlname.'.' : '').$task.')';
-	else       $_msg = ' (VIEW: ' .$_view. ($_layout ? ' -- LAYOUT: '.$_layout : '') .')';
+	if ($task) $_msg = ' (TASK: '.$ctrl_name.'.'.$task.')';
+	else       $_msg = ' (VIEW: ' .$view. ($layout ? ' -- LAYOUT: '.$layout : '') .')';
 	
 	
 	// **************************************

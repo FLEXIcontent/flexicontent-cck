@@ -1042,9 +1042,11 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// Check if auto archive interval passed
 		$session = JFactory::getSession();
-		$last_autoarchive_secs = $session->get('last_autoarchive_secs', 0, 'flexicontent');
-		$last_autoarchive_secs = $session->set('last_autoarchive_secs', $current_time_secs, 'flexicontent');
+		$last_autoarchive_secs = $session->get('last_autoarchive_secs', $current_time_secs, 'flexicontent');
+		
 		if ($current_time_secs - $last_autoarchive_secs < $auto_archive_minute_interval*60) return;
+		
+		$session->set('last_autoarchive_secs', $current_time_secs, 'flexicontent');
 		
 		$new_state = $archive_on_publish_down==1 ? 2 : 0;
 		$_nowDate = 'UTC_TIMESTAMP()';

@@ -110,44 +110,16 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, $fo
 
 
 
-// ********************************
-// Load common js libs / frameworks
-// ********************************
-
-if ( JRequest::getWord('format')!='raw')
-{
-	// Load mootools
-	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-	
-	// Load jquery Framework
-	flexicontent_html::loadFramework('jQuery');
-	
-	if (1) 
-	{
-		// Load J2.5 (mootools tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
-		FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
-		
-		// J3.0+ tooltips (bootstrap based)
-		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
-	}
-	// Add flexi-lib JS
-	JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
-	JFactory::getDocument()->addScriptVersion( JURI::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Backend only script
-}
-
-
-
 // ***********************************
 // PREPARE Calling the controller task
 // ***********************************
 
 // a. Get view, task, controller REQUEST variables
-$view = JRequest::getWord( 'view' );
-$controller = JRequest::getWord( 'controller' );
-$task = JRequest::getVar( 'task' );
+$view = $jinput->get('view', '', 'cmd');
+$task = $jinput->get('task', '', 'cmd');
+$controller = $jinput->get('controller', '', 'cmd');
 
-
-// b. In J1.6+ controller is set via task variable ... split task from controller name
+// b. In J1.6+ controller can be set via task variable ... split task from controller name
 $_ct = explode('.', $task);
 $task = $_ct[ count($_ct) - 1];
 if (count($_ct) > 1) $controller = $_ct[0];
@@ -155,7 +127,7 @@ if (count($_ct) > 1) $controller = $_ct[0];
 
 // c. Force variables: controller AND/OR task
 $forced_views = array('category'=>1);  // *** Cases that view variable must be ignored
-if ( isset($forced_views[$controller]) )  JRequest::setVar('view', $view=$controller);
+if ( isset($forced_views[$controller]) )  $jinput->set('view', $view = $controller);
 
 if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) ) {
 	
@@ -179,9 +151,8 @@ if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) ) {
 
 
 // d. Set changes to controller/task variables back to HTTP REQUEST
-if ( FLEXI_J16GE && $controller && $task) $task = $controller.'.'.$task;
-JRequest::setVar('controller', $ctrlname=$controller);
-JRequest::setVar('task', $task);   //echo "$controller -- $task <br/>\n";
+$jinput->set('controller', $ctrl_name = $controller);
+if ($controller && $task) $jinput->set('task', $ctrl_name.'.'.$task);   //echo "$ctrl_name -- $task <br/>\n";
 
 
 
@@ -189,14 +160,14 @@ JRequest::setVar('task', $task);   //echo "$controller -- $task <br/>\n";
 // Files needed for user groups manager
 // ************************************
 
-if (FLEXI_J16GE && ( $view=='group' || $ctrlname=='group'   || $view=='groups' || $ctrlname=='groups'   || $view=='debuggroup' || $ctrlname=='debuggroup') ) {
+if (FLEXI_J16GE && ( $view=='group' || $ctrl_name=='group'   || $view=='groups' || $ctrl_name=='groups'   || $view=='debuggroup' || $ctrl_name=='debuggroup') ) {
 	// Load english language file for 'com_users' component then override with current language file
 	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
 	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
 	// users helper file
 	require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'helpers'.DS.'users.php');
 }
-if (FLEXI_J16GE && ($view=='debuggroup' || $ctrlname=='debuggroup') ) {
+if (FLEXI_J16GE && ($view=='debuggroup' || $ctrl_name=='debuggroup') ) {
 	// users helper file
 	require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'helpers'.DS.'debug.php');
 }
@@ -209,7 +180,7 @@ if (FLEXI_J16GE && ($view=='debuggroup' || $ctrlname=='debuggroup') ) {
 
 require_once (JPATH_COMPONENT.DS.'controller.php');
 if (!FLEXI_J16GE) {
-	if( $controller = JRequest::getWord('controller') ) {
+	if( $controller ) {
 		$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
 		if (file_exists($path)) {
 			require_once $path;
@@ -232,8 +203,10 @@ if ( $print_logging_info && $format=='html')
 if ( $format == 'html' )
 {
 	$start_microtime = microtime(true);
+	
 	// Files in frontend assets folder
 	$path = JPATH_COMPONENT_SITE.DS.'assets'.DS;
+	$inc_path = $path.'less/include/';
 	
 	$less_files = array(
 		'less/flexi_form_fields.less',
@@ -241,14 +214,19 @@ if ( $format == 'html' )
 		'less/j3x.less',
 		'less/fcvote.less'
 	);
-	flexicontent_html::checkedLessCompile($less_files, $path, $path.'less/include/', $force=false);
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 	
 	$less_files = array(
 		'less/flexi_form.less',
 		'less/flexi_containers.less',
-		'less/flexi_shared.less'
+		'less/flexi_shared.less',
+		'less/flexi_frontend.less'
 	);
-	$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $path.'less/include/', $force=false);
+	
+	$stale_frontend = flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	$force = $stale_frontend && count($stale_frontend);
+	$less_files = array('less/flexicontent.less');
+	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force);
 	
 	// Files in backend assets folder
 	$path = JPATH_COMPONENT_ADMINISTRATOR.DS.'assets'.DS;
@@ -263,6 +241,7 @@ if ( $format == 'html' )
 	
 	$less_files = array('less/j3x.less');
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
+	
 	if ( $print_logging_info)
 		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 }
@@ -281,11 +260,41 @@ if (FLEXI_J16GE) {
 }
 
 
+
 // **************************
 // Perform the requested task
 // **************************
 
-$controller->execute( JRequest::getCmd('task') );
+$controller->execute($task);
+
+
+
+// ********************************
+// Load common js libs / frameworks
+// ********************************
+
+$view   = $jinput->get('view', 'flexicontent', 'cmd');  // Re-get view it may have changed
+$layout = $jinput->get('layout', '', 'string');
+if ( $format == 'html' )
+{
+	// Load mootools
+	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+	
+	// Load jquery Framework, but let some views decide for themselves, so that they can choose not to load some parts of jQuery.ui JS
+	if ($view != 'item') flexicontent_html::loadFramework('jQuery');
+	
+	if (1) 
+	{
+		// Load J2.5 (mootools tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
+		FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
+		
+		// J3.0+ tooltips (bootstrap based)
+		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
+	}
+	// Add flexi-lib JS
+	JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
+	JFactory::getDocument()->addScriptVersion( JURI::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Backend only script
+}
 
 
 
@@ -300,11 +309,8 @@ if ( $print_logging_info && $format=='html')
 	// Total performance stats of current view
 	// ***************************************
 	
-	$app = JFactory::getApplication();
-	$_view = JRequest::getWord('view','flexicontent');
-	$_layout = JRequest::getWord('layout','');
-	if ($task) $_msg = ' (TASK: '.(!FLEXI_J16GE ? $ctrlname.'.' : '').$task.')';
-	else       $_msg = ' (VIEW: ' .$_view. ($_layout ? ' -- LAYOUT: '.$_layout : '') .')';
+	if ($task) $_msg = ' (TASK: '.$ctrl_name.'.'.$task.')';
+	else       $_msg = ' (VIEW: ' .$view. ($layout ? ' -- LAYOUT: '.$layout : '') .')';
 	
 	
 	// **************************************

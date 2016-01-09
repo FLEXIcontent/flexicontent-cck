@@ -102,8 +102,8 @@ class FlexicontentModelTypes extends JModelList
 		// **************
 		
 		// Various filters
-		$filter_state    = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',    '', 'string' );
-		$filter_access   = $fcform ? $jinput->get('filter_access',   '',    'int')  :  $app->getUserStateFromRequest( $p.'filter_access',   'filter_access',   '',    'int' );
+		$filter_state    = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',   '', 'string' );   // we may check for '*', so string filter
+		$filter_access   = $fcform ? $jinput->get('filter_access',   '', 'int')     :  $app->getUserStateFromRequest( $p.'filter_access',   'filter_access',  '', 'int' );
 		
 		$this->setState('filter_state', $filter_state);
 		$this->setState('filter_access', $filter_access);
@@ -207,7 +207,7 @@ class FlexicontentModelTypes extends JModelList
 				$query->where('t.published = 1');
 			} else if ($filter_state == 'U' ) {
 				$query->where('t.published = 0');
-			}
+			} // else ALL: published & unpublished (in future we may have more states, e.g. archived, trashed)
 		}
 		
 		// Filter by access level

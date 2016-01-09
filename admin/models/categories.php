@@ -61,9 +61,9 @@ class FlexicontentModelCategories extends JModelList
 		
 		// Various filters
 		$filter_cats      = $fcform ? $jinput->get('filter_cats',     0,  'int')     :  $app->getUserStateFromRequest( $p.'filter_cats',      'filter_cats',      0,   'int' );
-		$filter_state     = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',     'filter_state',     '',  'string' );
-		$filter_access    = $fcform ? $jinput->get('filter_access',   '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_access',    'filter_access',    '',  'string' );
-		$filter_level     = $fcform ? $jinput->get('filter_level',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_level',     'filter_level',     '',  'string' );
+		$filter_state     = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',     'filter_state',     '',  'string' );   // we may check for '*', so string filter
+		$filter_access    = $fcform ? $jinput->get('filter_access',   '', 'int')     :  $app->getUserStateFromRequest( $p.'filter_access',    'filter_access',    '',  'int' );
+		$filter_level     = $fcform ? $jinput->get('filter_level',    '', 'int')     :  $app->getUserStateFromRequest( $p.'filter_level',     'filter_level',     '',  'int' );
 		$filter_language  = $fcform ? $jinput->get('filter_language', '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_language',  'filter_language',  '',  'string' );
 		
 		$this->setState('filter_cats',     $filter_cats);
@@ -296,12 +296,13 @@ class FlexicontentModelCategories extends JModelList
 		$query->where("c.extension = '".FLEXI_CAT_EXTENSION."' ");
 		
 		
-		// Filter by publicationd state
+		// Filter by publication state
 		if (is_numeric($filter_state)) {
 			$query->where('c.published = ' . (int) $filter_state);
 		}
 		elseif ( $filter_state === '') {
 			$query->where('c.published IN (0, 1)');
+		} else {  // $filter_state === '*', or any other will allow all states including: archive, trashed 
 		}
 		
 		// Filter by access level
@@ -324,12 +325,12 @@ class FlexicontentModelCategories extends JModelList
 		
 		// Filter by language
 		if ( $filter_language ) {
-			$query->where('c.language = '.$db->Quote( $filter_language ) );
+			$query->where('c.language = '.$db->Quote( $filter_language ));
 		}
 		
 		// Filter by id
 		if ( $filter_id ) {
-			$query->where('c.id = '.$db->Quote( $filter_id ) );
+			$query->where('c.id = '.(int) $filter_id);
 		}
 		
 		// Implement View Level Access

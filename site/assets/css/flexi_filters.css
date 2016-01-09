@@ -61,6 +61,12 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 	margin: 4px 16px 16px 16px;
 	font-size: 12px;
 }
+.ui-autocomplete {
+	z-index: 1000 !important;
+}
+.ui-autocomplete-loading {
+	background: #eee url('../images/ajax-loader.gif') no-repeat 96% center;
+}
 .cid_loading {
 	color: darkred;
 	font-weight: bold;

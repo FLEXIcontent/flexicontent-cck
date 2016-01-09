@@ -74,9 +74,9 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		// **************
 		
 		// Various filters
-		$filter_itemstate = $fcform ? $jinput->get('filter_itemstate', '', 'word')    :  $app->getUserStateFromRequest( $p.'filter_itemstate', 'filter_itemstate', '', 'word' );
+		$filter_itemstate = $fcform ? $jinput->get('filter_itemstate', '', 'cmd')     :  $app->getUserStateFromRequest( $p.'filter_itemstate', 'filter_itemstate', '', 'cmd' );
 		$filter_itemtype  = $fcform ? $jinput->get('filter_itemtype',  0,  'int')     :  $app->getUserStateFromRequest( $p.'filter_itemtype',  'filter_itemtype',   0, 'int' );
-		$filter_fieldtype = $fcform ? $jinput->get('filter_fieldtype', '', 'word')    :  $app->getUserStateFromRequest( $p.'filter_fieldtype', 'filter_fieldtype', '', 'word' );
+		$filter_fieldtype = $fcform ? $jinput->get('filter_fieldtype', '', 'cmd')     :  $app->getUserStateFromRequest( $p.'filter_fieldtype', 'filter_fieldtype', '', 'cmd' );
 		$search_itemtitle = $fcform ? $jinput->get('search_itemtitle', '', 'string')  :  $app->getUserStateFromRequest( $p.'search_itemtitle', 'search_itemtitle', '', 'string' );
 		$search_itemid    = $fcform ? $jinput->get('search_itemid',     0, 'int')     :  $app->getUserStateFromRequest( $p.'search_itemid',    'search_itemid',     0, 'int' );
 		
@@ -94,12 +94,12 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		
 		
 		// Type of search index being listed
-		$indexer = $app->getUserStateFromRequest( $p.'indexer', 'indexer', '', 'word' );
+		$indexer = $app->getUserStateFromRequest( $p.'indexer', 'indexer', '', 'cmd' );
 		if ($indexer) {
 			$filter_indextype = $indexer;
 			$app->setUserState('indexer', '');
 		} else {
-			$filter_indextype = $fcform ? $jinput->get('filter_indextype',  'advanced', 'word')  :  $app->getUserStateFromRequest( $p.'filter_indextype', 'filter_indextype', 'advanced', 'word' );
+			$filter_indextype = $fcform ? $jinput->get('filter_indextype',  'advanced', 'cmd')  :  $app->getUserStateFromRequest( $p.'filter_indextype', 'filter_indextype', 'advanced', 'cmd' );
 		}
 		$this->setState('filter_indextype', $filter_indextype);
 		$app->setUserState($p.'filter_indextype', $filter_indextype);

@@ -80,11 +80,11 @@ class FlexicontentModelFields extends JModelList
 		// **************
 		
 		// Various filters
-		$filter_fieldtype = $fcform ? $jinput->get('filter_fieldtype', '', 'word')  :  $app->getUserStateFromRequest( $p.'filter_fieldtype', 'filter_fieldtype', '', 'word' );
-		$filter_type      = $fcform ? $jinput->get('filter_type',      0,  'int')   :  $app->getUserStateFromRequest( $p.'filter_type',      'filter_type',      0,  'int' );
-		$filter_state     = $fcform ? $jinput->get('filter_state',     '', 'word')  :  $app->getUserStateFromRequest( $p.'filter_state',     'filter_state',     '', 'word' );
-		$filter_access    = $fcform ? $jinput->get('filter_access',    0,  'int')   :  $app->getUserStateFromRequest( $p.'filter_access',    'filter_access',    0,  'int' );
-		$filter_assigned  = $fcform ? $jinput->get('filter_assigned',  '', 'word')  :  $app->getUserStateFromRequest( $p.'filter_assigned',  'filter_assigned',  '', 'word' );
+		$filter_fieldtype = $fcform ? $jinput->get('filter_fieldtype', '', 'cmd')     :  $app->getUserStateFromRequest( $p.'filter_fieldtype', 'filter_fieldtype', '', 'cmd' );
+		$filter_type      = $fcform ? $jinput->get('filter_type',      0,  'int')     :  $app->getUserStateFromRequest( $p.'filter_type',      'filter_type',      0,  'int' );
+		$filter_state     = $fcform ? $jinput->get('filter_state',     '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',      '', 'string' );   // we may check for '*', so string filter
+		$filter_access    = $fcform ? $jinput->get('filter_access',    0,  'int')     :  $app->getUserStateFromRequest( $p.'filter_access',    'filter_access',    0,  'int' );
+		$filter_assigned  = $fcform ? $jinput->get('filter_assigned',  '', 'cmd')     :  $app->getUserStateFromRequest( $p.'filter_assigned',  'filter_assigned',  '', 'cmd' );
 		
 		$this->setState('filter_fieldtype', $filter_fieldtype);
 		$this->setState('filter_type', $filter_type);
@@ -364,7 +364,7 @@ class FlexicontentModelFields extends JModelList
 				$where[] = 't.published = 1';
 			} else if ($filter_state == 'U' ) {
 				$where[] = 't.published = 0';
-			}
+			} // else ALL: published & unpublished (in future we may have more states, e.g. archived, trashed)
 		}
 		
 		// Filter by access level
@@ -374,7 +374,7 @@ class FlexicontentModelFields extends JModelList
 		
 		// Filter by search word
 		if ($search) {
-			$escaped_search = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
+			$escaped_search = $this->_db->escape( $search, true );
 			$where[] = ' (LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false )
 				.' OR LOWER(t.label) LIKE '.$this->_db->Quote( '%'.$escaped_search.'%', false ) .')';
 		}
@@ -701,7 +701,7 @@ class FlexicontentModelFields extends JModelList
 				$field = $this->getTable('flexicontent_fields', '');
 				$field->load($id);
 				if ( $copyvalues && in_array($field->field_type, array('image')) ) {
-					$params = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
+					$params = new JRegistry($field->attribs);
 					if ($params->get('image_source')) {
 						JFactory::getApplication()->enqueueMessage( 'You cannot copy image field -- "'.$field->name.'" -- together with its values, since this field has data in folders too' ,'error');
 						continue;

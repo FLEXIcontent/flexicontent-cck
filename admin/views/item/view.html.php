@@ -54,8 +54,9 @@ class FlexicontentViewItem extends JViewLegacy
 		$option     = JRequest::getVar('option');
 		$nullDate   = $db->getNullDate();
 		
-		// Get the COMPONENT only parameters
-		// Get component parameters
+		// We do not have item parameters yet, but we need to do some work before creating the item
+		
+		// Get the COMPONENT only parameter
 		$params  = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
@@ -66,30 +67,6 @@ class FlexicontentViewItem extends JViewLegacy
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
-		
-		// *****************
-		// Load JS/CSS files
-		// *****************
-		
-		// Add css to document
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
-		
-		// Fields common CSS
-		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
-		
-		// Add JS frameworks
-		flexicontent_html::loadFramework('select2');
-		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
-		flexicontent_html::loadFramework('flexi-lib');
-		
-		// Add js function to overload the joomla submitform validation
-		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
-		
-		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
 		
 		
 		// ***********************
@@ -103,11 +80,26 @@ class FlexicontentViewItem extends JViewLegacy
 		$form = $this->get('Form');
 		
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
-
+		
+		
+		
+		// **************************************************************
+		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
+		// **************************************************************
+		
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		
+		$fields = $this->get( 'Extrafields' );
+		$item->fields = & $fields;
+		
+		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		
+		
 		// ***************************
 		// Get Associated Translations
 		// ***************************
+		
 		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
 		$langs = FLEXIUtilities::getLanguages('code');
 
@@ -127,6 +119,7 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		// Get number of subscribers
 		$subscribers = $model->getSubscribersCount();
+		
 		
 		
 		// ******************
@@ -156,6 +149,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$ratings = $model->getRatingDisplay();
 		
 		
+		
 		// *****************
 		// Type related data
 		// *****************
@@ -176,6 +170,43 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		
 		
+		// *****************
+		// Load JS/CSS files
+		// *****************
+		
+		// Add css to document
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
+		
+		// Fields common CSS
+		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', FLEXI_VHASH);
+		
+		// Add JS frameworks
+		$has_J2S = false;
+		foreach ($fields as $field) {
+			$has_J2S = $has_J2S || $field->field_type == 'j2store';
+			if ($has_J2S) break;
+		}
+		$_params = new JRegistry();
+		$_params->set('load-ui-dialog', 1);
+		$_params->set('load-ui-menu', $has_J2S ? 0 : 1);
+		$_params->set('load-ui-autocomplete', $has_J2S ? 0 : 1);
+		
+		flexicontent_html::loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1, $add_remote = 1, $_params);   //flexicontent_html::loadFramework('jQuery');
+		flexicontent_html::loadFramework('select2');
+		flexicontent_html::loadFramework('prettyCheckable');
+		flexicontent_html::loadFramework('flexi-lib');
+		
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		
+		// Add js function for custom code used by FLEXIcontent item form
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', FLEXI_VHASH);
+		
+		
+		
 		// ******************
 		// Create the toolbar
 		// ******************
@@ -189,6 +220,7 @@ class FlexicontentViewItem extends JViewLegacy
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );     // Creating new item
 		}
+		
 		
 		
 		// **************
@@ -205,6 +237,7 @@ class FlexicontentViewItem extends JViewLegacy
 		if (!$isnew || $item->version) JToolBarHelper::save('items.save');
 		if (!$isnew || $item->version) JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel('items.cancel');
+		
 		
 		
 		// ***********************
@@ -271,6 +304,7 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 		
 		
+		
 		// ************************
 		// Add modal layout editing
 		// ************************
@@ -287,21 +321,12 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 		
 		
-		// Check if saving an item that translates an original content in site's default language
-		$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
-		$is_content_default_lang = $site_default == substr($item->language, 0,2);
 		
 		// *****************************************************************************
-		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
 		// (a) Apply Content Type Customization to CORE fields (label, description, etc)
 		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
 		// *****************************************************************************
 		
-		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$fields = $this->get( 'Extrafields' );
-		$item->fields = & $fields;
-		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$jcustom = $app->getUserState('com_flexicontent.edit.item.custom');   //print_r($jcustom);
 		foreach ($fields as $field)
@@ -378,12 +403,14 @@ class FlexicontentViewItem extends JViewLegacy
 		if ( $print_logging_info ) $fc_run_times['render_field_html'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		
+		
 		// *************************
 		// Get tags used by the item
 		// *************************
 		
 		$usedtagsIds = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
 		$usedtags = $model->getUsedtagsData($usedtagsIds);
+		
 		
 		
 		// *******************************
@@ -435,6 +462,7 @@ class FlexicontentViewItem extends JViewLegacy
 		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES );
 		
 		$lists = array();
+		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');  // Get if prettyCheckable was loaded
 		
 		// build state list
 		$non_publishers_stategrp    = $perms['isSuperAdmin'] || $item->state==-3 || $item->state==-4 ;

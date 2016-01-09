@@ -1312,8 +1312,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// Get/Create the view
 		$viewType   = $document->getType();
-		$viewName   = FLEXI_J30GE ? $this->input->get('view', $this->default_view) : JRequest::getVar('view');
-		$viewLayout = FLEXI_J30GE ? $this->input->get('layout', 'default', 'string') : JRequest::getVar('layout', 'default', 'string');
+		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
+		$viewLayout = $this->input->get('layout', 'default', 'string');
 		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 		
 		// Get/Create the model
@@ -1450,7 +1450,7 @@ class FlexicontentControllerItems extends FlexicontentController
 					<li class="tagitem">
 						<span>'.$tag->name.'</span>
 						<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
-						<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
+						<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
 					</li>';
 				} else {
 					$rsp .='

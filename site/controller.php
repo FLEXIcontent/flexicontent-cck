@@ -927,8 +927,8 @@ class FlexicontentController extends JControllerLegacy
 		$jinput = JFactory::getApplication()->input;
 		$userid = JFactory::getUser()->get('id');
 		$cc     = $jinput->get('cc', null);
-		$view   = $jinput->get('view');
-		$layout = $jinput->get('layout');
+		$view   = $jinput->get('view', '', 'cmd');
+		$layout = $jinput->get('layout', '', 'cmd');
 		
 		
 		// Access checking for --items-- viewing, will be handled by the items model, this is because THIS display() TASK is used by other views too
@@ -1048,8 +1048,8 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Get/Create the view
 		$viewType   = $document->getType();
-		$viewName   = FLEXI_J30GE ? $this->input->get('view', $this->default_view) : JRequest::getVar('view');
-		$viewLayout = FLEXI_J30GE ? $this->input->get('layout', 'form', 'string') : JRequest::getVar('layout', 'form', 'string');
+		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
+		$viewLayout = $this->input->get('layout', 'form', 'string');
 		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 		
 		// Get/Create the model
@@ -1078,8 +1078,8 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Get/Create the view
 		$viewType   = $document->getType();
-		$viewName   = FLEXI_J30GE ? $this->input->get('view', $this->default_view) : JRequest::getVar('view');
-		$viewLayout = FLEXI_J30GE ? $this->input->get('layout', 'form', 'string') : JRequest::getVar('layout', 'form', 'string');
+		$viewName   = $this->input->get('view', $this->default_view, 'cmd');
+		$viewLayout = $this->input->get('layout', 'form', 'string');
 		$view = $this->getView($viewName, $viewType, '', array('base_path' => $this->basePath, 'layout' => $viewLayout));
 		
 		// Get/Create the model

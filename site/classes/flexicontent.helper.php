@@ -792,9 +792,9 @@ class flexicontent_html
 			} else {
 				if (FLEXI_J30GE) {
 					JHtml::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position
-					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
-					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.menu.min.js');
-					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
+					if ( !$params || $params->get('load-ui-dialog', 1) )        $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
+					if ( !$params || $params->get('load-ui-menu', 1) )          $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.menu.min.js');
+					if ( !$params || $params->get('load-ui-autocomplete', 1) )  $document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
 				} else {
 					$document->addScript(JURI::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
 				}
@@ -844,7 +844,7 @@ class flexicontent_html
 	 * @return 	string
 	 * @since 1.5
 	 */
-	static function loadFramework( $framework, $mode='' )
+	static function loadFramework( $framework, $mode='', $params=null )
 	{
 		// Detect already loaded framework
 		static $_loaded = array();
@@ -879,7 +879,7 @@ class flexicontent_html
 		switch ( $framework )
 		{
 			case 'jQuery':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				if ($load_jquery) flexicontent_html::loadJQuery(1, 1, 1, 1, $params);
 				break;
 			
 			case 'mCSB':

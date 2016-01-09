@@ -205,21 +205,13 @@ class FlexicontentModelItemelement extends JModelLegacy
 			$language    = $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
 			$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
 			
-			$type_data = $this->getTypeData( $assocs_id, $type_id );
+			//$type_data = $this->getTypeData( $assocs_id, $type_id );
 			
 			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
 			if (!$assocanytrans && !$created_by) {
 				$created_by = $user->id;
 				$app->setUserState( $option.'.'.$view.'.created_by', $created_by );
 			}
-			
-			/*if ($type_data || $created_by) {
-				JFactory::getApplication()->enqueueMessage( 'Selecting language association: '
-					.($type_data ? ' <b>'.JText::_('FLEXI_TYPE').'</b> <span class="badge badge-info">'. $type_data->name.'</span>' : '')
-					.($language ? ' and <b>'.JText::_('FLEXI_LANGUAGE').'</b> <span class="badge badge-info">'.$language.'</span>' : '')
-					.(!$assocanytrans && $created_by ? ' and <b>'.JText::_('FLEXI_AUTHOR').'</b> <span class="badge badge-info">'.JFactory::getUser($created_by)->name.'</span>' : '')
-				, 'message');
-			}*/
 		}
 		
 		$filter_state  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state', 'filter_state', '', 'cmd' );

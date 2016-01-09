@@ -139,11 +139,12 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		$view   = JRequest::getVar('view');
 		
 		$assocs_id   = JRequest::getInt( 'assocs_id', 0 );
-		$language    = $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
-		$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
 		
 		if ($assocs_id)
 		{
+			$language    = $app->getUserStateFromRequest( $option.'.'.$view.'.language', 'language', '', 'string' );
+			$created_by  = $app->getUserStateFromRequest( $option.'.'.$view.'.created_by', 'created_by', 0, 'int' );
+			
 			$assocanytrans = $user->authorise('flexicontent.assocanytrans', 'com_flexicontent');
 			if (!$assocanytrans && !$created_by) {
 				$created_by = $user->id;
@@ -159,8 +160,8 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author','filter_author','', 'cmd' );
 		$filter_access = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access','filter_access','', 'string' );
 		
-		$filter_lang = $language ? $language : $filter_lang;
-		$filter_author = $created_by ? $created_by : $filter_author;
+		$filter_lang   = $assocs_id && $language   ? $language   : $filter_lang;
+		$filter_author = $assocs_id && $created_by ? $created_by : $filter_author;
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
 		$search = trim( JString::strtolower( $search ) );

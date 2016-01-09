@@ -93,10 +93,10 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		$document->addStyleDeclaration($css);
 		
 		if (FLEXI_J30GE) $jinput = JFactory::getApplication()->input;
-		$option = FLEXI_J30GE ? $jinput->get('option', '', 'string') : JRequest::getVar('option');
-		$view   = FLEXI_J30GE ? $jinput->get('view', '', 'string') : JRequest::getVar('view');
-		$controller = FLEXI_J30GE ? $jinput->get('controller', '', 'string') : JRequest::getVar('controller');
-		$component  = FLEXI_J30GE ? $jinput->get('component', '', 'string')  : JRequest::getVar('component');
+		$option = $jinput->get('option', '', 'cmd');
+		$view   = $jinput->get('view', '', 'cmd');
+		$controller = $jinput->get('controller', '', 'cmd');
+		$component  = $jinput->get('component', '', 'cmd');
 		
 		// NOTE: this is imported by main Frontend/Backend CSS file
 		// so import these only if it is not a flexicontent view

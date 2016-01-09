@@ -1301,7 +1301,8 @@ class FlexicontentModelItems extends JModelLegacy
 			$where[] = 'i.created_by IN (' . implode( ',', $filter_author) .')';
 		}
 		
-		if ( $filter_id )      $where[] = 'i.id = ' . $filter_id;
+		if ( $filter_id )
+			$where[] = 'i.id = ' . $filter_id;
 		
 		if ( !empty($filter_lang) )
 		{

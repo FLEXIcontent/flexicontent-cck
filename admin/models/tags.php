@@ -102,8 +102,8 @@ class FlexicontentModelTags extends JModelLegacy
 		// **************
 		
 		// Various filters
-		$filter_state    = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',    '', 'string' );
-		$filter_assigned = $fcform ? $jinput->get('filter_assigned', '',   'word')  :  $app->getUserStateFromRequest( $p.'filter_assigned', 'filter_assigned',  '',  'word' );
+		$filter_state    = $fcform ? $jinput->get('filter_state',    '', 'string')  :  $app->getUserStateFromRequest( $p.'filter_state',    'filter_state',    '', 'string' );   // we may check for '*', so string filter
+		$filter_assigned = $fcform ? $jinput->get('filter_assigned', '', 'cmd')     :  $app->getUserStateFromRequest( $p.'filter_assigned', 'filter_assigned', '', 'cmd' );
 		
 		$this->setState('filter_state', $filter_state);
 		$this->setState('filter_assigned', $filter_assigned);
@@ -318,7 +318,7 @@ class FlexicontentModelTags extends JModelLegacy
 				$where[] = 't.published = 1';
 			} else if ($filter_state == 'U' ) {
 				$where[] = 't.published = 0';
-			}
+			} // else ALL: published & unpublished (in future we may have more states, e.g. archived, trashed)
 		}
 
 		if ($search) {
