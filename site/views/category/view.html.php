@@ -875,10 +875,22 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->assignRef('comments',  $comments);
 		$this->assignRef('alpha',     $alpha);
 		$this->assignRef('tmpl',      $tmpl);
-
-		// Moved decision of layout into the model, function decideLayout() $ilayout should never be empty
+		
+		
+		// NOTE: Moved decision of layout into the model, function decideLayout() layout variable should never be empty
 		// It will consider things like: template exists, is allowed, client is mobile, current frontend user override, etc
-		// The following is Joomla legacy view loading of templates, TODO: use JLayout ?? (examine if template file need to be re-used)
+		
+		// !!! The following method of loading layouts, is Joomla legacy view loading of layouts
+		// TODO: EXAMINE IF NEEDED to re-use these layouts, and use JLayout ??
+		
+		// Despite layout variable not being empty, there may be missing some sub-layout files,
+		// e.g. category_somefilename.php for this reason we will use a fallback layout that surely has these files
+		$fallback_layout = $params->get('category_fallback_layout', 'blog');  // parameter does not exist yet
+		if ($clayout != $fallback_layout) {
+			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$fallback_layout);
+			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$fallback_layout);
+		}
+		
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$clayout);
 		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout);
 		

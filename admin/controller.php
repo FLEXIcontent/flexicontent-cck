@@ -98,7 +98,7 @@ class FlexicontentController extends JControllerLegacy
 			$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
-		} else {
+		} else if ($postinst_integrity_ok && $config_saved) {
 			$this->checkDirtyFields();
 		}
 		
