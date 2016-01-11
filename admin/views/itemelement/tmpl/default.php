@@ -200,7 +200,7 @@ function delAllFilters() {
 			<td align="center" class="col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.($row->lang=='*' ? JText::_("All") : (!empty($row->lang) ? $this->langs->{$row->lang}->name : '')); ?>">
 				
 				<?php if ( 0 && !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
-					<img class="hasTip" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.($row->lang=='*' ? JText::_("All") : (!empty($row->lang) ? $this->langs->{$row->lang}->name : '')); ?>"
+					<img class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip(JText::_( 'FLEXI_LANGUAGE' ), ($row->lang=='*' ? JText::_("All") : (!empty($row->lang) ? $this->langs->{$row->lang}->name : '')), 0, 1); ?>"
 						src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
 				<?php elseif( !empty($row->lang) ) : ?>
 					<?php echo ($row->lang=='*'  ?  JText::_("All")  :  (!empty($row->lang) ? $this->langs->{$row->lang}->name : '')); ?>

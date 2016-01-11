@@ -13,7 +13,8 @@ defined('_JEXEC') or die;
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 
 // Load the tooltip behavior.
-JHtml::_('behavior.tooltip');
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+//JHtml::_('behavior.tooltip');
 
 $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
@@ -69,7 +70,9 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 				</th>
 				<?php foreach ($this->actions as $key => $action) : ?>
 				<th width="5%">
-					<span class="hasTip" title="<?php echo htmlspecialchars(JText::_($key).'::'.JText::_($action[1]), ENT_COMPAT, 'UTF-8'); ?>"><?php echo JText::_($key); ?></span>
+					<span class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip(JText::_($key), JText::_($action[1]), 0, 1); ?>">
+						<?php echo JText::_($key); ?>
+					</span>
 				</th>
 				<?php endforeach; ?>
 				<th class="nowrap" width="5%">

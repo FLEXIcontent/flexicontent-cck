@@ -60,7 +60,7 @@ class FlexicontentViewUser extends JViewLegacy
 		
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.tooltip');
+		//JHTML::_('behavior.tooltip');
 		
 		// Add js function to overload the joomla submitform validation
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden

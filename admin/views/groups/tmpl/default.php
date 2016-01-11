@@ -32,7 +32,7 @@ $view_entry = JText::_('FLEXI_VIEW', true);
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 
 // Load the tooltip behavior.
-JHtml::_('behavior.tooltip');
+//JHtml::_('behavior.tooltip');
 JHtml::_('behavior.multiselect');
 
 $user    = JFactory::getUser();

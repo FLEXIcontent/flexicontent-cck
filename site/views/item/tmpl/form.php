@@ -638,7 +638,7 @@ ob_start();  // category ?>
 		<?php
 			if ($cats_canselect_sec) {
 				// display secondary categories if permitted
-				$mcats_tooltip = 'class="editlinktip '.(FLEXI_J30GE?'hasTooltip':'hasTip').'"'.
+				$mcats_tooltip = 'class="editlinktip '.$tip_class.'"'.
 					' style="display:inline-block;" title="'.
 					(FLEXI_J30GE ?
 						JHtml::tooltipText(trim(JText::_('FLEXI_NOTES'), ':'), htmlspecialchars(JText::_( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8'), 0).'" ' :

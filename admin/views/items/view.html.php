@@ -704,7 +704,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 
 		// Add js to document
-		JHTML::_('behavior.tooltip');
+		//JHTML::_('behavior.tooltip');
 		flexicontent_html::loadFramework('select2');
 		$document->addScriptVersion(JURI::base(true).'/components/com_flexicontent/assets/js/copymove.js', FLEXI_VHASH);
 		

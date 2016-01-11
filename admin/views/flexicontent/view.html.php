@@ -58,7 +58,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		jimport('joomla.filesystem.file');
 		
 		// activate the tooltips
-		JHTML::_('behavior.tooltip');
+		//JHTML::_('behavior.tooltip');
 
 		// handle jcomments integration
 		if (JPluginHelper::isEnabled('system', 'jcomments')) {

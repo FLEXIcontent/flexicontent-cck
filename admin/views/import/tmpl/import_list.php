@@ -1,4 +1,6 @@
 <?php
+$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+
 $_levels = JHtml::_('access.assetgroups');
 $access_levels = array();
 foreach($_levels as $_level) {
@@ -221,7 +223,7 @@ foreach($_levels as $_level) {
 						echo flexicontent_html::stateicon( $field_values, $this->cparams);
 					else if (!is_array($field_values)) {
 						$is_missing = !empty($this->conf['filenames_missing'][$fieldname]) && is_string($field_values) && isset($this->conf['filenames_missing'][$fieldname][$field_values]);
-						echo $is_missing ? '<span class="fcimport_missingfile hasTip" title="File is missing::not found in path '.(@$this->conf['thefields'][$fieldname]->folderpath).'">' : '';
+						echo $is_missing ? '<span class="fcimport_missingfile '.$tip_class.'" title="<b>File is missing</b><br/> not found in path '.(@$this->conf['thefields'][$fieldname]->folderpath).'">' : '';
 						echo mb_strlen($field_values, 'UTF-8') > 40  ?  mb_substr(strip_tags($field_values), 0, 40, 'UTF-8') . ' ... '  :  $field_values;
 						echo $is_missing ? '</span>' : '';
 					} else {
@@ -230,7 +232,7 @@ foreach($_levels as $_level) {
 							echo '<li>';
 							if (!is_array($field_value)) {
 								$is_missing = !empty($this->conf['filenames_missing'][$fieldname]) && is_string($field_value) && isset($this->conf['filenames_missing'][$fieldname][$field_value]);
-								echo $is_missing ? '<span class="fcimport_missingfile hasTip" title="File is missing::not found in path '.(@$this->conf['thefields'][$fieldname]->folderpath).'">' : '';
+								echo $is_missing ? '<span class="fcimport_missingfile '.$tip_class.'" title="<b>File is missing</b><br/> not found in path '.(@$this->conf['thefields'][$fieldname]->folderpath).'">' : '';
 								echo mb_strlen($field_value, 'UTF-8') > 40  ?  mb_substr(strip_tags($field_value), 0, 40, 'UTF-8') . ' ... '  :  $field_value;
 								echo $is_missing ? '</span>' : '';
 							} else {

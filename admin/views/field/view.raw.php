@@ -35,7 +35,7 @@ class FlexicontentViewField extends JViewLegacy
 		$app      = JFactory::getApplication();
 		$user     = JFactory::getUser();
 		
-		JHTML::_('behavior.tooltip');
+		//JHTML::_('behavior.tooltip');
 
 		//get vars
 		$cid 		= JRequest::getVar( 'cid' );

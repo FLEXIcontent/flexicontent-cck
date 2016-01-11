@@ -56,7 +56,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		
 		flexicontent_html::loadJQuery();
 		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.tooltip');
+		//JHTML::_('behavior.tooltip');
 		// Load the form validation behavior
 		JHTML::_('behavior.formvalidation');
 		

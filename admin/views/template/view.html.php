@@ -185,7 +185,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		// **************************
 		
 		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.tooltip');
+		//JHTML::_('behavior.tooltip');
 		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);

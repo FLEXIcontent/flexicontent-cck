@@ -39,7 +39,7 @@ class FlexicontentViewTagelement extends JViewLegacy {
 		$document = JFactory::getDocument();
 		$template = $mainframe->getTemplate();
 		
-		JHTML::_('behavior.tooltip');
+		//JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
 
 		//get var

@@ -42,7 +42,7 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy
 		// Get model
 		$model = $this->getModel();
 		
-		JHTML::_('behavior.tooltip');
+		//JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
 
 		$assocs_id   = JRequest::getInt( 'assocs_id', 0 );
