@@ -55,7 +55,7 @@ $usetags_fe = $this->params->get('usetags_fe', 1);
 $tags_displayed = $typeid && ( ($this->perms['cantags'] && $usetags_fe) || (count(@$this->usedtagsdata) && $usetags_fe==2) ) ;
 
 // Create reusable html code
-$infoimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ) );
+$infoimage = $this->params->get('use_font_icons', 1) ? '<i class="icon-comment" style="color:darkgray"></i>' : JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ) );
 $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
@@ -519,7 +519,7 @@ if ($typeid==0) : ob_start();  // type ?>
 	
 	<div class="container_fcfield container_fcfield_id_8 container_fcfield_name_type" id="container_fcfield_8">
 		<?php echo $this->lists['type']; ?>
-		<span class="editlinktip <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_( 'FLEXI_NOTES' ), ':'), JText::_( 'FLEXI_TYPE_CHANGE_WARNING' ), 0):htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_TYPE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8'); ?>">
+		<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', 'FLEXI_TYPE_CHANGE_WARNING', 1, 1); ?>">
 			<?php echo $infoimage; ?>
 		</span>
 		<?php echo sprintf( $alert_box, 'id="fc-change-warning" style="display:none;"', 'warning', '', '<h4>'.JText::_( 'FLEXI_WARNING' ).'</h4> '.JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ) ); ?>
@@ -552,7 +552,7 @@ if ( $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new i
 		<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state fcdualline" id="container_fcfield_10" style="margin-right:4% !important;" >
 			<?php echo $this->lists['state']; ?>
 			<?php //echo $this->form->getInput('state'); ?>
-			<span class="editlinktip <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_( 'FLEXI_NOTES' ), ':'), JText::_( 'FLEXI_STATE_CHANGE_WARNING' ), 0):htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_STATE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8'); ?>">
+			<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', 'FLEXI_STATE_CHANGE_WARNING', 1, 1); ?>">
 				<?php echo $infoimage; ?>
 			</span>
 		</div>
@@ -635,18 +635,13 @@ ob_start();  // category ?>
 	<div class="container_fcfield container_fcfield_name_catid">
 		<?php /* MENU SPECIFIED main category (new item) or main category according to perms */ ?>
 		<?php echo $this->menuCats ? $this->menuCats->catid : $this->lists['catid']; ?>
-		<?php
-			if ($cats_canselect_sec) {
-				// display secondary categories if permitted
-				$mcats_tooltip = 'class="editlinktip '.$tip_class.'"'.
-					' style="display:inline-block;" title="'.
-					(FLEXI_J30GE ?
-						JHtml::tooltipText(trim(JText::_('FLEXI_NOTES'), ':'), htmlspecialchars(JText::_( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8'), 0).'" ' :
-						htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8').'" '
-					);
-				echo '<span '.$mcats_tooltip.'>'.$infoimage.'</span>';
-			}
-		?>
+		
+		<?php /* Display secondary categories if permitted */ ?>
+		<?php if ($cats_canselect_sec): ?>
+		<span class="<?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', 'FLEXI_CATEGORIES_NOTES', 1, 1); ?>">
+			<?php echo $infoimage; ?>
+		</span>
+		<?php endif; ?>
 	</div>
 <?php $captured['category'] = ob_get_clean();
 

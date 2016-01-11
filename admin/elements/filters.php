@@ -326,7 +326,7 @@ class JFormFieldFilters extends JFormFieldList
 		{
 			$style = 'display:inline-block; float:left; margin: 0px 0px 0px 18px;';
 			$tip = '
-			<span class="editlinktip hasTooltip" style="'.$style.'" title="'.JHtml::tooltipText('FLEXI_NOTES', 'FLEXI_SETTING_DEFAULT_FILTER_ORDER', 1, 1).'">
+			<span class="hasTooltip" style="'.$style.'" title="'.JHtml::tooltipText('FLEXI_NOTES', 'FLEXI_SETTING_DEFAULT_FILTER_ORDER', 1, 1).'">
 				'.JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) ).'
 			</span>';
 		}*/

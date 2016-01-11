@@ -197,7 +197,7 @@ function delAllFilters() {
 			
 			<td align="center"><?php echo $row->access_level; ?></td>
 			
-			<td align="center" class="col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.($row->lang=='*' ? JText::_("All") : (!empty($row->lang) ? $this->langs->{$row->lang}->name : '')); ?>">
+			<td align="center" class="col_lang">
 				
 				<?php if ( 0 && !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
 					<img class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip(JText::_( 'FLEXI_LANGUAGE' ), ($row->lang=='*' ? JText::_("All") : (!empty($row->lang) ? $this->langs->{$row->lang}->name : '')), 0, 1); ?>"

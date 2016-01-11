@@ -46,7 +46,7 @@ jQuery(document).ready(function() {
 	<fieldset>
 		<legend>
 			<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
-			<span class="editlinktip hasTooltip" title="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_DESC', true ); ?>" style="text-decoration: none; color: #333;">
+			<span class="hasTooltip" title="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_DESC', true ); ?>" style="text-decoration: none; color: #333;">
 				<img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
 			</span>
 		</legend>

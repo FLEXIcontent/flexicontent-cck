@@ -77,12 +77,6 @@ h3.themes-title {
 h3.themes-title small {
 	font-weight: normal;
 }
-span.editlinktip.hasTip.tags img {
-	position: relative;
-	top: 4px;
-	left: 2px;
-	margin-right: 4px;
-}
 .pane-disabled {
 	filter: alpha(opacity=40);
 	-moz-opacity: 0.4;
@@ -952,11 +946,6 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 .container_fcfield.fcdualline {
 	width: auto !important;
-}
-.container_fcfield .editlinktip img {
-	margin: 4px 4px -4px 0px !important;
-	padding: 0px !important;
-	vertical-align: baseline;
 }
 #flexicontent .fcclear,
 #flexicontent .clear {
