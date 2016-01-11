@@ -127,7 +127,12 @@ if (count($_ct) > 1) $controller = $_ct[0];
 
 // c. Force variables: controller AND/OR task
 $forced_views = array('category'=>1);  // *** Cases that view variable must be ignored
-if ( isset($forced_views[$controller]) )  $jinput->set('view', $view = $controller);
+if ( isset($forced_views[$controller]) )
+{
+	$view = $controller;
+	$jinput->set('view', $view);
+	JRequest::setVar('view', $view);  // Compatibility for views still using JRequest
+}
 
 if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) ) {
 	
@@ -148,11 +153,18 @@ if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) ) {
 		if ( !$task ) $task = 'edit';  // default task for singular views is edit
 	}
 }
+//echo "$controller -- $task <br/>\n";
 
 
 // d. Set changes to controller/task variables back to HTTP REQUEST
-$jinput->set('controller', $ctrl_name = $controller);
-if ($controller && $task) $jinput->set('task', $ctrl_name.'.'.$task);   //echo "$ctrl_name -- $task <br/>\n";
+$controller_task = $controller && $task  ?  $controller.'.'.$task  :  $task;
+$controller_name = $controller;
+
+$jinput->set('controller', $controller_name);
+$jinput->set('task', $controller_task);
+
+JRequest::setVar('controller', $controller_name);  // Compatibility for views still using JRequest
+JRequest::setVar('task', $controller_task);        // Compatibility for views still using JRequest
 
 
 
@@ -160,35 +172,25 @@ if ($controller && $task) $jinput->set('task', $ctrl_name.'.'.$task);   //echo "
 // Files needed for user groups manager
 // ************************************
 
-if (FLEXI_J16GE && ( $view=='group' || $ctrl_name=='group'   || $view=='groups' || $ctrl_name=='groups'   || $view=='debuggroup' || $ctrl_name=='debuggroup') ) {
+if ( $view=='group' || $controller_name=='group'   || $view=='groups' || $controller_name=='groups'   || $view=='debuggroup' || $controller_name=='debuggroup' ) {
 	// Load english language file for 'com_users' component then override with current language file
 	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
 	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
 	// users helper file
 	require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'helpers'.DS.'users.php');
 }
-if (FLEXI_J16GE && ($view=='debuggroup' || $ctrl_name=='debuggroup') ) {
+if ( $view=='debuggroup' || $controller_name=='debuggroup' ) {
 	// users helper file
 	require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'helpers'.DS.'debug.php');
 }
 
 
 
-// **************************************************************************************************************
-// Include the component base AND FOR J1.5 ONLY: the view-specific controller (in J1.6+ is included automatically)
-// **************************************************************************************************************
+// *******************************************************************************************
+// Include the component base, in J1.6+ is included automatically the view-specific controller
+// *******************************************************************************************
 
 require_once (JPATH_COMPONENT.DS.'controller.php');
-if (!FLEXI_J16GE) {
-	if( $controller ) {
-		$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
-		if (file_exists($path)) {
-			require_once $path;
-		} else {
-			$controller = '';
-		}
-	}
-}
 
 
 // initialization done ... log stats for initialization
@@ -265,7 +267,7 @@ if (FLEXI_J16GE) {
 // Perform the requested task
 // **************************
 
-$controller->execute($task);
+$controller->execute( $task );
 
 
 
@@ -283,10 +285,10 @@ if ( $format == 'html' )
 	// Load jquery Framework, but let some views decide for themselves, so that they can choose not to load some parts of jQuery.ui JS
 	if ($view != 'item') flexicontent_html::loadFramework('jQuery');
 	
-	if (1) 
+	if (1)
 	{
 		// Load J2.5 (mootools tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
-		FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
+		//JHTML::_('behavior.tooltip');  // TODO check for 'hasTip' and remove all remaining cases
 		
 		// J3.0+ tooltips (bootstrap based)
 		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
@@ -302,14 +304,14 @@ if ( $format == 'html' )
 // Enqueue PERFORMANCE statistics as a message BUT  NOT if in RAW FORMAT or COMPONENT only views
 // *********************************************************************************************
 
-if ( $print_logging_info && $format=='html')
+if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $format=='html' )
 {
 	
 	// ***************************************
 	// Total performance stats of current view
 	// ***************************************
 	
-	if ($task) $_msg = ' (TASK: '.$ctrl_name.'.'.$task.')';
+	if ($task) $_msg = ' (TASK: '.$controller_name.'.'.$task.')';
 	else       $_msg = ' (VIEW: ' .$view. ($layout ? ' -- LAYOUT: '.$layout : '') .')';
 	
 	
