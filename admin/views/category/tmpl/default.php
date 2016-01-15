@@ -172,6 +172,9 @@ $js = "
 					<?php echo $this->form->getInput('modified_time'); ?>
 				<?php endif; ?>
 				
+				<?php echo $this->form->getLabel('hits'); ?>
+				<?php echo $this->form->getInput('hits'); ?>
+				
 				<?php echo $this->form->getLabel('access'); ?>
 				<?php echo $this->form->getInput('access'); ?>
 			</fieldset>
