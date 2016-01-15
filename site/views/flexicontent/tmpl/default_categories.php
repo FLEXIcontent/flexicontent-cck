@@ -207,7 +207,14 @@ switch ($cols)
 			<li class='fcsubcat <?php echo $oddeven; ?>' >
 				<a class='fcsubcat_title'  href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($subcat->slug) ); ?>"><?php echo $this->escape($subcat->title); ?></a>
 				<?php if ($showassignated) : ?>
-				<span class="fcsubcat_assigned small"><?php echo $subcat->assignedsubitems != null ? '('.$subcat->assignedsubitems.'/'.$subcat->assignedcats.')' : '(0/'.$subcat->assignedcats.')'; ?></span>
+				<span class="fcsubcat_assigned small nowrap_box">
+					<?php echo '[ <b>'
+						.($subcat->assignedsubitems ? '<span class="fcdir-cntitems">'.$subcat->assignedsubitems.'</span> <i class="icon-list-2 fcdir-icon-itemscnt"></i>' : '')
+						.($subcat->assignedsubitems && $subcat->assignedcats ? '<span class="fcdir-cnt-sep"></span> ' : '')
+						.($subcat->assignedcats ? '<span class="fcdir-subcatscnt">'.$subcat->assignedcats.'</span> <i class="icon-folder fcdir-icon-subcatscnt"></i>' : '')
+						.'</b> ]';
+					?>
+				</span>
 				<?php endif; ?>
 
 			<?php 

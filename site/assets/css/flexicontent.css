@@ -2802,6 +2802,17 @@ table.admintable td {
 	margin: 2px 6px 1px 0px;
 	padding: 1px;
 }
+#flexicontent.fcdirectory .fcdir-cnt-sep:before {
+	content: "/";
+	display: inline-block;
+	margin: 0 4px;
+}
+#flexicontent.fcdirectory .fcdir-icon-itemscnt:before {
+	color: darkorange;
+}
+#flexicontent.fcdirectory .fcdir-icon-subcatscnt:before {
+	color: darkred;
+}
 #flexicontent .pane-sliders .pane-toggler span {
 	padding-left: 20px;
 }
