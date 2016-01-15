@@ -364,7 +364,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$field->html = (($show_usage && $field_notes) ? ' <div class="alert alert-info fc-small fc-iblock">'.$field_notes.'</div><div class="clear"></div>' : '')  .  $field->html;
 		
 		if ( count($skipped_vals) )
-			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 	}
 	
 	
