@@ -3826,33 +3826,32 @@ class ParentClassItem extends JModelAdmin
 			//echo "new_ilayout: $new_ilayout,  old_ilayout: $old_ilayout <br/>";
 			//echo "<pre>"; print_r($params); exit;
 			
+			
+			// **************************************************************************************
+			// THIS is costly if site has many templates but it will only happen if layout is changed
+			// **************************************************************************************
+			
+			// WARNING: NULL layout means layout was not present in the FORM, aka do not clear parameters
 			if (
-				// non-null but empty string value means: use type's defaults (ilayout and its parameters), aka clear old parameters to allow proper heritage from content type
-				($new_ilayout!==null && $new_ilayout=='')  ||
-				// new ilayout was given and is different than old ilayout, clear ilayout parameters, in case old parameters are have same name with of new ilayout parameters
+				// (a) non-null but empty new ilayout, and (b) old layout was non empty: clear parameters of old layout, to allow proper heritage from content type (= aka use type's defaults for ilayout and its parameters)
+				($new_ilayout!==null && $new_ilayout=='' && !empty($old_ilayout))  ||
+				
+				// (a) new ilayout was given and (b) is different than old ilayout, clear ilayout parameters, in case old parameters are have same name with of new ilayout parameters
 				($new_ilayout!='' && $new_ilayout!=$old_ilayout)
 			) {
+				//JFactory::getApplication()->enqueueMessage('Layout changed, cleared old layout parameters', 'message');
+				
 				$themes = flexicontent_tmpl::getTemplates();
 				foreach ($themes->items as $tmpl_name => $tmpl)
 				{
 					//if ( $tmpl_name == @$params['ilayout'] ) continue;
 					
 					$tmpl_params = $tmpl->params;
-					if (FLEXI_J16GE) {
-						$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
-						$jform->load($tmpl_params);
-						foreach ($jform->getGroup('attribs') as $p) {
-							if (!empty($p->fieldname))
-								$item->attribs->set($p->fieldname, null);
-						}
-					} else {
-						if ( !empty($tmpl_params->_xml['_default']) )  // check if parameters group is empty
-						{
-							foreach ( $tmpl_params->_xml['_default']->children() as $p ) {
-								if (!empty($p->_attributes['name']))
-									$item->attribs->set($p->_attributes['name'], null);
-							}
-						}
+					$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+					$jform->load($tmpl_params);
+					foreach ($jform->getGroup('attribs') as $p) {
+						if (!empty($p->fieldname))
+							$item->attribs->set($p->fieldname, null);
 					}
 				}
 			}

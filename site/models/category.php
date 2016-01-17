@@ -205,8 +205,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($this->_id) $app->setUserState( $option.'.nav_catid',  $this->_id );
 		$this->setState('option', $option);
 		
-		// We load parameters here, AFTER populating category ID and author ID, etc variables 
-		$this->_loadCategoryParams();
+		// We set category parameters to component parameters, these will be full calculated when getCategory() is called
+		$this->_params = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$this->_params->merge($cparams);
+		//$this->_loadCategoryParams();
 		
 		// Set the pagination variables into state (We get them from http request OR use default category parameters)
 		$limit = strlen(JRequest::getVar('limit')) ? JRequest::getInt('limit') : $this->_params->get('limit');
@@ -1608,10 +1611,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		
 		
-		// *******************************************************
-		// Set category parameters, these have already been loaded
-		// *******************************************************
+		// ************************************
+		// Force loading of category parameters
+		// ************************************
 		
+		$this->_loadCategoryParams($force=true);
 		$this->_category->parameters = $this->_params;
 		
 		
@@ -1703,40 +1707,35 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Get category layout from configuration if not already set (e.g. via HTTP Request)
 		// *********************************************************************************
 		
-		//echo "decideLayout: ". $this->_clayout ."<br/>";
-		$clayout = $this->_clayout;
-		if (!$clayout)
-		{
-			// Decide to use mobile or normal category template layout
-			$useMobile = $params->get('use_mobile_layouts', 0 );
-			if ($useMobile) {
-				$force_desktop_layout = $params->get('force_desktop_layout', 0 );
-				$mobileDetector = flexicontent_html::getMobileDetector();
-				$isMobile = $mobileDetector->isMobile();
-				$isTablet = $mobileDetector->isTablet();
-				$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
-			}
-			
+		// Decide to use mobile or normal category template layout
+		$useMobile = $params->get('use_mobile_layouts', 0 );
+		if ($useMobile) {
+			$force_desktop_layout = $params->get('force_desktop_layout', 0 );
+			$mobileDetector = flexicontent_html::getMobileDetector();
+			$isMobile = $mobileDetector->isMobile();
+			$isTablet = $mobileDetector->isTablet();
+			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+		}
+		$_clayout = $useMobile ? 'clayout_mobile' : 'clayout';
+		
+		// Get category layout (... if not already set), from the configuration parameter (that was decided above)
+		$clayout = $this->_clayout=='__request__' ? JRequest::getCmd($_clayout, false) : false;
+		if (!$clayout) {
 			$desktop_clayout = $params->get('clayout', 'blog');
 			$clayout = !$useMobile ? $desktop_clayout : $params->get('clayout_mobile', $desktop_clayout);
 		}
 		
+		// Get all templates from cache, (without loading any language file this will be done at the view)
+		$themes = flexicontent_tmpl::getTemplates();
 		
-		// Get cached template data, without loading language file, (this will be done at the view)
-		$themes = flexicontent_tmpl::getTemplates( null );
-		
-		
-		// *********************************
 		// Verify the category layout exists
-		// *********************************
-		
 		if ( !isset($themes->category->{$clayout}) )
 		{
 			$cat_default_layout = 'blog';  // Layout default
 			$fixed_clayout = isset($themes->category->{$cat_default_layout}) ? $cat_default_layout : 'default';
 			JFactory::getApplication()->enqueueMessage("<small>Current category Layout (template) is '$clayout' does not exist<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
 			$clayout = $fixed_clayout;
-			FLEXIUtilities::loadTemplateLanguageFile( $clayout ); // Manually load Template-Specific language file of back fall clayout
+			FLEXIUtilities::loadTemplateLanguageFile( $clayout );  // Manually load Template-Specific language file of back fall clayout
 		}
 		
 		
@@ -1757,9 +1756,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @return	void
 	 * @since	1.5
 	 */
-	function _loadCategoryParams()
+	function _loadCategoryParams($force=false)
 	{
-		if ( $this->_params !== NULL ) return;
+		if ( $this->_params !== NULL && !$force ) return;
 		$id = (int)$this->_id;
 		
 		$app  = JFactory::getApplication();
@@ -1848,9 +1847,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		
 		
-		// ***************************
-		// Start merging of parameters
-		// ***************************
+		// *******************************************************************************************************************
+		// Start merging of parameters, OVERRIDE ORDER: layout(template-manager)/component/ancestors-cats/category/author/menu
+		// *******************************************************************************************************************
+		
+		// -1. layout parameters will be placed on top at end of this code ...
 		
 		// 0. Start from component parameters
 		$params = new JRegistry();
@@ -1873,7 +1874,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			array_push($merge_stack, "MERGED CATEGORY PARAMETERS of (current) author: {$this->_authorid}");
 		
 		// g. Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
-		if ( !empty($menu) )
+		if ( $menu && !empty($this->mergeMenuParams) ) 
 		{
 			$this->_menu_itemid = $menu->id;
 			
@@ -1934,7 +1935,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$layoutParams = $this->getLayoutparams();
 		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
 		
-		// Allow global layout parameters to be inherited properly
+		// Allow global layout parameters to be inherited properly, placing on TOP of all others
 		$this->_params = clone($layoutParams);
 		$this->_params->merge($params);
 		$merge_stack[1] = "MERGED LAYOUT PARAMETERS of '".$this->_clayout ."'";

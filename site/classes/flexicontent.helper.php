@@ -218,21 +218,18 @@ class flexicontent_html
 	/* Checks and if needed compiles LESS files to CSS files*/
 	static function checkedLessCompile($files, $path, $inc_paths=null, $force=false, $check_global_inc = true)
 	{
+		static $print_logging_info = null;
+		$print_logging_info = $print_logging_info !== null  ?  $print_logging_info  :  JComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
+		$debug = JDEBUG || $print_logging_info;
+		
 		static $initialized;
 		if ($initialized===null)
 		{
 			jimport('joomla.filesystem.path' );
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.file');
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'lessphp'.DS.'lessc.inc.php');
 			$initialized = 1;
 		}
-		
-		$app = JFactory::getApplication();
-		$flexiparams = JComponentHelper::getParams('com_flexicontent');
-		
-		$print_logging_info = $flexiparams->get('print_logging_info');
-		$debug = JDEBUG || $print_logging_info;
 		
 		// Validate paths
 		$path     = JPath::clean($path);
@@ -252,7 +249,7 @@ class flexicontent_html
 			$outFile    = 'css/' . $nameOnly . '.css';
 			
 			if (!JFile::exists($path.$inFile)) {
-				//if ($debug) $app->enqueueMessage('Path not found: '.$path.$inFile, 'warning');
+				//if ($debug) JFactory::getApplication()->enqueueMessage('Path not found: '.$path.$inFile, 'warning');
 			} else if ( $_dirty || $force || !is_file($path.$outFile) || filemtime($path.$inFile) > filemtime($path.$outFile) ) {
 				$stale[$inFile] = $outFile;
 			}
@@ -263,9 +260,9 @@ class flexicontent_html
 		if (empty($stale)) return array();
 		
 		static $prev_path = null;
-		if ( $prev_path != $path && $debug )  $app->enqueueMessage('Compiling LESS files in: ' .$path, 'message');
+		if ( $prev_path != $path && $debug )  JFactory::getApplication()->enqueueMessage('Compiling LESS files in: ' .$path, 'message');
 		
-		
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'lessphp'.DS.'lessc.inc.php');
 		$compiled = array();
 		$msg = ''; $error = false;
 		
@@ -289,14 +286,16 @@ class flexicontent_html
 			catch (Exception $e)
 			{
 				$error = true;
-				if ($debug || $app->isAdmin()) $app->enqueueMessage('- LESS to CSS halted ... CSS file was not changed ... please edit LESS file(s) find offending <b>lines</b> and fix or remove<br/>'. str_replace($path.$in, '<br/><b>'.$path.$in.'</b>', $e->getMessage()), 'notice');
+				if ($debug || JFactory::getApplication()->isAdmin()) JFactory::getApplication()->enqueueMessage(
+					'- LESS to CSS halted ... CSS file was not changed ... please edit LESS file(s) find offending <b>lines</b> and fix or remove<br/>'. str_replace($path.$in, '<br/><b>'.$path.$in.'</b>', $e->getMessage()), 'notice'
+				);
 				continue;
 			}
 		}
 		
 		if ( count($compiled) && $debug ) {
 			foreach($compiled as $inPath => $outPath) $msg .= '<span class="row" style="display:block; margin:0;"><span class="span4">' . $inPath . '</span><span class="span4">' .$outPath . '</span></span>';
-			$app->enqueueMessage(($prev_path != $path ? '<span class="row" style="display:block; margin:0;"><span class="span4">LESS</span><span class="span4">CSS</span></span>' : '').$msg, 'message');
+			JFactory::getApplication()->enqueueMessage(($prev_path != $path ? '<span class="row" style="display:block; margin:0;"><span class="span4">LESS</span><span class="span4">CSS</span></span>' : '').$msg, 'message');
 		}
 		
 		$prev_path = $path;
@@ -663,17 +662,8 @@ class flexicontent_html
 		$inside_label  = $_switcher_label==2 ? ' '.JText::_('FLEXI_LAYOUT') : '';
 		$outside_label = $_switcher_label==1 ? '<span class="flexi label limit_override_label">'.JText::_('FLEXI_LAYOUT').'</span>' : '';
 		
-		$tmpls = flexicontent_tmpl::getTemplates();
-		
-		// Get layout parameters and find the layout title
-		foreach($layout_names as $layout_name)
-		{
-			$tmpl = @ $tmpls->$layout_typename->$layout_name;
-			if ( $tmpl && empty($tmpl->parameters) ) {
-				$tmpl->parameters = new JRegistry( flexicontent_tmpl::getLayoutparams($layout_typename, $layout_name) );
-			}
-			$tmpl->customtitle = $tmpl ? JText::_($tmpl->parameters->get('custom_layout_title', @ $tmpl->defaulttitle)) : '';
-		}
+		// Get layout titles
+		$layout_texts = flexicontent_tmpl::getLayoutTexts($layout_typename);
 		
 		if ( $params->get('clayout_switcher_display_mode', 1) == 0 )
 		{
@@ -684,9 +674,8 @@ class flexicontent_html
 			
 			$options = array();
 			foreach($layout_names as $layout_name) {
-				$tmpl = @ $tmpls->$layout_typename->$layout_name;
-				$tmpl_title = $tmpl ? $tmpl->customtitle : $layout_name;
-				$options[] = JHTML::_('select.option', $layout_name, $tmpl_title .$inside_label);
+				$layout_title = !empty($layout_texts->$layout_name->title)  ?  $layout_texts->$layout_name->title  :  $layout_name;
+				$options[] = JHTML::_('select.option', $layout_name, $layout_title .$inside_label);
 			}
 			$html = JHTML::_('select.genericlist', $options, $layout_type, $attribs, 'value', 'text', $layout );
 		}
@@ -699,12 +688,11 @@ class flexicontent_html
 			$options = array();
 			foreach($layout_names as $layout_name)
 			{
-				$tmpl = @ $tmpls->$layout_typename->$layout_name;
-				$tmpl_title = $tmpl ? $tmpl->customtitle : ''/*$layout_name*/;
+				$layout_title = !empty($layout_texts->$layout_name->title)  ?  $layout_texts->$layout_name->title  :  '';
 				$checked_attr = $layout==$layout_name ? ' checked=checked ' : '';
 				$options[] =
 					'<input type="radio" name="'.$layout_type.'" value="'.$layout_name.'" id="'.$layout_type.$n.'" onchange="adminFormPrepare(this.form, 2);" '.$checked_attr.'>'.
-					'<label for="'.$layout_type.$n.'" class="btn '.$tooltip_class.'" title="'.$tmpl_title.'"><img alt="'.$layout_name.'" src="'.$tmplurl.$layout_name.'/clayout.png"></label>'
+					'<label for="'.$layout_type.$n.'" class="btn '.$tooltip_class.'" title="'.$layout_title.'"><img alt="'.$layout_name.'" src="'.$tmplurl.$layout_name.'/clayout.png"></label>'
 					;
 				$n++;
 			}
@@ -1505,16 +1493,31 @@ class flexicontent_html
 				return call_user_func($validation, $v);  // A callback function
 		}
 		
-		// Do filtering 
-		if ($validation=='1') $safeHtmlFilter = JFilterInput::getInstance(null, null, 1, 1);
-		else if ($validation!='2') $noHtmlFilter = JFilterInput::getInstance();
-		switch ($validation) {
-			case  '1':
-				// Allow safe HTML
+		// Map integer validation code to custom validation types
+		$_map = array('1'=>'safehtml_decode_first', '2'=>'joomla_text_filters', '3'=>'safehtml_allow_encoded');
+		$validation = isset($_map[$validation])  ?  $_map[$validation]  :  $validation;
+		
+		// Create a safe-HTML or a no-HTML filter
+		if ($validation=='safehtml_decode_first' || $validation=='safehtml_allow_encoded')
+			$safeHtmlFilter = JFilterInput::getInstance(null, null, 1, 1);
+		else if ($validation!='joomla_ug_text_filters')
+			$noHtmlFilter = JFilterInput::getInstance();
+		
+		// Do the filtering
+		switch ($validation)
+		{
+			case 'safehtml_decode_first':
+				// Allow safe HTML ... but also decode HTML special characters before filtering
+				// Decoding allows removal of e.g. &lt;badtag&gt; ... &lt;/badtag&gt;
 				$v = $safeHtmlFilter->clean($v, 'string');
 				break;
 				
-			case  '2':
+			case 'safehtml_allow_encoded':
+				// Allow safe HTML ... and allow ANY HTML if encoded, e.g. allows &lt;i&gt; ... &lt;/i&gt;
+				$v = $safeHtmlFilter->clean($v, 'html');
+				break;
+				
+			case 'joomla_text_filters':
 				// Filter according to user group Text Filters
 				$v = JComponentHelper::filterText($v);
 				break;
@@ -1527,7 +1530,7 @@ class flexicontent_html
 				$v = str_replace(array('<', '>', '"'), '', $v);
 				
 				// Convert to Punycode string
-				$v = FLEXI_J30GE ? JStringPunycode::urlToPunycode( $v ) : $v;
+				$v = JStringPunycode::urlToPunycode( $v );
 				break;
 				
 			case 'EMAIL': case 'email':
@@ -1538,7 +1541,7 @@ class flexicontent_html
 				$v = str_replace(array('<', '>', '"'), '', $v);
 				
 				// Convert to Punycode string
-				$v = FLEXI_J30GE ? JStringPunycode::emailToPunycode( $v ) : $v;
+				$v = JStringPunycode::emailToPunycode( $v );
 				
 				// Check for valid email (punycode is ASCII so this should work with UTF-8 too)
 				$email_regexp = "/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/";
@@ -2347,7 +2350,7 @@ class flexicontent_html
 			$canAdd = $user->authorise('core.create', 'com_flexicontent');
 			
 			if ($canAdd === NULL && $user->id) {
-				// Perfomance concern (NULL for $canAdd) means SOFT DENY, also check for logged user
+				// Performance concern (NULL for $canAdd) means SOFT DENY, also check for logged user
 				// thus to avoid checking some/ALL categories for "create" privelege for unlogged users
 				$specific_catids = $submit_cat ? @ $submit_cat->ids  :  false;
 				if ($specific_catids && count($specific_catids) > 3) $specific_catids = false;
@@ -4616,288 +4619,405 @@ class flexicontent_upload
 class flexicontent_tmpl
 {
 	/**
+	 * Parse any FLEXIcontent templates files that have been modified
+	 *
+	 * @return 	object	object of templates
+	 * @since 1.5
+	 */
+	static function parseTemplates_checked($tmpldir='', $unchanged_tmpls = null)
+	{
+		// Return cached data
+		static $tmpls = null;
+		
+		// Set 'unchanged' layouts and return (this avoid reparsing on subsequent call)
+		if ( !empty($unchanged_tmpls) )
+		{
+			$tmpls = $unchanged_tmpls;
+			return true;
+		}
+		
+		if ( $tmpls === null )
+		{
+			$tmpls = new stdClass();
+			$tmpls->items = new stdClass();
+			$tmpls->category = new stdClass();
+		}
+		
+		$folders = flexicontent_tmpl::getThemes($tmpldir);
+		
+		foreach ($folders as $tmplname)
+		{
+			if ( isset($tmpls->items->$tmplname) && isset($tmpls->category->$tmplname) ) continue;  // Avoid reparsing an 'unchanged' theme
+			flexicontent_tmpl::parseTemplate($tmpldir, $tmplname, $tmpls);   // Parse XML files of the template
+		}
+		
+		return $tmpls;
+	}
+	
+	
+	/**
+	 * Parses a specific FLEXIcontent template
+	 * - both layout files: item.xml and category.xml are parsed
+	 * - the parsed data are set into the given 'tmpls' parameter
+	 * NOTE: parameter $tmpls->items and $tmpls->category needs to have been initialized
+	 *
+	 * @return 	nothing
+	 * @since 3.0.10
+	 */
+	static function parseTemplate($tmpldir, $tmplname, &$themes)
+	{
+		static $initialized;
+		if ($initialized===null)
+		{
+			jimport('joomla.filesystem.path' );
+			jimport('joomla.filesystem.folder');
+			jimport('joomla.filesystem.file');
+			jimport('joomla.form.form');
+			$initialized = 1;
+		}
+		
+		$tmpldir = $tmpldir ? $tmpldir : JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
+		$layout_types = array('items'=>'item', 'category'=>'category');
+		
+		foreach ($layout_types as $layout_type => $view)
+		{
+			// Parse & Load the XML file of the current layout
+			$tmplxml = JPath::clean($tmpldir.DS.$tmplname.DS.$view.'.xml');
+			if ( JFile::exists($tmplxml) && empty($themes->$layout_type->$tmplname) )
+			{
+				// Parse the XML file
+				$doc = @simplexml_load_file($tmplxml);
+				if (!$doc)
+				{
+					if (JFactory::getApplication()->isAdmin()) JFactory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');
+					continue;
+				}
+				
+				// Create new class and alias for it
+				$themes->$layout_type->$tmplname = new stdClass();
+				$t = & $themes->$layout_type->$tmplname;
+				
+				$t->name     = $tmplname;
+				$t->xmlpath  = $tmplxml;
+				$t->xmlmtime = filemtime($tmplxml);
+				$t->view     = $view;
+				$t->tmplvar  = '.'.$layout_type.'.'.$tmplname;
+				$t->thumb    = 'components/com_flexicontent/templates/'.$tmplname.'/'.$view.'.png';
+				
+				// *** This can be serialized and thus Joomla Cache will work
+				$t->params = $doc->asXML();
+				
+				// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
+				// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
+				// but serialization is used by Joomla 's cache, causing problem with caching the output of this function
+				
+				//$t->params		= new JForm('com_flexicontent.template.'.$view, array('control' => 'jform', 'load_data' => true));
+				//$t->params->loadFile($tmplxml);
+				
+				// Get Meta Information
+				$t->author    = (string) @$doc->author;
+				$t->website   = (string) @$doc->website;
+				$t->email     = (string) @$doc->email;
+				$t->license   = (string) @$doc->license;
+				$t->version   = (string) @$doc->version;
+				$t->release   = (string) @$doc->release;
+				$t->microdata_support = (string) @$doc->microdata_support;
+				
+				// Get Display Information
+				$t->defaulttitle = (string) @$doc->defaulttitle;
+				$t->description  = (string) @$doc->description;
+				
+				// Get field positions
+				$groups = & $doc->fieldgroups;
+				$pos    = & $groups->group;
+				if ($pos) {
+					for ($n=0; $n<count($pos); $n++) {
+						$t->attributes[$n] = array();
+						foreach ($pos[$n]->attributes() as $_attr_name => $_attr_val) {
+							$t->attributes[$n][(string)$_attr_name] = (string)$_attr_val;
+						}
+						$t->positions[$n] = (string)$pos[$n];
+					}
+				}
+				
+				$tmpl_path = 'components/com_flexicontent/templates/'.$tmplname.'/';
+				
+				// CSS files
+				$cssfiles = & $doc->{'css'.$view}->file;
+				if ($cssfiles) {
+					$t->css = new stdClass();
+					$t->less_files = array();
+					for ($n=0; $n<count($cssfiles); $n++) {
+						$t->css->$n = $tmpl_path. (string)$cssfiles[$n];
+						$less_file = JPath::clean( preg_replace('/^css|css$/', 'less', (string)$cssfiles[$n]) );
+						$t->less_files[] = $less_file;
+					}
+				}
+				
+				// JS files
+				$js     = & $doc->{'js'.$view};
+				$jsfile = & $js->file;
+				if ($jsfile) {
+					$t->js = new stdClass();
+					for ($n=0; $n<count($jsfile); $n++) {
+						$t->js->$n = $tmpl_path. (string)$jsfile[$n];
+					}
+				}
+			}
+		}
+	}	
+	
+	/**
 	 * Parse all FLEXIcontent templates files
 	 *
 	 * @return 	object	object of templates
 	 * @since 1.5
 	 */
-	static function parseTemplates($tmpldir='')
+	static function parseTemplates($tmpldir='', $force=false, $checked_layouts=array())
 	{
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.file');
-		jimport('joomla.form.form');
+		static $print_logging_info = null;
+		$print_logging_info = $print_logging_info !== null  ?  $print_logging_info  :  JComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
 		
-		static $themes;
-		if ($themes) return $themes; // return cached data
-		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+		$debug = JDEBUG || $print_logging_info;
+		$apply_cache = 1;//FLEXI_CACHE;
 		
-		$themes = new stdClass();
-		$themes->items = new stdClass();
-		$themes->category = new stdClass();
-
-		$tmpldir = $tmpldir ? $tmpldir : JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
-		$templates = JFolder::folders($tmpldir);
-
-		foreach ($templates as $tmpl)
+		if ( $apply_cache )
 		{
-			// Parse & Load ITEM layout of current template
-			$tmplxml = JPath::clean($tmpldir.DS.$tmpl.DS.'item.xml');
-			if (JFile::exists($tmplxml))
+			// Get template XML data from cache
+			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');  // Get Joomla Cache of '...tmpl' Caching Group
+			$tmplcache->setCaching(1); 		              // Force cache ON
+			$tmplcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
+			$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates_checked'), $tmpldir);
+			
+			// Check for modified XML files, cleaning and updating cache only for modified templates
+			if ( !empty($checked_layouts) || $force )
 			{
-				// Parse the XML file
-				$document = @simplexml_load_file($tmplxml);
-				if (!$document) {
-					if (JFactory::getApplication()->isAdmin()) JFactory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');
-					continue;
-				}
-
-				$themes->items->{$tmpl} = new stdClass();
-				$themes->items->{$tmpl}->name     = $tmpl;
-				$themes->items->{$tmpl}->xmlpath  = $tmplxml;
-				$themes->items->{$tmpl}->xmlmtime = filemtime($tmplxml);
-				$themes->items->{$tmpl}->view     = FLEXI_ITEMVIEW;
-				$themes->items->{$tmpl}->tmplvar  = '.items.'.$tmpl;
-				$themes->items->{$tmpl}->thumb    = 'components/com_flexicontent/templates/'.$tmpl.'/item.png';
-
-				// *** This can be serialized and thus Joomla Cache will work
-				$themes->items->{$tmpl}->params = $document->asXML();
-
-				// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
-				// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
-				// but serialization is used by Joomla 's cache, causing problem with caching the output of this function
-
-				//$themes->items->{$tmpl}->params		= new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
-				//$themes->items->{$tmpl}->params->loadFile($tmplxml);
-				
-				$themes->items->{$tmpl}->author 		= (string) @$document->author;
-				$themes->items->{$tmpl}->website 		= (string) @$document->website;
-				$themes->items->{$tmpl}->email 			= (string) @$document->email;
-				$themes->items->{$tmpl}->license 		= (string) @$document->license;
-				$themes->items->{$tmpl}->version 		= (string) @$document->version;
-				$themes->items->{$tmpl}->release 		= (string) @$document->release;
-				$themes->items->{$tmpl}->microdata_support	= (string) @$document->microdata_support;
-				
-				$themes->items->{$tmpl}->defaulttitle = (string) @$document->defaulttitle;
-				$themes->items->{$tmpl}->description  = (string) @$document->description;
-				
-				$groups = & $document->fieldgroups;
-				$pos    = & $groups->group;
-				if ($pos) {
-					for ($n=0; $n<count($pos); $n++) {
-						$themes->items->{$tmpl}->attributes[$n] = array();
-						foreach ($pos[$n]->attributes() as $_attr_name => $_attr_val) {
-							$themes->items->{$tmpl}->attributes[$n][(string)$_attr_name] = (string)$_attr_val;
+				$modified = flexicontent_tmpl::checkXmlModified($tmpls, $checked_layouts);
+				if ( !empty($modified) )
+				{
+					$modified_file_list = '';
+					foreach($tmpls as $layout_type => $_tmpls) {
+						foreach($_tmpls as $tmpl) {
+							if ( isset($modified[$tmpl->name][$layout_type]) ) {
+								unset( $tmpls->$layout_type->{$tmpl->name} );
+								$modified_file_list .= '<br/>'.$modified[$tmpl->name][$layout_type];
+							}
 						}
-						$themes->items->{$tmpl}->positions[$n] = (string)$pos[$n];
 					}
+					flexicontent_tmpl::parseTemplates_checked($tmpldir, $tmpls);  // This call only set unchanged templates so that they are not reparsed
+					
+					if ($debug) JFactory::getApplication()->enqueueMessage("Re-reading XMLs, XML file modified: ".$modified_file_list, 'message');
+					$tmplcache->clean();
+					$tmplcache->gc();
+					$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates_checked'), $tmpldir);
 				}
-
-				$tmpl_path = 'components/com_flexicontent/templates/'.$tmpl.'/';
-				
-				$cssfiles = & $document->cssitem->file;
-				if ($cssfiles) {
-					$themes->items->{$tmpl}->css = new stdClass();
-					$themes->items->{$tmpl}->less_files = array();
-					for ($n=0; $n<count($cssfiles); $n++) {
-						$themes->items->{$tmpl}->css->$n = $tmpl_path. (string)$cssfiles[$n];
-						$less_file = JPath::clean( preg_replace('/^css|css$/', 'less', (string)$cssfiles[$n]) );
-						$themes->items->{$tmpl}->less_files[] = $less_file;
-					}
-				}
-				$js 		= & $document->jsitem;
-				$jsfile	= & $js->file;
-				if ($jsfile) {
-					$themes->items->{$tmpl}->js = new stdClass();
-					for ($n=0; $n<count($jsfile); $n++) {
-						$themes->items->{$tmpl}->js->$n = $tmpl_path. (string)$jsfile[$n];
-					}
-				}
-			}
-
-			// Parse & Load CATEGORY layout of current template
-			$tmplxml = JPath::clean($tmpldir.DS.$tmpl.DS.'category.xml');
-			if (JFile::exists($tmplxml))
-			{
-				// Parse the XML file
-				$document = @simplexml_load_file($tmplxml);
-				if (!$document) {
-					if (JFactory::getApplication()->isAdmin()) JFactory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');
-					continue;
-				}
-
-				$themes->category->{$tmpl} = new stdClass();
-				$themes->category->{$tmpl}->name     = $tmpl;
-				$themes->category->{$tmpl}->xmlpath  = $tmplxml;
-				$themes->category->{$tmpl}->xmlmtime = filemtime($tmplxml);
-				$themes->category->{$tmpl}->view     = 'category';
-				$themes->category->{$tmpl}->tmplvar  = '.category.'.$tmpl;
-				$themes->category->{$tmpl}->thumb    = 'components/com_flexicontent/templates/'.$tmpl.'/category.png';
-
-				// *** This can be serialized and thus Joomla Cache will work
-				$themes->category->{$tmpl}->params = $document->asXML();
-
-				// *** This was moved into the template files of the forms, because JForm contains 'JXMLElement',
-				// which extends the PHP built-in Class 'SimpleXMLElement', (built-in Classes cannot be serialized
-				// but serialization is used by Joomla 's cache, causing problem with caching the output of this function
-
-				//$themes->category->{$tmpl}->params		= new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
-				//$themes->category->{$tmpl}->params->loadFile($tmplxml);
-				
-				$themes->category->{$tmpl}->author 		= (string) @$document->author;
-				$themes->category->{$tmpl}->website 	= (string) @$document->website;
-				$themes->category->{$tmpl}->email 		= (string) @$document->email;
-				$themes->category->{$tmpl}->license 	= (string) @$document->license;
-				$themes->category->{$tmpl}->version 	= (string) @$document->version;
-				$themes->category->{$tmpl}->release 	= (string) @$document->release;
-				$themes->category->{$tmpl}->microdata_support	= (string) @$document->microdata_support;
-
-				$themes->category->{$tmpl}->defaulttitle = (string) @$document->defaulttitle;
-				$themes->category->{$tmpl}->description  = (string) @$document->description;
-
-				$groups = & $document->fieldgroups;
-				$pos    = & $groups->group;
-				if ($pos) {
-					for ($n=0; $n<count($pos); $n++) {
-						$themes->category->{$tmpl}->attributes[$n] = array();
-						foreach ($pos[$n]->attributes() as $_attr_name => $_attr_val) {
-							$themes->category->{$tmpl}->attributes[$n][(string)$_attr_name] = (string)$_attr_val;
-						}
-						$themes->category->{$tmpl}->positions[$n] = (string)$pos[$n];
-					}
-				}
-				
-				$tmpl_path = 'components/com_flexicontent/templates/'.$tmpl.'/';
-				
-				$cssfiles = & $document->csscategory->file;
-				if ($cssfiles) {
-					$themes->category->{$tmpl}->css = new stdClass();
-					$themes->category->{$tmpl}->less_files = array();
-					for ($n=0; $n<count($cssfiles); $n++) {
-						$themes->category->{$tmpl}->css->$n = $tmpl_path. (string)$cssfiles[$n];
-						$less_file = JPath::clean( preg_replace('/^css|css$/', 'less', (string)$cssfiles[$n]) );
-						$themes->category->{$tmpl}->less_files[] = $less_file;
-					}
-				}
-				
-				$js     = & $document->jscategory;
-				$jsfile = & $js->file;
-				if ($jsfile) {
-					$themes->category->{$tmpl}->js = new stdClass();
-					for ($n=0; $n<count($jsfile); $n++) {
-						$themes->category->{$tmpl}->js->$n = $tmpl_path. (string)$jsfile[$n];
-					}
-				}
-				
 			}
 		}
-		return $themes;
+		else {
+			$tmpls = flexicontent_tmpl::parseTemplates_checked();
+		}
+		
+		return $tmpls;
 	}
 	
 	
-	static function checkCompileLess($tmpls)
+	static function checkCompileLess($tmpls, $force, $checked_layouts=array())
 	{
 		jimport('joomla.filesystem.path' );
 		jimport('joomla.filesystem.file');
 		
 		$templates_path = JPath::clean(JPATH_SITE.DS.'components/com_flexicontent/templates/');
-		foreach($tmpls as $tmpl_type => $tmpls) {
-			foreach($tmpls as $tmpl) {
+		
+		foreach($checked_layouts as $tmplname)
+		{
+			$tmpl = @ $tmpls->items->$tmplname;
+			if ( $tmpl && !empty($tmpl->less_files) ) {
 				$tmpl_path = $templates_path.$tmpl->name.DS;
-				if ( !empty($tmpl->less_files) ) {
-					flexicontent_html::checkedLessCompile($tmpl->less_files, $tmpl_path, $tmpl_path.'less/include/', $force=false);
-				}
+				flexicontent_html::checkedLessCompile($tmpl->less_files, $tmpl_path, $tmpl_path.'less/include/', $force);
+			}
+			$tmpl = @ $tmpls->category->$tmplname;
+			if ( $tmpl && !empty($tmpl->less_files) ) {
+				$tmpl_path = $templates_path.$tmpl->name.DS;
+				flexicontent_html::checkedLessCompile($tmpl->less_files, $tmpl_path, $tmpl_path.'less/include/', $force);
 			}
 		}
 	}
 	
 	
-	static function checkXmlModified($tmpls, $return_one=true)
+	static function checkXmlModified($tmpls, $checked_layouts=array())
 	{
 		jimport('joomla.filesystem.file');
 		
-		$modified = array();
-		foreach($tmpls as $tmpl_type => $tmpls) {
-			foreach($tmpls as $tmpl) {
-				if (!JFile::exists($tmpl->xmlpath) || filemtime($tmpl->xmlpath) > $tmpl->xmlmtime) {
-					if ($return_one) return $tmpl->xmlpath;
-					else $modified[] = $tmpl->xmlpath;
+		$checked_tmpls = array();
+		
+		// Check specific templates
+		if ( !empty($checked_layouts) )
+		{
+			foreach ($checked_layouts as $layout_name)
+			{
+				$layout_types = array('items', 'category');
+				foreach($layout_types as $layout_type)
+				{
+					$tmpl = @ $tmpls->$layout_type->$layout_name;
+					if ($tmpl) $checked_tmpls[$layout_type][] = $tmpl;
 				}
 			}
 		}
-		return $return_one ? false : $modified;
+		
+		// Check all given templates
+		else {
+			foreach($tmpls as $layout_type => $_tmpls) {
+				foreach($_tmpls as $tmpl) {
+					$checked_tmpls[$layout_type][] = $tmpl;
+				}
+			}
+		}
+		
+		$modified_files = array();
+		foreach($checked_tmpls as $layout_type => $_tmpls)
+		{
+			foreach($_tmpls as $tmpl)
+			{
+				if (!JFile::exists($tmpl->xmlpath) || filemtime($tmpl->xmlpath) > $tmpl->xmlmtime)
+				{
+					$modified_files[$tmpl->name][$layout_type] = $tmpl->xmlpath;
+				}
+			}
+		}
+		
+		return $modified_files;
 	}
 	
 	
 	/**
-	 * Method to get the layout parameters of an item
+	 * Method to get the layout texts (cached)
 	 * 
 	 * @return string
 	 * @since 3.0
 	 */
-	static function getLayoutparams($type, $template, $force = false)
+	static function getLayoutTexts($layout_typename)
 	{
-		static $layoutparams = array();
-		if ( !$force && isset($layoutparams[$type][$template]) ) return $layoutparams[$type][$template];
-		
-		$db = JFactory::getDBO();
-		$query	= 'SELECT attribs, layout, template'
-			. ' FROM #__flexicontent_layouts_conf';
-		$db->setQuery($query);
-		$layout_conf = $db->loadObjectList();
-		
-		foreach ($layout_conf as $data) {
-			$layoutparams[$data->layout][$data->template] = !empty($data->attribs) ? $data->attribs : '';
-		}
-		
-		if ( !isset($layoutparams[$type][$template]) ) $layoutparams[$type][$template] = '';
-		return $layoutparams[$type][$template];
-	}
-	
-	
-	static function getTemplates($lang_files = 'all')
-	{
-		static $tmpls = null;
-		if ($tmpls !== null) return $tmpls;
-		
-		$flexiparams = JComponentHelper::getParams('com_flexicontent');
-		
-		$print_logging_info = $flexiparams->get('print_logging_info');
-		$debug = JDEBUG || $print_logging_info;
-
-		// Log content plugin and other performance information
-		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
-		
-		$apply_cache = FLEXI_CACHE;
-		if ( $apply_cache ) {
-			// Get templates from cache
+		$apply_cache = 1;//FLEXI_CACHE;
+		if ( $apply_cache )
+		{
 			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');  // Get Joomla Cache of '...tmpl' Caching Group
 			$tmplcache->setCaching(1); 		              // Force cache ON
 			$tmplcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
-			$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates'));
-			
-			// Check, clean, update cache if needed
-			$xml_modified = flexicontent_tmpl::checkXmlModified($tmpls);
-			if ( !empty($xml_modified) )
-			{
-				if ($debug) JFactory::getApplication()->enqueueMessage("Re-reading XMLs, XML file modified: ".print_r($xml_modified, true), 'message');
-				$tmplcache->clean();
-				$tmplcache->gc();
-				$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates'));
-			}
+			$layout_texts = $tmplcache->call(array('flexicontent_tmpl', '_getLayoutTexts'), $layout_typename);
 		}
 		else {
-			$tmpls = flexicontent_tmpl::parseTemplates();
+			$layout_texts = flexicontent_tmpl::_getLayoutTexts($layout_typename);
 		}
 		
-		// Compile LESS to CSS, if files have been modified
-		flexicontent_tmpl::checkCompileLess($tmpls);
+		return $layout_texts;
+	}
+	
+	
+	/**
+	 * Method to get the layout texts (non-cached)
+	 * 
+	 * @return string
+	 * @since 3.0
+	 */
+	static function _getLayoutTexts($layout_typename)
+	{
+		static $layout_texts;
+		if ( isset($layout_texts[$layout_typename]) ) return $layout_texts[$layout_typename];
 		
+		$layout_texts[$layout_typename] = new stdClass();
+		
+		// Get all templates
+		$tmpls = flexicontent_tmpl::getTemplates();
+		
+		// Load language files of all templates if not already loaded
+		FLEXIUtilities::loadTemplateLanguageFiles();
+		
+		// Get layout parameters and find the layout title
+		foreach($tmpls->$layout_typename as $layout_folder => $tmpl)
+		{
+			if ( $tmpl && empty($tmpl->parameters) ) {
+				//echo "CREATING PARAMETERS FOR: {$layout_typename} - {$layout_folder}<br/>";
+				$tmpl->parameters = new JRegistry( flexicontent_tmpl::getLayoutparams($layout_typename, $layout_folder, '') );
+			}
+			$layout_texts[$layout_typename]->$layout_folder = new stdClass();
+			$layout_texts[$layout_typename]->$layout_folder->title       = $tmpl ? JText::_($tmpl->parameters->get('custom_layout_title', @ $tmpl->defaulttitle)) : '';
+			$layout_texts[$layout_typename]->$layout_folder->description = $tmpl ? JText::_(@ $tmpl->description) : '';
+		}
+		
+		return $layout_texts[$layout_typename];
+	}
+	
+	
+	/**
+	 * Method to get the layout parameters of an layout configuration row
+	 * 
+	 * @return string
+	 * @since 3.0
+	 */
+	static function getLayoutparams($type, $folder, $cfgname, $force = false)
+	{
+		static $layout_params = array();
+		if ( !$force && isset($layout_params[$type][$folder][$cfgname]) ) return $layout_params[$type][$folder][$cfgname];
+		
+		$db = JFactory::getDBO();
+		$query = 'SELECT template as folder, cfgname, attribs, layout as type'
+			. ' FROM #__flexicontent_layouts_conf';
+		$db->setQuery($query);
+		$layout_confs = $db->loadObjectList();
+		
+		foreach ($layout_confs as $L) {
+			$layout_params[$L->type][$L->folder][$L->cfgname] = !empty($L->attribs) ? $L->attribs : '';
+		}
+		
+		if ( !isset($layout_params[$type][$folder][$cfgname]) ) $layout_params[$type][$folder][$cfgname] = '';
+		return $layout_params[$type][$folder][$cfgname];
+	}
+	
+	
+	static function getTemplates($layout_name = null)
+	{
+		$apply_cache = 1;//FLEXI_CACHE;   // Ignore cache setting in the case of template's XML / LESS / INI files
+		static $tmpls = null;
+		
+		static $print_logging_info = null;
+		$print_logging_info = $print_logging_info !== null  ?  $print_logging_info  :  JComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
+		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
+		$debug = JDEBUG || $print_logging_info;
+		
+		
+		// *****************************************************
+		// Parse view.xml (item|category).xml files of templates
+		// *****************************************************
+		
+		$checked_layouts = is_array($layout_name)  ?  $layout_name  :  ( $layout_name ? array($layout_name) : array() );
+		//printr_r($checked_layouts);
+		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+		
+		if ($tmpls === null)
+		{
+			// Get templates reparsing XML, checking if -specific layout(s)- files have been modified
+			if ($print_logging_info) $start_microtime = microtime(true);
+			$tmpls = flexicontent_tmpl::parseTemplates('', false, $checked_layouts);
+			if ($print_logging_info) $fc_run_times['templates_parsing_xml'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			
+			// Compile LESS to CSS, checking if -specific layout(s)- files have been modified
+			if ($print_logging_info) $start_microtime = microtime(true);
+			flexicontent_tmpl::checkCompileLess($tmpls, false, $checked_layouts);
+			if ($print_logging_info) $fc_run_times['templates_parsing_less'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		}
+		
+		
+		// *******************************************************************************
 		// Load Template-Specific language file(s) to override or add new language strings
-		if ( $lang_files == 'all' ) foreach ($tmpls->category as $tmpl => $d) FLEXIUtilities::loadTemplateLanguageFile( $tmpl );
-		else if ( is_array($lang_files) )  foreach ($lang_files as $tmpl) FLEXIUtilities::loadTemplateLanguageFile( $tmpl );
-		else if ( is_string($lang_files) ) FLEXIUtilities::loadTemplateLanguageFile( $lang_files );
+		// *******************************************************************************
 		
-		if ($print_logging_info) $fc_run_times[$apply_cache ? 'templates_parsing_cached' : 'templates_parsing_noncached'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		// Load language files of -specific layout(s)-
+		//echo "SPECIFIC files: ".print_r($layout_name, true);
+		foreach ($checked_layouts as $foldername)
+		{
+			FLEXIUtilities::loadTemplateLanguageFile( $foldername );
+		}
+		
 		return $tmpls;
 	}
 	
@@ -4905,9 +5025,8 @@ class flexicontent_tmpl
 	static function getThemes($tmpldir='')
 	{
 		jimport('joomla.filesystem.folder');
-
-		$tmpldir = $tmpldir?$tmpldir:JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
-		$themes = JFolder::folders($tmpldir);
+		$tmpldir = $tmpldir ? $tmpldir : JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
+		$themes = JFolder::folders($tmpldir);  // Get specific template folder
 
 		return $themes;
 	}
@@ -5043,30 +5162,63 @@ class FLEXIUtilities
 	
 	
 	/**
+	 * Load all template language files to override or add new language strings
+	 *
+	 * @return object
+	 * @since 3.0
+	 */
+	static function loadTemplateLanguageFiles( $tmplnames=null, $tmpldir='' )
+	{
+		if (!$tmplnames)
+			$tmplnames = flexicontent_tmpl::getThemes($tmpldir);
+		
+		// Load all language files (iterate 'category' layout type)
+		static $langs = array();
+		foreach ($tmplnames as $tmplname) if ( !isset($langs[$tmplname]) )
+		{
+			$langs[$tmplname] = true;
+			FLEXIUtilities::loadTemplateLanguageFile( $tmplname );
+		}
+	}
+	
+	
+	/**
 	 * Load Template-Specific language file to override or add new language strings
 	 *
 	 * @return object
-	 * @since 1.5
+	 * @since 2.0
 	 */
-	static function loadTemplateLanguageFile( $tmplname='default', $view='' )
+	static function loadTemplateLanguageFile( $tmplname='default', $tmpldir='', $extension='', $language_tag='' )
 	{
+		static $print_logging_info = null;
+		$print_logging_info = $print_logging_info !== null  ?  $print_logging_info  :  JComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
+		
+		if ($print_logging_info) {
+			global $fc_run_times; $start_microtime = microtime(true);
+			if ( !isset($fc_run_times['templates_parsing_ini']) ) $fc_run_times['templates_parsing_ini'] = 0;
+		}
+		
+		//echo "Loading language file for template: ". $tmplname ."<br/>";
 		// Check that template name was given
 		$tmplname = empty($tmplname) ? 'default' : $tmplname;
-
+		
 		// This is normally component/module/plugin name, we could use 'category', 'items', etc to have a view specific language file
 		// e.g. en/en.category.ini, but this is an overkill and make result into duplication of strings ... better all in one file
-		$extension = '';  // JRequest::get('view');
-
+		//$extension = $extension ? $extension : 'com_flexicontent';
+		
 		// Get current UI language, because language file paths use LL-CC (language-country)
-		$language_tag = JFactory::getLanguage()->getTag();
-
+		$language_tag = $language_tag ? $language_tag : JFactory::getLanguage()->getTag();
+		
 		// We will use template folder as BASE of language files instead of joomla's language folder
 		// Since FLEXIcontent templates are meant to be user-editable it makes sense to place language files inside them
-		$base_dir = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$tmplname;
-
+		$tmpldir  = $tmpldir ? $tmpldir : JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
+		$base_dir = $tmpldir.DS.$tmplname;
+		
 		// Final use joomla's API to load our template's language files -- (load english template language file then override with current language file)
 		JFactory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
 		JFactory::getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
+		
+		if ($print_logging_info) $fc_run_times['templates_parsing_ini'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 	
 	

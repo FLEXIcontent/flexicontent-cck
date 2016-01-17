@@ -917,13 +917,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			}
 		}
 
-		$templates	= flexicontent_tmpl::getTemplates();
-		$folders 	= flexicontent_tmpl::getThemes();
-		$views		= array('items', 'category');
+		$tmpls   = flexicontent_tmpl::getTemplates();
+		$folders = flexicontent_tmpl::getThemes();
+		$views   = array('items', 'category');
 		
 		foreach ($folders as $folder) {
 			foreach ($views as $view) {
-				$groups = @$templates->{$view}->{$folder}->positions;
+				$groups = @ $tmpls->{$view}->{$folder}->positions;
 				if ($groups) {
 					foreach ($groups as $group) {
 						$query 	= 'SELECT field'

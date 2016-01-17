@@ -367,10 +367,10 @@ class FlexicontentModelItem extends ParentClassItem
 			$app->enqueueMessage("<small>Current item Layout (template) is '$ilayout':<br/>- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Content Type Default Template Layout: '$type_default_layout'</small>", 'notice');
 			$ilayout = $type_default_layout;
 		}
-
-		// Get cached template data, without loading language file, (this will be done at the view)
-		$themes = flexicontent_tmpl::getTemplates( null );
-
+		
+		// Get all templates from cache, (without loading any language file this will be done at the view)
+		$themes = flexicontent_tmpl::getTemplates();
+		
 		// Verify the item layout exists
 		if ( !isset($themes->items->{$ilayout}) ) {
 			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : 'default';
@@ -436,12 +436,15 @@ class FlexicontentModelItem extends ParentClassItem
 		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
 		
 		
-		// ***************************************************************************************************
-		// Merge parameters in order: component, menu, (item 's) current category, (item's) content type, item
-		// ***************************************************************************************************
+		// **************************************************************************************************************
+		// Start merging of parameters, OVERRIDE ORDER: layout(template-manager)/component/category/type/item/menu/access
+		// **************************************************************************************************************
 		
-		// a. Start with empty registry, then merge COMPONENT parameters
+		// a0. Merge Layout parameters into the page configuration
 		$params = new JRegistry();
+		$params->merge($layoutParams);
+		
+		// a1. Start with empty registry, then merge COMPONENT parameters
 		$params->merge($compParams);
 		
 		// b. Merge parameters from current category
@@ -450,15 +453,12 @@ class FlexicontentModelItem extends ParentClassItem
 		$catParams->set('show_editbutton', '');  // Prevent title_linkable from propagating ... to the item, it is meant for category view only
 		$params->merge($catParams);
 		
-		// c0. Merge Layout parameters into the page configuration
-		$params->merge($layoutParams);
-
-		// c1. Merge TYPE parameters into the page configuration
+		// c. Merge TYPE parameters into the page configuration
 		$params->merge($typeParams);
 
 		// d. Merge ITEM parameters into the page configuration
 		$params->merge($itemParams);
-
+		
 		// e. Merge ACCESS permissions into the page configuration
 		$accessperms = $this->getItemAccess();
 		$params->merge($accessperms);

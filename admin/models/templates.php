@@ -74,16 +74,16 @@ class FlexicontentModelTemplates extends JModelLegacy
 	 */
 	function _getTemplates()
 	{
-		$folders 	= flexicontent_tmpl::getThemes();
-		$tmpl		= flexicontent_tmpl::getTemplates();
+		$folders = flexicontent_tmpl::getThemes();
+		$tmpls   = flexicontent_tmpl::getTemplates();
 
 		$themes = array();
 
 		foreach ($folders as $folder) {
 			$themes[$folder] = new stdClass();
-			$themes[$folder]->name 		= $folder;
-			$themes[$folder]->items 	= isset($tmpl->items->{$folder}) ? $tmpl->items->{$folder} : '';
-			$themes[$folder]->category 	= isset($tmpl->category->{$folder}) ? $tmpl->category->{$folder} : '';
+			$themes[$folder]->name  = $folder;
+			$themes[$folder]->items    = isset($tmpls->items->{$folder})    ? $tmpls->items->{$folder}    : '';
+			$themes[$folder]->category = isset($tmpls->category->{$folder}) ? $tmpls->category->{$folder} : '';
 		}
 		
 		return $themes;

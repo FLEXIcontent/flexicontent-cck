@@ -65,9 +65,17 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Get model
 		$model  = $this->getModel();
 		
-		// Get category and set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
+		// Allow clayout from HTTP request, this will be checked during loading category parameters
+		$model->setCatLayout('__request__');
+		// Indicate to model to merge menu parameters if menu matches
+		$model->mergeMenuParams = true;
+		
+		// Get the category, loading category data and doing parameters merging
 		$category = $this->get('Category');
+		
+		// Get category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
 		$params   = $category->parameters;
+		
 		if ($category->id)
 			$meta_params = new JRegistry($category->metadata);
 		
@@ -109,37 +117,12 @@ class FlexicontentViewCategory extends JViewLegacy
 		// CATEGORY LAYOUT handling
 		// ************************
 		
-		// (a) Decide to use mobile or normal category template layout
-		$useMobile = $params->get('use_mobile_layouts', 0 );
-		if ($useMobile) {
-			$force_desktop_layout = $params->get('force_desktop_layout', 0 );
-			$mobileDetector = flexicontent_html::getMobileDetector();
-			$isMobile = $mobileDetector->isMobile();
-			$isTablet = $mobileDetector->isTablet();
-			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
-		}
-		$_clayout = $useMobile ? 'clayout_mobile' : 'clayout';
+		// Get category 's layout as this may have been altered by model's decideLayout()
+		$clayout = $params->get('clayout');
 		
-		// (b) Get from category parameters, allowing URL override
-		$clayout = JRequest::getCmd($_clayout, false);
-		if (!$clayout) {
-			$desktop_clayout = $params->get('clayout', 'blog');
-			$clayout = !$useMobile ? $desktop_clayout : $params->get('clayout_mobile', $desktop_clayout);
-		}
+		// Get cached template data, re-parsing XML/LESS files, also loading any template language files of a specific template
+		$themes = flexicontent_tmpl::getTemplates(  array($clayout) );
 		
-		// (c) Get cached template data
-		$themes = flexicontent_tmpl::getTemplates( $lang_files = array($clayout) );
-		
-		// (d) Verify the category layout exists
-		if ( !isset($themes->category->{$clayout}) ) {
-			$fixed_clayout = 'blog';
-			$app->enqueueMessage("<small>Current Category Layout Template is '$clayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
-			$clayout = $fixed_clayout;
-			FLEXIUtilities::loadTemplateLanguageFile( $clayout );  // Manually load Template-Specific language file of back fall clayout
-		}
-		
-		// (e) finally set the template name back into the category's parameters
-		$params->set('clayout', $clayout);
 		
 		// Get URL variables
 		$layout_vars = flexicontent_html::getCatViewLayoutVars($model);

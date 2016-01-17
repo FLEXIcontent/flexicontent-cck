@@ -404,11 +404,14 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 		$msg .= sprintf('<br/>-- [Fields value saving: %.2f s] ', $fc_run_times['fields_value_saving']/1000000);
 	// **** EOF: ITEM FORM SAVING
 	
-	if (isset($fc_run_times['templates_parsing_cached']))
-		$msg .= sprintf('<br/>-- [FC Templates XML/LESS Parsing (cacheable): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
+	if (isset($fc_run_times['templates_parsing_xml']))
+		$msg .= sprintf('<br/>-- [FC Templates: XML files parsing: %.2f s] ', $fc_run_times['templates_parsing_xml']/1000000);
 	
-	if (isset($fc_run_times['templates_parsing_noncached']))
-		$msg .= sprintf('<br/>-- [FC Templates XML/LESS Parsing (not cacheable) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
+	if (isset($fc_run_times['templates_parsing_less']))
+		$msg .= sprintf('<br/>-- [FC Templates: LESS files parsing: %.2f s] ', $fc_run_times['templates_parsing_less']/1000000);
+	
+	if (isset($fc_run_times['templates_parsing_ini']))
+		$msg .= sprintf('<br/>-- [FC Templates: INI files parsing: %.2f s] ', $fc_run_times['templates_parsing_ini']/1000000);
 	
 	if (isset($fc_run_times['core_less_recompile']))
 		$msg .= sprintf('<br/>-- [FC core LESS checked re-compile: %.2f s] ', $fc_run_times['core_less_recompile']/1000000);

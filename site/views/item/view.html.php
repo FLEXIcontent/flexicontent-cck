@@ -85,7 +85,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$preview = JRequest::getVar( 'preview', 0, 'request', 'int' );   // Preview versioned data FLAG ... if previewing and version is not set then ... we load version -1 (=latest version)
 		$version = $preview && !$version ? -1 : $version;
 		
-		// Allow iLayout from HTTP request, this will be checked during loading item parameters
+		// Allow ilayout from HTTP request, this will be checked during loading item parameters
 		$model->setItemLayout('__request__');
 		// Indicate to model to merge menu parameters if menu matches
 		$model->mergeMenuParams = true;
@@ -98,7 +98,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$item = $model->getItem(null, $check_view_access=2, $no_cache=($version||$preview), $force_version=($version||$preview ? $version : 0));  // ZERO means unversioned data
 		$_run_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
-		// Get item parameters as VIEW's parameters (item parameters are merged parameters in order: component/category/layout/type/item/menu/access)
+		// Get item parameters as VIEW's parameters (item parameters are merged parameters in order: layout(template-manager)/component/category/type/item/menu/access)
 		$params = & $item->parameters;
 		
 		$print_logging_info = $params->get('print_logging_info');
@@ -122,13 +122,15 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		
-		// *************************************************************
-		// Get cached template data, loading any template language files
-		// *************************************************************
+		// ********************
+		// ITEM LAYOUT handling
+		// ********************
 		
-		// Get item 's layout as this may have been altered
+		// Get item 's layout as this may have been altered by model's decideLayout()
 		$ilayout = $params->get('ilayout');
-		$themes = flexicontent_tmpl::getTemplates( $lang_files = array($ilayout) );
+		
+		// Get cached template data, re-parsing XML/LESS files, also loading any template language files of a specific template
+		$themes = flexicontent_tmpl::getTemplates( array($ilayout) );
 		
 		
 		// *****************

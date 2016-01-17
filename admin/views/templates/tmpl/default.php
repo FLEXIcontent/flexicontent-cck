@@ -150,16 +150,19 @@ $list_total_cols = 8;
 		<?php
 		$k = 0;
 		$i = 1;
+		// Get cached texts to avoid reloading all language files
+		$item_texts = flexicontent_tmpl::getLayoutTexts('items');
+		$cats_texts = flexicontent_tmpl::getLayoutTexts('category');
 		foreach ($this->rows as $row) :
 			$copylink 	= 'index.php?option=com_flexicontent&amp;view=templates&amp;layout=duplicate&amp;tmpl=component&amp;source='. $row->name;
 			$itemlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;folder='.$row->name;
 			$catlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;folder='.$row->name;
 			
-			$defaulttitle_item = !empty($row->items)    ? @ $row->items->defaulttitle    : '';
-			$defaulttitle_cat  = !empty($row->category) ? @ $row->category->defaulttitle : '';
+			$defaulttitle_item = !empty($row->items)    ? @ $item_texts->{$row->name}->title    : '';
+			$defaulttitle_cat  = !empty($row->category) ? @ $cats_texts->{$row->name}->title : '';
 			
-			$description_item = !empty($row->items)    ? @ $row->items->description    : '';
-			$description_cat  = !empty($row->category) ? @ $row->category->description : '';
+			$description_item = !empty($row->items)    ? @ $item_texts->{$row->name}->description    : '';
+			$description_cat  = !empty($row->category) ? @ $cats_texts->{$row->name}->description : '';
 			
 			$row->id = $row->name;
 			$checked	= JHTML::_('grid.checkedout', $row, $i-1 );
@@ -189,9 +192,10 @@ $list_total_cols = 8;
 			</td>
 			<td style="text-align: left">
 				<?php if ($defaulttitle_item): ?>
-					<span data-placement="top" class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('', $description_item, 1, 1); ?>" >
-						<?php echo JText::_($defaulttitle_item); ?>
+					<span data-placement="top" class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('', $description_item, 0, 1); ?>" >
+						<i class="icon-info"></i>
 					</span>
+					<?php echo $defaulttitle_item; ?>
 				<?php endif; ?>
 			</td>
 			<td style="text-align:right; width:24px;">
@@ -199,9 +203,10 @@ $list_total_cols = 8;
 			</td>
 			<td style="text-align: left">
 				<?php if ($defaulttitle_cat): ?>
-					<span data-placement="top" class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('', $description_cat, 1, 1); ?>" >
-						<?php echo JText::_($defaulttitle_cat); ?>
+					<span data-placement="top" class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('', $description_cat, 0, 1); ?>" >
+						<i class="icon-info"></i>
 					</span>
+					<?php echo $defaulttitle_cat; ?>
 				<?php endif; ?>
 			</td>
 		</tr>
