@@ -19,7 +19,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.modellist');
+jimport('legacy.model.list');
 
 /**
  * Flexicontent Component Categoryelement Model

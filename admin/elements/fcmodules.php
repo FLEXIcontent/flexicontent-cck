@@ -19,14 +19,11 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-} else {
-	$fparams = JComponentHelper::getParams('com_flexicontent');
-	if (!defined('FLEXI_SECTION')) define('FLEXI_SECTION', $fparams->get('flexi_section'));
-	if (!defined('FLEXI_ACCESS')) define('FLEXI_ACCESS', (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
-}
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Renders a module names list

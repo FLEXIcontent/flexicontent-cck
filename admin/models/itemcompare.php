@@ -19,7 +19,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Category Model

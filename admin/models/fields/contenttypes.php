@@ -18,10 +18,11 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
-jimport('joomla.form.helper');
-JFormHelper::loadFieldClass('list');
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
  * Renders a fields element
@@ -30,7 +31,8 @@ JFormHelper::loadFieldClass('list');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldContenttypes extends JFormFieldList{
+class JFormFieldContenttypes extends JFormFieldList
+{
 	/**
 	 * The form field type.
 	 *

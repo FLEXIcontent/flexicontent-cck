@@ -18,7 +18,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.controller');
+// In case controller is executed by another component
+JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');
 
 /**
  * FLEXIcontent Component Files Controller

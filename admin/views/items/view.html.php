@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport('legacy.view.legacy');
 
 /**
  * View class for the FLEXIcontent categories screen

@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.controller');
+jimport('legacy.controller.legacy');
 
 /**
  * FLEXIcontent Component Controller
@@ -2013,7 +2013,6 @@ class FlexicontentController extends JControllerLegacy
 	function _traverseFileTree($nodes, $targetpath)
 	{
 		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.archive');
 		$all_files = array();
 		
 		foreach ($nodes as $node)
@@ -2554,6 +2553,7 @@ class FlexicontentController extends JControllerLegacy
 				$files[$i]['time'] = time();
 			}
 			
+			jimport('joomla.archive.archive');
 			$packager = JArchive::getAdapter('zip');
 			if (!$packager->create($archivepath, $files)) {
 				$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";

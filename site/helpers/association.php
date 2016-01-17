@@ -34,7 +34,7 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 
 	public static function getAssociations($id = 0, $view = null)
 	{
-		jimport('helper.route', JPATH_COMPONENT_SITE);
+		jimport('helpers.route', JPATH_COMPONENT_SITE);
 
 		$app = JFactory::getApplication();
 		$jinput = $app->input;

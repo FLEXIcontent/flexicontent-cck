@@ -14,7 +14,7 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.event.plugin');
+jimport('cms.plugin.plugin');
 
 class plgFlexicontent_fieldsRadio extends JPlugin
 {

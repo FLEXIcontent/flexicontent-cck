@@ -7,7 +7,7 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.controlleradmin');
+jimport('legacy.controller.admin');
 
 /**
  * User groups list controller class.

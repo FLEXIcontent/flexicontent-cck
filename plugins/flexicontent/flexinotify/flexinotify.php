@@ -19,7 +19,7 @@
 // Check to ensure this file is included in Joomla!
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.plugin.plugin' );
+jimport('cms.plugin.plugin');
 
 /**
  * Flexicontent Notification Plugin
@@ -175,13 +175,11 @@ class plgFlexicontentFlexinotify extends JPlugin
 		
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-		// Import utility class that contains the send mail helper function
-		if (!FLEXI_J16GE) jimport( 'joomla.utilities.utility' );
-		jimport( 'joomla.mail.helper' );
-		if (FLEXI_J16GE) {
-			$mailer = JFactory::getMailer();
-			$mailer->Encoding = 'base64';
-		}
+		
+		// Import joomla mail helper class that contains the sendMail helper function
+		jimport('joomla.mail.helper');
+		$mailer = JFactory::getMailer();
+		$mailer->Encoding = 'base64';
 		
 		// Parameters for 'message' language string
 		//
@@ -279,9 +277,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 				$html_mode=true; $cc=null; $bcc=null;
 				$attachment=null; $replyto=null; $replytoname=null;
 				
-				$send_result = FLEXI_J16GE ?
-					$mailer->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
-					JUtility::sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				$send_result = $mailer->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 				if ($send_result) $count_sent++;
 			}
 			$send_result = (boolean) $count_sent;
@@ -308,9 +304,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 				$html_mode=true; $cc=null; $bcc = $to_100;
 				$attachment=null; $replyto=null; $replytoname=null;
 				
-				$send_result = FLEXI_J16GE ?
-					$mailer->sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
-					JUtility::sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				$send_result = $mailer->sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 				if ($send_result) $count_sent += count($to_100);
 			}
 			$send_result = (boolean) $count_sent;

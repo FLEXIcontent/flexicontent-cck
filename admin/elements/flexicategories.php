@@ -18,10 +18,13 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-}
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
+
 
 JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 // Load the category class
@@ -29,7 +32,7 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'
 // Load the helper classes
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		
-FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+JHtml::_('behavior.framework', true);
 flexicontent_html::loadFramework('jQuery');
 flexicontent_html::loadFramework('select2');
 

@@ -19,18 +19,18 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('radio');   // JFormFieldRadio
+
 /**
- * Renders a selcet method radio element
+ * Renders the FC-method radio element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-if (FLEXI_J16GE) {
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('radio');
-}
-
 class JFormFieldFcmethod extends JFormFieldRadio
 {
 	/**
@@ -95,9 +95,8 @@ window.addEvent('domready', function(){
 		$options[] = JHTML::_('select.option', '3', JText::_('FLEXI_INCLUDE')); 
 		
 		$html = JHTML::_('select.radiolist', $options, $fieldname, $class, 'value', 'text', $value, $element_id);
-		if (FLEXI_J16GE) {
-			$html = '<fieldset id="'.$element_id.'" class="radio">'.$html.'</fieldset>';
-		}
+		$html = '<fieldset id="'.$element_id.'" class="radio">'.$html.'</fieldset>';
+		
 		return $html;
 	}
 }

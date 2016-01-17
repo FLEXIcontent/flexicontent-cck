@@ -322,6 +322,7 @@ class flexicontent_html
 		
 		$domain = $pluginParams->get('domain');
 		
+		//jimport('cms.version.version');  // done by defineconstants php file
 		$jversion = new JVersion;
 		$is_j35ge = version_compare( $jversion->getShortVersion(), '3.5.0', 'ge' );
 		if ( ($is_j35ge && $domain === false) || (!$is_j35ge && $domain === null) || $domain === '')

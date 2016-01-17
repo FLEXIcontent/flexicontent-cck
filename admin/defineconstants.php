@@ -55,32 +55,19 @@ switch ($config->error_reporting)
 }
 
 // Joomla version variables
-if (!defined('FLEXI_J16GE')) {
-	//define('FLEXI_J16GE' , 1 );
-	jimport( 'joomla.version' );  $jversion = new JVersion;
-	define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
-	define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
+if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
+{
+	jimport('cms.version.version');
+	$jversion = new JVersion;
 }
+if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
+if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
-if ( !class_exists('JControllerLegacy') )
-{
-	jimport('joomla.application.component.controller');
-	class JControllerLegacy extends JController {}
-}
-
-if ( !class_exists('JModelLegacy') )
-{
-	jimport('joomla.application.component.model');
-	class JModelLegacy extends JModel {}
-}
-
-if ( !class_exists('JViewLegacy') )
-{
-	jimport('joomla.application.component.view');
-	class JViewLegacy extends JView {}
-}
+if ( !class_exists('JControllerLegacy') )  jimport('legacy.controller.legacy');
+if ( !class_exists('JModelLegacy') )       jimport('legacy.model.legacy');
+if ( !class_exists('JViewLegacy') )        jimport('legacy.view.legacy');
 
 // Set a default timezone if web server provider has not done so
 // phpversion() should be used instead of PHP_VERSION, if not inside Joomla code

@@ -14,8 +14,7 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
-jimport('joomla.event.plugin');
+jimport('cms.plugin.plugin');
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsCore extends FCField

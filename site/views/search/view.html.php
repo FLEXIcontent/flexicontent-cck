@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport('legacy.view.legacy');
 require_once(JPATH_COMPONENT.DS.'helpers'.DS.'search.php' );
 
 /**

@@ -19,16 +19,17 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+jimport('cms.html.html');      // JHtml
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('spacer');   // JFormFieldSpacer
+
 /**
- * Renders a fields element
+ * Renders the flexicontent 'separator' (header) element
  *
  * @package 	Joomla
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-jimport('joomla.form.helper');
-JFormHelper::loadFieldClass('spacer');
-
 class JFormFieldSeparator extends JFormFieldSpacer
 {
 	/**

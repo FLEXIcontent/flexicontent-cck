@@ -18,7 +18,7 @@
 
 // Check to ensure this file is within the rest of the framework
 defined('JPATH_PLATFORM') or die;
-jimport('joomla.html.pagination');
+jimport('cms.pagination.pagination');
 
 /**
  * Pagination Class.  Provides a common interface for content pagination for the

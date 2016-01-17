@@ -7,10 +7,10 @@
 
 defined('JPATH_BASE') or die;
 
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
-jimport('joomla.form.helper');
-JFormHelper::loadFieldClass('list');
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
  * Form Field class for the Joomla Framework.
@@ -19,7 +19,8 @@ JFormHelper::loadFieldClass('list');
  * @subpackage	com_categories
  * @since		1.6
  */
-class JFormFieldCategoryTree extends JFormFieldList{
+class JFormFieldCategoryTree extends JFormFieldList
+{
 	/**
 	 * The form field type.
 	 *

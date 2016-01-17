@@ -18,7 +18,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.controller');
+// In case controller is executed by another component
+JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');
 
 /**
  * FLEXIcontent Component Search Controller
@@ -49,7 +50,6 @@ class FlexicontentControllerSearch extends FlexicontentController
 	 */
 	function countrows()
 	{
-		$jversion = new JVersion();
 		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
 		
 		// Test counting with limited memory
@@ -169,7 +169,6 @@ class FlexicontentControllerSearch extends FlexicontentController
 	
 	function index()
 	{
-		$jversion = new JVersion();
 		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
 		
 		$start_microtime = microtime(true);

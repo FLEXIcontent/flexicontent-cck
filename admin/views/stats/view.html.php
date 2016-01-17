@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the Stats View
@@ -114,12 +114,6 @@ class FlexicontentViewStats extends JViewLegacy
 			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
-		//Load pane behavior
-		if (!FLEXI_J16GE) {
-			jimport('joomla.html.pane');
-			$pane = JPane::getInstance('Tabs');
-			$this->assignRef('pane'       , $pane);
-		}
 		$this->assignRef('genstats'		, $genstats);
 		$this->assignRef('popular'		, $popular);
 		$this->assignRef('rating'			, $rating);

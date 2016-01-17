@@ -20,7 +20,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.plugin.plugin' );
+jimport('cms.plugin.plugin');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 

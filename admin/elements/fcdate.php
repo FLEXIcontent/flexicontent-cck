@@ -18,12 +18,11 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
-	JFormHelper::loadFieldClass('list');
-}
+
+jimport('cms.html.html');      // JHtml
+jimport('joomla.form.field');  // JFormField
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Renders a date element

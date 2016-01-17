@@ -19,8 +19,8 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.modeladmin' );
-jimport( 'joomla.html.parameter' );
+jimport('legacy.model.admin');
+
 /**
  * FLEXIcontent Component Item Model
  *
@@ -4256,10 +4256,7 @@ class ParentClassItem extends JModelAdmin
 		$replyto     = null;
 		$replytoname = null;
 		
-		if (!FLEXI_J16GE) jimport( 'joomla.utilities.utility' );
-		$send_result = FLEXI_J16GE ?
-			JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
-			JUtility::sendMail( $from, $fromname, $recipient, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+		$send_result = JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 		
 		$debug_str = ""
 			."<br/>FROM: $from"

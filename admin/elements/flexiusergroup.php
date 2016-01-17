@@ -18,12 +18,13 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-if (FLEXI_J16GE) {
-	jimport('joomla.html.html');
-	jimport('joomla.form.formfield');
-	jimport('joomla.form.helper');
-	//jformhelper::loadFieldClass('usergroup');
-}
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('usergroup');   // JFormFieldUsergroup
+
 /**
  * Form Field class for the Joomla Platform.
  * Supports a nested check box field listing user groups.

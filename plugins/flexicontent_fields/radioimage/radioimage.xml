@@ -330,7 +330,7 @@
 				<option value="1">FLEXI_HIDE</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_DISPLAY_AS_DROP_DOWN" level="level3" depend_class="filt-drop-down" />
+			<field name="" type="separator" default="FLEXI_DISPLAY_AS_DROP_DOWN" level="level3" depend_class="filt-drop-down-s" />
 			<field name="filter_usefirstoption_s" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down-s" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="displaydefauttext-mode-s">FLEXI_NO</option>
 				<option value="1" show_list="displaydefauttext-mode-s" hide_list="">FLEXI_YES</option>

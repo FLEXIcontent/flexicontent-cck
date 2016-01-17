@@ -17,7 +17,6 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport( 'joomla.html.parameter' );
 
 $params =  $this->params;
 $db     =  JFactory::getDBO();

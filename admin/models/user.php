@@ -18,7 +18,7 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.modeladmin');
+jimport('legacy.model.admin');
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'user.php');
 
 /**

@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the Items View
@@ -458,8 +458,9 @@ class FlexicontentViewItem extends JViewLegacy
 		// (a) form XML file to declare them and then (b) getInput() method form field to create them
 		// *********************************************************************************************
 		
-		// First clean form data, we do this after creating the description field which may contain HTML
-		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES );
+		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		// we do this after creating the description field which is used un-encoded inside 'textarea' tags
+		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES, $exclude_keys = '' );  // Maybe exclude description text ?
 		
 		$lists = array();
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');  // Get if prettyCheckable was loaded

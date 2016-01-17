@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.model');
+jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -332,10 +332,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return integer
 	 */
-	public function getPagination() {
+	public function getPagination()
+	{
 		// Load the content if it doesn't already exist
-		if (empty($this->_pagination)) {
-			//jimport('joomla.html.pagination');
+		if (empty($this->_pagination))
+		{
+			//jimport('cms.pagination.pagination');
 			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}

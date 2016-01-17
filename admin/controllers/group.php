@@ -7,7 +7,7 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.controllerform');
+jimport('legacy.controller.form');
 
 /**
  * User view level controller class.

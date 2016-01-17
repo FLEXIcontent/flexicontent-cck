@@ -42,7 +42,7 @@ if ($params->get('enable_php_rule', 0)) {
 if ( $show_mod )
 {
 	global $modfc_jprof;
-	jimport( 'joomla.error.profiler' );
+	jimport('joomla.profiler.profiler');
 	$modfc_jprof = new JProfiler();
 	$modfc_jprof->mark('START: FLEXIcontent Adv Search Module');
 	

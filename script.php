@@ -20,8 +20,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 
 // Joomla version variables
-if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE')) {
-	jimport( 'joomla.version' );  $jversion = new JVersion;
+if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
+{
+	jimport('cms.version.version');
+	$jversion = new JVersion;
 }
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );

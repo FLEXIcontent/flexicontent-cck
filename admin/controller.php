@@ -18,8 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.controller');
-
+jimport('legacy.controller.legacy');
 
 /**
  * FLEXIcontent Component Controller

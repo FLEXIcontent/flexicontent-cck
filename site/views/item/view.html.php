@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the Item View
@@ -423,8 +423,6 @@ class FlexicontentViewItem  extends JViewLegacy
 	 */
 	function _displayForm($tpl)
 	{
-		jimport( 'joomla.html.parameter' );
-
 		// ... we use some strings from administrator part
 		// load english language file for 'com_content' component then override with current language file
 		JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
@@ -964,10 +962,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Get pageclass suffix
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 
-		// Ensure the row data is safe html
-		// @TODO: check if this is really required as it conflicts with the escape function in the tmpl
-		//JFilterOutput::objectHTMLSafe( $item );
-
 		$this->assign('action',			$uri->toString());
 		$this->assignRef('item',		$item);
 		$this->assignRef('form',		$form);  // most core field are created via calling methods of the form (J2.5)
@@ -1116,8 +1110,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		// (a) form XML file to declare them and then (b) getInput() method form field to create them
 		// *********************************************************************************************
 		
-		// First clean form data, we do this after creating the description field which may contain HTML
-		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES );
+		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		// we do this after creating the description field which is used un-encoded inside 'textarea' tags
+		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES, $exclude_keys = '' );  // Maybe exclude description text ?
 		
 		$lists = array();
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');  // Get if prettyCheckable was loaded

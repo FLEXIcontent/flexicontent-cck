@@ -18,7 +18,7 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.modeladmin');
+jimport('legacy.model.admin');
 
 /**
  * User group model.

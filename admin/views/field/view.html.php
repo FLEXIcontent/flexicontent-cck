@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport('legacy.view.legacy');
 
 /**
  * View class for the FLEXIcontent field screen
@@ -50,8 +50,6 @@ class FlexicontentViewField extends JViewLegacy
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
-		//Load pane behavior
-		jimport('joomla.html.pane');
 		//Import File system
 		jimport('joomla.filesystem.file');
 
@@ -191,55 +189,10 @@ class FlexicontentViewField extends JViewLegacy
 		$types_fieldname = FLEXI_J16GE ? 'jform[tid][]' : 'tid[]';
 		$lists['tid'] = flexicontent_html::buildtypesselect($types, $types_fieldname, $typesselected, false, $attribs);
 		
+		
 		// **************************************************************************
 		// Create fields for J1.5 (J2.5+ uses JForm XML file for most of form fields)
 		// **************************************************************************
-		if (!FLEXI_J16GE)
-		{
-			//build formhidden selector
-			$formhidden[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
-			$formhidden[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_FRONTEND' ) );
-			$formhidden[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_BACKEND' ) );
-			$formhidden[] = JHTML::_('select.option',  3, JText::_( 'FLEXI_BOTH' ) );
-			$formhidden_fieldname = FLEXI_J16GE ? 'jform[formhidden]' : 'formhidden';
-			$lists['formhidden'] = JHTML::_('select.radiolist',   $formhidden, $formhidden_fieldname, '', 'value', 'text', $row->formhidden );
-		
-			if (FLEXI_ACCESS) {
-				$valueseditable[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_ANY_EDITOR' ) );
-				$valueseditable[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_USE_ACL_PERMISSION' ) );
-				$valueseditable_fieldname = FLEXI_J16GE ? 'jform[valueseditable]' : 'valueseditable';
-				$lists['valueseditable'] = JHTML::_('select.radiolist',   $valueseditable, $valueseditable_fieldname, '', 'value', 'text', $row->valueseditable );
-			}
-		
-			$edithelp[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_EDIT_HELP_NONE' ) );
-			$edithelp[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_EDIT_HELP_LABEL_TOOLTIP' ) );
-			$edithelp[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_EDIT_HELP_LABEL_TOOLTIP_WICON' ) );
-			$edithelp[] = JHTML::_('select.option',  3, JText::_( 'FLEXI_EDIT_HELP_INLINE' ) );
-			$edithelp_fieldname = FLEXI_J16GE ? 'jform[edithelp]' : 'edithelp';
-			$lists['edithelp'] = JHTML::_('select.radiolist', $edithelp, $edithelp_fieldname, '', 'value', 'text', $row->edithelp );
-
-			// build the html select list for ordering
-			$query = 'SELECT ordering AS value, label AS text'
-				.' FROM #__flexicontent_fields'
-				.' WHERE published >= 0'
-				.' ORDER BY ordering'
-				;
-			$row->ordering = @$row->ordering;
-			$lists['ordering'] = $row->id ?
-				JHTML::_('list.specificordering',  $row, $row->id, $query ) :
-				JHTML::_('list.specificordering',  $row, '', $query ) ;
-			
-			//build access level list
-			if (FLEXI_ACCESS) {
-				$lang = JFactory::getLanguage();
-				$lang->_strings['FLEXIACCESS_PADD'] = 'Edit-Value';
-				$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 1, 0, 1, 0, 1, 0, 1, 1 );
-			} else {
-				$lists['access'] 	= JHTML::_('list.accesslevel', $row );
-			}
-		}
-		
-		
 		if (!FLEXI_J16GE)
 		{
 			// Create the parameter 's form object parsing the file XML
@@ -262,8 +215,8 @@ class FlexicontentViewField extends JViewLegacy
 			}
 		}
 		
-		//clean data
-		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
+		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );    // we use JForm to output fields so this is redundant
 		
 		// assign permissions for J2.5
 		$permission = FlexicontentHelperPerm::getPerm();

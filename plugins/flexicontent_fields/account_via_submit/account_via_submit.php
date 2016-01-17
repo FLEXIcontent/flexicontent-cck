@@ -14,7 +14,7 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.event.plugin');
+jimport('cms.plugin.plugin');
 
 class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 {
@@ -389,7 +389,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 		// Initialize new usertype setting
 		jimport('joomla.user.user');
 		jimport('joomla.user.helper');
-		jimport('joomla.application.component.helper');
+		jimport('cms.component.helper');
 		JFactory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', true);
 		JFactory::getLanguage()->load('com_users', JPATH_SITE, null, true);
 		

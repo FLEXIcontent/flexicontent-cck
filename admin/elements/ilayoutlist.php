@@ -18,13 +18,14 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
+
 // Load the helper classes
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
-jimport('joomla.form.helper');
-JFormHelper::loadFieldClass('list');
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
  * Renders an ilayoutlist element

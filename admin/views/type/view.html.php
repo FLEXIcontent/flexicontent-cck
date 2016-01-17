@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport('legacy.view.legacy');
 
 /**
  * View class for the FLEXIcontent type screen
@@ -49,9 +49,6 @@ class FlexicontentViewType extends JViewLegacy
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
-		//Load pane behavior
-		jimport('joomla.html.pane');
-
 		//Get data from the model
 		$model  = $this->getModel();
 		$row    = $this->get( FLEXI_J16GE ? 'Item' : 'Type' );
@@ -80,28 +77,10 @@ class FlexicontentViewType extends JViewLegacy
 			}
 		}
 		
-		if (FLEXI_ACCESS) {
-			$itemscreatable[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_ANY_AUTHOR' ) );
-			$itemscreatable[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_USE_ACL_TO_HIDE' ) );
-			$itemscreatable[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_USE_ACL_TO_DISABLE' ) );
-			$itemscreatable_fieldname = FLEXI_J16GE ? 'jform[itemscreatable]' : 'itemscreatable';
-			$lists['itemscreatable'] = JHTML::_('select.genericlist',   $itemscreatable, $itemscreatable_fieldname, '', 'value', 'text', $row->itemscreatable );
-		}
-		
-		//build access level list
-		if (!FLEXI_J16GE) {
-			if (FLEXI_ACCESS) {
-				$lang = JFactory::getLanguage();
-				$lang->_strings['FLEXIACCESS_PADD'] = 'Create Items';
-				$lists['access']	= FAccess::TabGmaccess( $row, 'type', 1, 1, 0, 0, 0, 0, 0, 0, 0 );
-			} else {
-				$lists['access'] 	= JHTML::_('list.accesslevel', $row );
-			}
-		}
-		
-		if (!FLEXI_J16GE) {
-			//clean data
-			JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
+		if (!FLEXI_J16GE)
+		{
+			// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+			JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
 			
 			//create the parameter form
 			$form = new JParameter($row->attribs, JPATH_COMPONENT.DS.'models'.DS.'type.xml');
@@ -128,21 +107,15 @@ class FlexicontentViewType extends JViewLegacy
 			}
 		}		
 		
+		// assign permissions
+		$permission = FlexicontentHelperPerm::getPerm();
+		$this->assignRef('permission'  , $permission);
+		
 		//assign data to template
-		// assign permissions for J2.5
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$this->assignRef('permission'  , $permission);
-		}
 		$this->assignRef('document'   , $document);
 		$this->assignRef('row'        , $row);
 		$this->assignRef('form'       , $form);
 		$this->assignRef('tmpls'      , $tmpls);
-		if (!FLEXI_J16GE) {
-			$pane = JPane::getInstance('sliders');
-			$this->assignRef('pane'     , $pane);
-			$this->assignRef('lists'    , $lists);
-		}
 		
 		parent::display($tpl);
 	}

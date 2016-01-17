@@ -19,7 +19,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.modellist');
+jimport('legacy.model.list');
 
 /**
  * FLEXIcontent Component types Model
@@ -340,7 +340,7 @@ class FlexicontentModelUsers extends JModelList
 		// Lets load the files if it doesn't already exist
 		if (empty($this->_pagination))
 		{
-			jimport('joomla.html.pagination');
+			jimport('cms.pagination.pagination');
 			$this->_pagination = new JPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
 

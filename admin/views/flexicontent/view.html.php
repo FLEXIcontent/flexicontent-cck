@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the FLEXIcontent View
@@ -107,8 +107,6 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$model = $this->getModel('flexicontent');
 		
 		// initialise template related variables
-		if (!FLEXI_J16GE)
-			$pane = JPane::getInstance('sliders');
 		$template	= $app->getTemplate();
 		$themes		= flexicontent_tmpl::getThemes();
 		

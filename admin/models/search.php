@@ -15,7 +15,7 @@
 // Check to ensure this file is included in Joomla!
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.model');
+jimport('legacy.model.legacy');
 class FLEXIcontentModelSearch extends JModelLegacy
 {
 	/**
@@ -405,7 +405,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		if (!empty($this->_pagination)) {
 			return $this->_pagination;
 		}
-		jimport('joomla.html.pagination');
+		jimport('cms.pagination.pagination');
 		$this->_pagination = new JPagination($this->getCount(), $this->getState('limitstart'), $this->getState('limit'));
 
 		return $this->_pagination;

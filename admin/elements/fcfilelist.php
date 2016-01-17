@@ -9,9 +9,13 @@
 
 defined('JPATH_PLATFORM') or die;
 
-jimport('joomla.filesystem.folder');
-jimport('joomla.filesystem.file');
-JFormHelper::loadFieldClass('list');
+jimport('joomla.filesystem.folder');  // JFolder
+jimport('joomla.filesystem.file');    // JFile
+
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
  * Supports an HTML select list of files

@@ -17,7 +17,7 @@
 
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.modellist');
+jimport('legacy.model.list');
 
 /**
  * Methods supporting a list of user group records.

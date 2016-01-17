@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport('legacy.view.legacy');
 
 /**
  * View class for the FLEXIcontent category screen
@@ -146,9 +146,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
 		
-		//Load pane behavior
-		jimport('joomla.html.pane');
-		
 		
 		// ********************
 		// Initialise variables
@@ -254,9 +251,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Prepare data to pass to the form's template
 		// *******************************************
 		
-		if ( !FLEXI_J16GE ) {
-			//clean data
-			JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, 'description' );
+		if ( !FLEXI_J16GE )
+		{
+			// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+			JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = 'description' );
 			
 			// Create the form
 			$form = new JParameter($row->params, JPATH_COMPONENT.DS.'models'.DS.'category.xml');

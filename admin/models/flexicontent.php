@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.model');
+jimport('legacy.model.legacy');
 if (FLEXI_J16GE) {
 	jimport('joomla.access.rules');
 }
@@ -1363,7 +1363,6 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function processLanguageFiles($code = 'en-GB', $method = '', $params = array())
 	{
 		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.archive');
 		
 		$prefix 	= $code . '.';
 		$suffix 	= '.ini';
@@ -1509,23 +1508,21 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			
 			// Create the archive
 			echo JText::_('FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE')."<br>";
-			if (!FLEXI_J16GE) {
-				JArchive::create($archivename, $fileslist, 'gz', '', $targetfolder);
-			} else {
-				$app = JFactory::getApplication('administrator');
-				$files = array();
-				foreach ($fileslist as $i => $filename) {
-					$files[$i]=array();
-					$files[$i]['name'] = preg_replace("%^(\\\|/)%", "", str_replace($targetfolder, "", $filename) );  // STRIP PATH for filename inside zip
-					$files[$i]['data'] = implode('', file($filename));   // READ contents into string, here we use full path
-					$files[$i]['time'] = time();
-				}
-				
-				$packager = JArchive::getAdapter('zip');
-				if (!$packager->create($archivename, $files)) {
-					echo JText::_('FLEXI_OPERATION_FAILED');
-					return false;
-				}
+			
+			$app = JFactory::getApplication('administrator');
+			$files = array();
+			foreach ($fileslist as $i => $filename) {
+				$files[$i]=array();
+				$files[$i]['name'] = preg_replace("%^(\\\|/)%", "", str_replace($targetfolder, "", $filename) );  // STRIP PATH for filename inside zip
+				$files[$i]['data'] = implode('', file($filename));   // READ contents into string, here we use full path
+				$files[$i]['time'] = time();
+			}
+			
+			jimport('joomla.archive.archive');
+			$packager = JArchive::getAdapter('zip');
+			if (!$packager->create($archivename, $files)) {
+				echo JText::_('FLEXI_OPERATION_FAILED');
+				return false;
 			}
 			
 			// Remove temporary folder structure

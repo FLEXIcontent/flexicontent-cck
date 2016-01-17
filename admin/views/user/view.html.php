@@ -15,7 +15,7 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the Users component
@@ -124,12 +124,7 @@ class FlexicontentViewUser extends JViewLegacy
 		// ********************
 		
 		$cparams = JComponentHelper::getParams('com_flexicontent');
-		if (!FLEXI_J16GE) {
-			// Load pane behavior
-			jimport('joomla.html.pane');
-			$pane  = JPane::getInstance('sliders');
-			$tpane = JPane::getInstance('tabs', array('startOffset'=>2, 'allowAllClose'=>true, 'opacityTransition'=>true, 'duration'=>600));
-		}
+		
 		
 		// *************************************************************************************************
 		// Get author extended data, basic (described in author.xml) and category (described incategory.xml)

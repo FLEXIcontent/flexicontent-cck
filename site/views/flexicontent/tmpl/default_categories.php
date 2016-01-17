@@ -44,7 +44,6 @@ $subcat_image_method = $this->params->get('subcat_image_method', 1);
 $subcat_image_width = $this->params->get('subcat_image_width', 80);
 $subcat_image_height = $this->params->get('subcat_image_height', 80);
 
-if (!FLEXI_J16GE) jimport( 'joomla.html.parameter' );
 $app = JFactory::getApplication();
 $joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 $joomla_image_url  = str_replace (DS, '/', $joomla_image_path);

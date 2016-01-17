@@ -9,8 +9,11 @@
 
 defined('JPATH_BASE') or die;
 
-jimport('joomla.html.html');
-jimport('joomla.form.formfield');
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Supports an HTML select list of plugins

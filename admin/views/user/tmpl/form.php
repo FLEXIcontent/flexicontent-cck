@@ -7,8 +7,8 @@ $text = intval($edit) ? JText::_( 'Edit' ) : JText::_( 'New' );
 $cparams = JComponentHelper::getParams ('com_media');
 $date_format = FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S';
 
-// clean item data
-JFilterOutput::objectHTMLSafe( $this->user, ENT_QUOTES, '' );
+// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+JFilterOutput::objectHTMLSafe( $this->user, ENT_QUOTES, $exclude_keys = '' );
 
 if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 	$lvisit = JText::_( 'Never' );

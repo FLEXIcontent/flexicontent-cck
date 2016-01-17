@@ -19,6 +19,8 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+jimport('cms.component.helper');
+jimport('cms.plugin.helper');
 
 // *************************
 // Initialize some variables
@@ -47,7 +49,7 @@ if ( $print_logging_info && $format=='html')
 {
 	$start_microtime = microtime(true);
 	global $fc_jprof;
-	jimport( 'joomla.error.profiler' );
+	jimport('joomla.profiler.profiler');
 	$fc_jprof = new JProfiler();
 	$fc_jprof->mark('START: FLEXIcontent component');
 }

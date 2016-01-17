@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.application.component.view');
+jimport('legacy.view.legacy');
 
 /**
  * View class for the FLEXIcontent category screen
@@ -90,8 +90,8 @@ class FlexicontentViewTag extends JViewLegacy
 			}
 		}
 
-		//clean data
-		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
+		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
+		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
 
 		//assign data to template
 		$this->assignRef('row'      	, $row);
