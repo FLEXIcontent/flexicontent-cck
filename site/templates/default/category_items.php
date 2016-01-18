@@ -145,7 +145,12 @@ endif;
 		<tr>
 			<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
 				<th id="flexi_title" class="hideOnDemandClass">
-					<?php echo $show_title ? JText::_('FLEXI_ITEMS') : ''; ?>
+					 <?php echo $this->params->get('custom_name_row_mode', '') ;?>
+                    <?php if ($this->params->get('custom_name_row_mode', '')) : ?>
+                            <?php echo $this->params->get('title_custom_row', ''); ?>
+                        <?php else : ?>
+                            <?php echo $show_title ? JText::_('FLEXI_ITEMS') : ''; ?>
+                    <?php endif; ?>
 				</th>
 			<?php endif; ?>
 			

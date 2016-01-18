@@ -22,6 +22,12 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+            <field name="custom_name_row" type="radio" default="" label="FLEXI_FIRST_CUSTOM_ROW_MODE" description="FLEXI_FIRST_CUSTOM_ROW_MODE_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+            <field name="title_custom_row" type="text" default="" label="FLEXI_CUSTOM_NAME_ROW" description="FLEXI_FIRST_CUSTOM_ROW_DESC" />
 			<field name="togglable_table_cols" type="radio" default="" label="FLEXI_TMPL_DEFAULT_TOGGLABLE_TABLE_COLS" description="FLEXI_TMPL_DEFAULT_TOGGLABLE_TABLE_COLS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
