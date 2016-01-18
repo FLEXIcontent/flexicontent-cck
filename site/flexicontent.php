@@ -30,10 +30,17 @@ global $is_fc_component;
 $is_fc_component = 1;
 
 $cparams = JComponentHelper::getParams('com_flexicontent');
-$jinput  = JFactory::getApplication()->input;
+$app     = JFactory::getApplication();
+$jinput  = $app->input;
 $format  = $jinput->get('format', 'html', 'cmd');
 
-if ($cparams->get('loadfw_bootstrap_css', 2)==1 ) JHtml::_('bootstrap.loadCss', true);
+// No PDF support in J2.5, but too late to do this here, it must be done before JDocument instatiation
+// Furthermore, user may have installed 3rd party extension to handle PDF format
+/*if ( $format == 'pdf' )
+{
+	$jinput->set('format', $format='html');  
+	JRequest::setVar('format', $format='html');  // Compatibility for views still using JRequest
+}*/
 
 // Logging
 global $fc_run_times;
@@ -79,8 +86,6 @@ if (!FLEXI_ONDEMAND)
 	JPluginHelper::importPlugin('flexicontent_fields');
 JPluginHelper::importPlugin('flexicontent');
 
-// No PDF support in J2.5
-//if ( $format == 'pdf' ) $jinput->set('format', $format='html');  // too late to do this here, it must be done before JDocument instatiated
 
 
 // *****************
@@ -107,37 +112,74 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reloa
 // a. Get view, task, controller REQUEST variables
 $view = $jinput->get('view', '', 'cmd');
 $task = $jinput->get('task', '', 'cmd');
+$controller = $jinput->get('controller', '', 'cmd');
 
 // b. In J1.6+ controller can be set via task variable ... split task from controller name
-$tasks = explode(".", $task);
-if(count($tasks)>=2) {
-	$controller = @$controller ? $controller : $tasks[0];
-	$task = $tasks[1];
-	$jinput->set('task', $tasks[1]);
-} else {
-	$controller = $jinput->get('controller', '', 'cmd');
+$_ct = explode('.', $task);
+$task = $_ct[ count($_ct) - 1];
+if (count($_ct) > 1) $controller = $_ct[0];
+
+
+// c. Force variables: controller AND/OR task
+$forced_views = array();  // *** Cases that view variable must be ignored
+if ( isset($forced_views[$controller]) )
+{
+	$view = $controller;
+	$jinput->set('view', $view);
+	JRequest::setVar('view', $view);  // Compatibility for views still using JRequest
 }
-$ctrl_name = $controller;
 
+// FORCE (if it exists) using controller named as current view name (thus ignoring controller set in HTTP REQUEST)
+if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) )
+{
+	$controller = $view;
+}
 
-
-
-
-// **************************************************************************************************************
-// Include the component base AND FOR J1.5 ONLY: the view-specific controller (in J1.6+ is included automatically)
-// **************************************************************************************************************
-
-require_once (JPATH_COMPONENT.DS.'controller.php');
-if ($controller) {
-	$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
-	
-	// Views allowed to have a controller
-	if ( file_exists($path) ) {
-		require_once $path;
-	} else {
-		$jinput->set('controller', $controller = '');
+// Singular views do not (usually) have a controller, instead the 'Plural' controller is used
+else
+{
+	// Going through the controller makes sure that appropriate code is always executed
+	// Views/Layouts that can be called without a forced controller task (and without redirect to them, these must contain permission checking)
+	$view_to_ctrl = array(
+	);
+	if ( isset($view_to_ctrl[$view]) ) {
+		$controller = $view_to_ctrl[$view];
 	}
 }
+//echo "$controller -- $task <br/>\n";
+
+
+// d. Set changes to controller/task variables back to HTTP REQUEST
+$controller_task = $controller && $task  ?  $controller.'.'.$task  :  $task;
+$controller_name = $controller;
+
+$jinput->set('controller', $controller_name);
+$jinput->set('task', $controller_task);
+
+JRequest::setVar('controller', $controller_name);  // Compatibility for views still using JRequest
+JRequest::setVar('task', $controller_task);        // Compatibility for views still using JRequest
+
+
+
+// **************************************************************************
+// The view-specific controller is included automatically JControllerLegacy,
+// also base controller should be auto-loaded by the view controller itself !
+// **************************************************************************
+
+// Base controller
+/*require_once (JPATH_COMPONENT.DS.'controller.php');
+
+// View specific controller
+if ($controller) {
+	$base_controller = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
+	
+	if ( file_exists($base_controller) ) {
+		require_once $base_controller;
+	} else {
+		$jinput->set('controller', $controller = '');
+		JRequest::setVar('controller', $controller = '');  // Compatibility for views still using JRequest
+	}
+}*/
 
 
 // initialization done ... log stats for initialization
@@ -187,10 +229,7 @@ if ( $format == 'html' )
 // Create a controller instance
 // ****************************
 
-$classname	= 'FlexicontentController'.ucfirst($controller);
-$controller = new $classname();
-
-
+$controller	= JControllerLegacy::getInstance('Flexicontent');
 
 
 
@@ -198,22 +237,24 @@ $controller = new $classname();
 // Perform the requested task
 // **************************
 
-$controller->execute($task);
+$controller->execute( $task );
 
 // Redirect if set by the controller
 $controller->redirect();
 
-// TO BE MOVED TO HELPER FILE ...
-// Remove (thus prevent) the default menu item from showing in the pathway
-if ( $cparams->get('default_menuitem_nopathway',1) ) {
-	$pathway =  JFactory::getApplication()->getPathWay();
+// Remove (thus prevent) the default menu item from showing in the pathway, TODO: MOVE this TO HELPER FILE ...
+if ( $cparams->get('default_menuitem_nopathway',1) )
+{
+	$pathway =  $app->getPathWay();
 	$default_menu_itemid = $cparams->get('default_menu_itemid', 0);
 	$pathway_arr = $pathway->getPathway();
-	if ( count($pathway_arr) && preg_match("/Itemid=([0-9]+)/",$pathway_arr[0]->link, $matches) ) {
-		if ($matches[1] == $default_menu_itemid) {
+	if ( count($pathway_arr) && preg_match("/Itemid=([0-9]+)/",$pathway_arr[0]->link, $matches) )
+	{
+		if ($matches[1] == $default_menu_itemid)
+		{
 			array_shift ($pathway_arr);
 			$pathway->setPathway($pathway_arr);
-			//$pathway->set('_count',count($pathway_arr));  // not needed ??
+			//$pathway->set('_count', count($pathway_arr));  // not needed ??
 		}
 	}
 }
@@ -229,19 +270,25 @@ $layout = $jinput->get('layout', '', 'string');
 if ( $format == 'html' )
 {
 	// Load mootools
-	//FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+	//JHtml::_('behavior.framework', true);
 	
 	// Load jquery Framework, but let some views decide for themselves, so that they can choose not to load some parts of jQuery.ui JS
 	if ($view != 'item') flexicontent_html::loadFramework('jQuery');
 	
-	if ($cparams->get('add_tooltips', 1))
+	if ( $cparams->get('add_tooltips', 1) )
 	{
-		// Load J2.5 (mootools tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
-		FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
+		// J2.5 tooltips (mootools tooltips) 
+		//JHTML::_('behavior.tooltip');  // All uses of 'hasTip' were replaced with 'hasTooltip'
 		
 		// J3.0+ tooltips (bootstrap based)
 		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
 	}
+	// Add flexi-lib JS
+	//JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
+	
+	// Load bootstrap CSS
+	if ( $cparams->get('loadfw_bootstrap_css', 2)==1 )
+		JHtml::_('bootstrap.loadCss', true);
 }
 
 
@@ -250,14 +297,14 @@ if ( $format == 'html' )
 // Enqueue PERFORMANCE statistics as a message BUT  NOT if in RAW FORMAT or COMPONENT only views
 // *********************************************************************************************
 
-if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $format=='html')
+if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $format=='html' )
 {
 	
 	// ***************************************
 	// Total performance stats of current view
 	// ***************************************
 	
-	if ($task) $_msg = ' (TASK: '.$ctrl_name.'.'.$task.')';
+	if ($task) $_msg = ' (TASK: '.$controller_name.'.'.$task.')';
 	else       $_msg = ' (VIEW: ' .$view. ($layout ? ' -- LAYOUT: '.$layout : '') .')';
 	
 	

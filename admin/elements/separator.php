@@ -41,35 +41,18 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		
 	function add_css_js() {
 		$css="
-		div.pane-sliders ul.adminformlist li label.hasTip {
-			display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:132px; font-weight: bold;
-			background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
-		}
-		div.pane-sliders ul.adminformlist li ul#rules label.hasTip {
-			display:inherit; padding: inherit; margin: inherit; text-align: inherit;	width: inherit; font-weight: inherit;
-			background-color: inherit; border-width: 0px; color: inherit;
-		}
 		div.pane-sliders ul.adminformlist li select { margin-bottom: 0px;}
 		div.pane-sliders ul.adminformlist li fieldset  { margin: 0; padding: 0; }
 		
 		div.current ul.config-option-list li .fcsep_level3 {
 			left: 232px !important;
 		}
-		/*div.controls input, div.controls textarea {
-			min-width: 56%;
-		}*/
+		
+		/*div.controls input, div.controls textarea { min-width: 56%; }*/
+		
 		div.control-group div.control-label label.hasTooltip,
-		div.current ul.config-option-list li label.hasTooltip,
-		div.current ul.config-option-list li label.hasTip {
+		div.current ul.config-option-list li label.hasTooltip {
 			display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:220px; font-weight: normal; font-size: 12px;
-			background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
-		}
-		div.current ul.config-option-list li ul#rules label.hasTip {
-			display:inherit; padding: inherit; margin: inherit; text-align: inherit;	width: inherit; font-weight: inherit;
-			background-color: inherit; border-width: 0px; color: inherit;
-		}
-		form#item-form div.pane-sliders ul.adminformlist li label.hasTip {
-			display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:160px; font-weight: bold;
 			background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
 		}
 		

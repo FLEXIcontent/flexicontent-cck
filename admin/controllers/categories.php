@@ -18,6 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+// Import parent controller
 jimport('legacy.controller.admin');
 
 /**

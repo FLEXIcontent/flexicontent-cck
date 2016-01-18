@@ -18,6 +18,7 @@
 
 defined('_JEXEC') or die;
 
+// Import parent controller
 jimport('legacy.controller.form');
 
 /**

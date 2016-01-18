@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// In case controller is executed by another component
+// Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');   // we use JPATH_BASE since parent controller exists in frontend too
 
 
@@ -922,22 +922,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			return;
 		}
 		
-		if (FLEXI_J16GE) {
-			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
-			$access = $accesses[$file_id];
-		} else {
-			if ($task == 'accesspublic') {
-				$access = 0;
-			} elseif ($task == 'accessregistered') {
-				$access = 1;
-			} else {
-				if (FLEXI_ACCESS) {
-					$access = 3;
-				} else {
-					$access = 2;
-				}
-			}
-		}
+		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+		$access = $accesses[$file_id];
 		
 		if(!$model->saveaccess( $file_id, $access )) {
 			$msg = JText::_( 'FLEXI_OPERATION_FAILED' );

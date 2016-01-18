@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// In case controller is executed by another component
+// Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');
 
 /**
@@ -43,11 +43,6 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$this->registerTask( 'add',          'edit' );
 		$this->registerTask( 'apply',        'save' );
 		$this->registerTask( 'saveandnew',   'save' );
-		if (!FLEXI_J16GE) {
-			$this->registerTask( 'accesspublic',     'access' );
-			$this->registerTask( 'accessregistered', 'access' );
-			$this->registerTask( 'accessspecial',    'access' );
-		}
 		$this->registerTask( 'copy',         'copy' );
 	}
 
@@ -311,19 +306,9 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$model = $this->getModel('types');
 		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$id    = (int)$cid[0];
-		if (FLEXI_J16GE) {
-			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
-			$access = $accesses[$id];
-		} else {
-			if ($task == 'accesspublic') {
-				$access = 0;
-			} elseif ($task == 'accessregistered') {
-				$access = 1;
-			} else {
-				$access = 2;
-			}
-		}
-
+		
+		$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+		$access = $accesses[$id];
 		
 		if(!$model->saveaccess( $id, $access )) {
 			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();

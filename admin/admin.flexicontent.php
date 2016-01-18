@@ -30,7 +30,8 @@ global $is_fc_component;
 $is_fc_component = 1;
 
 $cparams = JComponentHelper::getParams('com_flexicontent');
-$jinput  = JFactory::getApplication()->input;
+$app     = JFactory::getApplication();
+$jinput  = $app->input;
 $format  = $jinput->get('format', 'html', 'cmd');
 
 // Logging
@@ -39,12 +40,15 @@ $fc_run_times['render_field'] = array();
 $fc_run_times['render_subfields'] = array();
 
 $force_print = false || JDEBUG;
+
+// Force post-install check for testing purposes
 /*if ( $format == "html" ) {
 	$session = JFactory::getSession();
 	$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 	$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
 	$force_print = $postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave;
 }*/
+
 if ($force_print) $cparams->set('print_logging_info', 2);
 $print_logging_info = $cparams->get('print_logging_info');
 
@@ -65,12 +69,6 @@ if ( $print_logging_info && $format=='html')
 
 //include constants file
 require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
-
-// Enable printing of notices,etc, except strict if error_reporting is enabled
-if( !FLEXI_J16GE && error_reporting() && ini_get('display_errors') /*&& in_array($_SERVER['HTTP_HOST'], array('localhost', '127.0.0.1'))*/ ) { 
-	error_reporting(E_ALL & ~E_STRICT);
-	//ini_set('display_errors',1);  // ... check above that this is enabled already
-}
 
 //include the needed classes and helpers
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
@@ -97,7 +95,6 @@ JPluginHelper::importPlugin('flexicontent');
 // Load english language file for 'com_content' component, and the override (forcing a reload) with current language file
 JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
 JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
-
 
 // Load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
@@ -136,14 +133,15 @@ if ( isset($forced_views[$controller]) )
 	JRequest::setVar('view', $view);  // Compatibility for views still using JRequest
 }
 
-if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) ) {
-	
-	// FORCE (if it exists) using controller named as current view name (thus ignoring controller set in HTTP REQUEST)
+// FORCE (if it exists) using controller named as current view name (thus ignoring controller set in HTTP REQUEST)
+if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) )
+{
 	$controller = $view;
-	
-} else {
-	
-	// Singular views do not (usually) have a controller, instead the 'Plural' controller is used
+}
+
+// Singular views do not (usually) have a controller, instead the 'Plural' controller is used
+else
+{
 	// Going through the controller makes sure that appropriate code is always executed
 	// Views/Layouts that can be called without a forced controller task (and without redirect to them, these must contain permission checking)
 	$view_to_ctrl = array(
@@ -188,11 +186,25 @@ if ( $view=='debuggroup' || $controller_name=='debuggroup' ) {
 
 
 
-// *******************************************************************************************
-// Include the component base, in J1.6+ is included automatically the view-specific controller
-// *******************************************************************************************
+// **************************************************************************
+// The view-specific controller is included automatically JControllerLegacy,
+// also base controller should be auto-loaded by the view controller itself !
+// **************************************************************************
 
-require_once (JPATH_COMPONENT.DS.'controller.php');
+// Base controller
+/*require_once (JPATH_COMPONENT.DS.'controller.php');
+
+// View specific controller
+if ($controller) {
+	$base_controller = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
+	
+	if ( file_exists($base_controller) ) {
+		require_once $base_controller;
+	} else {
+		$jinput->set('controller', $controller = '');
+		JRequest::setVar('controller', $controller = '');  // Compatibility for views still using JRequest
+	}
+}*/
 
 
 // initialization done ... log stats for initialization
@@ -256,12 +268,7 @@ if ( $format == 'html' )
 // Create a controller instance
 // ****************************
 
-if (FLEXI_J16GE) {
-	$controller	= JControllerLegacy::getInstance('Flexicontent');
-} else {
-	$classname  = 'FlexicontentController'.ucfirst($controller);
-	$controller = new $classname();
-}
+$controller	= JControllerLegacy::getInstance('Flexicontent');
 
 
 
@@ -270,6 +277,9 @@ if (FLEXI_J16GE) {
 // **************************
 
 $controller->execute( $task );
+
+// Redirect if set by the controller
+$controller->redirect();
 
 
 
@@ -282,15 +292,15 @@ $layout = $jinput->get('layout', '', 'string');
 if ( $format == 'html' )
 {
 	// Load mootools
-	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+	JHtml::_('behavior.framework', true);
 	
 	// Load jquery Framework, but let some views decide for themselves, so that they can choose not to load some parts of jQuery.ui JS
 	if ($view != 'item') flexicontent_html::loadFramework('jQuery');
 	
-	if (1)
+	if ( 1 ) // always load tooltips JS in backend
 	{
-		// Load J2.5 (mootools tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
-		//JHTML::_('behavior.tooltip');  // TODO check for 'hasTip' and remove all remaining cases
+		// J2.5 tooltips (mootools tooltips) 
+		//JHTML::_('behavior.tooltip');  // All uses of 'hasTip' were replaced with 'hasTooltip'
 		
 		// J3.0+ tooltips (bootstrap based)
 		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
@@ -298,6 +308,10 @@ if ( $format == 'html' )
 	// Add flexi-lib JS
 	JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
 	JFactory::getDocument()->addScriptVersion( JURI::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Backend only script
+	
+	// Load bootstrap CSS
+	if ( 0 )  // Let backend template decide to load bootstrap CSS
+		JHtml::_('bootstrap.loadCss', true);
 }
 
 
@@ -330,8 +344,8 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 		
 	if (isset($fc_run_times['initialize_component']))
 		$msg .= sprintf('<br/>-- [Initialize component: %.2f s] ', $fc_run_times['initialize_component']/1000000);
-		
-		
+	
+	// **** BOF: BACKEND SPECIFIC
 	if (isset($fc_run_times['post_installation_tasks']))
 		$msg .= sprintf('<br/>-- [Post installation / DB intergrity TASKs: %.2f s] ', $fc_run_times['post_installation_tasks']/1000000);
 		
@@ -349,7 +363,7 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 			if (isset($fc_run_times['checkInitialPermission']))
 				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - ACL initial permissions: %.2f s ', $fc_run_times['checkInitialPermission']/1000000);
 			$msg .= '</small>';
-	
+	// **** EOF: BACKEND SPECIFIC
 	
 	if (isset($fc_run_times['test_time']))
 		$msg .= sprintf('<br/>-- [Time of TEST part: %.2f s] ', $fc_run_times['test_time']/1000000);
@@ -439,8 +453,10 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	if (isset($fc_run_times['template_render']))
 		$msg .= sprintf('<br/>-- [FC "%s" view Template Rendering: %.2f s] ', $view, $fc_run_times['template_render']/1000000);
 	
+	// **** BOF: BACKEND SPECIFIC
 	if (isset($fc_run_times['quick_sliders']))
 		$msg .= sprintf('<br/>-- [Workflow sliders (Pending/Revised/etc): %.2f s] ', $fc_run_times['quick_sliders']/1000000);
+	// **** EOF: BACKEND SPECIFIC
 	
 	// **********************
 	// Fields rendering times
@@ -473,10 +489,4 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 }
 unset ($is_fc_component);
 
-
-// ************************************************************************
-// Redirect if a redirect URL was set, e.g. by the executed controller task
-// ************************************************************************
-
-$controller->redirect();
 ?>
