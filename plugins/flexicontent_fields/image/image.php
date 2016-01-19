@@ -14,7 +14,7 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('joomla.event.plugin');
+jimport('cms.plugin.plugin');
 JLoader::register('FlexicontentControllerFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');  // we use JPATH_BASE since controller exists in frontend too
 JLoader::register('FlexicontentModelFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');  // we use JPATH_BASE since model exists in frontend too
 
@@ -56,8 +56,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		
-		static $common_js_css_added = false;
-		
 		// Get a unique id to use as item id if current item is new
 		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
 		
@@ -77,14 +75,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		$image_source = $field->parameters->get('image_source', 0);
-		if ($image_source > 1) {
-			global $fc_folder_mode_err;
-			if (empty($fc_folder_mode_err[$field->id])) {
-				echo __FUNCTION__."(): folder-mode: ".$image_source." not implemented please change image-source mode in image/gallery field with id: ".$field->id;
-				$fc_folder_mode_err[$field->id] = 1;
-				$image_source = 1;
-			}
-		}
+		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
+		
 		$existing_imgs= $field->parameters->get('existing_imgs', 1);
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
@@ -93,7 +85,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
+		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method==0;
 		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
 		
 		$autoupload = $field->parameters->get('autoupload', 0);
@@ -125,7 +117,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$none_props = !$linkto_url && !$usealt && !$usetitle && !$usedesc && !$usecust1 && !$usecust2;
 		
-		if ( !$common_js_css_added ) {
+		static $db_mode_common_js_added = false;
+		if ( $image_source == 0 && !$db_mode_common_js_added )
+		{
+			// Insert once for all DB-mode fields
 			$js = "
 				function fx_toggle_upload_select_tbl (obj_changed, objid_disp_toggle) {
 					var value_container = jQuery(obj_changed).closest('.fcfieldval_container');
@@ -140,9 +135,31 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						value_container.css('width', '');
 					}
 				}
-					";
+			";
 			$document->addScriptDeclaration($js);
-			$common_js_css_added = true;
+			$db_mode_common_js_added = true;
+		}
+		
+		static $mm_mode_common_js_added = false;
+		if ( $image_source == -2 && !$mm_mode_common_js_added )
+		{
+			// We will use the mootools based media manager
+			JHtml::_('behavior.framework', true);
+			
+			// Load the modal behavior script.
+			JHtml::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
+			
+			// Include media field JS, detecting different version of Joomla
+			if( file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js') ) $media_js = 'media/mediafield-mootools.min.js';
+			else if( file_exists($path = JPATH_ROOT.'/media/media/js/mediafield.min.js') ) $media_js = 'media/mediafield.min.js';
+			else $media_js = 'media/mediafield.js';
+			
+			JHtml::_('script', $media_js, $mootools_framework = true, $media_folder_relative_path = true, false, false, true);
+			
+			// Tooltips for image path and image popup preview
+			JHtml::_('behavior.tooltip', '.hasTipImgpath', array('onShow' => 'jMediaRefreshImgpathTip'));
+			JHtml::_('behavior.tooltip', '.hasTipPreview', array('onShow' => 'jMediaRefreshPreviewTip'));
+			$mm_mode_common_js_added = true;
 		}
 		
 		$field->html = '';
@@ -160,6 +177,43 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
+		
+		// Intro / Full mode
+		if ( $image_source == -1 ) {
+			$field->html = $use_ingroup ?
+				array('<div class="alert alert-warning fc-small fc-iblock">Field is configured to use intro/full images, please disable use in group</div>') :
+				'<div class="fc-mssg-inline fc-info fc-small fc-iblock" style="margin:0 4px;">'.JText::_('FLEXI_FIELD_IMAGE_SET_VALUES_IN_COMPATIBILITY_TAB_DESC').'</div>' ;
+			return;
+		}
+		
+		// Media manager mode
+		else if ( $image_source == -2 ) {
+			if ($use_ingroup)
+			{
+				$field->html = array('<div class="alert alert-warning fc-small fc-iblock">Field is in Media-manager mode, field-group support not supported yet</div>');
+				return;
+			}
+			
+			//$start_microtime = microtime(true);
+			
+			/*$xml_field = '<field name="'.$field->name.'" type="media" width="500" />';
+			$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
+			
+			$jform = new JForm('flexicontent_field.image', array('control' => 'custom', 'load_data' => true));
+			$jform->load($xml_form);
+			$media = new JFormFieldMedia($jform);
+			
+			$value = str_replace('\\', '/', !empty($field->value[0])  ?  $field->value[0]  :  '');
+			$media->setup(new SimpleXMLElement($xml_field), $value, '');
+			$field->html = str_replace($elementid.'"', $elementid.'_0"',
+				str_replace('name="'.$fieldname.'"', 'name="'.$fieldname.'[0]"', $media->input)
+			);
+			
+			//$diff = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			//echo sprintf('<br/>-- [Media manager field creation : %.3f s] ', $diff/1000000);
+			
+			return;*/
+		}
 		
 		$js = "
 			var fc_field_dialog_handle_".$field->id.";
@@ -203,14 +257,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				
-			".( $image_source ? "" :"
+			".( $image_source == 0 ? "
 				var has_imagepicker = newField.find('ul.image_picker_selector').length != 0;
 				var has_select2     = newField.find('div.select2-container').length != 0;
 				if (has_imagepicker) newField.find('ul.image_picker_selector').remove();
 				if (has_select2)     newField.find('div.select2-container').remove();
-				").
+				" : "").
 			"
-			
 				newField.find('div.imgremove').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_imgremove');
 				newField.find('input.imgremove').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][remove]');
 				newField.find('input.imgremove').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_remove');
@@ -237,10 +290,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				newField.find('.preview_msg').attr('name','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_msg');
 				newField.find('.preview_msg').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_msg');
 				
-			".( $image_source ? "" :"
+			".( $image_source == 0 ? "
 				if (has_imagepicker && ".$auto_enable_imgpicker." ) newField.find('select.image-picker').imagepicker({ hide_select:false, show_label:true });
 				if (has_select2)  newField.find('select.use_select2_lib').show().select2();
-				").
+				" : "").
 			"
 				newField.find('a.addfile_".$field->id."').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
 				newField.find('a.addfile_".$field->id."').attr('href','".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JSession::getFormToken().'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$preview_thumb_w.'&thumb_h='.$preview_thumb_h.'&autoassign='.$autoassign."');
@@ -328,8 +381,23 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (scroll_visible) fc_scrollIntoView(newField, 1);
 				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
 				
+				// Set tooltip data placeholders
+				newField.find('.media-preview').html('<span class=\"hasTipPreview\" title=\"&lt;strong&gt;Selected image.&lt;/strong&gt;&lt;br /&gt;&lt;div id=&quot;'+'".$elementid."_'+uniqueRowNum".$field->id."+'_existingname_preview_empty&quot; style=&quot;display:none&quot;&gt;No image selected.&lt;/div&gt;&lt;div id=&quot;'+'".$elementid."_'+uniqueRowNum".$field->id."+'_existingname_preview_img&quot;&gt;&lt;img src=&quot;&quot; alt=&quot;Selected image.&quot; id=&quot;'+'".$elementid."_'+uniqueRowNum".$field->id."+'_existingname_preview&quot; class=&quot;media-preview&quot; style=&quot; style=&quot;max-width:480px; max-height:360&quot; &quot; /&gt;&lt;/div&gt;\"><i class=\"icon-eye\"></i></span>');
+				
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+				
+				var tipped_elements = newField.find('.hasTipImgpath, .hasTipPreview');
+				tipped_elements.each(function() {
+					var title = this.get('title');
+					if (title) {
+						var parts = title.split('::', 2);
+						this.store('tip:title', parts[0]);
+						this.store('tip:text', parts[1]);
+					}
+				});
+				//var imgpath_JTooltips = new Tips($(newField.get(0)).getElements('.hasTipImgpath'), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshImgpathTip});
+				var imgprev_JTooltips = new Tips($(newField.get(0)).getElements('.hasTipPreview'), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshPreviewTip});
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
@@ -342,17 +410,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				// When removing a field value we need to check if it had value and decrement the value counter
 				var originalfftag = 'input.originalname';
-				var existingfftag = '".($image_source ? "input" :"select")."' + '.existingname';
+				var existingfftag = '".($image_source == 0 ? "select" : "input")."' + '.existingname';
 				var originalname = row.find( originalfftag ).val();
 				var existingname = row.find( existingfftag ).val();
 				var newfile  = row.find( 'input.newfile' ).length ? row.find( 'input.newfile' ).val() : '';
 				var hasvalue = row.find( 'input.hasvalue').val();
+				var valcounter = document.getElementById('".$elementid."');
 				
 				// IF a non-empty container is being removed ... get counter (which is optionally used as 'required' form element and empty it if is 1, or decrement if 2 or more)
 				//if ( originalname != '' || existingname != '' || newfile != '' )
 				if (hasvalue!='')
 				{
-					var valcounter = document.getElementById('".$elementid."');
 					valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
 				}
@@ -371,6 +439,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					row.slideUp(400, function(){ jQuery(this).remove(); });
 					rowCount".$field->id."--;
 				}
+				//if(window.console) window.console.log(valcounter.value);
 			}
 			";
 			
@@ -432,77 +501,83 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				// a flag if file URL was given
 				var fileUrlGiven = file_url!='';
 				
-				if (".($image_source==0 ? 1 : 0).")  // DB-mode
+				".($image_source == 0 ? "
+				// DB-mode BOF
+				
+				var newfile_obj = jQuery('#' + elementid + '_newfile' );
+				var newfilename = newfile_obj.val();
+				
+				// Assigning newfile
+				if ( ff_suffix == '_newfile' )
 				{
-					var newfile_obj = jQuery('#' + elementid + '_newfile' );
-					var newfilename = newfile_obj.val();
-					
-					// Assigning newfile
-					if ( ff_suffix == '_newfile' )
-					{
-						if ( newfile_obj.hasClass('no_value_selected') && newfilename!='' ) {
-							var modify = ( originalname=='' && existingname=='' ) ? 1 : 0;
-							newfile_obj.removeClass('no_value_selected');
-						} else if ( !newfile_obj.hasClass('no_value_selected') && newfilename=='' ) {
-							var modify = -1;
-							newfile_obj.addClass('no_value_selected');
-						} else {
-							var modify = 0;
-						}
-						if (existingAllowed) existing_obj.addClass('no_value_selected').val('');
+					if ( newfile_obj.hasClass('no_value_selected') && newfilename!='' ) {
+						var modify = ( originalname=='' && existingname=='' ) ? 1 : 0;
+						newfile_obj.removeClass('no_value_selected');
+					} else if ( !newfile_obj.hasClass('no_value_selected') && newfilename=='' ) {
+						var modify = -1;
+						newfile_obj.addClass('no_value_selected');
+					} else {
+						var modify = 0;
 					}
-					
-					// Assigning existingfile
-					else
-					{
-						//alert('existingAllowed: ' + existingAllowed + ', existingname: ' + existingname + ', no_value_selected: ' + (existing_obj.hasClass('no_value_selected') ? 'yes' : 'no'));
-						if ( existingAllowed && existingname!='' && existing_obj.hasClass('no_value_selected') ) {
-							var modify = ( originalname=='' ) ? 1 : 0;
-							existing_obj.removeClass('no_value_selected');
-						} else if ( existingAllowed && existingname=='' && !existing_obj.hasClass('no_value_selected') ) {
-							var modify = -1;
-							existing_obj.addClass('no_value_selected');
-						} else {
-							var modify = 0;
-						}
-						newfile_obj.addClass('no_value_selected').val('');
+					if (existingAllowed) existing_obj.addClass('no_value_selected').val('');
+				}
+				
+				// Assigning existingfile
+				else
+				{
+					//alert('existingAllowed: ' + existingAllowed + ', existingname: ' + existingname + ', no_value_selected: ' + (existing_obj.hasClass('no_value_selected') ? 'yes' : 'no'));
+					if ( existingAllowed && existingname!='' && existing_obj.hasClass('no_value_selected') ) {
+						var modify = ( originalname=='' ) ? 1 : 0;
+						existing_obj.removeClass('no_value_selected');
+					} else if ( existingAllowed && existingname=='' && !existing_obj.hasClass('no_value_selected') ) {
+						var modify = -1;
+						existing_obj.addClass('no_value_selected');
+					} else {
+						var modify = 0;
 					}
-					
-					// Increment/decrement the form field used as value counter, we do not use ZERO in case of decrement, instead we set to empty string, so that is-required validation works
-					var valcounter = document.getElementById('".$elementid."');
-					if (modify>0)
-					{
-						if ( typeof valcounter.value === 'undefined' || valcounter.value=='' ) valcounter.value = '1';
-						else valcounter.value = parseInt(valcounter.value) + modify;
-						hasvalue_obj.val('1');  // value assigned
-					}
-					
-					else if (modify<0)
-					{
-						if ( valcounter.value=='1' ) valcounter.value = '';
-						else valcounter.value = parseInt(valcounter.value) + modify;
-						hasvalue_obj.val('');  // value de-assigned, (or ? fieldgroup is being deleted)
-					}
-					
-				} else {  // Folder mode
-					
-					if ( originalname=='' && existingname=='' ) {
-						// Increment/Make non-empty the form field used as value counter, so that is-required validation works
-						var valcounter = document.getElementById('".$elementid."');
-						if ( valcounter.value=='' ) valcounter.value = '1';
-						else valcounter.value = parseInt(valcounter.value) + 1;
-					}
+					newfile_obj.addClass('no_value_selected').val('');
+				}
+				
+				// Increment/decrement the form field used as value counter, we do not use ZERO in case of decrement, instead we set to empty string, so that is-required validation works
+				var valcounter = document.getElementById('".$elementid."');
+				if (modify>0)
+				{
+					if ( typeof valcounter.value === 'undefined' || valcounter.value=='' ) valcounter.value = '1';
+					else valcounter.value = parseInt(valcounter.value) + modify;
 					hasvalue_obj.val('1');  // value assigned
 				}
 				
-				//if(window.console) window.console.log(valcounter.value);
+				else if (modify<0)
+				{
+					if ( valcounter.value=='1' ) valcounter.value = '';
+					else valcounter.value = parseInt(valcounter.value) + modify;
+					hasvalue_obj.val('');  // value de-assigned, (or ? fieldgroup is being deleted)
+				}
 				
+				// DB-mode EOF
+				" : "")."
+				
+				".($image_source >= 1 ? "
+				// Folder-mode BOF
+				
+				if ( originalname=='' && existingname=='' ) {
+					// Increment/Make non-empty the form field used as value counter, so that is-required validation works
+					var valcounter = document.getElementById('".$elementid."');
+					if ( valcounter.value=='' ) valcounter.value = '1';
+					else valcounter.value = parseInt(valcounter.value) + 1;
+				}
+				hasvalue_obj.val('1');  // value assigned
+				
+				// Folder-mode EOF
+				" : "")."
+				
+				//if(window.console) window.console.log(valcounter.value);
 				var prv_obj = jQuery('#' + elementid + '_preview_image' );
 				
-				// Folder-Mode
+				// Folder-mode
 				if (file != '' && existingAllowed)  existing_obj.val(file);
 				
-				// DB-Mode, Folder-Mode empty original value
+				// Clear original value for both DB-mode & Folder-mode(s)
 				original_obj.val('');
 				
 				if (prv_obj) {
@@ -535,13 +610,31 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			function clearField".$field->id."(el)
 			{
 				var box = jQuery(el).closest('.fcfieldval_container');
+				var hasValue = box.find('.hasvalue').val();
+				
 				box.find('.originalname').val('');
 				box.find('.existingname').val('');
 				box.find('.hasvalue').val('');
 				box.find('input, textarea').val('');
 				box.find('.preview_image').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+				
 				var valcounter = document.getElementById('".$elementid."');
-				valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
+				if (hasValue) valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
+				//if(window.console) window.console.log(valcounter.value);
+			}
+			
+			var currElement".$field->id.";
+			function incrementValCnt".$field->id."(el)
+			{
+				var box = jQuery('#'+currElement".$field->id.").closest('.fcfieldval_container');
+				var hasValue = box.find('.hasvalue').val();
+				box.find('.hasvalue').val('1');
+				var valcounter = document.getElementById('".$elementid."');
+				if (hasValue=='') {
+					if ( typeof valcounter.value === 'undefined' || valcounter.value=='' ) valcounter.value = '1';
+					else valcounter.value = parseInt(valcounter.value) + 1;
+				}
+				//if(window.console) window.console.log(valcounter.value);
 			}
 			
 		";
@@ -552,8 +645,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			table.fcfield'.$field->id.'.img_upload_select ul.image_picker_selector { min-height: 400px; max-height: 600px; height: unset; width:100%; box-sizing: border-box; }
 		';
 		
-		// Add jQuery modal window to the select image file button, the container will be created if it does not exist already
-		if ( $image_source ) {
+		// Folder-mode(s), add jQuery modal window to the select image file button, the container will be created if it does not exist already
+		if ( $image_source >= 1 )
+		{
 			$js .= "
 			jQuery(document).ready(function() {
 				jQuery('a.addfile_".$field->id."').each(function(index, value) {
@@ -565,8 +659,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				});
 			});
 			";
-		} else {
+		}
+		else if ( $image_source == 0 ) {
 			$select_existing = $existing_imgs ? $this->buildSelectList( $field ) : '';
+		}
+		else {
+			$select_existing = '';
 		}
 		
 		if ($js)  $document->addScriptDeclaration($js);
@@ -624,11 +722,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$count_vals++;
 			}
 			
-			$preview_msg = '
-				<input type="text" class="preview_msg fcfield_textval"  id="'.$elementid_n.'_preview_msg"  name="'.$elementid_n.'_preview_msg" value="'.$image_name.'" readonly="readonly" />
+			
+			if ( $image_source == -2 || $image_source == -1 ) {
+				$preview_msg = '';  // Joomla Media Manager / and Intro/Full use their own path preview
+			} else {
+				$preview_msg = '
+					<input type="text" class="preview_msg fcfield_textval"  id="'.$elementid_n.'_preview_msg"  name="'.$elementid_n.'_preview_msg" value="'.$image_name.'" readonly="readonly" />
 				';
+			}
 			$existingname = '';
-			if ( $image_source )
+			if ( $image_source >= 1 )
 			{
 				$addExistingURL = JURI::base(true)
 					.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;folder_mode=1'
@@ -648,9 +751,41 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$select_existing .= '<span class="btn btn-warning btn-small" onclick="clearField'.$field->id.'(this);">'.JText::_( 'FLEXI_CLEAR' ).'</span>';
 			}
 			
+			else if ( $image_source == -2 ) {
+				$mm_id = $elementid_n.'_existingname';
+				$img_path = $value['originalname'];
+				$img_src  = ($img_path && file_exists(JPATH_ROOT . '/' . $img_path))  ?  JUri::root() . $img_path  :  '';
+				$img_attr = array('id' => $mm_id . '_preview', 'class' => 'media-preview', 'style' => ' style="max-width:480px; max-height:360" ');
+				$img = $img_src  ?  JHtml::image($img_src, JText::_('JLIB_FORM_MEDIA_PREVIEW_ALT'), $img_attr)  :  '';
+				
+				$previewImg = '<div id="' . $mm_id . '_preview_img"' . ($img_src ? '' : ' style="display:none"') . '>' . $img . '</div>';
+				$previewImgEmpty = '<div id="' . $mm_id . '_preview_empty"' . ($img_src ? ' style="display:none"' : '') . '>'.JText::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY').'</div>';
+				
+				$tooltip = $previewImgEmpty . $previewImg;
+				$tooltip_options = array('title' => JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE'), 'text' => '<i class="icon-eye"></i>', 'class' => 'hasTipPreview');
+				
+				$mm_link = 'index.php?option=com_media&amp;view=images&amp;tmpl=component&amp;asset=com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder=';
+				$select_existing = '
+				<div class="input-prepend input-append">
+					<div class="media-preview add-on">
+						'.JHtml::tooltip($tooltip, $tooltip_options).'
+					</div>
+					<input type="text" name="'.$fieldname_n.'[existingname]" id="'.$mm_id.'" value="'.htmlspecialchars($img_path, ENT_COMPAT, 'UTF-8').'" readonly="readonly"
+						class="existingname input-large field-media-input hasTipImgpath"  title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="'.JUri::root().'"
+					/>
+					<a class="fc_image_field_mm_modal btn hasTooltip" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); currElement'.$field->id.'=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((screen.width-120) > 1360 ? 1360 : (screen.width-120)), y: ((screen.height-220) > 800 ? 800 : (screen.width-220))}, handler: \'iframe\', onClose: function() { incrementValCnt'.$field->id.'(); } });  return false;">
+						'.JText::_('FLEXI_SELECT').'
+					</a>
+					<a class="btn hasTooltip" href="javascript:;" title="'.JText::_('FLEXI_CLEAR').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\');  clearField'.$field->id.'(this); jInsertFieldValue(\'\', mm_id); return false;" >
+						<i class="icon-remove"></i>
+					</a>
+				</div>
+				';
+			}
+			
 			// Add current image or add an empty image container
 			$remove = $change = '';
-			if ( (!$multiple || $is_ingroup) && !$image_source )
+			if ( (!$multiple || $is_ingroup) && $image_source == 0 )
 			{
 				if ( !$required_class ) {
 					$remove  = '<div id="'.$elementid_n.'_imgremove" class="imgremove">';
@@ -662,36 +797,52 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 			}
 			
+			// Calculate image preview link
+			if ( $image_source == -2 || $image_source == -1 ) {
+				//$img_link  = JURI::root(true).'/'.$image_name;
+				$img_link = false;  // Joomla Media Manager / and Intro/Full use a popup preview
+			}
+			
+			else if ( $image_name )
+			{
+				// $image_source >= 0
+				$img_link  = JURI::root(true).'/'.$dir_url;
+				$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : '');
+				$img_link .= ($item->id ? '/m_' .$extra_prefix : '/original/') .$image_name;
+				
+				if (isset($value['existingname']))
+				{
+					$ext = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
+					$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$img_link = str_replace('\\','/', $img_link);
+					$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h;
+				}
+			} else {
+				$img_link = '';
+			}
+			
+			// Create the image preview using the image preview link
+			if ( $img_link ) {
+				$imgpreview = '<img class="preview_image" id="'.$elementid_n.'_preview_image" src="'.$img_link.'" alt="Preview image" />';
+			}
+			else if ( $img_link !== false ) {
+				$imgpreview = '<img class="preview_image" id="'.$elementid_n.'_preview_image" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Preview image" />';
+			}
+			else {
+				$imgpreview = '';
+			}
+			
+			// originalname form field
 			if ( $image_name )
 			{
 				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
-				if ($use_ingroup) $originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required_class : '').'" value="'.$value['originalname'].'" />';
-				
-				if (!empty($image_name))
-				{
-					$img_link  = JURI::root(true).'/'.$dir_url;
-					$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : '');
-					$img_link .= ($item->id ? '/m_' .$extra_prefix : '/original/') .$image_name;
-					if (isset($value['existingname']))
-					{
-						$ext = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
-						$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
- 						$img_link = str_replace('\\','/', $img_link);
- 						$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h;
- 					}
-				} else {
-					$img_link = '';
-				}
-				$imgpreview = '<img class="preview_image" id="'.$elementid_n.'_preview_image" src="'.$img_link.'" alt="Preview image" />';
-				
+				$originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required_class : '').'" value="1" />';
 			} else {
-				
 				$originalname = '<input name="'.$fieldname_n.'[originalname]" id="'.$elementid_n.'_originalname" type="hidden" class="originalname" value="" />';
-				if ($use_ingroup) $originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required_class : '').'" value="" />';
-				$imgpreview = '<img class="preview_image" id="'.$elementid_n.'_preview_image" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Preview image" />';
+				$originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required_class : '').'" value="" />';
 			}
 			
-			if ( !$image_source && !$imgsel_visible ) {
+			if ( $image_source == 0 && !$imgsel_visible ) {
 				$change .= '
 					<span>
 						<input class="imgchange" style="visibility:hidden;" type="checkbox" name="'.$fieldname_n.'[change]" id="'.$elementid_n.'_change" onchange="fx_toggle_upload_select_tbl(this)" value="1" '.($image_name ? '' : ' checked="checked" ').'/>
@@ -730,8 +881,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					<td><input class="imgcust2" size="40" name="'.$fieldname_n.'[cust2]" value="'.(isset($value['cust2']) ? $value['cust2'] : $default_cust2).'" type="text" /></td>
 				</tr>';
 			
-			$curr_select = $select_existing ? str_replace('__FORMFLDNAME__', $fieldname_n.'[existingname]', $select_existing) : '';
-			$curr_select = $select_existing ? str_replace('__FORMFLDID__', $elementid_n.'_existingname', $curr_select) : '';
+			// DB-mode needs a 'select_existing_n'
+			if ( $image_source == 0 )
+			{
+				$select_existing_n = $select_existing ? str_replace('__FORMFLDNAME__', $fieldname_n.'[existingname]', $select_existing) : '';
+				$select_existing_n = $select_existing ? str_replace('__FORMFLDID__', $elementid_n.'_existingname', $select_existing_n) : '';
+			}
 			
 			$field->html[] = '
 			'.($multiple ? '
@@ -745,14 +900,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			'.$originalname.'
 			'.$existingname.'
 			<div class="fcclear"></div>
-			<div class="fcimg_preview_box" style="float:left!important; clear:none!important; margin-right:5px!important;">
-				'.$imgpreview.'
-				<div style="float:left; clear:both; display:inline-block; min-height:4px;" class="imgactions_box">
-					'.($remove ? $remove : '').'
-				</div>
+			
+			'.($image_source == -2 || $image_source == -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
+				$select_existing.'
 				<div class="fcclear"></div>
-			'.($image_source ? $curr_select : $change).'
-			</div>
+			' : '
+				<div class="fcimg_preview_box" style="float:left!important; clear:none!important; margin-right:5px!important;">
+					'.$imgpreview.'
+					<div style="float:left; clear:both; display:inline-block; min-height:4px;" class="imgactions_box">
+						'.($remove ? $remove : '').'
+					</div>
+					<div class="fcclear"></div>
+				'.($image_source ? $select_existing : $change).'
+				</div>
+			').'
 			'
 			
 			.(($linkto_url || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
@@ -769,11 +930,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			</div>'
 			: '').
 			
-			( !$image_source ? '
+			( $image_source == 0 ? '
 				<table class="admintable fcfield'.$field->id.' img_upload_select" id="'.$field->name.'_upload_select_tbl_'.$n.'" style="'.($image_name && $imgsel_visible==0 ? "display:none;" : "").($multiple ? '' : 'width:auto;').'" >
 				<tbody>
 					<tr class="img_newfile_row">
-						'.($curr_select ? '<td class="key">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).'</td>' : '').'
+						'.($select_existing_n ? '<td class="key">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).'</td>' : '').'
 						<td style="white-space: normal;">'.
 							'<input name="'.$field->name.'['.$n.']" id="'.$elementid_n.'_newfile" class="newfile no_value_selected" '.$onchange.' type="file" /><br/>' .
 							$uploadLimitsTxt.
@@ -781,10 +942,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 							'<span style="margin-left:12px;">'.str_replace(",", ", ", $field->parameters->get('upload_extensions')) .'</span>
 						</td>
 					</tr>
-					'.($curr_select ? '
+					'.($select_existing_n ? '
 					<tr class="img_existingfile_row">
-						<td class="key">'.JText::_( !$image_source ? 'FLEXI_FIELD_EXISTINGFILE' : 'FLEXI_SELECT' ).'</td>
-						<td>'.$curr_select.'</td>
+						<td class="key">'.JText::_( $image_source == 0 ? 'FLEXI_FIELD_EXISTINGFILE' : 'FLEXI_SELECT' ).'</td>
+						<td>'.$select_existing_n.'</td>
 					</tr>
 					' : '').'
 				</tbody></table>
@@ -817,7 +978,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		if ( count($skipped_vals) )
-			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_IMAGE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 	}
 	
 	
@@ -832,7 +993,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		
 		$image_source = $field->parameters->get('image_source', 0);
+		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		
 		// ***********************
@@ -846,7 +1009,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$app       = JFactory::getApplication();
 			$document	 = JFactory::getDocument();
 			$option    = JRequest::getVar('option');
-			jimport('joomla.filesystem');
 			
 			// *****************************
 			// Get isMobile / isTablet Flags
@@ -884,20 +1046,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$isItemsManager = $app->isAdmin() && $realview=='items' && $option=='com_flexicontent';
 		$isSite = $app->isSite();
 		
-		
-		
-		// *************************************************
-		// TODO:  implement MODES >= 2, and remove this CODE
-		// *************************************************
-		if ($image_source > 1) {
-			global $fc_folder_mode_err;
-			if (empty($fc_folder_mode_err[$field->id])) {
-				echo __FUNCTION__."(): folder-mode: ".$image_source." not implemented please change image-source mode in image/gallery field with id: ".$field->id;
-				$fc_folder_mode_err[$field->id] = 1;
-				$image_source = 1;
-			}
-		}
-		
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$dir          = $field->parameters->get('dir');
@@ -908,7 +1056,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$u_item_id = ($of_usage && $item->lang_parent_id && $item->lang_parent_id != $item->id)  ?  $item->lang_parent_id  :  $item->id;
 		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
+		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method==0;
 		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
 		
 		$usealt      = $field->parameters->get( 'use_alt', 1 ) ;
@@ -988,21 +1136,48 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (!is_object($item->images)) $item->images = new JRegistry($item->images);
 				//echo "<pre>"; print_r($item->images); echo "</pre>";
 				$_image_path = $item->images->get('image_'.$_image_name, '');
-				$image_by_params = array();
+				$image_IF = array();
 				// field attributes (mode-specific)
-				$image_by_params['image_size']  = $_image_name;
-				$image_by_params['image_path']  = $_image_path;
+				$image_IF['image_size']  = $_image_name;
+				$image_IF['image_path']  = $_image_path;
 				// field attributes (value)
-				$image_by_params['originalname'] = basename($_image_path);
-				$image_by_params['alt']   = $item->images->get('image_'.$_image_name.'_alt', '');
-				$image_by_params['title'] = $item->images->get('image_'.$_image_name.'_alt', '');
-				$image_by_params['desc']  = $item->images->get('image_'.$_image_name.'_caption', '');
-				$image_by_params['cust1'] = '';
-				$image_by_params['cust2'] = '';
-				$image_by_params['urllink'] = '';
-				$values = array(serialize($image_by_params));
-				//echo "<pre>"; print_r($image_by_params); echo "</pre>"; exit;
+				$image_IF['originalname'] = basename($_image_path);
+				$image_IF['alt']   = $item->images->get('image_'.$_image_name.'_alt', '');
+				$image_IF['title'] = $item->images->get('image_'.$_image_name.'_alt', '');
+				$image_IF['desc']  = $item->images->get('image_'.$_image_name.'_caption', '');
+				$image_IF['cust1'] = '';
+				$image_IF['cust2'] = '';
+				$image_IF['urllink'] = '';
+				$values = array(serialize($image_IF));
+				//echo "<pre>"; print_r($image_IF); echo "</pre>"; exit;
 			}
+		}
+		
+		else if ( $image_source == -2 ) {
+			$n = 0;
+			$_values = array();
+			$images_MM = array();
+			foreach($values as $value)
+			{
+				//echo "<pre>"; print_r($values); echo "</pre>";
+				$_image_path = $value;
+				$images_MM[$n] = array();
+				// field attributes (mode-specific)
+				$images_MM[$n]['image_size']  = 'media';
+				$images_MM[$n]['image_path']  = $_image_path;
+				// field attributes (value)
+				$images_MM[$n]['originalname'] = basename($_image_path);
+				$images_MM[$n]['alt']   = '';
+				$images_MM[$n]['title'] = '';
+				$images_MM[$n]['desc']  = '';
+				$images_MM[$n]['cust1'] = '';
+				$images_MM[$n]['cust2'] = '';
+				$images_MM[$n]['urllink'] = '';
+				$_values[$n] = serialize($images_MM[$n]);
+				//echo "<pre>"; print_r($images_MM[$n]); echo "</pre>"; exit;
+				$n++;
+			}
+			$values = $_values;
 		}
 		
 		// Check for deleted image files or image files that cannot be thumbnailed,
@@ -1021,20 +1196,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// Create default image to be used if  (a) no image assigned  OR  (b) images assigned have been deleted
 			$default_image = $field->parameters->get( 'default_image', '');
 			if ( $default_image ) {
-				$default_image_val = array();
+				$image_DF = array();
 				// field attributes (default value specific)
-				$default_image_val['default_image'] = $default_image;  // holds complete relative path and indicates that it is default image for field
+				$image_DF['default_image'] = $default_image;  // holds complete relative path and indicates that it is default image for field
 				// field attributes (value)
-				$default_image_val['originalname'] = basename($default_image);
-				$default_image_val['alt'] = $default_alt;
-				$default_image_val['title'] = $default_title;
-				$default_image_val['desc'] = $default_desc;
-				$default_image_val['cust1'] = $default_cust1;
-				$default_image_val['cust2'] = $default_cust2;
-				$default_image_val['urllink'] = '';
+				$image_DF['originalname'] = basename($default_image);
+				$image_DF['alt'] = $default_alt;
+				$image_DF['title'] = $default_title;
+				$image_DF['desc'] = $default_desc;
+				$image_DF['cust1'] = $default_cust1;
+				$image_DF['cust2'] = $default_cust2;
+				$image_DF['urllink'] = '';
 				
 				// Create thumbnails for default image
-				if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $default_image_val, $item) ) $values = array(serialize($default_image_val));
+				if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $image_DF, $item) ) $values = array(serialize($image_DF));
 				// Also default image can (possibly) be used across multiple fields, so set flag to add field id to filenames of thumbnails
 				$multiple_image_usages = true;
 				$extra_prefix = 'fld'.$field->id.'_';
@@ -1354,28 +1529,43 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		else if ( $image_source == -1 ) {
 			$extra_folder = 'intro_full';  // intro-full images mode
 		}
-		else if ( $image_source > 0 ) {
-			$extra_folder = 'item_'.$u_item_id.'_field_'.$field->id;  // folder-mode 1
-			if ( $image_source > 1 ) ; // TODO
+		else if ( $image_source == -2 ) {
+			$extra_folder = 'mediaman';  // media manager mode
+		}
+		else if ( $image_source >= 1 ) {
+			$extra_folder = 'item_'.$u_item_id.'_field_'.$field->id;  // Folder-mode 1
+			//if ( $image_source > 1 ) ; // TODO
 		}
 		else {
-			$extra_folder = '';  // db-mode
+			$extra_folder = '';  // DB-mode
 		}
 		
 		// Create thumbs/image Folder and URL paths
 		$thumb_folder  = JPATH_SITE .DS. JPath::clean( $dir .($extra_folder ? DS.$extra_folder : '') );
 		$thumb_urlpath = $dir_url .($extra_folder ? '/'. $extra_folder : '');
+		
 		if ( $field->using_default_value ) {
 			// default image of this field, these are relative paths up to site root
-			$orig_urlpath  = str_replace('\\','/', dirname($default_image_val['default_image']));
-		} else if ($image_source == -1) {
-			// intro-full image values, these are relative paths up to the site root, must be calculated later !!
-			$orig_urlpath  = str_replace('\\','/', dirname($image_by_params['image_path']));
-		} else if ( $image_source > 0) {
-			// various folder-mode(s)
+			$orig_urlpath  = str_replace('\\','/', dirname($image_DF['default_image']));
+		}
+		else if ( $image_source == -1 ) {
+			// intro-full image values, these are relative paths up to the site root
+			$orig_urlpath  = str_replace('\\','/', dirname($image_IF['image_path']));
+		}
+		else if ( $image_source == -2 ) {
+			// via media manager, these are relative paths up to the site root
+			$orig_urlpath = array();
+			foreach($images_MM as $n => $image_MM) {
+				$orig_urlpath[$n] = str_replace('\\','/', dirname($image_MM['image_path']));
+			}
+		}
+		else if ( $image_source >= 1 ) {
+			// various Folder-mode(s)
 			$orig_urlpath  = $thumb_urlpath . '/original';
-		} else {
-			// db-mode
+			//if ( $image_source > 1 ) ; // TODO
+		}
+		else {
+			// DB-mode
 			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 			$orig_urlpath  = str_replace('\\','/', $cparams->get('file_path', 'components/com_flexicontent/uploads'));
 		}
@@ -1446,7 +1636,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$srcs = $thumb_urlpath . '/s_' .$extra_prefix. $image_name;  // small
 			$srcm = $thumb_urlpath . '/m_' .$extra_prefix. $image_name;  // medium
 			$srcl = $thumb_urlpath . '/l_' .$extra_prefix. $image_name;  // large
-			$srco = $orig_urlpath  . '/'   .$image_name;  // original image
+			$srco = (is_array($orig_urlpath) ? $orig_urlpath[$i] : $orig_urlpath)  . '/'   .$image_name;  // original image
 			
 			// Create a popup url link
 			$urllink = @$value['urllink'] ? $value['urllink'] : '';
@@ -1893,16 +2083,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Get configuration
 		$is_importcsv      = JRequest::getVar('task') == 'importcsv';
 		$import_media_folder  = JRequest::getVar('import_media_folder');
-		$image_source = $field->parameters->get('image_source', 0);
-		if ($image_source > 1) {
-			global $fc_folder_mode_err;
-			if (empty($fc_folder_mode_err[$field->id])) {
-				echo __FUNCTION__."(): folder-mode: ".$image_source." not implemented please change image-source mode in image/gallery field with id: ".$field->id;
-				$fc_folder_mode_err[$field->id] = 1;
-				$image_source = 1;
-			}
-		}
 		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid', '' );
+		
+		$image_source = $field->parameters->get('image_source', 0);
+		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
+		
 		
 		// Set a warning message for overriden/changed files: form.php (frontend) or default.php (backend)
 		if ( !$is_importcsv && empty($unique_tmp_itemid) ) {
@@ -1924,15 +2109,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		
 		// ***********************************************
-		// Special steps for image field in folder-mode(s)
+		// Special steps for image field in Folder-mode(s)
 		// ***********************************************
-		if ( $image_source > 0 )
+		if ( $image_source >= 1 )
 		{
 			$dir = $field->parameters->get('dir');
 			$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid', '' );
 			
 			$destpath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id . '_field_'.$field->id .DS );
-			if ( $image_source > 1 ) ; // TODO
+			//if ( $image_source > 1 ) ; // TODO
 			
 			// Create original images folder if doing CSV import and folder does not exist
 			if ( $is_importcsv ) {
@@ -1948,6 +2133,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$temppath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$unique_tmp_itemid. '_field_'.$field->id .DS );
 				JFolder::move($temppath, $destpath);
 			}
+		}
+		
+		
+		// ****************************************
+		// Special steps for image field in MM-mode
+		// ****************************************
+		
+		if ( $image_source == -2 )
+		{
+			$destpath_media = 'images/';
+			$destpath_media_full = JPath::clean( JPATH_SITE .DS. $destpath_media );
 		}
 		
 		
@@ -2017,15 +2213,25 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$sub_folder = dirname($v['originalname']);
 				$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
 				
-				if ($image_source) {
+				if ( $image_source >= 1 ) {
 					$srcfilepath  = JPath::clean( $srcpath_original . $v['originalname'] );
 					$destfilepath = JPath::clean( $destpath_original . $filename );
 					if ( JFile::exists($srcfilepath) ) {
 						$result = JFile::copy( $srcfilepath,  $destfilepath );
 						if ( $result && JPath::canChmod($destfilepath) )  chmod($destfilepath, 0644);
 					}
-					$v['originalname'] = $filename; // make sure filename is without subfolder
-				} else {
+					$v['originalname'] = $filename; // make sure filename is WITHOUT subfolder
+				}
+				else if ( $image_source == -2 ) {
+					$srcfilepath  = JPath::clean( $srcpath_original . $v['originalname'] );
+					$destfilepath = JPath::clean( $destpath_media_full . $filename );
+					if ( JFile::exists($srcfilepath) ) {
+						$result = JFile::copy( $srcfilepath,  $destfilepath );
+						if ( $result && JPath::canChmod($destfilepath) )  chmod($destfilepath, 0644);
+					}
+					$v['originalname'] = $destpath_media . $filename; // make sure filename is WITH subfolder
+				}
+				else {
 					$fman = new FlexicontentControllerFilemanager();
 					JRequest::setVar( 'return-url', null, 'post' );
 					JRequest::setVar( 'file-dir-path', DS.$import_media_folder . $sub_folder, 'post' );
@@ -2073,7 +2279,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
     
     // Remove no longer used files, if limiting existing image list to current field, or if existing image list is hidden/disabled
-    if ( $image_source && ($field->parameters->get('auto_delete_unused', 1) || !$field->parameters->get('list_all_media_files', 0) || !$field->parameters->get('existing_imgs', 1)) )
+    if ( $image_source >= 1 && ($field->parameters->get('auto_delete_unused', 1) || !$field->parameters->get('list_all_media_files', 0) || !$field->parameters->get('existing_imgs', 1)) )
     {
 			// Get existing field values, 
 			if (!isset($item->fieldvalues)) {
@@ -2123,26 +2329,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	
 	
 	// Method called just before the item is deleted to remove custom item data related to the field
-	function onBeforeDeleteField(&$field, &$item) {
-		$image_source = $field->parameters->get('image_source', 0);
-		if ($image_source > 1) {
-			global $fc_folder_mode_err;
-			if (empty($fc_folder_mode_err[$field->id])) {
-				echo __FUNCTION__."(): folder-mode: ".$image_source." not implemented please change image-source mode in image/gallery field with id: ".$field->id;
-				$fc_folder_mode_err[$field->id] = 1;
-				$image_source = 1;
-			}
-		}
+	function onBeforeDeleteField(&$field, &$item)
+	{
 		$dir = $field->parameters->get('dir');
+		$image_source = $field->parameters->get('image_source', 0);
+		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
-		if ( $image_source > 0 ) {
+		if ( $image_source >= 1 ) {
 			jimport('joomla.filesystem.file');
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.path');
 			
 			// Delete image folder if it exists
 			$destpath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id   . '_field_'.$field->id .DS);
-			if ( $image_source > 1 ) ; // TODO
+			//if ( $image_source > 1 ) ; // TODO
 			
 			if ( JFolder::exists($destpath) && !JFolder::delete($destpath) ) {
 				JError::raiseNotice(100, $field->label .': Notice: Unable to delete folder: '. $destpath );
@@ -2254,18 +2454,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
+		
 		$image_source = $field->parameters->get('image_source', 0);  // This should be always ZERO inside this function
-		if ($image_source > 1) {
-			global $fc_folder_mode_err;
-			if (empty($fc_folder_mode_err[$field->id])) {
-				echo __FUNCTION__."(): folder-mode: ".$image_source." not implemented please change image-source mode in image/gallery field with id: ".$field->id;
-				$fc_folder_mode_err[$field->id] = 1;
-				$image_source = 1;
-			}
-		}
+		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
+		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method==0;
 		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
 		
 		if ( isset($file['name']) && $file['name'] != '' )
@@ -2376,14 +2570,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// (DB/Folder) Mode of image field
 		$image_source = $field->parameters->get('image_source', 0);
-		if ($image_source > 1) {
-			global $fc_folder_mode_err;
-			if (empty($fc_folder_mode_err[$field->id])) {
-				echo __FUNCTION__."(): folder-mode: ".$image_source." not implemented please change image-source mode in image/gallery field with id: ".$field->id;
-				$fc_folder_mode_err[$field->id] = 1;
-				$image_source = 1;
-			}
-		}
+		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
 		
 		// Image file paths
 		$dir = $field->parameters->get('dir');
@@ -2496,22 +2683,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$db = JFactory::getDBO();
 		$image_source = $field->parameters->get('image_source', 0);
-		if ($image_source > 1) {
-			global $fc_folder_mode_err;
-			if (empty($fc_folder_mode_err[$field->id])) {
-				echo __FUNCTION__."(): folder-mode: ".$image_source." not implemented please change image-source mode in image/gallery field with id: ".$field->id;
-				$fc_folder_mode_err[$field->id] = 1;
-				$image_source = 1;
-			}
-		}
-
-		if ( $image_source > 0 ) {  // folder-modes
+		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
+		
+		if ( $image_source >= 1 ) {  // Folder-mode 1
 			$thumbfolder = JPath::clean(JPATH_SITE .DS. $field->parameters->get('dir') .DS. 'item_'.$field->item_id . '_field_'.$field->id);
-			if ( $image_source > 1 ) ; // TODO
+			//if ( $image_source > 1 ) ; // TODO
 			
 			$origfolder  = $thumbfolder .DS. 'original' .DS;
 		}
-		else if ( $image_source == 0 ) { // db-bode
+		else if ( $image_source == 0 ) { // DB-mode
 			$thumbfolder = JPath::clean( JPATH_SITE .DS. $field->parameters->get('dir') );
 			$origfolder  = JPath::clean( COM_FLEXICONTENT_FILEPATH );
 		}
@@ -2538,9 +2718,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			JError::raiseNotice(100, JText::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') .": ". $origpath);
 		}
 
-		if ( $image_source ) {
-			// Done nothing more to clean
-		} else {
+		// For DB-mode, also delete file from database
+		if ( $image_source == 0 )
+		{
 			$query = 'DELETE FROM #__flexicontent_files'
 				. ' WHERE ' . $db->quoteName('filename') . ' = ' . $db->Quote($filename);
 			$db->setQuery( $query );
@@ -2562,18 +2742,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	{
 		static $images_processed = array();
 		
-		$filename = trim( @$value['originalname'] );
+		$image_source = $field->parameters->get('image_source', 0);
+		if ($image_source > 1) $image_source = $this->nonImplementedMode($image_source, $field);
+		
+		$filename = $image_source == -2 ? basename( @$value['originalname']) : @$value['originalname'];
+		$filename = trim( $filename );
+		
 		if ( !$filename ) return;  // check for empty filename
 		
-		$image_source = $field->parameters->get('image_source', 0);
-		if ($image_source > 1) {
-			global $fc_folder_mode_err;
-			if (empty($fc_folder_mode_err[$field->id])) {
-				echo __FUNCTION__."(): folder-mode: ".$image_source." not implemented please change image-source mode in image/gallery field with id: ".$field->id;
-				$fc_folder_mode_err[$field->id] = 1;
-				$image_source = 1;
-			}
-		}
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$dir = $field->parameters->get('dir');
@@ -2583,41 +2759,51 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$u_item_id = ($of_usage && $item->lang_parent_id && $item->lang_parent_id != $item->id)  ?  $item->lang_parent_id  :  $item->id;
 		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
+		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method==0;
 		$multiple_image_usages = $multiple_image_usages || @ $value['default_image'];
 		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
 		
 		
-		// Extra thumbnails sub-folder for various
+		// Extra thumbnails sub-folder
+		
 		if ( !empty($value['default_image']) ) {
 			$extra_folder = '';  // default value
 		}
 		else if ( $image_source == -1 ) {
 			$extra_folder = 'intro_full';  // intro-full images mode
 		}
-		else if ( $image_source > 0 ) {
-			$extra_folder = 'item_'.$u_item_id . '_field_'.$field->id;  // folder-mode 1
-			if ( $image_source > 1 ) ; // TODO
+		else if ( $image_source == -2 ) {
+			$extra_folder = 'mediaman';  // media manager mode
+		}
+		else if ( $image_source >= 1 ) {
+			$extra_folder = 'item_'.$u_item_id . '_field_'.$field->id;  // Folder-mode 1
+			//if ( $image_source > 1 ) ; // TODO
 		}
 		else {
-			$extra_folder = '';  // db-mode
+			$extra_folder = '';  // DB-mode
 		}
 		
 		
-		// ******************************
 		// Find out path to original file
-		// ******************************
+		
 		if ( !empty($value['default_image']) ) {
 			// default image of this field, these are relative paths up to site root
 			$origpath  = JPath::clean( JPATH_SITE .DS. dirname($value['default_image']) .DS );
-		} else if ($image_source == -1) {
+		}
+		else if ($image_source == -1) {
 			// intro-full image values, these are relative paths up to the site root
 			$origpath  = JPath::clean( JPATH_SITE .DS. dirname($value['image_path']) .DS );
-		} else if ( $image_source > 0) {
-			// various folder-mode(s)
+		}
+		else if ( $image_source == -2 ) {
+			// via media manager, these are relative paths up to the site root, must be calculated later !!
+			$origpath  = JPath::clean( JPATH_SITE .DS. dirname($value['originalname']) .DS );
+		}
+		else if ( $image_source >= 1) {
+			// various Folder-mode(s)
 			$origpath  = JPath::clean( JPATH_SITE .DS. $dir .DS. $extra_folder .DS. 'original' .DS );
-		} else {
-			// db-mode
+		}
+		else {
+			// DB-mode
 			$origpath  = JPath::clean( COM_FLEXICONTENT_FILEPATH .DS );
 		}
 		$filepath  = JPath::clean( $origpath . $filename );
@@ -2627,10 +2813,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// *************************************************************************************************
 		// ** PERFORMANCE CONSIDERATION : Try to avoid rechecking/recreating image thumbnails multiple times
 		// *************************************************************************************************
-		if ( $image_source > 0 ) {  // folder-modes
+		if ( $image_source >= 1 ) {  // Folder-mode 1
 			$pindex = 'item_'.$u_item_id . '_field_'.$field->id;
-			if ( $image_source > 1 ) ; // TODO
-		} else {  // db-mode or intro-full mode
+			//if ( $image_source > 1 ) ; // TODO
+		} else {  // DB-mode or intro-full mode
 			$pindex = 'field_'.$field->id;
 		}
 		if (isset($images_processed[$pindex][$filepath])) {
@@ -2644,10 +2830,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		
 		// **********************************************************
-		// Enforce protection of original image files any folder-mode
+		// Enforce protection of original image files any Folder-mode
 		// **********************************************************
 		jimport('joomla.filesystem.folder');
-		if ($image_source > 0 && JFolder::exists($origpath))
+		if ($image_source >= 1 && JFolder::exists($origpath))
 		{
 			$protect_original = $field->parameters->get('protect_original', 1);
 			$htaccess_file = JPath::clean( $origpath . '.htaccess' );
@@ -2965,4 +3151,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		</span>
 		';
 	}
+	
+	function nonImplementedMode($image_source, &$field)
+	{
+		static $fc_folder_mode_err;
+		if ( isset($fc_folder_mode_err[$field->id]) ) return 1;
+		
+		JFactory::getApplication()->enqueueMessage("Error source-mode: ".$image_source." not implemented please change image-source mode in image/gallery field with id: ".$field->id, 'warning' );
+		$fc_folder_mode_err[$field->id] = 1;
+		return 1;
+	}
+	
 }
