@@ -158,6 +158,7 @@
 		<fieldset name="acloverrides" label="FLEXI_MENU_OVERRIDE_SUBMIT_PUBLISH_ACL" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" label="" type="separator" default="FLEXI_MENU_UNAUTHORIZED_USERS" level="level1" />
+			<field name="" type="separator" default="- Override 'create' permission (ACL) of TYPES. &lt;br/&gt; - CATEGORIES 'create' permission (ACL) is still enforced" level="" class="alert alert-info fcpadded fcinlineblock" />
 			<field name="allowunauthorize" type="radio" default="0" label="FLEXI_MENU_UNAUTHORIZED_SUBMIT" description="FLEXI_MENU_UNAUTHORIZED_SUBMIT_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_MENU_NO_OVERRIDE_USE_ACL</option>
 				<option value="1">FLEXI_YES</option>
@@ -178,16 +179,28 @@
 		<fieldset name="catpermsoverride" label="FLEXI_MENU_OVERRIDE_CATEGORY_ACL" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements" >
 
 			<field name="" label="" type="separator" default="FLEXI_CATEGORIES" level="level1"/>
+			<field name="" type="separator" default="- Override 'create' permission (ACL) of CATEGORIES. &lt;br/&gt; - TYPES 'create' permission (ACL) is still enforced" level="" class="alert alert-info fcpadded fcinlineblock" />
 			<field name="overridecatperms" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE" description="FLEXI_MENU_ENABLE_CATPERMS_OVERRIDE_DESC" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="overridecatperms_on">FLEXI_MENU_NO_OVERRIDE_USE_ACL</option>
 				<option value="1" show_list="overridecatperms_on" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="maincatid" type="flexicategories" top="2" multiple="false" required="false" size="1" default="" label="FLEXI_MENU_DEFAULT_MAIN_CATEGORY" description="FLEXI_MENU_DEFAULT_MAIN_CATEGORY_DESC" class="overridecatperms_on" />
 			<field name="cid" type="flexicategories" multiple="true" size="12" required="false" default="" label="FLEXI_MENU_DISPLAYED_CATS" description="FLEXI_MENU_DISPLAYED_CATS_DESC" class="overridecatperms_on" />
-			<field name="postcats" type="multilist" subtype="radio" default="2" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC" class="overridecatperms_on btn-group group-fcinfo" >
-				<option value="0">SUBMIT_IN_ALL_ABOVE_CATS</option>
-				<option value="1">SUBMIT_IN_ONE_CAT</option>
-				<option value="2">SUBMIT_IN_MULTIPLE_CATS</option>
+			<field name="postcats" type="multilist" subtype="radio" toggle_related="1" default="2" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC" class="overridecatperms_on btn-group group-fcinfo" >
+				<option value="1" show_list="" hide_list="using_mul_cats,using_fixed_cats">SUBMIT_IN_ONE_CAT</option>
+				<option value="2" show_list="using_mul_cats" hide_list="using_fixed_cats" >SUBMIT_IN_MULTIPLE_CATS</option>
+				<option value="0" show_list="using_fixed_cats" hide_list="using_mul_cats">SUBMIT_IN_ALL_ABOVE_CATS</option>
+			</field>
+			
+			<field name="postcats_show" type="radio" default="1" label="Display category titles" description="Select to display main category or all category titles" class="overridecatperms_on using_fixed_cats btn-group group-fcinfo" >
+				<!--option value="0">FLEXI_NO</option-->
+				<option value="1">Main category only</option>
+				<option value="2">FLEXI_ALL</option>
+			</field>
+			
+			<field name="override_mulcatsperms" type="radio" default="1" label="Override multi-category ACL" description="Select to ignore user's privilege of assigning an item to multiple categories" class="overridecatperms_on using_mul_cats btn-group group-fcinfo" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 		</fieldset>

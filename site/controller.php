@@ -293,7 +293,7 @@ class FlexicontentController extends JControllerLegacy
 		$isOwner = $model->get('created_by') == $user->get('id');
 		
 		
-		// Get merged parameters: component, type, menu
+		// Get merged parameters: component, type, and (FE only) menu
 		$params = new JRegistry();
 		$model_params = $model->getComponentTypeParams();
 		$params->merge($model_params);
@@ -306,8 +306,24 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Get some needed parameters
 		$submit_redirect_url_fe = $params->get('submit_redirect_url_fe', '');
-		$allowunauthorize       = $params->get('allowunauthorize', 0);
 		$dolog = $params->get('print_logging_info');
+		
+		// Get submit configuration override
+		if ($isnew) {
+			$h = $data['submit_conf'];
+			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
+			
+			$submit_conf      = @ $item_submit_conf[$h] ;
+			$allowunauthorize = $params->get('allowunauthorize', 0);
+			$autopublished    = @ $submit_conf['autopublished'];     // Override flag for both TYPE and CATEGORY ACL
+			$overridecatperms = @ $submit_conf['overridecatperms'];  // Override flag for CATEGORY ACL
+		}
+		else {
+			$submit_conf      = false;
+			$allowunauthorize = false;
+			$autopublished    = false;
+			$overridecatperms = false;
+		}
 		
 		// Unique id for new items, needed by some fields for temporary data
 		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid' );
@@ -343,7 +359,7 @@ class FlexicontentController extends JControllerLegacy
 		$enable_cid_selector   = $perms->MultiCat && $CanChangeSecCat;
 		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
 		
-		// Enforce maintaining featured categories
+		// Enforce featured categories if user is not allowed to changed
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
 		$featured_cats = array();
 		if ( $featured_cats_parent && !$enable_featured_cid_selector )
@@ -360,24 +376,44 @@ class FlexicontentController extends JControllerLegacy
 			$data['featured_cid'] = $featured_cid;
 		}
 		
-		// Enforce maintaining secondary categories
-		if (!$enable_cid_selector && (empty($data['submit_conf']) || empty($data['cid'])) ) { // respect submit menu cat override
+		// Enforce maintaining secondary categories if user is not allowed to changed
+		// or (FE only) if these were not submitted
+		// *** NOTE *** this DOES NOT ENFORCE SUBMIT MENU category configuration, this is done later by the model store()
+		if (
+			!$enable_cid_selector   // user can not change / set secondary cats
+			&& !$overridecatperms   // (FE) no submit menu override for category ACL
+			&& empty($data['cid'])  // (FE) no secondary cats were submitted
+		) {
 			if ($isnew) {
+			  // For new item use default secondary categories from type configuration
 				$data['cid'] = $params->get('cid_default');
-			} else if ( isset($featured_cid) ) {
+			}
+			else if ( isset($featured_cid) ) {
+				// Use featured cats if these are set
 				$featured_cid_arr = array_flip($featured_cid);
 				$sec_cid = array();
 				foreach($model->get('cats') as $item_cat) if (!isset($featured_cid_arr[$item_cat])) $sec_cid[] = $item_cat;
 				$data['cid'] = $sec_cid;
-			} else {
+			}
+			else {
+				// Use already assigned categories (existing item)
 				$data['cid'] = $model->get('cats');
 			}
 		}
 		
-		if (!$enable_catid_selector && (empty($data['submit_conf']) || empty($data['catid'])) ) { // respect submit menu cat override
+		// Enforce maintaining main category if user is not allowed to change
+		// or (FE only) if this was not submitted
+		// *** NOTE *** this DOES NOT ENFORCE SUBMIT MENU category configuration, this is done later by the model store()
+		if (
+			!$enable_catid_selector   // user can not change / set main category
+			&& !$overridecatperms     // (FE) no submit menu override for category ACL
+			&& empty($data['catid'])  // (FE) no main category was submitted (FE)
+		) {
 			if ($isnew && $params->get('catid_default'))
+			  // For new item use default main category from type configuration
 				$data['catid'] = $params->get('catid_default');
 			else if ($model->get('catid'))
+				// Use already assigned main category (existing item)
 				$data['catid'] = $model->get('catid');
 		}
 		
@@ -468,9 +504,11 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
 		$ilayout = @ $data['attribs']['ilayout'];  // normal not be set if frontend template editing is not shown
-		if( $ilayout && !empty($data['layouts'][$ilayout]) )   $post['attribs']['layouts'] = $data['layouts'];
-		//echo "<pre>"; print_r($post['attribs']); exit;
-		
+		if( $ilayout && !empty($data['layouts'][$ilayout]) )
+		{
+			$post['attribs']['layouts'] = $data['layouts'];
+			//echo "<pre>"; print_r($post['attribs']); exit;
+		}
 		
 		// USEFULL FOR DEBUGING for J2.5 (do not remove commented code)
 		//$diff_arr = array_diff_assoc ( $data, $post);
@@ -520,6 +558,10 @@ class FlexicontentController extends JControllerLegacy
 			{
 				$canAdd = true;
 				$canCreateType = true;
+			}
+			else {
+				// If category override is enabled then only check type and do not check category ACL
+				$canAdd = $canAdd ? $canAdd : ($overridecatperms && $canCreateType);
 			}
 		}
 		

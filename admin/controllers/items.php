@@ -99,7 +99,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$isOwner = $model->get('created_by') == $user->get('id');
 		
 		
-		// Get merged parameters: component, type, menu (FE)
+		// Get merged parameters: component, type, and (FE only) menu
 		$params = new JRegistry();
 		$model_params = $model->getComponentTypeParams();
 		$params->merge($model_params);
@@ -131,7 +131,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$enable_cid_selector   = $perms->MultiCat && $CanChangeSecCat;
 		$enable_catid_selector = ($isnew && !$params->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
 		
-		// Enforce maintaining featured categories
+		// Enforce featured categories if user is not allowed to changed
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
 		$featured_cats = array();
 		if ( $featured_cats_parent && !$enable_featured_cid_selector )
@@ -148,24 +148,36 @@ class FlexicontentControllerItems extends FlexicontentController
 			$data['featured_cid'] = $featured_cid;
 		}
 		
-		// Enforce maintaining secondary categories
-		if (!$enable_cid_selector) {
+		// Enforce maintaining secondary categories if user is not allowed to changed
+		if (
+			!$enable_cid_selector   // user can not change / set secondary cats
+		) {
 			if ($isnew) {
+			  // For new item use default secondary categories from type configuration
 				$data['cid'] = $params->get('cid_default');
-			} else if ( isset($featured_cid) ) {
+			}
+			else if ( isset($featured_cid) ) {
+				// Use featured cats if these are set
 				$featured_cid_arr = array_flip($featured_cid);
 				$sec_cid = array();
 				foreach($model->get('cats') as $item_cat) if (!isset($featured_cid_arr[$item_cat])) $sec_cid[] = $item_cat;
 				$data['cid'] = $sec_cid;
-			} else {
+			}
+			else {
+				// Use already assigned categories (existing item)
 				$data['cid'] = $model->get('cats');
 			}
 		}
 		
-		if (!$enable_catid_selector) {
+		// Enforce maintaining main category if user is not allowed to change
+		if (
+			!$enable_catid_selector   // user can not change / set main category
+		) {
 			if ($isnew && $params->get('catid_default'))
+			  // For new item use default main category from type configuration
 				$data['catid'] = $params->get('catid_default');
 			else if ($model->get('catid'))
+				// Use already assigned main category (existing item)
 				$data['catid'] = $model->get('catid');
 		}
 		
@@ -213,10 +225,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		$post['jfdata']  = & $jfdata;          // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform
 		
 		// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
-		$ilayout = $data['attribs']['ilayout'];
-		if( !empty($data['layouts'][$ilayout]) ) {
-			//echo "<pre>"; print_r($post['attribs']);
-			//$post['attribs'] = array_merge($post['attribs'], $data['layouts'][$ilayout]);
+		$ilayout = $data['attribs']['ilayout'];  // must always be set in backend
+		if( $ilayout && !empty($data['layouts'][$ilayout]) )
+		{
 			$post['attribs']['layouts'] = $data['layouts'];
 			//echo "<pre>"; print_r($post['attribs']); exit;
 		}

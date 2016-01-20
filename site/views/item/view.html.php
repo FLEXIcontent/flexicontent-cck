@@ -490,7 +490,15 @@ class FlexicontentViewItem  extends JViewLegacy
 		{
 			JRequest::setVar('typeid', (int)$menu->query['typeid']);  // This also forces zero if value not set
 		}
+		
+		// Verify type is exists
 		$new_typeid = JRequest::getVar('typeid', 0, '', 'int');
+		$type_data = $model->getTypeslist(array($new_typeid), $check_perms = false, $_published=true);
+		if ( $new_typeid && empty($type_data) ) 
+		{
+			JError::raiseWarning( 404, 'Type ID: '.$new_typeid.' not found' );
+			$app->redirect( 'index.php' );
+		}
 		
 		// Verify type is allowed to the user
 		if ( !$new_typeid )
@@ -1475,12 +1483,15 @@ class FlexicontentViewItem  extends JViewLegacy
 		$maincatid = $params->get("maincatid");        // Default main category out of the overriden categories
 		$postcats  = $params->get("postcats", 0);      // Behavior of override, submit to ONE Or MULTIPLE or to FIXED categories
 		$override  = $params->get("overridecatperms", 1);   // Default to 1 for compatibilty with previous-version saved menu items
-
+		$postcats_show  = $params->get("postcats_show", 1);      // If submitting to fixed cats then show or not the category titles
+		$override_mulcatsperms  = $params->get("override_mulcatsperms", 0);
+		
 		// Check if item is new and overridden cats defined (cid or maincatid) and cat overriding enabled
 		if ( !$isnew || (empty($cid) && empty($maincatid)) || !$override ) return false;
 
-		// DO NOT override user's permission for submitting to multiple categories
-		if ( !$perms['multicat'] && $postcats==2 ) $postcats = 1;
+		// Check if overriding multi-category ACL permission for submitting to multiple categories
+		//echo "<pre>"; print_r($perms); echo "</pre>"; exit;
+		if ( !$perms['multicat'] && !$override_mulcatsperms && $postcats==2 ) $postcats = 1;
 
 		// OVERRIDE item categories, using the ones specified specified by the MENU item, instead of categories that user has CREATE (=add) Permission
 		$cids = empty($cid) ? array() : $cid;
@@ -1507,18 +1518,22 @@ class FlexicontentViewItem  extends JViewLegacy
 			case 0:  // no categories selection, submit to a MENU SPECIFIED categories list
 			default:
 				// Do not create multi-category field if only one category was selected
-				if ( count($cids)>1 ) {
+				if ( count($cids)>1 && $postcats_show==2 ) {
+					$mo_cats = '';
 					foreach ($cids as $catid) {
+						if ($catid == $maincatid) continue;
 						$cat_titles[$catid] = $globalcats[$catid]->title;
-						$mo_cats .= '<input type="hidden" name="'.$cid_form_fieldname.'" value="'.$catid.'" />';
+						$mo_cats .= '<!-- only used for form validation ignored during store --><input type="hidden" name="'.$cid_form_fieldname.'" value="'.$catid.'" />';
 					}
 					$mo_cats .= implode(', ', $cat_titles);
 				} else {
 					$mo_cats = false;
 				}
 				
-				$mo_maincat = $globalcats[$maincatid]->title;
-				$mo_maincat .= '<input type="hidden" name="'.$catid_form_fieldname.'" value="'.$maincatid.'" />';
+				$mo_maincat = $maincatid ?
+					$globalcats[$maincatid]->title :
+					flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="scat use_select2_lib required" ', $check_published=true, $check_perms=false);
+				$mo_maincat .= '<!-- only used for form validation ignored during store --><input type="hidden" name="'.$catid_form_fieldname.'" value="'.$maincatid.'" />';
 				$mo_cancid  = false;
 				break;
 			case 1:  // submit to a single category, selecting from a MENU SPECIFIED categories subset
@@ -1561,6 +1576,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Default to 1 for compatibilty with previous-version saved menu items
 		$overridecatperms  = $params->get("overridecatperms", 1);
 		if ( empty($cid) && empty($maincatid) ) $overridecatperms = 0;
+		$override_mulcatsperms  = $params->get("override_mulcatsperms", 0);
 
 		// Get menu parameters override parameters
 		$submit_conf = array(
@@ -1568,6 +1584,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			'maincatid'       => $params->get("maincatid"),        // Default main category out of the overriden categories
 			'postcats'        => $postcats,
 			'overridecatperms'=> $overridecatperms,
+			'override_mulcatsperms' => $override_mulcatsperms,
 			'autopublished'   => $params->get('autopublished', 0),  // Publish the item
 			'autopublished_up_interval'   => $params->get('autopublished_up_interval', 0),
 			'autopublished_down_interval' => $params->get('autopublished_down_interval', 0)

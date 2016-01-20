@@ -1823,8 +1823,8 @@ class ParentClassItem extends JModelAdmin
 			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 			$submit_conf = @ $item_submit_conf[$h] ;
 			
-			$autopublished    = @ $submit_conf['autopublished'];
-			$overridecatperms = @ $submit_conf['overridecatperms'];
+			$autopublished    = @ $submit_conf['autopublished'];     // Override flag for both TYPE and CATEGORY ACL
+			$overridecatperms = @ $submit_conf['overridecatperms'];  // Override flag for CATEGORY ACL
 			if ( $autopublished) {
 				// Dates forced during autopublishing
 				if ( @ $submit_conf['autopublished_up_interval'] ) {
