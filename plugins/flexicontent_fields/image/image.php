@@ -188,11 +188,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Media manager mode
 		else if ( $image_source == -2 ) {
-			if ($use_ingroup)
-			{
-				$field->html = array('<div class="alert alert-warning fc-small fc-iblock">Field is in Media-manager mode, field-group support not supported yet</div>');
-				return;
-			}
 			
 			//$start_microtime = microtime(true);
 			
