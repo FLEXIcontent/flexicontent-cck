@@ -191,7 +191,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		
 		//$this->values = $values;
 		//$this->displayFieldValue( $prop, $viewlayout );
-		include(self::getFormPath($this->fieldtypes[0], $viewlayout));
+		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
 		
 		
 		// Load needed JS/CSS

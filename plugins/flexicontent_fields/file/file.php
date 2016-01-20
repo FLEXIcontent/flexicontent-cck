@@ -689,7 +689,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$field->{$prop} = array();
 		//$this->values = $values;
 		//$this->displayFieldValue( $prop, $viewlayout );
-		include(self::getFormPath($this->fieldtypes[0], $viewlayout));
+		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
 		
 		if (!empty($fancybox_needed)) flexicontent_html::loadFramework('fancybox');
 		
