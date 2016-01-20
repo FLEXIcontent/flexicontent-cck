@@ -2274,7 +2274,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
     
     // Remove no longer used files, if limiting existing image list to current field, or if existing image list is hidden/disabled
-    if ( $image_source >= 1 && ($field->parameters->get('auto_delete_unused', 1) || !$field->parameters->get('list_all_media_files', 0) || !$field->parameters->get('existing_imgs', 1)) )
+    if ( $image_source == 0 && ($field->parameters->get('auto_delete_unused', 1) || !$field->parameters->get('list_all_media_files', 0) || !$field->parameters->get('existing_imgs', 1)) )
     {
 			// Get existing field values, 
 			if (!isset($item->fieldvalues)) {

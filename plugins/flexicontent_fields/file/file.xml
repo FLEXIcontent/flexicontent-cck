@@ -302,7 +302,7 @@
 			<field name="coupon_expiration_days" type="text" size="5" default="15" label="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS" depend_class="multivalue-mode11" description="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS_DESC"/>
 			
 		</fieldset>
-		<fieldset name="group-file-notifications" repeat="1" icon_class="icon-mail" label="Notifications" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-file-notifications" repeat="1" icon_class="icon-envelope" label="Notifications" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_DOWNLOAD_NOTIFICATION" level="level1" />
 			<field name="send_notifications" type="multilist" subtype="radio" default="0" label="FLEXI_DOWNLOAD_HIT_NOTIFICATION" toggle_related="1" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC" class="btn-group btn-group-yesno">

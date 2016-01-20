@@ -1899,7 +1899,7 @@ class flexicontent_html
 			static $icon_class = null;
 			if ($icon_class == null) {
 				if (self::$icon_classes==null) self::load_class_config();
-				$icon_class = empty(self::$icon_classes['mail']) ? 'icon-mail' : self::$icon_classes['mail'];
+				$icon_class = empty(self::$icon_classes['mail']) ? 'icon-envelope' : self::$icon_classes['mail'];
 				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
 			}
 			$attribs = '';

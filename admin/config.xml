@@ -265,7 +265,7 @@
 				<option value="0" show_list="" hide_list="disp_icon_classes">FLEXI_IMAGE</option>
 				<option value="1" show_list="disp_icon_classes" hide_list="disp_title">FLEXI_FONT_ICONS</option>
 			</field>
-			<field name="font_icon_classes" type="textarea" rows="2" default="pdf:icon-book, print:icon-print, mail:icon-mail, feed:icon-feed, edit:icon-pencil, new:icon-new, approval:icon-key" label="FLEXI_FONT_ICONS" description="FLEXI_FONT_ICONS_DESC" class="disp_icon_classes input-xxlarge" />
+			<field name="font_icon_classes" type="textarea" rows="2" default="pdf:icon-book, print:icon-print, mail:icon-envelope, feed:icon-feed, edit:icon-pencil, new:icon-new, approval:icon-key" label="FLEXI_FONT_ICONS" description="FLEXI_FONT_ICONS_DESC" class="disp_icon_classes input-xxlarge" />
 			<field name="btn_grp_dropdown" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_BTN_GROUP_AS_DROPDOWN" description="FLEXI_BTN_GROUP_AS_DROPDOWN_DESC" class="btn-group btn-group-yesno" >
 				<option value="0" show_list="" hide_list="disp_btn_grp_dropdown">FLEXI_NO</option>
 				<option value="1" show_list="disp_btn_grp_dropdown" hide_list="">FLEXI_YES</option>
