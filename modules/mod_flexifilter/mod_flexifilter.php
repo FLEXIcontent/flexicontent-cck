@@ -77,11 +77,11 @@ if ( $show_mod )
 	
 	// current & default category IDs
 	$catid_fieldname = 'cid'; //'filter_catid_'.$module->id;
-	$isflexicat = JRequest::getVar('option')=="com_flexicontent" && JRequest::getVar('view')=="category";
+	$use_current_cid = $option=="com_flexicontent" && ($view=="category" || $view=="item");
 	
-	$current_cid = $isflexicat ? JRequest::getInt($catid_fieldname, 0) : 0;
+	$current_cid = $use_current_cid ? JRequest::getInt($catid_fieldname, 0) : 0;
 	$default_cid = (int)$params->get('catid', 0);
-	$catid = !$isflexicat || !$current_cid ? $default_cid : $current_cid;  // id of category view or default value
+	$catid = !$use_current_cid || !$current_cid ? $default_cid : $current_cid;  // id of category view or default value
 	
 	// CATEGORY SELECTION
 	$display_cat_list = $params->get('display_cat_list', 0);
