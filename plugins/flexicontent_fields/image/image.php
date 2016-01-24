@@ -90,7 +90,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$autoupload = $field->parameters->get('autoupload', 0);
 		$autoassign = $field->parameters->get('autoassign', 0);
-		$imgsel_visible = $field->parameters->get('imgsel_visible', 0);
 		
 		$preview_thumb_w = $field->parameters->get( 'preview_w', 120 ) < $field->parameters->get( 'w_m', 400 ) ? $field->parameters->get( 'preview_w', 120 ) : $field->parameters->get( 'w_m', 400 );
 		$preview_thumb_h = $field->parameters->get( 'preview_h', 90 ) < $field->parameters->get( 'h_m', 300 ) ? $field->parameters->get( 'preview_h', 90 ) : $field->parameters->get( 'h_m', 300 );
@@ -121,22 +120,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ( $image_source == 0 && !$db_mode_common_js_added )
 		{
 			// Insert once for all DB-mode fields
-			$js = "
-				function fx_toggle_upload_select_tbl (obj_changed, objid_disp_toggle) {
-					var value_container = jQuery(obj_changed).closest('.fcfieldval_container');
-					obj_disp_toggle = value_container.find('table.img_upload_select');
-					if (obj_changed.checked) {
-						//obj_disp_toggle.css('display', 'table');
-						obj_disp_toggle.show('slide');
-						value_container.css('width', '100%');
-					} else {
-						//obj_disp_toggle.css('display', 'none');
-						obj_disp_toggle.hide('slide');
-						value_container.css('width', '');
-					}
-				}
-			";
-			$document->addScriptDeclaration($js);
+			$js = "";  // nothing needed
+			if ($js) $document->addScriptDeclaration($js);
 			$db_mode_common_js_added = true;
 		}
 		
@@ -303,45 +288,36 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					img_preview.remove();
 				}
 				
-				var imgchange_toggler = newField.find('input.imgchange');
-				if (imgchange_toggler.length) {
-					imgchange_toggler.attr('name','".$field->name."['+uniqueRowNum".$field->id."+']');
-					imgchange_toggler.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_change');
-					imgchange_toggler.parent().find('label').prop('for','".$elementid."_'+uniqueRowNum".$field->id."+'_change');
-					
-					newField.find('table.img_upload_select').attr('id','".$field->name."_upload_select_tbl_'+uniqueRowNum".$field->id.");
-					newField.find('table.img_upload_select').css('display', 'table');
-					newField.find('input.imgchange').prop('checked', true);
-				}
-					";
+				newField.find('table.fcimg_dbfile_tbl').parent('display', 'none');
+				";
 				
 			if ($linkto_url) $js .= "
 				newField.find('input.imglink').val('');
 				newField.find('input.imglink').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][urllink]');
 				newField.find('input.imglink').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_urllink');
-					";
+				";
 				
 			if ($usealt) $js .= "
 				newField.find('input.imgalt').val('".$default_alt."');
 				newField.find('input.imgalt').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][alt]');
 				newField.find('input.imgalt').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_alt');
-					";
+				";
 				
 			if ($usetitle) $js .= "
 				newField.find('input.imgtitle').val('".$default_title."');
 				newField.find('input.imgtitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				newField.find('input.imgtitle').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
-					";
+				";
 				
 			if ($usedesc) $js .= "
 				newField.find('textarea.imgdesc').val('".$default_desc."');
 				newField.find('textarea.imgdesc').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][desc]');
-					";
+				";
 				
 			if ($usecust1) $js .= "
 				newField.find('input.imgcust1').val('".$default_cust1."');
 				newField.find('input.imgcust1').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust1]');
-					";
+				";
 				
 			if ($usecust2) $js .= "
 				newField.find('input.imgcust2').val('".$default_cust2."');
@@ -634,10 +610,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 		";
 		$css .='
-			table.fcfield'.$field->id.'.img_upload_select li { min-height:'.($preview_thumb_h+56).'px; }
-			table.fcfield'.$field->id.'.img_upload_select ul { height:'.($preview_thumb_h+96).'px; }
-			table.fcfield'.$field->id.'.img_upload_select ul { width:'.(2*($preview_thumb_w+64)).'px; }
-			table.fcfield'.$field->id.'.img_upload_select ul.image_picker_selector { min-height: 400px; max-height: 600px; height: unset; width:100%; box-sizing: border-box; }
+			table.fcimg_dbfile_tbl_'.$field->id.' {}
+			table.fcimg_dbfile_tbl_'.$field->id.' li { min-height:'.($preview_thumb_h+56).'px; }
+			table.fcimg_dbfile_tbl_'.$field->id.' ul { height:'.($preview_thumb_h+96).'px; }
+			table.fcimg_dbfile_tbl_'.$field->id.' ul { width:'.(2*($preview_thumb_w+64)).'px; }
+			table.fcimg_dbfile_tbl_'.$field->id.' ul.image_picker_selector { min-height: 400px; max-height: 600px; height: unset; width:100%; box-sizing: border-box; }
 		';
 		
 		// Folder-mode(s), add jQuery modal window to the select image file button, the container will be created if it does not exist already
@@ -733,17 +710,21 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid='.$elementid_n."_existingname&amp;thumb_w=$preview_thumb_w&amp;thumb_h=$preview_thumb_h&amp;autoassign=".$autoassign
 					.'&amp;'.JSession::getFormToken().'=1';
 				
-				$_prompt_txt = JText::_( 'FLEXI_SELECT_IMAGE' );
 				$existingname = '
 					<input type="hidden" class="existingname fcfield_textval" id="'.$elementid_n.'_existingname" name="'.$fieldname_n.'[existingname]" value="'.(!empty($value['existingname']) ? $value['existingname'] : '').'" />
 				';
 				$select_existing = '
 				'.($none_props ? '<br/>' : '').'
-					<a class="addfile_'.$field->id.' btn btn-info btn-small" id="'.$elementid_n.'_addfile" title="'.$_prompt_txt.'" href="'.$addExistingURL.'" >
-						'.$_prompt_txt.'
+				<div class="input-prepend input-append" style="margin-top:12px;" >
+					<a class="addfile_'.$field->id.' btn btn-info hasTooltip" id="'.$elementid_n.'_addfile" title="'.JText::_('FLEXI_SELECT_IMAGE').'" href="'.$addExistingURL.'" >
+						<i class="icon-search"></i>
+						'.JText::_('FLEXI_SELECT').'
 					</a>
+					<span class="btn btn-warning hasTooltip" title="'.JText::_('FLEXI_CLEAR').'" onclick="clearField'.$field->id.'(this);">
+						<i class="icon-remove"></i>
+					</span>
+				</div>
 				';
-				$select_existing .= '<span class="btn btn-warning btn-small" onclick="clearField'.$field->id.'(this);">'.JText::_( 'FLEXI_CLEAR' ).'</span>';
 			}
 			
 			else if ( $image_source == -2 ) {
@@ -837,42 +818,48 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required_class : '').'" value="" />';
 			}
 			
-			if ( $image_source == 0 && !$imgsel_visible ) {
+			if ( $image_source == 0 ) {
 				$change .= '
-					<span>
-						<input class="imgchange" style="visibility:hidden;" type="checkbox" name="'.$fieldname_n.'[change]" id="'.$elementid_n.'_change" onchange="fx_toggle_upload_select_tbl(this)" value="1" '.($image_name ? '' : ' checked="checked" ').'/>
-						<label class="btn btn-info" style="margin: 0px 0px 4px 0px !important;" for="'.$elementid_n.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>
-					</span>';
+				<div class="input-prepend input-append" style="margin-top:12px;" >
+					<span class="btn btn-info hasTooltip" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var obj=jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_dbfile_tbl_outer\'); fc_field_dialog_handle_'.$field->id.' = fc_showAsDialog(obj); ">
+						<i class="icon-search"></i>
+						'.JText::_('FLEXI_SELECT').'
+					</span>
+					<span class="btn btn-warning hasTooltip" title="'.JText::_('FLEXI_CLEAR').'" onclick="clearField'.$field->id.'(this);">
+						<i class="icon-remove"></i>
+					</span>
+				</div>
+				';
 			}
 			
 			if ($linkto_url) $urllink =
 				'<tr>
-					<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).'</td>
+					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).'</label></td>
 					<td><input class="imglink" size="40" name="'.$fieldname_n.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
 				</tr>';
 			if ($usealt) $alt =
 				'<tr>
-					<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).'</td>
+					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_ALT' ).'</label></td>
 					<td><input class="imgalt" size="40" name="'.$fieldname_n.'[alt]" value="'.(isset($value['alt']) ? $value['alt'] : $default_alt).'" type="text" /></td>
 				</tr>';
 			if ($usetitle) $title =
 				'<tr>
-					<td class="key">'.JText::_( 'FLEXI_FIELD_TITLE' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
+					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_TITLE' ).' <br/>('.JText::_('FLEXI_FIELD_TOOLTIP').')</label></td>
 					<td><input class="imgtitle" size="40" name="'.$fieldname_n.'[title]" value="'.(isset($value['title']) ? $value['title'] : $default_title).'" type="text" /></td>
 				</tr>';
 			if ($usedesc) $desc =
 				'<tr>
-					<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': <br/>('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
+					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).' <br/>('.JText::_('FLEXI_FIELD_TOOLTIP').')</label></td>
 					<td><textarea class="imgdesc" name="'.$fieldname_n.'[desc]" rows="3" cols="24" >'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea></td>
 				</tr>';
 			if ($usecust1) $cust1 =
 				'<tr>
-					<td class="key">'.JText::_( 'FLEXI_FIELD_IMG_CUST1' ).'</td>
+					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_IMG_CUST1' ).'</label></td>
 					<td><input class="imgcust1" size="40" name="'.$fieldname_n.'[cust1]" value="'.(isset($value['cust1']) ? $value['cust1'] : $default_cust1).'" type="text" /></td>
 				</tr>';
 			if ($usecust2) $cust2 =
 				'<tr>
-					<td class="key">'.JText::_( 'FLEXI_FIELD_IMG_CUST2' ).'</td>
+					<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_IMG_CUST2' ).'</label></td>
 					<td><input class="imgcust2" size="40" name="'.$fieldname_n.'[cust2]" value="'.(isset($value['cust2']) ? $value['cust2'] : $default_cust2).'" type="text" /></td>
 				</tr>';
 			
@@ -914,36 +901,40 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			.(($linkto_url || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
 			'
 			<div style="float:left; clear:none;" class="img_value_props">
-				<table class="admintable"><tbody>
+				<table class="fc-form-tbl fcinner">
 					'.@ $urllink.'
 					'.@ $alt.'
 					'.@ $title.'
 					'.@ $desc.'
 					'.@ $cust1.'
 					'.@ $cust2.'
-				</tbody></table>
+				</table>
 			</div>'
 			: '').
 			
 			( $image_source == 0 ? '
-				<table class="admintable fcfield'.$field->id.' img_upload_select" id="'.$field->name.'_upload_select_tbl_'.$n.'" style="'.($image_name && $imgsel_visible==0 ? "display:none;" : "").($multiple ? '' : 'width:auto;').'" >
-				<tbody>
-					<tr class="img_newfile_row">
-						'.($select_existing_n ? '<td class="key">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).'</td>' : '').'
-						<td style="white-space: normal;">'.
-							'<input name="'.$field->name.'['.$n.']" id="'.$elementid_n.'_newfile" class="newfile no_value_selected" '.$onchange.' type="file" /><br/>' .
-							$uploadLimitsTxt.
-							'<br/><span class="label label-info">'.JText::_( 'FLEXI_FIELD_ALLOWEDEXT' ).'</span>'.
-							'<span style="margin-left:12px;">'.str_replace(",", ", ", $field->parameters->get('upload_extensions')) .'</span>
-						</td>
-					</tr>
-					'.($select_existing_n ? '
-					<tr class="img_existingfile_row">
-						<td class="key">'.JText::_( $image_source == 0 ? 'FLEXI_FIELD_EXISTINGFILE' : 'FLEXI_SELECT' ).'</td>
-						<td>'.$select_existing_n.'</td>
-					</tr>
-					' : '').'
-				</tbody></table>
+			<div class="fc-dialog-box-outer">'./* NEEDED for repositioning the actual box inside it, (proper DOM placement inside the form) */'
+				<div class="fc-dialog-box fcimg_dbfile_tbl_outer" style="display:none;">
+					<table class="fc-form-tbl fcfullwidth fcimg_dbfile_tbl fcimg_dbfile_tbl_'.$field->id.'" >
+						<tr class="img_newfile_row">
+							'.($select_existing_n ? '
+							<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).'</label></td>' : '').'
+							<td style="white-space: normal;">'.
+								'<input name="'.$field->name.'['.$n.']" id="'.$elementid_n.'_newfile" class="newfile no_value_selected" '.$onchange.' type="file" /><br/>' .
+								$uploadLimitsTxt.
+								'<br/><span class="label label-info">'.JText::_( 'FLEXI_FIELD_ALLOWEDEXT' ).'</span>'.
+								'<span style="margin-left:12px;">'.str_replace(",", ", ", $field->parameters->get('upload_extensions')) .'</span>
+							</td>
+						</tr>
+						'.($select_existing_n ? '
+						<tr class="img_existingfile_row">
+							<td class="key"><label class="label">'.JText::_( 'FLEXI_FIELD_EXISTINGFILE' ).'</label></td>
+							<td>'.$select_existing_n.'</td>
+						</tr>
+						' : '').'
+					</table>
+				</div>
+			</div>
 			'  :  '')
 			;
 			

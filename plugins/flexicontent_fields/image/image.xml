@@ -95,10 +95,6 @@
 				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_ALWAYS</option>
 			</field>
-			<field name="imgsel_visible" type="radio" default="0" label="File selection visible" description="Allow toggling the file selector to hide it or make it always visible" depend_class="img-db-mode" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_TOGGLE</option>
-				<option value="1">FLEXI_ALWAYS</option>
-			</field>
 			<field name="" type="separator" default="FLEXI_FIELD_EXISTING_IMAGE_LIST" description="FLEXI_FIELD_EXISTING_IMAGE_LIST_DESC" level="level3" depend_class="img-db-mode" />
 			<field name="existing_imgs" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ENABLE" description="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMITATION_DESC" depend_class="img-db-mode" class="btn-group btn-group-yesno">
 				<option value="0" show_list=""  hide_list="db-existing-imgsel,db-existing-imgpicker">FLEXI_HIDE</option>
