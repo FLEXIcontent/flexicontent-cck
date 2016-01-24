@@ -1,5 +1,36 @@
 @import 'include/config.less';
 
+/****************************************
+ * auto sized / positioned jquery dialogs
+ ****************************************/
+ 
+.ui-dialog.fc-fixed-dialog {
+	position: fixed;
+	top: 40px !important;
+	left: 30px !important;
+	overflow: auto;
+}
+.ui-dialog.fc-fixed-dialog .ui-dialog-titlebar  {
+	/*margin-bottom: 40px;*/
+}
+.ui-dialog.fc-fixed-dialog .ui-dialog-buttonpane {
+	background: transparent none repeat scroll 0 0;
+	box-sizing: border-box;
+	margin: 0 4px;
+	padding: 0 1%;
+	position: absolute;
+	top: 0; /* 40px;*/
+	width: auto;
+}
+.ui-dialog.fc-fixed-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+	float: left;
+}
+
+
+/**********************
+ * yet unclassified CSS
+ **********************/
+ 
 .flexicontent .ui-autocomplete {
 	z-index: 1000 !important;
 }
@@ -8,6 +39,10 @@
 }
 .flexicontent .calendar {
 	vertical-align: middle;
+}
+body.fc-no-scroll {  /* prevents scrolling of the document */
+	height: 100% !important;
+	overflow: hidden !important;
 }
 
 
@@ -1236,7 +1271,7 @@ table.fc-form-tbl td.key label.label {
 	white-space: normal;
 }
 table.fc-form-tbl.fcinner td.key label.label {
-	padding: 2px;
+	padding: 2px 4px;
 }
 table.fc-form-tbl fieldset {
 	margin: 0px;

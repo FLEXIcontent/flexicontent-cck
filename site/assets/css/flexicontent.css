@@ -769,6 +769,24 @@ body .fc-mssg.fc-noborder {
 .flexicontent .filterbuttons_head .nowrap_box .label {
 	vertical-align: middle;
 }
+.ui-dialog.fc-fixed-dialog {
+	position: fixed;
+	top: 40px !important;
+	left: 30px !important;
+	overflow: auto;
+}
+.ui-dialog.fc-fixed-dialog .ui-dialog-buttonpane {
+	background: transparent none repeat scroll 0 0;
+	box-sizing: border-box;
+	margin: 0 4px;
+	padding: 0 1%;
+	position: absolute;
+	top: 0;
+	width: auto;
+}
+.ui-dialog.fc-fixed-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+	float: left;
+}
 .flexicontent .ui-autocomplete {
 	z-index: 1000 !important;
 }
@@ -777,6 +795,10 @@ body .fc-mssg.fc-noborder {
 }
 .flexicontent .calendar {
 	vertical-align: middle;
+}
+body.fc-no-scroll {
+	height: 100% !important;
+	overflow: hidden !important;
 }
 table#version_tbl td.versions-first {
 	border-bottom: 1px dotted silver;
@@ -1819,7 +1841,7 @@ table.fc-form-tbl td.key label.label {
 	white-space: normal;
 }
 table.fc-form-tbl.fcinner td.key label.label {
-	padding: 2px;
+	padding: 2px 4px;
 }
 table.fc-form-tbl fieldset {
 	margin: 0px;

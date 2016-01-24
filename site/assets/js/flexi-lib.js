@@ -3,7 +3,33 @@
 	window.fc_refreshing_dependent = 0;
 	window.fc_dependent_params = {};
 	window.fc_cascade_field_funcs = {};
-
+	
+	
+	function fc_getAutoSizePos(winwidth, winheight, params)
+	{
+		
+		var autoWidth  = typeof winwidth === 'undefined'  || !winwidth;
+		var autoHeight = typeof winheight === 'undefined' || !winheight;
+		
+		params.dialogClass = typeof params.dialogClass !== 'undefined'  ?  params.dialogClass  :  'fc-fixed-dialog';
+		if (autoWidth)  params.dialogClass += ' fc-autow-dialog';
+		if (autoHeight) params.dialogClass += ' fc-autoh-dialog';
+		
+		var w = typeof winwidth !== 'undefined' && winwidth  ? winwidth  : jQuery( window ).width() - 80;
+		var h = typeof winheight!== 'undefined' && winheight ? winheight : jQuery( window ).height() - 120;
+		
+		params.winwidth  = w  > (jQuery( window ).width() - 80)   ? (jQuery( window ).width() - 80)  :  w;
+		params.winheight = h  > (jQuery( window ).height() - 120) ? (jQuery( window ).height() - 120) : h;
+		//window.console.log ('winwidth  : ' + params.winwidth  + ', winheight : ' + params.winheight );
+		
+		params.winleft = (jQuery( window ).width()  - params.winwidth)  / 2 + 5;
+		params.wintop  = (jQuery( window ).height() - params.winheight) / 2 - 5;
+		//window.console.log ('winleft : ' + params.winleft + ', wintop : ' + params.wintop);
+		
+		return params;
+	}
+	
+	
 	function fc_loadImagePreview(input_id, img_id, msg_id, thumb_w, thumb_h, nonimg_mssg)
 	{
 		var nonimg_mssg = typeof nonimg_mssg !== 'undefined' ? nonimg_mssg : '';
@@ -36,20 +62,65 @@
 		msg_box.nodeName == 'INPUT' ? msg_box.value = input.value : msg_box.innerHTML = input.value;
 	}
 	
-	// Load given URL in an open dialog
-	function fc_showDialog(url, tagid, no_iframe, winwidth, winheight, closeFunc)
+	// Display content in modal popup
+	function fc_showAsDialog(obj, winwidth, winheight, closeFunc, params)
 	{
-		// Initialize popup container
-		var winwidth  = typeof winwidth !== 'undefined' && winwidth ? winwidth : jQuery( window ).width() - 80;
-		var winheight = typeof winheight!== 'undefined' && winheight ? winheight : jQuery( window ).height() - 100;
-		winwidth  = winwidth  > (jQuery( window ).width() - 80)   ? (jQuery( window ).width() - 80)   : winwidth;
-		winheight = winheight > (jQuery( window ).height() - 100) ? (jQuery( window ).height() - 100) : winheight;
-		//window.console.log ('winwidth  : ' + winwidth  + ', winheight : ' + winheight );
-
-		var winleft = (jQuery( window ).width() - winwidth) / 2;
-		var wintop  = (jQuery( window ).height() - winheight) / 2 - 5;
-		//window.console.log ('winleft : ' + winleft + ', wintop : ' + wintop);
+		params = typeof params !== 'undefined' ? params : {};
+		params = fc_getAutoSizePos(winwidth, winheight, params);
 		
+		// Get close function
+		var closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;
+		
+		var parent = obj.parent();
+		var theDialog = obj.dialog({
+			closeOnEscape: (typeof params.closeOnEscape !== 'undefined'  ?  params.closeOnEscape  :  true),
+			resize: false,
+			autoOpen: false,
+			width: params.winwidth,
+			height: params.winheight,
+			position: [params.winleft, params.wintop],
+			modal: (typeof params.modal !== 'undefined'  ?  params.modal  :  true),
+			dialogClass: params.dialogClass,
+			icons: {
+				primary: "ui-icon-heart"
+			},
+      buttons: {
+				'Close': function() { jQuery(this).dialog('close'); }
+			},
+			// Clear contents after dialog closes
+			close: function(ev, ui) {
+				// Allow parent document to scroll again
+				jQuery(document.body).removeClass('fc-no-scroll');
+				
+				// Finalize by doing the closing operation
+				if (typeof closeFunc === 'function') closeFunc();
+				else if (closeFunc == 1) window.location.reload(false);
+				else if (closeFunc == 0) ;
+				else alert('Unknown action'+closeFunc);
+			}
+		})
+		.dialog('widget').next('.ui-widget-overlay').css('background', 'gray');  // Add an overlay
+		
+		// Manually replace the dialog back into its proper position
+		obj.parent().appendTo(parent);
+		
+		// Open the dialog manually
+		theDialog = obj.dialog('open');
+		
+		// Stop scrolling of parent document
+		jQuery(document.body).addClass('fc-no-scroll');
+		
+		// Return a reference of the dialog to the caller
+		return theDialog;
+	}
+	
+	// Load given URL in an open dialog
+	function fc_showDialog(url, tagid, no_iframe, winwidth, winheight, closeFunc, params)
+	{
+		params = typeof params !== 'undefined' ? params : {};
+		params = fc_getAutoSizePos(winwidth, winheight, params);
+		
+		// Get close function
 		var closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;
 		
 		// Get container creating it if it does not exist
@@ -68,8 +139,12 @@
 			iframe = jQuery('<iframe id="'+tagid+'_frame" style="visibility:hidden; width:100%; height:100%; border:0; margin:0; padding:0;" src=""></iframe>');
 			container.append(iframe);
 			iframe.load(function() {
+				// Show retrieved contents and hide the loading animation
 				iframe.show().css('visibility', 'visible');
 				loading.hide();
+				
+				// Remove unneeded scroll bar inside iframe document
+				iframe.contents().find('body').css({ 'height': 'unset' });
 			});
 		}
 		
@@ -78,12 +153,15 @@
 			container.css('overflow', 'scroll') :
 			container.css('overflow', 'hidden').css('padding', '0') ;
 		
+		// Initialize popup container
 		container.dialog({
+			closeOnEscape: (typeof params.closeOnEscape !== 'undefined'  ?  params.closeOnEscape  :  false),
 			autoOpen: false,
-			width: winwidth,
-			height: winheight,
-			modal: true,
-			position: [winleft, wintop],
+			width: params.winwidth,
+			height: params.winheight,
+			modal: (typeof params.modal !== 'undefined'  ?  params.modal  :  true),
+			position: [params.winleft, params.wintop],
+			dialogClass: params.dialogClass,
 			// Load contents (url) when dialog opens
 			open: function(ev, ui){
 				no_iframe ?
@@ -91,10 +169,14 @@
 					jQuery('#'+tagid+'_frame').attr('src', url);
 			},
 			// Clear contents after dialog closes
-			close: function(ev, ui){
-				no_iframe ?
-					container.html('') :
-					jQuery('#'+tagid+'_frame').remove();
+			close: function(ev, ui) {
+				// Allow parent document to scroll again
+				jQuery(document.body).removeClass('fc-no-scroll');
+				
+				// Remove container / iframe contents (we re-use it)
+				no_iframe  ?  container.html('')  :  jQuery('#'+tagid+'_frame').remove();
+				
+				// Finalize by doing the closing operation
 				if (typeof closeFunc === 'function') closeFunc();
 				else if (closeFunc == 1) window.location.reload(false);
 				else if (closeFunc == 0) ;
@@ -102,8 +184,13 @@
 			}
 		});
 		
-		// Open the dialog and return a reference of the dialog to the caller
+		// Open the dialog manually
 		var theDialog = container.dialog('open');
+		
+		// Stop scrolling of parent document
+		jQuery(document.body).addClass('fc-no-scroll');
+		
+		// Return a reference of the dialog to the caller
 		return theDialog;
 	}
 	
@@ -792,3 +879,45 @@
 		}
 		el.attr('disabled', false);
 	}
+	
+	
+	function fc_dialog_resize_now()
+	{
+		params = {};
+		params = fc_getAutoSizePos(0, 0, params);
+		
+		jQuery('.ui-dialog.fc-autow-dialog').css({ 'left': params.winleft+'px', 'width': params.winwidth+'px' });
+		jQuery('.ui-dialog.fc-autoh-dialog').css({ 'top': params.wintop+'px', 'height': params.winheight+'px' });
+		
+		var dialogs = jQuery('.ui-dialog.fc-autoh-dialog');
+		dialogs.each(function( index ) {
+			var dialog_box = jQuery(this);
+			var content_box = dialog_box.find('.ui-dialog-content');
+			var h = dialog_box.height() - content_box.prev().outerHeight();
+			content_box.css({ 'height': h+'px', 'margin': '0', 'box-sizing': 'border-box' });
+			content_box.find('iframe').contents().find('body').css({ 'height': 'unset' });
+		});
+	}
+	
+	
+	function fc_debounce_exec(func, wait, immediate) {
+		var timeout;
+		return function() {
+			var context = this, args = arguments;
+			var later = function() {
+				timeout = null;
+				if (!immediate) func.apply(context, args);
+			};
+			var callNow = immediate && !timeout;
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+			if (callNow) func.apply(context, args);
+		};
+	}
+	
+	var fc_dialog_resize = fc_debounce_exec(fc_dialog_resize_now, 200, false);
+	
+	jQuery(window).resize(function() {
+		fc_dialog_resize();
+	});
+	
