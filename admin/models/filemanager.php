@@ -64,6 +64,14 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 *
 	 * @since 1.0
 	 */
+	 
+	/**
+	 * uploaders
+	 *
+	 * @var object
+	 */
+	var $_users = null;
+
 	function __construct()
 	{
 		parent::__construct();
@@ -736,21 +744,30 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	function candelete( $cid = array(), $ignored=false, $s_field_types=array('file', 'minigallery'),
 		$m_field_props=array('image'=>'originalname'), $m_value_props=array('image'=>'filename')
 	) {
-		$n		= count( $cid );
-		if (count( $cid ))
+		if ( !count($cid) ) return false;
+		
+		$allowed_cid = $this->getDeletable($cid, $ignored, $s_field_types, $m_field_props, $m_value_props);
+		return count($cid) == count($allowed_cid);
+	}
+	
+	
+	function getDeletable( $cid = array(), $ignored=false, $s_field_types=array('file', 'minigallery'),
+		$m_field_props=array('image'=>'originalname'), $m_value_props=array('image'=>'filename')
+	) {
+		
+		if ( !count($cid) ) return array();
+		
+		$items_counts_s = $this->getItemsSingleprop( $s_field_types,  $cid, $count_items=true, $ignored);
+		$items_counts_m = $this->getItemsMultiprop ( $m_field_props, $m_value_props, $cid, $count_items=true, $ignored);
+		//echo "<pre>";  print_r($items_counts_s);  print_r($items_counts_m);  exit;
+		
+		$allowed_cid = array();
+		foreach ($cid as $file_id)
 		{
-			$items_counts_s = $this->getItemsSingleprop( $s_field_types,  $cid, $count_items=true, $ignored);
-			$items_counts_m = $this->getItemsMultiprop ( $m_field_props, $m_value_props, $cid, $count_items=true, $ignored);
-			//echo "<pre>";  print_r($items_counts_s);  print_r($items_counts_m);  exit;
-			foreach ($cid as $file_id)
-			{
-				if ( @ $items_counts_s[$file_id] > 0 || @ $items_counts_m[$file_id] > 0) {
-					return false;
-				}
-			}
-			return true;
+			if ( @ $items_counts_s[$file_id] > 0 || @ $items_counts_m[$file_id] > 0) continue;
+			$allowed_cid[] = $file_id;
 		}
-		return false;
+		return $allowed_cid;
 	}
 	
 	
@@ -763,45 +780,43 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function delete($cid)
 	{
-		if (count( $cid ))
+		if ( !count($cid) ) return false;
+		
+		jimport('joomla.filesystem.path');
+		jimport('joomla.filesystem.file');
+		
+		$cids = implode( ',', $cid );
+		
+		$query = 'SELECT f.filename, f.url, f.secure'
+				. ' FROM #__flexicontent_files AS f'
+				. ' WHERE f.id IN ('. $cids .')';
+		
+		$this->_db->setQuery( $query );
+		$files = $this->_db->loadObjectList();
+		
+		foreach($files as $file)
 		{
-			jimport('joomla.filesystem.path');
-			jimport('joomla.filesystem.file');
-			
-			$cids = implode( ',', $cid );
-		
-			$query = 'SELECT f.filename, f.url, f.secure'
-					. ' FROM #__flexicontent_files AS f'
-					. ' WHERE f.id IN ('. $cids .')';
-		
-			$this->_db->setQuery( $query );
-			$files = $this->_db->loadObjectList();
-			
-			foreach($files as $file)
+			if ($file->url != 1)
 			{
-				if ($file->url != 1)
-				{
-					$basepath	= $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-					$path 		= JPath::clean($basepath.DS.DS.$file->filename);
-					if (!JFile::delete($path)) {
-						JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_DELETE' ).$path);
-					}
+				$basepath	= $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+				$path 		= JPath::clean($basepath.DS.DS.$file->filename);
+				if (!JFile::delete($path)) {
+					JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_DELETE' ).$path);
 				}
 			}
-		
-			$query = 'DELETE FROM #__flexicontent_files'
-			. ' WHERE id IN ('. $cids .')';
-
-			$this->_db->setQuery( $query );
-
-			if(!$this->_db->execute()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-					
-			return true;
 		}
-		return false;
+		
+		$query = 'DELETE FROM #__flexicontent_files'
+		. ' WHERE id IN ('. $cids .')';
+
+		$this->_db->setQuery( $query );
+
+		if(!$this->_db->execute()) {
+			$this->setError($this->_db->getErrorMsg());
+			return false;
+		}
+		
+		return true;
 	}
 	
 	

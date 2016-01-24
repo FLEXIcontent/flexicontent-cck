@@ -29,6 +29,11 @@ jimport('legacy.view.legacy');
  */
 class FlexicontentViewFilemanager extends JViewLegacy
 {
+	/**
+	 * Creates the Filemanager view
+	 *
+	 * @since 1.0
+	 */
 	function display( $tpl = null )
 	{
 		// ********************
@@ -38,7 +43,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		
-		$layout  = $jinput->get('layout', '', 'cmd');
+		$layout  = $jinput->get('layout', 'default', 'cmd');
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
 		
@@ -66,7 +71,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		
 		// Get folder mode
 		$_view = $view;
-		$folder_mode			= 0;
+		$folder_mode = 0;
 		
 		
 		
@@ -84,6 +89,13 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$filter_url       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_url',       'filter_url',       '',          'word' );
 		$filter_secure    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_secure',    'filter_secure',    '',          'word' );
 		
+		$target_dir = $layout=='image' ? 0 : 2;  // 0: Force media, 1: force secure, 2: allow selection
+		$optional_cols = array('access', 'target', 'state', 'lang', 'uploader', 'upload_time', 'file_id', 'hits', 'usage');
+		$cols = array();
+		// No column disabling for filemanager YET, column disabling only in fileselement view
+		foreach($optional_cols as $col) $cols[$col] = 1;
+		
+		
 		$filter_ext       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_ext',       'filter_ext',       '',          'alnum' );
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_uploader',  'filter_uploader',  '',           'int' );
 		$filter_item      = $app->getUserStateFromRequest( $option.'.'.$_view.'.item_id',          'item_id',          '',           'int' );
@@ -93,8 +105,19 @@ class FlexicontentViewFilemanager extends JViewLegacy
 			if ($filter_url) $count_filters++;
 			if ($filter_secure) $count_filters++;
 		}
+		
+		// ?? Force unsetting language and target_dir columns if LAYOUT is image file list
+		else
+		{
+			unset($cols['lang']);
+			unset($cols['target']);
+		}
+		
+		// Case of uploader column not applicable or not allowed
+		if (!$folder_mode && !$perms->CanViewAllFiles) unset($this->cols['uploader']);
+		
 		if ($filter_ext) $count_filters++;
-		if ($filter_uploader) $count_filters++;
+		if ($filter_uploader && !empty($this->cols['uploader'])) $count_filters++;
 		if ($filter_item) $count_filters++;
 		
 		// Text search
@@ -104,6 +127,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		
 		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
 		$filter_item      = $filter_item ? $filter_item : '';
+		
 		
 		
 		
@@ -118,9 +142,6 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		}
 		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
-		
-		$js = "jQuery(document).ready(function(){";
-		
 		
 		
 		
@@ -150,7 +171,6 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		if ( !$folder_mode ) {
 			$rows  = $this->get('Data');
 		} else {
-			// TODO MORE ...
 		}
 		$pagination = $this->get('Pagination');
 		//$users = $this->get('Users');
@@ -223,13 +243,20 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$lists['item_id'] = '<input type="text" name="item_id" size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$filter_item.'" />';
 		
 		//build secure/media filterlist
-		$secure 	= array();
-		$secure[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_DIRECTORIES' )*/ );
-		$secure[] 	= JHTML::_('select.option',  'S', JText::_( 'FLEXI_SECURE_DIR' ) );
-		$secure[] 	= JHTML::_('select.option',  'M', JText::_( 'FLEXI_MEDIA_DIR' ) );
-
-		$lists['secure'] = ($filter_secure || 1 ? '<label class="label">'.JText::_('FLEXI_ALL_DIRECTORIES').'</label>' : '').
-			JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_secure );
+		$lists['secure'] = '<i data-placement="bottom" class="icon-info fc-man-icon-s hasTooltip" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>'
+			.($filter_secure || 1 ? '<label class="label">'.JText::_('FLEXI_URL_SECURE').'</label>' : '');
+		if ($target_dir==2)
+		{
+			$secure 	= array();
+			$secure[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_DIRECTORIES' )*/ );
+			$secure[] 	= JHTML::_('select.option',  'S', JText::_( 'FLEXI_SECURE_DIR' ) );
+			$secure[] 	= JHTML::_('select.option',  'M', JText::_( 'FLEXI_MEDIA_DIR' ) );
+			
+			$lists['secure'] .=
+				JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_secure );
+		}
+		else
+			$lists['secure'] .= '<span class="badge badge-info">'.JText::_($target_dir==0 ? 'FLEXI_MEDIA_DIR' : 'FLEXI_SECURE_DIR').'</span>';
 
 		//build ext filterlist
 		$lists['ext'] = ($filter_ext || 1 ? '<label class="label">'.JText::_('FLEXI_ALL_EXT').'</label>' : '').
@@ -251,6 +278,10 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$ftp = !JClientHelper::hasCredentials('ftp');
 		
 		//assign data to template
+		$this->assignRef('layout', $layout);
+		$this->assignRef('target_dir', $target_dir);
+		$this->assignRef('optional_cols', $optional_cols);
+		$this->assignRef('cols', $cols);
 		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('params'     , $cparams);
 		$this->assign('require_ftp'		, $ftp);

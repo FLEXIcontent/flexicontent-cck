@@ -15,6 +15,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
 class plgFlexicontent_fieldsToolbar extends JPlugin
 {

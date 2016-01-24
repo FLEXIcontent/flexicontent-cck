@@ -71,8 +71,8 @@ class FlexicontentModelFileselement extends JModelLegacy
 	 * @since 1.0
 	 */
 	 
-	 /**
-	 * file users
+	/**
+	 * uploaders
 	 *
 	 * @var object
 	 */
@@ -184,8 +184,8 @@ class FlexicontentModelFileselement extends JModelLegacy
 		// Files usage my single / multi property Fields.
 		// (a) Single property field types: store file ids
 		// (b) Multi property field types: store file id or filename via some property name
-		$s_assigned_fields = false; //array('file', 'minigallery');
-		$m_assigned_fields = false; //array('image');
+		$s_assigned_fields = array('file', 'minigallery');
+		$m_assigned_fields = array('image');
 		
 		$m_assigned_props = array('image'=>'originalname');
 		$m_assigned_vals = array('image'=>'filename');
@@ -774,7 +774,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 				. ' FROM #__content AS i'
 				. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $this->_db->Quote( $field_type ) .')' . $field_ids_list
-				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE '. $like_str . $file_ids_list
+				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE ' . $like_str . ' AND f.'.$value_prop.'<>""' . $file_ids_list
 				//. ' JOIN #__users AS u ON u.id = f.uploaded_by'
 				. $where
 				. $groupby
@@ -798,6 +798,92 @@ class FlexicontentModelFileselement extends JModelLegacy
 		//echo "<pre>"; print_r($items); exit;
 		return $items;
 	}
+	
+	
+	
+	/**
+	 * Method to count the field relations (assignments) of a file in a multi-property field
+	 *
+	 * @access	public
+	 * @return	string $msg
+	 * @since	1.
+	 */
+	function countFieldRelationsMultiProp(&$rows, $value_prop, $field_prop, $field_type)
+	{
+		if (!$rows || !count($rows)) return array();  // No file records to check
+		
+		// Some fields may not be using DB, create a limitation for them
+		$field_ids = $this->getFieldsUsingDBmode($field_type);
+		$field_ids_list = !$field_ids  ?  ""  :  " AND fi.id IN ('". implode("','", $field_ids) ."')";
+		
+		$format_str = 'CONCAT("%%","\"%s\";s:%%:%%\"",%s,"\"%%")';
+		$items = array();
+		
+		foreach ($rows as $row) $row_ids[] = $row->id;
+		$file_ids_list = "'". implode("','", $row_ids) . "'";
+		
+		// Serialized values are like : "__field_propname__";s:33:"__value__"
+		$format_str = 'CONCAT("%%","\"%s\";s:%%:%%\"",%s,"\"%%")';
+		
+		// Create a matching condition for the value depending on given configuration (property name of the field, and value property of file: either id or filename or ...)
+		$like_str = $this->_db->escape( 'f.'.$value_prop, false );
+		$like_str = sprintf( $format_str, $field_prop, $like_str );
+		
+		$query	= 'SELECT f.id as id, COUNT(rel.item_id) as count, GROUP_CONCAT(DISTINCT rel.item_id SEPARATOR  ",") AS item_list'
+				. ' FROM #__flexicontent_fields_item_relations AS rel'
+				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote($field_type) . $field_ids_list
+				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE ' . $like_str . ' AND f.'.$value_prop.'<>""'
+				. ' WHERE f.id IN('. $file_ids_list .')'
+				. ' GROUP BY f.id'
+				;
+		$this->_db->setQuery($query);
+		$assigned_data = $this->_db->loadObjectList('id');
+		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+		
+		//echo "<pre>"; print_r($assigned_data); exit;
+		
+		foreach($rows as $row) {
+			$row->{'assigned_'.$field_type} = (int) @ $assigned_data[$row->id]->count;
+			if (@ $assigned_data[$row->id]->item_list)
+				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
+		}
+	}
+	
+	
+	/**
+	 * Method to count the field relations (assignments) of a file in a single-property field that stores file ids !
+	 *
+	 * @access	public
+	 * @return	string $msg
+	 * @since	1.
+	 */
+	function countFieldRelationsSingleProp(&$rows, $field_type)
+	{
+		if ( !count($rows) ) return;
+		
+		foreach ($rows as $row)
+		{
+			$file_id_arr[] = $row->id;
+		}
+		$query	= 'SELECT f.id as file_id, COUNT(rel.item_id) as count, GROUP_CONCAT(DISTINCT rel.item_id SEPARATOR  ",") AS item_list'
+				. ' FROM #__flexicontent_files AS f'
+				. ' JOIN #__flexicontent_fields_item_relations AS rel ON f.id = rel.value'
+				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote($field_type)
+				. ' WHERE f.id IN ('. implode( ',', $file_id_arr ) .')'
+				. ' GROUP BY f.id'
+				;
+		$this->_db->setQuery($query);
+		
+		$assigned_data = $this->_db->loadObjectList('file_id');
+		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+		
+		foreach ($rows as $row) {
+			$row->{'assigned_'.$field_type} = (int) @ $assigned_data[$row->id]->count;
+			if (@ $assigned_data[$row->id]->item_list)
+				$row->item_list[$field_type] = $assigned_data[$row->id]->item_list;
+		}
+	}
+	
 	
 }
 ?>

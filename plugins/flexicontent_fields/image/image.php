@@ -1485,8 +1485,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						<div class="rg-image-wrapper">
 							{{if itemsCount > 1}}
 								<div class="rg-image-nav">
-									<a href="#" class="rg-image-nav-prev">'.JText::_('FLEXI_PREVIOUS').'</a>
-									<a href="#" class="rg-image-nav-next">'.JText::_('FLEXI_NEXT').'</a>
+									<a href="javascript:;" class="rg-image-nav-prev">'.JText::_('FLEXI_PREVIOUS').'</a>
+									<a href="javascript:;" class="rg-image-nav-next">'.JText::_('FLEXI_NEXT').'</a>
 								</div>
 							{{/if}}
 							<div class="rg-image"></div>

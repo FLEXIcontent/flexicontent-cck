@@ -89,19 +89,32 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// Order and order direction
 		$filter_order      = $model->getState('filter_order');
 		$filter_order_Dir  = $model->getState('filter_order_Dir');
-				
+		
 		$filter_lang			= $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_lang',      'filter_lang',      '',          'string' );
 		$filter_url       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_url',       'filter_url',       '',          'word' );
 		$filter_secure    = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_secure',    'filter_secure',    '',          'word' );
 		
-		$target_dir = 2;
+		$target_dir = $layout=='image' ? 0 : 2;  // 0: Force media, 1: force secure, 2: allow selection
+		$optional_cols = array('access', 'target', 'state', 'lang', 'uploader', 'upload_time', 'file_id', 'hits', 'usage');
+		$cols = array();
+		
+		// *** BOF FILESELEMENT view column column disabling ***
+		// Column disabling only applicable for FILESELEMENT view
 		if (!$folder_mode)
 		{
 			$field_params = $model->getFieldParams();
-			$target_dir = $field_params->get('target_dir', '');
+			
 			// Clear secure/media filter if field is not configured to use specific
-			if ( !strlen($target_dir) || $target_dir!=2 ) $filter_secure = '';
+			$target_dir = $field_params->get('target_dir', '');
+			$filter_secure = !strlen($target_dir) || $target_dir!=2  ?  ''  :  $filter_secure;
+			
+			$filelist_cols = FLEXIUtilities::paramToArray( $field_params->get('filelist_cols', array('upload_time', 'hits')) );
+			
+			$cols = array();
+			foreach($filelist_cols as $col) $cols[$col] = 1;
+			unset($cols['_SAVED_']);
 		}
+		// *** EOF FILESELEMENT view column column disabling ***
 		
 		$filter_ext       = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_ext',       'filter_ext',       '',          'alnum' );
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.'.$_view.'.filter_uploader',  'filter_uploader',  '',           'int' );
@@ -112,10 +125,22 @@ class FlexicontentViewFileselement extends JViewLegacy
 			if ($filter_url) $count_filters++;
 			if ($filter_secure) $count_filters++;
 		}
+		
+		// ?? Force unsetting language and target_dir columns if LAYOUT is image file list
+		else
+		{
+			unset($cols['lang']);
+			unset($cols['target']);
+		}
+		
+		// Case of uploader column not applicable or not allowed
+		if (!$folder_mode && !$perms->CanViewAllFiles) unset($this->cols['uploader']);
+		
 		if ($filter_ext) $count_filters++;
-		//if ($perms->CanViewAllFiles && $filter_uploader) $count_filters++;
+		if ($filter_uploader && !empty($this->cols['uploader'])) $count_filters++;
 		if ($filter_item) $count_filters++;
 		
+		// *** BOF FILESELEMENT view specific ***
 		$u_item_id 	      = $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id',        'u_item_id',        0,           'string' );
 		//if ($u_item_id && (int)$u_item_id = $u_item_id) $filter_item = $u_item_id;   // DO NOT SET it prevents listing and selecting files !!
 		if (!$u_item_id && $filter_item)   $u_item_id   = $filter_item;
@@ -128,6 +153,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$targetid					= $app->getUserStateFromRequest( $option.'.'.$_view.'.targetid',    		 'targetid',     		 '', 				  'string' );
 		$thumb_w					= $app->getUserStateFromRequest( $option.'.'.$_view.'.thumb_w',    			 'thumb_w',     		 120, 				'int' );
 		$thumb_h					= $app->getUserStateFromRequest( $option.'.'.$_view.'.thumb_h',    			 'thumb_h',     		 90, 				  'int' );
+		// *** EOF FILESELEMENT view specific ***
 		
 		// Text search
 		$scope  = $model->getState( 'scope' );
@@ -137,9 +163,13 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
 		$filter_item      = $filter_item ? $filter_item : '';
 		
+		// *** BOF FILESELEMENT view specific ***
 		$newfileid		= JRequest::getInt('newfileid');
 		$newfilename	= base64_decode(JRequest::getVar('newfilename', ''));
 		$delfilename	= base64_decode(JRequest::getVar('delfilename', ''));
+		// *** BOF FILESELEMENT view specific ***
+		
+		
 		
 		// **************************
 		// Add css and js to document
@@ -156,9 +186,6 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// This is not included automatically in frontend
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH);
 		
-		// Include backend CSS template CSS file , access to backend folder may not be allowed but ...
-		//$template = $app->isSite() ? (!FLEXI_J16GE ? 'khepri' : (FLEXI_J30GE ? 'hathor' : 'bluestork')) : $app->getTemplate();
-		//$document->addStyleSheet(JURI::base(true).'/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
 		
 		//a trick to avoid loosing general style in modal window
 		$css = 'body, td, th { font-size: 11px; }
@@ -170,11 +197,25 @@ class FlexicontentViewFileselement extends JViewLegacy
 		';
 		$document->addStyleDeclaration($css);
 		
+		
+		
+		// ************************
+		// Create Submenu & Toolbar
+		// ************************
+		
+		// Create Submenu (and also check access to current view)
+		//FLEXISubmenu('CanFiles');  // not applicable for fileselement view
+		
 		// Create document/toolbar titles
 		$doc_title = JText::_( 'FLEXI_FILE' );
 		$site_title = $document->getTitle();
+		//JToolBarHelper::title( $doc_title, 'files' );  // not applicable for fileselement view
 		$document->setTitle($doc_title .' - '. $site_title);
 		
+		// Create the toolbar
+		$this->setToolbar();
+		
+
 		
 		// ***********************
 		// Get data from the model
@@ -209,6 +250,9 @@ class FlexicontentViewFileselement extends JViewLegacy
 		foreach ($items_single as $item_id => $_item) $items[$item_id] = $_item;
 		foreach ($items_multi  as $item_id => $_item) $items[$item_id] = $_item;
 		ksort($items);*/
+		
+		$assigned_fields_labels = array('image'=>'image/gallery', 'file'=>'file', 'minigallery'=>'minigallery');
+		$assigned_fields_icons = array('image'=>'picture_link', 'file'=>'page_link', 'minigallery'=>'film_link');
 		
 		$fname = $model->getFieldName($fieldid);
 		$files_selected = $model->getItemFiles($u_item_id);
@@ -386,13 +430,20 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$lists['item_id'] = '<input type="text" name="item_id" size="1" class="inputbox" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$filter_item.'" />';
 		
 		//build secure/media filterlist
-		$secure 	= array();
-		$secure[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_DIRECTORIES' )*/ );
-		$secure[] 	= JHTML::_('select.option',  'S', JText::_( 'FLEXI_SECURE_DIR' ) );
-		$secure[] 	= JHTML::_('select.option',  'M', JText::_( 'FLEXI_MEDIA_DIR' ) );
-
-		$lists['secure'] = ($filter_secure || 1 ? '<label class="label">'.JText::_('FLEXI_ALL_DIRECTORIES').'</label>' : '').
-			JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_secure );
+		$lists['secure'] = '<i data-placement="bottom" class="icon-info fc-man-icon-s hasTooltip" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>'
+			.($filter_secure || 1 ? '<label class="label">'.JText::_('FLEXI_URL_SECURE').'</label>' : '');
+		if ($target_dir==2)
+		{
+			$secure 	= array();
+			$secure[] 	= JHTML::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_DIRECTORIES' )*/ );
+			$secure[] 	= JHTML::_('select.option',  'S', JText::_( 'FLEXI_SECURE_DIR' ) );
+			$secure[] 	= JHTML::_('select.option',  'M', JText::_( 'FLEXI_MEDIA_DIR' ) );
+			
+			$lists['secure'] .=
+				JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_secure );
+		}
+		else
+			$lists['secure'] .= '<span class="badge badge-info">'.JText::_($target_dir==0 ? 'FLEXI_MEDIA_DIR' : 'FLEXI_SECURE_DIR').'</span>';
 
 		//build ext filterlist
 		$lists['ext'] = ($filter_ext || 1 ? '<label class="label">'.JText::_('FLEXI_ALL_EXT').'</label>' : '').
@@ -412,12 +463,11 @@ class FlexicontentViewFileselement extends JViewLegacy
 
 		$filelist = explode(',', $filelist);
 		$files = array();
-		foreach ($filelist as $fileid) {
-			
+		foreach ($filelist as $fileid)
+		{
 			if ($fileid && $fileid != $file) {
-			$files[] = (int)$fileid;
+				$files[] = (int)$fileid;
 			}
-			
 		}
 
 		$files = implode(',', $files);
@@ -427,7 +477,10 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$files .= $file;
 		
 		//assign data to template
+		$this->assignRef('layout', $layout);
 		$this->assignRef('target_dir', $target_dir);
+		$this->assignRef('optional_cols', $optional_cols);
+		$this->assignRef('cols', $cols);
 		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('params'     , $cparams);
 		$this->assignRef('client'     , $client);
@@ -446,6 +499,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$this->assignRef('CanUpload'       , $perms->CanUpload);
 		$this->assignRef('CanViewAllFiles' , $perms->CanViewAllFiles);
 		$this->assignRef('files_selected'  , $files_selected);
+		$this->assignRef('assigned_fields_labels' , $assigned_fields_labels);
+		$this->assignRef('assigned_fields_icons'  , $assigned_fields_icons);
 		$this->assignRef('langs', $langs);
 		
 		$this->assignRef('option', $option);
@@ -453,5 +508,15 @@ class FlexicontentViewFileselement extends JViewLegacy
 
 		parent::display($tpl);
 	}
+	
+	
+	/**
+	 * Method to configure the toolbar for this view.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	function setToolbar()
+	{
+	}
 }
-?>

@@ -39,8 +39,9 @@
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 			
-			<field name="" type="separator" default="Layout" description="" level="level2" />
-			<field name="formlayout" type="fcfilelist" default="" label="Fields Layout" description="" directory="plugins/flexicontent_fields/file/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
+			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/minigallery/tmpl/" filter="field*" exclude="" stripext="1" stripprefix="field_" hide_none="1" hide_default="1" labelclass="label-warning" />
+			
 			<field name="fields_box_placing" type="radio" default="1" label="Fields Container" description="You can save space by floating the form fields container" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_FLOATED_LEFT</option>
@@ -70,6 +71,13 @@
 			<field name="target_dir" type="radio" default="0" label="FLEXI_TARGET_DIRECTORY" description="FLEXI_CHOOSE_DIRECTORY_DESC" depend_class="use-myfiles-on" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_MEDIA</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_FILELIST_COLUMNS" description="FLEXI_FILELIST_COLUMNS_DESC" level="level3" depend_class="" />
+			<field name="filelist_cols" type="fccheckbox" default="" display_useglobal="0"
+				checkoptions="FLEXI_ACCESS,FLEXI_TARGET_DIRECTORY,FLEXI_STATE,FLEXI_LANGUAGE,FLEXI_UPLOADER,FLEXI_UPLOAD_TIME,FLEXI_ID,FLEXI_HITS,FLEXI_USAGE"
+				checkvals="access,target,state,lang,uploader,upload_time,file_id,hits,usage"
+				defaultvals="upload_time,hits"
+				label="FLEXI_COLUMNS" description="FLEXI_FILELIST_COLUMNS_DESC" />
 			
 			<field name="" type="separator" default="File properties editing" description="" level="level2"/>
 			<field name="inputmode" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_ENABLE" description="Select to allow editing file properties elements" class="btn-group group-fcmethod">
