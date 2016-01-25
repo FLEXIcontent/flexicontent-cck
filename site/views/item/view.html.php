@@ -1016,6 +1016,11 @@ class FlexicontentViewItem  extends JViewLegacy
 		// (b) Get Content Type allowed templates
 		$allowed_tmpls = $tparams->get('allowed_ilayouts');
 		$type_default_layout = $tparams->get('ilayout', 'default');
+		
+		// Load language file
+		//*** TODO make loading of templates to BE AJAX
+		FLEXIUtilities::loadTemplateLanguageFile( $item->itemparams->get('ilayout', $type_default_layout) );
+
 		if ( empty($allowed_tmpls) ) {
 			$allowed_tmpls = array();
 		}

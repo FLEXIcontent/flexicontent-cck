@@ -199,7 +199,7 @@
 			</field>
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_CONFIG" level="level2" depend_class="disp-native-apis" />
-			<field name="youtube_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_KEY_DESC" depend_class="disp-native-apis" labelclass="label-info" />
+			<field name="youtube_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_API_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_YOUTUBE_API_KEY_DESC" depend_class="disp-native-apis" labelclass="label-info" />
 			
 		</fieldset>
 		
