@@ -3459,7 +3459,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function getLayoutparams($force = false)
 	{
-		return $this->_ilayout ? flexicontent_tmpl::getLayoutparams('items', $this->_ilayout, $force) : '';
+		return $this->_ilayout ? flexicontent_tmpl::getLayoutparams('items', $this->_ilayout, '', $force) : '';
 	}
 	
 	

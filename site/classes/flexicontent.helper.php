@@ -163,6 +163,10 @@ class flexicontent_html
 		static $less_folders = null;
 		$app = JFactory::getApplication();
 		
+		static $print_logging_info = null;
+		$print_logging_info = $print_logging_info !== null  ?  $print_logging_info  :  JComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
+		$debug = JDEBUG || $print_logging_info;
+		
 		if (!is_array($inc_paths)) $inc_paths = array($inc_paths);
 		
 		// Get global include folders
@@ -177,7 +181,10 @@ class flexicontent_html
 				);
 				$less_folders = str_replace(array_keys($_reps), $_reps, $less_folders);
 				$less_folders = preg_split("/[\s]*::[\s]*/", $less_folders);
-				foreach($less_folders as $k => $v)  if (empty($v))  unset($less_folders[$k]);
+				foreach($less_folders as $k => $v)  {
+					if (empty($v)) unset($less_folders[$k]);
+					else $less_folders[$k] = JPath::clean($v);
+				}
 			}
 			$inc_paths_all = array_merge($inc_paths, $less_folders);
 		}
@@ -198,7 +205,8 @@ class flexicontent_html
 			{
 				$_dirty = false;
 				$inc_files = glob($inc_path.'*.{less}', GLOB_BRACE);  //print_r($inc_files);
-				foreach ($inc_files as $confFile) {
+				if (!is_array($inc_files) && $debug) JFactory::getApplication()->enqueueMessage('Reading LESS folder failed: '.$inc_path, 'notice');
+				if (is_array($inc_files)) foreach ($inc_files as $confFile) {
 					//echo $confFile . " time: ".filemtime($confFile) ."<br/>";
 					if (!JFile::exists($inc_path.'_config_fc_ts') || filemtime($confFile) > filemtime($inc_path.'_config_fc_ts')) {
 						touch($inc_path.'_config_fc_ts');

@@ -2128,7 +2128,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function getLayoutparams($force = false)
 	{
-		return $this->_clayout ? flexicontent_tmpl::getLayoutparams('category', $this->_clayout, $force) : '';
+		return $this->_clayout ? flexicontent_tmpl::getLayoutparams('category', $this->_clayout, '', $force) : '';
 	}
 	
 	
