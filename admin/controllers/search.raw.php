@@ -30,6 +30,8 @@ JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.
  */
 class FlexicontentControllerSearch extends FlexicontentController
 {
+	static $item_limit = 5000;
+	
 	/**
 	 * Constructor
 	 *
@@ -142,18 +144,19 @@ class FlexicontentControllerSearch extends FlexicontentController
 		
 		
 		// Get ids of searchable and ids of item having values for these fields
+		$items_total = 0;
 		$itemsmodel = $this->getModel('items');          // Get items model to call needed methods
-		$itemids    = $itemsmodel->getFieldsItems($fieldids);
+		$itemids    = $itemsmodel->getFieldsItems(/*$fieldids*/null, $items_total, 0, self::$item_limit);
 		
 		// Set item ids into session to avoid recalculation ...
 		$_sz_encoded = base64_encode( $has_zlib ? zlib_encode(serialize($itemids), -15) : serialize($itemids) );
 		$session->set($indexer.'_items_to_index', $_sz_encoded, 'flexicontent');
 		
-		echo 'success';  //echo count($fieldids)*count($itemids).'|';
+		echo 'success';
 		// WARNING: json_encode will output object if given an array with gaps in the indexing
 		//echo '|'.json_encode($itemids);
 		//echo '|'.json_encode($fieldids);
-		echo '|'.count($itemids);
+		echo '|'.$items_total;
 		echo '|'.count($fieldids);
 		
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -161,14 +164,19 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$_total_queries = 0;
 		echo sprintf( '|0| Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries;
 		
-		$session->set($indexer.'_total_runtime', $elapsed_microseconds ,'flexicontent');
-		$session->set($indexer.'_total_queries', 0 ,'flexicontent');
+		$session->set($indexer.'_total_runtime', $elapsed_microseconds, 'flexicontent');
+		$session->set($indexer.'_total_queries', 0, 'flexicontent');
+		$session->set($indexer.'_items_total', $items_total, 'flexicontent');
+		$session->set($indexer.'_items_start', 0, 'flexicontent');
 		exit;
 	}
 	
 	
 	function index()
 	{
+		// Test indexing with limited memory
+		//ini_set("memory_limit", "20M");
+		
 		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
 		
 		$start_microtime = microtime(true);
@@ -217,6 +225,9 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$itemids = $session->get($indexer.'_items_to_index', array(),'flexicontent');
 		$itemids = unserialize( $has_zlib ? zlib_decode(base64_decode($itemids)) : base64_decode($itemids) );
 		
+		// Get total and current limit-start
+		$items_total = $session->get($indexer.'_items_total', 0,'flexicontent');
+		$items_start = $session->get($indexer.'_items_start', 0,'flexicontent');
 		
 		$_fields = array();
 		foreach($fields as $field_id => $field)
@@ -246,11 +257,17 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$query_count = 0;
 		$max_items_per_query = 100;
 		$max_items_per_query = $max_items_per_query > $items_per_call ? $items_per_call : $max_items_per_query;
-		$cnt = $itemcnt;
-		while($cnt < count($itemids) && $cnt < $itemcnt+$items_per_call)
+		$cnt = $itemcnt;  // Start item counter at given index position
+		
+		while($cnt < $items_start+count($itemids)  &&  $cnt < $itemcnt+$items_per_call)   // Until all items of current sub-set finish or until maximum items per AJAX call are reached
 		{
-			$query_itemids = array_slice($itemids, $cnt, $max_items_per_query);
+			// Get maximum items per SQL query
+			$query_itemids = array_slice($itemids, ($cnt - $items_start), $max_items_per_query);
+			if ( empty($query_itemids) ) die("fail|current step has no items");
+			
+			// Increment item counter, but detect passing past current sub-set limit
 			$cnt += $max_items_per_query;
+			if ($cnt > $items_start+self::$item_limit) $cnt = $items_start+self::$item_limit;
 			
 			// Item is not needed, later and only if field uses item replacements then it will be loaded
 			$item = null;
@@ -390,11 +407,12 @@ class FlexicontentControllerSearch extends FlexicontentController
 			
 			$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			$elapsed_seconds = $elapsed_microseconds / 1000000.0;
-			if ($elapsed_seconds > $max_execution_time/3 || $elapsed_seconds > 5) break;
+			if ($elapsed_seconds > $max_execution_time/3 || $elapsed_seconds > 6) break;
 		}
 		
+		
 		// Check if items have finished, otherwise continue with -next- group of item ids
-		if ($cnt >= count($itemids))
+		if ($cnt >= $items_total)
 		{
 			// Reset dirty SEARCH properties of published fields to be: normal ON/OFF
 			$set_clause = ' SET' .($indexer=='basic' ?
@@ -417,13 +435,30 @@ class FlexicontentControllerSearch extends FlexicontentController
 			}
 		}
 		
+		// Get next sub-set of items
+		else if ($cnt >= $items_start + self::$item_limit)
+		{
+			$items_start = $items_start + self::$item_limit;
+			
+			$itemsmodel = $this->getModel('items');          // Get items model to call needed methods
+			$itemids = $itemsmodel->getFieldsItems(/*$fieldids*/null, $total, $items_start, self::$item_limit);
+			
+			// Set item ids into session to avoid recalculation ...
+			$_sz_encoded = base64_encode( $has_zlib ? zlib_encode(serialize($itemids), -15) : serialize($itemids) );
+			$session->set($indexer.'_items_to_index', $_sz_encoded, 'flexicontent');
+			
+			$session->set($indexer.'_items_start', $items_start, 'flexicontent');
+		}
+		
+		// Terminate if no fields found to be indexable
 		if ( !count($fieldids) ) {
 			echo 'fail|Index was only cleaned-up, <br/>since no <b>fields</b> were marked as: '.'<br> -- ' .
 				($indexer=='basic' ? 'Text Searchable (CONTENT LISTS)' :	'Text Searchable OR filterable (SEARCH VIEW)');
 			exit;
 		}
 		
-		if ( !count($itemids) ) {
+		// Terminate if not indexing any items
+		if ( !$items_total ) {
 			echo 'fail|Index was only cleaned-up, <br/>since no <b>items</b> were found to have value for fields marked as: '.'<br> -- ' .
 				($indexer=='basic' ? 'Text Searchable (CONTENT LISTS)' :	'Text Searchable OR filterable (SEARCH VIEW)');
 			exit;

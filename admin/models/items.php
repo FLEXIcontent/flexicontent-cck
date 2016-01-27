@@ -2922,68 +2922,93 @@ class FlexicontentModelItems extends JModelLegacy
 	 * 
 	 * @since 1.5
 	 */
-	function getFieldsItems($fields) {
-		if ( !count($fields) ) return array();
+	function getFieldsItems($fields=null, &$total=null, $start=0, $limit=5000)
+	{
+		if ( $fields===null )
+			$use_all_items = true;
 		
-		// Get field data, so that we can identify the fields and take special action for each of them
-		$field_list = "'".implode("','", $fields)."'";
-		$query = "SELECT * FROM #__flexicontent_fields WHERE id IN ({$field_list})";
-		$this->_db->setQuery($query);
-		$field_data = $this->_db->loadObjectList();
+		else if ( !count($fields) )
+			return array();
 		
-		// Check the type of fields
-		$check_items_for_tags = false;
-		$use_all_items = false;
-		$non_core_fields = array();
-		foreach ($field_data as $field) {
-			// tags
-			if ($field->field_type == 'tags') {
-				$get_items_with_tags = true;
-				continue;
+		else {
+			// Get field data, so that we can identify the fields and take special action for each of them
+			$field_list = "'".implode("','", $fields)."'";
+			$query = "SELECT * FROM #__flexicontent_fields WHERE id IN ({$field_list})";
+			$this->_db->setQuery($query);
+			$field_data = $this->_db->loadObjectList();
+			
+			// Check the type of fields
+			$use_all_items = false;
+			$check_items_for_tags = false;
+			$non_core_fields = array();
+			foreach ($field_data as $field) {
+				// tags
+				if ($field->field_type == 'tags') {
+					$get_items_with_tags = true;
+					continue;
+				}
+				// other core fields
+				if ($field->iscore) {
+					$use_all_items = true;
+					break;
+				}
+				// non core fields
+				$non_core_fields[] = $field->id;
 			}
-			// other core fields
-			if ($field->iscore) {
-				$use_all_items = true;
-				break;
-			}
-			// non core fields
-			$non_core_fields[] = $field->id;
 		}
+		
+		
+		// NOTE: Must include all items regardless of state to avoid problems when
+		// (a) item changes state and (b) to allow privileged users to search any item
+		
 		
 		// Return all items, since we included a core field other than tag
-		if ($use_all_items == true) {
-			$query = "SELECT id FROM #__content";
+		if ($use_all_items == true)
+		{
+			$query = "SELECT SQL_CALC_FOUND_ROWS id FROM #__content";
+			if ($limit) $query .= " LIMIT ". (int)$start . ", ". (int)$limit;
 			$this->_db->setQuery($query);
-			return $this->_db->loadColumn();
+			$item_list = $this->_db->loadColumn();
+			
+			// Get items total
+			$this->_db->setQuery("SELECT FOUND_ROWS()");
+			$total = $this->_db->loadResult();
+			
+			return $item_list;
 		}
 		
+		// Queries used to get the item IDs of items having values for the fields
+		$queries = array();
+		
 		// Find item having tags
-		$items_with_tags = array();
-		if ( !empty($get_items_with_tags) ) {
-			$query  = 'SELECT DISTINCT itemid FROM #__flexicontent_tags_item_relations';
-			$this->_db->setQuery($query);
-			$items_with_tags = $this->_db->loadColumn();
+		if ( !empty($get_items_with_tags) )
+		{
+			$queries[] = "SELECT DISTINCT t.itemid "
+				." FROM #__flexicontent_tags_item_relations AS t"
+				//." JOIN #__content AS a ON a.id=t.item_id AND a.state IN (1, -5)"
+				;
 		}
 		
 		// Find items having values for non core fields
-		$items_with_noncore = array();
-		if (count($non_core_fields)) {
+		if (count($non_core_fields))
+		{
 			$non_core_fields_list = "'".implode("','", $non_core_fields)."'";
-			$query = "SELECT DISTINCT firel.item_id FROM #__flexicontent_fields_item_relations as firel"
-				." JOIN #__content as a ON firel.item_id=a.id "
-				." WHERE firel.field_id IN ({$non_core_fields_list}) "
-				." AND firel.value<>'' "
-				// NOTE: Must include all items regardless of state to avoid problems when
-				// (a) item changes state and (b) to allow priveleged users to search any item
-				//."  AND a.state IN (1, -5)"
-			;
-			//echo $query;
-			$this->_db->setQuery($query);
-			$items_with_noncore = $this->_db->loadColumn();
+			$queries[] = "SELECT DISTINCT r.item_id "
+				." FROM #__flexicontent_fields_item_relations as r"
+				//." JOIN #__content AS a ON a.id=r.item_id AND a.state IN (1, -5)"
+				." WHERE r.field_id IN ({$non_core_fields_list})"
+				;
 		}
 		
-		$item_list = array_merge($items_with_tags,$items_with_noncore);
-		//echo count($item_list);
+		$query = "SELECT SQL_CALC_FOUND_ROWS i.* FROM ((". implode(") UNION ( ", $queries) .")) AS i";
+		if ($limit) $query .= " LIMIT ". (int)$start . ", ". (int)$limit;
+		$this->_db->setQuery($query);
+		$item_list = $this->_db->loadColumn();
+		
+		// Get items total
+		$this->_db->setQuery("SELECT FOUND_ROWS()");
+		$total = $this->_db->loadResult();
+		//echo $total;
 		
 		// NOTE: array_unique() creates gaps in the index of the array,
 		// and if passed to json_encode it will output object !!! so we use array_values()
