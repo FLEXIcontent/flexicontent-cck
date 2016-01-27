@@ -19,6 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+$ico_class = 'btn btn-micro'; //'fc-man-icon-s';
 $commentimage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ), ' class="fc-man-icon-s" style="vertical-align:top;" ');
 
 $basetemplates = array('default', 'blog', 'faq', 'items-tabbed', 'presentation');
@@ -46,12 +47,13 @@ jQuery(document).ready(function() {
 ";
 JFactory::getDocument()->addScriptDeclaration($js);
 
-$editSingle   = JHTML::image ( 'components/com_flexicontent/assets/images/page_single_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:22px;" ' );
-$editMultiple = JHTML::image ( 'components/com_flexicontent/assets/images/page_multiple_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:22px;" '  );
-$editlayout = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_edit.png', JText::_( 'FLEXI_EDIT_LAYOUT' ), ' style="min-width:16px;" '  );
-$noeditlayout = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_link.png', JText::_( 'FLEXI_NOEDIT_LAYOUT' ), ' style="min-width:16px;" '  );
-$copytmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_add.png', JText::_( 'FLEXI_DUPLICATE' ), ' style="min-width:16px;" '  );
-$deltmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE' ), ' style="min-width:16px;" '  );
+$edit_layout = JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true);
+$editSingle_icon   = JHTML::image ( 'components/com_flexicontent/assets/images/page_single_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" ' );
+$editMultiple_icon = JHTML::image ( 'components/com_flexicontent/assets/images/page_multiple_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" '  );
+$editLayout_icon   = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_edit.png', $edit_layout, ' style="min-width:16px;"  class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" '  );
+$noEditLayout_icon = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_link.png', JText::_( 'FLEXI_NOEDIT_LAYOUT', true ), ' class="'.$ico_class.' '.$tip_class.'" style="min-width:16px;" title="'.JText::_( 'FLEXI_NOEDIT_LAYOUT', true ).'" '  );
+$copyTmpl_icon     = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_add.png', JText::_( 'FLEXI_DUPLICATE', true ), ' style="min-width:16px;" class="'.$ico_class.' '.$tip_class.'" title="'.JText::_( 'FLEXI_DUPLICATE', true ).'" '  );
+$delTmpl_icon      = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE', true ), ' style="min-width:16px;" class="'.$ico_class.' '.$tip_class.'" title="'.JText::_( 'FLEXI_REMOVE', true ).'" '  );
 
 $list_total_cols = 8;
 ?>
@@ -115,27 +117,27 @@ $list_total_cols = 8;
 				<table class="admintable" style="margin: 0 auto !important;">
 					<tr>
 						<td>
-						<?php echo $copytmpl; ?>
+						<?php echo $copyTmpl_icon; ?>
 						</td>
 						<td>
 						<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
 						</td>
 						<td>
-						<?php echo $editlayout; ?>
+						<?php echo $editLayout_icon; ?>
 						</td>
 						<td>
-						<?php echo JText::_( 'FLEXI_EDIT_LAYOUT' ); ?>
+						<?php echo JText::_( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS' ); ?>
 						</td>
 					</tr>
 					<tr>
 						<td>
-						<?php echo $deltmpl; ?>
+						<?php echo $delTmpl_icon; ?>
 						</td>
 						<td>
 						<?php echo JText::_( 'FLEXI_REMOVE_TEMPLATE' ); ?>
 						</td>
 						<td>
-						<?php echo $noeditlayout; ?>
+						<?php echo $noEditLayout_icon; ?>
 						</td>
 						<td>
 						<?php echo JText::_( 'FLEXI_NOEDIT_LAYOUT' ); ?>
@@ -173,11 +175,11 @@ $list_total_cols = 8;
 			<td class="right">
 				<?php if (!in_array($row->name, $basetemplates)) :?>
 					<a style="margin-right: 5px" id="<?php echo 'del-' . $row->name ?>" class="deletable-template" href="javascript:;">
-						<?php echo $deltmpl; ?>
+						<?php echo $delTmpl_icon; ?>
 					</a>
 			 	<?php endif; ?>
-				<?php /*<a class="modal" onclick="javascript:;" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copytmpl; ?></a>*/ ?>
-				<a onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300); return false;" href="<?php echo $copylink; ?>"><?php echo $copytmpl; ?></a>
+				<?php /*<a class="modal" onclick="javascript:;" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copyTmpl_icon; ?></a>*/ ?>
+				<a onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300); return false;" href="<?php echo $copylink; ?>"><?php echo $copyTmpl_icon; ?></a>
 			</td>
 			<td>
 				<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
@@ -188,7 +190,7 @@ $list_total_cols = 8;
 				<?php endif; ?>
 			</td>
 			<td style="text-align:right; width:24px;">
-				<?php echo @$row->items ? (isset($row->items->positions) ? '<a href="'.$itemlink.'">'.$editSingle.'</a>' : $noeditlayout) : ''; ?>
+				<?php echo @$row->items ? (isset($row->items->positions) ? '<a href="'.$itemlink.'">'.$editSingle_icon.'</a>' : $noEditLayout_icon) : ''; ?>
 			</td>
 			<td style="text-align: left">
 				<?php if ($defaulttitle_item): ?>
@@ -199,7 +201,7 @@ $list_total_cols = 8;
 				<?php endif; ?>
 			</td>
 			<td style="text-align:right; width:24px;">
-				<?php echo @$row->category ? (isset($row->category->positions) ? '<a href="'.$catlink.'">'.$editMultiple.'</a>' : $noeditlayout) : ''; ?>
+				<?php echo @$row->category ? (isset($row->category->positions) ? '<a href="'.$catlink.'">'.$editMultiple_icon.'</a>' : $noEditLayout_icon) : ''; ?>
 			</td>
 			<td style="text-align: left">
 				<?php if ($defaulttitle_cat): ?>

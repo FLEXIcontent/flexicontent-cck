@@ -20,13 +20,14 @@ defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
+$ico_class = 'btn btn-micro'; //'fc-man-icon-s';
 
 $start_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>';
 $end_text = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"></div>';
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCtypes', $start_text, $end_text);
 
 $edit_entry  = JText::_('FLEXI_EDIT_TYPE', true);
-$edit_layout = JText::_('FLEXI_EDIT_LAYOUT', true);
+$edit_layout = JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true);
 $view_fields = JText::_('FLEXI_VIEW', true); //JText::_('FLEXI_VIEW_FIELDS', true);
 $view_items  = JText::_('FLEXI_VIEW', true); //JText::_('FLEXI_VIEW_ITEMS', true);
 
@@ -35,9 +36,9 @@ $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 $list_total_cols = 12;
 
-$article_viewing_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_REDIRECT_ARTICLE_VIEW').'" title="'.flexicontent_html::getToolTip('FLEXI_REDIRECT_ARTICLE_VIEW', 'FLEXI_REDIRECT_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
-$default_template_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
-$layout_edit_icon = '<img src="components/com_flexicontent/assets/images/layout_edit.png" class="fc-man-icon-s" alt="'.$edit_layout.'" /> ';
+$article_viewing_tip  = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_REDIRECT_ARTICLE_VIEW', true).'" title="'.flexicontent_html::getToolTip('FLEXI_REDIRECT_ARTICLE_VIEW', 'FLEXI_REDIRECT_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
+$default_template_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_( 'FLEXI_TYPE_DEFAULT_TEMPLATE', true ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
+$editLayout_icon = '<img src="components/com_flexicontent/assets/images/layout_edit.png" class="'.$ico_class.' '.$tip_class.'" alt="'.$edit_layout.'" title="'.$edit_layout.'" /> ';
 ?>
 <script type="text/javascript">
 
@@ -227,8 +228,8 @@ function delAllFilters() {
 			
 			<td class="hidden-phone col_edit_layout">
 				<?php if ($this->CanTemplates) : ?>
-				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container'); return false;" >
-					<?php echo $layout_edit_icon;?>
+				<a href="<?php echo $layout_url; ?>" title="<?php echo $edit_layout; ?>" onclick="var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'<?php echo $edit_layout; ?>'}); return false;" >
+					<?php echo $editLayout_icon;?>
 				</a>
 				<?php endif; ?>
 			</td>

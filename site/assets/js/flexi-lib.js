@@ -73,6 +73,7 @@
 		
 		var parent = obj.parent();
 		var theDialog = obj.dialog({
+			title: params.title,
 			closeOnEscape: (typeof params.closeOnEscape !== 'undefined'  ?  params.closeOnEscape  :  true),
 			resize: false,
 			autoOpen: false,
@@ -155,6 +156,7 @@
 		
 		// Initialize popup container
 		container.dialog({
+			title: params.title,
 			closeOnEscape: (typeof params.closeOnEscape !== 'undefined'  ?  params.closeOnEscape  :  false),
 			autoOpen: false,
 			width: params.winwidth,
