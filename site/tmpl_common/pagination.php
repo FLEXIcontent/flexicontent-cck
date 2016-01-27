@@ -1,5 +1,6 @@
 <?php if ($this->params->get('show_pagination', 2) != 0) : ?>
-	<?php if ( FLEXI_J16GE ) echo '<div class="pagination">'; ?>
+
+<div class="pagination">
 	
 	<div class="pageslinks">
 		<?php echo $this->pageNav->getPagesLinks(); ?>
@@ -11,5 +12,6 @@
 	</p>
 	<?php endif; ?>
 	
-	<?php if ( FLEXI_J16GE ) echo '</div>'; ?>
+</div>
+
 <?php endif; ?>

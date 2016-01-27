@@ -3877,14 +3877,9 @@ class ParentClassItem extends JModelAdmin
 		if (is_array($metadata))
 		{
 			$item->metadata = new JRegistry($item->metadata);
+			// NOTE: metadesc, metakey are directly under jform 'attribs' so they do not need special handling
 			foreach ($metadata as $k => $v) {
-				if ( $k == 'description' && !FLEXI_J16GE ) {  // is jform field in J1.6+
-					$item->metadesc = $v;
-				} elseif ( $k == 'keywords' && !FLEXI_J16GE ) {  // is jform field in J1.6+
-					$item->metakey = $v;
-				} else {
-					$item->metadata->set($k, $v);
-				}
+				$item->metadata->set($k, $v);
 			}
 			$item->metadata = $item->metadata->toString();
 		}

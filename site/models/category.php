@@ -209,18 +209,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->_params = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$this->_params->merge($cparams);
-		//$this->_loadCategoryParams();
 		
-		// Set the pagination variables into state (We get them from http request OR use default category parameters)
-		$limit = strlen(JRequest::getVar('limit')) ? JRequest::getInt('limit') : $this->_params->get('limit');
-		$limitstart	= JRequest::getInt('limitstart', JRequest::getInt('start', 0, '', 'int'), '', 'int');
 		
-		// In case limit has been changed, adjust limitstart accordingly
-		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
-		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
-		
-		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
+		// ******************************************************************************
+		// Set state EXCEPT: limit and limitstart that will be calculated at getData()
+		// and after getCategory() has been called thus parameters have been loaded fully
+		// ******************************************************************************
 
 		// Set filter order variables into state
 		$this->setState('filter_order', JRequest::getCmd('filter_order', 'i.title', 'default'));
@@ -283,14 +277,27 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function getData()
 	{
+		// Make sure category has been loaded (false means category view without current category)
+		if ( $this->_category === null) $this->getCategory();
 		$cparams = $this->_params;
 		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
+		
+		// Set the pagination variables into state (We get them from http request OR use default category parameters)
+		$limit = strlen(JRequest::getVar('limit')) ? JRequest::getInt('limit') : $this->_params->get('limit');
+		$limitstart	= JRequest::getInt('limitstart', JRequest::getInt('start', 0, '', 'int'), '', 'int');
+		
+		// In case limit has been changed, adjust limitstart accordingly
+		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
+		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
+		
+		$this->setState('limit', $limit);
+		$this->setState('limitstart', $limitstart);
+		
+		
 		// Allow limit zero to achieve a category view without items
-		$limit = (int) $this->getState('limit');
-		$limitstart = (int) $this->getState('limitstart');
 		if ($limit <= 0)
 		{
 			$this->_data = array();
@@ -1379,7 +1386,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		if ( !$this->_id && !count($this->_ids)) return array();
 		
+		// Make sure category has been loaded (false means category view without current category)
+		if ( $this->_category === null) $this->getCategory();
 		$cparams = $this->_params;
+		
 		$show_itemcount   = $cparams->get('show_itemcount', 1);
 		//$show_subcatcount = $cparams->get('show_subcatcount', 0);
 		
@@ -1424,7 +1434,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		if ( !$this->_id || !$this->_category ) return array();
 		
+		// Make sure category has been loaded (false means category view without current category)
+		if ( $this->_category === null) $this->getCategory();
 		$cparams = $this->_params;
+		
 		$show_itemcount   = $cparams->get('show_itemcount_peercat', 1);
 		//$show_subcatcount = $cparams->get('show_subcatcount_peercat', 0);
 		
@@ -2141,7 +2154,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
  	function getAlphaindex()
 	{
+		// Make sure category has been loaded (false means category view without current category)
+		if ( $this->_category === null) $this->getCategory();
 		$cparams = $this->_params;
+		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		if ( $print_logging_info )  $start_microtime = microtime(true);

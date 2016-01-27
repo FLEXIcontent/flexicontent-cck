@@ -523,6 +523,9 @@ class FlexicontentModelItem extends ParentClassItem
 			$this->_item->metadata = new JRegistry();
 		}
 		
+		// Manually apply metadata from type parameters ... currently only 'robots' makes sense to exist per type
+		if ( !$this->_item->metadata->get('robots') )   !$this->_item->metadata->set('robots', $typeParams->get('robots'));
+		
 		
 		// *********************************************
 		// Finally set 'parameters' property of the item
