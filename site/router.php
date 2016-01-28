@@ -237,10 +237,6 @@ function FLEXIcontentBuildRoute(&$query)
 				$keep_view_layout = true;
 				break;
 			}
-			if (!$keep_view_layout) {
-				unset($query['layout']);
-				unset($query['view']);
-			}
 		}
 		
 		// Handle adding category ID and view if not already handled above
@@ -253,10 +249,11 @@ function FLEXIcontentBuildRoute(&$query)
 			}
 			// IMPLY view = 'category' when count($segments) == 1
 			if ($cid) $segments[] = $query['cid'];  // it is optional, some category view layouts do not use category id
-			unset($query['cid']);
-			unset($query['layout']);
-			unset($query['view']);
 		}
+		
+		if ( !$keep_view_layout ) unset($query['layout']);
+		if ( $mview == $view )    unset($query['view']);
+		if ( $mcid  == $cid )     unset($query['cid']);
 		break;
 	
 	case 'tags':
