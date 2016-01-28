@@ -2,15 +2,13 @@
 
 <div class="pagination">
 	
-	<div class="pageslinks">
-		<?php echo $this->pageNav->getPagesLinks(); ?>
-	</div>
-
 	<?php if ($this->params->get('show_pagination_results', 1)) : ?>
-	<p class="pagescounter counter">
+	<p class="counter pull-right">
 		<?php echo $this->pageNav->getPagesCounter(); ?>
 	</p>
 	<?php endif; ?>
+	
+	<?php echo $this->pageNav->getPagesLinks(); ?>
 	
 </div>
 

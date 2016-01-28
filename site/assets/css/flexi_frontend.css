@@ -148,21 +148,6 @@
 #flexicontent .fc_item_title img {
 	border: none;
 }
-#flexicontent .pagination {
-	text-align: center;
-}
-#flexicontent .pageslinks {
-	text-align: center;
-}
-#flexicontent .pageslinks ul {
-	text-align: center;
-}
-#flexicontent .pageslinks ul li a {
-	text-decoration: none;
-}
-#flexicontent .pagescounter {
-	text-align: center;
-}
 #flexicontent .catimg {
 	float: left;
 	margin: 0 0.5em 0.5em 0;
