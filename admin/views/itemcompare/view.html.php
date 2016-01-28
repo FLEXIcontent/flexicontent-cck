@@ -62,22 +62,42 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		// Add html to field object trought plugins
 		foreach ($fields as $field)
 		{
-			if ($field->value) {
+			// Render current field value
+			if ($field->iscore) {
+				$items_params = null;
+				FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, &$row, &$items_params, false, false, false, false, false, null, 'display' ));
+			}
+			else if ($field->value) {
 				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row ));
-				$field_type = $field->iscore ? 'core' : $field->field_type;
+				$field_type = $field->field_type;
 				FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFieldValue', array( &$field, $row ));
-			} else {
+			}
+			else {
 				$field->display = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 			}
-			if ($field->version) {
-				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
-				$field_type = $field->iscore ? 'core' : $field->field_type;
-				FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
+			
+			// Render versioned field value
+			if ($field->version)
+			{
+				if ( in_array($field->field_type, array(/*'tags', 'categories', */'maintext')) )
+				{
+					// TODO render more core fields for versioned value, $field->version is raw we need to convert it to $categories, $tags, etc
+					$items_params = null;
+					FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, &$row, &$items_params, false, false, false, false, false, $field->version, 'displayversion' ));
+				}
+				else if ($field->iscore) {
+					$field->displayversion = $field->version;
+				}
+				else {
+					//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
+					$field_type = $field->field_type;
+					FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFieldValue', array( &$field, $row, $field->version, 'displayversion' ));
+				}
 			} else {
 				$field->displayversion = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 			}
 		}
-
+		
 		//assign data to template
 		$this->assignRef('document'     , $document);
 		$this->assignRef('row'      	, $row);

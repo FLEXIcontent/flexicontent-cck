@@ -37,9 +37,10 @@ class plgFlexicontent_fieldsCore extends FCField
 	// *******************************************
 	
 	// Method to create field's HTML display for item form
-	function onDisplayCoreFieldValue( &$_field, & $_item, &$params, $_tags=null, $_categories=null, $_favourites=null, $_favoured=null, $_vote=null, $values=null, $prop='display' )
+	function onDisplayCoreFieldValue( &$_field, & $_item, &$params, $_tags=null, $_categories=null, $_favourites=null, $_favoured=null, $_vote=null, $raw_values=null, $prop='display' )
 	{
 		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
+		// Currently $raw_values only used by 'maintext'
 		
 		static $cat_links = array();
 		static $tag_links = array();
@@ -205,7 +206,8 @@ class plgFlexicontent_fieldsCore extends FCField
 					break;
 	
 				case 'voting': // voting button
-					if ($_vote===false) $vote = & $item->vote;
+					/*if ($raw_values!==null) $vote = convert ... $raw_values;
+					else */if ($_vote===false) $vote = & $item->vote;
 					else $vote = & $_vote;
 					
 					$field->value[] = 'button'; // dummy value to force display
@@ -236,7 +238,8 @@ class plgFlexicontent_fieldsCore extends FCField
 				case 'categories': // assigned categories
 					$field->{$prop} = '';
 					
-					if ($_categories===false) $categories = & $item->cats;
+					/*if ($raw_values!==null) $categories = convert ... $raw_values;
+					else */if ($_categories===false) $categories = & $item->cats;
 					else $categories = & $_categories;
 					
 					
@@ -261,7 +264,8 @@ class plgFlexicontent_fieldsCore extends FCField
 					$use_catlinks = $cparams->get('tags_using_catview', 0);
 					$field->{$prop} = '';
 					
-					if ($_tags===false) $tags = & $item->tags;
+					/*if ($raw_values!==null) $tags = convert ... $raw_values;
+					else */if ($_tags===false) $tags = & $item->tags;
 					else $tags = & $_tags;
 					
 					if ($tags) :
@@ -281,7 +285,9 @@ class plgFlexicontent_fieldsCore extends FCField
 				case 'maintext': // main text
 				
 					// Special display variables
-					if ($prop != 'display')
+					if ($raw_values!==null)
+						$field->{$prop} = $raw_values[0];
+					else if ($prop != 'display')
 					{
 						switch ($prop) {
 							case 'display_if': $field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;  break;

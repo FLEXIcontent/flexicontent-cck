@@ -49,17 +49,14 @@ table#itemcompare s{
 						<?php
 						foreach ($this->fields as $field)
 						{
-							// used to hide the core fields from this listing
-							if ( $field->iscore == 0 || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext'))) ) {
-							// set the specific label for the maintext field
-								if ($field->field_type == 'maintext') {
-									$field->label 			= JText::_($this->tparams->get('maintext_label', $field->label));
-									$field->description 	= $this->tparams->get('maintext_desc', $field->description);
-									$field->display			= $field->value ? flexicontent_html::nl2space($field->value[0]) : JText::_( 'FLEXI_NO_VALUE' );									
-									$field->displayversion	= $field->version ? flexicontent_html::nl2space($field->version[0]) : JText::_( 'FLEXI_NO_VALUE' );
-								}
+							if ( $field->iscore == 0 || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext'))) /*|| in_array($field->field_type, array('tags', 'categories'))*/ )
+							{
+								//$field->display = $field->value ? flexicontent_html::nl2space($field->value[0]) : JText::_( 'FLEXI_NO_VALUE' );
+								//$field->displayversion = $field->version ? flexicontent_html::nl2space($field->version[0]) : JText::_( 'FLEXI_NO_VALUE' );
+								
 								$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 4px 6px 4px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
-								//echo $field->name."<br/>";
+								
+								//echo "Calculating DIFF for: " $field->label."<br/>";
 								$html = flexicontent_html::flexiHtmlDiff(
 									!is_array($field->displayversion) ? $field->displayversion : implode('', $field->displayversion),
 									!is_array($field->display) ? $field->display : implode('', $field->display),
