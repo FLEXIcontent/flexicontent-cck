@@ -495,7 +495,7 @@ class FlexicontentHelperPerm
 		
 		$permsAny[$user_id][$perm_type] = $user->authorise('core.create', 'com_flexicontent');
 		
-		if ($CanAddAny === NULL) {
+		if ($permsAny[$user_id][$perm_type] === NULL) {
 			// get Allowed Cats is cacheable
 			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, false, $find_first = true );
 			$permsAny[$user_id][$perm_type] = count($allowedcats) > 0;
