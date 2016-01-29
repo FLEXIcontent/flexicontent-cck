@@ -502,18 +502,6 @@ class FlexicontentHelperPerm
 		}
 		
 		return $permsAny[$user_id][$perm_type];
+	}
 }
 
-
-class FlexiAccess extends JAccess {
-	public static function print_asset($asset='core.admin') {
-		/*if (empty(self::$assetRules[$asset])) {
-			self::$assetRules[$asset] = self::getAssetRules($asset, true);
-		}*/
-		echo "<pre style='font-size:12px;'>";
-		print_r(self::$assetRules);
-		echo "</pre>";
-	}	
-}
-
-?>
