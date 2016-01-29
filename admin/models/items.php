@@ -2339,7 +2339,8 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 	}
-
+	
+	
 	/**
 	 * Method to check if we can remove an item
 	 * return false if the user doesn't have rights to do it
@@ -2350,46 +2351,29 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function candelete($cid = array())
 	{
+		if ( !count( $cid ) ) return false;
+		
 		$user = JFactory::getUser();
 		
-		if (FLEXI_J16GE) {
-			// Not needed we will check individual item's permissions
-			//$permission = FlexicontentHelperPerm::getPerm();
-		} else if ($user->gid > 24) {
-			// Return true for super administrators
-			return true;
-		} else if (!FLEXI_ACCESS) {
-			// Return true if flexi_access component is not used,
-			// since all backend user groups can delete content (manager, administrator, super administrator)
-			return true;
-		}
-
-
-		$n		= count( $cid );
-		if ($n)
-		{
-			$query = 'SELECT id, catid, created_by FROM #__content'
+		$query = 'SELECT id, catid, created_by FROM #__content'
 			. ' WHERE id IN ( '. implode(',', $cid) . ' )'
 			;
-			$this->_db->setQuery( $query );
-			$items = $this->_db->loadObjectList();
-			
-			// This is not needed since functionality is already included in checkAllItemAccess() ???
-			//if (FLEXI_ACCESS) {
-				//$canDeleteAll			= FAccess::checkAllContentAccess('com_content','delete','users',$user->gmid,'content','all');
-				//$canDeleteOwnAll	= FAccess::checkAllContentAccess('com_content','deleteown','users',$user->gmid,'content','all');
-			//}
-			foreach ($items as $item)
-			{
-				$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
-				$canDelete 		= in_array('delete', $rights);
-				$canDeleteOwn = in_array('delete.own', $rights) && $item->created_by == $user->id;
-				if (!$canDelete && !$canDeleteOwn) return false;
-			}
-			return true;
+		$this->_db->setQuery( $query );
+		$items = $this->_db->loadObjectList();
+		
+		// We will check all items and return false if any item fails the check
+		foreach ($items as $item)
+		{
+			$rights 		= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $item->id);
+			$canDelete 		= in_array('delete', $rights);
+			$canDeleteOwn = in_array('delete.own', $rights) && $item->created_by == $user->id;
+			if (!$canDelete && !$canDeleteOwn) return false;
 		}
+		
+		return true;
 	}
-
+	
+	
 	/**
 	 * Method to remove an item
 	 *

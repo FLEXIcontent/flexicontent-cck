@@ -52,7 +52,10 @@ class FlexicontentControllerSearch extends FlexicontentController
 	 */
 	function countrows()
 	{
-		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
+		@ob_end_clean();
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Cache-Control: no-cache");
+		header("Pragma: no-cache");
 		
 		// Test counting with limited memory
 		//ini_set("memory_limit", "20M");
@@ -60,14 +63,14 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$start_microtime = microtime(true);
 		// Check for request forgeries
 		//JRequest::checkToken() or jexit( 'Invalid Token' );
-		//$params = JComponentHelper::getParams( 'com_flexicontent' );
 		
-		@ob_end_clean();
-		$indexer = JRequest::getVar('indexer','advanced');
+		$has_zlib    = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
+		$indexer     = JRequest::getVar('indexer','advanced');
 		$rebuildmode = JRequest::getVar('rebuildmode','');
+		
 		$session = JFactory::getSession();
-		$db  = JFactory::getDBO();
-		$app = JFactory::getApplication();
+		$db      = JFactory::getDBO();
+		$app     = JFactory::getApplication();
 		$model = $this->getModel('search');
 		
 		// Retrieve fields, that are assigned as (advanced/basic) searchable/filterable
@@ -174,25 +177,29 @@ class FlexicontentControllerSearch extends FlexicontentController
 	
 	function index()
 	{
+		@ob_end_clean();
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Cache-Control: no-cache");
+		header("Pragma: no-cache");
+		
 		// Test indexing with limited memory
 		//ini_set("memory_limit", "20M");
-		
-		$has_zlib = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
 		
 		$start_microtime = microtime(true);
+		// Check for request forgeries
+		//JRequest::checkToken() or jexit( 'Invalid Token' );
+		
 		$session = JFactory::getSession();
-		$db = JFactory::getDBO();
+		$db      = JFactory::getDBO();
 		
-		// Test indexing with limited memory
-		//ini_set("memory_limit", "20M");
-		
-		@ob_end_clean();
+		$has_zlib      = function_exists ( "zlib_encode" ); //version_compare(PHP_VERSION, '5.4.0', '>=');
 		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
-		$indexer = JRequest::getVar('indexer','advanced');
+		
+		$indexer     = JRequest::getVar('indexer','advanced');
 		$rebuildmode = JRequest::getVar('rebuildmode','');
 		
 		$items_per_call = JRequest::getVar('items_per_call', 20);  // Number of item to index per HTTP request
-		$itemcnt = JRequest::getVar('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
+		$itemcnt        = JRequest::getVar('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
 		
 		// TAKE CARE: this code depends on countrows() to set session variables
 		// Retrieve fields, that are assigned as (advanced/basic) searchable/filterable

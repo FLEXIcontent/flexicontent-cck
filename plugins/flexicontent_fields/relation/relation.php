@@ -179,9 +179,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$allowed_cats = $disallowed_cats = false;
 		
 		// Get user allowed categories
-		$usercats = (FLEXI_J16GE || FLEXI_ACCESS) ?
-			FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false, $check_published = true) :
-			FlexicontentHelperPerm::returnAllCats($check_published=true, $specific_catids=null);
+		$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false, $check_published = true);
+		//$usercats = FlexicontentHelperPerm::returnAllCats($check_published=true, $specific_catids=null);
 		
 		// Find (if configured) , descendants of the categories
 		if ($usesubcats) {

@@ -181,9 +181,9 @@ class FlexicontentViewItems extends JViewLegacy
 		$CanPublishOwn	= $perms->CanPublishOwn;
 		$CanDeleteOwn		= $perms->CanDeleteOwn;
 		
-		$hasEdit    = $CanEdit    || $CanEditOwn;
-		$hasPublish = $CanPublish || $CanPublishOwn;
-		$hasDelete  = $CanDelete  || $CanDeleteOwn;
+		$hasEdit    = $CanEdit    || $CanEditOwn     || $CanEdit==null    || $CanEditOwn==null;
+		$hasPublish = $CanPublish || $CanPublishOwn  || $CanPublish==null || $CanPublishOwn==null;
+		$hasDelete  = $CanDelete  || $CanDeleteOwn   || $CanDelete==null  || $CanDeleteOwn==null;
 		
 		$CanCats		= $perms->CanCats;
 		$CanAccLvl	= $perms->CanAccLvl;
@@ -194,7 +194,7 @@ class FlexicontentViewItems extends JViewLegacy
 		// Check if user can create in at least one published category
 		require_once("components/com_flexicontent/models/item.php");
 		$itemmodel = new FlexicontentModelItem();
-		$CanAdd = $itemmodel->getItemAccess()->get('access-create');
+		$CanAddAny = $itemmodel->getItemAccess()->get('access-create');
 		
 		
 		// *****************************
@@ -291,7 +291,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($add_divider) { JToolBarHelper::divider(); }
 		
 		$add_divider = false;
-		if ($CanAdd) {
+		if ($CanAddAny) {
 			$btn_task = '';
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=types&format=raw';
 			if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
@@ -317,7 +317,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($add_divider) { JToolBarHelper::divider(); }
 		
 		$add_divider = false;
-		if ($CanAdd && $CanCopy) {
+		if ($CanAddAny && $CanCopy) {
 			$btn_task = 'items.copy';
 			JToolBarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_BATCH' /*'FLEXI_COPY_MOVE'*/ );
 			if ($enable_translation_groups) {

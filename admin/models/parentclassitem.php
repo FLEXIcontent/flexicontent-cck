@@ -1216,16 +1216,9 @@ class ParentClassItem extends JModelAdmin
 				return $iparams_extra;  // no create items access in type, return
 			}
 			
-			// Check that user can create item in at least one category ... this check is not wasted,
-			// since joomla will cache it and use it later during creation of allowed Category Tree
-			$canCreate = $user->authorise('core.create', 'com_flexicontent');
-			if ($canCreate === NULL) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats($user, array('core.create')
-					, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
-				);
-				$canCreate = count($allowedcats) > 0;
-			}
-			$iparams_extra->set('access-create', $canCreate);
+			// Check that user can create item in at least one category ...
+			$canCreateAny = FlexicontentHelperPerm::getPermAny('core.create');
+			$iparams_extra->set('access-create', $canCreateAny);
 			return $iparams_extra;  // New item, so do not calculate EDIT, DELETE and VIEW access
 		}
 		

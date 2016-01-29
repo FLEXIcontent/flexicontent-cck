@@ -37,6 +37,7 @@ $this->document->addScriptDeclaration($js);
 		<div class="span6 full_width_980">
 			
 			<table class="fc-form-tbl" style="margin-bottom:12px;">
+				
 				<tr>
 					<td class="key">
 							<?php echo $this->form->getLabel('name'); ?>
@@ -45,6 +46,7 @@ $this->document->addScriptDeclaration($js);
 						<?php echo $this->form->getInput('name'); ?>
 					</td>
 				</tr>
+				
 				<tr>
 					<td class="key">
 						<?php echo $this->form->getLabel('published'); ?>
@@ -53,6 +55,7 @@ $this->document->addScriptDeclaration($js);
 						<?php echo $this->form->getInput('published'); ?>
 					</td>
 				</tr>
+				
 				<tr>
 					<td class="key">
 						<?php echo $this->form->getLabel('access'); ?>
@@ -61,6 +64,7 @@ $this->document->addScriptDeclaration($js);
 						<?php echo $this->form->getInput('access'); ?>
 					</td>
 				</tr>
+				
 				<tr>
 					<td class="key">
 						<?php echo $this->form->getLabel('alias'); ?>
@@ -69,7 +73,7 @@ $this->document->addScriptDeclaration($js);
 						<?php echo $this->form->getInput('alias'); ?>
 					</td>
 				</tr>
-				<?php if (FLEXI_ACCESS || FLEXI_J16GE) : ?>
+				
 				<tr>
 					<td class="key">
 						<?php echo $this->form->getLabel('itemscreatable'); ?>
@@ -78,7 +82,7 @@ $this->document->addScriptDeclaration($js);
 						<?php echo $this->form->getInput('itemscreatable'); ?>
 					</td>
 				</tr>
-				<?php endif; ?>
+				
 			</table>
 		
 		</div>

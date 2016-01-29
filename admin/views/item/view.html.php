@@ -878,6 +878,8 @@ class FlexicontentViewItem extends JViewLegacy
 		$perms['canedit']    = $permission->CanEdit    || $permission->CanEditOwn;
 		$perms['canpublish'] = $permission->CanPublish || $permission->CanPublishOwn;
 		$perms['candelete']  = $permission->CanDelete  || $permission->CanDeleteOwn;
+		
+		// Get permissions for changing item's category assignments
 		$perms['canchange_cat'] = $permission->CanChangeCat;
 		$perms['canchange_seccat'] = $permission->CanChangeSecCat;
 		$perms['canchange_featcat'] = $permission->CanChangeFeatCat;

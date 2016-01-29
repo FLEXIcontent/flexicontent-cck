@@ -80,8 +80,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
-		// Check no privilege to create new categories (Global permission)
-		if ( $isnew && !$perms->CanAddCats ) {
+		// Check no privilege to create new category under any category
+		if ( $isnew && (!$perms->CanCats || !FlexicontentHelperPerm::getPermAny('core.create')) ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
 			$app->redirect( 'index.php?option=com_flexicontent' );
 		}
@@ -93,16 +93,9 @@ class FlexicontentViewCategory extends JViewLegacy
 				
 		// Get edit privilege for current category
 		if (!$isnew) {
-			if (FLEXI_J16GE) {
-				$isOwner = $row->get('created_by') == $user->id;
-				$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $cid);
-				$canedit_cat   = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner);
-			} else if (FLEXI_ACCESS) {
-				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, 0,$row->id);
-				$canedit_cat = ($user->gid < 25) ? (in_array('edit', $rights) || in_array('editown', $rights)) : 1;
-			} else {
-				$canedit_cat = true;
-			}
+			$isOwner = $row->get('created_by') == $user->id;
+			$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $cid);
+			$canedit_cat   = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner);
 		}
 		
 		// Get if we can create inside at least one (com_content) category
@@ -298,20 +291,15 @@ class FlexicontentViewCategory extends JViewLegacy
 			$javascript = "onchange=\"javascript:if (document.forms[0].image.options[selectedIndex].value!='') {document.imagelib.src='../images/stories/' + document.forms[0].image.options[selectedIndex].value} else {document.imagelib.src='../images/blank.png'}\"";
 			$Lists['imagelist']	= JHTML::_('list.images', 'image', $row->image, $javascript, '/images/stories/' );
 			$Lists['access']		= JHTML::_('list.accesslevel', $row );
-			
-			// build granular access list
-			if (FLEXI_ACCESS) {
-				$Lists['access'] = FAccess::TabGmaccess( $row, 'category', 1, 1, 1, 1, 1, 1, 1, 1, 1 );
-			}
 		}
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.create');
-		$fieldname = FLEXI_J16GE ? 'jform[parent_id]' : 'parent_id';
+		$fieldname = 'jform[parent_id]';
 		$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, $fieldname, $row->parent_id, $top=1, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=true, $skip_subtrees=array(), $disable_subtrees=array($row->id));
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
-		$fieldname = FLEXI_J16GE ? 'jform[copycid]' : 'copycid';
+		$fieldname = 'jform[copycid]';
 		$Lists['copycid']    = flexicontent_cats::buildcatselect($categories, $fieldname, '', $top=2, 'class="use_select2_lib"', $check_published, $check_perms, $actions_allowed, $require_all=false);
 		
 		$custom_options[''] = 'FLEXI_USE_GLOBAL';
@@ -319,7 +307,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$custom_options['-1'] = 'FLEXI_PARENT_CAT_MULTI_LEVEL';
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
-		$fieldname = FLEXI_J16GE ? 'jform[special][inheritcid]' : 'params[inheritcid]';
+		$fieldname = 'jform[special][inheritcid]';
 		$Lists['inheritcid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $catparams->get('inheritcid', ''),$top=false, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=false, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options);
 		

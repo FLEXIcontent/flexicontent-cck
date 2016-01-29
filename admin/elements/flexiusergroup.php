@@ -104,38 +104,21 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		}
 		
 		$db = JFactory::getDBO();
-		if ( FLEXI_ACCESS && $faGrps ) {
-			$db->setQuery(
-				'SELECT a.id AS value, a.name AS text, 1 AS level' .
-				' FROM #__flexiaccess_groups AS a' .
-				' ORDER BY a.name ASC'
-			);
-			$options = $db->loadObjectList();
-			for ($i = 0, $n = count($options); $i < $n; $i++)
-			{
-				$options[$i]->text = str_replace('FLEXIACCESS_GR_REGISTERED', '** Registered **', $options[$i]->text);
-				$options[$i]->text = str_replace('FLEXIACCESS_GR_PUBLIC', '** Public **', $options[$i]->text);
-			}
-		} else if (!FLEXI_J16GE) {
-			$acl = JFactory::getACL();
-			$options = $acl->get_group_children_tree( null, 'USERS', false );
-		} else {
-			$db->setQuery(
-				'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
-				' FROM #__usergroups AS a' .
-				' LEFT JOIN `#__usergroups` AS b ON a.lft > b.lft AND a.rgt < b.rgt' .
-				' GROUP BY a.id' .
-				' ORDER BY a.lft ASC'
-			);
-			$options = $db->loadObjectList();
-			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-			
-			if ( !$options )  return null;
-			
-			for ($i = 0, $n = count($options); $i < $n; $i++)
-			{
-				$options[$i]->text = str_repeat('- ', $options[$i]->level) . $options[$i]->text;
-			}
+		$db->setQuery(
+			'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
+			' FROM #__usergroups AS a' .
+			' LEFT JOIN `#__usergroups` AS b ON a.lft > b.lft AND a.rgt < b.rgt' .
+			' GROUP BY a.id' .
+			' ORDER BY a.lft ASC'
+		);
+		$options = $db->loadObjectList();
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		
+		if ( !$options )  return null;
+		
+		for ($i = 0, $n = count($options); $i < $n; $i++)
+		{
+			$options[$i]->text = str_repeat('- ', $options[$i]->level) . $options[$i]->text;
 		}
 		
 		// If all usergroups is allowed, push it into the array.

@@ -354,11 +354,8 @@ class FlexicontentModelType extends JModelAdmin
 			return false;
 		}
 		
-		if (FLEXI_ACCESS) {
-			FAccess::saveaccess( $type, 'type' );
-		} else if (FLEXI_J16GE) {
-			// saving asset in J2.5 is handled by the types table class
-		}
+		// Saving asset in J2.5 is handled by the types table class
+		// ...
 		
 		$this->_type = & $type;
 		$this->_id   = $type->id;

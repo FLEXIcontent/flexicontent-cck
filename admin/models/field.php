@@ -365,11 +365,8 @@ class FlexicontentModelField extends JModelAdmin
 			return false;
 		}
 		
-		if (FLEXI_ACCESS) {
-			FAccess::saveaccess( $field, 'field' );
-		} else if (FLEXI_J16GE) {
-			// saving asset in J2.5 is handled by the fields table class
-		}
+		// Saving asset in J2.5 is handled by the fields table class
+		// ...
 		
 		$this->_field = & $field;
 		$this->_id    = $field->id;

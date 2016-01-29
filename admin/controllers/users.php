@@ -182,29 +182,7 @@ class FlexicontentControllerUsers extends FlexicontentController
 			JError::raiseWarning(0, $user->getError());
 			return $this->execute('edit');
 		}
-
-		// *** BOF FLEXIACCESS INTEGRATION *** //		
-		if (FLEXI_ACCESS)
-		{
-			// Delete old records
-			$query	= 'DELETE FROM #__flexiaccess_members'
-					. ' WHERE member_id = ' . (int)$user->get('id')
-					;
-			$db->setQuery( $query );
-			$db->execute();
-			
-			// Save new records
-			foreach ($data['groups'] as $group)
-			{			
-				$query = 'INSERT INTO #__flexiaccess_members'
-						. ' SET `group_id` = ' . (int)$group . ', `member_id` = ' . (int)$user->get('id')
-						;
-				$db->setQuery( $query );
-				$db->execute();
-			}
-		}
-		// *** EOF FLEXIACCESS INTEGRATION *** //		
-
+		
 		
 		// *** BOF AUTHOR EXTENDED DATA ***
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
@@ -269,14 +247,6 @@ class FlexicontentControllerUsers extends FlexicontentController
 			// Set the usertype based on the ACL group name
 			$user->set('usertype', $grp->name);
 			
-			// Add FLEXIaccess JUser parameters to the session
-			// @TODO: find a more generic solution that would trigger the onLogin event
-			if (FLEXI_ACCESS) 
-			{
-				$user->set('gmid', $me->get('gmid'));
-				$user->set('level', $me->get('level'));
-			}
-
 			$session = JFactory::getSession();
 			$session->set('user', $user);
 		}

@@ -155,11 +155,17 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			?><?php if (empty($skip_content_fieldset)): ?><fieldset class="fc-board-set"><legend class="fc-board-header-content-editing"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></legend><div class="fc-board-set-inner"><?php
 			$link = 'index.php?option='.$option.'&amp;view=items';
 			if (!isset($sbtns['items'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-items.png', JText::_( 'FLEXI_ITEMS' ) );
-			if ($this->perms->CanAdd && !isset($sbtns['additem']))
+			if (!isset($sbtns['additem']))
 			{
-				//$link = 'index.php?option='.$option.'&amp;view=item';
-				$link = 'index.php?option='.$option.'&amp;view=types&amp;format=raw';
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ), 1, 1, 600, 450 );
+				// Check if user can create in at least one published category
+				require_once("components/com_flexicontent/models/item.php");
+				$itemmodel = new FlexicontentModelItem();
+				$CanAddAny = $itemmodel->getItemAccess()->get('access-create');
+				if ($CanAddAny) {
+					//$link = 'index.php?option='.$option.'&amp;view=item';
+					$link = 'index.php?option='.$option.'&amp;view=types&amp;format=raw';
+					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-item-add.png', JText::_( 'FLEXI_NEW_ITEM' ), 1, 1, 600, 450 );
+				}
 			}
 			/*if ($this->perms->CanArchives && !isset($sbtns['archives']))
 			{
@@ -170,8 +176,8 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			{
 				$link = 'index.php?option='.$option.'&amp;view=categories';
 				if (!isset($sbtns['cats'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-categories.png', JText::_( 'FLEXI_CATEGORIES' ) );
-				$CanAddCats = FLEXI_J16GE ? $this->perms->CanAdd : $this->perms->CanAddCats;
-				if ($CanAddCats)
+				$canCreateAny = FlexicontentHelperPerm::getPermAny('core.create');
+				if ($canCreateAny)
 				{
 					$link = 'index.php?option='.$option.'&amp;view=category';
 					FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-category-add.png', JText::_( 'FLEXI_NEW_CATEGORY' ) );

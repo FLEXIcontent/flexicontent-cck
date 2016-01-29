@@ -221,108 +221,16 @@ class FlexicontentViewUser extends JViewLegacy
 		//$lists = array();
 		//$javascript = "onchange=\"javascript:if (document.forms[0].image.options[selectedIndex].value!='') {document.imagelib.src='../images/stories/' + document.forms[0].image.options[selectedIndex].value} else {document.imagelib.src='../images/blank.png'}\"";
 		//$lists['imagelist'] 		= JHTML::_('list.images', 'image', $flexiauthor_extdata->image, $javascript, '/images/stories/' );
-
 		
-		if (!FLEXI_J16GE) {
-			$userObjectID 	= $acl->get_object_id( 'users', $user->get('id'), 'ARO' );
-			$userGroups 	= $acl->get_object_groups( $userObjectID, 'ARO' );
-			$userGroupName 	= strtolower( $acl->get_group_name( $userGroups[0], 'ARO' ) );
-			$userIsAdmin = ($userGroupName == 'administrator');
-	
-			$myObjectID 	= $acl->get_object_id( 'users', $myuser->get('id'), 'ARO' );
-			$myGroups 		= $acl->get_object_groups( $myObjectID, 'ARO' );
-			$myGroupName 	= strtolower( $acl->get_group_name( $myGroups[0], 'ARO' ) );;
-			$myIsAdmin = ($myGroupName == 'administrator');
+		if ( !$user->get('id') ) {
+			$new_usertype = JComponentHelper::getParams('com_users')->get('new_usertype');
+			$usergroups = $new_usertype ? array($new_usertype) : array();
 		} else {
-		}
-		
-		// ensure user can't add/edit group higher than themselves
-		/* NOTE : This check doesn't work commented out for the time being
-		if ( is_array( $myGroups ) && count( $myGroups ) > 0 )
-		{
-			$excludeGroups = (array) $acl->get_group_children( $myGroups[0], 'ARO', 'RECURSE' );
-		}
-		else
-		{
-			$excludeGroups = array();
-		}
-
-		if ( in_array( $userGroups[0], $excludeGroups ) )
-		{
-			echo 'not auth';
-			$mainframe->redirect( 'index.php?option=com_flexicontent&amp;controller=users&amp;view=users', JText::_('NOT_AUTH') );
-		}
-		*/
-
-		/*
-		if ( $userGroupName == 'super administrator' )
-		{
-			// super administrators can't change
-	 		$lists['gid'] = '<input type="hidden" name="gid" value="'. $currentUser->gid .'" /><strong>'. JText::_( 'Super Administrator' ) .'</strong>';
-		}
-		else if ( $userGroupName == $myGroupName && $myGroupName == 'administrator' ) {
-		*/
-		if (FLEXI_ACCESS) 
-		{
-			// Create the list of all groups except public and registered
-			$query	= 'SELECT id AS value, name AS text, level, ordering'
-					. ' FROM #__flexiaccess_groups'
-					. ' WHERE level > 1'
-					. ' ORDER BY ordering ASC'
-					;
+			$ugrps_qtmpl = 'SELECT group_id FROM #__user_usergroup_map AS ug WHERE ug.user_id = %d';
+			$query = sprintf( $ugrps_qtmpl, intval( $user->get('id') ) );
 			$db->setQuery( $query );
-			$allgroups = $db->loadObjectList();
-
-			if ( $user->get('id') )
-			{
-				// get all the groups from the user
-				$query 	= 'SELECT group_id'
-				. ' FROM #__flexiaccess_members'
-				. ' WHERE member_id = '.(int) $cid[0]
-				;
-				$db->setQuery( $query );
-				$usergroups = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-			}
-			else
-			{
-				$usergroups = array();
-			}
-			$lists['access'] 	= JHTML::_('select.genericlist',   $allgroups, 'groups[]', 'size="10" multiple="multiple"', 'value', 'text', $usergroups );		
-		}
-		
-		if (!FLEXI_J16GE) {
-			if ( $userIsAdmin && $myIsAdmin )
-			{
-				// administrators can't change each other
-				$lists['gid'] = '<input type="hidden" name="gid" value="'. $user->get('gid') .'" /><strong>'. JText::_( 'Administrator' ) .'</strong>';
-			}
-			else
-			{
-				$gtree = $acl->get_group_children_tree( null, 'USERS', false );
-
-				// remove users 'above' me
-				//$i = 0;
-				//while ($i < count( $gtree )) {
-				//	if ( in_array( $gtree[$i]->value, (array)$excludeGroups ) ) {
-				//		array_splice( $gtree, $i, 1 );
-				//	} else {
-				//		$i++;
-				//	}
-				//}
-
-				$lists['gid'] 	= JHTML::_('select.genericlist',   $gtree, 'gid', 'size="10"', 'value', 'text', $user->get('gid') );
-			}
-		} else {
-			if ( !$user->get('id') ) {
-				$new_usertype = JComponentHelper::getParams('com_users')->get('new_usertype');
-				$usergroups = $new_usertype ? array($new_usertype) : array();
-			} else {
-				$ugrps_qtmpl = 'SELECT group_id FROM #__user_usergroup_map AS ug WHERE ug.user_id = %d';
-				$query = sprintf( $ugrps_qtmpl, intval( $user->get('id') ) );
-				$db->setQuery( $query );
-				$usergroups = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-				if ($db->getErrorMsg())	echo $db->getErrorMsg();
-			}
+			$usergroups = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			if ($db->getErrorMsg())	echo $db->getErrorMsg();
 		}
 
 		// build the html select list
@@ -334,10 +242,6 @@ class FlexicontentViewUser extends JViewLegacy
 		$this->assignRef('me'				, $me);
 		$this->assignRef('document'	, $document);
 		$this->assignRef('lists'		, $lists);
-		if (!FLEXI_J16GE) {
-			$this->assignRef('pane'		, $pane);
-			$this->assignRef('tpane'	, $tpane);
-		}
 		
 		$this->assignRef('user'				, $user);
 		$this->assignRef('usergroups'	, $usergroups);
@@ -347,16 +251,13 @@ class FlexicontentViewUser extends JViewLegacy
 		
 		$this->assignRef('params_authorbasic'	, $params_authorbasic);
 		$this->assignRef('params_authorcat'		, $params_authorcat);
-		if (FLEXI_J16GE) {
-			$this->assignRef('jform_authorbasic'	, $jform_authorbasic);
-			$this->assignRef('jform_authorcat'		, $jform_authorcat);
-		}
+		
+		$this->assignRef('jform_authorbasic'	, $jform_authorbasic);
+		$this->assignRef('jform_authorcat'		, $jform_authorcat);
 		
 		$this->assignRef('tmpls'		, $tmpls);
-		if (FLEXI_J16GE) {
-			$this->assignRef('form'		, $form);
-			$this->assignRef('params_author'		, $params_author);
-		}
+		$this->assignRef('form'		, $form);
+		$this->assignRef('params_author'		, $params_author);
 		
 		parent::display($tpl);
 	}
