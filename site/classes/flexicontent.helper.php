@@ -311,18 +311,18 @@ class flexicontent_html
 	}
 	
 	
-	static function getDefaultCanonical(&$domain=null)
+	/* Creates Joomla default canonical URL and also finds the configured SEF domain */
+	static function getDefaultCanonical(&$_domain=null)
 	{
 		$app = JFactory::getApplication();
 		$doc = JFactory::getDocument();
 
-		if ($app->getName() != 'site' || $doc->getType() !== 'html')
-		{
-			return;
-		}
-
-		$router = $app->getRouter();
-		$uri    = JUri::getInstance();
+		if ($app->getName() != 'site' || $doc->getType() !== 'html') return;
+		
+		static $link   = null;
+		static $domain = null;
+		$_domain = $domain;  // pass it back by reference
+		if ($link !== null) return $link;
 		
 		// Get SEF plugin configuration
 		$plugin = JPluginHelper::getPlugin('system', 'sef');
@@ -330,20 +330,63 @@ class flexicontent_html
 		
 		$domain = $pluginParams->get('domain');
 		
-		//jimport('cms.version.version');  // done by defineconstants php file
-		$jversion = new JVersion;
-		$is_j35ge = version_compare( $jversion->getShortVersion(), '3.5.0', 'ge' );
+		$jversion = new JVersion;   // jimport('cms.version.version');  was done by defineconstants php file
+		$is_j35ge = version_compare( $jversion->getShortVersion(), '3.4.999', 'ge' );  // includes 3.5.0-beta* too
+		
+		if ($domain === false) echo "is false<br/>";
+		if ($domain === null) echo "is null<br/>";
+		if ($domain === '') echo "is empty string<br/>";
+		
 		if ( ($is_j35ge && $domain === false) || (!$is_j35ge && $domain === null) || $domain === '')
 		{
-			$domain = $uri->toString(array('scheme', 'host', 'port'));
+			$domain = JUri::getInstance()->toString(array('scheme', 'host', 'port'));
+		}
+		$_domain = $domain;  // pass it back by reference
+		
+		echo $link = $domain . JRoute::_('index.php?' . http_build_query($app->getRouter()->getVars()), false);
+		
+		return $link;
+	}
+	
+	
+	/* Sets the given URL as rel canonical URL, also clearing any already set rel canonical URL */
+	static function setRelCanonical($ucanonical)
+	{
+		$uri = JUri::getInstance();
+		$doc = JFactory::getDocument();
+		
+		// Get canonical URL that SEF plugin adds, also $domain passed by reference, to get the domain configured in SEF plugin (multi-domain website)
+		$domain = null;
+		$defaultCanonical = flexicontent_html::getDefaultCanonical($domain);
+		$domain = $domain ? $domain : $uri->toString(array('scheme', 'host', 'port'));
+		
+		// Encode the canonical URL
+		$ucanonical = $domain . $ucanonical;
+		$ucanonical_encoded = htmlspecialchars($ucanonical);
+		
+		// Get head object
+		$head_obj = $doc->mergeHeadData(array(1=>1));
+			
+		// Remove canonical inserted by SEF plugin, unsetting default directly may not be reliable, we will search for it
+		//unset($head_obj->_links[htmlspecialchars($defaultCanonical)]);
+		$addRel = true;
+		foreach($head_obj->_links as $link => $data)
+		{
+			if ($data['relation']=='canonical' && $data['relType']=='rel') {
+				if($link == $ucanonical_encoded)
+					$addRel = false;
+				else
+					unset($head_obj->_links[$link]);
+			}
 		}
 		
-		$link = $domain . JRoute::_('index.php?' . http_build_query($router->getVars()), false);
-		
-		return $link; //($uri->toString() !== $link) ? htmlspecialchars($link) : false;
+		// Add REL canonical only if different than current URL
+		if ($addRel && rawurldecode($uri->toString()) != $ucanonical) {
+			$doc->addHeadLink( $ucanonical_encoded, 'canonical', 'rel', array() );
+		}
 	}
-
-
+	
+	
 	// *** Output the javascript to dynamically hide/show columns of a table
 	static function jscode_to_showhide_table($container_div_id, $data_tbl_id, $start_html='', $end_html='') {
 		$document = JFactory::getDocument();

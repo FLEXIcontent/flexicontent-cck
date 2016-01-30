@@ -186,25 +186,10 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		if ($params->get('add_canonical'))
 		{
-			// Get canonical URL that SEF plugin adds, also $domain passed by reference, to get the domain configured in SEF plugin (multi-domain website)
-			$domain = null;
-			$defaultCanonical = flexicontent_html::getDefaultCanonical($domain);
-			$domain = $domain ? $domain : $uri->toString(array('scheme', 'host', 'port'));
-			
 			// Create desired REL canonical URL
 			$start = JRequest::getInt('start', '');
-			$ucanonical = $domain . JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id).($start ? "&start=".$start : ''));
-			
-			// Check if SEF plugin inserted a different REL canonical
-			if ($defaultCanonical != $ucanonical)
-			{
-				// Add REL canonical only if different than current URL
-				$head_obj = $document->addHeadLink( htmlspecialchars($ucanonical), 'canonical', 'rel', '' );
-				if ($uri->toString() == $ucanonical)  unset($head_obj->_links[htmlspecialchars($ucanonical)]);
-				
-				// Remove canonical inserted by SEF plugin
-				unset($head_obj->_links[htmlspecialchars($defaultCanonical)]);
-			}
+			$ucanonical = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id).($start ? "&start=".$start : ''));
+			flexicontent_html::setRelCanonical($ucanonical);
 		}
 		
 		// Disable features, that are not supported by the view
