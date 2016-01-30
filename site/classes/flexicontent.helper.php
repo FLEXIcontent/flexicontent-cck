@@ -333,17 +333,13 @@ class flexicontent_html
 		$jversion = new JVersion;   // jimport('cms.version.version');  was done by defineconstants php file
 		$is_j35ge = version_compare( $jversion->getShortVersion(), '3.4.999', 'ge' );  // includes 3.5.0-beta* too
 		
-		if ($domain === false) echo "is false<br/>";
-		if ($domain === null) echo "is null<br/>";
-		if ($domain === '') echo "is empty string<br/>";
-		
 		if ( ($is_j35ge && $domain === false) || (!$is_j35ge && $domain === null) || $domain === '')
 		{
 			$domain = JUri::getInstance()->toString(array('scheme', 'host', 'port'));
 		}
 		$_domain = $domain;  // pass it back by reference
 		
-		echo $link = $domain . JRoute::_('index.php?' . http_build_query($app->getRouter()->getVars()), false);
+		$link = $domain . JRoute::_('index.php?' . http_build_query($app->getRouter()->getVars()), false);
 		
 		return $link;
 	}
@@ -382,7 +378,7 @@ class flexicontent_html
 		
 		// Add REL canonical only if different than current URL
 		if ($addRel && rawurldecode($uri->toString()) != $ucanonical) {
-			$doc->addHeadLink( $ucanonical_encoded, 'canonical', 'rel', array() );
+			$doc->addHeadLink( $ucanonical_encoded, 'canonical', 'rel' );
 		}
 	}
 	
