@@ -268,7 +268,8 @@ function FLEXIcontentBuildRoute(&$query)
 		// 2. Unset 'view' always, since this should be handled above in ALL cases
 		unset($query['view']);
 		
-		// 3. Do not unset 'cid', this is done above explicitely in every case, otherwise it will remain in the URL
+		// 3. Unset 'cid' if it matches the menu item, this may have be done above explicitely in every above case, otherwise it will remain in the URL
+		if ($mcid==$cid) unset($query['cid']);
 		break;
 		
 	case 'tags':

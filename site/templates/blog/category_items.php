@@ -26,6 +26,14 @@ $lead_link_image_to = $this->params->get('lead_link_image_to', 0);
 $intro_use_image = $this->params->get('intro_use_image', 1);
 $intro_link_image_to = $this->params->get('intro_link_image_to', 0);
 
+$lead_link_to_popup  = $this->params->get('lead_link_to_popup', 0);
+$intro_link_to_popup = $this->params->get('intro_link_to_popup', 0);
+
+if ($lead_link_to_popup || $intro_link_to_popup) {
+	flexicontent_html::loadFramework('flexi-lib');
+}
+
+
 // MICRODATA 'itemtype' for ALL items in the listing (this will override the 'itemtype' in content type configuration)
 $microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat');
 
@@ -215,6 +223,7 @@ if ($leadnum) :
 				}
 			endif;
 			$link_url = $custom_link ? $custom_link : JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+			$title_encoded = htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8');
 			
 			// MICRODATA document type (itemtype) for each item
 			// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
@@ -352,7 +361,6 @@ if ($leadnum) :
 			<div class="lineinfo image_descr">
 			<?php if ($lead_use_image && $src) : ?>
 			<div class="image<?php echo $this->params->get('lead_position') ? ' right' : ' left'; ?>">
-				<?php $title_encoded = htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>
 				<?php if ($this->params->get('lead_link_image', 1)) : ?>
 				<a href="<?php echo $link_url; ?>">
 					<img src="<?php echo $thumb; ?>" alt="<?php echo $title_encoded; ?>" class="<?php echo $tooltip_class;?>" title="<?php echo flexicontent_html::getToolTip($_read_more_about, $title_encoded, 0, 0); ?>"/>
@@ -433,21 +441,18 @@ if ($leadnum) :
 				$readmore_shown  = $this->params->get('show_readmore', 1) && ($uncut_length > $lead_cut_text || strlen(trim($item->fulltext)) >= 1);
 				$readmore_shown  = $readmore_shown || $readmore_forced;
 				$footer_shown = $readmore_shown || $item->event->afterDisplayContent;
+				
+				if ($lead_link_to_popup) $link_url = $link_url  .(strstr($link_url, '?') ? '&' : '?'). 'tmpl=component';
 			?>
 
-
 			<?php if ( $readmore_shown ) : ?>
-			<span class="readmore group">
-				<?php
-				/*$uniqueid = "read_more_fc_item_".$item->id;
-				$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item).'&tmpl=component');
-				echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>';
-				*/
-				?>
-				<a href="<?php echo $link_url; ?>" class="readon" itemprop="url">
-					<?php echo ' ' . ($item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title)); ?>
+			<span class="readmore">
+				
+				<a href="<?php echo $link_url; ?>" class="btn" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+					<span class="icon-chevron-right"></span>
+					<?php echo $item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title); ?>
 				</a>
-				<?php //echo '<script>document.write(\'</a> <div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.$item->title.'</div>\')</script>'; ?>
+				
 			</span>
 			<?php endif; ?>
 
@@ -554,6 +559,7 @@ if ($count > $leadnum) :
 				}
 			endif;
 			$link_url = $custom_link ? $custom_link : JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+			$title_encoded = htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8');
 			
 			// MICRODATA document type (itemtype) for each item
 			// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
@@ -689,7 +695,6 @@ if ($count > $leadnum) :
 			<div class="lineinfo image_descr">
 			<?php if ($intro_use_image && $src) : ?>
 			<div class="image<?php echo $this->params->get('intro_position') ? ' right' : ' left'; ?>">
-				<?php $title_encoded = htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>
 				<?php if ($this->params->get('intro_link_image', 1)) : ?>
 					<a href="<?php echo $link_url; ?>">
 						<img src="<?php echo $thumb; ?>" alt="<?php echo $title_encoded; ?>" class="<?php echo $tooltip_class;?>" title="<?php echo flexicontent_html::getToolTip($_read_more_about, $title_encoded, 0, 0); ?>"/>
@@ -771,26 +776,18 @@ if ($count > $leadnum) :
 				$readmore_shown  = $this->params->get('show_readmore', 1) && ($uncut_length > $intro_cut_text || strlen(trim($item->fulltext)) >= 1);
 				$readmore_shown  = $readmore_shown || $readmore_forced;
 				$footer_shown = $readmore_shown || $item->event->afterDisplayContent;
+				
+				if ($intro_link_to_popup) $link_url = $link_url  .(strstr($link_url, '?') ? '&' : '?'). 'tmpl=component';
 			?>
 
 			<?php if ( $readmore_shown ) : ?>
 			<span class="readmore">
-				<?php
-				/*$uniqueid = "read_more_fc_item_".$item->id;
-				$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item).'&tmpl=component');
-				echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>';
-				*/
-				?>
-				<a href="<?php echo $link_url; ?>" class="readon" itemprop="url">
-				<?php
-				if ($item->params->get('readmore')) :
-					echo ' ' . $item->params->get('readmore');
-				else :
-					echo ' ' . JText::sprintf('FLEXI_READ_MORE', $item->title);
-				endif;
-				?>
+				
+				<a href="<?php echo $link_url; ?>" class="btn" itemprop="url" <?php echo ($intro_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+					<span class="icon-chevron-right"></span>
+					<?php echo $item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title); ?>
 				</a>
-				<?php //echo '<script>document.write(\'</a> <div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.$item->title.'</div>\')</script>'; ?>
+				
 			</span>
 			<?php endif; ?>
 				

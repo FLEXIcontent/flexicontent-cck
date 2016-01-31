@@ -331,10 +331,13 @@ foreach ($items as $i => $item) :
 	
 	
 	<?php if ( $readmore_shown ) : ?>
-	<span class="readmore group">
-		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="readon" itemprop="url">
-			<?php echo ' ' . ($item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title)); ?>
+	<span class="readmore">
+		
+		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="btn" itemprop="url">
+			<span class="icon-chevron-right"></span>
+			<?php echo $item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title); ?>
 		</a>
+		
 	</span>
 	<?php endif; ?>
 	

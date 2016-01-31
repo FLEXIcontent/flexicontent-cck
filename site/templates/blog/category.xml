@@ -31,6 +31,12 @@
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
 			
+			<field name="lead_link_to_popup" type="radio" default="" label="Open items in popup" description="Items will be opened in a modal popup window" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 			<field name="lead_catblock_sep" type="separator" hr="false" default="(sub) Category block, at (sub-)category start" description="Enable to show (sub-)category information when next (sub-)category starts" level="level2" menu="hide" />
 			<field name="lead_catblock_sep_msg" type="separator" hr="false" default="Warning: this makes sense, if you order your items by their category (1st level order), (2nd level order can be anything e.g. title)" description="" level="level3" menu="hide" />
 			<field name="lead_catblock" type="radio" default="" label="FLEXI_ENABLE" description=" " class="btn-group btn-group-yesno">
@@ -102,6 +108,11 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NONE</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
+			</field>
+			<field name="intro_link_to_popup" type="radio" default="" label="Open items in popup" description="Items will be opened in a modal popup window" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="intro_catblock_sep" type="separator" hr="false" default="(sub) Category block, at (sub-)category start" description="Enable to show (sub-)category information when next (sub-)category starts" level="level2" menu="hide" />
