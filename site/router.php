@@ -118,9 +118,18 @@ function FLEXIcontentBuildRoute(&$query)
 		$cid  = !isset($query['cid']) ? null : (int)$query['cid'];
 		$mid = @$menu->query['id']; // not set returns null
 		$id  = !isset($query['id']) ? null : (int)$query['id'];
-		if ( $mid == $id && $mview == FLEXI_ITEMVIEW )	{
+		
+		if ( @$menu->query['layout'] && $mview == 'category' )	{
+			// add 'item' segment if using a 'layout' category view menu item, since segment length has different meaning for such items
+			$segments[] = 'item';
+			$segments[] = @$query['id'];
+		}
+		
+		else if ( $mid == $id && $mview == FLEXI_ITEMVIEW )	{
 			// add no segments, even if CIDs of menu item is not an exact match
-		} else if ( $cid && ($mcid != $cid  ||  $mview != 'category') )	{
+		}
+		
+		else if ( $cid && ($mcid != $cid  ||  $mview != 'category') )	{
 			// We will make an item URL -with- CID ...
 			// cid EXISTs and cid/view URL variables to do not match those in the menu item
 			// IMPLY view = FLEXI_ITEMVIEW when count($segments) == 2
@@ -129,7 +138,7 @@ function FLEXIcontentBuildRoute(&$query)
 		}
 		
 		else {
-			// We wiil make an item URL -without- CID ...
+			// We will make an item URL -without- CID ...
 			// because cid is missing or matched cid/view URL variables matched those in menu item
 			if ($add_item_sef_segment) {
 				// EXPLICIT view ('item' be contained in the url), because according to configuration,
@@ -248,14 +257,20 @@ function FLEXIcontentBuildRoute(&$query)
 				$segments[] = 'category';
 			}
 			// IMPLY view = 'category' when count($segments) == 1
-			if ($cid) $segments[] = $query['cid'];  // it is optional, some category view layouts do not use category id
+			// Check cid is set as it is optional, some category view layouts do not use category id
+			if ($cid) $segments[] = $query['cid'];
+			unset($query['cid']);
 		}
 		
+		// 1. Unset 'layout' if not needed
 		if ( !$keep_view_layout ) unset($query['layout']);
-		if ( $mview == $view )    unset($query['view']);
-		if ( $mcid  == $cid )     unset($query['cid']);
+		
+		// 2. Unset 'view' always, since this should be handled above in ALL cases
+		unset($query['view']);
+		
+		// 3. Do not unset 'cid', this is done above explicitely in every case, otherwise it will remain in the URL
 		break;
-	
+		
 	case 'tags':
 	case 'tag':  // legacy 'tags' view
 		// EXPLICIT view (will be contained in the url)

@@ -2341,8 +2341,8 @@ class flexicontent_html
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		if ( $params->get('show_editbutton', 1) == '1') {
-			// Maintain menu item ? e.g. current category view, 
-			$Itemid = JRequest::getInt('Itemid', 0);  //$Itemid = 0;
+			//$Itemid = JRequest::getInt('Itemid', 0);  // Maintain menu item ? e.g. current category view, 
+			$Itemid = 0;
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
 			$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=edit';
 			$targetLink = "_self";
