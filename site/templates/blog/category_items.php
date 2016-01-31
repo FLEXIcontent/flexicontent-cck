@@ -442,13 +442,13 @@ if ($leadnum) :
 				$readmore_shown  = $readmore_shown || $readmore_forced;
 				$footer_shown = $readmore_shown || $item->event->afterDisplayContent;
 				
-				if ($lead_link_to_popup) $link_url = $link_url  .(strstr($link_url, '?') ? '&' : '?'). 'tmpl=component';
+				if ($lead_link_to_popup) $_tmpl_ = (strstr($link_url, '?') ? '&' : '?'). 'tmpl=component';
 			?>
 
 			<?php if ( $readmore_shown ) : ?>
 			<span class="readmore">
 				
-				<a href="<?php echo $link_url; ?>" class="btn" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+				<a href="<?php echo $link_url; ?>" class="btn" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 					<span class="icon-chevron-right"></span>
 					<?php echo $item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title); ?>
 				</a>
@@ -777,13 +777,13 @@ if ($count > $leadnum) :
 				$readmore_shown  = $readmore_shown || $readmore_forced;
 				$footer_shown = $readmore_shown || $item->event->afterDisplayContent;
 				
-				if ($intro_link_to_popup) $link_url = $link_url  .(strstr($link_url, '?') ? '&' : '?'). 'tmpl=component';
+				if ($intro_link_to_popup) $_tmpl_ = (strstr($link_url, '?') ? '&' : '?'). 'tmpl=component';
 			?>
 
 			<?php if ( $readmore_shown ) : ?>
 			<span class="readmore">
 				
-				<a href="<?php echo $link_url; ?>" class="btn" itemprop="url" <?php echo ($intro_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+				<a href="<?php echo $link_url; ?>" class="btn" itemprop="url" <?php echo ($intro_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 					<span class="icon-chevron-right"></span>
 					<?php echo $item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title); ?>
 				</a>
@@ -805,4 +805,4 @@ if ($count > $leadnum) :
 	</ul>
 	<?php endif; ?>
 </div>
-
+<div class="clear"></div>
