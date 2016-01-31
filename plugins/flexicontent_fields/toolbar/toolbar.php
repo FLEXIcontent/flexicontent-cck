@@ -100,19 +100,19 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			//$item_link = JRoute::_($item_url, true, -1);
 		}
 		
-		$display	 = '<div class="flexitoolbar">'; // begin of the toolbar container
+		$ops = array();
+		$add_this = '';
 
 		// comments button
 		if ($display_comments)
 		{
 			$comment_link = $item_link . '#addcomments';
 			
-			$display	.= '
+			$ops[] = '
 			<div class="flexi-react toolbar-element">
 				<span class="comments-bubble">'.($module_position ? '<!-- jot '.$module_position.' s -->' : '').$this->_getCommentsCount($item->id).($module_position ? '<!-- jot '.$module_position.' e -->' : '').'</span>
 				<span class="comments-legend flexi-legend"><a href="'.$comment_link.'" title="'.JText::_('FLEXI_FIELD_TOOLBAR_COMMENT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_COMMENT').'</a></span>
 			</div>
-			<div class="toolbar-spacer"'.$spacer.'></div>
 			';
 		}
 
@@ -137,13 +137,12 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					lineheight 	= parseFloat(lineheight)-2;
 				}
 			}');
-			$display	 .= '
+			$ops[] = '
 			<div class="flexi-resizer toolbar-element">
 				<a class="decrease" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(0);">'.JText::_("FLEXI_FIELD_TOOLBAR_DECREASE").'</a>
 				<a class="increase" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(1);">'.JText::_("FLEXI_FIELD_TOOLBAR_INCREASE").'</a>
 				<span class="flexi-legend">'.JText::_("FLEXI_FIELD_TOOLBAR_SIZE").'</span>
 			</div>
-			<div class="toolbar-spacer"'.$spacer.'></div>
 			';
 		}
 		
@@ -154,11 +153,10 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			
 			$url = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $item_link );
 			$estatus = 'width=400,height=400,menubar=yes,resizable=yes';
-			$display	.= '
+			$ops[] = '
 			<div class="flexi-email toolbar-element">
 				<span class="email-legend flexi-legend"><a rel="nofollow" href="'. JRoute::_($url) .'" onclick="window.open(this.href,\'win2\',\''.$estatus.'\'); return false;" title="'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'">'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'</a></span>
 			</div>
-			<div class="toolbar-spacer"'.$spacer.'></div>
 			';
 		}
 		
@@ -169,46 +167,40 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			$pstatus = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
 			$print_link = $pop ? '#' : ( $item_link .(strstr($item_link, '?') ? '&amp;'  : '?') . 'pop=1&amp;print=1&amp;tmpl=component' );
 			$js_link = $pop ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';
-			$display	.= '
+			$ops[] = '
 			<div class="flexi-print toolbar-element">
 				<span class="print-legend flexi-legend"><a rel="nofollow" href="'. $print_link .'" '.$js_link.' title="'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'</a></span>
 			</div>
-			<div class="toolbar-spacer"'.$spacer.'></div>
 			';
 		}
 
-		// pdf button
+		// voice button
 		if ($display_voice)
 		{
-			$display .= "
-			<div class=\"flexi-voice toolbar-element\">";
 			if ($lang=='th') {
 				// Special case language case, maybe la=laos, and Bhutan languages in the future (NECTEC support these languages)
 				$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/th.js');
-				$display .="
-					<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"openwindow('".$voicetarget."','".$lang."');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
-					";
 			} else {
 				$document->addScript('//vozme.com/get_text.js');
-				$display .="
-					<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"get_id('".$voicetarget."','".$lang."','fm');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
-					";
 			}
-			$display .="
+			
+			$ops[] = '
+			<div class="flexi-voice toolbar-element">
+			'.( $lang=='th' ? '
+				<span class="voice-legend flexi-legend"><a href="javascript:void(0);" onclick="openwindow(\''.$voicetarget.'\',\''.$lang.'\');"        class="mainlevel-toolbar-article-horizontal" rel="nofollow">' . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . '</a></span>' : '
+				<span class="voice-legend flexi-legend"><a href="javascript:void(0);"     onclick="get_id(\''.$voicetarget.'\',\''.$lang.'\',\'fm\');" class="mainlevel-toolbar-article-horizontal" rel="nofollow">' . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . '</a></span>' ).'
 			</div>
-			<div class=\"toolbar-spacer\"".$spacer."></div>
-				";
+			';
 		}
 
 		// pdf button
 		if ($display_pdf)
 		{
 			$pdflink 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
-			$display	.= '
+			$ops[] = '
 			<div class="flexi-pdf toolbar-element">
 				<span class="pdf-legend flexi-legend"><a href="'.JRoute::_($pdflink).'" title="'.JText::_('FLEXI_FIELD_TOOLBAR_PDF').'">'.JText::_('FLEXI_FIELD_TOOLBAR_PDF').'</a></span>
 			</div>
-			<div class="toolbar-spacer"'.$spacer.'></div>
 			';
 		}
 
@@ -388,9 +380,9 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 				}
 			}
 			if ($addthis_outside_toolbar)
-				$display .= '<div class="flexi-socials-outside">'.$addthis_code.'</div>';
+				$add_this = '<div class="flexi-socials-outside">'.$addthis_code.'</div>';
 			else 
-				$display .= '<div class="flexi-socials toolbar-element">' .$addthis_code. '</div>';
+				$add_this = '<div class="flexi-socials toolbar-element">' .$addthis_code. '</div>';
 			
 			
 			if (!$addthis) {
@@ -406,7 +398,11 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			}
 		}
 		
-		$display	.= '</div>'; // end of the toolbar container
+		$display = '
+		<div class="flexitoolbar">
+			'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
+			'.$add_this.'
+		</div>';
 
 		$field->{$prop} = $display;
 	}
