@@ -1167,9 +1167,11 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Set re-index needed flag to fields</td>
 					<td>
 					<?php
-					
+					// Check if there is need to update the search-index
+			    $version_needs_search_reindex = version_compare($this->release_existing, '3.0.10', '<');
+			    
 			    $queries = array();
-					if ( $fields_tbl_exists ) {
+					if ( $fields_tbl_exists && $version_needs_search_reindex ) {
 						$db->setQuery('SELECT COUNT(*) FROM #__flexicontent_items_ext LIMIT 1');
 						$has_items = $db->loadResult();
 						if ($has_items) {
