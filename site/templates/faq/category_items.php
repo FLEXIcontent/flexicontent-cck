@@ -22,7 +22,7 @@ $tmpl = $this->tmpl;
 $user = JFactory::getUser();
 
 // MICRODATA 'itemtype' for ALL items in the listing (this will override the 'itemtype' in content type configuration)
-$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat');
+$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'article' );
 ?>
 
 <?php
@@ -224,7 +224,7 @@ foreach ($cat_items as $catid => $items) :
 					
 					// MICRODATA document type (itemtype) for each item
 					// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
-					$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
+					$microdata_itemtype = $item->params->get( 'microdata_itemtype') ? $item->params->get( 'microdata_itemtype') : $microdata_itemtype_cat;
 					$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 					?>
 					<li id="faqlist_cat_<?php echo $catid; ?>item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" <?php echo $microdata_itemtype_code; ?> >

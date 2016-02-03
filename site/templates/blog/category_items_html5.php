@@ -36,7 +36,7 @@ if ($lead_link_to_popup || $intro_link_to_popup) {
 
 
 // MICRODATA 'itemtype' for ALL items in the listing (this will override the 'itemtype' in content type configuration)
-$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat');
+$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'article' );
 
 // ITEMS as MASONRY tiles
 if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_placement', 0)==1))
@@ -228,7 +228,7 @@ if ($leadnum) :
 			
 			// MICRODATA document type (itemtype) for each item
 			// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
-			$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
+			$microdata_itemtype = $item->params->get( 'microdata_itemtype') ? $item->params->get( 'microdata_itemtype') : $microdata_itemtype_cat;
 			$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 		?>
 		
@@ -321,12 +321,12 @@ if ($leadnum) :
 			<?php if (isset($item->positions['above-description-line1'])) : ?>
 			<div class="lineinfo line1">
 				<?php foreach ($item->positions['above-description-line1'] as $field) : ?>
-				<span class="element">
+				<div class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -336,9 +336,9 @@ if ($leadnum) :
 			<?php if (isset($item->positions['above-description-line1-nolabel'])) : ?>
 			<div class="lineinfo line1">
 				<?php foreach ($item->positions['above-description-line1-nolabel'] as $field) : ?>
-				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+				<div class="element">
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -348,12 +348,12 @@ if ($leadnum) :
 			<?php if (isset($item->positions['above-description-line2'])) : ?>
 			<div class="lineinfo line2">
 				<?php foreach ($item->positions['above-description-line2'] as $field) : ?>
-				<span class="element">
+				<div class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -363,9 +363,9 @@ if ($leadnum) :
 			<?php if (isset($item->positions['above-description-line2-nolabel'])) : ?>
 			<div class="lineinfo line2">
 				<?php foreach ($item->positions['above-description-line2-nolabel'] as $field) : ?>
-				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+				<div class="element">
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -399,12 +399,12 @@ if ($leadnum) :
 			<?php if (isset($item->positions['under-description-line1'])) : ?>
 			<div class="lineinfo line3">
 				<?php foreach ($item->positions['under-description-line1'] as $field) : ?>
-				<span class="element">
+				<div class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -414,9 +414,9 @@ if ($leadnum) :
 			<?php if (isset($item->positions['under-description-line1-nolabel'])) : ?>
 			<div class="lineinfo line3">
 				<?php foreach ($item->positions['under-description-line1-nolabel'] as $field) : ?>
-				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+				<div class="element">
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -426,12 +426,12 @@ if ($leadnum) :
 			<?php if (isset($item->positions['under-description-line2'])) : ?>
 			<div class="lineinfo line4">
 				<?php foreach ($item->positions['under-description-line2'] as $field) : ?>
-				<span class="element">
+				<div class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -441,9 +441,9 @@ if ($leadnum) :
 			<?php if (isset($item->positions['under-description-line2-nolabel'])) : ?>
 			<div class="lineinfo line4">
 				<?php foreach ($item->positions['under-description-line2-nolabel'] as $field) : ?>
-				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+				<div class="element">
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -593,7 +593,7 @@ if ($count > $leadnum) :
 			
 			// MICRODATA document type (itemtype) for each item
 			// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
-			$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
+			$microdata_itemtype = $item->params->get( 'microdata_itemtype') ? $item->params->get( 'microdata_itemtype') : $microdata_itemtype_cat;
 			$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 		?>
 		
@@ -684,12 +684,12 @@ if ($count > $leadnum) :
 			<?php if (isset($item->positions['above-description-line1'])) : ?>
 			<div class="lineinfo line1">
 				<?php foreach ($item->positions['above-description-line1'] as $field) : ?>
-				<span class="element">
+				<div class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -699,9 +699,9 @@ if ($count > $leadnum) :
 			<?php if (isset($item->positions['above-description-line1-nolabel'])) : ?>
 			<div class="lineinfo line1">
 				<?php foreach ($item->positions['above-description-line1-nolabel'] as $field) : ?>
-				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+				<div class="element">
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -711,12 +711,12 @@ if ($count > $leadnum) :
 			<?php if (isset($item->positions['above-description-line2'])) : ?>
 			<div class="lineinfo line2">
 				<?php foreach ($item->positions['above-description-line2'] as $field) : ?>
-				<span class="element">
+				<div class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -726,9 +726,9 @@ if ($count > $leadnum) :
 			<?php if (isset($item->positions['above-description-line2-nolabel'])) : ?>
 			<div class="lineinfo line2">
 				<?php foreach ($item->positions['above-description-line2-nolabel'] as $field) : ?>
-				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+				<div class="element">
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -762,12 +762,12 @@ if ($count > $leadnum) :
 			<?php if (isset($item->positions['under-description-line1'])) : ?>
 			<div class="lineinfo line3">
 				<?php foreach ($item->positions['under-description-line1'] as $field) : ?>
-				<span class="element">
+				<div class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -777,9 +777,9 @@ if ($count > $leadnum) :
 			<?php if (isset($item->positions['under-description-line1-nolabel'])) : ?>
 			<div class="lineinfo line3">
 				<?php foreach ($item->positions['under-description-line1-nolabel'] as $field) : ?>
-				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+				<div class="element">
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -789,12 +789,12 @@ if ($count > $leadnum) :
 			<?php if (isset($item->positions['under-description-line2'])) : ?>
 			<div class="lineinfo line4">
 				<?php foreach ($item->positions['under-description-line2'] as $field) : ?>
-				<span class="element">
+				<div class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>
@@ -804,9 +804,9 @@ if ($count > $leadnum) :
 			<?php if (isset($item->positions['under-description-line2-nolabel'])) : ?>
 			<div class="lineinfo line4">
 				<?php foreach ($item->positions['under-description-line2-nolabel'] as $field) : ?>
-				<span class="element">
-					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
-				</span>
+				<div class="element">
+					<div class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+				</div>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>

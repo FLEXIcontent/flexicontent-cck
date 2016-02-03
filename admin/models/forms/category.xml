@@ -882,7 +882,7 @@
 		
 		<fieldset name="cat_seo" label="FLEXI_SEO" addfieldpath="/administrator/components/com_flexicontent/elements" >
 			
-			<field name="microdata_itemtype_cat" type="microdatatype" default="" label="FLEXI_MICRODATA_ITEMTYPE_LIST_OVERRIDE" description="FLEXI_MICRODATA_ITEMTYPE_LIST_OVERRIDE_DESC" class="use_select2_lib" />
+			<field name="microdata_itemtype_cat" type="microdatatype" default="" label="FLEXI_MICRODATA_ITEMTYPE_LIST_FALLBACK" description="FLEXI_MICRODATA_ITEMTYPE_LIST_FALLBACK_DESC" class="use_select2_lib" />
 			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>

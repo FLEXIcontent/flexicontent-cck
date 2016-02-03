@@ -90,7 +90,7 @@ $r = 0;
 			</span>
 		</legend>
 		
-		<table id="fc_textsearch_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
+		<table id="fc_textsearch_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" >
 		
 			<tr id="fcsearch_contenttypes_row" class="fc_search_row_<?php echo (($r++)%2);?>">
 				<?php if($this->params->get('show_type_label', 1)): ?>
@@ -100,15 +100,15 @@ $r = 0;
 					</label>
 				</td>
 				<td class="fc_search_option_cell">
-					<span class="fc_filter_html">
+					<div class="fc_filter_html">
 						<?php echo $this->lists['contenttypes'];?>
-					</span>
+					</div>
 				</td>
 				<?php else: ?>
 				<td class="fc_search_option_cell">
-					<span class="fc_filter_html">
+					<div class="fc_filter_html">
 						<?php echo $this->lists['contenttypes'];?>
-					</span>
+					</div>
 				</td>
 				<?php endif; ?>
 			</tr>
@@ -124,7 +124,7 @@ $r = 0;
 			</span>
 		</legend>
 		
-		<table id="fc_textsearch_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
+		<table id="fc_textsearch_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" >
 			
 			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 				<td class="fc_search_label_cell">
@@ -141,7 +141,7 @@ $r = 0;
 					$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' fc_label_internal') : ' fc_label_internal';
 					$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
 					?>
-					<span class="fc_filter_html">
+					<div class="fc_filter_html">
 						<?php echo $append_buttons ? '<span class="btn-wrapper input-append">' : ''; ?>
 							<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
 								data-fc_label_text="<?php echo $text_search_label; ?>" name="q" size="30" maxlength="120" 
@@ -178,10 +178,10 @@ $r = 0;
 						$msg .= $ignoredwords && $shortwords ? ' <br/> ' : '';
 						$msg .= $shortwords ? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) .': <b>'.$shortwords.'</b>' : '';
 						?>
-						<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>					
+						<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>
 						
 						<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
-					</span>
+					</div>
 				</td>
 			</tr>
 			
@@ -193,9 +193,9 @@ $r = 0;
 					</label>
 				</td>
 				<td class="fc_search_option_cell">
-					<span class="fc_filter_html">
+					<div class="fc_filter_html">
 						<?php echo $this->lists['searchphrase']; ?>
-					</span>
+					</div>
 				</td>
 			</tr>
 			<?php endif;*/ ?>
@@ -209,9 +209,9 @@ $r = 0;
 						</label>
 					</td>
 					<td class="fc_search_option_cell">
-						<span class="fc_filter_html">
+						<div class="fc_filter_html">
 							<?php echo $this->lists['txtflds'];?>
-						</span>
+						</div>
 					</td>
 				</tr>
 				
@@ -239,12 +239,12 @@ $r = 0;
 			$msg = '';
 			$msg = implode(' <br/> ', $filter_messages);
 			if ( $msg ) :
-				?><div class="fcclear"></div><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php
+				?><div class="fcclear"></div><div class="fc-mssg fc-note"><?php echo $msg; ?></div><?php
 			endif;
 			?>
 			<div class="fcclear"></div>
 			
-				<table id="fc_fieldfilters_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">		
+				<table id="fc_fieldfilters_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" >
 				
 				<?php /*if($show_operator = $this->params->get('show_filtersop', 1)) : ?>
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
@@ -252,9 +252,9 @@ $r = 0;
 							<label for="operator" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SEARCH_FILTERS_REQUIRED', 'FLEXI_SEARCH_FILTERS_REQUIRED_TIP', 1); ?>">
 								<?php echo JText::_("FLEXI_SEARCH_FILTERS_REQUIRED"); ?>:
 							</label>
-							<span class="fc_filter_html">
+							<div class="fc_filter_html">
 								<?php echo $this->lists['filtersop']; ?>:
-							</span>
+							</div>
 						</td>
 					</tr>
 				<?php endif; */ ?>
@@ -269,11 +269,11 @@ $r = 0;
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 						<td class="fc_search_label_cell">
 						<?php if ($descr) : ?>
-							<label for="<?php echo $filt->name; ?>" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip($label, $descr, 0); ?>">
+							<label for="filter_<?php echo $filt->id; ?>" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip($label, $descr, 0); ?>">
 								<?php echo $label; ?>
 							</label>
 						<?php else : ?>
-							<label for="<?php echo $filt->name; ?>" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'), JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $label), 0); ?>">
+							<label for="filter_<?php echo $filt->id; ?>" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'), JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $label), 0); ?>">
 								<?php echo $label; ?>
 							</label>
 						<?php endif; ?>
@@ -284,9 +284,9 @@ $r = 0;
 								$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}'.$prepend_onchange, $filt->html);
 							}
 							?>
-							<span class="fc_filter_html">
+							<div class="fc_filter_html">
 								<?php echo $filt->html; ?>
-							</span>
+							</div>
 						</td>
 					</tr>
 					
@@ -308,7 +308,7 @@ $r = 0;
 					</span>
 				</legend>
 				
-				<table id="fc_search_behavior_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
+				<table id="fc_search_behavior_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" >
 					
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 						<td class="fc_search_label_cell">
@@ -317,11 +317,11 @@ $r = 0;
 							</label>
 						</td>
 						<td class="fc_search_option_cell">
-							<span class="fc_filter_html">
+							<div class="fc_filter_html">
 								<?php echo $this->lists['areas']; ?>
-							</span>
+							</div>
 						</td>
-					</tr>	
+					</tr>
 					
 				<?php if( $show_searchordering ) : ?>
 					
@@ -332,9 +332,9 @@ $r = 0;
 							</label>
 						</td>
 						<td class="fc_search_option_cell">
-							<span class="fc_filter_html">
+							<div class="fc_filter_html">
 								<?php echo $this->lists['ordering'];?>
-							</span>
+							</div>
 						</td>
 					</tr>
 					
@@ -383,7 +383,7 @@ $r = 0;
 	<!-- BOF items total-->
 
 
-<?php /*<table class="searchintro<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
+<?php /*<table class="searchintro<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" >
 	<tr>
 		<td>
 			<?php echo $this->result; ?>

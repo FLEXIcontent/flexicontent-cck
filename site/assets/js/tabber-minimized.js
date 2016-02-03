@@ -197,7 +197,9 @@ tabberObj.prototype.init = function(e)
   /* Create a new UL list to hold the tab headings */
   DOM_ul = document.createElement("ul");
   DOM_ul.className = this.classNav;
-  
+
+	var decode_entities = document.createElement("textarea");  // used to decode html entities
+	
   /* Loop through each tab we found */
   for (i=0; i < this.tabs.length; i++) {
 
@@ -227,7 +229,8 @@ tabberObj.prototype.init = function(e)
       for (i2=0; i2<this.titleElements.length; i2++) {
         headingElement = t.div.getElementsByTagName(this.titleElements[i2])[0];
         if (headingElement) {
-          t.headingText = headingElement.innerHTML;
+          decode_entities.innerHTML = headingElement.innerHTML;
+					t.headingText = decode_entities.value;
           t.headingTitle = headingElement.title;
           if (typeof jQuery != 'undefined') {
             tab_classes=jQuery(headingElement).attr('class');

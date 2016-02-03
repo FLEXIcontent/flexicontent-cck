@@ -148,7 +148,7 @@ $items	= & $this->items;
 <input type="hidden" name="task" value="" />
 </form>
 
-<table id="flexitable" class="flexitable" summary="<?php echo JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' ).' '; ?>">
+<table id="flexitable" class="flexitable">
 	<thead>
 		<tr>
 			<?php if ($use_image) : ?>
@@ -227,7 +227,7 @@ $items	= & $this->items;
 	?>
 		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
 		<?php if ($use_image) : ?>
-			<td headers="fc_image" align="center">
+			<td headers="fc_image">
 				<?php if (!empty($thumb)) : ?>
 				
 					<?php $title_encoded = htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>
@@ -250,7 +250,7 @@ $items	= & $this->items;
 				</a>
 				<?php echo $markup_tags; ?>
 			</td>
-			<td headers="fc_intro">
+			<td headers="fc_desc">
 				<?php echo flexicontent_html::striptagsandcut( $item->introtext, 150 ); ?>
 			</td>
 		<?php if ($use_date) : ?>
@@ -262,7 +262,7 @@ $items	= & $this->items;
 		<?php if ($use_fields && count($fields)) : ?>
 			<?php foreach ($fields as $fieldname) : ?>
 				<?php	if ( empty($found_fields[$fieldname]) ) continue; ?>
-				<td headers="fc_<?php echo $item->fields[$fieldname]->name; ?>" ><?php echo $item->fields[$fieldname]->display; ?></th>
+				<td headers="fc_<?php echo $item->fields[$fieldname]->name; ?>" ><?php echo $item->fields[$fieldname]->display; ?></td>
 			<?php endforeach; ?>
 		<?php endif; ?>
 		

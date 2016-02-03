@@ -26,7 +26,7 @@ $btn_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall';
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 
 // MICRODATA 'itemtype' for ALL items in the listing (this will override the 'itemtype' in content type configuration)
-$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat');
+$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'article' );
 
 if ($this->params->get('togglable_table_cols', 1))
 {
@@ -139,7 +139,7 @@ endif;
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 <?php endif; ?>
 
-<table id="adminListTableFCcategory" class="adminlist" summary="<?php echo @$this->category->name; ?>">
+<table id="adminListTableFCcategory" class="adminlist">
 	
 	<?php if ($this->params->get('show_field_labels_row', 1) || $this->params->get('togglable_table_cols', 1)) : ?>
 	<thead style="<?php echo $this->params->get('show_field_labels_row', 1) ? '' : 'display:none;' ?>">
@@ -185,7 +185,7 @@ endif;
 		
 		// MICRODATA document type (itemtype) for each item
 		// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
-		$microdata_itemtype = $microdata_itemtype_cat ? $microdata_itemtype_cat : $item->params->get( 'microdata_itemtype');
+		$microdata_itemtype = $item->params->get( 'microdata_itemtype') ? $item->params->get( 'microdata_itemtype') : $microdata_itemtype_cat;
 		$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 		?>
 
