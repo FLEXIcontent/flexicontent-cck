@@ -104,7 +104,7 @@ class com_flexicontentInstallerScript
 		}*/
 		?>
 		
-		<table class="adminlist">
+		<table class="adminlist" style="width: 96%;">
 			<tr>
 				<td valign="top">
 		    	<img src="<?php echo 'components/com_flexicontent/assets/images/logo.png'; ?>" style="width:300px; margin: 0px 48px 0px 0px;" alt="FLEXIcontent Logo" />
