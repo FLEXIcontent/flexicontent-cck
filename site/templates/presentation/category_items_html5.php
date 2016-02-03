@@ -25,8 +25,8 @@ $user = JFactory::getUser();
 JFactory::getDocument()->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/tabber.css');
 
-// MICRODATA 'itemtype' for ALL items in the listing (this will override the 'itemtype' in content type configuration)
-$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'article' );
+// MICRODATA 'itemtype' for ALL items in the listing (this is the fallback if the 'itemtype' in content type / item configuration are not set)
+$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article' );
 ?>
 
 <?php
@@ -91,7 +91,7 @@ foreach ($items as $i => $item) :
 	$markup_tags .= '</span>';
 	
 	// MICRODATA document type (itemtype) for each item
-	// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
+	// -- NOTE: category's microdata itemtype is fallback if the microdata itemtype of the CONTENT TYPE / ITEM are not set
 	$microdata_itemtype = $item->params->get( 'microdata_itemtype') ? $item->params->get( 'microdata_itemtype') : $microdata_itemtype_cat;
 	$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 ?>

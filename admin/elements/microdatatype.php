@@ -35,18 +35,29 @@ class JFormFieldMicrodatatype extends JFormField {
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
 		
-		$values = array(
-			'NewsArticle' => 'NewsArticle',
-			'Person' => 'Person',
-			'Product' => 'Product',
-			'Event' => 'Event',
-			'Recipe' => 'Recipe',
-			'Organization' => 'Organization',
-			'Movie' => 'Movie',
-			'Book' => 'Book',
-			'Review' => 'Review',
-			'SoftwareApplication' => 'SoftwareApplication'
-		);
+		// Get microdata types
+		static $types = null;
+		
+		if ($types === null)
+		{
+			jimport('joomla.microdata.microdata');
+			$jm = new JMicrodata();
+			$jm_types = $jm->getTypes();
+			$types = array_keys($jm_types);
+		}
+		
+		/*$types = array(
+			'NewsArticle',
+			'Person',
+			'Product',
+			'Event',
+			'Recipe',
+			'Organization',
+			'Movie',
+			'Book',
+			'Review',
+			'SoftwareApplication'
+		);*/
 		
 		$first_option = @$attributes['first_option'];
 		
@@ -54,13 +65,14 @@ class JFormFieldMicrodatatype extends JFormField {
 		$options = array();
 		$options[] = JHTML::_('select.option','', '-- '.JText::_($first_option ? $first_option : 'FLEXI_USE_GLOBAL').' --');
 
-		foreach($values as $key=>$value) :
-		## Create $value ##
-		$options[] = JHTML::_('select.option', $key, $value);
+		foreach($types as $v) :
+			## Create $value ##
+			if (!$v) continue;
+			$options[] = JHTML::_('select.option', $v, $v);
 		endforeach;
 
 		## Create <select name="icons" class="inputbox"></select> ##
-		$dropdown = JHTML::_('select.genericlist', $options, $this->name, 'class="use_select2_lib inputbox"', 'value', 'text', $this->value, $this->id);
+		$dropdown = JHTML::_('select.genericlist', $options, $this->name, 'class="use_select2_lib"', 'value', 'text', $this->value, $this->id);
 
 		## Output created <select> list ##
 		return $dropdown;

@@ -35,8 +35,8 @@ if ($lead_link_to_popup || $intro_link_to_popup) {
 }
 
 
-// MICRODATA 'itemtype' for ALL items in the listing (this will override the 'itemtype' in content type configuration)
-$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'article' );
+// MICRODATA 'itemtype' for ALL items in the listing (this is the fallback if the 'itemtype' in content type / item configuration are not set)
+$microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article' );
 
 // ITEMS as MASONRY tiles
 if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_placement', 0)==1))
@@ -227,7 +227,7 @@ if ($leadnum) :
 			$title_encoded = htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8');
 			
 			// MICRODATA document type (itemtype) for each item
-			// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
+			// -- NOTE: category's microdata itemtype is fallback if the microdata itemtype of the CONTENT TYPE / ITEM are not set
 			$microdata_itemtype = $item->params->get( 'microdata_itemtype') ? $item->params->get( 'microdata_itemtype') : $microdata_itemtype_cat;
 			$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 		?>
@@ -592,7 +592,7 @@ if ($count > $leadnum) :
 			$title_encoded = htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8');
 			
 			// MICRODATA document type (itemtype) for each item
-			// -- NOTE: category's microdata itemtype will override the microdata itemtype of the CONTENT TYPE
+			// -- NOTE: category's microdata itemtype is fallback if the microdata itemtype of the CONTENT TYPE / ITEM are not set
 			$microdata_itemtype = $item->params->get( 'microdata_itemtype') ? $item->params->get( 'microdata_itemtype') : $microdata_itemtype_cat;
 			$microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://schema.org/'.$microdata_itemtype.'"' : '';
 		?>
