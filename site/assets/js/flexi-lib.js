@@ -93,6 +93,9 @@
 				// Allow parent document to scroll again
 				jQuery(document.body).removeClass('fc-no-scroll');
 				
+				// Destroy the dialog completely, this is needed because we have moved the content back into its proper position
+				jQuery(this).dialog('destroy');
+				
 				// Finalize by doing the closing operation
 				if (typeof closeFunc === 'function') closeFunc();
 				else if (closeFunc == 1) window.location.reload(false);
@@ -102,7 +105,7 @@
 		})
 		.dialog('widget').next('.ui-widget-overlay').css('background', 'gray');  // Add an overlay
 		
-		// Manually replace the dialog back into its proper position
+		// Manually move the dialog content back into its proper position, (the extra dialog container will be destroyed on dialog close)
 		obj.parent().appendTo(parent);
 		
 		// Open the dialog manually

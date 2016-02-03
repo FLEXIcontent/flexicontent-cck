@@ -367,8 +367,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						this.store('tip:text', parts[1]);
 					}
 				});
-				//var imgpath_JTooltips = new Tips($(newField.get(0)).getElements('.hasTipImgpath'), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshImgpathTip});
-				var imgprev_JTooltips = new Tips($(newField.get(0)).getElements('.hasTipPreview'), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshPreviewTip});
+				if ( tipped_elements.length ) {
+					//var imgpath_JTooltips = new Tips($(newField.get(0)).getElements('.hasTipImgpath'), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshImgpathTip});
+					var imgprev_JTooltips = new Tips($(newField.get(0)).getElements('.hasTipPreview'), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshPreviewTip});
+				}
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
