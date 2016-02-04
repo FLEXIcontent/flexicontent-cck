@@ -24,6 +24,25 @@
 		<fieldset name="group-relation_reverse-data" repeat="1" icon_class="icon-database" label="Reversing" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="reverse_field" type="fields" field_type="relation" label="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE" description="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE_DESC" />
+			<field name="" type="separator" default="FLEXI_RIFLD_RELATION_REVERSE_SCOPE" description="FLEXI_RIFLD_RELATION_REVERSE_SCOPE_DESC" level="level1" />
+			<field name="reverse_scope_category" type="flexicategories" multiple="true" size="9" label="FLEXI_RIFLD_CHOOSE_CATEGORY_FIELD" description="FLEXI_RIFLD_CHOOSE_CATEGORY_FIELD_DESC" />
+			<field name="reverse_scope_types" type="types" multiple="true" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" class="use_select2_lib" />
+
+			<field name="" type="separator" default="FLEXI_RIFLD_OTHER_SCOPE_LIMITS" level="level2" />
+			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="onlypublished" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_RIFLD_ANY_USER</option>
+				<option value="1">FLEXI_RIFLD_EDITOR</option>
+				<option value="2">FLEXI_RIFLD_ITEM_OWNER</option>
+			</field>
+
 			
 		</fieldset>
 		<fieldset name="group-relation_reverse-editing-ilist" repeat="1" icon_class="icon-pencil" label_prefix="FLEXI_FIELD_EDITING" label="FLEXI_ITEMS_LIST" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -98,6 +117,10 @@
 		<fieldset name="group-relation_reverse-viewing-ilist" repeat="1" icon_class="icon-list" label_prefix="FLEXI_FIELD_VIEWING" label="FLEXI_ITEMS_LIST" addfieldpath="/administrator/components/com_flexicontent/elements">		
 			<!--field name="" type="separator" default="FLEXI_ITEMS_LIST" level="level0" /-->
 			
+			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEM_LIST" level="level0" />
+			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_ITEM_COUNT_LABEL" description="FLEXI_RIFLD_ITEM_COUNT_DESC" />
+
+
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
 			<field name="orderby" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
 				<option value="">FLEXI_ORDER_DEFAULT</option>
