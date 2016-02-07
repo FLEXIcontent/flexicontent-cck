@@ -44,16 +44,6 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
-		// Check max allowed version
-		$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
-		$com_xml = JApplicationHelper::parseXMLInstallFile( $manifest_path );
-		if (version_compare( str_replace(' ', '.', $com_xml['version']), str_replace(' ', '.', self::$prior_to_version), '>=')) {
-			echo '
-			<span class="fc-note fc-nobgimage fc-mssg">
-				Warning: installed version of Field: \'<b>'.$field->field_type.'</b>\' was meant for FLEXIcontent versions prior to: v'.self::$prior_to_version.' <br/> It may or may not work properly in later versions<br/>
-			</span>';
-		}
-		
 		$field->label = JText::_($field->label);
 		$use_ingroup = 0; // Field grouped should not be recursively grouped
 		if ($use_ingroup) $field->formhidden = 3;
@@ -343,8 +333,16 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		}
 		if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').' fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
 		
+		// Check max allowed version
+		//$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
+		//$com_xml = JApplicationHelper::parseXMLInstallFile( $manifest_path );
+		
 		// Append non value html of fields
 		$field->html =
+			/*(version_compare( str_replace(' ', '.', $com_xml['version']), str_replace(' ', '.', self::$prior_to_version), '>=') ?
+				'<span class="alert alert-warning fc-iblock fc-small" style="margin: 0 0 8px 0;">
+					<b>Warning</b>: installed version of Field: \'<b>'.$field->field_type.'</b>\' was meant for FLEXIcontent versions prior to: v'.self::$prior_to_version.' It may or may not work properly in later versions
+				</span>' : '').*/
 			($field->parameters->get('compact_edit_global', 0) ? '
 			<div class="toggle_all_values_buttons_box">
 				<span id="sortables_'.$field->id.'_hide_vals_btn" class="btn hide_vals_btn" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).next(), 0); return false;">

@@ -552,13 +552,19 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 		
 		jQuery(window).resize(function() {
-			setHeight_'.$field->name.'("iframe.sharedmedia", 2/3)
+			setHeight_'.$field->name.'("iframe.sharedmedia", 2/3);
 		});
 		
 		jQuery(document).ready(function(){
-			setHeight_'.$field->name.'("iframe.sharedmedia", 2/3)
+			setHeight_'.$field->name.'("iframe.sharedmedia", 2/3);
+			jQuery(document).on("mouseenter", ".fcfieldval_container_'.$field->id.'", function(event) {
+				setHeight_'.$field->name.'("iframe.sharedmedia", 2/3);
+			});
 		});
 		';
+		
+		// TODO more
+		//if (!headers_sent()) header("Content-Security-Policy: script-src 'unsafe-inline' 'self' ...;");
 		
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
