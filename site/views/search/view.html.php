@@ -681,10 +681,17 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// ******************************************************************
 		// Create HTML of filters (-AFTER- getData of model have been called)
 		// ******************************************************************
+		$filter_values = array();
 		foreach ($filters as $filter)
 		{
 			$filter->parameters->set('display_label_filter_s', 0);
 			$filter->value = JRequest::getVar('filter_'.$filter->id, false);
+			
+			if ( (!is_array($filter->value) && strlen($filter->value)) || (is_array($filter->value) && count($filter->value)) )
+			{
+				$filter_values[$filter->id] = $filter->value;
+			}
+			
 			//$fieldsearch = $app->getUserStateFromRequest( 'flexicontent.search.'.'filter_'.$filter->id, 'filter_'.$filter->id, array(), 'array' );
 			//echo "Field name: ".$filter->name; echo ":: ". 'filter_'.$filter->id ." :: value: "; print_r($filter->value); echo "<br/>\n";
 			
@@ -714,6 +721,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$this->assignRef('typeData',	$typeData);
 
 		$this->assign('ordering',     $state->get('ordering'));
+		$this->assign('filter_values', $filter_values);
 		$this->assign('searchword',   $searchword);
 		$this->assign('searchphrase', $state->get('match'));
 		$this->assign('searchareas',  $areas);
