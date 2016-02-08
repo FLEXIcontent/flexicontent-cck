@@ -2941,12 +2941,9 @@ class FlexicontentController extends JControllerLegacy
 			}
 		}
 		
-		$model = $this->getModel(FLEXI_ITEMVIEW);
-		$view  = $this->getView('search', 'html');
-		$view->setModel($model);
-		
+		// Go through display task of this controller instead of parent class, so that cacheable and safeurlparams can be decided properly
 		JRequest::setVar('view', 'search');
-		parent::display(true);
+		$this->display();
 	}
 	
 	

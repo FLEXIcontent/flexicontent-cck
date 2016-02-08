@@ -1,13 +1,19 @@
-<?php defined('_JEXEC') or die('Restricted access'); ?>
-
-<?php if (!count($this->results)) : ?>
-	<div class="fcclear"></div>
-	<div class="alert alert-warning noitems_search"> <?php echo JText::_( 'FLEXI_SEARCH_NO_ITEMS_FOUND' ); ?> </div>
-	<div class="fcclear"></div>
-	<?php return; ?>
-<?php endif; ?>
-
 <?php
+defined('_JEXEC') or die('Restricted access');
+
+if (!count($this->results))
+{
+	if ($this->searchword || count($this->filter_values)) :	
+	?>
+		<div class="fcclear"></div>
+		<div class="alert alert-warning noitems_search"> <?php echo JText::_( 'FLEXI_SEARCH_NO_ITEMS_FOUND' ); ?> </div>
+		<div class="fcclear"></div>
+	<?php
+	endif;
+	
+	return;
+}
+
 
 // **************************************************
 // Indentify result ITEMs that are FLEXIcontent items

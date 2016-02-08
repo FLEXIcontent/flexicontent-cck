@@ -355,7 +355,7 @@ $r = 0;
 	<!-- BOF items total-->
 	<div id="item_total" class="item_total group">
 	
-		<?php if ($this->params->get('show_item_total', 1)) : ?>
+		<?php if ($this->params->get('show_item_total', 1) && count($this->results)) : ?>
 			<span class="fc_item_total_data">
 				<?php if (@$this->resultsCounter || @$this->pageNav) echo @$this->resultsCounter ? $this->resultsCounter : $this->pageNav->getResultsCounter(); // custom Results Counter ?>
 			</span>
