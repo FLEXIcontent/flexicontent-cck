@@ -1440,13 +1440,13 @@
 				<option value="20">FLEXI_20</option>
 				<option value="50">FLEXI_50</option>
 			</field>
-			<field name="auto_approve" type="radio" default="1" label="FLEXI_AUTO_APPROVE" description="FLEXI_AUTO_APPROVE_DESC" class="dispversioning btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="auto_approve" type="radio" default="1" label="FLEXI_PUBLISH_NEW_VER_CHANGES" description="FLEXI_PUBLISH_NEW_VER_CHANGES_DESC" class="dispversioning btn-group group-fcinfo">
+				<option value="1">FLEXI_IMMEDIATELY</option>
+				<option value="0">FLEXI_SELECTABLE_ALLOWS_PREVIEW_BEFORE_PUBLISHING</option>
 			</field>
-			<field name="disable_diff" type="radio" default="0" label="FLEXI_DISABLE_HTML_DIFF" description="FLEXI_DISABLE_HTML_DIFF_DESC" class="dispversioning btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="disable_diff" type="radio" default="0" label="FLEXI_VERSION_COMPARING" description="FLEXI_VERSION_COMPARING_DESC" class="dispversioning btn-group group-fcinfo">
+				<option value="0">FLEXI_ALLOW</option>
+				<option value="1">FLEXI_DISABLE</option>
 			</field>
 
 	</fieldset>
