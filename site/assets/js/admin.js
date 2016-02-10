@@ -115,11 +115,18 @@ Joomla.submitform = function(task, form, validate)
 		
 		if (!isValid) // If form is invalid, then focus the first invalid element
 		{
-			var invalid = jQuery('.invalid');
-			jQuery('html, body').animate({
-				scrollTop: invalid.offset().top - 80
-			}, 1000);
-			invalid[0].focus();
+			var invalid = jQuery('.invalid').first();  // Get single element so that hidden check will work
+			if (invalid.is(':hidden')) {
+				invalid = jQuery('#system-message-container');
+			}
+			
+			if (invalid.length) {
+				var pos = invalid.offset().top - 80;
+				jQuery('html, body').animate({
+					scrollTop: pos
+				}, 1000);
+				invalid[0].focus();
+			}
 			return;
 		}
 	}
