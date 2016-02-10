@@ -75,7 +75,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		// Get if text searching according to specific (single) content type
 		$show_txtfields = $params->get('show_txtfields', 1);  //0:hide, 1:according to content, 2:use custom configuration
-		$show_txtfields = $txtmode ? 0 : $show_txtfields;  // disable this flag if using BASIC index for text search
+		$show_txtfields = !$txtmode ? 0 : $show_txtfields;  // disable this flag if using BASIC index for text search
 		
 		// Get if filtering according to specific (single) content type
 		$show_filters   = $params->get('show_filters', 1);  //0:hide, 1:according to content, 2:use custom configuration
@@ -207,6 +207,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		// Force hidden content type selection if only 1 content type was initially configured
 		$canseltypes = count($contenttypes)==1 ? 0 : $canseltypes;
+		$params->set('canseltypes', $canseltypes);  // SET "type selection FLAG" back into parameters
 		
 		// Type data and configuration (parameters), if no content types specified then all will be retrieved
 		$typeData = flexicontent_db::getTypeData( implode(",", $contenttypes) );
@@ -222,7 +223,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$form_contenttypes = array_unique(array_map('intval', $form_contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
 			
 			$_contenttypes = array_intersect($contenttypes, $form_contenttypes);
-			if (!empty($_contenttypes)) $contenttypes = $_contenttypes;  // catch empty case: no content types were given or not-allowed content types were passed
+			if (!empty($_contenttypes)) $form_contenttypes = $contenttypes = $_contenttypes;  // catch empty case: no content types were given or not-allowed content types were passed
 		}
 		
 		// Check for zero content type (can occur during sanitizing content ids to integers)
@@ -231,9 +232,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		}
 		
 		// Type based seach, get a single content type (first one, if more than 1 were given ...)
-		if ($type_based_search && !empty($contenttypes)) {
-			$single_contenttype = reset($contenttypes);
-			$contenttypes = array($single_contenttype);
+		if ($type_based_search && $canseltypes && !empty($form_contenttypes)) {
+			$single_contenttype = reset($form_contenttypes);
+			$form_contenttypes = $contenttypes = array($single_contenttype);
 		} else {
 			$single_contenttype = false;
 		}
@@ -326,7 +327,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// If configured filters were not found/invalid for the current content type(s)
 		// then retrieve all fields marked as filterable for the give content type(s) this is useful to list per content type filters automatically, even when not set or misconfigured
 		if ( empty($filters) ) {
-			if( !empty($contenttypes) )
+			if ( $type_based_search && $canseltypes && empty($form_contenttypes))
+				$filters = array();
+			else if( !empty($contenttypes) )
 				$filters = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'filter');
 			else
 				$filters = array();
@@ -461,8 +464,10 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// *** Selector for usage of Search Text
 		if($show_searchphrase = $params->get('show_searchphrase', 1))
 		{
-			$searchphrase_names = array('natural'=>'FLEXI_NATURAL_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT', 
-				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'exact'=>'FLEXI_EXACT_PHRASE');
+			$searchphrase_names = array(
+				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'natural'=>'FLEXI_NATURAL_PHRASE',
+				'exact'=>'FLEXI_EXACT_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT'
+			);
 
 			$phrases = array();
 			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name) {
@@ -711,8 +716,11 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		$this->assignRef('action',    $link);  // $uri->toString()
 		$this->assignRef('print_link',$print_link);
+		
+		$this->assignRef('type_based_search', $type_based_search);
 		$this->assignRef('contenttypes', $contenttypes);
 		$this->assignRef('filters',   $filters);
+		
 		$this->assignRef('results',   $results);
 		$this->assignRef('lists',     $lists);
 		$this->assignRef('params',    $params);
