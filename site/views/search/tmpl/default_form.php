@@ -225,7 +225,7 @@ $r = 0;
 	
 	<div id="fc_advsearch_options_set" >
 		
-		<?php if ( count($this->filters) > 0 ) : ?>
+		<?php if ( count($this->filters) > 0 || $this->type_based_search ) : ?>
 			<fieldset id="fc_fieldfilters_set" class="fc_search_set <?php echo $type_class; ?>">
 				<legend>
 					<span class="fc_legend_text <?php echo $tooltip_class; ?>" <?php echo $field_filters_title_tip;?> >
@@ -245,6 +245,10 @@ $r = 0;
 			<div class="fcclear"></div>
 			
 				<table id="fc_fieldfilters_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" >
+					
+				<?php if ( !count($this->filters) && $this->type_based_search ) : ?>
+					<tr><td><div class="alert alert-info"><?php echo JText::_('FLEXI_SELECT_CONTENT_TYPE_BEFORE_USING_FILTERS'); ?></div></td></tr>
+				<?php endif; ?>
 				
 				<?php /*if($show_operator = $this->params->get('show_filtersop', 1)) : ?>
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">

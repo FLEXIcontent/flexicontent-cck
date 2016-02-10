@@ -124,7 +124,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// Get if text searching according to specific (single) content type
 		$show_txtfields = $params->get('show_txtfields', 1);  //0:hide, 1:according to content, 2:use custom configuration
-		$show_txtfields = $txtmode ? 0 : $show_txtfields;  // disable this flag if using BASIC index for text search
+		$show_txtfields = !$txtmode ? 0 : $show_txtfields;  // disable this flag if using BASIC index for text search
 		
 		// Get if filtering according to specific (single) content type
 		$show_filters   = $params->get('show_filters', 1);  //0:hide, 1:according to content, 2:use custom configuration
@@ -148,6 +148,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// Force hidden content type selection if only 1 content type was initially configured
 		$canseltypes = count($contenttypes)==1 ? 0 : $canseltypes;
+		$params->set('canseltypes', $canseltypes);  // SET "type selection FLAG" back into parameters
 		
 		// Type data and configuration (parameters), if no content types specified then all will be retrieved
 		$typeData = flexicontent_db::getTypeData( implode(",", $contenttypes) );
@@ -163,7 +164,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			$form_contenttypes = array_unique(array_map('intval', $form_contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
 			
 			$_contenttypes = array_intersect($contenttypes, $form_contenttypes);
-			if (!empty($_contenttypes)) $contenttypes = $_contenttypes;  // catch empty case: no content types were given or not-allowed content types were passed
+			if (!empty($_contenttypes)) $form_contenttypes = $contenttypes = $_contenttypes;  // catch empty case: no content types were given or not-allowed content types were passed
 		}
 		
 		// Check for zero content type (can occur during sanitizing content ids to integers)
@@ -172,8 +173,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		}
 		
 		// Type based seach, get a single content type (first one, if more than 1 were given ...)
-		if ($type_based_search && !empty($contenttypes)) {
-			$single_contenttype = reset($contenttypes);
+		if ($type_based_search && $canseltypes && !empty($form_contenttypes)) {
+			$single_contenttype = reset($form_contenttypes);
 			$contenttypes = array($single_contenttype);
 		} else {
 			$single_contenttype = false;
