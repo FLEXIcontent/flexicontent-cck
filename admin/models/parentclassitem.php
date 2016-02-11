@@ -3842,9 +3842,10 @@ class ParentClassItem extends JModelAdmin
 					$tmpl_params = $tmpl->params;
 					$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
 					$jform->load($tmpl_params);
-					foreach ($jform->getGroup('attribs') as $p) {
-						if (!empty($p->fieldname))
-							$item->attribs->set($p->fieldname, null);
+					foreach ($jform->getGroup('attribs') as $field)
+					{
+						// !! Do not call empty() on a variable created by magic __get function
+						if ( @ $field->fieldname ) $item->attribs->set($field->fieldname, null);
 					}
 				}
 			}
