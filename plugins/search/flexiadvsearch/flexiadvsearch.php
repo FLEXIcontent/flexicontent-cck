@@ -412,12 +412,18 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$orderby_join = '';
 		$orderby_col = '';
 		if (JRequest::getVar('option') == 'com_flexicontent') {
+
+			// Get defaults
+			$request_var = $orderby_override ? 'orderby' : '';
+			$default_order = JRequest::getCmd('filter_order', 'i.title', 'default');
+			$default_order_dir = JRequest::getCmd('filter_order_Dir', 'ASC', 'default');
+
 			$order = '';
 			$orderby = flexicontent_db::buildItemOrderBy(
 				$params,
-				$order, $_request_var='orderby', $_config_param='orderby',
+				$order, $request_var, $_config_param='orderby',
 				$_item_tbl_alias = 'i', $_relcat_tbl_alias = 'rel',
-				$_default_order='', $_default_order_dir='', $sfx='', $support_2nd_lvl=false
+				$default_order, $default_order_dir, $sfx='', $support_2nd_lvl=false
 			);
 			
 			// Create JOIN for ordering items by a custom field (Level 1)
@@ -425,11 +431,21 @@ class plgSearchFlexiadvsearch extends JPlugin
 				$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
 				$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
 			}
+			if ( 'custom:' == substr($order[1], 0, 7) ) {
+				$order_parts = preg_split("/:/", $order[1]);
+				$_field_id = (int) @ $order_parts[1];
+				if ($_field_id && count($order_parts)==4) $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$_field_id;
+			}
 			
 			// Create JOIN for ordering items by a custom field (Level 2)
 			if ( 'field' == $order[2] ) {
 				$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
 				$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
+			}
+			if ( 'custom:' == substr($order[2], 0, 7) ) {
+				$order_parts = preg_split("/:/", $order[2]);
+				$_field_id = (int) @ $order_parts[1];
+				if ($_field_id && count($order_parts)==4) $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$_field_id;
 			}
 			
 			// Create JOIN for ordering items by author's name
@@ -440,8 +456,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 			
 			// Create JOIN for ordering items by a most commented
 			if ( in_array('commented', $order) ) {
-				$orderby_col   = ', count(com.object_id) AS comments_total';
-				$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
+				$orderby_col   = ', COUNT(DISTINCT com.id) AS comments_total';
+				$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id AND com.object_group="com_flexicontent" AND com.published="1"';
 			}
 			
 			// Create JOIN for ordering items by a most rated
@@ -451,7 +467,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			}
 			
 			// Create JOIN for ordering items by their ordering attribute (in item's main category)
-		if ( in_array('order', $order) ) {
+			if ( in_array('order', $order) ) {
 				$orderby_join .= ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id AND rel.catid = i.catid';
 			}
 		}
