@@ -199,8 +199,8 @@
 			
 			<field name="" type="separator" default="Minimum sizes" description="" level="level3" class="alert alert-info fcpadded" depend_class="map-settings map-settings-int" />
 			<field name="" type="separator" default="Fixed sizes" description="" level="level3" class="alert alert-info fcpadded" depend_class="map-settings map-settings-img" />
-			<field name="map_width" type="text" default="640" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH_DESC" depend_class="map-settings" />
-			<field name="map_height" type="text" default="360" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT_DESC" depend_class="map-settings" />
+			<field name="map_width" type="text" default="200" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH_DESC" depend_class="map-settings" />
+			<field name="map_height" type="text" default="150" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT_DESC" depend_class="map-settings" />
 			
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LAYOUT" description="" level="level2"  depend_class="map-settings"/>
 			<field name="map_position" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_POSITION" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_POSITION_DESC" depend_class="map-settings" class="btn-group group-fcinfo">
