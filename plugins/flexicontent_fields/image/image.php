@@ -1141,33 +1141,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 		}
 		
-		else if ( $image_source == -2 ) {
-			$n = 0;
-			$_values = array();
-			$images_MM = array();
-			foreach($values as $value)
-			{
-				//echo "<pre>"; print_r($values); echo "</pre>";
-				$_image_path = $value;
-				$images_MM[$n] = array();
-				// field attributes (mode-specific)
-				$images_MM[$n]['image_size']  = 'media';
-				$images_MM[$n]['image_path']  = $_image_path;
-				// field attributes (value)
-				$images_MM[$n]['originalname'] = basename($_image_path);
-				$images_MM[$n]['alt']   = '';
-				$images_MM[$n]['title'] = '';
-				$images_MM[$n]['desc']  = '';
-				$images_MM[$n]['cust1'] = '';
-				$images_MM[$n]['cust2'] = '';
-				$images_MM[$n]['urllink'] = '';
-				$_values[$n] = serialize($images_MM[$n]);
-				//echo "<pre>"; print_r($images_MM[$n]); echo "</pre>"; exit;
-				$n++;
-			}
-			$values = $_values;
-		}
-		
 		// Check for deleted image files or image files that cannot be thumbnailed,
 		// rebuilding thumbnails as needed, and then assigning checked values to a new array
 		$usable_values = array();
@@ -1541,11 +1514,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$orig_urlpath  = str_replace('\\','/', dirname($image_IF['image_path']));
 		}
 		else if ( $image_source == -2 ) {
-			// via media manager, these are relative paths up to the site root
-			$orig_urlpath = array();
-			foreach($images_MM as $n => $image_MM) {
-				$orig_urlpath[$n] = str_replace('\\','/', dirname($image_MM['image_path']));
-			}
+			// via media manager, image names are paths relative to the site root
+			$orig_urlpath = array();  // calculate later inside value loop
 		}
 		else if ( $image_source >= 1 ) {
 			// various Folder-mode(s)
@@ -1599,6 +1569,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				continue;
 			}
 			$i++;
+			
+			// Some type contain path together with the image name
+			if ( is_array($orig_urlpath) )
+			{
+				$orig_urlpath[$i] = str_replace('\\','/', dirname($image_name));
+				$image_name = basename($image_name);
+			}
 			
 			// Create thumbnails urls, note thumbnails have already been verified above
 			$wl = $field->parameters->get( 'w_l', 800 );
