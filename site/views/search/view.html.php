@@ -435,19 +435,13 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		
 		// *** Selector of FLEXIcontent Results Ordering
-		if($orderby_override = $params->get('orderby_override', 0)) {
-			$lists['orderby'] = flexicontent_html::orderby_selector( $params, $form_id, $autosubmit=1, $extra_order_types=array(), $sfx='' );
-		}
+		$lists['orderby'] = flexicontent_html::orderby_selector( $params, $form_id, $autosubmit=1, $extra_order_types=array(), $sfx='' );
 		
 		// *** Selector of FLEXIcontent Results Ordering (2nd level)
-		if($orderby_override = $params->get('orderby_override_2nd', 0)) {
-			$lists['orderby_2nd'] = flexicontent_html::orderby_selector( $params, $form_id, $autosubmit=1, $extra_order_types=array(), $sfx='_2nd' );
-		}
+		$lists['orderby_2nd'] = flexicontent_html::orderby_selector( $params, $form_id, $autosubmit=1, $extra_order_types=array(), $sfx='_2nd' );
 		
 		// *** Selector of Pagination Limit
-		if($limit_override = $params->get('limit_override', 1)) {
-			$lists['limit'] = flexicontent_html::limit_selector( $params, $form_id, $autosubmit=0 );
-		}
+		$lists['limit'] = flexicontent_html::limit_selector( $params, $form_id, $autosubmit=0 );
 		
 		
 		// *** Selector of non-FLEXIcontent Results Ordering
@@ -588,7 +582,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$state->set('keyword', $searchword);
 		$filter_word_like_any = $params->get('filter_word_like_any', 0);
 		
-		if(!$error)
+		if ($error) {
+			$results	= array();
+			$total		= 0;
+			$pageNav = '';
+		}
+		else
 		{
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 			

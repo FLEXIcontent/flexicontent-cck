@@ -365,21 +365,21 @@ $r = 0;
 			</span>
 		<?php endif; ?>
 		
-		<?php if ( @$this->lists['limit'] ) : ?>
+		<?php if ( $this->lists['limit'] ) : ?>
 			<span class="fc_limit_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_PAGINATION', 'FLEXI_PAGINATION_INFO', 1); ?>">
 				<span class="fc_limit_selector"><?php echo $this->lists['limit']; ?></span>
 			</span>
 		<?php endif; ?>
 		
-		<?php if ( @$this->lists['orderby'] ) : ?>
+		<?php if ( $this->lists['orderby'] ) : ?>
 			<span class="fc_orderby_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY', 'FLEXI_ORDERBY_INFO', 1); ?>">
-				<?php if ($orderby_selector && $orderby_selector_2nd) echo '<span class="label">1</span> '; ?><span class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></span>
+				<?php if ($this->lists['orderby_2nd']) echo '<span class="label">1</span> '; ?><span class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></span>
 			</span>
 		<?php endif; ?>
 		
-		<?php if ( @$this->lists['orderby_2nd'] ) : ?>
+		<?php if ( $this->lists['orderby_2nd'] ) : ?>
 			<span class="fc_orderby_box fc_2nd_level <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY_2ND', 'FLEXI_ORDERBY_INFO_2ND', 1); ?>">
-				<?php if ($orderby_selector && $orderby_selector_2nd) echo '<span class="label">2</span> '; ?><span class="fc_orderby_selector"><?php echo $this->lists['orderby_2nd']; ?></span>
+				<span class="label">2</span> <span class="fc_orderby_selector"><?php echo $this->lists['orderby_2nd']; ?></span>
 			</span>
 		<?php endif; ?>
 		
