@@ -330,7 +330,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 */
 	function _buildItemOrderBy(& $order='')
 	{
-		$request_var = $this->_params->get('orderby_override', 0) ? 'orderby' : '';
+		$request_var = $this->_params->get('orderby_override', 0) || $this->_params->get('orderby_override_2nd', 0) ? 'orderby' : '';
 		$default_order = $this->getState('filter_order');
 		$default_order_dir = $this->getState('filter_order_Dir');
 		

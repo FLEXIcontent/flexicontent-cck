@@ -415,7 +415,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		if (JRequest::getVar('option') == 'com_flexicontent') {
 
 			// Get defaults
-			$request_var = $orderby_override ? 'orderby' : '';
+			$request_var = $orderby_override || $orderby_override_2nd ? 'orderby' : '';
 			$default_order = JRequest::getCmd('filter_order', 'i.title', 'default');
 			$default_order_dir = JRequest::getCmd('filter_order_Dir', 'ASC', 'default');
 
