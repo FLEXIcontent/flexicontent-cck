@@ -21,8 +21,8 @@ if ($this->params->get('show_alpha', 1)) :
 endif;
 
 $limit_selector = flexicontent_html::limit_selector( $this->params, $formname='adminForm', $autosubmit=1 );
-$orderby_selector = flexicontent_html::ordery_selector( $this->params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='');
-$orderby_selector_2nd = flexicontent_html::ordery_selector( $this->params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='_2nd');
+$orderby_selector = flexicontent_html::orderby_selector( $this->params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='');
+$orderby_selector_2nd = flexicontent_html::orderby_selector( $this->params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='_2nd');
 $clayout_selector = flexicontent_html::layout_selector( $this->params, $formname='adminForm', $autosubmit=1, 'clayout');
 
 $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
@@ -57,13 +57,13 @@ $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 		
 		<?php if ($orderby_selector) : ?>
 			<span class="fc_orderby_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY', 'FLEXI_ORDERBY_INFO', 1, 1); ?>">
-				<span class="fc_orderby_selector"><?php echo $orderby_selector;?></span>
+				<?php if ($orderby_selector && $orderby_selector_2nd) echo '<span class="label">1</span> '; ?><span class="fc_orderby_selector"><?php echo $orderby_selector;?></span>
 			</span>
 		<?php endif; ?>
 		
 		<?php if ($orderby_selector_2nd) : ?>
-			<span class="fc_orderby_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY', 'FLEXI_ORDERBY_INFO', 1, 1); ?>">
-				<span class="fc_orderby_selector"><?php echo $orderby_selector_2nd;?></span>
+			<span class="fc_orderby_box fc_2nd_level <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY_2ND', 'FLEXI_ORDERBY_INFO_2ND', 1, 1); ?>">
+				<?php if ($orderby_selector && $orderby_selector_2nd) echo '<span class="label">2</span> '; ?><span class="fc_orderby_selector"><?php echo $orderby_selector_2nd;?></span>
 			</span>
 		<?php endif; ?>
 		
