@@ -435,10 +435,14 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		
 		// *** Selector of FLEXIcontent Results Ordering
-		if($orderby_override = $params->get('orderby_override', 1)) {
-			$lists['orderby'] = flexicontent_html::ordery_selector( $params, $form_id, $autosubmit=0 );
+		if($orderby_override = $params->get('orderby_override', 0)) {
+			$lists['orderby'] = flexicontent_html::orderby_selector( $params, $form_id, $autosubmit=1, $extra_order_types=array(), $sfx='' );
 		}
 		
+		// *** Selector of FLEXIcontent Results Ordering (2nd level)
+		if($orderby_override = $params->get('orderby_override_2nd', 0)) {
+			$lists['orderby_2nd'] = flexicontent_html::orderby_selector( $params, $form_id, $autosubmit=1, $extra_order_types=array(), $sfx='_2nd' );
+		}
 		
 		// *** Selector of Pagination Limit
 		if($limit_override = $params->get('limit_override', 1)) {

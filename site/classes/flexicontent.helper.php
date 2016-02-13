@@ -587,14 +587,15 @@ class flexicontent_html
 		}
 		return $outside_label.JHTML::_('select.genericlist', $limiting, 'limit', $attribs, 'value', 'text', $limit );
 	}
-
-	static function ordery_selector(&$params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='')
+	
+	
+	static function orderby_selector(&$params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='')
 	{
 		if ( !$params->get('orderby_override'.$sfx, 0) ) return '';
 
 		$app	= JFactory::getApplication();
 		//$orderby = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-		$orderby = $app->getUserStateFromRequest( 'orderby', 'orderby', ''/*$params->get('orderby'.$sfx)*/, 'string' );
+		$orderby = $app->getUserStateFromRequest( 'orderby'.$sfx, 'orderby'.$sfx, ''/*$params->get('orderby'.$sfx)*/, 'string' );
 
 		flexicontent_html::loadFramework('select2');
 		$classes  = "fc_field_filter use_select2_lib";
@@ -668,10 +669,17 @@ class flexicontent_html
 			$ordering[] = JHTML::_('select.option', $value,  $text);
 		}
 		
-		return JHTML::_('select.genericlist', $ordering, 'orderby', $attribs, 'value', 'text', $orderby );
+		return JHTML::_('select.genericlist', $ordering, 'orderby'.$sfx, $attribs, 'value', 'text', $orderby );
 	}
-
-
+	
+	
+	static function ordery_selector(&$params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='')
+	{
+		return //'Please search and replace (in your template files): flexicontent_html::ordery_selector with flexicontent_html::orderby_selector'.
+			flexicontent_html::orderby_selector($params, $formname, $autosubmit, $extra_order_types, $sfx);
+	}
+	
+	
 	static function layout_selector(&$params, $formname='adminForm', $autosubmit=1, $layout_type='clayout')
 	{
 		if ( !$params->get($layout_type.'_switcher') ) return '';

@@ -111,7 +111,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// some parameter shortcuts for SQL query
 		$show_noauth  = $params->get('show_noauth', 0);
-		$orderby_override = $params->get('orderby_override', 1);
+		$orderby_override = $params->get('orderby_override', 0);
+		$orderby_override_2nd = $params->get('orderby_override_2nd', 0);
 		
 		// Compatibility text search (LIKE %word%) for language without spaces
 		$filter_word_like_any = $params->get('filter_word_like_any', 0);
@@ -423,7 +424,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 				$params,
 				$order, $request_var, $_config_param='orderby',
 				$_item_tbl_alias = 'i', $_relcat_tbl_alias = 'rel',
-				$default_order, $default_order_dir, $sfx='', $support_2nd_lvl=false
+				$default_order, $default_order_dir, $sfx='', $support_2nd_lvl=$orderby_override_2nd
 			);
 			
 			// Create JOIN for ordering items by a custom field (Level 1)

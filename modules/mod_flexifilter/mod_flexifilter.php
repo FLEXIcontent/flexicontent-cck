@@ -157,7 +157,7 @@ if ( $show_mod )
 	}
 	
 	$limit_selector = flexicontent_html::limit_selector( $params, $form_name, $autosubmit );
-	$orderby_selector = flexicontent_html::ordery_selector( $params, $form_name, $autosubmit );
+	$orderby_selector = flexicontent_html::orderby_selector( $params, $form_name, $autosubmit );
 	
 	// 2. Get category, this is needed so that we get only the allowed filters of the category
 	// allowed filters are set in the category options (configuration)

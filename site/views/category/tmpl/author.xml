@@ -512,8 +512,8 @@
 			<field name="sep_fe_overrides" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level2" />
 			<field name="limit_override" type="radio" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="limit_override_label" type="radio" default="" label="FLEXI_NUM_PER_PAGE_LABEL" description="FLEXI_NUM_PER_PAGE_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -522,15 +522,15 @@
 				<option value="2">FLEXI_INSIDE</option>
 			</field>
 			
-			<field name="orderby_override" type="radio" default="" label="FLEXI_ORDER_1ST" description="FLEXI_ORDER_1ST_DESC" class="btn-group btn-group-yesno">
+			<field name="orderby_override" type="radio" default="" label="FLEXI_USE_ORDERBY_SELECTOR_1ST" description="FLEXI_USE_ORDERBY_SELECTOR_1ST_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="orderby_override_2nd" type="radio" default="" label="FLEXI_ORDER_2ND" description="FLEXI_ORDER_2ND_DESC" class="btn-group btn-group-yesno">
+			<field name="orderby_override_2nd" type="radio" default="" label="FLEXI_USE_ORDERBY_SELECTOR_2ND" description="FLEXI_USE_ORDERBY_SELECTOR_2ND_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="sep_fe_overrides_pagination_options" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" />
 			<field name="limit_options" type="text" default="" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" />

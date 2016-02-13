@@ -834,13 +834,13 @@
 				<option value="2">FLEXI_INSIDE</option>
 			</field>
 			
-			<field name="orderby_override" type="multilist" subtype="radio" default="1" label="FLEXI_ORDER_1ST" description="FLEXI_ORDER_1ST_DESC" toggle_related="0" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="orderby_override_display">FLEXI_NO</option>
-				<option value="1" show_list="orderby_override_display" hide_list="">FLEXI_YES</option>
+			<field name="orderby_override" type="multilist" subtype="radio" default="1" label="FLEXI_USE_ORDERBY_SELECTOR_1ST" description="FLEXI_USE_ORDERBY_SELECTOR_1ST_DESC" toggle_related="0" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="orderby_override_display">FLEXI_HIDE</option>
+				<option value="1" show_list="orderby_override_display" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="orderby_override_2nd" type="multilist" subtype="radio" default="0" label="FLEXI_ORDER_2ND" description="FLEXI_ORDER_2ND_DESC" toggle_related="0" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="orderby_override2_display">FLEXI_NO</option>
-				<option value="1" show_list="orderby_override2_display" hide_list="">FLEXI_YES</option>
+			<field name="orderby_override_2nd" type="multilist" subtype="radio" default="0" label="FLEXI_USE_ORDERBY_SELECTOR_2ND" description="FLEXI_USE_ORDERBY_SELECTOR_2ND_DESC" toggle_related="0" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="orderby_override2_display">FLEXI_HIDE</option>
+				<option value="1" show_list="orderby_override2_display" hide_list="">FLEXI_SHOW</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" />
 			<field name="limit_options" type="text" default="5,10,20,30,50,100,150,200" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" class="limit_override_display" />
