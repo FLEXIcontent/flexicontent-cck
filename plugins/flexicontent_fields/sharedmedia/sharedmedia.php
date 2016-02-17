@@ -386,7 +386,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 						response = jqXHR.responseText;
 					}
 					var errorText = typeof response !== "object" ? response : (mediaID && (apiType=="dailymotion" || apiType=="youtube")  ? response.error.message : response.error_message);
-					if (apiType=="youtube") errorText += " Reason: "  +response.error.errors[0].reason;
+					if (apiType=="youtube" && typeof response == "object") errorText += " Reason: "  +response.error.errors[0].reason;
 					msg_box.html("<span class=\"alert alert-warning fc-iblock\"><i>'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_SERVER_RESPONDED_WITH_ERROR', true).'</i><br/><br/>"+errorText+"</span>");
 				}
 			});
@@ -647,10 +647,10 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				</tr>
 				<tr>
 					<td style="text-align:right; padding:0 8px 4px 0;">
-						<button class="btn btn-primary btn-small sm_fetch_btn" id="'.$elementid_n.'_fetch_btn" name="'.$fieldname_n.'[fetch_btn]" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'" onclick="fetchData_'.$field->name.'(\''.$elementid_n.'\'); return false;"><i class="icon-loop"></i>'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'</button>
+						<a href="javascript:;" class="btn btn-primary btn-small sm_fetch_btn" id="'.$elementid_n.'_fetch_btn" name="'.$fieldname_n.'[fetch_btn]" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'" onclick="fetchData_'.$field->name.'(\''.$elementid_n.'\'); return false;"><i class="icon-loop"></i>'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'</a>
 					</td>
 					<td style="text-align:left; padding:0 8px 4px 0;">
-						'.($use_ingroup ? '<button class="btn btn-warning btn-small sm_clear_btn" id="'.$elementid_n.'_clear_btn" name="'.$fieldname_n.'[clear_btn]" value="'.JText::_('FLEXI_CLEAR').'" onclick="clearData_'.$field->name.'(\''.$elementid_n.'\'); return false;" ><i class="icon-cancel"></i>'.JText::_('FLEXI_CLEAR').'</button>' : '').'
+						'.($use_ingroup ? '<a href="javascript:;" class="btn btn-warning btn-small sm_clear_btn" id="'.$elementid_n.'_clear_btn" name="'.$fieldname_n.'[clear_btn]" value="'.JText::_('FLEXI_CLEAR').'" onclick="clearData_'.$field->name.'(\''.$elementid_n.'\'); return false;" ><i class="icon-cancel"></i>'.JText::_('FLEXI_CLEAR').'</a>' : '').'
 						<input type="hidden" class="sm_embed_url" id="'.$elementid_n.'_embed_url" name="'.$fieldname_n.'[embed_url]" value="'.htmlspecialchars($value['embed_url'], ENT_COMPAT, 'UTF-8').'" />
 					</td>
 				</tr>
