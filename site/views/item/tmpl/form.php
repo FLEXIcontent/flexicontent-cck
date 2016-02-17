@@ -256,7 +256,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 
 
 <?php
-$page_classes  = 'flexi_edit';
+$page_classes  = 'flexi_edit flexicontent';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 ?>
 <div id="flexicontent" class="<?php echo $page_classes; ?>" style="font-size:90%;<?php echo $this->params->get('form_container_css_fe'); ?>">
