@@ -62,6 +62,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		if ($view != FLEXI_ITEMVIEW || $option != 'com_flexicontent' || $print) return;
 		
 		// parameters shortcuts
+		$tooltip_class = 'hasTooltip';
 		$load_css 			= $field->parameters->get('load_css', 1);
 		$use_tooltip		= $field->parameters->get('use_tooltip', 1);
 		$use_title			= $field->parameters->get('use_title', 0);

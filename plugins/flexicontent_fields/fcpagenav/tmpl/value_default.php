@@ -1,7 +1,6 @@
 <?php
 $html = '<span class="fcpagenav btn-group">';
-$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-		
+
 // CATEGORY back link
 if ($use_category_link)
 {
@@ -12,7 +11,7 @@ if ($use_category_link)
 	if (!empty($rows[$item->id]->categoryslug)) {
 		$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($category_label, $category->title, 0) .'"' : '';
 		$html .= '
-			<a class="fcpagenav-return btn' . ($use_tooltip ? $tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . ' href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)).'?start='.$start .'">
+			<a class="fcpagenav-return btn' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . ' href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)).'?start='.$start .'">
 				<i class="icon-undo"></i>
 				' . htmlspecialchars($category->title, ENT_NOQUOTES, 'UTF-8') .'
 				' . ( $cat_image ? '
@@ -27,7 +26,7 @@ if ($field->prev)
 {
 	$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($tooltip_title_prev, $field->prevtitle, 0) .'"' : '';
 	$html .= '
-		<a class="fcpagenav-prev btn' . ($use_tooltip ? $tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . ' href="'. $field->prevurl .'">
+		<a class="fcpagenav-prev btn' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . ' href="'. $field->prevurl .'">
 			<i class="icon-backward-circle"></i>
 			' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8') ).'
 			' . ($field->prevThumb ? '
@@ -50,7 +49,7 @@ if ($field->next)
 {
 	$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($tooltip_title_next, $field->nexttitle, 0) .'"' : '';
 	$html .= '
-		<a class="fcpagenav-next btn' . ($use_tooltip ? $tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . ' href="'. $field->nexturl .'">
+		<a class="fcpagenav-next btn' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . ' href="'. $field->nexturl .'">
 			<i class="icon-forward-circle"></i>
 			' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8') ).'
 			' . ($field->nextThumb ? '

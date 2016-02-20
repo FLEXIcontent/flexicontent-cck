@@ -48,6 +48,11 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 		
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		
+		$tooltip_class = 'hasTooltip';
+		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
+		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		
 		
 		// ****************
@@ -133,17 +138,27 @@ class plgFlexicontent_fieldsAccount_via_submit extends JPlugin
 			if ($field->parameters->get( 'display_item_owner', 0 ) ) {
 				$owner = JFactory::getUser($item->created_by);
 			  $field->html[] = '
-			  <span class="fc_acc_via_mail_item_owner">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_ITEM_OWNER' ).'</span>
-			  <span class="badge fc_acc_via_mail_owner_name">'.$owner->name.'</span>
-			  <span class="fc_acc_via_mail_owner_uname">['.$owner->username.']</span>';
+			  <div class="'.$input_grp_class.' fc-xpended">
+				  <span class="'.$add_on_class.' fc_acc_via_mail_item_owner">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_ITEM_OWNER' ).'</span>
+				  <span class="'.$add_on_class.'" style="font-weight: bold; background: #f7f7f7; padding-left: 32px; padding-right: 32px;">
+				  	<span class="fc_acc_via_mail_owner_name">'.$owner->name.'</span>
+				  	<span class="fc_acc_via_mail_owner_uname">['.$owner->username.']</span>
+				  </span>
+				 </div>
+				 ';
 				//<span class="fc_acc_via_mail_owner_uid">: '.$owner->id.'</span>';
 			}
 		} else if ($user->id) {
 			if ($field->parameters->get( 'display_when_logged', 0 ) ) {
 			  $field->html[] = '
-			  <b class="fc_acc_via_mail_logged_as">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_LOGGED_AS' ).'</b>
-			  <span class="badge fc_acc_via_mail_owner_name">'.$user->name.'</span>
-			  <span class="fc_acc_via_mail_owner_uname">['.$user->username.']</span>';
+			  <div class="'.$input_grp_class.' fc-xpended">
+				  <span class="'.$add_on_class.' fc_acc_via_mail_logged_as">'.JText::_( 'FLEXI_ACCOUNT_V_SUBMIT_LOGGED_AS' ).'</span>
+				  <span class="'.$add_on_class.'" style="font-weight: bold; background: #f7f7f7; padding-left: 32px; padding-right: 32px;">
+			  		<span class="fc_acc_via_mail_owner_name">'.$user->name.'</span>
+			  		<span class="fc_acc_via_mail_owner_uname">['.$user->username.']</span>
+				  </span>
+				 </div>
+				';
 				//<span class="fc_acc_via_mail_owner_uid">: '.$user->id.'</span>';
 			}
 		} else {
