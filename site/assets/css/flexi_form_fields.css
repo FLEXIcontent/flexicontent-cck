@@ -16,7 +16,7 @@
 	background: transparent;
 	border: 0px solid lightgray;
 	margin: 0 4px 4px 0;
-	padding: 4px;
+	padding: 2px 4px 4px 4px;
 	box-sizing: border-box;
 	width: 100%;
 	display: inline-block;
@@ -197,19 +197,10 @@
 #flexicontent .fcfield-delvalue,
 #flexicontent .fcfield-button,
 #flexicontent .fcfield-button-add a {
-	float: none;
-	clear: none;
-	display: inline-block;
+	padding: 4px 22px;
+	font-size: 13px;
+	line-height: 18px;
 	cursor: pointer;
-	color: #777;
-	font-size: 11px;
-	line-height: 100%;
-	font-weight: bold;
-	border-radius: 4px;
-	border: 1px solid #d0d0d0;
-	vertical-align: top;
-	padding: 7px 12px;
-	margin: 0px 2px 0px 6px;
 	background-color: white;
 	background-image: -webkit-gradient(linear,left top,left bottom,from(white),to(#d0d0d0));
 	background-image: -webkit-linear-gradient(top,white,#d0d0d0);
@@ -217,6 +208,26 @@
 	background-image: -ms-linear-gradient(top,white,#d0d0d0);
 	background-image: -o-linear-gradient(top,white,#d0d0d0);
 	background-image: linear-gradient(to bottom,white,#d0d0d0);
+}
+#flexicontent .fcfield-drag-handle:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-list-add:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-list-del:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-placement-h:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-placement-v:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-addvalue:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-insertvalue:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-delvalue:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-button:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
+	float: none;
+	clear: none;
+	display: inline-block;
+	color: #777;
+	font-weight: bold;
+	border-radius: 4px;
+	border: 1px solid #d0d0d0;
+	vertical-align: top;
+	margin: 0px 2px 0px 6px;
 }
 #flexicontent .fcfield-drag-handle:hover,
 #flexicontent .fcfield-list-add:hover,
@@ -384,9 +395,6 @@
 	font-style: normal;
 	content: "z";
 }
-#flexicontent span.fcfield-drag-handle:before {
-	color: black;
-}
 div.empty_image {
 	display: block;
 	background: #F9F9F9 url(../images/image_add.png) no-repeat 50% 50%;
@@ -404,12 +412,6 @@ div.empty_image {
 	border: 1px solid silver;
 	float: left;
 }
-#flexicontent .fc_filedata_title {
-	font-size: 90%;
-	display: inline-block;
-	margin: 0;
-	padding: 2px 0px 0px 12px;
-}
 #flexicontent .fc_filedata_txt.invalid {
 	color: red;
 	font-weight: normal;
@@ -424,7 +426,7 @@ div.empty_image {
 	border-radius: 0;
 	min-height: 1.2em;
 	padding: 4px 8px;
-	margin: 2px 0;
+	margin: 2px 0 4px;
 	min-width: 220px;
 	width: 100%;
 	background: #f0f0f0 none repeat scroll 0 0;
