@@ -83,7 +83,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="title_cut_text" type="text" class="input-xlarge" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
+			<field name="title_cut_text" type="text" class="input-xxlarge" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 			
 			<field name="sep_cat_image" type="separator" default="FLEXI_IMAGE" description="..." level="level3" />
 			<field name="show_description_image" type="radio" default="" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC" class="btn-group btn-group-yesno">
@@ -107,8 +107,8 @@
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="cat_image_width" type="text" class="input-xlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="cat_image_height" type="text" class="input-xlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="cat_image_width" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="cat_image_height" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
 			<field name="sep_cat_descr" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" />
 			<field name="show_description" type="radio" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
@@ -192,8 +192,8 @@
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="subcat_image_width" type="text" class="input-xlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="subcat_image_height" type="text" class="input-xlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="subcat_image_width" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="subcat_image_height" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
 			<field name="sep_subcats_descr" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" />
 			<field name="show_description_subcat" type="radio" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
@@ -201,11 +201,11 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="description_cut_text_subcat" type="text" class="input-xlarge" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
+			<field name="description_cut_text_subcat" type="text" class="input-xxlarge" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
 			
 			<field name="sep_subcats_enclosers" type="separator" default="FLEXI_SUBCATEGORY_ENCLOSING" level="level2" />
-			<field name="subcat_pretext" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
-			<field name="subcat_posttext" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
+			<field name="subcat_pretext" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
+			<field name="subcat_posttext" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
 			<field name="subcat_separatorf" type="multilist" subtype="list" default="" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SPACE</option>
@@ -215,8 +215,8 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="subcat_opentag" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
-			<field name="subcat_closetag" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
+			<field name="subcat_opentag" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
+			<field name="subcat_closetag" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
 			
 		</fieldset>
 		
@@ -288,8 +288,8 @@
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>		
-			<field name="peercat_image_width" type="text" class="input-xlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="peercat_image_height" type="text" class="input-xlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="peercat_image_width" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="peercat_image_height" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
 			<field name="sep_peercats_descr" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" />
 			<field name="show_description_peercat" type="radio" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
@@ -297,11 +297,11 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="description_cut_text_peercat" type="text" class="input-xlarge" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
+			<field name="description_cut_text_peercat" type="text" class="input-xxlarge" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
 			
 			<field name="sep_peercats_enclosers" type="separator" default="FLEXI_PEERCATEGORY_ENCLOSING" level="level2" />
-			<field name="peercat_pretext" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
-			<field name="peercat_posttext" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
+			<field name="peercat_pretext" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
+			<field name="peercat_posttext" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
 			<field name="peercat_separatorf" type="multilist" subtype="list" default="" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SPACE</option>
@@ -311,8 +311,8 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="peercat_opentag" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
-			<field name="peercat_closetag" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
+			<field name="peercat_opentag" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
+			<field name="peercat_closetag" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
 			
 		</fieldset>
 		
@@ -481,7 +481,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="limit" type="text" class="input-xlarge" size="4" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
+			<field name="limit" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
 			<field name="show_pagination" type="radio" default="" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
@@ -518,7 +518,7 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="sep_fe_overrides_pagination_options" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" />
-			<field name="limit_options" type="text" class="input-xlarge" default="" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" />
+			<field name="limit_options" type="text" class="input-xxlarge" default="" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" />
 			
 			<field name="orderby_options" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_MOST_COMMENTED,FLEXI_ORDER_BEST_RATED,FLEXI_ORDER_CONFIGURED_ORDER"
@@ -562,8 +562,8 @@
 			<field name="mu_addtext_acclvl" type="fccheckbox" default="" display_useglobal="0" label="FLEXI_MU_ADD_TXT_ACC" description="FLEXI_MU_ADD_TXT_ACC_DESC"
 				checkoptions="FLEXI_MU_NO_ACC,FLEXI_MU_FREE_ACC,FLEXI_MU_NEEDED_ACCLVL,FLEXI_MU_OBTAINED_ACCLVL" checkvals="no_acc,free_acc,needed_acc,obtained_acc" defaultvals="no_acc,free_acc,needed_acc,obtained_acc" />
 			
-			<field name="mu_no_acc_text" type="text" class="input-xlarge" size="60" default="" label="FLEXI_MU_NO_ACC_TEXT" description="FLEXI_MU_NO_ACC_TEXT_DESC" />
-			<field name="mu_free_acc_text" type="text" class="input-xlarge" size="60" default="" label="FLEXI_MU_FREE_ACC_TEXT" description="FLEXI_MU_FREE_ACC_TEXT_DESC" />
+			<field name="mu_no_acc_text" type="text" class="input-xxlarge" size="60" default="" label="FLEXI_MU_NO_ACC_TEXT" description="FLEXI_MU_NO_ACC_TEXT_DESC" />
+			<field name="mu_free_acc_text" type="text" class="input-xxlarge" size="60" default="" label="FLEXI_MU_FREE_ACC_TEXT" description="FLEXI_MU_FREE_ACC_TEXT_DESC" />
 			
 			<field name="sep_mu_radded" type="separator" default="FLEXI_MU_RADDED" description="FLEXI_MU_RADDED_DESC" level="level2" />
 			<field name="mu_addcss_radded" type="radio" default="" label="FLEXI_MU_ADD_MARKUP" description="FLEXI_MU_ADD_MARKUP_DESC" class="btn-group btn-group-yesno">
@@ -577,7 +577,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="sep_mu_radded_timeframes" type="separator" default="FLEXI_MU_RADDED_TIMEFRAMES_CONF" description="FLEXI_MU_RADDED_TIMEFRAMES_CONF_DESC" level="level3" />
-			<field name="mu_ra_timeframe_intervals" type="text" class="input-xlarge" size="60" default="" label="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS" description="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS_DESC" />
+			<field name="mu_ra_timeframe_intervals" type="text" class="input-xxlarge" size="60" default="" label="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS" description="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS_DESC" />
 			<field name="mu_ra_timeframe_names" type="textarea" rows="4" cols="60" default="" label="FLEXI_MU_RADDED_TIMEFRAME_NAMES" description="FLEXI_MU_RADDED_TIMEFRAME_NAMES_DESC" />
 			
 			<field name="sep_mu_rupdated" type="separator" default="FLEXI_MU_RUPDATED" description="FLEXI_MU_RUPDATED_DESC" level="level2" />
@@ -592,7 +592,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="sep_mu_rupdated_timeframes" type="separator" default="FLEXI_MU_RUPDATED_TIMEFRAMES_CONF" description="FLEXI_MU_RUPDATED_TIMEFRAMES_CONF_DESC" level="level3" />
-			<field name="mu_ru_timeframe_intervals" type="text" class="input-xlarge" size="60" default="" label="FLEXI_MU_RUPDATED_TIMEFRAME_INTERVALS" description="FLEXI_MU_RUPDATED_TIMEFRAME_INTERVALS_DESC" />
+			<field name="mu_ru_timeframe_intervals" type="text" class="input-xxlarge" size="60" default="" label="FLEXI_MU_RUPDATED_TIMEFRAME_INTERVALS" description="FLEXI_MU_RUPDATED_TIMEFRAME_INTERVALS_DESC" />
 			<field name="mu_ru_timeframe_names" type="textarea" rows="4" cols="60" default="" label="FLEXI_MU_RUPDATED_TIMEFRAME_NAMES" description="FLEXI_MU_RUPDATED_TIMEFRAME_NAMES_DESC" />
 			
 		</fieldset>
@@ -627,7 +627,7 @@
 				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
 				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
-			<field name="flexi_button_class_go_custom" type="text" class="input-xlarge" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" />
+			<field name="flexi_button_class_go_custom" type="text" class="input-xxlarge" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" />
 			<field name="flexi_button_class_reset" type="multilist" subtype="list" default="" label="FLEXI_BUTTON_CLASS_RESET" description="FLEXI_BUTTON_CLASS_RESET_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
@@ -639,7 +639,7 @@
 				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
 				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
-			<field name="flexi_button_class_reset_custom" type="text" class="input-xlarge" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" />
+			<field name="flexi_button_class_reset_custom" type="text" class="input-xxlarge" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" />
 			<field name="filter_autosubmit" type="radio" default="" label="FLEXI_FILTER_FORM_AUTO_SUBMIT" description="FLEXI_FILTER_FORM_AUTO_SUBMIT_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -660,10 +660,10 @@
 			</field>
 			
 			<field name="sep_filter_enclosers" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" />
-			<field name="filter_pretext" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
-			<field name="filter_posttext" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
-			<field name="filter_opentag" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
-			<field name="filter_closetag" type="text" class="input-xlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
+			<field name="filter_pretext" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
+			<field name="filter_posttext" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
+			<field name="filter_opentag" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
+			<field name="filter_closetag" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
 			<field name="filter_separatorf" type="multilist" subtype="list" default="" label="FLEXI_RECORD_SEPARATOR_IGNORED" description="FLEXI_RECORD_SEPARATOR_IGNORED_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SPACE</option>
@@ -738,8 +738,8 @@
 			<field name="show_alpha" type="alphaindex" default="" use_global="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
 			<field name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="4" cols="30" />
 			<field name="alphagrpcssclasses" type="textarea" default="letters!!numbers" label="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES" description="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES_DESC" rows="2" cols="30" />
-			<field name="alphacharseparator" type="text" class="input-xlarge" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR" description="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR_DESC" />
-			<field name="alphaaliases" type="text" class="input-xlarge" default="" label="FLEXI_CUSTOM_ALPHA_ALIASES" description="FLEXI_CUSTOM_ALPHA_ALIASES_DESC" />
+			<field name="alphacharseparator" type="text" class="input-xxlarge" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR" description="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR_DESC" />
+			<field name="alphaaliases" type="text" class="input-xxlarge" default="" label="FLEXI_CUSTOM_ALPHA_ALIASES" description="FLEXI_CUSTOM_ALPHA_ALIASES_DESC" />
 			<field name="alphaskipempty" type="radio" default="" label="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY" description="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -750,13 +750,13 @@
 		
 		<fieldset name="cat_rss_feeds" label="FLEXI_PARAMETERS_CAT_RSS_FEEDS" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="feed_limit" type="text" class="input-xlarge" size="4" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" />
+			<field name="feed_limit" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" />
 			<field name="feed_summary" type="radio" default="" label="FLEXI_SHOW_FEED" description="FLEXI_SHOW_FEED_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_INTRO_TEXT</option>
 				<option value="1">FLEXI_FULL_TEXT</option>
 			</field>
-			<field name="feed_summary_cut" type="text" class="input-xlarge" size="4" default="" label="FLEXI_FEED_SUMMARY_MAXLEN" description="FLEXI_FEED_SUMMARY_MAXLEN_DESC" />
+			<field name="feed_summary_cut" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_FEED_SUMMARY_MAXLEN" description="FLEXI_FEED_SUMMARY_MAXLEN_DESC" />
 			<field name="feed_show_readmore" type="radio" default="" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
@@ -781,8 +781,8 @@
 				<option value="m">FLEXI_MEDIUM</option>
 				<option value="l">FLEXI_LARGE</option>
 			</field>
-			<field name="feed_image_width" type="text" class="input-xlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="feed_image_height" type="text" class="input-xlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="feed_image_width" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="feed_image_height" type="text" class="input-xxlarge" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			<field name="feed_image_method" type="radio" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SCALE</option>
