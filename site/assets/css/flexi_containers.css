@@ -295,3 +295,50 @@ body .fc-mssg.fc-noborder {
 .flexicontent .filterbuttons_head .nowrap_box .label {
 	vertical-align: middle;
 }
+.flexicontent .fc-xpended {
+	margin-right: 12px;
+}
+.flexicontent .fc-xpended-btns {
+	margin: 0px;
+	float: none !important;
+}
+.flexicontent .fc-xpended-row {
+	box-sizing: border-box;
+	clear: both;
+	float: left;
+	margin-right: 0;
+	margin-top: 1px;
+	width: 100%;
+}
+.flexicontent .fc-xpended .add-on:first-child {
+	margin-bottom: 9px;
+}
+.flexicontent .fc-xpended-row .add-on:first-child {
+	min-width: 128px;
+	margin-left: 0px;
+}
+.flexicontent [class*="fc-xpended"] > select,
+.flexicontent [class*="fc-xpended"] > .use_select2_lib {
+	border-radius: 6px;
+	margin-top: 0;
+	vertical-align: top;
+}
+.flexicontent [class*="fc-xpended"] > select:not(:first-child),
+.flexicontent [class*="fc-xpended"] > .use_select2_lib:not(:first-child) a {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	margin-left: 0px;
+}
+.flexicontent [class*="fc-xpended"] > select:not(:last-child),
+.flexicontent [class*="fc-xpended"] > .use_select2_lib:nth-last-child(n+3) a {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	margin-right: 0px;
+}
+.flexicontent .add-on.fc-lbl {
+	background: #555 none repeat scroll 0 0;
+	color: white;
+	font-family: monospace;
+	text-shadow: unset;
+	border: 1px solid gray;
+}

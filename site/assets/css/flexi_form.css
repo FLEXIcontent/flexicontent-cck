@@ -2,7 +2,7 @@
 	display: inline-block;
 	margin: 1px 2px 1px 3px;
 }
-.flexicontent select {
+.flexicontent *:not(.input-append):not(.input-prepend) > select {
 	font-size: 12px;
 	display: inline-block;
 	margin: 1px 2px 1px 3px;

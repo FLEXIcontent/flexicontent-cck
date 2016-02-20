@@ -2,7 +2,7 @@
 	display: inline-block;
 	margin: 1px 2px 1px 3px;
 }
-.flexicontent select {
+.flexicontent *:not(.input-append):not(.input-prepend) > select {
 	font-size: 12px;
 	display: inline-block;
 	margin: 1px 2px 1px 3px;
@@ -769,6 +769,64 @@ body .fc-mssg.fc-noborder {
 .flexicontent .filterbuttons_head .nowrap_box .label {
 	vertical-align: middle;
 }
+.flexicontent .fc-xpended {
+	margin-right: 12px;
+}
+.flexicontent .fc-xpended-btns {
+	margin: 0px;
+	float: none !important;
+}
+.flexicontent .fc-xpended-row {
+	box-sizing: border-box;
+	clear: both;
+	float: left;
+	margin-right: 0;
+	margin-top: 1px;
+	width: 100%;
+}
+.flexicontent .fc-xpended .add-on:first-child {
+	margin-bottom: 9px;
+}
+.flexicontent .fc-xpended-row .add-on:first-child {
+	min-width: 128px;
+	margin-left: 0px;
+}
+.flexicontent [class*="fc-xpended"] > select,
+.flexicontent [class*="fc-xpended"] > .use_select2_lib {
+	border-radius: 6px;
+	margin-top: 0;
+	vertical-align: top;
+}
+.flexicontent [class*="fc-xpended"] > select:not(:first-child),
+.flexicontent [class*="fc-xpended"] > .use_select2_lib:not(:first-child) a {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	margin-left: 0px;
+}
+.flexicontent [class*="fc-xpended"] > select:not(:last-child),
+.flexicontent [class*="fc-xpended"] > .use_select2_lib:nth-last-child(n+3) a {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	margin-right: 0px;
+}
+.flexicontent .add-on.fc-lbl {
+	background: #555 none repeat scroll 0 0;
+	color: white;
+	font-family: monospace;
+	text-shadow: unset;
+	border: 1px solid gray;
+}
+input.fc-inherited-value + label {
+	font-weight: bold !important;
+	text-shadow: 0 0 6px !important;
+}
+div.fc-inherited-value {
+	float: left;
+	font-weight: bold !important;
+	text-shadow: 0 0 6px;
+	margin: 4px;
+	font-style: italic;
+}
 .ui-dialog.fc-fixed-dialog {
 	position: fixed;
 	top: 40px !important;
@@ -1521,6 +1579,7 @@ table.adminform td #search {
 		width: 100% !important;
 		padding: 0% !important;
 		margin: 0% !important;
+		clear: both !important;
 	}
 	#flexicontent .padded_wrap_box {
 		margin-top: 48px !important;
@@ -1539,6 +1598,12 @@ table.adminform td #search {
 	padding-left: 2%;
 	padding-right: 2%;
 	margin: 0;
+}
+#flexicontent .container_fcfield input.input-xxlarge {
+	width: 100%;
+}
+#flexicontent .container_fcfield input {
+	max-width: 100%;
 }
 .flexi_params table.admintable,
 .flexi_params table.admintable td {

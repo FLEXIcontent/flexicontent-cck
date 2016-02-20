@@ -39,8 +39,9 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	 */
 	var	$_name = 'separator';
 		
-	function add_css_js() {
-		$css="
+	function add_css_js()
+	{
+		$css = "
 		div.pane-sliders ul.adminformlist li select { margin-bottom: 0px;}
 		div.pane-sliders ul.adminformlist li fieldset  { margin: 0; padding: 0; }
 		
@@ -49,12 +50,36 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		}
 		
 		/*div.controls input, div.controls textarea { min-width: 56%; }*/
+
+		div.control-group div.control-label,
+		div.current ul.config-option-list li {
+			margin: 0 !important;
+			padding: 0 !important;
+			max-width: 160px;
+			min-width: 120px;
+			width: 15%;
+			border:0;
+		}
 		
 		div.control-group div.control-label label.hasTooltip,
 		div.current ul.config-option-list li label.hasTooltip {
-			display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:220px; font-weight: normal; font-size: 12px;
-			background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
-		}
+			display:inline-block;
+			
+			border-bottom: 1px solid #E9E9E9;
+			border-right: 1px solid #E9E9E9;
+			color: white;
+			border-radius: 3px;
+			
+			margin: 2px 4% 3px 0 !important;
+			padding: 8px !important;
+			background-color: #999;
+			text-align: right;
+			white-space: normal;
+			font-weight: normal; 
+			font-size: 12px;
+			width: 96%;
+			box-sizing: border-box;
+    }
 		
 		/*div.current fieldset.radio label {
 			min-width:10px!important; padding: 0px 16px 0px 0px!important; margin: 2px 0px 0px 1px!important;
@@ -74,13 +99,14 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		";
 		
 		$document = JFactory::getDocument();
-		$document->addStyleDeclaration($css);
 		
 		if (FLEXI_J30GE) $jinput = JFactory::getApplication()->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
 		$controller = $jinput->get('controller', '', 'cmd');
 		$component  = $jinput->get('component', '', 'cmd');
+		
+		if ($option!='com_flexicontent') $document->addStyleDeclaration($css);
 		
 		// NOTE: this is imported by main Frontend/Backend CSS file
 		// so import these only if it is not a flexicontent view

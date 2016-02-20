@@ -4,6 +4,17 @@
  * auto sized / positioned jquery dialogs
  ****************************************/
  
+input.fc-inherited-value + label {
+	font-weight: bold !important; /*font-style: italic !important; text-decoration: underline !important;*/
+	text-shadow: 0 0 6px !important;
+}
+div.fc-inherited-value {
+	float: left;
+	font-weight: bold !important; /*font-style: italic !important; text-decoration: underline !important;*/
+	text-shadow: 0 0 6px;
+	margin: 4px;
+	font-style: italic;
+}
 .ui-dialog.fc-fixed-dialog {
 	position: fixed;
 	top: 40px !important;
@@ -904,6 +915,7 @@ table.adminform td #search {
 		width: 100% !important;
 		padding: 0% !important;
 		margin: 0% !important;
+		clear: both !important;
 	}
 	#flexicontent .padded_wrap_box {
 		margin-top: 48px !important;
@@ -923,7 +935,12 @@ table.adminform td #search {
 	padding-right: 2%;
 	margin: 0;
 }
-
+#flexicontent .container_fcfield input.input-xxlarge {
+	width: 100%;
+}
+#flexicontent .container_fcfield input {
+	max-width: 100%;
+}
 
 .flexi_params table.admintable,
 .flexi_params table.admintable td {
