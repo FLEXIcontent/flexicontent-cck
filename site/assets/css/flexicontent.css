@@ -2595,12 +2595,33 @@ div .fc_categories.fc_ismain_cat {
 div .fc_categories:not(.fc_ismain_cat) {
 	font-weight: normal;
 }
-div .fc_field_unsused_val {
+div .fc_field_unsused_val,
+div .fc_field_unsused_val .fc_ifield_val_txt {
+	font-style: italic;
 	text-decoration: line-through;
+}
+div .fc_field_unsused_val .fc_ifield_val_txt {
+	opacity: 0.7;
 }
 div .fc_field_unsused_val img {
 	opacity: 0.4;
 	filter: alpha(opacity=40);
+}
+.fc_ifield_val_box {
+	float: left;
+	display: inline-block;
+	margin: 0 12px 0 0;
+}
+.fc_ifield_val_box .fc_ifield_val_img,
+.fc_ifield_val_box .fc_ifield_val_txt {
+	float: left;
+	display: inline-block;
+	clear: both;
+	padding: 0px;
+	margin: 2px;
+}
+.fc_ifield_val_box .alert.fc_ifield_val_txt {
+	padding: 2px 6px;
 }
 div.fc-fieldgrp-value-box {
 	border-radius: 4px;
