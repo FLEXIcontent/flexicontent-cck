@@ -205,8 +205,8 @@ class JFormFieldMultiList extends JFormField
 			$preview_img = $preview_img ? $preview_img : '';
 			$tip_class = @$attributes['tip_class'];
 			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-			$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin-left:12px; margin-right:0px;" ' );
-			$previewimage = $preview_img ? JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' align="left" style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
+			$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
+			$previewimage = $preview_img ? JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' align="left" style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text = '<span class="'.$tip_class.'" style="float:left;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
 		}
 		
@@ -218,8 +218,8 @@ class JFormFieldMultiList extends JFormField
 			$preview_img = $preview_img ? $preview_img : '';
 			$tip_class = @$attributes['tip_class2'];
 			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-			$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin-left:12px; margin-right:0px;" ' );
-			$previewimage = $preview_img ? JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' align="left" style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
+			$hintmage = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
+			$previewimage = $preview_img ? JHTML::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' align="left" style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text2 = '<span class="'.$tip_class.'" style="float:left;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
 		}
 		

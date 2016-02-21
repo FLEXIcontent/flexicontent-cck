@@ -209,16 +209,16 @@
 	background-image: -o-linear-gradient(top,white,#d0d0d0);
 	background-image: linear-gradient(to bottom,white,#d0d0d0);
 }
-#flexicontent .fcfield-drag-handle:not(.add-on):(.input-group-addon),
-#flexicontent .fcfield-list-add:not(.add-on):(.input-group-addon),
-#flexicontent .fcfield-list-del:not(.add-on):(.input-group-addon),
-#flexicontent .fcfield-placement-h:not(.add-on):(.input-group-addon),
-#flexicontent .fcfield-placement-v:not(.add-on):(.input-group-addon),
-#flexicontent .fcfield-addvalue:not(.add-on):(.input-group-addon),
-#flexicontent .fcfield-insertvalue:not(.add-on):(.input-group-addon),
-#flexicontent .fcfield-delvalue:not(.add-on):(.input-group-addon),
-#flexicontent .fcfield-butto:not(.add-on):(.input-group-addon),
-#flexicontent .fcfield-button-add:not(.add-on):(.input-group-addon) a {
+#flexicontent .fcfield-drag-handle:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-list-add:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-list-del:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-placement-h:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-placement-v:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-addvalue:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-insertvalue:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-delvalue:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-button:not(.add-on):not(.input-group-addon),
+#flexicontent .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
 	float: none;
 	clear: none;
 	display: inline-block;
