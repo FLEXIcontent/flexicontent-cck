@@ -54,6 +54,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
+		$input_pp_class  = $cparams->get('bootstrap_ver', 2)==2  ?  'input-prepend' : 'input-group';
 		
 		
 		// ****************
@@ -280,8 +281,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$value['link'] = !empty($value['link']) ? $value['link'] : $default_link;
 			$value['link'] = htmlspecialchars( JStringPunycode::urlToUTF8($value['link']), ENT_COMPAT, 'UTF-8' );
 			$link = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="'.$add_on_class.' urllink-lbl" for="'.$elementid_n.'_link">'.JText::_( 'FLEXI_FIELD_URL' ).'</label>
+				<div class="'.$input_pp_class.' fc-xpended">
+					<label class="'.$add_on_class.' fc-lbl urllink-lbl" for="'.$elementid_n.'_link">'.JText::_( 'FLEXI_FIELD_URL' ).'</label>
 					<input class="urllink fcfield_textval '.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'_link" type="text" '.$attribs.' value="'.$value['link'].'" />
 				</div>';
 			
@@ -290,8 +291,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				$value['title'] = !empty($value['title']) ? $value['title'] : $default_title;
 				$value['title'] = htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8');
 				$title = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="'.$add_on_class.' urltitle-lbl" for="'.$elementid_n.'_title">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).'</label>
+				<div class="'.$input_pp_class.' fc-xpended">
+					<label class="'.$add_on_class.' fc-lbl urltitle-lbl" for="'.$elementid_n.'_title">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).'</label>
 					<input class="urltitle fcfield_textval" name="'.$fieldname_n.'[title]" id="'.$elementid_n.'_title" type="text" size="'.$size.'" value="'.$value['title'].'" />
 				</div>';
 			}
@@ -300,8 +301,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			if ($usehits) {
 				$hits = (int) @ $value['hits'];
 				$hits = '
-					<div class="'.$input_grp_class.' fc-xpended-row">
-						<label class="'.$add_on_class.' urlhits-lbl" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_FIELD_HITS' ).'</label>
+					<div class="'.$input_grp_class.' fc-xpended">
+						<label class="'.$add_on_class.' fc-lbl urlhits-lbl" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_FIELD_HITS' ).'</label>
 						<span class="'.$add_on_class.' hitcount">'.$hits.'</span>
 					</div>
 					<input class="urlhits" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="hidden" value="'.$hits.'" />';
@@ -313,7 +314,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 					'.($use_ingroup ? '' : $remove_button).'
 					'.($use_ingroup || !$add_position ? '' : $add_here).'
 				</div>
-				'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
 				'.$link.'
 				'.$title.'
 				'.$hits.'

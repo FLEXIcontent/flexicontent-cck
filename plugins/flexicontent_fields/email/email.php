@@ -54,6 +54,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
+		$input_pp_class  = $cparams->get('bootstrap_ver', 2)==2  ?  'input-prepend' : 'input-group';
 		
 		
 		// ****************
@@ -277,8 +278,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$value['addr'] = !empty($value['addr']) ? $value['addr'] : '';
 			$value['addr'] = htmlspecialchars( JStringPunycode::emailToUTF8($value['addr']), ENT_COMPAT, 'UTF-8' );
 			$addr = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="'.$add_on_class.' emailaddr-lbl" for="'.$elementid_n.'_addr">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
+				<div class="'.$input_pp_class.' fc-xpended">
+					<label class="'.$add_on_class.' fc-lbl emailaddr-lbl" for="'.$elementid_n.'_addr">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
 					<input class="emailaddr fcfield_textval '.$classes.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'_addr" type="text" value="'.$value['addr'].'" '.$attribs.' />
 				</div>';
 			
@@ -287,8 +288,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 				$value['text'] = !empty($value['text']) ? $value['text'] : $default_title;
 				$value['text'] = isset($value['text']) ? htmlspecialchars($value['text'], ENT_COMPAT, 'UTF-8') : '';
 				$text = '
-				<div class="'.$input_grp_class.' fc-xpended-row">
-					<label class="'.$add_on_class.' emailtext-lbl" for="'.$elementid_n.'_text">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).'</label>
+				<div class="'.$input_pp_class.' fc-xpended">
+					<label class="'.$add_on_class.' fc-lbl emailtext-lbl" for="'.$elementid_n.'_text">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).'</label>
 					<input class="emailtext fcfield_textval" name="'.$fieldname_n.'[text]"  id="'.$elementid_n.'_text" type="text" size="'.$size.'" value="'.$value['text'].'" />
 				</div>';
 			}
@@ -299,7 +300,6 @@ class plgFlexicontent_fieldsEmail extends FCField
 					'.($use_ingroup ? '' : $remove_button).'
 					'.($use_ingroup || !$add_position ? '' : $add_here).'
 				</div>
-				'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
 				'.$addr.'
 				'.$text.'
 				';

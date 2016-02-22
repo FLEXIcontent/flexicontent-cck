@@ -372,14 +372,14 @@ body .fc-mssg.fc-noborder {
  * Xpended form elements
  ***********************/
  
-.flexicontent .fc-xpended {
+#flexicontent .fc-xpended {
 	margin-right: 12px;
 }
-.flexicontent .fc-xpended-btns {
-	margin: 0px;
+#flexicontent .fc-xpended-btns {
+	margin: 0 0 2px 0 !important;
 	float: none !important;
 }
-.flexicontent .fc-xpended-row {
+#flexicontent .fc-xpended-row {
 	box-sizing: border-box;
 	clear: both;
 	float: left;
@@ -389,11 +389,15 @@ body .fc-mssg.fc-noborder {
 }
 
 .flexicontent .fc-xpended .add-on:first-child {
-	margin-bottom: 9px;
+	margin: 0 0 9px 0;
+	padding-left: 4px;
+	padding-right: 4px;
 }
 .flexicontent .fc-xpended-row .add-on:first-child {
-	min-width: 128px;
-	margin-left: 0px;
+	min-width: 150px;
+	margin: 0 0 3px 0;
+	padding-left: 4px;
+	padding-right: 4px;
 }
 
 
@@ -425,5 +429,6 @@ body .fc-mssg.fc-noborder {
 	font-family: monospace;
 	text-shadow: unset;
 	border: 1px solid gray;
+	font-size: 12px;
 }
 
