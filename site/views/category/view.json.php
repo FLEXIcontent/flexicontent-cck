@@ -38,17 +38,26 @@ class FlexicontentViewCategory extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
+		// Initialize framework variables
 		$user     = JFactory::getUser();
 		$aid      = JAccess::getAuthorisedViewLevels($user->id);
 		
 		// Get model
 		$model  = $this->getModel();
 		
-		// Get category and set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
+		
+		// Get the category, loading category data and doing parameters merging
 		$category = $this->get('Category');
+		
+		// Get category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
 		$params   = $category->parameters;
 		
-		// Get various data from the model
+		
+		
+		// ***********************
+		// Get data from the model
+		// ***********************
+		
 		$items   = $this->get('Data');
 		
 		// Get field values

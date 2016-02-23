@@ -476,7 +476,9 @@ class FlexicontentViewItem  extends JViewLegacy
 			JRequest::setVar('typeid', (int)$menu->query['typeid']);  // This also forces zero if value not set
 		}
 		
-		// Verify type is exists
+		// NOTE about -new_typeid-, this is it used only for CREATING new item (ignored for EDIT existing item)
+		
+		// Verify type ID is exists
 		$new_typeid = JRequest::getVar('typeid', 0, '', 'int');
 		$type_data = $model->getTypeslist(array($new_typeid), $check_perms = false, $_published=true);
 		if ( $new_typeid && empty($type_data) ) 
@@ -489,7 +491,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		if ( !$new_typeid )
 		{
 			$types = $model->getTypeslist($type_ids_arr = false, $check_perms = true, $_published=true);
-			if ( $types && count($types)==1 ) $new_typeid = $types[0]->id;
+			if ( $types && count($types)==1 ) {
+				$single_type = reset($types);
+				$new_typeid = $single_type->id;
+			}
 			JRequest::setVar('typeid', $new_typeid);
 			$canCreateType = true;
 		}

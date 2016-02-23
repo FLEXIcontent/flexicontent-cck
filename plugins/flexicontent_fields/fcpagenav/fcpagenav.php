@@ -224,7 +224,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		foreach($items as $item_id => $item) {
 			if (!empty($img_field_name)) :
 				//$src = str_replace(JURI::root(), '', @ $_return[$item_id][$img_field_name] );
-				$img_field = & $item->fields[$img_field_name];
+				$img_field = $item->fields[$img_field_name];
 				$src = str_replace(JURI::root(), '', @ $img_field->{'display_'.$img_field_size.'_src'});
 			else :
 				$src = flexicontent_html::extractimagesrc($item);

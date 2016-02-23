@@ -191,7 +191,7 @@ if ($leadnum) :
 				if (!empty($img_field_name)) {
 					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
-					$img_field = & $item->fields[$img_field_name];
+					$img_field = $item->fields[$img_field_name];
 					$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 					if ( $lead_link_image_to && isset($img_field->value[0]) ) {
 						$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];
@@ -556,7 +556,7 @@ if ($count > $leadnum) :
 				if (!empty($img_field_name)) {
 					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
-					$img_field = & $item->fields[$img_field_name];
+					$img_field = $item->fields[$img_field_name];
 					$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 					if ( $intro_link_image_to && isset($img_field->value[0]) ) {
 						$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : @ $img_field->value[0]['link'];

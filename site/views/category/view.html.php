@@ -79,17 +79,18 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($category->id)
 			$meta_params = new JRegistry($category->metadata);
 		
-		// Get various data from the model
+		
+		// ***********************
+		// Get data from the model
+		// ***********************
+		
 		$categories = $this->get('Childs'); // this will also count sub-category items is if  'show_itemcount'  is enabled
 		$peercats   = $this->get('Peers');  // this will also count sub-category items is if  'show_subcatcount_peercat'  is enabled
 		$items   = $this->get('Data');
 		$total   = $this->get('Total');
-		$filters  = $this->get('Filters');
-		if ($params->get('show_comments_count', 0))
-			$comments = $this->get('CommentsInfo');
-		else
-			$comments = null;
-		$alpha   = $params->get('show_alpha', 1) ? $this->get('Alphaindex') : array();  // This is somwhat expensive so calculate it only if required
+		$filters = $this->get('Filters');
+		$comments= $params->get('show_comments_count', 0)  ?  $this->get('CommentsInfo')  :  null;
+		$alpha   = $params->get('show_alpha', 1)  ?  $this->get('Alphaindex')  :  array();  // This is somewhat expensive so calculate it only if required
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = JRequest::getInt('limitstart');
