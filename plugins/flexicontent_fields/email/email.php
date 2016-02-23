@@ -160,16 +160,16 @@ class plgFlexicontent_fieldsEmail extends FCField
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			// Update the new email address
 			$js .= "
-				var theInput = newField.find('input.emailaddr').first();
+				theInput = newField.find('input.emailaddr').first();
 				theInput.val('".$default_addr."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addr');
 				newField.find('.emailaddr-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_addr');
 				";
-				
+			
 			// Update the new email linking text
 			if ($usetitle) $js .= "
-				var theInput = newField.find('input.emailtext').first();
+				theInput = newField.find('input.emailtext').first();
 				theInput.val('".$default_title."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
@@ -268,11 +268,9 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
+			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			$value['addr'] = !empty($value['addr']) ? $value['addr'] : '';
-			$value['addr'] = htmlspecialchars(
-				(FLEXI_J30GE ? JStringPunycode::emailToUTF8($value['addr']) : $value['addr']),
-				ENT_COMPAT, 'UTF-8'
-			);
+			$value['addr'] = htmlspecialchars( JStringPunycode::emailToUTF8($value['addr']), ENT_COMPAT, 'UTF-8' );
 			$addr = '
 				<div class="nowrap_box">
 					<label class="label emailaddr-lbl" for="'.$elementid_n.'_addr">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>

@@ -156,22 +156,22 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			// Update new URL's address
 			$js .= "
-				var theInput = newField.find('input.urllink').first();
+				theInput = newField.find('input.urllink').first();
 				theInput.val('".$default_link."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
 				newField.find('.urllink-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
 				";
-				
+			
 			// Update new URL optional properties
 			if ($usetitle) $js .= "
-				var theInput = newField.find('input.urltitle').first();
+				theInput = newField.find('input.urltitle').first();
 				theInput.val('".$default_title."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				newField.find('.urltitle-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				";
-				
+			
 			if ($usehits) $js .="
 				theInput = newField.find('input.urlhits').first();
 				theInput.val('0');
@@ -301,8 +301,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 					<div class="nowrap_box urlhits-lbl">
 						<label class="label hits" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_FIELD_HITS' ).'</label>
 						<span class="hitcount">'.$hits.'</span> 
-						<input class="urlhits" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="hidden" value="'.$hits.'" />
-					</div>';
+					</div>
+					<input class="urlhits" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="hidden" value="'.$hits.'" />';
 			}
 			
 			$field->html[] = '

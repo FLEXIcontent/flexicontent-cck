@@ -458,7 +458,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 					$options[] = ''
 						.$pretext
 						.($use_prettycheckable && $prettycheckable_added ? $input_fld : '')
-						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" title="'.$element->label_tip.'">'
+						.'<label for="'.$elementid_no.'" class="'.$label_class.'" style="'.$label_style.'" title="'.@$element->label_tip.'">'
 							. (!$use_prettycheckable || !$prettycheckable_added ? $input_fld : '')
 							.($form_vals_display!=1 ? $element->text : '')
 							.($form_vals_display==2 ? ' <br/>' : '')
