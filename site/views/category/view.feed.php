@@ -37,14 +37,22 @@ class FlexicontentViewCategory extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		$db  = JFactory::getDBO();
-		$doc = JFactory::getDocument();
-		$app = JFactory::getApplication();
-		$params = $this->get('Params');
+		// Initialize framework variables
+		$db       = JFactory::getDBO();
+		$app      = JFactory::getApplication();
+		$document = JFactory::getDocument();
 		
-		$doc->link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute(JRequest::getVar('cid',null, '', 'int')));
+		// Get model
+		$model  = $this->getModel();
 		
+		// Indicate to model to merge menu parameters if menu matches
+		$model->mergeMenuParams = true;
+		
+		// Get the category, loading category data and doing parameters merging
 		$category = $this->get('Category');
+		
+		// Get category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
+		$params   = $category->parameters;
 		
 		// Prepare query to match feed data
 		JRequest::setVar('limit', $params->get('feed_limit'));   // Force a specific limit, this will be moved to the model
@@ -61,9 +69,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		$params->set('orderbycustomfielddir_2nd', $params->get('feed_orderbycustomfielddir_2nd', 'ASC'));
 		$params->set('orderbycustomfieldint_2nd', $params->get('feed_orderbycustomfieldint_2nd', 0));
 		
-		$model = $this->getModel();
 		$model->setState('limit', $params->get('feed_limit', $model->getState('limit')));
-		$rows = $this->get('Data');
+		
+		
+		// ***********************
+		// Get data from the model
+		// ***********************
+		
+		$items   = $this->get('Data');
 		
 		$feed_summary = $params->get('feed_summary', 0);
 		$feed_summary_cut = $params->get('feed_summary_cut', 200);
@@ -71,7 +84,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$feed_use_image = $params->get('feed_use_image', 1);
 		$feed_link_image = $params->get('feed_link_image', 1);
 		$feed_image_source = $params->get('feed_image_source', '');
-		$feed_image_size = $params->get('feed_image_size', '');
+		$feed_image_size = $params->get('feed_image_size', 'l');
 		$feed_image_method = $params->get('feed_image_method', 1);
 		
 		$feed_image_width = $params->get('feed_image_width', 100);
@@ -82,7 +95,6 @@ class FlexicontentViewCategory extends JViewLegacy
 			$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $feed_image_source;
 			$db->setQuery($query);
 			$image_dbdata = $db->loadObject();
-			//$image_dbdata->params = FLEXI_J16GE ? new JRegistry($image_dbdata->params) : new JParameter($image_dbdata->params);
 			
 			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', '' => '');
 			$img_field_size = $img_size_map[ $feed_image_size ];
@@ -95,48 +107,42 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($extra_fields) {
 			foreach($extra_fields as $fieldname) {
 				// Render given field for ALL ITEMS
-				FlexicontentFields::getFieldDisplay($rows, $fieldname, $values=null, $method='display');
+				FlexicontentFields::getFieldDisplay($items, $fieldname, $values=null, $method='display');
 			}
 		}
 		
 		$uri = clone JUri::getInstance();
 		$domain = $uri->toString(array('scheme', 'host', 'port'));
-		foreach ( $rows as $row )
+		foreach ( $items as $item )
 		{
 			// strip html from feed item title
-			$title = $this->escape( $row->title );
+			$title = $this->escape( $item->title );
 			$title = html_entity_decode( $title );
 
 			// url link to article
 			// & used instead of &amp; as this is converted by feed creator
-			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $category->slug, 0, $row));
+			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $category->slug, 0, $item));
 
 			// strip html from feed item description text
-			$description	= $feed_summary ? $row->introtext.$row->fulltext : $row->introtext;
+			$description	= $feed_summary ? $item->introtext.$item->fulltext : $item->introtext;
 			$item_desc_cut = mb_strlen($description) > $feed_summary_cut; 
 			$description = flexicontent_html::striptagsandcut( $description, $feed_summary_cut);
 			
-	  	if ($feed_use_image) {  // feed image is enabled
-				$src = '';
-				$thumb = '';
-				if ($feed_image_source) {   // case 1 use an image field
-					FlexicontentFields::getFieldDisplay($row, $img_field_name, null, 'display', 'module');
-					$img_field = $row->fields[$img_field_name];
-					if ( !$img_field_size ) {
-						$src = str_replace(JURI::root(), '',  $img_field->thumbs_src['large'][0] );
-					} else {
-						$src = '';
-						$thumb = $img_field->thumbs_src[ $img_field_size ][0];
-					}
-	  		} else {     // case 2 extract from item
-					$src = flexicontent_html::extractimagesrc($row);
+			if ($feed_use_image) :
+				if (!empty($img_field_name)) {
+					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
+					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
+					$img_field = $item->fields[$img_field_name];
+					$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
+				} else {
+					$src = flexicontent_html::extractimagesrc($item);
 				}
 				
 				$RESIZE_FLAG = !$feed_image_source || !$img_field_size;
-				if ($src && $RESIZE_FLAG) {
+				if ( $src && $RESIZE_FLAG ) {
 					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-					$h		= '&amp;h=' . $feed_image_height;
 					$w		= '&amp;w=' . $feed_image_width;
+					$h		= '&amp;h=' . $feed_image_height;
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
 					$zc		= $feed_image_method ? '&amp;zc=' . $feed_image_method : '';
@@ -148,55 +154,88 @@ class FlexicontentViewCategory extends JViewLegacy
 					$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 				} else {
 					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
+					$thumb = $src;
 					if ($src) {
-						// !!! this should be unreachable ... src must be SET only if resizing
-						$thumb = (!preg_match("#^http|^https|^ftp|^/#i", $src) ?  JURI::base(true).'/' : '') . $src ;  // Prepend site base folder
+						// Prepend site base folder
+						$thumb = (!preg_match("#^http|^https|^ftp|^/#i", $src) ?  JURI::base(true).'/' : '') . $src ;
 					}
 				}
 				
 				if ($thumb) {
 					$thumb = (!preg_match("#^http|^https|^ftp#i", $thumb) ?  $domain : '') . $thumb;  // Prepend site 's URL protocol, domain and port
-					$_img = "<img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/>";
-					if ($feed_link_image) $_img = "<a class='feed-readmore' target='_blank' href='".$link."'>".$_img."</a>";
-					$description = "
-					<div class='feed-description'>
-						".$_img."
-						<p>".$description."</p>
-					</div>";
+					$_img = '<img src="'.$thumb.'" alt="'.$title.'" title="'.$title.'" align="left" style="margin-left: 12px;"/>';
+					if ($feed_link_image) $_img = '<a class="feed-readmore" target="_blank" href="'.$link.'">'.$_img.'</a>';
+					$description = '
+					<div class="feed-description">
+						'.$_img.'
+						<p>'.$description.'</p>
+					</div>';
 				}
-			}
+			endif;
 			
 			if ($extra_fields) {
 				foreach($extra_fields as $fieldname) {
-					if ( isset($row->fields[$fieldname]->display) ) {
-						$description .= '<br/><b>'.$row->fields[$fieldname]->label .":</b> ". $row->fields[$fieldname]->display;
+					if ( isset($item->fields[$fieldname]->display) ) {
+						$description .= '<br/><b>'.$item->fields[$fieldname]->label .":</b> ". $item->fields[$fieldname]->display;
 					}
 				}
 			}
 			
 			
 			// Add readmore link to description if introtext is shown, show_readmore is true and fulltext exists
-			$more_text_exists = (!$feed_summary && $row->fulltext) || $item_desc_cut;
+			$more_text_exists = (!$feed_summary && $item->fulltext) || $item_desc_cut;
 			if ($params->get('feed_show_readmore', 0) && $more_text_exists)
 			{
 				$description .= '<p class="feed-readmore"><a target="_blank" href ="' . $link . '">' .  JText::sprintf('FLEXI_READ_MORE', $title) . '</a></p>';
 			}
 			
 			
-			//$author = $row->created_by_alias ? $row->created_by_alias : $row->author;
-			@$date    = ( $row->created ? date( 'r', strtotime($row->created) ) : '' );
+			$author = !empty($item->created_by_alias)  ?  $item->created_by_alias  :  (!empty($item->author) ? $item->author : '');
+			$date = $item->publish_up ? $item->publish_up : $item->created;
+			@ $date = ( $date ? date( 'r', strtotime($date) ) : '' );
 
 			// load individual item creator class
-			$item = new JFeedItem();
-			$item->title 		   = $title;
-			$item->link 		   = $link;
-			$item->description = $description;
-			$item->date			   = $date;
-			//$item->author    = $author;
-			$item->category    = $this->escape( $category->title );
+			$JF_item = new JFeedItem();
+			$JF_item->title 		  = $title;
+			$JF_item->link 		    = $link;
+			//$JF_item->image     = $thumb;  // Currently unused by Joomla, since browser support is incomplete
+			$JF_item->description = $description;
+			$JF_item->date			  = $date;
+			//$JF_item->author    = $author;
+			$JF_item->category    = $this->escape( $category->title );
 
 			// loads item info into rss array
-			$doc->addItem( $item );
+			$document->addItem( $JF_item );
+		}
+		
+		
+		// *****************
+		// Set document data
+		// *****************
+		
+		$non_sef_link = null;
+		$document->link = flexicontent_html::createCatLink($category->slug, $non_sef_link, $model);
+		
+		if ($category->id)
+		{
+			$document->title = $category->title;
+			//$document->description = flexicontent_html::striptagsandcut( $category->description, $feed_summary_cut);
+			
+			$category->image = ''; //$params->get('image');
+			if ($category->image)
+			{
+				$joomla_image_path = $app->getCfg('image_path', '');
+				$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
+				$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
+				$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';
+				$document->image = new stdClass;
+				$document->image->url = $this->baseurl ."/". $joomla_image_url . $category->image;
+				$document->image->title = $document->title;
+				$document->image->link  = $document->link;
+				$document->image->width = 100;
+				$document->image->height = 80;
+				$document->image->description = '';
+			}
 		}
 	}
 }
