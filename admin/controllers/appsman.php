@@ -421,19 +421,30 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		// Get optional filename of export file
 		$filename = JRequest::getCmd('export_filename');
 		
+		// When export type is given, we require that specific table and specific IDs are given too
 		if ( $export_type )
 		{
-			$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
-			JArrayHelper::toInteger($cid, array(0));
+			$table = strtolower(JRequest::getCmd('table', ''));
+			$cid = JRequest::getVar( 'cid', array(), $hash='default', 'array' );
+			JArrayHelper::toInteger($cid, array());
 			
-			$table = strtolower(JRequest::getCmd('table', 'flexicontent_fields'));
+			if ( !$table )
+				$error[500] = JText::_( 'No table name given. Export aborted' );
+			else if ( !in_array($table, self::$allowed_tables) )
+				$error[403] = JText::_( 'FLEXI_NO_ACCESS' . ' Table: ' .$table. ' not in allowed tables. Export aborted' ) );
+			else if ( !count($cid) )
+				$error[500] = JText::_( 'No records IDs were specified. Export aborted' );
 			
-			if (!in_array($table, self::$allowed_tables) ) {
-				JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS' . ' Table: ' .$table. ' not in allowed tables' ) );
+			if ( !empty($error) ) {
+				foreach ($error as $error_code => $error_text)  JError::raiseWarning( $error_code, $error_text );
 				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
 				return;
 			}
-			
+		}
+
+		// Export records from single table into the specified FILE FORMAT
+		if ( $export_type )
+		{
 			$table_name = '#__'.$table;
 			$id_colname = self::$table_idcols[$table];
 			$rows = $model->getTableRows($table_name, $id_colname, $cid, true);
@@ -467,7 +478,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			}
 		}
 		
-		// No specific format, get export LIST and export it
+		// No specific file type and no specific table to export, export specific records from all TABLES into single archive file using files in XML format
 		else {
 			$conf = $session->get('appsman_export', array(), 'flexicontent');	
 			$content = '';
@@ -477,8 +488,8 @@ class FlexicontentControllerAppsman extends FlexicontentController
 				
 				$cid = array_keys($conf[$table]);
 				
-				$id_colname = self::$table_idcols[$table];
 				$table_name = '#__'.$table;
+				$id_colname = self::$table_idcols[$table];
 				$rows = $model->getTableRows($table_name, $id_colname, $cid, true);
 				
 				$content .= $model->create_XML_records($rows, $table_name, $id_colname, $clear_id=false);

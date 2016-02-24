@@ -81,15 +81,25 @@ class FlexicontentModelAppsman extends JModelList
 	
 	
 	
-	function getTableRows($table, $id_colname, $cid, $id_is_unique=false)
+	function getTableRows($table, $id_colname, $ids, $id_is_unique=false, $fid_colname=null, $fids=array())
 	{
-		$ids = array();
-		foreach($cid as $id) {
-			$ids[] = $this->_db->Quote($id);
-		}
+		$_ids = array();
+		$_fids = array();
 		
-		$query = 'SELECT * FROM '.$table
-			.' WHERE '.$id_colname.' IN ('.implode(',', $ids).')';
+		foreach($ids as $id)
+			$_ids[] = $this->_db->Quote($id);
+		
+		foreach($fids as $fid)
+			$_fids[] = $this->_db->Quote($fid);
+		
+		$query = 'SELECT * FROM '.$table . ' WHERE 1 ';
+		
+		if (count($_ids))
+			$query .= ' AND '.$id_colname.' IN ('.implode(',', $_ids).')';
+		
+		if ($fid_colname && count($_fids))
+			$query .= ' AND '.$fid_colname.' IN ('.implode(',', $_fids).')';
+		
 		$this->_db->setQuery($query);
 		$rows = $id_is_unique ? $this->_db->loadAssocList($id_colname) : $this->_db->loadAssocList();
 		return $rows;
