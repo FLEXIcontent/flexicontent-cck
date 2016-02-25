@@ -79,7 +79,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			font-size: 12px;
 			width: 96%;
 			box-sizing: border-box;
-    }
+		}
 		
 		/*div.current fieldset.radio label {
 			min-width:10px!important; padding: 0px 16px 0px 0px!important; margin: 2px 0px 0px 1px!important;
