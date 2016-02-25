@@ -440,12 +440,10 @@ body .nowrap_hidden {
 	white-space: nowrap;
 }
 #flexicontent div.input-append > *:not(:last-child) {
-	margin: 0px !important;
 	border-top-right-radius: 0px !important;
 	border-bottom-right-radius: 0px !important;
 }
 #flexicontent div.input-prepend > *:not(:first-child) {
-	margin: 0px !important;
 	border-top-left-radius: 0px !important;
 	border-bottom-left-radius: 0px !important;
 }
@@ -812,14 +810,6 @@ body .fc-mssg.fc-noborder {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 	margin-right: 0px;
-}
-.flexicontent .add-on.fc-lbl {
-	background: #555 none repeat scroll 0 0;
-	color: white;
-	font-family: monospace;
-	text-shadow: unset;
-	border: 1px solid gray;
-	font-size: 12px;
 }
 input.fc-inherited-value + label {
 	font-weight: bold !important;

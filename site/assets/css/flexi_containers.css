@@ -339,11 +339,3 @@ body .fc-mssg.fc-noborder {
 	border-bottom-right-radius: 0;
 	margin-right: 0px;
 }
-.flexicontent .add-on.fc-lbl {
-	background: #555 none repeat scroll 0 0;
-	color: white;
-	font-family: monospace;
-	text-shadow: unset;
-	border: 1px solid gray;
-	font-size: 12px;
-}

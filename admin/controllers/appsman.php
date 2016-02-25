@@ -46,7 +46,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		'usergroups'=> 'id',
 		'assets'=>'id'
 	);
-	static $no_id_tables = array(
+	static $no_id_tables = array();
 	
 	
 	/**
@@ -431,7 +431,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 			if ( !$table )
 				$error[500] = JText::_( 'No table name given. Export aborted' );
 			else if ( !in_array($table, self::$allowed_tables) )
-				$error[403] = JText::_( 'FLEXI_NO_ACCESS' . ' Table: ' .$table. ' not in allowed tables. Export aborted' ) );
+				$error[403] = JText::_( 'FLEXI_NO_ACCESS' ) . ' Table: ' .$table. ' not in allowed tables. Export aborted';
 			else if ( !count($cid) )
 				$error[500] = JText::_( 'No records IDs were specified. Export aborted' );
 			

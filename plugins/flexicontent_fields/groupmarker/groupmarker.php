@@ -48,6 +48,7 @@ class plgFlexicontent_fieldsGroupmarker extends JPlugin
 				break;
 			case 'tab_open':
 				if (empty($cont_label)) $cont_label = "TAB LABEL NOT SET";
+				if ( !isset($tabCnt[$tabSetCur]) ) $field->html .= "WARNING: TAB-set is misconfigured, TAB OPEN field encountered, before it a TAB-SET START field is needed";
 				$field->html .= " <div class='tabbertab' style='float:left;' id='grpmarker_tabset_".$tabSetCur."_tab_".($tabCnt[$tabSetCur]++)."'>\n";
 				$field->html .= "  <h3 class='tabberheading'>".JText::_( $cont_label )."</h3>\n";   // Current TAB LABEL
 				$field->html .= $cont_cssclass? "  <div class='".$cont_cssclass."'>\n" : " <div style='border:0px!important; margin:0px!important; padding:0px!important;'>\n";
