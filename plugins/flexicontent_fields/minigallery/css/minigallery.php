@@ -95,13 +95,13 @@ Notes:
 */
 
 .<?php echo $id;?>-captions {
-	background: #000; bottom: 0; color: #FFF; font: normal 12px/22px Arial, sans-serif; left: 0; overflow: hidden; position: absolute; text-indent: 10px; width: 100%; z-index: 10000;
+	background: #000; bottom: 0; color: #FFF; font: normal 12px/22px Arial, sans-serif; left: 0; overflow: hidden; position: absolute; text-indent: 0px; padding: 4px; width: 100%; box-sizing: border-box; z-index: 10000;
 }
 .<?php echo $id;?>-captions-hidden {
 	height: 0; opacity: 0;
 }
 .<?php echo $id;?>-captions-visible {
-	height: 22px; opacity: .7;
+	height:38px; line-height: 16px; font-size: 12px; opacity: .7;
 }
 
 /**
