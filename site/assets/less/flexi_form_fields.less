@@ -97,7 +97,7 @@
 
 /* FIELD: (sortable) currently having single value, disable drag handle */
 #flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle:not(.fcfont-icon) {
-	background: url(../images/move3.png) 4px 4px no-repeat white;
+	background: url(../images/move3.png) 16px 4px no-repeat white;
 }
 #flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle {
 	cursor: default !important;
@@ -222,9 +222,26 @@
 }
 
 /* FIELDs: various buttons */
+#flexicontent span[class^="fcfield-"].fcfont-icon,
+#flexicontent span[class*=" fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon {
 	margin: 0px 0px 2px 0px;
+}
+#flexicontent span[class^="fcfield-"].fcfont-icon:before,
+#flexicontent span[class*=" fcfield-"].fcfont-icon:before,
+#flexicontent span[class^="fcfield-"].fcfont-icon:after,
+#flexicontent span[class*=" fcfield-"].fcfont-icon:after,
+#flexicontent ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon:before,
+#flexicontent ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon:before,
+#flexicontent ul.fcfield-sortables > li span[class^="fcfield-"].fcfont-icon:after,
+#flexicontent ul.fcfield-sortables > li span[class*=" fcfield-"].fcfont-icon:after {
+	margin: 0px 0px 2px 0px;
+	background: none;
+	font-family: "IcoMoon";
+	font-style: normal;
+	font-size: 14px;
+	vertical-align: top;
 }
 #flexicontent .fcfield-drag-handle,
 #flexicontent .fcfield-list-add,
@@ -237,7 +254,6 @@
 #flexicontent .fcfield-button,
 #flexicontent .fcfield-button-add a {
 	padding: 4px 22px;
-	font-size: 13px;
 	line-height: 18px;
 	cursor: pointer;
 	
@@ -268,8 +284,6 @@
 	
 	/* style these */
 	color: #777;
-	font-weight: bold;
-	
 	border-radius: 4px;
 	border: 1px solid #d0d0d0;
 	vertical-align: top;
@@ -344,13 +358,10 @@
 #flexicontent span.fcfield-addvalue:not(.fcfont-icon) {
 	margin: 0px 2px 6px 6px;
 	padding: 6px 12px 6px 28px;
-	background: url(../images/plus-button.png) 4px 4px no-repeat white;
+	background: url(../images/plus-button.png) 16px 4px no-repeat white;
 }
 #flexicontent span.fcfield-addvalue.fcfont-icon:before {
 	padding: 0 6px 0 2px;
-	background: none;
-	font-family: "IcoMoon";
-	font-style: normal;
 	content: "*";
 }
 #flexicontent span.fcfield-addvalue:before {
@@ -397,37 +408,25 @@
 /* FIELDs: Insert value button */
 #flexicontent .fcfield-insertvalue:not(.fcfont-icon) {
 	margin: 0px 0px 2px 0px;
-	padding: 12px;
-	background: url(../images/plus-button.png) 4px 4px no-repeat white;
+	padding: 4px 16px;
+	background: url(../images/plus-button.png) 16px 4px no-repeat white;
 }
 #flexicontent .fcfield-insertvalue.fc_after:not(.fcfont-icon) {
-	background: url(../images/insert_after_180.png) 4px 4px no-repeat white;
+	background: url(../images/insert_after_180.png) 16px 4px no-repeat white;
 }
 #flexicontent .fcfield-insertvalue.fc_before:not(.fcfont-icon) {
-	background: url(../images/insert_before_180.png) 4px 4px no-repeat white;
+	background: url(../images/insert_before_180.png) 16px 4px no-repeat white;
 }
 #flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_after.fcfont-icon:before {
-	background: none;
-	font-family: "IcoMoon";
-	font-style: normal;
 	content: "]";
 }
 #flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_before.fcfont-icon:before {
-	background: none;
-	font-family: "IcoMoon";
-	font-style: normal;
 	content: "\e207";
 }
 #flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_after.fcfont-icon:after {
-	background: none;
-	font-family: "IcoMoon";
-	font-style: normal;
 	content: " \6c";
 }
 #flexicontent ul.fcfield-sortables > li span.fcfield-insertvalue.fc_before.fcfont-icon:after {
-	background: none;
-	font-family: "IcoMoon";
-	font-style: normal;
 	content: " ]";
 }
 #flexicontent span.fcfield-insertvalue:before,
@@ -438,13 +437,10 @@
 /* FIELDs: Delete value button */
 #flexicontent .fcfield-delvalue:not(.fcfont-icon) {
 	margin: 0px 0px 2px 0px;
-	padding: 12px;
-	background: url(../images/delete.png) 4px 4px no-repeat white;
+	padding: 4px 16px;
+	background: url(../images/delete.png) 16px 4px no-repeat white;
 }
 #flexicontent ul.fcfield-sortables > li span.fcfield-delvalue.fcfont-icon:before {
-	background: none;
-	font-family: "IcoMoon";
-	font-style: normal;
 	content: "I";
 }
 #flexicontent span.fcfield-delvalue:before {
@@ -456,13 +452,10 @@
 #flexicontent .fcfield-drag-handle:not(.fcfont-icon) {
 	cursor: move;
 	margin: 0px 0px 2px 0px;
-	padding: 12px;
-	background: url(../images/move2.png) 4px 4px no-repeat white;
+	padding: 4px 16px;
+	background: url(../images/move2.png) 16px 4px no-repeat white;
 }
 #flexicontent ul.fcfield-sortables > li span.fcfield-drag-handle.fcfont-icon:before {
-	background: none;
-	font-family: "IcoMoon";
-	font-style: normal;
 	content: "z";
 }
 
