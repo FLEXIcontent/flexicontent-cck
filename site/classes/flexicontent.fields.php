@@ -3796,8 +3796,13 @@ class FlexicontentFields
 		}
 		
 		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
-		$order = $params->get( 'orderby'.$sfx, 'alpha' );
-		$orderby = flexicontent_db::buildItemOrderBy($params, $order, $request_var='', $config_param='', $item_tbl_alias = 'i', $relcat_tbl_alias = 'rel', '', '', $sfx, $support_2nd_lvl=true);
+		$order = '';
+		$orderby = flexicontent_db::buildItemOrderBy(
+			$params,
+			$order, $request_var='', $config_param='orderby',
+			$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
+			$default_order='', $default_order_dir='', $sfx, $support_2nd_lvl=true
+		);
 		$orderby_join = '';
 		
 		// Create JOIN for ordering items by a custom field (use SFC)
