@@ -32,7 +32,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsRadioimage( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_radioimage', JPATH_ADMINISTRATOR);

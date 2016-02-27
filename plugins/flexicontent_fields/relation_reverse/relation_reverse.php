@@ -23,7 +23,7 @@ class plgFlexicontent_fieldsRelation_reverse extends JPlugin
 	// ***********
 	static $field_types = array('relation_reverse');
 	
-	function plgFlexicontent_fieldsRelation_reverse( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_relation_reverse', JPATH_ADMINISTRATOR);

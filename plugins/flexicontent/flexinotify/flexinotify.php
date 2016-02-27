@@ -42,7 +42,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 	 * @param object $params  The object that holds the plugin parameters
 	 * @since 1.5
 	 */
-	function plgFlexicontentFlexinotify( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 

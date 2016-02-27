@@ -9,7 +9,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsCoreprops( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR);

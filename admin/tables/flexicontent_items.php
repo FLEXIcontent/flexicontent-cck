@@ -228,7 +228,7 @@ class flexicontent_items extends _flexicontent_items {
 	/**
 	* @param database A database connector object
 	*/
-	function flexicontent_items(&$db) {
+	function __construct(&$db) {
 		static $tbl_fields = null;
 		if (!isset($tbl_fields))
 		{

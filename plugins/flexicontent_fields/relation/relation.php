@@ -23,7 +23,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 	// ***********
 	static $field_types = array('relation');
 	
-	function plgFlexicontent_fieldsRelation( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_relation', JPATH_ADMINISTRATOR);
