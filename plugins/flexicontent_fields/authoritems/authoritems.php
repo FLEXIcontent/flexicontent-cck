@@ -24,7 +24,7 @@ class plgFlexicontent_fieldsAuthoritems extends JPlugin
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsAuthoritems( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_authoritems', JPATH_ADMINISTRATOR);

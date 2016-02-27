@@ -25,7 +25,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsFcpagenav( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_fcpagenav', JPATH_ADMINISTRATOR);

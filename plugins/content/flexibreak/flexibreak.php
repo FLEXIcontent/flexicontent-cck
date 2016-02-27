@@ -42,7 +42,7 @@ class plgContentFlexiBreak extends JPlugin
 	var $pattern = '#(<hr[^>]*?class=[\"|\']system-pagebreak[\"|\'][^(>|/>)]*?/?>)#iU';
 	var $pluginPath;
 
-	function plgContentFlexiBreak(&$subject, $params)
+	function __construct(&$subject, $params)
 	{
 		parent::__construct($subject, $params);
 		$this->pluginPath = dirname(__FILE__).DS.$this->_name;

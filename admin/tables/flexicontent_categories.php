@@ -139,7 +139,7 @@ class flexicontent_categories extends _flexicontent_categories
 	/**
 	* @param database A database connector object
 	*/
-	function flexicontent_categories(& $db) {
+	function __construct(& $db) {
 		$this->extension = 'com_content';
 		parent::__construct('#__categories', 'id', $db);
 	}

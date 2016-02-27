@@ -35,7 +35,7 @@ class plgSystemFlexisystem extends JPlugin
 	/**
 	 * Constructor
 	 */
-	function plgSystemFlexisystem( &$subject, $config )
+	function __construct( &$subject, $config )
 	{
 		parent::__construct( $subject, $config );
 		$this->extension = 'com_flexicontent';

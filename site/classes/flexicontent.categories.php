@@ -51,7 +51,7 @@ class flexicontent_cats
 	 * @param int $cid
 	 * @return flexicontent_categories
 	 */
-	public function flexicontent_cats($cid)
+	public function __construct($cid)
 	{
 		$this->id = $cid;
 	}

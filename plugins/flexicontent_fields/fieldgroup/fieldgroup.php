@@ -27,7 +27,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsFieldgroup( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_fieldgroup', JPATH_ADMINISTRATOR);

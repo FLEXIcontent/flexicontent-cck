@@ -24,7 +24,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsTextarea( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_textarea', JPATH_ADMINISTRATOR);

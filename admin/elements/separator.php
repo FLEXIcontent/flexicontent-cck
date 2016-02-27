@@ -61,6 +61,9 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			border:0;
 		}
 		
+		fieldset.form-vertical div.control-group {
+			margin-bottom: 8px;
+		}
 		div.control-group div.control-label label.hasTooltip,
 		div.current ul.config-option-list li label.hasTooltip {
 			display:inline-block;
@@ -70,7 +73,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			color: white;
 			border-radius: 3px;
 			
-			margin: 2px 4% 3px 0 !important;
+			margin: 0px 4% 3px 0 !important;
 			padding: 8px !important;
 			background-color: #999;
 			text-align: right;

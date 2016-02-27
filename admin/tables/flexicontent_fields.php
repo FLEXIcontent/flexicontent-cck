@@ -42,7 +42,7 @@ class _flexicontent_fields_common extends JTable {
 	}
 }
 
-if (FLEXI_J30GE) {
+if (FLEXI_J30GE) {  // This is not removed to be an example of how to workaround adding TYPE to method parameters of parent class
 	class _flexicontent_fields extends _flexicontent_fields_common {
 		protected function _getAssetParentId(JTable $table = null, $id = null) {
 			return parent::__getAssetParentId($table, $id);
@@ -115,7 +115,7 @@ class flexicontent_fields extends _flexicontent_fields
 	/** @var boolean */
 	var $_trackAssets	= true;
 
-	function flexicontent_fields(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_fields', 'id', $db);
 	}
 	

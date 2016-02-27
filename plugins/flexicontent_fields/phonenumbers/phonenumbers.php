@@ -11,7 +11,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsPhonenumbers( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_phonenumbers', JPATH_ADMINISTRATOR);

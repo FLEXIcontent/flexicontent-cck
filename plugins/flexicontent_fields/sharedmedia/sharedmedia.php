@@ -12,7 +12,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsSharedmedia( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_sharedmedia', JPATH_ADMINISTRATOR);

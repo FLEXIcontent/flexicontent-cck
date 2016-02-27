@@ -25,7 +25,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsToolbar( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_toolbar', JPATH_ADMINISTRATOR);

@@ -23,7 +23,7 @@ class plgFlexicontent_fieldsCore extends FCField
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsCore( &$subject, $params )
+	function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
