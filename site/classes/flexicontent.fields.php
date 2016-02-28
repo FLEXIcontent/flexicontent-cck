@@ -1996,7 +1996,7 @@ class FlexicontentFields
 				// Get Elements of the field these will be cached if they do not depend on the item ...
 				$field->item_id = $itemid;   // in case it needs to be loaded to replace item properties in a SQL query
 				$item_pros = false;
-				$elements = FlexicontentFields::indexedField_getElements($field, $item, $field->extra_props, $item_pros, $createFilter=true);
+				$elements = FlexicontentFields::indexedField_getElements($field, $item, $field->extra_props, $item_pros);
 				// Map index field vlaues to their real properties
 				$item_values = FlexicontentFields::indexedField_getValues($field, $elements, $item_values, $prepost_prop='');
 			}
