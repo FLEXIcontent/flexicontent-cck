@@ -5080,12 +5080,22 @@ class flexicontent_tmpl
 			if ($print_logging_info) $start_microtime = microtime(true);
 			$tmpls = flexicontent_tmpl::parseTemplates('', false, $checked_layouts);
 			if ($print_logging_info) $fc_run_times['templates_parsing_xml'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			
+		}
+		
+		
+		// *******************************
+		// Check/Complie LESS files to CSS
+		// *******************************
+		
+		if ( count($checked_layouts) )
+		{
 			// Compile LESS to CSS, checking if -specific layout(s)- files have been modified
 			if ($print_logging_info) $start_microtime = microtime(true);
 			flexicontent_tmpl::checkCompileLess($tmpls, false, $checked_layouts);
 			if ($print_logging_info) $fc_run_times['templates_parsing_less'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
+		// Uncomment to update ALL
+		//$all = array(); foreach ($tmpls->items as $tmplname => $aa) $t[] = $tmplname;  flexicontent_tmpl::checkCompileLess($tmpls, false, $all);
 		
 		
 		// *******************************************************************************
