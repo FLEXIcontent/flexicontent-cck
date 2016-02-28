@@ -15,7 +15,7 @@
 	clear: none;
 	display: block;
 	float: left;
-	max-width: 100% !important;
+	max-width: 96% !important;
 	padding: 0% !important;
 	margin: 0.5em 2% 0.5em 2% !important;
 }
@@ -27,9 +27,10 @@
 .topblock .flexi.image {
 	display: block;
 	float: left;
-	max-width: 100% !important;
+	max-width: 99% !important;
 	padding: 0% !important;
-	margin-right: 6px;
+	margin-right: 1%;
+	margin-left: 0%;
 	line-height: 0px;
 	border: 0px solid silver;
 }
