@@ -584,7 +584,7 @@ class plgSystemFlexisystem extends JPlugin
 			$descendants[] = $v->id;
 			
 			if ( empty($v->childrenarray) ) continue;
-			foreach( $v->childrenarray as $child ) $stack[] = $child;
+			foreach( array_reverse($v->childrenarray) as $child ) $stack[] = $child;
 		}
 		return $descendants;
 	}
