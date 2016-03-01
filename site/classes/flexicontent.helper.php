@@ -173,7 +173,7 @@ class flexicontent_html
 		if ($check_global) {
 			if ($less_folders===null) {
 				$JTEMPLATE_SITE = JPATH_SITE.'/templates/'.(!$app->isAdmin() ? $app->getTemplate() : JFactory::getDBO()->setQuery("SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1")->loadResult());
-				$less_folders = JComponentHelper::getParams('com_flexicontent')->get('less_folders', 'JPATH_COMPONENT_SITE/assets/less :: JTEMPLATE_SITE/less/com_flexicontent/ ::');
+				$less_folders = JComponentHelper::getParams('com_flexicontent')->get('less_folders', 'JPATH_COMPONENT_SITE/assets/less/ :: JTEMPLATE_SITE/less/com_flexicontent/ ::');
 				$_reps = array(
 					'JPATH_COMPONENT_SITE' => JPATH_COMPONENT_SITE, 'JPATH_COMPONENT_ADMINISTRATOR' => JPATH_COMPONENT_ADMINISTRATOR,
 					'JPATH_SITE' => JPATH_SITE, 'JPATH_ADMINISTRATOR' => JPATH_ADMINISTRATOR,
@@ -181,13 +181,21 @@ class flexicontent_html
 				);
 				$less_folders = str_replace(array_keys($_reps), $_reps, $less_folders);
 				$less_folders = preg_split("/[\s]*::[\s]*/", $less_folders);
-				foreach($less_folders as $k => $v)  {
-					if (empty($v)) unset($less_folders[$k]);
-					else $less_folders[$k] = JPath::clean($v);
+				foreach($less_folders as $k => $v)
+				{
+					if (!empty($v)) {
+						$v = JPath::clean($v);
+						$v .= $v[strlen($v) - 1] == DS ? '' : DS;
+						$less_folders[$k] = $v;
+					} else
+						unset($less_folders[$k]);
 				}
 			}
 			$inc_paths_all = array_merge($inc_paths, $less_folders);
 		}
+		
+		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+		//echo "<pre>"; print_r( $inc_paths_all); echo "</pre>"; 
 		
 		$_dirty_any = false;  // This FLAG is set in flag for all folders
 		foreach ($inc_paths_all as $inc_path)
@@ -242,7 +250,12 @@ class flexicontent_html
 		// Validate paths
 		$path     = JPath::clean($path);
 		if (!is_array($inc_paths)) $inc_paths = $inc_paths ? array($inc_paths) : array();
-		foreach($inc_paths as $k => $v)  $inc_paths[$k] = JPath::clean($v);
+		foreach($inc_paths as $k => $v)
+		{
+			$v = JPath::clean($v);
+			$v .= $v{strlen($v) - 1} == DS ? '' : DS;
+			$inc_paths[$k] = $v;
+		}
 		
 		// Check if LESS include paths have modified less files
 		$_dirty = flexicontent_html::dirty_less_incPath_exists($inc_paths, $check_global_inc);
