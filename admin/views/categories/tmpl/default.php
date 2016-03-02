@@ -28,7 +28,7 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableF
 
 $listOrder  = $this->lists['order'];
 $listDirn   = $this->lists['order_Dir'];
-$saveOrder  = ($listOrder == 'c.lft' && $listDirn == 'asc');
+$saveOrder  = ($listOrder == 'c.lft' && strtolower($listDirn) == 'asc');
 
 $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
@@ -398,16 +398,16 @@ function delAllFilters() {
 			<td>
 				<?php echo $access; ?>
 			</td>
-			<td class="center order">
+			<td class="left order">
 			 <?php if ($canChange) : ?>
+				<?php $disabled = $saveOrder ?  '' : 'disabled="disabled"'; ?>
+				<input type="text" name="order[]" size="5" value="<?php echo $orderkey + 1;?>" <?php echo $disabled ?> class="text-area-order" style="text-align: center" />
+				<?php $originalOrders[] = $orderkey + 1; ?>
+				
 				<?php if ($saveOrder) : ?>
 					<span><?php echo $this->pagination->orderUpIcon($i, isset($this->ordering[$row->parent_id][$orderkey - 1]), 'categories.orderup', 'JLIB_HTML_MOVE_UP', $this->orderingx); ?></span>
 					<span><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, isset($this->ordering[$row->parent_id][$orderkey + 1]), 'categories.orderdown', 'JLIB_HTML_MOVE_DOWN', $this->orderingx); ?></span>
 				<?php endif; ?>
-				
-				<?php $disabled = $saveOrder ?  '' : 'disabled="disabled"'; ?>
-				<input type="text" name="order[]" size="5" value="<?php echo $orderkey + 1;?>" <?php echo $disabled ?> class="text-area-order" style="text-align: center" />
-				<?php $originalOrders[] = $orderkey + 1; ?>
 			<?php else : ?>
 				<?php echo $orderkey + 1;?>
 			<?php endif; ?>
