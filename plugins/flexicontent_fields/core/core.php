@@ -436,7 +436,8 @@ class plgFlexicontent_fieldsCore extends FCField
 			case 'title':
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_TYPE_TO_LIST');
 				$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
-				$attribs_str = ' class="fc_field_filter fc_label_internal" data-fc_label_text="'.$_inner_lb.'"';
+				$_label_internal = '';//'fc_label_internal';  // data-fc_label_text="..."
+				$attribs_str = ' class="fc_field_filter '.$_label_internal.'" placeholder="'.$_inner_lb.'"';
 				
 				$filter_ffname = 'filter_'.$filter->id;
 				$filter_ffid   = $formName.'_'.$filter->id.'_val';
@@ -669,11 +670,13 @@ class plgFlexicontent_fieldsCore extends FCField
 			
 			// MULTI-select: special label and prompts
 			if ($display_filter_as == 6) {
-				$classes .= ' fc_label_internal fc_prompt_internal';
+				//$classes .= ' fc_label_internal fc_prompt_internal';
+				$classes .= ' fc_prompt_internal';
 				// Add field's LABEL internally or click to select PROMPT (via js)
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
 				// Add type to filter PROMPT (via js)
-				$extra_param  = ' data-fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
+				//$extra_param  = ' data-fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
+				$extra_param  = ' data-placeholder="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
 				$extra_param .= ' data-fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
 			}
 			
