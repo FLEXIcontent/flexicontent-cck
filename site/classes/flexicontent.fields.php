@@ -18,12 +18,12 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+// Include constants file
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+
 // Include com_content helper files, these are needed by some content plugins
 require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'query.php');
-
-//include constants file
-require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 class FlexicontentFields
 {
@@ -36,7 +36,6 @@ class FlexicontentFields
 	 */
 	static function renderFields( $item_per_field=true, $item_ids=array(), $field_names=array(), $view=FLEXI_ITEMVIEW, $methods=array(), $cfparams=array() )
 	{
-		require_once (JPATH_ADMINISTRATOR.DS.'components/com_flexicontent/defineconstants.php');
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once("components/com_flexicontent/classes/flexicontent.helper.php");
 		
@@ -3863,6 +3862,8 @@ class FlexicontentFields
 	// Helper method to create HTML display of an item list according to replacements
 	static function createItemsListHTML(&$params, &$item_list, $isform=0, &$parentfield, &$parentitem, &$_item_data=null)
 	{
+		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
+		
 		$db = JFactory::getDBO();
 		global $globalcats, $globalnoroute, $fc_run_times;
 		if (!is_array($globalnoroute)) $globalnoroute = array();
