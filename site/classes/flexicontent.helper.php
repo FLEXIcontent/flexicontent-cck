@@ -2993,14 +2993,19 @@ class flexicontent_html
 				<div class="nowrap_box fcvote-label-outer">
 					'.($label ? '<div id="fcvote_lbl'.$id.'_'.$xid.'" class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '').'
 					<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fc-mssg-inline fc-info fc-iblock fc-nobgimage fcvote-count" '.( ($counter==-1 || $counter==0) && !$show_percentage ? 'style="display:none;"' : '' ).'>'.
+						($show_percentage ? ((int)$percent ? (int)$percent.'%' : '') : '').
 						( $counter==-1 || $counter==0 ? '' :
+							($show_percentage && (int)$percent ? ' - ' : '').
 							($rating_count ? $rating_count : '0').
-							($counter_show_label ? ' '.JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '').
-							($show_percentage && (int)$percent ? ' - ' : '')
-						).
-						($show_percentage ? ((int)$percent ? (int)$percent.'%' : '') : '')
-						.'
-					</div>
+							($counter_show_label ? ' '.JText::_( $rating_count!=1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE' ) : '')
+						).'
+					</div>'.
+					(!(int)$percent ? '' : '
+					<span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+						<meta itemprop="ratingValue" content="'.round($percent).'" />
+						<meta itemprop="bestRating"  content="100" />
+						<meta itemprop="ratingCount" content="'.$rating_count.'" />
+					</span>').'
 				</div>
 				<ul class="fcvote_list">
 					<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;'.$nocursor.'"></li>
