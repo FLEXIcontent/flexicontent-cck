@@ -104,7 +104,8 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			<div class="<?php echo $filter_container_class; ?> fc_filter_text_search fc_odd">
 				<?php
 				$text_search_class = 'fc_text_filter';
-				$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike fc_basic_complete' : ' fc_index_complete_simple fc_basic_complete fc_label_internal') : ' fc_label_internal';
+				$_label_internal = '';//'fc_label_internal';  // data-fc_label_text="..."
+				$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike fc_basic_complete' : ' fc_index_complete_simple fc_basic_complete '.$_label_internal) : ' '.$_label_internal;
 				$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
 				?>
 				
@@ -114,7 +115,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				
 				<div class="fc_filter_html fc_text_search">
 					<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
-						data-fc_label_text="<?php echo $text_search_label; ?>" name="filter"
+						placeholder="<?php echo $text_search_label; ?>" name="filter"
 						id="<?php echo $form_id; ?>_filter" value="<?php echo htmlspecialchars($text_search_val, ENT_COMPAT, 'UTF-8');?>" />
 					<?php echo $searchphrase_selector; ?>
 					

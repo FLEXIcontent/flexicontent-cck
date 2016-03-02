@@ -51,7 +51,8 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		
 		$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
 		$text_search_class  = !$append_buttons ? 'fc_text_filter' : '';
-		$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' fc_label_internal') : ' fc_label_internal';
+		$_label_internal = '';//'fc_label_internal';  // data-fc_label_text="..."
+		$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' '.$_label_internal) : ' '.$_label_internal;
 		//$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
 		$search_inner_width = JText::_($params->get('search_inner_width', 20));
 		$search_inner_prompt = JText::_($params->get('search_inner_prompt', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
@@ -62,7 +63,7 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		$output = '
 			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
 				id="mod_search_searchword-'.$module->id.'" class="'.$text_search_class.'"
-				data-fc_label_text="'.$search_inner_prompt.'" name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="" />';
+				placeholder="'.$search_inner_prompt.'" name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="" />';
 		
 		// Search GO button
 		if ($button) :

@@ -138,13 +138,14 @@ $r = 0;
 					
 					$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
 					$text_search_class  = !$append_buttons ? 'fc_text_filter' : '';
-					$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' fc_label_internal') : ' fc_label_internal';
+					$_label_internal = '';//'fc_label_internal';  // data-fc_label_text="..."
+					$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' '.$_label_internal) : ' '.$_label_internal;
 					$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
 					?>
 					<div class="fc_filter_html">
 						<?php echo $append_buttons ? '<span class="btn-wrapper input-append">' : ''; ?>
 							<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
-								data-fc_label_text="<?php echo $text_search_label; ?>" name="q" size="30" maxlength="120" 
+								placeholder="<?php echo $text_search_label; ?>" name="q" size="30" maxlength="120" 
 								id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" />
 							
 							<?php $button_classes = FLEXI_J30GE ? ' btn btn-success' : ' fc_button fcsimple'; ?>
