@@ -555,8 +555,8 @@ flexicontent_html::loadFramework('flexi-lib');
 					}
 					
 					if ( in_array($ext, $imageexts)) {
-						$file_preview  = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1';
-						$file_preview2 = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w=120&amp;h=90&amp;zc=1';
+						$file_preview  = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95';
+						$file_preview2 = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w=120&amp;h=90&amp;zc=1&amp;q=95';
 					} else {
 						$file_preview  = '';
 						$file_preview2 = '';

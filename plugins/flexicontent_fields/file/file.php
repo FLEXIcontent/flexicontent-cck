@@ -794,9 +794,9 @@ class plgFlexicontent_fieldsFile extends FCField
 	    	$file_id = isset($v['file-id']) ? (int) $v['file-id'] : $v;
 	    	$file_id = is_numeric($file_id) ? (int) $file_id : 0;  // if $v is not an array
 				
-				$err_code = $_FILES["custom"]["error"][$field->name][$n]['file-data'];
-				$new_file = $err_code == 0;
-				if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE)
+				$err_code = isset($_FILES['custom']['error'][$field->name][$n]['file-data']) ? $_FILES['custom']['error'][$field->name][$n]['file-data'] : UPLOAD_ERR_NO_FILE;
+				$new_file = $err_code === 0;
+				if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE )
 				{
 					$err_msg = array(
 						UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
