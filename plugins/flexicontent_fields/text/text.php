@@ -319,12 +319,13 @@ class plgFlexicontent_fieldsText extends FCField
 			$field->html[] = '
 				'.$text_field.'
 				'.$select_field.'
+				'.($use_ingroup ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
-					'.($use_ingroup ? '' : $move2).'
-					'.($use_ingroup ? '' : $remove_button).'
-					'.($use_ingroup || !$add_position ? '' : $add_here).'
+					'.$move2.'
+					'.$remove_button.'
+					'.(!$add_position ? '' : $add_here).'
 				</div>
-				';
+				');
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist

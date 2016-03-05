@@ -880,13 +880,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$field->html[] = '
 			'.($multiple ? '
 				'.(!$none_props ? '<div class="fcclear"></div>' : '').'
+				'.($use_ingroup ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
-					'.($use_ingroup ? '' : $move2).'
-					'.($use_ingroup ? '' : $remove_button).'
-					'.($use_ingroup || !$add_position ? '' : $add_here).'
+					'.$move2.'
+					'.$remove_button.'
+					'.(!$add_position ? '' : $add_here).'
 				</div>
+				').'
 				<div class="fcclear"></div>
-				' : '').'
+			' : '').'
 			'.$preview_msg.'
 			'.$originalname.'
 			'.$existingname.'

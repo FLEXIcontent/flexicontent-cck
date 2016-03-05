@@ -295,11 +295,13 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 				</td></tr>';
 			
 			$field->html[] = '
+				'.($use_ingroup ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
-					'.($use_ingroup ? '' : $move2).'
-					'.($use_ingroup ? '' : $remove_button).'
-					'.($use_ingroup || !$add_position ? '' : $add_here).'
+					'.$move2.'
+					'.$remove_button.'
+					'.(!$add_position ? '' : $add_here).'
 				</div>
+				').'
 				'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
 				<table class="admintable"><tbody>
 				'.$phonelabel.'

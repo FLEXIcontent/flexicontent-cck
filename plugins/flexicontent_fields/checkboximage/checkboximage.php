@@ -500,12 +500,13 @@ class plgFlexicontent_fieldsCheckboximage extends FCField
 					'.'<div id="'.$elementid_n.'" class="fc_input_set">'.$form_field.'</div>
 					'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
 					'.($use_ingroup   ? '<input type="hidden" class="fcfield_value_holder" name="'.$valueholder_nm.'['.$n.']" id="'.$valueholder_id.'_'.$n.'" value="-">' : '').'
+				'.($use_ingroup ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
-					'.($use_ingroup ? '' : $move2).'
-					'.($use_ingroup ? '' : $remove_button).'
-					'.($use_ingroup || !$add_position ? '' : $add_here).'
+					'.$move2.'
+					'.$remove_button.'
+					'.(!$add_position ? '' : $add_here).'
 				</div>
-					';
+				');
 				
 				// Listen to the changes of cascade-after field
 				if ($cascade_after && !$ajax) $per_val_js .= "

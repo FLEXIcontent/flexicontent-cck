@@ -282,13 +282,14 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		for($n = 0; $n < $max_count; $n++)
 		{
 			$field->html[$n] = '
+				'.($use_ingroup ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
-					'.($use_ingroup ? '' : $move2).'
-					'.($use_ingroup ? '' : $remove_button).'
-					'.($use_ingroup ? '' : $togglers).'
-					'.($use_ingroup || !$add_position ? '' : $add_here).'
+					'.$move2.'
+					'.$remove_button.'
+					'.$togglers.'
+					'.(!$add_position ? '' : $add_here).'
 				</div>
-				';
+				');
 			
 			// Append item-form display HTML of the every field in the group
 			$i = 0;

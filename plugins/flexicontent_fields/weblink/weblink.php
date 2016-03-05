@@ -322,12 +322,14 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			}
 			
 			$field->html[] = '
+				'.($use_ingroup ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
-					'.($use_ingroup ? '' : $move2).'
-					'.($use_ingroup ? '' : $expand_view).'
-					'.($use_ingroup ? '' : $remove_button).'
-					'.($use_ingroup || !$add_position ? '' : $add_here).'
+					'.$move2.'
+					'.$expand_view.'
+					'.$remove_button.'
+					'.(!$add_position ? '' : $add_here).'
 				</div>
+				').'
 				'.$link.'
 				'.$title.'
 				'.$hits.'

@@ -637,11 +637,13 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			}
 			
 			$html_field = '
+				'.($use_ingroup ? '' : '
 				<div class="'.$input_grp_class.' fc-xpended-btns">
-					'.($use_ingroup ? '' : $move2).'
-					'.($use_ingroup ? '' : $remove_button).'
-					'.($use_ingroup || !$add_position ? '' : $add_here).'
+					'.$move2.'
+					'.$remove_button.'
+					'.(!$add_position ? '' : $add_here).'
 				</div>
+				').'
 			<div class="fcclear"></div>
 			<div class="fcfield_field_data_box">
 			<table class="fc-form-tbl fcfullwidth fcinner fc-sharedmedia-field-tbl" data-row="'.$n.'">
