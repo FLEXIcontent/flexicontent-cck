@@ -488,7 +488,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$_total_queries += $query_count;
 		$session->set($indexer.'_total_queries', $_total_queries ,'flexicontent');
 		
-		echo sprintf( $cnt.' | Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries;
+		echo sprintf( 'success | '. $cnt.' | Server execution time: %.2f secs ', $_total_runtime/1000000) . ' | Total DB updates: '. $_total_queries;
 		exit;
 	}
 	
