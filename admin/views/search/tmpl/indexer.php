@@ -52,14 +52,16 @@ jQuery(document).ready(function() {
 				total_time += request_time;
 				
 				var arr = response.split('|');
-				if(arr[0]=='fail') {
-					jQuery('div#statuscomment').html(arr[1]);
+				var result = arr[0].trim();
+				if ( result=='fail' || result!='success' )
+				{
+				jQuery('div#statuscomment').html( '<span style="font-weight:bold;">INDEXER HALTED, due to server response</span>: <br/> ' + (result=='fail'  ?  arr[1]  :  response) );
 					//jQuery('img#loading_img').hide();
 					looper = number;
 					return;
 				}
 				//looper=looper+items_per_call;
-				looper=parseInt(arr[0]);
+				looper=parseInt(arr[1]);
 				
 				width = onesector*looper;
 				if (width>300) width = 300;
@@ -68,11 +70,15 @@ jQuery(document).ready(function() {
 				jQuery('div#updatepercent').html(' '+percent.toFixed(2)+' %');
 				jQuery('div#statuscomment').html(
 					(looper<number?looper:number)+' / '+number+' items <br/>'
-					+ '<br/>' + arr[1]
-					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
 					+ '<br/>' + arr[2]
+					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
+					+ '<br/>' + arr[3]
 				);
 				setTimeout(updateprogress, 20);  // milliseconds to delay updating the HTML display
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				alert(xhr.status);
+				alert(thrownError);
 			}
 		});
 	}
@@ -85,8 +91,10 @@ jQuery(document).ready(function() {
 			total_time += request_time;
 			
 			var arr = response.split('|');
-			if(arr[0]=='fail') {
-				jQuery('div#statuscomment').html(arr[1]);
+			var result = arr[0].trim();
+			if( result=='fail' || result!='success' )
+			{
+				jQuery('div#statuscomment').html( '<span style="font-weight:bold;">INDEXER HALTED, due to server response</span>: <br/> ' + (result=='fail'  ?  arr[1]  :  response) );
 				return;
 			}
 			//items = jQuery.parseJSON(arr[1]);
@@ -110,6 +118,10 @@ jQuery(document).ready(function() {
 					+ '<br/>' + arr[5]
 			);
 			updateprogress();
+		},
+		error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
 		}
 	});
 });
