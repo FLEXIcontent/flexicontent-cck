@@ -2432,7 +2432,8 @@ class ParentClassItem extends JModelAdmin
 				if (!$field->iscore || isset($core_via_post[$field->name]))
 				{
 					$field_type = $field->iscore ? 'core' : $field->field_type;
-					$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item ));
+					$file_data  = isset($files[$field->name]) ? $files[$field->name] : null;  // Pass a copy field's FILE data
+					$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$file_data, &$item ));
 					
 					if ($result===false) {
 						// Field requested to abort item saving
@@ -2450,7 +2451,8 @@ class ParentClassItem extends JModelAdmin
 				}
 				
 				//$qindex[$field->name] = NULL;
-				//$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item, &$qindex[$field->name] ));
+				//$file_data  = isset($files[$field->name]) ? $files[$field->name] : null;  // Pass a copy field's FILE data
+				//$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$file_data, &$item, &$qindex[$field->name] ));
 				//if ($result===false) { ... }
 				
 				// Get vstate property from the field object back to the data array ... in case it was modified, since some field may decide to prevent approval !
@@ -2836,7 +2838,8 @@ class ParentClassItem extends JModelAdmin
 			foreach($fields as $field)
 			{
 				$field_type = $field->iscore ? 'core' : $field->field_type;
-				$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onAfterSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item ));
+				$file_data  = isset($files[$field->name]) ? $files[$field->name] : null;  // Pass a copy field's FILE data
+				$result = FLEXIUtilities::call_FC_Field_Func($field_type, 'onAfterSaveField', array( &$field, &$postdata[$field->name], &$file_data, &$item ));
 				// *** $result is ignored
 			}
 			if ( $print_logging_info ) @$fc_run_times['onAfterSaveField_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;

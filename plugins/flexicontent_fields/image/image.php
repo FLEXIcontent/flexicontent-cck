@@ -793,7 +793,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$ext = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
 					$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$img_link = str_replace('\\','/', $img_link);
-					$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h;
+					$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h.'&amp;zc=1&amp;q=95';
 				}
 			} else {
 				$img_link = '';
@@ -2113,7 +2113,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		
 		// **************************************************************************
-		// Rearrange file array so that file properties are groupped per image number
+		// Rearrange file array so that file properties are groupped per value number
 		// **************************************************************************
 		//echo "<pre>"; print_r($file); echo "</pre>";
 		$files = array();
@@ -2149,8 +2149,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 			
 			// Add system message if upload error
-			$err_code = isset($files[$n]['error']) ? $files[$n]['error'] : false;
-			if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE)
+			$err_code = isset($files[$n]['error']) ? $files[$n]['error'] : UPLOAD_ERR_NO_FILE;
+			if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE )
 			{
 				$err_msg = array(
 					UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',

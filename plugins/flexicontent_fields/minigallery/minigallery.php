@@ -654,8 +654,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				$img_path = (substr($file_data->filename, 0,7)!='http://' || substr($file_data->filename, 0,8)!='https://') ?
 					JURI::root(true) . '/' . $mediapath . '/' . $file_data->filename :
 					$file_data->filename ;
-				$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_s.'&amp;h='.$h_s.'&amp;zc=1';
-				$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_l.'&amp;h='.$h_l.'&amp;zc=1';
+				$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_s.'&amp;h='.$h_s.'&amp;zc=1&amp;q=95';
+				$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_l.'&amp;h='.$h_l.'&amp;zc=1&amp;q=95';
 				$ext = pathinfo($img_path, PATHINFO_EXTENSION);
 				if ( in_array( $ext, array('png', 'ico', 'gif') ) ) {
 					$srcs .= '&amp;f='. $ext;
@@ -711,7 +711,6 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
 		// Make sure posted data is an array 
-		//echo "<pre>"; print_r($post); exit;
 		$post = !is_array($post) ? array($post) : $post;   //echo "<pre>"; print_r($post);
 		
 		// Get configuration
@@ -738,15 +737,13 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		
 		$newpost = array();
 		$new = 0;
-    foreach ($post as $n => $v)
-    {
-    	if (empty($v)) {
-    		if ($use_ingroup) {  // empty value for group
-					$newpost[$new] = '';
-					$new++;
-				}
-    		continue;
-    	}
+		foreach ($post as $n => $v)
+		{
+			if (empty($v)) {
+				// skip empty value, but allow empty (null) placeholder value if in fieldgroup
+				if ($use_ingroup) $newpost[$new++] = null;
+				continue;
+			}
 			
 			// support for basic CSV import / export
 			if ( $is_importcsv ) {
@@ -772,10 +769,10 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			else {
 	    	$file_id = isset($v['file-id']) ? (int) $v['file-id'] : $v;
 	    	$file_id = is_numeric($file_id) ? (int) $file_id : 0;  // if $v is not an array
-				
-				$err_code = $_FILES["custom"]["error"][$field->name][$n]['file-data'];
-				$new_file = $err_code == 0;
-				if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE)
+	    	
+	    	$err_code = isset($_FILES['custom']['error'][$field->name][$n]['file-data']) ? $_FILES['custom']['error'][$field->name][$n]['file-data'] : UPLOAD_ERR_NO_FILE;
+				$new_file = $err_code === 0;
+				if ( $err_code && $err_code!=UPLOAD_ERR_NO_FILE )
 				{
 					$err_msg = array(
 						UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
@@ -787,6 +784,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 						UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload'
 					);
 					JFactory::getApplication()->enqueueMessage("FILE FIELD: ".$err_msg[$err_code], 'warning' );
+					if ($use_ingroup) $newpost[$new++] = null;
 					continue;
 				}
 				
@@ -831,6 +829,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 							$fm = new FlexicontentModelFilemanager();
 							$fm->delete( array($file_id) );
 						}
+						if ($use_ingroup) $newpost[$new++] = null;
 						continue;  // Skip file since unloading / removal was requested
 					}
 					
@@ -840,6 +839,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					// Update DB data of the file 
 					if ( !$row->check() || !$row->store() ) {
 						JFactory::getApplication()->enqueueMessage("FILE FIELD: ".JFactory::getDBO()->getErrorMsg(), 'warning' );
+						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}
 					
@@ -870,7 +870,10 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					}
 					
 					// Skip file if unloading / removal was requested
-					if ( $v['file-del'] )  continue;  
+					if ( $v['file-del'] ) {
+						if ($use_ingroup) $newpost[$new++] = null;
+						continue;
+					}
 					
 					$fman = new FlexicontentControllerFilemanager();   // Controller will do the data filter too
 					JRequest::setVar( 'return-url', null, 'post' );  // needed !
@@ -885,12 +888,12 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					JRequest::setVar( 'fname_level2', $n, 'post' );
 					JRequest::setVar( 'fname_level3', 'file-data', 'post' );
 					$file_id = $fman->upload();
-					$v = !empty($file_id) ? $file_id : false;
+					$v = !empty($file_id) ? $file_id : ($use_ingroup ? null : false);
 				}
 				
 				else {
 					// no existing file and no new file uploaded
-					$v = 0;
+					$v = $use_ingroup ? null : false;
 				}
 	    }
 			
@@ -899,7 +902,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				if ( !empty($v) && is_numeric($v) ) $newpost[(int)$v] = $new++;
 			} else {
 				// Inside fieldgroup, allow same file multiple times
-				$newpost[$new++] = (int)$v;
+				$newpost[$new++] = $v===null ? null : (int)$v;  // null means skip value but increment value position
 			}
     }
     
