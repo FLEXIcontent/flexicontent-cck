@@ -67,6 +67,8 @@ if ( $show_mod )
 	
 	// include the helper only once
 	require_once (dirname(__FILE__).DS.'helper.php');
+	// include flexicontent route helper file
+	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 	
 	// Other parameters
 	$moduleclass_sfx= $params->get('moduleclass_sfx', '');

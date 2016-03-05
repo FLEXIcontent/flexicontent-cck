@@ -21,10 +21,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // Include constants file
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
-// Include com_content helper files, these are needed by some content plugins
-require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
-require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'query.php');
-
 class FlexicontentFields
 {
 	/**
@@ -695,7 +691,12 @@ class FlexicontentFields
 		// Log content plugin and other performance information
 		//if ($print_logging_info) 	global $fc_run_times;
 		
-		if (!$_initialize) {
+		if (!$_initialize)
+		{
+			// Include com_content helper files, these are needed by some content plugins
+			require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'query.php');
+			
 			// some request and other variables
 			$_view   = JRequest::getVar('view');
 			$_option = JRequest::getVar('option');
