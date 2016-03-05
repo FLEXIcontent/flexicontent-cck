@@ -14,7 +14,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $custom_allpages = JText::_( $this->params->get('custom_allpages', 'FLEXIBREAK_ALL_PAGES') );
 $display_method = $this->params->get('display_method', 1);
-$onclick = $display_method == 1  ?  'javascript:return false;'  : '';  // need to disable anchor following
+$onclick    = $display_method == 1  ?  'javascript:return false;'  : '';  // need to disable anchor following
+$link_class = $display_method==1 ? ' tocPaginated' : ($display_method==0 ? ' tocScrolled' : ' tocReloaded');
+$curr_link  = JUri::getInstance()->toString(array('path', 'query'));
 ?>
 <div class="contenttoc" id="articleTOC">
 	<p class="tocHeader"><?php echo JText::_( 'FLEXIBREAK_TABLE_OF_CONTENT' ) ?></p>
@@ -23,18 +25,15 @@ $onclick = $display_method == 1  ?  'javascript:return false;'  : '';  // need t
 		
 		<?php if ( $this->params->get('allpages_link', 1) && $display_method == 1 ) : ?>
 			<li>
-				<a class="tocAll" id="showall" onclick="<?php echo $onclick ?>" href="#showall"> - <?php echo $custom_allpages; ?> - </a>
+				<a class="tocAll" id="showall" onclick="<?php echo $onclick ?>" href="<?php echo $curr_link; ?>#showall"> - <?php echo $custom_allpages; ?> - </a>
 			</li>
 		<?php endif; ?>
 		
 		<?php
-		$curr_link = JUri::getInstance()->toString(array('path', 'query'));
-		$link_class = $display_method==1 ? ' tocPaginated' : ($display_method==0 ? ' tocScrolled' : ' tocReloaded');
-		
 		$n = !empty($this->texts[0]) ? -1 : 0;
 		for ($i = 0; $i < $this->pagescount; $i++) :
 			$page = $this->_generateToc($this->row, $i);
-			if ($display_method == 1) $link = '#'.$page->id;
+			if ($display_method == 1) $link = $curr_link.'#'.$page->id;
 			else if ($display_method == 2) $link = $page->link;
 			else  $link = $curr_link.'#'.$page->id.'_toc_page';
 			$active = $this->limitstart == $i  ?  ' active'  : '';
