@@ -68,25 +68,18 @@ if (!preg_match( '/Itemid=[0-9]+/i', $string)) { // if no Itemid in non-sef URL
     : '';
 }
 
-$view 		= isset ($view) ? @$view : null;
-$Itemid		= isset ($Itemid) ? @$Itemid : null;
-$task 		= isset($task) ? @$task : null;
-$format		= isset($format) ? @$format : null;
-$return 	= isset ($return) ? @$return : null;
+$view 		= isset ($view)   ? $view   : null;
+$Itemid		= isset ($Itemid) ? $Itemid : null;
+$task 		= isset($task)    ? $task   : null;
+$format		= isset($format)  ? $format : null;
+$return 	= isset ($return) ? $return : null;
 
-// remove common URL from GET vars list, so that they don't show up as query string in the URL
-shRemoveFromGETVarsList('option');
-shRemoveFromGETVarsList('lang');
-if (!empty($Itemid))      shRemoveFromGETVarsList('Itemid');
-if (!empty($limit))       shRemoveFromGETVarsList('limit');
-if (isset($limitstart))   shRemoveFromGETVarsList('limitstart');
-
-// Added for the preview feature in FLEXIcontent 1.5.5 
+// Preview feature (login via URL (usually disable for security reasons))
 if (!empty($_fcu)) {
-	shRemoveFromGETVarsList('fcu');
+	shRemoveFromGETVarsList ( 'fcu' );
 	$dosef = false;
 } else if (!empty($_fcp)) {
-	shRemoveFromGETVarsList('fcp');
+	shRemoveFromGETVarsList ( 'fcp' );
 	$dosef = false;
 }
 
@@ -104,6 +97,7 @@ if (FLEXI_J16GE) {
 // Some FLEXIcontent views may only set task variable ... in this case set task variable as view
 if ( !$view && $task == 'search' ) {
 	$view = 'search';
+	shRemoveFromGETVarsList ( 'task' );
 }
 
 // Do not convert to SEF urls, the urls for vote and favourites
@@ -111,17 +105,17 @@ if($format == 'raw') {
 	if ($task == 'ajaxvote' || $task == 'ajaxfav') return;
 }
 
-switch ($view) {
+switch ($view)
+{
+	case 'item' :
 	
-	case 'items' : 	case 'item' :
-
 		// Do not convert to SEF urls, the urls for item form
 		if ($_layout == 'form' || $task == 'edit' || $task == 'add') return;
 		
-		if (!empty($id)) {
-		
-			if (!$task) {
-			
+		if (!empty($id))   // Existing item, empty ID means new item form or invalid URL
+		{
+			if (!$task)
+			{
 				$query	= 'SELECT i.id, i.title, i.alias, i.catid, ie.type_id, c.title AS cattitle, ty.alias AS typealias'
 						. ' FROM #__content AS i'
 						. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
@@ -131,18 +125,15 @@ switch ($view) {
 						. ' WHERE i.id = ' . ( int ) $id;
 				$database->setQuery ( $query );
 
-				// Do not translate the items url (Joomfish extended Database class and overrides the method)
-				if (!FLEXI_FISH) {
-					$row = $database->loadObject ( );
-				} else {
-					$row = $database->loadObject ( null, false );
-				}
+				// Do not translate the items url (Falang extended Database class and overrides the method)
+				$row = !FLEXI_FISH  ?  $database->loadObject ( )  :  $database->loadObject ( null, false );
 				
-				if ($database->getErrorNum ()) {
-					die ( $database->stderr () );
-				} elseif ($row) {
-					
-					if ($row->title) {
+				if ($database->getErrorNum ())  die ( $database->stderr () );
+				
+				if ($row)
+				{	
+					if ($row->title)
+					{
 						// force using the default category if none is specified in the query string
 						$catid = @$cid ? $cid : $row->catid;
 						
@@ -152,14 +143,14 @@ switch ($view) {
 							foreach ($ancestors as $ancestor) {
 								if (!in_array($ancestor, $globalnoroute)) {
 									if (shTranslateURL ( $option, $shLangName ) && FLEXI_FISH) {
-										// Translating title and Joomfish is installed
+										// Translating title and Falang is installed
 										$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
 										$database->setQuery ( $query );
 										$row_cat = $database->loadObject ();
 										$cat_titles[] = ($sefConfig->useCatAlias ? $row_cat->alias : $row_cat->title) . '/';
 									} else {
 										list($_cat_id, $_cat_alias) = explode( ":", $globalcats[$ancestor]->slug );
-										// Not translating title or Joomfish not installed
+										// Not translating title or Falang not installed
 										$cat_titles[] = ($sefConfig->useCatAlias ? $_cat_alias : $globalcats[$ancestor]->title) . '/';
 									}
 								}
@@ -203,11 +194,9 @@ switch ($view) {
 					}
 				}
 			
-				// Remove the vars from the url
-				if (!empty($id))
-					shRemoveFromGETVarsList ( 'id' );
-				if (!empty($cid))
-					shRemoveFromGETVarsList ( 'cid' );
+				// Remove the item-id and category-id vars from the url
+				if (!empty($id))   shRemoveFromGETVarsList ( 'id' );
+				if (!empty($cid))  shRemoveFromGETVarsList ( 'cid' );
 
 			} elseif ($task == 'edit') {
 				$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_EDIT'];
@@ -252,7 +241,7 @@ switch ($view) {
 							$cat_titles[] = ($sefConfig->useCatAlias ? $row->alias : $row->title) . '/';
 						} else {
 							list($_cat_id, $_cat_alias) = explode( ":", $globalcats[$ancestor]->slug );
-							// Not translating title or Joomfish not installed
+							// Not translating title or Falang not installed
 							$cat_titles[] = ($sefConfig->useCatAlias ? $_cat_alias : $globalcats[$ancestor]->title) . '/';
 						}
 					}
@@ -416,43 +405,45 @@ switch ($view) {
 
 if ($task == 'download') {
 	$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_DOWNLOAD'];
+	shRemoveFromGETVarsList ( 'task' );
 }
 
 if ($task == 'weblink') {
 	$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_WEBLINK'];
+	shRemoveFromGETVarsList ( 'task' );
 }
 
-// Remove the remaining common vars from the url
-if (!empty($option))
-	shRemoveFromGETVarsList ( 'option' );
 
-if (!empty($task))
-	shRemoveFromGETVarsList ( 'task' );
+// Remove other common URL variables from GET vars list, so that they don't show up as query string in the URL
+if (!empty($option))     shRemoveFromGETVarsList ( 'option' );
+if (!empty($lang))       shRemoveFromGETVarsList ( 'lang' );
+if (!empty($Itemid))     shRemoveFromGETVarsList ( 'Itemid' );
+if (!empty($limit))      shRemoveFromGETVarsList ( 'limit' );
 
-if (!empty($lang))
-	shRemoveFromGETVarsList ( 'lang' );
+// Variables 'limitstart', 'start', 'showall' can be zero or empty string, so use isset
+if (isset($limitstart))  shRemoveFromGETVarsList ( 'limitstart' );
+if (isset($start))       shRemoveFromGETVarsList ( 'start' );
+if (isset($showall))     shRemoveFromGETVarsList ( 'showall' );
 
-// This is done per view, to make sure that non-handled views will not unset the view variable, and thus breaking the URL !!
-//if (!empty($view))
-//	shRemoveFromGETVarsList ( 'view' );
+// Some special handling for pagination
+if ($view=='item') $limit = 1;   // For item view limit needs to be 1, so that page numbers are calculated correctly
+if (!isset($limitstart) &&  isset($start))  $limitstart = $start;   // Use 'start' if 'limitstart' is not set
 
-if (!empty($Itemid))
-	shRemoveFromGETVarsList ( 'Itemid' );
+// The following are done per case, to make sure that non-handled case will not unset the variables, and thus breaking the URL !!
+//if (!empty($task))   shRemoveFromGETVarsList ( 'task' );
+//if (!empty($view))   shRemoveFromGETVarsList ( 'view' );
 
-if (!empty($limit))
-	shRemoveFromGETVarsList ( 'limit' );
+// Never unset return URL
+//if (!empty($return))   shRemoveFromGETVarsList ( 'return' );
 
-if (isset($limitstart))
-	shRemoveFromGETVarsList ( 'limitstart' ); // limitstart can be zero
-	
-//if (!empty($return))
-//	shRemoveFromGETVarsList ( 'return' );
 
 // ------------------  standard plugin finalize function - don't change ---------------------------
 if ($dosef){
-  $string = shFinalizePlugin( $string, $title, $shAppendString, $shItemidString,
-      (isset($limit) ? @$limit : null), (isset($limitstart) ? @$limitstart : null),
-      (isset($shLangName) ? @$shLangName : null));
+  $string = shFinalizePlugin(
+		$string, $title, $shAppendString, $shItemidString,
+		(isset($limit) ? $limit : null),
+		(isset($limitstart) ? $limitstart : null),
+		(isset($shLangName) ? $shLangName : null)
+	);
 }
 // ------------------  standard plugin finalize function - don't change ---------------------------
-
