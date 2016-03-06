@@ -70,8 +70,8 @@ class com_flexicontentInstallerScript
 			if ( $memory_limit < 64000000 ) @ini_set( 'memory_limit', '64M' );
 		}
 		
-		// first check if PHP v5.3.0 or later is running
-		$PHP_VERSION_NEEDED = '5.3.0';
+		// first check if PHP v5.3.10 or later is running
+		$PHP_VERSION_NEEDED = '5.3.10';
 		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
 		{
 			// load english language file for 'com_flexicontent' component then override with current language file
