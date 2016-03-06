@@ -80,6 +80,7 @@
 			<menu link="option=com_flexicontent&amp;view=users">FLEXI_USERS</menu>
 			<menu link="option=com_flexicontent&amp;view=filemanager">FLEXI_FILEMANAGER</menu>
 			<menu link="option=com_flexicontent&amp;view=import">FLEXI_IMPORT</menu>
+			<menu link="option=com_flexicontent&amp;view=search">FLEXI_SEARCH_INDEXES</menu>
 			<menu link="option=com_flexicontent&amp;view=stats">FLEXI_STATISTICS</menu>
 			<menu link="option=com_config&amp;view=component&amp;component=com_flexicontent">FLEXI_CONFIG</menu>
 		</submenu>
