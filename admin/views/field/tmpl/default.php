@@ -20,7 +20,10 @@ defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$hint_image = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$hint_image = '<i class="icon-info"></i>';//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$warn_image = '<i class="icon-warning"></i>';//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$conf_image = '<i class="icon-cog"></i>';
+
 unset($form);
 $form = & $this->form;
 
@@ -61,12 +64,20 @@ $this->document->addScriptDeclaration($js);
 				</td>
 				<td>
 					<?php echo $form->getInput('name'); ?>
-					<?php if ($form->getValue('field_type')=='textarea') : ?>
-						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline"><?php echo JText::_('FLEXI_NOTES'); ?>:
-							<span class="<?php echo $tip_class; ?>" data-placement="bottom"
-									title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_CORE_FIELDS_CUSTOMIZATION', 'text', '<b>'.JText::_('FLEXI_DESCRIPTION').'</b>', 'text'), 0, 1); ?>">
-								<?php echo $hint_image; ?>
-							</span>
+					
+					<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo '<b>'.JText::_('FLEXI_NOTES').'</b><br/>'.JText::_('FLEXI_FIELDNAME_CHANGE_WARNING'); ?>">
+						<?php echo $warn_image; ?>
+						<?php echo $conf_image; ?>
+						<?php echo JText::_('FLEXI_NOTES'); ?>
+					</span>
+					
+					<?php if ($form->getValue('field_type')=='textarea') :
+						$msg_txt = flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_CORE_FIELDS_CUSTOMIZATION', 'text', '<b>'.JText::_('FLEXI_DESCRIPTION').'</b>', 'text'), 0, 1);
+					?>
+						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo $msg_txt; ?>">
+							<?php echo $hint_image; ?>
+							<?php echo $conf_image; ?>
+							<?php echo JText::_('FLEXI_NOTES'); ?>
 						</span>
 					<?php endif; ?>
 				</td>
@@ -78,12 +89,14 @@ $this->document->addScriptDeclaration($js);
 				</td>
 				<td>
 					<span class="badge badge-info"><?php echo $form->getValue("name"); ?></span>
-					<?php if ($form->getValue('field_type')=='maintext') : ?>
-						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline"><?php echo JText::_('FLEXI_NOTES'); ?>:
-							<span class="<?php echo $tip_class; ?>" data-placement="bottom"
-									title="<?php echo flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_FIELD_CUSTOMIZE_PER_CONTENT_TYPE', 'textarea', 'text', 'text'), 0, 1); ?>">
-								<?php echo $hint_image; ?>
-							</span>
+					
+					<?php if ($form->getValue('field_type')=='maintext') :
+						$msg_txt = flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_FIELD_CUSTOMIZE_PER_CONTENT_TYPE', 'textarea', 'text', 'text'), 0, 1);
+					?>
+						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo $msg_txt; ?>">
+							<?php echo $hint_image; ?>
+							<?php echo $conf_image; ?>
+							<?php echo JText::_('FLEXI_NOTES'); ?>
 						</span>
 					<?php endif; ?>
 				</td>

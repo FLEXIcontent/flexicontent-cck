@@ -193,13 +193,13 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		var layout_name  = jQuery('#editor__layout_name').val();
 		var file_subpath = jQuery('#editor__file_subpath').val();
 		if (file_subpath=='') {
-			alert('Please load a file before trying to save');
+			alert(<?php echo "'".JText::_('FLEXI_TMPLS_LOAD_FILE_BEFORE_SAVING', true)."'"; ?>);
 			return;
 		}
 		
 		<?php
 		if (in_array($this->layout->name, array('blog','default','faq','items-tabbed','presentation'))) {
-			echo 'if (!confirm("This is a built-in template files will be RESET on upgrade. Please duplicate template and edit files of new template. Continue ?")) return false;';
+			echo 'if (!confirm("'.JText::_('FLEXI_TMPLS_SAVE_BUILT_IN_TEMPLATE_FILE_WARNING', true).'")) return false;';
 		}
 		?>
 		
@@ -270,6 +270,11 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				jQuery('#fc_doajax_loading').remove();
 				var theData = jQuery.parseJSON(data);
 				jQuery('#ajax-system-message-container').html(theData.sysmssg);
+				
+				file_subpath.split('.').pop().toLowerCase() == 'css' ?
+					jQuery('#edit-css-files-warning').show() :
+					jQuery('#edit-css-files-warning').hide() ;
+									
 				// Loading task always return data, even empty data, set them into the editor
 				set_editor_contents(txtarea, theData);
 				// Display the buttons
@@ -800,9 +805,12 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 					<span id="layout_edit_name_container" class="label label-info"><?php echo JText::_( 'FLEXI_NO_FILE_LOADED' ); ?></span>
 				</span>
 				<div class="fcclear"></div>
-				<div id="ajax-system-message-container">
-				</div>
+				<div id="ajax-system-message-container"></div>
 				<div class="fcclear"></div>
+				
+				<div class="fc-note fc-mssg" id="edit-css-files-warning" style="display: none;">
+					<?php echo JText::_( 'FLEXI_MODIFY_LESS_FILES_INSTEAD_OF_CSS' ); ?>
+				</div>
 				
 				<?php
 				if ($use_editor) {
