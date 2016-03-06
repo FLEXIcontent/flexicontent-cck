@@ -447,6 +447,16 @@ body .nowrap_hidden {
 	border-top-left-radius: 0px !important;
 	border-bottom-left-radius: 0px !important;
 }
+.flexicontent .field-media-wrapper,
+.flexicontent .field-media-wrapper > div:not(.modal) {
+	min-width: 50%;
+	box-sizing: border-box;
+}
+.flexicontent .field-media-wrapper .field-media-input {
+	width: unset;
+	min-width: 80%;
+	max-width: unset;
+}
 .control-label {
 	clear: left;
 	float: left;
