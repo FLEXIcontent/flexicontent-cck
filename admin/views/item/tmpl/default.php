@@ -593,6 +593,43 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 	</div>
 
 
+<?php 
+// *****************************************
+// Capture JOOMLA INTRO/FULL IMAGES and URLS
+// *****************************************
+$FC_jfields_html = array();
+$show_jui = JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 0);
+if ( $this->params->get('use_jimages_be', $show_jui) || $this->params->get('use_jurls_be', $show_jui) ) :
+
+	$fields_grps_compatibility = array();
+	if ( $this->params->get('use_jimages_be', $show_jui) )  $fields_grps_compatibility[] = 'images';
+	if ( $this->params->get('use_jurls_be', $show_jui) )    $fields_grps_compatibility[] = 'urls';
+	foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
+		
+		ob_start(); ?>
+		<table class="fc-form-tbl fcinner fcfullwidth">
+		<?php foreach ($this->form->getGroup($fields_grp_name) as $field) : ?>
+			<?php if ($field->hidden): ?>
+				<tr style="display: none;"><td><?php echo $field->input; ?></td></tr>
+			<?php elseif (!$field->label): ?>
+			<tr>
+				<td colspan="2"><?php echo $field->input;?></td>
+			</tr>
+			<?php else: ?>
+			<tr>
+				<td class="key"><?php echo $field->label; ?></td>
+				<td><?php echo $field->input;?></td>
+			</tr>
+			<?php endif;
+		endforeach; ?>
+		</table>
+		<?php $FC_jfields_html[$fields_grp_name] = ob_get_clean();
+		
+	endforeach;
+endif;
+?>
+
+
 <?php
 // *****************
 // MAIN TABSET START
@@ -771,6 +808,13 @@ if ($this->row->type_id) {
 				} else if ($field->field_type=='maintext') {
 					// placed in separate TAB
 					continue;
+				}
+				
+				if ($field->field_type=='image' && $field->parameters->get('image_source')==-1)
+				{
+					$replace_txt = !empty($FC_jfields_html['images']) ? $FC_jfields_html['images'] : '<span class="alert alert-warning fc-small fc-iblock">'.JText::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION').'</span>';
+					unset($FC_jfields_html['images']);
+					$field->html = str_replace('_INTRO_FULL_IMAGES_HTML_', $replace_txt, $field->html);
 				}
 				
 				// Decide label classes, tooltip, etc
@@ -1194,36 +1238,17 @@ if ($this->perms['canparams']) : ?>
 // *********************
 // JOOMLA IMAGE/URLS TAB
 // *********************
-$show_jui = JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 0);
-if ( $this->params->get('use_jimages_be', $show_jui) || $this->params->get('use_jurls_be', $show_jui) ) : ?>
+if ( count($FC_jfields_html) ) : ?>
 	
 	<!-- Joomla images/urls tab -->
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-joomla" >
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-joomla">
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_COMPATIBILITY'); ?> </h3>
 		
-		<?php
-		$fields_grps_compatibility = array();
-		if ( $this->params->get('use_jimages_be', $show_jui) )  $fields_grps_compatibility[] = 'images';
-		if ( $this->params->get('use_jurls_be', $show_jui) )    $fields_grps_compatibility[] = 'urls';
-		foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
-		?>
-		
+		<?php foreach ($FC_jfields_html as $fields_grp_name => $_html) : ?>
 		<fieldset class="flexi_params fc_tabset_inner">
-			<?php foreach ($this->form->getGroup($fields_grp_name) as $field) : ?>
-				<div class="fcclear"></div>
-				<?php if ($field->hidden): ?>
-					<span style="display:none !important;">
-						<?php echo $field->input; ?>
-					</span>
-				<?php else: ?>
-					<?php echo $field->label; ?>
-					<div class="container_fcfield">
-						<?php echo $field->input;?>
-					</div>
-				<?php endif; ?>
-			<?php endforeach; ?>
+			<div class="alert alert-info" style="width: 50%;"><?php echo JText::_('FLEXI_'.strtoupper($fields_grp_name).'_COMP'); ?></div>
+			<?php echo $_html; ?>
 		</fieldset>
-		
 		<?php endforeach; ?>
 		
 	</div>

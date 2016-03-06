@@ -167,7 +167,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ( $image_source == -1 ) {
 			$field->html = $use_ingroup ?
 				array('<div class="alert alert-warning fc-small fc-iblock">Field is configured to use intro/full images, please disable use in group</div>') :
-				'<div class="fc-mssg-inline fc-info fc-small fc-iblock" style="margin:0 4px;">'.JText::_('FLEXI_FIELD_IMAGE_SET_VALUES_IN_COMPATIBILITY_TAB_DESC').'</div>' ;
+				'_INTRO_FULL_IMAGES_HTML_';
 			return;
 		}
 		
@@ -749,7 +749,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						'.JHtml::tooltip($tooltip, $tooltip_options).'
 					</div>
 					<input type="text" name="'.$fieldname_n.'[existingname]" id="'.$mm_id.'" value="'.htmlspecialchars($img_path, ENT_COMPAT, 'UTF-8').'" readonly="readonly"
-						class="existingname input-large field-media-input hasTipImgpath"  title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="'.JUri::root().'"
+						class="existingname input-xxlarge field-media-input hasTipImgpath"  title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="'.JUri::root().'"
 					/>
 					<a class="fc_image_field_mm_modal btn hasTooltip" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); currElement'.$field->id.'=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((screen.width-120) > 1360 ? 1360 : (screen.width-120)), y: ((screen.height-220) > 800 ? 800 : (screen.width-220))}, handler: \'iframe\', onClose: function() { incrementValCnt'.$field->id.'(); } });  return false;">
 						'.JText::_('FLEXI_SELECT').'

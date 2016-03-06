@@ -252,10 +252,44 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 
 	");
 }
-?>
 
 
-<?php
+// *****************************************
+// Capture JOOMLA INTRO/FULL IMAGES and URLS
+// *****************************************
+$FC_jfields_html = array();
+$show_jui = JComponentHelper::getParams('com_content')->get('show_urls_images_frontend', 0);
+if ( $this->params->get('use_jimages_fe', $show_jui) || $this->params->get('use_jurls_fe', $show_jui) ) :
+
+	$fields_grps_compatibility = array();
+	if ( $this->params->get('use_jimages_fe', $show_jui) )  $fields_grps_compatibility[] = 'images';
+	if ( $this->params->get('use_jurls_fe', $show_jui) )    $fields_grps_compatibility[] = 'urls';
+	foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
+		
+		ob_start(); ?>
+		<table class="fc-form-tbl fcinner fcfullwidth">
+		<?php foreach ($this->form->getGroup($fields_grp_name) as $field) : ?>
+			<?php if ($field->hidden): ?>
+				<tr style="display: none;"><td><?php echo $field->input; ?></td></tr>
+			<?php elseif (!$field->label): ?>
+			<tr>
+				<td colspan="2"><?php echo $field->input;?></td>
+			</tr>
+			<?php else: ?>
+			<tr>
+				<td class="key"><?php echo $field->label; ?></td>
+				<td><?php echo $field->input;?></td>
+			</tr>
+			<?php endif;
+		endforeach; ?>
+		</table>
+		<?php $FC_jfields_html[$fields_grp_name] = ob_get_clean();
+		
+	endforeach;
+endif;
+
+
+
 $page_classes  = 'flexi_edit flexicontent';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 ?>
@@ -1165,6 +1199,12 @@ if ($this->fields && $typeid) :
 				continue;
 			}
 			
+			if ($field->field_type=='image' && $field->parameters->get('image_source')==-1)
+			{
+				$replace_txt = !empty($FC_jfields_html['images']) ? $FC_jfields_html['images'] : '<span class="alert alert-warning">'.JText::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION').'</span>';
+				unset($FC_jfields_html['images']);
+				$field->html = str_replace('_INTRO_FULL_IMAGES_HTML_', $replace_txt, $field->html);
+			}
 			
 			// Check if 'Description' field will NOT be placed via fields manager placement/ordering,
 			// but instead it will be inside a custom TAB or inside the 'Description' TAB (default)
@@ -1517,34 +1557,16 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	// *********************
 	// JOOMLA IMAGE/URLS TAB
 	// *********************
-	$show_jui = JComponentHelper::getParams('com_content')->get('show_urls_images_frontend', 0);
-	if ( $this->params->get('use_jimages_fe', $show_jui) || $this->params->get('use_jurls_fe', $show_jui) ) : ?>
+	if ( count($FC_jfields_html) ) : ?>
+
 		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-joomla">
-			<h3 class="tabberheading"> <?php echo JText::_('Compatibility'); ?> </h3>
+			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_COMPATIBILITY'); ?> </h3>
 			
-			<?php
-			$fields_grps_compatibility = array();
-			if ( $this->params->get('use_jimages_fe', $show_jui) )  $fields_grps_compatibility[] = 'images';
-			if ( $this->params->get('use_jurls_fe', $show_jui) )    $fields_grps_compatibility[] = 'urls';
-			foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
-			?>
-			
-			<fieldset class="flexi_params fc_edit_container_full">
-				<?php foreach ($this->form->getGroup($fields_grp_name) as $field) : ?>
-					<div class="fcclear"></div>
-					<?php if ($field->hidden): ?>
-						<span style="visibility:hidden !important;">
-							<?php echo $field->input; ?>
-						</span>
-					<?php else: ?>
-						<?php echo $field->label; ?>
-						<div class="container_fcfield">
-							<?php echo $field->input;?>
-						</div>
-					<?php endif; ?>
-				<?php endforeach; ?>
+			<?php foreach ($FC_jfields_html as $fields_grp_name => $_html) : ?>
+			<fieldset class="flexi_params fc_tabset_inner">
+				<div class="alert alert-info" style="width: 50%;"><?php echo JText::_('FLEXI_'.strtoupper($fields_grp_name).'_COMP'); ?></div>
+				<?php echo $_html; ?>
 			</fieldset>
-			
 			<?php endforeach; ?>
 			
 		</div>
