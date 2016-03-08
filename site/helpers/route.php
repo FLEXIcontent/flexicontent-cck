@@ -916,7 +916,8 @@ class FlexicontentHelperRoute
 		if ($matched_menu && $active &&
 			@ $matched_menu->query['view'] == 'category' &&  $active->query['view'] == 'category' &&
 			@ $matched_menu->query['view'] == @ $active->query['view'] &&
-			@ $matched_menu->query['cid'] == @ $active->query['cid']
+			@ $matched_menu->query['cid'] == @ $active->query['cid'] &&
+			($active->language == $language || $active->language == '*')
 		) {
 			$matched_menu = $active;
 		}
@@ -1007,7 +1008,8 @@ class FlexicontentHelperRoute
 			@ $matched_menu->query['layout'] == @ $active->query['layout'] &&
 			@ $matched_menu->query['authorid'] == @ $active->query['authorid'] &&
 			@ $matched_menu->query['cids'] == @ $active->query['cids'] &&
-			@ $matched_menu->query['tagid'] == @ $active->query['tagid']
+			@ $matched_menu->query['tagid'] == @ $active->query['tagid'] &&
+			($active->language == $language || $active->language == '*')
 		) {
 			$matched_menu = $active;
 		}
@@ -1077,7 +1079,8 @@ class FlexicontentHelperRoute
 		// Prefer current tags menu item if also appropriate
 		if ($matched_menu && $active && @ $matched_menu->query['view'] == 'tags' &&
 			@ $matched_menu->query['view'] == @ $active->query['view'] &&
-			@ $matched_menu->query['id'] == @ $active->query['id']
+			@ $matched_menu->query['id'] == @ $active->query['id'] &&
+			($active->language == $language || $active->language == '*')
 		) {
 			$matched_menu = $active;
 		}
