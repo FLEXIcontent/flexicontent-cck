@@ -34,9 +34,11 @@ FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='displa
 
 // Find if description is placed via template position
 $_text_via_pos = false;
-foreach ($item->positions as $posName => $posFields) {
-	if ($posName == 'renderonly') continue;
-	foreach($posFields as $field) if ($field->name=='text') { $_text_via_pos = true; break; }
+if (isset($item->positions) && is_array($item->positions)) {
+	foreach ($item->positions as $posName => $posFields) {
+		if ($posName == 'renderonly') continue;
+		foreach($posFields as $field) if ($field->name=='text') { $_text_via_pos = true; break; }
+	}
 }
 
 // Prepend toc (Table of contents) before item's description (toc will usually float right)
