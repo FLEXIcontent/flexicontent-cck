@@ -1,3 +1,6 @@
+#flexicontent .fc_item_title {
+	color: inherit;
+}
 .flexi.lineinfo {
 	display: block;
 	padding: 0;

@@ -2,6 +2,12 @@
 
 /* Faq Theme : item template CSS file */
 
+/*LESS EXAMPLE variable name: 'fc_item_' + parameter name */
+/* e.g. 'FCI_' + 'title_color' =>  'FCI_title_color' */
+#flexicontent .fc_item_title {
+	color: @FCI_title_color;
+}
+
 .flexi.lineinfo {
 	display: block;
 	padding: 0;
@@ -97,12 +103,13 @@
 }
 .twocols .flexi.label {
 	min-width: 34%;
-	margin-right: 6%;
-	margin-bottom: 6px;
+	margin: 2px 3% 6px 0;
+	box-sizing: border-box;
 }
 .twocols .flexi.value {
-	min-width: 58%;
-	margin-right: 1%;
+	min-width: 59%;
+	margin: 2px 4% 6px 0;
+	box-sizing: border-box;
 }
 
 /* ===============================================

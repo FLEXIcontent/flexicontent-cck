@@ -17,6 +17,7 @@
 			<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
 			
 			<field name="disp_params" type="separator" default="FLEXI_DISPLAY" level="level1" menu="hide" />
+			<field name="title_color" type="color" cssprep="less" size="3" default="inherit" label="Title color" description="Color of title" />
 			<field name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 			<field name="show_author" type="radio" default="" label="FLEXI_SHOWAUTHOR" description="FLEXI_SHOWAUTHOR_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
