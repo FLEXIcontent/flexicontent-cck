@@ -1814,9 +1814,10 @@ class modFlexicontentHelper
 			$catconf->fallback_maincat  = $params->get('currcat_fallback_maincat', 0);
 			$catconf->showtitle  = $params->get('currcat_showtitle', 0);
 			$catconf->showdescr  = $params->get('currcat_showdescr', 0);
+			$catconf->do_cutdescr= (int)$params->get('currcat_do_cutdescr', 1);
 			$catconf->cuttitle   = (int)$params->get('currcat_cuttitle', 40);
 			$catconf->cutdescr   = (int)$params->get('currcat_cutdescr', 200);
-			$catconf->link_title	= $params->get('currcat_link_title');
+			$catconf->link_title = $params->get('currcat_link_title');
 			
 			$catconf->show_image 		= $params->get('currcat_show_image');
 			$catconf->image_source	= $params->get('currcat_image_source');
@@ -1848,9 +1849,10 @@ class modFlexicontentHelper
 			$catconf->orderby    = $params->get('cats_orderby', 'alpha');
 			$catconf->showtitle  = $params->get('cats_showtitle', 0);
 			$catconf->showdescr  = $params->get('cats_showdescr', 0);
+			$catconf->do_cutdescr= (int)$params->get('cats_do_cutdescr', 1);
 			$catconf->cuttitle   = (int)$params->get('cats_cuttitle', 40);
 			$catconf->cutdescr   = (int)$params->get('cats_cutdescr', 200);
-			$catconf->link_title	= $params->get('cats_link_title');
+			$catconf->link_title = $params->get('cats_link_title');
 			
 			$catconf->show_image 		= $params->get('cats_show_image');
 			$catconf->image_source	= $params->get('cats_image_source');
@@ -1932,9 +1934,9 @@ class modFlexicontentHelper
 			// Category Description
 			if (!$catconf->showdescr) {
 				unset($catdata->description);
-			} else {
+			} else if ($catconf->do_cutdescr) {
 				$catdata->description = flexicontent_html::striptagsandcut($catdata->description, $catconf->cutdescr);
-			}
+			} // else do not strip / cut description
 			
 			// Category Links (title and image links)
 			if ($catconf->link_title || $catconf->link_image || $catconf->readmore) {
