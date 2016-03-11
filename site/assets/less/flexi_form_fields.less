@@ -243,6 +243,7 @@
 	font-size: 14px;
 	vertical-align: top;
 }
+#flexicontent .fcfield-expand-view,
 #flexicontent .fcfield-drag-handle,
 #flexicontent .fcfield-list-add,
 #flexicontent .fcfield-list-del,
@@ -267,6 +268,7 @@
 	/*filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=#d0d0d0);*//*filter prevents background image in ie8/ie9*/
 }
 
+#flexicontent .fcfield-expand-view:not(.add-on):not(.input-group-addon),
 #flexicontent .fcfield-drag-handle:not(.add-on):not(.input-group-addon),
 #flexicontent .fcfield-list-add:not(.add-on):not(.input-group-addon),
 #flexicontent .fcfield-list-del:not(.add-on):not(.input-group-addon),
@@ -291,6 +293,7 @@
 }
 
 /* default hover styling which we make more specific below */
+#flexicontent .fcfield-expand-view:hover,
 #flexicontent .fcfield-drag-handle:hover,
 #flexicontent .fcfield-list-add:hover,
 #flexicontent .fcfield-list-del:hover,
@@ -311,6 +314,7 @@
 	/*filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f0f0f0, endColorstr=#c0c0c0);*/
 }
 /* Override hover background color if not using font icons */
+#flexicontent .fcfield-expand-view:not(.fcfont-icon):hover,
 #flexicontent .fcfield-drag-handle:not(.fcfont-icon):hover,
 #flexicontent .fcfield-list-add:not(.fcfont-icon):hover,
 #flexicontent .fcfield-list-del:not(.fcfont-icon):hover,
@@ -433,6 +437,28 @@
 #flexicontent span.fcfield-insertvalue:after {
 	color: LimeGreen;
 }
+
+/* FIELDs: Maximize view space button */
+#flexicontent .fcfield-expand-view:not(.fcfont-icon) {
+	margin: 0px 0px 2px 0px;
+	padding: 4px 16px;
+	background: url(../images/arrow-in-out.png) 16px 4px no-repeat white;
+}
+#flexicontent ul.fcfield-sortables > li span.fcfield-expand-view.fcfont-icon:after {
+	content: "h";
+}
+#flexicontent span.fcfield-expand-view:before {
+	color: black;
+}
+#flexicontent ul.fcfield-sortables > li span.fcfield-expand-view.fcfont-icon:before {
+	content: "<";
+	color: black;
+	font-size: 16px;
+	padding: 0 8px 0 0;
+	vertical-align: middle;
+}
+
+
 
 /* FIELDs: Delete value button */
 #flexicontent .fcfield-delvalue:not(.fcfont-icon) {

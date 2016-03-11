@@ -45,13 +45,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Get data from the model
 		$model		= $this->getModel();
-		if (FLEXI_J16GE) {
-			$row  = $this->get( 'Item' );
-			$form = $this->get( 'Form' );
-		} else {
-			$row  = $this->get( 'Category' );
-		}
+		$row  = $this->get( 'Item' );
+		$form = $this->get( 'Form' );
 		$catparams = new JRegistry($row->params);
+		$iparams   = $this->get( 'InheritedParams' );
 		
 		$cid    =	$row->id;
 		$isnew  = !$cid;
@@ -324,8 +321,62 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->assignRef('editor'		, $editor);
 		$this->assignRef('tmpls'		, $tmpls);
 		$this->assignRef('cparams'	, $cparams);
+		$this->assignRef('iparams'	, $iparams);
 
 		parent::display($tpl);
+	}
+	
+	
+	
+	/**
+	 * Method to diplay field showing inherited value
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function getInheritedFieldDisplay($field, $params)
+	{
+		$_v = $params->get($field->fieldname);
+		
+		if ($_v==='' || $_v===null)
+			echo $field->input;
+		else if ($field->getAttribute('type')=='radio' || ($field->getAttribute('type')=='multilist' && $field->getAttribute('subtype')=='radio'))
+		{
+			echo str_replace(
+				'value="'.$_v.'"',
+				'value="'.$_v.'" class="fc-inherited-value" ',
+				$field->input);
+		}
+		else if ($field->getAttribute('type')=='fccheckbox' && is_array($_v))
+		{
+			$_input = $field->input;
+			foreach ($_v as $v) {
+				$_input = str_replace(
+					'value="'.$v.'"',
+					'value="'.$v.'" class="fc-inherited-value" ',
+					$_input);
+			}
+			echo $_input;
+		}
+		else if ($field->getAttribute('type')=='text')
+		{
+			echo str_replace(
+				'<input ',
+				'<input placeholder="'.$_v.'" ',
+				$field->input);
+		}
+		else if ($field->getAttribute('type')=='textarea')
+		{
+			echo str_replace('<textarea ', '<textarea placeholder="'.$_v.'" ', $field->input);
+		}
+		else if ($field->getAttribute('type')=='multilist' && $field->getAttribute('subtype')=='list')
+		{
+			$field->setInherited($_v);
+			echo $field->input;
+		}
+		else
+			echo $field->input;
 	}
 }
 ?>

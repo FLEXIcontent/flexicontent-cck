@@ -144,7 +144,7 @@ $js = "
 				<fieldset class="panelform">
 					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
 						<?php echo $field->label; ?>
-						<?php echo $field->input; ?>
+						<?php echo $this->getInheritedFieldDisplay($field, $this->iparams); ?>
 					<?php endforeach; ?>
 				</fieldset>
 			<?php endforeach; ?>
@@ -193,11 +193,10 @@ $js = "
 				<?php echo $this->form->getInput('metakey'); ?>
 	
 				<?php foreach($this->form->getGroup('metadata') as $field): ?>
-					<?php if ($field->hidden): ?>
-						<?php echo $field->input; ?>
+					<?php if ($field->hidden): echo $field->input; ?>
 					<?php else: ?>
 						<?php echo $field->label; ?>
-						<?php echo $field->input; ?>
+						<?php echo $this->getInheritedFieldDisplay($field, $this->iparams); ?>
 					<?php endif; ?>
 				<?php endforeach; ?>
 			</fieldset>
@@ -214,7 +213,7 @@ $js = "
 				<fieldset class="panelform">
 					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
 						<?php echo $field->label; ?>
-						<?php echo $field->input; ?>
+						<?php echo $this->getInheritedFieldDisplay($field, $this->iparams); ?>
 					<?php endforeach; ?>
 				</fieldset>
 			<?php endforeach; ?>
@@ -282,7 +281,7 @@ $js = "
 					<fieldset class="panelform">
 						<?php foreach ($this->form->getFieldset($name) as $field) : ?>
 							<?php echo $field->label; ?>
-							<?php echo $field->input; ?>
+							<?php echo $this->getInheritedFieldDisplay($field, $this->iparams); ?>
 						<?php endforeach; ?>
 					</fieldset>
 				<?php endforeach; ?>
@@ -312,8 +311,7 @@ $js = "
 					$_name  = $field->fieldname;
 					$_value = isset($_p[$_name])  ?  $_p[$_name]  :  null;
 					
-					if ($field->hidden):
-						echo $field->input;
+					if ($field->hidden): echo $field->input;
 					else:
 						// setValue(), is ok if input property, has not been already created
 						// otherwise we need to re-initialize (which clears input)
@@ -321,7 +319,7 @@ $js = "
 						
 						$field->setValue($_value);
 						echo $field->label;
-						echo $field->input;
+						echo $this->getInheritedFieldDisplay($field, $this->iparams);
 						echo '<div class="clear"></div>';
 					endif;
 				endforeach;

@@ -1,5 +1,21 @@
 @import 'include/config.less';
 
+/**********************************
+ * CSS for inherited values marking
+ **********************************/
+ 
+input.fc-inherited-value + label {
+	font-weight: bold !important; /*font-style: italic !important; text-decoration: underline !important;*/
+	text-shadow: 0 0 6px !important;
+}
+div.fc-inherited-value {
+	float: left;
+	font-weight: bold !important; /*font-style: italic !important; text-decoration: underline !important;*/
+	text-shadow: 0 0 6px;
+	margin: 4px;
+	font-style: italic;
+}
+
 /****************************************
  * auto sized / positioned jquery dialogs
  ****************************************/

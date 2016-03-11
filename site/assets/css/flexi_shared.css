@@ -1,3 +1,14 @@
+input.fc-inherited-value + label {
+	font-weight: bold !important;
+	text-shadow: 0 0 6px !important;
+}
+div.fc-inherited-value {
+	float: left;
+	font-weight: bold !important;
+	text-shadow: 0 0 6px;
+	margin: 4px;
+	font-style: italic;
+}
 .ui-dialog.fc-fixed-dialog {
 	position: fixed;
 	top: 40px !important;
