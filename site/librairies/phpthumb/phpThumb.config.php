@@ -16,7 +16,7 @@ if ( ini_get('date.timezone')=='' && version_compare(phpversion(), '5.1.0', '>')
 	date_default_timezone_set('UTC');
 }
 
-define('phpThumbConfigFileVersion', '1.7.13');
+define('phpThumbConfigFileVersion', '1.7.14');
 ob_start();
 if (!file_exists(dirname(__FILE__).'/phpthumb.functions.php') || !include_once(dirname(__FILE__).'/phpthumb.functions.php')) {
 	ob_end_flush();
@@ -41,10 +41,11 @@ $PHPTHUMB_CONFIG['document_root'] = realpath((getenv('DOCUMENT_ROOT') && preg_ma
 
 
 // * Security configuration
-$PHPTHUMB_CONFIG['high_security_enabled']       = false;   // DO NOT DISABLE THIS ON ANY PUBLIC-ACCESSIBLE SERVER. If disabled, your server is vulnerable to hacking attempts, both on your server and via your server to other servers. When enabled, requires 'high_security_password' set to be set and requires the use of phpThumbURL() function (at the bottom of phpThumb.config.php) to generate hashed URLs
-$PHPTHUMB_CONFIG['high_security_password']      = '';      // required if 'high_security_enabled' is true, and must be at complex (uppercase, lowercase, numbers, punctuation, etc -- punctuation is strongest, lowercase is weakest; see PasswordStrength() in phpThumb.php). You can use a password generator like http://silisoftware.com/tools/password-random.php to generate a strong password
+$PHPTHUMB_CONFIG['disable_debug']               = true;    // DO NOT DISABLE THIS ON ANY PUBLIC-ACCESSIBLE SERVER. Prevents phpThumb from displaying any information about your system. If true, phpThumbDebug and error messages will be disabled. If set to false (debug messages enabled) then debug mode will be FORCED -- ONLY debug output will be presented, no actual thumbnail (to avoid accidentally leaving debug mode enabled on a production server)
+$PHPTHUMB_CONFIG['high_security_enabled']       = false;   // DO NOT DISABLE THIS ON ANY PUBLIC-ACCESSIBLE SERVER. If disabled, your server is more vulnerable to hacking attempts, both on your server and via your server to other servers. When enabled, requires 'high_security_password' set to be set and requires the use of phpThumbURL() function (at the bottom of phpThumb.config.php) to generate hashed URLs
+$PHPTHUMB_CONFIG['high_security_password']      = '';      // required if 'high_security_enabled' is true, and must be at complex (uppercase, lowercase, numbers, punctuation, etc -- punctuation is strongest, lowercase is weakest; see PasswordStrength() in phpthumb.functions.php). You can use a password generator like http://silisoftware.com/tools/password-random.php to generate a strong password
+
 $PHPTHUMB_CONFIG['high_security_url_separator'] = '&';     // should almost always be left as '&'. Must be a single character. Do not change to '&amp;' -- htmlspecialchars wrapped around phpThumbURL() takes care of this without breaking the hash
-$PHPTHUMB_CONFIG['disable_debug']               = true;    // DO NOT ENABLE THIS ON ANY PUBLIC-ACCESSIBLE SERVER. Prevent phpThumb from displaying any information about your system. If true, phpThumbDebug and error messages will be disabled. If set to false (debug messages enabled) then debug mode will be FORCED -- ONLY debug output will be presented, no actual thumbnail (to avoid accidentally leaving debug mode enabled on a production server)
 $PHPTHUMB_CONFIG['allow_src_above_docroot']     = false;   // if false (default) only allow src within document_root; if true, allow src to be anywhere in filesystem
 $PHPTHUMB_CONFIG['allow_src_above_phpthumb']    = true;    // if true (default), allow src to be anywhere in filesystem; if false only allow src within sub-directory of phpThumb installation
 $PHPTHUMB_CONFIG['auto_allow_symlinks']         = true;    // if true (default), allow symlink target directories without explicitly whitelisting them
@@ -64,7 +65,7 @@ $PHPTHUMB_CONFIG['cache_directory'] = dirname(__FILE__).'/cache/';              
 //	$PHPTHUMB_CONFIG['cache_directory'] = '/tmp/persistent/phpthumb/cache/';
 //}
 
-$PHPTHUMB_CONFIG['cache_disable_warning'] = true; // If [cache_directory] is non-existant or not writable, and [cache_disable_warning] is false, an error image will be generated warning to either set the cache directory or disable the warning (to avoid people not knowing about the cache)
+$PHPTHUMB_CONFIG['cache_disable_warning'] = false; // If [cache_directory] is non-existant or not writable, and [cache_disable_warning] is false, an error image will be generated warning to either set the cache directory or disable the warning (to avoid people not knowing about the cache)
 $PHPTHUMB_CONFIG['cache_directory_depth'] = 3; // If this larger than zero, cache structure will be broken into a broad directory structure based on cache filename. For example "cache_src012345..." will be stored in "/0/01/012/0123/cache_src012345..." when (cache_directory_depth = 4). Caution: larger values can lead to an exponentially larger number of subdirectories which will also affect disk space due to (typically) 4kB used per directory entry: "2" gives a maximum of 16^2=256 subdirectories (up to 1MB wasted space), "3": 16^3=4096 subdirs (up to 16MB wasted), "4": 16^4=65536 subdirs (256MB wasted space), etc.
 
 // * Cache culling: phpThumb can automatically limit the contents of the cache directory
@@ -166,7 +167,7 @@ $PHPTHUMB_CONFIG['error_silent_die_on_error']   = false;    // simply die with n
 $PHPTHUMB_CONFIG['error_die_on_source_failure'] = true;     // die with error message if source image cannot be processed by phpThumb() (usually because source image is corrupt in some way). If false the source image will be passed through unprocessed, if true (default) an error message will be displayed.
 
 // * Off-server Thumbnailing Configuration:
-$PHPTHUMB_CONFIG['nohotlink_enabled']           = false;                                    // If false will allow thumbnailing from any source domain
+$PHPTHUMB_CONFIG['nohotlink_enabled']           = false;                                    // If false will allow thumbnailing from any source domain, if true then only domains in 'nohotlink_valid_domains' will be accepted
 $PHPTHUMB_CONFIG['nohotlink_valid_domains']     = array(@$_SERVER['HTTP_HOST']);            // This is the list of domains for which thumbnails are allowed to be created. Note: domain only, do not include port numbers. The default value of the current domain should be fine in most cases, but if neccesary you can add more domains in here, in the format "www.example.com"
 $PHPTHUMB_CONFIG['nohotlink_erase_image']       = true;                                     // if true thumbnail is covered up with $PHPTHUMB_CONFIG['nohotlink_fill_color'] before text is applied, if false text is written over top of thumbnail
 $PHPTHUMB_CONFIG['nohotlink_text_message']      = 'Off-server thumbnailing is not allowed'; // text of error message
@@ -193,10 +194,10 @@ $PHPTHUMB_CONFIG['ttf_directory'] = dirname(__FILE__).'/fonts'; // Base director
 // You may want to pull data from a database rather than a physical file
 // If so, modify the $PHPTHUMB_CONFIG['mysql_query'] line to suit your database structure
 // Note: the data retrieved must be the actual binary data of the image, not a URL or filename
-
+$PHPTHUMB_CONFIG['mysql_extension'] = 'mysqli'; // either "mysqli" or "mysql"
 
 $PHPTHUMB_CONFIG['mysql_query'] = '';
-//$PHPTHUMB_CONFIG['mysql_query'] = 'SELECT `picture` FROM `products` WHERE (`id` = \''.mysql_escape_string(@$_GET['id']).'\')';
+//$PHPTHUMB_CONFIG['mysql_query'] = 'SELECT `picture` FROM `products` WHERE (`id` = \''.mysqli_real_escape_string(@$_GET['id']).'\')';
 
 // These 4 values must be modified if $PHPTHUMB_CONFIG['mysql_query'] is not empty, but may be ignored if $PHPTHUMB_CONFIG['mysql_query'] is blank.
 $PHPTHUMB_CONFIG['mysql_hostname'] = 'localhost';
@@ -216,6 +217,7 @@ $PHPTHUMB_CONFIG['http_user_agent'] = @$_SERVER['HTTP_USER_AGENT'];             
 $PHPTHUMB_CONFIG['disable_pathinfo_parsing']        = false;  // if true, $_SERVER[PATH_INFO] is not parsed. May be needed on some server configurations to allow normal behavior.
 $PHPTHUMB_CONFIG['disable_imagecopyresampled']      = false;  // if true, ImageCopyResampled is replaced with ImageCopyResampleBicubic. May be needed for buggy versions of PHP-GD.
 $PHPTHUMB_CONFIG['disable_onlycreateable_passthru'] = true;   // if true, any image that can be parsed by GetImageSize() can be passed through; if false, only images that can be converted to GD by ImageCreateFrom(JPEG|GIF|PNG) functions are allowed
+$PHPTHUMB_CONFIG['disable_realpath']                = false;  // PHP realpath() function requires that "the running script must have executable permissions on all directories in the hierarchy, otherwise realpath() will return FALSE". Set config_disable_realpath=false to enable alternate filename-parsing that does not use realpath() function (but also does not resolve symbolic links)
 
 
 // * HTTP remote file opening settings
@@ -255,5 +257,21 @@ $PHPTHUMB_DEFAULTS_DISABLEGETPARAMS  = false; // if true, GETstring parameters w
 
 function phpThumbURL($ParameterString, $path_to_phpThumb='phpThumb.php') {
 	global $PHPTHUMB_CONFIG;
+	if (is_array($ParameterString)) {
+		$ParameterStringArray = $ParameterString;
+	} else {
+		parse_str($ParameterString, $ParameterStringArray);
+	}
+	foreach ($ParameterStringArray as $key => $value) {
+		if (is_array($value)) {
+			// e.g. fltr[] is passed as an array
+			foreach ($value as $subvalue) {
+				$ParamterStringEncodedArray[] = $key.'[]='.rawurlencode($subvalue);
+			}
+		} else {
+			$ParamterStringEncodedArray[] = $key.'='.rawurlencode($value);
+		}
+	}
+	$ParameterString = implode($PHPTHUMB_CONFIG['high_security_url_separator'], $ParamterStringEncodedArray);
 	return $path_to_phpThumb.'?'.$ParameterString.$PHPTHUMB_CONFIG['high_security_url_separator'].'hash='.md5($ParameterString.$PHPTHUMB_CONFIG['high_security_password']);
 }
