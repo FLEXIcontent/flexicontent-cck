@@ -1,3 +1,6 @@
+#flexicontent .fc_item_title {
+	color: inherit;
+}
 .iteminfo .createdline {
 	font-size: 9px;
 	display: block;
