@@ -775,11 +775,15 @@
 			
 			<field name="" type="separator" default="FLEXI_DESCRIPTION" level="level3" class="confpercat" />
 			<field name="cats_showdescr" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_SHOW_CAT_DESCR" description="FLEXI_SHOW_CAT_DESCR_DESC" class="confpercat btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="catdesc">FLEXI_NO</option>
-				<option value="1" show_list="catdesc" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="cats_desc">FLEXI_NO</option>
+				<option value="1" show_list="cats_desc" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="cats_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC"  class="confpercat catdesc" />
-			<field name="cats_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC" class="confpercat catdesc btn-group btn-group-yesno">
+			<field name="cats_do_cutdescr" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_STRIP_HTML_N_CUT" description="FLEXI_STRIP_HTML_N_CUT_DESC" class="confpercat cats_desc btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="cats_do_cutdescr">FLEXI_NO</option>
+				<option value="1" show_list="cats_do_cutdescr" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="cats_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" class="confpercat cats_desc cats_do_cutdescr" />
+			<field name="cats_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC" class="confpercat cats_desc btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -839,7 +843,11 @@
 				<option value="0" show_list="" hide_list="currcat_desc">FLEXI_NO</option>
 				<option value="1" show_list="currcat_desc" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="currcat_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" class="confpercat currcat currcat_desc" />
+			<field name="currcat_do_cutdescr" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_STRIP_HTML_N_CUT" description="FLEXI_STRIP_HTML_N_CUT_DESC" class="confpercat currcat_desc btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="currcat_do_cutdescr">FLEXI_NO</option>
+				<option value="1" show_list="currcat_do_cutdescr" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="currcat_cutdescr" type="text" size="4" default="100" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" class="confpercat currcat currcat_desc currcat_do_cutdescr" />
 			<field name="currcat_readmore" type="radio" default="1" label="FLEXI_SHOW_READMORE_CATITEMS" description="FLEXI_SHOW_READMORE_CATITEMS_DESC" class="confpercat currcat currcat_desc btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
