@@ -88,16 +88,19 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// define a global variable to be sure the script is loaded only once
 		$addthis		= isset($addthis) ? $addthis : 0;
 		
-		if ($load_css) {
+		if ($load_css)
+		{
 			$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
 		}
 		
-		if ($display_social || $display_comments || $display_email || $display_print) {
+		if ($display_social || $display_comments || $display_email || $display_print)
+		{
 			$item_url = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug);
 			$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
-			$item_link = $server . JRoute::_($item_url);
+			$item_url_abs = $server . JRoute::_($item_url);
 			// NOTE: this uses current SSL setting (e.g menu item), and not URL scheme: http/https 
-			//$item_link = JRoute::_($item_url, true, -1);
+			//$item_url_abs = JRoute::_($item_url, true, -1);
+			$item_title_escaped = htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' );
 		}
 		
 		$ops = array();
@@ -106,7 +109,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// comments button
 		if ($display_comments)
 		{
-			$comment_link = $item_link . '#addcomments';
+			$comment_link = $item_url_abs . '#addcomments';
 			
 			$ops[] = '
 			<div class="flexi-react toolbar-element">
@@ -151,7 +154,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		{
 			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 			
-			$url = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $item_link );
+			$url = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $item_url_abs );
 			$estatus = 'width=400,height=400,menubar=yes,resizable=yes';
 			$ops[] = '
 			<div class="flexi-email toolbar-element">
@@ -165,7 +168,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		{
 			$pop = JRequest::getInt('pop');
 			$pstatus = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
-			$print_link = $pop ? '#' : ( $item_link .(strstr($item_link, '?') ? '&amp;'  : '?') . 'pop=1&amp;print=1&amp;tmpl=component' );
+			$print_link = $pop ? '#' : ( $item_url_abs .(strstr($item_url_abs, '?') ? '&amp;'  : '?') . 'pop=1&amp;print=1&amp;tmpl=component' );
 			$js_link = $pop ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';
 			$ops[] = '
 			<div class="flexi-print toolbar-element">
@@ -270,8 +273,8 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			}
 			
 			// Add og-URL explicitely as this is required by facebook ?
-			if ($item_link) {
-				$document->addCustomTag("<meta property=\"og:url\" content=\"".$item_link."\" />");
+			if ($item_url_abs) {
+				$document->addCustomTag("<meta property=\"og:url\" content=\"".$item_url_abs."\" />");
 			}
 
 			
@@ -284,108 +287,137 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			$addthis_custom_code       = $field->parameters->get('addthis_custom_code', false);
 			$addthis_custom_predefined = $field->parameters->get('addthis_custom_predefined', false);
 			
-			$addthis_code = '';
-			if ($addthis_custom_code) {
-				$addthis_code = str_replace('_item_url_', $item_link, $addthis_custom_code);
-				$addthis_code = str_replace('_item_title_', htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ), $addthis_code);
+			$addthis_add_fb_like_layout = $field->parameters->get('addthis_fb_like', 1);
+			switch($addthis_add_fb_like_layout)
+			{
+				case 1:
+					$_fb_layout = $addthis_custom_predefined <= 4 ?  'button_count'  :  'box_count';
+					$fb_like = '<a class="addthis_button_facebook_like" fb:like:layout="'.$_fb_layout.'"></a>';
+					break;
+				case 2:
+					$fb_like = '<a class="addthis_button_facebook_like" fb:like:layout="standard"></a>';
+					break;
+				case 3:
+					$fb_like = '<a class="addthis_button_facebook_like" fb:like:layout="button_count" fb:like:action="recommend"></a>';
+					break;
+				default:
+					$fb_like = '';
 			}
-			else {
-				switch ($addthis_custom_predefined) {
+			
+			
+			if (!$addthis_custom_code)
+			{
+				switch ($addthis_custom_predefined)
+				{
 					case 1:
-						$addthis_code .= '
+						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_default_style addthis_counter_style" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
-						<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
-						<a class="addthis_button_tweet"></a>
-						<a class="addthis_button_pinterest_pinit"></a>
-						<a class="addthis_counter addthis_pill_style"></a>
+						<div class="addthis_toolbox addthis_default_style" addthis:url="_item_url_" addthis:title="_item_title_">
+							_fb_like_
+							<a class="addthis_button_tweet"></a>
+							<a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+							<a class="addthis_button_pinterest_pinit"></a>
+							<a class="addthis_counter addthis_pill_style"></a>
 						</div>
 						<!-- AddThis Button END -->
 						';
 						break;
 					case 2:
-						$addthis_code .= '
+						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_default_style addthis_32x32_style" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
-						<a class="addthis_button_preferred_1"></a>
-						<a class="addthis_button_preferred_2"></a>
-						<a class="addthis_button_preferred_3"></a>
-						<a class="addthis_button_preferred_4"></a>
-						<a class="addthis_button_compact"></a>
-						<a class="addthis_counter addthis_bubble_style"></a>
+						<div class="addthis_toolbox addthis_default_style addthis_32x32_style" addthis:url="_item_url_" addthis:title="_item_title_">
+							_fb_like_
+							<a class="addthis_button_preferred_1"></a>
+							<a class="addthis_button_preferred_2"></a>
+							<a class="addthis_button_preferred_3"></a>
+							<a class="addthis_button_preferred_4"></a>
+							<a class="addthis_button_compact"></a>
+							<a class="addthis_counter addthis_bubble_style"></a>
 						</div>
 						<!-- AddThis Button END -->
 						';
 						break;
 					default:
 					case 3:
-						$addthis_code .= '
+						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_default_style addthis_16x16_style" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
-						<a class="addthis_button_preferred_1"></a>
-						<a class="addthis_button_preferred_2"></a>
-						<a class="addthis_button_preferred_3"></a>
-						<a class="addthis_button_preferred_4"></a>
-						<a class="addthis_button_compact"></a>
-						<a class="addthis_counter addthis_bubble_style"></a>
+						<div class="addthis_toolbox addthis_default_style addthis_16x16_style" addthis:url="_item_url_" addthis:title="_item_title_">
+							_fb_like_
+							<a class="addthis_button_preferred_1"></a>
+							<a class="addthis_button_preferred_2"></a>
+							<a class="addthis_button_preferred_3"></a>
+							<a class="addthis_button_preferred_4"></a>
+							<a class="addthis_button_compact"></a>
+							<a class="addthis_counter addthis_bubble_style"></a>
 						</div>
 						<!-- AddThis Button END -->
 						';
 						break;
 					case 4:
-						$addthis_code .= '
+						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
-						<a class="addthis_button" href="//www.addthis.com/bookmark.php?v=300&pubid='.$addthis_pubid.'"><img src="//s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="'.JText::_('FLEXI_FIELD_TOOLBAR_SHARE').'" style="border:0"/></a>
+							_fb_like_
+						<a class="addthis_button_compact" href="//www.addthis.com/bookmark.php?v=300&pubid=_addthis_pubid_"> <img src="//s7.addthis.com/static/btn/v2/sm-plus.gif" alt="_jtext_SHARE_" style="border:0; height:20px; width:20px; margin: 0; vertical-align: top;"/> <span style="vertical-align: top;">_jtext_SHARE_</span> </a>
 						<!-- AddThis Button END -->
 						';
 						break;
 					case 5:
-						$addthis_code .= '
+						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_floating_style addthis_counter_style" style="left:50px;top:50px;" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
-						<a class="addthis_button_facebook_like" fb:like:layout="box_count"></a>
-						<a class="addthis_button_tweet" tw:count="vertical"></a>
-						<a class="addthis_button_google_plusone" g:plusone:size="tall"></a>
-						<a class="addthis_counter"></a>
+						<div class="addthis_toolbox addthis_floating_style addthis_counter_style" style="left:50px;top:50px;" addthis:url="_item_url_" addthis:title="_item_title_">
+							_fb_like_
+							<a class="addthis_button_tweet" tw:count="vertical"></a>
+							<a class="addthis_button_google_plusone" g:plusone:size="tall"></a>
+							<a class="addthis_counter"></a>
 						</div>
 						<!-- AddThis Button END -->
 						';
 						break;
 					case 6:
-						$addthis_code .= '
+						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_floating_style addthis_32x32_style" style="left:50px;top:50px;" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
-						<a class="addthis_button_preferred_1"></a>
-						<a class="addthis_button_preferred_2"></a>
-						<a class="addthis_button_preferred_3"></a>
-						<a class="addthis_button_preferred_4"></a>
-						<a class="addthis_button_compact"></a>
+						<div class="addthis_toolbox addthis_floating_style addthis_32x32_style" style="left:50px;top:50px;" addthis:url="_item_url_" addthis:title="_item_title_">
+							_fb_like_
+							<a class="addthis_button_preferred_1"></a>
+							<a class="addthis_button_preferred_2"></a>
+							<a class="addthis_button_preferred_3"></a>
+							<a class="addthis_button_preferred_4"></a>
+							<a class="addthis_button_compact"></a>
 						</div>
 						<!-- AddThis Button END -->
 						';
 						break;
 					case 7:
-						$addthis_code .= '
+						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_floating_style addthis_16x16_style" style="left:50px;top:50px;" addthis:url="'.$item_link.'" addthis:title="'.htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' ).'">
-						<a class="addthis_button_preferred_1"></a>
-						<a class="addthis_button_preferred_2"></a>
-						<a class="addthis_button_preferred_3"></a>
-						<a class="addthis_button_preferred_4"></a>
-						<a class="addthis_button_compact"></a>
+						<div class="addthis_toolbox addthis_floating_style addthis_16x16_style" style="left:50px;top:50px;" addthis:url="_item_url_" addthis:title="_item_title_">
+							_fb_like_
+							<a class="addthis_button_preferred_1"></a>
+							<a class="addthis_button_preferred_2"></a>
+							<a class="addthis_button_preferred_3"></a>
+							<a class="addthis_button_preferred_4"></a>
+							<a class="addthis_button_compact"></a>
 						</div>
 						<!-- AddThis Button END -->
 						';
 						break;
 				}
 			}
-			if ($addthis_outside_toolbar)
-				$add_this = '<div class="flexi-socials-outside">'.$addthis_code.'</div>';
-			else 
-				$add_this = '<div class="flexi-socials toolbar-element">' .$addthis_code. '</div>';
 			
+			// Replacements
+			$addthis_custom_code = str_replace('_item_url_', $item_url_abs, $addthis_custom_code);
+			$addthis_custom_code = str_replace('_item_title_', $item_title_escaped, $addthis_custom_code);
+			$addthis_custom_code = str_replace('_fb_like_', $fb_like, $addthis_custom_code);
+			$addthis_custom_code = str_replace('_addthis_pubid_', $addthis_pubid, $addthis_custom_code);
+			$addthis_custom_code = str_replace('_jtext_SHARE_', JText::_('FLEXI_FIELD_TOOLBAR_SHARE'), $addthis_custom_code);
 			
-			if (!$addthis) {
+			$addthis_custom_code = $addthis_outside_toolbar ?
+				'<div class="toolbar-spacer"'.$spacer.'></div> <div class="flexi-socials-outside">'.$addthis_custom_code.'</div>' :
+				'<div class="flexi-socials toolbar-element">' .$addthis_custom_code. '</div>' ;
+			
+			// Add AddThis JS if not already added
+			if (!$addthis)
+			{
 				$document->addCustomTag('	
 					<script type="text/javascript">
 					var addthis_config = {
@@ -401,7 +433,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$display = '
 		<div class="flexitoolbar">
 			'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
-			'.$add_this.'
+			'.$addthis_custom_code.'
 		</div>';
 
 		$field->{$prop} = $display;

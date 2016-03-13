@@ -36,6 +36,7 @@
 .toolbar-element {
 	float: left;
 	line-height: 34px;
+	height: 34px;
 }
 
 .toolbar-spacer {
@@ -138,4 +139,44 @@
 }
 .flexi-resizer a.decrease {
 	background: transparent url(resizer_buttons.png) left 50% no-repeat;
+}
+
+
+#flexicontent .addthis_toolbox.addthis_floating_style.addthis_counter_style {
+	min-width:70px;
+}
+
+#flexicontent .addthis_toolbox.addthis_floating_style.addthis_counter_style  .addthis_internal_container {
+	min-width:70px;
+}
+
+#flexicontent .addthis_default_style.addthis_32x32_style .addthis_button_facebook_like {
+	transform: scale(1.6);
+	-ms-transform: scale(1.6); 
+	-webkit-transform: scale(1.6); 
+	-o-transform: scale(1.6); 
+	-moz-transform: scale(1.6); 
+	transform-origin: top left;
+	-ms-transform-origin: top left;
+	-webkit-transform-origin: top left;
+	-moz-transform-origin: top left;
+	-webkit-transform-origin: top left;
+	margin-left: 0px;
+	margin-right: 48px;
+}
+
+
+#flexicontent .addthis_default_style.addthis_16x16_style .addthis_button_facebook_like {
+	transform: scale(0.8);
+	-ms-transform: scale(0.8); 
+	-webkit-transform: scale(0.8); 
+	-o-transform: scale(0.8); 
+	-moz-transform: scale(0.8); 
+	transform-origin: top left;
+	-ms-transform-origin: top left;
+	-webkit-transform-origin: top left;
+	-moz-transform-origin: top left;
+	-webkit-transform-origin: top left;
+	margin-left: 0px;
+	margin-right: -12px;
 }
