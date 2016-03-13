@@ -126,6 +126,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	var $_comments = null;
 	
+	
+	/**
+	 * Current / active search elements
+	 *
+	 * @var string
+	 */
+	var $_active_filts  = null;
+	var $_active_search = null;
+	var $_active_ai     = null;
+	
+	
 	/**
 	 * Constructor
 	 *
@@ -309,6 +320,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			// 1, create full query: filter, ordered, limited
 			$query = $this->_buildQuery();
+			
+			
+			// Check if Text Search / Filters / AI are NOT active and special before FORM SUBMIT (per page) -limit- was configured
+			if ( empty($this->_active_filts) && empty($this->_active_search) && empty($this->_active_ai) )
+			{
+				$use_limit_before = (int) $cparams->get('use_limit_before_search_filt', 0);
+				$limit_before     = (int) $cparams->get('limit_before_search_filt', 0);
+				$limit = $use_limit_before  ?  $limit_before  :  $limit;
+				JRequest::setVar('limit', $limit);
+				$this->setState('limit', $limit);
+			}
 			
 			try {
 				// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
@@ -956,6 +978,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
 		$words = preg_split('/\s\s*/u', $text);
 		
+		$this->_active_search = $text;  // Set _relevant _active_* FLAG
+		
 		if( strlen($text) )
 		{
 			$ts = 'ie';
@@ -1083,7 +1107,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$empty_filt_vals_array  = is_array($filt_vals)  && !strlen(trim(implode('',$filt_vals)));
 			$empty_filt_vals_string = !is_array($filt_vals) && !strlen(trim($filt_vals));
 			$allow_filtering_empty = $filter->parameters->get('allow_filtering_empty', 0);
+			
 			if ( !$allow_filtering_empty && ($empty_filt_vals_array || $empty_filt_vals_string) ) continue;
+			if ( !$empty_filt_vals_array && !$empty_filt_vals_string) $this->_active_filts[ $filter->id ] = $filt_vals;  // Set _relevant _active_* FLAG
 			
 			//echo "category model found filters: "; print_r($filt_vals);
 			$filters_where[ $filter->id ] = $this->_getFiltered($filter, $filt_vals, $return_sql);
@@ -1190,6 +1216,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			//$where = ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $alpha_term, false );
 		}
 		
+		$this->_active_ai = $alpha;  // Set _relevant _active_* FLAG
 		return $where;
 	}
 	
