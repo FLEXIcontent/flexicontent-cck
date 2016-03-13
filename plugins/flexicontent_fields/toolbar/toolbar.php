@@ -304,7 +304,6 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					$fb_like = '';
 			}
 			
-			
 			if (!$addthis_custom_code)
 			{
 				switch ($addthis_custom_predefined)
@@ -314,9 +313,11 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 						<!-- AddThis Button BEGIN -->
 						<div class="addthis_toolbox addthis_default_style" addthis:url="_item_url_" addthis:title="_item_title_">
 							_fb_like_
-							<a class="addthis_button_tweet"></a>
 							<a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
-							<a class="addthis_button_pinterest_pinit"></a>
+							<a class="addthis_counter_twitter"></a>
+							<a class="addthis_counter_pinterest_share"></a>
+							<a class="addthis_counter_reddit"></a>
+							<a class="addthis_counter_linkedin"></a>
 							<a class="addthis_counter addthis_pill_style"></a>
 						</div>
 						<!-- AddThis Button END -->
@@ -366,8 +367,11 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 						<!-- AddThis Button BEGIN -->
 						<div class="addthis_toolbox addthis_floating_style addthis_counter_style" style="left:50px;top:50px;" addthis:url="_item_url_" addthis:title="_item_title_">
 							_fb_like_
-							<a class="addthis_button_tweet" tw:count="vertical"></a>
 							<a class="addthis_button_google_plusone" g:plusone:size="tall"></a>
+							<a class="addthis_counter_twitter"></a>
+							<a class="addthis_counter_pinterest_share"></a>
+							<a class="addthis_counter_reddit"></a>
+							<a class="addthis_counter_linkedin"></a>
 							<a class="addthis_counter"></a>
 						</div>
 						<!-- AddThis Button END -->
@@ -427,6 +431,14 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js'.($addthis_pubid ? '#pubid='.$addthis_pubid : '').'"></script>
 				');
 				$addthis = 1;
+				
+				if ($fb_like) {
+					$css = '
+						.addthis_floating_style.addthis_32x32_style, .addthis_floating_style.addthis_32x32_style .addthis_internal_container,
+						.addthis_floating_style.addthis_16x16_style, .addthis_floating_style.addthis_16x16_style .addthis_internal_container { min-width: 58px; }
+					';
+					$document->addStyleDeclaration($css);
+				}
 			}
 		}
 		
