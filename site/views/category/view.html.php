@@ -175,8 +175,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			$view_ok     = 'category' == @$menu->query['view'];
 			$cid_ok      = $cid       == (int) @$menu->query['cid'];
 			$layout_ok   = $layout    == @$menu->query['layout'];   // null is equal to empty string
-			$authorid_ok = $authorid  == (int) @$menu->query['authorid']; // null is equal to zero
-			$tagid_ok    = $tagid     == (int) @$menu->query['tagid']; // null is equal to zero
+			$authorid_ok = ($layout!='author') || ($authorid  == (int) @$menu->query['authorid']); // null is equal to zero
+			$tagid_ok    = ($layout!='tags')   || ($tagid     == (int) @$menu->query['tagid']); // null is equal to zero
 			$menu_matches = $view_ok && $cid_ok && $layout_ok && $authorid_ok && $tagid_ok;
 			//$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);  // Get active menu item parameters
 		} else {

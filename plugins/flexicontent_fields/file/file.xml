@@ -169,7 +169,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="display_filename" type="list" default="1" label="FLEXI_FIELD_FILE_SHOW_FILENAME" description="FLEXI_FIELD_FILE_SHOW_FILENAME_DESC">
+			<field name="display_filename" type="radio" default="1" label="FLEXI_FIELD_FILE_SHOW_FILENAME" description="FLEXI_FIELD_FILE_SHOW_FILENAME_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_PREFER_FILE_TITLE</option>
 				<option value="2">FLEXI_YES</option>
@@ -183,25 +183,25 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="display_lang" type="list" default="1" label="FLEXI_FIELD_FILE_SHOW_LANGUAGE" description="FLEXI_FIELD_FILE_SHOW_LANGUAGE_DESC">
+			<field name="display_lang" type="radio" default="1" label="FLEXI_FIELD_FILE_SHOW_LANGUAGE" description="FLEXI_FIELD_FILE_SHOW_LANGUAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_AS_ICON</option>
 				<option value="2">FLEXI_YES_AS_TEXT</option>
 				<option value="3">FLEXI_YES_BOTH</option>
 			</field>
-			<field name="display_size" type="list" default="0" label="FLEXI_FIELD_FILE_SHOW_SIZE" description="FLEXI_FIELD_FILE_SHOW_SIZE_DESC">
+			<field name="display_size" type="radio" default="0" label="FLEXI_FIELD_FILE_SHOW_SIZE" description="FLEXI_FIELD_FILE_SHOW_SIZE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">KBs</option>
 				<option value="2">MBs</option>
 				<option value="3">GBs</option>
 			</field>
-			<field name="display_hits" type="list" default="0" label="FLEXI_FIELD_SHOW_HITS" description="FLEXI_FIELD_SHOW_HITS">
+			<field name="display_hits" type="radio" default="0" label="FLEXI_FIELD_SHOW_HITS" description="FLEXI_FIELD_SHOW_HITS" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_AS_ICON</option>
 				<option value="2">FLEXI_YES_AS_TEXT</option>
 				<option value="3">FLEXI_YES_BOTH</option>
 			</field>
-			<field name="display_descr" type="list" default="1" label="FLEXI_FIELD_FILE_SHOW_DESCR" description="FLEXI_FIELD_FILE_SHOW_DESCR_DESC">
+			<field name="display_descr" type="radio" default="1" label="FLEXI_FIELD_FILE_SHOW_DESCR" description="FLEXI_FIELD_FILE_SHOW_DESCR_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
