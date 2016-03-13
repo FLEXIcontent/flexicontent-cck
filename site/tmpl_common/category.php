@@ -131,7 +131,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 <!-- BOF item list display -->
 <?php
 	echo $this->loadTemplate('items');
-	echo empty($this->items) ? '<span class="fc_return_msg">'.JText::sprintf('FLEXI_CLICK_HERE_TO_RETURN', '"JavaScript:window.history.back();"').'</span>' : "";
+	echo empty($this->items) && $this->getModel()->getState('limit') ? '<span class="fc_return_msg">'.JText::sprintf('FLEXI_CLICK_HERE_TO_RETURN', '"JavaScript:window.history.back();"').'</span>' : "";
 ?>
 <!-- BOF item list display -->
 
