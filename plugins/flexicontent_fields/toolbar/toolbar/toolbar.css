@@ -143,12 +143,20 @@
 
 
 #flexicontent .addthis_toolbox.addthis_floating_style.addthis_counter_style {
-	min-width:70px;
+	min-width: 70px;
 }
 
 #flexicontent .addthis_toolbox.addthis_floating_style.addthis_counter_style  .addthis_internal_container {
-	min-width:70px;
+	min-width: 70px;
 }
+
+#flexicontent .addthis_floating_style.addthis_counter_style .addthis_counter {
+	padding-left: 4px;
+}
+#flexicontent .addthis_floating_style.addthis_counter_style .addthis_internal_container span {
+	float: none;
+}
+
 
 #flexicontent .addthis_default_style.addthis_32x32_style .addthis_button_facebook_like {
 	transform: scale(1.6);
