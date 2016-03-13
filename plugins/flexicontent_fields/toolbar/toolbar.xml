@@ -95,19 +95,25 @@
 				<option value="0">FLEXI_NO</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_CASE_A" description="" level="level2" />
-			<field name="addthis_custom_predefined" type="list" default="3" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE_DESC">
-				<option value="1">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_1</option>
-				<option value="2">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_2</option>
-				<option value="3">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_3</option>
-				<option value="4">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_4</option>
-				<option value="5">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_5</option>
-				<option value="6">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_6</option>
-				<option value="7">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_7</option>
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_ADDTHIS" description="" level="level2" />
+			<field name="addthis_fb_like" type="radio" default="1" label="Facebook LIKE" description="Select to include facebook like or disable it" class="btn-group btn-group-yesno">
+				<option value="0">Hide</option>
+				<option value="1">With Counter</option>
+				<option value="2">With friends</option>
+				<option value="3">As recommend</option>
 			</field>
-			
-			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_CASE_B" description="" level="level2" />
-			<field name="addthis_custom_code" type="textarea" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE2_DESC" rows="4" cols="38"  filter="raw" />
+			<field name="addthis_custom_predefined" type="multilist" subtype="list" toggle_related="1" default="3" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE_DESC" class="btn-group group-fcmethod">
+				<option value=""   fcreadonly="{'addthis_custom_code':0}" >FLEXI_CUSTOMIZE</option>
+				<option value="1"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_default_style\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n\n  _fb_like_\n  &lt;a class=\'addthis_button_tweet\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_google_plusone\' g:plusone:size=\'medium\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_pinterest_pinit\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter addthis_pill_style\'&gt;&lt;/a&gt;\n\n&lt;/div&gt;'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_1</option>
+				<option value="2"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_default_style addthis_32x32_style\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_2</option>
+				<option value="3"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_default_style addthis_16x16_style\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_3</option>
+				<option value="4"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'_fb_like_\n&lt;a class=\'addthis_button\' href=\'//www.addthis.com/bookmark.php?v=300&amp;pubid=_addthis_pubid_\'&gt;\n  &lt;img src=\'//s7.addthis.com/static/btn/v2/sm-plus.gif\' alt=\'_jtext_SHARE_\' style=\'border:0; height:20px; width:20px; margin: 0; vertical-align: top;\'/&gt; &lt;span style=\'vertical-align: top;\'&gt;_jtext_SHARE_&lt;/span&gt; \n&lt;/a&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_4</option>
+				<option value="5"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_floating_style addthis_counter_style\' style=\'left:50px;top:50px;\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n\n  _fb_like_\n  &lt;a class=\'addthis_button_tweet\' tw:count=\'vertical\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_google_plusone\' g:plusone:size=\'tall\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter\'&gt;&lt;/a&gt;\n\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_5</option>
+				<option value="6"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_floating_style addthis_32x32_style\' style=\'left:50px;top:50px;\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_6</option>
+				<option value="7"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_floating_style addthis_16x16_style\' style=\'left:50px;top:50px;\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_7</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_ADDTHIS_CUSTOMIZE_CODE" description="" level="level3" />
+			<field name="addthis_custom_code" type="textarea" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE_DESC" rows="13" cols="38"  filter="raw" />
 			
 			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />
 			
