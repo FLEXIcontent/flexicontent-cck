@@ -434,8 +434,8 @@
 		}
 		
 		// Restore the form to select the element with value ''
-		if ( field.hasClass('fccustom_revert') && el.value!='' ) {
-			
+		if ( field.hasClass('fccustom_revert') && el.value!='' )
+		{
 			var currVal;
 			if ( field.is('fieldset') ) {
 				currVal = field.find('input[type="radio"]:checked').val();
@@ -454,7 +454,8 @@
 					field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
 					field.find(':input[value=""]').next().trigger('click');
 				} else {
-					field.removeAttr('disabled').removeAttr('readonly').val('').trigger('click');
+					field.removeAttr('disabled').removeAttr('readonly').css('pointer-events', 'auto').css('opacity', '1');
+					field.val('').trigger('click');
 				}
 			}, 200);
 		}
