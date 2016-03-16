@@ -40,6 +40,10 @@ body.fc-no-scroll {
 	height: 100% !important;
 	overflow: hidden !important;
 }
+.fccleared {
+	clear: both !important;
+	float: left !important;
+}
 table#version_tbl td.versions-first {
 	border-bottom: 1px dotted silver;
 	padding: 4px;

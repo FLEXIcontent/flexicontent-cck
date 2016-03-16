@@ -23,8 +23,9 @@
 	/*background: url(bg.png) 0 0 repeat-x;*/
 	padding: 0 5px;
 	float: left;
-	margin: 12px 0;
+	margin: 8px 0;
 	width: 100%;
+	box-sizing: border-box;
 }
 
 .flexi-legend, .flexi-legend a {
@@ -35,8 +36,8 @@
 
 .toolbar-element {
 	float: left;
-	line-height: 34px;
-	height: 34px;
+	line-height: 40px;
+	height: 40px;
 }
 
 .toolbar-spacer {
@@ -44,8 +45,8 @@
 	display: inline-block;
 	float: left;
 	font-size: 16px;
-	line-height: 34px;
-	height: 34px;
+	line-height: 40px;
+	height: 40px;
 }
 .toolbar-spacer::after {
 	border-left: 1px solid lightgray;
@@ -60,9 +61,9 @@
 /* Comments */
 .comments-bubble {
 	display: block;
-	height: 34px;
+	height: 40px;
 	width: 27px;
-	background: url(bubble.png) 0 8px no-repeat;
+	background: url(bubble.png) 0 12px no-repeat;
 	float: left;
 	text-align: center;
 	color: #fff;
@@ -75,51 +76,27 @@
 
 /* Email */
 .flexi-email {
-	background: url(email.png) 0 8px no-repeat;
+	background: url(email.png) 0 12px no-repeat;
 	padding-left: 26px;
 }
 
 /* Print */
 .flexi-print {
-	background: url(print.png) 0 8px no-repeat;
+	background: url(print.png) 0 12px no-repeat;
 	padding-left: 26px;
 }
 
 /* Voice */
 .flexi-voice {
-	background: url(sound.png) 0 8px no-repeat;
+	background: url(sound.png) 0 12px no-repeat;
 	padding-left: 26px;
 }
 
 /* PDF */
 .flexi-pdf {
-	background: url(pdf.png) 0 8px no-repeat;
+	background: url(pdf.png) 0 12px no-repeat;
 	padding-left: 26px;
 }
-
-/* Social share container and addthis */
-.flexi-socials {
-	padding: 9px 0;
-}
-.flexi-socials-outside {
-	/*clear: both;*/
-	padding-top: 9px;
-	display:block;
-	float:left;
-	margin-left:0;
-	margin-right:0;
-	padding-left:0;
-	padding-right:0;
-}
-.addthis_toolbox {
-	margin:0;
-	padding:0;
-	font-size: 12px;
-}
-.addthis_toolbox a {font-size: 12px; text-decoration: none; color: #00568F;}
-.addthis_toolbox .addthis_button_compact {line-height: 18px;}
-#at16pf a {display: none;}
-#at16pt h4 {background-image: none;}
 
 /* Text resizer */
 .flexi-resizer a {
@@ -142,49 +119,107 @@
 }
 
 
-#flexicontent .addthis_toolbox.addthis_floating_style.addthis_counter_style {
-	min-width: 70px;
+/* Social sharing */
+
+/* Outer container of addthis elements */
+.flexi-socials {
+	padding: 0;
+	box-sizing: border-box;
+	float: left;
+	overflow: visible;
+}
+.flexi-socials.fc_size_32 {
+	margin-bottom: -5px;
 }
 
-#flexicontent .addthis_toolbox.addthis_floating_style.addthis_counter_style  .addthis_internal_container {
-	min-width: 70px;
+.flexi-socials.fc-outside {
+	clear: both;
+	box-sizing: border-box;
+	display:block;
+	float:left;
+	margin-left:0;
+	margin-right:0;
+	padding-left:0;
+	padding-right:0;
 }
 
-#flexicontent .addthis_floating_style.addthis_counter_style .addthis_counter {
+
+/* Resize FB Like */
+.flexi-socials .addthis_toolbox .addthis_button_facebook_like {
+	display: inline-block;
+	box-sizing: border-box;
+	padding: 0 4px 0 0px;
+}
+.flexi-socials .addthis_toolbox.addthis_default_style  .addthis_button_facebook_like.fc_resize {
+	transform-origin: top left;  -ms-transform-origin: top left;  -webkit-transform-origin: top left;  -moz-transform-origin: top left;  -webkit-transform-origin: top left;
+}
+.flexi-socials .addthis_toolbox.addthis_floating_style .addthis_button_facebook_like.fc_resize {
+	transform-origin: top center;  -ms-transform-origin: top center;  -webkit-transform-origin: top center;  -moz-transform-origin: top center;  -webkit-transform-origin: top center;
 	padding-left: 4px;
 }
-#flexicontent .addthis_floating_style.addthis_counter_style .addthis_internal_container span {
+.flexi-socials .addthis_toolbox.addthis_default_style.addthis_16x16_style  .addthis_button_facebook_like.fc_resize {
+	transform: scale(0.9);  -ms-transform: scale(0.9);  -webkit-transform: scale(0.9);  -o-transform: scale(0.9);  -moz-transform: scale(0.9);
+	margin: 0 0 14px 0;
+}
+/*.flexi-socials .addthis_toolbox.addthis_floating_style.addthis_16x16_style .addthis_button_facebook_like.fc_resize {
+	transform: scale(0.9);  -ms-transform: scale(0.9);  -webkit-transform: scale(0.9);  -o-transform: scale(0.9);  -moz-transform: scale(0.9);
+	margin: 0 0px 14px 0;
+}*/
+.flexi-socials .addthis_toolbox.addthis_default_style.addthis_32x32_style  .addthis_button_facebook_like.fc_resize {
+	transform: scale(1.6);  -ms-transform: scale(1.6);  -webkit-transform: scale(1.6);  -o-transform: scale(1.6);  -moz-transform: scale(1.6);
+	margin: 0 0 14px 0;
+}
+/*.flexi-socials .addthis_toolbox.addthis_floating_style.addthis_32x32_style .addthis_button_facebook_like.fc_resize {
+	transform: scale(1.3);  -ms-transform: scale(1.3);  -webkit-transform: scale(1.3);  -o-transform: scale(1.3);  -moz-transform: scale(1.3);
+	margin: 0 0px 14px 0;
+}*/
+
+
+/* Some alignment / placement */
+.flexi-socials:not(.fccleared) .addthis_default_style.addthis_16x16_style {
+	margin: 10px 0 3px;
+}
+.flexi-socials:not(.fccleared) .addthis_default_style.addthis_20x20_style {
+	margin: 10px 0 1px;
+}
+.flexi-socials:not(.fccleared) .addthis_default_style.addthis_32x32_style {
+	margin: 3px 0;
+}
+.flexi-socials .addthis_toolbox .at_PinItButton {
+	display:inline-block;
+}
+
+
+/* Fixed Position of floating buttons */
+.flexi-socials .addthis_toolbox.addthis_floating_style {
+	left:0px;
+	top:100px;
+	background:rgba(255,255,255, 0.6);
+}
+.flexi-socials .addthis_toolbox.addthis_floating_style .addthis_internal_container > a {
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
+.flexi-socials .addthis_toolbox.addthis_floating_style,
+.flexi-socials .addthis_toolbox.addthis_floating_style .addthis_internal_container {
+	width: unset;
+	max-width: unset;
+}
+.flexi-socials .addthis_toolbox.addthis_floating_style .fc_addthis_btn_cnt {
+	width:100%;
+	box-sizing: border-box;
+}
+
+
+/* addThis Compact button with counter */
+.flexi-socials .addthis_toolbox .addthis_button_compact {
 	float: none;
 }
-
-
-#flexicontent .addthis_default_style.addthis_32x32_style .addthis_button_facebook_like {
-	transform: scale(1.6);
-	-ms-transform: scale(1.6); 
-	-webkit-transform: scale(1.6); 
-	-o-transform: scale(1.6); 
-	-moz-transform: scale(1.6); 
-	transform-origin: top left;
-	-ms-transform-origin: top left;
-	-webkit-transform-origin: top left;
-	-moz-transform-origin: top left;
-	-webkit-transform-origin: top left;
-	margin-left: 0px;
-	margin-right: 48px;
+.flexi-socials .addthis_toolbox .fc_addthis_btn_cnt > a {
+	float: none;
+	display: inline-block;
+	margin: 0;
 }
-
-
-#flexicontent .addthis_default_style.addthis_16x16_style .addthis_button_facebook_like {
-	transform: scale(0.8);
-	-ms-transform: scale(0.8); 
-	-webkit-transform: scale(0.8); 
-	-o-transform: scale(0.8); 
-	-moz-transform: scale(0.8); 
-	transform-origin: top left;
-	-ms-transform-origin: top left;
-	-webkit-transform-origin: top left;
-	-moz-transform-origin: top left;
-	-webkit-transform-origin: top left;
-	margin-left: 0px;
-	margin-right: -12px;
+.flexi-socials .addthis_toolbox.addthis_default_style.addthis_16x16_style .fc_addthis_btn_cnt > a {
+	margin: 2px 0;
 }
