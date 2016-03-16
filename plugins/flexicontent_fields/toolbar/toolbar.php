@@ -73,7 +73,9 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$display_pdf 		= 0; //$field->parameters->get('display_pdf', 1);
 		$load_css 			= $field->parameters->get('load_css', 1);
 		
-		$display_social 	= $field->parameters->get('display_social', 1);
+		$_sfx = ($view != FLEXI_ITEMVIEW) ? '_cat' : '';
+		$display_social 	= $field->parameters->get('display_social'.$_sfx, ($view != FLEXI_ITEMVIEW ? 0 : 1));
+		
 		$addthis_user		= $field->parameters->get('addthis_user', '');
 		$addthis_pubid	= $field->parameters->get('addthis_pubid', $addthis_user);
 		
@@ -88,23 +90,29 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// define a global variable to be sure the script is loaded only once
 		$addthis		= isset($addthis) ? $addthis : 0;
 		
-		if ($load_css)
+		static $css_loaded = false;
+		if ($load_css && !$css_loaded)
 		{
+			$css_loaded = true;
 			$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
 		}
 		
+		
+		// Create an absolute ITEM URL add and escaped ITEM TITLE
 		if ($display_social || $display_comments || $display_email || $display_print)
 		{
 			$item_url = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug);
-			$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
-			$item_url_abs = $server . JRoute::_($item_url);
+			
 			// NOTE: this uses current SSL setting (e.g menu item), and not URL scheme: http/https 
 			//$item_url_abs = JRoute::_($item_url, true, -1);
+			
+			$item_url_abs = JURI::getInstance()->toString(array('scheme', 'host', 'port')) . JRoute::_($item_url);
 			$item_title_escaped = htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' );
 		}
 		
+		
+		// Created an array of Toolbar's actions (buttons) according to configuration
 		$ops = array();
-		$add_this = '';
 
 		// comments button
 		if ($display_comments)
@@ -120,7 +128,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		}
 
 		// text resizer
-		if ($display_resizer)
+		if ($display_resizer && $view == 'item')  // *** Item view only
 		{
 			$document->addScriptDeclaration('var textsize = '.$default_size.';
 			var lineheight = '.$default_line.';
@@ -150,7 +158,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		}
 		
 		// email button
-		if ($display_email)
+		if ($display_email && $view == 'item')  // *** Item view only
 		{
 			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 			
@@ -164,7 +172,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		}
 		
 		// print button
-		if ($display_print)
+		if ($display_print && $view == 'item')  // *** Item view only
 		{
 			$pop = JRequest::getInt('pop');
 			$pstatus = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
@@ -178,7 +186,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		}
 
 		// voice button
-		if ($display_voice)
+		if ($display_voice && $view == 'item')  // *** Item view only
 		{
 			if ($lang=='th') {
 				// Special case language case, maybe la=laos, and Bhutan languages in the future (NECTEC support these languages)
@@ -245,6 +253,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			}
 			
 			// OPEN GRAPH: image (extracted from item's description text)
+			$imageurl = '';
 			if ($field->parameters->get('add_og_image'))
 			{
 				$og_image_field     = $field->parameters->get('og_image_field');
@@ -283,104 +292,78 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			// AddThis social SHARE buttons
 			// ****************************
 			
-			$addthis_outside_toolbar  = $field->parameters->get('addthis_outside_toolbar', 0);
-			$addthis_custom_code       = $field->parameters->get('addthis_custom_code', false);
-			$addthis_custom_predefined = $field->parameters->get('addthis_custom_predefined', false);
+			$addthis_custom_code     = $field->parameters->get('addthis_custom_code'   .$_sfx, '');
+			$addthis_code_predefined = $field->parameters->get('addthis_code_predefined'.$_sfx, 3);
 			
-			$addthis_add_fb_like_layout = $field->parameters->get('addthis_fb_like', 1);
-			switch($addthis_add_fb_like_layout)
-			{
-				case 1:
-					$_fb_layout = $addthis_custom_predefined <= 4 ?  'button_count'  :  'box_count';
-					$fb_like = '<a class="addthis_button_facebook_like" fb:like:layout="'.$_fb_layout.'"></a>';
-					break;
-				case 2:
-					$fb_like = '<a class="addthis_button_facebook_like" fb:like:layout="standard"></a>';
-					break;
-				case 3:
-					$fb_like = '<a class="addthis_button_facebook_like" fb:like:layout="button_count" fb:like:action="recommend"></a>';
-					break;
-				default:
-					$fb_like = '';
-			}
+			$addthis_size    = $field->parameters->get('addthis_size' .$_sfx, 20);
+			$addthis_style   = $field->parameters->get('addthis_style'.$_sfx,  1);
+			
+			$addthis_fb_like = $field->parameters->get('addthis_fb_like'.$_sfx, 1);
+			$fb_like_resize  = $addthis_style==2 ? 0 : $field->parameters->get('addthis_fb_like_resize'.$_sfx, 1) ? 'fc_resize' : '';
+			
+			$addthis_box_style = $field->parameters->get('addthis_box_style'.$_sfx, 0);
+			$addthis_box_pos   = $field->parameters->get('addthis_box_pos'.$_sfx, 0);
+			
+			// Allow floating in ITEM view only (because in category we have multiple !)
+			$addthis_style_class  = $addthis_style==2 && $view=='item' ? 'addthis_floating_style' : 'addthis_default_style';
+			
+			// Size class (note this is ignored by boxed style)
+			$addthis_size_class   = 'addthis_'.$addthis_size.'x'.$addthis_size.'_style';
+			
+			$outer_box_class  = 'fc_size_'.$addthis_size . ($addthis_box_style==1 ? ' fccleared' : '');
+			
+			$fb_like_layouts = array(
+				1 => 'fb:like:layout="button_count"',
+				2 => 'fb:like:layout="box_count"',
+				3 => 'fb:like:layout="standard"',
+				4 => 'fb:like:layout="button_count" fb:like:action="recommend"',
+				5 => 'fb:like:layout="box_count" fb:like:action="recommend"',
+			);
+			$fb_like = !$addthis_fb_like ? '' : '<a class="addthis_button_facebook_like '.$fb_like_resize.'" '.$fb_like_layouts[$addthis_fb_like].' ></a>';
 			
 			if (!$addthis_custom_code)
 			{
-				switch ($addthis_custom_predefined)
+				switch ($addthis_code_predefined)
 				{
 					case 1:
 						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_default_style" addthis:url="_item_url_" addthis:title="_item_title_">
+						<div class="addthis_toolbox _addthis_STYLE_ _addthis_SIZE_" addthis:url="_item_url_" addthis:title="_item_title_">
 							_fb_like_
-							<a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+							<a class="addthis_counter_facebook"></a>
 							<a class="addthis_counter_twitter"></a>
+							<a class="addthis_counter_google_plusone"></a>
 							<a class="addthis_counter_pinterest_share"></a>
 							<a class="addthis_counter_reddit"></a>
 							<a class="addthis_counter_linkedin"></a>
-							<a class="addthis_counter addthis_pill_style"></a>
+							<div class="fc_addthis_btn_cnt nowrap_box">
+								<a class="addthis_button_compact"></a>
+								<a class="addthis_counter addthis_bubble_style"></a>
+							</div>
 						</div>
 						<!-- AddThis Button END -->
 						';
 						break;
+					
 					case 2:
 						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_default_style addthis_32x32_style" addthis:url="_item_url_" addthis:title="_item_title_">
+						<div class="addthis_toolbox _addthis_STYLE_" addthis:url="_item_url_" addthis:title="_item_title_">
 							_fb_like_
-							<a class="addthis_button_preferred_1"></a>
-							<a class="addthis_button_preferred_2"></a>
-							<a class="addthis_button_preferred_3"></a>
-							<a class="addthis_button_preferred_4"></a>
-							<a class="addthis_button_compact"></a>
-							<a class="addthis_counter addthis_bubble_style"></a>
-						</div>
-						<!-- AddThis Button END -->
-						';
-						break;
-					default:
-					case 3:
-						$addthis_custom_code = '
-						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_default_style addthis_16x16_style" addthis:url="_item_url_" addthis:title="_item_title_">
-							_fb_like_
-							<a class="addthis_button_preferred_1"></a>
-							<a class="addthis_button_preferred_2"></a>
-							<a class="addthis_button_preferred_3"></a>
-							<a class="addthis_button_preferred_4"></a>
-							<a class="addthis_button_compact"></a>
-							<a class="addthis_counter addthis_bubble_style"></a>
-						</div>
-						<!-- AddThis Button END -->
-						';
-						break;
-					case 4:
-						$addthis_custom_code = '
-						<!-- AddThis Button BEGIN -->
-							_fb_like_
-						<a class="addthis_button_compact" href="//www.addthis.com/bookmark.php?v=300&pubid=_addthis_pubid_"> <img src="//s7.addthis.com/static/btn/v2/sm-plus.gif" alt="_jtext_SHARE_" style="border:0; height:20px; width:20px; margin: 0; vertical-align: top;"/> <span style="vertical-align: top;">_jtext_SHARE_</span> </a>
-						<!-- AddThis Button END -->
-						';
-						break;
-					case 5:
-						$addthis_custom_code = '
-						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_floating_style addthis_counter_style" style="left:50px;top:50px;" addthis:url="_item_url_" addthis:title="_item_title_">
-							_fb_like_
+							<a class="addthis_button_tweet" tw:count="vertical">
 							<a class="addthis_button_google_plusone" g:plusone:size="tall"></a>
-							<a class="addthis_counter_twitter"></a>
-							<a class="addthis_counter_pinterest_share"></a>
-							<a class="addthis_counter_reddit"></a>
-							<a class="addthis_counter_linkedin"></a>
+							<a class="addthis_button_pinterest_pinit" pi:pinit:url="_item_url_" pi:pinit:media="_item_image_" pi:pinit:layout="vertical"></a>
+							<a class="addthis_button_linkedin_counter" li:counter="top"></a>
 							<a class="addthis_counter"></a>
 						</div>
 						<!-- AddThis Button END -->
 						';
 						break;
-					case 6:
+											
+					case 3:
 						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_floating_style addthis_32x32_style" style="left:50px;top:50px;" addthis:url="_item_url_" addthis:title="_item_title_">
+						<div class="addthis_toolbox _addthis_STYLE_ _addthis_SIZE_" addthis:url="_item_url_" addthis:title="_item_title_">
 							_fb_like_
 							<a class="addthis_button_preferred_1"></a>
 							<a class="addthis_button_preferred_2"></a>
@@ -391,16 +374,17 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 						<!-- AddThis Button END -->
 						';
 						break;
-					case 7:
+						
+					default:
+					case 4:
 						$addthis_custom_code = '
 						<!-- AddThis Button BEGIN -->
-						<div class="addthis_toolbox addthis_floating_style addthis_16x16_style" style="left:50px;top:50px;" addthis:url="_item_url_" addthis:title="_item_title_">
+						<div class="addthis_toolbox _addthis_STYLE_ _addthis_SIZE_" addthis:url="_item_url_" addthis:title="_item_title_">
 							_fb_like_
-							<a class="addthis_button_preferred_1"></a>
-							<a class="addthis_button_preferred_2"></a>
-							<a class="addthis_button_preferred_3"></a>
-							<a class="addthis_button_preferred_4"></a>
-							<a class="addthis_button_compact"></a>
+							<div class="fc_addthis_btn_cnt nowrap_box">
+								<a class="addthis_button_compact"></a>
+								<a class="addthis_counter addthis_bubble_style"></a>
+							</div>
 						</div>
 						<!-- AddThis Button END -->
 						';
@@ -411,13 +395,17 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			// Replacements
 			$addthis_custom_code = str_replace('_item_url_', $item_url_abs, $addthis_custom_code);
 			$addthis_custom_code = str_replace('_item_title_', $item_title_escaped, $addthis_custom_code);
+			$addthis_custom_code = str_replace('_item_image_', $imageurl, $addthis_custom_code);
 			$addthis_custom_code = str_replace('_fb_like_', $fb_like, $addthis_custom_code);
 			$addthis_custom_code = str_replace('_addthis_pubid_', $addthis_pubid, $addthis_custom_code);
 			$addthis_custom_code = str_replace('_jtext_SHARE_', JText::_('FLEXI_FIELD_TOOLBAR_SHARE'), $addthis_custom_code);
 			
-			$addthis_custom_code = $addthis_outside_toolbar ?
-				'<div class="toolbar-spacer"'.$spacer.'></div> <div class="flexi-socials-outside">'.$addthis_custom_code.'</div>' :
-				'<div class="flexi-socials toolbar-element">' .$addthis_custom_code. '</div>' ;
+			$addthis_custom_code = str_replace('_addthis_STYLE_' , $addthis_style_class , $addthis_custom_code);
+			$addthis_custom_code = str_replace('_addthis_SIZE_'  , $addthis_size_class, $addthis_custom_code);
+			
+			$addthis_custom_code = $addthis_box_pos ?
+				'<div class="flexi-socials fc-outside '.$outer_box_class.'">'.$addthis_custom_code.'</div>' :
+				'<div class="toolbar-spacer"'.$spacer.'></div> <div class="flexi-socials '.$outer_box_class.'">' .$addthis_custom_code. '</div>' ;
 			
 			// Add AddThis JS if not already added
 			if (!$addthis)
@@ -427,6 +415,16 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					var addthis_config = {
 						services_exclude: "print,email"
 					}
+					var f = function() { 
+						jQuery(".addthis_button_facebook_like.fc_resize").each(function(i, el) {
+							var scale = -1 + jQuery(el).get(0).getBoundingClientRect().width / jQuery(el).get(0).offsetWidth;
+							jQuery(el).css({"margin-bottom": scale*jQuery(this).height()});
+							if ( !jQuery(el).closest(".addthis_floating_style").length )
+								jQuery(el).css({"margin-right": scale*jQuery(this).width()});
+							else jQuery(el).css({"margin-right": 0});
+						});
+					};
+					jQuery(document).ready(function() {  setTimeout(f, 2500); setTimeout(f, 3500); setTimeout(f, 4500);  });
 					</script>
 					<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js'.($addthis_pubid ? '#pubid='.$addthis_pubid : '').'"></script>
 				');
@@ -434,19 +432,24 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 				
 				if ($fb_like) {
 					$css = '
-						.addthis_floating_style.addthis_32x32_style, .addthis_floating_style.addthis_32x32_style .addthis_internal_container,
-						.addthis_floating_style.addthis_16x16_style, .addthis_floating_style.addthis_16x16_style .addthis_internal_container { min-width: 58px; }
+						.flexi-socials .addthis_toolbox.addthis_floating_style,
+						.flexi-socials .addthis_toolbox.addthis_floating_style .addthis_internal_container { min-width: 90px; }
 					';
 					$document->addStyleDeclaration($css);
 				}
 			}
 		}
 		
-		$display = '
-		<div class="flexitoolbar">
-			'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
-			'.$addthis_custom_code.'
-		</div>';
+		$display = $addthis_box_pos ? '
+			<div class="flexitoolbar">
+				'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
+			</div>'
+			.$addthis_custom_code :			
+			'<div class="flexitoolbar">
+				'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
+				'.$addthis_custom_code.'
+			</div>'
+			;
 
 		$field->{$prop} = $display;
 	}

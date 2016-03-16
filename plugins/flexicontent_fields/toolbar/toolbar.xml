@@ -45,7 +45,9 @@
 				<option value="0">FLEXI_NO</option>
 			</field>
 			
+			<field name="" type="separator" default="NOTE: These controls will only display in sinlge item view" level="level3" class="alert alert-warning fcpadded" />
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_VARIOUS_CONTROLS" level="level2" />
+			
 			<field name="display_comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
@@ -84,36 +86,8 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS_DESC" level="level1" />
 			
-			<field name="display_social" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS_DESC" class="btn-group btn-group-yesno">
-				<option value="1" show_list="hiddefield-mode3" hide_list="">FLEXI_YES</option>
-				<option value="0" show_list="" hide_list="hiddefield-mode3">FLEXI_NO</option>
-			</field>
-			<field name="addthis_user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USERNAME" depend_class="hiddefield-mode3" description="FLEXI_FIELD_TOOLBAR_USERNAME_DESC" />
-			<field name="addthis_pubid" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_PUBID" depend_class="hiddefield-mode3" description="FLEXI_FIELD_TOOLBAR_PUBID_DESC" />
-			<field name="addthis_outside_toolbar" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SOCIAL_POSITION" depend_class="hiddefield-mode3" description="FLEXI_FIELD_TOOLBAR_SOCIAL_POSITION_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_ADDTHIS" description="" level="level2" />
-			<field name="addthis_fb_like" type="radio" default="1" label="Facebook LIKE" description="Select to include facebook like or disable it" class="btn-group btn-group-yesno">
-				<option value="0">Hide</option>
-				<option value="1">With Counter</option>
-				<option value="2">With friends</option>
-				<option value="3">As recommend</option>
-			</field>
-			<field name="addthis_custom_predefined" type="multilist" subtype="list" toggle_related="1" default="3" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE_DESC" class="btn-group group-fcmethod">
-				<option value=""   fcreadonly="{'addthis_custom_code':0}" >FLEXI_CUSTOMIZE</option>
-				<option value="1"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_default_style\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_button_google_plusone\' g:plusone:size=\'medium\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_twitter\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_pinterest_share\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_reddit\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_linkedin\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter addthis_pill_style\'&gt;&lt;/a&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_1</option>
-				<option value="2"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_default_style addthis_32x32_style\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_2</option>
-				<option value="3"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_default_style addthis_16x16_style\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_3</option>
-				<option value="4"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'_fb_like_\n&lt;a class=\'addthis_button\' href=\'//www.addthis.com/bookmark.php?v=300&amp;pubid=_addthis_pubid_\'&gt;\n  &lt;img src=\'//s7.addthis.com/static/btn/v2/sm-plus.gif\' alt=\'_jtext_SHARE_\' style=\'border:0; height:20px; width:20px; margin: 0; vertical-align: top;\'/&gt; &lt;span style=\'vertical-align: top;\'&gt;_jtext_SHARE_&lt;/span&gt; \n&lt;/a&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_4</option>
-				<option value="5"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_floating_style addthis_counter_style\' style=\'left:50px;top:50px;\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_button_google_plusone\' g:plusone:size=\'tall\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_twitter\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_pinterest_share\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_reddit\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_linkedin\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter\'&gt;&lt;/a&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_5</option>
-				<option value="6"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_floating_style addthis_32x32_style\' style=\'left:50px;top:50px;\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_6</option>
-				<option value="7"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox addthis_floating_style addthis_16x16_style\' style=\'left:50px;top:50px;\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_7</option>
-			</field>
-			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_ADDTHIS_CUSTOMIZE_CODE" description="" level="level3" />
-			<field name="addthis_custom_code" type="textarea" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE_DESC" rows="13" cols="38"  filter="raw" />
+			<field name="addthis_user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USERNAME" depend_class="" description="FLEXI_FIELD_TOOLBAR_USERNAME_DESC" />
+			<field name="addthis_pubid" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_PUBID" depend_class="" description="FLEXI_FIELD_TOOLBAR_PUBID_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />
 			
@@ -176,6 +150,113 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field-->
+			
+		</fieldset>
+		<fieldset name="group-toolbar-addthis-item" repeat="1" icon_class="icon-folder-3" label="Social - Item View" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS_DESC" level="level1" />
+			<field name="display_social" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="enable_addthis">FLEXI_NO</option>
+				<option value="1" show_list="enable_addthis" hide_list="">FLEXI_YES</option>
+			</field>
+			
+			<field name="addthis_code_predefined" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS_DESC" class="btn-group group-fcmethod" labelclass="label-info" depend_class="enable_addthis">
+				<option value=""   fcreadonly="{'addthis_custom_code':0}" >FLEXI_CUSTOMIZE</option>
+				<option value="1"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_counter_facebook\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_twitter\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_google_plusone\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_pinterest_share\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_reddit\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_linkedin\'&gt;&lt;/a&gt;\n  &lt;div class=\'fc_addthis_btn_cnt nowrap_box\'&gt;\n    &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n    &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n  &lt;/div&gt;\n&lt;/div&gt;'}">FLEXI_FIELD_TOOLBAR_COMMON_COUNTERS</option>
+				<option value="2"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox _addthis_STYLE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_button_tweet\' tw:count=\'vertical\'&gt;\n  &lt;a class=\'addthis_button_google_plusone\' g:plusone:size=\'tall\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_pinterest_pinit\' pi:pinit:url=\'_item_url_\' pi:pinit:media=\'_item_image_\' pi:pinit:layout=\'vertical\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_linkedin_counter\' li:counter=\'top\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter\'&gt;&lt;/a&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_COMMON_COUNTERS_BOX_STYLE</option>
+				<option value="3"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_POPULAR_BUTTONS</option>
+				<option value="4"  fcreadonly="{'addthis_custom_code':1}" fcconfigs="{'addthis_custom_code':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;div class=\'fc_addthis_btn_cnt nowrap_box\'&gt;\n    &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n    &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n  &lt;/div&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_SINGLE_SHARE_BUTTON</option>
+			</field>
+			<field name="addthis_custom_code" type="textarea" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE_DESC" rows="13" cols="38" filter="raw" depend_class="enable_addthis" />
+			
+			<field name="" type="separator" default="FLEXI_BUTTONS" description="" level="level2" depend_class="enable_addthis"/>
+			<field name="addthis_size" type="multilist" subtype="radio" default="20" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE_DESC" inline_tip="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis">
+				<option value="">FLEXI_DEFAULT</option>
+				<option value="16">16x16</option>
+				<option value="20">20x20</option>
+				<option value="32">32x32</option>
+			</field>
+			<field name="addthis_style" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis">
+				<option value="1" show_list="addthis_inline" hide_list="">FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS_INLINE_H</option>
+				<option value="2" show_list="" hide_list="addthis_inline">FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS_FIXED_V</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_FB_LIKE" description="" level="level3" depend_class="enable_addthis"/>
+			<field name="addthis_fb_like" type="radio" default="1" label="FLEXI_LAYOUT" description="FLEXI_FIELD_TOOLBAR_FB_LIKE_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_FIELD_TOOLBAR_FBLIKE_CNT</option>
+				<option value="2">FLEXI_FIELD_TOOLBAR_FBLIKE_CNT_BOX</option>
+				<option value="3">FLEXI_FIELD_TOOLBAR_FBLIKE_FRIENDS</option>
+				<option value="4">FLEXI_FIELD_TOOLBAR_FBLIKE_RECOMMEND</option>
+				<option value="5">FLEXI_FIELD_TOOLBAR_FBLIKE_RECOMMEND_BOX</option>
+			</field>
+			<field name="addthis_fb_like_resize" type="multilist" subtype="radio" default="1" label="FLEXI_RESIZE" description="FLEXI_FIELD_TOOLBAR_FB_LIKE_RESIZE_DESC" tip_img="warning.png" inline_tip="FLEXI_FIELD_TOOLBAR_FB_LIKE_RESIZE_WARNING" class="btn-group btn-group-yesno" depend_class="enable_addthis addthis_inline">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_BOX" description="" level="level2" depend_class="enable_addthis addthis_inline"/>
+			<field name="addthis_box_style" type="radio" default="1" label="FLEXI_FLOAT_CLEAR" description="..." class="btn-group btn-group-yesno" depend_class="enable_addthis addthis_inline">
+				<option value="0">FLEXI_FLOATED</option>
+				<option value="1">FLEXI_FLOATED_N_CLEARED</option>
+			</field>
+			<field name="addthis_box_pos" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_BOX_PLACEMENT" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_BOX_PLACEMENT_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis addthis_inline">
+				<option value="0">FLEXI_FIELD_TOOLBAR_SOCIAL_INSIDE</option>
+				<option value="1">FLEXI_FIELD_TOOLBAR_SOCIAL_OUTSIDE</option>
+			</field>
+			
+		</fieldset>
+		<fieldset name="group-toolbar-addthis-cat" repeat="1" icon_class="icon-stack" label="Social - Category view" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS_DESC" level="level1" />
+			<field name="display_social_cat" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="enable_addthis_cat">FLEXI_NO</option>
+				<option value="1" show_list="enable_addthis_cat" hide_list="">FLEXI_YES</option>
+			</field>
+			
+			<field name="addthis_code_predefined_cat" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_PREDEFINED_CONFIGS_DESC" class="btn-group group-fcmethod" labelclass="label-info" depend_class="enable_addthis_cat">
+				<option value=""   fcreadonly="{'addthis_custom_code_cat':0}" >FLEXI_CUSTOMIZE</option>
+				<option value="1"  fcreadonly="{'addthis_custom_code_cat':1}" fcconfigs="{'addthis_custom_code_cat':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_counter_facebook\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_twitter\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_google_plusone\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_pinterest_share\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_reddit\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter_linkedin\'&gt;&lt;/a&gt;\n  &lt;div class=\'fc_addthis_btn_cnt nowrap_box\'&gt;\n    &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n    &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n  &lt;/div&gt;\n&lt;/div&gt;'}">FLEXI_FIELD_TOOLBAR_COMMON_COUNTERS</option>
+				<option value="2"  fcreadonly="{'addthis_custom_code_cat':1}" fcconfigs="{'addthis_custom_code_cat':'&lt;div class=\'addthis_toolbox _addthis_STYLE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_button_tweet\' tw:count=\'vertical\'&gt;\n  &lt;a class=\'addthis_button_google_plusone\' g:plusone:size=\'tall\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_pinterest_pinit\' pi:pinit:url=\'_item_url_\' pi:pinit:media=\'_item_image_\' pi:pinit:layout=\'vertical\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_linkedin_counter\' li:counter=\'top\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_counter\'&gt;&lt;/a&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_COMMON_COUNTERS_BOX_STYLE</option>
+				<option value="3"  fcreadonly="{'addthis_custom_code_cat':1}" fcconfigs="{'addthis_custom_code_cat':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;a class=\'addthis_button_preferred_1\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_2\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_3\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_preferred_4\'&gt;&lt;/a&gt;\n  &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_POPULAR_BUTTONS</option>
+				<option value="4"  fcreadonly="{'addthis_custom_code_cat':1}" fcconfigs="{'addthis_custom_code_cat':'&lt;div class=\'addthis_toolbox _addthis_STYLE_ _addthis_SIZE_\' addthis:url=\'_item_url_\' addthis:title=\'_item_title_\'&gt;\n  _fb_like_\n  &lt;div class=\'fc_addthis_btn_cnt nowrap_box\'&gt;\n    &lt;a class=\'addthis_button_compact\'&gt;&lt;/a&gt;\n    &lt;a class=\'addthis_counter addthis_bubble_style\'&gt;&lt;/a&gt;\n  &lt;/div&gt;\n&lt;/div&gt;\n'}">FLEXI_FIELD_TOOLBAR_SINGLE_SHARE_BUTTON</option>
+			</field>
+			<field name="addthis_custom_code_cat" type="textarea" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_HTML_CODE_DESC" rows="13" cols="38" filter="raw" depend_class="enable_addthis_cat" />
+			
+			<field name="" type="separator" default="FLEXI_BUTTONS" description="" level="level2" depend_class="enable_addthis_cat"/>
+			<field name="addthis_size_cat" type="multilist" subtype="radio" default="20" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE_DESC" inline_tip="FLEXI_FIELD_TOOLBAR_ADDTHIS_SIZE_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis_cat">
+				<option value="">FLEXI_DEFAULT</option>
+				<option value="16">16x16</option>
+				<option value="20">20x20</option>
+				<option value="32">32x32</option>
+			</field>
+			<field name="addthis_style_cat" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis_cat">
+				<option value="1" show_list="addthis_inline_cat" hide_list="">FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_POS_INLINE_H</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_FB_LIKE" description="" level="level3" depend_class="enable_addthis_cat"/>
+			<field name="addthis_fb_like_cat" type="radio" default="1" label="FLEXI_LAYOUT" description="FLEXI_FIELD_TOOLBAR_FB_LIKE_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis_cat">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_FIELD_TOOLBAR_FBLIKE_CNT</option>
+				<option value="2">FLEXI_FIELD_TOOLBAR_FBLIKE_CNT_BOX</option>
+				<option value="3">FLEXI_FIELD_TOOLBAR_FBLIKE_FRIENDS</option>
+				<option value="4">FLEXI_FIELD_TOOLBAR_FBLIKE_RECOMMEND</option>
+				<option value="5">FLEXI_FIELD_TOOLBAR_FBLIKE_RECOMMEND_BOX</option>
+			</field>
+			<field name="addthis_fb_like_resize_cat" type="multilist" subtype="radio" default="1" label="FLEXI_RESIZE" description="FLEXI_FIELD_TOOLBAR_FB_LIKE_RESIZE_DESC" tip_img="warning.png" inline_tip="FLEXI_FIELD_TOOLBAR_FB_LIKE_RESIZE_WARNING" class="btn-group btn-group-yesno" depend_class="enable_addthis_cat addthis_inline_cat">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_BOX" description="" level="level2" depend_class="enable_addthis_cat addthis_inline_cat"/>
+			<field name="addthis_box_style_cat" type="radio" default="1" label="FLEXI_FLOAT_CLEAR" description="..." class="btn-group btn-group-yesno" depend_class="enable_addthis_cat addthis_inline_cat">
+				<option value="0">FLEXI_FLOATED</option>
+				<option value="1">FLEXI_FLOATED_N_CLEARED</option>
+			</field>
+			<field name="addthis_box_pos_cat" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_BOX_PLACEMENT" description="FLEXI_FIELD_TOOLBAR_SOCIAL_BTN_BOX_PLACEMENT_DESC" class="btn-group btn-group-yesno" depend_class="enable_addthis_cat addthis_inline_cat">
+				<option value="0">FLEXI_FIELD_TOOLBAR_SOCIAL_INSIDE</option>
+				<option value="1">FLEXI_FIELD_TOOLBAR_SOCIAL_OUTSIDE</option>
+			</field>
 			
 		</fieldset>
 	</fields>
