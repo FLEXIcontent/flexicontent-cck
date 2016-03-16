@@ -54,7 +54,6 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		//if ($view != FLEXI_ITEMVIEW) return;
 		if (JRequest::getCmd('print')) return;
 		
-		global $mainframe, $addthis;
 		//$scheme = JURI::getInstance()->getScheme();  // we replaced http(s):// with //
 		$document	= JFactory::getDocument();
 		
@@ -87,8 +86,6 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$voicetarget 		= $field->parameters->get('voicetarget', 'flexicontent');
 
 		$spacer				= ' style="width:'.$spacer_size.'px;"';
-		// define a global variable to be sure the script is loaded only once
-		$addthis		= isset($addthis) ? $addthis : 0;
 		
 		static $css_loaded = false;
 		if ($load_css && !$css_loaded)
@@ -216,6 +213,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		}
 
 		// AddThis social SHARE buttons, also optionally add OPEN GRAPH TAGs
+		$addthis_html = '';
 		if ($display_social)
 		{
 			// ***************
@@ -403,12 +401,13 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			$addthis_custom_code = str_replace('_addthis_STYLE_' , $addthis_style_class , $addthis_custom_code);
 			$addthis_custom_code = str_replace('_addthis_SIZE_'  , $addthis_size_class, $addthis_custom_code);
 			
-			$addthis_custom_code = $addthis_box_pos ?
+			$addthis_html = $addthis_box_pos ?
 				'<div class="flexi-socials fc-outside '.$outer_box_class.'">'.$addthis_custom_code.'</div>' :
 				'<div class="toolbar-spacer"'.$spacer.'></div> <div class="flexi-socials '.$outer_box_class.'">' .$addthis_custom_code. '</div>' ;
 			
 			// Add AddThis JS if not already added
-			if (!$addthis)
+			static $addthis_added = null;
+			if (!$addthis_added)
 			{
 				$document->addCustomTag('	
 					<script type="text/javascript">
@@ -428,7 +427,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					</script>
 					<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js'.($addthis_pubid ? '#pubid='.$addthis_pubid : '').'"></script>
 				');
-				$addthis = 1;
+				$addthis_added = 1;
 				
 				if ($fb_like) {
 					$css = '
@@ -440,14 +439,14 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			}
 		}
 		
-		$display = $addthis_box_pos ? '
+		$display = $addthis_html && $addthis_box_pos ? '
 			<div class="flexitoolbar">
 				'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
 			</div>'
-			.$addthis_custom_code :			
+			.$addthis_html :			
 			'<div class="flexitoolbar">
 				'.implode('<div class="toolbar-spacer"'.$spacer.'></div>', $ops).'
-				'.$addthis_custom_code.'
+				'.$addthis_html.'
 			</div>'
 			;
 
