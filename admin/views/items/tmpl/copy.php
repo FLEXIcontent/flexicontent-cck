@@ -31,7 +31,7 @@ defined('_JEXEC') or die('Restricted access');
 					<thead>
 						<tr>
 							<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-							<th><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></th>
+							<th><?php echo JText::_( 'FLEXI_MAIN_CATEGORY' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -224,7 +224,7 @@ defined('_JEXEC') or die('Restricted access');
 						</td>
 					</tr>
 					<tr id="row_maincat">
-						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label></td>
+						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_MAIN_CATEGORY' ); ?></label></td>
 						<td>
 							<?php echo $this->lists['maincat']; ?>
 						</td>

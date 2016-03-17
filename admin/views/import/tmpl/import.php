@@ -232,7 +232,7 @@ $tabCnt[$tabSetCnt] = 0;
 			</tr>
 			
 			<tr>
-				<td class="key"><label class="label" for="maincat"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label></td>
+				<td class="key"><label class="label" for="maincat"><?php echo JText::_( 'FLEXI_MAIN_CATEGORY' ); ?></label></td>
 				<td class="data"><?php echo $this->lists['maincat']; ?></td>
 			</tr>
 			
@@ -249,7 +249,7 @@ $tabCnt[$tabSetCnt] = 0;
 			
 			<tr>
 				<td class="key" style="text-align:left;">
-					<label class="label" for="maincat_col" style="clear:both;"><?php echo JText::_( 'FLEXI_IMPORT_FILE_OVERRIDE' ); ?> <?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label>
+					<label class="label" for="maincat_col" style="clear:both;"><?php echo JText::_( 'FLEXI_IMPORT_FILE_OVERRIDE' ); ?> <?php echo JText::_( 'FLEXI_MAIN_CATEGORY' ); ?></label>
 				</td>
 				<td class="data">
 					<?php
