@@ -333,7 +333,7 @@ ul#ultagbox > li.tagitem .deletetag {
 	background-color: transparent;
 }
 div#tags {
-	margin: 0px 48px 0 0;
+	margin: 0px 32px 8px 0;
 	padding: 0px;
 	float: left;
 }
@@ -771,7 +771,7 @@ table.adminform td #search {
 		margin-top: 48px !important;
 	}
 }
-@media (max-width: 1200px) {
+@media (max-width: 1660px) {
 	#flexicontent .span6 .label-fcouter {
 		width: 28% !important;
 	}

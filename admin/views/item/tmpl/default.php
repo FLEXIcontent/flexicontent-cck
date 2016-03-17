@@ -37,6 +37,10 @@ $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 4px 6px 4px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 
+$hint_image = '<i class="icon-info"></i>';//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$warn_image = '<i class="icon-warning"></i>';//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$conf_image = '<i class="icon-cog"></i>';
+
 // add extra css/js for the edit form
 if ($this->params->get('form_extra_css'))    $this->document->addStyleDeclaration($this->params->get('form_extra_css'));
 if ($this->params->get('form_extra_css_be')) $this->document->addStyleDeclaration($this->params->get('form_extra_css_be'));
@@ -396,10 +400,15 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<span class="label-fcouter" id="jform_catid-lbl-outer">
 			<label id="jform_catid-lbl" for="jform_catid" data-for_bck="jform_catid" class="label pull-left label-fcinner label-toplevel <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', 'FLEXI_SEC_FEAT_CATEGORIES_NOTES', 1, 1);?>">
 				<?php echo JText::_( 'FLEXI_CATEGORY' ); ?>
+				<i class="icon-tree-2"></i>
 			</label>
 			</span>
 			<div class="container_fcfield container_fcfield_name_catid">
 				<?php echo $this->lists['catid']; ?>
+				<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo '<b>'.JText::_('FLEXI_NOTES').'</b><br/>'.JText::_('<br/>Please select <br/> - secondary categories <br/> - and featured <br/> inside the \'Assignments\' TAB'); ?>">
+					<?php echo $conf_image; ?>
+					<?php echo JText::_('FLEXI_NOTES'); ?>
+				</span>
 			</div>
 		
 
@@ -416,6 +425,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<span class="label-fcouter" id="jform_tag-lbl-outer">
 			<label id="jform_tag-lbl" for="jform_tag" <?php echo $label_tooltip; ?> >
 				<?php echo $field ? $field->label : JText::_( 'FLEXI_TAGS' ); ?>
+				<i class="icon-tags-2"></i>
 			</label>
 			</span>
 			<div class="container_fcfield container_fcfield_name_tags">
@@ -480,6 +490,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<span class="label-fcouter" id="jform_type_id-lbl-outer">
 			<label id="jform_type_id-lbl" for="jform_type_id" data-for_bck="jform_type_id" <?php echo $label_tooltip; ?> >
 				<?php echo $field ? $field->label : JText::_( 'FLEXI_TYPE' ); ?>
+				<i class="icon-briefcase"></i>
 			</label>
 			</span>
 			<?php /*echo $this->form->getLabel('type_id');*/ ?>
@@ -501,6 +512,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<span class="label-fcouter" id="jform_language-lbl-outer">
 			<label id="jform_language-lbl" for="jform_language" class="label pull-left label-fcinner label-toplevel" >
 				<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
+				<i class="icon-flag"></i>
 			</label>
 			</span>
 			<?php /*echo $this->form->getLabel('language');*/ ?>
@@ -524,6 +536,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<span class="label-fcouter" id="jform_state-lbl-outer">
 			<label id="jform_state-lbl" for="jform_state" <?php echo $label_tooltip; ?> >
 				<?php echo $field ? $field->label : JText::_( 'FLEXI_STATE' ); ?>
+				<i class="icon-file-check"></i>
 			</label>
 			</span>
 			<?php /*echo $this->form->getLabel('state');*/ ?>

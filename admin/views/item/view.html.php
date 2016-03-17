@@ -622,10 +622,14 @@ class FlexicontentViewItem extends JViewLegacy
 			$class  = "use_select2_lib select2_list_selected";
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
 			$attribs .= $enable_featured_cid_selector ? '' : ' disabled="disabled"';
-			
 			$fieldname = 'jform[featured_cid][]';
+			
+			// Skip main category from the selected cats to allow easy change of it
+			$featured_sel_nomain = array();
+			foreach($featured_sel_nomain as $cat_id) if ($cat_id!=$item->catid) $featured_sel_nomain[] = $cat_id;
+			
 			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed,
+				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel_nomain, 3, $attribs, true, true,	$actions_allowed,
 					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats
 				);
 		}
@@ -663,8 +667,13 @@ class FlexicontentViewItem extends JViewLegacy
 			
 			$fieldname = 'jform[cid][]';
 			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
+			
+			// Skip main category from the selected cats to allow easy change of it
+			$selectedcats_nomain = array();
+			foreach($selectedcats as $cat_id) if ($cat_id!=$item->catid) $selectedcats_nomain[] = $cat_id;
+			
 			$lists['cid'] = ($enable_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $selectedcats, false, $attribs, true, true, $actions_allowed,
+				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $selectedcats_nomain, false, $attribs, true, true, $actions_allowed,
 					$require_all=true, $skip_subtrees, $disable_subtrees=array(), $custom_options=array(), $disabled_cats
 				);
 		}

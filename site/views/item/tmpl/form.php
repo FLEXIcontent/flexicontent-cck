@@ -662,7 +662,7 @@ if ( $typeid && $this->params->get('allow_subscribers_notify_fe', 0) && $this->s
 ob_start();  // category ?>
 	<span class="label-fcouter" id="jform_catid-lbl-outer">
 		<label id="jform_catid-lbl" for="jform_catid" data-for_bck="jform_catid" class="label">
-			<?php echo JText::_( !$secondary_displayed || isset($all_tab_fields['category']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' ); ?>
+			<?php echo JText::_( !$secondary_displayed || isset($all_tab_fields['category']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_MAIN_CATEGORY' ); ?>
 		</label>
 	</span>
 	
@@ -757,6 +757,20 @@ if ($tags_displayed) : ob_start();  // tags ?>
 		</span>
 		<div class="container_fcfield container_fcfield_name_tags">
 			
+			<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
+			<div class="fcclear"></div>
+			<div id="tags">
+				<?php /*<label for="input-tags">
+					<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
+				</label> */ ?>
+				<input type="text" id="input-tags" name="tagname" class="fcfield_textval <?php echo $tip_class; ?>"
+					placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>" 
+					title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"
+				/>
+				<span id='input_new_tag' ></span>
+			</div>
+			<?php endif; ?>
+			
 			<div class="qf_tagbox" id="qf_tagbox">
 				<ul id="ultagbox">
 				<?php
@@ -779,20 +793,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 				?>
 				</ul>
 			</div>
-
-			<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
-			<div class="fcclear"></div>
-			<div id="tags">
-				<label for="input-tags">
-					<?php echo JText::_( 'FLEXI_SELECT_TAG' ); ?>
-				</label>
-				<input type="text" id="input-tags" name="tagname" class="fcfield_textval <?php echo $tip_class; ?>"
-					placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>" 
-					title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"
-				/>
-				<span id='input_new_tag' ></span>
-			</div>
-			<?php endif; ?>
+			
 		</div>
 	</fieldset>
 <?php $captured['tags'] = ob_get_clean(); endif;
