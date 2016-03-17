@@ -211,14 +211,14 @@
 			
 			<field name="" type="separator" default="FLEXI_TAGS_SCOPE" level="level2" />
 			<field name="method_tags" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_DESC" toggle_related="1" class="btn-group group-fcmethod">
-				<option value="1" show_list="" hide_list="method_tags_ops">FLEXI_ALL</option>
-				<option value="2" show_list="method_tags_ops" hide_list="">FLEXI_EXCLUDE</option>
-				<option value="3" show_list="method_tags_ops" hide_list="">FLEXI_INCLUDE</option>
+				<option value="1" show_list="" hide_list="method_tags_ops,method_tags_inc">FLEXI_ALL</option>
+				<option value="2" show_list="method_tags_ops" hide_list="method_tags_inc">FLEXI_EXCLUDE</option>
+				<option value="3" show_list="method_tags_ops,method_tags_inc" hide_list="">FLEXI_INCLUDE</option>
 			</field>
 			<field name="tag_ids" type="tags" default="" multiple="true" size="6" label="FLEXI_SELECT_TAGS" description="FLEXI_SELECT_TAGS_DESC" class="method_tags_ops" />
-			<field name="combine_tags" type="radio" default="1" label="FLEXI_TAGS_REQUIRE_ALL" description="FLEXI_TAGS_REQUIRE_ALL_DESC" class="method_tags_ops btn-group btn-group-yesno">
+			<field name="tag_combine" type="radio" default="0" label="FLEXI_TAGS_REQUIRE_ALL" description="FLEXI_TAGS_REQUIRE_ALL_DESC" class="method_tags_ops method_tags_inc btn-group group-fcmethod">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES_SLOW</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			
@@ -227,9 +227,9 @@
 			<field name="" type="separator" default="FLEXI_CAT_SCOPE" level="level2" />
 			<field name="" type="separator" default="FLEXI_UMOD_STATIC_SET_TO_ALL_TO_DISABLE" level="level3" />
 			<field name="method_cat" type="multilist" subtype="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" toggle_related="1" class="btn-group group-fcmethod">
-				<option value="1" show_list="" hide_list="method_cat_ops">FLEXI_ALL</option>
-				<option value="2" show_list="method_cat_ops" hide_list="">FLEXI_EXCLUDE</option>
-				<option value="3" show_list="method_cat_ops" hide_list="">FLEXI_INCLUDE</option>
+				<option value="1" show_list="" hide_list="method_cat_ops,method_cat_inc">FLEXI_ALL</option>
+				<option value="2" show_list="method_cat_ops" hide_list="method_cat_inc">FLEXI_EXCLUDE</option>
+				<option value="3" show_list="method_cat_ops,method_cat_inc" hide_list="">FLEXI_INCLUDE</option>
 			</field>
 			<field name="catids" type="flexicategories" multiple="true" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" class="method_cat_ops" />
 			<field name="" type="separator" default="FLEXI_UMOD_DYNAMIC_SET_TO_STATIC_TO_DISABLE" level="level3" class="method_cat_ops" />
@@ -250,6 +250,10 @@
 				<option value="2">FLEXI_PARENTS</option>
 				<option value="3">FLEXI_CHILDREN_PARENTS</option>
 				<option value="4">FLEXI_OTHER_CATS_OF_ITEM</option>
+			</field>
+			<field name="cat_combine" type="radio" default="0" label="FLEXI_CATS_REQUIRE_ALL" description="FLEXI_CATS_REQUIRE_ALL_DESC" class="method_cat_ops method_cat_inc no_confpercat btn-group group-fcmethod" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_TYPES_SCOPE" level="level2" />
@@ -739,8 +743,8 @@
 			<field name="" type="separator" default="FLEXI_CATS" level="level1" />
 			
 			<field name="apply_config_per_category" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_MOD_APPLY_CON_PER_CAT" description="FLEXI_MOD_APPLY_CON_PER_CAT_DESC" class="btn-group group-fcmethod fcoffactive">
-				<option value="0" show_list="" hide_list="confpercat">FLEXI_NO</option>
-				<option value="1" show_list="confpercat" hide_list="">FLEXI_YES</option>
+				<option value="0" show_list="no_confpercat" hide_list="confpercat">FLEXI_NO</option>
+				<option value="1" show_list="confpercat" hide_list="no_confpercat">FLEXI_YES</option>
 			</field>
 			<field name="skip_category_if_noitems" type="radio" default="0" label="FLEXI_MOD_SKIP_CATEGORY_IF_NOITEMS" description="FLEXI_MOD_SKIP_CATEGORY_IF_NOITEMS_DESC" class="confpercat btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
