@@ -276,28 +276,25 @@ jQuery(document).ready(function() {
 		}
 	});
 	
-	/* handle calender fields being changed by popup calendar, focus/blur is cross-browser compatible ... to detect input field being changed */
-	/* up to J2.5 */
-	jQuery('img.calendar').bind('click', function() {
+	// handle calender fields being changed by popup calendar
+	jQuery('input + button .icon-calendar').parent().bind('click', function() {
 		var el = jQuery(this).prev();
-		el.prev().hide();
 		el.attr('data-previous_value', el.val());
-		el.css("opacity", "1");
-		el.focus();
+		Calendar.prototype.__currentCalendarInput = el;   // Set a singular variable for the current input field
+		//el.focus(); // Effectivle sets: document.activeElement so that close handler of calendar 'callCloseHandler' will find it
 	});
-	/* up to J3.0+ */
-	jQuery('button i.icon-calendar').parent().bind('click', function() {
-		var el = jQuery(this).prev();
-		el.prev().hide();
-		el.attr('data-previous_value', el.val());
-		el.css("opacity", "1");
-		el.focus();
-	});
-	if (typeof Calendar !== "undefined" && typeof Calendar.prototype.callCloseHandler === 'function') {
+	
+	if (typeof Calendar !== "undefined" && typeof Calendar.prototype.callCloseHandler === 'function')
+	{
 		var oldFunc = Calendar.prototype.callCloseHandler;
-		Calendar.prototype.callCloseHandler = function() {
+		Calendar.prototype.callCloseHandler = function()
+		{
 			var oldFuncResult = oldFunc.apply(this, arguments);
-			document.activeElement.blur();
+			var el = Calendar.prototype.__currentCalendarInput; //jQuery(document.activeElement);
+			var previous_value = el.attr('data-previous_value');
+			if ( typeof previous_value !== "undefined" && previous_value != el.val())  {
+				el.trigger('change');
+			}
 			return oldFuncResult;
 		}
 	}
