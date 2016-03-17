@@ -700,6 +700,7 @@ class modFlexicontentHelper
 		$catids 				= $params->get('catids', array());
 		$behaviour_cat 	= $params->get('behaviour_cat', 0);
 		$treeinclude 		= $params->get('treeinclude');
+		$cat_combine    = $params->get('cat_combine', 0);
 
 		// types scope parameters
 		$method_types 	= (int)$params->get('method_types', 1);
@@ -984,15 +985,31 @@ class modFlexicontentHelper
 					return;
 				}
 				$where .= ' AND c.id NOT IN (' . implode(',', $catids_arr) . ')';
-			} else if ($method_cat == 3) { // include method
+			}
+			
+			else if ($method_cat == 3) { // include method
+				
 				if (!$apply_config_per_category) {
-					$where .= ' AND c.id IN (' . implode(',', $catids_arr) . ')';
-				} else {
+					if ($cat_combine)
+					{
+						$where .= ' AND i.id IN ('
+							.' SELECT DISTINCT itemid'
+							.' FROM #__flexicontent_cats_item_relations'
+							.' WHERE catid IN ('.implode(',', $catids_arr).')'
+							.' GROUP by itemid HAVING COUNT(*) >= '.count($catids_arr) .')'
+						;
+					}
+					else
+						$where .= ' AND c.id IN (' . implode(',', $catids_arr) . ')';
+				}
+				
+				else {
 					// *** Applying configuration per category ***
 					foreach($catids_arr as $catid)                // The items retrieval query will be executed ... once per EVERY category
 						$multiquery_cats[$catid] = ' AND c.id = '.$catid;
 					$params->set('dynamic_catids', serialize($catids_arr));  // Set dynamic catids to be used by the getCategoryData
 				}
+				
 			}
 		}
 		
@@ -1257,6 +1274,9 @@ class modFlexicontentHelper
 			
 			// Make sure tag_ids is an array
 			$tag_ids = !is_array($tag_ids) ? array($tag_ids) : $tag_ids ;
+			
+			// Require ALL is meant only for "include" method
+			if ($method_tags == 2) $tag_combine = 0;
 			
 			// Create query to match item ids using the selected tags
 			$query2 = 'SELECT '.($tag_combine ? 'itemid' : 'DISTINCT itemid')
