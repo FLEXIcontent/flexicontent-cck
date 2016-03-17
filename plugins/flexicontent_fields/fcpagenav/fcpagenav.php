@@ -75,12 +75,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$category_label	= JText::_($field->parameters->get('category_label', 'FLEXI_FIELDS_PAGENAV_CATEGORY'));
 		
 		$field->{$prop} = null;
-		$use_model_state = true;
-		if ($use_model_state)
-		{
-			$cid = (int) $app->getUserState( $option.'.nav_catid', 0 );
-		}
-		$cid = !$cid || !isset($globalcats[$cid])  ?  JRequest::getInt('cid')  :  $cid;
+		$cid = JRequest::getInt('cid');
 		$cid = !$cid || !isset($globalcats[$cid])  ?  (int)$item->catid  :  $cid;
 		
 		$item_count = $app->getUserState( $option.'.'.$cid.'nav_item_count', 0);
@@ -181,7 +176,9 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$items_arr = array();
 		if ($field->prev) $items_arr[$field->prev->id] = $field->prev;
 		if ($field->next) $items_arr[$field->next->id] = $field->next;
-		$thumbs = $this->getItemThumbs($field->parameters, $items_arr);
+		
+		$img_err_msg = '';
+		$thumbs = $this->getItemThumbs($field->parameters, $items_arr, $img_err_msg, $uprefix='item', $rprefix='nav');
 		
 		$field->prevThumb = $field->prev && isset($thumbs[$field->prev->id]) ? $thumbs[$field->prev->id] : '';
 		$field->nextThumb = $field->next && isset($thumbs[$field->next->id]) ? $thumbs[$field->next->id] : '';
@@ -205,9 +202,9 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	}
 	
 	
-	function getItemThumbs(&$params, &$items, $uprefix='item', $rprefix='nav')
+	function getItemThumbs(&$params, &$items, & $img_err_msg, $uprefix='item', $rprefix='nav')
 	{
-		if ( !$params->get($uprefix.'_use_image', 1) ) return array();
+		if ( !$params->get($uprefix.'_use_image', 0) ) return array();
 		if ( empty($items) ) return array();
 		
 		if ( $params->get($uprefix.'_image') ) {
@@ -216,20 +213,26 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$img_field_name = $params->get($uprefix.'_image');
 		}
 		
-		if (!empty($img_field_name)) {
-			//$_return = FlexicontentFields::renderFields( false, array_keys($items), array($img_field_name), FLEXI_ITEMVIEW, array('display_'.$img_field_size.'_src'));
+		if (!empty($img_field_name))
+		{
 			FlexicontentFields::getFieldDisplay($items, $img_field_name, $values=null, 'display_'.$img_field_size.'_src', FLEXI_ITEMVIEW);
 		}
 		
 		$thumbs = array();
-		foreach($items as $item_id => $item) {
-			if (!empty($img_field_name)) :
-				//$src = str_replace(JURI::root(), '', @ $_return[$item_id][$img_field_name] );
-				$img_field = $item->fields[$img_field_name];
-				$src = str_replace(JURI::root(), '', @ $img_field->{'display_'.$img_field_size.'_src'});
-			else :
+		foreach($items as $item_id => $item)
+		{
+			if ( !empty($img_field_name) ) {
+				$src = '';
+				// This is not set when image field is not assigned to the item type
+				if ( !empty($item->fields[$img_field_name]) )
+				{
+					$img_field = $item->fields[$img_field_name];
+					$src = str_replace(JURI::root(), '', @ $img_field->{'display_'.$img_field_size.'_src'});
+				}
+			}
+			else {
 				$src = flexicontent_html::extractimagesrc($item);
-			endif;
+			}
 				
 			$RESIZE_FLAG = !$params->get($uprefix.'_image') || !$params->get($uprefix.'_image_size');
 			if ( $src && $RESIZE_FLAG ) {
@@ -257,7 +260,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	
 	function getCatThumb(&$cat, &$params, $uprefix='cat', $rprefix='nav')
 	{
-		if ( empty($cat->id) || !$params->get($uprefix.'_use_image', 1) ) return '';
+		if ( empty($cat->id) || !$params->get($uprefix.'_use_image', 0) ) return '';
 		
 		// Joomla media folder
 		$app = JFactory::getApplication();

@@ -213,7 +213,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('clayout', $this->_clayout);
 		
 		// Other
-		if ($this->_id) $app->setUserState( $option.'.nav_catid',  $this->_id );
+		//if ($this->_id) $app->setUserState( $option.'.nav_catid',  $this->_id );
 		$this->setState('option', $option);
 		
 		// We set category parameters to component parameters, these will be full calculated when getCategory() is called
