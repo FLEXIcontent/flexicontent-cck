@@ -4,14 +4,19 @@
 	white-space: nowrap !important;
 }
 .fcpagenav.btn-group {
-	max-width: 80%;
 	box-sizing: border-box !important;
+	margin: 6px;
 }
 
-.fcpagenav a img {
+.fcpagenav a img,
+.fcpagenav span.fc-pagenav-noimg {
 	margin: 8px 4px 4px 4px;
 	border-radius: 4px;
 	border: 1px solid #d0d0d0;
+}
+.fcpagenav span.fc-pagenav-noimg {
+	display: inline-block;
+	background: lightgray;
 }
 
 .fcpagenav.btn-group > .btn {
