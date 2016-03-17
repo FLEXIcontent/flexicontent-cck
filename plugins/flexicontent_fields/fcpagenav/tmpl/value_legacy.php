@@ -32,7 +32,7 @@ if ($field->prev)
 {
 	$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($tooltip_title_prev, $field->prevtitle, 0) .'"' : '';
 	$html .= '
-	<span class="fc-pagenav-prev' . ($use_tooltip ? $tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . '>
+	<span class="fc-pagenav-prev' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . '>
 		<a class="btn" href="'. $field->prevurl .'">
 			<i class="icon-previous"></i>
 			' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8') ).'
@@ -62,7 +62,7 @@ if ($field->next)
 {
 	$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($tooltip_title_next, $field->nexttitle, 0) .'"' : '';
 	$html .= '
-	<span class="fc-pagenav-next' . ($use_tooltip ? $tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . '>
+	<span class="fc-pagenav-next' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . '>
 		<a class="btn" href="'. $field->nexturl .'">
 			<i class="icon-next"></i>
 			' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8') ).'
