@@ -148,6 +148,7 @@ class FlexicontentViewFields extends JViewLegacy
 					.attr('href', '".$popup_load_url."')
 					.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 340}, onClose: function() {}}');
 			";
+			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
 		}
 		
 		$contrl = "fields.";
