@@ -177,6 +177,8 @@ if ( $show_mod )
 	
 	// Get/Create current category model ... according to configuaration set above into the JRequest variables ...
 	$catmodel = new FlexicontentModelCategory();
+	$category = $catmodel->getCategory($pk=null, $raiseErrors=false, $checkAccess=false);
+	
 	$catparams = $catmodel->getParams();  // Get current's view category parameters this will if needed to get category specific filters ...
 	$catmodel->_buildItemWhere($wherepart='where', $counting=true);
 	$catmodel->_buildItemFromJoin($counting=true);
