@@ -28,7 +28,7 @@
 	<fields name="params" addfieldpath="/modules/mod_flexifilter/elements">
 		<fieldset name="basic">
 		
-			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level0" />
+			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level0" class="fc-ngmargin" />
 			<field name="layout" type="fclayout" label="FLEXI_CHOOSE_TMPL" description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexifilter/tmpl"
 					default="default"  hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_" />
 			
@@ -43,7 +43,6 @@
 				<option value="1" show_list="disp_catselector" hide_list="">FLEXI_FILTER_YES_INCLUDE_SELECTED_CATEGORIES</option>
 				<option value="2" show_list="disp_catselector" hide_list="">FLEXI_FILTER_YES_EXCLUDE_SELECTED_CATEGORIES</option>
 			</field>
-			<!--field name="catlistsize" type="text" required="false" size="10" label="FLEXI_FILTER_LINES_CATEGORY_BOX" description="FLEXI_FILTER_LINES_CATEGORY_BOX_DESC" /-->
 			<field name="catids" type="flexicategories" multiple="true" required="false" size="10" label="FLEXI_FILTER_SELECTOR_CATS" description="FLEXI_FILTER_SELECTOR_CATS_DESC" class="disp_catselector" />
 			<field name="usesubcats" type="radio" default="0" label="FLEXI_FILTER_INCLUDE_SUBCATS" description="FLEXI_FILTER_INCLUDE_SUBCATS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -64,7 +63,7 @@
 				<option value="0" show_list="" hide_list="using_slider">FLEXI_SEARCH_FILTER_FORM_INLINE</option>
 				<option value="1" show_list="using_slider" hide_list="">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
 			</field>
-			<field name="ff_toggle_search_title" type="text" size="20" default="FLEXI_TOGGLE_SEARCH_FORM_MODULE" label="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE" description="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE_DESC" class="using_slider" />
+			<field name="ff_toggle_search_title" type="text" size="20" default="FLEXI_TOGGLE_SEARCH_FORM_MODULE" label="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE" description="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE_DESC" class="using_slider input-xxlarge" />
 			<field name="filter_autosubmit" type="radio" default="0" label="FLEXI_FILTER_FORM_AUTO_SUBMIT" description="FLEXI_FILTER_FORM_AUTO_SUBMIT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -90,7 +89,7 @@
 				<option value="btn btn-inverse" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_INVERSE</option>
 				<option value="-1" show_list="custom_goclass" hide_list="">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
-			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" class="custom_goclass" />
+			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" class="custom_goclass input-xxlarge" />
 			
 			<field name="show_search_reset" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_resetbtn">FLEXI_HIDE</option>
@@ -106,7 +105,7 @@
 				<option value="btn btn-inverse" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_INVERSE</option>
 				<option value="-1" show_list="custom_resetclass" hide_list="">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
-			<field name="flexi_button_class_reset_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" class="disp_resetbtn custom_resetclass" />
+			<field name="flexi_button_class_reset_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" class="disp_resetbtn custom_resetclass input-xxlarge" />
 			
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" level="level1" hr="false" />
 			<field name="use_search" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC" class="btn-group btn-group-yesno">
@@ -154,7 +153,7 @@
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
-			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" class="usefilters"/>
+			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" class="usefilters input-xxlarge"/>
 
 			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level2" class="usefilters" />
 			<field name="filter_placement" type="radio" default="1" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="usefilters btn-group btn-group-yesno">
@@ -171,10 +170,10 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="filter_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" class="usefilters" />
-			<field name="filter_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" class="usefilters" />
-			<field name="filter_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="usefilters" />
-			<field name="filter_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="usefilters" />
+			<field name="filter_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" class="usefilters input-xxlarge" />
+			<field name="filter_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" class="usefilters input-xxlarge" />
+			<field name="filter_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="usefilters input-xxlarge" />
+			<field name="filter_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="usefilters input-xxlarge" />
 
 
 			<field name="" type="separator" default="FLEXI_LOCKED_FILTERS" description="" level="level1" />
@@ -182,7 +181,7 @@
 				<option value="0" show_list="" hide_list="usepersistantfilter">FLEXI_NO</option>
 				<option value="1" show_list="usepersistantfilter" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_LOCKED_FILTER_VALUES" description="FLEXI_LOCKED_FILTER_VALUES_DESC" class="usepersistantfilter"/>
+			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_LOCKED_FILTER_VALUES" description="FLEXI_LOCKED_FILTER_VALUES_DESC" class="usepersistantfilter input-xxlarge"/>
 			
 		</fieldset>
 		
@@ -205,7 +204,7 @@
 				<option value="0" show_list="" hide_list="using_php_rule">FLEXI_NO</option>
 				<option value="1" show_list="using_php_rule" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule" />
+			<field name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
 			
 		</fieldset>
 		

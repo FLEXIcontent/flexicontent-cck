@@ -73,7 +73,7 @@
 				<option value="0" show_list="" hide_list="using_php_rule">FLEXI_NO</option>
 				<option value="1" show_list="using_php_rule" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule" />
+			<field name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
 		</fieldset>
 		
 		<fieldset name="FLEXI_ITEM_LIST_BASIC_OPTIONS" label="FLEXI_ITEM_LIST_BASIC_OPTIONS" description="FLEXI_ITEM_LIST_BASIC_OPTIONS_DESC">
@@ -146,7 +146,7 @@
 				<option value="1" show_list="skipping_items" hide_list="">FLEXI_YES_CHECK_FIELD_VALUE_EMPTY_FAST</option>
 				<option value="2" show_list="skipping_items" hide_list="">FLEXI_YES_CHECK_FIELD_DISPLAY_EMPTY_SLOWER</option>
 			</field>
-			<field name="skiponempty_fields" type="textarea" cols="35" rows="4" default="" label="FLEXI_EMPTY_FIELDS_LIST" description="FLEXI_EMPTY_FIELDS_LIST_DESC" class="skipping_items" />
+			<field name="skiponempty_fields" type="textarea" cols="35" rows="4" default="" label="FLEXI_EMPTY_FIELDS_LIST" description="FLEXI_EMPTY_FIELDS_LIST_DESC" class="skipping_items input-xxlarge" />
 			<field name="maxskipcount" type="text" default="50" size="4" label="FLEXI_MAX_SKIP_COUNT" description="FLEXI_MAX_SKIP_COUNT_DESC" class="skipping_items" />
 			<field name="onempty_fields_combination" type="radio" default="any" label="FLEXI_EMPTY_FIELDS_COMBINATION" description="FLEXI_EMPTY_FIELDS_COMBINATION_DESC" class="skipping_items btn-group group-fcinfo">
 				<option value="any">FLEXI_SKIP_ON_ANY_EMPTY</option>

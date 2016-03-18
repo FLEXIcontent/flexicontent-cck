@@ -389,6 +389,11 @@ li:first-child .fcsep_level2,
 .fc-nomargin > .fcsep_level2 {
 	margin-top: 0.8em !important;
 }
+.fcsep_level0.fc-ngmargin,
+.fcsep_level1.fc-ngmargin,
+.fcsep_level2.fc-ngmargin {
+	margin-top: -12px !important;
+}
 div.control-group:first-of-type > div > .fcsep_level0,
 div.control-group:first-of-type > div > .fcsep_level1,
 div.control-group:first-of-type > div > .fcsep_level2 {
