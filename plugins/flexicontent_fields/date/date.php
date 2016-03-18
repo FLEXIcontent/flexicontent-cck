@@ -326,11 +326,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				';
 			}
 			else {
-				$html = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_date fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
+				$html = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_date input-medium'.$required), $skip_on_invalid=true, $timezone);
 				if (!$html) {
 					$skipped_vals[] = $value;
 					if (!$use_ingroup) continue;
-					$html = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_date fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
+					$html = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname_n, $elementid_n, $attribs_arr=array('class'=>'fcfield_date input-medium'.$required), $skip_on_invalid=true, $timezone);
 				}
 			}
 			
