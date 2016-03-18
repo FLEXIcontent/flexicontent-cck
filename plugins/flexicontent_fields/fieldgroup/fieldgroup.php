@@ -399,7 +399,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			break;
 
 			case 1:
-			$separatorf = '<br />';
+			$separatorf = '<br class="fcclear" />';
 			break;
 
 			case 2:
