@@ -420,7 +420,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			break;
 
 			case 1:
-			$separatorf = '<br />';
+			$separatorf = '<br class="fcclear" />';
 			break;
 
 			case 2:
