@@ -231,6 +231,12 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 		<?php endif; /* EOF filter */ ?>
 
 
+		<?php if (!$show_search_go) : ?>
+			<div style="display:none; ">
+				<input type="submit" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" />
+			</div>
+		<?php endif; ?>
+		
 		<?php if ($show_search_go || $show_search_reset) : ?>
 		<div class="<?php echo $filter_container_class; ?> fc_filter_buttons_box">
 			<div class="fc_buttons btn-group">
