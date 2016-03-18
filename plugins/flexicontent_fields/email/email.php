@@ -316,8 +316,10 @@ class plgFlexicontent_fieldsEmail extends FCField
 					'.(!$add_position ? '' : $add_here).'
 				</div>
 				').'
+				<div class="fc-field-props-box">
 				'.$addr.'
 				'.$text.'
+				</div>
 				';
 			
 			$n++;

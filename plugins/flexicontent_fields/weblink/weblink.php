@@ -330,9 +330,11 @@ class plgFlexicontent_fieldsWeblink extends FCField
 					'.(!$add_position ? '' : $add_here).'
 				</div>
 				').'
+				<div class="fc-field-props-box">
 				'.$link.'
 				'.$title.'
 				'.$hits.'
+				</div>
 				';
 			
 			$n++;

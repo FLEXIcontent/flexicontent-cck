@@ -439,7 +439,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 					'.(!$add_position ? '' : $add_here).'
 				</div>
 				').'
-				'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
+				<div class="fc-field-props-box">
 				'.$link.'
 				'.$autoprefix.'
 				'.$title.'
@@ -447,6 +447,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				'.$class.'
 				'.$id.'
 				'.$hits.'
+				</div>
 				';
 			
 			$n++;
