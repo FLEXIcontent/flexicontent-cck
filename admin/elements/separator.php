@@ -51,7 +51,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		
 		/*div.controls input, div.controls textarea { min-width: 56%; }*/
 
-		div.control-group div.control-label,
+		*:not(.form-vertical) > div.control-group div.control-label,
 		div.current ul.config-option-list li {
 			margin: 0 !important;
 			padding: 0 !important;
@@ -64,7 +64,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		fieldset.form-vertical div.control-group {
 			margin-bottom: 8px;
 		}
-		div.control-group div.control-label label.hasTooltip,
+		*:not(.form-vertical) > div.control-group div.control-label label.hasTooltip,
 		div.current ul.config-option-list li label.hasTooltip {
 			display:inline-block;
 			
