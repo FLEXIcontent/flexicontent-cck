@@ -38,6 +38,11 @@ $use_search  = $params->get('use_search', 1);
 $show_search_label = $params->get('show_search_label', 1);
 $search_autocomplete = $params->get( 'search_autocomplete', 1 );
 
+// Categories used for Text Search auto-complete
+$txt_ac_cid    = $params->get('txt_ac_cid', 'NA');
+$txt_ac_cids   = $params->get('txt_ac_cids', array());
+$txt_ac_usesubs= $params->get('txt_ac_usesubs', 2);  // 2: all subcat levels, 0: OFF
+
 // Filters configuration
 $use_filters = $params->get('use_filters', 0) && $filters;
 $show_filter_labels = $params->get('show_filter_labels', 1);
@@ -115,6 +120,9 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				
 				<div class="fc_filter_html fc_text_search">
 					<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
+						<?php echo 'data-txt_ac_cid="'.$txt_ac_cid.'"'; ?>
+						<?php echo 'data-txt_ac_cids="'. implode(',', $txt_ac_cids) .'"'; ?>
+						<?php echo 'data-txt_ac_usesubs="'. $txt_ac_usesubs .'"'; ?>
 						placeholder="<?php echo $text_search_label; ?>" name="filter"
 						id="<?php echo $form_id; ?>_filter" value="<?php echo htmlspecialchars($text_search_val, ENT_COMPAT, 'UTF-8');?>" />
 					<?php echo $searchphrase_selector; ?>

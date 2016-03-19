@@ -77,7 +77,9 @@ class FlexicontentController extends JControllerLegacy
 	 * @return void
 	 * @since 1.0
 	 */
-	function txtautocomplete() {
+	function txtautocomplete()
+	{
+		global $globalcats;
 		$app    = JFactory::getApplication();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		$option = JRequest::getVar('option');
@@ -92,26 +94,47 @@ class FlexicontentController extends JControllerLegacy
 		$text = JRequest::getVar('text');
 		$pageSize = JRequest::getInt('pageSize', 20);
 		$pageNum  = JRequest::getInt('pageNum', 1);
-		$cid =  JRequest::getInt('cid', 0);
-		$cids = array();
-		$_cids = JRequest::getVar('cids', '');
-		if ( $cid ) {
-			// single category view
-			global $globalcats;
-			$_cids = $globalcats[$cid]->descendantsarray;
-		} else if ( empty($_cids) ) {
-			// try to get category ids from the categories filter
-			$_cids = JRequest::getVar('filter_13', '');
-			$_cids = empty($_cids) ? array() : $_cids;
-			$_cids = !is_array($_cids) ? json_decode($_cids) : $_cids;
-		} else if ( !is_array($_cids) ) {
-			// multi category view
-			$_cids = preg_replace( '/[^0-9,]/i', '', (string) $_cids );
-			$_cids = explode(',', $_cids);
+		
+		$usesubs = JRequest::getInt('usesubs', 1);
+		
+		$cid   = JRequest::getInt('cid', 0);
+		$cids  = JRequest::getVar('cids', '');
+		
+		// CASE 1: Single category view, zero or string means ignore and use 'cids'
+		if ( $cid )
+		{
+			$_cids = array($cid);
 		}
 		
-		// make sure given data are integers ... !!
-		foreach ($_cids as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+		// CASE 2: Multi category view
+		else if ( !empty($cids) )
+		{
+			if ( !is_array($cids) ) {
+				$_cids = preg_replace( '/[^0-9,]/i', '', (string) $cids );
+				$_cids = explode(',', $_cids);
+			} else $_cids = $cids;
+		}
+		
+		// No category id was given
+		else $_cids = array();
+		
+		
+		// Make sure given data are integers ...
+		$cids = array();
+		if ($_cids) foreach ($_cids as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+		
+		// Sub - cats
+		if ($usesubs)
+		{
+			// Find descendants of the categories
+			$subcats = array();
+			foreach ($cids as $_id) {
+				if ( !isset($globalcats[$_id]) ) continue;
+				$subcats = array_merge($subcats, $globalcats[$_id]->descendantsarray);
+			}
+			$cids = array_unique($subcats);
+		}
+		
 		$cid_list = implode(',', $cids);
 		
 		$lang = flexicontent_html::getUserCurrentLang();

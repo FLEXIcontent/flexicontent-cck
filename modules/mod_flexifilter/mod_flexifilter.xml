@@ -44,18 +44,21 @@
 				<option value="2" show_list="disp_catselector" hide_list="">FLEXI_FILTER_YES_EXCLUDE_SELECTED_CATEGORIES</option>
 			</field>
 			<field name="catids" type="flexicategories" multiple="true" required="false" size="10" label="FLEXI_FILTER_SELECTOR_CATS" description="FLEXI_FILTER_SELECTOR_CATS_DESC" class="disp_catselector" />
-			<field name="usesubcats" type="radio" default="0" label="FLEXI_FILTER_INCLUDE_SUBCATS" description="FLEXI_FILTER_INCLUDE_SUBCATS_DESC" class="btn-group btn-group-yesno">
+			<field name="usesubcats" type="radio" default="0" label="FLEXI_FILTER_INCLUDE_SUBCATS" description="FLEXI_FILTER_INCLUDE_SUBCATS_DESC" class="btn-group btn-group-yesno disp_catselector">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FILTER_TARGET_VIEW" level="level2" />
-			<field name="mcats_selection" type="multilist" subtype="list" toggle_related="1" default="0" label="FLEXI_FILTER_FORM_TARGET" description="FLEXI_FILTER_FORM_TARGET_DESC" >
+			<field name="" type="separator" default="FLEXI_FILTER_TARGET_VIEW" level="level3" class="disp_catselector" />
+			<field name="" type="separator" default="This effects if category selector will allow selecting multiple categories" level="level4" class="alert alert-info fcpadded disp_catselector" />
+			<field name="mcats_selection" type="multilist" subtype="list" toggle_related="1" default="0" label="FLEXI_FILTER_FORM_TARGET" description="FLEXI_FILTER_FORM_TARGET_DESC" class="disp_catselector" >
 				<option value="0" show_list="" hide_list="mcats_menuid">FLEXI_FILTER_TARGET_CAT_VIEW</option>
 				<option value="1" show_list="mcats_menuid" hide_list="">FLEXI_FILTER_TARGET_MCATS_VIEW</option>
 			</field>
-			<field name="mcats_itemid" type="text" default="" label="FLEXI_FILTER_MCATS_VIEW_ITEMID" description="FLEXI_FILTER_MCATS_VIEW_ITEMID_DESC" class="mcats_menuid"/>
-			
+			<!-- TODO allow selecting layouts: myitems / favs / tags as a target -->
+			<field name="mcats_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=category%%layout=mcats%%!cids=" default="" disable="separator" state="1" published="1" label="FLEXI_FILTER_MCATS_VIEW_ITEMID" description="FLEXI_FILTER_MCATS_VIEW_ITEMID_DESC" class="mcats_menuid disp_catselector">
+				<option value="">FLEXI_SELECT</option>
+			</field>
 						
 			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level0" hr="false" />
 			

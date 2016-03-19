@@ -70,33 +70,73 @@ if ( $show_mod )
 	// include flexicontent route helper file
 	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 	
-	// Other parameters
+	
+	// Styling parameters
 	$moduleclass_sfx= $params->get('moduleclass_sfx', '');
 	$layout 				= $params->get('layout', 'default');
 	$add_ccs 				= $params->get('add_ccs', !$flexiparams->get('disablecss', 0));
 	$add_tooltips 	= $params->get('add_tooltips', 1);
+	
+	// Form behaviour parameters
 	$autosubmit  	  = $params->get('filter_autosubmit', 0);
 	
-	// current & default category IDs
-	$catid_fieldname = 'cid'; //'filter_catid_'.$module->id;
-	$use_current_cid = $option=="com_flexicontent" && ($view=="category" || $view=="item");
-	
-	$current_cid = $use_current_cid ? JRequest::getInt($catid_fieldname, 0) : 0;
-	$default_cid = (int)$params->get('catid', 0);
-	$catid = !$use_current_cid || !$current_cid ? $default_cid : $current_cid;  // id of category view or default value
-	
-	// CATEGORY SELECTION
+	// CATEGORY SELECTION parameters
 	$display_cat_list = $params->get('display_cat_list', 0);
 	$catids           = $params->get('catids', array());
 	$catlistsize      = $params->get('catlistsize', 6);
 	
-	// TARGET VIEW
-	$mcats_selection = $params->get('mcats_selection', 0);
-	$mcats_itemid    = $params->get('mcats_itemid', 0);
+	// default-OR-specific category ID
+	$config_catid = (int)$params->get('catid', 0);
+	
+	// Current category ID (via any of: menu item / url / single category selector 'cid')
+	$is_flexiview = $option=="com_flexicontent" && ($view=="category" || $view=="item");
+	$catid_fieldname = 'cid';    // we could use a different name per module but that is an overkill and possible will lead to bugs, e.g. 'cid_mod_'.$module->id;
+	$current_cid = $is_flexiview ? JRequest::getInt($catid_fieldname, 0) : 0;
+	
+	// Decide to use specific category ID or use current category ID
+	$force_specific_cid = !$display_cat_list && $config_catid;
+	$empty_current_cid  = !$current_cid;
+	$catid = $force_specific_cid || $empty_current_cid ? $config_catid : $current_cid;
+	
+	// TARGET VIEW / Get target menu item for multi-category view case
+	$mcats_selection = $display_cat_list ? $params->get('mcats_selection', 0) : 0;
+	$mcats_itemid    = $mcats_selection  ? $params->get('mcats_itemid', 0)    : 0;
+	
+	if ($mcats_itemid)
+	{
+		$menus = JFactory::getApplication()->getMenu('site', array());
+		$mcats_menu = $menus->getItem( $mcats_itemid );
+		if (!$mcats_menu) $mcats_itemid = 0;
+	}
+	
+	if ( !empty($mcats_menu) )
+	{
+		$menu_params = new JRegistry();   // Empty parameters object
+		$menu_params->merge( JComponentHelper::getComponent('com_flexicontent')->params );   // Merge component parameters
+		$menu_params->merge($mcats_menu->params);   // Merge menu parameters
+	}
+	
+	// Set category id / ids for TEXT autocomplete
+	if ($display_cat_list && $mcats_selection)
+	{
+		$cids_val = JRequest::getVar('cids', array());
+		
+		// CLEAR single category id, we will you cids from category selector
+		$params->set('txt_ac_cid', 'NA');
+		!empty($cids_val) ?
+			$params->set('txt_ac_cids', is_array($cids_val) ? $cids_val : array((string) $cids_val) ) :  // Use current 'cids' (selected in category selector)
+			$params->set('txt_ac_cids', $display_cat_list==1 ? $catids : array() );   // Category selector is empty, use the 'include' categories configured for the selector (include: display_cat_list==1)
+	}
+	else {
+		// Specific or current category (single selector uses name 'cid' which is same name as categor id via menu item or viaitem/category URLs)
+		$params->set('txt_ac_cid',  $catid);
+		$params->set('txt_ac_cids', array());
+	}
+	
 	
 	// FIELD FILTERS
 	$display_filter_list  = $params->get('display_filter_list', 0);
-	$filter_ids            = $params->get('filters', array());
+	$filter_ids           = $params->get('filters', array());
 	$limit_filters_to_cat = $display_filter_list==1 || $display_filter_list==3;
 	
 	// Check if array or comma separated list
@@ -119,6 +159,8 @@ if ( $show_mod )
 	
 	//print_r($filter_ids);
 	
+	
+	// CREATE CATEGORY SELECTOR or create a hidden single category for input
 	if ($display_cat_list)
 	{
 		$_fld_classes = 'fc_field_filter use_select2_lib select2_list_selected';
@@ -128,21 +170,25 @@ if ( $show_mod )
 		$autosubmit_msg = '<span>'.JText::_('FLEXI_RELOADING_PLEASE_WAIT').'</span>';
 		
 		$_fld_onchange = $_fld_multiple = '';
+		
+		// CASE 1: Multi-category selector, targeting multi-category view
 		if ($mcats_selection) {
 			$_fld_size = " size='$catlistsize' ";
 			$_fld_multiple = ' multiple="multiple" ';
 			$_fld_name = 'cids[]';
+			
 			$mcats_list = JRequest::getVar('cids', '');
-			$cats_filter =  JRequest::getVar('filter_13', array());  // ALSO consider categories filter if it is active in current view
 			if ( !is_array($mcats_list) ) {
 				$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
 				$mcats_list = explode(',', $mcats_list);
 			}
-			// make sure given data are integers ... !!
+			// Make sure given data are integers ... !!
 			$cids = array();
 			foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
-			if (is_array($cats_filter)) foreach ($cats_filter as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;   // ALSO consider categories filter if it is active in current view
-		} else {
+		}
+		
+		// CASE 2: Single category selector, targeting single category view
+		else {
 			$_fld_classes .= ' fc_autosubmit_exclude';  // exclude from autosubmit because we need to get single category SEF url before submitting, and then submit ...
 			$_fld_size = "";
 			$_fld_onchange = ' onchange="update_'.$form_name.'();" ';
@@ -151,10 +197,14 @@ if ( $show_mod )
 		$_fld_attributes = ' class="'.$_fld_classes.'" '.$_fld_size.$_fld_onchange.$_fld_multiple;
 		
 		$allowedtree = modFlexifilterHelper::decideCats($params);
-		$selected_cats = $mcats_selection ? $cids : ($catid ? $catid : "") ;
+		$selected_cats = $mcats_selection ? $cids : ($catid ? $catid : '');
 		$top = false;
 		$cats_select_field = flexicontent_cats::buildcatselect($allowedtree, $_fld_name, $selected_cats, $top, $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false);
-	} else if ($catid) {
+	}
+	
+	
+	// CASE 3: Hidden single category selector, targeting specific category or current category
+	else if ($catid) {
 		$cat_hidden_field = '<input type="hidden" name="cid" value="'.$catid.'"/>';
 	}
 	
@@ -175,26 +225,29 @@ if ( $show_mod )
 	JRequest::setVar('option', 'com_flexicontent');
 	JRequest::setVar('view', 'category');
 	
-	// Get/Create current category model ... according to configuaration set above into the JRequest variables ...
-	$catmodel = new FlexicontentModelCategory();
-	$category = $catmodel->getCategory($pk=null, $raiseErrors=false, $checkAccess=false);
+	// Get/Create current category model ... according to configuration set above into the JRequest variables ...
+	$cat_model = new FlexicontentModelCategory();
+	$category = $cat_model->getCategory($pk=null, $raiseErrors=false, $checkAccess=false);
 	
-	$catparams = $catmodel->getParams();  // Get current's view category parameters this will if needed to get category specific filters ...
-	$catmodel->_buildItemWhere($wherepart='where', $counting=true);
-	$catmodel->_buildItemFromJoin($counting=true);
+	$cat_params = $cat_model->getParams();  // Get current's view category parameters this will if needed to get category specific filters ...
+	$cat_model->_buildItemWhere($wherepart='where', $counting=true);
+	$cat_model->_buildItemFromJoin($counting=true);
+	
+	// Category parameters from category or from multi-category menu item
+	$view_params = !empty($mcats_menu) ? $menu_params : $cat_params;
 	
 	// ALL filters
 	if ($display_filter_list==0) {
 		// WARNING: this CASE is supposed to get ALL filters regardless category,
 		// but __ALL_FILTERS__ ignores the 'use_filters' parameter, so we must check it separetely
 		// ... $params->set('filters_order', 1);  // respect filters ordering if so configured in category 
-		$filters = ! $params->get('use_filters', 0) ? array() : FlexicontentFields::getFilters('filters', '__ALL_FILTERS__', $catparams);
+		$filters = ! $params->get('use_filters', 0) ? array() : FlexicontentFields::getFilters('filters', '__ALL_FILTERS__', $view_params);
 	}
 	
 	// Filter selected in category configuration
 	else if ($display_filter_list==1) {
 		// ... $params->set('filters_order', 1);  // respect filters ordering if so configured in category 
-		$filters = FlexicontentFields::getFilters('filters', 'use_filters', $catparams);
+		$filters = FlexicontentFields::getFilters('filters', 'use_filters', $view_params);
 	}
 	
 	// Filters selected in module
@@ -219,18 +272,23 @@ if ( $show_mod )
 	}
 	
 	// Remove categories filter
-	if ($display_cat_list || $catid) {
-		foreach ($filters as $i => $filter) {
-			if ($filter->field_type=='categories') {
-				unset($filters[$i]);
-				break;
-			}
-		}
-	}
+	if ($display_cat_list)  unset($filters[13]);
 	
 	// Set filter values (initial or locked) via configuration parameters
 	FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
 	FlexicontentFields::setFilterValues( $params, 'initial_filters'   , $is_persistent=0);
+	
+	// Set if auto-complete will use items from subcategories
+	$display_subcats = (int) $view_params->get('display_subcategories_items', 2);   // include subcategory items
+	$params->set('txt_ac_usesubs', $display_subcats );
+	
+	// Override text search auto-complete category ids with those of filter 13
+	$f13_val = JRequest::getVar('filter_13');
+	if ( isset($filters['categories']) && !empty($f13_val) )
+	{
+		$params->set('txt_ac_cid', 'NA');
+		$params->set('txt_ac_cids', is_array($f13_val) ? $f13_val : array((string) $f13_val) );
+	}
 	
 	// 4. Add html to filter objects
 	if ( !empty($filters) ) {
@@ -287,8 +345,9 @@ if ( $show_mod )
 		JRoute::_('index.php?Itemid='.$mcats_itemid) :
 		JURI::base(true).'/index.php?option=com_flexicontent&view=category&layout=mcats'
 		;
+	
 	// !! target MCATS layout of category view when selecting multiple categories OR selecting single category but no default category set (or no current category)
-	if (($display_cat_list && $mcats_selection) || !$catid) {
+	if ( ($display_cat_list && $mcats_selection) || !$catid) {
 		$form_target = $default_target;
 	}
 	
