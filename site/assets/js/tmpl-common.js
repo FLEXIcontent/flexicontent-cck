@@ -307,7 +307,10 @@ jQuery(document).ready(function() {
 		theElements.each(function () {
 			jQuery.ui.autocomplete( {
 				source: function( request, response ) {
-					el = jQuery(this.element);
+					var el = jQuery(this.element);
+					var el_cid  = el.attr('data-txt_ac_cid')  ? el.attr('data-txt_ac_cid')  : (parseInt(_FC_GET['cid']) || 0);
+					var el_cids = el.attr('data-txt_ac_cids') ? el.attr('data-txt_ac_cids') : _FC_GET['cids'];
+					var el_usesubs = parseInt(el.attr('data-txt_ac_usesubs')) || 0;
 					jQuery.ajax({
 						url: "index.php?option=com_flexicontent&tmpl=component",
 						dataType: "json",
@@ -317,9 +320,9 @@ jQuery(document).ready(function() {
 							pageSize: fc_select_pageSize,
 							text: request.term,
 							lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: ''),
-							cid: parseInt(_FC_GET['cid']),
-							cids: _FC_GET['cids'],
-							filter_13: _FC_GET['filter_13']
+							cid: el_cid,
+							cids: el_cids,
+							usesubs: el_usesubs
 						},
 						success: function( data ) {
 							//console.log( '... done' );
@@ -389,9 +392,9 @@ jQuery(document).ready(function() {
 						pageSize: fc_select_pageSize,
 						pageNum: page,
 						lang: (typeof _FC_GET !="undefined" && 'lang' in _FC_GET ? _FC_GET['lang']: ''),
-						cid: parseInt(_FC_GET['cid']),
-						cids: _FC_GET['cids'],
-						filter_13: _FC_GET['filter_13']
+						cid:  (jQuery(this).attr('data-txt_ac_cid')  ? jQuery(this).attr('data-txt_ac_cid')  : (parseInt(_FC_GET['cid']) || 0)),
+						cids: (jQuery(this).attr('data-txt_ac_cids') ? jQuery(this).attr('data-txt_ac_cids') : _FC_GET['cids']),
+						usesubs: (parseInt(jQuery(this).attr('data-txt_ac_usesubs')) || 0)
 					};
 				},
 				results: function (data, page) {

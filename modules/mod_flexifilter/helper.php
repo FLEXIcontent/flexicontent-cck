@@ -40,37 +40,33 @@ class modFlexifilterHelper
 		$catids = $params->get('catids', array());
 		$usesubcats = $params->get('usesubcats', 0 );
 		
-		// FIND categories to display
-		$allowed_cats = $disallowed_cats = false;
-		
-		if ($usesubcats) {
-			// Find descendants of the categories
+		// Find descendants of the categories
+		if ($usesubcats)
+		{
 			$subcats = array();
 			foreach ($catids as $catid) {
 				$subcats = array_merge($subcats, array_map('trim',explode(",",$globalcats[$catid]->descendants)) );
 			}
 			$catids = array_unique($subcats);
 		}
-		
-    if ( $display_cat_list == 1 ) {  // include method
-    	$allowed_cats = $catids;
-    } else if ( $display_cat_list == 2 ) {  // exclude method
-    	$disallowed_cats = $catids;
-    }
     
+    
+		// Find categories to display
 		$tree = flexicontent_cats::getCategoriesTree();
-		if ($allowed_cats) {
-			foreach ($allowed_cats as $catid) {
-				$allowedtree[$catid] = $tree[$catid];
-			}
+		
+		if ( $display_cat_list == 1 )  // include method
+		{
+			foreach ($catids as $catid)  $allowedtree[$catid] = $tree[$catid];
 		}
-		if ($disallowed_cats) {
-			foreach ($disallowed_cats as $catid) {
-				unset($tree[$catid]);
-			}
+		
+		else if ( $display_cat_list == 2 )  // exclude method
+		{
+			foreach ($catids as $catid)  unset($tree[$catid]);
 			$allowedtree = & $tree;
 		}
-		if (!$allowed_cats && !$disallowed_cats) {
+		
+		else
+		{
 			$allowedtree = & $tree;
 		}
 		

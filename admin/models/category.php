@@ -848,8 +848,11 @@ class FlexicontentModelCategory extends JModelAdmin
 		$pk = $this->_id;
 		if ( !$pk ) {
 			$cid = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.id');
-			JArrayHelper::toInteger($cid, array(0));
-			$pk = $cid[0];
+			if ( empty($cid) ) $pk = 0;
+			else {
+				JArrayHelper::toInteger($cid, array(0));
+				$pk = $cid[0];
+			}
 		}
 		if ( !$pk ) {
 			$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );

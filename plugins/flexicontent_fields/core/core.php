@@ -546,7 +546,7 @@ class plgFlexicontent_fieldsCore extends FCField
 					foreach($cids as $_cid)
 					{
 						if ( !isset($globalcats[$_cid]) ) continue;
-						if ( count($cids)>1 )
+						if ( count($cids)>1 || !empty($globalcats[$_cid]->childrenarray) )
 						{
 							$cat_obj = new stdClass();
 							$cat_obj->id = $globalcats[$_cid]->id;

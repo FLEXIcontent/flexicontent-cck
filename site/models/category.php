@@ -1077,8 +1077,16 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$shown_filters  = FlexicontentFields::getFilters( 'filters', /*'use_filters'*/ '__ALL_FILTERS__', $cparams, $check_access=true );
 		$locked_filters = FlexicontentFields::getFilters( 'persistent_filters', 'use_persistent_filters', $cparams, $check_access=false );
 		$filters = array();
-		if ($shown_filters)  foreach($shown_filters  as $_filter) $filters[] = $_filter;
-		if ($locked_filters) foreach($locked_filters as $_filter) $filters[] = $_filter;
+		if ($shown_filters)  foreach($shown_filters  as $_filter) $filters[$_filter->id] = $_filter;
+		if ($locked_filters) foreach($locked_filters as $_filter) $filters[$_filter->id] = $_filter;
+		
+		// Override text search auto-complete category ids with those of filter 13
+		$f13_val = JRequest::getVar('filter_13');
+		if ( isset($filters[13]) && !empty($f13_val) )
+		{
+			$cparams->set('txt_ac_cid', 'NA');
+			$cparams->set('txt_ac_cids', is_array($f13_val) ? $f13_val : array((string) $f13_val) );
+		}
 		
 		// Get SQL clause for filtering via each field
 		$return_sql = 2;
@@ -1828,7 +1836,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$catParams = new JRegistry();
 		}
 		
-		
 		// c. Retrieve author parameters if using displaying AUTHOR/MYITEMS layouts, and merge them into category parameters
 		if ($this->_authorid!=0) {
 			$query = 'SELECT author_basicparams, author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $this->_authorid;
@@ -1983,6 +1990,16 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$merge_stack[1] = "MERGED LAYOUT PARAMETERS of '".$this->_clayout ."'";
 		
 		if ($debug_inheritcid) $app->enqueueMessage(implode("<br/>\n", $merge_stack));
+		
+		
+		// Set category id for TEXT autocomplete (maybe overriden by category filter 13 in getFilters)
+		$this->_params->set('txt_ac_cid',  (!empty($this->_id) ? $this->_id : 'NA') );
+		// Set category ids for TEXT autocomplete (maybe overriden by category filter 13 in getFilters)
+  	$this->_params->set('txt_ac_cids', (!empty($this->_ids) ? $this->_ids : array()) );
+  	
+		// Include subcat items
+		$display_subcats = $this->_params->get('display_subcategories_items', 2);   // include subcategory items
+		$this->_params->set('txt_ac_usesubs', (int) $display_subcats );
 		
 		// Also set into a global variable
 		global $fc_catview;
