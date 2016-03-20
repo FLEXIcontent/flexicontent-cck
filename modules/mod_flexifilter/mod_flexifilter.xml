@@ -78,19 +78,19 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_BUTTONS" level="level2" hr="false" />
-			<field name="show_search_go" type="radio" default="1" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" class="btn-group group-fcsuccess" >
+			<field name="show_search_go" type="multilist" subtype="radio" default="1" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" class="btn-group group-fcsuccess">
 				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="flexi_button_class_go" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_BUTTON_CLASS_GO" description="FLEXI_BUTTON_CLASS_GO_DESC">
-				<option value="fc_button" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_FCBUTTON</option>
+			<field name="flexi_button_class_go" type="multilist" subtype="radio" toggle_related="1" default="btn btn-success" label="FLEXI_BUTTON_CLASS_GO" description="FLEXI_BUTTON_CLASS_GO_DESC" class="btn-group">
+				<option value="-1" show_list="custom_goclass" hide_list="">FLEXI_D_CUSTOM_D</option>
+				<option value="btn" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_PLAIN</option>
 				<option value="btn btn-primary" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_SUCCESS</option>
 				<option value="btn btn-info" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_INFO</option>
 				<option value="btn btn-warning" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_WARNING</option>
 				<option value="btn btn-danger" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_DANGER</option>
 				<option value="btn btn-inverse" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_INVERSE</option>
-				<option value="-1" show_list="custom_goclass" hide_list="">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
 			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" class="custom_goclass input-xxlarge" />
 			
@@ -98,15 +98,15 @@
 				<option value="0" show_list="" hide_list="disp_resetbtn">FLEXI_HIDE</option>
 				<option value="1" show_list="disp_resetbtn" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="flexi_button_class_reset" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_BUTTON_CLASS_RESET" description="FLEXI_BUTTON_CLASS_RESET_DESC" class="disp_resetbtn">
-				<option value="fc_button" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_FCBUTTON</option>
+			<field name="flexi_button_class_reset" type="multilist" subtype="radio" toggle_related="1" default="btn" label="FLEXI_BUTTON_CLASS_RESET" description="FLEXI_BUTTON_CLASS_RESET_DESC" class="btn-group disp_resetbtn">
+				<option value="-1" show_list="custom_resetclass" hide_list="">FLEXI_D_CUSTOM_D</option>
+				<option value="btn" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_PLAIN</option>
 				<option value="btn btn-primary" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_SUCCESS</option>
 				<option value="btn btn-info" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_INFO</option>
 				<option value="btn btn-warning" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_WARNING</option>
 				<option value="btn btn-danger" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_DANGER</option>
 				<option value="btn btn-inverse" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_INVERSE</option>
-				<option value="-1" show_list="custom_resetclass" hide_list="">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
 			<field name="flexi_button_class_reset_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" class="disp_resetbtn custom_resetclass input-xxlarge" />
 			

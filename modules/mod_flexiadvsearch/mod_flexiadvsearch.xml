@@ -53,16 +53,15 @@
 				<option value="0" show_list="" hide_list="disp_gobtn">FLEXI_NO</option>
 				<option value="1" show_list="disp_gobtn" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="flexi_button_class_go" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="disp_gobtn">
-				<option value="" show_list="" hide_list="custom_gobtn_class">FLEXI_DEFAULT</option>
-				<option value="fc_button" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_FCBUTTON</option>
+			<field name="flexi_button_class_go" type="multilist" subtype="radio" toggle_related="1" default="btn btn-success" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="btn-group disp_gobtn">
+				<option value="-1" show_list="custom_gobtn_class" hide_list="">FLEXI_D_CUSTOM_D</option>
+				<option value="btn" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_PLAIN</option>
 				<option value="btn btn-primary" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_SUCCESS</option>
 				<option value="btn btn-info" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_INFO</option>
 				<option value="btn btn-warning" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_WARNING</option>
 				<option value="btn btn-danger" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_DANGER</option>
 				<option value="btn btn-inverse" show_list="" hide_list="custom_gobtn_class">FLEXI_BUTTON_CLASS_INVERSE</option>
-				<option value="-1" show_list="custom_gobtn_class" hide_list="">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
 			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_CUSTOM" description="FLEXI_BUTTON_CLASS_CUSTOM_DESC" class="disp_gobtn custom_gobtn_class input-xxlarge" />
 			<field name="button_pos" type="radio" default="right" label="FLEXI_MOD_BUTTON_POSITION" description="FLEXI_MOD_BUTTON_POSITION_DESC" class="disp_gobtn btn-group group-fcinfo">
@@ -83,16 +82,15 @@
 				<option value="0" show_list="" hide_list="disp_directbtn">FLEXI_NO</option>
 				<option value="1" show_list="disp_directbtn" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="flexi_button_class_direct" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="disp_directbtn">
-				<option value="" show_list="" hide_list="custom_gobtn_class">FLEXI_DEFAULT</option>
-				<option value="fc_button" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_FCBUTTON</option>
+			<field name="flexi_button_class_direct" type="multilist" subtype="radio" toggle_related="1" default="btn" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="btn-group disp_directbtn">
+				<option value="-1" show_list="custom_directbtn_class" hide_list="">FLEXI_D_CUSTOM_D</option>
+				<option value="btn" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_PLAIN</option>
 				<option value="btn btn-primary" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_SUCCESS</option>
 				<option value="btn btn-info" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_INFO</option>
 				<option value="btn btn-warning" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_WARNING</option>
 				<option value="btn btn-danger" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_DANGER</option>
 				<option value="btn btn-inverse" show_list="" hide_list="custom_directbtn_class">FLEXI_BUTTON_CLASS_INVERSE</option>
-				<option value="-1" show_list="custom_directbtn_class" hide_list="">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
 			<field name="flexi_button_class_direct_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_CUSTOM" description="FLEXI_BUTTON_CLASS_CUSTOM_DESC" class="disp_directbtn custom_directbtn_class input-xxlarge" />
 			<field name="direct_pos" type="radio" default="right" label="FLEXI_MOD_DIRECT_POSITION" description="FLEXI_MOD_DIRECT_POSITION_DESC" class="disp_directbtn btn-group group-fcinfo">
@@ -114,15 +112,15 @@
 				<option value="1" show_list="disp_advlink" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="linkadvsearch_txt" type="text" default="FLEXI_ADV_MOD_ADVANCED_SEARCH" label="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT" description="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT_DESC" class="disp_advlink input-xxlarge" />
-			<field name="flexi_button_class_advanced" type="multilist" subtype="list" toggle_related="1" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="disp_advlink">
-				<option value="fc_button fcsimple flexiadvsearchlink" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_FCBUTTON</option>
+			<field name="flexi_button_class_advanced" type="multilist" subtype="radio" toggle_related="1" default="btn" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="btn-group disp_advlink">
+				<option value="-1" show_list="custom_advlink_class" hide_list="">FLEXI_D_CUSTOM_D</option>
+				<option value="btn" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_PLAIN</option>
 				<option value="btn btn-primary" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_SUCCESS</option>
 				<option value="btn btn-info" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_INFO</option>
 				<option value="btn btn-warning" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_WARNING</option>
 				<option value="btn btn-danger" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_DANGER</option>
 				<option value="btn btn-inverse" show_list="" hide_list="custom_advlink_class">FLEXI_BUTTON_CLASS_INVERSE</option>
-				<option value="-1" show_list="custom_advlink_class" hide_list="">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
 			<field name="flexi_button_class_advanced_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_CUSTOM" description="FLEXI_BUTTON_CLASS_CUSTOM_DESC" class="disp_advlink custom_advlink_class input-xxlarge" />
 		</fieldset>
