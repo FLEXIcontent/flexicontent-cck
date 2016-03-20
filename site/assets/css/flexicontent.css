@@ -782,6 +782,10 @@ body .fc-mssg.fc-noborder {
 .flexicontent .filterbuttons_head .nowrap_box .label {
 	vertical-align: middle;
 }
+#flexicontent .fc-field-props-box {
+	display: inline-block;
+	float: left;
+}
 #flexicontent .fc-xpended {
 	margin-right: 12px;
 }
