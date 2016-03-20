@@ -519,27 +519,31 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$collation_version = $session->get('flexicontent.collation_version');
 		if ($collation_version == $jversion->getShortVersion())  return;
 		
-		// Data Types of columns
-		$tbl_names_arr = array(
-			'flexicontent_items_ext'=>array(
-				'language' => "VARCHAR(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '*'"
-			),
-			'flexicontent_fields'=>array(
-				'field_type' => "VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL default ''"
-			)
-		);
-		
-		foreach ($tbl_names_arr as $tbl_name => $tbl_cols)
+		$docheck = version_compare( $jversion->getShortVersion(), '3.4.99', 'g' );
+		if ($docheck)
 		{
-			$full_tbl_name = $dbprefix . $tbl_name;
-			$query = "SELECT COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$full_tbl_name."' AND COLUMN_NAME IN ('".implode("','", array_keys($tbl_cols))."')";
-			$db->setQuery($query);
-			$col_data = $db->loadAssocList('COLUMN_NAME');
-			foreach($col_data as $col => $data) {
-				if ($data['CHARACTER_SET_NAME'] <> 'utf8mb4' || $data['COLLATION_NAME'] <> 'utf8mb4_unicode_ci') {
-					$query = "ALTER TABLE ".$full_tbl_name." MODIFY `".$col."` ". $tbl_cols[$col];
-					$db->setQuery($query);
-					$col_data = $db->execute();
+			// Data Types of columns
+			$tbl_names_arr = array(
+				'flexicontent_items_ext'=>array(
+					'language' => "VARCHAR(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '*'"
+				),
+				'flexicontent_fields'=>array(
+					'field_type' => "VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL default ''"
+				)
+			);
+			
+			foreach ($tbl_names_arr as $tbl_name => $tbl_cols)
+			{
+				$full_tbl_name = $dbprefix . $tbl_name;
+				$query = "SELECT COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$full_tbl_name."' AND COLUMN_NAME IN ('".implode("','", array_keys($tbl_cols))."')";
+				$db->setQuery($query);
+				$col_data = $db->loadAssocList('COLUMN_NAME');
+				foreach($col_data as $col => $data) {
+					if ($data['CHARACTER_SET_NAME'] <> 'utf8mb4' || $data['COLLATION_NAME'] <> 'utf8mb4_unicode_ci') {
+						$query = "ALTER TABLE ".$full_tbl_name." MODIFY `".$col."` ". $tbl_cols[$col];
+						$db->setQuery($query);
+						$col_data = $db->execute();
+					}
 				}
 			}
 		}
