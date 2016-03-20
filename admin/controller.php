@@ -36,6 +36,9 @@ class FlexicontentController extends JControllerLegacy
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
+		jimport('cms.version.version');
+		$jversion = new JVersion;
+		
 		$config_saved = !FLEXI_J16GE ? $params->get('flexi_section', 0) : $params->get('flexi_cat_extension', 0);
 		//$config_saved = $config_saved && $params->get('search_mode', 0);  // an Extra configuration check
 		
@@ -51,6 +54,9 @@ class FlexicontentController extends JControllerLegacy
 		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED
 		$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 		$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
+		
+		$collation_version = $session->get('flexicontent.collation_version');
+		if ($collation_version != $jversion->getShortVersion())  $postinst_integrity_ok = NULL;
 		
 		//$valArray = array(false => 'false', true => 'true', null=>'null');
 		//echo  "postinst_integrity_ok: " . (isset($valArray[$postinst_integrity_ok])  ?  $valArray[$postinst_integrity_ok]  :  $postinst_integrity_ok) ."<br/>\n";

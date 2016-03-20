@@ -507,10 +507,17 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 */
 	function checkCollations()
 	{
+		$session = JFactory::getSession();
 		$app = JFactory::getApplication();
 		$db = JFactory::getDBO();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
+		
+		jimport('cms.version.version');
+		$jversion = new JVersion;
+		
+		$collation_version = $session->get('flexicontent.collation_version');
+		if ($collation_version == $jversion->getShortVersion())  return;
 		
 		// Data Types of columns
 		$tbl_names_arr = array(
@@ -536,6 +543,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				}
 			}
 		}
+		
+		$session->set('flexicontent.postinstall', $jversion->getShortVersion());
 	}
 	
 	
