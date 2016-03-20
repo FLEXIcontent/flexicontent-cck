@@ -640,40 +640,43 @@
 			<field name="limit_before_search_filt" type="text" size="4" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" class="limit_before_search_filt" />
 			
 			<field name="sep_search_filter_ai_form_btns" type="separator" default="FLEXI_BUTTONS" label="" level="level3" />
+			<field name="sep_search_filter_ai_form_btn_go" type="separator" default="FLEXI_SEARCH_GO_BUTTON" label="" level="level4" class="alert alert-info fcpadded" />
 			<field name="show_search_go" type="multilist" subtype="radio" default="" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" class="btn-group group-fcsuccess">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_search_reset" type="radio" default="" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" class="btn-group btn-group-yesno">
+			<field name="flexi_button_class_go" type="multilist" subtype="radio" toggle_related="0" default="" label="FLEXI_BUTTON_CLASS_GO" description="FLEXI_BUTTON_CLASS_GO_DESC" class="btn-group">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
+				<option value="-1" show_list="custom_goclass" hide_list="">FLEXI_D_CUSTOM_D</option>
+				<option value="btn" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_PLAIN</option>
+				<option value="btn btn-primary" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_PRIMARY</option>
+				<option value="btn btn-success" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_SUCCESS</option>
+				<option value="btn btn-info" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_INFO</option>
+				<option value="btn btn-warning" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_WARNING</option>
+				<option value="btn btn-danger" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_DANGER</option>
+				<option value="btn btn-inverse" show_list="" hide_list="custom_goclass">FLEXI_BUTTON_CLASS_INVERSE</option>
 			</field>
-			<field name="flexi_button_class_go" type="multilist" subtype="list" default="" label="FLEXI_BUTTON_CLASS_GO" description="FLEXI_BUTTON_CLASS_GO_DESC">
+			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" class="custom_goclass input-xxlarge" />
+			
+			<field name="sep_search_filter_ai_form_btn_reset" type="separator" default="FLEXI_SEARCH_RESET_BUTTON" label="" level="level4" class="alert alert-info fcpadded" />
+			<field name="show_search_reset" type="multilist" subtype="radio" toggle_related="0" default="" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
-				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
-				<option value="btn btn-success">FLEXI_BUTTON_CLASS_SUCCESS</option>
-				<option value="btn btn-info">FLEXI_BUTTON_CLASS_INFO</option>
-				<option value="btn btn-warning">FLEXI_BUTTON_CLASS_WARNING</option>
-				<option value="btn btn-danger">FLEXI_BUTTON_CLASS_DANGER</option>
-				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
-				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
+				<option value="0" show_list="" hide_list="disp_resetbtn">FLEXI_HIDE</option>
+				<option value="1" show_list="disp_resetbtn" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="flexi_button_class_go_custom" type="text" class="input-xxlarge" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" />
-			<field name="flexi_button_class_reset" type="multilist" subtype="list" default="" label="FLEXI_BUTTON_CLASS_RESET" description="FLEXI_BUTTON_CLASS_RESET_DESC">
+			<field name="flexi_button_class_reset" type="multilist" subtype="radio" toggle_related="0" default="" label="FLEXI_BUTTON_CLASS_RESET" description="FLEXI_BUTTON_CLASS_RESET_DESC" class="btn-group disp_resetbtn">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
-				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
-				<option value="btn btn-success">FLEXI_BUTTON_CLASS_SUCCESS</option>
-				<option value="btn btn-info">FLEXI_BUTTON_CLASS_INFO</option>
-				<option value="btn btn-warning">FLEXI_BUTTON_CLASS_WARNING</option>
-				<option value="btn btn-danger">FLEXI_BUTTON_CLASS_DANGER</option>
-				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
-				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
+				<option value="-1" show_list="custom_resetclass" hide_list="">FLEXI_D_CUSTOM_D</option>
+				<option value="btn" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_PLAIN</option>
+				<option value="btn btn-primary" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_PRIMARY</option>
+				<option value="btn btn-success" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_SUCCESS</option>
+				<option value="btn btn-info" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_INFO</option>
+				<option value="btn btn-warning" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_WARNING</option>
+				<option value="btn btn-danger" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_DANGER</option>
+				<option value="btn btn-inverse" show_list="" hide_list="custom_resetclass">FLEXI_BUTTON_CLASS_INVERSE</option>
 			</field>
-			<field name="flexi_button_class_reset_custom" type="text" class="input-xxlarge" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" />
+			<field name="flexi_button_class_reset_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" class="disp_resetbtn custom_resetclass input-xxlarge" />
 			
 			<field name="sep_filter_enclosers" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_ENCLOSING" level="level3" />
 			<field name="filter_pretext" type="text" class="input-xxlarge" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />

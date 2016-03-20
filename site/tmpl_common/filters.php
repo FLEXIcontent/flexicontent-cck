@@ -9,11 +9,11 @@ $filter_instructions = $params->get('filter_instructions', 1);
 $filter_placement = $params->get( 'filter_placement', 1 );
 
 $flexi_button_class_go =  ($params->get('flexi_button_class_go' ,'') != '-1')  ?
-    $params->get('flexi_button_class_go' , 'btn btn-success')   :
-    $params->get('flexi_button_class_go_custom', (FLEXI_J30GE ? 'btn btn-success' : 'fc_button'))  ;
+    $params->get('flexi_button_class_go', 'btn btn-success')   :
+    $params->get('flexi_button_class_go_custom', 'btn btn-success')  ;
 $flexi_button_class_reset =  ($params->get('flexi_button_class_reset','') != '-1')  ?
     $params->get('flexi_button_class_reset', 'btn')   :
-    $params->get('flexi_button_class_reset_custom', (FLEXI_J30GE ? 'btn' : 'fc_button'))  ;
+    $params->get('flexi_button_class_reset_custom', 'btn')  ;
 
 $filters_in_lines = $filter_placement==1 || $filter_placement==2;
 $filters_in_tabs  = $filter_placement==3;
