@@ -644,8 +644,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$file_mode = JRequest::getVar( 'folder_mode', 0) ? 'folder_mode' : 'db_mode';
 		
 		if ($file_mode == 'folder_mode') {
-			$filename = JRequest::getVar( 'filename' );
-			
+			$filename = rawurldecode( JRequest::getVar('filename') );
+			//$filename_original = iconv(mb_detect_encoding($filename, mb_detect_order(), true), "UTF-8", $filename);
 			$db->setQuery("SELECT * FROM #__flexicontent_fields WHERE id='".$fieldid."'");
 			$field = $db->loadObject();
 			$field->parameters = new JRegistry($field->attribs);
