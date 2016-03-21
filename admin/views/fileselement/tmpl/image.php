@@ -106,7 +106,11 @@ var _file_data = new Array();
 <?php
 // Output file data JSON encoded so that they are available to JS code
 foreach ($this->rows as $i => $row) :
-	echo '  _file_data['.$i.'] = '.json_encode($row).";\n";
+	$data = new stdClass();
+	foreach($row as $i => $d) {
+		if (!is_array($d) && !is_object($d)) $data->$i = utf8_encode($d);
+	}
+	echo '  _file_data['.$i.'] = '.json_encode($data).";\n";
 endforeach;
 ?>
 </script>
@@ -495,7 +499,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					
 					unset($thumb_or_icon);
 					$filename = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
-					$filename_original = $this->folder_mode ? '' : str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
+					$filename_original = str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
 					$filename_original = $filename_original ? $filename_original : $filename;
 					
 					$fileid = $this->folder_mode ? '' : $row->id;
@@ -519,12 +523,13 @@ flexicontent_html::loadFramework('flexi-lib');
 						$file_path = $row->filename;
 						$thumb_or_icon = 'URL';
 					}
+					$file_path = JPath::clean($file_path);
 					
-					$file_path = str_replace('\\', '/', $file_path);
+					$file_url = rawurlencode(str_replace('\\', '/', $file_path));
 					$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					if ( empty($thumb_or_icon) ) {
 						if (file_exists($file_path)){
-							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w=60&amp;h=60&amp;zc=1" alt="'.$filename_original.'" />';
+							$thumb_or_icon = '<img src="'.JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w=60&amp;h=60&amp;zc=1" alt="'.$filename_original.'" />';
 						} else {
 							$thumb_or_icon = '<span class="badge badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 						}
@@ -555,15 +560,15 @@ flexicontent_html::loadFramework('flexi-lib');
 					}
 					
 					if ( in_array($ext, $imageexts)) {
-						$file_preview  = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95';
-						$file_preview2 = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&amp;w=120&amp;h=90&amp;zc=1&amp;q=95';
+						$file_preview  = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95';
+						$file_preview2 = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$_f. '&amp;w=120&amp;h=90&amp;zc=1&amp;q=95';
 					} else {
 						$file_preview  = '';
 						$file_preview2 = '';
 					}
 					
 					if ($this->folder_mode) {
-						$img_assign_link = "window.parent.qmAssignFile".$this->fieldid."('".$this->targetid."', '".$filename."', '".$file_preview."');document.getElementById('file{$i}').className='striketext';";
+						$img_assign_link = "window.parent.qmAssignFile".$this->fieldid."('".$this->targetid."', '".$filename."', '".$file_preview."', 0, '".$filename_original."');document.getElementById('file{$i}').className='striketext';";
 					} else {
 						$img_assign_link = "var file_data = _file_data[ '".$i."']; file_data.displayname = '".$filename_original."'; file_data.preview = '".$file_preview."';  qffileselementadd(document.getElementById('file".$row->id."'), '".$row->id."', '".$filename_original."', '".$this->targetid."', file_data);";
 					}
@@ -574,28 +579,28 @@ flexicontent_html::loadFramework('flexi-lib');
 					</td>
 					
 					<td>
-						<?php if (!$this->folder_mode) echo '<span style="display: none;">'.$checked.'</span>'; ?>
-						<a href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8');?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }" href="javascript:;">
+						<?php echo '<span style="display: none;">'.$checked.'</span>'; ?>
+						<a href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }" href="javascript:;">
 						<?php echo JHTML::image('components/com_flexicontent/assets/images/trash.png', JText::_('FLEXI_REMOVE') ); ?>
 						</a>
 					</td>
 					
 					<td class="center">
-						<a style="cursor:pointer" class="<?php echo $tip_class; ?>" onclick="<?php echo $img_assign_link; ?>" title="<?php echo $select_entry; ?>">
+						<a style="cursor:pointer; font-family:Georgia;" class="<?php echo $tip_class; ?>" onclick="<?php echo $img_assign_link; ?>" title="<?php echo $select_entry; ?>">
 							<?php echo $thumb_or_icon; ?>
 						</a>
 					</td>
 					
 					<td class="left">
 						<?php
-							if (JString::strlen($filename_original) > 100) {
-								$filename_cut = JString::substr( htmlspecialchars($filename_original, ENT_QUOTES, 'UTF-8'), 0 , 100).'...';
+							if (mb_strlen($row->filename_original, 'UTF-8') > 100) {
+								$filename_cut = htmlspecialchars(flexicontent_html::striptagsandcut($row->filename_original, 100) . '...', ENT_QUOTES, 'UTF-8');
 							} else {
-								$filename_cut = htmlspecialchars($filename_original, ENT_QUOTES, 'UTF-8');
+								$filename_cut = htmlspecialchars($row->filename_original, ENT_QUOTES, 'UTF-8');
 							}
 						?>
 						<?php echo '
-						<a style="cursor:pointer" id="file'.$row->id.'" class="'.$btn_class.' '.$tip_class.' btn-small" prv="'.$file_preview2.'" data-fileid="'.$fileid.'" data-filename="'.$filename.'" onclick="'.$img_assign_link.'" title="'.$select_entry.'" targetid="'.$this->targetid.'">
+						<a style="cursor:pointer; font-family:Georgia;" id="file'.$row->id.'" class="'.$btn_class.' '.$tip_class.' btn-small" prv="'.$file_preview2.'" data-fileid="'.$fileid.'" data-filename="'.$filename.'" onclick="'.$img_assign_link.'" title="'.$select_entry.'" targetid="'.$this->targetid.'">
 							'.$filename_cut.'
 						</a>
 						'; ?>

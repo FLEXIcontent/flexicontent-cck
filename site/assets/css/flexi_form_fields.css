@@ -418,6 +418,9 @@ div.empty_image {
 	margin-bottom: 3px;
 	word-wrap: break-word;
 }
+.fcimg_preview_msg {
+	font-family: Courier;
+}
 .fcimg_preview_box {
 	float: left !important;
 	clear: none !important;

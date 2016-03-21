@@ -548,7 +548,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			}
 		}
 		
-		$session->set('flexicontent.postinstall', $jversion->getShortVersion());
+		$session->set('flexicontent.collation_version', $jversion->getShortVersion());
 	}
 	
 	

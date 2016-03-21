@@ -302,13 +302,17 @@ class FlexicontentModelFileselement extends JModelLegacy
 			$pinfo = pathinfo($filepath);
 			$row = new stdClass();
 			$row->ext = $pinfo['extension'];
-			$row->filename = $filesubpath;  //$pinfo['filename'].".".$pinfo['extension'];
+			// Convert directory separators inside the subpath
+			$row->filename = str_replace('\\', '/', $filesubpath);  //$pinfo['filename'].".".$pinfo['extension'];
+			// Try to create a UTF8 filename
+			$row->filename_original = iconv(mb_detect_encoding($row->filename, mb_detect_order(), true), "UTF-8", $row->filename);
+			$row->filename_original = $row->filename_original ? $row->filename_original : $row->filename;
 			$row->size = sprintf("%.0f KB", (filesize($filepath) / 1024) );
 			$row->altname = $pinfo['filename'];
 			$row->uploader = '-';
 			$row->uploaded = date("F d Y H:i:s.", filectime($filepath) );
 			$row->id = $i;
-
+			
 			if ( in_array(strtolower($row->ext), $imageexts)) {
 				$row->icon = JURI::root()."components/com_flexicontent/assets/images/mime-icon-16/image.png";
 			} elseif (file_exists(JPATH_SITE."/components/com_flexicontent/assets/images/mime-icon-16/".$row->ext.".png")) {
