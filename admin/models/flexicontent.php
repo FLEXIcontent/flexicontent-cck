@@ -522,13 +522,20 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$docheck = version_compare( $jversion->getShortVersion(), '3.4.99', 'g' );
 		if ($docheck)
 		{
+			$full_tbl_name = $dbprefix . 'content';
+			$query = "SELECT COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$full_tbl_name."' AND COLUMN_NAME IN ('language')";
+			$db->setQuery($query);
+			$col_data = $db->loadAssocList('COLUMN_NAME');
+			$jchset = $col_data['language']['CHARACTER_SET_NAME'];   // ? 'utf8mb4'
+			$jcname = $col_data['language']['COLLATION_NAME'];   // ? 'utf8mb4_unicode_ci'
+			
 			// Data Types of columns
 			$tbl_names_arr = array(
 				'flexicontent_items_ext'=>array(
-					'language' => "VARCHAR(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '*'"
+					'language' => "VARCHAR(11) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL DEFAULT '*'"
 				),
 				'flexicontent_fields'=>array(
-					'field_type' => "VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL default ''"
+					'field_type' => "VARCHAR(50) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL default ''"
 				)
 			);
 			
@@ -539,7 +546,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$db->setQuery($query);
 				$col_data = $db->loadAssocList('COLUMN_NAME');
 				foreach($col_data as $col => $data) {
-					if ($data['CHARACTER_SET_NAME'] <> 'utf8mb4' || $data['COLLATION_NAME'] <> 'utf8mb4_unicode_ci') {
+					if ($data['CHARACTER_SET_NAME'] <> $jchset || $data['COLLATION_NAME'] <> $jcname) {
 						$query = "ALTER TABLE ".$full_tbl_name." MODIFY `".$col."` ". $tbl_cols[$col];
 						$db->setQuery($query);
 						$col_data = $db->execute();
