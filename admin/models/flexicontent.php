@@ -534,6 +534,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				'flexicontent_items_ext'=>array(
 					'language' => "VARCHAR(11) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL DEFAULT '*'"
 				),
+				'flexicontent_items_tmp'=>array(
+					'title' => "VARCHAR(255) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL",
+					'language' => "VARCHAR(11) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL DEFAULT '*'"
+				),
 				'flexicontent_fields'=>array(
 					'field_type' => "VARCHAR(50) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL default ''"
 				)
