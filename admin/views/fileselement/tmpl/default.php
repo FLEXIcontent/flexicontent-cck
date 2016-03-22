@@ -107,8 +107,8 @@ var _file_data = new Array();
 // Output file data JSON encoded so that they are available to JS code
 foreach ($this->rows as $i => $row) :
 	$data = new stdClass();
-	foreach($row as $i => $d) {
-		if (!is_array($d) && !is_object($d)) $data->$i = utf8_encode($d);
+	foreach($row as $j => $d) {
+		if (!is_array($d) && !is_object($d)) $data->$j = utf8_encode($d);
 	}
 	echo '  _file_data['.$i.'] = '.json_encode($data).";\n";
 endforeach;
@@ -593,10 +593,11 @@ flexicontent_html::loadFramework('flexi-lib');
 					
 					<td class="left">
 						<?php
+							$_filename_original = $row->filename_original ? $row->filename_original :$row->filename;
 							if (mb_strlen($row->filename_original, 'UTF-8') > 100) {
-								$filename_cut = htmlspecialchars(flexicontent_html::striptagsandcut($row->filename_original, 100) . '...', ENT_QUOTES, 'UTF-8');
+								$filename_cut = htmlspecialchars(flexicontent_html::striptagsandcut($_filename_original, 100) . '...', ENT_QUOTES, 'UTF-8');
 							} else {
-								$filename_cut = htmlspecialchars($row->filename_original, ENT_QUOTES, 'UTF-8');
+								$filename_cut = htmlspecialchars($_filename_original, ENT_QUOTES, 'UTF-8');
 							}
 						?>
 						<?php echo '
