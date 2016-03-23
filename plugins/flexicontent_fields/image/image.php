@@ -2626,8 +2626,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// **********************************************************************
 	function imagePhpThumb( $origpath, $destpath, $prefix, $filename, $ext, $width, $height, $quality, $size, $crop, $usewm, $wmfile, $wmop, $wmpos )
 	{
-		$lib = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpthumb.class.php';		
-		require_once ( $lib );
+		static $initialized = null;
+		if ($initialized === null)
+		{
+			$initialized = 1;
+			require_once ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpthumb.class.php' );
+			require_once ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config.php' );
+		}
 		
 		unset ($phpThumb);
 		$phpThumb = new phpThumb();
