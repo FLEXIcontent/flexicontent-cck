@@ -135,7 +135,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 ?>
 
 <script type="text/javascript">
-	function <?php echo $this->use_jquery_sortable ? 'initordering' : 'storeordering'; ?>() {
+	function <?php echo $this->use_jquery_sortable ? 'fcfield_initordering' : 'fcfield_storeordering'; ?>() {
 	<?php echo $this->jssort . ';' ; ?>
 	}
 	

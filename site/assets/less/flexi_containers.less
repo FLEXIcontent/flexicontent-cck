@@ -398,12 +398,12 @@ body .fc-mssg.fc-noborder {
 	width: 100%;
 }
 
-.flexicontent .fc-xpended .add-on:first-child {
+#flexicontent .fc-xpended .add-on:first-child {
 	margin: 0 0 9px 0;
 	padding-left: 4px;
 	padding-right: 4px;
 }
-.flexicontent .fc-xpended-row .add-on:first-child {
+#flexicontent .fc-xpended-row .add-on:first-child {
 	min-width: 150px;
 	margin: 0 0 3px 0;
 	padding-left: 4px;
@@ -411,29 +411,32 @@ body .fc-mssg.fc-noborder {
 }
 
 
-.flexicontent [class*="fc-xpended"] > select,
-.flexicontent [class*="fc-xpended"] > .use_select2_lib {
-	border-radius: 6px;
+#flexicontent [class*="fc-xpended"] > select,
+#flexicontent [class*="fc-xpended"] > .use_select2_lib {
+	border-top-left-radius: 6px;
+	border-bottom-left-radius: 6px;
+	border-top-right-radius: 6px;
+	border-bottom-right-radius: 6px;	
 	margin-top: 0;
 	vertical-align: top;
 	/*padding: 4px 12px;
 	height: 18px;*/
 }
-.flexicontent [class*="fc-xpended"] > select:not(:first-child),
-.flexicontent [class*="fc-xpended"] > .use_select2_lib:not(:first-child) a {
+.#flexicontent [class*="fc-xpended"] > select:not(:first-child),
+#flexicontent [class*="fc-xpended"] > .use_select2_lib:not(:first-child) a {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
 	margin-left: 0px;
 }
-.flexicontent [class*="fc-xpended"] > select:not(:last-child),
-.flexicontent [class*="fc-xpended"] > .use_select2_lib:nth-last-child(n+3) a {
+#flexicontent [class*="fc-xpended"] > select:not(:last-child),
+#flexicontent [class*="fc-xpended"] > .use_select2_lib:nth-last-child(n+3) a {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 	margin-right: 0px;
 }
 
 
-.flexicontent .add-on.fc-lbl {
+#flexicontent .add-on.fc-lbl {
 	/*background: #555 none repeat scroll 0 0;
 	color: white;
 	font-family: monospace;
