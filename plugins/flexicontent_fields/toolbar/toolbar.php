@@ -220,19 +220,19 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			// OPEN GRAPH TAGs
 			// ***************
 			// OPEN GRAPH: site name
-			if ($field->parameters->get('add_og_site_name'))
+			if ($field->parameters->get('add_og_site_name') && $view == 'item')
 			{
 				$document->addCustomTag("<meta property=\"og:site_name\" content=\"".JFactory::getApplication()->getCfg('sitename')."\" />");
 			}
 			
 			// OPEN GRAPH: title
-			if ($field->parameters->get('add_og_title')) {
+			if ($field->parameters->get('add_og_title') && $view == 'item') {
 				$title = flexicontent_html::striptagsandcut($item->title);
 				$document->addCustomTag("<meta property=\"og:title\" content=\"{$title}\" />");
 			}
 			
 			// OPEN GRAPH: description
-			if ($field->parameters->get('add_og_descr'))
+			if ($field->parameters->get('add_og_descr') && $view == 'item')
 			{
 				if ( $item->metadesc ) {
 					$document->addCustomTag('<meta property="og:description" content="'.$item->metadesc.'" />');
@@ -244,7 +244,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			
 			// OPEN GRAPH: type
 			$og_type = (int) $field->parameters->get('add_og_type');
-			if ($og_type) {
+			if ($og_type && $view == 'item') {
 				if ($og_type > 2) $og_type = 1;
 				$og_type_names = array(1=>'article', 2=>'website');
 				$document->addCustomTag("<meta property=\"og:type\" content=\"".$og_type_names[$og_type]."\">");
@@ -252,7 +252,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			
 			// OPEN GRAPH: image (extracted from item's description text)
 			$imageurl = '';
-			if ($field->parameters->get('add_og_image'))
+			if ($field->parameters->get('add_og_image') && $view == 'item')
 			{
 				$og_image_field     = $field->parameters->get('og_image_field');
 				$og_image_fallback  = $field->parameters->get('og_image_fallback');

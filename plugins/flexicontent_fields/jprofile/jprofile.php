@@ -228,4 +228,37 @@ class plgFlexicontent_fieldsJProfile extends JPlugin
 	// **********************
 	// VARIOUS HELPER METHODS
 	// **********************
+	
+	function getUserProfile_FC()
+	{
+		$authordescr_item_html = false;
+		
+		// Retrieve author configuration
+		$authorparams = flexicontent_db::getUserConfig($item->created_by);
+		
+		// Render author profile
+		if ( $authordescr_itemid = $authorparams->get('authordescr_itemid') )
+		{
+			$flexi_html_helper = new flexicontent_html();
+			$saved_view = JRequest::getVar('view');
+			JRequest::setVar(view, 'module');
+			$authordescr_item_html = $flexi_html_helper->renderItem($authordescr_itemid);
+			JRequest::setVar('view', $saved_view);
+		}
+		
+		return $authordescr_item_html;
+	}
+	
+	
+	function getUserProfile_Joomla()
+	{
+		return 'getUserProfile_Joomla() is empty';
+	}
+	
+	
+	function getUserProfile_CB()
+	{
+		return 'getUserProfile_CB() is empty';
+	}
+
 }
