@@ -22,6 +22,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$values[0]['autocomplete'] = '';
 			$values[0]['addr_display'] = '';
 			$values[0]['addr_formatted'] = '';
+			$values[0]['name'] = '';
 			$values[0]['addr1'] = '';
 			$values[0]['addr2'] = '';
 			$values[0]['addr3'] = '';
@@ -85,13 +86,19 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$post = !is_array($v) ? array($post) : $post;
 		
 		// Enforce configuration so that user does not manipulate form to add disabled data
+		$use_name     = $field->parameters->get('use_name', 1);
 		$use_addr2    = $field->parameters->get('use_addr2', 1);
 		$use_addr3    = $field->parameters->get('use_addr3', 1);
 		$use_usstate  = $field->parameters->get('use_usstate', 1);
 		$use_province = $field->parameters->get('use_province', 1);
 		$use_country  = $field->parameters->get('use_country', 1);
 		$use_zip_suffix = $field->parameters->get('use_zip_suffix', 1);
-		$single_country = $field->parameters->get('single_country', '');
+		
+		// Get allowed countries
+		$ac_country_default = $field->parameters->get('ac_country_default', '');
+		$ac_country_allowed_list = $field->parameters->get('ac_country_allowed_list', '');
+		$ac_country_allowed_list = array_unique(FLEXIUtilities::paramToArray($ac_country_allowed_list, "/[\s]*,[\s]*/", false, true));
+		$ac_country_allowed_list = array_flip($ac_country_allowed_list);
 		
 		$new=0;
 		$newpost = array();
@@ -102,7 +109,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			// validate data or empty/set default values
 			$newpost[$new] = array();
 			
-			$v['country'] = !$use_country ? $single_country : @ $v['country'];  // Force single country
+			// Skip value if non-allowed country was passed
+			if ( $use_country && @ $v['country'] && count($ac_country_allowed_list) && !isset($ac_country_allowed_list[$v['country']]) ) $continue;
+			
 			$newpost[$new]['autocomplete']  = flexicontent_html::dataFilter($v['autocomplete'],   4000, 'STRING', 0);
 			$newpost[$new]['addr_display']  = flexicontent_html::dataFilter($v['addr_display'],   4000, 'STRING', 0);
 			$newpost[$new]['addr_formatted']= flexicontent_html::dataFilter($v['addr_formatted'], 4000, 'STRING', 0);
@@ -113,13 +122,15 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$newpost[$new]['lon']   = flexicontent_html::dataFilter(str_replace(',', '.', $v['lon']),  100, 'DOUBLE', 0);
 			$newpost[$new]['url']   = flexicontent_html::dataFilter($v['url'],    4000,   'URL', 0);
 			$newpost[$new]['zoom']  = flexicontent_html::dataFilter($v['zoom'],  2, 'INTEGER', 0);
-	
-			$newpost[$new]['addr2']      = !$use_addr2      || !isset($v['addr2'])      ? '' : flexicontent_html::dataFilter($v['addr2'],     4000, 'STRING', 0);
-			$newpost[$new]['addr3']      = !$use_addr3      || !isset($v['addr3'])      ? '' : flexicontent_html::dataFilter($v['addr3'],     4000, 'STRING', 0);
-			$newpost[$new]['state']      = !$use_usstate    || !isset($v['state'])      ? '' : flexicontent_html::dataFilter($v['state'],     200,  'STRING', 0);
-			$newpost[$new]['country']    = !$use_country    || !isset($v['country'])    ? '' : flexicontent_html::dataFilter($v['country'],     2,  'STRING', 0);
-			$newpost[$new]['province']   = !$use_province   || !isset($v['province'])   ? '' : flexicontent_html::dataFilter($v['province'],  200,  'STRING', 0);
-			$newpost[$new]['zip_suffix'] = !$use_zip_suffix || !isset($v['zip_suffix']) ? '' : flexicontent_html::dataFilter($v['zip_suffix'], 10,  'STRING', 0);
+			
+			// Allow saving these into the DB, so that they can be enabled later
+			$newpost[$new]['name']       = /*!$use_name       ||*/ !isset($v['name'])       ? '' : flexicontent_html::dataFilter($v['name'],     4000,  'STRING', 0);
+			$newpost[$new]['addr2']      = /*!$use_addr2      ||*/ !isset($v['addr2'])      ? '' : flexicontent_html::dataFilter($v['addr2'],    4000, 'STRING', 0);
+			$newpost[$new]['addr3']      = /*!$use_addr3      ||*/ !isset($v['addr3'])      ? '' : flexicontent_html::dataFilter($v['addr3'],    4000,  'STRING', 0);
+			$newpost[$new]['state']      = /*!$use_usstate    ||*/ !isset($v['state'])      ? '' : flexicontent_html::dataFilter($v['state'],     200,  'STRING', 0);
+			$newpost[$new]['country']    = /*!$use_country    ||*/ !isset($v['country'])    ? '' : flexicontent_html::dataFilter($v['country'],     2,  'STRING', 0);
+			$newpost[$new]['province']   = /*!$use_province   ||*/ !isset($v['province'])   ? '' : flexicontent_html::dataFilter($v['province'],  200,  'STRING', 0);
+			$newpost[$new]['zip_suffix'] = /*!$use_zip_suffix ||*/ !isset($v['zip_suffix']) ? '' : flexicontent_html::dataFilter($v['zip_suffix'], 10,  'STRING', 0);
 	
 			$new++;
 		}
