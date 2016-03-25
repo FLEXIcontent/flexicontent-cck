@@ -300,7 +300,7 @@
 			</field>
 			<field name="catid_default" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
-				default="" label="Default category" description="Select the category subtree that will be allowed to be used as main category" />
+				default="" label="Default category" description="Select the default main category to for this type (that will be pre-selected on item form load)" />
 			
 			<field name="" type="separator" default="Secondary categories" level="level2" />
 			<field name="cid_allowed_parent" type="flexicategories" top="2"

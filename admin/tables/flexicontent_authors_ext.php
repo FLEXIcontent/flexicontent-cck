@@ -39,7 +39,7 @@ class flexicontent_authors_ext extends JTable
 	/** @var string */
 	var $author_catparams  = null;
 
-	function flexicontent_authors_ext(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_authors_ext', 'user_id', $db);
 	}
 	

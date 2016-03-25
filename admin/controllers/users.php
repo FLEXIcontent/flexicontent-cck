@@ -261,7 +261,6 @@ class FlexicontentControllerUsers extends FlexicontentController
 				break;
 
 			case 'saveandnew':
-			default:
 				$msg = JText::sprintf( 'Successfully Saved User', $user->get('name') );
 				$this->setRedirect( 'index.php?option=com_flexicontent&controller=users&view=user&task='.$ctrl.'add', $msg );
 				break;

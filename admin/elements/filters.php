@@ -63,7 +63,7 @@ class JFormFieldFilters extends JFormFieldList
 				var element = jQuery(obj).parent();
 				var parent_element = jQuery(element.parent());
 				element.remove();
-				storeordering( parent_element );
+				fcfield_storeordering( parent_element );
 			}
 			
 			function fcfield_add_sortable_element(selector){
@@ -84,7 +84,7 @@ class JFormFieldFilters extends JFormFieldList
 				selobj.prop('selectedIndex',0);
 			}
 			
-			function storeordering(parent_element) {
+			function fcfield_storeordering(parent_element) {
 				hidden_id = '#'+jQuery.trim(parent_element.attr('id').replace('sortable-',''));
 				fields = new Array();
 				i = 0;
@@ -97,16 +97,16 @@ class JFormFieldFilters extends JFormFieldList
 			jQuery(document).ready(function() {
 			
 				jQuery( sorttable_fcfield_lists ).each(function(index, value) {
-					storeordering(jQuery(this));
+					fcfield_storeordering(jQuery(this));
 				});
 				
 				jQuery( sorttable_fcfield_lists ).sortable({
 					connectWith: sorttable_fcfield_lists,
 					update: function(event, ui) {
 						if(ui.sender) {
-							storeordering(jQuery(ui.sender));
+							fcfield_storeordering(jQuery(ui.sender));
 						}else{
-							storeordering(jQuery(ui.item).parent());
+							fcfield_storeordering(jQuery(ui.item).parent());
 						}
 					}
 				});

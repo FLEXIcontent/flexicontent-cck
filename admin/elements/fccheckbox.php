@@ -98,8 +98,9 @@ class JFormFieldFccheckbox extends JFormField
 				$check_global = ' checked="checked" ';
 				$disable_all = ' disabled="disabled" ';
 			}
+			$useglobal_lbl = @$attributes['useglobal_lbl'] ? $attributes['useglobal_lbl'] : 'FLEXI_USE_GLOBAL';
 			$html .= '<div style="'.$inline_style.'" ><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="fc_toggle_checkbox_group(\''.$element_id.'\', this)" />';
-			$html .= '<label for="'.$element_id.'_useglobal" >'.JText::_('FLEXI_USE_GLOBAL').'</label></div>';
+			$html .= '<label for="'.$element_id.'_useglobal" >'.JText::_($useglobal_lbl).'</label></div>';
 		}
 
 		// Create checkboxes

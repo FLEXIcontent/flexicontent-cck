@@ -5928,9 +5928,9 @@ class FLEXIUtilities
 	 * @return object
 	 * @since 1.5
 	 */
-	static function paramToArray($value, $regex = "", $filterfunc = "")
+	static function paramToArray($value, $regex = false, $filterfunc = false, $remove_save_flag=false)
 	{
-		if ($regex) {
+		if ($regex && !is_array($value)) {
 			$value = trim($value);
 			$value = !$value  ?  array()  :  preg_split($regex, $value);
 		}
@@ -5944,6 +5944,7 @@ class FLEXIUtilities
 		} else {
 			$value = !is_array($value) ? array($value) : $value;
 		}
+		if ($remove_save_flag) foreach($value as $i =>$v) if ($v=='__SAVED__') unset($value[$i]);
 		return $value;
 	}
 
