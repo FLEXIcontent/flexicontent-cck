@@ -4,11 +4,12 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // Some parameter shortcuts
 $required = $field->parameters->get('required', 0);
-$required = $required ? ' class="required"' : '';
+$required_class = $required ? 'required' : '';
 
 $google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
 $addr_edit_mode = $field->parameters->get('addr_edit_mode', 'plaintext');
-$edit_latlon = $field->parameters->get('edit_latlon', 1);
+$edit_latlon  = $field->parameters->get('edit_latlon',  1);
+$use_name     = $field->parameters->get('use_name',     1);
 $use_addr2    = $field->parameters->get('use_addr2',    1);
 $use_addr3    = $field->parameters->get('use_addr3',    1);
 $use_usstate  = $field->parameters->get('use_usstate',  1);
@@ -28,9 +29,23 @@ if ($js_added === null)
 	$document->addScript('https://maps.google.com/maps/api/js?libraries=places' . ($google_maps_js_api_key ? '&key=' . $google_maps_js_api_key : ''));
 }
 
+
+
+// Google autocomplete search types drop down list (for geolocation)
+$list_ac_types = array(
+	''=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_ALL_SEARCH_TYPES',
+	'geocode'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_GEOCODE',
+	'address'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_ADDRESS',
+	'establishment'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_BUSINESS',
+	'(regions)'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_REGION',
+	'(cities)'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_CITY'
+);
+
+
+
 // States drop down list
 $list_states = array(
-	''=>JText::_('FLEXI_PLEASE_SELECT'),
+	''=>JText::_('FLEXI_SELECT'),
 	'AL'=>'Alabama',
 	'AK'=>'Alaska',
 	'AS'=>'American Samoa',
@@ -91,9 +106,10 @@ $list_states = array(
 	'WY'=>'Wyoming'
 );
 
+
+
 // Country drop down list
 $list_countries = array(
-	''=>JText::_('FLEXI_PLEASE_SELECT'),
 	'AF'=>'Afghanistan',
 	'AX'=>'&Aring;land Islands',
 	'AL'=>'Albania',
@@ -346,13 +362,59 @@ $list_countries = array(
 );
 
 
-// Optionally silently enforce single country
-$single_country = $field->parameters->get('single_country',  '');
-if ($single_country && !$use_country && !isset($list_countries[$single_country]) )
+
+// CET ALLOWED ac search types
+$ac_types_default = $field->parameters->get('ac_types_default', '');
+$ac_type_allowed_list = $field->parameters->get('ac_type_allowed_list', array('','geocode','address','establishment','(regions)','(cities)'));
+$ac_type_allowed_list = FLEXIUtilities::paramToArray($ac_type_allowed_list, false, false, true);
+
+
+
+// CET ALLOWED countries, with special check for single country
+$ac_country_default = $field->parameters->get('ac_country_default', '');
+$ac_country_allowed_list = $field->parameters->get('ac_country_allowed_list', '');
+$ac_country_allowed_list = array_unique(FLEXIUtilities::paramToArray($ac_country_allowed_list, "/[\s]*,[\s]*/", false, true));
+$single_country = count($ac_country_allowed_list)==1 && $ac_country_default ? $ac_country_default : false;
+
+
+
+// CREATE COUNTRY OPTIONS
+$_list = count($ac_country_allowed_list) ? array_flip($ac_country_allowed_list) : $list_countries;
+$allowed_country_names = array();
+$allowed_countries = array(''=>JText::_('FLEXI_SELECT'));
+foreach($_list as $country_code => $k)
 {
-	$field->html[-1] = '<br/><div class="alert">Invalid (parameter) single country CODE: '.$single_country.'</div> <strong>Valid country codes</strong><br/> '.print_r($list_countries, true);
-	$single_country = '';
+	$country_op = new stdClass;
+	$allowed_countries[] = $country_op;
+	$country_op->value = $country_code;
+	$country_op->text  = JText::_('PLG_FC_ADDRESSINT_CC_'.$country_code);
+	if (count($ac_country_allowed_list)) $allowed_country_names[] = $country_op->text;
 }
+//echo $ac_country_options; exit;
+
+$countries_attribs = ' class="use_select2_lib fc_gm_country '.$required_class.'"'
+	. ($single_country ? ' disabled="disabled" readonly="readonly"' : '')
+	. ' onchange="var country=jQuery(this); var usstate_row = country.closest(\'table\').find(\'.fc_gm_usstate_row\'); country.val()==\'US\' ? usstate_row.show(600) : usstate_row.hide(600); " ';
+
+
+
+// CREATE AC SEARCH TYPE OPTIONS
+$ac_type_options = '';
+foreach($ac_type_allowed_list as $ac_type)
+{
+	$lbl = $list_ac_types[$ac_type];
+	$ac_type_options .= '<option value="'.$ac_type.'"  '.($ac_type == $ac_types_default ? 'selected="selected"' : '').'>'.JText::_($lbl)."</option>\n";
+}
+//echo $ac_type_options; exit;
+
+
+// initialize framework objects and other variables
+$document = JFactory::getDocument();
+$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+
+$tooltip_class = 'hasTooltip';
+$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
+$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';		
 
 // Field name and HTML TAG id
 $fieldname = 'custom['.$field->name.']';
@@ -369,25 +431,35 @@ foreach ($values as $value)
 	$value['zip_suffix']     = @ $value['zip_suffix'];
 	$value['url']  = @ $value['url'];
 	$value['zoom'] = @ $value['zoom'];
+	$value['name'] = @ $value['name'];
 	
 	$field_html = '
-	<div class="fcfield_field_data_box fcfield_addressint_data">
-	
 	<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
 		<tr>
-			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH_ADDRESS').'</span></td>
 			<td>
-				<div id="locationField">
-					<input id="'.$elementid_n.'_autocomplete" placeholder="" class="fcfield_textval" name="'.$fieldname_n.'[autocomplete]" type="text" />
+				<div class="'.$input_grp_class.' fc-xpended">
+					<label class="'.$add_on_class.' fc-lbl addrint-ac-lbl" for="'.$elementid_n.'_autocomplete">'.JText::_( 'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH_ADDRESS' ).'</label>
+					<input id="'.$elementid_n.'_autocomplete" placeholder="" class="input-xxlarge" name="'.$fieldname_n.'[autocomplete]" type="text" />
+					<select id="'.$elementid_n.'_ac_type" class="" name="'.$fieldname_n.'[ac_type]" onchange="changeAutoCompleteType('.$n.');">
+						'.$ac_type_options.'
+					</select>
 				</div>
 			</td>
 		</tr>
+	</tbody></table>
+	
+	<div><div id="'.$elementid_n.'_messages" class="alert alert-warning fc-iblock" style="display:none;"></div></div>
+	
+	<div class="fcfield_field_data_box fcfield_addressint_data">
+	<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
 	';
+	
 	if($addr_edit_mode == 'plaintext') {
 		$field_html .= '
 		<tr>
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_ADDRESS').'</span></td>
-			<td><textarea class="fcfield_textval" id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" rows="4" cols="24" '.$required.' />'
+			<td><textarea class="fcfield_textval" id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" rows="4" cols="24" class="'.$required_class.'" />'
+			.($value['name'] ? $value['name'] : '')
 			.($value['addr_display'] ? $value['addr_display'] :
 			((!empty($value['addr1']) && !empty($value['city']) && (!empty($value['province']) || !empty($value['state']))  && !empty($value['zip'])) ?
 			($value['addr1'] ? $value['addr1']."\n" : '')
@@ -407,37 +479,43 @@ foreach ($values as $value)
 	}
 	if($addr_edit_mode == 'formatted') {
 		$field_html .= '
-		<tr>
+		<tr '.($use_name ? '' : 'style="display:none;"').' class="fc_gm_name_row">
+			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BUSINESS_LOCATION').'</span></td>
+			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_name" name="'.$fieldname_n.'[name]" value="'.htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" class="'.$required_class.'" /></td>
+		</tr>
+		<tr class="fc_gm_addr_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').'</span></td>
 			<td>
-				<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" value="'.$value['addr1'].'" maxlength="400" '.$required.' />'
-				.($use_addr2 ? '<br/><input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" value="'.$value['addr2'].'" maxlength="400" />' : '')
-				.($use_addr3 ? '<br/><input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" value="'.$value['addr3'].'" maxlength="400" />' : '')
+				<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" value="'.htmlspecialchars($value['addr1'], ENT_COMPAT, 'UTF-8').'" maxlength="400" class="'.$required_class.'" />'
+				.($use_addr2 ? '<br/><input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" value="'.htmlspecialchars($value['addr2'], ENT_COMPAT, 'UTF-8').'" maxlength="400" />' : '')
+				.($use_addr3 ? '<br/><input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" value="'.htmlspecialchars($value['addr3'], ENT_COMPAT, 'UTF-8').'" maxlength="400" />' : '')
 				.'
 			</td>
 		</tr>
-		<tr>
+		<tr class="fc_gm_city_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY').'</span></td>
-			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_city" name="'.$fieldname_n.'[city]" value="'.$value['city'].'" size="50" maxlength="100" '.$required.' /></td>
+			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_city" name="'.$fieldname_n.'[city]" value="'.htmlspecialchars($value['city'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" class="'.$required_class.'" /></td>
 		</tr>
-		<tr '.($use_usstate ? '' : 'style="display:none;"').'>
+		<tr '.($use_usstate ? '' : 'style="display:none;"').' class="fc_gm_usstate_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').'</span></td>
-			<td>'.JHTML::_('select.genericlist', $list_states, $fieldname_n.'[state]', '', 'value', 'text', $value['state'], $elementid_n.'_state').'</td>
+			<td>'.JHTML::_('select.genericlist', $list_states, $fieldname_n.'[state]', ' class="use_select2_lib fc_gm_usstate" ', 'value', 'text', $value['state'], $elementid_n.'_state').'</td>
 		</tr>
-		<tr '.($use_province ? '' : 'style="display:none;"').'>
+		<tr '.($use_province ? '' : 'style="display:none;"').' class="fc_gm_province_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').'</span></td>
-			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_province" name="'.$fieldname_n.'[province]" value="'.$value['province'].'" size="50" maxlength="100" /></td>
+			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_province" name="'.$fieldname_n.'[province]" value="'.htmlspecialchars($value['province'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" /></td>
 		</tr>
-		<tr>
+		<tr class="fc_gm_zip_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').'</span></td>
 			<td>
-				<input type="text" class="fcfield_textval inlineval" id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" value="'.$value['zip'].'" size="10" maxlength="10" '.$required.' />
-				<span '.($use_zip_suffix ? '' : 'style="display:none"').'>&nbsp;<input type="text" class="fcfield_textval inlineval" id="'.$elementid_n.'_zip_suffix" name="'.$fieldname_n.'[zip_suffix]" value="'.$value['zip_suffix'].'" size="5" maxlength="10" /></span>
+				<input type="text" class="fcfield_textval inlineval" id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" value="'.htmlspecialchars($value['zip'], ENT_COMPAT, 'UTF-8').'" size="10" maxlength="10" class="'.$required_class.'" />
+				<span '.($use_zip_suffix ? '' : 'style="display:none"').'>&nbsp;<input type="text" class="fcfield_textval inlineval" id="'.$elementid_n.'_zip_suffix" name="'.$fieldname_n.'[zip_suffix]" value="'.htmlspecialchars($value['zip_suffix'], ENT_COMPAT, 'UTF-8').'" size="5" maxlength="10" /></span>
 			</td>
 		</tr>
-		<tr '.($use_country ? '' : 'style="display:none;"').'>
+		<tr '.($use_country ? '' : 'style="display:none;"').' class="fc_gm_country_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').'</span></td>
-			<td>'.JHTML::_('select.genericlist', $list_countries, $fieldname_n.'[country]', $required, 'value', 'text', ($use_country ? $value['country'] : $single_country), $elementid_n.'_country').'</td>
+			<td>
+				'.JHTML::_('select.genericlist', $allowed_countries, $fieldname_n.'[country]', $countries_attribs, 'value', 'text', ($value['country'] ? $value['country'] : $ac_country_default), $elementid_n.'_country').'
+			</td>
 		</tr>
 		';
 	}
@@ -446,11 +524,11 @@ foreach ($values as $value)
 		$field_html .= '
 		<tr>
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LATITUDE').'</span></td>
-			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_lat" name="'.$fieldname_n.'[lat]" value="'.$value['lat'].'" size="10" maxlength="10" '.$required.' /></td>
+			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_lat" name="'.$fieldname_n.'[lat]" value="'.htmlspecialchars($value['lat'], ENT_COMPAT, 'UTF-8').'" size="10" maxlength="10" class="'.$required_class.'" /></td>
 		</tr>
 		<tr>
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LONGITUDE').'</span></td>
-			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.$value['lon'].'" size="10" maxlength="10" '.$required.' /></td>
+			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.htmlspecialchars($value['lon'], ENT_COMPAT, 'UTF-8').'" size="10" maxlength="10" class="'.$required_class.'" /></td>
 		</tr>
 		';
 	}
@@ -480,59 +558,129 @@ foreach ($values as $value)
 	</div>
 	
 	
-	<input type="hidden" id="'.$elementid_n.'_addr_formatted" name="'.$fieldname_n.'[addr_formatted]" value="'.$value['addr_formatted'].'" />
-	<input type="hidden" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" value="'.$value['url'].'" />
-	<input type="hidden" id="'.$elementid_n.'_zoom" name="'.$fieldname_n.'[zoom]" value="'.$value['zoom'].'" />
+	<input type="hidden" id="'.$elementid_n.'_addr_formatted" name="'.$fieldname_n.'[addr_formatted]" value="'.htmlspecialchars($value['addr_formatted'], ENT_COMPAT, 'UTF-8').'" />
+	<input type="hidden" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" value="'.htmlspecialchars($value['url'], ENT_COMPAT, 'UTF-8').'" />
+	<input type="hidden" id="'.$elementid_n.'_zoom" name="'.$fieldname_n.'[zoom]" value="'.htmlspecialchars($value['zoom'], ENT_COMPAT, 'UTF-8').'" />
 	';
 	
 	if($addr_edit_mode == 'plaintext') {
 		$field_html .= '
-		<input type="hidden" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" value="'.$value['addr1'].'" />
-		<input type="hidden" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" value="'.$value['addr2'].'" />
-		<input type="hidden" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" value="'.$value['addr3'].'" />
-		<input type="hidden" id="'.$elementid_n.'_city" name="'.$fieldname_n.'[city]" value="'.$value['city'].'" />
-		<input type="hidden" id="'.$elementid_n.'_state" name="'.$fieldname_n.'[state]" value="'.$value['state'].'" />
-		<input type="hidden" id="'.$elementid_n.'_province" name="'.$fieldname_n.'[province]" value="'.$value['province'].'" />
-		<input type="hidden" id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" value="'.$value['zip'].'" />
-		<input type="hidden" id="'.$elementid_n.'_zip_suffix" name="'.$fieldname_n.'[zip_suffix]" value="'.$value['zip_suffix'].'" />
-		<input type="hidden" id="'.$elementid_n.'_country" name="'.$fieldname_n.'[country]" value="'.$value['country'].'" />
+		<input type="hidden" id="'.$elementid_n.'_name" name="'.$fieldname_n.'[name]" value="'.htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" value="'.htmlspecialchars($value['addr1'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" value="'.htmlspecialchars($value['addr2'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" value="'.htmlspecialchars($value['addr3'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_city" name="'.$fieldname_n.'[city]" value="'.htmlspecialchars($value['city'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_state" name="'.$fieldname_n.'[state]" value="'.htmlspecialchars($value['state'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_province" name="'.$fieldname_n.'[province]" value="'.htmlspecialchars($value['province'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" value="'.htmlspecialchars($value['zip'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_zip_suffix" name="'.$fieldname_n.'[zip_suffix]" value="'.htmlspecialchars($value['zip_suffix'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_country" name="'.$fieldname_n.'[country]" value="'.htmlspecialchars($value['country'], ENT_COMPAT, 'UTF-8').'" />
 		';
 	}
 
 	if($addr_edit_mode == 'formatted') {
 		$field_html .= '
-		<input type="hidden" id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" value="'.$value['addr_display'].'" />
+		<input type="hidden" id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" value="'.htmlspecialchars($value['addr_display'], ENT_COMPAT, 'UTF-8').'" />
 		';
 	}
-
+	
 	if(!$edit_latlon) {
 		$field_html .= '
-		<input type="hidden" id="'.$elementid_n.'_lat" name="'.$fieldname_n.'[lat]" value="'.$value['lat'].'" />
-		<input type="hidden" id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.$value['lon'].'" />
+		<input type="hidden" id="'.$elementid_n.'_lat" name="'.$fieldname_n.'[lat]" value="'.htmlspecialchars($value['lat'], ENT_COMPAT, 'UTF-8').'" />
+		<input type="hidden" id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.htmlspecialchars($value['lon'], ENT_COMPAT, 'UTF-8').'" />
 		';
 	}
 	$field_html .= '
 	<script>
-
+	
+	if ('.count($ac_country_allowed_list).')
+		var allowed_countries_'.$field->name.$n.' = new Array("'.implode('", "', $ac_country_allowed_list).'");
+	else
+		var allowed_countries_'.$field->name.$n.' = new Array();
+	
 	// autocomplete object
 	var autoComplete_'.$field->name.$n.';
+	var gmapslistener_'.$field->name.$n.';
 
 	// initialize autocomplete
-	function initAutoComplete_'.$field->name.$n.'() {
-		autoComplete_'.$field->name.$n.' = new google.maps.places.Autocomplete(document.getElementById("'.$elementid_n.'_autocomplete"), { types: [ "geocode" ] });
-		google.maps.event.addListener(autoComplete_'.$field->name.$n.', "place_changed", function() {
+	function initAutoComplete_'.$field->name.$n.'()
+	{
+		var ac_input = document.getElementById("'.$elementid_n.'_autocomplete");
+		var ac_type    = jQuery("#'.$elementid_n.'_ac_type").val();
+		var ac_country = "'.$single_country.'";
+		//window.console.log(ac_type);
+		
+		var ac_options = {};
+		if (ac_type)    ac_options.types = [ ac_type ];
+		if (ac_country) ac_options.componentRestrictions = {country: ac_country};
+		
+		autoComplete_'.$field->name.$n.' = new google.maps.places.Autocomplete( ac_input, ac_options );
+		gmapslistener_'.$field->name.$n.' = google.maps.event.addListener(autoComplete_'.$field->name.$n.', "place_changed", function() {
 			fillInAddress_'.$field->name.$n.'();
 		});
+		return true;
+	}
+	
+	// re-initialize autocomplete
+	function changeAutoCompleteType(n)
+	{
+		// Remove listener that update the google map on autocomplete selection
+		google.maps.event.removeListener(gmapslistener_'.$field->name.$n.' );
+		
+		// Clone replace input to remove the currently configured autocomplete search
+		var el = document.getElementById("'.$elementid_n.'_autocomplete");
+		el.parentNode.replaceChild(el.cloneNode(true), el);
+		
+		// Attach new autocomplete search
+		return initAutoComplete_'.$field->name.$n.'();
 	}
 
 	// fill address fields when autocomplete address is selected
 	function fillInAddress_'.$field->name.$n.'()
 	{
 		var place = autoComplete_'.$field->name.$n.'.getPlace();
-		console.log(place);
+		//window.console.log(place);
 		
-		// empty all fields
-		jQuery("#'.$elementid_n.'_autocomplete, #'.$elementid_n.'_addr_display, #'.$elementid_n.'_addr_formatted, #'.$elementid_n.'_addr1, #'.$elementid_n.'_addr2, #'.$elementid_n.'_addr3, #'.$elementid_n.'_city, #'.$elementid_n.'_state, #'.$elementid_n.'_province, #'.$elementid_n.'_country, #'.$elementid_n.'_zip, #'.$elementid_n.'_zip_suffix, #'.$elementid_n.'_lat, #'.$elementid_n.'_lon ").val("");
+		// Check allowed country, (zero length means all allowed)
+		var country_valid = allowed_countries_'.$field->name.$n.'.length == 0;
+		var selected_country = "";
+		if (!country_valid)
+		{
+			//place.address_components.forEach(function(o)
+			for(var j=0; j<place.address_components.length; j++)
+			{
+				var o = place.address_components[j];
+				if (o.types[0] != "country") continue;
+				selected_country = o.long_name;
+				for(var i=0; i<allowed_countries_'.$field->name.$n.'.length; i++)
+				{
+					if (o.short_name == allowed_countries_'.$field->name.$n.'[i]) { country_valid = true; break; }
+				}
+				if (country_valid) break;
+			}
+		}
+		if (!country_valid) {
+			jQuery("#'.$elementid_n.'_messages").html(
+				"'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING').': <b>"
+				+selected_country+"</b><br/>"
+				+"<b>'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES').'</b>: "
+				+"'.htmlspecialchars(implode(', ', $allowed_country_names), ENT_COMPAT, 'UTF-8').'"
+			).show();
+			return false;
+		}
+		else
+			jQuery("#'.$elementid_n.'_messages").html("").hide();
+		
+		
+		// Empty all fields in case they are not set to a new value
+		jQuery(""+
+			"#'.$elementid_n.'_autocomplete, #'.$elementid_n.'_name, #'.$elementid_n.'_url,"+
+			"#'.$elementid_n.'_addr_display, #'.$elementid_n.'_addr_formatted,"+
+			"#'.$elementid_n.'_addr1, #'.$elementid_n.'_addr2, #'.$elementid_n.'_addr3,"+
+			"#'.$elementid_n.'_city, #'.$elementid_n.'_state, #'.$elementid_n.'_province, #'.$elementid_n.'_country,"+
+			"#'.$elementid_n.'_zip, #'.$elementid_n.'_zip_suffix, #'.$elementid_n.'_lat, #'.$elementid_n.'_lon"
+		).val("").trigger("change");
+		
 		
 		// get street address
 		jQuery("#'.$elementid_n.'_addr1").val(place.formatted_address.split(",")[0]);
@@ -549,7 +697,7 @@ foreach ($values as $value)
 				
 				// load country code
 				case "country":
-				jQuery("#'.$elementid_n.'_country").val(o.short_name);
+				jQuery("#'.$elementid_n.'_country").val(o.short_name).trigger("change");
 				break;
 				
 				// load postal code
@@ -575,13 +723,16 @@ foreach ($values as $value)
 			place.address_components.forEach(function(o){
 				if(o.types[0] == "administrative_area_level_1")
 				{
-					jQuery("#'.$elementid_n.'_state").val(o.short_name);
+					jQuery("#'.$elementid_n.'_state").val(o.short_name).trigger("change");
 				}
 			});
 		}
 		
 		// load suggested display address
 		jQuery("#'.$elementid_n.'_addr_display, #'.$elementid_n.'_addr_formatted").val(place.formatted_address);
+		
+		// name to google maps
+		jQuery("#'.$elementid_n.'_name").val(place.name);
 		
 		// url to google maps
 		jQuery("#'.$elementid_n.'_url").val(place.url);

@@ -13,7 +13,7 @@ $show_address = $field->parameters->get('show_address','both');
 $show_address = false || $show_address == 'both' || ($view != 'item' && $show_address == 'category') || ($view == 'item' && $show_address == 'item');
 
 $addr_display_mode = $field->parameters->get('addr_display_mode','plaintext');
-$addr_format_tmpl = $field->parameters->get('addr_format_tmpl','<span class="street-address">{{addr1}}<br />[[addr2|{{addr2}}<br />]][[addr3|{{addr3}}</span><br />]]<span class="city">{{city}}</span> <span class="state">[[state|{{state}}]][[province|{{province}}]]</span>, <span class="postal-code">{{zip}}[[zip_suffix|-{{zip_suffix}}]]</span><br /><span class="country">{{country}}</span>');
+$addr_format_tmpl = $field->parameters->get('addr_format_tmpl','<h3 class="fc-addrint business-name">{{name}}</h3> <span class="fc-addrint street-address">{{addr1}}<br />[[addr2|{{addr2}}<br />]][[addr3|{{addr3}}</span><br />]]<span class="fc-addrint city">{{city}}</span> <span class="fc-addrint state">[[state|{{state}}]][[province|{{province}}]]</span>, <span class="fc-addrint postal-code">{{zip}}[[zip_suffix|-{{zip_suffix}}]]</span><br /><span class="fc-addrint country">{{country}}</span>');
 
 $directions_position = $field->parameters->get('directions_position','after');
 $directions_link_label = $field->parameters->get('directions_link_label', JText::_('PLG_FC_ADDRESSINT_GET_DIRECTIONS'));
