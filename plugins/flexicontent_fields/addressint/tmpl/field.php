@@ -426,19 +426,22 @@ foreach ($values as $value)
 	$fieldname_n = $fieldname.'['.$n.']';
 	$elementid_n = $elementid.'_'.$n;
 	
+	// make sure that optional data exist
 	$value['addr_display']   = @ $value['addr_display'];
 	$value['addr_formatted'] = @ $value['addr_formatted'];
 	$value['zip_suffix']     = @ $value['zip_suffix'];
 	$value['url']  = @ $value['url'];
 	$value['zoom'] = @ $value['zoom'];
 	$value['name'] = @ $value['name'];
+	$value['addr2'] = @ $value['addr2'];
+	$value['addr3'] = @ $value['addr3'];
 	
 	$field_html = '
 	<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
 		<tr>
 			<td>
 				<div class="'.$input_grp_class.' fc-xpended">
-					<label class="'.$add_on_class.' fc-lbl addrint-ac-lbl" for="'.$elementid_n.'_autocomplete">'.JText::_( 'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH_ADDRESS' ).'</label>
+					<label class="'.$add_on_class.' fc-lbl addrint-ac-lbl" for="'.$elementid_n.'_autocomplete">'.JText::_( 'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH' ).'</label>
 					<input id="'.$elementid_n.'_autocomplete" placeholder="" class="input-xxlarge" name="'.$fieldname_n.'[autocomplete]" type="text" />
 					<select id="'.$elementid_n.'_ac_type" class="" name="'.$fieldname_n.'[ac_type]" onchange="changeAutoCompleteType('.$n.');">
 						'.$ac_type_options.'
@@ -486,9 +489,9 @@ foreach ($values as $value)
 		<tr class="fc_gm_addr_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').'</span></td>
 			<td>
-				<input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" value="'.htmlspecialchars($value['addr1'], ENT_COMPAT, 'UTF-8').'" maxlength="400" class="'.$required_class.'" />'
-				.($use_addr2 ? '<br/><input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" value="'.htmlspecialchars($value['addr2'], ENT_COMPAT, 'UTF-8').'" maxlength="400" />' : '')
-				.($use_addr3 ? '<br/><input type="text" class="fcfield_textval" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" value="'.htmlspecialchars($value['addr3'], ENT_COMPAT, 'UTF-8').'" maxlength="400" />' : '')
+				<textarea class="fcfield_textval" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" maxlength="400" class="'.$required_class.'" rows="2">'.$value['addr1'].'</textarea>'
+				.($use_addr2 ? '<br/><textarea class="fcfield_textval" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" maxlength="400" rows="2">'.$value['addr2'].'</textarea>' : '')
+				.($use_addr3 ? '<br/><textarea class="fcfield_textval" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" maxlength="400" rows="2">'.$value['addr3'].'</textarea>' : '')
 				.'
 			</td>
 		</tr>
@@ -640,6 +643,7 @@ foreach ($values as $value)
 	{
 		var place = autoComplete_'.$field->name.$n.'.getPlace();
 		//window.console.log(place);
+		if (typeof place.address_components == "undefined") return;
 		
 		// Check allowed country, (zero length means all allowed)
 		var country_valid = allowed_countries_'.$field->name.$n.'.length == 0;
@@ -681,10 +685,6 @@ foreach ($values as $value)
 			"#'.$elementid_n.'_zip, #'.$elementid_n.'_zip_suffix, #'.$elementid_n.'_lat, #'.$elementid_n.'_lon"
 		).val("").trigger("change");
 		
-		
-		// get street address
-		jQuery("#'.$elementid_n.'_addr1").val(place.formatted_address.split(",")[0]);
-		
 		// load city, country code, postal code
 		place.address_components.forEach(function(o)
 		{
@@ -716,6 +716,19 @@ foreach ($values as $value)
 				break;
 			}
 		});
+		
+		// get street address
+		var addr_end = jQuery("#'.$elementid_n.'_city").val() || jQuery("#'.$elementid_n.'_province").val() || jQuery("#'.$elementid_n.'_country").val();
+		var street_address = "";
+		
+		if (typeof place.formatted_address != "undefined")  street_address = place.formatted_address;
+		else if (typeof place.adr_address != "undefined")   street_address = place.adr_address;
+		var div = document.createElement("div");
+		div.innerHTML = street_address;
+		street_address = div.innerText.split(addr_end)[0];
+		street_address = street_address.replace(/(^\s*,)|(,\s*$)/g, "");
+		
+		jQuery("#'.$elementid_n.'_addr1").val(street_address);
 		
 		if(jQuery("#'.$elementid_n.'_country").val() == "US")
 		{	

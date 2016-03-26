@@ -56,11 +56,11 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="use_addr2" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_ADDR2" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_ADDR2_DESC" class="btn-group btn-group-yesno" depend_class="addr-formatted-mode">
+			<field name="use_addr2" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_ADDR2" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_ADDR2_DESC" class="btn-group btn-group-yesno" depend_class="addr-formatted-mode">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="use_addr3" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_ADDR3" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_ADDR3_DESC" class="btn-group btn-group-yesno" depend_class="addr-formatted-mode">
+			<field name="use_addr3" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_ADDR3" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_USE_ADDR3_DESC" class="btn-group btn-group-yesno" depend_class="addr-formatted-mode">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
