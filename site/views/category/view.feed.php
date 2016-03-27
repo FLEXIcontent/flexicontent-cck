@@ -113,6 +113,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$uri = clone JUri::getInstance();
 		$domain = $uri->toString(array('scheme', 'host', 'port'));
+		$site_base_url = JURI::base(true).'/';
 		foreach ( $items as $item )
 		{
 			// strip html from feed item title
@@ -121,7 +122,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 			// url link to article
 			// & used instead of &amp; as this is converted by feed creator
-			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $category->slug, 0, $item));
+			$link = $domain . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $category->slug, 0, $item));
 
 			// strip html from feed item description text
 			$description	= $feed_summary ? $item->introtext.$item->fulltext : $item->introtext;
@@ -150,14 +151,14 @@ class FlexicontentViewCategory extends JViewLegacy
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 					
-					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
-					$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $site_base_url : '';
+					$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.rawurlencode($base_url.$src).$conf;
 				} else {
 					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 					$thumb = $src;
 					if ($src) {
 						// Prepend site base folder
-						$thumb = (!preg_match("#^http|^https|^ftp|^/#i", $src) ?  JURI::base(true).'/' : '') . $src ;
+						$thumb = (!preg_match("#^http|^https|^ftp|^/#i", $src) ?  $site_base_url : '') . $src ;
 					}
 				}
 				
@@ -229,7 +230,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 				$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';
 				$document->image = new stdClass;
-				$document->image->url = $this->baseurl ."/". $joomla_image_url . $category->image;
+				$document->image->url = $site_base_url . $joomla_image_url . $category->image;
 				$document->image->title = $document->title;
 				$document->image->link  = $document->link;
 				$document->image->width = 100;
