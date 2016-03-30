@@ -45,7 +45,6 @@
 				<option value="0">FLEXI_NO</option>
 			</field>
 			
-			<field name="" type="separator" default="NOTE: These controls will only display in sinlge item view" level="level3" class="alert alert-warning fcpadded" />
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_VARIOUS_CONTROLS" level="level2" />
 			
 			<field name="display_comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC" class="btn-group btn-group-yesno">
@@ -73,6 +72,7 @@
 			<field name="voicetarget" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_VOICE_TARGET" depend_class="hiddefield-mode" description="FLEXI_FIELD_TOOLBAR_VOICE_TARGET_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_REZIZE_CONTROLS" level="level2" />
+			<field name="" type="separator" default="NOTE: These controls will only display in single item view" level="level3" class="alert alert-warning fcpadded" />
 			<field name="display_resizer" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_TOOLBAR_RESIZER" toggle_related="1" description="FLEXI_FIELD_TOOLBAR_RESIZER_DESC" class="btn-group btn-group-yesno">
 				<option value="1" show_list="hiddefield-mode2" hide_list="">FLEXI_YES</option>
 				<option value="0" show_list="" hide_list="hiddefield-mode2">FLEXI_NO</option>
