@@ -49,6 +49,11 @@ class plgFlexicontent_fieldsEmail extends FCField
 		
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		
+		$tooltip_class = 'hasTooltip';
+		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
+		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		
 		
 		// ****************
@@ -206,6 +211,18 @@ class plgFlexicontent_fieldsEmail extends FCField
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
+			function expandFields".$field->id."(el, groupval_box, fieldval_box)
+			{
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				var fields_s = row.find('.fc-xpended');
+				var fields_m = row.find('.fc-xpended-row');
+				
+				fields_s.each(function() {  jQuery(this).removeClass('fc-xpended').addClass('fc-xpended-row');  });
+				fields_m.each(function() {  jQuery(this).removeClass('fc-xpended-row').addClass('fc-xpended');  });
+			}
+			
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
 				// Find field value container
@@ -230,12 +247,14 @@ class plgFlexicontent_fieldsEmail extends FCField
 			
 			$css .= '';
 			
-			$remove_button = '<span class="fcfield-delvalue'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="fcfield-drag-handle'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$expand_view = '<span class="'.$add_on_class.' fcfield-expand-view'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_EXPAND_VALUES' ).'" onclick="expandFields'.$field->id.'(this);"></span>';
+			$remove_button = '<span class="'.$add_on_class.' fcfield-delvalue'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="'.$add_on_class.' fcfield-drag-handle'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="fcfield-insertvalue fc_before'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="fcfield-insertvalue fc_after'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_before'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_after'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		} else {
+			$expand_view = '';
 			$remove_button = '';
 			$move2 = '';
 			$add_here = '';
@@ -272,8 +291,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$value['addr'] = !empty($value['addr']) ? $value['addr'] : '';
 			$value['addr'] = htmlspecialchars( JStringPunycode::emailToUTF8($value['addr']), ENT_COMPAT, 'UTF-8' );
 			$addr = '
-				<div class="nowrap_box">
-					<label class="label emailaddr-lbl" for="'.$elementid_n.'_addr">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
+				<div class="'.$input_grp_class.' fc-xpended">
+					<label class="'.$add_on_class.' fc-lbl emailaddr-lbl" for="'.$elementid_n.'_addr">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
 					<input class="emailaddr fcfield_textval '.$classes.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'_addr" type="text" value="'.$value['addr'].'" '.$attribs.' />
 				</div>';
 			
@@ -282,18 +301,25 @@ class plgFlexicontent_fieldsEmail extends FCField
 				$value['text'] = !empty($value['text']) ? $value['text'] : $default_title;
 				$value['text'] = isset($value['text']) ? htmlspecialchars($value['text'], ENT_COMPAT, 'UTF-8') : '';
 				$text = '
-				<div class="nowrap_box">
-					<label class="label emailtext-lbl" for="'.$elementid_n.'_text">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).'</label>
+				<div class="'.$input_grp_class.' fc-xpended">
+					<label class="'.$add_on_class.' fc-lbl emailtext-lbl" for="'.$elementid_n.'_text">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).'</label>
 					<input class="emailtext fcfield_textval" name="'.$fieldname_n.'[text]"  id="'.$elementid_n.'_text" type="text" size="'.$size.'" value="'.$value['text'].'" />
 				</div>';
 			}
 			
 			$field->html[] = '
+				'.($use_ingroup ? '' : '
+				<div class="'.$input_grp_class.' fc-xpended-btns">
+					'.$move2.'
+					'.$expand_view.'
+					'.$remove_button.'
+					'.(!$add_position ? '' : $add_here).'
+				</div>
+				').'
+				<div class="fc-field-props-box">
 				'.$addr.'
 				'.$text.'
-				'.($use_ingroup ? '' : $move2).'
-				'.($use_ingroup ? '' : $remove_button).'
-				'.($use_ingroup || !$add_position ? '' : $add_here).'
+				</div>
 				';
 			
 			$n++;
@@ -307,7 +333,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').' fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}

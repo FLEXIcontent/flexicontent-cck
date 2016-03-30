@@ -53,9 +53,14 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		
 		// Initialize framework objects and other variables
 		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		
+		$tooltip_class = 'hasTooltip';
+		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
+		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
+		$tip_class     = $tooltip_class;  // Compatibility with older custom templates
 		
 		// Get a unique id to use as item id if current item is new
 		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
@@ -419,11 +424,11 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			
 			$css .= '';
 			
-			$remove_button = '<span class="fcfield-delvalue'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="fcfield-drag-handle'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="'.$add_on_class.' fcfield-delvalue'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="'.$add_on_class.' fcfield-drag-handle'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="fcfield-insertvalue fc_before'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="fcfield-insertvalue fc_after'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_before'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_after'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -454,9 +459,13 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 		foreach($field->html as &$_html_) {
 			$_html_ = '
-			'.($use_ingroup ? '' : $move2).'
-			'.($use_ingroup ? '' : $remove_button).'
-			'.($use_ingroup || !$add_position ? '' : $add_here).'
+				'.($use_ingroup ? '' : '
+				<div class="'.$input_grp_class.' fc-xpended-btns">
+					'.$move2.'
+					'.$remove_button.'
+					'.(!$add_position ? '' : $add_here).'
+				</div>
+				').'
 			'.$_html_;
 		}
 		unset($_html_);
@@ -468,7 +477,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
@@ -507,6 +516,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 		$popuptype = $field->parameters->get('popuptype', 4);
 
 		// some parameter shortcuts
+		$tooltip_class = 'hasTooltip';
 		$thumbposition		= $field->parameters->get( 'thumbposition', 3 ) ;
 		$w_l				= $field->parameters->get( 'w_l', 450 ) ;
 		$h_l				= $field->parameters->get( 'h_l', 300 ) ;

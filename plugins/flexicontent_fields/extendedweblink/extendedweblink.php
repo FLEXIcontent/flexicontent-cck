@@ -49,6 +49,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		
+		$tooltip_class = 'hasTooltip';
+		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
+		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		
 		
 		// ****************
@@ -166,6 +171,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 					return 'cancel';
 				}
 				
+				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				";
@@ -176,7 +182,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				theInput = newField.find('input.urllink').first();
 				theInput.val('".$default_link."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
+				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
+				newField.find('.urllink-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
 				";
 			
 			if ($allow_relative_addrs==2) $js .= "
@@ -196,6 +203,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				theInput.val('".$default_title."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
+				newField.find('.urltitle-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				";
 			
 			if ($usetext) $js .= "
@@ -203,20 +211,23 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				theInput.val('".$default_text."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][linktext]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_linktext');
+				newField.find('.urllinktext-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_linktext');
 				";
-				
+			
 			if ($useclass) $js .= "
 				theInput = newField.find('input.urlclass').first();
 				theInput.val('".$default_class."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
+				newField.find('.urlclass-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
 				";
-				
+			
 			if ($useid) $js .= "
 				theInput = newField.find('input.urlid').first();
 				theInput.val('".$default_id."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][id]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_id');
+				newField.find('.urlid-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_id');
 				";
 			
 			if ($usehits) $js .="
@@ -224,6 +235,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				theInput.val('0');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_hits');
+				newField.find('.urlhits-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_hits');
 				
 				// Set hits to zero for new row value
 				newField.find('span span').html('0');
@@ -255,6 +267,18 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
+			function expandFields".$field->id."(el, groupval_box, fieldval_box)
+			{
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				var fields_s = row.find('.fc-xpended');
+				var fields_m = row.find('.fc-xpended-row');
+				
+				fields_s.each(function() {  jQuery(this).removeClass('fc-xpended').addClass('fc-xpended-row');  });
+				fields_m.each(function() {  jQuery(this).removeClass('fc-xpended-row').addClass('fc-xpended');  });
+			}
+			
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
 				// Find field value container
@@ -279,12 +303,14 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			
 			$css .= '';
 			
-			$remove_button = '<span class="fcfield-delvalue'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="fcfield-drag-handle'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$expand_view = '<span class="'.$add_on_class.' fcfield-expand-view'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_EXPAND_VALUES' ).'" onclick="expandFields'.$field->id.'(this);"></span>';
+			$remove_button = '<span class="'.$add_on_class.' fcfield-delvalue'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="'.$add_on_class.' fcfield-drag-handle'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="fcfield-insertvalue fc_before'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="fcfield-insertvalue fc_after'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_before'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_after'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		} else {
+			$expand_view = '';
 			$remove_button = '';
 			$move2 = '';
 			$add_here = '';
@@ -319,27 +345,25 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			$value['link'] = !empty($value['link']) ? $value['link'] : $default_link;
-			$value['link'] = htmlspecialchars(
-				(FLEXI_J30GE ? JStringPunycode::urlToUTF8($value['link']) : $value['link']),
-				ENT_COMPAT, 'UTF-8'
-			);
+			$value['link'] = htmlspecialchars( JStringPunycode::urlToUTF8($value['link']), ENT_COMPAT, 'UTF-8' );
 			$link = '
-				<tr><td class="key">' .JText::_( 'FLEXI_FIELD_URL' ). '</td><td>
-					<input class="urllink fcfield_textval '.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['link'].'" />
-				</td></tr>';
+				<div class="'.$input_grp_class.' fc-xpended-row">
+					<label class="'.$add_on_class.' fc-lbl urllink-lbl" for="'.$elementid_n.'_link">'.JText::_( 'FLEXI_FIELD_URL' ).'</label>
+					<input class="urllink fcfield_textval '.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'_link" type="text" size="'.$size.'" value="'.$value['link'].'" />
+				</div>';
 			
 			$autoprefix = '';
 			if ($allow_relative_addrs==2) {
 				$_tip_title  = flexicontent_html::getToolTip(null, 'FLEXI_EXTWL_IS_RELATIVE_DESC', 1, 1);
-				$_tip_class  = (FLEXI_J30GE ? 'hasTooltip' : 'hasTip');
 				$is_absolute = (boolean) parse_url($value['link'], PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $value['link']);
 				$autoprefix = '
-				<tr><td class="key '.$_tip_class.'" title="'.$_tip_title.'">'.JText::_( 'FLEXI_EXTWL_IS_RELATIVE' ). ' *</td><td>
+				<div class="'.$input_grp_class.' fc-xpended-row btn-group group-fcinfo">
+					<label class="'.$add_on_class.' fc-lbl '.$tooltip_class.'" title="'.$_tip_title.'">'.JText::_( 'FLEXI_EXTWL_IS_RELATIVE' ).'</label>
 					<input class="autoprefix" id="'.$elementid_n.'_autoprefix_0" name="'.$fieldname_n.'[autoprefix]" type="radio" value="0" '.( !$is_absolute ? 'checked="checked"' : '' ).'/>
-					<label for="'.$elementid_n.'_autoprefix_0">'.JText::_('FLEXI_YES').'</label>
+					<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_0">'.JText::_('FLEXI_YES').'</label>
 					<input class="autoprefix" id="'.$elementid_n.'_autoprefix_1" name="'.$fieldname_n.'[autoprefix]" type="radio" value="1" '.( $is_absolute ? 'checked="checked"' : '' ).'/>
-					<label for="'.$elementid_n.'_autoprefix_1">'.JText::_('FLEXI_NO').'</label>
-				</td></tr>';
+					<label class="'.$add_on_class.' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_1">'.JText::_('FLEXI_NO').'</label>
+				</div>';
 			}
 			
 			$title = '';
@@ -347,9 +371,10 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				$value['title'] = !empty($value['title']) ? $value['title'] : $default_title;
 				$value['title'] = htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8');
 				$title = '
-				<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_URLTITLE' ). '</td><td>
+				<div class="'.$input_grp_class.' fc-xpended-row">
+					<label class="'.$add_on_class.' fc-lbl urltitle-lbl" for="'.$elementid_n.'_title">'.JText::_( 'FLEXI_EXTWL_URLTITLE' ).'</label>
 					<input class="urltitle fcfield_textval" name="'.$fieldname_n.'[title]" id="'.$elementid_n.'_title" type="text" size="'.$size.'" value="'.$value['title'].'" />
-				</td></tr>';
+				</div>';
 			}
 			
 			$linktext = '';
@@ -357,9 +382,10 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				$value['linktext'] = !empty($value['linktext']) ? $value['linktext'] : $default_text;
 				$value['linktext'] = htmlspecialchars($value['linktext'], ENT_COMPAT, 'UTF-8');
 				$linktext = '
-				<tr><td class="key">' .JText::_( 'FLEXI_EXTWL_URLLINK_TEXT' ). '</td><td>
+				<div class="'.$input_grp_class.' fc-xpended-row">
+					<label class="'.$add_on_class.' fc-lbl urllinktext-lbl" for="'.$elementid_n.'_linktext">'.JText::_( 'FLEXI_EXTWL_URLLINK_TEXT' ).'</label>
 					<input class="urllinktext fcfield_textval" name="'.$fieldname_n.'[linktext]" id="'.$elementid_n.'_linktext" type="text" size="'.$size.'" value="'.$value['linktext'].'" />
-				</td></tr>';
+				</div>';
 			}
 			
 			$class = '';
@@ -369,15 +395,17 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			}
 			if ($useclass==1) {
 				$class = '
-					<tr><td class="key">' .JText::_( 'FLEXI_EXTWL_URLCLASS' ). '</td><td>
+					<div class="'.$input_grp_class.' fc-xpended-row">
+						<label class="'.$add_on_class.' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_EXTWL_URLCLASS' ).'</label>
 						<input class="urlclass fcfield_textval" name="'.$fieldname_n.'[class]" id="'.$elementid_n.'_class" type="text" size="'.$size.'" value="'.$value['class'].'" />
-					</td></tr>';
+					</div>';
 			} else if ($useclass==2) {
 				$class_attribs = ' class="urlclass" ';
 				$class = '
-					<tr><td class="key">' .JText::_( 'FLEXI_EXTWL_URLCLASS' ). '</td><td>
+					<div class="'.$input_grp_class.' fc-xpended-row">
+						<label class="'.$add_on_class.' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_EXTWL_URLCLASS' ).'</label>
 						'.JHTML::_('select.genericlist', $class_options, $fieldname_n.'[class]', $class_attribs, 'value', 'text', $value['class'], $class_elementid = $elementid_n.'_class').'
-					</td></tr>';
+					</div>';
 			}
 			
 			$id = '';
@@ -385,27 +413,33 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				$value['id'] = !empty($value['id']) ? $value['id'] : $default_id;
 				$value['id'] = htmlspecialchars($value['id'], ENT_COMPAT, 'UTF-8');
 				$id = '
-				<tr><td class="key">' .JText::_( 'FLEXI_EXTWL_URLID' ). '</td><td>
-					<input class="urlid" name="'.$fieldname_n.'[id]" id="'.$elementid_n.'_id" type="text" size="'.$size.'" value="'.$value['id'].'" />
-				</td></tr>';
+				<div class="'.$input_grp_class.' fc-xpended-row">
+					<label class="'.$add_on_class.' fc-lbl urlid-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_EXTWL_URLID' ).'</label>
+					<input class="urlid fcfield_textval" name="'.$fieldname_n.'[id]" id="'.$elementid_n.'_id" type="text" size="'.$size.'" value="'.$value['id'].'" />
+				</div>';
 			}
 			
 			$hits = '';
 			if ($usehits) {
 				$hits = (int) @ $value['hits'];
 				$hits = '
-					<tr><td class="key">' .JText::_( 'FLEXI_EXTWL_POPULARITY' ). '</td><td>
-						<input class="urlhits" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="hidden" value="'.$hits.'" />
-						<span class="hits"><span class="hitcount">'.$hits.'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
-					</td></tr>';
+					<div class="'.$input_grp_class.' fc-xpended-row">
+						<label class="'.$add_on_class.' fc-lbl urlhits-lbl" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_EXTWL_POPULARITY' ).'</label>
+						<span class="'.$add_on_class.' hitcount" style="font-style: italic; min-width:64px;">'.$hits.' '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
+					</div>
+					<input class="urlhits" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="hidden" value="'.$hits.'" />';
 			}
 			
 			$field->html[] = '
-				'.($use_ingroup ? '' : $move2).'
-				'.($use_ingroup ? '' : $remove_button).'
-				'.($use_ingroup || !$add_position ? '' : $add_here).'
-				'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
-				<table class="admintable"><tbody>
+				'.($use_ingroup ? '' : '
+				<div class="'.$input_grp_class.' fc-xpended-btns">
+					'.$move2.'
+					'.$expand_view.'
+					'.$remove_button.'
+					'.(!$add_position ? '' : $add_here).'
+				</div>
+				').'
+				<div class="fc-field-props-box">
 				'.$link.'
 				'.$autoprefix.'
 				'.$title.'
@@ -413,7 +447,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 				'.$class.'
 				'.$id.'
 				'.$hits.'
-				</tbody></table>
+				</div>
 				';
 			
 			$n++;
@@ -427,7 +461,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').' fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').' fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
@@ -467,8 +501,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
 		
 		// some parameter shortcuts
-		$target         = $field->parameters->get( 'target', '' );
-		$target_param   = $target ? ' target="'.$target.'"' : '';
+		$tooltip_class = 'hasTooltip';
+		$target       = $field->parameters->get( 'target', '' );
+		$target_param = $target ? ' target="'.$target.'"' : '';
 		$display_hits = $field->parameters->get( 'display_hits', 0 ) ;
 		$add_hits_img = $display_hits == 1 || $display_hits == 3;
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;

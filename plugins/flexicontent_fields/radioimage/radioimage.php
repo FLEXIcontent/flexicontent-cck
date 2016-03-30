@@ -57,6 +57,11 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		
+		$tooltip_class = 'hasTooltip';
+		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
+		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
@@ -337,11 +342,11 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			
 			$css .= '';
 			
-			$remove_button = '<span class="fcfield-delvalue'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="fcfield-drag-handle'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="'.$add_on_class.' fcfield-delvalue'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="'.$add_on_class.' fcfield-drag-handle'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="fcfield-insertvalue fc_before'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="fcfield-insertvalue fc_after'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_before'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_after'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -396,7 +401,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 			if ($required) $classes .= ' validate-radio ';  // if required then set appropriate validate-* CSS class (*=handler name)
 			if ($onchange) $attribs .= ' onchange="'.$onchange.'" ';
 		}
-		$label_class = 'fccheckradio_lbl'.(FLEXI_J30GE ? ' hasTooltip' : ' hasTip');
+		$label_class = 'fccheckradio_lbl '.$tooltip_class;
 		$label_style = 'vertical-align: unset!important;';
 		
 		// Handle case of FORM fields that each value is an array of values
@@ -479,10 +484,13 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 					'.'<div id="'.$elementid_n.'" class="fc_input_set">'.$form_field.'</div>
 					'.($cascade_after ? '<span class="field_cascade_loading"></span>' : '').'
 					'.($use_ingroup   ? '<input type="hidden" class="fcfield_value_holder" name="'.$valueholder_nm.'['.$n.']" id="'.$valueholder_id.'_'.$n.'" value="-">' : '').'
-					'.($use_ingroup ? '' : $move2).'
-					'.($use_ingroup ? '' : $remove_button).'
-					'.($use_ingroup || !$add_position ? '' : $add_here).'
-					';
+				'.($use_ingroup ? '' : '
+				<div class="'.$input_grp_class.' fc-xpended-btns">
+					'.$move2.'
+					'.$remove_button.'
+					'.(!$add_position ? '' : $add_here).'
+				</div>
+				');
 				
 				// Listen to the changes of cascade-after field
 				if ($cascade_after && !$ajax) $per_val_js .= "
@@ -515,7 +523,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
@@ -707,7 +715,7 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		// image specific or image related variables
 		$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
 		$imgpath  = JURI::root(true) .'/'. $imagedir;
-		$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
+		$tooltip_class = 'hasTooltip';
 		
 		switch($separatorf)
 		{

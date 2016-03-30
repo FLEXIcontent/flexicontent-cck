@@ -60,7 +60,7 @@ foreach($values as $file_id)
 		$file_data	= $this->addIcon( $file_data );
 		$_tooltip_title   = '';
 		$_tooltip_content = JText::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
-		$icon = JHTML::image($file_data->icon, $file_data->ext, 'class="fcicon-mime hasTooltip" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"');
+		$icon = JHTML::image($file_data->icon, $file_data->ext, 'class="fcicon-mime '.$tooltip_class.'" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"');
 		$icon = '<span class="fcfile_mime">'.$icon.'</span>';
 	}
 	
@@ -75,7 +75,7 @@ foreach($values as $file_id)
 			if (!$add_lang_txt) {
 				$_tooltip_title   = JText::_( 'FLEXI_LANGUAGE', true );
 				$_tooltip_content = $file_data->language=='*' ? JText::_("FLEXI_ALL") : $langs->{$file_data->language}->name;
-				$_attribs = 'class="hasTooltip fcicon-lang" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'" alt="'.$_tooltip_title.'" ';
+				$_attribs = 'class="'.$tooltip_class.' fcicon-lang" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'" alt="'.$_tooltip_title.'" ';
 			} else {
 				$_attribs = ' class="fcicon-lang"';
 			}

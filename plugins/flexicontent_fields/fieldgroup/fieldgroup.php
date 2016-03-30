@@ -52,8 +52,12 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$db = JFactory::getDBO();
-		$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
+		
+		$tooltip_class = 'hasTooltip';
+		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
+		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		
 		
 		// ****************
@@ -237,18 +241,18 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 			
 			$css .= '';
 			
-			$remove_button = '<span class="fcfield-delvalue'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="fcfield-drag-handle'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="'.$add_on_class.' fcfield-delvalue'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="'.$add_on_class.' fcfield-drag-handle'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="fcfield-insertvalue fc_before'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="fcfield-insertvalue fc_after'.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_before'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="'.$add_on_class.' fcfield-insertvalue fc_after'.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 			$togglers = !$compact_edit ? '' : '
-				<button class="toggle_group_down btn btn-small btn-success" style="'.($compact_edit==2 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).next(), 1); return false;">
+				<span class="toggle_group_down '.$add_on_class.' btn btn-small btn-success" style="text-shadow: unset; '.($compact_edit==2 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).next(), 1); return false;">
 					<i class="icon-downarrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_EDIT_DETAILS' ). '
-				</button>
-				<button class="toggle_group_up   btn btn-small" style="'.($compact_edit==1 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 0); return false;">
+				</span>
+				<span class="toggle_group_up   '.$add_on_class.' btn btn-small" style="text-shadow: unset; '.($compact_edit==1 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 0); return false;">
 					<i class="icon-uparrow"></i>'.JText::_( 'FLEXI_FIELD_GROUP_HIDE_DETAILS' ). '
-				</button>
+				</span>
 			';
 		} else {
 			$remove_button = '';
@@ -278,11 +282,14 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		for($n = 0; $n < $max_count; $n++)
 		{
 			$field->html[$n] = '
-				'.($use_ingroup ? '' : $move2).'
-				'.($use_ingroup ? '' : $remove_button).'
-				'.($use_ingroup ? '' : $togglers).'
-				'.($use_ingroup || !$add_position ? '' : $add_here).'
-				';
+				'.($use_ingroup ? '' : '
+				<div class="'.$input_grp_class.' fc-xpended-btns">
+					'.$move2.'
+					'.$remove_button.'
+					'.$togglers.'
+					'.(!$add_position ? '' : $add_here).'
+				</div>
+				');
 			
 			// Append item-form display HTML of the every field in the group
 			$i = 0;
@@ -331,7 +338,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		} else {
 			$field->html = '';
 		}
-		if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.(JComponentHelper::getParams('com_flexicontent')->get('form_font_icons', 1) ? ' fcfont-icon' : '').' fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
+		if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').' fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
 		
 		// Check max allowed version
 		//$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';

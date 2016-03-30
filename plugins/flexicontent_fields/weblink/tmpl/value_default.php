@@ -6,7 +6,7 @@ if (($display_hits==1 || $display_hits==3))
 {
 	if ( !isset($hits_icon_arr[$field->id]) )
 	{
-		$_tip_class = $display_hits==1 ? ' hasTooltip' : '';
+		$_tip_class = $display_hits==1 ? ' '.$tooltip_class : '';
 		$_hits_tip  = $display_hits==1 ? ' title="'.flexicontent_html::getToolTip(null, '%s '.JText::_( 'FLEXI_HITS', true ), 0, 0).'" ' : '';
 		$hits_icon_arr[$field->id] = '<span class="fcweblink_icon icon-eye-open '.$_tip_class.'" '.$_hits_tip.'></span>';
 	}
