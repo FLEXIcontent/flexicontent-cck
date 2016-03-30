@@ -119,7 +119,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				<?php endif; ?>
 				
 				<div class="fc_filter_html fc_text_search">
-					<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
+					<input type="text" class="<?php echo $text_search_class; ?>"
 						<?php echo 'data-txt_ac_cid="'.$txt_ac_cid.'"'; ?>
 						<?php echo 'data-txt_ac_cids="'. implode(',', $txt_ac_cids) .'"'; ?>
 						<?php echo 'data-txt_ac_usesubs="'. $txt_ac_usesubs .'"'; ?>
