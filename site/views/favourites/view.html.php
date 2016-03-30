@@ -183,24 +183,41 @@ class FlexicontentViewFavourites extends JViewLegacy
 		$lists['filter_order_Dir'] 	= $filter_order_Dir;
 		$lists['filter']			= $filter;
 		
+		
+		// ****************************
 		// Create the pagination object
+		// ****************************
+		
 		$pageNav = $this->get('pagination');
+		
 		// URL-encode filter values
+		$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
 		foreach($_GET as $i => $v) {
 			if (substr($i, 0, 6) === "filter") {
-				$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-				$v = str_replace('&', '__amp__', $v);
-				$v = strtr(rawurlencode($v), $_revert);
-				$pageNav->setAdditionalUrlParam($i, $v);
+				if (is_array($v)) {
+					foreach($v as $ii => &$vv) {
+						$vv = str_replace('&', '__amp__', $vv);
+						$vv = strtr(rawurlencode($vv), $_revert);
+						$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
+					}
+					unset($vv);
+				} else {
+					$v = str_replace('&', '__amp__', $v);
+					$v = strtr(rawurlencode($v), $_revert);
+					$pageNav->setAdditionalUrlParam($i, $v);
+				}
 			}
 		}
+		
+		$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
+		if ($_sh404sef) $pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
 		
 		// Create links, etc
 		$link = JRoute::_(FlexicontentHelperRoute::getFavsRoute(0, $menu_matches ? $menu->id : 0));
 		
-		//$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
+		//$print_link = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
 		$curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
-    $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
+		$print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 		
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		

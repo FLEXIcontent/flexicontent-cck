@@ -605,6 +605,9 @@ div .fc_categories.fc_ismain_cat {
 div .fc_categories:not(.fc_ismain_cat) {
 	font-weight: normal;
 }
+div .fc_field_unsused_val {
+	display: inline-block;
+}
 div .fc_field_unsused_val,
 div .fc_field_unsused_val .fc_ifield_val_txt {
 	font-style: italic;

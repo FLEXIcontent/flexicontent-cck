@@ -794,8 +794,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ****************************
 		
 		$pageNav = $this->get('pagination');
-		$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
+		
 		// URL-encode filter values
+		$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
 		foreach($_GET as $i => $v) {
 			if (substr($i, 0, 6) === "filter") {
 				if (is_array($v)) {
@@ -813,6 +814,9 @@ class FlexicontentViewCategory extends JViewLegacy
 			}
 		}
 		$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
+		
+		$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
+		if ($_sh404sef) $pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
 		
 		
 		// **********************************************************************
