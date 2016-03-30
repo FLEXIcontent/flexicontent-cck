@@ -435,6 +435,9 @@ foreach ($values as $value)
 	$value['name'] = @ $value['name'];
 	$value['addr2'] = @ $value['addr2'];
 	$value['addr3'] = @ $value['addr3'];
+	$value['state']    = @ $value['state'];
+	$value['province'] = @ $value['province'];
+	$value['country']  = @ $value['country'];
 	
 	$field_html = '
 	<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
@@ -457,23 +460,36 @@ foreach ($values as $value)
 	<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
 	';
 	
-	if($addr_edit_mode == 'plaintext') {
+	if($addr_edit_mode == 'plaintext')
+	{
 		$field_html .= '
 		<tr>
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORMATTED_ADDRESS').'</span></td>
 			<td><textarea class="fcfield_textval" id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" rows="4" cols="24" class="'.$required_class.'" />'
-			.($value['name'] ? $value['name'] : '')
+			.($value['name'] ? $value['name']."\n" : '')
 			.($value['addr_display'] ? $value['addr_display'] :
-			((!empty($value['addr1']) && !empty($value['city']) && (!empty($value['province']) || !empty($value['state']))  && !empty($value['zip'])) ?
-			($value['addr1'] ? $value['addr1']."\n" : '')
-			.($value['addr2'] ? $value['addr2']."\n" : '')
-			.($value['addr3'] ? $value['addr3']."\n" : '')
-			.($value['city'] ? $value['city'] : '')
-			.($value['state'] ? ' '. $value['state'] : '')
-			.($value['province'] ? ' '.$value['province'] : '')
-			.($value['zip'] ? ', '.$value['zip']."\n" : '')
-			.($value['country'] ? JText::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) : '')
-			: '')
+				(
+					(
+					!empty($value['addr1'])    || !empty($value['city']) ||
+					!empty($value['province']) || !empty($value['state']) ||
+					!empty($value['zip'])
+					) ?
+					 ($value['addr1'] ? $value['addr1'] . "\n" : '')
+					.($value['addr2'] ? $value['addr2'] . "\n" : '')
+					.($value['addr3'] ? $value['addr3'] . "\n" : '')
+					.($value['city'] || $value['state'] ? ' '
+						.($value['city']  ? $value['city']  : '')
+						.($value['state'] ? $value['state'] : '')
+					 : ''
+					)
+					.($value['province'] ? ' '  . $value['province'] : '')
+					.($value['zip']      ? ', ' . $value['zip']
+						 .($value['zip_suffix'] ? ' '.$value['zip_suffix'] : '') . "\n"
+					 : ''
+					)
+					.($value['country']  ? JText::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) . "\n" : '')
+				: ''
+				)
 			)
 			.'</textarea>
 			</td>
@@ -686,6 +702,7 @@ foreach ($values as $value)
 		).val("").trigger("change");
 		
 		// load city, country code, postal code
+		var country_long_name = "";
 		place.address_components.forEach(function(o)
 		{
 			switch(o.types[0])
@@ -698,6 +715,7 @@ foreach ($values as $value)
 				// load country code
 				case "country":
 				jQuery("#'.$elementid_n.'_country").val(o.short_name).trigger("change");
+				country_long_name = o.long_name;
 				break;
 				
 				// load postal code
@@ -718,14 +736,18 @@ foreach ($values as $value)
 		});
 		
 		// get street address
-		var addr_end = jQuery("#'.$elementid_n.'_city").val() || jQuery("#'.$elementid_n.'_province").val() || jQuery("#'.$elementid_n.'_country").val();
-		var street_address = "";
 		
 		if (typeof place.formatted_address != "undefined")  street_address = place.formatted_address;
 		else if (typeof place.adr_address != "undefined")   street_address = place.adr_address;
 		var div = document.createElement("div");
 		div.innerHTML = street_address;
-		street_address = div.innerText.split(addr_end)[0];
+		
+		var addr_end;
+		if ( (addr_end = jQuery("#'.$elementid_n.'_city").val()) && div.innerText.split(addr_end).length > 1 ) ;
+		else if ( (addr_end = jQuery("#'.$elementid_n.'_province").val()) && div.innerText.split(addr_end).length > 1 ) ;
+		else addr_end = country_long_name;
+		
+		var street_address = div.innerText.split(addr_end)[0];
 		street_address = street_address.replace(/(^\s*,)|(,\s*$)/g, "");
 		
 		jQuery("#'.$elementid_n.'_addr1").val(street_address);
@@ -772,7 +794,7 @@ foreach ($values as $value)
 	
 	// map object
 	var myMap_'.$field->name.$n.';
-	var myLatLon_'.$field->name.$n.' = {lat: '.($value['lat']?$value['lat']:0).', lng: '.($value['lon']?$value['lon']:0).'};
+	var myLatLon_'.$field->name.$n.' = {lat: '.($value['lat'] ? $value['lat'] : '').', lng: '.($value['lon'] ? $value['lon'] : '').'};
 	
 	function initMap_'.$field->name.$n.'()
 	{
