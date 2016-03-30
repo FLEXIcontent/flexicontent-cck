@@ -93,6 +93,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$use_province = $field->parameters->get('use_province', 1);
 		$use_country  = $field->parameters->get('use_country', 1);
 		$use_zip_suffix = $field->parameters->get('use_zip_suffix', 1);
+		$map_zoom = $field->parameters->get('map_zoom', 16);
 		
 		// Get allowed countries
 		$ac_country_default = $field->parameters->get('ac_country_default', '');
@@ -106,22 +107,32 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		{
 			if (empty($v)) continue;
 			
+			// Skip value if both address and formated address are empty
+			if (
+				empty($v['addr_display']) && empty($v['addr_formatted']) && empty($v['addr1']) &&
+				empty($v['city']) && empty($v['state']) && empty($v['province']) &&
+				(empty($v['lat']) || empty($v['lon'])) && empty($v['url'])
+			) continue;
+			
 			// validate data or empty/set default values
 			$newpost[$new] = array();
 			
 			// Skip value if non-allowed country was passed
 			if ( $use_country && @ $v['country'] && count($ac_country_allowed_list) && !isset($ac_country_allowed_list[$v['country']]) ) $continue;
 			
-			$newpost[$new]['autocomplete']  = flexicontent_html::dataFilter($v['autocomplete'],   4000, 'STRING', 0);
-			$newpost[$new]['addr_display']  = flexicontent_html::dataFilter($v['addr_display'],   4000, 'STRING', 0);
-			$newpost[$new]['addr_formatted']= flexicontent_html::dataFilter($v['addr_formatted'], 4000, 'STRING', 0);
-			$newpost[$new]['addr1'] = flexicontent_html::dataFilter($v['addr1'],  4000, 'STRING', 0);
-			$newpost[$new]['city']  = flexicontent_html::dataFilter($v['city'],   4000, 'STRING', 0);
-			$newpost[$new]['zip']   = flexicontent_html::dataFilter($v['zip'],    10,   'STRING', 0);
+			$newpost[$new]['autocomplete']  = flexicontent_html::dataFilter($v['autocomplete'],   4000, 'STRING', '');
+			$newpost[$new]['addr_display']  = flexicontent_html::dataFilter($v['addr_display'],   4000, 'STRING', '');
+			$newpost[$new]['addr_formatted']= flexicontent_html::dataFilter($v['addr_formatted'], 4000, 'STRING', '');
+			$newpost[$new]['addr1'] = flexicontent_html::dataFilter($v['addr1'],  4000, 'STRING', '');
+			$newpost[$new]['city']  = flexicontent_html::dataFilter($v['city'],   4000, 'STRING', '');
+			$newpost[$new]['zip']   = flexicontent_html::dataFilter($v['zip'],    10,   'STRING', '');
 			$newpost[$new]['lat']   = flexicontent_html::dataFilter(str_replace(',', '.', $v['lat']),  100, 'DOUBLE', 0);
 			$newpost[$new]['lon']   = flexicontent_html::dataFilter(str_replace(',', '.', $v['lon']),  100, 'DOUBLE', 0);
-			$newpost[$new]['url']   = flexicontent_html::dataFilter($v['url'],    4000,   'URL', 0);
-			$newpost[$new]['zoom']  = flexicontent_html::dataFilter($v['zoom'],  2, 'INTEGER', 0);
+			$newpost[$new]['url']   = flexicontent_html::dataFilter($v['url'],    4000,   'URL', '');
+			$newpost[$new]['zoom']  = flexicontent_html::dataFilter($v['zoom'],  2, 'INTEGER', $map_zoom);
+			
+			$newpost[$new]['lat']   = $newpost[$new]['lat'] ? $newpost[$new]['lat'] : '';  // clear if zero
+			$newpost[$new]['lon']   = $newpost[$new]['lon'] ? $newpost[$new]['lon'] : '';  // clear if zero
 			
 			// Allow saving these into the DB, so that they can be enabled later
 			$newpost[$new]['name']       = /*!$use_name       ||*/ !isset($v['name'])       ? '' : flexicontent_html::dataFilter($v['name'],     4000,  'STRING', 0);
