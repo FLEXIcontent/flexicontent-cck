@@ -14,10 +14,11 @@ $show_address = false || $show_address == 'both' || ($view != 'item' && $show_ad
 
 $addr_display_mode = $field->parameters->get('addr_display_mode','plaintext');
 $addr_format_tmpl = $field->parameters->get('addr_format_tmpl',	'
- <h3 class="fc-addrint business-name">{{name}}</h3>
- <span class="fc-addrint street-address">{{addr1}}</span><br/>
- [[addr2|{{addr2}}<br/>]][[addr3|{{addr3}}<br/>]]
- <span class="fc-addrint city">{{city}}</span>
+ [[name|<h3 class="fc-addrint business-name">{{name}}</h3>]]
+ [[addr1|<span class="fc-addrint street-address">{{addr1}}</span><br/>]]
+ [[addr2|<span class="fc-addrint street-address2">{{addr2}}</span><br/>]]
+ [[addr3|<span class="fc-addrint street-address3">{{addr3}}</span><br/>]]
+ [[city|<span class="fc-addrint city">{{city}}</span>]]
  <span class="fc-addrint state">[[state|{{state}}]][[province|{{province}},]]</span>
  <span class="fc-addrint postal-code">{{zip}}[[zip_suffix|-{{zip_suffix}}]]</span><br/>
  <span class="fc-addrint country">{{country}}</span>
@@ -45,7 +46,6 @@ $field_prefix = $field->parameters->get('field_prefix','');
 $field_suffix = $field->parameters->get('field_suffix','');
 
 $list_states = array(
-	''=>JText::_('FLEXI_PLEASE_SELECT'),
 	'AL'=>'Alabama',
 	'AK'=>'Alaska',
 	'AS'=>'American Samoa',
@@ -151,10 +151,20 @@ foreach ($this->values as $n => $value)
 		// match all field value groups
 		preg_match_all('/\{\{(.[^\}\}]*)\}\}/m', $addr, $matches);
 		
+		$is_us = @ $value['country'] == 'US';
+		$state_added = false;
 		foreach($matches[1] as $match)
 		{
 			// $match is something like 'addr2'
-			$prop_val = @ $value[$match];
+			if ($is_us && ($match == 'state' || $match == 'province')) {
+				if ($state_added)
+					$prop_val = '';
+				else
+					$prop_val = @ $value['province'] ? $value['province'] : (@ $value['state'] ? @ $list_states[$value['state']] : '');
+				$state_added = true;
+			}
+			else
+				$prop_val = @ $value[$match];
 			$addr = str_replace('{{'.$match.'}}', ($match == 'country' ? (!empty($value['country']) ? JText::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) : '') : $prop_val), $addr);
 		}
 		
@@ -219,7 +229,7 @@ foreach ($this->values as $n => $value)
 			<script>
 			// map object   
 			var myMap_'.$field->name.$n.';
-			var myLatLon_'.$field->name.$n.' = {lat: '.($value['lat'] ? $value['lat'] : 0).', lng: '.($value['lon'] ? $value['lon'] : 0).'};
+			var myLatLon_'.$field->name.$n.' = {lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'};
 			
 			function initMap_'.$field->name.$n.'()
 			{

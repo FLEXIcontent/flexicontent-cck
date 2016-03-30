@@ -500,12 +500,12 @@ foreach ($values as $value)
 		$field_html .= '
 		<tr '.($use_name ? '' : 'style="display:none;"').' class="fc_gm_name_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BUSINESS_LOCATION').'</span></td>
-			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_name" name="'.$fieldname_n.'[name]" value="'.htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" class="'.$required_class.'" /></td>
+			<td><input type="text" class="fcfield_textval '.$required_class.'" id="'.$elementid_n.'_name" name="'.$fieldname_n.'[name]" value="'.htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" /></td>
 		</tr>
 		<tr class="fc_gm_addr_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').'</span></td>
 			<td>
-				<textarea class="fcfield_textval" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" maxlength="400" class="'.$required_class.'" rows="2">'.$value['addr1'].'</textarea>'
+				<textarea class="fcfield_textval '.$required_class.'" id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" maxlength="400" rows="2">'.$value['addr1'].'</textarea>'
 				.($use_addr2 ? '<br/><textarea class="fcfield_textval" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" maxlength="400" rows="2">'.$value['addr2'].'</textarea>' : '')
 				.($use_addr3 ? '<br/><textarea class="fcfield_textval" id="'.$elementid_n.'_addr3" name="'.$fieldname_n.'[addr3]" maxlength="400" rows="2">'.$value['addr3'].'</textarea>' : '')
 				.'
@@ -513,7 +513,7 @@ foreach ($values as $value)
 		</tr>
 		<tr class="fc_gm_city_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY').'</span></td>
-			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_city" name="'.$fieldname_n.'[city]" value="'.htmlspecialchars($value['city'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" class="'.$required_class.'" /></td>
+			<td><input type="text" class="fcfield_textval '.$required_class.'" id="'.$elementid_n.'_city" name="'.$fieldname_n.'[city]" value="'.htmlspecialchars($value['city'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" /></td>
 		</tr>
 		<tr '.($use_usstate ? '' : 'style="display:none;"').' class="fc_gm_usstate_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').'</span></td>
@@ -526,7 +526,7 @@ foreach ($values as $value)
 		<tr class="fc_gm_zip_row">
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').'</span></td>
 			<td>
-				<input type="text" class="fcfield_textval inlineval" id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" value="'.htmlspecialchars($value['zip'], ENT_COMPAT, 'UTF-8').'" size="10" maxlength="10" class="'.$required_class.'" />
+				<input type="text" class="fcfield_textval inlineval '.$required_class.'" id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" value="'.htmlspecialchars($value['zip'], ENT_COMPAT, 'UTF-8').'" size="10" maxlength="10" />
 				<span '.($use_zip_suffix ? '' : 'style="display:none"').'>&nbsp;<input type="text" class="fcfield_textval inlineval" id="'.$elementid_n.'_zip_suffix" name="'.$fieldname_n.'[zip_suffix]" value="'.htmlspecialchars($value['zip_suffix'], ENT_COMPAT, 'UTF-8').'" size="5" maxlength="10" /></span>
 			</td>
 		</tr>
@@ -543,11 +543,11 @@ foreach ($values as $value)
 		$field_html .= '
 		<tr>
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LATITUDE').'</span></td>
-			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_lat" name="'.$fieldname_n.'[lat]" value="'.htmlspecialchars($value['lat'], ENT_COMPAT, 'UTF-8').'" size="10" maxlength="10" class="'.$required_class.'" /></td>
+			<td><input type="text" class="fcfield_textval '.$required_class.'" id="'.$elementid_n.'_lat" name="'.$fieldname_n.'[lat]" value="'.htmlspecialchars($value['lat'], ENT_COMPAT, 'UTF-8').'" size="10" maxlength="10" /></td>
 		</tr>
 		<tr>
 			<td class="key"><span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LONGITUDE').'</span></td>
-			<td><input type="text" class="fcfield_textval" id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.htmlspecialchars($value['lon'], ENT_COMPAT, 'UTF-8').'" size="10" maxlength="10" class="'.$required_class.'" /></td>
+			<td><input type="text" class="fcfield_textval '.$required_class.'" id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.htmlspecialchars($value['lon'], ENT_COMPAT, 'UTF-8').'" size="10" maxlength="10" /></td>
 		</tr>
 		';
 	}
@@ -794,7 +794,7 @@ foreach ($values as $value)
 	
 	// map object
 	var myMap_'.$field->name.$n.';
-	var myLatLon_'.$field->name.$n.' = {lat: '.($value['lat'] ? $value['lat'] : '').', lng: '.($value['lon'] ? $value['lon'] : '').'};
+	var myLatLon_'.$field->name.$n.' = {lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'};
 	
 	function initMap_'.$field->name.$n.'()
 	{

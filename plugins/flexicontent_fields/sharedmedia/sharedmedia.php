@@ -647,10 +647,10 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				</tr>
 				<tr>
 					<td style="text-align:right; padding:0 8px 4px 0;">
-						<a href="javascript:;" class="btn btn-primary btn-small sm_fetch_btn" id="'.$elementid_n.'_fetch_btn" name="'.$fieldname_n.'[fetch_btn]" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'" onclick="fetchData_'.$field->name.'(\''.$elementid_n.'\'); return false;"><i class="icon-loop"></i>'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'</a>
+						<a href="javascript:;" class="btn btn-primary btn-small sm_fetch_btn" id="'.$elementid_n.'_fetch_btn" title="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'" onclick="fetchData_'.$field->name.'(\''.$elementid_n.'\'); return false;"><i class="icon-loop"></i>'.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_FETCH').'</a>
 					</td>
 					<td style="text-align:left; padding:0 8px 4px 0;">
-						'.($use_ingroup ? '<a href="javascript:;" class="btn btn-warning btn-small sm_clear_btn" id="'.$elementid_n.'_clear_btn" name="'.$fieldname_n.'[clear_btn]" value="'.JText::_('FLEXI_CLEAR').'" onclick="clearData_'.$field->name.'(\''.$elementid_n.'\'); return false;" ><i class="icon-cancel"></i>'.JText::_('FLEXI_CLEAR').'</a>' : '').'
+						'.($use_ingroup ? '<a href="javascript:;" class="btn btn-warning btn-small sm_clear_btn" id="'.$elementid_n.'_clear_btn" title="'.JText::_('FLEXI_CLEAR').'" onclick="clearData_'.$field->name.'(\''.$elementid_n.'\'); return false;" ><i class="icon-cancel"></i>'.JText::_('FLEXI_CLEAR').'</a>' : '').'
 						<input type="hidden" class="sm_embed_url" id="'.$elementid_n.'_embed_url" name="'.$fieldname_n.'[embed_url]" value="'.htmlspecialchars($value['embed_url'], ENT_COMPAT, 'UTF-8').'" />
 					</td>
 				</tr>
@@ -701,8 +701,8 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				<tr '.($is_empty ? ' style="display:none;" ' : '').'>
 					<td class="key"><span class="flexi label prop_label">' . JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_PLAYER_DIMENSIONS') . '</span></td>
 					<td>
-						<input type="text" class="fcfield_textval inlineval sm_width" size="5" id="'.$elementid_n.'_width"  name="'.$fieldname_n.'[width]"  value="'.htmlspecialchars($value['width'], ENT_COMPAT, 'UTF-8').'"  size="60" '.($display_edit_size_form==2 ? 'readonly="readonly"' : '').' /> x
-						<input type="text" class="fcfield_textval inlineval sm_height" size="5" id="'.$elementid_n.'_height" name="'.$fieldname_n.'[height]" value="'.htmlspecialchars($value['height'], ENT_COMPAT, 'UTF-8').'" size="60" '.($display_edit_size_form==2 ? 'readonly="readonly"' : '').' /> '.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_PIXELS').'
+						<input type="text" class="fcfield_textval inlineval sm_width" size="5" id="'.$elementid_n.'_width"  name="'.$fieldname_n.'[width]"  value="'.htmlspecialchars($value['width'], ENT_COMPAT, 'UTF-8').'" '.($display_edit_size_form==2 ? 'readonly="readonly"' : '').' /> x
+						<input type="text" class="fcfield_textval inlineval sm_height" size="5" id="'.$elementid_n.'_height" name="'.$fieldname_n.'[height]" value="'.htmlspecialchars($value['height'], ENT_COMPAT, 'UTF-8').'" '.($display_edit_size_form==2 ? 'readonly="readonly"' : '').' /> '.JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_PIXELS').'
 					</td>
 				</tr>' : '')  // no need for hidden width/height fields, server validation will discard them anyway
 			.($display_description_form ? '
