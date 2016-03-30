@@ -5,8 +5,8 @@ if ( $display_all ) {
 	// non-selected value shortcuts
   $ns_pretext			= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_pretext', '' ), 'ns_pretext' );
   $ns_posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_posttext', '' ), 'ns_posttext' );
-  $ns_pretext  = $ns_pretext . '<span class="fc_field_unsused_val">';
-  $ns_posttext = '</span>' . $ns_posttext;
+  $ns_pretext  = $ns_pretext . '<div class="fc_field_unsused_val">';
+  $ns_posttext = '</div>' . $ns_posttext;
 	$ns_pretext  = $remove_space ? $ns_pretext : $ns_pretext . ' ';
   $ns_posttext = $remove_space ? $ns_posttext : ' ' . $ns_posttext;
 }
