@@ -737,7 +737,29 @@ class plgSystemFlexisystem extends JPlugin
 		$session  = JFactory::getSession();
 		
 		// Count an item or category hit if appropriate
-		if ( $app->isSite() )$this->countHit();
+		if ( $app->isSite() ) $this->countHit();
+		
+		// CSS CLASSES for body TAG
+		if ( $app->isSite() ) {
+			$start_microtime = microtime(true);
+			$css = array();
+			$view = JRequest::getCmd('view');
+			if ($view=='item') {
+				if ($id = JRequest::getInt('id'))            $css[] = "item-id-".$id;  // Item's id
+				if ($cid = JRequest::getInt('cid'))          $css[] = "item-catid-".$cid;  // Item's category id
+			}
+			else if ($view=='category') {
+				if ($cid = JRequest::getInt('cid'))            $css[] = "catid-".$cid;  // Category id
+				if ($authorid = JRequest::getInt('authorid'))  $css[] = "authorid-".$authorid; // Author id
+				if ($tagid = JRequest::getInt('tagid'))        $css[] = "tagid-".$tagid;  // Tag id
+				if ($layout = JRequest::getCmd('layout'))      $css[] = "cat-layout-".$layout;   // Category 'layout': tags, favs, author, myitems, mcats
+			}
+			
+			$html = JResponse::getBody();
+			$html = preg_replace('#<body([^>]*)class="#', '<body\1class="'.implode(' ', $css).' ', $html);
+			JResponse::setBody($html);
+			$body_css_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		}
 		
 		// If this is reached we now that the code for setting screen cookie has been added
 		if ( $session->get('screenSizeCookieToBeAdded', 0, 'flexicontent') ) {
@@ -755,6 +777,7 @@ class plgSystemFlexisystem extends JPlugin
 			$html = str_replace('</body>',
 				'<div class="fc-mssg fc-info" style="'.$inline_css.'" >'.
 					'<a class="close" data-dismiss="alert" '.$inline_js_close_btn.' style="'.$inline_css_close_btn.'" >&#215;</a>'.
+					(!empty($body_css_time) ? sprintf('** [Flexisystem PLG: Adding css classes to BODY: %.2f s]<br/>', $body_css_time/1000000) : '').
 					$fc_performance_msg.
 				'</div>'."\n</body>", $html
 			);
