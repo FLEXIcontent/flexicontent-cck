@@ -155,7 +155,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		}
 		
 		// email button
-		if ($display_email && $view == 'item')  // *** Item view only
+		if ($display_email)
 		{
 			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 			
@@ -169,7 +169,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		}
 		
 		// print button
-		if ($display_print && $view == 'item')  // *** Item view only
+		if ($display_print)
 		{
 			$pop = JRequest::getInt('pop');
 			$pstatus = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
@@ -183,7 +183,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		}
 
 		// voice button
-		if ($display_voice && $view == 'item')  // *** Item view only
+		if ($display_voice)  // *** Item view only
 		{
 			if ($lang=='th') {
 				// Special case language case, maybe la=laos, and Bhutan languages in the future (NECTEC support these languages)
@@ -310,12 +310,12 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			
 			$outer_box_class  = 'fc_size_'.$addthis_size . ($addthis_box_style==1 ? ' fccleared' : '');
 			
-			$fb_like_layouts = array(
-				1 => 'fb:like:layout="button_count"',
-				2 => 'fb:like:layout="box_count"',
-				3 => 'fb:like:layout="standard"',
-				4 => 'fb:like:layout="button_count" fb:like:action="recommend"',
-				5 => 'fb:like:layout="box_count" fb:like:action="recommend"',
+			$fb_like_layouts = array(   // data-fb-like-layout will be replaced with fb:like:layout on document ready
+				1 => 'data-fb-like-layout="button_count"',
+				2 => 'data-fb-like-layout="box_count"',
+				3 => 'data-fb-like-layout="standard"',
+				4 => 'data-fb-like-layout="button_count" fb:like:action="recommend"',
+				5 => 'data-fb-like-layout="box_count" fb:like:action="recommend"',
 			);
 			$fb_like = !$addthis_fb_like ? '' : '<a class="addthis_button_facebook_like '.$fb_like_resize.'" '.$fb_like_layouts[$addthis_fb_like].' ></a>';
 			
@@ -390,6 +390,11 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 				}
 			}
 			
+			// Replacements (pass HTML validation)
+			$addthis_custom_code = str_replace('addthis:url', 'data-url', $addthis_custom_code);
+			$addthis_custom_code = str_replace('addthis:title', 'data-title', $addthis_custom_code);
+			$addthis_custom_code = str_replace('fb:like:layout', 'data-fb-like-layout', $addthis_custom_code);
+			
 			// Replacements
 			$addthis_custom_code = str_replace('_item_url_', $item_url_abs, $addthis_custom_code);
 			$addthis_custom_code = str_replace('_item_title_', $item_title_escaped, $addthis_custom_code);
@@ -414,7 +419,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					var addthis_config = {
 						services_exclude: "print,email"
 					}
-					var f = function() { 
+					var fc_shape_fb_addthis = function() { 
 						jQuery(".addthis_button_facebook_like.fc_resize").each(function(i, el) {
 							var scale = -1 + jQuery(el).get(0).getBoundingClientRect().width / jQuery(el).get(0).offsetWidth;
 							jQuery(el).css({"margin-bottom": scale*jQuery(this).height()});
@@ -423,9 +428,20 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 							else jQuery(el).css({"margin-right": 0});
 						});
 					};
-					jQuery(document).ready(function() {  setTimeout(f, 2500); setTimeout(f, 3500); setTimeout(f, 4500);  });
+					jQuery(document).ready(function() {
+						setTimeout(fc_shape_fb_addthis, 2500); setTimeout(fc_shape_fb_addthis, 3500); setTimeout(fc_shape_fb_addthis, 4500);
+						
+						jQuery(".addthis_toolbox").each(function(i, el) {
+							if (jQuery(el).get(0).hasAttribute("data-url")) jQuery(el).attr("addthis:url", jQuery(el).attr("data-url"));
+							if (jQuery(el).get(0).hasAttribute("data-title")) jQuery(el).attr("addthis:title", jQuery(el).attr("data-title"));
+							if (jQuery(el).get(0).hasAttribute("data-fb-like-layout")) jQuery(el).attr("fb:like:layout", jQuery(el).attr("data-fb-like-layout"));
+						});
+						var scriptTag = document.createElement("script");
+						scriptTag.src = "//s7.addthis.com/js/300/addthis_widget.js'.($addthis_pubid ? '#pubid='.$addthis_pubid : '').'";
+						document.getElementsByTagName("head")[0].appendChild(scriptTag);
+					});
+					
 					</script>
-					<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js'.($addthis_pubid ? '#pubid='.$addthis_pubid : '').'"></script>
 				');
 				$addthis_added = 1;
 				
