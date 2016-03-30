@@ -596,14 +596,26 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$pageNav  = $this->get('pagination');
 			
 			// URL-encode filter values
+			$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
 			foreach($_GET as $i => $v) {
 				if (substr($i, 0, 6) === "filter") {
-					$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
-					$v = str_replace('&', '__amp__', $v);
-					$v = strtr(rawurlencode($v), $_revert);
-					$pageNav->setAdditionalUrlParam($i, $v);
+					if (is_array($v)) {
+						foreach($v as $ii => &$vv) {
+							$vv = str_replace('&', '__amp__', $vv);
+							$vv = strtr(rawurlencode($vv), $_revert);
+							$pageNav->setAdditionalUrlParam($i.'['.$ii.']', $vv);
+						}
+						unset($vv);
+					} else {
+						$v = str_replace('&', '__amp__', $v);
+						$v = strtr(rawurlencode($v), $_revert);
+						$pageNav->setAdditionalUrlParam($i, $v);
+					}
 				}
 			}
+			
+			$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
+			if ($_sh404sef) $pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
 			
 			if ($state->get('match') == 'exact') {
 				$searchwords = array($searchword);
