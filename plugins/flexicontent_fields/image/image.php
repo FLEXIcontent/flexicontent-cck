@@ -2631,7 +2631,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		{
 			$initialized = 1;
 			require_once ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpthumb.class.php' );
-			require_once ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config.php' );
+			// WE DO INCLUDE TO FORCE LOADING OF configuration AFTER the class
+			// WE HAVE PATCHED configuration not to double define CONSTANTS and FUNCTIONS
+			include ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config.php' );
 		}
 		
 		unset ($phpThumb);

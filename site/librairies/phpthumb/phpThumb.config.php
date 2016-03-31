@@ -16,7 +16,11 @@ if ( ini_get('date.timezone')=='' && version_compare(phpversion(), '5.1.0', '>')
 	date_default_timezone_set('UTC');
 }
 
-define('phpThumbConfigFileVersion', '1.7.14');
+if (!defined('phpThumbConfigFileVersion'))
+{
+	define('phpThumbConfigFileVersion', '1.7.14');
+}
+
 ob_start();
 if (!file_exists(dirname(__FILE__).'/phpthumb.functions.php') || !include_once(dirname(__FILE__).'/phpthumb.functions.php')) {
 	ob_end_flush();
@@ -255,23 +259,26 @@ $PHPTHUMB_DEFAULTS_DISABLEGETPARAMS  = false; // if true, GETstring parameters w
 //   require_once('phpThumb/phpThumb.config.php');
 //   echo '<img src="'.htmlspecialchars(phpThumbURL('src=/images/pic.jpg&w=50', '/phpThumb/phpThumb.php')).'">';
 
-function phpThumbURL($ParameterString, $path_to_phpThumb='phpThumb.php') {
-	global $PHPTHUMB_CONFIG;
-	if (is_array($ParameterString)) {
-		$ParameterStringArray = $ParameterString;
-	} else {
-		parse_str($ParameterString, $ParameterStringArray);
-	}
-	foreach ($ParameterStringArray as $key => $value) {
-		if (is_array($value)) {
-			// e.g. fltr[] is passed as an array
-			foreach ($value as $subvalue) {
-				$ParamterStringEncodedArray[] = $key.'[]='.rawurlencode($subvalue);
-			}
+if (!function_exists('phpThumbURL'))
+{
+	function phpThumbURL($ParameterString, $path_to_phpThumb='phpThumb.php') {
+		global $PHPTHUMB_CONFIG;
+		if (is_array($ParameterString)) {
+			$ParameterStringArray = $ParameterString;
 		} else {
-			$ParamterStringEncodedArray[] = $key.'='.rawurlencode($value);
+			parse_str($ParameterString, $ParameterStringArray);
 		}
+		foreach ($ParameterStringArray as $key => $value) {
+			if (is_array($value)) {
+				// e.g. fltr[] is passed as an array
+				foreach ($value as $subvalue) {
+					$ParamterStringEncodedArray[] = $key.'[]='.rawurlencode($subvalue);
+				}
+			} else {
+				$ParamterStringEncodedArray[] = $key.'='.rawurlencode($value);
+			}
+		}
+		$ParameterString = implode($PHPTHUMB_CONFIG['high_security_url_separator'], $ParamterStringEncodedArray);
+		return $path_to_phpThumb.'?'.$ParameterString.$PHPTHUMB_CONFIG['high_security_url_separator'].'hash='.md5($ParameterString.$PHPTHUMB_CONFIG['high_security_password']);
 	}
-	$ParameterString = implode($PHPTHUMB_CONFIG['high_security_url_separator'], $ParamterStringEncodedArray);
-	return $path_to_phpThumb.'?'.$ParameterString.$PHPTHUMB_CONFIG['high_security_url_separator'].'hash='.md5($ParameterString.$PHPTHUMB_CONFIG['high_security_password']);
 }
