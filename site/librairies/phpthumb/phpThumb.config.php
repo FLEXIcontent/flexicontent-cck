@@ -29,7 +29,6 @@ if (!file_exists(dirname(__FILE__).'/phpthumb.functions.php') || !include_once(d
 ob_end_clean();
 
 
-
 /****************************************************************************************/
 /* START USER CONFIGURATION SECTION: */
 
@@ -251,6 +250,10 @@ $PHPTHUMB_DEFAULTS_DISABLEGETPARAMS  = false; // if true, GETstring parameters w
 
 /* END DEFAULT PARAMETERS SECTION */
 
+
+// CURRENT WEBSITE CONFIGURATION
+include_once('phpThumb.config_OVERRIDE.php');
+//include_once('phpThumb.config_FC_DB_CONFIG.php');
 
 
 //////////////////////////////////////////////////////////////////////////////
