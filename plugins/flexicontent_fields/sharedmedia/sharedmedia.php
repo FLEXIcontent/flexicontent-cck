@@ -905,8 +905,8 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			}
 			$player_url = ($embed_url ? $embed_url : 'about:blank').'?autoplay='.$autostart.$_show_related.$_show_srvlogo;
 			
-			$_width  = ($display_edit_size_form && (int)$value['width'])  ? (int)$value['width']  : $width;
-			$_height = ($display_edit_size_form && (int)$value['height']) ? (int)$value['height'] : $height;
+			$_width  = ($display_edit_size_form && (int) @ $value['width'])  ? (int)$value['width']  : $width;
+			$_height = ($display_edit_size_form && (int) @ $value['height']) ? (int)$value['height'] : $height;
 			
 			$player_html = '
 			<div class="fc_sharedmedia_player_outer">

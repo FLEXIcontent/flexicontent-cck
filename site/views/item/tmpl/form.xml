@@ -184,23 +184,30 @@
 				<option value="0" show_list="" hide_list="overridecatperms_on">FLEXI_MENU_NO_OVERRIDE_USE_ACL</option>
 				<option value="1" show_list="overridecatperms_on" hide_list="">FLEXI_YES</option>
 			</field>
+			<field name="cid" type="flexicategories" multiple="true" size="12" required="false" default="" label="FLEXI_MENU_ALLOWED_CATS" description="FLEXI_MENU_ALLOWED_CATS_DESC" class="overridecatperms_on" />
+			
+			<field name="" label="" type="separator" default="FLEXI_MENU_MAIN_CAT" description="FLEXI_MENU_MAIN_CAT_DESC" level="level2" class="overridecatperms_on" />
 			<field name="maincatid" type="flexicategories" top="2" multiple="false" required="false" size="1" default="" label="FLEXI_MENU_DEFAULT_MAIN_CATEGORY" description="FLEXI_MENU_DEFAULT_MAIN_CATEGORY_DESC" class="overridecatperms_on" />
-			<field name="cid" type="flexicategories" multiple="true" size="12" required="false" default="" label="FLEXI_MENU_DISPLAYED_CATS" description="FLEXI_MENU_DISPLAYED_CATS_DESC" class="overridecatperms_on" />
-			<field name="postcats" type="multilist" subtype="radio" toggle_related="1" default="2" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC" class="overridecatperms_on btn-group group-fcinfo" >
-				<option value="1" show_list="" hide_list="using_mul_cats,using_fixed_cats">SUBMIT_IN_ONE_CAT</option>
-				<option value="2" show_list="using_mul_cats" hide_list="using_fixed_cats" >SUBMIT_IN_MULTIPLE_CATS</option>
-				<option value="0" show_list="using_fixed_cats" hide_list="using_mul_cats">SUBMIT_IN_ALL_ABOVE_CATS</option>
+			<field name="maincat_show" type="radio" default="2" label="FLEXI_MENU_DISPLAY_MAIN_CAT_SELECTOR" description="FLEXI_MENU_DISPLAY_MAIN_CAT_SELECTOR_DESC" class="overridecatperms_on btn-group group-fcinfo" >
+				<option value="1">FLEXI_HIDE</option>
+				<option value="2">FLEXI_SHOW</option>
 			</field>
 			
-			<field name="postcats_show" type="radio" default="1" label="Display category titles" description="Select to display main category or all category titles" class="overridecatperms_on using_fixed_cats btn-group group-fcinfo" >
-				<!--option value="0">FLEXI_NO</option-->
-				<option value="1">Main category only</option>
-				<option value="2">FLEXI_ALL</option>
+			<field name="" label="" type="separator" default="FLEXI_MENU_MCATS_SUBMIT" description="FLEXI_MENU_MCATS_SUBMIT_DESC" level="level2" class="overridecatperms_on" />
+			<field name="postcats" type="multilist" subtype="radio" toggle_related="1" default="2" label="FLEXI_MENU_SEC_CATS_SELECTOR_ENABLE" description="FLEXI_MENU_SEC_CATS_SELECTOR_ENABLE_DESC" tip_img="note.gif" inline_tip="'Locked' will also lock main category too !!" class="overridecatperms_on btn-group group-fcinfo" >
+				<option value="1" show_list="" hide_list="using_mul_cats,using_fixed_cats">FLEXI_HIDE</option>
+				<option value="2" show_list="using_mul_cats" hide_list="using_fixed_cats" >FLEXI_SHOW</option>
+				<option value="0" show_list="using_fixed_cats" hide_list="using_mul_cats">FLEXI_MENU_LOCKED_SUBMIT_IN_ALL_CATS</option>
 			</field>
 			
-			<field name="override_mulcatsperms" type="radio" default="1" label="Override multi-category ACL" description="Select to ignore user's privilege of assigning an item to multiple categories" class="overridecatperms_on using_mul_cats btn-group group-fcinfo" >
-				<option value="0">FLEXI_NO</option>
+			<field name="" label="" type="separator" default="Note: Users are not allowed to submit into multiple categories, unless they have ACL (COMPONENT) permission &lt;b&gt;'Assign multiple categories to items'&lt;/b&gt;" level="level3" class="overridecatperms_on using_mul_cats alert alert-info fcpadded" />
+			<field name="override_mulcatsperms" type="radio" default="1" label="Allow to ALL users" description="Select to ignore user's privilege of assigning an item to multiple categories" class="overridecatperms_on using_mul_cats btn-group group-fcinfo" >
+				<option value="0">FLEXI_MENU_NO_OVERRIDE_USE_ACL</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="postcats_show" type="radio" default="1" label="Display category titles" description="Select to display main category or all category titles" class="overridecatperms_on using_fixed_cats btn-group group-fcinfo" >
+				<option value="1">FLEXI_HIDE</option>
+				<option value="2">FLEXI_SHOW</option>
 			</field>
 			
 		</fieldset>

@@ -302,10 +302,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		$category_link = flexicontent_html::createCatLink($category->slug, $non_sef_link, $model);
 		
 		
-		// ****************************************************************
-		// Make sure Joomla SEF plugin has inserted a correct REL canonical
-		// or that it has not insert any REL if current URL is sufficient
-		// ****************************************************************
+		// **********************************************************************************************************
+		// Add canonical link (if needed and different than current URL), also preventing Joomla default (SEF plugin)
+		// **********************************************************************************************************
 		
 		if ($params->get('add_canonical'))
 		{

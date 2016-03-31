@@ -659,7 +659,7 @@ if ( $typeid && $this->params->get('allow_subscribers_notify_fe', 0) && $this->s
 
 
 
-ob_start();  // category ?>
+if ( !$this->menuCats || $this->menuCats->cancatid) : ob_start();  // category ?>
 	<span class="label-fcouter" id="jform_catid-lbl-outer">
 		<label id="jform_catid-lbl" for="jform_catid" data-for_bck="jform_catid" class="label">
 			<?php echo JText::_( !$secondary_displayed || isset($all_tab_fields['category']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_MAIN_CATEGORY' ); ?>
@@ -677,7 +677,11 @@ ob_start();  // category ?>
 		</span>
 		<?php endif; ?>
 	</div>
-<?php $captured['category'] = ob_get_clean();
+<?php
+	$captured['category'] = ob_get_clean();
+else:
+	$captured['category'] = $this->menuCats->catid;
+endif;
 
 
 
