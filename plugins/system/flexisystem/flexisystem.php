@@ -756,7 +756,7 @@ class plgSystemFlexisystem extends JPlugin
 			}
 			
 			$html = JResponse::getBody();
-			$html = preg_replace('#<body([^>]*)class="#', '<body\1class="'.implode(' ', $css).' ', $html);
+			$html = preg_replace('#<body([^>]*)class="#', '<body\1class="'.implode(' ', $css).' ', $html, 1);  // limit to ONCE !!
 			JResponse::setBody($html);
 			$body_css_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
@@ -777,7 +777,7 @@ class plgSystemFlexisystem extends JPlugin
 			$html = str_replace('</body>',
 				'<div class="fc-mssg fc-info" style="'.$inline_css.'" >'.
 					'<a class="close" data-dismiss="alert" '.$inline_js_close_btn.' style="'.$inline_css_close_btn.'" >&#215;</a>'.
-					(!empty($body_css_time) ? sprintf('** [Flexisystem PLG: Adding css classes to BODY: %.2f s]<br/>', $body_css_time/1000000) : '').
+					(!empty($body_css_time) ? sprintf('** [Flexisystem PLG: Adding css classes to BODY: %.3f s]<br/>', $body_css_time/1000000) : '').
 					$fc_performance_msg.
 				'</div>'."\n</body>", $html
 			);
