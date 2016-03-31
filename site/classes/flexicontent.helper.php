@@ -521,7 +521,6 @@ class flexicontent_html
 		$item = $itemmodel->getItem($item_id, $check_view_access=false);
 		
 		$aid = JAccess::getAuthorisedViewLevels($user->id);
-		list($item) = FlexicontentFields::getFields($item, $view, $item->parameters, $aid);
 		
 		// Get Item's specific ilayout
 		if ($ilayout=='') {
@@ -535,10 +534,22 @@ class flexicontent_html
 			$type->params = new JRegistry($type->attribs);
 			$ilayout = $type->params->get('ilayout', 'default');
 		}
-
-		$this->item = & $item;
+		
+		// Get cached template data, re-parsing XML/LESS files, also loading any template language files of a specific template
+		$themes = flexicontent_tmpl::getTemplates( array($ilayout) );
+		
+		// Get Fields
+		list($item) = FlexicontentFields::getFields($item, $view, $item->parameters, $aid);
+		
+		// WE WILL NOT LOAD CSS/JS of the item as it may have undesired effects !
+		// TODO add parameter for this
+		
+		// WE DO NOT TRIGGER CONTENT PLUGINS, as it may have undesired effects ?
+		// TODO add parameter for this
+		
+		$this->item = $item;
 		$this->params_saved = @$this->params;
-		$this->params = & $item->parameters;
+		$this->params = $item->parameters;
 		$this->tmpl = '.item.'.$ilayout;
 		$this->print_link = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&id='.$item->slug.'&pop=1&tmpl=component');
 		$this->pageclass_sfx = '';

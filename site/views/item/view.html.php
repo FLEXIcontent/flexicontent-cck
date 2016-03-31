@@ -231,19 +231,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		
-		// ****************************************************************
-		// Make sure Joomla SEF plugin has inserted a correct REL canonical
-		// or that it has not insert any REL if current URL is sufficient
-		// ****************************************************************
-		
-		if ($params->get('add_canonical'))
-		{
-			// Create desired REL canonical URL
-			$ucanonical = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $globalcats[$item->maincatid]->slug, 0, $item));  // $item->categoryslug
-			flexicontent_html::setRelCanonical($ucanonical);
-		}
-		
-		
 		// *************************
 		// increment the hit counter
 		// *************************
@@ -326,6 +313,20 @@ class FlexicontentViewItem  extends JViewLegacy
 		if(isset($item->fields['text']->toc)) {
 			$item->toc = &$item->fields['text']->toc;
 		}
+		
+		
+		// **********************************************************************************************************
+		// Add canonical link (if needed and different than current URL), also preventing Joomla default (SEF plugin)
+		// For item view this must be after the TOC table creation
+		// **********************************************************************************************************
+		
+		if ($params->get('add_canonical'))
+		{
+			// Create desired REL canonical URL
+			$ucanonical = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $globalcats[$item->maincatid]->slug, 0, $item));  // $item->categoryslug
+			flexicontent_html::setRelCanonical($ucanonical);
+		}
+		
 		
 		// ********************************************************************************************
 		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
@@ -1489,6 +1490,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		$maincatid = $params->get("maincatid");        // Default main category out of the overriden categories
 		$postcats  = $params->get("postcats", 0);      // Behavior of override, submit to ONE Or MULTIPLE or to FIXED categories
 		$override  = $params->get("overridecatperms", 1);   // Default to 1 for compatibilty with previous-version saved menu items
+		
+		$maincat_show  = $params->get("maincat_show", 2);      // Select to hide: 1 or show: 2 main category selector
+		$maincat_show  = !$maincatid ? 2 : $maincat_show;      // Can not hide if default was not configured
+		
 		$postcats_show  = $params->get("postcats_show", 1);      // If submitting to fixed cats then show or not the category titles
 		$override_mulcatsperms  = $params->get("override_mulcatsperms", 0);
 		
@@ -1517,7 +1522,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		$cid_form_fieldname   = 'jform[cid][]';
 		$catid_form_fieldname = 'jform[catid]';
 		$catid_form_tagid     = 'jform_catid';
-
+		
+		$mo_maincat = $maincat_show==1 ? '<input type="hidden" name="'.$catid_form_fieldname.'" id="'.$catid_form_tagid.'" value="'.$maincatid.'" />' : false;
+				
 		// Create form field HTML for the menu-overridden categories fields
 		switch($postcats)
 		{
@@ -1536,21 +1543,23 @@ class FlexicontentViewItem  extends JViewLegacy
 					$mo_cats = false;
 				}
 				
-				$mo_maincat = $maincatid ?
-					$globalcats[$maincatid]->title :
-					flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="scat use_select2_lib required" ', $check_published=true, $check_perms=false);
+				if (!$mo_maincat) {
+					$mo_maincat = $maincatid ?
+						$globalcats[$maincatid]->title :
+						flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="scat use_select2_lib required" ', $check_published=true, $check_perms=false);
+				}
 				$mo_maincat .= '<!-- only used for form validation ignored during store --><input type="hidden" name="'.$catid_form_fieldname.'" value="'.$maincatid.'" />';
 				$mo_cancid  = false;
 				break;
 			case 1:  // submit to a single category, selecting from a MENU SPECIFIED categories subset
 				$mo_cats    = false;
-				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="scat use_select2_lib required" ', $check_published=true, $check_perms=false);
+				$mo_maincat = $mo_maincat ? $mo_maincat : flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="scat use_select2_lib required" ', $check_published=true, $check_perms=false);
 				$mo_cancid  = false;
 				break;
 			case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
 				$attribs = 'class="validate use_select2_lib select2_list_selected" multiple="multiple" size="8"';
 				$mo_cats    = flexicontent_cats::buildcatselect($categories, $cid_form_fieldname, array(), false, $attribs, $check_published=true, $check_perms=false);
-				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="scat use_select2_lib validate-catid" ', $check_published=true, $check_perms=false);
+				$mo_maincat = $mo_maincat ? $mo_maincat : flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="scat use_select2_lib validate-catid" ', $check_published=true, $check_perms=false);
 				$mo_cancid  = true;
 				break;
 		}
@@ -1558,7 +1567,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		$menuCats->cid    = $mo_cats;
 		$menuCats->catid  = $mo_maincat;
 		$menuCats->cancid = $mo_cancid;
-
+		$menuCats->cancatid = $maincat_show==2;
+		
 		return $menuCats;
 	}
 
@@ -1588,6 +1598,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$submit_conf = array(
 			'cids'            => $cids,
 			'maincatid'       => $params->get("maincatid"),        // Default main category out of the overriden categories
+			'maincatid_show'  => $params->get("maincatid_show", 2),
 			'postcats'        => $postcats,
 			'overridecatperms'=> $overridecatperms,
 			'override_mulcatsperms' => $override_mulcatsperms,

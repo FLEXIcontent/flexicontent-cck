@@ -179,10 +179,9 @@ class FlexicontentViewTags extends JViewLegacy
 		}
 		
 		
-		// ****************************************************************
-		// Make sure Joomla SEF plugin has inserted a correct REL canonical
-		// or that it has not insert any REL if current URL is sufficient
-		// ****************************************************************
+		// **********************************************************************************************************
+		// Add canonical link (if needed and different than current URL), also preventing Joomla default (SEF plugin)
+		// **********************************************************************************************************
 		
 		if ($params->get('add_canonical'))
 		{
