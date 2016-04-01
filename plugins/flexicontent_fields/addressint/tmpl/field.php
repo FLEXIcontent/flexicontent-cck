@@ -569,7 +569,7 @@ foreach ($values as $value)
 		<tr>
 			<td>
 				<span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').'</span>
-				<span id="'.$elementid_n.'_zoom_label">'.$value['zoom'].'</span>
+				<span id="'.$elementid_n.'_zoom_label" class="alert alert-info fc-small fc-iblock">'.$value['zoom'].'</span>
 			</td>
 		</tr>
 	</tbody></table>

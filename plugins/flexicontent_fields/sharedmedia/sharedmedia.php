@@ -88,13 +88,6 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			$api_key_desc = JText::_('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_YOUTUBE_API_KEY_DESC');
 			$error_text = JText::sprintf('PLG_FLEXICONTENT_FIELDS_SHARED'.$_MEDIA_.'_API_KEY_REQUIRED', $api_key_name) ." <br/> ". $api_key_desc;
 		}
-		if ( !empty($error_text) ) {
-			if ($use_ingroup)
-				$field->html[0] = '<div class="alert alert-warning fc-small fc-iblock">'.$error_text.'</div>';
-			else
-				$field->html = '<div class="alert alert-warning fc-small fc-iblock">'.$error_text.'</div>';
-			return;
-		}
 		
 		
 		// Initialise value property
@@ -756,6 +749,15 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			if (!$add_position) $field->html .= '<span class="fcfield-addvalue '.($cparams->get('form_font_icons', 1) ? ' fcfont-icon' : '').'" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.JText::_( 'FLEXI_ADD_VALUE' ).'</span>';
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] .'</div>';
+		}
+		
+		// Add Error message
+		if ( !empty($error_text) ) {
+			if ($use_ingroup)
+				$field->html[-1] = '<div class="alert alert-warning fc-small fc-iblock">'.$error_text.'</div>';
+			else
+				$field->html = '<div class="alert alert-warning fc-small fc-iblock">'.$error_text.'</div>' . $field->html;
+			return;
 		}
 	}
 	
