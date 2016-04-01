@@ -414,7 +414,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$field->html .= '
 			<span class="fcrelation_field_unused_items'.$placement_class.'">
 				<span class="label">'.JText::_($select_items_prompt).'</span><br/>
-				<select id="'.$ri_field_name.'_visitems" name="'.$ri_field_name.'_visitems[]" multiple="multiple" class="fcfield_selectmulval" '.$size.' >
+				<select id="'.$ri_field_name.'_visitems" name="'.$ri_field_name.'_visitems[]" multiple="multiple" class="fcfield_selectmulval fc_no_js_attach" '.$size.' >
 				</select>
 			</span>
 		
@@ -427,15 +427,15 @@ class plgFlexicontent_fieldsRelation extends JPlugin
     	
     	<span class="fcrelation_field_used_items'.$placement_class.'">
 				<span class="label">'.JText::_($selected_items_label).'</span><br/>
-				<select id="'.$ri_field_name.'" name="'.$fieldname.'" multiple="multiple" class="'.$required.'" style="display:none;" '.$size.' >
+				<select id="'.$ri_field_name.'" name="'.$fieldname.'" multiple="multiple" class="fc_no_js_attach '.$required.'" style="display:none;" '.$size.' >
 					'.$items_options_select.'
 				</select>
 				
-				<select id="'.$ri_field_name.'_selitems" name="'.$ri_field_name.'_selitems[]" multiple="multiple" class="fcfield_selectmulval" '.$size.' >
+				<select id="'.$ri_field_name.'_selitems" name="'.$ri_field_name.'_selitems[]" multiple="multiple" class="fc_no_js_attach fcfield_selectmulval" '.$size.' >
 					'.$items_options.'
 				</select>
 				
-				<select id="'.$ri_field_name.'_hiditems" name="'.$ri_field_name.'_hiditems" style="display:none;" >
+				<select id="'.$ri_field_name.'_hiditems" name="'.$ri_field_name.'_hiditems" style="display:none;" class="fc_no_js_attach">
 					'.$items_options_unused.'
 				</select>
 			</span>
