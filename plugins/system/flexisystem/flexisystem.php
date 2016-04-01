@@ -239,10 +239,8 @@ class plgSystemFlexisystem extends JPlugin
 		$task = $_ct[ count($_ct) - 1];
 		if (count($_ct) > 1) $controller = $_ct[0];
 		
-		// NOTE: in J1.6+, a user can be assigned multiple groups, so we need to retrieve them
-		$usergroups = $user->get('groups');
-		$usergroups = is_array($usergroups) ? $usergroups : array();
-		$usergroups = array_keys($usergroups);
+		// Get user groups of current user
+		$usergroups = $user->getAuthorisedGroups();
 		
 		// Get user groups excluded from redirection
 		$exclude_cats = $this->params->get('exclude_redirect_cats', array());

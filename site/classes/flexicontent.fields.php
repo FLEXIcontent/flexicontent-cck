@@ -472,7 +472,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function renderField(&$_item, &$_field, &$values, $method='display', $view=FLEXI_ITEMVIEW)
+	static function renderField(&$_item, &$_field, &$values, $method='display', $view=FLEXI_ITEMVIEW, $skip_trigger_plgs = false)
 	{
 		static $_trigger_plgs_ft = array();
 		static $_created = array();
@@ -646,14 +646,14 @@ class FlexicontentFields
 			$item = reset($items);
 			$field = $item->fields[$field_name];
 		}
-		if ( !isset($_trigger_plgs_ft[$field_name]) ) {
+		if ( !$skip_trigger_plgs && !isset($_trigger_plgs_ft[$field_name]) ) {
 			$_t = $field->parameters->get('trigger_onprepare_content', 0);
 			if ($request_view=='category' && $view=='category') $_t = $_t && $field->parameters->get('trigger_plgs_incatview', 1);
 			$_trigger_plgs_ft[$field_name] = $_t;
 		}
 		
 		// DOES NOT support multiple items, do it 1 at a time
-		if ( $_trigger_plgs_ft[$field_name] )
+		if ( !$skip_trigger_plgs && $_trigger_plgs_ft[$field_name] )
 		{
 			//echo "RENDER: ".$field_name."<br/>";
 			foreach($items as $item) {
@@ -764,6 +764,7 @@ class FlexicontentFields
 		
 		// Initialize field for plugin triggering
 		$method_text = isset($field->{$method}) ? $field->{$method} : '';
+		
 		$field->text = $method_text;
 		$field->introtext = $method_text;  // needed by some plugins that do not use or clear ->text property
 		$field->created_by = $item->created_by;
