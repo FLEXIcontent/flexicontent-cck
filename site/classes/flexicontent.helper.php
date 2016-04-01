@@ -999,7 +999,7 @@ class flexicontent_html
 					jQuery.fn.chosen = function(){
 						var args = arguments;
 						jQuery(this).each(function() {
-							if (jQuery(this).hasClass('use_select2_lib')) return;
+							if (jQuery(this).hasClass('use_select2_lib') || jQuery(this).hasClass('fc_no_js_attach')) return;
 							jQuery(this).chosen_fc(args);
 						});
 					};
