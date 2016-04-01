@@ -738,15 +738,36 @@ class plgSystemFlexisystem extends JPlugin
 		if ( $app->isSite() ) $this->countHit();
 		
 		// CSS CLASSES for body TAG
-		if ( $app->isSite() ) {
+		if ( $app->isSite() )
+		{
 			$start_microtime = microtime(true);
 			$css = array();
 			$view = JRequest::getCmd('view');
-			if ($view=='item') {
+			
+			if ($view=='item')
+			{
 				if ($id = JRequest::getInt('id'))            $css[] = "item-id-".$id;  // Item's id
 				if ($cid = JRequest::getInt('cid'))          $css[] = "item-catid-".$cid;  // Item's category id
+				if ($id)
+				{
+					$db = JFactory::getDBO();
+					$query 	= 'SELECT t.id, t.alias'
+						. ' FROM #__flexicontent_items_ext AS e'
+						. ' JOIN #__flexicontent_types AS t ON e.type_id = t.id'
+						. ' WHERE e.item_id='.(int)$id
+						;
+					$db->setQuery( $query );
+					$type = $db->loadObject();
+					if ($type)
+					{
+						$css[] = "type-id-".$type->id;        // Type's id
+						$css[] = "type-alias-".$type->alias;  // Type's alias
+					}
+				}
 			}
-			else if ($view=='category') {
+			
+			else if ($view=='category')
+			{
 				if ($cid = JRequest::getInt('cid'))            $css[] = "catid-".$cid;  // Category id
 				if ($authorid = JRequest::getInt('authorid'))  $css[] = "authorid-".$authorid; // Author id
 				if ($tagid = JRequest::getInt('tagid'))        $css[] = "tagid-".$tagid;  // Tag id
