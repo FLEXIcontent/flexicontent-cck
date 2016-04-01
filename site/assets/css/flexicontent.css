@@ -985,6 +985,7 @@ h3.themes-title small {
 	margin: 2px;
 	float: left;
 	cursor: move;
+	border-radius: 2px;
 }
 .positions_container .fields.delfield {
 	background: url("../images/publish_r.png") no-repeat scroll 100% 50% #F9F9F9 !important;
@@ -994,7 +995,7 @@ h3.themes-title small {
 	cursor: move;
 }
 .positions_container .fields.delfield .delfield_handle {
-	display: block;
+	display: inline-block;
 	width: 18px;
 	height: 18px;
 	float: right;

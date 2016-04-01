@@ -457,7 +457,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		else {
 			// Render HTML of fields in the group
 			$method = 'display';
-			$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));;
+			$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 			foreach($grouped_fields as $grouped_field) {
 
 				// Render the display method for the given field
@@ -468,7 +468,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				//FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayFieldValue', array(&$grouped_field, $item, $_values, $method));
 				
 				unset($grouped_field->$method);  // Unset display variable to make sure display HTML it is created, because we reuse the field
-				FlexicontentFields::renderField($item, $grouped_field, $_values, $method, $view);  // Includes content plugins triggering
+				FlexicontentFields::renderField($item, $grouped_field, $_values, $method, $view, $_skip_trigger_plgs = true);  // We will trigger only once the final result
 				unset($grouped_field->ingroup);
 			}
 			
@@ -580,7 +580,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 				//echo 'Rendering: '. $grouped_field->name . ', method: ' . $method . '<br/>';
 				//FLEXIUtilities::call_FC_Field_Func($grouped_field->field_type, 'onDisplayFieldValue', array(&$grouped_field, $item, $_values, $method));
 				
-				FlexicontentFields::renderField($item, $grouped_field, $_values, $method, $view);  // Includes content plugins triggering
+				FlexicontentFields::renderField($item, $grouped_field, $_values, $method, $view, $_skip_trigger_plgs = true);  // We will trigger only once the final result
 				//print_r($grouped_field->$method);
 				$grouped_field->_method = $method;  // This is used to decide if field does not have value and hide label (if configured to hide on empty values)
 				
