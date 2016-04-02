@@ -133,7 +133,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$skip_buttons_arr = ($show_buttons && $editor_name=='jce' && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
 		
 		// Initialise property with default value
-		if ( !$field->value ) {
+		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) ) {
 			$field->value = array();
 			$field->value[0]['title'] = $default_title;
 			$field->value[0]['text']  = $default_value;
@@ -185,9 +185,13 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				var newField  = lastField.clone();
 				
 				// Update the new term title
-				newField.find('input.termtitle').val('');
-				newField.find('input.termtitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
-				newField.find('input.termtitle').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
+				var termtitle = newField.find('input.termtitle');
+				var termtitle_dv = termtitle.attr('data-defvals');
+				termtitle_dv && termtitle_dv.length ?
+					termtitle.val(termtitle_dv) :
+					termtitle.val('') ;
+				termtitle.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				termtitle.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				
 				";
 			
@@ -358,7 +362,8 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			$title = '
 				<div class="nowrap_box fc_termtitle">
 					<label class="label label-info labeltitle" for="'.$elementid_n.'_title">'.$title_label./*' '.($multiple?($n+1):'').*/'</label>
-					<input class="fcfield_textval termtitle '.$required.'" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" maxlength="'.$title_maxlength.'" value="'.htmlspecialchars( @$value['title'], ENT_COMPAT, 'UTF-8' ).'" />
+					<input class="fcfield_textval termtitle '.$required.'" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" maxlength="'.$title_maxlength.'"
+						value="'.htmlspecialchars( @$value['title'], ENT_COMPAT, 'UTF-8' ).'" data-defvals="'.htmlspecialchars( $default_title, ENT_COMPAT, 'UTF-8' ).'"/>
 				</div>';
 			
 			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed

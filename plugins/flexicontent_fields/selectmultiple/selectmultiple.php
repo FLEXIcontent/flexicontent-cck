@@ -92,6 +92,7 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_values = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_values', '' )) : '';
+		$default_values= preg_split("/\s*,\s*/u", $default_values);
 		
 		
 		// *************************
@@ -113,8 +114,8 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 		$closetag  = $field->parameters->get( 'closetag_form', '' ) ;
 		
 		// Initialise property with default value
-		if ( !$field->value ) {
-			$field->value = preg_split("/\s*,\s*/u", $default_values);
+		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) ) {
+			$field->value = !empty($field->ingroup) ? array($default_values) : $default_values;
 		}
 		
 		// CSS classes of value container
@@ -216,7 +217,14 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 				
 				// Update the new select field
 				var elem= newField.find('select.fcfield_textselval').first();
-				elem.val('');
+				var defvals = elem.attr('data-defvals');
+				if ( defvals && defvals.length )
+				{
+					jQuery.each(defvals.split('|||'), function(i, val){
+						elem.find('option[value=\"' + val + '\"]').attr('selected', 'selected');
+					});
+				}
+				else elem.val('');
 				elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
 				elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 				elem.attr('data-uniqueRowNum', uniqueRowNum".$field->id.");
@@ -352,6 +360,7 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 			}
 			if ($js_popup_err)  $attribs .= ' data-js_popup_err="'.$js_popup_err.'" ';
 			if ($max_values || $min_values || $exact_values)  $classes .= ' validate-sellimitations ';
+			if (!empty($default_values)) $attribs .= ' data-defvals="'.implode('|||', $default_values).'" ';
 			if ($classes)  $attribs .= ' class="'.$classes.'" ';
 			if ($onchange) $attribs .= ' onchange="'.$onchange.'" ';
 		}
@@ -449,9 +458,20 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 		
 		// Add message box about allowed # values
 		if ($exact_values) {
-			$field->html = '<div class="alert alert-info fc-small fc-iblock">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_EXACTLY', $exact_values) .'</div><div class="clear"></div>'. $field->html;
+			$values_msg = '<div class="alert alert-info fc-small fc-iblock">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_EXACTLY', $exact_values) .'</div><div class="clear"></div>';
 		} else if ($max_values || $min_values > 1) {
-			$field->html = '<div class="alert alert-info fc-small fc-iblock">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_BETWEEN', $min_values, $max_values) .'</div><div class="clear"></div>'. $field->html;
+			$values_msg = '<div class="alert alert-info fc-small fc-iblock">'.JText::sprintf('FLEXI_FIELD_NUM_VALUES_BETWEEN', $min_values, $max_values) .'</div><div class="clear"></div>';
+		}
+		
+		// Add message to every value if inside field group
+		if ( !empty($values_msg) )
+		{
+			if (!$use_ingroup) {
+				$field->html = $values_msg . $field->html;
+			} else {
+				foreach($field->html as & $html) $html = $values_msg . $html;
+				unset($html);
+			}
 		}
 	}
 	

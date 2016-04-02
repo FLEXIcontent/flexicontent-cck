@@ -86,6 +86,7 @@ class plgFlexicontent_fieldsSelect extends FCField
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_value', '' )) : '';
+		$default_values= array($default_value);
 		
 		
 		// *************************
@@ -106,8 +107,8 @@ class plgFlexicontent_fieldsSelect extends FCField
 		$closetag  = $field->parameters->get( 'closetag_form', '' ) ;
 		
 		// Initialise property with default value
-		if ( !$field->value ) {
-			$field->value = array($default_value);
+		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) ) {
+			$field->value = $default_values;
 		}
 		
 		// CSS classes of value container
@@ -209,7 +210,14 @@ class plgFlexicontent_fieldsSelect extends FCField
 				
 				// Update the new select field
 				var elem= newField.find('select.fcfield_textselval').first();
-				elem.val('');
+				var defvals = elem.attr('data-defvals');
+				if ( defvals && defvals.length )
+				{
+					jQuery.each(defvals.split('|||'), function(i, val){
+						elem.find('option[value=\"' + val + '\"]').attr('selected', 'selected');
+					});
+				}
+				else elem.val('');
 				elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
 				elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 				elem.attr('data-uniqueRowNum', uniqueRowNum".$field->id.");
@@ -332,6 +340,7 @@ class plgFlexicontent_fieldsSelect extends FCField
 			$onchange = '';
 			// Extra properties
 			$attribs  = '';
+			if (!empty($default_values)) $attribs .= ' data-defvals="'.implode('|||', $default_values).'" ';
 			if ($classes)  $attribs .= ' class="'.$classes.'" ';
 			if ($onchange) $attribs .= ' onchange="'.$onchange.'" ';
 		}

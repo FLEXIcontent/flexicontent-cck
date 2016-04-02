@@ -74,6 +74,7 @@ class plgFlexicontent_fieldsText extends FCField
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		$default_value = $default_value ? JText::_($default_value) : '';
+		$default_values= array($default_value);
 		
 		// Input field display size & max characters
 		$display_label_form= (int) $field->parameters->get( 'display_label_form', 1 ) ;
@@ -84,6 +85,7 @@ class plgFlexicontent_fieldsText extends FCField
 		// create extra HTML TAG parameters for the form field
 		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
 		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
+		if (!empty($default_values)) $attribs .= ' data-defvals="'.htmlspecialchars( implode('|||', $default_values), ENT_COMPAT, 'UTF-8' ).'" ';
 		$attribs .= ' size="'.$size.'" ';
 		
 		// Custom HTML placed before / after form fields
@@ -105,8 +107,8 @@ class plgFlexicontent_fieldsText extends FCField
 		}
 		
 		// Initialise property with default value
-		if ( !$field->value ) {
-			$field->value = array($default_value);
+		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) ) {
+			$field->value = $default_values;
 		}
 		
 		// CSS classes of value container
@@ -159,7 +161,10 @@ class plgFlexicontent_fieldsText extends FCField
 			// Update the new text field
 			$js .= "
 				var theInput = newField.find('input.fcfield_textval').first();
-				theInput.val('');
+				var theInput_dv = theInput.attr('data-defvals');
+				(theInput_dv && theInput_dv.length) ?
+					theInput.val( theInput.attr('data-defvals') ) :
+					theInput.val('') ;
 				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theInput.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 				

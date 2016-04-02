@@ -180,7 +180,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			// Update new URL's address
 			$js .= "
 				theInput = newField.find('input.urllink').first();
-				theInput.val('".$default_link."');
+				theInput.val(".json_encode($default_link).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
 				newField.find('.urllink-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
@@ -200,7 +200,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			// Update new URL optional properties
 			if ($usetitle) $js .= "
 				theInput = newField.find('input.urltitle').first();
-				theInput.val('".$default_title."');
+				theInput.val(".json_encode($default_title).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				newField.find('.urltitle-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
@@ -208,7 +208,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			
 			if ($usetext) $js .= "
 				theInput = newField.find('input.urllinktext').first();
-				theInput.val('".$default_text."');
+				theInput.val(".json_encode($default_text).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][linktext]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_linktext');
 				newField.find('.urllinktext-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_linktext');
@@ -216,7 +216,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			
 			if ($useclass) $js .= "
 				theInput = newField.find('input.urlclass').first();
-				theInput.val('".$default_class."');
+				theInput.val(".json_encode($default_class).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
 				newField.find('.urlclass-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_class');
@@ -224,7 +224,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends FCField
 			
 			if ($useid) $js .= "
 				theInput = newField.find('input.urlid').first();
-				theInput.val('".$default_id."');
+				theInput.val(".json_encode($default_id).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][id]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_id');
 				newField.find('.urlid-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_id');

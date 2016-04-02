@@ -111,7 +111,7 @@
 				<option value="0" show_list="" hide_list="using-editor-btns">FLEXI_NO</option>
 				<option value="1" show_list="using-editor-btns" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_BUTTONS_JCE_ONLY" description="FLEXI_SKIP_BUTTONS_JCE_ONLY_DESC" depend_class="using-html-editor using-editor-btns" />
+			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_BUTTONS_LIST" description="FLEXI_SKIP_BUTTONS_LIST_DESC" depend_class="using-html-editor using-editor-btns" />
 			
 
 		</fieldset>

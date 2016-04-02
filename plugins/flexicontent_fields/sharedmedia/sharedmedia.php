@@ -752,12 +752,15 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 		
 		// Add Error message
-		if ( !empty($error_text) ) {
-			if ($use_ingroup)
-				$field->html[-1] = '<div class="alert alert-warning fc-small fc-iblock">'.$error_text.'</div>';
-			else
-				$field->html = '<div class="alert alert-warning fc-small fc-iblock">'.$error_text.'</div>' . $field->html;
-			return;
+		if ( !empty($error_text) )
+		{
+			$error_text = '<div class="alert alert-warning fc-small fc-iblock">'.$error_text.'</div>';
+			if (!$use_ingroup) {
+				$field->html = $error_text . $field->html;
+			} else {
+				foreach($field->html as & $html) $html = $error_text . $html;
+				unset($html);
+			}
 		}
 	}
 	
