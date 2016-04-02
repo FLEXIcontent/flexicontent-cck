@@ -166,7 +166,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			// Update the new email address
 			$js .= "
 				theInput = newField.find('input.emailaddr').first();
-				theInput.val('".$default_addr."');
+				theInput.val(".json_encode($default_addr).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addr');
 				newField.find('.emailaddr-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_addr');
@@ -175,7 +175,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			// Update the new email linking text
 			if ($usetitle) $js .= "
 				theInput = newField.find('input.emailtext').first();
-				theInput.val('".$default_title."');
+				theInput.val(".json_encode($default_title).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
 				newField.find('.emailtext-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_text');

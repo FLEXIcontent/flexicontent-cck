@@ -86,6 +86,7 @@ class plgFlexicontent_fieldsRadio extends FCField
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? trim($field->parameters->get( 'default_value', '' )) : '';
+		$default_values= array($default_value);
 		
 		
 		// *************************
@@ -136,8 +137,8 @@ class plgFlexicontent_fieldsRadio extends FCField
 		}
 		
 		// Initialise property with default value
-		if ( !$field->value ) {
-			$field->value = array($default_value);
+		if ( !$field->value || (count($field->value)==1 && $field->value[0] === null) ) {
+			$field->value = $default_values;
 		}
 		
 		// CSS classes of value container
@@ -258,7 +259,9 @@ class plgFlexicontent_fieldsRadio extends FCField
 					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(self::$valueIsArr ? '[]' : '')."');
 					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
 					elem.attr('class', '".$elementid."_'+uniqueRowNum".$field->id." + js_class);
-					elem.removeAttr('checked');
+					elem.attr('data-is-defval') ?
+						elem.attr('checked', 'checked') :
+						elem.removeAttr('checked') ;
 					".($use_prettycheckable && $prettycheckable_added ?
 						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" :
 						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" )."
@@ -439,7 +442,7 @@ class plgFlexicontent_fieldsRadio extends FCField
 						$options[] = '<span style="float: left;" class="'.$element->isprompt.'">'.$element->text.'</span>';
 						continue;
 					}
-					$checked  = in_array($element->value, $value)  ?  ' checked="checked"'  :  '';
+					$checked  = (in_array($element->value, $value)  ?  ' checked="checked"'  :  '') . (in_array($element->value, $default_values)  ?  ' data-is-defval="1"'  :  '');
 					$elementid_no = $elementid_n.'_'.$i;
 					//echo " &nbsp; &nbsp; $elementid_n , $elementid_no , $fieldname_n  , &nbsp; value: {$element->value} <br/>\n";
 					$input_attribs  = $use_prettycheckable && $prettycheckable_added ? ' data-customClass="fcradiocheck"'/*.' data-labelPosition="right" data-labeltext="'.$element->text.'"'*/ : '';
@@ -581,11 +584,12 @@ class plgFlexicontent_fieldsRadio extends FCField
 			$elements = array(0=>$prompt);
 			return $elements;
 		} else {
-			$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
-			$usefirstoption  = $field->parameters->get( 'usefirstoption', self::$isDropDown ? 1 : 0 ) ;
+			$display_label_form= 1;  // always-on, not applicable
+			$firstoptiontext = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ));
+			$usefirstoption  = $display_label_form==-1 ? 1 : $field->parameters->get( 'usefirstoption', self::$isDropDown ? 1 : 0 );
 			if ($usefirstoption) { // Add selection prompt
-				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), JText::_($firstoptiontext), 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
-				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>JText::_($firstoptiontext), 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
+				//prompt = JHTML::_('select.option', (self::$valueIsArr ? '_field_selection_prompt_' : ''), $firstoptiontext, 'value', 'text', (self::$valueIsArr ? 'disabled' : null));
+				$prompt = (object) array( 'value'=>(self::$valueIsArr ? '_field_selection_prompt_' : ''), 'text'=>$firstoptiontext, 'disable'=>(self::$valueIsArr ? true : null), 'isprompt'=>'badge badge-info' );
 				array_unshift($elements, $prompt);
 			}
 		}

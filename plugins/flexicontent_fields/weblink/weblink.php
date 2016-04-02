@@ -162,7 +162,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			// Update new URL's address
 			$js .= "
 				theInput = newField.find('input.urllink').first();
-				theInput.val('".$default_link."');
+				theInput.val(".json_encode($default_link).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
 				newField.find('.urllink-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_link');
@@ -171,7 +171,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			// Update new URL optional properties
 			if ($usetitle) $js .= "
 				theInput = newField.find('input.urltitle').first();
-				theInput.val('".$default_title."');
+				theInput.val(".json_encode($default_title).");
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				newField.find('.urltitle-lbl').first().attr('for','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
