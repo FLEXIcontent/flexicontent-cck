@@ -35,6 +35,10 @@ class modFlexicontentHelper
 		$forced_itemid = $params->get('forced_itemid');
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
+		
+		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		
 		// Get IDs of user's access view levels
 		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
 		else $aid_arr = JAccess::getAuthorisedViewLevels($user->id);
@@ -314,11 +318,11 @@ class modFlexicontentHelper
 				JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
 		}
 		
+		$id     = JRequest::getInt('id', 0);   // id of current item
 		
-		$option = JRequest::getVar('option');
-		$view   = JRequest::getVar('view');
-		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW);
-		$active_item_id = JRequest::getInt('id', 0);
+		$is_content_ext   = $option == 'com_flexicontent' || $option == 'com_content';
+		$isflexi_itemview = $is_content_ext && ($view == 'item' || $view == 'article') && $id;
+		$active_item_id   = $id;
 		
 		$lists_arr = array();
 		foreach($filtered_rows_arr as $catid => $filtered_rows)
@@ -804,21 +808,25 @@ class modFlexicontentHelper
 		// NON-STATIC behaviors that need current item information
 		// *******************************************************
 		
-		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW && JRequest::getInt('id'));
-		$isflexi_catview  = ($option == 'com_flexicontent' && $view == 'category' && (JRequest::getInt('cid') || JRequest::getVar('cids')));
+		$id     = JRequest::getInt('id', 0);   // id of current item
+		$cid    = JRequest::getInt( ($option == 'com_content' ? 'id' : 'cid') );  // current category ID or category ID of current item
+		
+		$is_content_ext   = $option == 'com_flexicontent' || $option == 'com_content';
+		$isflexi_itemview = $is_content_ext && ($view == 'item' || $view == 'article') && $id;
+		$isflexi_catview  = $is_content_ext && $view == 'category' && ( $cid || JRequest::getVar('cids') );
+		
 		$curritem_date_field_needed =
 			$behaviour_dates &&  // Dynamic
 			$date_compare && // Comparing to current item
 			$date_type==3 && // Comparing to custom date field
 			$datecomp_field;  // Date field selected
 		
-		if ( ($behaviour_cat || $behaviour_types || $behaviour_auth || $behaviour_items || $curritem_date_field_needed || $behaviour_filt) && $isflexi_itemview ) {
+		if ( ($behaviour_cat || $behaviour_types || $behaviour_auth || $behaviour_items || $curritem_date_field_needed || $behaviour_filt) && $isflexi_itemview )
+		{
 			// initialize variables
-			$cid		= JRequest::getInt('cid');
-			$id			= JRequest::getInt('id');
 			$Itemid	= JRequest::getInt('Itemid');
-			// Check for new item nothing to retrieve,
-			// NOTE: aborting execution if current view is not item view, but item view is required
+			
+			// NOTE: aborting execution if item view is required, but current view is not item view
 			// and also proper usage of current item, both of these will be handled by SCOPEs
 			
 			$sel_date = ''; $join_date = '';
@@ -829,6 +837,7 @@ class modFlexicontentHelper
 					. '   ON ( i.id = dfrel.item_id AND dfrel.valueorder = 1 AND dfrel.field_id = '.$datecomp_field.' )';
 			}
 			
+			// Check for new item form, aka nothing to retrieve
 			if ( $id ) {
 				$query = 'SELECT i.*, ie.*, GROUP_CONCAT(ci.catid SEPARATOR ",") as itemcats'
 							. $sel_date
@@ -1037,7 +1046,7 @@ class modFlexicontentHelper
 			
 			else if ($isflexi_catview)
 			{
-				$cid = JRequest::getInt('cid', 0);
+				$cid = JRequest::getInt( ($option == 'com_content' ? 'id' : 'cid'), 0);
 				if (!$cid) {
 					$_cids = JRequest::getVar('cids', '');
 					if ( !is_array($_cids) ) {
@@ -1818,16 +1827,20 @@ class modFlexicontentHelper
 		
 		$currcat_custom_display = $params->get('currcat_custom_display', 0);
 		$currcat_source = $params->get('currcat_source', 0);  // 0 item view, 1 category view, 2 both
-		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW);
-		$isflexi_catview  = ($option == 'com_flexicontent' && $view == 'category');
+		
+		$id     = JRequest::getInt('id', 0);   // id of current item
+		$cid    = JRequest::getInt( ($option == 'com_content' ? 'id' : 'cid') );  // current category ID or category ID of current item
+
+		$is_content_ext   = $option == 'com_flexicontent' || $option == 'com_content';
+		$isflexi_itemview = $is_content_ext && ($view == 'item' || $view == 'article') && $id;
+		$isflexi_catview  = $is_content_ext && $view == 'category' && $cid;
 		
 		$currcat_valid_case =
 			($currcat_source==2 && ($isflexi_itemview || $isflexi_catview))
 			|| ($currcat_source==0 && $isflexi_itemview)
 			|| ($currcat_source==1 && $isflexi_catview);
-		if ($currcat_custom_display && $currcat_valid_case) {
-			$id   = JRequest::getInt('id', 0);   // id of current item
-			$cid  = JRequest::getInt('cid', 0);  // current category id of current item
+		if ($currcat_custom_display && $currcat_valid_case)
+		{
 			
 			$catconf = new stdClass();
 			$catconf->orderby = '';
@@ -1848,7 +1861,7 @@ class modFlexicontentHelper
 			$catconf->show_default_image = (int)$params->get('currcat_show_default_image', 0);  // parameter not added yet
 			$catconf->readmore	= (int)$params->get('currcat_currcat_readmore', 1);
 			
-			if ($catconf->fallback_maincat && !$cid && $id) {
+			if ($isflexi_itemview && $catconf->fallback_maincat && !$cid && $id) {
 				$query = 'SELECT catid FROM #__content WHERE id = ' . $id;
 				$db->setQuery($query);
 				$cid = $db->loadResult();
