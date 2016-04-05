@@ -183,11 +183,11 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 	<div class="iteminfo group">
 		
 		<?php if (($this->params->get('show_author')) && ($item->creator != "")) : ?>
-		<span class="createdline">
-			<span class="createdby">
+		<div class="createdline">
+			<div class="createdby">
 				<?php FlexicontentFields::getFieldDisplay($item, 'created_by', $values=null, $method='display'); ?>
 				<?php echo JText::sprintf('FLEXI_WRITTEN_BY', $this->fields['created_by']->display); ?>
-			</span>
+			</div>
 			<?php endif; ?>
 			
 			<?php if (($this->params->get('show_author')) && ($item->creator != "") && ($this->params->get('show_create_date'))) : ?>
@@ -195,19 +195,19 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 			<?php endif; ?>
 	
 			<?php if ($this->params->get('show_create_date')) : ?>
-			<span class="created">
+			<div class="created">
 				<?php FlexicontentFields::getFieldDisplay($item, 'created', $values=null, $method='display'); ?>
 				<?php echo '['.JHTML::_('date', $this->fields['created']->value[0], JText::_('DATE_FORMAT_LC2')).']'; ?>		
-			</span>
+			</div>
 			<?php endif; ?>
-		</span>
+		</div>
 		
-		<span class="modifiedline">
+		<div class="modifiedline">
 			<?php if (($this->params->get('show_modifier')) && ($item->modifier != "")) : ?>
-			<span class="modifiedby">
+			<div class="modifiedby">
 				<?php FlexicontentFields::getFieldDisplay($item, 'modified_by', $values=null, $method='display'); ?>
 				<?php echo JText::_('FLEXI_LAST_UPDATED').' '.JText::sprintf('FLEXI_BY', $this->fields['modified_by']->display); ?>
-			</span>
+			</div>
 			<?php endif; ?>
 	
 			<?php if (($this->params->get('show_modifier')) && ($item->modifier != "") && ($this->params->get('show_modify_date'))) : ?>
@@ -215,12 +215,12 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 			<?php endif; ?>
 			
 			<?php if (intval($item->modified) !=0 && $this->params->get('show_modify_date')) : ?>
-				<span class="modified">
+				<div class="modified">
 				<?php FlexicontentFields::getFieldDisplay($item, 'modified', $values=null, $method='display'); ?>
 				<?php echo '['.JHTML::_('date', $this->fields['modified']->value[0], JText::_('DATE_FORMAT_LC2')).']'; ?>
-				</span>
+				</div>
 			<?php endif; ?>
-		</span>
+		</div>
 	</div>
 	<!-- EOF item basic/core info -->
 	<?php endif; ?>
@@ -240,10 +240,10 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 		<?php endif; ?>
 
 		<?php if ($this->params->get('show_favs', 1)) : ?>
-		<span class="favourites">
+		<div class="favourites">
 			<?php FlexicontentFields::getFieldDisplay($item, 'favourites', $values=null, $method='display'); ?>
 			<?php echo $this->fields['favourites']->display; ?>
-		</span>
+		</div>
 		<?php endif; ?>
 	</aside>
 	<!-- EOF item rating, favourites -->
@@ -256,7 +256,7 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 		<?php foreach ($item->positions['beforedescription'] as $field) : ?>
 		<div class="flexi element field_<?php echo $field->name; ?> <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
-			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<div class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
 			<?php endif; ?>
 			<div class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>">
 				<?php echo $field->display; ?>
@@ -281,7 +281,7 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 		<?php foreach ($item->positions['afterdescription'] as $field) : ?>
 		<div class="flexi element field_<?php echo $field->name; ?> <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
-			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<div class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
 			<?php endif; ?>
 			<div class="flexi value field_<?php echo $field->name.' '.(!$field->label ? ' nolabel ' : ''); ?>">
 				<?php echo $field->display; ?>
@@ -298,7 +298,7 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 		<?php if ($this->params->get('show_category', 1)) : ?>
 		<div class="categories">
 			<?php FlexicontentFields::getFieldDisplay($item, 'categories', $values=null, $method='display'); ?>
-			<span class="flexi label"><?php echo $this->fields['categories']->label; ?></span>
+			<div class="flexi label"><?php echo $this->fields['categories']->label; ?></div>
 			<div class="flexi value"><i class="icon-folder-open"></i> <?php echo $this->fields['categories']->display; ?></div>
 		</div>
 		<?php endif; ?>
@@ -306,7 +306,7 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 		<?php FlexicontentFields::getFieldDisplay($item, 'tags', $values=null, $method='display'); ?>
 		<?php if ($this->params->get('show_tags', 1) && $this->fields['tags']->display) : ?>
 		<div class="tags">
-			<span class="flexi label"><?php echo $this->fields['tags']->label; ?></span>
+			<div class="flexi label"><?php echo $this->fields['tags']->label; ?></div>
 			<div class="flexi value"><i class="icon-tags"></i> <?php echo $this->fields['tags']->display; ?></div>
 		</div>
 		<?php endif; ?>

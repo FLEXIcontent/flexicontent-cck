@@ -12,29 +12,21 @@
 /*** Part 1, CSS rules for fields display via Template parameters ***/
 /********************************************************************/
 
-.iteminfo .createdline {
-	font-size: 9px;
+.iteminfo .createdline,
+.iteminfo .modifiedline {
+	font-size: 90%;
 	display: block;
-}
-.iteminfo .createdby {
-	font-size: 9px;
-	font-weight: normal;
-}
-.iteminfo .created {
-	font-size: 9px;
-	font-weight: bold;
 }
 
-.iteminfo .modifiedline {
-	font-size: 9px;
-	display: block;
-}
+.iteminfo .createdby,
 .iteminfo .modifiedby {
-	font-size: 9px;
+	font-size: 90%;
 	font-weight: normal;
 }
+
+.iteminfo .created,
 .iteminfo .modified {
-	font-size: 9px;
+	font-size: 90%;
 	font-weight: bold;
 }
 
@@ -42,10 +34,10 @@
 .iteminfo,
 .itemadditionnal,
 .description {
-	margin: 0 0 1em;
+	margin: 1em 0 1em 0;
 }
 .iteminfo {
-	margin: 0 0 0.4em;
+	margin: 1em 0 1em 0.4em;
 }
 .description {
 	clear: both;
@@ -53,11 +45,11 @@
 .itemactions span {
 	margin: 0 0 0.5em;
 }
-.itemactions .voting {
-	margin-right: 6px;
+.itemactions .voting,
+.itemactions .favourites {
+	margin-right: 32px;
 	float: left;
 }
-.itemactions .favourites {}
 
 .itemadditionnal span {
 	margin: 0 0 0.3em;
