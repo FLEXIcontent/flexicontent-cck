@@ -245,7 +245,7 @@ foreach ($this->values as $n => $value)
 					rotateControl: false,
 				});
 				
-				var myContent = \'<div class="address">'.str_replace("'", "\'", $addr).'</div>'.str_replace("'", "\'", $map_directions).'\';
+				var myContent = '. json_encode('<div class="address">'.$addr.'</div>'.$map_directions) .';
 				
 				var myInfoWindow = new google.maps.InfoWindow({
 					content: myContent

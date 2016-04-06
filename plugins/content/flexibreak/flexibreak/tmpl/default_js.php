@@ -12,43 +12,69 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-$custom_allpages = JText::_( $this->params->get('custom_allpages', 'FLEXIBREAK_ALL_PAGES') );
-$display_method = $this->params->get('display_method', 1);
-$onclick    = $display_method == 1  ?  'javascript:return false;'  : '';  // need to disable anchor following
-$link_class = $display_method==1 ? ' tocPaginated' : ($display_method==0 ? ' tocScrolled' : ' tocReloaded');
-$curr_link  = JUri::getInstance()->toString(array('path', 'query'));
-?>
-<div class="contenttoc" id="articleTOC">
-	<p class="tocHeader"><?php echo JText::_( 'FLEXIBREAK_TABLE_OF_CONTENT' ) ?></p>
+// - RETURNED HTML is used as 'toc' 
+// - Optionally set 'visible pages HTML' into $this->_text 
 
-	<ul class="tocList">
-		
-		<?php if ( $this->params->get('allpages_link', 1) && $display_method == 1 ) : ?>
-			<li>
-				<a class="tocAll" id="showall" onclick="<?php echo $onclick ?>" href="<?php echo $curr_link; ?>#showall"> - <?php echo $custom_allpages; ?> - </a>
-			</li>
+$custom_allpages = JText::_( $this->params->get('custom_allpages', 'FLEXIBREAK_ALL_PAGES') );
+$display_method  = $this->params->get('display_method', 1);
+$multipage_toc = $this->params->get('multipage_toc', 1);
+
+$onclick    = $display_method == 1  ?  'javascript:return false;'  : '';  // need to disable anchor following
+$link_class = $display_method == 1  ?  ' tocPaginated' : ($display_method==0 ? ' tocScrolled' : ' tocReloaded');
+
+$sef_link   = JRoute::_($this->nonsef_link);  // Get current SEF link of current item
+
+if ($multipage_toc) : /* TOC Start */ ?>
+
+	<div class="contenttoc" id="articleTOC">
+	<a id="articleToc"></a>
+		<?php if ( $this->params->get('toc_title', 1) ) : ?>
+		<p class="tocHeader"><?php echo JText::_( 'FLEXIBREAK_TABLE_OF_CONTENT' ) ?></p>
 		<?php endif; ?>
 		
-		<?php
-		$n = !empty($this->texts[0]) ? -1 : 0;
-		for ($i = 0; $i < $this->pagescount; $i++) :
-			$page = $this->_generateToc($this->row, $i);
-			if ($display_method == 1) $link = $curr_link.'#'.$page->id;
-			else if ($display_method == 2) $link = $page->link;
-			else  $link = $curr_link.'#'.$page->id.'_toc_page';
-			$active = $this->limitstart == $i  ?  ' active'  : '';
-			$n++;
-		?>
-			<li class="<?php echo $active ?>">
-				<a class="tocLink<?php echo $link_class; ?>" id="<?php echo $page->id ?>_tocLink" href="<?php echo $link; ?>" onclick="<?php echo $onclick ?>" >
-					<?php echo $n .". ". $page->title ?>
-				</a>
-			</li>
-		<?php endfor; ?>
+		<ul class="tocList">
 		
-	</ul>
+			<?php
+			$n = !empty($this->texts[0]) ? -1 : 0;
+			for ($i = 0; $i < $this->pagescount; $i++) :
+				$page = $this->_generateToc($this->row, $i);  // Create page data of current page, needed to create TOC navigation entries (in our case JS navigation links)
+				
+				switch($display_method)
+				{
+					case 2:  case 1:
+						$link = $page->link;
+						break;
+					
+					default: case 0:
+						$link = $sef_link.'#'.$page->id;
+						break;
+				}
+				$active = !$this->showall && $this->limitstart == $i  ?  ' active'  : '';
+				$n++;
+			?>
+				<li class="<?php echo $active ?>">
+					<a class="tocLink<?php echo $link_class; ?>" id="<?php echo $page->id ?>_toc_link" href="<?php echo $link; ?>" onclick="<?php echo $onclick ?>" >
+						<?php echo ($n+1) .". ". $page->title ?>
+					</a>
+				</li>
+			<?php endfor; ?>
+			
+			<?php if ( $this->params->get('allpages_link', 1) && ($display_method == 1 || $display_method == 2) ) : ?>
+				<li class="<?php echo $this->showall ? 'active' : ''; ?>">
+					<a class="tocAll" id="showall" onclick="<?php echo $onclick ?>" href="<?php echo JRoute::_($this->nonsef_link.($display_method == 0 ? '#showall' : '&showall=1' )); ?>"> - <?php echo $custom_allpages; ?> - </a>
+				</li>
+			<?php endif; ?>
+		
+		</ul>
 
-	<?php if ( $this->params->get('pagination', 1) == 1 ) : ?>
-	<?php echo $this->loadTemplate('pagination_js'); ?>
-	<?php endif; ?>
-</div>
+		<?php if ( $this->params->get('pagination', 1) == 1 ) echo $this->loadTemplate('pagination_js'); ?>
+	</div>
+
+<?php endif; /* TOC End */ ?>
+
+<?php
+
+// Create 'visible pages text' (visible without page reload)
+// Below is default code, that can handle display_method: 0, 1, 2
+$this->_text = '';
+for ($i = 0; $i < $this->pagescount; $i++)  $this->_text .= $this->_getPageText($this->row, $i, $this->showall);

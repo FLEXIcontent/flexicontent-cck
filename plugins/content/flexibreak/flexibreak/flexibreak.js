@@ -3,7 +3,7 @@ var flexibreak = function(element, options)
 	this.options = {
 		duration:	200,
 		mouseOverClass:	'active',
-		activateOnLoad:	0,
+		activateOnLoad:	'hash',
 		wrap:	false
 	}
 	
@@ -19,23 +19,23 @@ var flexibreak = function(element, options)
 	
 	this.tocLinksScrolled  = jQuery('#' + this.elid + ' ul li .tocScrolled');
 	this.tocLinksPaginated = jQuery('#' + this.elid + ' ul li .tocPaginated');
-	this.pages = jQuery('.articlePage');
+	this.pages = jQuery('.articlePage, .articleAnchor');
 	this.tocLinkAll = jQuery('.tocAll');
 	
 	
-	this.activate = function(page, skipAnim)
+	this.activate = function(pageElement, skipAnim)
 	{
-		// Check if page not valid, by searching inside the page collection
-		var found = this.pages.filter('#'+jQuery(page).attr('id'));
-		if (found.length==0) { alert("Page id: " + jQuery(page).attr('id') + "not found"); return; }
+		// Check if pageElement -exists-, by searching inside the known pages collection
+		var found = this.pages.filter('#'+jQuery(pageElement).attr('id'));
+		if (found.length==0) { alert("Page id: " + jQuery(pageElement).attr('id') + " not found"); return; }
 		else if (found.length > 1) { found = found.first(); }
 		
 		// Check if page already active
-		if (page == this.currentPage) return;
+		if (pageElement == this.currentPage) return;
 		
 		// Set new active page and new page index
-		this.currentPage = page;
-		this.currentIndex = this.pages.index(page);
+		this.currentPage = pageElement;
+		this.currentIndex = this.pages.index(pageElement);
 		
 		if(typeof skipAnim === 'undefined') skipAnim = false;
 		
@@ -50,6 +50,7 @@ var flexibreak = function(element, options)
 		
 		// Show previous/next buttons container
 		jQuery('.tocNav').css('display', 'block');
+		jQuery('.tocReturnAll').css('display', 'none');  // visible only if showAll
 		
 		
 		// Highlight current TOC entry
@@ -75,18 +76,50 @@ var flexibreak = function(element, options)
 	};
 	
 	
-	// Activate initial page and highlight TOC entry
-	if(this.options.activateOnLoad != 'none')
+	this.showall = function(pageElement)
 	{
-		this.options.activateOnLoad == 'first' ? 0 : this.options.activateOnLoad;
+		jQuery('.tocNav').css('display', 'none');   // hide prev/next links
+		jQuery('.tocReturnAll').css('display', ''); // return links visible only when showAll
 		
+		jQuery(this.pages).addClass('active');
+		jQuery(this.pages).css('opacity', '0.01').animate({'opacity': '1'},  600, 'swing');
+		
+		jQuery(this.tocLinksPaginated).parent().removeClass('active');
+		jQuery(pageElement).parent().addClass('active');
+		this.currentPage = pageElement;
+	};
+	
+	
+	// Activate initial page and highlight TOC entry
+	if (this.options.activateOnLoad == 'hash')
+	{
+		this.options.activateOnLoad = 'none';
+		
+		var pageHash = window.location.hash;
+		if (pageHash == '#showall')
+		{
+			this.showall(this.tocLinkAll.get(0));
+		}
+		else if (pageHash)
+		{
+			var pageId = pageHash.substring(1);
+			var pageElement = jQuery('#'+pageId);
+			if ( pageElement ) {
+				var found = this.pages.filter('#'+pageElement.attr('id'));
+				this.options.activateOnLoad = found.length ? this.pages.index(found.get(0)) : 'none';
+			}
+		}
+	}
+	
+	if (this.options.activateOnLoad != 'none')
+	{
 		if (this.tocLinksPaginated.length) {
 			this.activate(this.pages[this.options.activateOnLoad], true);
 		}
 		
 		if (this.tocLinksScrolled.length) {
-			jQuery(this.tocLinksScrolled).removeClass('active');
-			jQuery(this.tocLinksScrolled.get(this.options.activateOnLoad)).addClass('active');
+			jQuery(this.tocLinksScrolled).parent().removeClass('active');
+			jQuery(this.tocLinksScrolled.get(this.options.activateOnLoad)).parent().addClass('active');
 		}
 	};
 	
@@ -109,14 +142,16 @@ var flexibreak = function(element, options)
 	
 	
 	// Handle paginated mode
-	this.tocLinksPaginated.each(function(index, page) {
-		jQuery(page).on('click', function(){
+	this.tocLinksPaginated.each(function(index, pageElement) {
+		jQuery(pageElement).on('click', function(){
 			flexibreak.activate(flexibreak.pages[index]);
+			return false;  // prevent href link reloading
 		});
 	});
 	this.tocLinkAll.each(function(index, tocLink) {
 		jQuery(tocLink).on('click', function(){
 			flexibreak.showall(tocLink);
+			return false;  // prevent href link reloading
 		});
 	});
 	
@@ -124,31 +159,20 @@ var flexibreak = function(element, options)
 	this.next = function() {
 		var next = this.currentIndex + 1;
 		if (next == this.pages.length) {
-			if (this.options.wrap == true) { next = 0 } else { return }
+			if (this.options.wrap == true) { next = 0 } else { return false }
 		}
 		this.activate(this.pages[next]);
+		return false;  // prevent href link reloading
 	};
 	
 	
 	this.previous = function() {
-		var prev = this.currentIndex - 1
+		var prev = this.currentIndex - 1;
 		if (prev < 0) {
-			if (this.options.wrap == true) { prev = this.pages.length - 1 } else { return }
+			if (this.options.wrap == true) { prev = this.pages.length - 1 } else { return false }
 		}
 		this.activate(this.pages[prev]);
-	};
-	
-	
-	this.showall = function(page)
-	{
-		jQuery('.tocNav').css('display', 'none');
-		
-		jQuery(this.pages).addClass('active');
-		jQuery(this.pages).css('opacity', '0.01').animate({'opacity': '1'},  600, 'swing');
-		
-		jQuery(this.tocLinksPaginated).parent().removeClass('active');
-		jQuery(page).parent().addClass('active');
-		this.currentPage = page;
+		return false;  // prevent href link reloading
 	};
 };
 

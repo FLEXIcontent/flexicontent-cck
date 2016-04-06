@@ -277,19 +277,19 @@
 		if (!show_list) {
 			show_list = {};
 			_d  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
-			for (var i = 0; i<_d.length; i++) show_list[_d[i]] = 1;
+			for (var i = 0; i<_d.length; i++) show_list[_d[i].trim()] = 1;
 			el.data('show_list', show_list);
 		}
 		if (!hide_list) {
 			hide_list = {};
 			_d = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
-			for (var i = 0; i<_d.length; i++) hide_list[_d[i]] = 1;
+			for (var i = 0; i<_d.length; i++) hide_list[_d[i].trim()] = 1;
 			el.data('hide_list', hide_list);
 		}
 		if (!force_list) {
 			force_list = {};
 			_d = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
-			for (var i = 0; i<_d.length; i++) force_list[_d[i]] = 1;
+			for (var i = 0; i<_d.length; i++) force_list[_d[i].trim()] = 1;
 			el.data('force_list', force_list);
 		}
 		

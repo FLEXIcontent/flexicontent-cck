@@ -390,7 +390,8 @@ class flexicontent_html
 		}
 		
 		// Add REL canonical only if different than current URL
-		if ($addRel && rawurldecode($uri->toString()) != $ucanonical) {
+		// * J3.5.1+ * Always add canonical, otherwise Joomla SEF plugin will add the default
+		if ($addRel /*&& rawurldecode($uri->toString()) != $ucanonical*/) {
 			$doc->addHeadLink( $ucanonical_encoded, 'canonical', 'rel' );
 		}
 	}
@@ -1499,6 +1500,7 @@ class flexicontent_html
 				
 				$js .= "
 					var _FC_GET = ".json_encode($_GET).";
+					var jbase_url_fc = ".json_encode(JURI::root()).";
 				";
 				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', FLEXI_VHASH);
 				$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', FLEXI_VHASH);
@@ -1880,7 +1882,8 @@ class flexicontent_html
 		
 		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+(screen.width-100)+\',top=20,height=\'+(screen.height-160)+\',directories=no,location=no';
 		
-		if ( JRequest::getInt('pop') ) {
+		$print = JRequest::getInt('pop') || JRequest::getInt('print');
+		if ( $print ) {
 			$onclick = ' window.print(); return false; ';
 			$link = 'javascript:;';
 		} else {

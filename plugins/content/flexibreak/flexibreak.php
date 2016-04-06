@@ -60,21 +60,27 @@ class plgContentFlexiBreak extends JPlugin
 	 */
 	public function onContentPrepare($context, &$row, &$params, $page = 0)
 	{
-		// Simple performance check to determine whether bot should process further
-		if (
-			strpos($row->text, 'class="system-pagebreak') === false &&
-			strpos($row->text, 'class=\'system-pagebreak') === false
-		)
-			return true;
+		if ( $context != 'com_content.article' && $context != 'com_flexicontent.item' ) return true;
 		
 		// Sanity check property slug or id exists
-		if ( empty($row->id) && empty($row->slug) ) return;  // nothing to do
-
-		// Remove page markers when article in popup (printing)
-		if ( JRequest::getBool('pop') )
+		if ( empty($row->id) && empty($row->slug) ) return true;
+		
+		// Simple performance check to determine whether bot should process further.
+		if ( JString::strpos($row->text, 'class="system-pagebreak') === false ) return true;
+		
+		$input = JFactory::getApplication()->input;
+		
+		$print   = $input->getBool('pop') || $input->getBool('print');
+		$showall = $input->getBool('showall');
+		$view    = $input->getString('view');
+		
+		// If current page is print page or is not article / item view,
+		// then display all pages, hiding TOC and pagination (prev/next/count)
+		if ( $print || ($view!='article' && $view!='item') )
 		{
-			$row->text = preg_replace( $this->pattern, '', $row->text );
-			return;
+			$this->params->set('multipage_toc', 0);
+			$this->params->set('pagination', 0);
+			$showall = 'plain';
 		}
 		
 		// Find all instances of plugin inside the description text
@@ -87,17 +93,17 @@ class plgContentFlexiBreak extends JPlugin
 		
 		// Get slug and limitstart (current page) and use them to create next / previous links
 		$row->slug = @ $row->slug ? $row->slug : $row->id;
-		$limitstart = JRequest::getInt('limitstart', 0);
+		$limitstart = $input->getInt('limitstart', 0);  // should be same as: $page;
 		
-		// Create item's SEF link without limitstart
+		// Create item's SEF link without any extra variables (limitstart , showall)
 		if ( !isset(self::$rowLinks[$row->slug]) )
 			self::$rowLinks[$row->slug] = FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid, 0, $row);
 		
-		$prev_link = $limitstart > 0 ?
-			JRoute::_(self::$rowLinks[$row->slug].'&showall=&limitstart='. ($limitstart-1)) :
+		$prev_link = !$showall && $limitstart > 0 ?
+			JRoute::_(self::$rowLinks[$row->slug].'&limitstart='. ($limitstart-1)) :
 			'';
-		$next_link = $limitstart < $textscount - 1 ?
-			JRoute::_(self::$rowLinks[$row->slug].'&showall=&limitstart='. ($limitstart+1)) :
+		$next_link = !$showall && $limitstart < $textscount - 1 ?
+			JRoute::_(self::$rowLinks[$row->slug].'&limitstart='. ($limitstart+1)) :
 			'';
 		
 		$this->assignRef('pages', $pages);
@@ -105,9 +111,11 @@ class plgContentFlexiBreak extends JPlugin
 		$this->assignRef('texts', $texts);
 		$this->assignRef('textscount', $textscount);
 		$this->assignRef('limitstart', $limitstart);
+		$this->assignRef('showall', $showall);
 		$this->assignRef('row', $row);
 		$this->assignRef('prev_link', $prev_link);
 		$this->assignRef('next_link', $next_link);
+		$this->assignRef('nonsef_link', self::$rowLinks[$row->slug]);
 		
 		// Plugin base folder
 		$document = JFactory::getDocument();
@@ -116,12 +124,14 @@ class plgContentFlexiBreak extends JPlugin
 		// Display configuration
 		$display_method = $this->params->get('display_method', 1);
 		$pagenav        = $this->params->get('pagination', 3);
+		
+		$multipage_toc  = $this->params->get('multipage_toc', 1);
 		$toc_placement  = $this->params->get('toc_placement', 1);
 		
 		// Add JS code for JS based navigation
 		if ($display_method == 1 || $display_method == 0)
 		{
-			if (class_exists('flexicontent_html'))
+			if ( !class_exists('flexicontent_html') )
 			{
 				require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 				flexicontent_html::loadFramework('jQuery');
@@ -132,32 +142,56 @@ class plgContentFlexiBreak extends JPlugin
 		// Add CSS
 		$document->addStyleSheet($plgbase.'.css');
 		
-		// Clear article's text, so that we re-construct with appropriate containers
+		// Clear article's text (and toc), so that we re-construct with appropriate containers
 		$row->text = '';
+		$row->toc = null;
 		
-		// Add page navigation (next / previous) at article's start
-		if (2 == $pagenav && $display_method != 0) $row->text .= $this->loadTemplate('pagination_js');
-		
-		// Create Table Of Contents (TOC). This will also create the text of all pages, encapsulated in containers
-		// (having anchor IDs), and assign it to: $this->_text, so that it can be re-assigned to article's text below
-		if ($toc_placement) {
-			$row->text .= $this->loadTemplate('default_js');
-		} else {
-			$row->toc = $this->loadTemplate('default_js');
+		// Create Table Of Contents (TOC) if this was enabled, this may also create the 'text of visible pages' ($this->_text)
+		switch ($display_method)
+		{
+			case 0: case 1: case 2:
+				$row->toc = $this->loadTemplate('default_js');
+				break;
+			
+			case 3: case 4:
+				$row->toc = $this->loadTemplate('default_tabs_sliders');
+				break;
+			
+			default:
+				$row->toc = 'Pagination plugin: Unreachable code due to "display_method": '.$display_method.' (not implemented)';
+				break;
 		}
 		
-		// Append the text of all pages encapsulated in containers (having anchor IDs too)
+		// Add page navigation (next / previous) at article's start
+		if (2 == $pagenav && !in_array($display_method, array(0, 3, 4))) $row->text .= $this->loadTemplate('pagination_js');
+		
+		// Respect TOC placement method, but note: if $this->_text ('text of visible pages') is set
+		// then it indicates non-free placeable TOC, aka add to description text
+		if ($toc_placement || isset($this->_text))
+		{
+			$row->text .= $row->toc;
+			$row->toc = null;
+		}
+		
+		// Get text of visible pages, if the template file has not created it, this is either current page or all pages 
+		if ( !isset($this->_text) )
+		{
+			$this->_text = '';
+			for ($i = 0; $i < $pagescount; $i++)  $this->_text .= $this->_getPageText($row, $i, $showall);
+		}
+		
+		// Add visible pages back to the articles description text
 		$row->text .= $this->_text;
 		
 		// Add page navigation (next / previous) at article's end
-		if (3 == $pagenav && $display_method != 0) $row->text .= $this->loadTemplate('pagination_js');
+		if (3 == $pagenav && !in_array($display_method, array(0, 3, 4))) $row->text .= $this->loadTemplate('pagination_js');
 	}
-
-
+	
+	
+	
 	function _generateToc( &$row, $index )
 	{
 		$display_method = $this->params->get('display_method', 1);
-		$limitstart = JRequest::getInt('limitstart', 0);
 		
 		$page = new stdClass();
 		
@@ -166,44 +200,104 @@ class plgContentFlexiBreak extends JPlugin
 		{
 			$this->pagescount++;
 			
-			$page->title = JText::_($this->params->get('custom_introtext', 'FLEXIBREAK_INTRO_TEXT'));
-			$page->name = 'start';
-			$page->link = JRoute::_(self::$rowLinks[$row->slug].'&showall=&limitstart=');
-			$page->id = str_replace('"', '', str_replace("'", "", $page->name));
+			$page->title = $this->params->get('introtext_title', 1) ?  $row->title  :  JText::_($this->params->get('custom_introtext', 'FLEXIBREAK_INTRODUCTION'));
+			$page->link = JRoute::_(self::$rowLinks[$row->slug]);
+			
+			$page->name = 'Page-1';
+			$page->id   = $page->name;
 		}
 		else
 		{
 			$attrs = $this->texts[0] == "" ?
 				JUtility::parseAttributes($this->pages[$index][0]) :
 				JUtility::parseAttributes($this->pages[$index-1][0]) ;
-			$page->title = isset($attrs['title']) ? $attrs['title'] : 'unknown';
-			$page->name	= isset($attrs['name']) ? $attrs['name'] : preg_replace('/[ \t]+/u', '', $page->title);
-			$page->link = JRoute::_(self::$rowLinks[$row->slug].'&showall=&limitstart='. ($index));
-			$page->id		= $page->name ? str_replace('"', '', str_replace("'", "", $page->name)) : 'start';
+			
+			$_alt   = @ $attrs['alt'];
+			$_title = $_alt ? $_alt : @ $attrs['title'];
+			$_page  = isset($attrs['name']) ? $attrs['name'] : $_title;
+			
+			$page->title = $_title  ?  $_title  : JText::_('FLEXIBREAK_PAGE') .' '. ($index+1);  // Default is "Page N"
+			$page->link  = JRoute::_(self::$rowLinks[$row->slug].'&limitstart='. ($index));
+			
+			$page->name	 = $this->getHashtag($_page, $index+1);    // Default is "Page-N"
+			$page->id		 = $page->name;
 		}
+		
+		$this->page_links[$index] = $page;
+		return $page;
+	}
+	
+	
+	
+	function _getPageText( &$row, $index, $showall )
+	{
+		$input = JFactory::getApplication()->input;
+		$limitstart = $input->getInt('limitstart', 0);
+		
+		$display_method = $this->params->get('display_method', 1);
+		$auto_toc_return = $this->params->get('return_anchors', 1) == 2;
 		
 		$curr_index = $this->texts[0] == "" ? $index+1 : $index;
-		if ( !isset($this->_text) ) $this->_text = '';
 		
-		switch ($display_method) {
-			
-		// Add an anchor link for scrolling,
-		case 0:
-			$this->_text .= '<a id="'.$page->id.'_toc_page"></a>'.$this->texts[$curr_index];
-			break;
+		$_page = isset($this->page_links[$curr_index] ) ? $this->page_links[$curr_index] : false;
+		$page_id = $_page ? $_page->id : 'page_id'.$curr_index;
 		
-		// Add a DIV container for JS based navigation
-		case 1:
-			$this->_text .= '<div class="articlePage" id="'.$page->id.'"> '.$this->texts[$curr_index].'</div>';
-			break;
 		
-		// Nor scrolled, neither JS based navigation:  Only ADD page's text, if it is the current page
-		case 2:
-			if ($limitstart == $curr_index) $this->_text .= $this->texts[$curr_index];
-			break;
-		
+		if (($showall && $display_method >= 3) || $showall==='plain')  // Methods 0 - 2 can handle showall on load properly
+		{
+			return
+				$this->texts[$curr_index]
+				. ($curr_index < count($this->texts)-1 ? '<hr class="articlePageEnd" />' : '');
 		}
-		return $page;
+		
+		if ( !isset($this->toc_return_link) )
+		{
+			// RETURN-TO-TOC LINK, current uri is needed to avoid page reloading when anchors are clicked and BASE Tags is missing query variables
+			$this->toc_return_link = !$this->params->get('multipage_toc', 1) || !$this->params->get('return_anchors', 1) ?  '' :  '
+				<br/>
+				<a class="btn returnToc'.($display_method==1 && $auto_toc_return ? ' tocReturnAll' : '').'" href="'.htmlentities( JUri::getInstance(), ENT_QUOTES, 'UTF-8' ).'#articleToc" >
+					'.JText::_('FLEXIBREAK_RETURN_TO_CONTENTS').'
+				</a>';
+		}
+		switch ($display_method)
+		{
+			// Add an anchor link for scrolling, and page separator HTML
+			case 0:
+				return '
+					<div class="articlePageScrolled">
+						<a class="articleAnchor" id="'.$page_id.'"></a>
+					' . $this->texts[$curr_index] . '
+					' . $this->toc_return_link . '
+					' . ($curr_index < count($this->texts)-1 ? '<hr class="articlePageEnd" />' : '') . '
+					</div>';
+				break;
+			
+			// Add a DIV container for JS based navigation
+			case 1:
+				return '
+					<div class="articlePage'.($limitstart == $curr_index || $showall ? ' active' : '').'" id="'.$page_id.'">
+						' . $this->texts[$curr_index] . '
+						' . $this->toc_return_link . '
+						' . ($curr_index < count($this->texts)-1 ? '<hr class="articlePageEnd" />' : '') . '
+					</div>';
+				break;
+			
+			// Nor scrolled, neither JS based navigation:  Only ADD page's text, if it is the current page or showall IS true
+			case 2:
+				if ($limitstart == $curr_index || $showall)
+				{
+					return
+						$this->texts[$curr_index] . '
+						' . (!$showall && $auto_toc_return ? '' : $this->toc_return_link)  . '
+						' . ( $showall && $curr_index < count($this->texts)-1 ? '<hr class="articlePageEnd" />' : '');
+				}
+				else return ''; // No text for current page
+				break;
+			
+			default:  // Other case unhandled case, just add all pages, this is normally handled in the template file
+				return $this->texts[$curr_index] . ($curr_index < count($this->texts)-1 ? '<hr class="articlePageEnd" />' : '');
+				break;
+		}
 	}
 
 
@@ -240,4 +334,34 @@ class plgContentFlexiBreak extends JPlugin
 		}
 		return trim(ob_get_clean());
 	}
+	
+	
+	// Create safe hashtag (UTF8 language characters and dashes)
+	function getHashtag($string, $i)
+	{
+		static $hashtags = array();
+		
+		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
+		
+		// Strip invalid characters
+		if (function_exists('iconv'))
+			$hashtag = iconv("utf-8", "utf-8//IGNORE", $string);
+		
+		else if (function_exists('mb_convert_encoding'))
+			$hashtag = mb_convert_encoding($string, 'utf-8', 'utf-8');
+		
+		else if (version_compare(PHP_VERSION, '5.4.0', '>='))
+			$hashtag = htmlspecialchars_decode(htmlspecialchars($string, ENT_SUBSTITUTE, 'UTF-8'));
+		
+		// Replace special characters and spaces with dash
+		$hashtag = preg_replace('/[^\p{L}0-9-]/u','-', $hashtag);
+		
+		// Default if empty is Page-N, also no language filtering for it to avoid it changing if language is switched
+		if ( empty($hashtag) || isset($hashtags[$hashtag]) )
+			$hashtag = 'Page-'.$i;  
+		
+		$hashtags[$hashtag] = 1;
+		return $hashtag;
+	}
+	
 }
