@@ -1,98 +1,149 @@
 <?php
 /**
- * @version 1.5 stable $Id: com_flexicontent.php 1500 2012-09-29 07:21:46Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
+ * FLEXIcontent plugin for sh404SEF 
  *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
  */
-defined( '_JEXEC' ) or die( 'Direct Access to this location is not allowed.' );
+defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-// ------------------  standard plugin initialize function - don't change ---------------------------
+// ------------------ standard plugin initialize function - don't change ---------------------------
 global $sh_LANG;
-$sefConfig 		= & shRouter::shGetConfig();
+$sefConfig = Sh404sefFactory::getConfig();
 $shLangName = '';
 $shLangIso = '';
 $title = array();
 $shItemidString = '';
-$dosef = shInitializePlugin( $lang, $shLangName, $shLangIso, $option);
-if ($dosef == false) return;
-// ------------------  standard plugin initialize function - don't change ---------------------------
+$dosef = shInitializePlugin($lang, $shLangName, $shLangIso, $option);
+if ($dosef == false)
+{
+	return;
+}
+// ------------------ standard plugin initialize function - don't change ---------------------------
 
-// ------------------  load language file - adjust as needed ----------------------------------------
-$shLangIso = shLoadPluginLanguage ( 'com_flexicontent', $shLangIso, '_SH404SEF_FLEXICONTENT_ADD', JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'sef_ext'.DS.'lang'.DS );
-// ------------------  load language file - adjust as needed ----------------------------------------
+// ------------------ load language file - adjust as needed ----------------------------------------
+$shLangIso = shLoadPluginLanguage('com_flexicontent', $shLangIso, '_SH404SEF_FLEXICONTENT_ADD', JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'sef_ext'.DS.'lang'.DS );
+// ------------------ load language file - adjust as needed ----------------------------------------
 
+// get DB
+$database = ShlDbHelper::getDb();
 
-require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
-global $globalcats, $globalnopath, $globalnoroute;
+// CHECK for if givent URL is home page, so we must return an empty string
+$shHomePageFlag = false;
+$shHomePageFlag = ! $shHomePageFlag ? shIsHomepage($string) : $shHomePageFlag;
 
-// Get some needed HTTP Request variable
-$_layout	= JRequest::getVar('layout', null);
-$_typeid	= JRequest::getInt('typeid', null);
-$_fcu	= JRequest::getVar('fcu', null);
-$_fcp	= JRequest::getInt('fcp', null);
-
-// Insure that the global vars are array
-if (!is_array($globalnopath))	$globalnopath	= array();
-if (!is_array($globalnoroute))	$globalnoroute	= array();
-
-
-
-// do something about that Itemid thing
-if (!preg_match( '/Itemid=[0-9]+/i', $string)) { // if no Itemid in non-sef URL
-  //global $Itemid;
-  if ($sefConfig->shInsertGlobalItemidIfNone && !empty($shCurrentItemid)) {
-    $string .= '&Itemid='.$shCurrentItemid;  // append current Itemid 
-    $Itemid = $shCurrentItemid;
-    shAddToGETVarsList('Itemid', $Itemid); // V 1.2.4.m
-  }  
-  if ($sefConfig->shInsertTitleIfNoItemid)
-  	$title[] = $sefConfig->shDefaultMenuItemName ? 
-      $sefConfig->shDefaultMenuItemName : getMenuTitle($option, null, $shCurrentItemid );
-  $shItemidString = $sefConfig->shAlwaysInsertItemid ? 
-    _COM_SEF_SH_ALWAYS_INSERT_ITEMID_PREFIX.$sefConfig->replacement.$shCurrentItemid
-    : '';
-} else {  // if Itemid in non-sef URL
-  $shItemidString = $sefConfig->shAlwaysInsertItemid ? 
-    _COM_SEF_SH_ALWAYS_INSERT_ITEMID_PREFIX.$sefConfig->replacement.$Itemid
-    : '';
+if ($shHomePageFlag)
+{ // this is homepage (optionally multipaged)
+	$title[] = '/';
+	$string = sef_404::sefGetLocation(
+		$string, $title, null,
+		(isset($limit) ? $limit : null),
+		(isset($limitstart) ? $limitstart : null),
+		(isset($shLangName) ? $shLangName : null),
+		(isset($showall) ? $showall : null)    // currently ignored for non com_content components ?
+	);
+	return;
 }
 
-$view 		= isset ($view)   ? $view   : null;
-$Itemid		= isset ($Itemid) ? $Itemid : null;
-$task 		= isset($task)    ? $task   : null;
+
+static $FC_sh404sef_init = null;
+static $IS_FISH_SITE = null;
+if (!$FC_sh404sef_init)
+{
+	$FC_sh404sef_init = true;
+	
+	// Include FC constants file
+	require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+	$IS_FISH_SITE = FLEXI_FISH && JFactory::getApplication()->isSite();
+
+	// Make sure that the global FC vars are arrays
+	global $globalcats, $globalnopath, $globalnoroute;
+	if (!is_array($globalcats))    $globalcats    = array();
+	if (!is_array($globalnopath))  $globalnopath  = array();
+	if (!is_array($globalnoroute)) $globalnoroute = array();
+}
+
+// Avoid PHP not set notices, by setting variables to null, also null will not break isset behaviour
+$Itemid   = isset($Itemid)  ? $Itemid : null;
+$view     = isset($view)    ? $view   : null;
+$layout   = isset($layout)  ? $layout : null;
+$task     = isset($task)    ? $task   : null;
 $format		= isset($format)  ? $format : null;
-$return 	= isset ($return) ? $return : null;
+$return 	= isset($return)  ? $return : null;
 
-// Preview feature (login via URL (usually disable for security reasons))
-if (!empty($_fcu)) {
-	shRemoveFromGETVarsList ( 'fcu' );
-	$dosef = false;
-} else if (!empty($_fcp)) {
-	shRemoveFromGETVarsList ( 'fcp' );
-	$dosef = false;
+// start by inserting the menu element title (just an idea, this is not required at all)
+//$shSampleName = shGetComponentPrefix($option);
+//$shSampleName = empty($shSampleName) ? getMenuTitle($option, $task, $Itemid, null, $shLangName) : $shSampleName;
+//$shSampleName = (empty($shSampleName) || $shSampleName == '/') ? 'FC_CONTENT' : $shSampleName;
+
+
+// Itemid NOT found inside the non-sef URL
+$Itemid_exists_in_URL = ! preg_match('/Itemid=[0-9]+/iu', $string);
+if ( !$Itemid_exists_in_URL )
+{
+  // V 1.2.4.t moved back here
+	if ($sefConfig->shInsertGlobalItemidIfNone && ! empty($shCurrentItemid))
+	{
+		$string .= '&Itemid=' . $shCurrentItemid; // append current Itemid
+		$Itemid = $shCurrentItemid;
+		shAddToGETVarsList('Itemid', $Itemid); // V 1.2.4.m
+	}
+
+	if ($sefConfig->shInsertTitleIfNoItemid)
+	{
+		$title[] = $sefConfig->shDefaultMenuItemName ?
+			$sefConfig->shDefaultMenuItemName :
+			getMenuTitle($option, (isset($view) ? $view : null), $shCurrentItemid, null, $shLangName);
+	}
+	$shItemidString = '';
+	if ($sefConfig->shAlwaysInsertItemid && (! empty($Itemid) || ! empty($shCurrentItemid)))
+	{
+		$shItemidString = JText::_('COM_SH404SEF_ALWAYS_INSERT_ITEMID_PREFIX')
+			. $sefConfig->replacement . (empty($Itemid) ? $shCurrentItemid : $Itemid);
+	}
 }
 
-if (FLEXI_J16GE) {
-	$item_segs = array(5=>0, 1=>-1, 2=>1, 3=>-2, 4=>2, 0=>999);
-	$cats_in_itemlnk = (isset($item_segs[$sefConfig->includeContentCat])) ? $item_segs[$sefConfig->includeContentCat] : 999;
-
-	$cat_segs = array(1=>-1, 2=>1, 3=>-2, 4=>2, 0=>999);
-	$cats_in_catlnk = (isset($cat_segs[$sefConfig->includeContentCatCategories])) ? $cat_segs[$sefConfig->includeContentCatCategories] : 999;
-} else {
-	$cats_in_itemlnk = 999;
-	$cats_in_catlnk = 999;
+// Itemid found inside the non-sef URL
+else
+{
+	$shItemidString = $sefConfig->shAlwaysInsertItemid ?
+		JText::_('COM_SH404SEF_ALWAYS_INSERT_ITEMID_PREFIX') . $sefConfig->replacement . $Itemid : '';
+	if ($sefConfig->shAlwaysInsertMenuTitle)
+	{
+		// global $Itemid; V 1.2.4.g we want the string option, not current page !
+		if ($sefConfig->shDefaultMenuItemName)
+			$title[] = $sefConfig->shDefaultMenuItemName; // V 1.2.4.q added
+				                                              // force language
+		elseif ($menuTitle = getMenuTitle($option, (isset($view) ? $view : null), $Itemid, '', $shLangName))
+		{
+			if ($menuTitle != '/')
+				$title[] = $menuTitle;
+		}
+	}
 }
+// V 1.2.4.m
+// Remove common URL variables from GET vars list, so that they don't show up as query string in the URL
+shRemoveFromGETVarsList('option');
+shRemoveFromGETVarsList('lang');
+if (! empty($Itemid))   shRemoveFromGETVarsList('Itemid');
+if (! empty($limit))    shRemoveFromGETVarsList('limit');
+
+// Variables 'limitstart', 'start', 'showall' can be zero or empty string, so use isset
+if (isset($limitstart))  shRemoveFromGETVarsList('limitstart');
+if (isset($start))       shRemoveFromGETVarsList('start');
+//if (isset($showall))     shRemoveFromGETVarsList('showall');  // Bug in SH404SEF, DO NOT unset this
+if (empty($showall))     shRemoveFromGETVarsList('showall');  // only unset an zero or zero-length variables
+
+// Preview feature (login via URL (normally disabled for security reasons)), do not add such URLS to SH404SEF URLs !!
+if (! empty($fcu) || ! empty($fcp)) return
+
+
+// Get Depth of parent category segmenets to use for item view
+$item_segs = array(5=>0, 1=>-1, 2=>1, 3=>-2, 4=>2, 0=>999);
+$cats_in_itemlnk = (isset($item_segs[$sefConfig->includeContentCat])) ? $item_segs[$sefConfig->includeContentCat] : 999;
+
+// Get Depth of parent category segmenets to use for category view
+$cat_segs = array(1=>-1, 2=>1, 3=>-2, 4=>2, 0=>999);
+$cats_in_catlnk = (isset($cat_segs[$sefConfig->includeContentCatCategories])) ? $cat_segs[$sefConfig->includeContentCatCategories] : 999;
+
 
 // Some FLEXIcontent views may only set task variable ... in this case set task variable as view
 if ( !$view && $task == 'search' ) {
@@ -104,13 +155,17 @@ if ( !$view && $task == 'search' ) {
 if($format == 'raw') {
 	if ($task == 'ajaxvote' || $task == 'ajaxfav') return;
 }
+// Do not convert autocomplete URLs
+if ($task == 'txtautocomplete') return;
+
+
 
 switch ($view)
 {
 	case 'item' :
 	
 		// Do not convert to SEF urls, the urls for item form
-		if ($_layout == 'form' || $task == 'edit' || $task == 'add') return;
+		if ($layout == 'form' || $task == 'edit' || $task == 'add') return;
 		
 		if (!empty($id))   // Existing item, empty ID means new item form or invalid URL
 		{
@@ -124,9 +179,9 @@ switch ($view)
 						. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 						. ' WHERE i.id = ' . ( int ) $id;
 				$database->setQuery ( $query );
-
+				
 				// Do not translate the items url (Falang extended Database class and overrides the method)
-				$row = !FLEXI_FISH  ?  $database->loadObject ( )  :  $database->loadObject ( null, false );
+				$row = !$IS_FISH_SITE  ?  $database->loadObject()  :  $database->loadObject(null, false);
 				
 				if ($database->getErrorNum ())  die ( $database->stderr () );
 				
@@ -140,21 +195,26 @@ switch ($view)
 						if (@$globalcats[$catid]->ancestorsarray) {
 							$ancestors = $globalcats[$catid]->ancestorsarray;
 							$cat_titles = array();
-							foreach ($ancestors as $ancestor) {
-								if (!in_array($ancestor, $globalnoroute)) {
-									if (shTranslateURL ( $option, $shLangName ) && FLEXI_FISH) {
-										// Translating title and Falang is installed
-										$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
-										$database->setQuery ( $query );
-										$row_cat = $database->loadObject ();
-										$cat_titles[] = ($sefConfig->useCatAlias ? $row_cat->alias : $row_cat->title) . '/';
-									} else {
-										list($_cat_id, $_cat_alias) = explode( ":", $globalcats[$ancestor]->slug );
-										// Not translating title or Falang not installed
-										$cat_titles[] = ($sefConfig->useCatAlias ? $_cat_alias : $globalcats[$ancestor]->title) . '/';
-									}
+							foreach ($ancestors as $ancestor)
+							{
+								if (in_array($ancestor, $globalnoroute)) continue;
+								
+								if (shTranslateURL ( $option, $shLangName ) && FLEXI_FISH) {
+									// Translating title and Falang is installed
+									$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
+									$database->setQuery ( $query );
+									$row_cat = $database->loadObject();
+									if (!$row_cat) { $cat_titles[] = $ancestor; continue; }
+									$cat_titles[] = ($sefConfig->useCatAlias ? $row_cat->alias : $row_cat->title) . '/';
 								}
+								else if ( isset($globalcats[$ancestor]) ) {
+									list($_cat_id, $_cat_alias) = explode( ":", $globalcats[$ancestor]->slug );
+									// Not translating title or Falang not installed
+									$cat_titles[] = ($sefConfig->useCatAlias ? $_cat_alias : $globalcats[$ancestor]->title) . '/';
+								}
+								else $cat_titles[] = $ancestor . '/';
 							}
+							
 							$first_url_cat = ($cats_in_itemlnk >= 0) ? count($cat_titles) - $cats_in_itemlnk : 0;
 							$first_url_cat = ($first_url_cat < 0) ? 0 : $first_url_cat;
 							
@@ -178,8 +238,8 @@ switch ($view)
 						if ($sefConfig->shInsertNumericalId && isset($sefConfig->shInsertNumericalIdCatList) && !empty($id) && ($view == 'items') && !in_array($row->type_id, $globalnopath)) {
 							$q = 'SELECT id, catid, created FROM #__content WHERE id = '.$database->Quote( $id);
 							$database->setQuery($q);
-							if (shTranslateUrl($option, $shLangName) || !FLEXI_FISH) // V 1.2.4.m
-								$contentElement = $database->loadObject( );
+							if (shTranslateUrl($option, $shLangName) || !$IS_FISH_SITE) // V 1.2.4.m
+								$contentElement = $database->loadObject();
 							else 
 								$contentElement = $database->loadObject(null, false);
 							if ($contentElement) {
@@ -195,9 +255,9 @@ switch ($view)
 				}
 			
 				// Remove the item-id and category-id vars from the url
-				if (!empty($id))   shRemoveFromGETVarsList ( 'id' );
-				if (!empty($cid))  shRemoveFromGETVarsList ( 'cid' );
-
+				shRemoveFromGETVarsList ( 'id' );
+				shRemoveFromGETVarsList ( 'cid' );
+				
 			} elseif ($task == 'edit') {
 				$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_EDIT'];
 			}
@@ -219,32 +279,39 @@ switch ($view)
 			
 			// Remove the vars from the url
 			shRemoveFromGETVarsList ( 'layout' );
-			shRemoveFromGETVarsList ( 'typeid' );
+			//shRemoveFromGETVarsList ( 'typeid' );  // TODO more this is needed
 		}
 		
 		shRemoveFromGETVarsList ( 'view' );
+		
+		// Remove 'ilayout' if empty
+		if (empty($ilayout)) shRemoveFromGETVarsList ( 'ilayout' );
 	break;
 	
 	case 'category' :
-
+		
 		if (!empty($cid) && empty($id)) {
-
+			
 			if (@$globalcats[$cid]->ancestorsarray) {
 				$ancestors = $globalcats[$cid]->ancestorsarray;
 				$cat_titles = array();
-				foreach ($ancestors as $ancestor) {
-					if (!in_array($ancestor, $globalnoroute)) {
-						if (shTranslateURL ( $option, $shLangName ) && FLEXI_FISH) {
-							$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
-							$database->setQuery ( $query );
-							$row = $database->loadObject ();
-							$cat_titles[] = ($sefConfig->useCatAlias ? $row->alias : $row->title) . '/';
-						} else {
-							list($_cat_id, $_cat_alias) = explode( ":", $globalcats[$ancestor]->slug );
-							// Not translating title or Falang not installed
-							$cat_titles[] = ($sefConfig->useCatAlias ? $_cat_alias : $globalcats[$ancestor]->title) . '/';
-						}
+				foreach ($ancestors as $ancestor)
+				{
+					if (in_array($ancestor, $globalnoroute)) continue;
+					
+					if (shTranslateURL ( $option, $shLangName ) && FLEXI_FISH) {
+						$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . $ancestor;
+						$database->setQuery ( $query );
+						$row_cat = $database->loadObject();
+						if (!$row_cat) { $cat_titles[] = $ancestor; continue; }
+						$cat_titles[] = ($sefConfig->useCatAlias ? $row_cat->alias : $row_cat->title) . '/';
 					}
+					else if ( isset($globalcats[$ancestor]) ) {
+						list($_cat_id, $_cat_alias) = explode( ":", $globalcats[$ancestor]->slug );
+						// Not translating title or Falang not installed
+						$cat_titles[] = ($sefConfig->useCatAlias ? $_cat_alias : $globalcats[$ancestor]->title) . '/';
+					}
+					else $cat_titles[] = $ancestor . '/';
 				}
 				$curr_cat_title = count($cat_titles) ? array_pop($cat_titles) : null;
 				
@@ -261,13 +328,12 @@ switch ($view)
 			}
 			shMustCreatePageId( 'set', true);
 		}
-
+		
 		// Remove the vars from the url
+		shRemoveFromGETVarsList ( 'cid' );
 		if (!empty($cid)) {
-			shRemoveFromGETVarsList ( 'cid' );
 			shRemoveFromGETVarsList ( 'view' );  // only unset view if category ID was set
 		}
-		
 		
 		// HANDLE 'tags' layout of category view
 		if (! empty ( $tagid )) {
@@ -275,10 +341,10 @@ switch ($view)
 					.' WHERE id = ' . ( int ) $tagid;
 			$database->setQuery ( $query );
 			
-			if (shTranslateURL ( $option, $shLangName ) || !FLEXI_FISH) {
-				$row = $database->loadObject ();
+			if (shTranslateURL ( $option, $shLangName ) || !$IS_FISH_SITE) {
+				$row = $database->loadObject();
 			} else {
-				$row = $database->loadObject ( null, false );
+				$row = $database->loadObject(null, false);
 			}
 			
 			if ($database->getErrorNum ()) {
@@ -302,7 +368,7 @@ switch ($view)
 					.' WHERE id = ' . ( int ) $authorid;
 			$database->setQuery ( $query );
 			
-			if (shTranslateURL ( $option, $shLangName ) || !FLEXI_FISH) {
+			if (shTranslateURL ( $option, $shLangName ) || !$IS_FISH_SITE) {
 				$row = $database->loadObject ();
 			} else {
 				$row = $database->loadObject ( null, false );
@@ -339,6 +405,9 @@ switch ($view)
 			shRemoveFromGETVarsList ( 'layout' );
 			shRemoveFromGETVarsList ( 'view' );
 		}
+		
+		// Remove 'clayout' if empty
+		if (empty($clayout)) shRemoveFromGETVarsList ( 'clayout' );
 	break;
 	
 	case 'tags' :
@@ -347,10 +416,10 @@ switch ($view)
 					.' WHERE id = ' . ( int ) $id;
 			$database->setQuery ( $query );
 			
-			if (shTranslateURL ( $option, $shLangName ) || !FLEXI_FISH) {
-				$row = $database->loadObject ();
+			if (shTranslateURL ( $option, $shLangName ) || !$IS_FISH_SITE) {
+				$row = $database->loadObject();
 			} else {
-				$row = $database->loadObject ( null, false );
+				$row = $database->loadObject(null,false);
 			}
 			
 			if ($database->getErrorNum ()) {
@@ -364,14 +433,14 @@ switch ($view)
 		} else {
 			$title [] = '/';
 		}
-
+		
 		// Remove the vars from the url
-		if (!empty($id))
-			shRemoveFromGETVarsList ( 'id' );
+		shRemoveFromGETVarsList ( 'id' );
 		shRemoveFromGETVarsList ( 'view' );
 	break;
 	
 	case 'search' :
+		//$title [] = $shSampleName .'/';
 		$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_SEARCH'] . '/';
 		shRemoveFromGETVarsList ( 'view' );
 	break;
@@ -380,22 +449,42 @@ switch ($view)
 		$title [] = $sh_LANG[$shLangIso]['_SH404SEF_FLEXICONTENT_FAVOURITES'] .  '/';
 		shRemoveFromGETVarsList ( 'view' );
 	break;
-
+	
 	case 'flexicontent' :
 		$title [] = $sh_LANG [$shLangIso] ['_SH404SEF_FLEXICONTENT'] . '/';
 		shRemoveFromGETVarsList ( 'view' );
+		
+		$rootcat_title = false;
+		if (!empty($rootcat))
+		{
+			if (shTranslateURL ( $option, $shLangName ) && FLEXI_FISH) {
+				// Translating title and Falang is installed
+				$query	= 'SELECT id, title, alias FROM #__categories WHERE id = ' . (int) $rootcat;
+				$database->setQuery ( $query );
+				$row_cat = $database->loadObject();
+				if ($row_cat) $rootcat_title = ($sefConfig->useCatAlias ? $row_cat->alias : $row_cat->title) . '/';
+			}
+			else if ( isset($globalcats[$ancestor]) ) {
+				list($_cat_id, $_cat_alias) = explode( ":", $globalcats[$ancestor]->slug );
+				// Not translating title or Falang not installed
+				$rootcat_title = ($sefConfig->useCatAlias ? $_cat_alias : $globalcats[$ancestor]->title) . '/';
+			}
+			
+			$title [] = $rootcat_title ? $rootcat_title : $rootcat . '/';
+			shRemoveFromGETVarsList ( 'rootcat' );
+		}
 	break;
-
+	
 	case 'fileselement' :
 		$dosef = false;
 	break;
-
+	
 	case 'itemelement' :
 		$dosef = false;
 	break;
-
+	
 	case 'search' :
-		$dosef = false;
+		//$dosef = false;
 	break;
 	
 	default :
@@ -413,18 +502,6 @@ if ($task == 'weblink') {
 	shRemoveFromGETVarsList ( 'task' );
 }
 
-
-// Remove other common URL variables from GET vars list, so that they don't show up as query string in the URL
-if (!empty($option))     shRemoveFromGETVarsList ( 'option' );
-if (!empty($lang))       shRemoveFromGETVarsList ( 'lang' );
-if (!empty($Itemid))     shRemoveFromGETVarsList ( 'Itemid' );
-if (!empty($limit))      shRemoveFromGETVarsList ( 'limit' );
-
-// Variables 'limitstart', 'start', 'showall' can be zero or empty string, so use isset
-if (isset($limitstart))  shRemoveFromGETVarsList ( 'limitstart' );
-if (isset($start))       shRemoveFromGETVarsList ( 'start' );
-if (isset($showall))     shRemoveFromGETVarsList ( 'showall' );
-
 // Some special handling for pagination
 if ($view=='item') $limit = 1;   // For item view limit needs to be 1, so that page numbers are calculated correctly
 if (!isset($limitstart) &&  isset($start))  $limitstart = $start;   // Use 'start' if 'limitstart' is not set
@@ -437,13 +514,15 @@ if (!isset($limitstart) &&  isset($start))  $limitstart = $start;   // Use 'star
 //if (!empty($return))   shRemoveFromGETVarsList ( 'return' );
 
 
-// ------------------  standard plugin finalize function - don't change ---------------------------
-if ($dosef){
-  $string = shFinalizePlugin(
+// ------------------ standard plugin finalize function - don't change ---------------------------
+if ($dosef)
+{
+	$string = shFinalizePlugin(
 		$string, $title, $shAppendString, $shItemidString,
 		(isset($limit) ? $limit : null),
 		(isset($limitstart) ? $limitstart : null),
-		(isset($shLangName) ? $shLangName : null)
+		(isset($shLangName) ? $shLangName : null),
+		(isset($showall) ? $showall : null)    // currently ignored for non com_content components ?
 	);
 }
-// ------------------  standard plugin finalize function - don't change ---------------------------
+// ------------------ standard plugin finalize function - don't change ---------------------------
