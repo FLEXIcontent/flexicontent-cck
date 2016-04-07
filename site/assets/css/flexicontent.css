@@ -835,6 +835,7 @@ body .fc-mssg.fc-noborder {
 }
 input.fc-inherited-value + label {
 	font-weight: bold !important;
+	text-decoration: underline !important;
 }
 div.fc-inherited-value {
 	float: left;

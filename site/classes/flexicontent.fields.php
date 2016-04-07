@@ -2251,7 +2251,7 @@ class FlexicontentFields
 		// RANGE cases
 		case 2: case 3: case 8:
 			if ( ! @ $quoted ) foreach($value as $i => $v) {
-				if ( !$filter_compare_type ) $value[$i] = $db->Quote( $_search_prefix . $v );
+				if ( !$filter_compare_type ) $value[$i] = $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $v) );
 				else $value[$i] = $filter_compare_type==1 ? intval( $v ) : floatval( $v );
 			}
 			$reverse_values = $filter->parameters->get( 'reverse_filter_order', 0) && $display_filter_as == 8;
@@ -2264,7 +2264,7 @@ class FlexicontentFields
 		// SINGLE TEXT select value cases
 		case 1:
 			// DO NOT put % in front of the value since this will force a full table scan instead of indexed column scan
-			$_value_like = $_search_prefix.$value[0].($is_full_text ? '*' : '%');
+			$_value_like = preg_replace('(\w+)', $_search_prefix.'$0'.($is_full_text ? '*' : '%'), $value[0]);
 			if (empty($quoted))  $_value_like = $db->Quote($_value_like);
 			if ($is_full_text)
 				$valueswhere .= ' AND  MATCH (_v_) AGAINST ('.$_value_like.' IN BOOLEAN MODE)';
@@ -2277,12 +2277,12 @@ class FlexicontentFields
 			
 			if ( ! $require_all ) {
 				foreach ($value as $val) {
-					$value_clauses[] = '_v_=' . $db->Quote( $_search_prefix . $val );
+					$value_clauses[] = '_v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
 				}
 				$valueswhere .= ' AND ('.implode(' OR ', $value_clauses).') ';
 			} else {
 				foreach ($value as $val) {
-					$value_clauses[] = $db->Quote( $_search_prefix . $val );
+					$value_clauses[] = $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
 				}
 				$valueswhere = ' AND _v_ IN ('. implode(',', $value_clauses) .')';
 			}
@@ -2368,6 +2368,7 @@ class FlexicontentFields
 				$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
 				$db->execute();
 				$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$query);
+				//echo $query; exit;
 				$db->execute();
 				$_query = $query;
 				$query = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using temporary table: ".$query." for :".$_query ." <br/><br/>";
@@ -2457,6 +2458,7 @@ class FlexicontentFields
 				$db->setQuery('TRUNCATE TABLE '.$tmp_tbl);
 				$db->execute();
 				$db->setQuery('INSERT INTO '.$tmp_tbl.' '.$query);
+				//echo $query; exit;
 				$db->execute();
 				$_query = $query;
 				$query = 'SELECT id FROM '.$tmp_tbl;   //echo "<br/><br/>GET FILTERED Items (helper func) -- [".$filter->name."] using temporary table: ".$query." for :".$_query ." <br/><br/>";
