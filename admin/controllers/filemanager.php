@@ -154,9 +154,18 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			
 			$filePath_tmp = $targetDir . DIRECTORY_SEPARATOR . $fileName_tmp;
 			
-			// Open temp file
-			if (!$out = @fopen("{$filePath_tmp}", "ab")) {
-				die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream: '.$fileName_tmp.'."}, "id" : "id"}');
+			// CREATE tmp file inside SERVER tmp directory, but if this FAILS, then CREATE tmp file inside the Joomla temporary folder
+			if (!$out = @fopen("{$filePath_tmp}", "ab"))
+			{
+				
+				$targetDir = $app->getCfg('tmp_path') . DIRECTORY_SEPARATOR . "fc_fileselement";
+				if (!file_exists($targetDir))  @mkdir($targetDir);
+				$filePath_tmp = $targetDir . DIRECTORY_SEPARATOR . $fileName_tmp;
+				
+				ini_set('track_errors', 1);
+				if (!$out = @fopen("{$filePath_tmp}", "ab")) {
+					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream: '.$filePath_tmp. ' fopen failed. reason: ' .@$php_errormsg. '"}, "id" : "id"}');
+				}
 			}
 			
 			if (!empty($_FILES)) {
