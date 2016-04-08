@@ -1443,29 +1443,67 @@ class plgSystemFlexisystem extends JPlugin
 	
 	
 	
-	function renderFields($context, &$row, &$params, $page=0)
+	function renderFields($context, &$row, &$params, $page=0, $eventName='')
 	{
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+		// This is meant for Joomla article view
+		if ( $context!='com_content.article' ) return;
 		
-		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.FLEXI_ITEMVIEW.'.php');
+		$jinput = JFactory::getApplication()->input;
+		if (
+			$jinput->get('option', '', 'CMD')!='com_content' ||
+			$jinput->get('view', '', 'CMD')!='article' ||
+			$jinput->get('isflexicontent')
+		) return;
+		
+		
+		static $fields_added = array();
+		static $items = array();
+		if ( !empty($fields_added[$row->id]) ) return;
+		
+		
+		static $init = null;
+		if (!$init)
+		{
+			JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+			
+			require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.FLEXI_ITEMVIEW.'.php');
+		}
 		
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$aid = JAccess::getAuthorisedViewLevels($user->id);
 		
 		$itemmodel = new FlexicontentModelItem();
-		$item = $itemmodel->getItem($row->id, $check_view_access=false);
+		if ( !isset($items[$row->id]) )
+		{
+			$items[$row->id] = $itemmodel->getItem($row->id, $check_view_access=false);
+		}
+		$item = $items[$row->id];
+		if (!$item) return;  // Item retrieval failed avoid fatal error
 		
+		// Check placement and abort adding the fields
+		$placements_arr = array(
+			1=>'beforeContent',
+			2=>'afterContent'
+		);
+		$allow_jview = $item->parameters->get('allow_jview', 0);
+		$placement = $item->parameters->get('jview_fields_placement', 1);
+		
+		if ( !$allow_jview || !$placement || !isset($placements_arr[$placement]) ) return;   //Disabled
+		if ( $placements_arr[$placement] != $eventName ) return;  // Not current event
+		
+		$fields_added[$row->id] = true; // Only add once
 		$view = 'com_content.article' ? FLEXI_ITEMVIEW : 'category';
 		$items = FlexicontentFields::getFields($item, $view, $_item_params = null, $aid = null, $use_tmpl = false);  // $_item_params == null means only retrieve fields
 		
 		// Only Render custom fields
 		$displayed_fields = array();
-		foreach ($item->fields as $field) {
+		foreach ($item->fields as $field)
+		{
 			if ($field->iscore) continue;
 			
 			$displayed_fields[$field->name] = $field;
@@ -1477,7 +1515,8 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// Render the list of groups
 		$field_html = array();
-		foreach($displayed_fields as $field_name => $field) {
+		foreach($displayed_fields as $field_name => $field)
+		{
 			$_values = null;
 			if ( !isset($field->display) ) continue;
 			$field_html[] = '
@@ -1495,31 +1534,15 @@ class plgSystemFlexisystem extends JPlugin
 	
 	
 	
-	function onContentAfterTitle($context, &$row, &$params, $page=0)
-	{
-		if ( $context!='com_content.article' ) return;  // This is meant for Joomla article view
-		if ( JRequest::getVar('option')==$this->extension || JRequest::getVar('isflexicontent') ) return;  // This is meant for non-FLEXIcontent views
-		if ($this->cparams->get('article_jview_fields_placement', 1)!=0) return;
-		
-		return $this->renderFields($context, $row, $params, $page);
-	}
 	
 	function onContentBeforeDisplay($context, &$row, &$params, $page=0)
 	{
-		if ( $context!='com_content.article' ) return;  // This is meant for Joomla article view
-		if ( JRequest::getVar('option')==$this->extension || JRequest::getVar('isflexicontent') ) return;  // This is meant for non-FLEXIcontent views
-		if ($this->cparams->get('article_jview_fields_placement', 1)!=1) return;
-		
-		return $this->renderFields($context, $row, $params, $page);
+		return $this->renderFields($context, $row, $params, $page, 'beforeContent');
 	}
 	
 	function onContentAfterDisplay($context, &$row, &$params, $page=0)
 	{
-		if ( $context!='com_content.article' ) return;  // This is meant for Joomla article view
-		if ( JRequest::getVar('option')==$this->extension || JRequest::getVar('isflexicontent') ) return;  // This is meant for non-FLEXIcontent views
-		if ($this->cparams->get('article_jview_fields_placement', 1)!=2) return;
-		
-		return $this->renderFields($context, $row, $params, $page);
+		return $this->renderFields($context, $row, $params, $page, 'afterContent');
 	}
 	
 	
