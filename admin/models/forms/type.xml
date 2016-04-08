@@ -353,15 +353,19 @@
 			
 		<fieldset name="viewing" label="FLEXI_ITEM_VIEW" icon_class="icon-eye-open">
 			
-			<field name="" type="separator" default="FLEXI_ITEM_VIEW" level="level0" />
-			
-			<field name="allow_jview" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_REDIRECT_ARTICLE_VIEW" description="FLEXI_REDIRECT_ARTICLE_VIEW_DESC" class="btn-group group-fcmethod">
-				<option value="0" show_list="" hide_list="allow_jview">FLEXI_REDIRECT_TO_ITEM_VIEW</option>
-				<option value="1" show_list="allow_jview" hide_list="">FLEXI_ALLOW</option>
+			<field name="" type="separator" default="FLEXI_JOOMLA_ARTICLE_VIEW" level="level1" />
+			<field name="allow_jview" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_ALLOW_ARTICLE_VIEW" description="FLEXI_ALLOW_ARTICLE_VIEW_DESC" class="btn-group group-fcmethod">
+				<option value="0" show_list="" hide_list="allow_jview">FLEXI_ROUTE_TO_ITEM_VIEW</option>
+				<option value="1" show_list="allow_jview" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="search_jlinks" type="radio" default="1" label="FLEXI_SEARCH_VIEW_LINKS_TYPE" description="FLEXI_SEARCH_VIEW_LINKS_TYPE_DESC" depend_class="allow_jview" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_USE_FCITEMS_LINKS</option>
 				<option value="1">FLEXI_USE_JARTICLE_LINKS</option>
+			</field>
+			<field name="jview_fields_placement" type="radio" default="1" label="FLEXI_ADD_CUSTOM_FIELD_TO_ARTICLE_VIEW" description="FLEXI_ADD_CUSTOM_FIELD_TO_ARTICLE_VIEW_DESC" depend_class="allow_jview" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_BEFORE_CONTENT</option>
+				<option value="2">FLEXI_AFTER_CONTENT</option>
 			</field>
 			
 			<field name="" type="separator" default="Menu Item" level="level1" />
