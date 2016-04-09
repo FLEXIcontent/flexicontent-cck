@@ -1210,6 +1210,46 @@ if ($this->perms['canparams']) : ?>
 
 
 
+	<?php
+	$fieldSets = $this->form->getFieldsets('attribs');
+	foreach ($fieldSets as $name => $fieldSet) :
+		if ( $name=='themes' || $name=='params-seoconf' || $name=='images' ||  $name=='urls' || substr($name, 0, 7) == "params-") continue;
+
+		$label = JText::_('COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL');
+		if ( $label=='COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL' ) $label = JText::_('COM_CONTENT_'.$name.'_FIELDSET_LABEL');
+		$icon_class = $name == 'metafb' ? "icon-users" : 'icon-eye-open';
+		//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
+		//echo "<h2>".$label. "</h2> " . "<h3>".$name. "</h3> ";
+	?>
+	<!-- CUSTOM parameters TABs -->
+	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
+		<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
+		
+		<div class="fc_tabset_inner">
+			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+				
+				<?php if ($field->hidden): ?>
+					<span style="display:none !important;">
+						<?php echo $field->input; ?>
+					</span>
+				<?php else: ?>
+					<fieldset class="panelform">
+						<?php echo ($field->label ? '
+							<span class="label-fcouter" id="jform_attribs_'.$field->fieldname.'-lbl-outer">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+							<div class="container_fcfield">'.$field->input.'</div>
+						' : $field->input); ?>
+					</fieldset>
+				<?php endif; ?>
+				
+			<?php endforeach; ?>
+		</div>
+		
+	</div> <!-- end tab -->
+	
+	<?php endforeach; ?>
+
+
+
 	<!-- Display parameters tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-eye-open">
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_DISPLAYING'); ?> </h3>
@@ -1218,10 +1258,12 @@ if ($this->perms['canparams']) : ?>
 		<?php
 			$fieldSets = $this->form->getFieldsets('attribs');
 			foreach ($fieldSets as $name => $fieldSet) :
-				if ( $name=='themes' || $name=='params-seoconf'  || $name=='images' ||  $name=='urls' ) continue;
-
-				//$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+			
+				if ( $name=='themes' || $name=='params-seoconf'  || $name=='images' ||  $name=='urls' || substr($name, 0, 7) != "params-") continue;
+				
+				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
 				//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
+				//echo "<h2>".$label. "</h2> " . "<h3>".$name. "</h3> ";
 				?>
 				<?php foreach ($this->form->getFieldset($name) as $field) : ?>
 					

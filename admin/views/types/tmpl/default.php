@@ -36,7 +36,7 @@ $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 $list_total_cols = 12;
 
-$article_viewing_tip  = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_REDIRECT_ARTICLE_VIEW', true).'" title="'.flexicontent_html::getToolTip('FLEXI_REDIRECT_ARTICLE_VIEW', 'FLEXI_REDIRECT_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
+$article_viewing_tip  = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_('FLEXI_JOOMLA_ARTICLE_VIEW', true).'" title="'.flexicontent_html::getToolTip('FLEXI_JOOMLA_ARTICLE_VIEW', 'FLEXI_JOOMLA_ARTICLE_VIEW_DESC', 1, 1).'" /> ';
 $default_template_tip = '<img src="components/com_flexicontent/assets/images/comment.png" class="fc-man-icon-s '.$tip_class.'" data-placement="bottom" alt="'.JText::_( 'FLEXI_TYPE_DEFAULT_TEMPLATE', true ).'" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'" /> ';
 $editLayout_icon = '<img src="components/com_flexicontent/assets/images/layout_edit.png" class="'.$ico_class.' '.$tip_class.'" alt="'.$edit_layout.'" title="'.$edit_layout.'" /> ';
 ?>
@@ -133,7 +133,7 @@ function delAllFilters() {
 			<th class="hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th class="hideOnDemandClass title"><?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="hideOnDemandClass col_redirect hidden-tablet hidden-phone"><?php echo $article_viewing_tip . JText::_( 'FLEXI_REDIRECT_ARTICLE_VIEW' )."<br/><small>(".JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REDIRECTED' ).")</small>"; ?></th>
+			<th class="hideOnDemandClass col_redirect hidden-tablet hidden-phone"><?php echo $article_viewing_tip . JText::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(".JText::_( 'FLEXI_ALLOWED') .' / '. JText::_( 'FLEXI_REROUTED' ).")</small>"; ?></th>
 			<th class="hideOnDemandClass hidden-phone" colspan="2"><?php echo $default_template_tip.JText::_( 'FLEXI_TEMPLATE' )."<br/><small>(".JText::_( 'FLEXI_PROPERTY_DEFAULT' )." ".JText::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?></th>
 			<th class="hideOnDemandClass hidden-tablet hidden-phone"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -221,7 +221,7 @@ function delAllFilters() {
 				<span style="cursor:pointer;"
 					<?php
 					echo ' class="'.$btn_class.' btn-small" onclick="return listItemTask(\'cb'.$i.'\',\'types.toggle_jview\');">';
-					echo JText::_($row->config->get("allow_jview") ? 'FLEXI_ALLOWED' : 'FLEXI_REDIRECT_TO_ITEM_VIEW');
+					echo JText::_($row->config->get("allow_jview") ? 'FLEXI_ALLOWED' : 'FLEXI_ROUTE_TO_ITEM_VIEW');
 					?>
 				</span>
 			</td>
