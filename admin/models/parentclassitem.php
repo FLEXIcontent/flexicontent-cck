@@ -1153,10 +1153,14 @@ class ParentClassItem extends JModelAdmin
 	 * @return	mixed	The data for the form.
 	 * @since	1.6
 	 */
-	protected function loadFormData() {
+	protected function loadFormData()
+	{
 		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
-		JFactory::getApplication()->setUserState('com_flexicontent.edit.'.$this->getName().'.data', false);
+		$app = JFactory::getApplication();
+		$data = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
+		
+		// Clear form data from session ?
+		$app->setUserState('com_flexicontent.edit.'.$this->getName().'.data', false);
 		
 		if (empty($data)) {
 			$data = $this->_item ? $this->_item : $this->getItem();
@@ -1174,6 +1178,14 @@ class ParentClassItem extends JModelAdmin
 				if ( isset($data['catid']) )     $this->_item->catid  = $data['catid'];
 			}
 		}
+
+		// If there are params fieldsets in the form it will fail with a registry object
+		if (isset($data->params) && $data->params instanceof Registry)
+		{
+			$data->params = $data->params->toArray();
+		}
+
+		$this->preprocessData('com_flexicontent.item', $data);
 		
 		return $data;
 	}

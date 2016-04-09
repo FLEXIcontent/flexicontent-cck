@@ -1039,8 +1039,14 @@ if ( $typeid && $this->params->get('useseoconf_fe', 0) ) : ob_start(); // seocon
 <?php $captured['seoconf'] = ob_get_clean(); endif;
 
 
+$has_custom_params = false;
+foreach ($fieldSets as $name => $fieldSet) {
+	if ($name=='themes' || $name=='params-basic' || $name=='params-advanced' || $name=='params-seoconf') continue;
+	$has_custom_params = true;
+	break;
+}
 
-if ( $typeid && $this->params->get('usedisplaydetails_fe') ) : ob_start(); ?>
+if ( $typeid && $this->params->get('usedisplaydetails_fe') || $has_custom_params ) : ob_start(); ?>
 <fieldset class="panelform params_set">
 	<legend>
 		<?php echo JText::_( 'FLEXI_DISPLAYING' ); ?>
@@ -1048,13 +1054,12 @@ if ( $typeid && $this->params->get('usedisplaydetails_fe') ) : ob_start(); ?>
 	
 	<?php foreach ($fieldSets as $name => $fieldSet) : ?>
 		<?php
-		$fieldsetname = str_replace("params-", "", $name);
-		if ( $fieldsetname=='basic') {
+		if ( $name=='params-basic' ) {
 			if ( $this->params->get('usedisplaydetails_fe') < 1 ) continue;
-		} else if ( $fieldsetname=='advanced') {
+		} else if ( $name=='params-advanced' ) {
 			if ( $this->params->get('usedisplaydetails_fe') < 2 ) continue;
 		} else {
-			continue;
+			if ($name=='themes' || $name=='params-seoconf') continue;
 		}
 		$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
 		?>
@@ -1063,12 +1068,12 @@ if ( $typeid && $this->params->get('usedisplaydetails_fe') ) : ob_start(); ?>
 			<!--legend><?php echo JText::_($label); ?></legend-->
 					
 			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-				<?php if ( $this->params->get('allowdisablingcomments_fe') && $fieldsetname=='advanced' && $field->fieldname=='comments')  continue; ?>
-				<div class="fcclear"></div>
+				<?php if ( $this->params->get('allowdisablingcomments_fe') && $name=='params-advanced' && $field->fieldname=='comments')  continue; ?>
 				<?php echo $field->label; ?>
 				<div class="container_fcfield">
 					<?php echo $field->input;?>
 				</div>
+				<div class="fcclear"></div>
 			<?php endforeach; ?>
 		</fieldset>
 	<?php endforeach; ?>
