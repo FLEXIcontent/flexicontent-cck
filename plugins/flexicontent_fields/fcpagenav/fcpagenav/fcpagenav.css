@@ -5,7 +5,8 @@
 }
 .fcpagenav.btn-group {
 	box-sizing: border-box !important;
-	margin: 6px;
+	margin: 32px 2%;
+	width: 96%;
 }
 
 .fcpagenav a img,

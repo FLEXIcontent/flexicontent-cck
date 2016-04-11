@@ -43,8 +43,6 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$folder  = JRequest::getVar('folder',  'default', '', 'cmd');
 		$ismodal = JRequest::getVar('ismodal',  'default', '', 'int');
 		
-		FLEXIUtilities::loadTemplateLanguageFile( $folder );
-
 		//Get data from the model
 		$layout  = $this->get( 'Data');
 		if (!$layout)
@@ -235,6 +233,18 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		} else {
 			$layout->params->loadINI($row->params);
 		}
+		
+		
+		// Create / Update less files, NOTE: Do this after loading the JForm because we need the XML parameters,
+		// ... in order to user their default values into the LESS files:  config_auto_item.less  -AND-  config_auto_category.less
+		$this->create_LESS_Files($layout);
+		
+		// Load the template again but ... this time allow triggering less compiling if needed
+		flexicontent_tmpl::getTemplates( $folder, $skip_less=false );
+		
+		// Load language file (this will also load the template and also trigger less compiling)
+		FLEXIUtilities::loadTemplateLanguageFile( $folder );
+		
 		//print_r($layout);
 		
 		//assign data to template
@@ -255,5 +265,85 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		
 		parent::display($tpl);
 	}
+	
+	
+	
+	
+	function create_LESS_Files($layout = null)
+	{
+		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$layout->name;
+		
+		// Create less folders if they do not exist already
+		if ( !JFolder::exists( $tmpldir . '/less' ) ) if ( !JFolder::create( $tmpldir . '/less') )  JError::raiseWarning(100, JText::_('Unable to create "/less/" folder'));
+		
+		// Abort if directory creation failed
+		if ( ! JFolder::exists( $tmpldir . '/less' ) ) return;
+		
+		
+		// ***********************************************************************
+		// Create CUSTOM config.less, that is include by item.less / category.less
+		// ************************************************************ ***********
+		
+		if ( !JFolder::exists( $tmpldir . '/less/include' ) ) if ( !JFolder::create( $tmpldir . '/less/include') )  JError::raiseWarning(100, JText::_('Unable to create "/less/include" folder'));
+		if ( !JFile::exists($tmpldir . '/less/include/config.less') ) {
+			file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n@import 'config_auto_item.less';\n@import 'config_auto_category.less';\n");
+		}
+		
+		
+		// *************************************************************************
+		// Create files item.less / category.less by COPYING item.css / category.css
+		// *************************************************************************
+		
+		$less_files = array('/css/item.css'=>'/less/item.less', '/css/category.css'=>'/less/category.less');
+		foreach($less_files as $css_name => $less_name) {
+			if ( !JFile::exists($tmpldir . $css_name) )  continue;  // Do not try to copy CSS file that does not exist
+			if ( !JFile::exists($tmpldir . $less_name) ) {
+				if ( !JFile::copy($tmpldir.$css_name, $tmpldir.$less_name) ) {
+					JError::raiseWarning(100, JText::_('Unable to create file: "'.$tmpldir.$less_name.'"'));
+				} else {
+					$file_data = "@import 'include/config.less';\n\n";
+					$file_data .= preg_replace("/[ \t]*\*zoom[\s]*:[\s]*expression[^\r\n]+[\r\n]+/u", "", file_get_contents($tmpldir.$less_name));  // copy and replace old invalid code
+					file_put_contents($tmpldir.$less_name, $file_data);
+				}
+			}
+		}
+		
+		
+		// ****************************************************************************************************************************
+		// Create / Update the "variable defaults" FILEs (using defaults from XML files): config_auto_item.less / config_auto_item.less 
+		// ****************************************************************************************************************************
+		
+		$less_data = "/* This is created automatically, do NOT edit this manually! \nThis is used by _layout_type_ layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' \n to make a parameter be a LESS variable, edit parameter in _layout_type_.xml and add cssprep=\"less\" \n created parameters will be like: @FCLL_parameter_name: value; */\n\n";
+		$_less_auto = false;
+		if ( $layout->view=='item' && ( !JFile::exists($tmpldir . '/less/include/config_auto_item.less') || filemtime($tmpldir . '/less/include/config_auto_item.less') < filemtime($tmpldir . '/item.xml') ) ) {
+			$_less_auto = $tmpldir . '/less/include/config_auto_item.less';
+			file_put_contents($_less_auto, str_replace("FCLL_", "FCI_", str_replace("_layout_type_", "item", $less_data)));
+		}
+		if ( $layout->view=='category' && ( !JFile::exists($tmpldir . '/less/include/config_auto_category.less') || filemtime($tmpldir . '/less/include/config_auto_category.less') < filemtime($tmpldir . '/category.xml') ) ) {
+			$_less_auto = $tmpldir . '/less/include/config_auto_category.less';
+			file_put_contents($_less_auto, str_replace("FCLL_", "FCC_", str_replace("_layout_type_", "category", $less_data)));
+		}
+
+		$_FCLL = $layout->view=='item' ? '@FCI_' : '@FCC_';
+		
+		$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
+		$fieldSets = $layout->params->getFieldsets($groupname);
+		foreach ($fieldSets as $fsname => $fieldSet)
+		{
+			foreach ($layout->params->getFieldset($fsname) as $field)
+			{
+				$fieldname = $field->fieldname;
+				$cssprep = $field->getAttribute('cssprep')=='less';
+				
+				if ($cssprep && $_less_auto)
+				{
+					$default_value = $field->getAttribute('default');
+					file_put_contents($_less_auto, $_FCLL.$fieldname.': '.$default_value.";\n", FILE_APPEND);
+				}
+			}
+		}
+		
+	}
+
 }
 ?>

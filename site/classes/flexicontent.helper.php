@@ -5088,7 +5088,7 @@ class flexicontent_tmpl
 	}
 	
 	
-	static function getTemplates($layout_name = null)
+	static function getTemplates($layout_name = null, $skip_less_compile = false)
 	{
 		static $tmpls = null;
 		
@@ -5119,7 +5119,7 @@ class flexicontent_tmpl
 		// Check/Complie LESS files to CSS
 		// *******************************
 		
-		if ( count($checked_layouts) )
+		if ( count($checked_layouts) && !$skip_less_compile )
 		{
 			// Compile LESS to CSS, checking if -specific layout(s)- files have been modified
 			if ($print_logging_info) $start_microtime = microtime(true);

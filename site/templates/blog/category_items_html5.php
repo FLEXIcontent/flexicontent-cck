@@ -22,10 +22,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
 
-$lead_use_image = $this->params->get('lead_use_image', 1);
-$lead_link_image_to = $this->params->get('lead_link_image_to', 0);
-$intro_use_image = $this->params->get('intro_use_image', 1);
-$intro_link_image_to = $this->params->get('intro_link_image_to', 0);
+$lead_use_image        = $this->params->get('lead_use_image', 1);
+$lead_link_image_to    = $this->params->get('lead_link_image_to', 0);
+$lead_use_description  = $this->params->get('lead_use_description', 1);
+
+$intro_use_image       = $this->params->get('intro_use_image', 1);
+$intro_link_image_to   = $this->params->get('intro_link_image_to', 0);
+$intro_use_description = $this->params->get('intro_use_description', 1);
 
 $lead_link_to_popup  = $this->params->get('lead_link_to_popup', 0);
 $intro_link_to_popup = $this->params->get('intro_link_to_popup', 0);
@@ -383,7 +386,8 @@ if ($leadnum) :
 				<?php endif; ?>
 			</figure>
 			<?php endif; ?>
-            <?php if ($lead_use_description) : ?>    
+			  
+			<?php if ($lead_use_description) : ?>
 			<p>
 			<?php
 				//FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
@@ -394,7 +398,8 @@ if ($leadnum) :
 				endif;
 			?>
 			</p>
-            <?php endif; ?>
+			<?php endif; ?>
+			
 			</div>
 
 			<!-- BOF under-description-line1 block -->
@@ -748,7 +753,8 @@ if ($count > $leadnum) :
 				<?php endif; ?>
 			</figure>
 			<?php endif; ?>
-            <?php if ($introitems_use_description ) : ?> 
+			
+			<?php if ($intro_use_description ) : ?>      
 			<p>
 			<?php
 				//FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
@@ -759,7 +765,8 @@ if ($count > $leadnum) :
 				endif;
 			?>
 			</p>
-                <?php endif; ?>
+			<?php endif; ?>  
+			
 			</div>
 
 			<!-- BOF under-description-line1 block -->
