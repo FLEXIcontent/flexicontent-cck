@@ -7,7 +7,37 @@
 #flexicontent .fc_item_title {
 	color: @FCI_title_color;
 }
-
+/* TAB color */
+#flexicontent ul.tabbernav > li a {
+    border: 1px solid @FCI_tab2_color;
+    background-color: @FCI_tab1_color;
+    background-image: -webkit-gradient(linear, left top, left bottom, from( @FCI_tab1_color ), to( @FCI_tab2_color ));
+    background-image: -webkit-linear-gradient(top, @FCI_tab1_color , @FCI_tab2_color);
+    background-image: -moz-linear-gradient(top, @FCI_tab1_color , @FCI_tab2_color) ;
+    background-image: -ms-linear-gradient(top, @FCI_tab1_color , @FCI_tab2_color );
+    background-image: -o-linear-gradient(top, @FCI_tab1_color , @FCI_tab2_color );
+    background-image: linear-gradient(to bottom, @FCI_tab1_color , @FCI_tab2_color );
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= @FCI_tab1_color , endColorstr= @FCI_tab2_color );
+    color: @FCI_tab_text_color;
+}
+#flexicontent ul.tabbernav > li.tabberactive a::before {
+    border-top: 4px solid @FCI_tab2_color;
+}
+#flexicontent ul.tabbernav > li.tabberactive a, #flexicontent ul.tabbernav > li.tabberactive a:hover{
+    background-color: @FCI_tab2_color;
+}
+#flexicontent ul.tabbernav > li:hover a {
+    border: 1px solid darken(@FCI_tab2_color, 20%);
+    background-color: darken(@FCI_tab1_color, 20%);
+    background-image: -webkit-gradient(linear, left top, left bottom, from( darken(@FCI_tab1_color, 20%) ), to( darken(@FCI_tab2_color, 20%) ));
+    background-image: -webkit-linear-gradient(top, darken(@FCI_tab1_color, 20%) , darken(@FCI_tab2_color, 20%));
+    background-image: -moz-linear-gradient(top, darken(@FCI_tab1_color, 20%) , darken(@FCI_tab2_color, 20%)) ;
+    background-image: -ms-linear-gradient(top, darken(@FCI_tab1_color, 20%) , darken(@FCI_tab2_color, 20%) );
+    background-image: -o-linear-gradient(top, darken(@FCI_tab1_color, 20%) , darken(@FCI_tab2_color, 20%) );
+    background-image: linear-gradient(to bottom, darken(@FCI_tab1_color, 20%) , darken(@FCI_tab2_color, 20%) );
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= darken(@FCI_tab1_color, 20%) , endColorstr= darken(@FCI_tab2_color, 20%) );
+    color: @FCI_tab_text_color;
+}
 .flexi.lineinfo {
 	display: block;
 	padding: 0;
