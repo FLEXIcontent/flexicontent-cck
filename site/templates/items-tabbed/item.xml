@@ -29,6 +29,14 @@
 				<option value="one">FLEXI_1_COL</option>
 				<option value="two">FLEXI_2_COLS</option>
 			</field>
+            
+            <field name="color_tabs_grp" type="separator" default="FLEXI_TABS_COLOR" description="" level="level2" hr="false" />
+            
+            <field name="tab1_color" type="color" cssprep="less" size="3" default="inherit" label="FLEXI_TAB_COLOR1" description="FLEXI_TAB_COLOR1_DESC" />
+            
+            <field name="tab2_color" type="color" cssprep="less" size="3" default="inherit" label="FLEXI_TAB_COLOR2" description="FLEXI_TAB_COLOR2" />
+            
+            <field name="tab_text_color" type="color" cssprep="less" size="3" default="inherit" label="FLEXI_TAB_TITLE_COLOR" description="FLEXI_TAB_TITLE_COLOR_DESC" />
 			
 			<field name="subtitle_tabs_grp" type="separator" default="SubTitle Tabs" description="" level="level2" hr="false" />
 			<field name="subtitle_tab1_label" type="text" default="" label="Label for Tab 1" description="The text for this label is filter via JText (you can add to your ini language files)" />
