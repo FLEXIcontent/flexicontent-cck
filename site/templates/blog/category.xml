@@ -50,6 +50,13 @@
 			</field>
 			
 			<field name="leadingitems_text_sep" type="separator" hr="false" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
+            
+            <field name="lead_use_description" type="radio" default="1" label="FLEXI_DISPLAY_DESCRIPTION" description="FLEXI_DISPLAY_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
+                <option value="">FLEXI_USE_GLOBAL</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+            </field>
+
 			<field name="lead_strip_html" type="radio" default="" label="FLEXI_STRIP_N_CUT" description="FLEXI_STRIP_N_CUT_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -128,6 +135,14 @@
 			</field>
 			
 			<field name="introitems_text_sep" type="separator" hr="false" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
+            
+             <field name="introitems_use_description" type="radio" default="1" label="FLEXI_DISPLAY_DESCRIPTION" description="FLEXI_DISPLAY_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
+                <option value="">FLEXI_USE_GLOBAL</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+            </field>
+            
+            
 			<field name="intro_strip_html" type="radio" default="" label="FLEXI_STRIP_N_CUT" description="FLEXI_STRIP_N_CUT_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>

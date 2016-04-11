@@ -383,6 +383,7 @@ if ($leadnum) :
 				<?php endif; ?>
 			</figure>
 			<?php endif; ?>
+            <?php if ($lead_use_description) : ?>    
 			<p>
 			<?php
 				//FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
@@ -393,6 +394,7 @@ if ($leadnum) :
 				endif;
 			?>
 			</p>
+            <?php endif; ?>
 			</div>
 
 			<!-- BOF under-description-line1 block -->
@@ -746,6 +748,7 @@ if ($count > $leadnum) :
 				<?php endif; ?>
 			</figure>
 			<?php endif; ?>
+            <?php if ($introitems_use_description ) : ?> 
 			<p>
 			<?php
 				//FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
@@ -756,6 +759,7 @@ if ($count > $leadnum) :
 				endif;
 			?>
 			</p>
+                <?php endif; ?>
 			</div>
 
 			<!-- BOF under-description-line1 block -->
