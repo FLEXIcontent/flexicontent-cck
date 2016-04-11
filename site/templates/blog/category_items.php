@@ -25,6 +25,7 @@ $lead_use_image = $this->params->get('lead_use_image', 1);
 $lead_link_image_to = $this->params->get('lead_link_image_to', 0);
 $intro_use_image = $this->params->get('intro_use_image', 1);
 $intro_link_image_to = $this->params->get('intro_link_image_to', 0);
+$lead_use_description = $this->params->get('lead_use_description', 1);
 
 $lead_link_to_popup  = $this->params->get('lead_link_to_popup', 0);
 $intro_link_to_popup = $this->params->get('intro_link_to_popup', 0);
@@ -370,6 +371,8 @@ if ($leadnum) :
 				<?php endif; ?>
 			</div>
 			<?php endif; ?>
+                
+            <?php if ($lead_use_description) : ?>
 			<p>
 			<?php
 				//FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
@@ -380,6 +383,7 @@ if ($leadnum) :
 				endif;
 			?>
 			</p>
+               <?php endif; ?>
 			</div>
 
 			<!-- BOF under-description-line1 block -->
@@ -704,6 +708,8 @@ if ($count > $leadnum) :
 				<?php endif; ?>
 			</div>
 			<?php endif; ?>
+                
+            <?php if ($introitems_use_description ) : ?>      
 			<p>
 			<?php
 				//FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
@@ -714,6 +720,7 @@ if ($count > $leadnum) :
 				endif;
 			?>
 			</p>
+              <?php endif; ?>  
 			</div>
 
 			<!-- BOF under-description-line1 block -->
