@@ -131,7 +131,7 @@ class FlexicontentModelTemplate extends JModelLegacy
 	function _getLayout()
 	{
 		// Get all templates re-parsing only XML/LESS files of a specific template
-		$tmpl	= flexicontent_tmpl::getTemplates($this->_folder);
+		$tmpl	= flexicontent_tmpl::getTemplates($this->_folder, $skip_less_compile=true);  // Will check less compiling later ...
 		
 		$layout = !isset($tmpl->{$this->_type}->{$this->_folder})  ?  false  :  $tmpl->{$this->_type}->{$this->_folder};
 		

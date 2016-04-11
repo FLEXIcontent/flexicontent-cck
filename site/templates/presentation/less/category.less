@@ -1,39 +1,46 @@
 @import 'include/config.less';
 
-/*TAB color */
-#flexicontent ul.tabbernav > li a {
-    border: 1px solid @FCI_tab2_color;
-    background-color: @FCI_tab1_color;
-    background-image: -webkit-gradient(linear, left top, left bottom, from( @FCI_tab1_color ), to( @FCI_tab2_color ));
-    background-image: -webkit-linear-gradient(top, @FCI_tab1_color , @FCI_tab2_color);
-    background-image: -moz-linear-gradient(top, @FCI_tab1_color , @FCI_tab2_color) ;
-    background-image: -ms-linear-gradient(top, @FCI_tab1_color , @FCI_tab2_color );
-    background-image: -o-linear-gradient(top, @FCI_tab1_color , @FCI_tab2_color );
-    background-image: linear-gradient(to bottom, @FCI_tab1_color , @FCI_tab2_color );
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= @FCI_tab1_color , endColorstr= @FCI_tab2_color );
-    color: @FCI_tab_text_color;
-}
-#flexicontent ul.tabbernav > li.tabberactive a::before {
-    border-top: 4px solid @FCI_tab2_color;
-}
-#flexicontent ul.tabbernav > li.tabberactive a, #flexicontent ul.tabbernav > li.tabberactive a:hover{
-    background-color: @FCI_tab2_color;
-}
-#flexicontent ul.tabbernav > li:hover a {
-    border: 1px solid darken(@FCI_tab2_color, 20%);
-    background-color: darken(@FCI_tab1_color, 20%);
-    background-image: -webkit-gradient(linear, left top, left bottom, from( darken(@FCI_tab1_color, 20%) ), to( darken(@FCI_tab2_color, 20%) ));
-    background-image: -webkit-linear-gradient(top, darken(@FCI_tab1_color, 20%) , darken(@FCI_tab2_color, 20%));
-    background-image: -moz-linear-gradient(top, darken(@FCI_tab1_color, 20%) , darken(@FCI_tab2_color, 20%)) ;
-    background-image: -ms-linear-gradient(top, darken(@FCI_tab1_color, 20%) , darken(@FCI_tab2_color, 20%) );
-    background-image: -o-linear-gradient(top, darken(@FCI_tab1_color, 20%) , darken(@FCI_tab2_color, 20%) );
-    background-image: linear-gradient(to bottom, darken(@FCI_tab1_color, 20%) , darken(@FCI_tab2_color, 20%) );
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= darken(@FCI_tab1_color, 20%) , endColorstr= darken(@FCI_tab2_color, 20%) );
-    color: @FCI_tab_text_color;
-}
-
-
 /* Presentation Theme : item template CSS file */
+
+/*LESS EXAMPLE variable name: 'FCC_' + parameter name */
+/* e.g. 'FCC_' + 'title_color' =>  'FCC_title_color' */
+#flexicontent .fc_item_title {
+	color: @FCC_title_color;
+}
+
+/* TAB color */
+body #flexicontent ul.tabbernav > li a {
+	border: 1px solid @FCC_tab_bg_color_end;
+	background-color: @FCC_tab_bg_color_start;
+	background-image: -webkit-gradient(linear, left top, left bottom, from( @FCC_tab_bg_color_start ), to( @FCC_tab_bg_color_end ));
+	background-image: -webkit-linear-gradient(top, @FCC_tab_bg_color_start , @FCC_tab_bg_color_end);
+	background-image: -moz-linear-gradient(top, @FCC_tab_bg_color_start , @FCC_tab_bg_color_end) ;
+	background-image: -ms-linear-gradient(top, @FCC_tab_bg_color_start , @FCC_tab_bg_color_end );
+	background-image: -o-linear-gradient(top, @FCC_tab_bg_color_start , @FCC_tab_bg_color_end );
+	background-image: linear-gradient(to bottom, @FCC_tab_bg_color_start , @FCC_tab_bg_color_end );
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= @FCC_tab_bg_color_start , endColorstr= @FCC_tab_bg_color_end );
+	color: @FCC_tab_title_color;
+}
+body #flexicontent ul.tabbernav > li.tabberactive a::before {
+	border-top: 4px solid @FCC_tab_bg_color_end;
+}
+/*  ... NOT USED !!
+body #flexicontent ul.tabbernav > li.tabberactive a,
+body #flexicontent ul.tabbernav > li.tabberactive a:hover{
+	background-color: @FCC_tab_bg_color_active;
+}*/
+body #flexicontent ul.tabbernav > li:hover a {
+	border: 1px solid darken(@FCC_tab_bg_color_end, 20%);
+	background-color: darken(@FCC_tab_bg_color_start, 20%);
+	background-image: -webkit-gradient(linear, left top, left bottom, from( darken(@FCC_tab_bg_color_start, 20%) ), to( darken(@FCC_tab_bg_color_end, 20%) ));
+	background-image: -webkit-linear-gradient(top, darken(@FCC_tab_bg_color_start, 20%) , darken(@FCC_tab_bg_color_end, 20%));
+	background-image: -moz-linear-gradient(top, darken(@FCC_tab_bg_color_start, 20%) , darken(@FCC_tab_bg_color_end, 20%)) ;
+	background-image: -ms-linear-gradient(top, darken(@FCC_tab_bg_color_start, 20%) , darken(@FCC_tab_bg_color_end, 20%) );
+	background-image: -o-linear-gradient(top, darken(@FCC_tab_bg_color_start, 20%) , darken(@FCC_tab_bg_color_end, 20%) );
+	background-image: linear-gradient(to bottom, darken(@FCC_tab_bg_color_start, 20%) , darken(@FCC_tab_bg_color_end, 20%) );
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr= darken(@FCC_tab_bg_color_start, 20%) , endColorstr= darken(@FCC_tab_bg_color_end, 20%) );
+	color: @FCC_tab_title_color;
+}
 
 .flexi.lineinfo {
 	display: block;
