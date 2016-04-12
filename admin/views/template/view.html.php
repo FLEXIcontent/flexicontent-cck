@@ -221,23 +221,17 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		}
 		
 		
-		// **********************************************************************************
-		// Get Templates and apply Template Parameters values into the form fields structures 
-		// **********************************************************************************
+		// Check that less files for all layouts of current template (=folder) exist and are up-to-date
+		$this->check_less_files($folder);
 		
-		if (FLEXI_J16GE) {
-			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
+		// Create / load layout parameters if not already done above
+		if (!is_object($layout->params))
+		{
+			$jform = new JForm('com_flexicontent.template', array('control' => 'jform', 'load_data' => true));
 			$jform->load($layout->params);
 			$layout->params = $jform;
-			// ... values applied at the template form file
-		} else {
-			$layout->params->loadINI($row->params);
 		}
-		
-		
-		// Create / Update less files, NOTE: Do this after loading the JForm because we need the XML parameters,
-		// ... in order to user their default values into the LESS files:  config_auto_item.less  -AND-  config_auto_category.less
-		$this->create_LESS_Files($layout);
+		// ... values applied at the template form file
 		
 		// Load the template again but ... this time allow triggering less compiling if needed
 		flexicontent_tmpl::getTemplates( $folder, $skip_less=false );
@@ -268,10 +262,48 @@ class FlexicontentViewTemplate extends JViewLegacy {
 	
 	
 	
-	
-	function create_LESS_Files($layout = null)
+	/*
+	 * Check that the LESS layout file that stores parameter values exists and is up to date (its modification time after XML file modification)
+	 */
+	function check_xml_to_less($layout = null)
 	{
 		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$layout->name;
+		
+		// ****************************************************************************************************************************
+		// Create / Update the "variable defaults" FILEs (using defaults from XML files): config_auto_item.less / config_auto_item.less 
+		// ****************************************************************************************************************************
+		
+		$view = $layout->view;
+		$less_data = "/* This is created automatically, do NOT edit this manually! \nThis is used by _layout_type_ layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' \n to make a parameter be a LESS variable, edit parameter in _layout_type_.xml and add cssprep=\"less\" \n created parameters will be like: @FCLL_parameter_name: value; */\n\n";
+		$_less_auto = false;
+		if ( !JFile::exists($tmpldir . '/less/include/config_auto_'.$view.'.less') || filemtime($tmpldir . '/less/include/config_auto_'.$view.'.less') < filemtime($tmpldir . '/'.$view.'.xml') ) {
+			$_less_auto = $tmpldir . '/less/include/config_auto_'.$view.'.less';
+			file_put_contents($_less_auto, str_replace("FCLL_", "FCI_", str_replace("_layout_type_", $view, $less_data)));
+		}
+		if (!$_less_auto) return;
+		
+		$layout_type = $view == 'item' ? 'items' : 'category';
+		$model = new FlexicontentModelTemplate();
+		$model->setLayoutType($layout_type);
+		$_layout = $model->getData();
+		$_conf = $model->getLayoutConf();
+		$_attribs = $_conf->attribs;
+		$model->storeLessConf($layout->name, $cfgname='', $layout_type, $_attribs);
+	}
+	
+	/*	
+	 * Check that less files for all layouts of current template (=folder) exist and are up-to-date
+	 */
+	function check_less_files($folder)
+	{
+		// **************************************************************************************
+		// Get both single item ('items') and multi-item ('category') layouts of current template
+		// 'folder' and apply Template Parameters values into the form fields structures 
+		// **************************************************************************************
+		
+		$tmpl = flexicontent_tmpl::getTemplates( $folder, $skip_less=true );
+		
+		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$folder;
 		
 		// Create less folders if they do not exist already
 		if ( !JFolder::exists( $tmpldir . '/less' ) ) if ( !JFolder::create( $tmpldir . '/less') )  JError::raiseWarning(100, JText::_('Unable to create "/less/" folder'));
@@ -309,41 +341,14 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		}
 		
 		
-		// ****************************************************************************************************************************
-		// Create / Update the "variable defaults" FILEs (using defaults from XML files): config_auto_item.less / config_auto_item.less 
-		// ****************************************************************************************************************************
+		// Check that the LESS layout files that stores parameter values exist
+		// and they are up to date (their modification time after XML file modification)
 		
-		$less_data = "/* This is created automatically, do NOT edit this manually! \nThis is used by _layout_type_ layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' \n to make a parameter be a LESS variable, edit parameter in _layout_type_.xml and add cssprep=\"less\" \n created parameters will be like: @FCLL_parameter_name: value; */\n\n";
-		$_less_auto = false;
-		if ( $layout->view=='item' && ( !JFile::exists($tmpldir . '/less/include/config_auto_item.less') || filemtime($tmpldir . '/less/include/config_auto_item.less') < filemtime($tmpldir . '/item.xml') ) ) {
-			$_less_auto = $tmpldir . '/less/include/config_auto_item.less';
-			file_put_contents($_less_auto, str_replace("FCLL_", "FCI_", str_replace("_layout_type_", "item", $less_data)));
-		}
-		if ( $layout->view=='category' && ( !JFile::exists($tmpldir . '/less/include/config_auto_category.less') || filemtime($tmpldir . '/less/include/config_auto_category.less') < filemtime($tmpldir . '/category.xml') ) ) {
-			$_less_auto = $tmpldir . '/less/include/config_auto_category.less';
-			file_put_contents($_less_auto, str_replace("FCLL_", "FCC_", str_replace("_layout_type_", "category", $less_data)));
-		}
-
-		$_FCLL = $layout->view=='item' ? '@FCI_' : '@FCC_';
+		$_layout = !isset($tmpl->items->$folder)  ?  false  :  $tmpl->items->$folder;
+		$this->check_xml_to_less($_layout);
 		
-		$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
-		$fieldSets = $layout->params->getFieldsets($groupname);
-		foreach ($fieldSets as $fsname => $fieldSet)
-		{
-			foreach ($layout->params->getFieldset($fsname) as $field)
-			{
-				$fieldname = $field->fieldname;
-				$cssprep = $field->getAttribute('cssprep')=='less';
-				
-				if ($cssprep && $_less_auto)
-				{
-					$default_value = $field->getAttribute('default');
-					file_put_contents($_less_auto, $_FCLL.$fieldname.': '.$default_value.";\n", FILE_APPEND);
-				}
-			}
-		}
-		
+		$_layout = !isset($tmpl->category->$folder)  ?  false  :  $tmpl->category->$folder;
+		$this->check_xml_to_less($_layout);
 	}
-
 }
 ?>

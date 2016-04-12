@@ -104,6 +104,20 @@ class FlexicontentModelTemplate extends JModelLegacy
 	
 	
 	/**
+	 * Method to set the layout type ('items' or 'category')
+	 * 'items': single item layout
+	 * 'category': multi-item layout
+	 *
+	 * @access	public
+	 * @param	int item identifier
+	 */
+	function setLayoutType($type)
+	{
+		$this->_type    = $type;
+	}
+	
+	
+	/**
 	 * Method to get the layout data (XML schema, CSS/JS files, image, etc)
 	 *
 	 * @access public
@@ -406,16 +420,15 @@ class FlexicontentModelTemplate extends JModelLegacy
 	function storeLessConf($folder, $cfgname, $layout, $attribs)
 	{
 		// Load the XML file into a JForm object
-		$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
+		$jform = new JForm('com_flexicontent.template', array('control' => 'jform', 'load_data' => true));
 		$jform->load($this->_getLayout()->params);   // params is the XML file contents as a string
 		
-
-		$layout_type = $layout=='items'? 'item' : 'category';
+		$layout_type = $layout=='items' ? 'item' : 'category';
 		$tmpldir = JPath::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates');
 		$less_path = JPath::clean($tmpldir.DS.$folder.DS.'less/include/config_auto_'.$layout_type.'.less');
 		//echo "<pre>".$less_path."<br/>";
 
-		$var_pfx = '@FC'. ($layout == 'items' ? 'I' : 'C').'_';
+		$_FCLL = '@FC'. ($layout == 'items' ? 'I' : 'C').'_';
 		
 		// Get 'attribs' fieldset
 		$fieldSets = $jform->getFieldsets($groupname = 'attribs');
@@ -427,13 +440,14 @@ class FlexicontentModelTemplate extends JModelLegacy
 			foreach($jform->getFieldset($fsname) as $field)
 			{
 				if ($field->getAttribute('cssprep')!='less') continue;  // Only add parameters meant to be less variables
-				if (is_array($attribs[$field->fieldname])) continue;  // array parameters not supported
-				$v = trim($attribs[$field->fieldname]);
+				$v = isset($attribs[$field->fieldname])  ?  $attribs[$field->fieldname] : '';
+				if (is_array($v)) continue;  // array parameters not supported
+				$v = trim($v);
 				if ( !strlen($v) ) {
 					$v = $field->getAttribute('default');
 					if ( !strlen($v) ) continue;  // do not add empty parameters
 				}
-				$less_data .= $var_pfx.$field->fieldname.': '.$v.";\n";
+				$less_data .= $_FCLL.$field->fieldname.': '.$v.";\n";
 			}
 		}
 		file_put_contents($less_path, $less_data);
