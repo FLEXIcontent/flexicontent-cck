@@ -15,6 +15,13 @@
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
+            <field name="item_title_color_grp" type="separator" cssprep="1" default="FLEXI_ITEM_TITLE_COLOR" description="" level="level2" hr="false" />
+            <field name="title_color" type="color" cssprep="less" default="inherit" label="Title color" description="Color of title" />
+            
+            <field name="label_color_grp" type="separator" cssprep="1" default="FLEXI_LABEL_COLOR" description="" level="level2" hr="false" />
+			<field name="label_bg_color" type="color" cssprep="less" default="#999999" label="FLEXI_TMPL_LABEL_BG" description="FLEXI_TMPL_LABEL_BG_DESC" />
+            <field name="label_txt_color" type="color" cssprep="less" default="#ffffff" label="FLEXI_TMPL_LABEL_TXT" description="FLEXI_TMPL_LABEL_TXT_COLOR_DESC" />
+            <field name="label_radius" type="number" cssprep="less" default="3" label="FLEXI_TMPL_LABEL_RADIUS" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="80" step="1" />
 			
 			<field name="leadingitems_sep" type="separator" hr="false" default="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" level="level1" menu="hide" />
 			<field name="lead_num" type="text" size="3" default="" label="FLEXI_LEADING_NUM" description="FLEXI_LEADING_NUM_DESC" />

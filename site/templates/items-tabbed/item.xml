@@ -29,6 +29,12 @@
 				<option value="one">FLEXI_1_COL</option>
 				<option value="two">FLEXI_2_COLS</option>
 			</field>
+            
+            <field name="label_color_grp" type="separator" cssprep="1" default="FLEXI_LABEL_COLOR" description="" level="level2" hr="false" />
+			<field name="label_bg_color" type="color" cssprep="less" default="#999999" label="FLEXI_TMPL_LABEL_BG" description="FLEXI_TMPL_LABEL_BG_DESC" />
+            <field name="label_txt_color" type="color" cssprep="less" default="#ffffff" label="FLEXI_TMPL_LABEL_TXT" description="FLEXI_TMPL_LABEL_TXT_COLOR_DESC" />
+            <field name="label_radius" type="number" cssprep="less" default="3" label="FLEXI_TMPL_LABEL_RADIUS" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="80" step="1" />
+
 			
 			<field name="color_tabs_grp" type="separator" cssprep="1" default="FLEXI_TABS_COLOR" description="" level="level2" hr="false" />
 			<field name="tab_bg_color_start" type="color" cssprep="less" default="#3093c7" label="FLEXI_TMPL_TAB_BG_START" description="FLEXI_TMPL_TAB_BG_START_DESC" />
