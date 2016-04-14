@@ -21,8 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // Make sure that Joomla error reporting is used (some plugin may have turned it OFF)
 // Also make some changes e.g. disable E_STRICT for maximum and leave it on only for development
-$config = new JConfig();
-switch ($config->error_reporting)
+switch ( JFactory::getConfig()->get('error_reporting') )
 {
 	case 'default':
 	case '-1':
@@ -49,7 +48,7 @@ switch ($config->error_reporting)
 		break;
 	
 	default:
-		error_reporting($config->error_reporting);
+		error_reporting( JFactory::getConfig()->get('error_reporting') );
 		ini_set('display_errors', 1);
 		break;
 }
