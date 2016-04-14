@@ -4620,15 +4620,23 @@ class ParentClassItem extends JModelAdmin
 	
 	function verifyAlias($alias, $title, &$item)
 	{
+		$alias = trim($alias);
 		if ( empty($alias) )
 		{
 			$alias = $title;
 		}
-		$alias = JApplication::stringURLSafe($alias);
+		
+		if ( !JFactory::getConfig()->get('unicodeslugs') )
+		{
+			$alias = $item->transliterate($alias, $item);
+		}
+		
+		// Call the default conversion
+		$alias = JApplicationHelper::stringURLSafe($alias);
 		
 		if(trim(str_replace('-','',$alias)) == '')
 		{
-			$alias = JFactory::getDate()->format($format = 'Y-M-d-H-i-s', $local = true);
+			$alias = JFactory::getDate()->format('Y-m-d-H-i-s');
 		}
 		
 		// Check for unique Alias

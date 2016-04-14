@@ -22,8 +22,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 // Try re-appling Joomla configuration of error reporting (some installed plugins may disable it)
-$config = new JConfig();  // System configuration
-switch ($config->error_reporting)  // Set the error_reporting
+switch ( JFactory::getConfig()->get('error_reporting') )  // Set the error_reporting
 {
 	case 'default': case '-1':
 		break;
@@ -48,7 +47,7 @@ switch ($config->error_reporting)  // Set the error_reporting
 		break;
 		
 	default:
-		error_reporting($config->error_reporting);
+		error_reporting( JFactory::getConfig()->get('error_reporting') );
 		ini_set('display_errors', 1);
 		break;
 }
