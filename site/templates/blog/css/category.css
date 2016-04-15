@@ -1,10 +1,9 @@
-#flexicontent .fc_item_title,
-#flexicontent .fc_item_title a {
+body #flexicontent .fc_item_title,
+body #flexicontent .fc_item_title a {
 	color: inherit;
 }
-.flexi.label,
-.description .label,
-.fc_filter_label_inline {
+body #flexicontent .flexi.label,
+body #flexicontent .desc-title.label {
 	background-color: #999999;
 	color: #ffffff;
 	border-radius: 3px;

@@ -445,7 +445,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
 				
 			<div class="fcclear"></div>
-			<span class="fc-mssg fc-note fc-nobgimage" style="font-size:100%; margin: 4px 0;">
+			<span class="fc-mssg fc-info fc-nobgimage" style="font-size:100%; margin: 4px 0;">
 				<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
 				<?php echo JText::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?>
 			</span>
@@ -607,18 +607,25 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 			
 		</div>
 		
+		<?php
+			$pfx = $this->layout->view == 'category' ? 'FCC' : 'FCI';
+		?>
+		
 		<div class="tabbertab" id="tabset_layout_disp_params_tab" data-icon-class="icon-options" >	
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_DISPLAY_PARAMETERS' ); ?> </h3>
 			
-			<div class="fcclear"></div>
-			<span class="fc-mssg-inline fc-warning" style="font-size:100%; margin: 12px 0 0 0!important;">
-				Parameters specific to the layout, <br/> -
+			<span class="fc-mssg fc-info" style="max-width: unset; font-size:100%; margin: 4px 0 0 0!important; padding-top:2px; padding-bottom:2px;">
+				-
 				<?php echo JText::_( $this->layout->view == 'item' ?
 					'your <b>content types / items</b> ' :
 					'your <b>content lists</b> (categories, etc)'
 				);?>
 				will inherit defaults from here, you may <b>override</b> them inside <b>type</b> (but <b>avoid</b> overriding inside the <b>item</b>)
 				<br/> -	<?php echo JText::_( 'setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
+			</span>
+			<span class="fc-mssg fc-success" style="max-width: unset; font-size:100%; margin: 8px 0 0 0!important; padding-top:2px; padding-bottom:2px;">
+				-	<span class="badge" style="background:darkcyan !important;">less</span> parameters: add more to <b><?php echo $this->layout->view; ?>.xml</b> , then you use them inside <b>less/<?php echo $this->layout->view; ?>.less</b> with using @<b><?php echo $pfx; ?>_</b>parameter_name;
+				<br/> - NOTE: <b>FCC_</b> for category and <b>FCI_</b> for item layout, EXAMPLE:  <code style="font-size:100%;">body&nbsp; .flexi.label &nbsp;{ color: @<?php echo $pfx; ?>_label_bg_color; }</code>
 			</span>
 			
 			<div style="max-width:1024px; margin-top:16px;">
