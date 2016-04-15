@@ -15,15 +15,16 @@
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
-            <field name="item_title_color_grp" type="separator" cssprep="1" default="FLEXI_ITEM_TITLE_COLOR" description="" level="level2" hr="false" />
-            <field name="title_color" type="color" cssprep="less" default="inherit" label="Title color" description="Color of title" />
-            
-            <field name="label_color_grp" type="separator" cssprep="1" default="FLEXI_LABEL_COLOR" description="" level="level2" hr="false" />
-			<field name="label_bg_color" type="color" cssprep="less" default="#999999" label="FLEXI_TMPL_LABEL_BG" description="FLEXI_TMPL_LABEL_BG_DESC" />
-            <field name="label_txt_color" type="color" cssprep="less" default="#ffffff" label="FLEXI_TMPL_LABEL_TXT" description="FLEXI_TMPL_LABEL_TXT_COLOR_DESC" />
-            <field name="label_radius" type="number" cssprep="less" default="3" label="FLEXI_TMPL_LABEL_RADIUS" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="80" step="1" />
 			
-			<field name="leadingitems_sep" type="separator" hr="false" default="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" level="level1" menu="hide" />
+			<field name="title_grp" type="separator" cssprep="1" default="FLEXI_TMPL_ITEM_TITLE" description="" level="level2" />
+			<field name="title_color" type="color" cssprep="less" default="inherit" label="Title color" description="Color of title" />
+			
+			<field name="label_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_LABEL_STYLING" description="" level="level2" />
+			<field name="label_bg_color" type="color" cssprep="less" default="#999999" label="FLEXI_TMPL_LABEL_BG" description="FLEXI_TMPL_LABEL_BG_DESC" />
+			<field name="label_txt_color" type="color" cssprep="less" default="#ffffff" label="FLEXI_TMPL_LABEL_TXT_COLOR" description="FLEXI_TMPL_LABEL_TXT_COLOR_DESC" />
+			<field name="label_radius" type="number" cssprep="less" default="3" label="FLEXI_TMPL_LABEL_RADIUS" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="80" step="1" />
+			
+			<field name="leadingitems_sep" type="separator" default="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" level="level1" menu="hide" />
 			<field name="lead_num" type="text" size="3" default="" label="FLEXI_LEADING_NUM" description="FLEXI_LEADING_NUM_DESC" />
 			<field name="lead_cols" type="radio" default="" label="FLEXI_MAX_ITEM_COLS_RESPONSIVE" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -44,8 +45,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="lead_catblock_sep" type="separator" hr="false" default="(sub) Category block, at (sub-)category start" description="Enable to show (sub-)category information when next (sub-)category starts" level="level2" menu="hide" />
-			<field name="lead_catblock_sep_msg" type="separator" hr="false" default="Warning: this makes sense, if you order your items by their category (1st level order), (2nd level order can be anything e.g. title)" description="" level="level3" menu="hide" />
+			<field name="lead_catblock_sep" type="separator" default="(sub) Category block, at (sub-)category start" description="Enable to show (sub-)category information when next (sub-)category starts" level="level2" menu="hide" />
+			<field name="lead_catblock_sep_msg" type="separator" default="Warning: this makes sense, if you order your items by their category (1st level order), (2nd level order can be anything e.g. title)" description="" level="level3" menu="hide" />
 			<field name="lead_catblock" type="radio" default="" label="FLEXI_ENABLE" description=" " class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -56,7 +57,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="leadingitems_text_sep" type="separator" hr="false" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
+			<field name="leadingitems_text_sep" type="separator" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
 			<field name="lead_use_description" type="radio" default="" label="FLEXI_DISPLAY_DESCRIPTION" description="FLEXI_DISPLAY_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -69,7 +70,7 @@
 				<option value="2">FLEXI_YES_IF_NEEDED</option>
 			</field>
 			<field name="lead_cut_text" type="text" size="4" default="" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
-			<field name="leadingitems_img_sep" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
+			<field name="leadingitems_img_sep" type="separator" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
 			<field name="lead_use_image" type="radio" default="" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -108,7 +109,7 @@
 			<field name="lead_default_images" type="textarea" default="" label="FLEXI_TMPL_BLOG_DEFAULT_IMAGES" description="FLEXI_TMPL_BLOG_DEFAULT_IMAGES_DESC" />
 			
 			
-			<field name="introitems_sep" type="separator" hr="false" default="FLEXI_INTRO_ITEMS" description="FLEXI_INTRO_ITEMS_DESC" level="level1" menu="hide" />
+			<field name="introitems_sep" type="separator" default="FLEXI_INTRO_ITEMS" description="FLEXI_INTRO_ITEMS_DESC" level="level1" menu="hide" />
 			<field name="intro_cols" type="radio" default="" label="FLEXI_MAX_ITEM_COLS_RESPONSIVE" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="1">FLEXI_1_COL</option>
@@ -127,8 +128,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="intro_catblock_sep" type="separator" hr="false" default="(sub) Category block, at (sub-)category start" description="Enable to show (sub-)category information when next (sub-)category starts" level="level2" menu="hide" />
-			<field name="intro_catblock_sep_msg" type="separator" hr="false" default="Warning: this makes sense, if you order your items by their category (1st level order), (2nd level order can be anything e.g. title)" description="" level="level3" menu="hide" />
+			<field name="intro_catblock_sep" type="separator" default="(sub) Category block, at (sub-)category start" description="Enable to show (sub-)category information when next (sub-)category starts" level="level2" menu="hide" />
+			<field name="intro_catblock_sep_msg" type="separator" default="Warning: this makes sense, if you order your items by their category (1st level order), (2nd level order can be anything e.g. title)" description="" level="level3" menu="hide" />
 			<field name="intro_catblock" type="radio" default="" label="FLEXI_ENABLE" description=" " class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -139,7 +140,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="introitems_text_sep" type="separator" hr="false" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
+			<field name="introitems_text_sep" type="separator" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
 			<field name="intro_use_description" type="radio" default="" label="FLEXI_DISPLAY_DESCRIPTION" description="FLEXI_DISPLAY_DESCRIPTION_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -152,7 +153,7 @@
 				<option value="2">FLEXI_YES_IF_NEEDED</option>
 			</field>
 			<field name="intro_cut_text" type="text" size="4" default="" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
-			<field name="introitems_img_sep" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
+			<field name="introitems_img_sep" type="separator" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
 			<field name="intro_use_image" type="radio" default="" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -190,7 +191,7 @@
 			</field>
 			<field name="intro_default_images" type="textarea" default="" label="FLEXI_TMPL_BLOG_DEFAULT_IMAGES" description="FLEXI_TMPL_BLOG_DEFAULT_IMAGES_DESC" />
 			
-			<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level1" menu="hide" />
+			<field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level1" menu="hide" />
 			<field name="htmlmode" type="radio" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_XHTML</option>

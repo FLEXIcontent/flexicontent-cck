@@ -4,20 +4,24 @@
 
 /*LESS EXAMPLE variable name: 'FCI_' + parameter name */
 /* e.g. 'FCI_' + 'title_color' =>  'FCI_title_color' */
-#flexicontent .fc_item_title {
+body #flexicontent .fc_item_title,
+body #flexicontent .fc_item_title a {
 	color: @FCI_title_color;
 }
 
-/* Label color */
-#flexicontent .flexi.label, #flexicontent .description .label {
-    background-color: @FCI_label_bg_color;
-    color: @FCI_label_txt_color;
-    border-radius: @FCI_label_radius*1px;
-    -webkit-border-radius: @FCI_label_radius*1px;
+/* Label styling  */
+
+body #flexicontent .flexi.label,
+body #flexicontent .desc-title.label {
+	background-color: @FCI_label_bg_color;
+	color: @FCI_label_txt_color;
+	border-radius: @FCI_label_radius*1px;
+	-webkit-border-radius: @FCI_label_radius*1px;
 	-moz-border-radius: @FCI_label_radius*1px;
 }
 
-/* TAB color */
+/* TAB styling*/
+
 body #flexicontent ul.tabbernav > li a {
 	border: 1px solid @FCI_tab_bg_color_end;
 	background-color: @FCI_tab_bg_color_start;
@@ -35,7 +39,7 @@ body #flexicontent ul.tabbernav > li.tabberactive a::before {
 }
 /*  ... NOT USED !!
 body #flexicontent ul.tabbernav > li.tabberactive a,
-body #flexicontent ul.tabbernav > li.tabberactive a:hover{
+body #flexicontent ul.tabbernav > li.tabberactive a:hover {
 	background-color: @FCI_tab_bg_color_active;
 }*/
 body #flexicontent ul.tabbernav > li:hover a {

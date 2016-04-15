@@ -4,11 +4,13 @@
 
 /*LESS EXAMPLE variable name: 'FCC_' + parameter name */
 /* e.g. 'FCC_' + 'title_color' =>  'FCC_title_color' */
-#flexicontent .fc_item_title {
+body #flexicontent .fc_item_title,
+body #flexicontent .fc_item_title a {
 	color: @FCC_title_color;
 }
 
-/* TAB color */
+/* TAB styling */
+
 body #flexicontent ul.tabbernav > li a {
 	border: 1px solid @FCC_tab_bg_color_end;
 	background-color: @FCC_tab_bg_color_start;
@@ -26,7 +28,7 @@ body #flexicontent ul.tabbernav > li.tabberactive a::before {
 }
 /*  ... NOT USED !!
 body #flexicontent ul.tabbernav > li.tabberactive a,
-body #flexicontent ul.tabbernav > li.tabberactive a:hover{
+body #flexicontent ul.tabbernav > li.tabberactive a:hover {
 	background-color: @FCC_tab_bg_color_active;
 }*/
 body #flexicontent ul.tabbernav > li:hover a {

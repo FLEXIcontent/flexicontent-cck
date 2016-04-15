@@ -1,15 +1,23 @@
 @import 'include/config.less';
 
 /* Blog Theme : category template CSS file */
-#flexicontent .fc_item_title, #flexicontent .fc_item_title a {
-color:@FCC_title_color;
+
+
+/* LESS EXAMPLE variable name: 'FCI_' + parameter name */
+/* e.g. 'FCI_' + 'title_color' =>  'FCI_title_color' */
+body #flexicontent .fc_item_title,
+body #flexicontent .fc_item_title a {
+	color:@FCC_title_color;
 }
 
-.flexi.label, .description .label , .fc_filter_label_inline{
-    background-color: @FCC_label_bg_color;
-    color: @FCC_label_txt_color;
-    border-radius: @FCC_label_radius*1px;
-    -webkit-border-radius: @FCC_label_radius*1px;
+/* Label styling */
+
+body #flexicontent .flexi.label,
+body #flexicontent .desc-title.label {
+	background-color: @FCC_label_bg_color;
+	color: @FCC_label_txt_color;
+	border-radius: @FCC_label_radius*1px;
+	-webkit-border-radius: @FCC_label_radius*1px;
 	-moz-border-radius: @FCC_label_radius*1px;
 }
 

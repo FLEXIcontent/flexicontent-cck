@@ -1,4 +1,5 @@
-#flexicontent .fc_item_title {
+body #flexicontent .fc_item_title,
+body #flexicontent .fc_item_title a {
 	color: inherit;
 }
 body #flexicontent ul.tabbernav > li a {
