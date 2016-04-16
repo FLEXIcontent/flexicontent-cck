@@ -1061,10 +1061,19 @@ class FlexicontentController extends JControllerLegacy
 		// CASE: urlparams are empty, use the FULL URL request array (_GET)
 		else {
 			$safeurlparams = array();
+			
 			// Add menu URL variables
 			$menu = JFactory::getApplication()->getMenu()->getActive();
-			if ($menu) foreach($menu->query as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
-			// Add any existing URL variables (=submitted via GET),  ... we only need variable names, (so can use them unfiltered)
+			if ($menu)
+			{
+				// Add menu Itemid to make sure that the menu items with --different-- parameter values, will display differently
+				$safeurlparams['Itemid'] = 'STRING';
+				
+				// Add menu's HTTP query variables so that we match the non-SEF URL exactly, thus we create the same cache-ID for both SEF / non-SEF urls (purpose: save some cache space)
+				foreach($menu->query as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
+			}
+			
+			// Add any existing URL variables (=submitted via GET),  ... we only need variable names, (values are ignored)
 			foreach($_GET as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
 		}
 		
