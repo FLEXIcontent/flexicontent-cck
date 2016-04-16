@@ -18,6 +18,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\String\StringHelper;
+
 // Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');   // we use JPATH_BASE since parent controller exists in frontend too
 
@@ -668,7 +670,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			} else {
 				$msg = JText::_( 'FLEXI_FILES_DELETED' );
 			}
-			$vc_start = mb_strrpos('?', $_SERVER['HTTP_REFERER']) ? '&' : '?'; 
+			$vc_start = StringHelper::strrpos('?', $_SERVER['HTTP_REFERER']) ? '&' : '?'; 
 			$this->setRedirect( $_SERVER['HTTP_REFERER'].$vc_start.'delfilename='.base64_encode($filename), $msg );
 			return;
 		}

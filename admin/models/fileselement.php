@@ -21,6 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.legacy');
 jimport('joomla.filesystem.file');
+use Joomla\String\StringHelper;
 
 if ( JFactory::getApplication()->isSite() ) {
 	// needed for frontend
@@ -509,7 +510,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 		
 		$scope  = $this->getState( 'scope' );
 		$search = $this->getState( 'search' );
-		$search = trim( JString::strtolower( $search ) );
+		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
 		
 		$filter_lang			= $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_lang',      'filter_lang',      '',          'string' );
 		$filter_uploader  = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_uploader',  'filter_uploader',  0,           'int' );

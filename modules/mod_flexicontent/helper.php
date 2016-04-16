@@ -19,6 +19,9 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
@@ -464,7 +467,7 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->catid = $row->catid; 
 					$lists[$ord]['featured'][$i]->itemcats = explode("," , $row->itemcats);
 					$lists[$ord]['featured'][$i]->link 	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid, $row).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
-					$lists[$ord]['featured'][$i]->title	= (strlen($row->title) > $cuttitle_feat) ? JString::substr($row->title, 0, $cuttitle_feat) . '...' : $row->title;
+					$lists[$ord]['featured'][$i]->title	= StringHelper::strlen($row->title) > $cuttitle_feat  ?  StringHelper::substr($row->title, 0, $cuttitle_feat) . '...'  :  $row->title;
 					$lists[$ord]['featured'][$i]->alias	= $row->alias;
 					$lists[$ord]['featured'][$i]->fulltitle = $row->title;
 					$lists[$ord]['featured'][$i]->text = ($mod_do_stripcat_feat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text_feat) : $row->introtext;
@@ -603,7 +606,7 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->catid = $row->catid;
 					$lists[$ord]['standard'][$i]->itemcats = explode("," , $row->itemcats);
 					$lists[$ord]['standard'][$i]->link	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid, $row).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
-					$lists[$ord]['standard'][$i]->title	= (strlen($row->title) > $cuttitle) ? JString::substr($row->title, 0, $cuttitle) . '...' : $row->title;
+					$lists[$ord]['standard'][$i]->title	= StringHelper::strlen($row->title) > $cuttitle  ?  StringHelper::substr($row->title, 0, $cuttitle) . '...'  :  $row->title;
 					$lists[$ord]['standard'][$i]->alias	= $row->alias;
 					$lists[$ord]['standard'][$i]->fulltitle = $row->title;
 					$lists[$ord]['standard'][$i]->text = ($mod_do_stripcat)? flexicontent_html::striptagsandcut($row->introtext, $mod_cut_text) : $row->introtext;
@@ -1653,7 +1656,7 @@ class modFlexicontentHelper
 					// Special case only one part of range provided ... must MATCH/INCLUDE empty values or NULL values ...
 					$value_empty = !strlen(@$filter_values[1]) && strlen(@$filter_values[2]) ? ' OR rel'.$filter_id.'.value="" OR rel'.$filter_id.'.value IS NULL ' : '';
 					
-					if ( strlen(@$filter_values[1]) || ( strlen(@$filter_values[2]) ) ) {
+					if ( strlen(@$filter_values[1]) || strlen(@$filter_values[2]) ) {
 						$where_field_filters .= ' AND '.$negate_op.' ( 1 ';
 						if ( strlen(@$filter_values[1]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value >=' . $filter_values[1] . ') ';
 						if ( strlen(@$filter_values[2]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value <=' . $filter_values[2] . $value_empty . ') ';

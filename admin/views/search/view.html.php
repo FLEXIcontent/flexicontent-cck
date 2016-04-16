@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * View class for the FLEXIcontent search indexes screen
@@ -86,7 +87,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if ($filter_fieldtype) $count_filters++; if ($filter_itemtype) $count_filters++; if ($filter_itemstate) $count_filters++;
 		
 		$search			= $model->getState( 'search' );
-		$search			= $db->escape( trim(JString::strtolower( $search ) ) );
+		$search			= $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
 		
 		$search_itemtitle	= $model->getState( 'search_itemtitle' );
 		$search_itemid		= $model->getState( 'search_itemid' );

@@ -18,6 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 $ico_class = 'btn btn-micro'; //'fc-man-icon-s';
@@ -1004,17 +1006,17 @@ jQuery(document).ready(function(){
 					<span class="<?php echo $typeofcats; ?>" title="<?php echo $edit_cat_title; ?>">
 					<a href="<?php echo $catlink; ?>">
 						<?php
-						if (JString::strlen($title) > 40) {
-							echo JString::substr( $title , 0 , 40).'...';
+						if (StringHelper::strlen($title) > 40) {
+							echo StringHelper::substr( $title , 0 , 40).'...';
 						} else {
 							echo $title;
 						}
 						?></a></span>
 					<?php
 					else :
-						if (JString::strlen($title) > 40) {
+						if (StringHelper::strlen($title) > 40) {
 							echo ($category->id != $row->catid) ? '' : '<strong>';
-							echo JString::substr( $title , 0 , 40).'...';
+							echo StringHelper::substr( $title , 0 , 40).'...';
 							echo ($category->id != $row->catid) ? '' : '</strong>';
 						} else {
 							echo ($category->id != $row->catid) ? '' : '<strong>';

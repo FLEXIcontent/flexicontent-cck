@@ -1,4 +1,6 @@
 <?php
+use Joomla\String\StringHelper;
+
 $field->url = array();
 $field->abspath = array();
 $field->file_data = array();
@@ -120,7 +122,7 @@ foreach($values as $file_id)
 	
 	// e. FILENAME / TITLE: decide whether to show it (if we do not use button, then displaying of filename is forced)
 	$_filetitle = $file_data->altname ? $file_data->altname : $file_data->filename;
-	if ($lowercase_filename) $_filetitle = mb_strtolower( $_filetitle, "UTF-8");
+	if ($lowercase_filename) $_filetitle = StringHelper::strtolower( $_filetitle );
 	
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
 	$$filename_original = str_replace( array("'", "\""), array("\\'", ""), $filename_original );

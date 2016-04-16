@@ -20,6 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.list');
+use Joomla\String\StringHelper;
 
 /**
  * FLEXIcontent Component Categories Model
@@ -265,7 +266,7 @@ class FlexicontentModelCategories extends JModelList
 		
 		// text search
 		$search = $this->getState( 'search' );
-		$search = trim( JString::strtolower( $search ) );
+		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
 		
 		// ordering filters
 		$filter_order     = $this->getState( 'filter_order' );

@@ -18,6 +18,9 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\String\StringHelper;
+
 // first define the template name
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
@@ -102,7 +105,7 @@ foreach ($items as $i => $item) :
 
 <!-- tab start -->
 <?php echo '<'.$mainAreaTag; ?> id="tablist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group" <?php echo $microdata_itemtype_code; ?>>
-	<h3 class="tabberheading"><?php echo mb_substr ($item->title, 0, 20, 'utf-8'); ?></h3><!-- tab title -->
+	<h3 class="tabberheading"><?php echo StringHelper::substr($item->title, 0, 20); ?></h3><!-- tab title -->
 	
 	<?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
 	
@@ -167,8 +170,8 @@ foreach ($items as $i => $item) :
 		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading">
 			<span class="fc_item_title" itemprop="name">
 			<?php
-				echo ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) ?
-					mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...'  :  $item->title;
+				echo ( StringHelper::strlen($item->title) > $this->params->get('title_cut_text',200) ) ?
+					StringHelper::substr($item->title, 0, $this->params->get('title_cut_text',200)) . ' ...'  :  $item->title;
 			?>
 			</span>
 		<?php echo '</h'.$itemTitleHeaderLevel; ?>>

@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * View class for the tagelement screen
@@ -46,7 +47,7 @@ class FlexicontentViewTagelement extends JViewLegacy {
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.tags.search', 			'search', 			'', 'string' );
-		$search 			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search 			= $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
 
 		//prepare the document
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));

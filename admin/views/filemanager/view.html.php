@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * HTML View class for the Filemanager View
@@ -123,7 +124,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// Text search
 		$scope  = $model->getState( 'scope' );
 		$search = $model->getState( 'search' );
-		$search = $db->escape( trim(JString::strtolower( $search ) ) );
+		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
 		
 		$filter_uploader  = $filter_uploader ? $filter_uploader : '';
 		$filter_item      = $filter_item ? $filter_item : '';

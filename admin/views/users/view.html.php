@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * View class for the FLEXIcontent users screen
@@ -78,8 +79,8 @@ class FlexicontentViewUsers extends JViewLegacy
 		$startdate  = $model->getState( 'startdate' );
 		$enddate    = $model->getState( 'enddate' );
 		
-		$startdate = $db->escape( trim( JString::strtolower( $startdate ) ) );
-		$enddate   = $db->escape( trim( JString::strtolower( $enddate ) ) );
+		$startdate = $db->escape( StringHelper::trim(StringHelper::strtolower( $startdate ) ) );
+		$enddate   = $db->escape( StringHelper::trim(StringHelper::strtolower( $enddate ) ) );
 		if ($startdate) $count_filters++;
 		if ($enddate)   $count_filters++;
 		
@@ -89,7 +90,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		
 		// Text search
 		$search = $model->getState( 'search' );
-		$search = $db->escape( trim(JString::strtolower( $search ) ) );
+		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
 		
 		
 		

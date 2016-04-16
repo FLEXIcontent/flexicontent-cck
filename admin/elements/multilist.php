@@ -19,6 +19,8 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
 jimport('joomla.form.field');  // JFormField
@@ -192,7 +194,7 @@ class JFormFieldMultiList extends JFormField
 			$val = key($V2L);
 			if ( $val === '' && $this->_inherited!==null && !is_array($this->_inherited) && isset($V2L[$this->_inherited]) )
 			{
-				$this->_options[0]['text'] = mb_strtoupper($this->_options[0]['text']). ' ... '. $V2L[$this->_inherited];
+				$this->_options[0]['text'] = StringHelper::strtoupper($this->_options[0]['text']). ' ... '. $V2L[$this->_inherited];
 			}
 			$html = JHTML::_('select.genericlist', $this->_options, $fieldname, $attribs);
 		}

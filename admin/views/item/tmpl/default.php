@@ -18,6 +18,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\String\StringHelper;
+
 $task_items = 'task=items.';
 $ctrl_items = 'items.';
 $tags_task  = 'task=tags.';
@@ -765,7 +767,7 @@ $tabCnt[$tabSetCnt] = 0;
 //$type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->typesselected->name : JText::_( 'FLEXI_TYPE_NOT_DEFINED' );
 if ($this->row->type_id) {
 	$_str = JText::_('FLEXI_DETAILS');
-	$_str = mb_strtoupper(mb_substr($_str, 0, 1, 'UTF-8')) . mb_substr($_str, 1, NULL, 'UTF-8');
+	$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1, NULL);
 	
 	$type_lbl = $this->typesselected->name;
 	$type_lbl = $type_lbl ? JText::_($type_lbl) : JText::_('FLEXI_CONTENT_TYPE');

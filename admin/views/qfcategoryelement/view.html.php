@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * View class for the qfcategoryelement screen
@@ -68,7 +69,7 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy
 		$filter_author = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_author', 'filter_author',  '',    'cmd' );
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
-		$search = $db->escape( trim(JString::strtolower( $search ) ) );
+		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
 
 		// Prepare the document: set title, add css files, etc
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));

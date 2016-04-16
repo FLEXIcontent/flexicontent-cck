@@ -20,6 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * FLEXIcontent Component Category Model
@@ -96,7 +97,7 @@ class FlexicontentModelItemcompare extends JModelLegacy
 	{		
 		if ($this->_loadItem())
 		{		
-			if (JString::strlen($this->_item->fulltext) > 1) {
+			if (StringHelper::strlen($this->_item->fulltext) > 1) {
 				$this->_item->text = $this->_item->introtext . "<hr id=\"system-readmore\" />" . $this->_item->fulltext;
 			} else {
 				$this->_item->text = $this->_item->introtext;

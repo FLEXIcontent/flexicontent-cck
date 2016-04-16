@@ -21,6 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
 jimport('joomla.filesystem.file');
+use Joomla\String\StringHelper;
 
 /**
  * HTML View class for the Category View

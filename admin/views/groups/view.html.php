@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * View class for the FLEXIcontent (user) groups screen
@@ -56,7 +57,7 @@ class FlexicontentViewGroups extends JViewLegacy
 		$count_filters = 0;
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
-		$search = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search = $db->escape( StringHelper::trim(StringHelper::strtolower( $search ) ) );
 		
 		
 		

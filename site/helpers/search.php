@@ -15,7 +15,9 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die( 'Restricted access' );
 
-//include constants file
+use Joomla\String\StringHelper;
+
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 /**
@@ -38,16 +40,16 @@ class FLEXIadvsearchHelper
 		}
 
 	 	// check for words to ignore
-		$aterms = explode( ' ', JString::strtolower( $searchword ) );
+		$aterms = explode( ' ', StringHelper::strtolower( $searchword ) );
 
 		// first case is single ignored word
-		if ( count( $aterms ) == 1 && in_array( JString::strtolower( $searchword ), $search_ignore ) ) {
+		if ( count( $aterms ) == 1 && in_array( StringHelper::strtolower( $searchword ), $search_ignore ) ) {
 			$ignored = true;
 		}
 
 		// filter out search terms that are too small
 		foreach( $aterms AS $aterm ) {
-			if (!$search_prefix && JString::strlen( $aterm ) < $min) {
+			if (!$search_prefix && StringHelper::strlen( $aterm ) < $min) {
 				$search_ignore[] = $aterm;
 			}
 		}
@@ -68,13 +70,13 @@ class FLEXIadvsearchHelper
 		$restriction = false;
 
 		// maximum searchword length character limit
-		if ( JString::strlen( $searchword ) > $max ) {
-			$searchword 	= JString::substr( $searchword, 0, $max );
+		if ( StringHelper::strlen( $searchword ) > $max ) {
+			$searchword 	= StringHelper::substr( $searchword, 0, $max );
 			$restriction 	= true;
 		}
 
 		// minimum searchword length character limit
-		if ( $searchword && JString::strlen( $searchword ) < $min ) {
+		if ( $searchword && StringHelper::strlen( $searchword ) < $min ) {
 			$searchword 	= '';
 			$restriction 	= true;
 		}
@@ -134,10 +136,10 @@ class FLEXIadvsearchHelper
 		// replace line breaking tags with whitespace
 		$text = preg_replace( "'<(br[^/>]*?/|hr[^/>]*?/|/(div|h[1-6]|li|p|td))>'si", ' ', $text );
 		
-		if (($wordpos = @JString::strpos($text, ' ', $length)) !== false) {
-			$start_part = JString::substr($text, 0, $wordpos) . '&nbsp;...';
+		if (($wordpos = @StringHelper::strpos($text, ' ', $length)) !== false) {
+			$start_part = StringHelper::substr($text, 0, $wordpos) . '&nbsp;...';
 		} else {
-			$start_part = JString::substr($text, 0, $length);
+			$start_part = StringHelper::substr($text, 0, $length);
 		}
 		
 		$parts = array();
@@ -185,7 +187,7 @@ class FLEXIadvsearchHelper
 				$text = preg_replace($regex, '', $text);
 			}
 			foreach($terms AS $term) {
-				if(JString::stristr($text, $term) !== false) {
+				if(StringHelper::stristr($text, $term) !== false) {
 					return true;
 				}
 			}
@@ -203,18 +205,18 @@ class FLEXIadvsearchHelper
 	 */
 	static function _smartSubstr($text, $length = 200, $searchword, &$wordfound)
 	{
-		$textlen = JString::strlen($text);
-		$lsearchword = JString::strtolower($searchword);
+		$textlen = StringHelper::strlen($text);
+		$lsearchword = StringHelper::strtolower($searchword);
 		$wordfound = false;
 		$pos = 0;
 		while ($wordfound === false && $pos < $textlen) {
-			if (($wordpos = @JString::strpos($text, ' ', $pos + $length)) !== false) {
+			if (($wordpos = @StringHelper::strpos($text, ' ', $pos + $length)) !== false) {
 				$chunk_size = $wordpos - $pos;
 			} else {
 				$chunk_size = $length;
 			}
-			$chunk = JString::substr($text, $pos, $chunk_size);
-			$wordfound = JString::strpos(JString::strtolower($chunk), $lsearchword);
+			$chunk = StringHelper::substr($text, $pos, $chunk_size);
+			$wordfound = StringHelper::strpos(StringHelper::strtolower($chunk), $lsearchword);
 			if ($wordfound === false) {
 				$pos += $chunk_size + 1;
 			}
@@ -223,10 +225,10 @@ class FLEXIadvsearchHelper
 		if ($wordfound !== false) {
 			return (($pos > 0) ? '...&nbsp;' : '') . $chunk . '&nbsp;...';
 		} else {
-			if (($wordpos = @JString::strpos($text, ' ', $length)) !== false) {
-				return JString::substr($text, 0, $wordpos) . '&nbsp;...';
+			if (($wordpos = @StringHelper::strpos($text, ' ', $length)) !== false) {
+				return StringHelper::substr($text, 0, $wordpos) . '&nbsp;...';
 			} else {
-				return JString::substr($text, 0, $length);
+				return StringHelper::substr($text, 0, $length);
 			}
 		}
 	}

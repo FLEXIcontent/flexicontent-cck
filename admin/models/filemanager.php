@@ -20,7 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.legacy');
-
+use Joomla\String\StringHelper;
 
 /**
  * FLEXIcontent Component Filemanager Model
@@ -414,7 +414,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		
 		$scope  = $this->getState( 'scope' );
 		$search = $this->getState( 'search' );
-		$search = trim( JString::strtolower( $search ) );
+		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
 		
 		$filter_lang			= $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_lang',      'filter_lang',      '',          'string' );
 		$filter_uploader  = $app->getUserStateFromRequest(  $option.'.'.$this->viewid.'.filter_uploader',  'filter_uploader',  0,           'int' );

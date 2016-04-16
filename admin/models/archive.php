@@ -20,6 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.list');
+use Joomla\String\StringHelper;
 
 /**
  * FLEXIcontent Component Items Model
@@ -225,7 +226,7 @@ class FlexicontentModelArchive extends JModelList
 		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$search = $app->getUserStateFromRequest( $option.'.archive.search', 'search', '', 'string' );
-		$search = trim( JString::strtolower( $search ) );
+		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
 
 		$where = array();
 		

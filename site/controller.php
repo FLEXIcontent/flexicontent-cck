@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.controller.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * FLEXIcontent Component Controller
@@ -225,7 +226,7 @@ class FlexicontentController extends JControllerLegacy
 				foreach ($matches[2] as $_m) {
 					if ($search_prefix)
 						$_m = preg_replace('/\b'.$search_prefix.'/u', '', $_m);
-					$_m_low = mb_strtolower($_m, 'UTF-8');
+					$_m_low = StringHelper::strtolower($_m, 'UTF-8');
 					$words_found[$_m_low] = 1;
 				}
 			}
@@ -241,7 +242,7 @@ class FlexicontentController extends JControllerLegacy
 		$n = 0;
 		foreach ($words_found as $_w => $i) {
 			if (!$search_prefix) {
-				if ( mb_strlen($_w) < $min_word_len ) continue;  // word too short
+				if ( StringHelper::strlen($_w) < $min_word_len ) continue;  // word too short
 				if ( $this->isStopWord($_w, $tbl) ) continue;  // stopword or too common
 			}
 			

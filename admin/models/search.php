@@ -16,6 +16,16 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.model.legacy');
+use Joomla\String\StringHelper;
+
+
+/**
+ * FLEXIcontent Component Search Model
+ *
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @since		2.0
+ */
 class FLEXIcontentModelSearch extends JModelLegacy
 {
 	/**
@@ -335,7 +345,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$isADV = $filter_indextype=='advanced';
 		
 		$search  = $this->getState( 'search' );
-		$search  = trim( JString::strtolower( $search ) );
+		$search  = StringHelper::trim( StringHelper::strtolower( $search ) );
 		
 		$where = array();
 
