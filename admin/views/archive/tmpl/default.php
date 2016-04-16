@@ -18,6 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
@@ -99,8 +101,8 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 			</td>
 			<td>
 				<?php
-				if (JString::strlen($row->alias) > 25) {
-					echo JString::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
+				if (StringHelper::strlen($row->alias) > 25) {
+					echo StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
 				} else {
 					echo htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8');
 				}
@@ -119,8 +121,8 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 					<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText( JText::_( 'FLEXI_EDIT_CATEGORY' ), $title, 0, 1); ?>">
 					<a href="<?php echo $catlink; ?>">
 						<?php 
-						if (JString::strlen($title) > 20) {
-							echo JString::substr( $title , 0 , 20).'...';
+						if (StringHelper::strlen($title) > 20) {
+							echo StringHelper::substr( $title , 0 , 20).'...';
 						} else {
 							echo $title;
 						}

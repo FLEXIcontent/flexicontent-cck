@@ -18,6 +18,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\String\StringHelper;
+
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 $hint_image = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), '' );
@@ -594,7 +596,7 @@ flexicontent_html::loadFramework('flexi-lib');
 					<td class="left">
 						<?php
 							$_filename_original = $row->filename_original ? $row->filename_original :$row->filename;
-							if (mb_strlen($row->filename_original, 'UTF-8') > 100) {
+							if (StringHelper::strlen($row->filename_original) > 100) {
 								$filename_cut = htmlspecialchars(flexicontent_html::striptagsandcut($_filename_original, 100) . '...', ENT_QUOTES, 'UTF-8');
 							} else {
 								$filename_cut = htmlspecialchars($_filename_original, ENT_QUOTES, 'UTF-8');
@@ -608,8 +610,8 @@ flexicontent_html::loadFramework('flexi-lib');
 						
 						<?php
 						if (!$this->folder_mode && $row->altname != $row->filename_displayed) {
-							if (JString::strlen($row->altname) > 100) {
-								echo '<br/><small>'.JString::substr( htmlspecialchars($row->altname, ENT_QUOTES, 'UTF-8'), 0 , 100).'... </small>';
+							if (StringHelper::strlen($row->altname) > 100) {
+								echo '<br/><small>'.StringHelper::substr( htmlspecialchars($row->altname, ENT_QUOTES, 'UTF-8'), 0 , 100).'... </small>';
 							} else {
 								echo '<br/><small>'.htmlspecialchars($row->altname, ENT_QUOTES, 'UTF-8').'</small>';
 							}

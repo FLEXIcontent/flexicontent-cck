@@ -20,6 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.list');
+use Joomla\String\StringHelper;
 
 /**
  * FLEXIcontent Component types Model
@@ -216,15 +217,15 @@ class FlexicontentModelUsers extends JModelList
 		$startdate  = $this->getState( 'startdate' );
 		$enddate    = $this->getState( 'enddate' );
 		
-		$startdate = trim( JString::strtolower( $startdate ) );
-		$enddate   = trim( JString::strtolower( $enddate ) );
+		$startdate = StringHelper::trim( StringHelper::strtolower( $startdate ) );
+		$enddate   = StringHelper::trim( StringHelper::strtolower( $enddate ) );
 		
 		// author id
 		$filter_id  = $this->getState( 'filter_id' );
 		
 		// text search
 		$search = $this->getState( 'search' );
-		$search = trim( JString::strtolower( $search ) );
+		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
 		
 		// ordering filters
 		$filter_order      = $this->getState('filter_order');

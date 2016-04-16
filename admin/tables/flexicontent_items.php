@@ -18,11 +18,11 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-if (FLEXI_J16GE) {
-	jimport('joomla.access.rules');
-}
+jimport('joomla.access.rules');
+use Joomla\String\StringHelper;
 
-class _flexicontent_items_common extends JTable {
+class _flexicontent_items_common extends JTable
+{
 	protected function __getAssetParentId(JTable $table = null, $id = null)
 	{
 		// Initialise variables.
@@ -53,6 +53,10 @@ class _flexicontent_items_common extends JTable {
 	}
 }
 
+/* This is no longer needed but it is a good example of
+ *  how to fix STRICT warnings when a newer Joomla version adds TYPE to the parameter of a method
+ *  thus makes possible for same code to run on both old and new Joomla version without warnings
+ */
 if (FLEXI_J30GE) {
 	class _flexicontent_items extends _flexicontent_items_common {
 		protected function _getAssetParentId(JTable $table = null, $id = null) {
@@ -607,7 +611,7 @@ class flexicontent_items extends _flexicontent_items {
 		// and cr (\r) and lf (\n) characters from string
 		if(!empty($this->metakey)) { // only process if not empty
 			$bad_characters = array("\n", "\r", "\"", "<", ">"); // array of characters to remove
-			$after_clean = JString::str_ireplace($bad_characters, "", $this->metakey); // remove bad characters
+			$after_clean = StringHelper::str_ireplace($bad_characters, "", $this->metakey); // remove bad characters
 			$keys = explode(',', $after_clean); // create array using commas as delimiter
 			$clean_keys = array(); 
 			foreach($keys as $key) {
@@ -621,7 +625,7 @@ class flexicontent_items extends _flexicontent_items {
 		// clean up description -- eliminate quotes and <> brackets
 		if(!empty($this->metadesc)) { // only process if not empty
 			$bad_characters = array("\"", "<", ">");
-			$this->metadesc = JString::str_ireplace($bad_characters, "", $this->metadesc);
+			$this->metadesc = StringHelper::str_ireplace($bad_characters, "", $this->metadesc);
 		}
 
 		return true;
@@ -772,10 +776,10 @@ class flexicontent_items extends _flexicontent_items {
 		//$deLangTo  = array('ae','oe','ue','ss','ae','oe','ue');
 		
 		$langFrom    = array_merge ($langFrom, $deLangFrom);
-		$langTo      =  array_merge ($langTo, $deLangTo);
+		$langTo      = array_merge ($langTo, $deLangTo);
 		
-		$string = JString::str_ireplace($langFrom, $langTo, $string);
-		$string = JString::strtolower($string);
+		$string = StringHelper::str_ireplace($langFrom, $langTo, $string);
+		$string = StringHelper::strtolower($string);
 		
 		return $string;
 	}

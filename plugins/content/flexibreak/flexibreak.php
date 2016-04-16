@@ -14,6 +14,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
+use Joomla\String\StringHelper;
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
@@ -66,7 +67,7 @@ class plgContentFlexiBreak extends JPlugin
 		if ( empty($row->id) && empty($row->slug) ) return true;
 		
 		// Simple performance check to determine whether bot should process further.
-		if ( JString::strpos($row->text, 'class="system-pagebreak') === false ) return true;
+		if ( StringHelper::strpos($row->text, 'class="system-pagebreak') === false ) return true;
 		
 		$input = JFactory::getApplication()->input;
 		

@@ -18,6 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
@@ -414,9 +416,9 @@ function delAllFilters() {
 				$escaped_label = htmlspecialchars(JText::_($row->label), ENT_QUOTES, 'UTF-8');
 				
 				$field_desc = '';
-				$field_desc_len = JString::strlen($row->description);
+				$field_desc_len = StringHelper::strlen($row->description);
 				if ($field_desc_len > 50) {
-					$field_desc = JString::substr( htmlspecialchars($row->description, ENT_QUOTES, 'UTF-8'), 0 , 50).'...';
+					$field_desc = StringHelper::substr( htmlspecialchars($row->description, ENT_QUOTES, 'UTF-8'), 0 , 50).'...';
 				} else if ($field_desc_len) {
 					$field_desc = htmlspecialchars($row->description, ENT_QUOTES, 'UTF-8');
 				}

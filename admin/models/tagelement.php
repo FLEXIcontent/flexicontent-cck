@@ -20,6 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * Flexicontent Component Tagelement Model
@@ -172,7 +173,7 @@ class FlexicontentModelTagelement extends JModelLegacy
 		$option = JRequest::getVar('option');
 
 		$search = $app->getUserStateFromRequest( $option.'.tags.search', 'search', '', 'string' );
-		$search = trim( JString::strtolower( $search ) );
+		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
 
 		$where = array();
 

@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * View class for the FLEXIcontent templates screen
@@ -75,7 +76,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		
 		
 		// Create FIELD TYPE SELECTOR
-		$ALL = mb_strtoupper(JText::_( 'FLEXI_ALL' ), 'UTF-8') . ' : ';
+		$ALL = StringHelper::strtoupper(JText::_( 'FLEXI_ALL' )) . ' : ';
 		$fftypes = array();
 		$fftypes[] = array('value'=>'', 'text'=>JText::_( 'FLEXI_ALL' ) );
 		//$fftypes[] = array('value'=>'BV', 'text'=>$ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );

@@ -9,6 +9,8 @@
 // No direct access.
 defined('_JEXEC') or die;
 
+use Joomla\String\StringHelper;
+
 /**
  * Users component debugging helper.
  *
@@ -80,7 +82,7 @@ class UsersHelperDebug
 				foreach($component_actions as &$action)
 				{
 					echo $action->name . " -- ";
-					if ( JString::substr( $action->name , 0 , 5) != 'core.' ) continue;
+					if ( StringHelper::substr( $action->name , 0 , 5) != 'core.' ) continue;
 					$action_title = str_replace('core.', '', $action->name); //$action->title;
 					$actions[$action_title] = array($action->name, $action->description);
 				}

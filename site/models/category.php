@@ -20,6 +20,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.model.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * FLEXIcontent Component Model
@@ -1150,7 +1151,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$alpha = JRequest::getVar('letter', NULL, 'request', 'string');
 		$alpha = preg_replace ("/(\(|\)\'|\"|\\\)/u", "", $alpha);
 		
-		if (JString::strlen($alpha)==0) {
+		if (StringHelper::strlen($alpha)==0) {
 			// nothing to do
 			return '';
 		}
@@ -1167,9 +1168,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		else if (count($range) == 1)
 		{
-			$regexp = '"^('.JString::substr($alpha,0,1);
-			for($i=1; $i<JString::strlen($alpha); $i++) :
-				$regexp .= '|'.JString::substr($alpha,$i,1);
+			$regexp = '"^('.StringHelper::substr($alpha,0,1);
+			for($i=1; $i<StringHelper::strlen($alpha); $i++) :
+				$regexp .= '|'.StringHelper::substr($alpha,$i,1);
 			endfor;
 			$regexp .= ')"';
 		}
@@ -1181,7 +1182,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$startletter = $range[0];  $endletter = $range[1];
 			
 			// ERROR CHECK: Range START and END are single character strings
-			if (JString::strlen($startletter) != 1 || JString::strlen($endletter) != 1) {
+			if (StringHelper::strlen($startletter) != 1 || StringHelper::strlen($endletter) != 1) {
 				echo "Error in Alpha Index<br>letter range: ".$alpha." start and end must be one character<br>";
 				return '';
 			}

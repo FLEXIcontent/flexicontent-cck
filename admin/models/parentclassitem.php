@@ -20,6 +20,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.model.admin');
+use Joomla\String\StringHelper;
 
 /**
  * FLEXIcontent Component Item Model
@@ -600,7 +601,7 @@ class ParentClassItem extends JModelAdmin
 			
 			// -- Create the description field called 'text' by appending introtext + readmore + fulltext
 			$item->text = $item->introtext;
-			$item->text .= JString::strlen( trim($item->fulltext) ) ? '<hr id="system-readmore" />' . $item->fulltext : "";
+			$item->text .= StringHelper::strlen( StringHelper::trim($item->fulltext) ) ? '<hr id="system-readmore" />' . $item->fulltext : "";
 			
 			//echo "<br/>Current version (Frontend Active): " . $item->version;
 			//echo "<br/>Version to load: ".$version;
@@ -683,7 +684,7 @@ class ParentClassItem extends JModelAdmin
 						// Create text field value for all languages
 						$translation_data->fields->text = new stdClass();
 						$translation_data->fields->text->value = @ $translation_data->fields->introtext->value;
-						if ( JString::strlen( trim(@$translation_data->fields->fulltext->value) ) ) {
+						if ( StringHelper::strlen( StringHelper::trim(@$translation_data->fields->fulltext->value) ) ) {
 							$translation_data->fields->text->value .=  '<hr id="system-readmore" />' . @ $translation_data->fields->fulltext->value;
 						}
 					}
@@ -1166,14 +1167,14 @@ class ParentClassItem extends JModelAdmin
 			$data = $this->_item ? $this->_item : $this->getItem();
 		} else {
 			// Split text to introtext & fulltext
-			if ( !JString::strlen(trim(@$data['introtext'])) && !JString::strlen(trim(@$data['fulltext'])) ) {
+			if ( !StringHelper::strlen(StringHelper::trim(@$data['introtext'])) && !StringHelper::strlen(StringHelper::trim(@$data['fulltext'])) ) {
 				$this->splitText($data);
 			}
 			
 			if ($this->_item) {
-				if ( JString::strlen(trim(@$data['text'])) )      $this->_item->text      = $data['text'];
-				if ( JString::strlen(trim(@$data['introtext'])) ) $this->_item->introtext = $data['introtext'];
-				if ( JString::strlen(trim(@$data['fulltext'])) )  $this->_item->fulltext  = $data['fulltext'];
+				if ( StringHelper::strlen(StringHelper::trim(@$data['text'])) )      $this->_item->text      = $data['text'];
+				if ( StringHelper::strlen(StringHelper::trim(@$data['introtext'])) ) $this->_item->introtext = $data['introtext'];
+				if ( StringHelper::strlen(StringHelper::trim(@$data['fulltext'])) )  $this->_item->fulltext  = $data['fulltext'];
 				if ( isset($data['language']) )  $this->_item->language  = $data['language'];
 				if ( isset($data['catid']) )     $this->_item->catid  = $data['catid'];
 			}
@@ -2005,7 +2006,7 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		// -- Creation Date
-		if ($item->created && JString::strlen(trim( $item->created )) <= 10) {
+		if ($item->created && StringHelper::strlen(StringHelper::trim( $item->created )) <= 10) {
 			$item->created 	.= ' 00:00:00';
 		}
 		$date = JFactory::getDate($item->created);
@@ -2013,7 +2014,7 @@ class ParentClassItem extends JModelAdmin
 		$item->created = $date->toSql();
 			
 		// -- Publish UP Date
-		if ($item->publish_up && JString::strlen(trim( $item->publish_up )) <= 10) {
+		if ($item->publish_up && StringHelper::strlen(StringHelper::trim( $item->publish_up )) <= 10) {
 			$item->publish_up 	.= ' 00:00:00';
 		}
 		$date = JFactory::getDate($item->publish_up);
@@ -2027,7 +2028,7 @@ class ParentClassItem extends JModelAdmin
 		}
 		else if ($item->publish_down != $nullDate)
 		{
-			if ( JString::strlen(trim( $item->publish_down )) <= 10 ) {
+			if ( StringHelper::strlen(StringHelper::trim( $item->publish_down )) <= 10 ) {
 				$item->publish_down .= ' 00:00:00';
 			}
 			$date = JFactory::getDate($item->publish_down);
@@ -3051,7 +3052,7 @@ class ParentClassItem extends JModelAdmin
 			$translated_fields = array('title','alias','introtext','fulltext','metadesc','metakey');
 			foreach ($translated_fields as $fieldname) {
 				if ( !strlen( @$jfdata[$fieldname] ) ) continue;
-				//if ( !JString::strlen(trim(str_replace("&nbsp;", "", strip_tags(@$jfdata[$fieldname])))) ) continue;   // skip empty content
+				//if ( !StringHelper::strlen(StringHelper::trim(str_replace("&nbsp;", "", strip_tags(@$jfdata[$fieldname])))) ) continue;   // skip empty content
 				//echo "<br/><b>#__".$nn_content_tbl."($fieldname) :</b><br/>";
 				$query = "INSERT INTO #__".$nn_content_tbl." (language_id, reference_id, reference_table, reference_field, value, original_value, original_text, modified, modified_by, published) ".
 					"VALUES ( {$langs->$shortcode->id}, {$item->id}, 'content', '$fieldname', ".$db->Quote(@$jfdata[$fieldname]).", '".md5($item->{$fieldname})."', ".$db->Quote($item->{$fieldname}).", '$modified', '$modified_by', 1)";
@@ -3560,7 +3561,7 @@ class ParentClassItem extends JModelAdmin
 			break;
 			
 			case 'maintext': // main text
-			$value = JString::strlen( trim($item->fulltext) ) ? $item->introtext . "<hr id=\"system-readmore\" />" . $item->fulltext : $item->introtext;
+			$value = StringHelper::strlen( StringHelper::trim($item->fulltext) ) ? $item->introtext . "<hr id=\"system-readmore\" />" . $item->fulltext : $item->introtext;
 			$field_value = array($value);
 			break;
 		}
@@ -4601,7 +4602,7 @@ class ParentClassItem extends JModelAdmin
 				$data['fulltext']  = '';
 			} else {
 				list($data['introtext'], $data['fulltext']) = preg_split($pattern, $data['text'], 2);
-				$data['fulltext'] = JString::strlen( trim($data['fulltext']) ) ? $data['fulltext'] : '';
+				$data['fulltext'] = StringHelper::strlen( StringHelper::trim($data['fulltext']) ) ? $data['fulltext'] : '';
 			}
 		}
 		else {
@@ -4612,7 +4613,7 @@ class ParentClassItem extends JModelAdmin
 				$item->fulltext  = '';
 			} else {
 				list($item->introtext, $item->fulltext) = preg_split($pattern, $item->text, 2);
-				$item->fulltext = JString::strlen( trim($item->fulltext) ) ? $item->fulltext : '';
+				$item->fulltext = StringHelper::strlen( StringHelper::trim($item->fulltext) ) ? $item->fulltext : '';
 			}
 		}
 	}

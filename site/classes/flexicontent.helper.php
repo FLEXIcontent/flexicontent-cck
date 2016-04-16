@@ -18,7 +18,9 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//include constants file
+use Joomla\String\StringHelper;
+
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 // Try re-appling Joomla configuration of error reporting (some installed plugins may disable it)
@@ -1681,12 +1683,12 @@ class flexicontent_html
 		$cleantext = preg_replace('/[\p{Z}\s]{2,}/u', ' ', $cleantext);  // Unicode safe whitespace replacing
 		
 		// Calculate length according to UTF-8 encoding
-		$uncut_length = JString::strlen($cleantext);
+		$uncut_length = StringHelper::strlen($cleantext);
 		
 		// Cut off the text if required but reencode html entities before doing so
 		if ($chars) {
 			if ($uncut_length > $chars) {
-				$cleantext = JString::substr( $cleantext, 0, $chars ).'...';
+				$cleantext = StringHelper::substr( $cleantext, 0, $chars ).'...';
 			}
 		}
 		
@@ -5115,7 +5117,7 @@ class flexicontent_tmpl
 		
 		
 		// *******************************
-		// Check/Complie LESS files to CSS
+		// Check/Compile LESS files to CSS
 		// *******************************
 		
 		if ( count($checked_layouts) && !$skip_less_compile )
@@ -5126,7 +5128,7 @@ class flexicontent_tmpl
 			if ($print_logging_info) $fc_run_times['templates_parsing_less'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
 		// Uncomment to update ALL
-		//$all = array(); foreach ($tmpls->items as $tmplname => $aa) $t[] = $tmplname;  flexicontent_tmpl::checkCompileLess($tmpls, false, $all);
+		//$all = array(); foreach ($tmpls->items as $tmplname => $i) $t[] = $tmplname;  flexicontent_tmpl::checkCompileLess($tmpls, false, $all);
 		
 		
 		// *******************************************************************************
@@ -5807,7 +5809,10 @@ class FLEXIUtilities
 	 * @param  $ords   utf8 ord arrray
 	 * @return $str    utf8 string
 	 */
-	static function ords_to_unistr($ords, $encoding = 'UTF-8'){
+	static function ords_to_unistr($ords, $encoding = 'UTF-8')
+	{
+		if (extension_loaded('mbstring')) return '';
+		
 		// Turns an array of ordinal values into a string of unicode characters
 		$str = '';
 		for($i = 0; $i < sizeof($ords); $i++){
@@ -5816,7 +5821,8 @@ class FLEXIUtilities
 			$v = $ords[$i];
 			$str .= pack("N",$v);
 		}
-		$str = mb_convert_encoding($str,$encoding,"UCS-4BE");
+		$str = mb_convert_encoding($str, $encoding, "UCS-4BE");
+		
 		return($str);
 	}
 
@@ -5830,21 +5836,23 @@ class FLEXIUtilities
 	 */
 	static function unistr_to_ords($str, $encoding = 'UTF-8')
 	{
+		if (extension_loaded('mbstring')) return array();
+		
 		// Turns a string of unicode characters into an array of ordinal values,
 		// Even if some of those characters are multibyte.
-		$str = mb_convert_encoding($str,"UCS-4BE",$encoding);
 		$ords = array();
+		$str = mb_convert_encoding($str, "UCS-4BE", $encoding);
 
 		// Visit each unicode character
-		//for($i = 0; $i < mb_strlen($str,"UCS-4BE"); $i++){
-		//for($i = 0; $i < utf8_strlen($str); $i++){
-		for($i = 0; $i < JString::strlen($str,"UCS-4BE"); $i++){
+		for($i = 0; $i < mb_strlen($str, "UCS-4BE"); $i++)
+		{
 			// Now we have 4 bytes. Find their total
 			// numeric value.
-			$s2 = JString::substr($str,$i,1,"UCS-4BE");
+			$s2 = mb_substr($str, $i, 1, "UCS-4BE");
 			$val = unpack("N",$s2);
 			$ords[] = $val[1];
 		}
+		
 		return($ords);
 	}
 	
@@ -6163,7 +6171,8 @@ class flexicontent_db
 	 * @return array
 	 * @since 1.5
 	 */
-	static function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index', $isprefix=1) {
+	static function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index', $isprefix=1)
+	{
 		$db     = JFactory::getDBO();
 		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -6182,7 +6191,7 @@ class flexicontent_db
 			$result = $db->loadAssocList();
 			if ( !empty($result) ) {
 				$_words[] = $word;      // word found
-			} else if ( mb_strlen($word) < $min_word_len ) {
+			} else if ( StringHelper::strlen($word) < $min_word_len ) {
 				$shortwords[] = $word;  // word not found and word too short
 			} else {
 				$stopwords[] = $word;   // word not found

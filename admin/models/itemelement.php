@@ -20,6 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * Flexicontent Component Itemelement Model
@@ -227,7 +228,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 		$filter_author = $assocs_id && $created_by ? $created_by : $filter_author;
 		
 		$search = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 'search', '', 'string' );
-		$search = trim( JString::strtolower( $search ) );
+		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
 
 		$where = array();
 		if (!FLEXI_J16GE) $where[] = ' sectionid = ' . FLEXI_SECTION;

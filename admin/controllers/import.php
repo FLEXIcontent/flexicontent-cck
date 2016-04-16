@@ -18,6 +18,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\String\StringHelper;
+
 // Register autoloader for parent controller, in case controller is executed by another component
 JLoader::register('FlexicontentController', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controller.php');
 
@@ -628,7 +630,7 @@ class FlexicontentControllerImport extends FlexicontentController
 					';
 				}
 				foreach ($_d as $i => $flddata) if (is_string($_d[$i])) {
-					if ( mb_strlen($_d[$i], 'UTF-8') > 80 ) $_d[$i] = mb_substr(strip_tags($_d[$i]), 0, 80, 'UTF-8') . ' ... ';
+					if ( StringHelper::strlen($_d[$i]) > 80 ) $_d[$i] = StringHelper::substr(strip_tags($_d[$i]), 0, 80) . ' ... ';
 				}
 				if ($lineno <= $conf['debug_records']) {
 					$parse_log .= "<pre><b>Item no $lineno:</b>\n". print_r($_d,true) ."</pre><hr/>";

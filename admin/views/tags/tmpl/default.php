@@ -18,6 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
@@ -217,8 +219,8 @@ function delAllFilters() {
 			</td>
 			<td class="alias hidden-phone">
 				<?php
-				if (JString::strlen($row->alias) > 25) {
-					echo JString::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
+				if (StringHelper::strlen($row->alias) > 25) {
+					echo StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
 				} else {
 					echo htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8');
 				}

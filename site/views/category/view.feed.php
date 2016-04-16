@@ -20,6 +20,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * HTML View class for the FLEXIcontent View (RSS)
@@ -126,7 +127,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 			// strip html from feed item description text
 			$description	= $feed_summary ? $item->introtext.$item->fulltext : $item->introtext;
-			$item_desc_cut = mb_strlen($description) > $feed_summary_cut; 
+			$item_desc_cut = StringHelper::strlen($description) > $feed_summary_cut; 
 			$description = flexicontent_html::striptagsandcut( $description, $feed_summary_cut);
 			
 			if ($feed_use_image) :

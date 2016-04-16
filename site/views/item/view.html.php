@@ -20,6 +20,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * HTML View class for the Item View
@@ -1700,7 +1701,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Create title of the custom fields default TAB (field manager TAB)
 		if ($item->type_id) {
 			$_str = JText::_('FLEXI_DETAILS');
-			$_str = mb_strtoupper(mb_substr($_str, 0, 1, 'UTF-8')) . mb_substr($_str, 1, NULL, 'UTF-8');
+			$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1, NULL);
 			
 			$types_arr = flexicontent_html::getTypesList();
 			$type_lbl = isset($types_arr[$item->type_id]) ? $types_arr[$item->type_id]->name : '';

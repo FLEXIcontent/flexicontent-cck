@@ -20,6 +20,8 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
+use Joomla\String\StringHelper;
+
 require_once(JPATH_COMPONENT.DS.'helpers'.DS.'search.php' );
 
 /**
@@ -628,7 +630,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			// Create regular expressions, for highlighting the matched words
 			$w_regexp_highlight = array();
 			foreach($searchwords as $n => $_word) {
-				$w_regexp_highlight[$_word] = mb_strlen($_word, 'utf-8')<=2  ||  $n+1 < count($searchwords) ?
+				$w_regexp_highlight[$_word] = StringHelper::strlen($_word) <= 2  ||  $n+1 < count($searchwords) ?
 					'#\b('. preg_quote($_word, '#') .')\b#iu' :   // Non-last word or word too small avoid highlighting non exact matches
 					'#\b('. preg_quote($_word, '#') .')#iu' ;
 			}

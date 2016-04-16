@@ -20,6 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.model.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * FLEXIcontent Component Items Model
@@ -786,7 +787,7 @@ class FlexicontentModelItems extends JModelLegacy
 			$row_catid = (int)$row->catid;
 			$catrel[] = '('.$row_catid.', '.(int)$row->id.')';
 			// append the text property to the object
-			if (JString::strlen($row->fulltext) > 1) {
+			if (StringHelper::strlen($row->fulltext) > 1) {
 				$row->text_stripped = $row->introtext . '<hr id="system-readmore" />' . $row->fulltext;
 			} else {
 				$row->text_stripped = flexicontent_html::striptagsandcut($row->introtext);
@@ -1149,15 +1150,15 @@ class FlexicontentModelItems extends JModelLegacy
 		// text search and search scope
 		$scope  = $this->getState( 'scope' );
 		$search = $this->getState( 'search' );
-		$search = trim( JString::strtolower( $search ) );
+		$search = StringHelper::trim( StringHelper::strtolower( $search ) );
 		
 		// date filters
 		$date      = $this->getState( 'date' );
 		$startdate = $this->getState( 'startdate' );
 		$enddate   = $this->getState( 'enddate' );
 		
-		$startdate = trim( JString::strtolower( $startdate ) );
-		$enddate   = trim( JString::strtolower( $enddate ) );
+		$startdate = StringHelper::trim( StringHelper::strtolower( $startdate ) );
+		$enddate   = StringHelper::trim( StringHelper::strtolower( $enddate ) );
 		
 		
 		// ********************************************
@@ -1538,31 +1539,31 @@ class FlexicontentModelItems extends JModelLegacy
 							$jfitemdata->{$jfitemfield->reference_field} = $jfitemfield->value;
 						}
 						
-						if (isset($jfitemdata->title) && mb_strlen($jfitemdata->title)>0){
+						if (isset($jfitemdata->title) && StringHelper::strlen($jfitemdata->title)>0){
 							$row->title = $jfitemdata->title;
 							$doauto['title'] = false;
 						}
 						
-						if (isset($jfitemdata->alias) && mb_strlen($jfitemdata->alias)>0) {
+						if (isset($jfitemdata->alias) && StringHelper::strlen($jfitemdata->alias)>0) {
 							$row->alias = $jfitemdata->alias;
 						}
 						
-						if (isset($jfitemdata->introtext) && mb_strlen(strip_tags($jfitemdata->introtext))>0) {
+						if (isset($jfitemdata->introtext) && StringHelper::strlen(strip_tags($jfitemdata->introtext))>0) {
 							$row->introtext = $jfitemdata->introtext;
 							$doauto['introtext'] = false;
 						}
 						
-						if (isset($jfitemdata->fulltext) && mb_strlen(strip_tags($jfitemdata->fulltext))>0) {
+						if (isset($jfitemdata->fulltext) && StringHelper::strlen(strip_tags($jfitemdata->fulltext))>0) {
 							$row->fulltext = $jfitemdata->fulltext;
 							$doauto['fulltext'] = false;
 						}
 						
-						if (isset($jfitemdata->metakey) && mb_strlen($jfitemdata->metakey)>0) {
+						if (isset($jfitemdata->metakey) && StringHelper::strlen($jfitemdata->metakey)>0) {
 							$row->metakey = $jfitemdata->metakey;
 							$doauto['metakey'] = false;
 						}
 						
-						if (isset($jfitemdata->metadesc) && mb_strlen($jfitemdata->metadesc)>0) {
+						if (isset($jfitemdata->metadesc) && StringHelper::strlen($jfitemdata->metadesc)>0) {
 							$row->metadesc = $jfitemdata->metadesc;
 							$doauto['metadesc'] = false;
 						}

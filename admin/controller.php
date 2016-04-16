@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.controller.legacy');
+use Joomla\String\StringHelper;
 
 /**
  * FLEXIcontent Component Controller
@@ -1177,7 +1178,7 @@ class FlexicontentController extends JControllerLegacy
 				$f->field_type	= "maintext";
 				$f->name				= "text";
 				$f->value				= $row->introtext;
-				if ( JString::strlen($row->fulltext) > 1 ) {
+				if ( StringHelper::strlen($row->fulltext) > 1 ) {
 					$f->value .= '<hr id="system-readmore" />' . $row->fulltext;
 				}
 				if(substr($f->value, 0, 3)!="<p>") {

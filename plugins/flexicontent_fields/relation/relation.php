@@ -15,6 +15,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
+use Joomla\String\StringHelper;
 
 class plgFlexicontent_fieldsRelation extends JPlugin
 {
@@ -351,7 +352,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$items_options_unused = '';
 		$state_shortname = array(1=>'P', 0=>'U', -1=>'A', -3=>'PE', -4=>'OQ', -5=>'IP');
 		foreach($items_arr as $itemdata) {
-			$itemtitle = (mb_strlen($itemdata->title) > $maxtitlechars) ? mb_substr($itemdata->title,0,$maxtitlechars) . "..." : $itemdata->title;
+			$itemtitle = (StringHelper::strlen($itemdata->title) > $maxtitlechars) ? StringHelper::substr($itemdata->title,0,$maxtitlechars) . "..." : $itemdata->title;
 			if ($prepend_item_state) {
 				$statestr = "[". @$state_shortname[$itemdata->state]."] ";
 				$itemtitle = $statestr.$itemtitle." ";//.$itemdata->catlist;

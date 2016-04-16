@@ -17,15 +17,7 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-function utf8ord($char) {
-	$i = 0;
-	$number = '';
-	while (isset($char{$i})) {
-		$number.= ord($char{$i});
-		++$i;
-	}
-	return $number;
-}
+use Joomla\String\StringHelper;
 
 $app = JFactory::getApplication();
 $caching = $app->getCfg('caching');
@@ -124,8 +116,8 @@ $selected_letter = JRequest::getVar('letter', '');
 				// Check if any character out of the all subgroup characters exists
 				// Meaning (There is at least on item title starting with one of the group letters)
 				$c = 0;
-				while ($c < JString::strlen($letter)) {
-					$uchar = JString::substr($letter,$c++,1);
+				while ($c < StringHelper::strlen($letter)) {
+					$uchar = StringHelper::substr($letter,$c++,1);
 					if (in_array($uchar, $this->alpha)) {
 						$has_item = true;
 						break;
@@ -142,7 +134,7 @@ $selected_letter = JRequest::getVar('letter', '');
 				$startletter = $range[0];  $endletter = $range[1];
 				
 				// ERROR CHECK: Range START and END are single character strings
-				if (JString::strlen($startletter) != 1 || JString::strlen($endletter) != 1) {
+				if (StringHelper::strlen($startletter) != 1 || StringHelper::strlen($endletter) != 1) {
 					echo "Error in Alpha Index<br>letter range: ".$letter." start and end must be one character<br>";
 					continue;
 				}
@@ -180,10 +172,10 @@ $selected_letter = JRequest::getVar('letter', '');
 				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo "<a class=\"$aiclass $currentclass\" href=\"javascript:;\" onclick=\"document.getElementById('alpha_index').value='".$letter."'; ";
 				echo " var form=document.getElementById('adminForm'); ";
-				echo " adminFormPrepare(form); form.submit(); \">".mb_strtoupper($letter_label)."</a>";
+				echo " adminFormPrepare(form); form.submit(); \">".StringHelper::strtoupper($letter_label)."</a>";
 			elseif (!$alphaskipempty) :
 				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
-				echo '<span class="'.$aiclass.'">'.mb_strtoupper($letter_label).'</span>';
+				echo '<span class="'.$aiclass.'">'.StringHelper::strtoupper($letter_label).'</span>';
 			endif;
 			$group_start = false;
 		endforeach;
