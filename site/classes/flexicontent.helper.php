@@ -263,12 +263,12 @@ class flexicontent_html
 		
 		// Find which LESS files have changed
 		$stale = array();
-		foreach ($files as $inFile)
+		foreach ($files as & $inFile)
 		{
-			//$inFile   = urldecode(base64_decode($inFile));
+			$inFile = JPath::clean($inFile);
 			$inFilename = basename($inFile);
 			$nameOnly   = basename($inFilename, '.less');
-			$outFile    = 'css/' . $nameOnly . '.css';
+			$outFile    = 'css' .DS. $nameOnly . '.css';
 			
 			if (!JFile::exists($path.$inFile)) {
 				//if ($debug) JFactory::getApplication()->enqueueMessage('Path not found: '.$path.$inFile, 'warning');
@@ -276,6 +276,7 @@ class flexicontent_html
 				$stale[$inFile] = $outFile;
 			}
 		}
+		unset($inFile);
 		//print_r($stale);
 		
 		// We are done if no CSS files need to be updated
@@ -5811,7 +5812,7 @@ class FLEXIUtilities
 	 */
 	static function ords_to_unistr($ords, $encoding = 'UTF-8')
 	{
-		if (extension_loaded('mbstring')) return '';
+		if (!extension_loaded('mbstring')) return '';
 		
 		// Turns an array of ordinal values into a string of unicode characters
 		$str = '';
@@ -5836,7 +5837,7 @@ class FLEXIUtilities
 	 */
 	static function unistr_to_ords($str, $encoding = 'UTF-8')
 	{
-		if (extension_loaded('mbstring')) return array();
+		if (!extension_loaded('mbstring')) return array();
 		
 		// Turns a string of unicode characters into an array of ordinal values,
 		// Even if some of those characters are multibyte.
