@@ -641,32 +641,28 @@ class plgSystemFlexisystem extends JPlugin
 	
 	function handleSerialized()
 	{
-		// Workaround for max_input_vars (PHP 5.3.9+), in the case that form sender is com_config
-		// J1.6+ adds ACL which is 50+ variables (due to FLEXIcontent's access.xml) per user-group
+		//echo "<pre>"; print_r($_POST); exit;
+		//echo "<pre>"; print_r($_REQUEST); exit;
+		//echo count($_REQUEST, COUNT_RECURSIVE); exit;
+		
+		// Workaround for max_input_vars limitation (PHP 5.3.9+)
 		if ( !empty($_POST['fcdata_serialized']) )
 		{
-			//print_r($_REQUEST); exit;
-			//echo count($_REQUEST, COUNT_RECURSIVE); exit;
-			
-			$form_data = $this->parse_json_decode( $_POST['fcdata_serialized'] );
 			//parse_str($_POST['fcdata_serialized'], $form_data);  // Combined with "jQuery.serialize()", but cannot be used to overcome 'max_input_vars'
+			
+			//$total_vars_e = null;
+			//$form_data_e = $this->parse_json_decode_eval( $_POST['fcdata_serialized'], $total_vars_e );
+			
+			$total_vars = null;
+			$form_data = $this->parse_json_decode( $_POST['fcdata_serialized'], $total_vars );
+			
+			//echo "<pre>"; print_r( $this->array_diff_recursive($form_data_e, $form_data) );  echo "</pre>"; exit;
+			
 			foreach($form_data as $n => $v)  JRequest::setVar($n, $v, 'POST');
 			
 			/*foreach($_GET as $var => $val) {
 				if ( !isset($_POST[$var]) ) JFactory::getApplication()->enqueueMessage( "GET variable: ".$var . " is not set in the POST ARRAY", 'message');
 			}*/
-			
-			$total_vars = 0;
-			foreach($_REQUEST as $var_1) {   // Level 1
-				if (!is_array($var_1)) $total_vars++;
-				else foreach($var_1 as $var_2) {     // Level 2
-					if (!is_array($var_2)) $total_vars++;
-					else foreach($var_2 as $var_3) {   // Level 3
-						$total_vars += !is_array($var_3) ? 1 : count($var_3);
-					}
-				}
-			}
-			//echo $total_vars." - ".count($_REQUEST, COUNT_RECURSIVE); exit;
 			
 			if (JDEBUG) JFactory::getApplication()->enqueueMessage(
 				"Form data were serialized, ".
@@ -1265,16 +1261,18 @@ class plgSystemFlexisystem extends JPlugin
 	
 	/*
 	 * Function to restore serialized form data with:  JSON.stringify( jform.serializeArray() )
-	 * This is currently UNUSED, we use parse_str instead
+	 * This is currently UNUSED, because we use an alternative without eval ...
 	 */
-	private function parse_json_decode($string) {
-		$result = array();
+	private function parse_json_decode_eval($string, & $count)
+	{
+		$parsed = array();    // Decompressed data to be returned
+		
 		$pairs = json_decode($string, true);
+		$count = count($pairs);
 		//echo "<pre>"; print_r($pairs); exit;
 		
-		// find the pairs "name=value"
-		$toEvaluate = ''; // we will do a big eval() at the end not pretty but simplier
-		foreach ($pairs as $pair) {
+		foreach ($pairs as $pair)
+		{
 			$name = $pair['name'];
 			$value = $pair['value'];
 			
@@ -1294,24 +1292,102 @@ class plgSystemFlexisystem extends JPlugin
 				$name = str_replace(array('\'', '[', ']'), array('\\\'', '[\'', '\']'), $name);
 				// WHEN no index name, remove the empty string being used as index, thus an integer auto-incremented index will be used (e.g. checkbox values)
 				$name = str_replace("['']", '[]', $name);
-				// Final create the assignment to be evaluated:  $result['na']['me'] = 'value';
-				//$toEvaluate .= '$result[\'' . $name . ' = ' . $value . "; \n";
-				eval('$result[\'' . $name . ' = ' . $value . "; \n");
+				// Final create the assignment to be evaluated:  $parsed['na']['me'] = 'value';
+				eval('$parsed[\'' . $name . ' = ' . $value . "; \n");
 			}
 			
 			// CASE name is not an array, a single variable assignment
 			else {
 				// Add double slashes to index name
 				$name = str_replace('\'', '\\\'', $name);
-				// Finally quote the name, thus treating index as string and create assignment to be evaluated: $result['name'] = 'value';
-				//$toEvaluate .= '$result[\'' . $name . '\'] = ' . $value . "; \n";
-				eval('$result[\'' . $name . '\'] = ' . $value . "; \n");
+				// Finally quote the name, thus treating index as string and create assignment to be evaluated: $parsed['name'] = 'value';
+				eval('$parsed[\'' . $name . '\'] = ' . $value . "; \n");
 			}
 		}
-		//eval($toEvaluate);
-		//echo "<pre>". $toEvaluate; exit;
-		return $result;
+		//echo "<pre>"; print_r($parsed);  echo "</pre>"; exit;
+		return $parsed;
 	}
+	
+	
+	/*
+	 * Function to restore serialized form data with:  JSON.stringify( jform.serializeArray() )
+	 */
+	private function parse_json_decode($string, & $count)
+	{
+		$name_cnt = array();  // Empty index counters
+		$parsed = array();    // Decompressed data to be returned
+		
+		$pairs = json_decode($string, true);
+		$count = count($pairs);
+		//echo "<pre>"; print_r($pairs); echo "</pre>";
+		
+		foreach ($pairs as $pair)
+		{
+			$name = $pair['name'];
+			$value = $pair['value'];
+			
+			$name_cnt[$name] = isset($name_cnt[$name]) ? $name_cnt[$name] + 1 : 0;
+			$indexes = preg_split('/[\[]+/', $name);
+			
+			$point = & $parsed;
+			foreach($indexes as $n => &$index)
+			{
+				$index = trim($index, ']');
+				$index = $index === '' ? (string) $name_cnt[$name] : $index;
+				
+				if ($n+1 == count($indexes))
+				{
+					break;
+				}
+				
+				if ( !isset($point[$index]) )
+				{
+					$point[$index] = array();
+				}
+				
+				$point = & $point[$index];
+			}
+			
+			// Assign value and ... !! UNSET ARRAY REFERENCE, BEWARE !!
+			//if ($value=='__SAVED__') $value .= 'test';
+			$point[$index] = $value;
+			unset($index);
+		}
+		
+		//echo "<pre>"; print_r($parsed);  echo "</pre>"; exit;
+		return $parsed;
+	}
+	
+	
+	
+	function array_diff_recursive($arr1, $arr2)
+	{
+		$diff = array();
+		
+		foreach ($arr1 as $i => $v)
+		{
+			if (array_key_exists($i, $arr2))
+			{
+				if (is_array($v))
+				{
+					$diff_rec = $this->array_diff_recursive($v, $arr2[$i]);
+					if (count($diff_rec)) $diff[$i] = $diff_rec;
+				}
+				
+				else if ($v != $arr2[$i]) {
+					$diff[$i] = $v;
+				}
+			}
+			
+			else {
+				$diff[$i] = $v;
+			}
+		}
+		
+		return $diff;
+	}
+	
+	
 	
 	
 	// ***********************

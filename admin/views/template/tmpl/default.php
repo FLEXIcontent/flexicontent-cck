@@ -624,7 +624,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				<br/> -	<?php echo JText::_( 'setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
 			</span>
 			<span class="fc-mssg fc-success" style="max-width: unset; font-size:100%; margin: 8px 0 0 0!important; padding-top:2px; padding-bottom:2px;">
-				-	<span class="badge" style="background:darkcyan !important;">less</span> parameters: add more to <b><?php echo $this->layout->view; ?>.xml</b> , then you use them inside <b>less/<?php echo $this->layout->view; ?>.less</b> with using @<b><?php echo $pfx; ?>_</b>parameter_name;
+				-	<span class="badge" style="background:darkcyan !important;">less</span> parameters: add more to <b><?php echo $this->layout->view; ?>.xml</b> , then inside file: <b>less/<?php echo $this->layout->view; ?>.less</b> use less variables: &nbsp; @<b><?php echo $pfx; ?>_</b>parameter_name;
 				<br/> - NOTE: <b>FCC_</b> for category and <b>FCI_</b> for item layout, EXAMPLE:  <code style="font-size:100%;">body&nbsp; .flexi.label &nbsp;{ color: @<?php echo $pfx; ?>_label_bg_color; }</code>
 			</span>
 			
