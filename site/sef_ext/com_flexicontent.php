@@ -82,6 +82,8 @@ if (!$FC_sh404sef_init)
 	$IS_FISH_SITE = FLEXI_FISH && JFactory::getApplication()->isSite();
 
 	// Make sure that the global FC vars are arrays
+	global $fc_list_items;
+	if (!is_array($fc_list_items))    $fc_list_items    = array();
 	global $globalcats, $globalnopath, $globalnoroute;
 	if (!is_array($globalcats))    $globalcats    = array();
 	if (!is_array($globalnopath))  $globalnopath  = array();
@@ -105,8 +107,8 @@ if (!$FC_sh404sef_init)
 	{
 		// Get template XML data from cache
 		$_cache = JFactory::getCache('com_flexicontent_cats');  // Get Joomla Cache
-		$_cache->setCaching(1); 		              // Force cache ON
-		$_cache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
+		//$_cache->setCaching(1); 		              // Force cache ON
+		//$_cache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 		$_helper = new sh404_fc_helper();
 		$_cats = $_cache->call(array($_helper, 'getCats'), false);
 	}
@@ -259,17 +261,22 @@ switch ($view)
 		
 		else   // Item viewing  -or-  TASK: edit  -or-  TASK: *
 		{
-			$query	= 'SELECT i.id, i.title, i.alias, i.catid, i.created, ie.type_id' //.', c.title AS cattitle, ty.alias AS typealias'
-					. ' FROM #__content AS i'
-					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-					//. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-					//. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-					//. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-					. ' WHERE i.id = ' . ( int ) $id;
-			$database->setQuery ( $query );
+			if ( isset($fc_list_items[$id]) )  $row = $fc_list_items[ $id ];
 			
-			// Do not translate the items url (Falang extended Database class and overrides the method)
-			$row = !$IS_FISH_SITE  ?  $database->loadObject()  :  $database->loadObject('stdClass', $_translate=false, $_language=null);
+			else
+			{
+				$query	= 'SELECT i.id, i.title, i.alias, i.catid, i.created, ie.type_id' //.', c.title AS cattitle, ty.alias AS typealias'
+						. ' FROM #__content AS i'
+						. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+						//. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+						//. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+						//. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+						. ' WHERE i.id = ' . ( int ) $id;
+				$database->setQuery ( $query );
+				
+				// Do not translate the items url (Falang extended Database class and overrides the method)
+				$row = !$IS_FISH_SITE  ?  $database->loadObject()  :  $database->loadObject('stdClass', $_translate=false, $_language=null);
+			}
 			
 			if ($row)
 			{
@@ -352,8 +359,8 @@ switch ($view)
 		// Remove 'ilayout' if empty
 		if (empty($ilayout)) shRemoveFromGETVarsList ( 'ilayout' );
 		
-		// Recreate page id on next display
-		shMustCreatePageId( 'set', true );
+		// Create page id
+		//shMustCreatePageId( 'set', true );
 	break;
 	
 	
@@ -520,8 +527,8 @@ switch ($view)
 		// Remove 'clayout' if empty
 		if (empty($clayout)) shRemoveFromGETVarsList ( 'clayout' );
 		
-		// Recreate page id on next display
-		shMustCreatePageId( 'set', true);
+		// Create page id
+		//shMustCreatePageId( 'set', true );
 	break;
 	
 	
@@ -545,8 +552,8 @@ switch ($view)
 		shRemoveFromGETVarsList ( 'id' );
 		shRemoveFromGETVarsList ( 'view' );
 		
-		// Recreate page id on next display
-		shMustCreatePageId( 'set', true );
+		// Create page id
+		//shMustCreatePageId( 'set', true );
 	break;
 	
 	
@@ -602,8 +609,8 @@ switch ($view)
 		// Remove the vars from the url
 		shRemoveFromGETVarsList ( 'view' );
 		
-		// Recreate page id on next display
-		shMustCreatePageId( 'set', true);
+		// Create page id
+		//shMustCreatePageId( 'set', true );
 	break;
 	
 	
