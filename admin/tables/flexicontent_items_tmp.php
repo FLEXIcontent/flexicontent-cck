@@ -41,7 +41,7 @@ class flexicontent_items_tmp extends JTable{
 		
 		// Get columns
 		$tbls = array($tbl_name);
-		$tbl_fields = $db->getTableFields($tbls);
+		foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
 		
 		$tbl_fields = array_keys($tbl_fields[$tbl_name]);
 		foreach ($tbl_fields as $tbl_field) $this->$tbl_field = null;

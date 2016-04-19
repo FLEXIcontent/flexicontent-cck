@@ -237,7 +237,7 @@ class flexicontent_items extends _flexicontent_items {
 		if (!isset($tbl_fields))
 		{
 			$tbls = array($this->_tbl_join_tmp);
-			$tbl_fields = $db->getTableFields($tbls);
+			foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
 		}
 		$this->_join_prop_tmp = array_keys($tbl_fields[$this->_tbl_join_tmp]);
 		
