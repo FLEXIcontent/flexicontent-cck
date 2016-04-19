@@ -45,7 +45,7 @@ class flexicontent_favourites extends JTable
 	/** @var int */	
 	var $notify				= null;
 
-	function flexicontent_favourites(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_favourites', 'id', $db);
 	}
 	

@@ -44,7 +44,7 @@ class flexicontent_cats_item_relations extends JTable
 	 */
 	var $ordering			= null;
 
-	function flexicontent_cats_item_relations(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_cats_item_relations', 'catid', $db);
 	}
 	

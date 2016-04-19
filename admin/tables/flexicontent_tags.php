@@ -43,7 +43,7 @@ class flexicontent_tags extends JTable
 	/** @var date */
 	var $checked_out_time	= '';
 
-	function flexicontent_tags(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_tags', 'id', $db);
 	}
 	

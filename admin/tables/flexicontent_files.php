@@ -67,7 +67,7 @@ class flexicontent_files extends JTable
 	/** @var string */
 	var $attribs	 		= null;
 
-	function flexicontent_files(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_files', 'id', $db);
 		$this->access = FLEXI_J16GE ? 1 : 0;    // Public access is 1 for J2.5 and 0 for J1.5
 	}

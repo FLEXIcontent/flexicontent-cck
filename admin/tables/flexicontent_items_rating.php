@@ -40,7 +40,7 @@ class flexicontent_items_rating extends JTable
 	/** @var string */
 	var $lastip				= null;
 
-	function flexicontent_items_rating(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__content_rating', 'content_id', $db);
 	}
 	
