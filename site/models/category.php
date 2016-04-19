@@ -894,12 +894,18 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}
 		
-		// Get session
-		$session  = JFactory::getSession();
+		// All items / Normal only / Featured only
+		$flag_featured = (int) $cparams->get('display_flag_featured', 0);
 		
-		// Featured items, this item property exists in J1.6+ only
-		$flag_featured = $cparams->get('display_flag_featured', 0);
-		switch ($flag_featured) {
+		// Check if Text Search / Filters / AI are NOT active and
+		// special before FORM SUBMIT (per page) -limit- was configured to "FEATURED ONLY"
+		if ( empty($this->_active_filts) && empty($this->_active_search) && empty($this->_active_ai) )
+		{
+			$use_limit_before = (int) $cparams->get('use_limit_before_search_filt', 0);
+			if ($use_limit_before == 2) $flag_featured = 2;
+		}
+		switch ($flag_featured)
+		{
 			case 1: $where .= ' AND i.featured=0'; break;   // 1: normal only
 			case 2: $where .= ' AND i.featured=1'; break;   // 2: featured only
 			default: break;  // 0: both normal and featured

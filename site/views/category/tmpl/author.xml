@@ -636,11 +636,12 @@
 			</field>
 			
 			<field name="sep_limit_items_list_till_submit" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT" description="" level="level3" />
-			<field name="sep_limit_items_list_till_submit_desc" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT_DESC" label="" level="level4" class="alert alert-warning fcpadded" />
-			<field name="use_limit_before_search_filt" type="radio" default="" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
+			<field name="sep_limit_items_list_till_submit_desc" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT_DESC" label="" level="level4" class="alert alert-info fcpadded" />
+			<field name="use_limit_before_search_filt" type="multilist" subtype="radio" default="" toggle_related="0" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="0" show_list="" hide_list="limit_before_search_filt">FLEXI_NO</option>
+				<option value="1" show_list="limit_before_search_filt" hide_list="">FLEXI_YES</option>
+				<option value="2" show_list="limit_before_search_filt" hide_list="">FLEXI_FEATURED_ONLY</option>
 			</field>
 			<field name="limit_before_search_filt" type="text" size="4" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" class="limit_before_search_filt" />
 			
