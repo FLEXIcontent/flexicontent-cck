@@ -45,7 +45,7 @@ class flexicontent_versions extends JTable
 	/** @var int */
 	var $state				= null;
 
-	function flexicontent_versions(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_versions', 'id', $db);
 	}
 	

@@ -42,7 +42,7 @@ class flexicontent_items_extravote extends JTable
 	/** @var string */
 	var $lastip				= null;
 
-	function flexicontent_items_extravote(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_items_extravote', 'content_id', $db);
 	}
 	

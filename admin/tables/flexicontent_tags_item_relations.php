@@ -38,7 +38,7 @@ class flexicontent_tags_item_relations extends JTable
 	 */
 	var $itemid				= null;
 
-	function flexicontent_tags_item_relations(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_tags_item_relations', 'tid', $db);
 	}
 	

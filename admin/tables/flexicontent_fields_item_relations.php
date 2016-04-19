@@ -56,7 +56,7 @@ class flexicontent_fields_item_relations extends JTable
 	 */
 	var $value					= null;
 
-	function flexicontent_fields_item_relations(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_fields_item_relations', 'item_id', $db);
 	}
 	

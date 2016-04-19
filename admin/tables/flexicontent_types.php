@@ -90,7 +90,7 @@ class flexicontent_types extends _flexicontent_types
 	/** @var boolean */
 	var $_trackAssets	= true;
 
-	function flexicontent_types(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_types', 'id', $db);
 	}
 	

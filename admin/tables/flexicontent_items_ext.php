@@ -46,7 +46,7 @@ class flexicontent_items_ext extends JTable{
 	/**
 	* @param database A database connector object
 	*/
-	function flexicontent_items_ext(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_items_ext', 'item_id', $db);
 	}
 }

@@ -43,7 +43,7 @@ class flexicontent_fields_type_relations extends JTable
 	 */
 	var $ordering				= null;
 
-	function flexicontent_fields_type_relations(& $db) {
+	function __construct(& $db) {
 		parent::__construct('#__flexicontent_fields_type_relations', 'field_id', $db);
 	}
 	

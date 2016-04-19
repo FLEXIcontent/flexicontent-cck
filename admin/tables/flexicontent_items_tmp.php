@@ -36,13 +36,12 @@ class flexicontent_items_tmp extends JTable{
 	/**
 	* @param database A database connector object
 	*/
-	function flexicontent_items_tmp(& $db) {
+	function __construct(& $db) {
 		$tbl_name = '#__flexicontent_items_tmp';
 		
 		// Get columns
 		$tbls = array($tbl_name);
-		if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
-		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
+		$tbl_fields = $db->getTableFields($tbls);
 		
 		$tbl_fields = array_keys($tbl_fields[$tbl_name]);
 		foreach ($tbl_fields as $tbl_field) $this->$tbl_field = null;
