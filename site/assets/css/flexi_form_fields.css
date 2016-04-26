@@ -217,6 +217,7 @@
 #flexicontent .fcfield-button-add a {
 	padding: 4px 22px;
 	line-height: 18px;
+	min-height: 18px;
 	cursor: pointer;
 	background-color: white;
 	background-image: -webkit-gradient(linear,left top,left bottom,from(white),to(#d0d0d0));

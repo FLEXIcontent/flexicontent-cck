@@ -79,7 +79,7 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 		$required   = $required ? ' required' : '';
 		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		// Sanitize limitations
-		$exact_values	= $field->parameters->get( 'exact_values', 0 ) ;
+		$exact_values	= $use_ingroup ? 0 : (int) $field->parameters->get( 'exact_values', 0 ) ;
 		if ($required && !$min_values) $min_values = 1;
 		if ($exact_values) $max_values = $min_values = $exact_values;
 		$js_popup_err	= $field->parameters->get( 'js_popup_err', 0 ) ;

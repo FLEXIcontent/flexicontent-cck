@@ -1622,18 +1622,9 @@ class flexicontent_html
 				break;
 				
 			case 'EMAIL': case 'email':
-				// This cleans some of the more dangerous characters but leaves special characters that are valid.
-				$v = trim($noHtmlFilter->clean($v, 'HTML'));
-				
-				// <>" are never valid in a email ?
-				$v = str_replace(array('<', '>', '"'), '', $v);
-				
-				// Convert to Punycode string
-				$v = JStringPunycode::emailToPunycode( $v );
-				
-				// Check for valid email (punycode is ASCII so this should work with UTF-8 too)
-				$email_regexp = "/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/";
-				if (!preg_match($email_regexp, $v)) $v = '';
+				// Use the Joomla mail helper to validate emails
+				jimport('joomla.mail.helper');
+				if ( !JMailHelper::isEmailAddress($v) ) $v = '';
 				break;
 				
 			default:
