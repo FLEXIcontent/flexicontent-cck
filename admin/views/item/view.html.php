@@ -252,22 +252,23 @@ class FlexicontentViewItem extends JViewLegacy
 			$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
 			$autologin = ''; //$params->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 			
-			// Check if we are in the backend, in the back end we need to set the application to the site app instead
-			// we do not remove 'isAdmin' check so that we can copy later without change, e.g. to a plugin
+			// We use 'isAdmin' check so that we can copy later without change, e.g. to a plugin
 			$isAdmin = JFactory::getApplication()->isAdmin();
-			if ( $isAdmin && !$_sh404sef )
-			{
-				JFactory::$application = JApplication::getInstance('site');
-			}
 			
-			// Create the URL
+			// Create the non-SEF URL
 			$item_url =
 				FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)
 				. ($item->language!='*' ? '&lang='.substr($item->language, 0,2) : '');
 			
-			$item_url = //!$isAdmin && $_sh404sef ?
-				//Sh404sefHelperGeneral::getSefFromNonSef($item_url, $fullyQualified = true, $xhtml = false, $ssl = null) :
+			// Check if we are in the backend, in the backend we need to set the application to the site app
+			if ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('site');
+			
+			// Create the SEF URL
+			$item_url = //!$isAdmin && $_sh404sef  ?  Sh404sefHelperGeneral::getSefFromNonSef($item_url, $fullyQualified = true, $xhtml = false, $ssl = null) :
 				JRoute::_($item_url);
+			
+			// Restore application to the admin app if we are in the backend
+			if  ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('administrator');
 			
 			// Check if we are in the backend again
 			if ( $isAdmin )
@@ -275,11 +276,6 @@ class FlexicontentViewItem extends JViewLegacy
 				// Remove administrator from URL as it is added even though we've set the application to the site app
 				$admin_folder = str_replace(JURI::root(true),'',JURI::base(true));
 				$item_url = str_replace($admin_folder.'/', '/', $item_url);
-			}
-			if  ( $isAdmin && !$_sh404sef )
-			{
-				// Restore application to the admin app
-				JFactory::$application = JApplication::getInstance('administrator');
 			}
 			
 			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? '&amp;' : '?') .'preview=1' . $autologin;

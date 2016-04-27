@@ -565,7 +565,7 @@ switch ($view)
 		if ($Itemid && $menu = JFactory::getApplication()->getMenu()->getItem($Itemid))
 		{
 			$menu_matches = @ $menu->query['view'] == $view;
-			if ( $view=='flexicontent' ) $menu_matches = $menu_matches && @ $menu->query['rootcat'] == $rootcat;
+			if ( $view=='flexicontent' ) $menu_matches = $menu_matches && @ $menu->query['rootcat'] == @ $rootcat;
 		}
 		
 		if ($menu_matches)

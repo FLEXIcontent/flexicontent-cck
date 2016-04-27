@@ -412,7 +412,7 @@ class plgSystemFlexisystem extends JPlugin
 				//$app->enqueueMessage( "Set com_flexicontent item view instead of com_content article view", 'message');
 			} else {
 				if ($view=='form') {
-					$urlItem = 'index.php?option='.$this->extension.'&view='.FLEXI_ITEMVIEW.'&id='.$id.'&task=edit&layout=form';
+					$urlItem = 'index.php?option='.$this->extension.'&view='.FLEXI_ITEMVIEW.'&id='.$id.'&task=edit';
 				} else {
 					// Include the route helper files
 					require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');

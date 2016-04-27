@@ -213,42 +213,38 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$title    = $item->title;
 		$maincat  = $categories[$item->catid]->title;
 		
+		//$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef') && $config->get('sef');
+		$_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
+		
 		// Domain URL and autologin vars
 		$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
 		$autologin = ($send_personalized && $user_autologin) ? '&fcu=__SUBSCRIBER_USERNAME__&fcp=__SUBSCRIBER_PASSWORD__' : '';
 		
-		//$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef') && $config->get('sef');
-		$_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
-		
-		// Check if we are in the backend, in the back end we need to set the application to the site app instead
+		// We use 'isAdmin' check so that we can copy later without change, e.g. to a plugin
 		$isAdmin = JFactory::getApplication()->isAdmin();
-		if ( $isAdmin && !$_sh404sef )
-		{
-			JFactory::$application = JApplication::getInstance('site');
-		}
 		
-		// Create the URL
+		// Create the non-SEF URL
 		$item_url =
 			FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)
 			. $autologin
 			. ($item->language!='*' ? '&lang='.substr($item->language, 0,2) : '');
 		
-		$item_url = //!$isAdmin && $_sh404sef ?
-			//Sh404sefHelperGeneral::getSefFromNonSef($item_url, $fullyQualified = true, $xhtml = false, $ssl = null) :
+		// Check if we are in the backend, in the backend we need to set the application to the site app
+		if ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('site');
+		
+		// Create the SEF URL
+		$item_url = //!$isAdmin && $_sh404sef  ?  Sh404sefHelperGeneral::getSefFromNonSef($item_url, $fullyQualified = true, $xhtml = false, $ssl = null) :
 			JRoute::_($item_url);
+		
+		// Restore application to the admin app if we are in the backend
+		if  ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('administrator');
 		
 		// Check if we are in the backend again
 		if ( $isAdmin )
 		{
 			// Remove administrator from URL as it is added even though we've set the application to the site app
 			$admin_folder = str_replace(JURI::root(true),'',JURI::base(true));
-			$item_url = str_replace($admin_folder, '', $item_url);
-		}
-		
-		if  ( $isAdmin && !$_sh404sef )
-		{
-			// Restore application to the admin app
-			JFactory::$application = JApplication::getInstance('administrator');
+			$item_url = str_replace($admin_folder.'/', '/', $item_url);
 		}
 		
 		$link     = $server . $item_url;
