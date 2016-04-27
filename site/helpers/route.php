@@ -891,7 +891,7 @@ class FlexicontentHelperRoute
 		//JFactory::getApplication()->enqueueMessage("Finding Item: ".$item->id ."<br/>Language:".$language." <br/> ". print_r(self::$lookup[$language]['item'], true)."<br/>".print_r($needles,true),'message');
 		foreach ($needles as $view => $ids)
 		{
-			if ( is_object($ids) ) return $ids;  // done, this an already appropriate menu item object
+			if ( is_object($ids) && ($ids->language=='*' || $ids->language==$language) ) return $ids;  // done, this an already appropriate menu item object
 			
 			// Lookup if then given ids for the given view exists for the given language
 			if ( !isset(self::$lookup[$language][$view]) ) continue;
@@ -974,7 +974,7 @@ class FlexicontentHelperRoute
 		
 		foreach ($needles as $view => $ids)
 		{
-			if ( is_object($ids) ) return $ids;  // done, this an already appropriate menu item object
+			if ( is_object($ids) && ($ids->language=='*' || $ids->language==$language) ) return $ids;  // done, this an already appropriate menu item object
 			if ( $view=='_language' ) continue;
 			
 			$i_view = $view . ($layout ? '_'.$layout : '');
@@ -1056,7 +1056,7 @@ class FlexicontentHelperRoute
 		
 		foreach ($needles as $view => $ids)
 		{
-			if ( is_object($ids) ) return $ids;  // done, this an already appropriate menu item object
+			if ( is_object($ids) && ($ids->language=='*' || $ids->language==$language) ) return $ids;  // done, this an already appropriate menu item object
 			
 			// Lookup if then given ids for the given view exists for the given language
 			if ( !isset(self::$lookup[$language][$view]) ) continue;
