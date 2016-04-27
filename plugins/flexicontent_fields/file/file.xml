@@ -246,12 +246,12 @@
 			
 			<field name="" type="separator" default="Button configuration for actions such as: download, view, share, add-to-cart" level="level2" />
 			
-			<field name="usebutton" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_USE_BUTTONS" toggle_related="1" description="FLEXI_FIELD_USE_BUTTONS_DESC">
+			<field name="usebutton" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_USE_BUTTONS" toggle_related="1" description="FLEXI_FIELD_USE_BUTTONS_DESC" class="btn-group group-fcinfo">
 				<option value="0" show_list="" hide_list="multivalue-mode5">FLEXI_FIELD_LINKS</option>
 				<option value="1" show_list="multivalue-mode5" hide_list="">FLEXI_FIELD_BUTTONS</option>
 			</field>
 			
-			<field name="buttonsposition" type="radio" default="1" label="FLEXI_FIELD_BUTTONS_POSITION" depend_class="multivalue-mode5" description="FLEXI_FIELD_BUTTONS_POSITION_DESC">
+			<field name="buttonsposition" type="radio" default="1" label="FLEXI_FIELD_BUTTONS_POSITION" depend_class="multivalue-mode5" description="FLEXI_FIELD_BUTTONS_POSITION_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_FIELD_BEFORE</option>
 				<option value="1">FLEXI_FIELD_AFTER</option>
 			</field>
@@ -263,7 +263,7 @@
 			<field name="actionseptxt" type="text" default="" label="FLEXI_FIELD_FILE_ACTION_SEP_CHARS" depend_class="multivalue-mode6" description="FLEXI_FIELD_FILE_ACTION_SEP_CHARS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_DOWNLOADS" level="level1" />
-			<field name="allowdownloads" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD_DESC">
+			<field name="allowdownloads" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode7">FLEXI_NO</option>
 				<option value="1" show_list="" hide_list="multivalue-mode7">FLEXI_YES</option>
 				<option value="2" show_list="multivalue-mode7" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
@@ -271,18 +271,24 @@
 			<field name="downloadstext" type="text" size="40" default="FLEXI_DOWNLOAD" label="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT" depend_class="multivalue-mode7" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
 			
 			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" level="level1" />
-			<field name="allowview" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_VIEW" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_VIEW_DESC">
+			<field name="allowview" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_VIEW" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_VIEW_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode8">FLEXI_NO</option>
 				<option value="1" show_list="" hide_list="multivalue-mode8">FLEXI_YES</option>
 				<option value="2" show_list="multivalue-mode8" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
 			</field>
 			<field name="viewtext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT" depend_class="multivalue-mode8" description="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT_DESC"/>
+			<field name="viewinside" type="radio" default="1" label="View inside" description="Select to view file in same / new window" depend_class="multivalue-mode8" class="btn-group group-fcinfo">
+				<option value="0">Fancybox modal</option>
+				<option value="1">jQuery modal (responsive + fullscreen)</option>
+				<option value="2">New window</option>
+				<option value="3">Same window</option>
+			</field>
 			
 		</fieldset>
 		<fieldset name="group-file-cart" repeat="1" icon_class="icon-cart" label="FLEXI_DOWNLOAD_CART_SHORT" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_DOWNLOAD_CART" level="level1" />
-			<field name="use_downloads_manager" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_DESC">
+			<field name="use_downloads_manager" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode9">FLEXI_NO</option>
 				<option value="1" show_list="" hide_list="multivalue-mode9">FLEXI_YES</option>
 				<option value="2" show_list="multivalue-mode9" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>
@@ -293,7 +299,7 @@
 		<fieldset name="group-file-share" repeat="1" icon_class="icon-users" label="FLEXI_SHARING" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_SHARING" level="level1" />
-			<field name="allowshare" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_SHARE" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC">
+			<field name="allowshare" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_SHARE" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode10">FLEXI_NO</option>
 				<option value="1" show_list="" hide_list="multivalue-mode10">FLEXI_YES</option>
 				<option value="2" show_list="multivalue-mode10" hide_list="">FLEXI_YES_CUSTOM_TEXT</option>

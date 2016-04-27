@@ -235,8 +235,10 @@ foreach($values as $file_id)
 		
 		if ($authorized && $allowview && !$file_data->url) {
 			$actions_arr[] = '
-				<a href="'.$dl_link.(strpos($dl_link,'?')!==false ? '&amp;' : '?').'method=view" class="fancybox '.$file_classes.' btn-info fcfile_viewFile" data-fancybox-type="iframe" title="'.$viewinfo.'" style="line-height:1.3em;" >
-					'.$viewtext.'
+				<a href="'.$dl_link.(strpos($dl_link,'?')!==false ? '&amp;' : '?').'method=view" ' .($viewinside==2 ? 'target="_blank"' : '')
+					.' class="'.($viewinside==0 ? 'fancybox ' : '').$file_classes.' btn-info fcfile_viewFile" '.($viewinside==0 ? 'data-fancybox-type="iframe" ' : '')
+					.($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'href\');  fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. flexicontent_html::escapeJsText($_filetitle,'s') .'\'}); return false;" ' : '').' title="'.$viewinfo.'" style="line-height:1.3em;" >
+					'. $viewtext.'
 				</a>';
 			$fancybox_needed = 1;
 		}

@@ -579,6 +579,14 @@ class plgFlexicontent_fieldsFile extends FCField
 		$viewtext  = $allowview==2 ? $field->parameters->get( 'viewtext', 'FLEXI_FIELD_FILE_VIEW' ) : 'FLEXI_FIELD_FILE_VIEW';
 		$viewtext  = JText::_($viewtext);
 		$viewinfo  = JText::_('FLEXI_FIELD_FILE_VIEW_INFO', true);
+		$viewinside= $field->parameters->get( 'viewinside', 1 ) ;
+		
+		static $fc_lib_added = false;
+		if ($viewinside==1 && !$fc_lib_added)
+		{
+			$fc_lib_added = true;
+			flexicontent_html::loadFramework('flexi-lib');
+		}
 		
 		$allowshare = $field->parameters->get( 'allowshare', 0 ) ;
 		$sharetext  = $allowshare==2 ? $field->parameters->get( 'sharetext', 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND' ) : 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND';
