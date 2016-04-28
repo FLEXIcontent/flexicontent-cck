@@ -163,9 +163,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Add apply and save buttons
 		JToolBarHelper::apply('category.apply', 'FLEXI_APPLY');
-		/*if ( !$isnew ) flexicontent_html::addToolBarButton(
+		if ( !$isnew ) flexicontent_html::addToolBarButton(
 			'FLEXI_FAST_APPLY', $btn_name='apply_ajax', $full_js="Joomla.submitbutton('category.apply_ajax')", $msg_alert='', $msg_confirm='',
-			$btn_task='category.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="", $btn_icon="icon-loop");*/
+			$btn_task='category.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="", $btn_icon="icon-loop");
 		JToolBarHelper::save('category.save');
 		
 		// Add a save and new button, if user can create inside at least one (com_content) category

@@ -119,6 +119,7 @@ class JFormFieldFccheckbox extends JFormField
 		static $js_added = false;
 		if (!$js_added) {
 			$js_added = true;
+			$doc = JFactory::getDocument();
 			flexicontent_html::loadFramework('flexi-lib');
 			//$js = "";
 			//if ($js) $doc->addScriptDeclaration($js);

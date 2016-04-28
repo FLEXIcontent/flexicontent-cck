@@ -150,6 +150,7 @@ class JFormFieldMultiList extends JFormField
 		static $js_added = false;
 		if (!$js_added) {
 			$js_added = true;
+			$doc = JFactory::getDocument();
 			flexicontent_html::loadFramework('flexi-lib');
 			if ( JRequest::getCmd('option')!='com_flexicontent' ) {
 				$js = "

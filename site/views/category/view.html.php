@@ -311,7 +311,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		{
 			// Create desired REL canonical URL
 			$start = JRequest::getInt('start', '');
-			$ucanonical = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug).($start ? "&start=".$start : ''));
+			$ucanonical = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, 0, $layout_vars).($start ? "&start=".$start : ''));
 			flexicontent_html::setRelCanonical($ucanonical);
 		}
 		
