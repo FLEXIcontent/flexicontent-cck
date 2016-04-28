@@ -10,6 +10,7 @@
 defined('JPATH_PLATFORM') or die;
 
 // Load the helper classes
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('joomla.filesystem.folder');  // JFolder

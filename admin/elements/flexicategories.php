@@ -25,10 +25,12 @@ jimport('joomla.form.field');  // JFormField
 //jimport('joomla.form.helper'); // JFormHelper
 //JFormHelper::loadFieldClass('...');   // JFormField...
 
-
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+
 // Load the category class
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
+
 // Load the helper classes
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		

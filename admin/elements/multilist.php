@@ -22,6 +22,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 
 // Load the helper classes
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('cms.html.html');      // JHtml
