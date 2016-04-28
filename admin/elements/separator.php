@@ -19,6 +19,9 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+// Load the helper classes
+require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
 jimport('cms.html.html');      // JHtml
 jimport('joomla.form.helper'); // JFormHelper
 JFormHelper::loadFieldClass('spacer');   // JFormFieldSpacer
@@ -122,7 +125,6 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 		}
 		
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();
 		

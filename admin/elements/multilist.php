@@ -21,6 +21,9 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 
+// Load the helper classes
+require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
 jimport('joomla.form.field');  // JFormField
