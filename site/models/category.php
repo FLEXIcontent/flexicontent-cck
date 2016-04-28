@@ -100,11 +100,18 @@ class FlexicontentModelCategory extends JModelLegacy {
 	var $_params = null;
 
 	/**
-	 * Category author (used by AUTHOR layout)
+	 * Author of listed items (used by AUTHOR / MYITEMS layout)
 	 *
 	 * @var integer
 	 */
 	var $_authorid = 0;
+	
+	/**
+	 * User id for favoured items (used by FAVS layout)
+	 *
+	 * @var integer
+	 */
+	var $_uid = 0;
 	
 	/**
 	 * Tag id (used by TAGS layout)
@@ -163,6 +170,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	protected function populateCategoryState($ordering = null, $direction = null)
 	{
 		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
@@ -183,9 +191,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($this->_layout=='author') {
 			$this->_authorid = JRequest::getInt('authorid', 0);
 		}
-		else if ($this->_layout=='myitems' || $this->_layout=='favs') {
-			$user = JFactory::getUser();
+		else if ($this->_layout=='myitems') {
 			$this->_authorid = $user->id;
+		}
+		else if ($this->_layout=='favs') {
+			$this->_uid = $user->id;
 		}
 		else if ($this->_layout=='tags') {
 			$_tagid = JRequest::getInt('tagid', '');
@@ -207,9 +217,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		else if (!$this->_id) {
 		}
 		
-		// Set layout and authorid variables into state
+		// Set behaviour variables into state
 		$this->setState('layout', $this->_layout);
 		$this->setState('authorid', $this->_authorid);
+		$this->setState('tagid', $this->_tagid);
+		$this->setState('uid', $this->_uid);
 		$this->setState('cids', $this->_ids);
 		$this->setState('clayout', $this->_clayout);
 		
@@ -845,7 +857,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Limit to favourites
 		if ($this->_layout=='favs')
-			$where .= ' AND fav.userid = ' . $db->Quote($this->_authorid);
+			$where .= ' AND fav.userid = ' . $db->Quote($this->_uid);
 		
 		// Limit to give tag id
 		if ($this->_layout=='tags')
@@ -878,7 +890,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Filter the category view with the active language
 		// But not language filter: favourites
 		if ($filtercat && $this->_layout!='favs') {
-			$lta = FLEXI_J16GE || $use_tmp ? 'i': 'ie';
+			$lta = 'i';
 			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
 		
@@ -947,24 +959,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($text_search !== null) return $text_search;
 		$text_search = '';
 		
-		// Get value of search text ('filter') from URL or SESSION (which is set new value if not already set)
-		// *** Commented out to get variable only by HTTP GET or POST
-		// thus supporting FULL PAGE CACHING (e.g. Joomla's system plugin 'Cache')
-		/*if (!$this->_layout) {
-			$text  = $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter', 'filter', '', 'string' );
-		} else if ($this->_layout=='author') {
-			$text  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter', 'filter', '', 'string' );
-		} else if ($this->_layout=='mcats') {
-			$text  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
-		} else if ($this->_layout=='myitems') {
-			$text  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
-		} else if ($this->_layout=='favs') {
-			$text  = $app->getUserStateFromRequest( $option.'favs'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
-		} else if ($this->_layout=='tags') {
-			$text  = $app->getUserStateFromRequest( $option.'tags'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
-		} else {
-			$text  = JRequest::getString('filter', '', 'default');
-		}*/
 		
 		// ****************************************
 		// Create WHERE clause part for Text Search 
@@ -1100,22 +1094,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
-			// *** Commented out to get variable only by HTTP GET or POST thus supporting FULL PAGE CACHING (e.g. Joomla's system plugin 'Cache')
-			/*if (!$this->_layout) {
-				$filt_vals 	= $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
-			} else if ($this->_layout=='author') {
-				$filt_vals  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
-			} else if ($this->_layout=='mcats') {
-				$filt_vals  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
-			} else if ($this->_layout=='myitems') {
-				$filt_vals  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
-			} else if ($this->_layout=='favs') {
-				$filt_vals  = $app->getUserStateFromRequest( $option.'.favs'.$this->_menu_itemid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
-			} else if ($this->_layout=='tags') {
-				$filt_vals  = $app->getUserStateFromRequest( $option.'.tags'.$this->_menu_itemid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
-			} else {
-				$filt_vals  = JRequest::getVar('filter_'.$filter->id, '', '');
-			}*/
 			$filt_vals  = JRequest::getVar('filter_'.$filter->id, '', '');
 			
 			// Skip filters without value
@@ -1638,8 +1616,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$err_type = 403;
 				$login_redirect = true;
 			}
-			else if ( $this->_layout=='favs' && !$this->_authorid ) {
-				$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
+			else if ( $this->_layout=='favs' && !$this->_uid ) {
+				$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_FAVOURED_CONTENT');
 				$err_type = 403;
 				$login_redirect = true;
 			}

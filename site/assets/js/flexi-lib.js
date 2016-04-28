@@ -172,6 +172,11 @@
 				no_iframe ?
 					container.load(url) :
 					jQuery('#'+tagid+'_frame').attr('src', url);
+				
+				// Close on click outside of modal popup
+				jQuery('.ui-widget-overlay').bind('click', function(){
+					container.dialog('close');
+				});
 			},
 			// Clear contents after dialog closes
 			close: function(ev, ui) {

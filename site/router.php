@@ -188,6 +188,7 @@ function FLEXIcontentBuildRoute(&$query)
 					unset($query['cid']);
 				}
 				break;
+			
 			case 'author':
 				$mauthorid = @$menu->query['authorid'];
 				$authorid  = (int)(@$query['authorid']);
@@ -209,6 +210,7 @@ function FLEXIcontentBuildRoute(&$query)
 					unset($query['cid']);
 				}
 				break;
+			
 			case 'favs':
 				if ($mview==$view && $mlayout==$layout) {
 					if ($cid && $mcid!=$cid) $segments[] = $query['cid'];
@@ -219,6 +221,7 @@ function FLEXIcontentBuildRoute(&$query)
 					unset($query['cid']);
 				}
 				break;
+			
 			case 'myitems':
 				if ($mview==$view && $mlayout==$layout) {
 					if ($cid && $mcid!=$cid) $segments[] = $query['cid'];
@@ -228,13 +231,21 @@ function FLEXIcontentBuildRoute(&$query)
 					if ($cid && $mcid!=$cid) $segments[] = $query['cid'];
 					unset($query['cid']);
 				}
+				unset($query['authorid']);  // this should not be in the SEF URL even if it is set, as it is ignored (registered view effected by current user)
 				break;
+			
 			case 'mcats':
 				$mcids = @$menu->query['cids'];
 				$cids  = @$query['cids'];
-				if ($mview==$view && $mlayout==$layout) {
-					if ($mcids==$cids) unset($query['cids']);
-				} else {
+				if (!$mcids) $mcids = array();
+				if (!$cids)  $cids  = array();
+				if ( !is_array($mcids) ) $mcids = explode(',', $mcids);
+				if ( !is_array($cids) )  $cids  = explode(',', $cids);
+				if ($mview==$view && $mlayout==$layout)
+				{
+					if ( array_values($mcids)==array_values($cids) ) unset($query['cids']);
+				}
+				else {
 					$segments[] = 'categories';
 					$segments[] = is_array($cids) ? implode($cids, ",") : $cids;
 					//if ($cid && $mcid!=$cid) $segments[] = $query['cid'];  // ignored
@@ -242,6 +253,7 @@ function FLEXIcontentBuildRoute(&$query)
 				}
 				//unset($query['cid']);
 				break;
+			
 			default:  // Unhandled
 				$keep_view_layout = true;
 				break;
