@@ -2041,7 +2041,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// For new items get next available ordering number
 		if ($isnew) {
-			$item->ordering = $item->getNextOrder();
+			if ( empty($item->ordering) || !$canEditState ) $item->ordering = $item->getNextOrder();
 		}
 		
 		// Auto assign the default language if not set, (security of allowing language usage and of language in user's allowed languages was checked above)
