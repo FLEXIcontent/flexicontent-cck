@@ -9,9 +9,11 @@
 
 defined('JPATH_PLATFORM') or die;
 
+// Load the helper classes
+require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+
 jimport('joomla.filesystem.folder');  // JFolder
 jimport('joomla.filesystem.file');    // JFile
-
 jimport('cms.html.html');      // JHtml
 jimport('joomla.form.helper'); // JFormHelper
 JFormHelper::loadFieldClass('list');   // JFormFieldList
