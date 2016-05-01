@@ -169,7 +169,7 @@ $this->document->addScriptDeclaration($js);
 		
 		
 		<!-- Template tab -->
-		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-palette">
+		<div class="tabbertab" id="themes-options" data-icon-class="icon-palette">
 			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 		
 			<div class="fc_tabset_inner">
@@ -237,7 +237,7 @@ $this->document->addScriptDeclaration($js);
 	
 	
 	<!-- Permissions tab -->
-	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-power-cord">
+	<div class="tabbertab" id="permissions-options" data-icon-class="icon-power-cord">
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
 		
 		<div class="fc_tabset_inner">
