@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////
 
 // Set a default timezone if web server has not done already in php.ini
-if ( ini_get('date.timezone')=='' && version_compare(phpversion(), '5.1.0', '>')) {
+if ( ini_get('date.timezone')=='' ) {
 	date_default_timezone_set('UTC');
 }
 
@@ -218,7 +218,7 @@ class phpthumb {
 	var $issafemode       = null;
 	var $php_memory_limit = null;
 
-	var $phpthumb_version = '1.7.14-201602212037';
+	var $phpthumb_version = '1.7.14-201604151303';
 
 	//////////////////////////////////////////////////////////////////////
 
@@ -1342,7 +1342,9 @@ class phpthumb {
 		}
 		*/
 		if ($this->iswindows) {
-			$AbsoluteFilename = preg_replace('#^'.preg_quote($this->realPathSafe($this->config_document_root)).'#i', $this->realPathSafe($this->config_document_root), $AbsoluteFilename);
+			$AbsoluteFilename = function_exists('mb_ereg_replace')
+				? mb_ereg_replace('#^'.preg_quote($this->realPathSafe($this->config_document_root)).'#i', $this->realPathSafe($this->config_document_root), $AbsoluteFilename)
+				: preg_replace('#^'.preg_quote($this->realPathSafe($this->config_document_root)).'#i', $this->realPathSafe($this->config_document_root), $AbsoluteFilename);
 			$AbsoluteFilename = str_replace(DIRECTORY_SEPARATOR, '/', $AbsoluteFilename);
 		}
 		$AbsoluteFilename = $this->resolvePath($AbsoluteFilename, $this->config_additional_allowed_dirs);
@@ -1489,7 +1491,7 @@ class phpthumb {
 					$this->DebugMessage('ImageMagick version checked with "'.$commandline.'"', __FILE__, __LINE__);
 					$versionstring[1] = trim(phpthumb_functions::SafeExec($commandline));
 					if (preg_match('#^Version: [^0-9]*([ 0-9\\.\\:Q/\\-]+)#i', $versionstring[1], $matches)) {
-						$versionstring[0] = $matches[1];
+						$versionstring[0] = trim($matches[1]);
 					} else {
 						$versionstring[0] = false;
 						$this->DebugMessage('ImageMagick did not return recognized version string ('.$versionstring[1].')', __FILE__, __LINE__);
@@ -1678,8 +1680,8 @@ class phpthumb {
 
 
 				if (!is_null($this->dpi) && $this->ImageMagickSwitchAvailable('density')) {
-					// for raster source formats only (WMF, PDF, etc)
-					$commandline .= ' -density '.phpthumb_functions::escapeshellarg_replacement($this->dpi);
+					// for vector source formats only (WMF, PDF, etc)
+					$commandline .= ' -flatten -density '.phpthumb_functions::escapeshellarg_replacement($this->dpi);
 				}
 				ob_start();
 				$getimagesize = GetImageSize($this->sourceFilename);
@@ -2805,13 +2807,13 @@ if (false) {
 						}
 						break;
 
-					case 'elip': // Elipse cropping
+					case 'elip': // Ellipse cropping
 						if (phpthumb_functions::gd_version() < 2) {
-							$this->DebugMessage('Skipping Elipse() because gd_version is "'.phpthumb_functions::gd_version().'"', __FILE__, __LINE__);
+							$this->DebugMessage('Skipping Ellipse() because gd_version is "'.phpthumb_functions::gd_version().'"', __FILE__, __LINE__);
 							return false;
 						}
 						$this->is_alpha = true;
-						$phpthumbFilters->Elipse($this->gdimg_output);
+						$phpthumbFilters->Ellipse($this->gdimg_output);
 						break;
 
 					case 'ric': // RoundedImageCorners
