@@ -82,7 +82,6 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 		$exact_values	= $use_ingroup ? 0 : (int) $field->parameters->get( 'exact_values', 0 ) ;
 		if ($required && !$min_values) $min_values = 1;
 		if ($exact_values) $max_values = $min_values = $exact_values;
-		$js_popup_err	= $field->parameters->get( 'js_popup_err', 0 ) ;
 		
 		
 		// **************
@@ -358,7 +357,6 @@ class plgFlexicontent_fieldsSelectmultiple extends FCField
 				if ($max_values)    $attribs .= ' data-max_values="'.$max_values.'" ';
 				if ($min_values)    $attribs .= ' data-min_values="'.$min_values.'" ';
 			}
-			if ($js_popup_err)  $attribs .= ' data-js_popup_err="'.$js_popup_err.'" ';
 			if ($max_values || $min_values || $exact_values)  $classes .= ' validate-sellimitations ';
 			if (!empty($default_values)) $attribs .= ' data-defvals="'.implode('|||', $default_values).'" ';
 			if ($classes)  $attribs .= ' class="'.$classes.'" ';

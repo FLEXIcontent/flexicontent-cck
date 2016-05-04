@@ -19,74 +19,182 @@
 /**
 * Check the form is valid and if true, submit it (overload the joomla.javascript.js one)
 */
-function fc_submit_form(form, task, validate) {
-	var jform = jQuery(form);
-	var doserialized = jform.attr('data-fc_doserialized_submit');
+function fc_submit_form(form, task, validate)
+{
+	var $form = jQuery(form);
 	
-	var match_apply_ajax = new RegExp(/(.|^)apply_ajax$/);  // Do AJAX submit only for 'apply_ajax' button
-	var match_apply      = new RegExp(/(.|^)apply$/);  // Do AJAX submit only for 'apply_ajax' button
-	var doajax = match_apply_ajax.test(task)  ||  (match_apply.test(task) && jform.attr('data-fc_doajax_submit'));
+	// *************
+	// Do task tests
+	// *************
 	
-	var sdata_id = 'fcdata_serialized';
+	// Check is AJAX submit task
+	var match_apply_ajax = new RegExp(/(.|^)apply_ajax$/);  // Do AJAX submit if 'apply_ajax' task
+	var match_apply      = new RegExp(/(.|^)apply$/);  // Do AJAX submit if 'apply' task and form has ATTRIBUTE: 'data-fc_doajax_submit'
 	
-	var max_input_vars = (typeof fc_max_input_vars !== 'undefined' && typeof fc_max_input_vars !== 'undefined') ? fc_max_input_vars : 1000;  
+	var doajax_allowed = true;
+	var doajax_submit  = match_apply_ajax.test(task)  ||  (match_apply.test(task) && $form.attr('data-fc_doajax_submit'));
+	$form.data('doajax_submit', doajax_submit);  // Pass FLAG to submit handler
 	
-	var form_fields_active = !doserialized ? 0 :   // Get form's active elements
-		jform.find('textarea:enabled, select:enabled, input[type="radio"]:enabled:checked, input[type="checkbox"]:enabled:checked, input:not(:button):not(:radio):not(:checkbox):enabled');
-	var doserialized = form_fields_active.length > max_input_vars; // Do serialization if estimated form variable count higher than max_input_vars
+	// Check is cancel task
+	var match_cancel = new RegExp(/(.*.|^)cancel$/);
+	var isCancel = match_cancel.test(task);
 	
-	if (doserialized) {
-		var sdata = jQuery('#'+sdata_id);
-		if (!sdata.length) {
-			jform.append('<input type="hidden" name="'+sdata_id+'" id="'+sdata_id+'" value="" />');
-			sdata = jQuery('#'+sdata_id);
+	
+	// ***********************
+	// Serialize submit needed
+	// ***********************
+	
+	var doserialized_allowed = $form.attr('data-fc_doserialized_submit');
+	var doserialized_submit  = false;
+	
+	if (doserialized_allowed)
+	{
+		// Get form's active elements
+		var form_fields_active = $form.find('textarea:enabled, select:enabled, input[type="radio"]:enabled:checked, input[type="checkbox"]:enabled:checked, input:not(:button):not(:radio):not(:checkbox):enabled');
+		
+		var max_input_vars = typeof fc_max_input_vars !== 'undefined' ? fc_max_input_vars : 1000;
+		
+		// Do serialization if estimated form variable count higher than max_input_vars
+		doserialized_submit = form_fields_active.length > max_input_vars;
+		
+		var sdata_id = 'fcdata_serialized';
+		var sdata = jQuery('#'+sdata_id);  // Holds serialized form data
+		var sdata_count = jQuery('#'+sdata_id+'_count');  // Holds serialized form data counter
+	}
+	$form.data('doserialized_submit', doserialized_submit);  // Pass FLAG to submit handler
+	
+	
+	// *************************
+	// SERIALIZED SUBMIT HANDLER
+	// *************************
+	
+	if (doserialized_allowed && !Joomla.fc_serialized_submit_handler_added)
+	{
+		Joomla.fc_serialized_submit_handler_added = true;
 			
-			jform.append('<input type="hidden" name="'+sdata_id+'_count" id="'+sdata_id+'_count" value="" />');
-			sdata_count = jQuery('#'+sdata_id+'_count');
-		}
-		sdata_count.val( form_fields_active.length );
-		sdata.val( JSON.stringify( jform.serializeArray() ) );  //sdata.val( jform.serialize() );
-		
-		// Disable all form fields, only serialized field will be submitted
-		form_fields_active.each(function() {
-			var el = jQuery(this);
-			el.attr('data-fcs_disabled', el.attr('disabled'));
-			el.attr('disabled', true);
+		$form.on('submit',function(e)
+		{
+			if ( !$form.data('doserialized_submit') ) return true;
+			$form.data('doserialized_submit', 0);  // Clear FLAG
+			
+			// Add form field that will hold the serialized form data, if this has not already been added
+			if (!sdata.length)
+			{
+				$form.append('<input type="hidden" name="'+sdata_id+'" id="'+sdata_id+'" value="" />');
+				sdata = jQuery('#'+sdata_id);
+			}
+			
+			// Add form field that will hold the serialized form data counter, if this has not already been added
+			if (!sdata_count.length)
+			{
+				$form.append('<input type="hidden" name="'+sdata_id+'_count" id="'+sdata_id+'_count" value="" />');
+				sdata_count = jQuery('#'+sdata_id+'_count');
+			}
+			sdata_count.val( form_fields_active.length );
+			sdata.val( JSON.stringify( $form.serializeArray() ) );  //sdata.val( $form.serialize() );
+				
+			// Disable the form fields that were serialized, so that they will not be submitted (form fields of type 'file' are not included, and will be submitted normally)
+			form_fields_active.each(function()
+			{
+				var type = this.type || this.tagName.toLowerCase();
+				if (type=='file') return;
+				var el = jQuery(this);
+				el.attr('data-fcs_disabled', el.attr('disabled'));
+				el.attr('disabled', true);
+			});
+			
+			sdata.attr('disabled', false);
+			$form.data('form_was_serialized', 1);  // Pass FLAG to AJAX submit handler
 		});
-		
-		sdata.attr('disabled', false);
 	}
 	
-	// Trigger submit events
-	//var start = new Date().getTime();
-	jform.trigger('submit');
-	//alert('onSubmit event execution time: ' + (new Date().getTime() - start));
 	
-	if (doajax) {
-		jform.after('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Saving</span>');
-		jform.hide();
-		jform.append('<input type="hidden" name="fc_doajax_submit" id="fc_doajax_submit" value="1" />');
-		jQuery.ajax({
-			type: form.method,
-			url: form.action,
-			data: jform.serialize(),
-			success: function (data) {
-				jQuery('#fc_doajax_loading').remove();
-				jQuery('#fc_doajax_submit').remove();
-				jform.show();
-				jQuery('#system-message-container').html(data);
-				if (doserialized) {
-					sdata.val( '' );
-					form_fields_active.each(function() {
-						var el = jQuery(this);
-						el.attr('data-fcs_disabled')  ?  el.attr('disabled', el.attr('data-fcs_disabled'))  :  el.removeAttr('disabled');
-					});
+	// *************************
+	// AJAXIFIED SUBMIT HANDLER
+	// *************************
+	
+	if (doajax_allowed && !Joomla.fc_ajaxified_submit_handler_added)
+	{
+		Joomla.fc_ajaxified_submit_handler_added = true;
+			
+		$form.on('submit',function(e)
+		{
+			// This will not be reached if
+			// - either HTML5 validation fails,
+			// - or any previous handler calls preventDefault()
+			
+			if ( !$form.data('doajax_submit') ) return true;
+			$form.data('doajax_submit', 0);  // Clear FLAG
+			
+			e.preventDefault();
+			
+			$form.after('<span id="fc_doajax_loading"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Saving</span>');
+			$form.hide();
+			$form.append('<input type="hidden" name="fc_doajax_submit" id="fc_doajax_submit" value="1" />');
+			jQuery.ajax({
+				type: form.method,
+				url: form.action,
+				data: $form.serialize(),
+				success: function (data) {
+					jQuery('#fc_doajax_loading').remove();
+					jQuery('#fc_doajax_submit').remove();
+					jQuery('#fc_filter_form_blocker').remove();
+					$form.show();
+					jQuery('#system-message-container').html(data);
+					if ( $form.data('form_was_serialized') )
+					{
+						$form.data('form_was_serialized', 0);  // Clear FLAG
+						sdata.val( '' );
+						form_fields_active.each(function() {
+							var el = jQuery(this);
+							el.attr('data-fcs_disabled')  ?  el.attr('disabled', el.attr('data-fcs_disabled'))  :  el.removeAttr('disabled');
+							el.removeAttr('data-fcs_disabled');
+						});
+					}
+				}
+			});
+			return false;  // Indicate that nothing more should be done ... in case anyone is listening after us
+		});
+	}
+	
+	
+	// *******************
+	// Submit progress bar
+	// *******************
+	
+	if (!Joomla.fc_progressbar_submit_handler_success)
+	{
+		Joomla.fc_progressbar_submit_handler_success = true;
+			
+		$form.on('submit',function(e)
+		{
+			if ( !isCancel )
+			{
+				jQuery('body').prepend(
+				 	'<span id="fc_filter_form_blocker">' +
+				    '<span class="fc_blocker_opacity"></span>' +
+				    '<span class="fc_blocker_content">' +
+				    	Joomla.JText._('FLEXI_FORM_IS_BEING_SUBMITTED') +
+				    	'<div class="fc_blocker_bar"><div></div></div>' +
+				    '</span>' +
+				  '</span>');
+				var fc_filter_form_blocker = jQuery("#fc_filter_form_blocker");
+				if (fc_filter_form_blocker) {
+					fc_filter_form_blocker.css("display", "block");
+					fc_admin_progress(95, jQuery('#fc_filter_form_blocker .fc_blocker_bar'));
 				}
 			}
 		});
-	} else {
-		form.submit();
 	}
+	
+	// Submit the form, triggering submit handlers properly: Create an input type="submit" and click it
+	var button = document.createElement('input');
+	button.style.display = 'none';
+	button.type = 'submit';
+	form.appendChild(button).click();
+	
+	// If "submit" was prevented (e.g. due HTML5 validation or due to AJAX submit), make sure we don't get a build up of submit buttons
+	form.removeChild(button);
 }
 
 
@@ -102,18 +210,20 @@ Joomla.submitform = function(task, form, validate)
 	if (!form) {
 		form = document.getElementById('adminForm');
 	}
-	form.noValidate = !!validate;
+	var form_task = task ? task : (typeof form.task !== 'undefinded' && typeof form.task.value !== 'undefinded'  ?  form.task.value  :  '');
 	
 	// Do form validation if button task is not 'cancel'
 	var match_cancel = new RegExp(/(.*.|^)cancel$/);
-	var isCancel = match_cancel.test(task);
+	var isCancel = match_cancel.test(form_task);
 	if ( document.formvalidator && !isCancel )
 	{
-		var start = new Date().getTime();
+		var vTimeStart = new Date().getTime();
 		var isValid = document.formvalidator.isValid(form);
-		//alert('Form validation time: ' + (new Date().getTime() - start));
+		var vTimeDiff = (new Date())  - vTimeStart;
+		//alert('Form validation time: ' + vTimeDiff + ' isValid: ' + isValid);
+		//window.console.log( 'isValid() time: ' + vTimeDiff );
 		
-		if (!isValid) // If form is invalid, then focus the first invalid element
+		if (!isValid)  // If form is invalid, then focus the first invalid element, or focus the all errors container
 		{
 			var invalid = jQuery('.invalid').first();  // Get single element so that hidden check will work
 			if (invalid.is(':hidden')) {
@@ -127,30 +237,27 @@ Joomla.submitform = function(task, form, validate)
 				}, 1000);
 				invalid[0].focus();
 			}
-			return;
-		}
-	}
-	if (task) form.task.value=task;    // Set form's TASK field
-	
-	// Submit progress bar
-	if ( !isCancel )
-	{
-		jQuery('body').prepend(
-		 	'<span id="fc_filter_form_blocker">' +
-		    '<span class="fc_blocker_opacity"></span>' +
-		    '<span class="fc_blocker_content">' +
-		    	Joomla.JText._('FLEXI_FORM_IS_BEING_SUBMITTED') +
-		    	'<div class="fc_blocker_bar"><div></div></div>' +
-		    '</span>' +
-		  '</span>');
-		var fc_filter_form_blocker = jQuery("#fc_filter_form_blocker");
-		if (fc_filter_form_blocker) {
-			fc_filter_form_blocker.css("display", "block");
-			fc_admin_progress(95, jQuery('#fc_filter_form_blocker .fc_blocker_bar'));
+			return false;
 		}
 	}
 	
-	setTimeout(function(){
-		fc_submit_form(form, task); // Submit the form
-	}, 50);
+	// Modify form task after JS validation has run
+	if (task) {
+		form.task.value = task;
+	}
+	
+	// HTML5 VALIDATION: Do according to form original code
+	if (typeof validate === 'undefined' || validate === null)
+		// TODO remove this to allow HTML5 validation, no we add it to suppress validateForm() of html5fallback.js 
+		form.setAttribute('novalidate', 'novalidate');
+
+	// HTML5 VALIDATION: Force OFF / ON
+	else !validate ?
+			form.setAttribute('novalidate', 'novalidate') :
+			form.removeAttribute('novalidate') ;
+	
+	// HTML5 VALIDATION: Suppress if "*.cancel" or "cancel" tasks
+	if ( isCancel )  form.setAttribute('novalidate', 'novalidate');
+	
+	fc_submit_form(form, task); // Submit the form
 }
