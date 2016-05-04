@@ -81,7 +81,7 @@ class FlexicontentModelAppsman extends JModelList
 	
 	
 	
-	function getTableRows($table, $id_colname, $ids, $id_is_unique=false, $fid_colname=null, $fids=array())
+	function getTableRows($table, $id_colname, $ids, $id_is_unique=true, $fid_colname=null, $fids=array())
 	{
 		$_ids = array();
 		$_fids = array();
@@ -204,8 +204,8 @@ class FlexicontentModelAppsman extends JModelList
 				else if ($colname=='checked_out')  $coldata = '0';
 				else $coldata = ($clear_id && $id_colname==$colname) ? '0' : $coldata;
 				
-				$coldata = str_replace("\n","\\n", addslashes(htmlspecialchars($coldata, ENT_NOQUOTES, 'UTF-8')) );
-				$content .= "\n".str_repeat($istr, $indent). '<'.$colname.'>"' .$coldata. '"</'.$colname.'>';
+				$coldata_str = $coldata===null ? "NULL" : '"'.str_replace( "\n","\\n", addslashes(htmlspecialchars($coldata, ENT_NOQUOTES, 'UTF-8')) ).'"';
+				$content .= "\n".str_repeat($istr, $indent). '<'.$colname.'>' .$coldata_str. '</'.$colname.'>';
 			}
 			
 			$indent--;
@@ -288,9 +288,9 @@ class FlexicontentModelAppsman extends JModelList
 		// *************************
 		
 		// Get DB data
-		$type_ids = array_keys($rows);
 		$tbl = '#__flexicontent_fields_type_relations';
 		$id_colname = 'type_id';
+		$type_ids = array_keys($rows);
 		$rows = $this->getTableRows($tbl, $id_colname, $type_ids, $id_is_unique=false);
 		
 		// Convert them to XML format

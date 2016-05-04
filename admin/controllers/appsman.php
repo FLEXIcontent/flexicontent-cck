@@ -336,7 +336,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		
 		case 'initxml':
 		
-			// Retrieve the uploaded CSV file
+			// Retrieve the temporary path of the uploaded file
 			$xmlfile = @$_FILES["xmlfile"]["tmp_name"];
 			if( !is_file($xmlfile) ) {
 				$app->enqueueMessage('Upload file error!', 'error');
@@ -447,7 +447,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 		{
 			$table_name = '#__'.$table;
 			$id_colname = self::$table_idcols[$table];
-			$rows = $model->getTableRows($table_name, $id_colname, $cid, true);
+			$rows = $model->getTableRows($table_name, $id_colname, $cid, $id_is_unique=true);
 			
 			if (empty($rows))
 			{
@@ -490,7 +490,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 				
 				$table_name = '#__'.$table;
 				$id_colname = self::$table_idcols[$table];
-				$rows = $model->getTableRows($table_name, $id_colname, $cid, true);
+				$rows = $model->getTableRows($table_name, $id_colname, $cid, $id_is_unique=true);
 				
 				$content .= $model->create_XML_records($rows, $table_name, $id_colname, $clear_id=false);
 				$customHandler = 'getExtraData_'.$table;
@@ -557,7 +557,7 @@ class FlexicontentControllerAppsman extends FlexicontentController
 					
 					$id_colname = self::$table_idcols[$table];
 					$table_name = '#__'.$table;
-					$rows = $model->getTableRows($table_name, $id_colname, $cid, true);
+					$rows = $model->getTableRows($table_name, $id_colname, $cid, $id_is_unique=true);
 					
 					$model->$customHandler($rows, $zip);
 				}
