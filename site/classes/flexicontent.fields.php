@@ -2677,8 +2677,15 @@ class FlexicontentFields
 		//$filter->html = $label_filter==1 ? $filter->label.': ' : '';
 		$filter->html = '';
 		
+		// *** Do not create any HTML just return empty string to indicate a filter that should be skipped
+		if ( $hide_disabled_values && empty($results) )
+		{
+			// no HTML
+		}
+		
 		// *** Create the form field(s) used for filtering
-		switch ($display_filter_as) {
+		else switch ($display_filter_as)
+		{
 		case 0: case 2: case 6:  // 0: Select (single value selectable), 2: Dual select (value range), 6: Multi Select (multiple values selectable)
 			$options = array();
 			// MULTI-select does not has an internal label a drop-down list option
