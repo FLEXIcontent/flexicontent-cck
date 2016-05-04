@@ -18,7 +18,7 @@ if (ini_get('magic_quotes_runtime')) {
 }
 
 // Set a default timezone if web server has not done already in php.ini
-if ( ini_get('date.timezone')=='' && version_compare(phpversion(), '5.1.0', '>')) {
+if ( ini_get('date.timezone')=='' ) {
 	date_default_timezone_set('UTC');
 }
 
