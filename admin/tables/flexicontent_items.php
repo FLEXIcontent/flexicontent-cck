@@ -573,35 +573,31 @@ class flexicontent_items extends _flexicontent_items {
 	 */
 	function check()
 	{
-		/*
-		TODO: This filter is too rigorous,need to implement more configurable solution
-		// specific filters
-		$filter = JFilterInput::getInstance( null, null, 1, 1 );
-		$this->introtext = trim( $filter->clean( $this->introtext ) );
-		$this->fulltext =  trim( $filter->clean( $this->fulltext ) );
-		*/
-		
-		if(!strlen($this->title)) {
+		// check for empty title
+		if (trim( $this->title ) == '') {
 			$this->setError(JText::_( 'FLEXI_ARTICLES_MUST_HAVE_A_TITLE' ));
 			return false;
 		}
-
+		
+		// check for empty alias
 		if(empty($this->alias)) {
 			$this->alias = $this->title;
 		}
 		
+		// transliterate alias
 		if ( !JFactory::getConfig()->get('unicodeslugs') )
 		{
 			$this->alias = $this->transliterate($this->alias);
 		}
 		
+		// make alias safe
 		$this->alias = JApplicationHelper::stringURLSafe($this->alias);
-		
 		if (trim(str_replace('-', '', $this->alias)) == '')
 		{
 			$this->alias = JFactory::getDate()->format('Y-m-d-H-i-s');
 		}
-
+		
+		// make fulltext empty if it only contains empty spaces
 		if (trim( str_replace( '&nbsp;', '', $this->fulltext ) ) == '') {
 			$this->fulltext = '';
 		}
@@ -668,6 +664,7 @@ class flexicontent_items extends _flexicontent_items {
 	
 	/**
 	 * Original code form: Phoca International Alias Plugin for Joomla 1.5
+	 * TODO: move to helper file or to common class parent
 	 *
 	 * This method processes a string and replaces all accented UTF-8 characters by unaccented
 	 * ASCII-7 "equivalents", whitespaces are replaced by hyphens and the string is lowercased.
@@ -677,8 +674,14 @@ class flexicontent_items extends _flexicontent_items {
 		$langFrom    = array();
 		$langTo      = array();
 		
+		$language = $this->language != '*' ?
+			$this->language :
+			JComponentHelper::getParams('com_languages')->get('site', '*') ;
+
+		if ($language == '*') return $string;
+		
 		// BULGARIAN
-		if ($this->language == 'bg-BG') {
+		if ($language == 'bg-BG') {
 			$bgLangFrom = array('А', 'а', 'Б', 'б', 'В', 'в', 'Г', 'г', 'Д', 'д', 'Е', 'е', 'Ж', 'ж', 'З', 'з', 'И', 'и', 'Й', 'й', 'К', 'к', 'Л', 'л', 'М', 'м', 'Н', 'н', 'О', 'о', 'П', 'п', 'Р', 'р', 'С', 'с', 'Т', 'т', 'У', 'у', 'Ф', 'ф', 'Х', 'х', 'Ц', 'ц', 'Ч', 'ч', 'Ш', 'ш', 'Щ', 'щ', 'Ъ', 'ъ', 'Ьо', 'ьо', 'Ю', 'ю', 'Я', 'я');
 			$bgLangTo   = array('A', 'a', 'B', 'b', 'V', 'v', 'G', 'g', 'D', 'd', 'E', 'e', 'Zh', 'zh', 'Z', 'z', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o', 'P', 'p', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'F', 'f', 'H', 'h', 'C', 'c', 'Ch', 'ch', 'Sh', 'sh', 'Sht', 'sht', 'Y', 'y', 'Io', 'io', 'Ju', 'ju', 'Ja', 'ja');
 			$langFrom   = array_merge ($langFrom, $bgLangFrom);
@@ -686,7 +689,7 @@ class flexicontent_items extends _flexicontent_items {
 		}
 		
 		// CZECH
-		if ($this->language == 'cz-CZ') {
+		if ($language == 'cz-CZ') {
 			$czLangFrom = array('á','č','ď','é','ě','í','ň','ó','ř','š','ť','ú','ů','ý','ž','Á','Č','Ď','É','Ě','Í','Ň','Ó','Ř','Š','Ť','Ú','Ů','Ý','Ž');
 			$czLangTo   = array('a','c','d','e','e','i','n','o','r','s','t','u','u','y','z','a','c','d','e','e','i','ň','o','r','s','t','u','u','y','z');
 			$langFrom   = array_merge ($langFrom, $czLangFrom);
@@ -694,7 +697,7 @@ class flexicontent_items extends _flexicontent_items {
 		}
 		
 		// CROATIAN
-		if ($this->language == 'hr-HR' || $this->language == 'hr-BA') {
+		if ($language == 'hr-HR' || $language == 'hr-BA') {
 			$hrLangFrom = array('č','ć','đ','š','ž','Č','Ć','Đ','Š','Ž');
 			$hrLangTo   = array('c','c','d','s','z','c','c','d','s','z');
 			$langFrom   = array_merge ($langFrom, $hrLangFrom);
@@ -702,7 +705,7 @@ class flexicontent_items extends _flexicontent_items {
 		}
 		
 		// GREEK
-		if ($this->language == 'el-GR') {
+		if ($language == 'el-GR') {
 			$grLangFrom = array('α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ',  'η', 'ι', 'κ', 'λ', 'μ', 'ν', 'ξ',  'ο', 'π', 'ρ', 'σ', 'τ', 'υ', 'φ', 'χ', 'ψ',  'ω', 'Α', 'Β', 'Γ', 'Δ', 'Ε', 'Ζ', 'Η', 'Θ',  'Ι', 'Κ', 'Λ', 'Μ', 'Ν', 'Ξ',  'Ο', 'Π', 'Ρ', 'Σ', 'Τ', 'Υ', 'Φ', 'Χ', 'Ψ',  'Ω', 'Ά', 'Έ', 'Ή', 'Ί', 'Ύ', 'Ό', 'Ώ', 'ά', 'έ', 'ή', 'ί', 'ύ', 'ό', 'ώ', 'ΰ', 'ΐ', 'ϋ', 'ϊ', 'ς', '«', '»' );
 			$grLangTo   = array('a', 'b', 'g', 'd', 'e', 'z', 'h', 'th', 'i', 'i', 'k', 'l', 'm', 'n', 'ks', 'o', 'p', 'r', 's', 't', 'u', 'f', 'x', 'ps', 'o', 'A', 'B', 'G', 'D', 'E', 'Z', 'I', 'Th', 'I', 'K', 'L', 'M', 'N', 'Ks', 'O', 'P', 'R', 'S', 'T', 'Y', 'F', 'X', 'Ps', 'O', 'A', 'E', 'I', 'I', 'U', 'O', 'O', 'a', 'e', 'i', 'i', 'u', 'o', 'o', 'u', 'i', 'u', 'i', 's', '_', '_' );
 			$langFrom   = array_merge ($langFrom, $grLangFrom);
@@ -710,7 +713,7 @@ class flexicontent_items extends _flexicontent_items {
 		}
 		
 		// HUNGARIAN
-		if ($this->language == 'hu-HU') {
+		if ($language == 'hu-HU') {
 			$huLangFrom = array('á','é','ë','í','ó','ö','ő','ú','ü','ű','Á','É','Ë','Í','Ó','Ö','Ő','Ú','Ü','Ű');
 			$huLangTo   = array('a','e','e','i','o','o','o','u','u','u','a','e','e','i','o','o','o','u','u','u');
 			$langFrom   = array_merge ($langFrom, $huLangFrom);
@@ -718,7 +721,7 @@ class flexicontent_items extends _flexicontent_items {
 		}
 		
 		// POLISH
-		if ($this->language == 'pl-PL') {
+		if ($language == 'pl-PL') {
 			$plLangFrom = array('ą','ć','ę','ł','ń','ó','ś','ź','ż','Ą','Ć','Ę','Ł','Ń','Ó','Ś','Ź','Ż');
 			$plLangTo   = array('a','c','e','l','n','o','s','z','z','a','c','e','l','n','o','s','z','z');
 			$langFrom   = array_merge ($langFrom, $plLangFrom);
@@ -726,7 +729,7 @@ class flexicontent_items extends _flexicontent_items {
 		}
 		
 		// RUSSIAN
-		if ($this->language == 'ru-RU') {
+		if ($language == 'ru-RU') {
 			$ruLangFrom = array('А', 'а', 'Б', 'б', 'В', 'в', 'Г', 'г', 'Д', 'д', 'Е', 'е', 'Ё', 'ё', 'Ж', 'ж', 'З', 'з', 'И', 'и', 'Й', 'й', 'К', 'к', 'Л', 'л', 'М', 'м', 'Н', 'н', 'О', 'о', 'П', 'п', 'Р', 'р', 'С', 'с', 'Т', 'т', 'У', 'у', 'Ф', 'ф', 'Х', 'х', 'Ц', 'ц', 'Ч', 'ч', 'Ш', 'ш', 'Щ', 'щ', 'Ъ', 'ъ', 'Ы', 'ы', 'Ь', 'ь', 'Э', 'э', 'Ю', 'ю', 'Я', 'я');
 			$ruLangTo   = array('A', 'a', 'B', 'b', 'V', 'v', 'G', 'g', 'D', 'd', 'E', 'e', 'Jo', 'jo', 'Zh', 'zh', 'Z', 'z', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o', 'P', 'p', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'F', 'f', 'H', 'h', 'C', 'c', 'Ch', 'ch', 'Sh', 'sh', 'Shh', 'shh', '', '', 'Y', 'y', '', '', 'Je', 'je', 'Ju', 'ju', 'Ja', 'ja');
 			$langFrom   = array_merge ($langFrom, $ruLangFrom);
@@ -734,7 +737,7 @@ class flexicontent_items extends _flexicontent_items {
 		}
 		
 		// SLOVAK
-		if ($this->language == 'sk-SK') {
+		if ($language == 'sk-SK') {
 			$skLangFrom = array('á','ä','č','ď','é','í','ľ','ĺ','ň','ó','ô','ŕ','š','ť','ú','ý','ž','Á','Ä','Č','Ď','É','Í','Ľ','Ĺ','Ň','Ó','Ô','Ŕ','Š','Ť','Ú','Ý','Ž');
 			$skLangTo   = array('a','a','c','d','e','i','l','l','n','o','o','r','s','t','u','y','z','a','a','c','d','e','i','l','l','n','o','o','r','s','t','u','y','z');
 			$langFrom   = array_merge ($langFrom, $skLangFrom);
@@ -742,7 +745,7 @@ class flexicontent_items extends _flexicontent_items {
 		}
 		
 		// SLOVENIAN
-		if ($this->language == 'sl-SI') {
+		if ($language == 'sl-SI') {
 			$slLangFrom = array('č','š','ž','Č','Š','Ž');
 			$slLangTo   = array('c','s','z','c','s','z');
 			$langFrom   = array_merge ($langFrom, $slLangFrom);
@@ -750,7 +753,7 @@ class flexicontent_items extends _flexicontent_items {
 		}
 		
 		// LITHUANIAN
-		if ($this->language == 'lt-LT') {
+		if ($language == 'lt-LT') {
 			$ltLangFrom = array('ą','č','ę','ė','į','š','ų','ū','ž','Ą','Č','Ę','Ė','Į','Š','Ų','Ū','Ž');
 			$ltLangTo   = array('a','c','e','e','i','s','u','u','z','A','C','E','E','I','S','U','U','Z');
 			$langFrom   = array_merge ($langFrom, $ltLangFrom);
@@ -758,7 +761,7 @@ class flexicontent_items extends _flexicontent_items {
 		}
 		
 		// ICELANDIC
-		if ($this->language == 'is-IS') {
+		if ($language == 'is-IS') {
 			$isLangFrom = array('þ', 'æ', 'ð', 'ö', 'í', 'ó', 'é', 'á', 'ý', 'ú', 'Þ', 'Æ', 'Ð', 'Ö', 'Í', 'Ó', 'É', 'Á', 'Ý', 'Ú');
 			$isLangTo   = array('th','ae','d', 'o', 'i', 'o', 'e', 'a', 'y', 'u', 'Th','Ae','D', 'O', 'I', 'O', 'E', 'A', 'Y', 'U');
 			$langFrom   = array_merge ($langFrom, $isLangFrom);
@@ -766,7 +769,7 @@ class flexicontent_items extends _flexicontent_items {
 		}
 		
 		// TURKISH
-		if ($this->language == 'tr-TR') {
+		if ($language == 'tr-TR') {
 			$tuLangFrom = array('ş','ı','ö','ü','ğ','ç','Ş','İ','Ö','Ü','Ğ','Ç');
 			$tuLangTo   = array('s','i','o','u','g','c','S','I','O','U','G','C');
 			$langFrom   = array_merge ($langFrom, $tuLangFrom);
