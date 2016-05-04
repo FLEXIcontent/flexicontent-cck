@@ -118,11 +118,11 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		// NOTE: this is imported by main Frontend/Backend CSS file
 		// so import these only if it is not a flexicontent view
 		if ($option!='com_flexicontent') {
-			$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form.css');  // NOTE: this is imported by main Frontend/Backend CSS file
-			$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css');  // NOTE: this is imported by main Frontend/Backend CSS file
+			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', FLEXI_VHASH);  // NOTE: this is imported by main Frontend/Backend CSS file
+			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', FLEXI_VHASH);  // NOTE: this is imported by main Frontend/Backend CSS file
 			// Add flexicontent specific TABBing to non-flexicontent views
-			$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
-			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
+			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
 			$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 		}
 		
@@ -133,6 +133,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
+		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 	}
 	

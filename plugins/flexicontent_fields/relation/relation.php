@@ -48,8 +48,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$document = JFactory::getDocument();
 		$field->html = '';
 		
-		$ri_field_name = str_replace('-','_',$field->name);
-		$fieldname = FLEXI_J16GE ? 'custom['.$ri_field_name.'][]' : $ri_field_name.'[]';
+		$fieldname = 'custom['.$field->name.']';
+		$elementid = 'custom_'.$field->name;
 		
 		// Case of autorelated item
 		$autorelation_itemid = JRequest::getInt('autorelation_'.$field->id);
@@ -68,7 +68,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 				return;
 			}
 			
-			$field->html = '<input id="'.$ri_field_name.'" name="'.$fieldname.'" type="hidden" value="'.$rel_item->id.':'.$rel_item->catid.'" />';
+			$field->html = '<input id="'.$elementid.'" name="'.$fieldname.'[]" type="hidden" value="'.$rel_item->id.':'.$rel_item->catid.'" />';
 			$field->html .= $rel_item->title;
 			return;
 		}
@@ -109,7 +109,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			$rel_items = $db->loadObjectList();
 			$i = 0;
 			foreach ($rel_items as $rel_item) {
-				$field->html .= '<input id="'.$ri_field_name.$i.'" name="'.$fieldname.'" type="hidden" value="'.$rel_item->id.':'.$rel_item->catid.'" />';
+				$field->html .= '<input id="'.$elementid.$i.'" name="'.$fieldname.'['.$i.']" type="hidden" value="'.$rel_item->id.':'.$rel_item->catid.'" />';
 				$field->html .= $rel_item->title." <br/> \n";
 				$i++;
 			}
@@ -373,9 +373,9 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$cat_selecor_box_style = count($allowedtree)==1 ? 'style="display:none;" ' :'';
 		
 		$_cat_selector = flexicontent_cats::buildcatselect(
-			$allowedtree, $ri_field_name.'_fccats', $catvals=($cat_selected ? $cat_selected->id : ''),
+			$allowedtree, $elementid.'_fccats', $catvals=($cat_selected ? $cat_selected->id : ''),
 			$top=2, // (adds first option "please select") Important otherwise single entry in select cannot initiate onchange event
-			' class="use_select2_lib '.$ri_field_name.'_fccats" ',
+			' class="use_select2_lib '.$elementid.'_fccats" ',
 			$check_published = true, $check_perms = true,
 			$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false,
 			$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array('__ALL__'=>'FLEXI_RIFLD_FILTER_LIST_ALL')
@@ -384,9 +384,9 @@ class plgFlexicontent_fieldsRelation extends JPlugin
     {
 			$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/filterlist.js' );
 			$_title_filtering =	''
-				.'<input class="fcfield_textval" id="'.$ri_field_name.'_regexp" name="'.$ri_field_name.'_regexp" onKeyUp="'.$ri_field_name.'_titlefilter.set(this.value)" size="30" onfocus="if (this.value==\''.$default_value_title_filter.'\') this.value=\'\';" onblur="if (this.value==\'\') this.value=\''.$default_value_title_filter.'\';" value="'.$default_value_title_filter.'" />'
-				//.'<input class="fcfield-button" type="button" onclick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_RIFLD_FILTER').'" />'
-				.'<input class="fcfield-button" type="button" onclick="'.$ri_field_name.'_titlefilter.reset();this.form.'.$ri_field_name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_RIFLD_RESET').'" />'
+				.'<input class="fcfield_textval" id="'.$elementid.'_regexp" name="'.$elementid.'_regexp" onKeyUp="'.$elementid.'_titlefilter.set(this.value)" size="30" onfocus="if (this.value==\''.$default_value_title_filter.'\') this.value=\'\';" onblur="if (this.value==\'\') this.value=\''.$default_value_title_filter.'\';" value="'.$default_value_title_filter.'" />'
+				//.'<input class="fcfield-button" type="button" onclick="'.$elementid.'_titlefilter.set(this.form.'.$elementid.'_regexp.value)" value="'.JText::_('FLEXI_RIFLD_FILTER').'" />'
+				.'<input class="fcfield-button" type="button" onclick="'.$elementid.'_titlefilter.reset();this.form.'.$elementid.'_regexp.value=\'\'" value="'.JText::_('FLEXI_RIFLD_RESET').'" />'
 				;
     }
 		
@@ -415,54 +415,54 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$field->html .= '
 			<span class="fcrelation_field_unused_items'.$placement_class.'">
 				<span class="label">'.JText::_($select_items_prompt).'</span><br/>
-				<select id="'.$ri_field_name.'_visitems" name="'.$ri_field_name.'_visitems[]" multiple="multiple" class="fcfield_selectmulval fc_no_js_attach" '.$size.' >
+				<select id="'.$elementid.'_visitems" name="'.$elementid.'_visitems[]" multiple="multiple" class="fcfield_selectmulval fc_no_js_attach" '.$size.' >
 				</select>
 			</span>
 		
 			<span class="fcrelation_field_controls'.$placement_class.'">
-				<span id="btn-add_'.$ri_field_name.'" class="fcrelation_btn fcfield-list-add '.$placement_class.'" title="'.JText::_('FLEXI_ADD').'"></span>
-				<span id="btn-remove_'.$ri_field_name.'" class="fcrelation_btn fcfield-list-del '.$placement_class.'" title="'.JText::_('FLEXI_REMOVE').'"></span>
-				<span id="btn-toggle_horizontal_'.$ri_field_name.'" class="fcrelation_btn fcfield-placement-h fc_toggle '.$placement_class.'" onclick="jQuery(this).closest(\'.valuebox\').find(\'.fc_vertical\').removeClass(\'fc_vertical\').addClass(\'fc_horizontal\');" title="'.JText::_('FLEXI_HORIZONTAL').'"></span>
-				<span id="btn-toggle_vertical_'.$ri_field_name.'" class="fcrelation_btn fcfield-placement-v fc_toggle '.$placement_class.'" onclick="jQuery(this).closest(\'.valuebox\').find(\'.fc_horizontal\').removeClass(\'fc_horizontal\').addClass(\'fc_vertical\');" title="'.JText::_('FLEXI_VERTICAL').'"></span>
+				<span id="btn-add_'.$elementid.'" class="fcrelation_btn fcfield-list-add '.$placement_class.'" title="'.JText::_('FLEXI_ADD').'"></span>
+				<span id="btn-remove_'.$elementid.'" class="fcrelation_btn fcfield-list-del '.$placement_class.'" title="'.JText::_('FLEXI_REMOVE').'"></span>
+				<span id="btn-toggle_horizontal_'.$elementid.'" class="fcrelation_btn fcfield-placement-h fc_toggle '.$placement_class.'" onclick="jQuery(this).closest(\'.valuebox\').find(\'.fc_vertical\').removeClass(\'fc_vertical\').addClass(\'fc_horizontal\');" title="'.JText::_('FLEXI_HORIZONTAL').'"></span>
+				<span id="btn-toggle_vertical_'.$elementid.'" class="fcrelation_btn fcfield-placement-v fc_toggle '.$placement_class.'" onclick="jQuery(this).closest(\'.valuebox\').find(\'.fc_horizontal\').removeClass(\'fc_horizontal\').addClass(\'fc_vertical\');" title="'.JText::_('FLEXI_VERTICAL').'"></span>
 			</span>
     	
     	<span class="fcrelation_field_used_items'.$placement_class.'">
 				<span class="label">'.JText::_($selected_items_label).'</span><br/>
-				<select id="'.$ri_field_name.'" name="'.$fieldname.'" multiple="multiple" class="fc_no_js_attach '.$required.'" style="display:none;" '.$size.' >
+				<select id="'.$elementid.'" name="'.$fieldname.'[]" multiple="multiple" class="fc_no_js_attach '.$required.'" style="display:none;" '.$size.' >
 					'.$items_options_select.'
 				</select>
 				
-				<select id="'.$ri_field_name.'_selitems" name="'.$ri_field_name.'_selitems[]" multiple="multiple" class="fc_no_js_attach fcfield_selectmulval" '.$size.' >
+				<select id="'.$elementid.'_selitems" name="'.$elementid.'_selitems[]" multiple="multiple" class="fc_no_js_attach fcfield_selectmulval" '.$size.' >
 					'.$items_options.'
 				</select>
 				
-				<select id="'.$ri_field_name.'_hiditems" name="'.$ri_field_name.'_hiditems" style="display:none;" class="fc_no_js_attach">
+				<select id="'.$elementid.'_hiditems" name="'.$elementid.'_hiditems" style="display:none;" class="fc_no_js_attach">
 					'.$items_options_unused.'
 				</select>
 			</span>
 		</div>
 		';
 		
-		$js= ($title_filter ? ' var filteredfield, '.$ri_field_name.'_titlefilter;' : '')."
+		$js= ($title_filter ? ' var filteredfield, '.$elementid.'_titlefilter;' : '')."
 
 jQuery(document).ready(function() {
 
 ".($title_filter ? '
-	filteredfield = document.getElementById("'.$ri_field_name.'_visitems");
-	'.$ri_field_name.'_titlefilter = new filterlist( filteredfield );
+	filteredfield = document.getElementById("'.$elementid.'_visitems");
+	'.$elementid.'_titlefilter = new filterlist( filteredfield );
 	' : '')."
 
-  jQuery('#btn-add_".$ri_field_name."').click(function(){
-      jQuery('#".$ri_field_name."_visitems option:selected').each( function() {
-          jQuery('#".$ri_field_name."_selitems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
-          jQuery('#".$ri_field_name."').append(\"<option selected='selected' class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
+  jQuery('#btn-add_".$elementid."').click(function(){
+      jQuery('#".$elementid."_visitems option:selected').each( function() {
+          jQuery('#".$elementid."_selitems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
+          jQuery('#".$elementid."').append(\"<option selected='selected' class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
           jQuery(this).remove();
       });
   });
-  jQuery('#btn-remove_".$ri_field_name."').click(function(){
-      jQuery('#".$ri_field_name."_selitems option:selected').each( function() {
-          jQuery('#".$ri_field_name."_visitems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
-          jQuery(\"#".$ri_field_name." option[value='\"+jQuery(this).val()+\"']\").remove();
+  jQuery('#btn-remove_".$elementid."').click(function(){
+      jQuery('#".$elementid."_selitems option:selected').each( function() {
+          jQuery('#".$elementid."_visitems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
+          jQuery(\"#".$elementid." option[value='\"+jQuery(this).val()+\"']\").remove();
           jQuery(this).remove();
       });
   });
@@ -471,29 +471,29 @@ jQuery(document).ready(function() {
 
 jQuery(document).ready(function() {
 	
-	jQuery('#".$ri_field_name."_fccats').change(function() {
+	jQuery('#".$elementid."_fccats').change(function() {
 		
-		var ".$ri_field_name."_fccats_val = jQuery('#".$ri_field_name."_fccats').val();
+		var ".$elementid."_fccats_val = jQuery('#".$elementid."_fccats').val();
 		
-		". ( $title_filter ? $ri_field_name."_titlefilter.reset(); this.form.".$ri_field_name."_regexp.value='';" : "" ) . "
+		". ( $title_filter ? $elementid."_titlefilter.reset(); this.form.".$elementid."_regexp.value='';" : "" ) . "
 		
-	  jQuery('#".$ri_field_name."_visitems option').each( function() {
+	  jQuery('#".$elementid."_visitems option').each( function() {
 	  	var data = jQuery(this).val().split(':'); 
 	  	var itemid = data[0];
-	  	jQuery('#".$ri_field_name."_hiditems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+itemid+\"'>\"+jQuery(this).text()+\"</option>\");
+	  	jQuery('#".$elementid."_hiditems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+itemid+\"'>\"+jQuery(this).text()+\"</option>\");
 	  	jQuery(this).remove();
 		});
 		
-	  jQuery('#".$ri_field_name."_hiditems option').each( function() {
-	  	if ( ".$ri_field_name."_fccats_val == '__ALL__' || jQuery(this).hasClass('cat_' + ".$ri_field_name."_fccats_val ) ) {
-			  jQuery('#".$ri_field_name."_visitems').append(\"<option class='\"+jQuery(this).attr('class')+\"'value='\"+jQuery(this).val()+\":\"+ ".$ri_field_name."_fccats_val+\"'>\"+jQuery(this).text()+\"</option>\");
+	  jQuery('#".$elementid."_hiditems option').each( function() {
+	  	if ( ".$elementid."_fccats_val == '__ALL__' || jQuery(this).hasClass('cat_' + ".$elementid."_fccats_val ) ) {
+			  jQuery('#".$elementid."_visitems').append(\"<option class='\"+jQuery(this).attr('class')+\"'value='\"+jQuery(this).val()+\":\"+ ".$elementid."_fccats_val+\"'>\"+jQuery(this).text()+\"</option>\");
 				jQuery(this).remove();
 	  	}
 		});
 		
-		". ( $title_filter ? $ri_field_name."_titlefilter.init();" : "" ) . "
+		". ( $title_filter ? $elementid."_titlefilter.init();" : "" ) . "
 	});
-	". ( count($allowedtree)==1 ? "jQuery('#".$ri_field_name."_fccats').trigger('change');" : "" ) . "
+	". ( count($allowedtree)==1 ? "jQuery('#".$elementid."_fccats').trigger('change');" : "" ) . "
 	
 });";
 		

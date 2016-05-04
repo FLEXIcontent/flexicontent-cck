@@ -141,6 +141,10 @@ input.fc_checkradio {
 	position: relative;
 	top: -1px;
 }
+.fc_input_set {
+	display: inline-block;
+	vertical-align: top;
+}
 div.fc_checkradio_group_wrapper {
 	display: inline-block;
 	float: left;
