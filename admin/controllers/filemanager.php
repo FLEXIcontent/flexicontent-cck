@@ -420,7 +420,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 		
 		// we verifiy the url prefix and add http if any
-		if (!eregi("^http|^https|^ftp", $filename)) { $filename	= 'http://'.$filename; }
+		if (!preg_match("#^http|^https|^ftp#i", $filename)) { $filename	= 'http://'.$filename; }
 		
 		$db 	= JFactory::getDBO();
 		$user	= JFactory::getUser();
