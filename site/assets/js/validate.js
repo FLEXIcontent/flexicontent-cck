@@ -325,7 +325,8 @@ var JFormValidator = function()
 		var isIE8 = isIE() ? isIE() < 9 : false;
 		
 		// Iterate through the form object and attach the validate method to all input fields.
-		elements = $form.find('input, textarea, select, fieldset, button');
+		//elements = $form.find('input, textarea, select, fieldset, button');
+		elements = $form.find('fieldset').toArray().concat(Array.from(form.elements));
 
  	 	for (var i = 0, l = elements.length; i < l; i++)
  	 	{
@@ -348,7 +349,7 @@ var JFormValidator = function()
 			else if ( tagType == 'radio' || tagType == 'checkbox' )
 			{
 				isIE8 ?
-					$el.on('change', function(){ document.formvalidator.validate(this); return true; }) :
+					$el.on('change', function(){ document.formvalidator.validate(this); return true; }) :  /*IE8 or less*/
 					$el.on('change', function(){ return document.formvalidator.validate(this); }) ;
 			}
 			
@@ -403,7 +404,7 @@ var JFormValidator = function()
 		window.console.log('lbls_hash_size: ' + lbls_hash_size);
 
 		// Set to zero length the .data('label') of elements without one
-		var f = form.elements;
+		var f = jQuery(form).find('fieldset').toArray().concat(Array.from(form.elements));
 
 		for(var i=0; i<f.length; i++)
 		{
@@ -541,12 +542,16 @@ var JFormValidator = function()
 		first_invalid_field_found = false;
  		
  		// Get fieldset containers of (checkbox/radio) and all form fields
+ 		//fields = jQuery(form).find('input, textarea, select, fieldset');
 		fields = jQuery(form).find('fieldset').toArray().concat(Array.from(form.elements));
 		
 		// Validate form fields
- 	 	for (i = 0, l = fields.length; i < l; i++)
- 	 	{
-			if (jQuery(fields[i]).hasClass('novalidate'))  continue;
+		for (i = 0, l = fields.length; i < l; i++)
+		{
+			var $el = jQuery(fields[i]), tagName = $el.prop("tagName").toLowerCase();
+			if ( $el.hasClass('novalidate') || tagName=='button' ) {
+				continue;
+			}
 			if ( ! this.validate(fields[i]) )
 			{
 				first_invalid_field_found = true;
@@ -692,11 +697,11 @@ jQuery(document).ready(function()
 {
 	document.formvalidator = JFormValidator_fc;
 	
-	//window.console.time("timing attachToForm()");
+	window.console.time("timing attachToForm()");
 	jQuery('form.form-validate').each(function(){
 		document.formvalidator.attachToForm(this);
 	});
-	//window.console.timeEnd("timing attachToForm()");
+	window.console.timeEnd("timing attachToForm()");
 });
 
 
