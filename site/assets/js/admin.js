@@ -246,15 +246,17 @@ Joomla.submitform = function(task, form, validate)
 		form.task.value = task;
 	}
 	
+	// Disable HTML5 validation , currently we will only do not need it
+	// but main reason is to prevent validateForm() of html5fallback.js from running !!
+	form.removeAttribute('novalidate') ;
+	
 	// HTML5 VALIDATION: Do according to form original code
-	if (typeof validate === 'undefined' || validate === null)
-		// TODO remove this to allow HTML5 validation, no we add it to suppress validateForm() of html5fallback.js 
-		form.setAttribute('novalidate', 'novalidate');
+	/*if (typeof validate === 'undefined' || validate === null);
 
 	// HTML5 VALIDATION: Force OFF / ON
 	else !validate ?
 			form.setAttribute('novalidate', 'novalidate') :
-			form.removeAttribute('novalidate') ;
+			form.removeAttribute('novalidate') ;*/
 	
 	// HTML5 VALIDATION: Suppress if "*.cancel" or "cancel" tasks
 	if ( isCancel )  form.setAttribute('novalidate', 'novalidate');
