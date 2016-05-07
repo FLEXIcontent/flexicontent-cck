@@ -735,21 +735,35 @@ foreach ($values as $value)
 			}
 		});
 		
-		// get street address
+		var street_address = "", index = -1, div = document.createElement("div");
 		
-		if (typeof place.formatted_address != "undefined")  street_address = place.formatted_address;
-		else if (typeof place.adr_address != "undefined")   street_address = place.adr_address;
-		var div = document.createElement("div");
+		// Get FULL address
+		if (typeof place.formatted_address != "undefined")
+			street_address = place.formatted_address;
+		else if (typeof place.adr_address != "undefined")
+			street_address = place.adr_address;
+		
+		window.console.log(street_address);
+		
+		// Strip tags
 		div.innerHTML = street_address;
+		street_address = div.textContent || div.innerText; // innerText: FF >= 45  --  textContent: IE >= 9
+		street_address = !!street_address ? street_address : "";  // Case div.textContent was empty string and div.innerText was undefined
 		
-		var addr_end;
-		if ( (addr_end = jQuery("#'.$elementid_n.'_city").val()) && div.innerText.split(addr_end).length > 1 ) ;
-		else if ( (addr_end = jQuery("#'.$elementid_n.'_province").val()) && div.innerText.split(addr_end).length > 1 ) ;
-		else addr_end = country_long_name;
+		// Convert full-address to just street-address, by splitting at the (zip) postal code
+		street_address = street_address.split( jQuery("#'.$elementid_n.'_zip").val() )[0];
 		
-		var street_address = div.innerText.split(addr_end)[0];
-		street_address = street_address.replace(/(^\s*,)|(,\s*$)/g, "");
+		// Also split at the city / province or country in case that postal code (zip) was missing or in case it was placed after city or  province
+		index = jQuery("#'.$elementid_n.'_city").val() ? street_address.lastIndexOf( jQuery("#'.$elementid_n.'_city").val() ) : -1;
+		if (index != -1)  street_address = street_address.substring(0, index);
 		
+		index = jQuery("#'.$elementid_n.'_province").val() ? street_address.lastIndexOf( jQuery("#'.$elementid_n.'_province").val() ) : -1;
+		if (index != -1)  street_address = street_address.substring(0, index);		
+		
+		if (country_long_name)  street_address = street_address.split(country_long_name)[0];
+		
+		// Get the street address trimming any spaces, commas
+		street_address = street_address.replace(/(^\s*,)|(,\s*$)/g, "")
 		jQuery("#'.$elementid_n.'_addr1").val(street_address);
 		
 		if(jQuery("#'.$elementid_n.'_country").val() == "US")
