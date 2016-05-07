@@ -115,7 +115,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$uri = clone JUri::getInstance();
 		$domain = $uri->toString(array('scheme', 'host', 'port'));
 		$site_base_url = JURI::base(true).'/';
-		foreach ( $items as $item )
+		foreach ($items as $item)
 		{
 			// strip html from feed item title
 			$title = $this->escape( $item->title );
@@ -143,8 +143,8 @@ class FlexicontentViewCategory extends JViewLegacy
 				$RESIZE_FLAG = !$feed_image_source || !$img_field_size;
 				if ( $src && $RESIZE_FLAG ) {
 					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-					$w		= '&amp;w=' . $feed_image_width;
 					$h		= '&amp;h=' . $feed_image_height;
+					$w		= '&amp;w=' . $feed_image_width;
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
 					$zc		= $feed_image_method ? '&amp;zc=' . $feed_image_method : '';

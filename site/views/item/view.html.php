@@ -123,6 +123,45 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		
+		// ********************************************************************************************
+		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
+		// ********************************************************************************************
+		
+		// Get category titles needed by pathway (and optionally by document title too), this will allow Falang to translate them
+		$catshelper = new flexicontent_cats($cid);
+		$parents    = $catshelper->getParentlist($all_cols=false);
+		
+		// Get current pathway
+		$pathway = $app->getPathWay();
+		
+		// Clear pathway, if automatic pathways are enabled
+		if ( $params->get('automatic_pathways', 0) ) {
+			$pathway_arr = $pathway->getPathway();
+			$pathway->setPathway( array() );
+			//$pathway->set('_count', 0);  // not needed ??
+			$item_depth = 0;  // menu item depth is now irrelevant ???, ignore it
+		} else {
+			$item_depth = $params->get('item_depth', 0);
+		}
+		
+		// Respect menu item depth, defined in menu item
+		$p = $item_depth;
+		while ( $p < count($parents) ) {
+			// For some Content Types the pathway should not be populated with category links
+			if ( in_array($item->type_id, $globalnopath) )  break;
+			
+			// Do not add to pathway unroutable categories
+			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
+			
+			// Add current parent category
+			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
+			$p++;
+		}
+		if ($params->get('add_item_pathway', 1)) {
+			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)) );
+		}
+		
+		
 		// ********************
 		// ITEM LAYOUT handling
 		// ********************
@@ -141,22 +180,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		$_items = array(&$item);
 		FlexicontentFields::getFields($_items, FLEXI_ITEMVIEW, $params, $aid);
 		$fields = $item->fields;
-		
-		
-		// ****************************************
-		// Get category titles needed by pathway,
-		// this will allow Falang to translate them
-		// ****************************************
-		
-		$catshelper = new flexicontent_cats($cid);
-		$parents    = $catshelper->getParentlist($all_cols=false);
-		//echo "<pre>".print_r($parents,true)."</pre>";
-		/*$parents = array();
-		if ( $cid && isset($globalcats[$cid]->ancestorsarray) ) {
-			$parent_ids = $globalcats[$cid]->ancestorsarray;
-			foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
-		}*/
-		
 		
 		
 		// **********************************************************
@@ -233,14 +256,18 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		
 		// *************************
-		// increment the hit counter
+		// Increment the hit counter
 		// *************************
 		// MOVED to flexisystem plugin due to ...
 		/*if (FLEXIUtilities::count_new_hit($item->id) ) {
 			$model->hit();
 		}*/
-
+		
+		
+		// ***************************************************
 		// Load template css/js and set template data variable
+		// ***************************************************
+		
 		$tmplvar	= $themes->items->{$ilayout}->tmplvar;
 		if ($ilayout) {
 			// Add the templates css files if availables
@@ -328,38 +355,6 @@ class FlexicontentViewItem  extends JViewLegacy
 			flexicontent_html::setRelCanonical($ucanonical);
 		}
 		
-		
-		// ********************************************************************************************
-		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
-		// ********************************************************************************************
-		$pathway = $app->getPathWay();
-		
-		// Clear pathway, if automatic pathways are enabled
-		if ( $params->get('automatic_pathways', 0) ) {
-			$pathway_arr = $pathway->getPathway();
-			$pathway->setPathway( array() );
-			//$pathway->set('_count', 0);  // not needed ??
-			$item_depth = 0;  // menu item depth is now irrelevant ???, ignore it
-		} else {
-			$item_depth = $params->get('item_depth', 0);
-		}
-		
-		// Respect menu item depth, defined in menu item
-		$p = $item_depth;
-		while ( $p < count($parents) ) {
-			// For some Content Types the pathway should not be populated with category links
-			if ( in_array($item->type_id, $globalnopath) )  break;
-			
-			// Do not add to pathway unroutable categories
-			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
-			
-			// Add current parent category
-			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
-			$p++;
-		}
-		if ($params->get('add_item_pathway', 1)) {
-			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)) );
-		}
 		
 		// **********************************************************************
 		// Print link ... must include layout and current filtering url vars, etc
