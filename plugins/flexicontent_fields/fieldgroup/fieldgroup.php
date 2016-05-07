@@ -698,8 +698,9 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 		$grouped_fields[$field->id] = $db->loadObjectList('id');
 		
 		$_grouped_fields = array();
-		foreach($grouped_fields[$field->id] as $field_id => $grouped_field) {
-			// Create field parameters, if not already created, NOTEL: for 'custom' fields loadFieldConfig() is optional
+		foreach($grouped_fields[$field->id] as $field_id => $grouped_field)
+		{
+			// Create field parameters, if not already created, NOTE: for 'custom' fields loadFieldConfig() is optional
 			if (empty($grouped_field->parameters)) {
 				$grouped_field->parameters = new JRegistry($grouped_field->attribs);
 			}

@@ -31,6 +31,7 @@ $is_fc_component = 1;
 
 $cparams = JComponentHelper::getParams('com_flexicontent');
 $app     = JFactory::getApplication();
+$document= JFactory::getDocument();
 $jinput  = $app->input;
 $format  = $jinput->get('format', 'html', 'cmd');
 
@@ -308,6 +309,10 @@ if ( $format == 'html' )
 	// Add flexi-lib JS
 	JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script
 	JFactory::getDocument()->addScriptVersion( JURI::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Backend only script
+	
+	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
+	$js = 'var fc_validateOnSubmitForm = 1';
+	$document->addScriptDeclaration( $js );
 	
 	// Load bootstrap CSS
 	if ( 0 )  // Let backend template decide to load bootstrap CSS
