@@ -577,7 +577,13 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		
 		foreach ($field->value as $n => $value) 
 		{
-			$value = unserialize($value);
+			// Compatibility for unserialized values (e.g. reload user input after form validation error) or for NULL values in a field group
+			if ( !is_array($value) )
+			{
+				$v = !empty($value) ? @unserialize($value) : false;
+				$value = ( $v !== false || $v === 'b:0;' ) ? $v :
+					array();
+			}
 			
 			// Compatibility with deprecated fields
 			if (empty($value['api_type'])) $value['api_type'] = isset($value['videotype']) ? $value['videotype'] : (isset($value['audiotype']) ? $value['audiotype'] : '');

@@ -210,12 +210,15 @@ Joomla.submitform = function(task, form, validate)
 	if (!form) {
 		form = document.getElementById('adminForm');
 	}
-	var form_task = task ? task : (typeof form.task !== 'undefinded' && typeof form.task.value !== 'undefinded'  ?  form.task.value  :  '');
+	var form_task = task ? task : (typeof form.task !== 'undefined' && typeof form.task.value !== 'undefined'  ?  form.task.value  :  '');
 	
 	// Do form validation if button task is not 'cancel'
 	var match_cancel = new RegExp(/(.*.|^)cancel$/);
 	var isCancel = match_cancel.test(form_task);
-	if ( document.formvalidator && !isCancel )
+	
+	// For flexicontent views we will do validation too (FLAG: fc_validateOnSubmitForm), NOTE: for non-FC views this is done before the method is called
+	var doValidation = typeof window.fc_validateOnSubmitForm !== undefined ? window.fc_validateOnSubmitForm : 0;
+	if ( doValidation && document.formvalidator && !isCancel )
 	{
 		var vTimeStart = new Date().getTime();
 		var isValid = document.formvalidator.isValid(form);
@@ -246,9 +249,9 @@ Joomla.submitform = function(task, form, validate)
 		form.task.value = task;
 	}
 	
-	// Disable HTML5 validation , currently we will only do not need it
+	// Disable HTML5 validation , currently we do not need it
 	// but main reason is to prevent validateForm() of html5fallback.js from running !!
-	form.removeAttribute('novalidate') ;
+	form.setAttribute('novalidate', 'novalidate') ;
 	
 	// HTML5 VALIDATION: Do according to form original code
 	/*if (typeof validate === 'undefined' || validate === null);

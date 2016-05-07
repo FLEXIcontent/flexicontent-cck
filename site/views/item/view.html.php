@@ -819,6 +819,23 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		
+		// **************************************************************************
+		// Load any previous form, NOTE: Because of fieldgroup rendering other fields
+		// this step must be done in seperate loop, placed before FIELD HTML creation
+		// **************************************************************************
+		
+		$jcustom = $app->getUserState('com_flexicontent.edit.item.custom');   //print_r($jcustom);
+		foreach ($fields as $field)
+		{
+			if (!$field->iscore)
+			{
+				if ( isset($jcustom[$field->name]) ) {
+					$field->value = array();
+					foreach ($jcustom[$field->name] as $i => $_val)  $field->value[$i] = $_val;
+				}
+			}
+		}
+
 		
 		// *****************************************************************************
 		// (a) Apply Content Type Customization to CORE fields (label, description, etc)
@@ -826,7 +843,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		// *****************************************************************************
 		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$jcustom = $app->getUserState('com_flexicontent.edit.item.custom');   //print_r($jcustom);
 		foreach ($fields as $field)
 		{
 			// a. Apply CONTENT TYPE customizations to CORE FIELDS, e.g a type specific label & description
@@ -839,11 +855,6 @@ class FlexicontentViewItem  extends JViewLegacy
 			// NOTE: this is DONE only for CUSTOM fields, since form field html is created by the form for all CORE fields, EXCEPTION is the 'text' field (see bellow)
 			if (!$field->iscore)
 			{
-				if ( isset($jcustom[$field->name]) ) {
-					$field->value = array();
-					foreach ($jcustom[$field->name] as $i => $_val)  $field->value[$i] = $_val;
-				}
-				
 				$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
 				
 				if ($is_editable) {

@@ -697,11 +697,11 @@ jQuery(document).ready(function()
 {
 	document.formvalidator = JFormValidator_fc;
 	
-	window.console.time("timing attachToForm()");
+	//window.console.time("timing attachToForm()");
 	jQuery('form.form-validate').each(function(){
 		document.formvalidator.attachToForm(this);
 	});
-	window.console.timeEnd("timing attachToForm()");
+	//window.console.timeEnd("timing attachToForm()");
 });
 
 
