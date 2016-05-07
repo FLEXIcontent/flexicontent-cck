@@ -64,10 +64,19 @@ class FlexicontentViewTags extends JViewLegacy
 		$items   = $this->get('Data');
 		$total   = $this->get('Total');
 		
-		// Make sure field values were retrieved e.g. we need 'item->categories' for template classes
+		
+		// ****************************************************************************************************************
+		// Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
+		// plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
+		// ****************************************************************************************************************
+		
 		$items 	= FlexicontentFields::getFields($items, $view, $params);
 		
+		
+		// ************************************************************************
 		// Calculate CSS classes needed to add special styling markups to the items
+		// ************************************************************************
+		
 		flexicontent_html::calculateItemMarkups($items, $params);
 		
 		

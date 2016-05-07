@@ -97,24 +97,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		$limitstart = JRequest::getInt('limitstart');
 		
 		
-		// ********************************
-		// Load needed JS libs & CSS styles
-		// ********************************
-		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		flexicontent_html::loadFramework('jQuery');
-		flexicontent_html::loadFramework('flexi_tmpl_common');
-		
-		// Add css files to the document <head> section (also load CSS joomla template override)
-		if (!$params->get('disablecss', '')) {
-			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
-			//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
-		}
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
-		}
-		
-		
 		// ************************
 		// CATEGORY LAYOUT handling
 		// ************************
@@ -142,29 +124,85 @@ class FlexicontentViewCategory extends JViewLegacy
 			$authordescr_itemid = $params->get('authordescr_itemid');
 		}
 		
-		// Bind Fields to items and render their display HTML, but check for document type, due to Joomla issue 
-		// with system plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
-		if ($format != 'feed') {
-			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
-		}
-		
 		//Set layout
 		$this->setLayout('category');
 		
-		$limit		= $app->getUserStateFromRequest('com_flexicontent'.$category->id.'.category.limit', 'limit', $params->def('limit', 0), 'int');
+		$limit = $app->getUserStateFromRequest('com_flexicontent'.$category->id.'.category.limit', 'limit', $params->def('limit', 0), 'int');
+		
+		
+		// ********************************
+		// Load needed JS libs & CSS styles
+		// ********************************
+		
+		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+		flexicontent_html::loadFramework('jQuery');
+		flexicontent_html::loadFramework('flexi_tmpl_common');
+		
+		// Add css files to the document <head> section (also load CSS joomla template override)
+		if (!$params->get('disablecss', '')) {
+			$document->addStyleSheetVersion($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', FLEXI_VHASH);
+			//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
+		}
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
+		}
+		
+		
+		// ********************************************************************************************
+		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
+		// ********************************************************************************************
 		
 		// Get category titles needed by pathway, this will allow Falang to translate them
 		$catshelper = new flexicontent_cats($cid);
 		$parents    = $catshelper->getParentlist($all_cols=false);
-		//echo "<pre>".print_r($parents,true)."</pre>";
-		/*$parents = array();
-		if ( $cid && isset($globalcats[$cid]->ancestorsarray) ) {
-			$parent_ids = $globalcats[$cid]->ancestorsarray;
-			foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
-		}*/
-		
 		$rootcat = (int) $params->get('rootcat');
 		if ($rootcat) $root_parents = $globalcats[$rootcat]->ancestorsarray;
+		
+		// Get current pathway
+		$pathway = $app->getPathWay();
+		
+		// Clear pathway, if automatic pathways are enabled
+		if ( $params->get('automatic_pathways', 0) ) {
+			$pathway_arr = $pathway->getPathway();
+			$pathway->setPathway( array() );
+			//$pathway->set('_count', 0);  // not needed ??
+			$item_depth = 0;  // menu item depth is now irrelevant ???, ignore it
+		} else {
+			$item_depth = $params->get('item_depth', 0);
+		}
+		
+		// Respect menu item depth, defined in menu item
+		$p = $item_depth;
+		while ( $p < count($parents) )
+		{
+			// Do not add the directory root category or its parents (this when coming from a directory view)
+			if ( !empty($root_parents) && in_array($parents[$p]->id, $root_parents) )  { $p++; continue; }
+			
+			// Do not add to pathway unroutable categories
+			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
+			
+			// Add current parent category
+			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
+			$p++;
+		}
+		//echo "<pre>"; print_r($pathway); echo "</pre>";
+		
+		
+		// *******************************************************************************************************************
+		// Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
+		// plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
+		// *******************************************************************************************************************
+		
+		if ($format != 'feed') {
+			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
+		}
+		
+		
+		// ************************************************************************
+		// Calculate CSS classes needed to add special styling markups to the items
+		// ************************************************************************
+		
+		flexicontent_html::calculateItemMarkups($items, $params);
 		
 		
 		// **********************************************************
@@ -324,35 +362,10 @@ class FlexicontentViewCategory extends JViewLegacy
 			$document->addHeadLink(JRoute::_($link.'&type=atom'), 'alternate', 'rel', $attribs);
 		}
 		
-		// ********************************************************************************************
-		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
-		// ********************************************************************************************
-		$pathway = $app->getPathWay();
 		
-		// Clear pathway, if automatic pathways are enabled
-		if ( $params->get('automatic_pathways', 0) ) {
-			$pathway_arr = $pathway->getPathway();
-			$pathway->setPathway( array() );
-			//$pathway->set('_count', 0);  // not needed ??
-			$item_depth = 0;  // menu item depth is now irrelevant ???, ignore it
-		} else {
-			$item_depth = $params->get('item_depth', 0);
-		}
-		
-		// Respect menu item depth, defined in menu item
-		$p = $item_depth;
-		while ( $p < count($parents) ) {
-			// Do not add the directory root category or its parents (this when coming from a directory view)
-			if ( !empty($root_parents) && in_array($parents[$p]->id, $root_parents) )  { $p++; continue; }
-			
-			// Do not add to pathway unroutable categories
-			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
-			
-			// Add current parent category
-			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
-			$p++;
-		}
-		//echo "<pre>"; print_r($pathway); echo "</pre>";
+		// *********************
+		// Author "profile" item
+		// *********************
 		
 		$authordescr_item_html = false;
 		if ($authordescr_item) {
@@ -360,6 +373,11 @@ class FlexicontentViewCategory extends JViewLegacy
 			$authordescr_item_html = $flexi_html_helper->renderItem($authordescr_itemid);
 		}
 		//echo $authordescr_item_html; exit();
+		
+		
+		// ***************************************************
+		// Load template css/js and set template data variable
+		// ***************************************************
 		
 		if ($clayout) {
 			// Add the templates css files if availables
@@ -403,7 +421,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$type_attribs = flexicontent_db::getTypeAttribs($force=true, $typeid=0);
 		$type_params = array();
-		foreach ($items as $item) 
+		foreach ($items as $item)
 		{
 			$item->event 	= new stdClass();
 			
@@ -480,10 +498,6 @@ class FlexicontentViewCategory extends JViewLegacy
 			$item->fields['text']->display = & $item->text;
 			
 		}
-		
-		// Calculate CSS classes needed to add special styling markups to the items
-		flexicontent_html::calculateItemMarkups($items, $params);
-		
 		
 		
 		// *****************************************************
