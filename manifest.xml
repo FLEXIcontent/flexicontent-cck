@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="component" version="3.2.0" method="upgrade">
+<extension type="component" version="3.4.0" method="upgrade">
 	<name>FLEXIcontent</name>
 	<!-- The following elements are optional and free of formatting constraints -->
 	<creationDate>7 May 2016</creationDate>
@@ -91,6 +91,7 @@
 			<filename>admin.flexicontent.php</filename>
 			<filename>flexicontent.php</filename>
 			<filename>defineconstants.php</filename>
+			<filename>j34x_LE.php</filename>
 			<filename>controller.php</filename>
 			<filename>config.xml</filename>
 			<filename>access.xml</filename>

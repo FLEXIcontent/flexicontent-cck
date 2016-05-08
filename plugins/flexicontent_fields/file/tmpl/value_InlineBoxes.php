@@ -127,8 +127,8 @@ foreach($values as $file_id)
 			$hits .= '<span class="fcfile_hits_label label">' .JTEXT::_('FLEXI_HITS'). '</span> <span class="fcfile_hits_value">'.$file_data->hits.'</span>';
 		}
 		$hits .= '</span>';
-		$hits_total += $file_data->hits;
 	}
+	$hits_total += $file_data->hits;
 	
 	
 	// e. FILENAME / TITLE: decide whether to show it (if we do not use button, then displaying of filename is forced)
@@ -393,17 +393,17 @@ foreach($values as $file_id)
 }
 
 $file_totals = '';
-if ($display_total_hits && $hits_total) {
-	$file_totals .='
-			<div class="fcfile_total_hits">
-				<span class="fcfile_total_hits_label">'. $total_count_label .' </span> <span class="fcfile_total_hits_value badge">'. $hits_total .'</span>
-			</div>
-		';
-}
 if ($display_total_count) {
 	$file_totals .= '
 			<div class="fcfile_total_count">
-				<span class="fcfile_total_count_label">'. $total_hits_label .' </span> <span class="fcfile_total_count_value badge">'. count($values) .'</span>
+				<span class="fcfile_total_count_label">'. $total_count_label .' </span> <span class="fcfile_total_count_value badge">'. count($values) .'</span>
+			</div>
+		';
+}
+if ($display_total_hits && $hits_total) {
+	$file_totals .='
+			<div class="fcfile_total_hits">
+				<span class="fcfile_total_hits_label">'. $total_hits_label .' </span> <span class="fcfile_total_hits_value badge">'. $hits_total .'</span>
 			</div>
 		';
 }

@@ -58,6 +58,12 @@ if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
 {
 	jimport('cms.version.version');
 	$jversion = new JVersion;
+	
+	// J3.5.0+ added new CLASS: StringHelper, to fix name conflict with PHP7 String class, we need to define the StringHelper CLASS in the case of J3.4.x
+	if ( version_compare( $jversion->getShortVersion(), '3.5.0', 'lt' ) && !class_exists('Joomla\String\StringHelper') )
+	{
+		require_once('j34x_LE.php');
+	}
 }
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
