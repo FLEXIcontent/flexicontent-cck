@@ -2080,6 +2080,12 @@ table.fc-form-tbl td.data {
 	width: 0;
 	background-color: #0099ff;
 }
+hr.fcclearline {
+	border: 0;
+	height: 1px;
+	background-image: linear-gradient(to right,rgba(0,0,0,0),rgba(0,0,0,0.75),rgba(0,0,0,0));
+	margin: 32px 0;
+}
 .fcclear,
 #flexicontent .fcclear,
 #flexicontent .clear {
@@ -2614,25 +2620,55 @@ div.current dd {
 	margin: 0 auto;
 	width: 373px;
 }
+.fcfile_hits,
+.fcfile_lang,
+.fcfile_size,
+.fcfile_descr_tip {
+	margin: 8px 16px;
+}
+.fcfile_descr_inline {
+	margin: 16px 0 !important;
+	width: 100% !important;
+	box-sizing: border-box !important;
+}
+.fcfile_mime {
+	display: inline-block;
+	float: left;
+	height: 42px;
+	line-height: 42px;
+	width: 32px;
+}
 .fcfile_mime .fcicon-mime,
 .fcfile_hits .fcicon-hits,
 .fcfile_lang .fcicon-lang {
 	vertical-align: middle;
-	margin-bottom: 2px;
 }
 .fcfile_actions {
 	margin: 4px;
-	float: left;
 	clear: both;
-	display: inline-block;
+	display: block;
+	width: 100% !important;
+	box-sizing: border-box !important;
 }
-.fcfile_title {
-	font-size: 13px;
-	font-weight: normal;
-	margin: 4px 6px 0px 6px;
-	padding: 4px 0px 0px 0px;
-	display: inline-block;
-	border-bottom: 1px dashed gray;
+.fcfile_actions > a,
+.fcfile_actions > input,
+.fcfile_actions > form > input {
+	margin: 4px 0;
+	width: 100% !important;
+	box-sizing: border-box !important;
+}
+.fcfile_actions > form {
+	width: 100% !important;
+	box-sizing: border-box !important;
+	margin: 0px !important;
+	padding: 0px !important;
+}
+.fcfile_total {
+	margin: 8px 0 !important;
+}
+.fcfile_total_count_label,
+.fcfile_total_hits_label {
+	font-weight: bold;
 }
 img.fc_field_image {
 	display: inline-block;

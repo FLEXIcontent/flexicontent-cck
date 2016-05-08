@@ -447,7 +447,6 @@ class plgFlexicontent_fieldsFile extends FCField
 		// *****************************************
 		
 		$field->html = array();
-		$n = 0;
 		
 		//$this->setField($field);
 		//$this->setItem($item);
@@ -549,7 +548,15 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		// some parameter shortcuts
 		$tooltip_class = 'hasTooltip';
-		$useicon = $field->parameters->get( 'useicon', 1 ) ;
+		
+		
+		$display_total_count = $field->parameters->get( 'display_total_count', 1 ) ;
+		$total_count_label = JText::_($field->parameters->get( 'total_count_label', 'FLEXI_FIELD_FILE_TOTAL_FILES' ));
+		
+		$display_total_hits  = $field->parameters->get( 'display_total_hits', 1 ) ;
+		$total_hits_label = JText::_($field->parameters->get( 'total_hits_label', 'FLEXI_FIELD_FILE_TOTAL_DOWNLOADS' ));
+		
+		$useicon = $field->parameters->get( 'useicon', 0 ) ;
 		$lowercase_filename = $field->parameters->get( 'lowercase_filename', 1 ) ;
 		$link_filename      = $field->parameters->get( 'link_filename', 1 ) ;
 		$display_filename	= $field->parameters->get( 'display_filename', 1 ) ;
@@ -565,10 +572,10 @@ class plgFlexicontent_fieldsFile extends FCField
 		
 		$usebutton    = $field->parameters->get( 'usebutton', 1 ) ;
 		$buttonsposition = $field->parameters->get('buttonsposition', 1);
-		$use_infoseptxt   = $field->parameters->get( 'use_infoseptxt', 1 ) ;
-		$use_actionseptxt = $field->parameters->get( 'use_actionseptxt', 1 ) ;
-		$infoseptxt   = $use_infoseptxt   ?  ' '.$field->parameters->get( 'infoseptxt', '' ).' '    :  ' ';
-		$actionseptxt = $use_actionseptxt ?  ' '.$field->parameters->get( 'actionseptxt', '' ).' '  :  ' ';
+		$use_infoseptxt   = $field->parameters->get( 'use_info_separator', 0 ) ;
+		$use_actionseptxt = $field->parameters->get( 'use_action_separator', 0 ) ;
+		$infoseptxt   = $use_infoseptxt   ?  ' '.$field->parameters->get( 'info_separator', '' ).' '    :  ' ';
+		$actionseptxt = $use_actionseptxt ?  ' '.$field->parameters->get( 'action_separator', '' ).' '  :  ' ';
 		
 		$allowdownloads = $field->parameters->get( 'allowdownloads', 1 ) ;
 		$downloadstext  = $allowdownloads==2 ? $field->parameters->get( 'downloadstext', 'FLEXI_DOWNLOAD' ) : 'FLEXI_DOWNLOAD';
@@ -645,7 +652,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			break;
 
 			case 1:
-			$separatorf = '<br class="fcclear" />';
+			$separatorf = '<hr class="fcclearline" />'; //'<br class="fcclear" />';
 			break;
 
 			case 2:

@@ -1,10 +1,14 @@
 <?php
 use Joomla\String\StringHelper;
 
+$field->{$prop}[-1] = '';
 $field->url = array();
 $field->abspath = array();
 $field->file_data = array();
 
+$hits_total = 0;
+
+$n = 0;
 foreach($values as $file_id)
 {
 	if (empty($file_id) || !isset($files_data[$file_id]))
@@ -63,7 +67,7 @@ foreach($values as $file_id)
 		$_tooltip_title   = '';
 		$_tooltip_content = JText::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
 		$icon = JHTML::image($file_data->icon, $file_data->ext, 'class="fcicon-mime '.$tooltip_class.'" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"');
-		$icon = '<span class="fcfile_mime">'.$icon.'</span>';
+		$icon = '<span class="fcfile_mime" style="float: left; display:inline-block;">'.$icon.'</span>';
 	}
 	
 	
@@ -72,7 +76,10 @@ foreach($values as $file_id)
 	$file_data->language = $file_data->language=='' ? '*' : $file_data->language;
 	if ($display_lang && $file_data->language!='*')  // ... skip 'ALL' language ... maybe allow later
 	{
-		$lang = '<span class="fcfile_lang">';
+		$lang = '
+		<span class="fcfile_lang">
+			<span class="fcfile_lang_label label">' .JTEXT::_('FLEXI_LANGUAGE'). '</span>
+			<span class="fcfile_lang_value">';
 		if ( $add_lang_img && @ $langs->{$file_data->language}->imgsrc ) {
 			if (!$add_lang_txt) {
 				$_tooltip_title   = JText::_( 'FLEXI_LANGUAGE', true );
@@ -84,9 +91,11 @@ foreach($values as $file_id)
 			$lang .= "\n".'<img src="'.$langs->{$file_data->language}->imgsrc.'" '.$_attribs.' /> ';
 		}
 		if ( $add_lang_txt ) {
-			$lang .= '['. ($file_data->language=='*' ? JText::_("FLEXI_ALL_LANGUAGES") : $langs->{$file_data->language}->name) .']';
+			$lang .= $file_data->language=='*' ? JText::_("FLEXI_ALL_LANGUAGES") : $langs->{$file_data->language}->name;
 		}
-		$lang .= '</span>';
+		$lang .= '
+			</span>
+		</span>';
 	}
 	
 	
@@ -95,12 +104,13 @@ foreach($values as $file_id)
 	if ($display_size)
 	{
 		$sizeinfo = '<span class="fcfile_size">';
+		$sizeinfo .= '<span class="fcfile_size_label label">' .JTEXT::_('FLEXI_SIZE'). '</span> ';
 		if ($display_size==1)
-			$sizeinfo .= '<span class="badge">'.number_format($file_data->size / 1024, 0).'&nbsp;'.JTEXT::_('FLEXI_KBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($file_data->size / 1024, 0).'&nbsp;'.JTEXT::_('FLEXI_KBS').'</span>';
 		else if ($display_size==2)
-			$sizeinfo .= '<span class="badge">'.number_format($file_data->size / 1048576, 2).'&nbsp;'.JTEXT::_('FLEXI_MBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($file_data->size / 1048576, 2).'&nbsp;'.JTEXT::_('FLEXI_MBS').'</span>';
 		else
-			$sizeinfo .= '<span class="badge">'.number_format($file_data->size / 1073741824, 2).'&nbsp;'.JTEXT::_('FLEXI_GBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($file_data->size / 1073741824, 2).'&nbsp;'.JTEXT::_('FLEXI_GBS').'</span>';
 		$sizeinfo .= '</span>';
 	}
 	
@@ -114,9 +124,10 @@ foreach($values as $file_id)
 			$hits .= sprintf($hits_icon, $file_data->hits);
 		}
 		if ( $add_hits_txt ) {
-			$hits .= '<span class="badge badge-info">'.$file_data->hits.'&nbsp;'.JTEXT::_('FLEXI_HITS').'</span>';
+			$hits .= '<span class="fcfile_hits_label label">' .JTEXT::_('FLEXI_HITS'). '</span> <span class="fcfile_hits_value">'.$file_data->hits.'</span>';
 		}
 		$hits .= '</span>';
+		$hits_total += $file_data->hits;
 	}
 	
 	
@@ -130,7 +141,7 @@ foreach($values as $file_id)
 	
 	$name_str   = $display_filename==2 ? $filename_original : $_filetitle;
 	$name_classes = $file_classes.($file_classes ? ' ' : '').'fcfile_title';
-	$name_html  = '<span class="'.$name_classes.'">'. $name_str . '</span>';
+	$name_html  = '<h3 class="'.$name_classes.'">'. $name_str . '</h3>';
 	
 	
 	// f. DESCRIPTION: either as tooltip or as inline text
@@ -149,9 +160,9 @@ foreach($values as $file_id)
 			$descr_icon = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 			$descr_inline  = '';
 		} else if ($display_descr==2) {  // As inline text
-			$descr_inline = ' <span class="fcfile_descr_inline alert alert-info fc-iblock">'. nl2br($file_data->description) . '</span>';
+			$descr_inline = ' <div class="fcfile_descr_inline alert alert-info">'. nl2br($file_data->description) . '</div>';
 		}
-		if ($descr_icon) $descr_icon = ' <span class="fcfile_descr_tip">'. $descr_icon . '</span>';
+		if ($descr_icon) $descr_icon = ' <span class="fcfile_descr_tip"><span class="fcfile_descr_tip_label label">' .JTEXT::_('FLEXI_DESCRIPTION'). '</span> '. $descr_icon . '</span>';
 	}
 	
 	
@@ -162,6 +173,8 @@ foreach($values as $file_id)
 	// *****************************
 	
 	$str = '';
+	
+	
 	
 	// [1]: either create the download link -or- use no authorized link ...
 	if ( !$authorized ) {
@@ -179,6 +192,7 @@ foreach($values as $file_id)
 	$filename_shown_as_link = $filename_shown && $link_filename && !$usebutton;
 	
 	
+	
 	// [2]: Add information properties: filename, and icons with optional inline text
 	$info_arr = array();
 	if ( ($filename_shown && !$filename_shown_as_link) || $not_downloadable ) {   // Filename will be shown if not l
@@ -190,7 +204,14 @@ foreach($values as $file_id)
 	if ($descr_icon) $info_arr[] = $descr_icon;
 	$str .= implode($info_arr, $infoseptxt);
 	
-	// [3]: Display the buttons:  DOWNLOAD, SHARE, ADD TO CART
+	
+	
+	// [3]: Add the file description (if displayed inline)
+	if ($descr_inline) $str .= '<div class="fcclear"></div>'.$descr_inline;
+	
+	
+	
+	// [4]: Display the buttons:  DOWNLOAD, SHARE, ADD TO CART
 	
 	$actions_arr = array();
 	
@@ -355,9 +376,6 @@ foreach($values as $file_id)
 			.'</div>'.$str;
 	}
 	
-	// [4]: Add the file description (if displayed inline)
-	if ($descr_inline) $str .= '<div class="fcclear"></div>'.$descr_inline;
-	
 	
 	// Values Prefix and Suffix Texts
 	$field->{$prop}[]	=  $pretext . $str . $posttext;
@@ -372,4 +390,28 @@ foreach($values as $file_id)
 	
 	$n++;
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
+}
+
+$file_totals = '';
+if ($display_total_hits && $hits_total) {
+	$file_totals .='
+			<div class="fcfile_total_hits">
+				<span class="fcfile_total_hits_label">'. $total_count_label .' </span> <span class="fcfile_total_hits_value badge">'. $hits_total .'</span>
+			</div>
+		';
+}
+if ($display_total_count) {
+	$file_totals .= '
+			<div class="fcfile_total_count">
+				<span class="fcfile_total_count_label">'. $total_hits_label .' </span> <span class="fcfile_total_count_value badge">'. count($values) .'</span>
+			</div>
+		';
+}
+
+if ($file_totals) {
+	$field->{$prop}[-1] = '
+		<div class="alert alert-success fcfile_total">
+		'.$file_totals.'
+		</div>
+		';
 }
