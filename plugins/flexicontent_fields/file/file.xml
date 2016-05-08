@@ -164,7 +164,21 @@
 			<field name="" type="separator" default="FLEXI_FIELD_VALUES" level="level1" />
 			<field name="viewlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_VIEW_LAYOUT" description="FLEXI_FIELD_SELECT_VIEW_LAYOUT_DESC" directory="plugins/flexicontent_fields/file/tmpl/" filter="value*" exclude="" stripext="1" stripprefix="value_" hide_none="1" hide_default="1" labelclass="label-warning" />
 			
-			<field name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_TOTALS" level="level2" />
+			<field name="display_total_count" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_FILE_SHOW_TOTAL_COUNT" toggle_related="1" description="FLEXI_FIELD_FILE_SHOW_TOTAL_COUNT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="use_total_count">FLEXI_HIDE</option>
+				<option value="1" show_list="use_total_count" hide_list="">FLEXI_SHOW</option>
+			</field>
+			<field name="total_count_label" type="text" default="FLEXI_FIELD_FILE_TOTAL_FILES" label="FLEXI_FIELD_FILE_TOTAL_COUNT_LABEL" depend_class="use_total_count" description="FLEXI_FIELD_FILE_CUSTOM_LABEL_DESC" />
+			
+			<field name="display_total_hits" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_FILE_SHOW_TOTAL_HITS" toggle_related="1" description="FLEXI_FIELD_FILE_SHOW_TOTAL_HITS_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="use_total_hits">FLEXI_HIDE</option>
+				<option value="1" show_list="use_total_hits" hide_list="">FLEXI_SHOW</option>
+			</field>
+			<field name="total_hits_label" type="text" default="FLEXI_FIELD_FILE_TOTAL_DOWNLOADS" label="FLEXI_FIELD_FILE_TOTAL_HITS_LABEL" depend_class="use_total_hits" description="FLEXI_FIELD_FILE_CUSTOM_LABEL_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_INDIVIDUAL_FILES" level="level2" />
+			<field name="useicon" type="radio" default="0" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -206,12 +220,11 @@
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
-			
-			<field name="use_infoseptxt" type="radio" default="1" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="use_info_separator" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" toggle_related="1" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="use_info_sep">FLEXI_NO</option>
+				<option value="1" show_list="use_info_sep" hide_list="use_action_sep">FLEXI_YES</option>
 			</field>
-			<field name="infoseptxt" type="text" default="" label="FLEXI_FIELD_FILE_INFO_SEP_CHARS" description="FLEXI_FIELD_FILE_INFO_SEP_CHARS_DESC" />
+			<field name="info_separator" type="text" default="" label="FLEXI_FIELD_FILE_INFO_SEP_CHARS" depend_class="use_info_sep" description="FLEXI_FIELD_FILE_INFO_SEP_CHARS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="prx_sfx_open_close_configs" type="multilist" subtype="list" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" class="btn-group group-fcmethod">
@@ -232,7 +245,7 @@
 			<field name="opentag_closetag_separatorf_disabled_ingroup" type="separator" label="" default="FLEXI_OPENTAG_CLOSETAG_SEPARATORF_DISABLED_INGROUP" description="" class="alert fcpadded" depend_class="fieldgroupon" />
 			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
 				<option value="0">FLEXI_SPACE</option>
-				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="1">FLEXI_HORIZONTAL_LINE</option>
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
@@ -256,11 +269,11 @@
 				<option value="1">FLEXI_FIELD_AFTER</option>
 			</field>
 
-			<field name="use_actionseptxt" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" toggle_related="1" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="multivalue-mode6">FLEXI_NO</option>
-				<option value="1" show_list="multivalue-mode6" hide_list="">FLEXI_YES</option>
+			<field name="use_action_separator" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" toggle_related="1" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="use_action_sep">FLEXI_NO</option>
+				<option value="1" show_list="use_action_sep" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="actionseptxt" type="text" default="" label="FLEXI_FIELD_FILE_ACTION_SEP_CHARS" depend_class="multivalue-mode6" description="FLEXI_FIELD_FILE_ACTION_SEP_CHARS_DESC" />
+			<field name="action_separator" type="text" default="" label="FLEXI_FIELD_FILE_ACTION_SEP_CHARS" depend_class="use_action_sep" description="FLEXI_FIELD_FILE_ACTION_SEP_CHARS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_DOWNLOADS" level="level1" />
 			<field name="allowdownloads" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD" toggle_related="1" description="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD_DESC" class="btn-group btn-group-yesno">
