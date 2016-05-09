@@ -24,11 +24,13 @@
 
 /* ORDERING GROUPs TITLE */
 .mod_flexicontent_wrapper .order_group_title {
-	display:block; float:none; clear:both;
-	width:56%; margin: 4px 20%;
-	border:dashed gray;	border-width:2px;
-	color:darkred; font-weight:bold;
-	text-align:center; text-transform:uppercase;
+ color: #d04764;
+ font-family: 'Lobster', cursive;
+ font-size: 36px;
+ font-weight: normal;
+ line-height: 48px;
+ margin: 0 0 18px;
+ text-shadow: 1px 0 0 #fff;
 }
 
 

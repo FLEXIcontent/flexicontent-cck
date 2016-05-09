@@ -1,6 +1,7 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access');
 
+flexicontent_html::loadFramework('select2');
 $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata->id : '');
 ?>
 
@@ -14,25 +15,39 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 	include(JPATH_SITE.'/modules/mod_flexicontent/tmpl_common/category.php');
 	
 	$ord_titles = array(
-		'popular'=>JText::_( 'FLEXI_MOST_POPULAR'),
-		'commented'=>JText::_( 'FLEXI_MOST_COMMENTED'),
-		'rated'=>JText::_( 'FLEXI_BEST_RATED' ),
-		'added'=>	JText::_( 'FLEXI_RECENTLY_ADDED'),
-		'addedrev'=>JText::_( 'FLEXI_RECENTLY_ADDED_REVERSE' ),
-		'updated'=>JText::_( 'FLEXI_RECENTLY_UPDATED'),
-		'alpha'=>	JText::_( 'FLEXI_ALPHABETICAL'),
-		'alpharev'=>JText::_( 'FLEXI_ALPHABETICAL_REVERSE'),
-		'id'=>JText::_( 'FLEXI_HIGHEST_ITEM_ID'),
-		'rid'=>JText::_( 'FLEXI_LOWEST_ITEM_ID'),
-		'catorder'=>JText::_( 'FLEXI_CAT_ORDER'),
-		'random'=>JText::_( 'FLEXI_RANDOM' ),
-		'field'=>JText::_( 'FLEXI_CUSTOM_FIELD' ),
-		 0=>'Default' );
+		'popular'=>JText::_( 'FLEXI_UMOD_MOST_POPULAR'),  // popular == hits
+		'rhits'=>JText::_( 'FLEXI_UMOD_LESS_VIEWED'),
+		
+		'author'=>JText::_( 'FLEXI_UMOD_AUTHOR_ALPHABETICAL'),
+		'rauthor'=>JText::_( 'FLEXI_UMOD_AUTHOR_ALPHABETICAL_REVERSE'),
+		
+		'published'=>JText::_( 'FLEXI_UMOD_RECENTLY_PUBLISHED_SCHEDULED'),
+		'published_oldest'=>JText::_( 'FLEXI_UMOD_OLDEST_PUBLISHED_SCHEDULED'),
+		'expired'=>JText::_( 'FLEXI_UMOD_FLEXI_RECENTLY_EXPIRING_EXPIRED'),
+		'expired_oldest'=>JText::_( 'FLEXI_UMOD_OLDEST_EXPIRING_EXPIRED_FIRST'),
+		
+		'commented'=>JText::_( 'FLEXI_UMOD_MOST_COMMENTED'),
+		'rated'=>JText::_( 'FLEXI_UMOD_BEST_RATED' ),
+		
+		'added'=>	JText::_( 'FLEXI_UMOD_RECENTLY_ADDED'),  // added == rdate
+		'addedrev'=>JText::_( 'FLEXI_UMOD_RECENTLY_ADDED_REVERSE' ),  // addedrev == date
+		'updated'=>JText::_( 'FLEXI_UMOD_RECENTLY_UPDATED'),  // updated == modified
+		
+		'alpha'=>	JText::_( 'FLEXI_UMOD_ALPHABETICAL'),
+		'alpharev'=>JText::_( 'FLEXI_UMOD_ALPHABETICAL_REVERSE'),   // alpharev == ralpha
+		
+		'id'=>JText::_( 'FLEXI_UMOD_HIGHEST_ITEM_ID'),
+		'rid'=>JText::_( 'FLEXI_UMOD_LOWEST_ITEM_ID'),
+		
+		'catorder'=>JText::_( 'FLEXI_UMOD_CAT_ORDER'),  // catorder == order
+		'random'=>JText::_( 'FLEXI_UMOD_RANDOM_ITEMS' ),
+		'field'=>JText::sprintf( 'FLEXI_UMOD_CUSTOM_FIELD', $custom_field->label)
+	);
 	?>
 	
 	<form class="mod_flexicontent<?php echo $params->get('moduleclass_sfx'); ?>" name="select_form_<?php echo $module->id; ?>" id="select_form_<?php echo $module->id; ?>">
 	<?php
-	$js = 'onchange="window.location=this.form.select_list_'.$module->id.'.value;"';
+	$attribs = array('class' => 'use_select2_lib', 'onchange' => 'window.location=this.form.select_list_'.$module->id.'.value;');
 	$options = array();
 	$options[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
 	
@@ -43,7 +58,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		if ($ordering_addtitle && $ord) :
 			if ($ord_count > 1)
 				$options[] = JHTML::_('select.optgroup', '' );
-			$options[] = JHTML::_('select.optgroup', $ord_titles[$ord] );
+			$options[] = JHTML::_('select.optgroup', (isset($ord_titles[$ord]) ? $ord_titles[$ord] : $ord) );
 		endif;
 		
 		if (isset($list[$ord]['featured'])) :
@@ -60,7 +75,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 		
 	endforeach;
 	
-	echo JHTML::_('select.genericlist', $options, 'select_list_'.$module->id, $js, 'value', 'text', null);
+	echo JHTML::_('select.genericlist', $options, 'select_list_'.$module->id, $attribs, 'value', 'text', null);
 	?>
 	</form>
 
