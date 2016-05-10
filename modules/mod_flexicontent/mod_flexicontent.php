@@ -84,15 +84,15 @@ if ( $show_mod )
 	$count 					= (int)$params->get('count', 5);
 	$featured				= (int)$params->get('count_feat', 1);
 	
-	if ( $ordering_addtitle && in_array('field', $ordering) )
+	if ( $ordering_addtitle && (int)$params->get('orderbycustomfieldid', 0) && in_array('field', $ordering) )
 	{
 		$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
-		$custom_field = JTable::getInstance('flexicontent_fields', '');
-		$custom_field->load($orderbycustomfieldid);
+		$orderby_custom_field = JTable::getInstance('flexicontent_fields', '');
+		$orderby_custom_field->load($orderbycustomfieldid);
 	}
 	else {
-		$custom_field = new stdClass();
-		$custom_field->label = 'NA';
+		$orderby_custom_field = new stdClass();
+		$orderby_custom_field->label = 'NA';
 	}
 	
 	// Default ordering is 'added' if none ordering is set. Also make sure $ordering is an array (of ordering groups)

@@ -90,23 +90,27 @@ class JFormFieldFields extends JFormField
 		
 		$field_type = (string) @ $attributes['field_type'];
 		if($field_type) {
-			$field_type = explode(",", $field_type);
+			$field_type = preg_split("/[\s]*,[\s]*/", $field_type);
 			foreach($field_type as $i => $ft) $field_type_quoted[$i] = $db->Quote($ft);
 			$and .= " AND field_type IN (". implode(",", $field_type_quoted).")";
 		}
 		$exclude_field_type = (string) @ $attributes['exclude_field_type'];
 		if($exclude_field_type) {
-			$exclude_field_type = explode(",", $exclude_field_type);
+			$exclude_field_type = preg_split("/[\s]*,[\s]*/", $exclude_field_type);
 			foreach($exclude_field_type as $i => $ft) $exclude_field_type_quoted[$i] = $db->Quote($ft);
 			$and .= " AND field_type NOT IN (". implode(",", $exclude_field_type_quoted).")";
 		}
 		$orderable = (int) @ $attributes['orderable'];
 		if ($orderable) {
-			$non_orderable1 = 'account_via_submit,authoritems,toolbar,file,image,groupmarker,fcpagenav,minigallery,weblink,extendedweblink,email,fcloadmodule';
+			$non_orderable1 = 'account_via_submit,authoritems,toolbar,image,groupmarker,fcpagenav,minigallery,weblink,extendedweblink,email,fcloadmodule';
 			$non_orderable2 = trim($cparams->get('non_orderable_types', ''));
 			
 			$non_orderable = $non_orderable1.($non_orderable2 ? ','.$non_orderable2 : '');
-			$non_orderable = array_unique(explode(",", $non_orderable));
+			$non_orderable = array_unique(preg_split("/[\s]*,[\s]*/", $non_orderable));
+			
+			$non_orderable = array_flip( $non_orderable);
+			unset($non_orderable['file']);  // always include 'file' fields in the orderable types
+			$non_orderable = array_flip( $non_orderable);
 			
 			foreach($non_orderable as $i => $ft) $non_orderable_quoted[$i] = $db->Quote($ft);
 			$and .= " AND field_type NOT IN (". implode(",", $non_orderable_quoted).")";

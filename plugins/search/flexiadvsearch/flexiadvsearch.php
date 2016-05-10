@@ -430,28 +430,76 @@ class plgSearchFlexiadvsearch extends JPlugin
 			// Create JOIN for ordering items by a custom field (Level 1)
 			if ( 'field' == $order[1] ) {
 				$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
-				$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
+				$orderbycustomfieldint = (int)$params->get('orderbycustomfieldint', 0);
+				if ($orderbycustomfieldint==4) {
+					$orderby_join .= '
+						LEFT JOIN (
+							SELECT f.item_id, SUM(fdat.hits) AS file_hits
+							FROM #__flexicontent_fields_item_relations AS f
+							LEFT JOIN #__flexicontent_files AS fdat ON fdat.id = f.value
+					 		WHERE f.field_id='.$orderbycustomfieldid.'
+					 		GROUP BY f.item_id
+					 	) AS dl ON dl.item_id = i.id';
+				}
+				else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
 			}
 			if ( 'custom:' == substr($order[1], 0, 7) ) {
 				$order_parts = preg_split("/:/", $order[1]);
 				$_field_id = (int) @ $order_parts[1];
-				if ($_field_id && count($order_parts)==4) $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$_field_id;
+				$_o_method = @ $order_parts[2];
+				if ($_field_id && count($order_parts)==4) {
+					if ($_o_method=='file_hits') {
+						$orderby_join .= '
+							LEFT JOIN (
+								SELECT f.item_id, SUM(fdat.hits) AS file_hits
+								FROM #__flexicontent_fields_item_relations AS f
+								LEFT JOIN #__flexicontent_files AS fdat ON fdat.id = f.value
+						 		WHERE f.field_id='.$_field_id.'
+						 		GROUP BY f.item_id
+						 	) AS dl ON dl.item_id = i.id';
+					}
+					else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$_field_id;
+				}
 			}
 			
 			// Create JOIN for ordering items by a custom field (Level 2)
 			if ( 'field' == $order[2] ) {
 				$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
-				$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
+				$orderbycustomfieldint_2nd = (int)$params->get('orderbycustomfieldint'.'_2nd', 0);
+				if ($orderbycustomfieldint_2nd==4) {
+					$orderby_join .= '
+						LEFT JOIN (
+							SELECT f2.item_id, SUM(fdat2.hits) AS file_hits2
+							FROM #__flexicontent_fields_item_relations AS f2
+							LEFT JOIN #__flexicontent_files AS fdat2 ON fdat2.id = f2.value
+					 		WHERE f2.field_id='.$orderbycustomfieldid_2nd.'
+					 		GROUP BY f2.item_id
+					 	) AS dl2 ON dl2.item_id = i.id';
+				}
+				else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
 			}
 			if ( 'custom:' == substr($order[2], 0, 7) ) {
 				$order_parts = preg_split("/:/", $order[2]);
 				$_field_id = (int) @ $order_parts[1];
-				if ($_field_id && count($order_parts)==4) $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$_field_id;
+				$_o_method = @ $order_parts[2];
+				if ($_field_id && count($order_parts)==4) {
+					if ($_o_method=='file_hits') {
+						$orderby_join .= '
+							LEFT JOIN (
+								SELECT f2.item_id, SUM(fdat2.hits) AS file_hits2
+								FROM #__flexicontent_fields_item_relations AS f2
+								LEFT JOIN #__flexicontent_files AS fdat2 ON fdat2.id = f2.value
+						 		WHERE f2.field_id='.$_field_id.'
+						 		GROUP BY f2.item_id
+						 	) AS dl2 ON dl2.item_id = i.id';
+					}
+					else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$_field_id;
+				}
 			}
 			
 			// Create JOIN for ordering items by author's name
 			if ( in_array('author', $order) || in_array('rauthor', $order) ) {
-				$orderby_col   = '';
+				$orderby_col = '';
 				$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
 			}
 			
