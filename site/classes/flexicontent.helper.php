@@ -667,15 +667,17 @@ class flexicontent_html
 		// Add custom field orderings
 		$orderby_custom = $params->get('orderby_custom'.$sfx, '');
 		$orderby_custom = preg_split("/\s*,\s*/u", $orderby_custom);
+		$custom_order_types = array('int'=>1, 'decimal'=>1, 'date'=>1, 'file_hits'=>1);
 		
 		$field_ids = array();
 		$custom_ops = array();
 		$n = 0;
 		foreach ($orderby_custom as $custom_option) {
 			$order_parts = preg_split("/:/", $custom_option);
-			if (count($order_parts)!=3 && count($order_parts)!=4) continue;
+			if (count($order_parts)!=3 && count($order_parts)!=4) continue;  // ignore order with wrong number parts 
 			$_field_id = (int) @ $order_parts[0];
-			if (!$_field_id) continue;
+			if (!$_field_id) continue;  // ignore order with bad fieldid
+			if (!isset($custom_order_types[@ $order_parts[1]]))  continue;  // ignore order with bad type
 			$field_ids[$_field_id] = 1;
 			$custom_ops[$n] = $order_parts;
 			$n++;
@@ -686,7 +688,6 @@ class flexicontent_html
 		{
 			$field_id = $op[0];
 			$field    = $fields[$field_id];
-			
 			$value = 'custom:'.$op[0].':'.$op[1].':'.$op[2];
 			if (count($op)==4) {
 				$text = JText::_( $op[3] );
@@ -6376,15 +6377,15 @@ class flexicontent_db
 	{
 		// 'order' contains a symbolic order name to indicate using the category / global ordering setting
 		switch ($order) {
-			case 'date': case 'addedrev': /* 2nd is for module */
+			case 'date': case 'addedrev': /* 2nd is for module (PARAMETER FORM ELEMENT: fcordering) */
 				$order_col	= $i_as.'.created';
 				$order_dir	= 'ASC';
 				break;
-			case 'rdate': case 'added': /* 2nd is for module */
+			case 'rdate': case 'added': /* 2nd is for module (PARAMETER FORM ELEMENT: fcordering) */
 				$order_col	= $i_as.'.created';
 				$order_dir	= 'DESC';
 				break;
-			case 'modified': case 'updated': /* 2nd is for module */
+			case 'modified': case 'updated': /* 2nd is for module (PARAMETER FORM ELEMENT: fcordering) */
 				$order_col	= $i_as.'.modified';
 				$order_dir	= 'DESC';
 				break;
@@ -6408,7 +6409,7 @@ class flexicontent_db
 				$order_col	= $i_as.'.title';
 				$order_dir	= 'ASC';
 				break;
-			case 'ralpha': case 'alpharev': /* 2nd is for module */
+			case 'ralpha': case 'alpharev': /* 2nd is for module (PARAMETER FORM ELEMENT: fcordering) */
 				$order_col	= $i_as.'.title';
 				$order_dir	= 'DESC';
 				break;
@@ -6420,7 +6421,7 @@ class flexicontent_db
 				$order_col	= 'u.name';
 				$order_dir	= 'DESC';
 				break;
-			case 'hits': case 'popular': /* 2nd is for module */
+			case 'hits': case 'popular': /* 2nd is for module (PARAMETER FORM ELEMENT: fcordering) */
 				$order_col	= $i_as.'.hits';
 				$order_dir	= 'DESC';
 				break;
@@ -6428,7 +6429,7 @@ class flexicontent_db
 				$order_col	= $i_as.'.hits';
 				$order_dir	= 'ASC';
 				break;
-			case 'order': case 'catorder': /* 2nd is for module */
+			case 'order': case 'catorder': /* 2nd is for module (PARAMETER FORM ELEMENT: fcordering) */
 				$order_col	= $rel_as.'.catid, '.$rel_as.'.ordering ASC, '.$i_as.'.id DESC';
 				$order_dir	= '';
 				break;
@@ -6440,6 +6441,7 @@ class flexicontent_db
 					case 1:  $order_col = 'CAST('.$cf.'.value AS SIGNED)';  break;  // Integer
 					case 2:  $order_col = 'CAST('.$cf.'.value AS DECIMAL(65,15))'; break; // Decimal
 					case 3:  $order_col = 'CAST('.$cf.'.value AS DATE)';  break;  // Date
+					case 4:  $order_col = ($sfx == '_2nd' ? 'file_hits2' : 'file_hits'); break;  // Download hits
 					default: $order_col = $cf.'.value'; break;  // Text
 				}
 				$order_dir	= $params->get('orderbycustomfielddir'.$sfx, 'ASC');
@@ -6476,10 +6478,11 @@ class flexicontent_db
 				if (!empty($_field_id) && count($order_parts)==4) {
 					$cf = $sfx == '_2nd' ? 'f2' : 'f';
 					switch(strtolower($order_parts[2])) {
-						case 'int':     $order_col = 'CAST('.$cf.'.value AS SIGNED)';  break;
-						case 'decimal': $order_col = 'CAST('.$cf.'.value AS DECIMAL(65,15))'; break;
-						case 'date':    $order_col = 'CAST('.$cf.'.value AS DATE)'; break;
-						default:        $order_col = $cf.'.value'; break;
+						case 'int':       $order_col = 'CAST('.$cf.'.value AS SIGNED)';  break;
+						case 'decimal':   $order_col = 'CAST('.$cf.'.value AS DECIMAL(65,15))'; break;
+						case 'date':      $order_col = 'CAST('.$cf.'.value AS DATE)'; break;
+						case 'file_hits': $order_col = ($sfx == '_2nd' ? 'file_hits2' : 'file_hits'); break;  // Download hits
+						default:          $order_col = $cf.'.value'; break;
 					}
 					$order_dir = strtolower($order_parts[3])=='desc' ? 'DESC' : 'ASC';
 				} else {
