@@ -18,7 +18,12 @@
 
 // Check to ensure this file is within the rest of the framework
 defined('JPATH_PLATFORM') or die;
-jimport('cms.pagination.pagination');
+
+// Avoid problems with extensions that implement JPagination, instead of extending it, and have already load it
+if ( !class_exists('JPagination') )
+{
+	jimport('cms.pagination.pagination');
+}
 
 /**
  * Pagination Class.  Provides a common interface for content pagination for the

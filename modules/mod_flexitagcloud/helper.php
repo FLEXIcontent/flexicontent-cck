@@ -118,8 +118,8 @@ class modFlexiTagCloudHelper
 
 			$lists[$i]->link = $use_catlinks ?
 				FlexicontentHelperRoute::getCategoryRoute(0, $tagitemid, array('layout'=>'tags','tagid'=>$row->slug)) :
-				FlexicontentHelperRoute::getTagRoute($row->slug, $tagitemid) ;
-			$lists[$i]->link = JRoute::_($lists[$i]->link.'&module='.$module->id);
+				FlexicontentHelperRoute::getTagRoute($row->slug, $tagitemid) . '&module='.$module->id ;
+			$lists[$i]->link = JRoute::_( $lists[$i]->link );
 
 			$i++;
 		}

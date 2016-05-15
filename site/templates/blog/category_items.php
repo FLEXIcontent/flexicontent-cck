@@ -190,9 +190,11 @@ if ($leadnum) :
 			
 			$custom_link = null;
 			if ($lead_use_image) :
-				if (!empty($img_field_name)) {
-					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
-					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
+				if (!empty($img_field_name))
+				{
+					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
+					FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src', 'category');
+					
 					$img_field = $item->fields[$img_field_name];
 					$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 					if ( $lead_link_image_to && isset($img_field->value[0]) ) {
@@ -377,7 +379,6 @@ if ($leadnum) :
 			<?php if ($lead_use_description) : ?>
 			<p>
 			<?php
-				//FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
 				if ($this->params->get('lead_strip_html', 1)) :
 					echo flexicontent_html::striptagsandcut( $item->fields['text']->display, $lead_cut_text, $uncut_length );
 				else :
@@ -530,9 +531,11 @@ if ($count > $leadnum) :
 			
 			$custom_link = null;
 			if ($intro_use_image) :
-				if (!empty($img_field_name)) {
-					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
-					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
+				if (!empty($img_field_name))
+				{
+					// Render method 'display_NNNN_src' to avoid CSS/JS being added to the page
+					FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src', 'category');
+					
 					$img_field = $item->fields[$img_field_name];
 					$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 					if ( $intro_link_image_to && isset($img_field->value[0]) ) {

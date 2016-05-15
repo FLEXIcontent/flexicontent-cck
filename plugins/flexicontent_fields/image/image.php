@@ -1146,11 +1146,26 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Intro-full mode get their values from item's parameters
 		if ( $image_source == -1 ) {
 			$values = array();
-			$_image_name = $view=='item' ? 'fulltext' : 'intro';
-			if ( $item->images ) {
-				if (!is_object($item->images)) $item->images = new JRegistry($item->images);
-				//echo "<pre>"; print_r($item->images); echo "</pre>";
+			
+			// Use 'intro' image in multi-item listings
+			$_image_name = $view!='item' ? 'intro' : 'fulltext';
+			
+			if ( $item->images )
+			{
+				if (!is_object($item->images))
+				{
+					$item->images = new JRegistry($item->images);
+				}
+				
 				$_image_path = $item->images->get('image_'.$_image_name, '');
+				
+				// Use 'fulltext' image if 'intro' image is empty
+				if (!$_image_path && $_image_name=='intro')
+				{
+					$_image_name = 'fulltext';
+					$_image_path = $item->images->get('image_'.$_image_name, '') :
+				}
+				
 				$image_IF = array();
 				// field attributes (mode-specific)
 				$image_IF['image_size']  = $_image_name;
