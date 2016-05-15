@@ -1,12 +1,13 @@
 <?php
 use Joomla\String\StringHelper;
 
+// Important create a -1 "value", before any other normal values, so that it is at 1st position of the array
 $field->{$prop}[-1] = '';
+
 $field->url = array();
 $field->abspath = array();
 $field->file_data = array();
-
-$hits_total = 0;
+$field->hits_total = 0;
 
 $n = 0;
 foreach($values as $file_id)
@@ -128,7 +129,7 @@ foreach($values as $file_id)
 		}
 		$hits .= '</span>';
 	}
-	$hits_total += $file_data->hits;
+	$field->hits_total += $file_data->hits;
 	
 	
 	// e. FILENAME / TITLE: decide whether to show it (if we do not use button, then displaying of filename is forced)
@@ -392,23 +393,36 @@ foreach($values as $file_id)
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }
 
+
+// *****************
+// Create total INFO
+// *****************
+
 $file_totals = '';
-if ($display_total_count) {
+
+// Total number of files
+if ($display_total_count)
+{
 	$file_totals .= '
 			<div class="fcfile_total_count">
 				<span class="fcfile_total_count_label">'. $total_count_label .' </span> <span class="fcfile_total_count_value badge">'. count($values) .'</span>
 			</div>
 		';
 }
-if ($display_total_hits && $hits_total) {
+
+// Total download hits (of all files)
+if ($display_total_hits && $field->hits_total)
+{
 	$file_totals .='
 			<div class="fcfile_total_hits">
-				<span class="fcfile_total_hits_label">'. $total_hits_label .' </span> <span class="fcfile_total_hits_value badge">'. $hits_total .'</span>
+				<span class="fcfile_total_hits_label">'. $total_hits_label .' </span> <span class="fcfile_total_hits_value badge">'. $field->hits_total .'</span>
 			</div>
 		';
 }
 
-if ($file_totals) {
+// Add -1 position (display at top of field or at top of field, or at top/bottom of field group)
+if ($file_totals)
+{
 	$field->{$prop}[-1] = '
 		<div class="alert alert-success fcfile_total">
 		'.$file_totals.'
