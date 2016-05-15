@@ -1163,7 +1163,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (!$_image_path && $_image_name=='intro')
 				{
 					$_image_name = 'fulltext';
-					$_image_path = $item->images->get('image_'.$_image_name, '') :
+					$_image_path = $item->images->get('image_'.$_image_name, '');
 				}
 				
 				$image_IF = array();

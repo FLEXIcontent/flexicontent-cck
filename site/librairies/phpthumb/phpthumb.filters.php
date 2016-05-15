@@ -13,7 +13,7 @@ class phpthumb_filters {
 
 	var $phpThumbObject = null;
 
-	function phpthumb_filters() {
+	function __construct() {
 		return true;
 	}
 

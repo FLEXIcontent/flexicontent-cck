@@ -982,49 +982,80 @@ class FlexicontentFields
 	 */
 	static function _getTags(&$items, $view = FLEXI_ITEMVIEW)
 	{
-		// This is fix for versioned fields in items view when previewing
-		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->tags);
-		
 		$db = JFactory::getDBO();
 		
-		/*echo "_getTags <br/> \n";
-		echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+		// ***************************************************************
+		// SPECIAL CASE for versioned fields in items view when previewing
+		// ***************************************************************
+		
+		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->tags);
+		if ($versioned_item)
+		{
+			$item = $items[0];
+			if ( !count($item->tags) ) return array();
+			
+			$query 	= 'SELECT DISTINCT t.id, t.name, CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
+				. ' FROM #__flexicontent_tags AS t'
+				. ' WHERE t.id IN (' . $db->Quote(implode(',', $item->tags)) . ')'
+				. ' AND t.published = 1';
+			
+			$db->setQuery( $query );
+			$tags = $db->loadObjectList();
+			
+			$taglists[$item->id] = array_reverse( $tags );
+			return $taglists;
+		}
+		
+		
+		// *************************
+		// Get itemid to tagid pairs
+		// *************************
+		
 		$cids = array();
-		foreach ($items as $item) { array_push($cids, $item->id); }
-		print_r($cids);
-		echo "<br/>";*/
-		
-		if ($versioned_item) {
-			if (!count($items[0]->tags)) return array();
-			$tids = $items[0]->tags;
-			//echo "<pre>"; print_r($tids); echo "</pre>";
-			$query 	= 'SELECT DISTINCT t.id, t.name, ' . $items[0]->id .' as itemid, '
-				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
-				. ' FROM #__flexicontent_tags AS t'
-				. " WHERE t.id IN ('" . implode("','", $tids) . "')"
-				. ' AND t.published = 1'
-				. ' ORDER BY t.name'
-				;
-		} else {
-			$cids = array();
-			foreach ($items as $item) { array_push($cids, $item->id); }
-			$query 	= 'SELECT DISTINCT t.id, t.name, i.itemid,'
-				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
-				. ' FROM #__flexicontent_tags AS t'
-				. ' JOIN #__flexicontent_tags_item_relations AS i ON i.tid = t.id'
-				. " WHERE i.itemid IN ('" . implode("','", $cids) . "')"
-				. ' AND t.published = 1'
-				. ' ORDER BY t.name'
-				;
+		foreach ($items as $item)
+		{
+			$cids[] = $item->id;
 		}
+		if (empty($cids)) return array();
+
+		$query = 'SELECT t.tid, t.itemid'
+			. ' FROM #__flexicontent_tags_item_relations AS t'
+			. ' WHERE t.itemid IN (' . $db->Quote(implode(',', $cids)) .')';
 		$db->setQuery( $query );
-		$tags = $db->loadObjectList();
+		$item_tagids = $db->loadObjectList();
 		
-		// improve performance by doing a single pass of tags to aggregate them per item
+		if ( empty($item_tagids) ) return array();
+		
+		
+		// ***************************
+		// Get single copy of tag data
+		// ***************************
+		
+		$query = 'SELECT DISTINCT t.id, t.name, CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
+			. ' FROM #__flexicontent_tags AS t'
+			. ' JOIN #__flexicontent_tags_item_relations AS i ON i.tid = t.id'
+			. ' WHERE i.itemid IN (' . $db->Quote(implode(',', $cids)) . ')'
+			. ' AND t.published = 1';
+		
+		$db->setQuery( $query );
+		$tags = $db->loadObjectList('id');
+		
+		// Create an array of every item's tag data
 		$taglists = array();
-		foreach ($tags as $tag) {
-			$taglists[$tag->itemid][] = $tag;
+		foreach ($item_tagids as $it)
+		{
+			if ( !empty($tags[$it->tid]) )
+			{
+				$taglists[$it->itemid][] = $tags[$it->tid];
+			}
 		}
+		
+		// Workaround for not having "order" column in tags assignments table (should work in MySql, but no guarantee)
+		foreach ($taglists as $itemid => $taglist)
+		{
+			$taglists[$itemid] = array_reverse($taglists[$itemid]);
+		}
+		
 		return $taglists;
 	}
 
@@ -1037,35 +1068,71 @@ class FlexicontentFields
 	 */
 	static function _getCategories(&$items, $view = FLEXI_ITEMVIEW)
 	{
-		// This is fix for versioned fields in items view when previewing
-		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->categories);
-		
 		$db = JFactory::getDBO();
 		
-		if ($versioned_item) {
-			$catids = $items[0]->categories;
-			$query 	= 'SELECT DISTINCT c.id, c.title, ' . $items[0]->id .' as itemid, '
-				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
+		// ***************************************************************
+		// SPECIAL CASE for versioned fields in items view when previewing
+		// ***************************************************************
+		
+		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->categories);
+		if ($versioned_item)
+		{
+			$item = $items[0];
+			
+			$query = 'SELECT DISTINCT c.id, c.title, CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
 				. ' FROM #__categories AS c'
-				. " WHERE c.id IN ('" . implode("','", $catids) . "')"
+				. ' WHERE c.id IN (' . $db->Quote(implode(',', $item->categories)) . ')'
+				//. ' AND c.published = 1'   // Get unpublished cats too
 				;
-		} else {
-			$cids = array();
-			foreach ($items as $item) { array_push($cids, $item->id); }		
-			$query 	= 'SELECT DISTINCT c.id, c.title, rel.itemid,'
-				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
-				. ' FROM #__categories AS c'
-				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-				. " WHERE rel.itemid IN ('" . implode("','", $cids) . "')"
-				;
+			$db->setQuery( $query );
+			$cats = $db->loadObjectList();
+			
+			$catlists[$item->id] = array_reverse( $cats );
+			return $catlists;
 		}
-		$db->setQuery( $query );
-		$cats = $db->loadObjectList();
+		
+		// *************************
+		// Get itemid to tagid pairs
+		// *************************
+		
+		$cids = array();
+		foreach ($items as $item)
+		{
+			$cids[] = $item->id;
+		}
+		if (empty($cids)) return array();
 
-		// improve performance by doing a single pass of cats to aggregate them per item
+		$query = 'SELECT c.catid, c.itemid'
+			. ' FROM #__flexicontent_cats_item_relations AS c'
+			. ' WHERE c.itemid IN (' . $db->Quote(implode(',', $cids)) .')';
+		$db->setQuery( $query );
+		$item_catids = $db->loadObjectList();
+		
+		if ( empty($item_catids) ) return array();
+		
+		
+		// ***************************
+		// Get single copy of cat data
+		// ***************************
+		
+		$query = 'SELECT DISTINCT c.id, c.title, CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
+			. ' FROM #__categories AS c'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+			. ' WHERE rel.itemid IN (' . $db->Quote(implode(',', $cids)) . ')'
+			//. ' AND c.published = 1'   // Get unpublished cats too
+			;
+		
+		$db->setQuery( $query );
+		$cats = $db->loadObjectList('id');
+
+		// Create an array of every item's cat data
 		$catlists = array();
-		foreach ($cats as $cat) {
-			$catlists[$cat->itemid][] = $cat;
+		foreach ($item_catids as $ic)
+		{
+			if ( !empty($cats[$ic->catid]) )
+			{
+				$catlists[$ic->itemid][] = $cats[$ic->catid];
+			}
 		}
 		return $catlists;
 	}
