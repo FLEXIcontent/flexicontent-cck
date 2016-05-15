@@ -775,6 +775,7 @@ class ParentClassItem extends JModelAdmin
 				$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
 				$db->setQuery($query);
 				$item->tags = $db->loadColumn();
+				$item->tags = array_reverse($item->tags);
 			}
 			
 			// -- Retrieve categories field value (if not using versioning)
@@ -1688,6 +1689,7 @@ class ParentClassItem extends JModelAdmin
 			$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . $item->id;
 			$db->setQuery($query);
 			$item->tags = $db->loadColumn();
+			$item->tags = array_reverse($item->tags);
 			
 			// Retrieve property: 'categories', that do not exist in the DB TABLE class, but are created by the ITEM model
 			$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $item->id;
@@ -3092,6 +3094,7 @@ class ParentClassItem extends JModelAdmin
 				// Retrieved tags of current item, set them
 				$this->_item->tags = $tags;
 			}
+			$tags = array_reverse($tags); 
 			return $tags;
 		} else {
 			return array();
@@ -3112,12 +3115,19 @@ class ParentClassItem extends JModelAdmin
 			return array();
 		}
 		
-		$query 	= 'SELECT *,t.id as tid FROM #__flexicontent_tags as t '
+		$query 	= 'SELECT *, t.id as tid FROM #__flexicontent_tags as t '
 				. ' WHERE t.id IN (\'' . implode("','", $tagIds).'\')'
 				. ' ORDER BY name ASC'
 				;
 		$this->_db->setQuery($query);
-		$used = $this->_db->loadObjectList();
+		$tagDatas = $this->_db->loadObjectList('tid');
+		
+		$used = array();
+		foreach($tagIds as $tid)
+		{
+			if ( !empty($tagDatas[$tid]) )  $used[] = $tagDatas[$tid];
+		}
+		
 		return $used;
 	}
 	
