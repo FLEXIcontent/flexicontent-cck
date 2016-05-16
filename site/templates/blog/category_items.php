@@ -718,7 +718,6 @@ if ($count > $leadnum) :
 			<?php if ($intro_use_description ) : ?>      
 			<p>
 			<?php
-				//FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
 				if ($this->params->get('intro_strip_html', 1)) :
 					echo flexicontent_html::striptagsandcut( $item->fields['text']->display, $intro_cut_text, $uncut_length );
 				else :

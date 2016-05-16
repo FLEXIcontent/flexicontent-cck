@@ -109,10 +109,7 @@ class JFormFieldCategoryTree extends JFormFieldList
 
 		//$usercats 		= FAccess::checkUserCats($user->gmid);
 		$usercats		= array();
-		//$viewallcats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1;
 		$viewallcats 	= $permission->ViewAllCats;
-		//$viewtree 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'cattree', 'users', $user->gmid) : 1;
-		$viewtree 		= $permission->ViewTree;
 
 		$catlist 	= array();
 		$top = (int)$this->element->getAttribute('top');
@@ -154,8 +151,7 @@ class JFormFieldCategoryTree extends JFormFieldList
 						}
 					} else {
 						$item->treename = str_replace("&nbsp;", "_", strip_tags($item->treename));
-						// FLEXIaccess rule $viewtree enables tree view
-						$catlist[] = JHTML::_( 'select.option', $item->id, ($viewtree ? $item->treename : $item->title) );
+						$catlist[] = JHTML::_( 'select.option', $item->id, $item->treename );
 					}
 				} else {
 					$obj = new stdClass;

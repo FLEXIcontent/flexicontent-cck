@@ -434,11 +434,11 @@ class plgSearchFlexiadvsearch extends JPlugin
 				if ($orderbycustomfieldint==4) {
 					$orderby_join .= '
 						LEFT JOIN (
-							SELECT f.item_id, SUM(fdat.hits) AS file_hits
-							FROM #__flexicontent_fields_item_relations AS f
-							LEFT JOIN #__flexicontent_files AS fdat ON fdat.id = f.value
-					 		WHERE f.field_id='.$orderbycustomfieldid.'
-					 		GROUP BY f.item_id
+							SELECT rf.item_id, SUM(fdat.hits) AS file_hits
+							FROM #__flexicontent_fields_item_relations AS rf
+							LEFT JOIN #__flexicontent_files AS fdat ON fdat.id = rf.value
+					 		WHERE rf.field_id='.$orderbycustomfieldid.'
+					 		GROUP BY rf.item_id
 					 	) AS dl ON dl.item_id = i.id';
 				}
 				else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
@@ -451,11 +451,11 @@ class plgSearchFlexiadvsearch extends JPlugin
 					if ($_o_method=='file_hits') {
 						$orderby_join .= '
 							LEFT JOIN (
-								SELECT f.item_id, SUM(fdat.hits) AS file_hits
-								FROM #__flexicontent_fields_item_relations AS f
-								LEFT JOIN #__flexicontent_files AS fdat ON fdat.id = f.value
-						 		WHERE f.field_id='.$_field_id.'
-						 		GROUP BY f.item_id
+								SELECT rf.item_id, SUM(fdat.hits) AS file_hits
+								FROM #__flexicontent_fields_item_relations AS rf
+								LEFT JOIN #__flexicontent_files AS fdat ON fdat.id = rf.value
+						 		WHERE rf.field_id='.$_field_id.'
+						 		GROUP BY rf.item_id
 						 	) AS dl ON dl.item_id = i.id';
 					}
 					else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$_field_id;
@@ -636,7 +636,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			$onBasic_textsearch    = '';
 			$onAdvanced_textsearch = $text_where;
 			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id '.(count($fields_text) ? 'AND ts.field_id IN ('. implode(',',array_keys($fields_text)) .')' : '');
-			$join_textfields = ' JOIN #__flexicontent_fields as f ON f.id=ts.field_id';
+			$join_textfields = ' JOIN #__flexicontent_fields as txtf ON txtf.id=ts.field_id';
 		}
 		
 		// JOIN clauses ... (shared with filters)
@@ -755,7 +755,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. ', c.title AS maincat_title, c.alias AS maincat_alias'  // Main category data
 			. ( !$txtmode ?
 				', ie.search_index AS text' :
-				', GROUP_CONCAT(ts.search_index ORDER BY f.ordering ASC SEPARATOR \' \') AS text'
+				', GROUP_CONCAT(ts.search_index ORDER BY txtf.ordering ASC SEPARATOR \' \') AS text'
 				)
 			. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'

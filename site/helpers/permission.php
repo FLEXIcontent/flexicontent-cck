@@ -131,7 +131,7 @@ class FlexicontentHelperPerm
 		// CATEGORIES: management tab and usage
 		$permission->CanCats			= $user->authorise('flexicontent.managecats',	'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
 		$permission->ViewAllCats	= $user->authorise('flexicontent.usercats',		'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
-		$permission->ViewTree			= $user->authorise('flexicontent.viewtree',		'com_flexicontent'); // (item edit form) view categories as tree instead of flat list
+		$permission->ViewTree			= 1;  // Old (non-used) ACL, we will always displaying of categories as tree
 		$permission->MultiCat			= $user->authorise('flexicontent.multicat',		'com_flexicontent'); // (item edit form) allow user to assign items to multiple categories
 		
 		// TAGS: management tab and usage
@@ -172,11 +172,6 @@ class FlexicontentHelperPerm
 		$permission->CanComments 	= $user->authorise('core.manage', 'com_jcomments');
 		$permission->CanComments	=	$permission->CanComments && $JComments_Installed;
 		$permission->JComments_Installed = $JComments_Installed;
-		
-		// Global parameter to force always displaying of categories as tree
-		if (JComponentHelper::getParams('com_flexicontent')->get('cats_always_astree', 1)) {
-			$permission->ViewTree = 1;
-		}
 		
 		return $permission;
 	}

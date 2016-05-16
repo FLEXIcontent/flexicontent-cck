@@ -993,10 +993,11 @@ class FlexicontentFields
 		{
 			$item = $items[0];
 			if ( !count($item->tags) ) return array();
+			JArrayHelper::toInteger($item->tags);
 			
 			$query 	= 'SELECT DISTINCT t.id, t.name, CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 				. ' FROM #__flexicontent_tags AS t'
-				. ' WHERE t.id IN (' . $db->Quote(implode(',', $item->tags)) . ')'
+				. ' WHERE t.id IN (' . implode(',', $item->tags) . ')'
 				. ' AND t.published = 1';
 			
 			$db->setQuery( $query );
@@ -1016,11 +1017,13 @@ class FlexicontentFields
 		{
 			$cids[] = $item->id;
 		}
+		
 		if (empty($cids)) return array();
+		JArrayHelper::toInteger($cids);
 
 		$query = 'SELECT t.tid, t.itemid'
 			. ' FROM #__flexicontent_tags_item_relations AS t'
-			. ' WHERE t.itemid IN (' . $db->Quote(implode(',', $cids)) .')';
+			. ' WHERE t.itemid IN (' . implode(',', $cids) .')';
 		$db->setQuery( $query );
 		$item_tagids = $db->loadObjectList();
 		
@@ -1034,7 +1037,7 @@ class FlexicontentFields
 		$query = 'SELECT DISTINCT t.id, t.name, CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 			. ' FROM #__flexicontent_tags AS t'
 			. ' JOIN #__flexicontent_tags_item_relations AS i ON i.tid = t.id'
-			. ' WHERE i.itemid IN (' . $db->Quote(implode(',', $cids)) . ')'
+			. ' WHERE i.itemid IN (' . implode(',', $cids) . ')'
 			. ' AND t.published = 1';
 		
 		$db->setQuery( $query );
@@ -1078,10 +1081,11 @@ class FlexicontentFields
 		if ($versioned_item)
 		{
 			$item = $items[0];
+			JArrayHelper::toInteger($item->categories);
 			
 			$query = 'SELECT DISTINCT c.id, c.title, CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
 				. ' FROM #__categories AS c'
-				. ' WHERE c.id IN (' . $db->Quote(implode(',', $item->categories)) . ')'
+				. ' WHERE c.id IN (' . implode(',', $item->categories) . ')'
 				//. ' AND c.published = 1'   // Get unpublished cats too
 				;
 			$db->setQuery( $query );
@@ -1100,11 +1104,13 @@ class FlexicontentFields
 		{
 			$cids[] = $item->id;
 		}
+		
 		if (empty($cids)) return array();
-
+		JArrayHelper::toInteger($cids);
+		
 		$query = 'SELECT c.catid, c.itemid'
 			. ' FROM #__flexicontent_cats_item_relations AS c'
-			. ' WHERE c.itemid IN (' . $db->Quote(implode(',', $cids)) .')';
+			. ' WHERE c.itemid IN (' . implode(',', $cids) .')';
 		$db->setQuery( $query );
 		$item_catids = $db->loadObjectList();
 		
@@ -1118,7 +1124,7 @@ class FlexicontentFields
 		$query = 'SELECT DISTINCT c.id, c.title, CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
 			. ' FROM #__categories AS c'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-			. ' WHERE rel.itemid IN (' . $db->Quote(implode(',', $cids)) . ')'
+			. ' WHERE rel.itemid IN (' . implode(',', $cids) . ')'
 			//. ' AND c.published = 1'   // Get unpublished cats too
 			;
 		
