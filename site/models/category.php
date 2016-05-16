@@ -522,11 +522,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 				if ($orderbycustomfieldint==4) {
 					$orderby_join .= '
 						LEFT JOIN (
-							SELECT f.item_id, SUM(fdat.hits) AS file_hits
-							FROM #__flexicontent_fields_item_relations AS f
-							LEFT JOIN #__flexicontent_files AS fdat ON fdat.id = f.value
-					 		WHERE f.field_id='.$orderbycustomfieldid.'
-					 		GROUP BY f.item_id
+							SELECT rf.item_id, SUM(fdat.hits) AS file_hits
+							FROM #__flexicontent_fields_item_relations AS rf
+							LEFT JOIN #__flexicontent_files AS fdat ON fdat.id = rf.value
+					 		WHERE rf.field_id='.$orderbycustomfieldid.'
+					 		GROUP BY rf.item_id
 					 	) AS dl ON dl.item_id = i.id';
 				}
 				else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
@@ -539,11 +539,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 					if ($_o_method=='file_hits') {
 						$orderby_join .= '
 							LEFT JOIN (
-								SELECT f.item_id, SUM(fdat.hits) AS file_hits
-								FROM #__flexicontent_fields_item_relations AS f
-								LEFT JOIN #__flexicontent_files AS fdat ON fdat.id = f.value
-						 		WHERE f.field_id='.$_field_id.'
-						 		GROUP BY f.item_id
+								SELECT rf.item_id, SUM(fdat.hits) AS file_hits
+								FROM #__flexicontent_fields_item_relations AS rf
+								LEFT JOIN #__flexicontent_files AS fdat ON fdat.id = rf.value
+						 		WHERE rf.field_id='.$_field_id.'
+						 		GROUP BY rf.item_id
 						 	) AS dl ON dl.item_id = i.id';
 					}
 					else $orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$_field_id;

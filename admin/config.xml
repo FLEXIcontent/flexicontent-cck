@@ -48,17 +48,6 @@
 			
 			<field name="flexi_cat_extension" type="hidden" size="1" default="com_content" label="Category Type" description="Please save configuration once" />
 			<field name="fcdata_serialized" type="hidden" size="1" default="" label=".." description="..." />
-			<field name="cats_always_astree" type="hidden" default="1" label="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE" description="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE_DESC"/>
-			
-			<!--field name="draggable_reordering" type="radio" default="1" label="FLEXI_DRAG_AND_DROP_ORDERING" description="FLEXI_DRAG_AND_DROP_ORDERING_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field-->
-			<!--field name="cats_always_astree" type="radio" default="1" label="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE" description="FLEXI_ALWAYS_DISPLAY_CATEGORIES_AS_TREE_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field-->
-			<!--field name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="2" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" class="input-xxlarge" /-->
 			
 		<field name="" type="separator" default="FLEXI_BROWSER_FRAMEWORKS" label="" level="level0" />
 

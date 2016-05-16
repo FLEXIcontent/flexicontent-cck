@@ -296,10 +296,6 @@ class flexicontent_cats
 		// Privilege of (a) viewing all categories (even if disabled) and (b) viewing as a tree
 		require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
 		$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
-		$viewtree			= FlexicontentHelperPerm::getPerm()->ViewTree;
-		
-		// Global parameter to force always displaying of categories as tree
-		if ($cparams->get('cats_always_astree', 1)) $viewtree = 1;
 		
 		
 		// **************************************************************
@@ -388,7 +384,7 @@ class flexicontent_cats
 		
 		foreach ($list as $cat) {
 			$cat->treename = str_replace("&nbsp;", " ", strip_tags($cat->treename));
-			$cat_title = $viewtree ? $cat->treename : $cat->title;
+			$cat_title = $cat->treename;
 			if (!$check_published && $cat->published!=1) $cat_title .= ' -U-';
 			
 			if ( !$check_published || $cat->published )

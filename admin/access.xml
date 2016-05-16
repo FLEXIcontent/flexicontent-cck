@@ -36,7 +36,6 @@
 		<!-- CATEGORIES: management tab and usage -->
 		<action name="flexicontent.managecats" title="&lt;b&gt;Categories: -- manage --&lt;/b&gt;" description="Allow users in the group to have access to the Category Management. NOTE: the inherited privileges of each category are in effect. Thus the user can only perform specific actions on specific categories" />		
 		<action name="flexicontent.usercats" title="&lt;b&gt;Categories (&lt;span style&#61;&#34;color:blue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; View unauthorized categories" description="Allow users in the group to view the categories which they cannot assign to items" />
-		<action name="flexicontent.viewtree" title="&lt;b&gt;Categories (&lt;span style&#61;&#34;color:blue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; View categories as tree" description="Allow users in the group to view categories as tree instead of flat list" />
 		<action name="flexicontent.multicat" title="&lt;b&gt;Categories (&lt;span style&#61;&#34;color:blue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; Assign multiple categories to items" description="Allow users in the group to assign multiple categories to items. If lacking this privelege, the secondary category selector will be disabled. NOTE: user will still need to have 'create' privilege in these categories" />
 		
 		<!-- TAGs: management tab and usage -->
