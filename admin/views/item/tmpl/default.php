@@ -1014,15 +1014,12 @@ if ($this->row->type_id) {
 
 
 
-<?php 
-if ($this->perms['canparams']) : ?>
-
 	<!-- Publishing tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-calendar">
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING'); ?> </h3>
 		
 		<div class="fc_tabset_inner">
-			<div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 0px 0px 16px 0px !important; padding: 16px 32px !important">
+			<div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 0px 0px 16px 0px !important; padding: 16px 32px !important;">
 			<?php
 				// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
 				$site_zone = JFactory::getApplication()->getCfg('offset');
@@ -1035,49 +1032,39 @@ if ($this->perms['canparams']) : ?>
 			?>
 			</div>
 			
-			
-			<?php /*if ($this->perms['isSuperAdmin']) :*/ ?>
 			<fieldset class="panelform">
 				<span class="label-fcouter" id="created_by-lbl-outer"><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('created_by')); ?></span>
-				<div class="container_fcfield"><?php echo $this->form->getInput('created_by'); ?></div>
+				<div class="container_fcfield"><?php echo $this->perms['isSuperAdmin'] ? $this->form->getInput('created_by') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->author.'&nbsp;</span>'; ?></div>
 			</fieldset>	
-			<?php /*endif;*/ ?>
 			
-			<?php if ($this->perms['editcreationdate']) : ?>
 			<fieldset class="panelform">
 				<span class="label-fcouter" id="created-lbl-outer"><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('created')); ?></span>
-				<div class="container_fcfield"><?php echo $this->form->getInput('created'); ?></div>
-			</fieldset>	
-			<?php endif; ?>
+				<div class="container_fcfield"><?php echo $this->perms['editcreationdate'] ? $this->form->getInput('created') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->created.'&nbsp;</span>'; ?></div>
+			</fieldset>
 			
 			<fieldset class="panelform">
 				<span class="label-fcouter" id="created_by_alias-lbl-outer"><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('created_by_alias')); ?></span>
-				<div class="container_fcfield"><?php echo $this->form->getInput('created_by_alias'); ?></div>
+				<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('created_by_alias') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->created_by_alias.'&nbsp;</span>'; ?></div>
 			</fieldset>	
 			
 			<fieldset class="panelform">
 				<span class="label-fcouter" id="publish_up-lbl-outer"><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('publish_up')); ?></span>
-				<div class="container_fcfield"><?php echo $this->form->getInput('publish_up'); ?></div>
+				<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('publish_up') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->publish_up.'&nbsp;</span>'; ?></div>
 			</fieldset>	
 			
 			<fieldset class="panelform">
 				<span class="label-fcouter" id="publish_down-lbl-outer"><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('publish_down')); ?></span>
-				<div class="container_fcfield"><?php echo $this->form->getInput('publish_down'); ?></div>
+				<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('publish_down') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->publish_down.'&nbsp;</span>'; ?></div>
 			</fieldset>	
 			
 			<fieldset class="panelform">
 				<span class="label-fcouter" id="access-lbl-outer"><?php echo str_replace('class="', 'class="label label-fcinner ', $this->form->getLabel('access')); ?></span>
-				<?php if ($this->perms['canacclvl']) :?>
-					<div class="container_fcfield"><?php echo $this->form->getInput('access'); ?></div>
-				<?php else :?>
-					<div class="container_fcfield"><span class="label"><?php echo $this->row->access_level; ?></span></div>
-				<?php endif; ?>
+				<div class="container_fcfield"><?php echo $this->perms['canacclvl'] ? $this->form->getInput('access') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->row->access_level.'&nbsp;</span>'; ?></div>
 			</fieldset>	
 
 		</div>
 		
 	</div> <!-- end tab -->
-<?php endif; ?>
 
 
 
@@ -1318,6 +1305,7 @@ if ( count($FC_jfields_html) ) : ?>
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 		
 		<div class="fc_tabset_inner">
+			
 			<div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 0px 0px 48px 0px !important; padding: 16px 32px !important">
 				<?php echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
 				<br/><br/>
@@ -1328,7 +1316,6 @@ if ( count($FC_jfields_html) ) : ?>
 				<br/>
 				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
 			</div>
-			
 			<div class="fcclear"></div>
 			
 			<?php foreach($this->form->getFieldset('themes') as $field): ?>
@@ -1353,7 +1340,6 @@ if ( count($FC_jfields_html) ) : ?>
 				<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
 				<?php echo "<br/><br/>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
 			</span>
-			
 			<div class="fcclear"></div>
 			
 			<div style="max-width:1200px; padding-top: 24px;">

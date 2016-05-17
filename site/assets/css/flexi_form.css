@@ -310,6 +310,12 @@ div .flexi_buttons button:not(.btn):hover {
 	font-size: times;
 	padding: 4px 0px 4px 30px;
 	background: transparent url(../images/ajax-loader.gif) 6px 5px no-repeat;
+	display: inline-block;
+	min-height: 1em;
+	line-height: 1.1em;
+	box-sizing: unset;
+	margin: 0;
+	vertical-align: top;
 }
 #flexi_form_submit_btns {
 	font-size: 11px;

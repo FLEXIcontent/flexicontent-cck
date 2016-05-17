@@ -821,6 +821,13 @@ class ParentClassItem extends JModelAdmin
 			// Retrieve item properties not defined in the model's CLASS
 			// *********************************************************
 			
+			if ( !isset($item->author) )
+			{
+				$query = 'SELECT name FROM #__users WHERE id = '. (int) ($item->id ? $item->created_by : $user->id);
+				$db->setQuery($query);
+				$item->author = $db->loadResult();
+			}
+			
 			$query = 'SELECT title FROM #__viewlevels WHERE id = '. (int) $item->access;
 			$db->setQuery($query);
 			$item->access_level = $db->loadResult();
