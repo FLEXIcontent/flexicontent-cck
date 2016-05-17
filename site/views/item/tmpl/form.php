@@ -866,49 +866,45 @@ if ($typeid && $this->params->get('usepublicationdetails_fe', 1)) : // timezone_
 		?>
 	<?php $captured['timezone_info'] = ob_get_clean(); ?>
 		
-	<?php if ($this->perms['isSuperAdmin'] && $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
+	<?php if ( $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
 		<fieldset class="flexi_params panelform">
 			<?php echo $this->form->getLabel('created_by'); ?>
-			<div class="container_fcfield"><?php echo $this->form->getInput('created_by'); ?></div>
+			<div class="container_fcfield"><?php echo $this->perms['isSuperAdmin'] ? $this->form->getInput('created_by') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->author.'&nbsp;</span>'; ?></div>
 		</fieldset>
 	<?php $captured['created_by'] = ob_get_clean(); endif; ?>
 	
-	<?php if ($this->perms['editcreationdate'] && $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
+	<?php if ( $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
 		<fieldset class="flexi_params panelform">
 			<?php echo $this->form->getLabel('created'); ?>
-			<div class="container_fcfield"><?php echo $this->form->getInput('created'); ?></div>
+			<div class="container_fcfield"><?php echo $this->perms['editcreationdate'] ? $this->form->getInput('created') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->created.'&nbsp;</span>'; ?></div>
 		</fieldset>
 	<?php $captured['created'] = ob_get_clean(); endif; ?>
 	
 	<?php ob_start(); ?>
 		<fieldset class="flexi_params panelform">
 			<?php echo $this->form->getLabel('created_by_alias'); ?>
-			<div class="container_fcfield"><?php echo $this->form->getInput('created_by_alias'); ?></div>
+			<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('created_by_alias') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->created_by_alias.'&nbsp;</span>'; ?></div>
 		</fieldset>
 	<?php $captured['created_by_alias'] = ob_get_clean(); ?>
 	
 	<?php ob_start(); ?>
 		<fieldset class="flexi_params panelform">
 			<?php echo $this->form->getLabel('publish_up'); ?>
-			<div class="container_fcfield"><?php echo $this->form->getInput('publish_up'); ?></div>
+			<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('publish_up') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->publish_up.'&nbsp;</span>'; ?></div>
 		</fieldset>
 	<?php $captured['publish_up'] = ob_get_clean(); ?>
 	
 	<?php ob_start(); ?>
 		<fieldset class="flexi_params panelform">
 			<?php echo $this->form->getLabel('publish_down'); ?>
-			<div class="container_fcfield"><?php echo $this->form->getInput('publish_down'); ?></div>
+			<div class="container_fcfield"><?php echo $this->perms['canpublish'] ? $this->form->getInput('publish_down') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->publish_down.'&nbsp;</span>'; ?></div>
 		</fieldset>
 	<?php $captured['publish_down'] = ob_get_clean(); ?>
 	
 	<?php ob_start(); ?>
 		<fieldset class="flexi_params panelform">
 			<?php echo $this->form->getLabel('access'); ?>
-			<?php if ($this->perms['canacclvl']) :?>
-				<div class="container_fcfield"><?php echo $this->form->getInput('access'); ?></div>
-			<?php else :?>
-				<div class="container_fcfield"><span class="label"><?php echo $this->item->access_level; ?></span></div>
-			<?php endif; ?>
+			<div class="container_fcfield"><?php echo $this->perms['canacclvl'] ? $this->form->getInput('access') : '<span class="fc-mssg-inline fc-success fc-nobgimage" style="margin:0;">'.$this->item->access_level.'&nbsp;</span>'; ?></div>
 		</fieldset>
 	<?php $captured['access'] = ob_get_clean(); ?>
 <?php endif;
@@ -1084,7 +1080,7 @@ if ( $typeid && $this->params->get('usedisplaydetails_fe') || $has_custom_params
 
 
 
-if ( $typeid && $this->perms['cantemplates'] && $this->params->get('selecttheme_fe') ) : ?>
+if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 
 	<?php if ( $this->params->get('selecttheme_fe') >= 1 ) : ob_start(); ?>
 		<?php foreach($this->form->getFieldset('themes') as $field) : ?>

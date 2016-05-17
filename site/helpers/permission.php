@@ -119,7 +119,7 @@ class FlexicontentHelperPerm
 		$permission->DisplayAllItems		= $user->authorise('flexicontent.displayallitems','com_flexicontent'); // (backend) List all items (otherwise only items that can be edited)
 		$permission->CanCopy			= $user->authorise('flexicontent.copyitems',	'com_flexicontent'); // (backend) Item Copy Task
 		$permission->CanOrder			= $user->authorise('flexicontent.orderitems',	'com_flexicontent'); // (backend) Reorder items inside the category
-		$permission->CanParams		= $user->authorise('flexicontent.paramsitem',	'com_flexicontent'); // (backend) Edit item parameters like meta data and template parameters
+		$permission->CanParams		= 1; // Legacy permission, we will not use it in FC v3.0.15+
 		$permission->CanVersion		= $user->authorise('flexicontent.versioning',	'com_flexicontent'); // (backend) Use item versioning
 		
 		$permission->AssocAnyTrans		  = $user->authorise('flexicontent.assocanytrans',	  	'com_flexicontent'); // (item edit form) associate any translation
