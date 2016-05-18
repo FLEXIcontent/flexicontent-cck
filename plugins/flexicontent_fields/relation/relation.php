@@ -238,12 +238,16 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		// *****************************************************
 		// Item retrieving query ... put together and execute it
 		// *****************************************************
-		$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias'
-			.' FROM #__content AS i '
-			.' WHERE i.id IN (' . implode(',', $_itemids) . ')'
-			;
-		$db->setQuery($query);
-		$items_arr = $db->loadObjectList();
+		if ( count($_itemids) )
+		{
+			$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias'
+				.' FROM #__content AS i '
+				.' WHERE i.id IN (' . implode(',', $_itemids) . ')'
+				;
+			$db->setQuery($query);
+			$items_arr = $db->loadObjectList();
+		}
+		else $items_arr = array();
 		
 		
 		// *******************************************************
