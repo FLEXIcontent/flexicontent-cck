@@ -37,16 +37,11 @@
 	display: block;
 	margin: 0 0 6px 0;
 }
-#flexicontent ul.fcfield-sortables > li .input-append,
-#flexicontent ul.fcfield-sortables > li .input-prepend {
+#flexicontent .fcfieldval_container.valuebox .input-append,
+#flexicontent .fcfieldval_container.valuebox .input-prepend {
 	float: left;
 	margin-bottom: 0px;
-}
-#flexicontent ul.fcfield-sortables > li .input-append {
 	margin-right: 10px;
-}
-#flexicontent ul.fcfield-sortables > li .use_select2_lib {
-	vertical-align: top;
 }
 #flexicontent ul.fcfield-sortables > li > * {
 	vertical-align: top;

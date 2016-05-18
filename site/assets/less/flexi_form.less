@@ -599,14 +599,14 @@ body .nowrap_hidden {
 	white-space: nowrap;
 }
 
-
-#flexicontent div.input-append > *:not(:last-child) {
-	/*margin: 0px !important;*/
+/* bootstrap INPUT groups */
+#flexicontent div.input-group-addon > *:not(:last-child):not(.select2-container),
+#flexicontent div.input-append > *:not(:last-child):not(.select2-container) {
 	border-top-right-radius: 0px !important;
 	border-bottom-right-radius: 0px !important;
 }
+#flexicontent div.input-group-addon > *:not(:first-child),
 #flexicontent div.input-prepend > *:not(:first-child) {
-	/*margin: 0px !important;*/
 	border-top-left-radius: 0px !important;
 	border-bottom-left-radius: 0px !important;
 }

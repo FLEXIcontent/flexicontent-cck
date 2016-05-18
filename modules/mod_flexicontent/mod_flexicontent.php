@@ -87,10 +87,12 @@ if ( $show_mod )
 	if ( $ordering_addtitle && (int)$params->get('orderbycustomfieldid', 0) && in_array('field', $ordering) )
 	{
 		$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		$orderby_custom_field = JTable::getInstance('flexicontent_fields', '');
 		$orderby_custom_field->load($orderbycustomfieldid);
 	}
-	else {
+	
+	if ( empty($orderby_custom_field) ) {
 		$orderby_custom_field = new stdClass();
 		$orderby_custom_field->label = 'NA';
 	}
