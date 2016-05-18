@@ -424,7 +424,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 				$params,
 				$order, $request_var, $_config_param='orderby',
 				$_item_tbl_alias = 'i', $_relcat_tbl_alias = 'rel',
-				$default_order, $default_order_dir, $sfx='', $support_2nd_lvl=$orderby_override_2nd
+				$default_order, $default_order_dir, $sfx='', $support_2nd_lvl=true
 			);
 			
 			// Create JOIN for ordering items by a custom field (Level 1)
@@ -771,7 +771,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. ' GROUP BY i.id '
 			. ' ORDER BY FIELD(i.id, '. implode(',', $item_ids) .')'
 		;
-		//echo nl2br($query)."<br/><br/>";
+		//require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'SqlFormatter'.DS.'SqlFormatter.php');
+		//echo str_replace('PPP_', '#__', SqlFormatter::format(str_replace('#__', 'PPP_', $query)))."<br/>";
 		
 		$db->setQuery( $query_data );
 		$list = $db->loadObjectList();

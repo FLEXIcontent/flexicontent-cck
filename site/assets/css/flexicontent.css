@@ -458,10 +458,12 @@ body .nowrap_hidden {
 	margin: -1px 0 0 0;
 	white-space: nowrap;
 }
-#flexicontent div.input-append > *:not(:last-child) {
+#flexicontent div.input-group-addon > *:not(:last-child):not(.select2-container),
+#flexicontent div.input-append > *:not(:last-child):not(.select2-container) {
 	border-top-right-radius: 0px !important;
 	border-bottom-right-radius: 0px !important;
 }
+#flexicontent div.input-group-addon > *:not(:first-child),
 #flexicontent div.input-prepend > *:not(:first-child) {
 	border-top-left-radius: 0px !important;
 	border-bottom-left-radius: 0px !important;
@@ -826,12 +828,19 @@ body .fc-mssg.fc-noborder {
 	padding-left: 4px;
 	padding-right: 4px;
 }
+#flexicontent [class^="fc-xpended"] > div.select2-container,
+#flexicontent [class*="fc-xpended"] > div.select2-container {
+	vertical-align: top;
+}
+#flexicontent [class^="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen,
 #flexicontent [class*="fc-xpended"] > div.select2-container .select2-choice > .select2-chosen {
 	font-size: 12px;
 	line-height: 26px;
 	min-height: 26px;
 	font-weight: normal !important;
 }
+#flexicontent [class^="fc-xpended"] > select,
+#flexicontent [class^="fc-xpended"] > div.select2-container > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > select,
 #flexicontent [class*="fc-xpended"] > div.select2-container > a.select2-choice {
 	border-top-left-radius: 6px;
@@ -841,12 +850,16 @@ body .fc-mssg.fc-noborder {
 	margin-top: 0;
 	vertical-align: top;
 }
+#flexicontent [class^="fc-xpended"] > select:not(:first-child),
+#flexicontent [class^="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > select:not(:first-child),
 #flexicontent [class*="fc-xpended"] > div.select2-container:not(:first-child) > a.select2-choice {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
 	margin-left: 0px;
 }
+#flexicontent [class^="fc-xpended"] > select:not(:last-child),
+#flexicontent [class^="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice,
 #flexicontent [class*="fc-xpended"] > select:not(:last-child),
 #flexicontent [class*="fc-xpended"] > div.select2-container:nth-last-child(n+3) > a.select2-choice {
 	border-top-right-radius: 0;

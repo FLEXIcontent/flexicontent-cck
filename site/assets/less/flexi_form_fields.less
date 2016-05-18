@@ -57,18 +57,16 @@
 }
 
 
-/* FIELD: (sortable) special cases alignment, etc */
-#flexicontent ul.fcfield-sortables > li .input-append,
-#flexicontent ul.fcfield-sortables > li .input-prepend {
+/* FIELD: styling for input groups inside fields code */
+#flexicontent .fcfieldval_container.valuebox .input-append,
+#flexicontent .fcfieldval_container.valuebox .input-prepend {
 	float: left;
 	margin-bottom: 0px;
-}
-#flexicontent ul.fcfield-sortables > li .input-append {
 	margin-right: 10px;
 }
-#flexicontent ul.fcfield-sortables > li .use_select2_lib {
-	vertical-align: top;
-}
+
+/* FIELD: (multi-value / sortable) special cases alignment, etc */
+/* multi-value handling buttons, todo make more specific */
 #flexicontent ul.fcfield-sortables > li > * {
 	vertical-align: top;
 }
@@ -77,7 +75,7 @@
 	cursor: pointer;
 }
 
-/* FIELD: (sortable) having multi-property value displayed in a table */
+/* FIELD: (multi-value / sortable) having multi-property value displayed in a table */
 #flexicontent ul.fcfield-sortables > li table.admintable {
 	text-align: left;
 	width: 100%;
