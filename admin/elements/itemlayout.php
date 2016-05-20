@@ -131,39 +131,38 @@ if ( ! @$attributes['skipparams'] ) {
 		$js 	= "
 var tmpl = ['".$lays."'];
 
-function disablePanel(element) {
-	if ( ! jQuery('#'+element+'-attribs-options') ) return;
+function disablePanel(element)
+{
+	var el, panel = jQuery('#'+element+'-attribs-options').next();
 	
-	var panel 	= jQuery('#'+element+'-attribs-options').next();
-	var selects = panel.find('select');
-	var inputs 	= panel.find('input');
-	panel.parent().addClass('pane-disabled');
-	selects.each(function(index){
-		jQuery(this).attr('disabled', 'disabled');
+	if ( !panel.length ) return;
+	if ( panel.parent().hasClass('pane-disabled') ) return;
+	
+	var form_fields_active = panel.find('textarea:enabled, select:enabled, input[type=\"radio\"]:enabled:checked, input[type=\"checkbox\"]:enabled:checked, input:not(:button):not(:radio):not(:checkbox):enabled');
+	form_fields_active.each(function(index)
+	{
+		el = jQuery(this);
+		//if ( el.is(':disabled') ) return;  // no need, because above we selected only enabled elements
+		el.addClass('fclayout_disabled_element');
+		el.attr('disabled', 'disabled');
 	});
-	inputs.each(function(index){
-		jQuery(this).attr('disabled', 'disabled');
-	});
-	panel.parent().css('display','none');
+	
+	panel.parent().addClass('pane-disabled').hide();
 }
 
-function enablePanel(element) {
-	if ( ! jQuery('#'+element+'-attribs-options') ) return;
+function enablePanel(element)
+{
+	var el, panel = jQuery('#'+element+'-attribs-options').next();
 	
-	var panel 	= jQuery('#'+element+'-attribs-options').next();
-	var selects = panel.find('select');
-	var inputs 	= panel.find('input');
-	panel.parent().removeClass('pane-disabled');
-	selects.each(function(index){
-		jQuery(this).removeAttr('disabled');
-	});
-	inputs.each(function(index){
-		jQuery(this).removeAttr('disabled');
-	});
-	panel.parent().css('display','');
+	if ( !panel.length ) return;
+	if ( !panel.parent().hasClass('pane-disabled') ) return;
+	
+	panel.find('.fclayout_disabled_element').removeAttr('disabled').removeClass('fclayout_disabled_element');
+	panel.parent().removeClass('pane-disabled').show();
 }
 
-function activatePanel(active) {
+function activatePanel(active)
+{
 	var inactives = jQuery.grep(tmpl, function( item, index ) {
 		return item != active;
 	});

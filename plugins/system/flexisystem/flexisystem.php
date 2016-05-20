@@ -150,6 +150,13 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function onAfterRoute()
 	{
+		// Detect saving component configuration, e.g. set a flag to indicate cleaning categories cache on next page load
+		// We place this above format check, because maybe, saving will be AJAX based (? format=raw ?)
+		$this->trackSaveConf();
+		
+		$format = strtolower( JFactory::getApplication()->input->get('format', 'html', 'cmd') );
+		if ($format != 'html') return;
+		
 		$jinput   = JFactory::getApplication()->input;
 		$app      = JFactory::getApplication();
 		$session  = JFactory::getSession();
@@ -164,23 +171,26 @@ class plgSystemFlexisystem extends JPlugin
 		$tmpl   = $jinput->get('tmpl', '', 'string');
 		$task   = $jinput->get('task', '', 'string');
 		
+		$fcdebug = $this->cparams->get('print_logging_info')==2  ?  2  :  $session->get('fcdebug', 0, 'flexicontent');
+		$isAdmin = JFactory::getApplication()->isAdmin();
+		
 		$js = '';
 			
-		if ( JFactory::getApplication()->isAdmin() && (
-			($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') ||
-			(($option=='com_modules' || $option=='com_advancedmodules') && $view == 'module') ||
-			($option=='com_flexicontent' && ($view == 'category' || $view == 'item'))
-		) ) {
-			// WORKAROUNDs of for 2 issues in com_config: slow chosen JS and PHP 5.3.9+ 'max_input_vars' limit
-			if (FLEXI_J30GE && ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent')) {
-				// Make sure chosen JS file is loaded before our code
+		if (
+			$isAdmin && (
+				($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent')  ||  (($option=='com_modules' || $option=='com_advancedmodules') && $view == 'module')
+			) ||
+			($option=='com_flexicontent' && ($isAdmin || $task == 'edit'))
+		) {
+			// WORKAROUNDs for slow chosen JS in component configuration form
+			if ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent')
+			{
+				// Make sure chosen JS file is loaded before our code, but do not attach it to any elements (YET)
 				JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
-				// replace chosen function
-				/*$js .= "
-					jQuery.fn.chosen = function(){};
-				";*/
+				//$js .= "\n"."jQuery.fn.chosen = function(){};"."\n";  // Suppress chosen function completely, (commented out ... we will allow it)
 			}
 			
+			// Add information for PHP 5.3.9+ 'max_input_vars' limit
 			$max_input_vars = ini_get('max_input_vars');
 			if (extension_loaded('suhosin'))
 			{
@@ -191,29 +201,26 @@ class plgSystemFlexisystem extends JPlugin
 			}
 			$js .= "
 				jQuery(document).ready(function() {
+					Joomla.fc_max_input_vars = ".$max_input_vars.";
+					".((JDEBUG || $fcdebug) ? 'Joomla.fc_debug = 1;' : '')."
 					jQuery(document.forms['adminForm']).attr('data-fc_doserialized_submit', '1');
-					//if ('".$option."'=='com_flexicontent') jQuery(document.forms['adminForm']).attr('data-fc_doajax_submit', '1');
+					". /*(($option=='com_flexicontent' && $view='category') ? "jQuery(document.forms['adminForm']).attr('data-fc_force_apply_ajax', '1');" : "") .*/"
 				});
-				var fc_max_input_vars = ".$max_input_vars.";
 			";
 		}
 		if ($js) $document->addScriptDeclaration($js);
 		
-
-		// Detect resultion we will do this regardless of ... using mobile layouts
+		
+		// Detect resolution we will do this regardless of ... using mobile layouts
 		if ($this->cparams->get('use_mobile_layouts') || $app->isAdmin()) $this->detectClientResolution($this->cparams);
 		
 		// Exclude pagebreak outputing dialog from redirection
 		if ( $option=='com_content' && $layout=='pagebreak' ) return;
-		//if( $option=='com_content' && $view=='articles' && $layout=='modal' && $tmpl=='component' ) return;
 		
-		// Detect saving configuration, e.g. set a flag to indicate cleaning categories cache on next page load
-		$this->trackSaveConf();
-		
-		if ( $app->isAdmin() )
-			$this->redirectAdminComContent();
-		else
-			$this->redirectSiteComContent();
+		// Redirect backend article / category management, and frontend article view
+		$app->isAdmin() ?
+			$this->redirectAdminComContent() :
+			$this->redirectSiteComContent() ;
 	}
 	
 	
@@ -634,7 +641,6 @@ class plgSystemFlexisystem extends JPlugin
 			// Indicate that next page load will clean categories cache so that cache configuration will be recalculated
 			// (we will not do this at this step, because new component configuration has not been saved yet)
 			$session->set('clear_cats_cache', 1, 'flexicontent');
-			
 		}
 	}
 	
