@@ -429,8 +429,13 @@ jQuery(document).ready(function()
 				extfolder: 'flexicontent_fields',
 				extname: 'relation',
 				extfunc: 'getCategoryItems',
-				field_id: ".$field->id.",
+				field_id: ".$field->id.","
+			.($item->id ? "
 				item_id: ".$item->id.",
+			" : "
+				type_id: ".$item->type_id.",
+				lang_code: '".$item->language."',"
+			)."
 				catid: catid
 			}
 		}).done( function(data) {
@@ -756,42 +761,84 @@ jQuery(document).ready(function()
 	// Method called via AJAX to get dependent values
 	function getCategoryItems()
 	{
-		$app = JFactory::getApplication();
+		// Get API objects / data
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
+		$user   = JFactory::getUser();
+		
+		// Get Access Levels of user
+		$uacc = array_flip(JAccess::getAuthorisedViewLevels($user->id));
+		
+		
+		// Get request variables
 		$field_id = $jinput->get('field_id', 0, 'int');
 		$item_id  = $jinput->get('item_id',  0, 'int');
+		$type_id  = $jinput->get('type_id',  0, 'int');
+		$lang_code= $jinput->get('lang_code',  0, 'cmd');
 		$catid    = $jinput->get('catid',    0, 'int');
 		
+		
+		// Basic checks
 		$response = array();
 		$response['error'] = '';
 		$response['options'] = array();
 		
-		if (!$field_id) $response['error'] = 'Invalid field_id';
-		if (!$item_id)  $response['error'] = 'Invalid item_id';
-		if (!$catid)    $response['error'] = 'Invalid catid';
+		if (!$field_id)    $response['error'] = 'Invalid field_id';
+		else if (!$catid)  $response['error'] = 'Invalid catid';
 		
 		if ( $response['error'] )
 		{
-			echo json_encode($response);
-			exit;
+			exit( json_encode($response) );
 		}
 		
-		// Load field
-		$_fields = FlexicontentFields::getFieldsByIds(array($field_id), array($item_id));
-		$field = $_fields[$field_id];
-		$field->item_id = $item_id;
 		
-		// Load item
+		
+		// ********************
+		// Load and check field
+		// ********************
+		
+		$field = JTable::getInstance( $_type = 'flexicontent_fields', $_prefix = '', $_config = array() );
+		
+		if ( !$field->load( $field_id ) )           $response['error'] = 'relation field not found';
+		else if ( $field->field_type!='relation' )  $response['error'] = 'relation field is not a relation field';
+		else if ( !isset($uacc[$field->access]) )   $response['error'] = 'relation field has non-allowed access level';
+		
+		if ( $response['error'] )
+		{
+			exit( json_encode($response) );
+		}
+		
+		
+		// *******************
+		// Load and check item
+		// *******************
+		
 		$item = JTable::getInstance( $_type = 'flexicontent_items', $_prefix = '', $_config = array() );
-		$item->load( $item_id );
+		if ( !$item_id )
+		{
+			$item->type_id = $type_id;
+			$item->language = $lang_code;
+			$item->created_by = $user->id;
+		}
+		else if ( !$item->load( $item_id ) )       $response['error'] = 'content item not found';
+		else if ( !isset($uacc[$item->access]) )   $response['error'] = 'content item has non-allowed access level';
 		
-		// Get field configuration
+		if ( $response['error'] )
+		{
+			exit( json_encode($response) );
+		}
+		
+		
+		// ************************
+		// Load field configuration
+		// ************************
+		
 		FlexicontentFields::loadFieldConfig($field, $item);
-		
+		$field->item_id = $item_id;
 		
 		// Some needed parameters
 		$maxtitlechars 	= $field->parameters->get( 'maxtitlechars', 40 ) ;
-
+		
 		
 		// ***********************************************
 		// Get & check Global category related permissions
@@ -898,7 +945,7 @@ jQuery(document).ready(function()
 		else if ($method_types == 3)  $where[] = ' ie.type_id IN (' . implode(',', $types) . ')';       // include method
 		
 		// OTHER SCOPE LIMITS
-		if ($samelangonly)  $where[] = $item->language=='*' ? " ie.language='*' " : " (ie.language='{$item->language}' OR ie.language='*') ";
+		if ($samelangonly)  $where[] = !$item->language || $item->language=='*' ? " ie.language='*' " : " (ie.language='{$item->language}' OR ie.language='*') ";
 		if ($onlypublished) $where[] = " i.state IN (1, -5) ";
 		if ($ownedbyuser==1) $where[] = " i.created_by = ". $user->id;
 		else if ($ownedbyuser==2) $where[] = " i.created_by = ". $item->created_by;
