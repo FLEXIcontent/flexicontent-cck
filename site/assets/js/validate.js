@@ -181,9 +181,6 @@ var JFormValidator = function()
 			var values = jQuery('#'+element_id).val();
 			var value_catid = values[0];
 			
-			//window.console.log(values);
-			//window.console.log(existing_cats_fc);
-			
 			// Check if maincat is not in already selected secondary cats
 			var add_val = ( value_catid && ( jQuery.inArray(value_catid, values) == -1) ) ? 1 : 0;
 			
@@ -379,7 +376,8 @@ var JFormValidator = function()
 
 	refreshFormLabels = function(form)
 	{
-		window.console.time("HASHING form labels");
+		var vTimeStart = new Date().getTime();
+		
 		// Iteration through DOM labels
 		var $lbl, $el, for_id, el_id, $lbls_hash = {};
 		
@@ -400,9 +398,6 @@ var JFormValidator = function()
 			}
 		});
 		
-		var lbls_hash_size = Object.keys($lbls_hash).length; 
-		window.console.log('lbls_hash_size: ' + lbls_hash_size);
-
 		// Set to zero length the .data('label') of elements without one
 		var f = jQuery(form).find('fieldset').toArray().concat(Array.from(form.elements));
 
@@ -427,7 +422,7 @@ var JFormValidator = function()
 				}
 			}
 		}
-		window.console.timeEnd("HASHING form labels");
+		if (!!Joomla.fc_debug) window.console.log( 'refreshFormLabels() time: ' + ((new Date())  - vTimeStart) + ' ms -- LABELs hash size: ' + Object.keys($lbls_hash).length);
 	},
 
 
@@ -533,6 +528,7 @@ var JFormValidator = function()
 
 	isValid = function(form)
 	{
+		var vTimeStart = new Date().getTime();
  		var fields, valid = true, message, error, label, invalid = [], i, l;
  		
  		// Remove any inline error messages (added by any previous form, note we do not add this to individual fields)
@@ -601,6 +597,7 @@ var JFormValidator = function()
  	 	}
 		
 		fcform_isValid = valid;
+		if (!!Joomla.fc_debug) window.console.log( 'isValid() time: ' + ((new Date())  - vTimeStart) + ' ms');
 		return valid;
 	},
 
@@ -697,11 +694,11 @@ jQuery(document).ready(function()
 {
 	document.formvalidator = JFormValidator_fc;
 	
-	//window.console.time("timing attachToForm()");
+	var vTimeStart = new Date().getTime();
 	jQuery('form.form-validate').each(function(){
 		document.formvalidator.attachToForm(this);
 	});
-	//window.console.timeEnd("timing attachToForm()");
+	if (!!Joomla.fc_debug) window.console.log( 'attachToForm() time: ' + ((new Date())  - vTimeStart) + ' ms');
 });
 
 

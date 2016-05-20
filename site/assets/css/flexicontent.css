@@ -1679,6 +1679,9 @@ input.invalid,
 textarea.invalid {
 	border: 1px dotted #CC0000 !important;
 }
+label.invalid > img {
+	border: 2px dotted #CC0000 !important;
+}
 .use_prettycheckable.invalid + a + label,
 input.invalid + .fccheckradio_lbl {
 	color: #cc0000 !important;
