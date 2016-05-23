@@ -63,49 +63,53 @@ class FlexicontentController extends JControllerLegacy
 		//echo  "postinst_integrity_ok: " . (isset($valArray[$postinst_integrity_ok])  ?  $valArray[$postinst_integrity_ok]  :  $postinst_integrity_ok) ."<br/>\n";
 		//echo  "recheck_aftersave: " . (isset($valArray[$recheck_aftersave])  ?  $valArray[$recheck_aftersave]  :  $recheck_aftersave) ."<br/>\n";
 		
-		$format	= JRequest::getCmd('format', null);
-		if ( $format!="raw"  &&  ($postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave) ) {
-			// NULL mean POSTINSTALL tasks has not been checked YET (current PHP user session),
-			// false means it has been checked during current session, but has failed one or more tasks
-			// In both cases we must evaluate the POSTINSTALL tasks,  and set the session variable
+		$format	= strtolower(JRequest::getCmd('format', 'html'));
+		if ($format == 'html')
+		{
+			if ( $postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave )
+			{
+				// NULL mean POSTINSTALL tasks has not been checked YET (current PHP user session),
+				// false means it has been checked during current session, but has failed one or more tasks
+				// In both cases we must evaluate the POSTINSTALL tasks,  and set the session variable
+				if ( $print_logging_info ) $start_microtime = microtime(true);
+				$postinst_integrity_ok = $this->getPostinstallState();
+				//echo  "set postinst_integrity_ok: " . (isset($valArray[$postinst_integrity_ok])  ?  $valArray[$postinst_integrity_ok]  :  $postinst_integrity_ok) ."<br/>\n";
+				$session->set('flexicontent.postinstall', $postinst_integrity_ok);
+				$session->set('unbounded_count', false, 'flexicontent');  // indicate to item manager to recheck unbound items
+				if ( $print_logging_info ) @$fc_run_times['post_installation_tasks'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			}
+			
+			// SET recheck_aftersave FLAG to indicate rechecking of (a) post installation tasks AND (b) integrity checks after configuration save or article importing
+			if ($config_saved) {
+				$session->set('flexicontent.recheck_aftersave', !$postinst_integrity_ok);
+				//echo  "set recheck_aftersave: " . (isset($valArray[!$postinst_integrity_ok])  ?  $valArray[!$postinst_integrity_ok]  :  !$postinst_integrity_ok) ."<br/>\n";
+			} else {
+				$session->set('flexicontent.recheck_aftersave', true);
+				//echo  "set recheck_aftersave: true" ."<br/>\n";
+			}
+			
 			if ( $print_logging_info ) $start_microtime = microtime(true);
-			$postinst_integrity_ok = $this->getPostinstallState();
-			//echo  "set postinst_integrity_ok: " . (isset($valArray[$postinst_integrity_ok])  ?  $valArray[$postinst_integrity_ok]  :  $postinst_integrity_ok) ."<br/>\n";
-			$session->set('flexicontent.postinstall', $postinst_integrity_ok);
-			$session->set('unbounded_count', false, 'flexicontent');  // indicate to item manager to recheck unbound items
-			if ( $print_logging_info ) @$fc_run_times['post_installation_tasks'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		}
-		
-		// SET recheck_aftersave FLAG to indicate rechecking of (a) post installation tasks AND (b) integrity checks after configuration save or article importing
-		if ($config_saved) {
-			$session->set('flexicontent.recheck_aftersave', !$postinst_integrity_ok);
-			//echo  "set recheck_aftersave: " . (isset($valArray[!$postinst_integrity_ok])  ?  $valArray[!$postinst_integrity_ok]  :  !$postinst_integrity_ok) ."<br/>\n";
-		} else {
-			$session->set('flexicontent.recheck_aftersave', true);
-			//echo  "set recheck_aftersave: true" ."<br/>\n";
-		}
-		
-		if ( $print_logging_info ) $start_microtime = microtime(true);
-		
-		// GET ALLPLGPUBLISH task from session variable AND IF NEEDED re-evaluate it
-		// NOTE, we choose to have this separate from REQUIRED POSTINSTALL tasks,
-		// because WE DON'T WANT TO FORCE the user to enable all plugins but rather recommend it
-		$allplgpublish = $session->get('flexicontent.allplgpublish');
-		if(($allplgpublish===NULL) || ($allplgpublish===false)) {
-			// NULL means ALLPLGPUBLISH task has not been checked YET (current PHP user session),
-			// false means it has been checked during current session but has failed
-			// In both cases we must evaluate the ALLPLGPUBLISH task,  and set the session variable
-			$model = $this->getModel('flexicontent');
-			$allplgpublish = $model->getAllPluginsPublished();
-			$session->set('flexicontent.allplgpublish', $allplgpublish);
-		}
-		
-		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search', 'import')) && !$postinst_integrity_ok) {
-			$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
-			$link 	= 'index.php?option=com_flexicontent';
-			$this->setRedirect($link, $msg);
-		} else if ($postinst_integrity_ok && $config_saved) {
-			$this->checkDirtyFields();
+			
+			// GET ALLPLGPUBLISH task from session variable AND IF NEEDED re-evaluate it
+			// NOTE, we choose to have this separate from REQUIRED POSTINSTALL tasks,
+			// because WE DON'T WANT TO FORCE the user to enable all plugins but rather recommend it
+			$allplgpublish = $session->get('flexicontent.allplgpublish');
+			if(($allplgpublish===NULL) || ($allplgpublish===false)) {
+				// NULL means ALLPLGPUBLISH task has not been checked YET (current PHP user session),
+				// false means it has been checked during current session but has failed
+				// In both cases we must evaluate the ALLPLGPUBLISH task,  and set the session variable
+				$model = $this->getModel('flexicontent');
+				$allplgpublish = $model->getAllPluginsPublished();
+				$session->set('flexicontent.allplgpublish', $allplgpublish);
+			}
+			
+			if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search', 'import')) && !$postinst_integrity_ok) {
+				$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
+				$link 	= 'index.php?option=com_flexicontent';
+				$this->setRedirect($link, $msg);
+			} else if ($postinst_integrity_ok && $config_saved) {
+				$this->checkDirtyFields();
+			}
 		}
 		
 		// Register Extra task

@@ -106,9 +106,9 @@ h3.themes-title {
 	font-size: 12px;
 	font-weight: normal;
 	color: #666666;
-	background: url(../images/layout_content.png) no-repeat 0% 0%;
-	padding: 0px 0px 0px 20px;
-	margin: 24px 0 0px 4px;
+	background: url(../images/layout_content.png) no-repeat 0% 2px;
+	padding: 0px 0px 0px 28px;
+	margin: 4px 0;
 	font-family: Helvetica;
 }
 h3.themes-title small {
@@ -482,13 +482,14 @@ div label.lang_box img {
 	padding: 0px 0px 4px 0px;
 }
 #flexicontent .pane-sliders .panel .pane-slider {
-	padding: 0px !important;
+	padding-left: 8px;
+	padding-right: 8px;
 }
 #flexicontent .pane-sliders .panel .pane-slider fieldset.panelform {
-	padding: 8px !important;
-	margin: 4px !important;
-	border: 0px solid lightgray !important;
-	background: white !important;
+	padding: 0px !important;
+	margin: 3px !important;
+	border-width: 0px !important;
+	background: unset !important;
 }
 #flexicontent .ui-sortable > li {
 	background-color: white;
@@ -696,6 +697,7 @@ table.adminform td #search {
 #flexicontent .pane-sliders .group-rules label.hasTip {
 	width: auto;
 }
+body fieldset.panelform > label,
 #flexicontent .flexi_params > label,
 #flexicontent fieldset.panelform > label,
 #flexicontent label.fckey,
@@ -718,6 +720,7 @@ table.adminform td #search {
 	padding: 8px 8px 8px 8px !important;
 	box-sizing: border-box;
 }
+body .label-fcouter,
 #flexicontent .label-fcouter {
 	display: inline-block;
 	width: 15%;
@@ -727,6 +730,8 @@ table.adminform td #search {
 	margin: 2px 1% 3px 0% !important;
 	padding: 0 !important;
 }
+body .label-fcouter > label,
+body .label-fcinner,
 #flexicontent .label-fcouter > label,
 #flexicontent .label-fcinner {
 	font-size: 12px;
@@ -741,6 +746,8 @@ table.adminform td #search {
 	box-sizing: border-box;
 	white-space: normal !important;
 }
+body .label-fcouter > label.fc_tooltip_icon,
+body .label-fcinner.fc_tooltip_icon,
 #flexicontent .label-fcouter > label.fc_tooltip_icon,
 #flexicontent .label-fcinner.fc_tooltip_icon {
 	padding: 8px 8px 8px 20px !important;

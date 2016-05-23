@@ -1299,81 +1299,105 @@ if ( count($FC_jfields_html) ) : ?>
 <?php endif; ?>
 
 
-
+	
 	<!-- Template tab -->
 	<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-palette">
-		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
+		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_LAYOUT'); ?> </h3>
 		
 		<div class="fc_tabset_inner">
 			
-			<div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 0px 0px 48px 0px !important; padding: 16px 32px !important">
-				<?php echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
-				<br/><br/>
-				<ol style="margin:0 0 0 16px; padding:0;">
-					<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
-					<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
-				</ol>
-				<br/>
+			<div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 8px 0 !important; padding: 8px !important">
+				<h3 class="themes-title">
+					<?php echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
+				</h3>
 				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
 			</div>
 			<div class="fcclear"></div>
 			
-			<?php foreach($this->form->getFieldset('themes') as $field): ?>
-				<div class="fcclear"></div>
-				<?php if ($field->hidden): ?>
-					<span style="display:none !important;">
-						<?php echo $field->input; ?>
-					</span>
-				<?php elseif ($field->input): ?>
-					<fieldset class="panelform">
-						<span class="label-fcouter"><?php echo str_replace('class="', 'class="label label-fcinner ', $field->label); ?></span>
+			<?php
+			foreach ($this->form->getFieldset('themes') as $field):
+				if (!$field->label || $field->hidden)
+				{
+					echo $field->input;
+					continue;
+				}
+				elseif ($field->input)
+				{
+					$_depends = $field->getAttribute('depend_class');
+					echo '
+					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						<span class="label-fcouter">
+							'.str_replace('class="', 'class="label label-fcinner ', $field->label).'
+						</span>
 						<div class="container_fcfield">
-							<?php echo $field->input;?>
+							'.$field->input.'
 						</div>
 					</fieldset>
-				<?php endif; ?>
-			<?php endforeach; ?>
+					';
+				}
+			endforeach; ?>
 			
-			<div class="fcclear"></div>
-			<?php $type_default_layout = $this->tparams->get('ilayout'); ?>
-			<span class="fc-success fc-nobgimage fc-mssg-inline" id="__content_type_default_layout__">
-				<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
-				<?php echo "<br/><br/>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
-			</span>
+			<div class="fc-success fc-mssg-inline" style="font-size: 12px; margin: 8px 0 !important;" id="__content_type_default_layout__">
+				<?php /*echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $this->tparams->get('ilayout') ) . "<br/><br/>";*/ ?>
+				<?php echo JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
+			</div>
 			<div class="fcclear"></div>
 			
-			<div style="max-width:1200px; padding-top: 24px;">
+			<div class="fc-sliders-plain-outer">
 				<?php
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
+				$item_layout = $this->row->itemparams->get('ilayout');
 				
-				foreach ($this->tmpls as $tmplname => $tmpl) :
-					$fieldSets = $tmpl->params->getFieldsets($groupname);
-					foreach ($fieldSets as $fsname => $fieldSet) :
-						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$fsname.'-options');
-						if (isset($fieldSet->description) && trim($fieldSet->description)) :
-							echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
-						endif;
-						?>
+				foreach ($this->tmpls as $tmpl) :
+					
+					$form_layout = $tmpl->params;
+					$label = '<span class="btn"><i class="icon-edit"></i>'.JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name.'</span>';
+					echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
+					
+					if ($tmpl->name != $item_layout) continue;
+					
+					$fieldSets = $form_layout->getFieldsets($groupname);
+					foreach ($fieldSets as $fsname => $fieldSet) : ?>
 						<fieldset class="panelform">
-							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
-								if ($field->getAttribute('not_inherited')) continue;
-								if ($field->getAttribute('cssprep')) continue;
-								$fieldname =  $field->fieldname;
-								$value = $tmpl->params->getValue($fieldname, $groupname, $this->row->itemparams->get($fieldname));
-								echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-									$tmpl->params->getLabel($fieldname, $groupname)); ?>
+						
+						<?php
+						if (isset($fieldSet->label) && trim($fieldSet->label)) :
+							echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.JText::_($fieldSet->label).'</div>';
+						endif;
+						if (isset($fieldSet->description) && trim($fieldSet->description)) :
+							echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+						endif;
+						
+						foreach ($form_layout->getFieldset($fsname) as $field) :
+							
+							if ($field->getAttribute('not_inherited')) continue;
+							if ($field->getAttribute('cssprep')) continue;
+							
+							$fieldname = $field->fieldname;
+							//$value = $form_layout->getValue($fieldname, $groupname, $this->row->itemparams->get($fieldname));
+							
+							$input_only = !$field->label || $field->hidden;
+							echo
+								($input_only ? '' :
+								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+									$form_layout->getLabel($fieldname, $groupname)).'
 								<div class="container_fcfield">
-								<?php echo
-									str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
-										str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-											$tmpl->params->getInput($fieldname, $groupname, $value)
-										)
-									); ?>
+								').
+								
+								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+									str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+										$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
+									)
+								).
+								
+								($input_only ? '' : '
 								</div>
-							<?php endforeach; ?>
+								');
+						endforeach; ?>
+						
 						</fieldset>
+						
 					<?php endforeach; //fieldSets ?>
 				<?php endforeach; //tmpls ?>
 				

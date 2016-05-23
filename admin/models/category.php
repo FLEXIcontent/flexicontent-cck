@@ -515,17 +515,18 @@ class FlexicontentModelCategory extends JModelAdmin
 			$params->merge($catdata->params);
 		}
 		
-		// 2. Merge category parameters
-		if ($catParams->get('orderbycustomfieldid')==="0") $catParams->set('orderbycustomfieldid', '');
-		$params->merge($catParams);
+		// 2. Merge category parameters -- CURRENT CATEGORY PARAMETERS MUST BE SKIPED ! we only want the inherited parameters
+		//if ($catParams->get('orderbycustomfieldid')==="0") $catParams->set('orderbycustomfieldid', '');
+		//$params->merge($catParams);
 		
 		// Retrieve Layout's parameters
 		$layoutParams = flexicontent_tmpl::getLayoutparams('category', $params->get('clayout'), '', $force);
-		$layoutParams = new JRegistry($layoutParams);  //print_r($layoutParams);
+		$layoutParams = new JRegistry($layoutParams);
 		
 		// Allow global layout parameters to be inherited properly, placing on TOP of all others
 		$this->_inherited_params = clone($layoutParams);
 		$this->_inherited_params->merge($params);
+		
 		return $this->_inherited_params;
 	}
 	

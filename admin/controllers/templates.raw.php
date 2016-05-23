@@ -97,8 +97,8 @@ class FlexicontentControllerTemplates extends FlexicontentController
 
 	/**
 	 * Logic to render an XML file as form parameters
-	 * NOTE: this does not work with Request Data validation in J2.5+. The validation
-	 *       must be skipped or the parameters must be re-added after the validation
+	 * NOTE: Saving of these extra parameters requires extra handling as the are cleared during main form validation,
+	 *       These parameters must validated via an extra JForm object that represents their XML file and then re-added before DB saving step
 	 *
 	 * @access public
 	 * @return void
@@ -111,116 +111,185 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		$user = JFactory::getUser();
 		
 		//get vars
-		$ext_option = JRequest::getVar( 'ext_option', '');
-		$ext_view = JRequest::getVar( 'ext_view', '');
-		$ext_id   = JRequest::getInt ( 'ext_id', 0 );
-		$layout_name = JRequest::getVar( 'layout_name', 0 );
-		$directory   = JRequest::getVar( 'directory', 0 );
-		$path = (!is_dir($directory) ? JPATH_ROOT : '') . $directory;
+		$ext_option = JRequest::getVar( 'ext_option', '');  // Current component name
+		$ext_view   = JRequest::getVar( 'ext_view', '');    // Current view name
+		$ext_type   = JRequest::getVar( 'ext_type', '');    // Type layouts: 'templates' or empty: ('modules'/'fields')
+		$ext_name   = JRequest::getVar( 'ext_name', '');    // IN item/type/category (templates): template name
+		$ext_id     = JRequest::getInt ( 'ext_id', 0 );     // ID of item / type / category being edited
+		$layout_name = JRequest::getVar( 'layout_name', '' ); // IN modules/fields: layout name, IN item/type/category forms (FC templates):  'item' / 'category'
+		$directory   = JRequest::getVar( 'directory', '' );   // Explicit path of XML file:  $layout_name.xml
 		
 		$db = JFactory::getDBO();
-		if ($ext_view=='module') {
+		if ($ext_view=='item')
+		{
+			$query = 'SELECT attribs FROM #__content WHERE id = '.$ext_id;
+			// Load language file of the template
+			FLEXIUtilities::loadTemplateLanguageFile( $ext_name );
+			$path = JPATH::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$directory);
+			$groupname = 'attribs';  // name="..." of <fields> container
+		}
+		
+		else if ($ext_view=='type')
+		{
+			$query = 'SELECT attribs FROM #__flexicontent_types WHERE id = '.$ext_id;
+			// Load language file of the template
+			FLEXIUtilities::loadTemplateLanguageFile( $ext_name );
+			$path = JPATH::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$directory);
+			$groupname = 'attribs';  // name="..." of <fields> container
+		}
+		
+		else if ($ext_view=='category')
+		{
+			$query = 'SELECT params FROM #__categories WHERE id = '.$ext_id;
+			// Load language file of the template
+			FLEXIUtilities::loadTemplateLanguageFile( $ext_name );
+			$path = JPATH::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$directory);
+			$groupname = 'attribs';  // name="..." of <fields> container
+		}
+		
+		else if ($ext_view=='module')
+		{
 			$query = 'SELECT params FROM #__modules WHERE id = '.$ext_id;
-			// load english language file for 'mod_flexicontent' module then override with current language file
-			$module_name = basename(dirname($directory));
-			JFactory::getLanguage()->load($module_name, JPATH_SITE, 'en-GB', true);
-			JFactory::getLanguage()->load($module_name, JPATH_SITE, null, true);
-		} else if ($ext_view=='field') {
+			if ($ext_name)
+			{
+				JFactory::getLanguage()->load($ext_name, JPATH_SITE, 'en-GB', true);
+				JFactory::getLanguage()->load($ext_name, JPATH_SITE, null, true);
+			}
+			$path = is_dir($directory)  ?  $directory  :  JPATH_ROOT . $directory;
+			$groupname = 'params';  // name="..." of <fields> container
+		}
+		
+		else if ($ext_view=='field')
+		{
 			$query = 'SELECT attribs FROM #__flexicontent_fields WHERE id = '.$ext_id;
-		} else {
+			if ($ext_name)
+			{
+				JFactory::getLanguage()->load('plg_flexicontent_fields_'.$ext_name, JPATH_ADMINISTRATOR, 'en-GB', true);
+				JFactory::getLanguage()->load('plg_flexicontent_fields_'.$ext_name, JPATH_ADMINISTRATOR, null, true);
+			}
+			$path = is_dir($directory)  ?  $directory  :  JPATH_ROOT . $directory;
+			$groupname = 'params';  // name="..." of <fields> container
+		}
+		
+		else
+		{
 			echo "not supported extension/view: ".$ext_view;
 			return;
 		}
-		if ($ext_option!='com_flexicontent' && $ext_option!='com_modules' && $ext_option!='com_advancedmodules' && $ext_option!='com_menus') {
+		
+		if ( $ext_view=='module' && $ext_option!='com_modules' && $ext_option!='com_advancedmodules' )
+		{
 			echo '<div class="alert fcpadded fcinlineblock" style="">You are editing module via extension: <span class="label label-warning">'.$ext_option.'</span><br/> - If extension does not call Joomla event <span class="label label-warning">onExtensionBeforeSave</span> then custom layout parameters may not be saved</div>';
+		}
+		
+		if ( !$app->isAdmin() )
+		{
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 		
 		$db->setQuery( $query );
 		$ext_params_str = $db->loadResult();
 		
 		$layout_names = explode(':', $layout_name);
-		if(count($layout_names)>1) {
+		if ( count($layout_names) > 1 ) {
 			$layout_name = $layout_names[1];
-			$layoutpath = JPATH_ROOT.DS.'templates'.DS.$layout_names[0].DS.'html'.DS.'mod_flexicontent/'.$layout_name.'.xml';
-		}else{
-			$layoutpath = $path.DS.$layout_name.'.xml';
+			$layoutpath = JPATH::clean(JPATH_ROOT.DS.'templates'.DS.$layout_names[0].DS.'html'.DS.$ext_name.DS.$layout_name.'.xml');
 		}
-		if (!file_exists($layoutpath)) {
+		
+		if ( empty($layoutpath) || !file_exists($layoutpath) )
+		{
+			$layoutpath = JPATH::clean($path.DS.$layout_name.'.xml');
+		}
+		
+		if ( !file_exists($layoutpath) ) {
 			if (file_exists($path.DS.'_fallback'.DS.'_fallback.xml')) {
 				$layoutpath = $path.DS.'_fallback'.DS.'_fallback.xml';
-				echo '<div class="alert fcpadded fcinlineblock">Currently selected layout: <b>"'.$layout_name.'"</b> does not have a parameters XML file, using general defaults. if this is an old template then these parameters will allow to continue using it, but we recommend that you create parameter file: '.$layout_name.'.xml</div><div class="clear"></div>';
+				echo '<div class="alert alert-warning">Currently selected layout: <b>"'.$layout_name.'"</b> does not have a parameters XML file, using general defaults. if this is an old template then these parameters will allow to continue using it, but we recommend that you create parameter file: '.$layout_name.'.xml</div><div class="clear"></div>';
 			}
 			else {
-				echo !FLEXI_J16GE ? '<div style="font-size: 11px; color: gray; background-color: lightyellow; border: 1px solid lightgray; width: auto; padding: 4px 2%; margin: 1px 8px; height: auto;">' : '<p class="tip">';
-				echo ' Currently selected layout: <b>"'.$layout_name.'"</b> does not have layout specific parameters';
-				echo !FLEXI_J16GE ? '</div>' : '</p>';
+				echo '<div class="alert alert-info">Currently selected layout: <b>"'.$layout_name.'"</b> does not have layout specific parameters</div>';
 				exit;
 			}
 		}
 		
-		//Get data from the model
-		if (FLEXI_J16GE)
-		{
-			// Load XML file
-			if (FLEXI_J30GE) {
-				$xml = simplexml_load_file($layoutpath);
-				$xmldoc = & $xml;
-			} else {
-				$xml = JFactory::getXMLParser('Simple');
-				$xml->loadFile($layoutpath);
-				$xmldoc = & $xml->document;
-			}
-			
-			// Create form object, (form name seems not to cause any problem)
-			$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
-			$tmpl_params = FLEXI_J30GE ? $xmldoc->asXML() : $xmldoc->toString();
-			$jform->load($tmpl_params);
-			
-			// Load existing layout values into the object (that we got from DB)
-			$ext_params = new JRegistry($ext_params_str); // and for J1.5:  new JParameter($ext_params_str);
-			$grpname = 'params'; // this is the name of <fields> container
-			foreach ($jform->getGroup($grpname) as $field) {
-				$fieldname =  $field->__get('fieldname');
-				$value = $ext_params->get($fieldname);
-				if (strlen($value)) $jform->setValue($fieldname, $grpname, $value);
-			}
+		// Get data from the model
+		// Load XML file
+		if (FLEXI_J30GE) {
+			$xml = simplexml_load_file($layoutpath);
+			$xmldoc = & $xml;
+		} else {
+			$xml = JFactory::getXMLParser('Simple');
+			$xml->loadFile($layoutpath);
+			$xmldoc = & $xml->document;
 		}
-		else {
-			// Create a parameters object
-			$form = new JParameter('', $layoutpath);
-			
-			// Load existing layout values into the object (that we got from DB)
-			$form->loadINI($ext_params_str);
+		
+		// Create form object, (form name seems not to cause any problem)
+		$form_layout = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+		$tmpl_params = FLEXI_J30GE ? $xmldoc->asXML() : $xmldoc->toString();
+		$form_layout->load($tmpl_params);
+		
+		// Load existing layout values into the object (that we got from DB)
+		$ext_params = new JRegistry($ext_params_str);
+		
+		foreach ($form_layout->getGroup($groupname) as $field)
+		{
+			$fieldname = $field->fieldname;
+			$value = $ext_params->get($fieldname);
+			if (strlen($value)) $form_layout->setValue($fieldname, $groupname, $value);
 		}
 		
 		if ($layout_name)
 		{
-			if (!FLEXI_J16GE) {
-				echo $form->render('params', 'layout' );
-			} else {
-				?>
-				<fieldset class="panelform"><?php /*<ul class="adminformlist">*/ ?>
-					<?php
-					$grpname = 'params'; // this is the name of <fields> container
-					foreach ($jform->getGroup($grpname) as $field) {
-						//echo '<li>'. $field->label . $field->input .'</li>';
-						$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
-							$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
-
-						echo '
-						<fieldset class="panelform '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-							'.($field->label ? '
-								<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-								<div class="container_fcfield">'.$field->input.'</div>
-							' : $field->input).'
-						</fieldset>';
-					}
-					?>
-				<?php /*</ul>*/?></fieldset>
+			$fieldSets = $form_layout->getFieldsets($groupname);
+			
+			foreach ($fieldSets as $fsname => $fieldSet) : ?>
+			
+			<div class="fc_layout_box_outer">
+				
 				<?php
-			}
+				if (isset($fieldSet->label) && trim($fieldSet->label)) :
+					echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.JText::_($fieldSet->label).'</div>';
+				endif;
+				if (isset($fieldSet->description) && trim($fieldSet->description)) :
+					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+				endif;
+				
+				foreach ($form_layout->getFieldset($fsname) as $field) :
+				
+					if ($field->getAttribute('not_inherited')) continue;
+					if ($field->getAttribute('cssprep')) continue;
+					
+					$_depends = $field->getAttribute('depend_class');
+					
+					//echo $field->label . $field->input;
+					$_label = str_replace('class="', 'class="label label-fcinner ', $field->label);
+					if ($ext_type == 'templates')
+					{
+						$_label = str_replace('jform_attribs_', 'jform_layouts_'.$ext_name.'_', $_label);
+						$_input = str_replace('jform_attribs_', 'jform_layouts_'.$ext_name.'_',
+							str_replace('[attribs]', '[layouts]['.$ext_name.']', $field->input)
+						);
+					}
+					else $_input = $field->input;
+					echo '
+					<fieldset class="panelform '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						'.($field->label ? '
+							<span class="label-fcouter">
+								'.$_label.'
+							</span>
+							<div class="container_fcfield">
+								'.$_input.'
+							</div>
+						' : $field->input).'
+					</fieldset>';
+				endforeach; ?>
+					
+			</div>
+			
+			<?php endforeach; //fieldSets
 		} else {
-			echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
+			echo "<br /><div class=\"alert alert-info\" style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</div><br />";
 		}
 		//parent::display($tpl);
 	}

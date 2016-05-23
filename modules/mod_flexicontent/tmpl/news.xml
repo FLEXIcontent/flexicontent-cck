@@ -26,17 +26,17 @@
 				<option value="7">7</option>
 				<option value="8">8</option>
 			</field>
-			<field name="news_item_placement_feat" type="radio" default="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
+			<field name="news_item_placement_feat" type="radio" default="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
-			<field name="news_hl_items_onnav_feat" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes">
+			<field name="news_hl_items_onnav_feat" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="2">On Hover</option>
 			</field>
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
-			<field name="news_content_layout_feat" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
+			<field name="news_content_layout_feat" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part" class="btn-group group-fcinfo">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
 				<option value="2">Cleared (Above)</option>
@@ -45,20 +45,20 @@
 				<option value="5">Overlayed (Bottom)</option>
 				<option value="6">Overlayed (Full)</option>
 			</field>
-			<field name="news_content_display_feat" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="news_content_display_feat" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 				<option value="0">Always visible</option>
 				<!--option value="1">On mouse over / item active</option-->
 				<option value="2">On mouse over</option>
 			</field>
-			<field name="news_img_fit_feat" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="news_img_fit_feat" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
 			
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
-			<field name="news_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers">
-				<option value="1">FLEXI_YES</option>
+			<field name="news_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
 				<option value="0">No (use default/custom CSS)</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="news_padding_top_bottom_feat" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="news_padding_left_right_feat" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
@@ -79,39 +79,39 @@
 				<option value="7">7</option>
 				<option value="8">8</option>
 			</field>
-			<field name="news_item_placement" type="radio" default="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
+			<field name="news_item_placement" type="radio" default="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
-			<field name="news_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes">
+			<field name="news_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="2">On Hover</option>
 			</field>
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
-			<field name="news_content_layout" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
+			<field name="news_content_layout" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part" class="btn-group group-fcinfo">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
 				<option value="2">Cleared (Above)</option>
 				<option value="3">Cleared (Below)</option>
 				<option value="4">Overlayed (Top)</option>
-				<option value="5">Overlayed (Bottom **)</option>
+				<option value="5">Overlayed (Bottom)</option>
 				<option value="6">Overlayed (Full)</option>
 			</field>
-			<field name="news_content_display" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="news_content_display" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 				<option value="0">Always visible</option>
 				<!--option value="1">On mouse over / item active</option-->
 				<option value="2">On mouse over</option>
 			</field>
-			<field name="news_img_fit" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="news_img_fit" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
 			
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
-			<field name="news_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers">
-				<option value="1">FLEXI_YES</option>
+			<field name="news_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
 				<option value="0">No (use default/custom CSS)</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="news_padding_top_bottom" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="news_padding_left_right" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />

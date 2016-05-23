@@ -56,11 +56,16 @@ class JFormFieldCategorylayout extends JFormFieldList
 		$value = $this->value;
 		//$value = $value ? $value : @$attributes['default'];
 		
-		$view	= JRequest::getVar('view');
-		$controller	= JRequest::getVar('controller');
 		$app = JFactory::getApplication();
 		$db  = JFactory::getDBO();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$jinput  = $app->input;
+		$view	= $jinput->get('view', '', 'cmd');
+		$controller	= $jinput->get('controller', '', 'cmd');
+		
+		// Get RECORED id of current view
+		$cid = $jinput->get('cid', array(0), 'array');
+		$pk = (int)$cid[0];
 		
 		// GET LIMITING to specific templates according to item's type, or according to type of new item
 		$allowed_tmpls = array();
@@ -82,59 +87,100 @@ class JFormFieldCategorylayout extends JFormFieldList
 			if ( !$cparams->get($attributes['enableparam']) ) return '';
 		}
 		
-if ( ! @$attributes['skipparams'] ) {
+if ( ! @$attributes['skipparams'] )
+{
+		$ext_option = 'com_flexicontent';
+		$ext_view = $view;
 		$doc 	= JFactory::getDocument();
 		$js 	= "
 var tmpl = ['".$lays."'];
 
-function disablePanel(element) {
-	if ( ! jQuery('#'+element+'-attribs-options') ) return;
+function clayout_disablePanel(element)
+{
+	var el, panel = jQuery('#'+element+'-attribs-options').next();
 	
-	var panel 	= jQuery('#'+element+'-attribs-options').next();
-	var selects = panel.find('select');
-	var inputs 	= panel.find('input');
-	panel.parent().addClass('pane-disabled');
-	selects.each(function(index){
-		jQuery(this).attr('disabled', 'disabled');
+	if ( !panel.length ) return;
+	if ( panel.parent().hasClass('pane-disabled') ) return;
+	
+	var form_fields_active = panel.find('textarea:enabled, select:enabled, input[type=\"radio\"]:enabled:checked, input[type=\"checkbox\"]:enabled:checked, input:not(:button):not(:radio):not(:checkbox):enabled');
+	form_fields_active.each(function(index)
+	{
+		el = jQuery(this);
+		//if ( el.is(':disabled') ) return;  // no need, because above we selected only enabled elements
+		el.addClass('fclayout_disabled_element');
+		el.attr('disabled', 'disabled');
 	});
-	inputs.each(function(index){
-		jQuery(this).attr('disabled', 'disabled');
-	});
-	panel.parent().css('display','none');
+	
+	panel.parent().addClass('pane-disabled').hide();
 }
 
-function enablePanel(element) {
-	if ( ! jQuery('#'+element+'-attribs-options') ) return;
+function clayout_loadPanel(element)
+{
+	var panel_header_id = element+'-attribs-options',
+		panel_id = panel_header_id + '-panel';
 	
-	var panel 	= jQuery('#'+element+'-attribs-options').next();
-	var selects = panel.find('select');
-	var inputs 	= panel.find('input');
-	panel.parent().removeClass('pane-disabled');
-	selects.each(function(index){
-		jQuery(this).removeAttr('disabled');
-	});
-	inputs.each(function(index){
-		jQuery(this).removeAttr('disabled');
-	});
-	panel.parent().css('display','');
+	var el,
+		panel_header = jQuery('#'+panel_header_id),
+		panel = panel_header.next();
+	
+	if ( !panel.length ) return;
+	
+	if ( !panel.parent().hasClass('pane-disabled') ) panel.addClass('fc_layout_loaded');
+	
+	// Add LOADING animation into the panel header, and show outer box that contains the panel header and the panel
+	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">';
+	panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"></i>'+(panel.hasClass('fc_layout_loaded') ? '".JText::_( 'FLEXI_REFRESHING' )."' : '".JText::_( 'FLEXI_LOADING' )."')+' ... '+_loading_img+'</span></span></a>');
+	panel.parent().removeClass('pane-disabled').show();
+	
+	// Re-enabled an already loaded panel, (avoid re-downloading which will cause modified parameters to be lost)
+	if ( panel.hasClass('fc_layout_loaded') )
+	{
+	 	panel.find('.fclayout_disabled_element').removeAttr('disabled').removeClass('fclayout_disabled_element');
+	 	setTimeout(function(){
+			panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"></i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'</span></span></a>');
+	 	}, 300);
+		
+	}
+	
+	// (AJAX) Retrieve layout parameters for the selected template
+	else
+	{
+		panel.attr('id', panel_id);
+		jQuery.ajax({
+			type: 'GET',
+			url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_view=".$ext_view."&ext_option=".$ext_option."&ext_name='+element+'&ext_id=".$pk."&layout_name=category&ext_type=templates&directory='+element+'&format=raw',
+			success: function(str)
+			{
+				panel.addClass('fc_layout_loaded').html(str);
+				
+				jQuery('.hasTooltip').tooltip({'html': true,'container': panel});
+				fc_bindFormDependencies('#'+panel_id, 0, '');
+				fc_bootstrapAttach('#'+panel_id);
+				//tabberAutomatic(tabberOptions, panel_id);
+				
+				panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"></i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'</span></span></a>');
+			}
+		});
+	}
 }
 
-function activatePanel(active) {
+function clayout_activatePanel(active)
+{
 	var inactives = jQuery.grep(tmpl, function( item, index ) {
 		return item != active;
 	});
 	
 	inactives.each(function(el){
-		disablePanel(el);
+		clayout_disablePanel(el);
 	});
 	
 	if (active) {
-		enablePanel(active);
+		clayout_loadPanel(active);
 	}
 }
 
 jQuery(document).ready(function() {
-	activatePanel('".$value."');
+	clayout_activatePanel('".$value."');
 });
 ";
 		$doc->addScriptDeclaration($js);
@@ -164,7 +210,7 @@ jQuery(document).ready(function() {
 		
 		if ( ! @$attributes['skipparams'] )
 		{
-			$attribs .= ' onchange="activatePanel(this.value);"';
+			$attribs .= ' onchange="clayout_activatePanel(this.value);"';
 		}
 		
 		if ($inline_tip = @$attributes['inline_tip'])

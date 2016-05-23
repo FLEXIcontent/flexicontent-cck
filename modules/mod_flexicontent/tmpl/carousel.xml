@@ -27,17 +27,17 @@
 				<option value="7">7</option>
 				<option value="8">8</option>
 			</field>
-			<field name="carousel_item_placement_feat" type="radio" default="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
+			<field name="carousel_item_placement_feat" type="radio" default="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
-			<field name="carousel_hl_items_onnav_feat" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes">
+			<field name="carousel_hl_items_onnav_feat" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="2">On Hover</option>
 			</field>
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
-			<field name="carousel_content_layout_feat" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part">
+			<field name="carousel_content_layout_feat" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part" class="btn-group group-fcinfo">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
 				<option value="2">Cleared (Above)</option>
@@ -46,20 +46,20 @@
 				<option value="5">Overlayed (Bottom)</option>
 				<option value="6">Overlayed (Full)</option>
 			</field>
-			<field name="carousel_content_display_feat" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="carousel_content_display_feat" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 				<option value="0">Always visible</option>
 				<!--option value="1">On mouse over / item active</option-->
 				<option value="2">On mouse over</option>
 			</field>
-			<field name="carousel_img_fit_feat" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="carousel_img_fit_feat" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
 			
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
-			<field name="carousel_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers">
-				<option value="1">FLEXI_YES</option>
+			<field name="carousel_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
 				<option value="0">No (use default/custom CSS)</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="carousel_padding_top_bottom_feat" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="carousel_padding_left_right_feat" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
@@ -72,7 +72,7 @@
 			
 			
 			<field name="" type="separator" default="Content / image placement" level="level2" />
-			<field name="carousel_content_layout" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part">
+			<field name="carousel_content_layout" type="radio" default="3" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: overlayed will crop content that does not fit from the bottom part" class="btn-group group-fcinfo">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
 				<option value="2">Cleared (Above)</option>
@@ -81,20 +81,20 @@
 				<option value="5">Overlayed (Bottom)</option>
 				<option value="6">Overlayed (Full)</option>
 			</field>
-			<field name="carousel_content_display" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="carousel_content_display" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 				<option value="0">Always visible</option>
 				<option value="1">On mouse over / item active</option>
 				<option value="2">On mouse over</option>
 			</field>
-			<field name="carousel_img_fit" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="carousel_img_fit" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container" class="btn-group group-fcinfo">
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
 			
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
-			<field name="carousel_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers">
-				<option value="1">FLEXI_YES</option>
+			<field name="carousel_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
 				<option value="0">No (use default/custom CSS)</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="carousel_padding_top_bottom" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="carousel_padding_left_right" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
@@ -103,13 +103,13 @@
 			<field name="carousel_margin_left_right" type="text" default="0" label="margin left/right" description="This is the margin applied at left and right of the items" />
 			
 			<field name="" type="separator" default="Carousel Layout" level="level0" />
-			<field name="carousel_mode" type="radio" default="horizontal" label="Direction" description="Description of scrolling">
+			<field name="carousel_mode" type="radio" default="horizontal" label="Direction" description="Description of scrolling" class="btn-group group-fcinfo">
 				<option value="vertical">Vertical</option>
 				<option value="horizontal">Horizontal</option>
 			</field>
 			
 			<field name="" type="separator" default="Responsive or Fixed" level="level2" />
-			<field name="carousel_responsive" type="radio" default="1" label="Sizing method" description="Select to set number of items or fixed size, width (horizontal mode) OR height (vertical mode)">
+			<field name="carousel_responsive" type="radio" default="1" label="Sizing method" description="Select to set number of items or fixed size, width (horizontal mode) OR height (vertical mode)" class="btn-group group-fcinfo">
 				<option value="0">fixed size (px)</option>
 				<option value="1"># items (responsive)</option>
 			</field>
@@ -117,51 +117,51 @@
 			<field name="carousel_items_per_page" type="text" default="2" label="# items" description="Number of items that will be displayed, use 1 for 'slideshow' effect" />
 			
 			<field name="" type="separator" default="Navigation" level="level1" />
-			<field name="carousel_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes">
+			<field name="carousel_hl_items_onnav" type="radio" default="0" label="Highlight items" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Active</option>
 				<option value="2">On Hover</option>
 				<option value="3">Both</option>
 			</field>
-			<field name="carousel_edgewrap" type="radio" default="1" label="Edge wrap around" description="When an edge is reached wrap around to the other edge">
+			<field name="carousel_edgewrap" type="radio" default="1" label="Edge wrap around" description="When an edge is reached wrap around to the other edge" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="Touch (mobile) / mouse support" level="level2" />
-			<field name="carousel_touch_walk" type="radio" default="1" label="Walk via touch drag" description="Allow mobile user to walk the carousel via touch drag">
+			<field name="carousel_touch_walk" type="radio" default="1" label="Walk via touch drag" description="Allow mobile user to walk the carousel via touch drag" class="btn-group btn-group-yesno">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
 			</field>
-			<field name="carousel_mouse_walk" type="radio" default="0" label="Walk via mouse drag" description="Allow desktop user to walk the carousel via mouse drag">
+			<field name="carousel_mouse_walk" type="radio" default="0" label="Walk via mouse drag" description="Allow desktop user to walk the carousel via mouse drag" class="btn-group btn-group-yesno">
 				<option value="0">No, recommended</option>
 				<option value="1">Yes, (experimental)</option>
 			</field>
 			<field name="carousel_drag_margin" type="text" default="100" label="Drag margin (px)" description="Minimum margin in pixel for doing a walk of the carousel via touch or mouse drag"/>
 			
 			<field name="" type="separator" default="Autoplay" level="level2" />
-			<field name="carousel_autoplay" type="radio" default="1" label="Enable" description="Start playing after page loads">
+			<field name="carousel_autoplay" type="radio" default="1" label="Enable" description="Start playing after page loads" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="carousel_interval" type="text" default="5000" label="Play Interval (ms)" description="Milliseconds between autoplay steps" />
-			<field name="carousel_method" type="radio" default="page" label="Play Method" description="The carousel can move to next / previous item, or to next / previous page">
+			<field name="carousel_method" type="radio" default="page" label="Play Method" description="The carousel can move to next / previous item, or to next / previous page" class="btn-group group-fcinfo">
 				<option value="item">Single Item</option>
 				<option value="page">Full Page</option>
 			</field>
 			
 			<field name="" type="separator" default="Page Buttons" level="level2" />
-			<field name="carousel_show_page_handles" type="radio" default="1" label="Enable" description="Display One page button per page of items">
+			<field name="carousel_show_page_handles" type="radio" default="1" label="Enable" description="Display One page button per page of items" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="carousel_page_handle_event" type="radio" default="click" label="Activation Event" description="How the page buttons will get activated">
+			<field name="carousel_page_handle_event" type="radio" default="click" label="Activation Event" description="How the page buttons will get activated" class="btn-group group-fcinfo">
 				<option value="mouseover">Mouse Over</option>
 				<option value="click">Click</option>
 			</field>
 			
 			<field name="" type="separator" default="Item Buttons" level="level2" />
-			<field name="carousel_show_handles" type="radio" default="1" label="Enable" description="Display One Thumbnail will be created per content item, and content will be accessible via click or mouseover">
+			<field name="carousel_show_handles" type="radio" default="1" label="Enable" description="Display One Thumbnail will be created per content item, and content will be accessible via click or mouseover" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -170,54 +170,54 @@
 			<field name="" type="separator" default="Thumbnails" level="level3" />
 			<field name="carousel_handle_width" type="text" default="64" label="Width" description="This is the width of thumbnail image of each item" />
 			<field name="carousel_handle_height" type="text" default="64" label="Height" description="This is the height of thumbnail image of each item" />
-			<field name="carousel_handle_event" type="radio" default="mouseover" label="Activation Event" description="How the content item buttons get activated">
+			<field name="carousel_handle_event" type="radio" default="mouseover" label="Activation Event" description="How the content item buttons get activated" class="btn-group group-fcinfo">
 				<option value="mouseover">Mouse Over</option>
 				<option value="click">Click</option>
 			</field>
 			
 			<field name="" type="separator" default="Item Info" level="level3" />
-			<field name="carousel_handle_title" type="radio" default="0" label="Title" description="Display a title for the thumbnail, e.g. as tooltip or caption">
+			<field name="carousel_handle_title" type="radio" default="0" label="Title" description="Display a title for the thumbnail, e.g. as tooltip or caption" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Thumbnail Tooltip</option>
 				<option value="2">Info Box</option>
 			</field>
-			<field name="carousel_handle_text" type="radio" default="0" label="Description" description="Display a title for the thumbnail, e.g. as tooltip or caption">
+			<field name="carousel_handle_text" type="radio" default="0" label="Description" description="Display a title for the thumbnail, e.g. as tooltip or caption" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Thumbnail Tooltip</option>
 				<option value="2">Info Box</option>
 			</field>
 			
 			<field name="" type="separator" default="Playback controls" level="level2" />
-			<field name="carousel_show_controls" type="radio" default="1" label="Enable" description="Display  previous, next, previous page, next page, play, playback, stop, etc controls. The integrated controls will be placed inside or at the edges of the ITEM display area usually as big arrows but maybe customized to display differently. Integrated controls can be configured to transition single item or a full page">
+			<field name="carousel_show_controls" type="radio" default="1" label="Enable" description="Display  previous, next, previous page, next page, play, playback, stop, etc controls. The integrated controls will be placed inside or at the edges of the ITEM display area usually as big arrows but maybe customized to display differently. Integrated controls can be configured to transition single item or a full page" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Intergrated</option>
 				<option value="2">Detached controls</option>
 			</field>
 			
 			<field name="" type="separator" default="Intergrated controls" level="level3" />
-			<field name="carousel_icontrols_method" type="radio" default="page" label="Play Method" description="The carousel can move to next / previous item, or to next / previous page">
+			<field name="carousel_icontrols_method" type="radio" default="page" label="Play Method" description="The carousel can move to next / previous item, or to next / previous page" class="btn-group group-fcinfo">
 				<option value="item">Single Item</option>
 				<option value="page">Full Page</option>
 			</field>
 			
 			<field name="" type="separator" default="Detached controls" level="level3" />
-			<field name="carousel_dcontrols_labels" type="radio" default="1" label="Show labels" description="Display Autoplay, Pages, Items label in front of the controls">
+			<field name="carousel_dcontrols_labels" type="radio" default="1" label="Show labels" description="Display Autoplay, Pages, Items label in front of the controls" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="carousel_dcontrols_icon" type="radio" default="0" label="Icons type" description="Choose to display images, or bootstrap based icons (needs J3+)">
+			<field name="carousel_dcontrols_icon" type="radio" default="0" label="Icons type" description="Choose to display images, or bootstrap based icons (needs J3+)" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_IMAGE</option>
 				<option value="1">Bootstrap</option>
 			</field>			
-			<field name="carousel_dcontrols_auto" type="radio" default="1" label="Autoplay controls" description="Display Autoplay controls">
+			<field name="carousel_dcontrols_auto" type="radio" default="1" label="Autoplay controls" description="Display Autoplay controls" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="carousel_dcontrols_pages" type="radio" default="1" label="Page controls" description="Display Page controls">
+			<field name="carousel_dcontrols_pages" type="radio" default="1" label="Page controls" description="Display Page controls" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="carousel_dcontrols_items" type="radio" default="1" label="Item controls" description="Display Item controls">
+			<field name="carousel_dcontrols_items" type="radio" default="1" label="Item controls" description="Display Item controls" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -250,23 +250,23 @@
 			<field name="carousel_jqe_times" type="text" default="5" label="Effect times" description="Number of times to bounce" depend_class="jqe-times"/>
 			<field name="carousel_jqe_distance" type="text" default="20" label="Distance" description="Distance of bouncing" depend_class="jqe-dist"/>
 			<field name="carousel_jqe_pieces" type="text" default="4" label="Explode pieces" description="Number of explosion pieces" depend_class="jqe-pieces"/>
-			<field name="carousel_jqe_direction" type="radio" default="horizontal" label="Effect direction" description="Effect direction: horizontally, vertically" depend_class="jqe-dir">
+			<field name="carousel_jqe_direction" type="radio" default="horizontal" label="Effect direction" description="Effect direction: horizontally, vertically" depend_class="jqe-dir" class="btn-group group-fcinfo">
 				<option value="horizontal">Horizontal</option>
-				<option value="vertical">Vertical</option>	
+				<option value="vertical">Vertical</option>
 			</field>
-			<field name="carousel_jqe_direction_arrow" type="radio" default="right" label="Effect direction" description="Effect direction: up, down, left, right" depend_class="jqe-dir-arrow">
+			<field name="carousel_jqe_direction_arrow" type="radio" default="right" label="Effect direction" description="Effect direction: up, down, left, right" depend_class="jqe-dir-arrow" class="btn-group group-fcinfo">
 				<option value="up">Up</option>
-				<option value="down">Down</option>	
+				<option value="down">Down</option>
 				<option value="left">Left</option>
-				<option value="right">Right</option>	
+				<option value="right">Right</option>
 			</field>
-			<field name="carousel_jqe_direction_blind" type="radio" default="up" label="Effect direction" description="Effect direction: up, down, left, right, vertical, horizontal" depend_class="jqe-dir-bl">
+			<field name="carousel_jqe_direction_blind" type="radio" default="up" label="Effect direction" description="Effect direction: up, down, left, right, vertical, horizontal" depend_class="jqe-dir-bl" class="btn-group group-fcinfo">
 				<option value="up">Up</option>
-				<option value="down">Down</option>	
+				<option value="down">Down</option>
 				<option value="left">Left</option>
-				<option value="right">Right</option>	
+				<option value="right">Right</option>
 				<option value="horizontal">Horizontal</option>
-				<option value="vertical">Vertical</option>	
+				<option value="vertical">Vertical</option>
 			</field>
 			
 			<field name="" type="separator" default="Transition smoothing" level="level2" />
@@ -288,7 +288,7 @@
 					<option value="elastic">Elastic</option>
 				</group>
 			</field>
-			<field name="carousel_easing_inout" type="list" default="easeOut" label="Slow start/ending" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" >
+			<field name="carousel_easing_inout" type="radio" default="easeOut" label="Slow start/ending" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" class="btn-group group-fcinfo">
 				<option value="easeIn">easeIn</option>
 				<option value="easeOut">easeOut</option>
 				<option value="easeInOut">easeInOut</option>

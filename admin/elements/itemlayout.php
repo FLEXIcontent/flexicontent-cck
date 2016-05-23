@@ -56,46 +56,59 @@ class JFormFieldItemlayout extends JFormFieldList
 		$value = $this->value;
 		//$value = $value ? $value : @$attributes['default'];
 		
-		$view	= JRequest::getVar('view');
-		$controller	= JRequest::getVar('controller');
 		$app = JFactory::getApplication();
 		$db  = JFactory::getDBO();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$jinput  = $app->input;
+		$view	= $jinput->get('view', '', 'cmd');
+		$controller	= $jinput->get('controller', '', 'cmd');
+		
+		// Get RECORED id of current view
+		if (!$app->isAdmin()) {
+			// FRONTEND, use "id" from request
+			$pk = $jinput->get('id', 0, 'int');
+		} else {
+			// BACKEND, use "cid" array from request
+			$cid = $jinput->get('cid', array(0), 'array');
+			$pk = (int)$cid[0];
+		}
 		
 		// GET LIMITING to specific templates according to item's type, or according to type of new item
 		$allowed_tmpls = array();
 		$all_tmpl_allowed = true;
 		$type_default_layout = '';
 		$type_default_layout_mobile = '';
-		if ( $view==FLEXI_ITEMVIEW || ($app->isAdmin() && $controller=='items') )
+		
+		if ( $view=='item' )
 		{
-			// Get item id
-			if (!$app->isAdmin()) {
-				// FRONTEND, use "id" from request
-				$pk = JRequest::getVar('id', 0, 'default', 'int');
-			} else {
-				// BACKEND, use "cid" array from request
-				$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
-				$pk = (int)$cid[0];
-			}
+			// Get typeid from URL
+			$typeid = $jinput->get('typeid', 0, 'int');
 			
 			// Get type attibutes
-			if ($pk) {
-				$query = 'SELECT t.id as id, t.attribs attribs'
+			$query = false;
+			if ($pk)
+			{
+				$query = 'SELECT t.id, t.attribs'
 					. ' FROM #__flexicontent_items_ext as ie'
 					. ' JOIN #__flexicontent_types as t ON ie.type_id=t.id'
 					. ' WHERE ie.item_id = ' . (int)$pk;
-			} else {
-				$typeid = (int)JRequest::getInt('typeid', 0);
-				$query = 'SELECT t.id,t.attribs'
+			}
+			else if ($typeid)
+			{
+				$query = 'SELECT t.id, t.attribs'
 					. ' FROM #__flexicontent_types as t'
 					. ' WHERE t.id = ' . (int)$typeid;
 			}
-			$db->setQuery($query);
-			$typedata = $db->loadObject();
+			
+			if ($query)
+			{
+				$db->setQuery($query);
+				$typedata = $db->loadObject();
+			}
 			
 			// Finally get allowed templates
-			if ($typedata) {
+			if ( !empty($typedata) )
+			{
 				$tparams = new JRegistry($typedata->attribs);
 				$type_default_layout = $tparams->get('ilayout', 'default');
 				$type_default_layout_mobile = $tparams->get('ilayout_mobile', JText::_('FLEXI_USE_DESKTOP'));
@@ -107,7 +120,9 @@ class JFormFieldItemlayout extends JFormFieldList
 				
 				$use_mobile_layouts = $cparams->get('use_mobile_layouts', 0 );
 				if ($use_mobile_layouts && $type_default_layout_mobile)
+				{
 					if ( !in_array( $type_default_layout_mobile, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout_mobile;
+				}
 				//echo "Allowed Templates: "; print_r($allowed_tmpls); echo "<br>\n";
 			}
 		}
@@ -126,12 +141,15 @@ class JFormFieldItemlayout extends JFormFieldList
 			if ( !$cparams->get($attributes['enableparam']) ) return '';
 		}
 		
-if ( ! @$attributes['skipparams'] ) {
+if ( ! @$attributes['skipparams'] )
+{
+		$ext_option = 'com_flexicontent';
+		$ext_view = $view;
 		$doc 	= JFactory::getDocument();
 		$js 	= "
 var tmpl = ['".$lays."'];
 
-function disablePanel(element)
+function ilayout_disablePanel(element)
 {
 	var el, panel = jQuery('#'+element+'-attribs-options').next();
 	
@@ -150,37 +168,76 @@ function disablePanel(element)
 	panel.parent().addClass('pane-disabled').hide();
 }
 
-function enablePanel(element)
+function ilayout_loadPanel(element)
 {
-	var el, panel = jQuery('#'+element+'-attribs-options').next();
+	var panel_header_id = element+'-attribs-options',
+		panel_id = panel_header_id + '-panel';
+	
+	var el,
+		panel_header = jQuery('#'+panel_header_id),
+		panel = panel_header.next();
 	
 	if ( !panel.length ) return;
-	if ( !panel.parent().hasClass('pane-disabled') ) return;
 	
-	panel.find('.fclayout_disabled_element').removeAttr('disabled').removeClass('fclayout_disabled_element');
+	if ( !panel.parent().hasClass('pane-disabled') ) panel.addClass('fc_layout_loaded');
+	
+	// Add LOADING animation into the panel header, and show outer box that contains the panel header and the panel
+	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">';
+	panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"></i>'+(panel.hasClass('fc_layout_loaded') ? '".JText::_( 'FLEXI_REFRESHING' )."' : '".JText::_( 'FLEXI_LOADING' )."')+' ... '+_loading_img+'</span></span></a>');
 	panel.parent().removeClass('pane-disabled').show();
+	
+	// Re-enabled an already loaded panel, (avoid re-downloading which will cause modified parameters to be lost)
+	if ( panel.hasClass('fc_layout_loaded') )
+	{
+	 	panel.find('.fclayout_disabled_element').removeAttr('disabled').removeClass('fclayout_disabled_element');
+	 	setTimeout(function(){
+			panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"></i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'</span></span></a>');
+	 	}, 300);
+		
+	}
+	
+	// (AJAX) Retrieve layout parameters for the selected template
+	else
+	{
+		panel.attr('id', panel_id);
+		jQuery.ajax({
+			type: 'GET',
+			url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_view=".$ext_view."&ext_option=".$ext_option."&ext_name='+element+'&ext_id=".$pk."&layout_name=item&ext_type=templates&directory='+element+'&format=raw',
+			success: function(str)
+			{
+				panel.addClass('fc_layout_loaded').html(str);
+				
+				jQuery('.hasTooltip').tooltip({'html': true,'container': panel});
+				fc_bindFormDependencies('#'+panel_id, 0, '');
+				fc_bootstrapAttach('#'+panel_id);
+				//tabberAutomatic(tabberOptions, panel_id);
+				
+				panel_header.html('<a href=\"javascript:void(0);\"><span><span class=\"btn\"><i class=\"icon-edit\"></i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'</span></span></a>');
+			}
+		});
+	}
 }
 
-function activatePanel(active)
+function ilayout_activatePanel(active)
 {
 	var inactives = jQuery.grep(tmpl, function( item, index ) {
 		return item != active;
 	});
 	
 	inactives.each(function(el){
-		disablePanel(el);
+		ilayout_disablePanel(el);
 	});
 	
 	if (active) {
-		enablePanel(active);
-		if ( jQuery('#__content_type_default_layout__') ) jQuery('#__content_type_default_layout__').css('display','none');
+		ilayout_loadPanel(active);
+		if ( jQuery('#__content_type_default_layout__') ) jQuery('#__content_type_default_layout__').hide();
 	} else {
-		if ( jQuery('#__content_type_default_layout__') ) jQuery('#__content_type_default_layout__').css('display','');
+		if ( jQuery('#__content_type_default_layout__') ) jQuery('#__content_type_default_layout__').show();
 	}
 }
 
 jQuery(document).ready(function() {
-	activatePanel('".$value."');
+	ilayout_activatePanel('".$value."');
 });
 ";
 		$doc->addScriptDeclaration($js);
@@ -213,7 +270,7 @@ jQuery(document).ready(function() {
 		
 		if ( ! @$attributes['skipparams'] )
 		{
-			$attribs .= ' onchange="activatePanel(this.value);"';
+			$attribs .= ' onchange="ilayout_activatePanel(this.value);"';
 		}
 		
 		return JHTML::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id);
@@ -227,7 +284,7 @@ jQuery(document).ready(function() {
 		$attributes = $attributes['@attributes'];
 		
 		if ( @$attributes['enableparam'] ) {
-			if ( !JComponentHelper::getParams( 'com_flexicontent' )->get($attributes['enableparam']) ) return '';
+			if ( !JComponentHelper::getParams('com_flexicontent')->get($attributes['enableparam']) ) return '';
 		}
 		
 		$label = $this->element['label'];

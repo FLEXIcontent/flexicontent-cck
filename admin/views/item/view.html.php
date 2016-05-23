@@ -60,7 +60,6 @@ class FlexicontentViewItem extends JViewLegacy
 		$params  = new JRegistry();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
-		$params = clone( JComponentHelper::getParams('com_flexicontent') );
 		
 		// Some flags
 		$enable_translation_groups = flexicontent_db::useAssociations(); //$params->get("enable_translation_groups");
@@ -343,6 +342,7 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 		}
 		
+		
 		// *****************************************************************************
 		// (a) Apply Content Type Customization to CORE fields (label, description, etc)
 		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
@@ -456,15 +456,6 @@ class FlexicontentViewItem extends JViewLegacy
 			// NOTE: This will normally return the already set versioned value of categories ($item->categories)
 			$selectedcats = $this->get( 'Catsselected' );
 		}
-
-		//$selectedcats 	= $isnew ? array() : $fields['categories']->value;
-
-		//echo "<br/>row->tags: "; print_r($item->tags);
-		//echo "<br/>usedtagsIds: "; print_r($usedtagsIds);
-		//echo "<br/>usedtags (data): "; print_r($usedtags);
-
-		//echo "<br/>row->categories: "; print_r($item->categories);
-		//echo "<br/>selectedcats: "; print_r($selectedcats);
 		
 		
 		
@@ -610,7 +601,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$authorparams = flexicontent_db::getUserConfig($user->id);
 		
 		// Get author's maximum allowed categories per item and set js limitation
-		$max_cat_assign = intval($authorparams->get('max_cat_assign',0));
+		$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
 		$document->addScriptDeclaration('
 			max_cat_assign_fc = '.$max_cat_assign.';
 			existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
@@ -682,7 +673,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$fieldname = 'jform[cid][]';
 			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
 			
-			// Skip main category from the selected cats to allow easy change of it
+			// Skip main category from the selected secondary cats to allow easy change of it
 			$selectedcats_nomain = array();
 			foreach($selectedcats as $cat_id) if ($cat_id!=$item->catid) $selectedcats_nomain[] = $cat_id;
 			
@@ -791,25 +782,28 @@ class FlexicontentViewItem extends JViewLegacy
 		// Handle Template related work
 		// ****************************
 
-		// (a) Get the templates structures used to create form fields for template parameters
+		// (a) Get the item layouts
 		$themes			= flexicontent_tmpl::getTemplates();
 		$tmpls_all	= $themes->items;
 
 		// (b) Get Content Type allowed templates
 		$allowed_tmpls = $tparams->get('allowed_ilayouts');
 		$type_default_layout = $tparams->get('ilayout', 'default');
-		
-		// Load language file
-		//*** TODO make loading of templates to BE AJAX
-		FLEXIUtilities::loadTemplateLanguageFile( $item->itemparams->get('ilayout', $type_default_layout) );
-		
-		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
-		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = explode("|", $allowed_tmpls);
 
-		// (c) Add default layout, unless all templates allowed (=array is empty)
+		// (c) Load language file of currently selected template
+		$_ilayout = $item->itemparams->get('ilayout', $type_default_layout);
+		if ($_ilayout) FLEXIUtilities::loadTemplateLanguageFile( $_ilayout );
+
+		// (d) Get allowed layouts adding default layout (unless all templates are already allowed ... array is empty)
+		if ( empty($allowed_tmpls) ) {
+			$allowed_tmpls = array();
+		}
+		if ( ! is_array($allowed_tmpls) ) {
+			$allowed_tmpls = explode("|", $allowed_tmpls);
+		}
 		if ( count ($allowed_tmpls) && !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
 
-		// (d) Create array of template data according to the allowed templates for current content type
+		// (e) Create array of template data according to the allowed templates for current content type
 		if ( count($allowed_tmpls) ) {
 			foreach ($tmpls_all as $tmpl) {
 				if (in_array($tmpl->name, $allowed_tmpls) ) {
@@ -820,13 +814,15 @@ class FlexicontentViewItem extends JViewLegacy
 			$tmpls= $tmpls_all;
 		}
 
-		// (e) Apply Template Parameters values into the form fields structures
-		foreach ($tmpls as $tmpl) {
+		// (f) Create JForm for the layout and apply Layout parameters values into the fields
+		foreach ($tmpls as $tmpl)
+		{
 			$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
 			$jform->load($tmpl->params);
 			$tmpl->params = $jform;
-			foreach ($tmpl->params->getGroup('attribs') as $field) {
-				$fieldname =  $field->__get('fieldname');
+			foreach ($tmpl->params->getGroup('attribs') as $field)
+			{
+				$fieldname = $field->fieldname;
 				$value = $item->itemparams->get($fieldname);
 				if (strlen($value)) $tmpl->params->setValue($fieldname, 'attribs', $value);
 			}

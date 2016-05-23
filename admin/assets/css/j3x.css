@@ -158,13 +158,26 @@ select {
 #user-groups .control-group {
 	margin: 0px;
 }
+#flexicontent .fc-sliders-plain-outer {
+	max-width: 1200px;
+	padding: 16px 0 0 0;
+}
+#flexicontent .fc-sliders-plain-outer > .pane-sliders .panel h3 {
+	margin-bottom: 16px;
+	border: 0 solid !important;
+	background: unset !important;
+	display: inline-block !important;
+}
+#flexicontent .fc-sliders-plain-outer .pane-toggler-down {
+	border: 0 solid !important;
+}
 .tab-pane.active table {
 	width: auto;
 }
 .pane-sliders .panel {
 	margin-bottom: 3px;
 }
-.pane-sliders .panel h3 {
+:not(.fc-sliders-plain-outer) > .pane-sliders .panel h3 {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
@@ -195,15 +208,15 @@ select {
 	text-decoration: none !important;
 }
 .pane-toggler > a > span {
-	background: url("../images/toggle_blue.png") no-repeat scroll 0px 0px transparent;
+	background: url("../images/toggle.png") no-repeat scroll 0px 0px transparent;
 	padding-left: 20px;
 	font-size: 14px;
 }
 .pane-toggler-down {
-	border-bottom: 1px solid #CCCCCC;
+	border: 0 solid;
 }
 .pane-toggler-down > a > span {
-	background: url("../images/toggle_blue_up.png") no-repeat scroll 0px 0px transparent;
+	background: url("../images/toggle_up.png") no-repeat scroll 0px 0px transparent;
 	padding-left: 20px;
 	font-size: 14px;
 }

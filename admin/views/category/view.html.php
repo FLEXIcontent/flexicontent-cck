@@ -47,6 +47,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		$model		= $this->getModel();
 		$row  = $this->get( 'Item' );
 		$form = $this->get( 'Form' );
+		
+		// Get category parameters and inherited parameters
 		$catparams = new JRegistry($row->params);
 		$iparams   = $this->get( 'InheritedParams' );
 		
@@ -268,17 +270,29 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		
-		// **********************************************************************************
-		// Get Templates and apply Template Parameters values into the form fields structures 
-		// **********************************************************************************
+		// **********************************************************************************************************
+		// Get Layouts, load language of current selected template and apply Layout parameters values into the fields
+		// **********************************************************************************************************
 		
+		// Get Layouts
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->category;
+
+		// Load language file of currently selected template
+		$_clayout = $catparams->get('clayout');
+		if ($_clayout) FLEXIUtilities::loadTemplateLanguageFile( $_clayout );
+		
+		// Create JForm for the layout and apply Layout parameters values into the fields
 		foreach ($tmpls as $tmpl) {
 			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
 			$jform->load($tmpl->params);
 			$tmpl->params = $jform;
-			// ... values applied at the template form file
+			foreach ($tmpl->params->getGroup('attribs') as $field)
+			{
+				$fieldname = $field->fieldname;
+				$value = $catparams->get($fieldname);
+				if (strlen($value)) $tmpl->params->setValue($fieldname, 'attribs', $value);
+			}
 		}
 		
 		//build selectlists
@@ -340,10 +354,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		$_v = $params->get($field->fieldname);
 		
 		if ($_v==='' || $_v===null)
-			echo $field->input;
+			return $field->input;
 		else if ($field->getAttribute('type')=='radio' || ($field->getAttribute('type')=='multilist' && $field->getAttribute('subtype')=='radio'))
 		{
-			echo str_replace(
+			return str_replace(
 				'value="'.$_v.'"',
 				'value="'.$_v.'" class="fc-inherited-value" ',
 				$field->input);
@@ -357,26 +371,26 @@ class FlexicontentViewCategory extends JViewLegacy
 					'value="'.$v.'" class="fc-inherited-value" ',
 					$_input);
 			}
-			echo $_input;
+			return $_input;
 		}
 		else if ($field->getAttribute('type')=='text')
 		{
-			echo str_replace(
+			return str_replace(
 				'<input ',
 				'<input placeholder="'.$_v.'" ',
 				$field->input);
 		}
 		else if ($field->getAttribute('type')=='textarea')
 		{
-			echo str_replace('<textarea ', '<textarea placeholder="'.$_v.'" ', $field->input);
+			return str_replace('<textarea ', '<textarea placeholder="'.$_v.'" ', $field->input);
 		}
-		else if ($field->getAttribute('type')=='multilist' && $field->getAttribute('subtype')=='list')
+		else if ( method_exists($field, 'setInherited') )
 		{
 			$field->setInherited($_v);
-			echo $field->input;
+			return $field->input;
 		}
 		else
-			echo $field->input;
+			return $field->input;
 	}
 }
 ?>

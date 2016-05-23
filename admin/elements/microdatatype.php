@@ -17,6 +17,8 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // JHtmlSelect
 jimport('joomla.form.field');  // JFormField
@@ -26,6 +28,7 @@ jimport('joomla.form.field');  // JFormField
 class JFormFieldMicrodatatype extends JFormField {
 
 	protected $type = 'microdatatype';
+	protected $_inherited;
 
 	// getLabel() left out
 
@@ -61,9 +64,14 @@ class JFormFieldMicrodatatype extends JFormField {
 		
 		$first_option = @$attributes['first_option'];
 		
-		## Initialize array to store dropdown options ##
+		## Initialize array adding FIRST option and also indicating the inherited value
+		$prompt_text = JText::_($first_option ? $first_option : 'FLEXI_USE_GLOBAL');
+		if ( $this->_inherited!==null && !is_array($this->_inherited) && isset($jm_types[$this->_inherited]) )
+		{
+			$prompt_text = StringHelper::strtoupper($prompt_text). ' ... '. $this->_inherited;
+		}
 		$options = array();
-		$options[] = JHTML::_('select.option','', '-- '.JText::_($first_option ? $first_option : 'FLEXI_USE_GLOBAL').' --');
+		$options[] = JHTML::_('select.option', '', $prompt_text);
 
 		foreach($types as $v) :
 			## Create $value ##
@@ -76,5 +84,10 @@ class JFormFieldMicrodatatype extends JFormField {
 
 		## Output created <select> list ##
 		return $dropdown;
+	}
+
+	function setInherited($values)
+	{
+		$this->_inherited = $values;
 	}
 }

@@ -105,9 +105,16 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$user  = JFactory::getUser();
 		$menu  = $app->getMenu()->getActive();
 		
-		// Get the COMPONENT only parameters and merge current menu item parameters
-		$params = clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) $params->merge($menu->params);
+		// Get the COMPONENT only parameter
+		$params  = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$params->merge($cparams);
+		
+		// Merge the active menu parameters
+		if ($menu)
+		{
+			$params->merge($menu->params);
+		}
 		
 		// some parameter shortcuts for SQL query
 		$show_noauth  = $params->get('show_noauth', 0);

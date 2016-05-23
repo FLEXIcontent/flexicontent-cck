@@ -53,6 +53,11 @@ class FlexicontentViewType extends JViewLegacy
 		$model  = $this->getModel();
 		$row    = $this->get( FLEXI_J16GE ? 'Item' : 'Type' );
 		$form   = $this->get('Form');
+		
+		// Get type parameters
+		$tparams = new JRegistry($row->attribs);
+		
+		// Get item layouts
 		$themes = flexicontent_tmpl::getTemplates();
 		$tmpls  = $themes->items;
 		
@@ -77,33 +82,21 @@ class FlexicontentViewType extends JViewLegacy
 			}
 		}
 		
-		if (!FLEXI_J16GE)
-		{
-			// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
-			JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
-			
-			//create the parameter form
-			$form = new JParameter($row->attribs, JPATH_COMPONENT.DS.'models'.DS.'type.xml');
-			//$form->loadINI($row->attribs);
-			
-			//echo "<pre>"; print_r($form->_xml['themes']->_children[0]);  echo "<pre>"; print_r($form->_xml['themes']->param[0]); exit;
-			foreach($form->_xml['themes']->_children as $i => $child) {
-				if ( isset($child->_attributes['enableparam']) && !$cparams->get($child->_attributes['enableparam']) ) {
-					unset($form->_xml['themes']->_children[$i]);
-					unset($form->_xml['themes']->param[$i]);
-				}
-			}
-		}
+		// Load language file of currently selected template
+		$_ilayout = @ $row->attribs['ilayout'];
+		if ($_ilayout) FLEXIUtilities::loadTemplateLanguageFile( $_ilayout );
 		
-		// Apply Template Parameters values into the form fields structures 
-		foreach ($tmpls as $tmpl) {
-			if (FLEXI_J16GE) {
-				$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
-				$jform->load($tmpl->params);
-				$tmpl->params = $jform;
-				// ... values applied at the template form file
-			} else {
-				$tmpl->params->loadINI($row->attribs);
+		// Create JForm for the layout and apply Layout parameters values into the fields
+		foreach ($tmpls as $tmpl)
+		{
+			$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+			$jform->load($tmpl->params);
+			$tmpl->params = $jform;
+			foreach ($tmpl->params->getGroup('attribs') as $field)
+			{
+				$fieldname = $field->fieldname;
+				$value = $tparams->get($fieldname);
+				if (strlen($value)) $tmpl->params->setValue($fieldname, 'attribs', $value);
 			}
 		}		
 		

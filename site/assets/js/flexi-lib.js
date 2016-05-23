@@ -511,6 +511,44 @@
 		/*setTimeout(function(){ }, 20);*/
 	}
 	
+	
+	function fc_bootstrapAttach(sel)
+	{
+		// Turn radios into btn-group
+		jQuery(sel).find('.radio.btn-group label').addClass('btn');
+		jQuery(sel).find('.btn-group label:not(.active)').click(function()
+		{
+			var label = jQuery(this);
+			var input = jQuery('#' + label.attr('for'));
+	
+			if (!input.prop('checked')) {
+				label.closest('.btn-group').find('label').removeClass('active btn-success btn-danger btn-primary');
+				if (input.val() == '') {
+					label.addClass('active btn-primary');
+				} else if (input.val() == 0) {
+					label.addClass('active btn-danger');
+				} else {
+					label.addClass('active btn-success');
+				}
+				input.prop('checked', true);
+				input.trigger('change');
+			}
+		});
+		
+		jQuery(sel).find('.btn-group input[checked=checked]').each(function()
+		{
+			var input = jQuery(this);
+			if (input.val() == '') {
+				input.parent().find('label[for=' + input.attr('id') + ']').addClass('active btn-primary');
+			} else if (input.val() == 0) {
+				input.parent().find('label[for=' + input.attr('id') + ']').addClass('active btn-danger');
+			} else {
+				input.parent().find('label[for=' + input.attr('id') + ']').addClass('active btn-success');
+			}
+		});
+	}
+
+	
 	function fc_applyFormDependencies(toBeUpdated, toggleParent, toggleParentSelector, noFX)
 	{
 		jQuery.each( toBeUpdated, function( i, val ) {

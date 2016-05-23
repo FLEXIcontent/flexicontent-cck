@@ -1190,12 +1190,26 @@ table.admintable td {
  ********************************/
 
 /* PANELs */
-#flexicontent .pane-sliders .pane-toggler span {
-	/*background: url("../../../../administrator/templates/bluestork/images/j_arrow.png") no-repeat scroll 5px 50% transparent;*/
+#flexicontent .fc-sliders-plain-outer {
+	max-width:1200px;
+	padding: 16px 0 0 0;
+}
+#flexicontent .fc-sliders-plain-outer > .pane-sliders .panel h3 {
+	margin-bottom: 16px;
+	border: 0 solid !important;
+	background: unset !important;
+	display: inline-block !important;
+}
+#flexicontent .fc-sliders-plain-outer .pane-toggler-down {
+	border: 0 solid !important;
+}
+
+#flexicontent .pane-sliders .pane-toggler > a > span {
+	background: url("../images/toggle.png") no-repeat scroll 0px 4px transparent;
 	padding-left: 20px;
 }
-#flexicontent .pane-sliders .pane-toggler-down span {
-	/*background: url("../../../../administrator/templates/bluestork/images/j_arrow_down.png") no-repeat scroll 5px 50% transparent;*/
+#flexicontent .pane-sliders .pane-toggler-down > a > span {
+	background: url("../images/toggle_up.png") no-repeat scroll 0px 4px transparent;
 	padding-left: 20px;
 }
 
