@@ -1082,65 +1082,104 @@ if ( $typeid && $this->params->get('usedisplaydetails_fe') || $has_custom_params
 
 if ( $typeid && $this->params->get('selecttheme_fe') ) : ?>
 
-	<?php if ( $this->params->get('selecttheme_fe') >= 1 ) : ob_start(); ?>
-		<?php foreach($this->form->getFieldset('themes') as $field) : ?>
-			<div class="fcclear"></div>
-			<?php if ($field->hidden) : ?>
-				<span style="display:none !important;">
-					<?php echo $field->input; ?>
-				</span>
-			<?php else : ?>
-				<?php echo $field->label; ?>
-				<div class="container_fcfield">
-					<?php echo $field->input;?>
-				</div>
-			<?php endif; ?>
-		<?php endforeach; ?>
+		<?php if ( $this->params->get('selecttheme_fe') >= 1 ) : ob_start(); ?>
 		
-		<div class="fcclear"></div>
-		<blockquote id="__content_type_default_layout__">
-			<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $this->tparams->get('ilayout') ); ?>
-		</blockquote>
-	
-	<?php $captured['layout_selection'] = ob_get_clean(); endif;
-	
-	
-	
-	if ( $this->params->get('selecttheme_fe') >= 2 ) : ob_start();
-		echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
-		echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) . '</h3>';
-		$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
+			<?php
+			foreach ($this->form->getFieldset('themes') as $field):
+				if (!$field->label || $field->hidden)
+				{
+					echo $field->input;
+					continue;
+				}
+				elseif ($field->input)
+				{
+					$_depends = $field->getAttribute('depend_class');
+					echo '
+					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						<span class="label-fcouter">
+							'.str_replace('class="', 'class="label label-fcinner ', $field->label).'
+						</span>
+						<div class="container_fcfield">
+							'.$field->input.'
+						</div>
+					</fieldset>
+					';
+				}
+			endforeach; ?>
 			
-		foreach ($this->tmpls as $tmpl) :
-			$fieldSets = $tmpl->params->getFieldsets($groupname);
-			foreach ($fieldSets as $fsname => $fieldSet) :
-				$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-				echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$fsname.'-options');
-				if (isset($fieldSet->description) && trim($fieldSet->description)) :
-					echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
-				endif;
-				?>
-				<fieldset class="panelform params_set">
-					<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
-						if ($field->getAttribute('not_inherited')) continue;
-						if ($field->getAttribute('cssprep')) continue;
-						$fieldname =  $field->fieldname;
-						$value = $tmpl->params->getValue($fieldname, $groupname, $this->item->itemparams->get($fieldname));
-						echo str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
-							$tmpl->params->getLabel($fieldname, $groupname));
-						echo
-							str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
-								str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
-									$tmpl->params->getInput($fieldname, $groupname, $value)
-								)
-							);
-					endforeach; ?>
-				</fieldset>
-			<?php endforeach; ?>
-		<?php endforeach; ?>
+			<div class="fcclear"></div>
+			<div class="fc-success fc-mssg" style="font-size: 12px; margin: 8px 0 !important;" id="__content_type_default_layout__">
+				<?php echo JText::_( 'FLEXI_USING_LAYOUT_DEFAULTS' ); ?>
+			</div>
+		
+		<?php $captured['layout_selection'] = ob_get_clean(); endif;
+		
+		
+		
+		if ( $this->params->get('selecttheme_fe') >= 2 ) : ob_start(); ?>
+		
+			<div class="fc-sliders-plain">
+				<?php
+				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
+				$item_layout = $this->item->itemparams->get('ilayout');
 				
-		<?php echo JHtml::_('sliders.end');
-	$captured['layout_params'] = ob_get_clean(); endif; ?>
+				foreach ($this->tmpls as $tmpl) :
+					
+					$form_layout = $tmpl->params;
+					$label = '<span class="btn"><i class="icon-edit"></i>'.JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name.'</span>';
+					echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
+					
+					if ($tmpl->name != $item_layout) continue;
+					
+					$fieldSets = $form_layout->getFieldsets($groupname);
+					foreach ($fieldSets as $fsname => $fieldSet) : ?>
+						<fieldset class="panelform params_set">
+						
+						<?php
+						if (isset($fieldSet->label) && trim($fieldSet->label)) :
+							echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.JText::_($fieldSet->label).'</div>';
+						endif;
+						if (isset($fieldSet->description) && trim($fieldSet->description)) :
+							echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
+						endif;
+						
+						foreach ($form_layout->getFieldset($fsname) as $field) :
+							
+							if ($field->getAttribute('not_inherited')) continue;
+							if ($field->getAttribute('cssprep')) continue;
+							
+							$fieldname = $field->fieldname;
+							//$value = $form_layout->getValue($fieldname, $groupname, $this->item->itemparams->get($fieldname));
+							
+							$input_only = !$field->label || $field->hidden;
+							echo
+								($input_only ? '' :
+								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_',
+									$form_layout->getLabel($fieldname, $groupname)).'
+								<div class="container_fcfield">
+								').
+								
+								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+									str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+										$form_layout->getInput($fieldname, $groupname/*, $value*/)   // Value already set, no need to pass it
+									)
+								).
+								
+								($input_only ? '' : '
+								</div>
+								');
+						endforeach; ?>
+						
+						</fieldset>
+						
+					<?php endforeach; //fieldSets ?>
+				<?php endforeach; //tmpls ?>
+				
+				<?php echo JHtml::_('sliders.end'); ?>
+			</div>
+		<?php
+		$captured['layout_params'] = ob_get_clean(); endif; ?>
 	
 <?php endif; // end of template: layout_selection, layout_params
 

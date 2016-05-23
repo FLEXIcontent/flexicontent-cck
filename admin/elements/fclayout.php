@@ -84,7 +84,8 @@ class JFormFieldFclayout extends JFormFieldList
 		
 		// Get the path which contains layouts
 		$directory = (string) @ $attributes['directory'];
-		$path = (!is_dir($directory) ? JPATH_ROOT : '') . $directory;
+		$ext_name = (string) @ $attributes['ext_name'];
+		$path = is_dir($directory)  ?  $directory  :  JPATH_ROOT . $directory;
 		
 		// For using directory in url
 		$directory = str_replace('\\', '/', $directory);
@@ -280,17 +281,17 @@ function fc_getLayout(el)
  	//if (container2) container2.parent().css('display', 'none');
 	
 	var panel;
-	var panel_name;
+	var panel_id;
 	var panel_header = container;
 	if (panel_header) {
-		panel_name = '".$tmpl_container.$container_sx."';
+		panel_id = '".$tmpl_container.$container_sx."';
 		panel = panel_header.next();
 	}
 	
 	if (panel_header.length==0 && container2.length>0) {
 		panel_header = container2;
-		panel_name = 'attrib-".$tmpl_container."';
-		panel = jQuery('#'+panel_name);
+		panel_id = 'attrib-".$tmpl_container."';
+		panel = jQuery('#'+panel_id);
 	}
 	
 	var layout_name = el.value;
@@ -300,14 +301,15 @@ function fc_getLayout(el)
 	panel.html('');
 	jQuery.ajax({
 		type: 'GET',
-		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_view=".$view."&ext_option=".$option."&ext_id=".$pk."&directory=".$directory."&layout_name='+layout_name+'&format=raw',
+		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option=".$option."&ext_view=".$view."&ext_name=".$ext_name."&ext_id=".$pk."&directory=".$directory."&layout_name='+layout_name+'&format=raw',
 		success: function(str) {
 			panel_header.html('<a href=\"javascript:void(0);\"><span>Layout: '+layout_name+'</span></a>');
 		 	panel_header.parent().css('display', '');
 			panel.html(str);
 			jQuery('.hasTooltip').tooltip({'html': true,'container': panel});
-			//tabberAutomatic(tabberOptions, panel_name);
-			fc_bindFormDependencies('#'+panel_name, 0, '');
+			//tabberAutomatic(tabberOptions, panel_id);
+			fc_bindFormDependencies('#'+panel_id, 0, '');
+			fc_bootstrapAttach('#'+panel_id);
 		}
 	});
 }

@@ -37,9 +37,9 @@
 			<field name="count_feat" type="text" default="1" size="3" label="FLEXI_COUNT_FEAT" description="FLEXI_COUNT_FEAT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" level="level1" />
-			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-template-for-universal-content-module.html' target='_blank' a&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
+			<field name="" type="separator" default="Please set layout parameters in &lt;b&gt;Layout: ... TAB&lt;/b&gt;. CSS/HTML developers please read: &lt;u&gt;&lt;b&gt; &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-layout-for-universal-content-module-and-other-flexicontent-modules.html' target='_blank' a&gt;Custom templates HOW-TO&lt;/a&gt; &lt;/b&gt; &lt;/u&gt;" level="level3" class="alert alert-info fcpadded" />
 			<field  name="layout"  type="fclayout"  default="news"  label="FLEXI_CHOOSE_TMPL"
-						description="FLEXI_CHOOSE_TMPL_DESC"  directory="/modules/mod_flexicontent/tmpl"
+						description="FLEXI_CHOOSE_TMPL_DESC"  directory="/modules/mod_flexicontent/tmpl"  ext_name="mod_flexicontent"
 						hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_"
 						tmpl_container="mod_tmpl_layout" params_source="file"
 						/> <!-- params_source="inline" -->
