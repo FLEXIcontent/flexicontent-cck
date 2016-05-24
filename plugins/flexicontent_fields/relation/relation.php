@@ -655,17 +655,30 @@ jQuery(document).ready(function()
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
+
+		// Get $now
+		$date = JFactory::getDate();
+		$now = $date->toSql();
+
+		// Create order clause dynamically based on the field settings
+		$order = $filter->parameters->get( 'orderby', 'alpha' );
+		$orderby = flexicontent_db::buildItemOrderBy(
+			$filter->parameters,
+			$order, $request_var='', $config_param='',
+			$item_tbl_alias = 'ct', $relcat_tbl_alias = 'rel',
+			$default_order='', $default_order_dir='', $sfx='_form', $support_2nd_lvl=false
+		);
 		
 		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' ct.id AS value, ct.title AS text';
 		$filter->filter_valuesfrom   = null;  // use default
-		$filter->filter_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED)';
+		$filter->filter_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED) AND ct.state = 1 AND ct.publish_up < "' . $now . '" AND (ct.publish_down = "0000-00-00 00:00:00" OR ct.publish_down > "' . $now . '")';
 		$filter->filter_valueswhere  = null;  // use default
 		// full SQL clauses
 		$filter->filter_groupby = ' GROUP BY CAST(fi.value AS UNSIGNED) '; // * will be be appended with , fi.item_id
 		$filter->filter_having  = null;  // use default
-		$filter->filter_orderby = null;  // use default, no ordering done to improve speed, it will be done inside PHP code
+		$filter->filter_orderby = $orderby; // use field ordering setting
 		
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
