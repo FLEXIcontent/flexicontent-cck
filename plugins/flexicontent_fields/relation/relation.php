@@ -656,10 +656,6 @@ jQuery(document).ready(function()
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 
-		// Get $now
-		$date = JFactory::getDate();
-		$now = $date->toSql();
-
 		// Create order clause dynamically based on the field settings
 		$order = $filter->parameters->get( 'orderby', 'alpha' );
 		$orderby = flexicontent_db::buildItemOrderBy(
@@ -673,7 +669,7 @@ jQuery(document).ready(function()
 		// partial SQL clauses
 		$filter->filter_valuesselect = ' ct.id AS value, ct.title AS text';
 		$filter->filter_valuesfrom   = null;  // use default
-		$filter->filter_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED) AND ct.state = 1 AND ct.publish_up < "' . $now . '" AND (ct.publish_down = "0000-00-00 00:00:00" OR ct.publish_down > "' . $now . '")';
+		$filter->filter_valuesjoin   = ' JOIN #__content AS ct ON ct.id = CAST(fi.value AS UNSIGNED) AND ct.state = 1 AND ct.publish_up < UTC_TIMESTAMP() AND (ct.publish_down = "0000-00-00 00:00:00" OR ct.publish_down > UTC_TIMESTAMP())';
 		$filter->filter_valueswhere  = null;  // use default
 		// full SQL clauses
 		$filter->filter_groupby = ' GROUP BY CAST(fi.value AS UNSIGNED) '; // * will be be appended with , fi.item_id
