@@ -501,14 +501,12 @@ class plgFlexicontent_fieldsFile extends FCField
 		static $langs = null;
 		if ($langs === null) $langs = FLEXIUtilities::getLanguages('code');
 		
-		static $tooltips_added = false;
 		static $isMobile = null;
 		static $isTablet = null;
 		static $useMobile = null;
 		if ($useMobile===null) 
 		{
-			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-			$force_desktop_layout = $cparams->get('force_desktop_layout', 0 );
+			$force_desktop_layout = JComponentHelper::getParams( 'com_flexicontent' )->get('force_desktop_layout', 0 );
 			//$start_microtime = microtime(true);
 			$mobileDetector = flexicontent_html::getMobileDetector();
 			$isMobile = $mobileDetector->isMobile();
@@ -516,9 +514,15 @@ class plgFlexicontent_fieldsFile extends FCField
 			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			//printf('<br/>-- [Detect Mobile: %.3f s] ', $time_passed/1000000);
 		}
-		if (!$tooltips_added) {
-			FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
-			$tooltips_added = true;
+		
+		// Load the tooltip library according to configuration, FLAG is an array to have a different check per field ID
+		// This is needed ONLY for fields that also have a configuration parameter, for this field is redundant 
+		static $tooltips_added = array();
+		if ( empty($tooltips_added[$field->id]) )
+		{
+			$add_tooltips = JComponentHelper::getParams( 'com_flexicontent' )->get('add_tooltips', 1);
+			if ($add_tooltips) JHtml::_('bootstrap.tooltip');
+			$tooltips_added[$field->id] = true;
 		}
 		
 		$field->label = JText::_($field->label);

@@ -149,7 +149,7 @@ class modFlexicontentHelper
 			$disp_field_where = array();
 			if ($display_hits || $display_hits_feat)      $disp_field_where[] = 'field_type="hits"';
 			if ($display_voting || $display_voting_feat)  $disp_field_where[] = 'field_type="voting"';
-			$query .= ' WHERE ' . implode($disp_field_where, ' OR ');
+			$query .= ' WHERE ' . implode(' OR ', $disp_field_where);
 			$db->setQuery($query);
 			$disp_fields_data = $db->loadObjectList('field_type');
 			
@@ -2043,14 +2043,14 @@ class modFlexicontentHelper
 		
 		// Get comment ids ordered
 		$query = 'SELECT id FROM #__jcomments AS com '
-			.' WHERE com.object_id IN (' . implode($item_ids, ",") .') AND com.object_group="com_flexicontent" AND com.published="1"'
+			.' WHERE com.object_id IN (' . implode(',', $item_ids) .') AND com.object_group="com_flexicontent" AND com.published="1"'
 			.' ORDER BY com.object_id, com.date DESC';
 		$db->setQuery($query);
 		$comment_ids = FLEXI_J16GE ? $db->loadColumn(0) : $db->loadResultArray(0);
 		
 		// Get comments data
 		$query = 'SELECT * FROM #__jcomments AS com '
-			.' WHERE com.id IN (' . implode($comment_ids, ",") .')';
+			.' WHERE com.id IN (' . implode(',', $comment_ids) .')';
 		$db->setQuery($query);
 		$_comments = $db->loadObjectList('id');
 		

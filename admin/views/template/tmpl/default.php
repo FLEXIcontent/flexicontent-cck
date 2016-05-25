@@ -614,7 +614,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 		<div class="tabbertab" id="tabset_layout_disp_params_tab" data-icon-class="icon-options" >	
 			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_DISPLAY_PARAMETERS' ); ?> </h3>
 			
-			<span class="fc-mssg fc-info" style="max-width: unset; font-size:100%; margin: 4px 0 0 0!important; padding-top:2px; padding-bottom:2px;">
+			<span class="fc-mssg-inline fc-info" style="max-width: unset; font-size:100%; margin: 4px 32px 0 0!important; padding-top:4px; padding-bottom:4px;">
 				-
 				<?php echo JText::_( $this->layout->view == 'item' ?
 					'your <b>content types / items</b> ' :
@@ -623,9 +623,10 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				will inherit defaults from here, you may <b>override</b> them inside <b>type</b> (but <b>avoid</b> overriding inside the <b>item</b>)
 				<br/> -	<?php echo JText::_( 'setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
 			</span>
-			<span class="fc-mssg fc-success" style="max-width: unset; font-size:100%; margin: 8px 0 0 0!important; padding-top:2px; padding-bottom:2px;">
-				-	<span class="badge" style="background:darkcyan !important;">less</span> parameters: add more to <b><?php echo $this->layout->view; ?>.xml</b> , then inside file: <b>less/<?php echo $this->layout->view; ?>.less</b> use less variables: &nbsp; @<b><?php echo $pfx; ?>_</b>parameter_name;
-				<br/> - NOTE: <b>FCC_</b> for category and <b>FCI_</b> for item layout, EXAMPLE:  <code style="font-size:100%;">body&nbsp; .flexi.label &nbsp;{ color: @<?php echo $pfx; ?>_label_bg_color; }</code>
+			
+			<span class="fc-mssg-inline fc-info" style="max-width: unset; font-size:100%; margin: 4px 32px 0 0!important; padding-top:4px; padding-bottom:4px;">
+				-	<span class="fc_less_parameter"></span> parameters: add more to <b><?php echo $this->layout->view; ?>.xml</b> , then inside file: <b>less/<?php echo $this->layout->view; ?>.less</b> use less variables: &nbsp; @<b><?php echo $pfx; ?>_</b>parameter_name;
+				<br/> - NOTE: <b>FCC_</b> for category and <b>FCI_</b> for item layout, EXAMPLE:  <code style="font-size:100%; color:black;">body&nbsp; .flexi.label &nbsp;{ color: @<?php echo $pfx; ?>_label_bg_color; }</code>
 			</span>
 			
 			<div style="max-width:1024px; margin-top:16px;">
@@ -762,7 +763,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 						(!isset($file_tip_extra[$filename]) ? '<img src="components/com_flexicontent/assets/images/tick_f2.png" alt="Edit file">' :
 							'<img src="components/com_flexicontent/assets/images/comments.png" data-placement="bottom" class="'.$tip_class.'" title="'.$file_tip_extra[$filename].'" alt="Edit file"/>'
 						).'
-						<a href="javascript:;" class="'.$tip_class.'" data-placement="right" onclick="load_layout_file(\''.addslashes($this->layout->name).'\', \''.addslashes($it->getSubPathName()).'\', \'0\', \''.implode($btn_allowed, ' ').'\'); return false;"
+						<a href="javascript:;" class="'.$tip_class.'" data-placement="right" onclick="load_layout_file(\''.addslashes($this->layout->name).'\', \''.addslashes($it->getSubPathName()).'\', \'0\', \''.implode(' ', $btn_allowed).'\'); return false;"
 						title="'.(isset($file_tip[$filename]) ? $file_tip[$filename] : $ext.' file').'">'
 							.$subpath_highlighted.'&nbsp;'.$filename.
 						'</a>'

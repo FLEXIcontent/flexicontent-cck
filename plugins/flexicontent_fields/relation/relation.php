@@ -726,7 +726,7 @@ jQuery(document).ready(function()
 			$_ids = array();
 			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID
 			$db = JFactory::getDBO();
-			$query = 'SELECT i.id AS value_id, i.title AS value FROM #__content AS i WHERE i.id IN ('.implode($_ids, ',').')';
+			$query = 'SELECT i.id AS value_id, i.title AS value FROM #__content AS i WHERE i.id IN ('.implode(',', $_ids).')';
 			$db->setQuery($query);
 			$_values = $db->loadAssocList();
 			$values = array();
@@ -753,7 +753,7 @@ jQuery(document).ready(function()
 			$_ids = array();
 			foreach($post as $_id) $_ids[] = (int)$_id;  // convert itemID:catID to itemID 
 			$db = JFactory::getDBO();
-			$query = 'SELECT i.id AS value_id, i.title AS value FROM #__content AS i WHERE i.id IN ('.implode($_ids, ',').')';
+			$query = 'SELECT i.id AS value_id, i.title AS value FROM #__content AS i WHERE i.id IN ('.implode(',', $_ids).')';
 			$db->setQuery($query);
 			$_values = $db->loadAssocList();
 			$values = array();

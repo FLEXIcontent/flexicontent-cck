@@ -15,7 +15,7 @@
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="Currently selected layout, does not have layout specific parameters" level="level1" menu="hide" />
+			<field name="" type="separator" default="Currently selected layout, does not have layout specific parameters" level="level1" class="alert alert-info" />
 			
 		</fieldset>
 		

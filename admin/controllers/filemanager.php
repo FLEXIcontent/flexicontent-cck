@@ -699,7 +699,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		else {
 			$msg = '';
 			
-			$db->setQuery( 'SELECT * FROM #__flexicontent_files WHERE id IN ('.implode($cid).')' );
+			$db->setQuery( 'SELECT * FROM #__flexicontent_files WHERE id IN ('.implode(',', $cid).')' );
 			$files = $db->loadObjectList('id');
 			$cid = array_keys($files);
 			
@@ -925,7 +925,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			JError::raiseWarning(500, JText::_( $state ? 'FLEXI_SELECT_ITEM_PUBLISH' : 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
 		} else {
 			
-			$db->setQuery( 'SELECT * FROM #__flexicontent_files WHERE id IN ('.implode($cid).')' );
+			$db->setQuery( 'SELECT * FROM #__flexicontent_files WHERE id IN ('.implode(',', $cid).')' );
 			$files = $db->loadObjectList('id');
 			$cid = array_keys($files);
 			

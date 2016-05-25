@@ -300,11 +300,8 @@ if ( $format == 'html' )
 	
 	if ( 1 ) // always load tooltips JS in backend
 	{
-		// J2.5 tooltips (mootools tooltips) 
-		//JHTML::_('behavior.tooltip');  // All uses of 'hasTip' were replaced with 'hasTooltip'
-		
 		// J3.0+ tooltips (bootstrap based)
-		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
+		JHtml::_('bootstrap.tooltip');
 	}
 	// Add flexi-lib JS
 	JFactory::getDocument()->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', FLEXI_VHASH );  // Frontend/backend script

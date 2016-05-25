@@ -446,7 +446,7 @@ foreach ($values as $value)
 				<div class="'.$input_grp_class.' fc-xpended">
 					<label class="'.$add_on_class.' fc-lbl addrint-ac-lbl" for="'.$elementid_n.'_autocomplete">'.JText::_( 'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SEARCH' ).'</label>
 					<input id="'.$elementid_n.'_autocomplete" placeholder="" class="input-xxlarge" name="'.$fieldname_n.'[autocomplete]" type="text" />
-					<select id="'.$elementid_n.'_ac_type" class="" name="'.$fieldname_n.'[ac_type]" onchange="changeAutoCompleteType('.$n.');">
+					<select id="'.$elementid_n.'_ac_type" class="" name="'.$fieldname_n.'[ac_type]" onchange="changeAutoCompleteType_'.$field->name.$n.'();">
 						'.$ac_type_options.'
 					</select>
 				</div>
@@ -609,8 +609,7 @@ foreach ($values as $value)
 		<input type="hidden" id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.htmlspecialchars($value['lon'], ENT_COMPAT, 'UTF-8').'" />
 		';
 	}
-	$field_html .= '
-	<script>
+	$js = '
 	
 	if ('.count($ac_country_allowed_list).')
 		var allowed_countries_'.$field->name.$n.' = new Array("'.implode('", "', $ac_country_allowed_list).'");
@@ -641,7 +640,7 @@ foreach ($values as $value)
 	}
 	
 	// re-initialize autocomplete
-	function changeAutoCompleteType(n)
+	function changeAutoCompleteType_'.$field->name.$n.'()
 	{
 		// Remove listener that update the google map on autocomplete selection
 		google.maps.event.removeListener(gmapslistener_'.$field->name.$n.' );
@@ -839,9 +838,8 @@ foreach ($values as $value)
 	jQuery(document).ready(function(){
 		initMap_'.$field->name.$n.'();
 	});
-	
-	</script>
 	';
+	JFactory::getDocument()->addScriptDeclaration($js);
 	
 	$field->html[$n] = $field_html;
 	$n++;

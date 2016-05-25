@@ -1024,19 +1024,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$app       = JFactory::getApplication();
 			$document	 = JFactory::getDocument();
 			$option    = JRequest::getVar('option');
+			$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
+			$configured_file_path = $cparams->get('file_path', 'components/com_flexicontent/uploads');
 			
 			// *****************************
 			// Get isMobile / isTablet Flags
 			// *****************************
-			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 			$force_desktop_layout = $cparams->get('force_desktop_layout', 0 );
-			//$start_microtime = microtime(true);
 			$mobileDetector = flexicontent_html::getMobileDetector();
 			$isMobile = $mobileDetector->isMobile();
 			$isTablet = $mobileDetector->isTablet();
 			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
-			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			//printf('<br/>-- [Detect Mobile: %.3f s] ', $time_passed/1000000);
 		}
 		
 		
@@ -1300,10 +1298,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ($view=='category' && !in_array('category',$legendinview)) $uselegend = 0;
 		if ($isItemsManager && !in_array('backend',$legendinview)) $uselegend = 0;
 		
-		// load the tooltip library if required
-		if ($uselegend)
-			FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
-		
+		// Load the tooltip library according to configuration, FLAG is an array to have a different check per field ID
+		// This is needed ONLY for fields that also have a configuration parameter, for this field is NEEDED 
+		static $tooltips_added = array();
+		if ( empty($tooltips_added[$field->id]) )
+		{
+			$add_tooltips = JComponentHelper::getParams( 'com_flexicontent' )->get('add_tooltips', 1);
+			if ($add_tooltips && $uselegend) JHtml::_('bootstrap.tooltip');
+			$tooltips_added[$field->id] = true;
+		}
 		
 		// **************************************
 		// Title/Description in inline thumbnails
@@ -1566,8 +1569,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		else {
 			// DB-mode
-			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-			$orig_urlpath  = str_replace('\\', '/', $cparams->get('file_path', 'components/com_flexicontent/uploads'));
+			$orig_urlpath = str_replace('\\', '/', $configured_file_path);
 		}
 		
 		// Initialize value handling arrays and loop's common variables

@@ -445,7 +445,7 @@ function delAllFilters() {
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
-	<input type="hidden" name="original_order_values" value="<?php echo implode($originalOrders, ','); ?>" />
+	<input type="hidden" name="original_order_values" value="<?php echo implode(',', $originalOrders); ?>" />
 	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 	

@@ -203,7 +203,7 @@ foreach($values as $file_id)
 	if ($sizeinfo) $info_arr[] = $sizeinfo;
 	if ($hits) $info_arr[] = $hits;
 	if ($descr_icon) $info_arr[] = $descr_icon;
-	$str .= implode($info_arr, $infoseptxt);
+	$str .= implode($infoseptxt, $info_arr);
 	
 	
 	
@@ -368,12 +368,12 @@ foreach($values as $file_id)
 	if ($buttonsposition) {
 		$str .= (count($actions_arr) ?  $infoseptxt : "")
 			.'<div class="fcfile_actions">'
-			.  implode($actions_arr, $actionseptxt)
+			.  implode($actionseptxt, $actions_arr)
 			.'</div>';
 	} else {
 		$str = (count($actions_arr) ?  $infoseptxt : "")
 			.'<div class="fcfile_actions">'
-			.  implode($actions_arr, $actionseptxt)
+			.  implode($actionseptxt, $actions_arr)
 			.'</div>'.$str;
 	}
 	

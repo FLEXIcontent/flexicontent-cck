@@ -638,10 +638,12 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 		
 		$app = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$jinput = $app->input;
+		$option = $jinput->get('option', '', 'cmd');
 		
 		$filter_type = $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
-		if ($filter_type) {
+		if ($filter_type)
+		{
 			$app->setUserState( $option.'.fields.filter_type', '' );
 			$msg .= ' '.JText::_('FLEXI_TYPE_FILTER_CLEARED_TO_VIEW_NEW_FIELDS');
 		}
@@ -656,17 +658,6 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function selectsearchflag()
 	{
-		$user	= JFactory::getUser();
-		$document = JFactory::getDocument();
-		
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', FLEXI_VHASH);
-		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
-		
-		// Load jquery Framework
-		flexicontent_html::loadJQuery();
-		JHtml::_('bootstrap.framework');
-		JHtml::_('bootstrap.tooltip');
-		
 		$btn_class = 'hasTooltip btn btn-small';
 		
 		$state['issearch'] = array( 'name' =>'FLEXI_TOGGLE_TEXT_SEARCHABLE', 'desc' =>'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC', 'icon' => 'search', 'btn_class' => 'btn-success', 'clear' => true );
