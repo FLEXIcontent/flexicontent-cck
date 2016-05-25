@@ -183,7 +183,7 @@ if ( $show_mod )
 	flexicontent_html::loadFramework('flexi_tmpl_common');
 	
 	// Add tooltips
-	if ($add_tooltips) FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
+	if ($add_tooltips) JHtml::_('bootstrap.tooltip');
 	
 	// Add css
 	if ($add_ccs && $layout) {

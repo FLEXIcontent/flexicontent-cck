@@ -105,7 +105,7 @@ class JFormFieldMultiList extends JFormField
 		if (@$attributes['toggle_related']) {
 			$attribs['list.attr']['class'][] = 'fcform_toggler_element';
 		}
-		$attribs['list.attr']['class'] = implode($attribs['list.attr']['class'], ' ');
+		$attribs['list.attr']['class'] = implode(' ', $attribs['list.attr']['class']);
 		
 		// Construct an array of the HTML OPTION statements.
 		$this->_options = array ();

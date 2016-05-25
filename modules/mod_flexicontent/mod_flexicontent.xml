@@ -703,7 +703,7 @@
 			</field>
 			<field name="comments_limit_feat" type="text" default="4" label="FLEXI_UMOD_COMMENTS_LIST_LIMIT" description="FLEXI_UMOD_COMMENTS_LIST_LIMIT_DESC" class="display_commentfeat display_commentlistfeat" /-->
 			
-			<field name="" type="separator" default="FLEXI_FIELDS_PARAMS" level="level1" />
+			<field name="" type="separator" default="FLEXI_CUSTOM_FIELDS_PARAMS" level="level1" />
 			<field name="" type="separator" default="FLEXI_STD" level="level3" />
 			<field name="use_fields" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_DISPLAY_FIELDS" description="FLEXI_DISPLAY_FIELDS_DESC" class="btn-group btn-group-yesno" >
 				<option value="0" show_list="" hide_list="display_fieldsstd">FLEXI_NO</option>

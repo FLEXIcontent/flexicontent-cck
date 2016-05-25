@@ -57,6 +57,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$option = JRequest::getCmd('option');
 		$view   = JRequest::getString('view', FLEXI_ITEMVIEW);
 		$print  = JRequest::getCMD('print');
+		$add_tooltips = JComponentHelper::getParams('com_flexicontent')->get('add_tooltips', 1);
 		
 		// No output if it is not FLEXIcontent item view or view is "print"
 		if ($view != FLEXI_ITEMVIEW || $option != 'com_flexicontent' || $print) return;
@@ -193,7 +194,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		
 		
 		// Load needed JS/CSS
-		if ($use_tooltip)
+		if ($add_tooltips && $use_tooltip)
 			JHtml::_('bootstrap.tooltip');
 		if ($load_css)
 			JFactory::getDocument()->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');	
