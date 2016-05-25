@@ -303,19 +303,24 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		// Make sure category has been loaded (false means category view without current category)
 		if ( $this->_category === null) $this->getCategory();
+		
+		$app     = JFactory::getApplication();
 		$cparams = $this->_params;
 		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
+		$this->_listall = $app->input->get('listall');
 		
 		// Set the pagination variables into state (We get them from http request OR use default category parameters)
-		$limit = strlen(JRequest::getVar('limit')) ? JRequest::getInt('limit') : $this->_params->get('limit');
-		$limitstart	= JRequest::getInt('limitstart', JRequest::getInt('start', 0, '', 'int'), '', 'int');
+		$this->_active_limit = strlen( $app->input->get('limit') );
+		$limit = $this->_active_limit ? $app->input->get('limit', 0, 'int') : $this->_params->get('limit');
+		$limitstart	= $app->input->get('limitstart', $app->input->get('start', 0, 'int'), 'int');
 		
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
 		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
+		$app->input->set('limitstart', $limitstart);
 		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
@@ -334,14 +339,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// 1, create full query: filter, ordered, limited
 			$query = $this->_buildQuery();
 			
-			
 			// Check if Text Search / Filters / AI are NOT active and special before FORM SUBMIT (per page) -limit- was configured
-			if ( empty($this->_active_filts) && empty($this->_active_search) && empty($this->_active_ai) )
+			$use_limit_before = $app->getUserState('use_limit_before_search_filt', 0);
+			if ( $use_limit_before )
 			{
-				$use_limit_before = (int) $cparams->get('use_limit_before_search_filt', 0);
-				$limit_before     = (int) $cparams->get('limit_before_search_filt', 0);
+				$limit_before = (int) $cparams->get('limit_before_search_filt', 0);
 				$limit = $use_limit_before  ?  $limit_before  :  $limit;
 				JRequest::setVar('limit', $limit);
+				$app->input->set('limit', $limit);
 				$this->setState('limit', $limit);
 			}
 			
@@ -365,7 +370,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				// 2, get items via normal joomla SQL layer
 				$this->_db->setQuery($query, $limitstart, $limit);
 				$query_ids = $this->_db->loadColumn();
-				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+				if ($this->_db->getErrorNum())  $app->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 				
 				// 3, get current items total for pagination
 				if ( count($query_ids) ) {
@@ -381,10 +386,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			/*if ((int)$this->getState('limitstart') < (int)$this->_total) {
 				$this->_data = $this->_getList( $query, $limitstart, $limit );
 			} else {
-				$this->setState('limitstart',0);
-				$this->setState('start',0);
-				JRequest::setVar('start',0);
-				JRequest::setVar('limitstart',0);
+				$this->setState('limitstart', 0);
+				$this->setState('start', 0);
+				JRequest::setVar('start', 0);
+				JRequest::setVar('limitstart', 0);
+				$app->input->set('start', 0);
+				$app->input->set('limitstart', 0);
 				$this->_data = $this->_getList( $query, 0, $limit );
 			}*/
 			
@@ -394,7 +401,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if (count($query_ids)) {
 				$this->_db->setQuery($query);
 				$_data = $this->_db->loadObjectList('id');
-				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+				if ($this->_db->getErrorNum())  $app->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			}
 			
 			// 5, reorder items
@@ -954,25 +961,33 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}
 		
+		
+		// Calculate filters and alphaindex WHERE clauses
+		$filters_where = $this->_buildFiltersWhere();
+		$alpha_where   = $this->_buildAlphaIndexWhere();
+		
 		// All items / Normal only / Featured only
 		$flag_featured = (int) $cparams->get('display_flag_featured', 0);
 		
-		// Check if Text Search / Filters / AI are NOT active and
-		// special before FORM SUBMIT (per page) -limit- was configured to "FEATURED ONLY"
-		if ( empty($this->_active_filts) && empty($this->_active_search) && empty($this->_active_ai) )
+		// Check if Text Search / Filters / AI are NOT active and LIST-ALL Flag not present
+		// then check if doing a before FORM SUBMIT, "FEATURED ONLY" item list
+		$app->setUserState('use_limit_before_search_filt', 0);
+		$use_limit_before = (int) $cparams->get('use_limit_before_search_filt', 0);
+		if ( $use_limit_before )
 		{
-			$use_limit_before = (int) $cparams->get('use_limit_before_search_filt', 0);
-			if ($use_limit_before == 2) $flag_featured = 2;
+			if ( empty($this->_active_filts) && empty($this->_active_search) && empty($this->_active_ai) && empty($this->_listall) )
+			{
+				$app->setUserState('use_limit_before_search_filt', $use_limit_before);
+				if ($use_limit_before==2) $flag_featured = 2;
+			}
 		}
+		
 		switch ($flag_featured)
 		{
 			case 1: $where .= ' AND i.featured=0'; break;   // 1: normal only
 			case 2: $where .= ' AND i.featured=1'; break;   // 2: featured only
 			default: break;  // 0: both normal and featured
 		}
-		
-		$filters_where = $this->_buildFiltersWhere();
-		$alpha_where   = $this->_buildAlphaIndexWhere();
 		
 		$fc_catview['filters_where'] = $filters_where;
 		$fc_catview['alpha_where'] = $alpha_where;
@@ -1790,23 +1805,27 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Get category layout from configuration if not already set (e.g. via HTTP Request)
 		// *********************************************************************************
 		
+		$app = JFactory::getApplication();
+		
 		// Decide to use mobile or normal category template layout
 		$useMobile = $params->get('use_mobile_layouts', 0 );
-		if ($useMobile) {
+		if ($useMobile)
+		{
 			$force_desktop_layout = $params->get('force_desktop_layout', 0 );
 			$mobileDetector = flexicontent_html::getMobileDetector();
 			$isMobile = $mobileDetector->isMobile();
 			$isTablet = $mobileDetector->isTablet();
 			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
 		}
-		$_clayout = $useMobile ? 'clayout_mobile' : 'clayout';
 		
 		// Get category layout (... if not already set), from the configuration parameter (that was decided above)
-		$clayout = $this->_clayout=='__request__' ? JRequest::getCmd($_clayout, false) : false;
-		if (!$clayout) {
-			$desktop_clayout = $params->get('clayout', 'blog');
-			$clayout = !$useMobile ? $desktop_clayout : $params->get('clayout_mobile', $desktop_clayout);
-		}
+		$desktop_clayout = $params->get('clayout', 'blog');
+		$clayout_default = !$useMobile ? $desktop_clayout : $params->get('clayout_mobile', $desktop_clayout);
+		$params->set('clayout_default', $clayout_default);
+
+		$clayout = $this->_clayout=='__request__' ?
+			$app->input->get('clayout', $clayout_default, 'cmd') :
+			$clayout_default ;
 		
 		// Get all templates from cache, (without loading any language file this will be done at the view)
 		$themes = flexicontent_tmpl::getTemplates();
@@ -1827,8 +1846,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// *****************************************************************************************
 		
 		$this->setCatLayout($clayout);
+		
+		// Maybe these should not be changed ... and instead the view will get correct value from state !!
 		$params->set('clayout', $clayout);
 		JRequest::setVar('clayout', $clayout);
+		$app->input->set('clayout', $clayout);
 	}
 	
 	

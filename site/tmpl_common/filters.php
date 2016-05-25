@@ -156,7 +156,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			
 			<?php
 			$n=0;
-			$prepend_onchange = " adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
+			$prepend_onchange = ''; //" adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
 			$filters_html = array();
 			foreach ($filters as $filt) :
 				if (empty($filt->html)) continue;
@@ -275,21 +275,21 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 if ($filter_autosubmit) {
 	$js = '
 		jQuery(document).ready(function() {
-			jQuery("#'.$form_id.' input:not(.fc_autosubmit_exclude), #'.$form_id.' select:not(.fc_autosubmit_exclude)").on("change", function() {
-				var form=document.getElementById("'.$form_id.'");
+			var form=document.getElementById("'.$form_id.'");
+			jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude), select:not(.fc_autosubmit_exclude)").on("change", function() {
 				adminFormPrepare(form, 2);
 			});
-			jQuery("#'.$form_id.'").attr("data-fc-autosubmit", "2");
+			jQuery(form).attr("data-fc-autosubmit", "2");
 		});
 	';
 } else {
 	$js = '
 		jQuery(document).ready(function() {
-			jQuery("#'.$form_id.' input:not(.fc_autosubmit_exclude), #'.$form_id.' select:not(.fc_autosubmit_exclude)").on("change", function() {
-				var form=document.getElementById("'.$form_id.'");
+			var form=document.getElementById("'.$form_id.'");
+			jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude), select:not(.fc_autosubmit_exclude)").on("change", function() {
 				adminFormPrepare(form, 1);
 			});
-			jQuery("#'.$form_id.'").attr("data-fc-autosubmit", "1");
+			jQuery(form).attr("data-fc-autosubmit", "1");
 		});
 	';
 }

@@ -316,6 +316,24 @@ input[type="radio"].fc_checkradio_bar:checked + label {
  * Flexicontent buttons for Forms
  *******************************/
 
+div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group {
+	width: 100%;
+	max-width: 1200px;
+	box-sizing:border-box;
+	margin-left: 0;
+	margin-right: 0;
+}
+div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group > button {
+	width: 50%;
+	box-sizing:border-box;
+}
+div .listall-lbl {
+	max-width: 1200px;
+	width: 100%;
+	box-sizing: border-box;
+	margin:8px 0;
+}
+
 div .flexi_buttons,
 div .fc_buttons {
 	margin: 0px;
@@ -644,10 +662,21 @@ body .nowrap_hidden {
 	overflow: hidden;
 }
 
-
 .flexicontent .fc_less_parameter::before {
-	background-color: darkcyan !important;
+	background-color: darkcyan;
+	color: white;
+	font-size: 12px;
+	font-weight: bold;
 	border-radius: 4px;
-	content: "less";
+	content: "L";
 	padding: 2px 4px;
+	box-sizing: content-box;
+	height: 1em;
+	line-height: 1em;
+}
+.flexicontent label.fc_less_parameter::before {
+	float: left;
+	position: relative;
+	top: -4px;
+	left: -4px;
 }

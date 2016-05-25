@@ -86,6 +86,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$limit = strlen(JRequest::getVar('limit')) ? JRequest::getInt('limit') : $this->_params->get('limit');
 		$limitstart	= JRequest::getInt('limitstart', JRequest::getInt('start', 0, '', 'int'), '', 'int');
 		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
+		JFactory::getApplication()->input->set('limitstart', $limitstart);
 		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);

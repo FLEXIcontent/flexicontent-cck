@@ -580,31 +580,78 @@ class flexicontent_html
 		return $item_html;
 	}
 
-
+	static function listall_selector(&$params, $formname='adminForm', $autosubmit=1)
+	{
+		
+		$use_limit_before = (int) $params->get('use_limit_before_search_filt', 0);
+		if ($use_limit_before < 2) return '';
+		
+		$app = JFactory::getApplication();
+		$use_limit_before_search_filt = $app->getUserState('use_limit_before_search_filt');
+		if ($use_limit_before_search_filt < 2) return '';
+		
+		$tooltip_class = 'hasTooltip';
+		return '
+			<input type="checkbox" id="listall" name="listall" value="1" form="'.$formname.'"/>
+			<label id="listall-lbl" for="listall" class="btn '.$tooltip_class.'" style="width:100%; margin:8px 0; box-sizing:border-box;" title="'.JText::_('FLEXI_LISTING_ONLY_FEATURED_CLICK_TO_LIST_ALL_DESC', true).'">
+				'.JText::_('FLEXI_LIST_ALL_ITEMS').'
+			</label>
+		';
+	}
+	
+	
 	static function limit_selector(&$params, $formname='adminForm', $autosubmit=1)
 	{
 		if ( !$params->get('limit_override') ) return '';
 
-		$app	= JFactory::getApplication();
-		//$orderby = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-		$limit = $app->getUserStateFromRequest( 'limit', 'limit', $params->get('limit'), 'string' );
-
+		$app = JFactory::getApplication();
+		
+		$default_limit = $app->getUserState('use_limit_before_search_filt') ? $params->get('limit_before_search_filt') : $params->get('limit');
+		$limit_given = strlen( $app->input->get('limit') );
+		$limit = $limit_given ? $app->input->get('limit', 0, 'int') : $default_limit;
+		
 		flexicontent_html::loadFramework('select2');
 		$classes  = "fc_field_filter use_select2_lib";
-		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(this.form, 2);" ';
-		$attribs  = ' class="'.$classes.'" ' . $onchange;
+		
+		$attribs = array(
+	    'id' => 'limit', // HTML id for select field
+	    'list.attr' => array( // additional HTML attributes for select field
+	    ),
+	    'list.translate'=>false, // true to translate
+	    'option.key'=>'value',   // key name for value in data array
+	    'option.text'=>'text',   // key name for text in data array
+	    'option.attr'=>'attr',   // key name for attr in data array
+	    'list.select'=>$limit    // value of the SELECTED field
+		);
+		$attribs['list.attr']['onchange'] = $autosubmit ? "adminFormPrepare(this.form, 2);" : null;
+		$attribs['list.attr']['class'] = $classes;
+		$attribs['list.attr']['form'] = $formname;
 		
 		$limit_options = $params->get('limit_options', '5,10,20,30,50,100,150,200');
 		$limit_options = preg_split("/[\s]*,[\s]*/", $limit_options);
 
 		$limiting = array();
+		
 		$limit_override_label = $params->get('limit_override_label', 2);
-		//$limiting[] = JHTML::_('select.option', '', JText::_('Default'));
 		$inside_label = $limit_override_label==2 ? ' '.JText::_('FLEXI_PER_PAGE') : '';
-		//$default_limit = $params->get('limit');
-		foreach($limit_options as $limit_option) {
-			//$limit_isdefault = ($default_limit == $limit_option) ? ' ('.JText::_('FLEXI_DEFAULT').') ' : '';
-			$limiting[] = JHTML::_('select.option', $limit_option, $limit_option .$inside_label /*.$limit_isdefault*/);
+
+		if ($app->getUserState('use_limit_before_search_filt'))
+		{
+			$attribs['list.attr']['disabled'] = 'disabled';
+			$limiting[] = array(
+				'value' => $default_limit,
+				'text'  => $default_limit . $inside_label,
+				'attr'  => array('data-is-default-value' => '1')
+			);
+		}
+		else foreach($limit_options as $limit_option)
+		{
+			$attr_arr = $default_limit == $limit_option ? array('data-is-default-value' => '1') : array();
+			$limiting[] = array(
+				'value' => $limit_option,
+				'text'  => $limit_option . $inside_label,
+				'attr'  => $attr_arr
+			);
 		}
 		
 		// Outside label
@@ -612,7 +659,8 @@ class flexicontent_html
 		if ($limit_override_label==1) {
 			$outside_label = '<span class="flexi label limit_override_label">'.JText::_('FLEXI_PER_PAGE').'</span>';
 		}
-		return $outside_label.JHTML::_('select.genericlist', $limiting, 'limit', $attribs, 'value', 'text', $limit );
+		
+		return $outside_label.JHTML::_('select.genericlist', $limiting, 'limit', $attribs);
 	}
 	
 	
@@ -621,18 +669,32 @@ class flexicontent_html
 		if ( !$params->get('orderby_override'.$sfx, 0) ) return '';
 
 		$app	= JFactory::getApplication();
-		//$orderby = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-		$orderby = $app->getUserStateFromRequest( 'orderby'.$sfx, 'orderby'.$sfx, ''/*$params->get('orderby'.$sfx)*/, 'string' );
-
+		
+		$default_orderby = $params->get( 'orderby'.$sfx );
+		$orderby = $app->input->get('orderby'.$sfx);
+		$orderby = $orderby ? $orderby : $default_orderby;
+		
 		flexicontent_html::loadFramework('select2');
 		$classes  = "fc_field_filter use_select2_lib";
-		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(this.form, 2);" ';
-		$attribs  = ' class="'.$classes.'" ' . $onchange;
+		
+		$attribs = array(
+	    'id' => 'orderby'.$sfx, // HTML id for select field
+	    'list.attr' => array( // additional HTML attributes for select field
+	    ),
+	    'list.translate'=>false, // true to translate
+	    'option.key'=>'value',   // key name for value in data array
+	    'option.text'=>'text',   // key name for text in data array
+	    'option.attr'=>'attr',   // key name for attr in data array
+	    'list.select'=>$orderby  // value of the SELECTED field
+		);
+		$attribs['list.attr']['onchange'] = $autosubmit ? "adminFormPrepare(this.form, 2);" : null;
+		$attribs['list.attr']['class'] = $classes;		
+		$attribs['list.attr']['form'] = $formname;
 		
 		$orderby_options = $params->get('orderby_options'.$sfx, array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','id','rid','order'));
 		$orderby_options = FLEXIUtilities::paramToArray($orderby_options);
 
-		$orderby_names =array(
+		$orderby_names = array(
 			'_preconfigured_'=>'FLEXI_ORDER_DEFAULT_INITIAL',
 			'date'=>'FLEXI_ORDER_OLDEST_FIRST',
 			'rdate'=>'FLEXI_ORDER_MOST_RECENT_FIRST',
@@ -652,15 +714,29 @@ class flexicontent_html
 		);
 		
 		$ordering = array();
-		foreach ($extra_order_types as $value => $text) {
+		foreach ($extra_order_types as $value => $text)
+		{
 			$text = JText::_( $text );
-			$ordering[] = JHTML::_('select.option',  $value,  $text);
+			//$ordering[] = JHTML::_('select.option',  $value,  $text);
+			$attr_arr = $default_orderby == $value ? array('data-is-default-value' => '1') : array();
+			$ordering[] = array(
+				'value' => $value,
+				'text'  => $text,
+				'attr'  => $attr_arr
+			);
 		}
-		foreach ($orderby_options as $orderby_option) {
+		foreach ($orderby_options as $orderby_option)
+		{
 			if ($orderby_option=='__SAVED__') continue;
 			$value = ($orderby_option!='_preconfigured_') ? $orderby_option : '';
 			$text = JText::_( $orderby_names[$orderby_option] );
-			$ordering[] = JHTML::_('select.option',  $value,  $text);
+			//$ordering[] = JHTML::_('select.option',  $value,  $text);
+			$attr_arr = $default_orderby == $value ? array('data-is-default-value' => '1') : array();
+			$ordering[] = array(
+				'value' => $value,
+				'text'  => $text,
+				'attr'  => $attr_arr
+			);
 		}
 		
 		
@@ -694,10 +770,16 @@ class flexicontent_html
 			} else {
 				$text = JText::_( $field->label ) .' '. JText::_(strtolower($op[2])=='asc' ? 'FLEXI_INCREASING' : 'FLEXI_DECREASING');
 			}
-			$ordering[] = JHTML::_('select.option', $value,  $text);
+			//$ordering[] = JHTML::_('select.option', $value,  $text);
+			$attr_arr = $default_orderby == $value ? array('data-is-default-value' => '1') : array();
+			$ordering[] = array(
+				'value' => $value,
+				'text'  => $text,
+				'attr'  => $attr_arr
+			);
 		}
 		
-		return JHTML::_('select.genericlist', $ordering, 'orderby'.$sfx, $attribs, 'value', 'text', $orderby );
+		return JHTML::_('select.genericlist', $ordering, 'orderby'.$sfx, $attribs);
 	}
 	
 	
@@ -711,9 +793,10 @@ class flexicontent_html
 	static function layout_selector(&$params, $formname='adminForm', $autosubmit=1, $layout_type='clayout')
 	{
 		if ( !$params->get($layout_type.'_switcher') ) return '';
-		$_default_layout = $params->get($layout_type, $layout_type=='clayout' ? 'blog' : 'default');
+		$default_layout = $params->get($layout_type.'_default', $layout_type=='clayout' ? 'blog' : 'default');
 		
-		if ($layout_type=='clayout') {
+		if ($layout_type=='clayout')
+		{
 			$displayed_tmpls = $params->get('displayed_'.$layout_type.'s');
 			if ( empty($displayed_tmpls) )							$displayed_tmpls = array();
 			else if ( ! is_array($displayed_tmpls) )		$displayed_tmpls = explode("|", $displayed_tmpls);
@@ -740,7 +823,8 @@ class flexicontent_html
 		else if ($layout=='author') $svar .= JRequest::getInt('authorid');
 		if ($layout) $svar .= '.category'.JRequest::getInt('cid');*/
 		
-		$layout = $app->getUserStateFromRequest( $option.$svar.'.'.$layout_type, $layout_type, $_default_layout, 'string' );
+		//$layout = $app->getUserStateFromRequest( $option.$svar.'.'.$layout_type, $layout_type, $default_layout, 'cmd' );
+		$layout = $app->input->get($layout_type, $default_layout, 'cmd') ;
 		
 		$_switcher_label = $params->get($layout_type.'_switcher_label', 0);
 		$inside_label  = $_switcher_label==2 ? ' '.JText::_('FLEXI_LAYOUT') : '';
@@ -753,15 +837,36 @@ class flexicontent_html
 		{
 			flexicontent_html::loadFramework('select2');
 			$classes  = "fc_field_filter use_select2_lib";
-			$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(this.form, 2);" ';
-			$attribs  = ' class="'.$classes.'" ' . $onchange;
+			//$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(this.form, 2);" ';
+			//$attribs  = ' class="'.$classes.'" ' . $onchange . ' form="'.$formname.'" ';
+			
+			$attribs = array(
+		    'id' => $layout_type, // HTML id for select field
+		    'list.attr' => array( // additional HTML attributes for select field
+		    ),
+		    'list.translate'=>false, // true to translate
+		    'option.key'=>'value',   // key name for value in data array
+		    'option.text'=>'text',   // key name for text in data array
+		    'option.attr'=>'attr',   // key name for attr in data array
+		    'list.select'=>$layout   // value of the SELECTED field
+			);
+			$attribs['list.attr']['onchange'] = $autosubmit ? "adminFormPrepare(this.form, 2);" : null;
+			$attribs['list.attr']['class'] = $classes;		
+			$attribs['list.attr']['form'] = $formname;
 			
 			$options = array();
-			foreach($layout_names as $layout_name) {
+			foreach($layout_names as $layout_name)
+			{
 				$layout_title = !empty($layout_texts->$layout_name->title)  ?  $layout_texts->$layout_name->title  :  $layout_name;
-				$options[] = JHTML::_('select.option', $layout_name, $layout_title .$inside_label);
+				//$options[] = JHTML::_('select.option', $layout_name, $layout_title .$inside_label);
+				$attr_arr = $default_layout == $layout_name ? array('data-is-default-value' => '1') : array();
+				$options[] = array(
+					'value' => $layout_name,
+					'text'  => $layout_title .$inside_label,
+					'attr'  => $attr_arr
+				);
 			}
-			$html = JHTML::_('select.genericlist', $options, $layout_type, $attribs, 'value', 'text', $layout );
+			$html = JHTML::_('select.genericlist', $options, $layout_type, $attribs);
 		}
 		else
 		{
@@ -774,15 +879,19 @@ class flexicontent_html
 			{
 				$layout_title = !empty($layout_texts->$layout_name->title)  ?  $layout_texts->$layout_name->title  :  '';
 				$checked_attr = $layout==$layout_name ? ' checked=checked ' : '';
+				$is_default_attr = $default_layout == $layout_name ? ' data-is-default-value="1" ' : '';
 				$options[] =
-					'<input type="radio" name="'.$layout_type.'" value="'.$layout_name.'" id="'.$layout_type.$n.'" onchange="adminFormPrepare(this.form, 2);" '.$checked_attr.'>'.
+					'<input form="'.$formname.'" type="radio" name="'.$layout_type.'" value="'.$layout_name.'" id="'.$layout_type.$n.'" onchange="adminFormPrepare(this.form, 2); return true;" '.$checked_attr.$is_default_attr.'>'.
 					'<label for="'.$layout_type.$n.'" class="btn '.$tooltip_class.'" title="'.$layout_title.'"><img alt="'.$layout_name.'" src="'.$tmplurl.$layout_name.'/clayout.png"></label>'
 					;
 				$n++;
 			}
-			$html =
-				'<fieldset class="radio btn-group group-fcinfo">'.implode('', $options).'</fieldset>'.
-				'<script> jQuery(\'input[name="'.$layout_type.'"]\').click( function() { adminFormPrepare(this.form, 2); }); </script>';
+			$html = '
+				<fieldset class="radio btn-group group-fcinfo">
+					'.implode('', $options).'
+				</fieldset>
+			';
+			JFactory::getDocument()->addScriptDeclaration('jQuery(document).ready(function(){ jQuery(\'input[name="'.$layout_type.'"]\').click( function() { adminFormPrepare(this.form, 2); }); });');
 		}
 		return $outside_label.$html;
 	}
@@ -2860,7 +2969,7 @@ class flexicontent_html
 			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 			
 			// Load tooltips JS
-			if ($cparams->get('add_tooltips', 1)) FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
+			if ($cparams->get('add_tooltips', 1)) JHtml::_('bootstrap.tooltip');
 			
 			flexicontent_html::loadFramework('jQuery');
 			flexicontent_html::loadFramework('flexi_tmpl_common');
@@ -3099,7 +3208,7 @@ class flexicontent_html
 			//FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 			
 			// Load tooltips JS
-			if ($cparams->get('add_tooltips', 1)) FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
+			if ($cparams->get('add_tooltips', 1)) JHtml::_('bootstrap.tooltip');
 			
 			flexicontent_html::loadFramework('jQuery');
 			flexicontent_html::loadFramework('flexi_tmpl_common');

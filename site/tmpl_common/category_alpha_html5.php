@@ -1,21 +1,4 @@
 <?php
-/**
- * HTML5 Template
- * @version 1.5 stable $Id: category_alpha_html5.php 0001 2012-09-23 14:00:28Z Rehne $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
@@ -76,11 +59,10 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 	$groupcssclasses[$i] = 'letters';
 }
 
-if ($caching) $selected_letter = JRequest::getVar('letter', '', 'get');
-else $selected_letter = JRequest::getVar('letter', '', 'post');
+$selected_letter = JRequest::getVar('letter', '');
 ?>
 
-<div id="fc_alpha" class="control-group group" role="application">
+<div id="fc_alpha">
 	<?php
 	$flag = true;
 	$grp_no=-1;
@@ -91,7 +73,7 @@ else $selected_letter = JRequest::getVar('letter', '', 'post');
 	?>
 	<div class="aichargrp <?php echo $groupcssclasses[$grp_no]; ?>">
 	<?php if($flag) {?>
-	<a class="btn btn-medium fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value='';document.getElementById('adminForm').submit();"><?php echo JText::_('FLEXI_ALL'); ?></a>
+	<a class="fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value=''; var form=document.getElementById('adminForm'); adminFormPrepare(form, 2);"><?php echo JText::_('FLEXI_ALL'); ?></a>
 	<?php $flag = false;}?>
 	<?php
 		foreach ($letters as $letter) :
@@ -164,20 +146,20 @@ else $selected_letter = JRequest::getVar('letter', '', 'post');
 				endfor;
 			}
 			
-			if ($alphacharsep) $aiclass = "btn btn-medium fc_alpha_index_sep";
-			else $aiclass = "btn btn-medium fc_alpha_index";
+			if ($alphacharsep) $aiclass = "fc_alpha_index_sep";
+			else $aiclass = "fc_alpha_index";
 			$currentclass = '';
 			if($letter_label == $selected_letter){
-				$currentclass = 'current active';
+				$currentclass = 'current';
 			}
 			if ($has_item) :
 				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo "<a class=\"$aiclass $currentclass\" href=\"javascript:;\" onclick=\"document.getElementById('alpha_index').value='".$letter."'; ";
 				echo " var form=document.getElementById('adminForm'); ";
-				echo " adminFormPrepare(form); form.submit(); \">".StringHelper::strtoupper($letter_label)."</a>";
+				echo " adminFormPrepare(form, 2); \">".StringHelper::strtoupper($letter_label)."</a>";
 			elseif (!$alphaskipempty) :
 				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
-				echo '<span class="'.$aiclass.' disabled">'.StringHelper::strtoupper($letter_label).'</span>';
+				echo '<span class="'.$aiclass.'">'.StringHelper::strtoupper($letter_label).'</span>';
 			endif;
 			$group_start = false;
 		endforeach;

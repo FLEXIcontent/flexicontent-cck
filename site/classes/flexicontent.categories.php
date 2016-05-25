@@ -71,7 +71,7 @@ class flexicontent_cats
 		$query = 'SELECT ' .($all_cols ? '*,' : 'id, title, published, access,')
 				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				.' FROM #__categories'
-				.' WHERE id IN ('.implode($this->parentcats_ids, ',').')'
+				.' WHERE id IN ('.implode(',', $this->parentcats_ids).')'
 				. (!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ' )
 				;
 		$db->setQuery($query);

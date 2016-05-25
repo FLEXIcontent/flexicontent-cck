@@ -1,5 +1,7 @@
 <?php
-$form_style = JRequest::getCmd('print') ? 'display:none' : '';
+defined( '_JEXEC' ) or die( 'Restricted access' );
+if ( JFactory::getApplication()->input->get('print') ) return;
+
 ob_start();
 
 // Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
@@ -29,7 +31,7 @@ if ($ff_placement){
 }
 ?>
 
-<form action="<?php echo $this->action; ?>" method="post" id="adminForm" onsubmit="" style="<?php echo $form_style;?>">
+<form action="<?php echo $this->action; ?>" method="post" id="adminForm" >
 
 <?php echo $filter_form_body; ?>
 
@@ -46,6 +48,13 @@ if ($ff_placement){
 <?php
 // FORM in slider
 if ($ff_placement) echo JHtml::_('sliders.end');
-?>
+
+$listall_selector = flexicontent_html::listall_selector( $this->params, $formname='adminForm', $autosubmit=1 );
+
+if ($listall_selector) : ?>
+	<div class="fc_listall_box">
+		<div class="fc_listall_selector"><?php echo $listall_selector;?></div>
+	</div>
+<?php endif; ?>
 
 </div>

@@ -221,8 +221,9 @@ switch ($view)
 {
 	case 'item' :
 		
-		if ( empty($id) || $task == 'add' )  // New item form (TASK: add  -or-  empty ID)
+		if ( empty($id) || $task == 'add' )  // New item form URL (TASK: add  -or-  empty ID)
 		{
+			$menu_matches = false;
 			if ($Itemid && $menu = JFactory::getApplication()->getMenu()->getItem($Itemid))
 			{
 				$menu_matches = @ $menu->query['view'] == $view && @ $menu->query['task'] == $task && @ $menu->query['layout'] == $layout && @ $menu->query['typeid'] == @ $typeid;
@@ -236,12 +237,13 @@ switch ($view)
 				}
 			}
 			
-			else {
+			else if ( !empty($typeid) )  // New item form URL without menu item, add type name to the URL
+			{
 				$title [] = $compName[$shLangName] .'/';
 				$title [] = $sh_LANG[$shLangIso][ $view2seg[$view] ] . '/';
 				$title [] = ($task=='add' ? $sh_LANG[$shLangIso][ '_SH404SEF_FLEXICONTENT_ADD' ] : $task) . '/';
 				
-				$query 	= 'SELECT id, name FROM #__flexicontent_types WHERE id = ' . ( int ) $tagid;
+				$query 	= 'SELECT id, name FROM #__flexicontent_types WHERE id = ' . ( int ) $typeid;
 				$database->setQuery ( $query );
 				$row = $database->loadObject();
 				if ($row)

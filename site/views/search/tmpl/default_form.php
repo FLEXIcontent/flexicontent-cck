@@ -265,7 +265,7 @@ $r = 0;
 				<?php endif; */ ?>
 				
 				<?php
-				$prepend_onchange = " adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
+				$prepend_onchange = ''; //" adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
 				foreach($this->filters as $filt) {
 					if (empty($filt->html)) continue;
 					$label = JText::_($filt->label);
@@ -367,21 +367,21 @@ $r = 0;
 		<?php endif; ?>
 		
 		<?php if ( $this->lists['limit'] ) : ?>
-			<span class="fc_limit_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_PAGINATION', 'FLEXI_PAGINATION_INFO', 1); ?>">
-				<span class="fc_limit_selector"><?php echo $this->lists['limit']; ?></span>
-			</span>
+			<div class="fc_limit_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_PAGINATION', 'FLEXI_PAGINATION_INFO', 1); ?>">
+				<div class="fc_limit_selector"><?php echo $this->lists['limit']; ?></div>
+			</div>
 		<?php endif; ?>
 		
 		<?php if ( $this->lists['orderby'] ) : ?>
-			<span class="fc_orderby_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY', 'FLEXI_ORDERBY_INFO', 1); ?>">
-				<?php if ($this->lists['orderby_2nd']) echo '<span class="label">1</span> '; ?><span class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></span>
-			</span>
+			<div class="fc_orderby_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY', 'FLEXI_ORDERBY_INFO', 1); ?>">
+				<?php if ($this->lists['orderby_2nd']) echo '<span class="label">1</span> '; ?><div class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></div>
+			</div>
 		<?php endif; ?>
 		
 		<?php if ( $this->lists['orderby_2nd'] ) : ?>
-			<span class="fc_orderby_box fc_2nd_level <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY_2ND', 'FLEXI_ORDERBY_INFO_2ND', 1); ?>">
-				<span class="label">2</span> <span class="fc_orderby_selector"><?php echo $this->lists['orderby_2nd']; ?></span>
-			</span>
+			<div class="fc_orderby_box fc_2nd_level <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY_2ND', 'FLEXI_ORDERBY_INFO_2ND', 1); ?>">
+				<span class="label">2</span> <div class="fc_orderby_selector"><?php echo $this->lists['orderby_2nd']; ?></div>
+			</div>
 		<?php endif; ?>
 		
 		<?php if (@$this->pageNav) : ?>
@@ -432,19 +432,21 @@ $filter_autosubmit = 0;
 if ($filter_autosubmit) {
 	$js = '
 		jQuery(document).ready(function() {
-			jQuery("#'.$form_id.' input:not(.fc_autosubmit_exclude), #'.$form_id.' select:not(.fc_autosubmit_exclude)").on("change", function() {
-				var form=document.getElementById("'.$form_id.'");
+			var form=document.getElementById("'.$form_id.'");
+			jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude), select:not(.fc_autosubmit_exclude)").on("change", function() {
 				adminFormPrepare(form, 2);
 			});
+			jQuery(form).attr("data-fc-autosubmit", "2");
 		});
 	';
 } else {
 	$js = '
 		jQuery(document).ready(function() {
-			jQuery("#'.$form_id.' input:not(.fc_autosubmit_exclude), #'.$form_id.' select:not(.fc_autosubmit_exclude)").on("change", function() {
-				var form=document.getElementById("'.$form_id.'");
+			var form=document.getElementById("'.$form_id.'");
+			jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude), select:not(.fc_autosubmit_exclude)").on("change", function() {
 				adminFormPrepare(form, 1);
 			});
+			jQuery(form).attr("data-fc-autosubmit", "1");
 		});
 	';
 }

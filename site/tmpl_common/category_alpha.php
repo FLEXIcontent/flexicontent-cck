@@ -1,20 +1,4 @@
 <?php
-/**
- * @version 1.5 stable $Id: category_alpha.php 1035 2011-12-09 00:16:50Z ggppdk $
- * @package Joomla
- * @subpackage FLEXIcontent
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
- * @license GNU/GPL v2
- * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
- * FLEXIcontent is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
@@ -89,7 +73,7 @@ $selected_letter = JRequest::getVar('letter', '');
 	?>
 	<div class="aichargrp <?php echo $groupcssclasses[$grp_no]; ?>">
 	<?php if($flag) {?>
-	<a class="fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value='';document.getElementById('adminForm').submit();"><?php echo JText::_('FLEXI_ALL'); ?></a>
+	<a class="fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value=''; var form=document.getElementById('adminForm'); adminFormPrepare(form, 2);"><?php echo JText::_('FLEXI_ALL'); ?></a>
 	<?php $flag = false;}?>
 	<?php
 		foreach ($letters as $letter) :
@@ -172,7 +156,7 @@ $selected_letter = JRequest::getVar('letter', '');
 				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo "<a class=\"$aiclass $currentclass\" href=\"javascript:;\" onclick=\"document.getElementById('alpha_index').value='".$letter."'; ";
 				echo " var form=document.getElementById('adminForm'); ";
-				echo " adminFormPrepare(form); form.submit(); \">".StringHelper::strtoupper($letter_label)."</a>";
+				echo " adminFormPrepare(form, 2); \">".StringHelper::strtoupper($letter_label)."</a>";
 			elseif (!$alphaskipempty) :
 				if ($alphacharsep && !$group_start) echo "<span class=\"fc_alpha_index_sep\">$alphacharsep</span>";
 				echo '<span class="'.$aiclass.'">'.StringHelper::strtoupper($letter_label).'</span>';

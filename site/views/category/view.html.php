@@ -49,6 +49,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$session  = JFactory::getSession();
 		$option   = JRequest::getVar('option');
 		$format   = JRequest::getCmd('format', 'html');
+		$print    = JRequest::getCmd('print');
 		$document = JFactory::getDocument();
 		
 		// Check for Joomla issue with system plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
@@ -89,9 +90,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		$peercats   = $this->get('Peers');  // this will also count sub-category items is if  'show_subcatcount_peercat'  is enabled
 		$items   = $this->get('Data');
 		$total   = $this->get('Total');
-		$filters = $this->get('Filters');
-		$comments= $params->get('show_comments_count', 0)  ?  $this->get('CommentsInfo')  :  null;
-		$alpha   = $params->get('show_alpha', 1)  ?  $this->get('Alphaindex')  :  array();  // This is somewhat expensive so calculate it only if required
+		$filters = !$print ? $this->get('Filters') : array();
+		$comments= !$print && $params->get('show_comments_count', 0)  ?  $this->get('CommentsInfo')  :  null;
+		$alpha   = !$print && $params->get('show_alpha', 1)  ?  $this->get('Alphaindex')  :  array();  // This is somewhat expensive so calculate it only if required
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = JRequest::getInt('limitstart');
@@ -126,8 +127,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		//Set layout
 		$this->setLayout('category');
-		
-		$limit = $app->getUserStateFromRequest('com_flexicontent'.$category->id.'.category.limit', 'limit', $params->def('limit', 0), 'int');
 		
 		
 		// ********************************

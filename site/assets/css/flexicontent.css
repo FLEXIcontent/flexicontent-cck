@@ -213,6 +213,23 @@ input[type="radio"].fc_checkradio_bar:checked + label {
 	box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.05) !important;
 	background-color: #e0e0e0 !important;
 }
+div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group {
+	width: 100%;
+	max-width: 1200px;
+	box-sizing: border-box;
+	margin-left: 0;
+	margin-right: 0;
+}
+div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group > button {
+	width: 50%;
+	box-sizing: border-box;
+}
+div .listall-lbl {
+	max-width: 1200px;
+	width: 100%;
+	box-sizing: border-box;
+	margin: 8px 0;
+}
 div .flexi_buttons,
 div .fc_buttons {
 	margin: 0px;
@@ -496,10 +513,22 @@ body .nowrap_hidden {
 	overflow: hidden;
 }
 .flexicontent .fc_less_parameter::before {
-	background-color: darkcyan !important;
+	background-color: darkcyan;
+	color: white;
+	font-size: 12px;
+	font-weight: bold;
 	border-radius: 4px;
-	content: "less";
+	content: "L";
 	padding: 2px 4px;
+	box-sizing: content-box;
+	height: 1em;
+	line-height: 1em;
+}
+.flexicontent label.fc_less_parameter::before {
+	float: left;
+	position: relative;
+	top: -4px;
+	left: -4px;
 }
 body .fc-close {
 	color: #000000;
@@ -2519,6 +2548,10 @@ div table.adminform td {
 	display: inline-block;
 	float: right;
 	padding: 8px 4px;
+}
+#flexicontent .item_total .fc_orderby_level_lbl {
+	float: left;
+	margin: 1px 2px 0 2px;
 }
 #flexicontent .fc_search_field_container {
 	display: block;
