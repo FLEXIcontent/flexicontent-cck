@@ -1,9 +1,7 @@
-
-<?php if (JRequest::getCmd('print')) : ?>
-<div style="display:none">
-<?php endif;?>
-
 <?php
+defined( '_JEXEC' ) or die( 'Restricted access' );
+if ( JFactory::getApplication()->input->get('print') ) return;
+
 // ***********************************************************************************************************
 // Form for Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
 // ***********************************************************************************************************
@@ -25,7 +23,7 @@ $orderby_selector = flexicontent_html::orderby_selector( $this->params, $formnam
 $orderby_selector_2nd = flexicontent_html::orderby_selector( $this->params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='_2nd');
 $clayout_selector = flexicontent_html::layout_selector( $this->params, $formname='adminForm', $autosubmit=1, 'clayout');
 
-$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
+$tooltip_class = 'hasTooltip';
 ?>
 
 <?php if (count($this->items) && ($this->params->get('show_item_total', 1) || $limit_selector || $orderby_selector || $orderby_selector_2nd || $clayout_selector)) : ?>
@@ -50,21 +48,21 @@ $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 		<?php endif; ?>
 		
 		<?php if ($limit_selector) : ?>
-			<span class="fc_limit_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_PAGINATION', 'FLEXI_PAGINATION_INFO', 1, 1); ?>">
-				<span class="fc_limit_selector"><?php echo $limit_selector;?></span>
-			</span>
+			<div class="fc_limit_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_PAGINATION', 'FLEXI_PAGINATION_INFO', 1, 1); ?>">
+				<div class="fc_limit_selector"><?php echo $limit_selector;?></div>
+			</div>
 		<?php endif; ?>
 		
 		<?php if ($orderby_selector) : ?>
-			<span class="fc_orderby_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY', 'FLEXI_ORDERBY_INFO', 1, 1); ?>">
-				<?php if ($orderby_selector_2nd) echo '<span class="label">1</span> '; ?><span class="fc_orderby_selector"><?php echo $orderby_selector;?></span>
-			</span>
+			<div class="fc_orderby_box nowrap_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY', 'FLEXI_ORDERBY_INFO', 1, 1); ?>">
+				<?php if ($orderby_selector_2nd) echo '<div class="label fc_orderby_level_lbl">1</div>'; ?> <div class="fc_orderby_selector"><?php echo $orderby_selector;?></div>
+			</div>
 		<?php endif; ?>
 		
 		<?php if ($orderby_selector_2nd) : ?>
-			<span class="fc_orderby_box fc_2nd_level <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY_2ND', 'FLEXI_ORDERBY_INFO_2ND', 1, 1); ?>">
-				<span class="label">2</span> <span class="fc_orderby_selector"><?php echo $orderby_selector_2nd;?></span>
-			</span>
+			<div class="fc_orderby_box fc_2nd_level nowrap_box <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ORDERBY_2ND', 'FLEXI_ORDERBY_INFO_2ND', 1, 1); ?>">
+				<div class="label fc_orderby_level_lbl">2</div> <div class="fc_orderby_selector"><?php echo $orderby_selector_2nd;?></div>
+			</div>
 		<?php endif; ?>
 		
 		<span class="fc_pages_counter">
@@ -78,8 +76,4 @@ $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 
 <?php if (!$clayout_selector) : ?>
 	<input type="hidden" name="clayout" value="<?php JRequest::getVar('clayout'); ?>" />
-<?php endif; ?>
-
-<?php if (JRequest::getCmd('print')) : ?>
-</div>
 <?php endif; ?>

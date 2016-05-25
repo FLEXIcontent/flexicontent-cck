@@ -57,6 +57,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Prepare query to match feed data
 		JRequest::setVar('limit', $params->get('feed_limit'));   // Force a specific limit, this will be moved to the model
+		JFactory::getApplication()->input->set('limit', $params->get('feed_limit'));
 		
 		$params->set('orderby', $params->get('feed_orderby', 'rdate'));
 		$params->set('orderbycustomfield'   , $params->get('feed_orderbycustomfield' , 1));

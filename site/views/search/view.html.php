@@ -647,7 +647,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 						$searchRegex = $w_regexp_highlight[$word_found];
 						$parts[$word_found] = preg_replace($searchRegex, '_fc_highlight_start_\0_fc_highlight_end_', $part );
 					}
-					$result->text = implode($parts, " <br/> ");
+					$result->text = implode(' <br/> ', $parts);
 					
 					$replace_count_total = 0;
 					
@@ -680,7 +680,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 					$result->text = $text_search_header . $result->text;*/
 				} else {
 					$parts = FLEXIadvsearchHelper::prepareSearchContent( $result->text, $params->get('text_chars', 200), array() );
-					$result->text = implode($parts, " <br/> ");
+					$result->text = implode(' <br/> ', $parts);
 				}
 				
 				/*if ( !empty($result->fields_text) ) {

@@ -79,6 +79,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
 		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
+		JFactory::getApplication()->input->set('limitstart', $limitstart);
 		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);

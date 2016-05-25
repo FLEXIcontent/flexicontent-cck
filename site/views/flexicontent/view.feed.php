@@ -44,6 +44,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		
 		$doc->link = JRoute::_('index.php?option=com_flexicontent&view=flexicontent&rootcat='. (int)$params->get('rootcat', FLEXI_J16GE ? 1:0));
 		JRequest::setVar('limit', $params->get('feed_limit'));   // Force a specific limit, this will be moved to the model
+		JFactory::getApplication()->input->set('limit', $params->get('feed_limit'));
 		$cats = $this->get('Feed');
 		
 		//$feed_summary = $params->get('feed_summary', 0);

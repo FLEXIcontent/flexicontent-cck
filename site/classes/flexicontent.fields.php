@@ -3009,38 +3009,38 @@ class FlexicontentFields
 			if ($display_filter_as==1 || $display_filter_as==7) {
 				if ($isDate && !$isSlider) {
 					$filter->html	.= '
-						<span class="fc_filter_element">
+						<div class="fc_filter_element">
 							'.FlexicontentFields::createCalendarField($value, $allowtime=0, $filter_ffname, $filter_ffid, $attribs_arr).'
-						</span>';
+						</div>';
 				} else {
 					$filter->html	.=
 					($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider"></div><div class="fc_slider_input_box">' : '').'
-						<span class="fc_filter_element">
+						<div class="fc_filter_element">
 							<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value, ENT_COMPAT, 'UTF-8').'" />
-						</span>
+						</div>
 					'.($isSlider ? '</div>' : '');
 				}
 			} else {
 				if ($isDate && !$isSlider) {
 					$filter->html	.= '
-						<span class="fc_filter_element">
+						<div class="fc_filter_element">
 							'.FlexicontentFields::createCalendarField(@ $value[1], $allowtime=0, $filter_ffname.'[1]', $filter_ffid.'1', $attribs_arr).'
-						</span>
+						</div>
 						<span class="fc_range"></span>
-						<span class="fc_filter_element">
+						<div class="fc_filter_element">
 							'.FlexicontentFields::createCalendarField(@ $value[2], $allowtime=0, $filter_ffname.'[2]', $filter_ffid.'2', $attribs_arr).'
-						</span>';
+						</div>';
 				} else {
 					$size = (int)($size / 2);
 					$filter->html	.=
 					($isSlider ? '<div id="'.$filter_ffid.'_nouislider" class="fcfilter_with_nouislider"></div><div class="fc_slider_input_box">' : '').'
-						<span class="fc_filter_element">
+						<div class="fc_filter_element">
 							<input name="'.$filter_ffname.'[1]" '.$attribs_str.' id="'.$filter_ffid.'1" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[1], ENT_COMPAT, 'UTF-8').'" />
-						</span>
+						</div>
 						<span class="fc_range"></span>
-						<span class="fc_filter_element">
+						<div class="fc_filter_element">
 							<input name="'.$filter_ffname.'[2]" '.$attribs_str.' id="'.$filter_ffid.'2" type="text" size="'.$size.'" value="'.htmlspecialchars(@ $value[2], ENT_COMPAT, 'UTF-8').'" />
-						</span>
+						</div>
 					'.($isSlider ? '</div>' : '');
 				}
 			}

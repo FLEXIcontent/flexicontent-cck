@@ -65,9 +65,23 @@
 			if (element.name=='filter_order' && element.value=='i.title') continue;
 			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
 			
-			var matches = element.name.match(/^(filter.*|cids|letter|clayout|limit|orderby|q|searchword|p|searchphrase|areas\[\]|contenttypes\[\]|txtflds|o|ordering)$/);
+			var matches = element.name.match(/^(filter.*|cids|letter|clayout|limit|orderby|orderby_2nd|listall|q|searchword|p|searchphrase|areas\[\]|contenttypes\[\]|txtflds|o|ordering)$/);
 			if (!matches || element.value == '') continue;
-			if ((element.type=='radio' || element.type=='checkbox') && !element.checked) continue;
+
+			if ( (element.type=='radio' || element.type=='checkbox') ) {
+				if ( !element.checked ) continue;
+				if ( jQuery(element).attr('data-is-default-value') == '1' )
+				{
+					if (postprep==2) jQuery(element).attr('disabled', 'disabled');
+					continue;
+				}
+			}
+			if ( element.type=='select-one' ) {
+				if ( jQuery(element).find('option:selected').attr('data-is-default-value') ) {
+					if (postprep==2) jQuery(element).attr('disabled', 'disabled');
+					continue;
+				}
+			}
 			
 			if ( element.type=='select-multiple' ) {
 				for (var p=0; p < element.length; p++) {

@@ -278,11 +278,8 @@ if ( $format == 'html' )
 	
 	if ( $cparams->get('add_tooltips', 1) )
 	{
-		// J2.5 tooltips (mootools tooltips) 
-		//JHTML::_('behavior.tooltip');  // All uses of 'hasTip' were replaced with 'hasTooltip'
-		
 		// J3.0+ tooltips (bootstrap based)
-		if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
+		JHtml::_('bootstrap.tooltip');
 	}
 	
 	// Add flexi-lib JS

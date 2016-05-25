@@ -247,7 +247,7 @@ function FLEXIcontentBuildRoute(&$query)
 				}
 				else {
 					$segments[] = 'categories';
-					$segments[] = is_array($cids) ? implode($cids, ",") : $cids;
+					$segments[] = is_array($cids) ? implode(',', $cids) : $cids;
 					//if ($cid && $mcid!=$cid) $segments[] = $query['cid'];  // ignored
 					unset($query['cids']);
 				}

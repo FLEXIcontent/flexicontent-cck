@@ -91,6 +91,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$limit 			= $params->def('catlimit', 5);
 		$limitstart	= JRequest::getInt('limitstart', JRequest::getInt('start', 0, '', 'int'), '', 'int');
 		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
+		JFactory::getApplication()->input->set('limitstart', $limitstart);
 		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
