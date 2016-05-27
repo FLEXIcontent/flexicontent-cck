@@ -70,6 +70,23 @@
 		
 		// Get close function
 		var closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;
+		var keepPlace = !!params.keepPlace;
+		
+		// Because allowing moving modal to be moved out of form (under body), we need to set form ATTRIBUTE to form, for any form elements inside it
+		if (!keepPlace)
+		{
+			var form_fields = obj.find('textarea, select, input, button').toArray();
+			for ( var i = 0, l = form_fields.length; i < l; i++ )
+			{
+				// Get field type / tag name
+				var $el = jQuery(form_fields[i]);
+				var form = form_fields[i].form;
+				if (form && form.id && !$el.attr('form'))
+				{
+					$el.attr('form', form.id);
+				}
+			}
+		}
 		
 		var parent = obj.parent();
 		var theDialog = obj.dialog({
@@ -85,8 +102,8 @@
 			icons: {
 				primary: "ui-icon-heart"
 			},
-      buttons: {
-				'Close': function() { jQuery(this).dialog('close'); }
+			buttons: {
+				/*'Close': function() { jQuery(this).dialog('close'); }*/
 			},
 			// Clear contents after dialog closes
 			close: function(ev, ui) {
@@ -106,7 +123,7 @@
 		.dialog('widget').next('.ui-widget-overlay').css('background', 'gray');  // Add an overlay
 		
 		// Manually move the dialog content back into its proper position, (the extra dialog container will be destroyed on dialog close)
-		obj.parent().appendTo(parent);
+		if (keepPlace) obj.parent().appendTo(parent);
 		
 		// Open the dialog manually
 		theDialog = obj.dialog('open');
@@ -945,7 +962,7 @@
 		dialogs.each(function( index ) {
 			var dialog_box = jQuery(this);
 			var content_box = dialog_box.find('.ui-dialog-content');
-			var h = dialog_box.height() - content_box.prev().outerHeight();
+			var h = dialog_box.height() - content_box.prev().outerHeight(true) - content_box.next().outerHeight(true);
 			content_box.css({ 'height': h+'px', 'margin': '0', 'box-sizing': 'border-box' });
 			content_box.find('iframe').contents().find('body').css({ 'height': 'unset' });
 		});

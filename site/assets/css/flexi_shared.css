@@ -15,18 +15,6 @@ div.fc-inherited-value {
 	left: 30px !important;
 	overflow: auto;
 }
-.ui-dialog.fc-fixed-dialog .ui-dialog-buttonpane {
-	background: transparent none repeat scroll 0 0;
-	box-sizing: border-box;
-	margin: 0 4px;
-	padding: 0 1%;
-	position: absolute;
-	top: 0;
-	width: auto;
-}
-.ui-dialog.fc-fixed-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
-	float: left;
-}
 .flexicontent .ui-autocomplete {
 	z-index: 1000 !important;
 }
@@ -697,7 +685,6 @@ table.adminform td #search {
 #flexicontent .pane-sliders .group-rules label.hasTip {
 	width: auto;
 }
-body fieldset.panelform > label,
 #flexicontent .flexi_params > label,
 #flexicontent fieldset.panelform > label,
 #flexicontent label.fckey,
@@ -755,11 +742,13 @@ body .label-fcinner.fc_tooltip_icon,
 	background-position: 2px 5px;
 	background-repeat: no-repeat;
 }
+body .nowrap_box .label-fcouter,
 #flexicontent .nowrap_box .label-fcouter {
 	float: none;
 	width: unset;
 	max-width: unset;
 }
+body .nowrap_box .container_fcfield,
 #flexicontent .nowrap_box .container_fcfield {
 	float: none !important;
 }
@@ -784,22 +773,27 @@ body .label-fcinner.fc_tooltip_icon,
 	}
 }
 @media (max-width: 1660px) {
+	body .span6 .label-fcouter,
 	#flexicontent .span6 .label-fcouter {
 		width: 28% !important;
 	}
+	body .span6 .container_fcfield,
 	#flexicontent .span6 .container_fcfield {
 		width: 71% !important;
 	}
 }
+body .input-fcmax.container_fcfield input,
 #flexicontent .input-fcmax.container_fcfield input {
 	width: 96%;
 	padding-left: 2%;
 	padding-right: 2%;
 	margin: 0;
 }
+body .container_fcfield input.input-xxlarge,
 #flexicontent .container_fcfield input.input-xxlarge {
 	width: 100%;
 }
+body .container_fcfield input,
 #flexicontent .container_fcfield input {
 	max-width: 100%;
 }

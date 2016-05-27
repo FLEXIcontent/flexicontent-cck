@@ -204,7 +204,8 @@ if ( $format == 'html' )
 		'less/flexi_form_fields.less',
 		'less/flexi_filters.less',
 		'less/j3x.less',
-		'less/fcvote.less'
+		'less/fcvote.less',
+		'less/tabber.less'
 	);
 	flexicontent_html::checkedLessCompile($less_files, $path, $inc_path, $force=false);
 	
