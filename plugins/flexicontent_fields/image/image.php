@@ -479,8 +479,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var action = typeof action!== 'undefined' ? action : '0';
 				var file_original = typeof file_original!== 'undefined' ? file_original : file;
 				var ff_suffix = (tagid.indexOf('_existingname') > -1) ? '_existingname' : '_newfile';
-				//alert(tagid); alert(ff_suffix);
 				var elementid = tagid.replace(ff_suffix,'');
+				
+				//alert(tagid); alert(ff_suffix);
 				
 				// Get current value of new / existing filename fields
 				var hasvalue_obj = jQuery('#' + elementid );
@@ -520,7 +521,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				// Assigning existingfile
 				else
 				{
-					//alert('existingAllowed: ' + existingAllowed + ', existingname: ' + existingname + ', no_value_selected: ' + (existing_obj.hasClass('no_value_selected') ? 'yes' : 'no'));
+					//alert('file: ' + file + ' -- existingAllowed: ' + existingAllowed + ', existingname: ' + existingname + ', no_value_selected: ' + (existing_obj.hasClass('no_value_selected') ? 'yes' : 'no'));
 					if ( existingAllowed && existingname!='' && existing_obj.hasClass('no_value_selected') ) {
 						var modify = ( originalname=='' ) ? 1 : 0;
 						existing_obj.removeClass('no_value_selected');
@@ -843,13 +844,29 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$originalname .= '<input name="'.$elementid_n.'_hasvalue" id="'.$elementid_n.'" type="hidden" class="hasvalue '.($use_ingroup ? $required_class : '').'" value="" />';
 			}
 			
-			if ( $image_source == 0 ) {
+			if ( $image_source == 0 )
+			{
 				$change .= '
 				<div class="'.$input_grp_class.'" style="margin-top:12px;" >
-					<span class="btn btn-info '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var obj=jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_dbfile_tbl_outer\'); fc_field_dialog_handle_'.$field->id.' = fc_showAsDialog(obj); ">
-						<i class="icon-search"></i>
-						'.JText::_('FLEXI_SELECT').'
-					</span>
+				';
+				if ( $field->parameters->get('select_in_modal', 1) ) {
+					$change .= '
+						<span class="btn btn-info '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var obj=jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_dbfile_tbl_outer\'); fc_field_dialog_handle_'.$field->id.' = fc_showAsDialog(obj, null, null, null, {\'title\': \''.JText::_('FLEXI_SELECT_IMAGE').'\'}); ">
+							<i class="icon-search"></i>
+							'.JText::_('FLEXI_SELECT').'
+						</span>
+						';
+				}
+				else {
+					$change .= '
+						<span class="btn btn-info '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT_IMAGE').'" onclick="var obj=jQuery(this).closest(\'.fcfieldval_container\').find(\'.fcimg_dbfile_tbl_outer\'); obj.toggle(); ">
+							<i class="icon-search"></i>
+							'.JText::_('FLEXI_TOGGLE_IMAGE_SELECTOR').'
+						</span>
+						';
+				}
+				
+				$change .= '
 					<span class="btn btn-warning '.$tooltip_class.'" title="'.JText::_('FLEXI_CLEAR').'" onclick="clearField'.$field->id.'(this);">
 						<i class="icon-remove"></i>
 					</span>
@@ -3037,7 +3054,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Create attributes of the drop down field for selecting existing images
 		$onchange  = ' onchange="';
-		$onchange .= " qmAssignFile".$field->id."(this.id, this.value, fc_db_img_path+'/s_'+this.value);";
+		$onchange .= " if (!this.value) return true; qmAssignFile".$field->id."(this.id, this.value, fc_db_img_path+'/s_'+this.value); jQuery(this).val('').trigger('change');";
 		$onchange .= ' "';
 		$classes = ' existingname no_value_selected ';
 		$js = "";
@@ -3096,7 +3113,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			JHTML::_('select.genericlist', $options, $formfldname, $attribs, 'value', 'text', '', $formfldid) ;
 		if ($use_imgpicker) {
 			$btn_name = JText::_( 'FLEXI_TOGGLE_ALL_THUMBS' )." (". $images_count .")";
-			$list	= '<input class="fcfield-button" type="button" value="'.$btn_name.'" onclick="fcimgfld_toggle_image_picker(this);" /> ' .$list;
+			$list	= '<input class="btn" type="button" value="'.$btn_name.'" onclick="fcimgfld_toggle_image_picker(this);" /> ' .$list;
 		}
 		
 		return $list;

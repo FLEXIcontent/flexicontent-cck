@@ -58,7 +58,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Get data from the model
 		// ***********************
 		
-		$items   = $this->get('Data');
+		$items = $this->get('Data');
 		
 		// Get field values
 		$_vars = null;
@@ -66,6 +66,13 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Zero unneeded search index text
 		foreach ($items as $item) $item->search_index = '';
+		
+		// Nullify creator / modifier emails for JSON view
+		foreach ($items as $item)
+		{
+			$item->cmail = null;
+			$item->mmail = null;
+		}
 		
 		// Use &test=1 to test / preview item data of first item
 		if (JRequest::getCmd('test', 0))

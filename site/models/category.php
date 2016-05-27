@@ -1822,10 +1822,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$desktop_clayout = $params->get('clayout', 'blog');
 		$clayout_default = !$useMobile ? $desktop_clayout : $params->get('clayout_mobile', $desktop_clayout);
 		$params->set('clayout_default', $clayout_default);
-
+		
 		$clayout = $this->_clayout=='__request__' ?
 			$app->input->get('clayout', $clayout_default, 'cmd') :
 			$clayout_default ;
+		if ( empty($clayout) )  $clayout = $clayout_default;
 		
 		// Get all templates from cache, (without loading any language file this will be done at the view)
 		$themes = flexicontent_tmpl::getTemplates();
