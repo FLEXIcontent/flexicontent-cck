@@ -815,6 +815,7 @@ body .fc-mssg.fc-noborder {
 	display: block;
 	padding: 2px;
 }
+body .fc-nowrap-box,
 #flexicontent .nowrap_box,
 .flexicontent .nowrap_box {
 	white-space: nowrap !important;
@@ -829,6 +830,13 @@ body .fc-mssg.fc-noborder {
 #flexicontent .filterbuttons_head .nowrap_box .label,
 .flexicontent .filterbuttons_head .nowrap_box .label {
 	vertical-align: middle;
+}
+.fc-disable-notices-box {
+	float: right !important;
+	font-style: italic !important;
+}
+#fc-mini-help {
+	font-size: 100%;
 }
 #flexicontent .fc-field-props-box {
 	display: inline-block;

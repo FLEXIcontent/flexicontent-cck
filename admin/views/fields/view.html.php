@@ -83,17 +83,27 @@ class FlexicontentViewFields extends JViewLegacy
 		// Important usability messages
 		// ****************************
 		
-		if ( $cparams->get('show_usability_messages', 1) )
+		$conf_link = '<a href="index.php?option=com_config&view=component&component=com_flexicontent&path=" class="btn btn-info btn-small">'.JText::_("FLEXI_CONFIG").'</a>';
+		
+		/*if ( $cparams->get('show_usability_messages', 1) )
 		{
 			$notice_content_type_order = $app->getUserStateFromRequest( $option.'.'.$view.'.notice_content_type_order',	'notice_content_type_order',	0, 'int' );
-			if (!$notice_content_type_order) {
+			if (!$notice_content_type_order)
+			{
 				$app->setUserState( $option.'.'.$view.'.notice_content_type_order', 1 );
-				$app->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_BY_TYPE'), 'message');
-				$app->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_WITHOUT_TYPE'), 'message');
-				$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'message');
+				JFactory::getDocument()->addStyleDeclaration("#system-message-container .alert.alert-info > .alert-heading { display:none; }");
+				
+				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="clear"></div>';
+				$app->enqueueMessage(JText::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' '. $disable_use_notices, 'notice');
 			}
-		}
+		}*/
 		
+		$this->minihelp = '
+			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none;">
+				'.JText::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' <br/><br/>
+				'.JText::_('FLEXI_FIELDS_ORDER_NO_TYPE_FILTER_ACTIVE').'
+			</div>
+		';
 		
 		
 		// **************************

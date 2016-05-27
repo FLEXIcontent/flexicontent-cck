@@ -238,10 +238,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$app->enqueueMessage('Please enable: "Searching small/common words":
 					<a class="btn" href="index.php?option=com_config&view=component&component=com_flexicontent&path=&"><span class="icon-options"></span>Configuration</a>
 					and then click to re-INDEX both search indexes', 'notice');
-				//$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'message');
 			}
 		}
-		//}
 		
 		
 		
