@@ -148,6 +148,7 @@ function delAllFilters() {
 		<span class="btn-group input-append fc-filter">
 			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+			<span href="javascript:;" id="fc-mini-help_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" value="help_button" ><span class="icon-help"></span></span>
 		</span>
 		
 		<span class="fc-filter nowrap_box">
@@ -198,6 +199,7 @@ function delAllFilters() {
 	</div>
 	
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
+	<?php echo @$this->minihelp; ?>
 	
 	<span style="display:none;" class="alert fc-small fc-iblock" id="fcorder_save_warn_box">
 		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder')) : '') ; ?>

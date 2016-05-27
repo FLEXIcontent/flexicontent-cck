@@ -108,16 +108,27 @@ class FlexicontentViewUsers extends JViewLegacy
 		// Add usability notices if these are enabled
 		// ******************************************
 		
-		if ( $cparams->get('show_usability_messages', 1) )
+		$conf_link = '<a href="index.php?option=com_config&view=component&component=com_flexicontent&path=" class="btn btn-info btn-small">'.JText::_("FLEXI_CONFIG").'</a>';
+		
+		/*if ( $cparams->get('show_usability_messages', 1) )
 		{
 			$notice_author_with_items_only	= $app->getUserStateFromRequest( $option.'.users.notice_author_with_items_only',	'notice_author_with_items_only',	0, 'int' );
-			if (!$notice_author_with_items_only) {
+			
+			if (!$notice_author_with_items_only)
+			{
 				$app->setUserState( $option.'.users.notice_author_with_items_only', 1 );
-				$app->enqueueMessage(JText::_('FLEXI_BY_DEFAULT_ONLY_AUTHORS_WITH_ITEMS_SHOWN'), 'notice');
-				$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'message');
+				JFactory::getDocument()->addStyleDeclaration("#system-message-container .alert.alert-info > .alert-heading { display:none; }");
+				
+				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="clear"></div>';
+				$app->enqueueMessage(JText::_('FLEXI_BY_DEFAULT_ONLY_AUTHORS_WITH_ITEMS_SHOWN') .' '. $disable_use_notices, 'notice');
 			}
-		}
+		}*/
 		
+		$this->minihelp = '
+			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none;">
+				'.JText::_('FLEXI_BY_DEFAULT_ONLY_AUTHORS_WITH_ITEMS_SHOWN') .'
+			</div>
+		';
 		
 		
 		// **************************

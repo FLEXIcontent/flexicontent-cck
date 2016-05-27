@@ -46,7 +46,7 @@
 			<field name="maxtitlechars" type="text" default="40" label="FLEXI_RIFLD_TITLE_MAXLEN" description="FLEXI_RIFLD_TITLE_MAXLEN_DESC" />
 			
 			<field name="orderby_form" type="list" default="alpha" label="FLEXI_BASIC_ORDER" description="FLEXI_BASIC_ORDER_DESC">
-				<option value="">FLEXI_ORDER_DEFAULT</option>
+				<option value="">FLEXI_DEFAULT</option>
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
 				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
@@ -127,7 +127,7 @@
 			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_ITEM_COUNT_LABEL" description="FLEXI_RIFLD_ITEM_COUNT_DESC" />
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
 			<field name="orderby" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
-				<option value="">FLEXI_ORDER_DEFAULT</option>
+				<option value="">FLEXI_DEFAULT</option>
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
 				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>

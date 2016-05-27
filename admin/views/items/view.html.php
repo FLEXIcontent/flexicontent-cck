@@ -376,6 +376,8 @@ class FlexicontentViewItems extends JViewLegacy
 		// Add usability notices if these are enabled
 		// ******************************************
 		
+		$conf_link = '<a href="index.php?option=com_config&view=component&component=com_flexicontent&path=" class="btn btn-info btn-small">'.JText::_("FLEXI_CONFIG").'</a>';
+		
 		if ( $cparams->get('show_usability_messages', 1)  && !$unassociated && !$badcatitems)     // Important usability messages
 		{
 			$notice_iss_disabled = $app->getUserStateFromRequest( $option.'.items.notice_iss_disabled',	'notice_iss_disabled',	0, 'int' );
@@ -392,16 +394,17 @@ class FlexicontentViewItems extends JViewLegacy
 				$show_turn_off_notice = 1;
 			}
 			
-			$notice_add_custom_columns = $app->getUserStateFromRequest( $option.'.items.notice_add_custom_columns',	'notice_add_custom_columns',	0, 'int' );
-			if (!$notice_add_custom_columns) {
-				$app->setUserState( $option.'.items.notice_add_custom_columns', 1 );
-				$app->enqueueMessage(JText::_('FLEXI_YOU_MAY_CONFIGURE_CUSTOM_COLUMNS_GLOBAL_AND_PER_TYPE'), 'message');
-				$show_turn_off_notice = 1;
+			if (!empty($show_turn_off_notice)) {
+				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="clear"></div>';
+				$app->enqueueMessage($disable_use_notices, 'notice');
 			}
-			
-			if (!empty($show_turn_off_notice))
-				$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'message');
 		}
+		
+		$this->minihelp = '
+			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none;">
+				'.JText::sprintf('FLEXI_ABOUT_CUSTOM_FIELD_COLUMNS_COMPONENT_AND_PER_TYPE', $conf_link).'
+			</div>
+		';
 		
 		
 		// *******************
