@@ -700,6 +700,7 @@ class flexicontent_html
 			'rdate'=>'FLEXI_ORDER_MOST_RECENT_FIRST',
 			'modified'=>'FLEXI_ORDER_LAST_MODIFIED_FIRST',
 			'published'=>'FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST',
+			'published_oldest'=>'FLEXI_ORDER_OLDEST_PUBLISHED_FIRST',
 			'alpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL',
 			'ralpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE',
 			'author'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL',
@@ -710,7 +711,10 @@ class flexicontent_html
 			'rid'=>'FLEXI_ORDER_LOWEST_ITEM_ID',
 			'commented'=>'FLEXI_ORDER_MOST_COMMENTED',
 			'rated'=>'FLEXI_ORDER_BEST_RATED',
-			'order'=>'FLEXI_ORDER_CONFIGURED_ORDER'
+			'order'=>'FLEXI_ORDER_CONFIGURED_ORDER',
+			'random'=>'FLEXI_ORDER_RANDOM',
+			'alias'=>'FLEXI_ORDER_ALIAS',
+			'ralias'=>'FLEXI_ORDER_ALIAS_REVERSE'
 		);
 		
 		$ordering = array();
@@ -748,7 +752,8 @@ class flexicontent_html
 		$field_ids = array();
 		$custom_ops = array();
 		$n = 0;
-		foreach ($orderby_custom as $custom_option) {
+		foreach ($orderby_custom as $custom_option)
+		{
 			$order_parts = preg_split("/:/", $custom_option);
 			if (count($order_parts)!=3 && count($order_parts)!=4) continue;  // ignore order with wrong number parts 
 			$_field_id = (int) @ $order_parts[0];
@@ -6577,6 +6582,14 @@ class flexicontent_db
 				$order_col	= $i_as.'.id';
 				$order_dir	= 'ASC';
 				break;
+			case 'alias':
+				$order_col	= $i_as.'.alias';
+				$order_dir	= 'ASC';
+				break;
+			case 'ralias':
+				$order_col	= $i_as.'.alias';
+				$order_dir	= 'DESC';
+				break;
 
 			case 'default':
 			default:
@@ -6624,43 +6637,43 @@ class flexicontent_db
 		$order = $request_var && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
 
 		switch ($order) {
-			case 'date' :                  // *** J2.5 only ***
+			case 'date':
 				$order_col = $c_as.'.created_time';
 				$order_dir = 'ASC';
 				break;
-			case 'rdate' :                 // *** J2.5 only ***
+			case 'rdate':
 				$order_col = $c_as.'.created_time';
 				$order_dir = 'DESC';
 				break;
-			case 'modified' :              // *** J2.5 only ***
+			case 'modified':
 				$order_col = $c_as.'.modified_time';
 				$order_dir = 'DESC';
 				break;
-			case 'alpha' :
+			case 'alpha':
 				$order_col = $c_as.'.title';
 				$order_dir = 'ASC';
 				break;
-			case 'ralpha' :
+			case 'ralpha':
 				$order_col = $c_as.'.title';
 				$order_dir = 'DESC';
 				break;
-			case 'author' :                // *** J2.5 only ***
+			case 'author':
 				$order_col = $u_as.'.name';
 				$order_dir = 'ASC';
 				break;
-			case 'rauthor' :               // *** J2.5 only ***
+			case 'rauthor':
 				$order_col = $u_as.'.name';
 				$order_dir = 'DESC';
 				break;
-			case 'hits' :                  // *** J2.5 only ***
+			case 'hits':
 				$order_col = $c_as.'.hits';
 				$order_dir = 'DESC';
 				break;
-			case 'rhits' :                 // *** J2.5 only ***
+			case 'rhits':
 				$order_col = $c_as.'.hits';
 				$order_dir = 'ASC';
 				break;
-			case 'order' :
+			case 'order':
 				$order_col = $c_as.'.lft';
 				$order_dir = 'ASC';
 				break;

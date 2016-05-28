@@ -361,25 +361,9 @@
 			</field>
 			
 			<field name="sep_items_order_1st" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
-			<field name="orderby" type="multilist" subtype="list" default="" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
-				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
-				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
-				<option value="published">FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST</option>
-				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
-				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
-				<!--option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option-->
-				<!--option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option-->
-				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
-				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
-				<option value="id">FLEXI_ORDER_HIGHEST_ITEM_ID</option>
-				<option value="rid">FLEXI_ORDER_LOWEST_ITEM_ID</option>
-				<option value="commented">FLEXI_ORDER_MOST_COMMENTED</option>
-				<option value="rated">FLEXI_ORDER_BEST_RATED</option>
-				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
-				<option value="random">FLEXI_ORDER_RANDOM</option>
-			</field>
+			<field name="orderby" type="fcordering" default="" add_global="1" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC"
+				skip_orders="author,rauthor"
+			/>
 			<field name="sep_items_order_1st_custom" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
 			<field name="orderbycustomfield" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -404,25 +388,9 @@
 			<field name="sep_items_order_1st_custom_file" type="separator" default="FLEXI_ABOUT_FILE_FIELD_ORDERING" description="" level="level4" class="alert alert-info fcppaded" />
 			
 			<field name="sep_items_order_2nd" type="separator" default="FLEXI_ITEMS_ORDER_2ND_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level1" />
-			<field name="orderby_2nd" type="multilist" subtype="list" default="" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
-				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
-				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
-				<option value="published">FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST</option>
-				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
-				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
-				<!--option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option-->
-				<!--option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option-->
-				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
-				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
-				<option value="id">FLEXI_ORDER_HIGHEST_ITEM_ID</option>
-				<option value="rid">FLEXI_ORDER_LOWEST_ITEM_ID</option>
-				<option value="commented">FLEXI_ORDER_MOST_COMMENTED</option>
-				<option value="rated">FLEXI_ORDER_BEST_RATED</option>
-				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
-				<option value="random">FLEXI_ORDER_RANDOM</option>
-			</field>
+			<field name="orderby_2nd" type="fcordering" default="" add_global="1" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC"
+				skip_orders="author,rauthor"
+			/>
 			<field name="sep_items_order_2nd_custom" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
 			<field name="orderbycustomfield_2nd" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -525,15 +493,15 @@
 			<field name="limit_options" type="text" class="input-xxlarge" default="" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" />
 			
 			<field name="orderby_options" type="fccheckbox" default="" display_useglobal="1"
-				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_MOST_COMMENTED,FLEXI_ORDER_BEST_RATED,FLEXI_ORDER_CONFIGURED_ORDER"
-				checkvals="_preconfigured_,date,rdate,modified,published,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order"
+				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST,FLEXI_ORDER_OLDEST_PUBLISHED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_MOST_COMMENTED,FLEXI_ORDER_BEST_RATED,FLEXI_ORDER_CONFIGURED_ORDER,FLEXI_ORDER_RANDOM,FLEXI_ORDER_ALIAS,FLEXI_ORDER_ALIAS_REVERSE"
+				checkvals="_preconfigured_,date,rdate,modified,published,published_oldest,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order,random,alias,ralias"
 				defaultvals=""
 				label="FLEXI_ORDER_OPTIONS_1ST" description="FLEXI_ORDER_OPTIONS_DESC" />
 			<field name="orderby_custom" type="textarea" rows="3" default="" label="FLEXI_ORDER_OPTIONS_CUSTOM_1ST" description="FLEXI_ORDER_OPTIONS_CUSTOM_V2_DESC" class="input-xxlarge" />
 				
 			<field name="orderby_options_2nd" type="fccheckbox" default="" display_useglobal="1"
-				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_MOST_COMMENTED,FLEXI_ORDER_BEST_RATED,FLEXI_ORDER_CONFIGURED_ORDER"
-				checkvals="_preconfigured_,date,rdate,modified,published,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order"
+				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST,FLEXI_ORDER_OLDEST_PUBLISHED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_MOST_COMMENTED,FLEXI_ORDER_BEST_RATED,FLEXI_ORDER_CONFIGURED_ORDER,FLEXI_ORDER_RANDOM,FLEXI_ORDER_ALIAS,FLEXI_ORDER_ALIAS_REVERSE"
+				checkvals="_preconfigured_,date,rdate,modified,published,published_oldest,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order,random,alias,ralias"
 				defaultvals=""
 				label="FLEXI_ORDER_OPTIONS_2ND" description="FLEXI_ORDER_OPTIONS_DESC" />
 			<field name="orderby_custom_2nd" type="textarea" rows="3" default="" label="FLEXI_ORDER_OPTIONS_CUSTOM_2ND" description="FLEXI_ORDER_OPTIONS_CUSTOM_V2_DESC" class="input-xxlarge" />

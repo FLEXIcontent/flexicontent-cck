@@ -81,7 +81,8 @@
 			<field name="" type="separator" default="FLEXI_ORDER_ORDERING" description="FLEXI_ORDERING_MULTIPLE" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" level="level2" />
-			<field name="ordering" type="fcordering" default="added" add_expired_scheduled="1" size="16" multiple="true" label="FLEXI_ORDERING_GROUPS" description="FLEXI_ORDERING_GROUPS_DESC" />
+			<field name="" type="separator" default="To use scheduled / expired items orderings, please enable ignore scheduled / expired dates, inside 'Select Items' TAB" level="level4" class="alert alert-info"/>
+			<field name="ordering" type="fcordering" default="added" is_legacy="1" add_expired_scheduled="1" add_field_order="1" size="4" multiple="true" label="FLEXI_ORDERING_GROUPS" description="FLEXI_ORDERING_GROUPS_DESC"/>
 			<field name="ordering_addtitle" type="radio" default="0" label="FLEXI_ORDERING_GROUP_ADDTITLE" description="FLEXI_ORDERING_GROUP_ADDTITLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -104,26 +105,7 @@
 			<field name="" type="separator" default="FLEXI_ABOUT_FILE_FIELD_ORDERING" description="" level="level4" class="alert alert-info fcppaded" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_2ND_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
-			<field name="orderby_2nd" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC" >
-				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
-				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
-				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
-				<option value="published">FLEXI_ORDER_RECENTLY_PUBLISHED_SCHEDULED_FIRST</option>
-				<option value="published_oldest">FLEXI_ORDER_OLDEST_PUBLISHED_SCHEDULED_FIRST</option>
-				<option value="expired">FLEXI_ORDER_RECENTLY_EXPIRING_EXPIRED_FIRST</option>
-				<option value="expired_oldest">FLEXI_ORDER_OLDEST_EXPIRING_EXPIRED_FIRST</option>
-				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
-				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
-				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
-				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
-				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
-				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
-				<option value="id">FLEXI_ORDER_HIGHEST_ITEM_ID</option>
-				<option value="rid">FLEXI_ORDER_LOWEST_ITEM_ID</option>
-				<option value="commented">FLEXI_ORDER_MOST_COMMENTED</option>
-				<option value="rated">FLEXI_ORDER_BEST_RATED</option>
-				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
-			</field>
+			<field name="orderby_2nd" type="fcordering" default="alpha" add_expired_scheduled="1" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC"/>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" level="level3" />
 			<field name="orderbycustomfield_2nd" type="multilist" subtype="radio" default="0" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="customorder2_ops">FLEXI_NO</option>
