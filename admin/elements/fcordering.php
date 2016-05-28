@@ -38,8 +38,25 @@ class JFormFieldFcordering extends JFormFieldList
 	 * @access	protected
 	 * @var		string
 	 */
-	
 	var	$type = 'Fcordering';
+	
+	static $order_names = array(
+		'date'=>'date',
+		'rdate'=>'rdate',
+		'modified'=>'modified',
+		'ralpha'=>'ralpha',
+		'hits'=>'hits',
+		'order'=>'order'
+	);
+	static $legacy_names = array(   // module ordering groups (1st level)
+		'date'=>'addedrev',
+		'rdate'=>'added',
+		'modified'=>'updated',
+		'ralpha'=>'alpharev',
+		'hits'=>'popular',
+		'order'=>'catorder'
+	);
+	
 	
 	function getOptions()
 	{
@@ -47,12 +64,23 @@ class JFormFieldFcordering extends JFormFieldList
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
 		
-		$ordering[] = JHTML::_('select.option',  'addedrev', 	JText::_( 'FLEXI_ORDER_OLDEST_FIRST' ) );       // 'date'
-		$ordering[] = JHTML::_('select.option',  'added', 		JText::_( 'FLEXI_ORDER_MOST_RECENT_FIRST' ) );  // 'rdate'
+		$is_legacy = !empty($attributes['is_legacy']);
+		$o = $is_legacy ? self::$legacy_names : self::$order_names;
 		
-		$ordering[] = JHTML::_('select.option',  'updated', 	JText::_( 'FLEXI_ORDER_LAST_MODIFIED_FIRST' ) );
+		$s = !empty($attributes['skip_orders']) ? preg_split("/\s*,\s*/u", $skip_orders) : array();
+		$s = array_flip($s);
 		
-		if (!empty($attributes['add_expired_scheduled']))
+		if ( !empty($attributes['add_global']) )
+		{
+			$ordering[] = JHTML::_('select.option',  '', 	JText::_( 'FLEXI_USE_GLOBAL' ) );
+		}
+		
+		if ( !isset($s['date']) )      $ordering[] = JHTML::_('select.option',  $o['date'],			JText::_( 'FLEXI_ORDER_OLDEST_FIRST' ) );         // 'addedrev'
+		if ( !isset($s['rdate']) )     $ordering[] = JHTML::_('select.option',  $o['rdate'],			JText::_( 'FLEXI_ORDER_MOST_RECENT_FIRST' ) );    // 'added'
+		
+		if ( !isset($s['modified']) )  $ordering[] = JHTML::_('select.option',  $o['modified'],	JText::_( 'FLEXI_ORDER_LAST_MODIFIED_FIRST' ) );  // 'updated'
+		
+		if ( !empty($attributes['add_expired_scheduled']) )
 		{
 			$ordering[] = JHTML::_('select.option',  'published',        JText::_( 'FLEXI_ORDER_RECENTLY_PUBLISHED_SCHEDULED_FIRST' ) );
 			$ordering[] = JHTML::_('select.option',  'published_oldest', JText::_( 'FLEXI_ORDER_OLDEST_PUBLISHED_SCHEDULED_FIRST' ) );
@@ -63,25 +91,30 @@ class JFormFieldFcordering extends JFormFieldList
 			$ordering[] = JHTML::_('select.option',  'published_oldest', JText::_( 'FLEXI_ORDER_OLDEST_PUBLISHED_FIRST' ) );
 		}
 		
-		$ordering[] = JHTML::_('select.option',  'alpha', 		JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL' ) );
-		$ordering[] = JHTML::_('select.option',  'alpharev', 	JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE' ) );  // 'ralpha'
+		if ( !isset($s['alpha']) )     $ordering[] = JHTML::_('select.option',  'alpha',				JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL' ) );
+		if ( !isset($s['ralpha']) )    $ordering[] = JHTML::_('select.option',  $o['ralpha'],	JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE' ) );    // 'alpharev'
 		
-		$ordering[] = JHTML::_('select.option',  'author', 		JText::_( 'FLEXI_ORDER_AUTHOR_ALPHABETICAL' ) );
-		$ordering[] = JHTML::_('select.option',  'rauthor', 	JText::_( 'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE' ) );
+		if ( !isset($s['author']) )    $ordering[] = JHTML::_('select.option',  'author', 		JText::_( 'FLEXI_ORDER_AUTHOR_ALPHABETICAL' ) );
+		if ( !isset($s['rauthor']) )   $ordering[] = JHTML::_('select.option',  'rauthor', 	JText::_( 'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE' ) );
 		
-		$ordering[] = JHTML::_('select.option',  'popular', 	JText::_( 'FLEXI_ORDER_MOST_HITS' ) );          // 'hits'
-		$ordering[] = JHTML::_('select.option',  'rhits',			JText::_( 'FLEXI_ORDER_LEAST_HITS' ) );
+		if ( !isset($s['hits']) )      $ordering[] = JHTML::_('select.option',  $o['hits'],	JText::_( 'FLEXI_ORDER_MOST_HITS' ) );    // 'popular'
+		if ( !isset($s['rhits']) )     $ordering[] = JHTML::_('select.option',  'rhits',			JText::_( 'FLEXI_ORDER_LEAST_HITS' ) );
 		
-		$ordering[] = JHTML::_('select.option',  'id', 				JText::_( 'FLEXI_ORDER_HIGHEST_ITEM_ID' ) );
-		$ordering[] = JHTML::_('select.option',  'rid', 			JText::_( 'FLEXI_ORDER_LOWEST_ITEM_ID' ) );
+		if ( !isset($s['id']) )        $ordering[] = JHTML::_('select.option',  'id', 				JText::_( 'FLEXI_ORDER_HIGHEST_ITEM_ID' ) );
+		if ( !isset($s['rid']) )       $ordering[] = JHTML::_('select.option',  'rid', 			JText::_( 'FLEXI_ORDER_LOWEST_ITEM_ID' ) );
 		
-		$ordering[] = JHTML::_('select.option',  'commented',	JText::_( 'FLEXI_ORDER_MOST_COMMENTED' ) );
-		$ordering[] = JHTML::_('select.option',  'rated',			JText::_( 'FLEXI_ORDER_BEST_RATED' ) ); 
-		$ordering[] = JHTML::_('select.option',  'catorder', 	JText::_( 'FLEXI_ORDER_CONFIGURED_ORDER' ) );   // 'order'
+		if ( !isset($s['commented']) ) $ordering[] = JHTML::_('select.option',  'commented',	JText::_( 'FLEXI_ORDER_MOST_COMMENTED' ) );
+		if ( !isset($s['rated']) )     $ordering[] = JHTML::_('select.option',  'rated',			JText::_( 'FLEXI_ORDER_BEST_RATED' ) ); 
+		if ( !isset($s['order']) )     $ordering[] = JHTML::_('select.option',  $o['order'],	JText::_( 'FLEXI_ORDER_CONFIGURED_ORDER' ) );    // 'catorder'
 		
-		$ordering[] = JHTML::_('select.option',  'random', 		JText::_( 'FLEXI_RANDOM' ) );
+		if ( !isset($s['random']) )    $ordering[] = JHTML::_('select.option',  'random', 		JText::_( 'FLEXI_ORDER_RANDOM' ) );
+		if ( !isset($s['alias']) )     $ordering[] = JHTML::_('select.option',  'alias', 		JText::_( 'FLEXI_ORDER_ALIAS' ) );
+		if ( !isset($s['ralias']) )    $ordering[] = JHTML::_('select.option',  'ralias', 		JText::_( 'FLEXI_ORDER_ALIAS_REVERSE' ) );
 		
-		$ordering[] = JHTML::_('select.option',  'field', 		JText::_( 'FLEXI_CUSTOM_FIELD' ) );
+		if ( !empty($attributes['add_field_order']) )
+		{
+			$ordering[] = JHTML::_('select.option',  'field', 		JText::_( 'FLEXI_CUSTOM_FIELD' ) );
+		}
 		
 		return $ordering;
 	}

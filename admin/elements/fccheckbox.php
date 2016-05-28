@@ -100,7 +100,7 @@ class JFormFieldFccheckbox extends JFormField
 			$check_global='';
 			if (count($values) == 0) {
 				$check_global = ' checked="checked" ';
-				$disable_all = ' disabled="disabled" ';
+				$disable_all  = ' disabled="disabled" ';
 			}
 			$useglobal_lbl = @$attributes['useglobal_lbl'] ? $attributes['useglobal_lbl'] : 'FLEXI_USE_GLOBAL';
 			$html .= '<div style="'.$inline_style.'" ><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="fc_toggle_checkbox_group(\''.$element_id.'\', this)" />';
@@ -110,11 +110,12 @@ class JFormFieldFccheckbox extends JFormField
 		// Create checkboxes
 		foreach($checkoptions as $i => $o) {
 			$curr_element_id = $element_id.$i;
-			$html .= '<div style="'.$inline_style.'" ><input id="'.$curr_element_id.'" type="checkbox"'.$disable_all;
-			$html .= in_array($checkvals[$i], $values) ? ' checked="checked"' : '' ;
-			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'" />';
-			$html .= '<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label></div>';
-			$html .= FLEXI_J16GE ? ' &nbsp; ' : '';
+			$html .= '
+			<div style="'.$inline_style.'">
+				<input id="'.$curr_element_id.'" type="checkbox" '.$disable_all .(in_array($checkvals[$i], $values) ? ' checked="checked"' : '').' name="'.$fieldname.'" value="'.$checkvals[$i].'" />
+				<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label>
+			</div>
+		';
 		}
 
 		$html .= '<input id="'.$element_id.'9999" type="hidden"  name="'.$fieldname.'" value="__SAVED__" '.$disable_all.'/> ';
