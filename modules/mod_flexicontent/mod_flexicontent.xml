@@ -99,7 +99,9 @@
 				<option value="1">FLEXI_INTEGER</option>
 				<option value="2">FLEXI_FLOAT</option>
 				<option value="3">FLEXI_DATE</option>
+				<option value="4">FLEXI_DOWNLOAD_HITS</option>
 			</field>
+			<field name="" type="separator" default="FLEXI_ABOUT_FILE_FIELD_ORDERING" description="" level="level4" class="alert alert-info fcppaded" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_2ND_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
 			<field name="orderby_2nd" type="list" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC" >
@@ -138,7 +140,9 @@
 				<option value="1">FLEXI_INTEGER</option>
 				<option value="2">FLEXI_FLOAT</option>
 				<option value="3">FLEXI_DATE</option>
+				<option value="4">FLEXI_DOWNLOAD_HITS</option>
 			</field>
+			<field name="" type="separator" default="FLEXI_ABOUT_FILE_FIELD_ORDERING" description="" level="level4" class="alert alert-info fcppaded" />
 			
 			<field name="" type="separator" default="FLEXI_EMPTY_FIELD_FILTER" level="level1" />
 			<field name="skip_items" type="multilist" subtype="radio" default="0" label="FLEXI_SKIP_ITEMS" description="FLEXI_SKIP_ITEMS_DESC" toggle_related="1" class="btn-group btn-group-yesno">

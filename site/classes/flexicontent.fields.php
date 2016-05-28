@@ -3419,7 +3419,7 @@ class FlexicontentFields
 				. $having."\n"
 				. $orderby
 				;
-			if ($filter->id==15) echo $query."<br/><br/>";
+			//if ($filter->id==NN) echo $query."<br/><br/>";
 		}
 		
 		// Non FACETED filter (according to view but without acounting for filtering and without counting items)
