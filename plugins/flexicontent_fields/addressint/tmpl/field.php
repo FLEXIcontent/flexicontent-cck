@@ -26,7 +26,7 @@ if ($js_added === null)
 	$js_added = true;
 	$document = JFactory::getDocument();
 	// Load google maps library
-	$document->addScript('https://maps.google.com/maps/api/js?libraries=places' . ($google_maps_js_api_key ? '&key=' . $google_maps_js_api_key : ''));
+	$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($google_maps_js_api_key ? '&key=' . $google_maps_js_api_key : ''));
 }
 
 
@@ -454,9 +454,10 @@ foreach ($values as $value)
 		</tr>
 	</tbody></table>
 	
+	<div class="fcfield_field_data_box fcfield_addressint_data">
+	
 	<div><div id="'.$elementid_n.'_messages" class="alert alert-warning fc-iblock" style="display:none;"></div></div>
 	
-	<div class="fcfield_field_data_box fcfield_addressint_data">
 	<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
 	';
 	
@@ -556,24 +557,24 @@ foreach ($values as $value)
 	</tbody></table>
 	</div>
 	
-	<div class="fcfield_field_preview_box fcfield_addressint_map">
-	<table style="border-collapse:collapse; padding:0; margin:0;"><tbody>
-		<tr>
-			<td>
-				<span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PREVIEW').'</span>
-				<div class="fcfield_addressint_canvas_outer">
-					<div id="map_canvas_'.$field->name.$n.'" style="width:100%; height:0; padding-bottom:56.25%;"></div>
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').'</span>
-				<span id="'.$elementid_n.'_zoom_label" class="alert alert-info fc-small fc-iblock">'.$value['zoom'].'</span>
-			</td>
-		</tr>
-	</tbody></table>
 	
+	<div class="fcfield_field_preview_box fcfield_addressint_map">
+		<table class="fc-form-tbl"><tbody>
+			<tr>
+				<td>
+					<span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_TOLERANCE').'</span>
+					<input type="text" class="fcfield_textval inlineval" id="'.$elementid_n.'_marker_tolerance" name="'.$fieldname_n.'[marker_tolerance]" value="50" size="10" maxlength="10" />
+				</td>
+				<td>
+					<span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').'</span>
+					<span id="'.$elementid_n.'_zoom_label" class="alert alert-info fc-small fc-iblock">'.$value['zoom'].'</span>
+				</td>
+			</tr>
+		</tbody></table>
+		
+		<div class="fcfield_addressint_canvas_outer">
+			<div id="map_canvas_'.$field->name.$n.'" style="width:100%; height:0; padding-bottom:56.25%;"></div>
+		</div>
 	</div>
 	
 	
@@ -633,11 +634,14 @@ foreach ($values as $value)
 		if (ac_country) ac_options.componentRestrictions = {country: ac_country};
 		
 		autoComplete_'.$field->name.$n.' = new google.maps.places.Autocomplete( ac_input, ac_options );
+		
 		gmapslistener_'.$field->name.$n.' = google.maps.event.addListener(autoComplete_'.$field->name.$n.', "place_changed", function() {
+			jQuery("#'.$elementid_n.'_messages").html("").hide();
 			fillInAddress_'.$field->name.$n.'();
 		});
 		return true;
 	}
+	
 	
 	// re-initialize autocomplete
 	function changeAutoCompleteType_'.$field->name.$n.'()
@@ -652,12 +656,19 @@ foreach ($values as $value)
 		// Attach new autocomplete search
 		return initAutoComplete_'.$field->name.$n.'();
 	}
-
+	
+	
 	// fill address fields when autocomplete address is selected
-	function fillInAddress_'.$field->name.$n.'()
+	function fillInAddress_'.$field->name.$n.'(place)
 	{
-		var place = autoComplete_'.$field->name.$n.'.getPlace();
+		var redrawMap = false;
+		if (typeof place === "undefined" || !place)
+		{
+			place = autoComplete_'.$field->name.$n.'.getPlace();
+			redrawMap = true;
+		}
 		//window.console.log(place);
+		
 		if (typeof place.address_components == "undefined") return;
 		
 		// Check allowed country, (zero length means all allowed)
@@ -679,7 +690,7 @@ foreach ($values as $value)
 			}
 		}
 		if (!country_valid) {
-			jQuery("#'.$elementid_n.'_messages").html(
+			jQuery("#'.$elementid_n.'_messages").removeClass("alert-success").removeClass("alert-info").addClass("alert-warning").html(
 				"'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING').': <b>"
 				+selected_country+"</b><br/>"
 				+"<b>'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES').'</b>: "
@@ -799,8 +810,15 @@ foreach ($values as $value)
 		myLatLon_'.$field->name.$n.' = place.geometry.location;
 		
 		// redraw map
-		initMap_'.$field->name.$n.'();
+		if (redrawMap)
+		{
+			initMap_'.$field->name.$n.'();
+		}
+		else {
+			//marker.setPosition( results[0].geometry.location );
+		}
 	}
+	
 	
 	// load autocomplete on page ready
 	jQuery(document).ready(function(){initAutoComplete_'.$field->name.$n.'();});
@@ -808,6 +826,7 @@ foreach ($values as $value)
 	// map object
 	var myMap_'.$field->name.$n.';
 	var myLatLon_'.$field->name.$n.' = {lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'};
+	
 	
 	function initMap_'.$field->name.$n.'()
 	{
@@ -825,14 +844,75 @@ foreach ($values as $value)
 		
 		myMarker = new google.maps.Marker({
 			map: myMap_'.$field->name.$n.',
+			draggable:true,
+			animation: google.maps.Animation.DROP,
 			position: myLatLon_'.$field->name.$n.'
+			//position: results[0].geometry.location
 		});
 		
-		myMap_'.$field->name.$n.'.addListener("zoom_changed", function() {
+		google.maps.event.addListener(myMap_'.$field->name.$n.', "zoom_changed", function() {
 			jQuery("#'.$elementid_n.'_zoom").val(myMap_'.$field->name.$n.'.getZoom());
 			jQuery("#'.$elementid_n.'_zoom_label").text(myMap_'.$field->name.$n.'.getZoom());
 		});
 		
+		/*google.maps.event.addListener(myMap_'.$field->name.$n.', "click", function (event) {
+			//geocodePosition_'.$field->name.$n.'(this.getPosition());
+			jQuery("#'.$elementid_n.'_lat").val( event.latLng.lat() );
+			jQuery("#'.$elementid_n.'_lon").val( event.latLng.lng() );
+		});*/
+		
+		
+		google.maps.event.addListener(myMarker, "dragend", function (event) {
+			geocodePosition_'.$field->name.$n.'( this.getPosition(), myMarker );
+		});
+	}
+	
+	
+	function geocodePosition_'.$field->name.$n.'(pos, marker)
+	{
+		jQuery("#'.$elementid_n.'_messages")
+			.removeClass("alert-success").removeClass("alert-warning").addClass("alert-info")
+			.html("Searching address of new marker position ...").show();
+		geocoder = new google.maps.Geocoder();
+		geocoder.geocode(
+			{ latLng: pos },
+			function(results, status)
+			{
+				if (status == google.maps.GeocoderStatus.OK)
+				{
+					var tolerance = parseInt( jQuery("#'.$elementid_n.'_marker_tolerance").val() );
+					if ( !tolerance || tolerance < 1 ) {
+						tolerance = 50;
+						jQuery("#'.$elementid_n.'_marker_tolerance").val(tolerance);
+					}
+					
+					var distance = Math.round( parseInt( google.maps.geometry.spherical.computeDistanceBetween(results[0].geometry.location, pos) ) );
+					if (distance > tolerance) {
+						jQuery("#'.$elementid_n.'_lat").val(pos.lat);
+						jQuery("#'.$elementid_n.'_lon").val(pos.lng);
+						jQuery("#'.$elementid_n.'_messages")
+							.removeClass("alert-success").removeClass("alert-warning").addClass("alert-info")
+							.html( Joomla.JText._("PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_WITHIN_TOLERANCE").replace("%s", tolerance) + "<br/> -" + Joomla.JText._("PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT") ).show();
+					} else {
+						jQuery("#'.$elementid_n.'_messages").html("");
+						fillInAddress_'.$field->name.$n.'( results[0] );
+						marker.setPosition( results[0].geometry.location );
+						var html = ! jQuery("#'.$elementid_n.'_messages").html().length ? "" : jQuery("#'.$elementid_n.'_messages").html() + "<br/> ";
+						jQuery("#'.$elementid_n.'_messages")
+							.removeClass("alert-info").removeClass("alert-warning").addClass("alert-success")
+							.html(html + Joomla.JText._("PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_FOUND_WITHIN_TOLERANCE").replace("%s", distance)).show();
+					}
+				}
+				else
+				{
+					jQuery("#'.$elementid_n.'_lat").val(pos.lat);
+					jQuery("#'.$elementid_n.'_lon").val(pos.lng);
+					jQuery("#'.$elementid_n.'_messages")
+						.removeClass("alert-info").removeClass("alert-success").removeClass("alert-info").addClass("alert-warning")
+						.html( Joomla.JText._("PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_FOUND_WITHIN_TOLERANCE") + "<br/> -" + Joomla.JText._("PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT") ).show();
+				}
+			}
+		);
 	}
 	
 	jQuery(document).ready(function(){
