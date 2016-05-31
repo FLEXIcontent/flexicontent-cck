@@ -439,6 +439,8 @@ foreach ($values as $value)
 	$value['province'] = @ $value['province'];
 	$value['country']  = @ $value['country'];
 	
+	$is_empty = !$value['lat'] && !$value['lon'];
+	
 	$field_html = '
 	<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
 		<tr>
@@ -558,12 +560,12 @@ foreach ($values as $value)
 	</div>
 	
 	
-	<div class="fcfield_field_preview_box fcfield_addressint_map">
+	<div id="'.$elementid_n.'_addressint_map" class="fcfield_field_preview_box fcfield_addressint_map" style="display: none;">
 		<table class="fc-form-tbl"><tbody>
 			<tr>
 				<td>
 					<span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_TOLERANCE').'</span>
-					<input type="text" class="fcfield_textval inlineval" id="'.$elementid_n.'_marker_tolerance" name="'.$fieldname_n.'[marker_tolerance]" value="50" size="10" maxlength="10" />
+					<input type="text" class="fcfield_textval inlineval" id="'.$elementid_n.'_marker_tolerance" name="'.$fieldname_n.'[marker_tolerance]" value="50" size="7" maxlength="7" />
 				</td>
 				<td>
 					<span class="flexi label prop_label">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').'</span>
@@ -814,9 +816,6 @@ foreach ($values as $value)
 		{
 			initMap_'.$field->name.$n.'();
 		}
-		else {
-			//marker.setPosition( results[0].geometry.location );
-		}
 	}
 	
 	
@@ -830,6 +829,8 @@ foreach ($values as $value)
 	
 	function initMap_'.$field->name.$n.'()
 	{
+		jQuery("#'.$elementid_n.'_addressint_map").show();  // Show map container
+		
 		myMap_'.$field->name.$n.' = new google.maps.Map(document.getElementById("map_canvas_'.$field->name.$n.'"), {
 			center: myLatLon_'.$field->name.$n.',
 			scrollwheel: false,
@@ -847,20 +848,12 @@ foreach ($values as $value)
 			draggable:true,
 			animation: google.maps.Animation.DROP,
 			position: myLatLon_'.$field->name.$n.'
-			//position: results[0].geometry.location
 		});
 		
 		google.maps.event.addListener(myMap_'.$field->name.$n.', "zoom_changed", function() {
 			jQuery("#'.$elementid_n.'_zoom").val(myMap_'.$field->name.$n.'.getZoom());
 			jQuery("#'.$elementid_n.'_zoom_label").text(myMap_'.$field->name.$n.'.getZoom());
 		});
-		
-		/*google.maps.event.addListener(myMap_'.$field->name.$n.', "click", function (event) {
-			//geocodePosition_'.$field->name.$n.'(this.getPosition());
-			jQuery("#'.$elementid_n.'_lat").val( event.latLng.lat() );
-			jQuery("#'.$elementid_n.'_lon").val( event.latLng.lng() );
-		});*/
-		
 		
 		google.maps.event.addListener(myMarker, "dragend", function (event) {
 			geocodePosition_'.$field->name.$n.'( this.getPosition(), myMarker );
@@ -915,10 +908,11 @@ foreach ($values as $value)
 		);
 	}
 	
+	'.($is_empty ? '' : '
 	jQuery(document).ready(function(){
 		initMap_'.$field->name.$n.'();
 	});
-	';
+	');
 	JFactory::getDocument()->addScriptDeclaration($js);
 	
 	$field->html[$n] = $field_html;
