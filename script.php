@@ -979,6 +979,7 @@ class com_flexicontentInstallerScript
 							CREATE TABLE `#__flexicontent_items_tmp` (
 							 `id` int(10) unsigned NOT NULL,
 							 `title` VARCHAR(255) NOT NULL,
+							 `alias` VARCHAR(400) NOT NULL,
 							 `state` tinyint(3) NOT NULL DEFAULT '0',
 							 `catid` int(10) unsigned NOT NULL DEFAULT '0',
 							 `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -1001,6 +1002,7 @@ class com_flexicontentInstallerScript
 					} else {
 						$_querycols = array();
 						if (array_key_exists('sectionid', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " DROP `sectionid`";  // Drop J1.5 sectionid
+						if (!array_key_exists('alias', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " ADD `alias` VARCHAR(400) NOT NULL AFTER `title`";
 						if (!array_key_exists('type_id', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " ADD `type_id` INT(11) NOT NULL DEFAULT '0' AFTER `language`";
 						if (!array_key_exists('lang_parent_id', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " ADD `lang_parent_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `type_id`";
 						if (!empty($_querycols)) $queries[] = "ALTER TABLE `#__flexicontent_items_tmp` " . implode(",", $_querycols);

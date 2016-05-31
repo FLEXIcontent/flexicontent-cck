@@ -622,6 +622,8 @@ body .alert.fc-iblock {
 body .alert.fc-small.fc-iblock {
 	display: inline-block;
 	margin: 0px 4px;
+	vertical-align: middle;
+	min-height: 1em;
 }
 body .fc-noauth {
 	display: inline-block;

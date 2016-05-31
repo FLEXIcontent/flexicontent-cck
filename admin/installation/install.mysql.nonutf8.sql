@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_favourites` (
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `id` int(11) unsigned NOT NULL auto_increment,
-  `asset_id` int(11) unsigned NOT NULL,
+  `asset_id` int(11) unsigned NOT NULL default '0',
   `field_type` varchar(50) NOT NULL default '',
   `name` varchar(255) NOT NULL default '',
   `label` varchar(255) NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
   `item_id` int(11) unsigned NOT NULL,
   `type_id` int(11) unsigned NOT NULL,
-  `language` varchar(11) NOT NULL default '*',
+  `language` varchar(7) NOT NULL default '*',
   `lang_parent_id` int(11) unsigned NOT NULL default 0,
   `sub_items` text NOT NULL,
   `sub_categories` text NOT NULL,
@@ -108,6 +108,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
  `id` int(10) unsigned NOT NULL,
  `title` varchar(255) NOT NULL,
+ `alias` VARCHAR(400) NOT NULL,
  `state` tinyint(3) NOT NULL DEFAULT '0',
  `catid` int(10) unsigned NOT NULL DEFAULT '0',
  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -121,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
  `access` int(10) unsigned NOT NULL DEFAULT '0',
  `hits` int(10) unsigned NOT NULL DEFAULT '0',
  `featured` tinyint(3) unsigned NOT NULL DEFAULT '0',
- `language` char(7) NOT NULL,
+ `language` varchar(7) NOT NULL DEFAULT '*',
  `type_id` int(11) NOT NULL DEFAULT '0',
  `lang_parent_id` int(11) NOT NULL DEFAULT '0',
  PRIMARY KEY (`id`),
@@ -179,7 +180,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_tags_item_relations` (
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `id` int(11) NOT NULL auto_increment,
-  `asset_id` int(11) unsigned NOT NULL,
+  `asset_id` int(11) unsigned NOT NULL default '0',
   `name` varchar(255) NOT NULL,
   `alias` varchar(255) NOT NULL,
   `published` tinyint(1) NOT NULL,

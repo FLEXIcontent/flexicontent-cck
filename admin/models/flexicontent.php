@@ -531,11 +531,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			// Data Types of columns
 			$tbl_names_arr = array(
 				'flexicontent_items_ext'=>array(
-					'language' => "VARCHAR(11) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL DEFAULT '*'"
+					'language' => "VARCHAR(7) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL DEFAULT '*'"
 				),
 				'flexicontent_items_tmp'=>array(
 					'title' => "VARCHAR(255) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL",
-					'language' => "VARCHAR(11) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL DEFAULT '*'"
+					'alias' => "VARCHAR(400) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL",
+					'language' => "VARCHAR(7) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL DEFAULT '*'"
 				),
 				'flexicontent_fields'=>array(
 					'field_type' => "VARCHAR(50) CHARACTER SET ".$jchset." COLLATE ".$jcname." NOT NULL default ''"

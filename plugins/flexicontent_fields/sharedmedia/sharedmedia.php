@@ -535,11 +535,11 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		{
 			action = typeof action === "undefined" ? 0 : action;
 			if (action==1)
-				jQuery("#" + element_id + "_title, " + "#" + element_id + "_author, " + "#" + element_id + "_description, " + "#" + element_id + "_api_type, " + "#" + element_id + "_media_id, " + "#" + element_id + "_preview, " + "#" + element_id + "_width, " + "#" + element_id + "_height").parents("tr").fadeIn();  // compatibility ?: show with fade so that the elements size are proper in case some JS code needs them ?
+				jQuery("#" + element_id + "_title, " + "#" + element_id + "_author, " + "#" + element_id + "_description, " + "#" + element_id + "_api_type, " + "#" + element_id + "_media_id, " + "#" + element_id + "_preview, " + "#" + element_id + "_width, " + "#" + element_id + "_height").closest("tr").fadeIn(4000);  // compatibility ?: show with fade so that the elements size are proper in case some JS code needs them ?
 			else if (action==-1)
-				jQuery("#" + element_id + "_title, " + "#" + element_id + "_author, " + "#" + element_id + "_description, " + "#" + element_id + "_api_type, " + "#" + element_id + "_media_id, " + "#" + element_id + "_preview, " + "#" + element_id + "_width, " + "#" + element_id + "_height").parents("tr").hide("fast");
+				jQuery("#" + element_id + "_title, " + "#" + element_id + "_author, " + "#" + element_id + "_description, " + "#" + element_id + "_api_type, " + "#" + element_id + "_media_id, " + "#" + element_id + "_preview, " + "#" + element_id + "_width, " + "#" + element_id + "_height").closest("tr").hide("fast");
 			else if (action==0)
-				jQuery("#" + element_id + "_title, " + "#" + element_id + "_author, " + "#" + element_id + "_description, " + "#" + element_id + "_api_type, " + "#" + element_id + "_media_id, " + "#" + element_id + "_preview, " + "#" + element_id + "_width, " + "#" + element_id + "_height").parents("tr").toggle(0);  // compatibility ?: toggle instantly
+				jQuery("#" + element_id + "_title, " + "#" + element_id + "_author, " + "#" + element_id + "_description, " + "#" + element_id + "_api_type, " + "#" + element_id + "_media_id, " + "#" + element_id + "_preview, " + "#" + element_id + "_width, " + "#" + element_id + "_height").closest("tr").toggle(0);  // compatibility ?: toggle instantly
 		}
 		
 		function setHeight_'.$field->name.'(selector, factor)
@@ -727,7 +727,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			</div>
 
 			<div class="fcfield_field_preview_box">
-			<table style="border-collapse:collapse; padding:0; margin:0;">
+			<table class="fcfield_field_preview_table">
 			<tbody>
 				<tr '.($is_empty ? ' style="display:none;" ' : '').'>
 					<td>
