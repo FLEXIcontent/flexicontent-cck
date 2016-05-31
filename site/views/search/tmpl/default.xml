@@ -73,14 +73,14 @@
 				<option value="1" show_list="" hide_list="disp_txtflds">FLEXI_ACCORDING_TO_TYPE</option>
 				<option value="2" show_list="disp_txtflds" hide_list="">FLEXI_CONFIGURE_BELOW</option>
 			</field>
-			<field name="txtflds" type="filters" isadvsearch="1" fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index text-searchable are listed" class="use_adv_txtsearch disp_txtflds" />
+			<field name="txtflds" type="filters" isadvsearch="1" isfilter='*' fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index text-searchable are listed" class="use_adv_txtsearch disp_txtflds" />
 			
 			<field name="show_filters" type="multilist" subtype="radio" default="1" label="FLEXI_FIELDS_AS_FILTERS" description="FLEXI_FIELDS_AS_FILTERS_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="disp_filtflds">Use all filterable</option>
 				<option value="1" show_list="" hide_list="disp_filtflds">FLEXI_ACCORDING_TO_TYPE</option>
 				<option value="2" show_list="disp_filtflds" hide_list="">FLEXI_CONFIGURE_BELOW</option>
 			</field>
-			<field name="filtflds" type="filters" isadvfilter="1" fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index filters are listed" class="disp_filtflds" />
+			<field name="filtflds" type="filters" isadvfilter="1" isfilter='*' fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index filters are listed" class="disp_filtflds" />
 			<!--field name="show_filtersop" type="radio" default="1" label="Filters Combination" description="Allow users to select method of combining the search filters, e.g. any filter, all filters">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -168,7 +168,7 @@
 				<option value="0" show_list="" hide_list="disp_field">FLEXI_NO</option>
 				<option value="1" show_list="disp_field" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="info_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" onchange="f=document.getElementById('{control_name}infoflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" class="disp_field"/>
+			<field name="info_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameasvalue="true" onchange="f=document.getElementById('{control_name}infoflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" class="disp_field"/>
 			<field name="infoflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to render their values and display them in the search results. You can separate each fieldname by comma(,)." cols="30" rows="3" class="disp_field"/>
 		
 		

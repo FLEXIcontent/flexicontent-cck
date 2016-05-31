@@ -363,7 +363,7 @@
 				<option value="4" show_list="" hide_list="date_custom_fld">FLEXI_UMOD_DATE_PUBLISH_DOWN</option>
 				<option value="3" show_list="date_custom_fld" hide_list="">FLEXI_CUSTOM_DATE_FIELD</option>
 			</field>
-			<field name="datecomp_field" type="fields" fieldnameastext="true" default="" multiple="false" field_type="date" label="FLEXI_CUSTOM_FIELD_AS_DATE_DATA" description="FLEXI_CUSTOM_FIELD_AS_DATE_DATA_DESC" class="date_custom_on date_custom_fld" />
+			<field name="datecomp_field" type="fields" default="" multiple="false" field_type="date" label="FLEXI_CUSTOM_FIELD_AS_DATE_DATA" description="FLEXI_CUSTOM_FIELD_AS_DATE_DATA_DESC" class="date_custom_on date_custom_fld" />
 			<field name="nulldates" type="radio" default="0" label="FLEXI_NULL_EMPTY_DATES" description="FLEXI_NULL_EMPTY_DATES_DESC" class="method_dates_ops emptyDates btn-group group-fcinfo">
 				<option value="0">FLEXI_EXCLUDE</option>
 				<option value="1">FLEXI_INCLUDE</option>
