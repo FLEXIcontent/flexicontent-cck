@@ -148,7 +148,7 @@ class JFormFieldFields extends JFormField
 		$tid = 0;
 		if($type_id_variable)
 		{
-			$tid = $app->input::get($type_id_variable);
+			$tid = $app->input->get($type_id_variable);
 			$tid = is_array($tid) ? 
 				(int) reset($tid) :
 				(int) $tid ;
