@@ -1022,12 +1022,17 @@ h3.themes-title small {
 	font-weight: bold;
 }
 .positions_container {
+	overflow-y: hidden;
 	border: 1px dashed silver;
 	display: inline-block;
 	background-color: #f0f0f0;
 	padding: 0;
 	margin: 0;
 	width: 100%;
+}
+.positions_container.fcfields_sorter {
+	margin: 6px 0px;
+	min-height: 64px;
 }
 .positions {
 	list-style: none;
@@ -1041,29 +1046,32 @@ h3.themes-title small {
 	width: 100%;
 }
 .positions_container .fields {
+	background: white;
 	display: block;
 	border: 1px solid silver;
-	padding: 4px 6px 3px 24px;
+	padding: 6px 6px 5px 24px;
 	margin: 2px;
 	float: left;
 	cursor: move;
 	border-radius: 2px;
+	white-space: nowrap;
 }
 .positions_container .fields.delfield {
-	background: url("../images/publish_r.png") no-repeat scroll 100% 50% #F9F9F9 !important;
-	padding: 4px 0px 3px 6px;
+	padding: 3px 3px 0px 6px;
 	margin: 2px;
 	float: left;
 	cursor: move;
 }
 .positions_container .fields.delfield .delfield_handle {
+	background: url("../images/cancel.png") no-repeat scroll 50% 30% transparent;
 	display: inline-block;
 	width: 18px;
 	height: 18px;
-	float: right;
-	margin-left: 5px;
+	margin: 0 0 0 3px;
+	padding: 3px;
 	outline: none;
 	background-color: transparent;
+	vertical-align: middle;
 }
 .positions_container .fields.user {
 	background: url(../images/textfield.png) #f9f9f9 no-repeat 3px 50%;
@@ -1826,6 +1834,16 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	clear: both;
 	padding: 0px !important;
 	margin: 0px !important;
+}
+.container_fcfield-inner {
+	border-width: 0px;
+	margin: 0px;
+	padding: 0px;
+	width: 68%;
+	float: left;
+}
+.container_fcfield .container_fcfield-inner {
+	width: 100%;
 }
 .container_fcfield {
 	float: left !important;

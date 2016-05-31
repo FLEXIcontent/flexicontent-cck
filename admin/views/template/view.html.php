@@ -113,7 +113,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 			}
 			foreach ($idsort as $k => $v) {
 				if ($k > 1) {
-					$jssort[] = 'fcfield_storeordering(jQuery("#sortable-'.$v.'"))';
+					$jssort[] = 'fcfield_store_ordering(jQuery("#sortable-'.$v.'"))';
 				}
 			}
 			$positions = implode(',', $idsort);
@@ -127,14 +127,14 @@ class FlexicontentViewTemplate extends JViewLegacy {
 					connectWith: \"".$sortable_ids."\",
 					update: function(event, ui) {
 						if (ui.sender)
-							fcfield_storeordering(jQuery(ui.sender));
+							tmpls_fcfield_store_ordering(jQuery(ui.sender));
 						else
-							fcfield_storeordering(jQuery(ui.item).parent());
+							tmpls_fcfield_store_ordering(jQuery(ui.item).parent());
 					}
 				});
-				fcfield_initordering();
+				tmpls_fcfield_init_ordering();
 			});
-			function fcfield_storeordering(parent_element) {
+			function tmpls_fcfield_store_ordering(parent_element) {
 				hidden_id = '#'+jQuery.trim(parent_element.attr('id').replace('sortable-',''));
 				fields = new Array();
 				i = 0;

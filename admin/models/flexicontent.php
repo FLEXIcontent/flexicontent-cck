@@ -2150,8 +2150,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				if (in_array('flexicontent.change.cat.feat', $flexi_action_names)) $flexi_rules['flexicontent.change.cat.feat'][$group->id] = 1;  // can ChangeFeatCat
 				if (in_array('flexicontent.uploadfiles', $flexi_action_names)) $flexi_rules['flexicontent.uploadfiles'][$group->id] = 1;  // can UploadFiles
 			}
-			// By default give to everybody the edit field values privelege
-			if (in_array('flexicontent.editfieldvalues', $flexi_action_names)) $flexi_rules['flexicontent.editfieldvalues'][$group->id] = 1;  // can EditFieldValues
+			
+			// By default DO NOT SET the edit field values privelege, bacause we have another parameter "allow any editor"
+			//if (in_array('flexicontent.editfieldvalues', $flexi_action_names)) $flexi_rules['flexicontent.editfieldvalues'][$group->id] = 1;  // can EditFieldValues
 		}
 		
 		// return rules, a NOTE: MAYBE in future we create better initial permissions by checking allow/deny/inherit values instead of just HAS ACTION ...

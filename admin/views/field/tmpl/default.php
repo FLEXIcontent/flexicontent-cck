@@ -119,7 +119,7 @@ $this->document->addScriptDeclaration($js);
 
 		</table>
 		
-		<div class="fctabber fields_tabset" id="field_specific_props_tabset">
+		<div class="fctabber fields_tabset" id="field_basic_props_tabset">
 			
 			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-home-2" >
 				<h3 class="tabberheading hasTooltip"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>

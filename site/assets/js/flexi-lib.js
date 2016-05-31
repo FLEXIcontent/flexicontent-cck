@@ -254,68 +254,68 @@
 	
 	function fc_findFormDependencies(el, toggleParent, toggleParentSelector, field)
 	{
-		var seton_list = el.data('seton_list');   // (selector comma list) show elements by selector
-		var setoff_list= el.data('setoff_list');  // (selector comma list) hide elements by selector
-		var refsh_list = el.data('refsh_list');   // (selector comma list) trigger change on elements
+		var seton_list = el.data('_seton_list');   // (selector comma list) show elements by selector
+		var setoff_list= el.data('_setoff_list');  // (selector comma list) hide elements by selector
+		var refsh_list = el.data('_refsh_list');   // (selector comma list) trigger change on elements
 		
-		var show_list  = el.data('show_list');    // (classnames comma list) grant  display dependency to elements (container shown  when dependencies are zero)
-		var hide_list  = el.data('hide_list');    // (classnames comma list) revoke display dependency to elements (container hidden when dependencies non-zero)
-		var force_list = el.data('force_list');   // (classnames comma list) show regardless of display dependencies (this is non-persistent -and- element's dependencies are not cleared)
+		var show_list  = el.data('_show_list');    // (classnames comma list) grant  display dependency to elements (container shown  when dependencies are zero)
+		var hide_list  = el.data('_hide_list');    // (classnames comma list) revoke display dependency to elements (container hidden when dependencies non-zero)
+		var force_list = el.data('_force_list');   // (classnames comma list) show regardless of display dependencies (this is non-persistent -and- element's dependencies are not cleared)
 		
-		var fcreadonly = el.data('fcreadonly');   // (JSON format, element name : value) set readonly property of elements, 1:ON , 2:OFF
-		var fcconfigs  = el.data('fcconfigs');    // (JSON format, element name : value) set value of elements
+		var fcreadonly = el.data('_fcreadonly');   // (JSON format, element name : value) set readonly property of elements, 1:ON , 2:OFF
+		var fcconfigs  = el.data('_fcconfigs');    // (JSON format, element name : value) set value of elements
 		
 		var _d;
 		if (!seton_list) {
 			seton_list = {};
-			seton_list[0] = el.attr('seton_list')  ? el.attr('seton_list')  : null;
-			el.data('seton_list', seton_list);
+			seton_list[0] = el.attr('data-seton_list')  ? el.attr('data-seton_list')  : null;
+			el.data('_seton_list', seton_list);
 		}
 		if (!setoff_list) {
 			setoff_list = {};
-			setoff_list[0] = el.attr('setoff_list')  ? el.attr('setoff_list')  : null;
-			el.data('setoff_list', setoff_list);
+			setoff_list[0] = el.attr('data-setoff_list')  ? el.attr('data-setoff_list')  : null;
+			el.data('_setoff_list', setoff_list);
 		}
 		if (!refsh_list) {
 			refsh_list = {};
-			refsh_list[0] = el.attr('refsh_list')  ? el.attr('refsh_list')  : null;
-			el.data('refsh_list', refsh_list);
+			refsh_list[0] = el.attr('data-refsh_list')  ? el.attr('data-refsh_list')  : null;
+			el.data('_refsh_list', refsh_list);
 		}
 		
 		if (!fcreadonly) {
-			var fcreadonly = el.attr('fcreadonly');
+			var fcreadonly = el.attr('data-fcreadonly');
 			if (fcreadonly) {
 				fcreadonly = fcreadonly.replace(/\'/g, '"');
 				fcreadonly = jQuery.parseJSON(fcreadonly);
 			}
-			el.data('fcconfigs', fcconfigs);
+			el.data('_fcconfigs', fcconfigs);
 		}
 		if (!fcconfigs) {
-			var fcconfigs = el.attr('fcconfigs');
+			var fcconfigs = el.attr('data-fcconfigs');
 			if (fcconfigs) {
 				fcconfigs = fcconfigs.replace(/\'/g, '"');
 				fcconfigs = jQuery.parseJSON(fcconfigs);
 			}
-			el.data('fcconfigs', fcconfigs);
+			el.data('_fcconfigs', fcconfigs);
 		}
 		
 		if (!show_list) {
 			show_list = {};
-			_d  = el.attr('show_list')  ? el.attr('show_list').split(',')  : Array();
+			_d  = el.attr('data-show_list')  ? el.attr('data-show_list').split(',')  : Array();
 			for (var i = 0; i<_d.length; i++) show_list[_d[i].trim()] = 1;
-			el.data('show_list', show_list);
+			el.data('_show_list', show_list);
 		}
 		if (!hide_list) {
 			hide_list = {};
-			_d = el.attr('hide_list')  ? el.attr('hide_list').split(',')  : Array();
+			_d = el.attr('data-hide_list')  ? el.attr('data-hide_list').split(',')  : Array();
 			for (var i = 0; i<_d.length; i++) hide_list[_d[i].trim()] = 1;
-			el.data('hide_list', hide_list);
+			el.data('_hide_list', hide_list);
 		}
 		if (!force_list) {
 			force_list = {};
-			_d = el.attr('force_list') ? el.attr('force_list').split(',') : Array();
+			_d = el.attr('data-force_list') ? el.attr('data-force_list').split(',') : Array();
 			for (var i = 0; i<_d.length; i++) force_list[_d[i].trim()] = 1;
-			el.data('force_list', force_list);
+			el.data('_force_list', force_list);
 		}
 		
 		var toBeUpdated = Array();
