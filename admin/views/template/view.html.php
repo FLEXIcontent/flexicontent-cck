@@ -113,7 +113,7 @@ class FlexicontentViewTemplate extends JViewLegacy {
 			}
 			foreach ($idsort as $k => $v) {
 				if ($k > 1) {
-					$jssort[] = 'fcfield_store_ordering(jQuery("#sortable-'.$v.'"))';
+					$jssort[] = 'tmpls_fcfield_store_ordering(jQuery("#sortable-'.$v.'"))';
 				}
 			}
 			$positions = implode(',', $idsort);
