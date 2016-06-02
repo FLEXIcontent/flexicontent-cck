@@ -446,7 +446,7 @@ jQuery(document).ready(function()
 			else if (data.error!='')        item_selector.append('<option value=\"\">'+data.error+'</option>');
 			else if (!data.options.length)  item_selector.append('<option value=\"\">".JText::_('FLEXI_RIFLD_NO_ITEMS')."</option>');
 			else {
-				item_selector.append('<option value=\"\">'+'".JText::_('FLEXI_SELECT', true)."'+'</option>');
+				item_selector.append('<option value=\"\">'+'- ".JText::_('FLEXI_RIFLD_ADD_ITEM', true)."'+' -</option>');
 				var item;
 				for(var i=0; i<data.options.length; i++)
 				{
