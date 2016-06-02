@@ -978,10 +978,13 @@ body .container_fcfield input,
 select.invalid,
 input.invalid,
 textarea.invalid {
-	border: 1px dotted #CC0000 !important; /* forced, display as INVALID */
+	border: 1px solid #CC0000 !important; /* forced, display as INVALID */
 }
 label.invalid > img {
-	border: 2px dotted #CC0000 !important; /* forced, display as INVALID */
+	border: 2px dashed #CC0000 !important; /* forced, display as INVALID */
+}
+label.invalid {
+	color: #CC0000 !important; /* forced, display as INVALID */
 }
 
 .use_prettycheckable.invalid + a + label,
@@ -989,7 +992,7 @@ input.invalid + .fccheckradio_lbl {
 	color: #cc0000 !important; /* FORCED styling, display as INVALID */
 }
 .use_prettycheckable.invalid + a + label > img {
-	border: 1px dotted #CC0000 !important; /* FORCED styling, display as INVALID */
+	border: 1px dashed #CC0000 !important; /* FORCED styling, display as INVALID */
 }
 #flexicontent .label.invalid,
 #flexicontent .label-fcinner.invalid,

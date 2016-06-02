@@ -124,7 +124,7 @@ foreach ($this->values as $n => $value)
 	}
 	
 	// prefer addr_display if available
-	if($addr_display_mode == 'formatted')
+	else if ($addr_display_mode == 'formatted')
 	{
 		$matches = array();
 		$addr = $addr_format_tmpl;
@@ -217,27 +217,43 @@ foreach ($this->values as $n => $value)
 			$map .= '</div></div>';
 		}
 		
-		if($map_embed_type == 'int')
+		if ( $map_embed_type == 'int' )
 		{
-			$document = JFactory::getDocument();
-			$document->addScript('https://maps.googleapis.com/maps/api/js' . ($google_maps_js_api_key ? '?key=' . $google_maps_js_api_key : ''));
 			$map .= '
 			<div class="fc_addressint_map">
-				<div class="fc_addressint_map_canvas" id="map_canvas_'.$field->name.$n.'" '.($map_width || $map_height  ?  'style="min-width:'.$map_width.'px; min-height:'.$map_height.'px;"' : '').'></div>
+				<div
+					class="fc_addressint_map_canvas"
+					data-maplatlon="{lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'}"
+					data-mapzoom="'.($value['zoom'] ? $value['zoom'] : $map_zoom).'"
+					data-mapaddr="'.$value['addr1'].'"
+					data-maptype="google.maps.MapTypeId.'.strtoupper($map_type).'"
+					data-mapcontent="'.htmlspecialchars(json_encode($addr.$map_directions), ENT_COMPAT, 'UTF-8' ).'"
+					id="map_canvas_'.$field->name.'_'.$n.'_'.$field->item_id.'" '.
+					($map_width || $map_height  ?  'style="min-width:'.$map_width.'px; min-height:'.$map_height.'px;"' : '').'
+				>
+				</div>
 			</div>
-			
-			<script>
-			// map object   
-			var myMap_'.$field->name.$n.';
-			var myLatLon_'.$field->name.$n.' = {lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'};
-			
-			function initMap_'.$field->name.$n.'()
+			';
+		}
+		
+		static $addressint_view_js_added = null;
+		if ( $addressint_view_js_added === null && $map_embed_type == 'int' )
+		{
+			$addressint_view_js_added = true;
+			$js = '
+			function fc_addressint_initMap(mapBox)
 			{
-				myMap_'.$field->name.$n.' = new google.maps.Map(document.getElementById("map_canvas_'.$field->name.$n.'"), {
-					center: myLatLon_'.$field->name.$n.',
+				var mapLatLon = eval("(" + mapBox.attr("data-maplatlon") + ")");
+				var mapZoom   = parseInt(mapBox.attr("data-mapzoom"));
+				var mapAddr   = mapBox.attr("data-mapaddr");
+				var mapType   = eval("(" + mapBox.attr("data-maptype") + ")");
+				var mapContent= eval("(" + mapBox.attr("data-mapcontent") + ")");
+				
+				var myMap = new google.maps.Map(document.getElementById(mapBox.attr("id")), {
+					center: mapLatLon,
 					scrollwheel: false,
-					zoom: '.($value['zoom'] ? $value['zoom'] : $map_zoom).',
-					mapTypeId: google.maps.MapTypeId.'.strtoupper($map_type).',
+					zoom: mapZoom,
+					mapTypeId: mapType,
 					zoomControl: true,
 					mapTypeControl: false,
 					scaleControl: false,
@@ -245,27 +261,31 @@ foreach ($this->values as $n => $value)
 					rotateControl: false,
 				});
 				
-				var myContent = '. json_encode('<div class="address">'.$addr.'</div>'.$map_directions) .';
-				
 				var myInfoWindow = new google.maps.InfoWindow({
-					content: myContent
+					content: mapContent
 				});
 				
-				myMarker = new google.maps.Marker({
-					map: myMap_'.$field->name.$n.',
-					position: myLatLon_'.$field->name.$n.',
-					title: "'.$value['addr1'].'"
+				var myMarker = new google.maps.Marker({
+					map: myMap,
+					position: mapLatLon,
+					title: mapAddr
 				});
 				
 				myMarker.addListener("click", function() {
-					myInfoWindow.open(myMap_'.$field->name.$n.', myMarker);
+					myInfoWindow.open(myMap, myMarker);
 				});
 			}
 			
-			jQuery(document).ready(function(){initMap_'.$field->name.$n.'();});
+			jQuery(document).ready(function(){
+				jQuery(".fc_addressint_map_canvas").each( function() {
+					fc_addressint_initMap( jQuery(this) );
+		  	});
+			});
+			';
 			
-			</script>';
-			
+			$document = JFactory::getDocument();
+			$document->addScript('https://maps.googleapis.com/maps/api/js' . ($google_maps_js_api_key ? '?key=' . $google_maps_js_api_key : ''));
+			$document->addScriptDeclaration($js);
 		}
 	}
 	
