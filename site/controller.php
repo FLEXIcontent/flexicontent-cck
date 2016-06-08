@@ -1317,7 +1317,7 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function getreviewform()
 	{
-		$tagid = JRequest::getCmd('tagid', '' );
+		$html_tagid = JRequest::getCmd('tagid', '' );
 		$content_id  = JRequest::getInt('content_id', '' );
 		$review_type = JRequest::getCmd('review_type', 'item' );
 		
@@ -1334,7 +1334,7 @@ class FlexicontentController extends JControllerLegacy
 		else {
 			// Check content item exists
 			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
-			if ( !$item->load( $content_id ) )  $error = 'ID: '.$pk. ': '.$table->getError();
+			if ( !$item->load( $content_id ) )  $error = 'ID: '.$pk. ': '.$item->getError();
 			
 			// Check voting is enabled
 			else {
@@ -1363,7 +1363,7 @@ class FlexicontentController extends JControllerLegacy
 		if ($user->id)
 		{
 			$query = "SELECT * "
-				." FROM #__flexicontent_reviews_ratings AS r"
+				." FROM #__flexicontent_reviews_dev AS r"
 				." WHERE r.content_id=" . $content_id
 				."  AND r.type=". $db->Quote($review_type)
 				."  AND r.user_id=". $user->id;				
@@ -1374,6 +1374,7 @@ class FlexicontentController extends JControllerLegacy
 		$result	= new stdClass();
 		$result->html = '
 		<form id="fcvote_review_form_'.$content_id.'" name="fcvote_form_'.$content_id.'">
+			<input type="hidden" name="review_id"  value="'. ($review ? $review->id : '').'"/>
 			<input type="hidden" name="content_id"  value="'.$content_id.'"/>
 			<input type="hidden" name="review_type" value="'.$review_type.'"/>
 			<table class="fc-form-tbl">
@@ -1398,7 +1399,7 @@ class FlexicontentController extends JControllerLegacy
 				</tr>
 				<tr class="fcvote_review_form_text">
 					<td></td>
-					<td><input type="button" class="btn btn-primary fcvote_review_form_submit_btn" onclick="fcvote_submit_review_form(\''.$tagid.'\', this.form)" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/></td>
+					<td><input type="button" class="btn btn-primary fcvote_review_form_submit_btn" onclick="fcvote_submit_review_form(\''.$html_tagid.'\', this.form)" value="'.JText::_('FLEXI_VOTE_REVIEW_SUMBIT').'"/></td>
 				</tr>
 			</table>
 		</form>';
@@ -1410,15 +1411,22 @@ class FlexicontentController extends JControllerLegacy
 	
 	function storereviewform()
 	{
+		$review_id   = JRequest::getInt('review_id', 0);
 		$content_id  = JRequest::getInt('content_id', '' );
 		$review_type = JRequest::getCmd('review_type', 'item' );
 		
 		$user = JFactory::getUser();
 		$db	= JFactory::getDBO();
+		$error = false;
+		
+		// Validate title
+		$title = flexicontent_html::dataFilter(JRequest::getVar('title'), $maxlength=255, 'STRING', 0);  // Decode entities, and strip HTML
 		
 		// Validate email
-		$email = $user->id ? $user->email : flexicontent_html::dataFilter(JRequest::getVar('email'), $maxlength=255, 'EMAIL', 0);  // Clean bad text/html
-		JRequest::setVar('email', $email);
+		$email = $user->id ? $user->email : flexicontent_html::dataFilter(JRequest::getVar('email'), $maxlength=255, 'EMAIL', 0);  // Validate email
+		
+		// Validate text
+		$text = flexicontent_html::dataFilter(JRequest::getVar('text'), $maxlength=10000, 'STRING', 0);  // Validate text only: decode entities and strip HTML
 		
 		
 		// ******************************
@@ -1431,7 +1439,7 @@ class FlexicontentController extends JControllerLegacy
 		else {
 			// Check content item exists
 			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
-			if ( !$item->load( $content_id ) )  $error = 'ID: '.$pk. ': '.$table->getError();
+			if ( !$item->load( $content_id ) )  $error = 'ID: '.$pk. ': '.$item->getError();
 			
 			// Check voting is enabled
 			else {
@@ -1455,21 +1463,53 @@ class FlexicontentController extends JControllerLegacy
 			jexit();
 		}
 		
-		// Load review of a logged user
-		$review = false;
-		if ($user->id)
+		// Check if review exists
+		$review = JTable::getInstance( $type = 'flexicontent_reviews', $prefix = '', $config = array() );
+		
+		if ($user->id && $review_id)
 		{
-			$query = "SELECT * "
-				." FROM #__flexicontent_reviews_ratings AS r"
-				." WHERE r.content_id=" . $content_id
-				."  AND r.type=". $db->Quote($review_type)
-				."  AND r.user_id=". $user->id;				
-			$db->setQuery($query);
-			$review = $db->loadObject();
+			if ( !$review->load( $review_id ) )  
+			{
+				$result	= new stdClass();
+				$error = 'ID: '.$review_id. ': '.$review->getError();
+				$result->html = $error;
+				echo json_encode($result);
+				jexit();
+			}
+			
+			if ( $review.content_id == $content_id )  $error = "Found content_id <> given content_id: "  .$content_id;
+			if ( !$review.type == $review_type )      $error = "Found review_type: " .$review.type.       " <> given review_type: " .$review_type;
+			if ( $review.user_id == $user->id )       $error = "Found user_id <> given user_id: "     .$user->id;
+			if ( ! empty($error) )
+			{
+				$result	= new stdClass();
+				$result->html = $error;
+				echo json_encode($result);
+				jexit();
+			}
+		}
+		
+		$review->id = $review_id;
+		$review->content_id = $content_id;
+		$review->type  = $review_type;
+		$review->title = $title;
+		$review->email = $user->id ? '' : $email;
+		$review->text  = $text;
+		
+		if ( !$review->store() )
+		{
+			$result	= new stdClass();
+			$error = 'ID: '.$review_id. ': '.$review->getError();
+			$result->html = $error;
+			echo json_encode($result);
+			jexit();
 		}
 		
 		$result	= new stdClass();
-		$result->html = '<pre>'.print_r($_REQUEST, true).'</pre>';
+		$result->html = $review_id ?
+			'Existing review updated' :
+			'New review saved' ;
+		//$result->html .= '<pre>'.print_r($_REQUEST, true).'</pre>';
 		
 		echo json_encode($result);
 		jexit();
