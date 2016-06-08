@@ -57,26 +57,47 @@ class FlexicontentControllerTypes extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-
+		
+		$app   = JFactory::getApplication();
 		$task  = JRequest::getVar('task');
 		$model = $this->getModel('type');
 		
-		// Get data from request and validate them
-		if (FLEXI_J16GE) {
-			// Retrieve form data these are subject to basic filtering
-			$data   = JRequest::getVar('jform', array(), 'post', 'array');    // Core Fields and and item Parameters
+		// *********************
+		// Get data from request
+		// *********************
+		
+		// Retrieve form data these are subject to basic filtering
+		$data = JRequest::getVar('jform', array(), 'post', 'array');   // Core Fields and and item Parameters
+		
+		// Validate Form data for core fields and for parameters
+		$form = $model->getForm($data, false);
+		$post = $model->validate($form, $data);
+		
+		// Check for validation error
+		if (!$post)
+		{
+			// Get the validation messages and push up to three validation messages out to the user
+			$errors	= $form->getErrors();
+			for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++) {
+				$app->enqueueMessage($errors[$i] instanceof Exception ? $errors[$i]->getMessage() : $errors[$i], 'error');
+			}
 			
-			// Validate Form data for core fields and for parameters
-			$form = $model->getForm($data, false);
-			$post = $model->validate($form, $data);
-			if (!$post) JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
+			// Set POST form date into the session, so that they get reloaded
+			$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);      // Save the jform data in the session
 			
-			// Some values need to be assigned after validation
-			$post['attribs'] = @ $data['attribs'];   // Workaround for item's template parameters being clear by validation since they are not present in item.xml
-		} else {
-			// Retrieve form data these are subject to basic filtering
-			$post = JRequest::get( 'post' );  // Core & Custom Fields and item Parameters
+			// Redirect back to the item form
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+			
+			if ( JRequest::getVar('fc_doajax_submit') )
+			{
+				echo flexicontent_html::get_system_messages_html();
+				exit();  // Ajax submit, do not rerender the view
+			}
+			return false; //die('error');
 		}
+		
+		// Some values need to be assigned after validation
+		$post['attribs'] = @ $data['attribs'];   // Workaround for item's template parameters being clear by validation since they are not present in item.xml
 		
 		if ( $model->store($post) )
 		{

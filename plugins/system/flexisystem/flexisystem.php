@@ -208,6 +208,21 @@ class plgSystemFlexisystem extends JPlugin
 				});
 			";
 		}
+		
+		if (
+			$isAdmin && (
+				($option=='com_users' && ($view == 'user'))
+			)
+		)
+			$js .= "
+				jQuery(document).ready(function() {
+					var el = parent.document.getElementById('fc_modal_popup_container');
+					if (el) {
+						jQuery('.navbar').hide();
+						jQuery('body').css('padding-top', 0);
+					}
+				});
+			";
 		if ($js) $document->addScriptDeclaration($js);
 		
 		

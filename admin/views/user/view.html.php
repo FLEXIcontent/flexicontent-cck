@@ -41,13 +41,11 @@ class FlexicontentViewUser extends JViewLegacy
 		$edit = JRequest::getVar('edit',true);
 		if (!$cid) $edit = false;
 		
-		if (FLEXI_J16GE) {
-			$form = $this->get('Form');
-			$form->setValue('password',		null);
-			$form->setValue('password2',	null);
-		}
+		$form = $this->get('Form');
+		$form->setValue('password',		null);
+		$form->setValue('password2',	null);
+		
 		$form_folder = FLEXI_J16GE ? 'forms'.DS : '';
-
 
 		
 		// *****************
@@ -78,16 +76,40 @@ class FlexicontentViewUser extends JViewLegacy
 			JToolBarHelper::title( JText::_( 'FLEXI_ADD_USER' ), 'authoradd' );
 		}
 		
-		$ctrl = FLEXI_J16GE ? 'users.' : '';
+		$ctrl = 'users.';
 		JToolBarHelper::apply( $ctrl.'apply' );
 		JToolBarHelper::save( $ctrl.'save' );
 		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 		JToolBarHelper::cancel( $ctrl.'cancel' );
 		JToolBarHelper::help( 'screen.users.edit' );
-
+		
 		$user   = $edit  ?  JUser::getInstance($cid[0])  :  JUser::getInstance();
 		$myuser = JFactory::getUser();
 		$acl    = JFactory::getACL();
+		
+		JText::script("FLEXI_UPDATING_CONTENTS", true);
+		$document->addScriptDeclaration('
+			function fc_edit_juser_modal_load( container ) {
+				if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=users") != -1 )
+				{
+					container.dialog("close");
+				}
+			}
+			function fc_edit_juser_modal_close() {
+				window.location.reload();
+				document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+			}
+		');
+		
+		$modal_title = JText::_('FLEXI_EDIT_JUSER', true);
+		$tip_class = ' hasTooltip';
+		JToolBarHelper::divider();
+		flexicontent_html::addToolBarButton(
+			'FLEXI_EDIT_JUSER', $btn_name='edit_juser', $full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;", $msg_alert='', $msg_confirm='',
+			$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="spaced-btn btn-info".$tip_class, $btn_icon="icon-pencil",
+			'data-placement="bottom" data-href="index.php?option=com_users&task=user.edit&id='.$user->get('id').'" title="Edit all details of joomla user"'
+		);
+		
 
 		// Check for post data in the event that we are returning
 		// from a unsuccessful attempt to save data
@@ -110,11 +132,6 @@ class FlexicontentViewUser extends JViewLegacy
 			$contact = NULL;
 			// Get the default group id for a new user
 			$config = JComponentHelper::getParams( 'com_users' );
-			$newGrp = $config->get( 'new_usertype' );
-			if (!FLEXI_J16GE)
-				$user->set( 'gid', $acl->get_group_id( $newGrp, null, 'ARO' ) );
-			else
-				$user->set( 'gid', $newGrp );
 		}
 		
 		
@@ -136,6 +153,7 @@ class FlexicontentViewUser extends JViewLegacy
 		$flexiauthor_extdata->load( $author_user_id );
 		//echo "<pre>"; print_r($flexiauthor_extdata); echo "</pre>"; exit;
 		
+		
 		// ***********************
 		// AUTHOR basic parameters
 		// ***********************
@@ -145,26 +163,21 @@ class FlexicontentViewUser extends JViewLegacy
 		// in JParameter is deprecated, instead we will JForm to load XML description and thus be able to render it
 		
 		$auth_xml = JPATH_COMPONENT.DS.'models'.DS.$form_folder.'author.xml';
-		if (FLEXI_J16GE)
-			$params_authorbasic = new JRegistry($flexiauthor_extdata->author_basicparams);
-		else
-			$params_authorbasic = new JParameter($flexiauthor_extdata->author_basicparams, $auth_xml);
+		$params_authorbasic = new JRegistry($flexiauthor_extdata->author_basicparams);
 		//echo "<pre>"; print_r($params_authorbasic); echo "</pre>"; exit;
 		
-		if (FLEXI_J16GE)
-		{
-			// Read XML file
-			$xml_string = str_replace('name="params"', 'name="authorbasicparams"', file_get_contents($auth_xml));
-			
-			// Load the form description from the XML string
-			$jform_authorbasic = new JForm('com_flexicontent.author', array('control' => 'jform', 'load_data' => true));
-			$jform_authorbasic->load($xml_string, $isFile=false);
-			
-			// Set DB parameter values into the JForm object
-			foreach ($jform_authorbasic->getFieldset() as $fsetname =>  $field) {
-				$jform_authorbasic->setValue($field->fieldname, $group = 'authorbasicparams', $value = $params_authorbasic->get($field->fieldname) );
-			}
+		// Read XML file
+		$xml_string = str_replace('name="params"', 'name="authorbasicparams"', file_get_contents($auth_xml));
+		
+		// Load the form description from the XML string
+		$jform_authorbasic = new JForm('com_flexicontent.author', array('control' => 'jform', 'load_data' => true));
+		$jform_authorbasic->load($xml_string, $isFile=false);
+		
+		// Set DB parameter values into the JForm object
+		foreach ($jform_authorbasic->getFieldset() as $fsetname =>  $field) {
+			$jform_authorbasic->setValue($field->fieldname, $group = 'authorbasicparams', $value = $params_authorbasic->get($field->fieldname) );
 		}
+		
 		
 		// **************************
 		// AUTHOR category parameters
@@ -175,25 +188,19 @@ class FlexicontentViewUser extends JViewLegacy
 		// in JParameter is deprecated, instead we will JForm to load XML description and thus be able to render it
 		
 		$cat_xml = JPATH_COMPONENT.DS.'models'.DS.$form_folder.'category.xml';
-		if (FLEXI_J16GE)
-			$params_authorcat = new JRegistry($flexiauthor_extdata->author_catparams);
-		else
-			$params_authorcat = new JParameter($flexiauthor_extdata->author_catparams, $cat_xml);
+		$params_authorcat = new JRegistry($flexiauthor_extdata->author_catparams);
 		//echo "<pre>"; print_r($params_authorcat); echo "</pre>"; exit;
 			
-		if (FLEXI_J16GE)
-		{
-			// Read XML file
-			$xml_string = str_replace('name="params"', 'name="authorcatparams"', file_get_contents($cat_xml));
-			
-			// Load the form description from the XML string
-			$jform_authorcat = new JForm('com_flexicontent.category', array('control' => 'jform', 'load_data' => true));
-			$jform_authorcat->load($xml_string, $isFile=false);
-			
-			// Set DB parameter values into the JForm object
-			foreach ($jform_authorcat->getFieldset() as $fsetname => $field) {
-				$jform_authorcat->setValue($field->fieldname, $group = 'authorcatparams', $value = $params_authorcat->get($field->fieldname) );
-			}
+		// Read XML file
+		$xml_string = str_replace('name="params"', 'name="authorcatparams"', file_get_contents($cat_xml));
+		
+		// Load the form description from the XML string
+		$jform_authorcat = new JForm('com_flexicontent.category', array('control' => 'jform', 'load_data' => true));
+		$jform_authorcat->load($xml_string, $isFile=false);
+		
+		// Set DB parameter values into the JForm object
+		foreach ($jform_authorcat->getFieldset() as $fsetname => $field) {
+			$jform_authorcat->setValue($field->fieldname, $group = 'authorcatparams', $value = $params_authorcat->get($field->fieldname) );
 		}
 		
 		
@@ -204,17 +211,22 @@ class FlexicontentViewUser extends JViewLegacy
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->category;
 		
-		if (FLEXI_J16GE) {
-			$params_author = new JRegistry($user->params);
-		}
-		foreach ($tmpls as $tmpl) {
-			if (FLEXI_J16GE) {
-				$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
-				$jform->load($tmpl->params);
-				$tmpl->params = $jform;
-				// ... values applied at the template form file
-			} else {
-				$tmpl->params->loadINI($flexiauthor_extdata->author_catparams);
+		// Load language file of currently selected template
+		$_clayout = $params_authorcat->get('clayout');
+		if ($_clayout) FLEXIUtilities::loadTemplateLanguageFile( $_clayout );
+		
+		$params_author = new JRegistry($user->params);
+		
+		foreach ($tmpls as $tmpl)
+		{
+			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
+			$jform->load($tmpl->params);
+			$tmpl->params = $jform;
+			foreach ($tmpl->params->getGroup('attribs') as $field)
+			{
+				$fieldname = $field->fieldname;
+				$value = $params_authorcat->get($fieldname);
+				if (strlen($value)) $tmpl->params->setValue($fieldname, 'attribs', $value);
 			}
 		}
 		
@@ -229,7 +241,7 @@ class FlexicontentViewUser extends JViewLegacy
 			$ugrps_qtmpl = 'SELECT group_id FROM #__user_usergroup_map AS ug WHERE ug.user_id = %d';
 			$query = sprintf( $ugrps_qtmpl, intval( $user->get('id') ) );
 			$db->setQuery( $query );
-			$usergroups = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$usergroups = $db->loadColumn();
 			if ($db->getErrorMsg())	echo $db->getErrorMsg();
 		}
 

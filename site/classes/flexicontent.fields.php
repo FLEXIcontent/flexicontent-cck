@@ -3659,7 +3659,7 @@ class FlexicontentFields
 		// indicate to category/search model security not to skip these if they are not IN category/search configured filters list
 		if ($set_method=='httpReq') {
 			count($filter_ids) ?
-				$cparams->set($mfilter_name, FLEXI_J16GE ? $filter_ids : implode( '|', $filter_ids) ) :
+				$cparams->set($mfilter_name, $filter_ids) :
 				$cparams->set($mfilter_name, false );  // FALSE means do not retrieve ALL
 		}
 		

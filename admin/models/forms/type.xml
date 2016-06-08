@@ -8,7 +8,7 @@
 		<option value="1">JPUBLISHED</option>
 		<option value="0">JUNPUBLISHED</option>
 	</field>
-	<field name="itemscreatable" type="radio" default="0" label="FLEXI_PERMIT_SUBMISSION" description="FLEXI_PERMIT_SUBMISSION_DESC" labelclass="label" class="btn-group group-fcmethod">
+	<field name="itemscreatable" type="radio" default="0" filter="int" label="FLEXI_PERMIT_SUBMISSION" description="FLEXI_PERMIT_SUBMISSION_DESC" labelclass="label" class="btn-group group-fcmethod">
 		<option value="0">FLEXI_ANY_AUTHOR</option>
 		<option value="1">FLEXI_USE_ACL_TO_HIDE</option>
 		<option value="2">FLEXI_USE_ACL_TO_DISABLE</option>

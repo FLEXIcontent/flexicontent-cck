@@ -232,8 +232,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			
 			$edit_layout = JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true);
 			flexicontent_html::addToolBarButton(
-				'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', $btn_name='apply_ajax', $full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;", $msg_alert='', $msg_confirm='',
-				$btn_task='items.apply_ajax', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info".$tip_class, $btn_icon="icon-pencil",
+				'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', $btn_name='edit_layout_params', $full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;", $msg_alert='', $msg_confirm='',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info".$tip_class, $btn_icon="icon-pencil",
 				'data-placement="bottom" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;tmpl=component&amp;ismodal=1&amp;folder='.$row_clayout.
 				'" title="Edit the display layout of this category. <br/><br/>Note: this layout maybe assigned to other categories, thus changing it will effect them too"'
 			);
@@ -283,7 +283,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($_clayout) FLEXIUtilities::loadTemplateLanguageFile( $_clayout );
 		
 		// Create JForm for the layout and apply Layout parameters values into the fields
-		foreach ($tmpls as $tmpl) {
+		foreach ($tmpls as $tmpl)
+		{
 			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
 			$jform->load($tmpl->params);
 			$tmpl->params = $jform;

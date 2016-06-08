@@ -13,6 +13,12 @@
 .flexicontent [class*=" icon-"] {
 	width: 16px;
 }
+.fc-rss-params-icon:before {
+	color: yellowgreen !important;
+}
+.fc-display-params-icon:before {
+	color: darkorange !important;
+}
 [class^="fcsb-icon-"],
 [class*=" fcsb-icon-"] {
 	display: inline-block;
@@ -41,6 +47,12 @@
 .icon-itemedit:before,
 .icon-itemadd:before {
 	content: "\2c";
+}
+.fcsb-icon-reviews:before,
+.icon-reviews:before,
+icon-reviewadd:before,
+.icon-reviewedit:before {
+	content: "%";
 }
 .fcsb-icon-types:before,
 .icon-types:before,
