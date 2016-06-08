@@ -497,6 +497,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$option  = $this->getState('option');
 		$params  = $this->_params;
 		$counting=true;
+		$extra_where = '';
 		
 		if ( $query_ids==-1 ) {
 			// Get FROM and JOIN SQL CLAUSES
@@ -504,13 +505,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			// ... count rows
 			// Create sql WHERE clause
-			$where = $this->_buildItemWhere('where', $counting);
+			$where = $this->_buildItemWhere('where', $counting, $extra_where);
 		} else if ( !$query_ids ) {
 			// Get FROM and JOIN SQL CLAUSES
 			$fromjoin = $this->_buildItemFromJoin($counting);
 			
 			// Create sql WHERE clause
-			$where = $this->_buildItemWhere('where', $counting);
+			$where = $this->_buildItemWhere('where', $counting, $extra_where);
 			
 			// Create sql ORDERBY clause -and- set 'order' variable (passed by reference), that is, if frontend user ordering override is allowed
 			$order = '';
@@ -643,13 +644,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		if ( $query_ids==-1 ) {
 			$query .= ""
-				. $where
+				. $where . $extra_where
 				. ' GROUP BY i.id '
 				;
 		} else if ( !$query_ids ) {
 			$query .= ""
 				. @ $orderby_join  // optional
-				. $where
+				. $where . $extra_where
 				//. ' GROUP BY i.id '
 				. $orderby
 				;
@@ -874,7 +875,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access private
 	 * @return array
 	 */
-	function _buildItemWhere( $wherepart='where', $counting = false )
+	function _buildItemWhere( $wherepart='where', $counting = false, &$extra_where = '' )
 	{
 		global $globalcats, $fc_catview;
 		if ( isset($fc_catview[$wherepart]) ) return $fc_catview[$wherepart];
@@ -966,13 +967,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$filters_where = $this->_buildFiltersWhere();
 		$alpha_where   = $this->_buildAlphaIndexWhere();
 		
+		
 		// All items / Normal only / Featured only
 		$flag_featured = (int) $cparams->get('display_flag_featured', 0);
 		
-		// Check if Text Search / Filters / AI are NOT active and LIST-ALL Flag not present
-		// then check if doing a before FORM SUBMIT, "FEATURED ONLY" item list
-		$app->setUserState('use_limit_before_search_filt', 0);
+		
+		// Check if doing a before FORM SUBMIT, "FEATURED ONLY" item list  --  then check if Text Search / Filters / AI are NOT active and LIST-ALL Flag not present
 		$use_limit_before = (int) $cparams->get('use_limit_before_search_filt', 0);
+		
+		$app->setUserState('use_limit_before_search_filt', 0);
 		if ( $use_limit_before )
 		{
 			if ( empty($this->_active_filts) && empty($this->_active_search) && empty($this->_active_ai) && empty($this->_listall) )
@@ -982,12 +985,23 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 		}
 		
-		switch ($flag_featured)
-		{
-			case 1: $where .= ' AND i.featured=0'; break;   // 1: normal only
-			case 2: $where .= ' AND i.featured=1'; break;   // 2: featured only
-			default: break;  // 0: both normal and featured
-		}
+		
+		// Now include featured items according to state calculated above
+		if ( !$app->getUserState('use_limit_before_search_filt', 0) )
+			switch ($flag_featured)
+			{
+				case 1: $where .= ' AND i.featured=0'; break;   // 1: normal only
+				case 2: $where .= ' AND i.featured=1'; break;   // 2: featured only
+				default: break;  // 0: both normal and featured
+			}
+		else
+			switch ($flag_featured)
+			{
+				case 1: $extra_where .= ' AND i.featured=0'; break;   // 1: normal only
+				case 2: $extra_where .= ' AND i.featured=1'; break;   // 2: featured only
+				default: break;  // 0: both normal and featured
+			}
+		
 		
 		$fc_catview['filters_where'] = $filters_where;
 		$fc_catview['alpha_where'] = $alpha_where;
