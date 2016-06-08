@@ -147,6 +147,15 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			$groupname = 'attribs';  // name="..." of <fields> container
 		}
 		
+		else if ($ext_view=='user')
+		{
+			$query = 'SELECT author_catparams FROM #__flexicontent_authors_ext WHERE user_id = '.$ext_id;
+			// Load language file of the template
+			FLEXIUtilities::loadTemplateLanguageFile( $ext_name );
+			$path = JPATH::clean(JPATH_COMPONENT_SITE.DS.'templates'.DS.$directory);
+			$groupname = 'attribs';  // name="..." of <fields> container
+		}
+		
 		else if ($ext_view=='module')
 		{
 			$query = 'SELECT params FROM #__modules WHERE id = '.$ext_id;

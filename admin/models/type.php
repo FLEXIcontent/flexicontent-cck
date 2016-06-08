@@ -408,7 +408,7 @@ class FlexicontentModelType extends JModelAdmin
 				. ' WHERE iscore = 1'
 				;
 		$this->_db->setQuery($query);
-		$corefields = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$corefields = $this->_db->loadColumn();
 		
 		return $corefields;
 	}
@@ -424,7 +424,8 @@ class FlexicontentModelType extends JModelAdmin
 	 *
 	 * @since   1.6
 	 */
-	public function getForm($data = array(), $loadData = true) {
+	public function getForm($data = array(), $loadData = true)
+	{
 		// Initialise variables.
 		$app = JFactory::getApplication();
 
@@ -433,10 +434,13 @@ class FlexicontentModelType extends JModelAdmin
 		if (empty($form)) {
 			return false;
 		}
-
+		$form->option = $this->option;
+		$form->context = $this->getName();
+		
 		return $form;
 	}
-
+	
+	
 	/**
 	 * Method to get the data that should be injected in the form.
 	 *
@@ -444,14 +448,21 @@ class FlexicontentModelType extends JModelAdmin
 	 *
 	 * @since   1.6
 	 */
-	protected function loadFormData() {
+	protected function loadFormData()
+	{
 		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
-
+		$app = JFactory::getApplication();
+		$data = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
+		
+		// Clear form data from session ?
+		$app->setUserState('com_flexicontent.edit.'.$this->getName().'.data', false);
+		
 		if (empty($data)) {
 			$data = $this->getItem($this->_id);
 		}
 
+		$this->preprocessData('com_flexicontent.'.$this->getName(), $data);
+		
 		return $data;
 	}
 

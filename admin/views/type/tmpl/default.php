@@ -111,7 +111,7 @@ $this->document->addScriptDeclaration($js);
 				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
 				//echo JHtml::_('sliders.panel',JText::_($label), $fsname.'-options');
 				if (isset($fieldSet->description) && trim($fieldSet->description)) :
-					echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 				endif;
 				
 				foreach ($this->form->getFieldset($fsname) as $field) :
@@ -144,7 +144,7 @@ $this->document->addScriptDeclaration($js);
 <?php
 			//echo JHtml::_('sliders.panel',JText::_($label), $fsname.'-options');
 			if (isset($fieldSet->description) && trim($fieldSet->description)) :
-				echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+				echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 			endif;
 			
 			foreach ($this->form->getFieldset($fsname) as $field) :

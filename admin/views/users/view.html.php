@@ -282,10 +282,35 @@ class FlexicontentViewUsers extends JViewLegacy
 	 */
 	function setToolbar()
 	{
+		$document = JFactory::getDocument();
 		$perms = FlexicontentHelperPerm::getPerm();
 		$contrl = "users.";
 		JToolBarHelper::custom( 'logout', 'cancel.png', 'cancel_f2.png', 'Logout' );
-		JToolBarHelper::addNew($contrl.'add');
+		
+		//JToolBarHelper::addNew($contrl.'add');
+		JText::script("FLEXI_UPDATING_CONTENTS", true);
+		$document->addScriptDeclaration('
+			function fc_edit_juser_modal_load( container ) {
+				if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=users") != -1 )
+				{
+					container.dialog("close");
+				}
+			}
+			function fc_edit_juser_modal_close() {
+				window.location.reload();
+				document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+			}
+		');
+		
+		$modal_title = JText::_('Add new Joomla user', true);
+		$tip_class = ' hasTooltip';
+		JToolBarHelper::divider();
+		flexicontent_html::addToolBarButton(
+			'FLEXI_BE_NEW', $btn_name='add_juser', $full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;", $msg_alert='', $msg_confirm='',
+			$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn btn-small btn-success".$tip_class, $btn_icon="icon-new icon-white",
+			'data-placement="bottom" data-href="index.php?option=com_users&task=user.edit&id=0" title="Add new Joomla user"'
+		);
+		
 		JToolBarHelper::editList($contrl.'edit');
 		
 		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');

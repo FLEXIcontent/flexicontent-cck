@@ -195,7 +195,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		$post = $model->validate($form, $data);
 		
 		// Check for validation error
-		if (!$post) {
+		if (!$post)
+		{
 			// Get the validation messages and push up to three validation messages out to the user
 			$errors	= $form->getErrors();
 			for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++) {
@@ -613,6 +614,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 		$this->setRedirect($link, $msg);
+		//return;  // comment above and decomment this one to profile the saving operation
 		
 		if ( JRequest::getVar('fc_doajax_submit') ) {
 			JFactory::getApplication()->enqueueMessage($msg, 'message');

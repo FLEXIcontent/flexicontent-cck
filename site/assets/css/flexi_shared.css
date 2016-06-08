@@ -706,7 +706,7 @@ table.adminform td #search {
 	border: 0px solid;
 	white-space: normal;
 	display: inline-block;
-	width: 15%;
+	width: 20%;
 	min-width: 90px;
 	max-width: 150px;
 	float: left;
@@ -762,9 +762,14 @@ body .nowrap_box .container_fcfield,
 }
 #flexicontent .span6.full_width_980 {
 	width: 50%;
-	padding: 0 32px 0 0;
+}
+#flexicontent .full_width_980 {
+	padding: 0;
 	margin: 0%;
 	box-sizing: border-box;
+}
+#flexicontent .full_width_980:first-child {
+	padding: 0 32px 0 0;
 }
 #flexicontent .span6.full_width_980.padded_wrap_box {
 	padding: 0;
@@ -776,8 +781,39 @@ body .nowrap_box .container_fcfield,
 		margin: 0% !important;
 		clear: both !important;
 	}
-	#flexicontent .padded_wrap_box {
+	#flexicontent .full_width_980.padded_wrap_box {
 		margin-top: 48px !important;
+	}
+}
+#flexicontent .span6.full_width_1340 {
+	width: 50%;
+}
+#flexicontent .full_width_1340 {
+	padding: 0;
+	margin: 0%;
+	box-sizing: border-box;
+}
+#flexicontent .full_width_1340:first-child {
+	padding: 0 32px 0 0;
+}
+#flexicontent .full_width_1340.padded_wrap_box {
+	padding: 0;
+}
+@media (max-width: 1339px) {
+	#flexicontent .full_width_1340 {
+		width: 100% !important;
+		padding: 0% !important;
+		margin: 0% !important;
+		clear: both !important;
+	}
+	#flexicontent .full_width_1340.padded_wrap_box {
+		margin-top: 48px !important;
+	}
+}
+@media (max-width: 1619px) {
+	body .full_width_1340 input.input-xxlarge,
+	#flexicontent .full_width_1340 input.input-xxlarge {
+		width: 75%;
 	}
 }
 @media (max-width: 1660px) {

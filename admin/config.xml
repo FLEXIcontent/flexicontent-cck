@@ -34,15 +34,6 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field-->
-			
-			<field name="filtercat" type="radio" default="1" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="filtertag" type="radio" default="1" label="FLEXI_FILTER_TAG_VIEWS" description="FLEXI_FILTER_TAG_VIEWS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 
 		<!--field name="" type="separator" default="FLEXI_GENERAL_CONF" label="" level="level0" /-->
 			
@@ -367,6 +358,10 @@
 			<field name="tags_view_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=tags%%id=0" default="" disable="separator" state="1" published="1" label="FLEXI_TAGGED_ITEMS" description="FLEXI_TAGS_DEFAULT_MENU_ITEMID_DESC">
 				<option value="">FLEXI_NONE</option>
 			</field>
+			<field name="filtertag" type="radio" default="1" label="FLEXI_FILTER_TAG_VIEWS" description="FLEXI_FILTER_TAG_VIEWS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<!--field name="" type="separator" default="FLEXI_FAVS_VIEW_CONF" label="" level="level3" /-->
 			<field name="favs_view_default_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=favourites" default="" disable="separator" state="1" published="1" label="FLEXI_FAVOURED_ITEMS" description="FLEXI_FAVS_DEFAULT_MENU_ITEMID_DESC">
@@ -399,43 +394,11 @@
 			<field name="catlimit" type="text" size="4" default="100" label="FLEXI_DIRECTORY_CAT_LIST_LIMIT" description="FLEXI_DIRECTORY_CAT_LIST_LIMIT_DESC"/>
 			
 	</fieldset>
-	<fieldset name="lists_template_fset" label="FLEXI_LISTS_TEMPLATE_CONF" description="" >
+	<fieldset name="lists_catdata_fset" label="FLEXI_LISTS_HEADER_CONF" description="" >
 		
-		<field name="" type="separator" default="FLEXI_TEMPLATES" label="" level="level0" />
-		<field name="" type="separator" default="FLEXI_SUPPORTED_LIST_VIEWS" label="" level="level4" class="alert alert-info fcpadded" />
-			
-			<field name="clayout" type="categorylayout" default="blog" label="FLEXI_DEFAULT_CATEGORY_LAYOUT" description="FLEXI_DEFAULT_CATEGORY_LAYOUT_DESC"
-				inline_tip="FLEXI_HOW_TO_CUSTOMIZE_LAYOUT_CONF" tip_class="" tip_img="comment.png" class="use_select2_lib" />
-			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
-			
-			<field name="less_folders" type="textarea" default="JPATH_COMPONENT_SITE/assets/less/ ::&#10;JTEMPLATE_SITE/less/com_flexicontent/ ::&#10;" cols="60" rows="3" label="FLEXI_LESS_GLOBAL_INC_FOLDERS" description="FLEXI_LESS_GLOBAL_INC_FOLDERS_DESC" class="input-xxlarge" />
-			
-			<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="..." level="level2" />
-			<field name="" type="separator" default="FLEXI_CATEGORY_LAYOUT_SWITCHER" description="" level="level3" />
-			<field name="clayout_switcher" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_DISPLAY" description="FLEXI_CATEGORY_LAYOUT_SWITCHER_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="clayout_selector_on">FLEXI_NO</option>
-				<option value="1" show_list="clayout_selector_on" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="clayout_switcher_display_mode" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_CATEGORY_LAYOUT_SWITCHER_DISPLAY_MODE" description="FLEXI_CATEGORY_LAYOUT_SWITCHER_DISPLAY_MODE_DESC" class="btn-group group-fcinfo">
-				<option value="0">Drop-down select</option>
-				<option value="1">Radio-image</option>
-			</field>
-			<field name="clayout_switcher_label" type="radio" default="0" label="FLEXI_LABEL" description="..." class="limit_override_display btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_OUTSIDE</option>
-				<option value="2">FLEXI_INSIDE</option>
-			</field>
-			<field name="displayed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_DISPLAYED_CATEGORY_LAYOUTS" description="FLEXI_DISPLAYED_CATEGORY_LAYOUTS_DESC" labelclass="label-success" class="clayout_selector_on"/>
-			<field name="" type="separator" default="URL / Links" description="" level="level3" />
-			<field name="allowed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_ALLOWED_CATEGORY_LAYOUTS" description="FLEXI_ALLOWED_CATEGORY_LAYOUTS_DESC" labelclass="label-success" class="" />
-						
-	</fieldset>
-	<fieldset name="lists_catdata_fset" label="FLEXI_LISTS_CATDATA_CONF" description="" >
-		
-		<field name="" type="separator" default="FLEXI_CATEGORY_DATA" label="" level="level0" />
 		<field name="" type="separator" default="FLEXI_SUPPORTED_LIST_VIEWS" label="" level="level4" class="alert alert-info fcpadded" />
 		
-			<field name="" type="separator" default="FLEXI_PARAMETERS_CAT_INFO_OPTIONS" label="" level="level1" />
+			<field name="" type="separator" default="FLEXI_PARAMETERS_CAT_INFO_OPTIONS" label="" level="level0" />
 			
 			<field name="" type="separator" default="FLEXI_CATEGORY_EXTRA" level="level2" />
 			<field name="show_feed_link" type="radio" default="1" label="FLEXI_ADD_FEED_TO_HEAD" description="FLEXI_ADD_FEED_TO_HEAD_DESC" class="btn-group btn-group-yesno">
@@ -486,7 +449,7 @@
 			</field>
 			
 			
-		<field name="" type="separator" default="FLEXI_PARAMETERS_SUBCATS_INFO_OPTIONS" level="level0" />
+		<field name="" type="separator" default="FLEXI_PARAMS_SUBCATS_INFO_OPTIONS" level="level0" />
 			
 			<field name="show_subcategories" type="multilist" subtype="radio" default="0" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC" toggle_related="0" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_subcats">FLEXI_HIDE</option>
@@ -651,176 +614,9 @@
 			<field name="peercat_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="disp_peercats input-xxlarge" />
 			<field name="peercat_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="disp_peercats input-xxlarge" />
 			
-
 	</fieldset>
-	<fieldset name="lists_itemdata_fset" label="FLEXI_LISTS_ITEMDATA_CONF" description="" >
+	<fieldset name="lists_search_n_filter_form_fset" label="FLEXI_LISTS_SEARCH_N_FILTER_CONF" description="" >
 		
-		<field name="" type="separator" default="FLEXI_ITEMS_LIST_CREATION_CONF" label="" level="level0" />
-		<field name="" type="separator" default="FLEXI_SUPPORTED_LIST_VIEWS" label="" level="level4" class="alert alert-info fcpadded" />
-			
-			<field name="" type="separator" default="FLEXI_ITEMS_LIST" description="" level="level1" />
-			
-			<field name="show_addbutton" type="multilist" subtype="radio" default="1" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_LIST_BUTTON_DESC" toggle_related="0" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="disp_addbtn">FLEXI_HIDE</option>
-				<option value="1" show_list="disp_addbtn" hide_list="">FLEXI_SHOW</option>
-			</field>
-			<field name="addbutton_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=item%%layout=form" default="" label="FLEXI_ADD_TO_LIST_BTN_MENU_ITEM" description="FLEXI_ADD_TO_LIST_BTN_MENU_ITEM_DESC" class="disp_addbtn">
-				<option value="">FLEXI_NONE</option>
-			</field>
-			<field name="show_editbutton_lists" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS" description="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_LINK_TO_FE</option>
-				<option value="2">FLEXI_LINK_TO_BE</option>
-			</field>
-			<field name="show_comments_count" type="radio" default="1" label="FLEXI_SHOW_COMMENTS_COUNTER" description="FLEXI_SHOW_COMMENTS_COUNTER_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			<field name="show_title_lists" type="multilist" subtype="radio" default="1" label="FLEXI_SHOWTITLE_IN_LISTS" toggle_related="0" description="FLEXI_SHOWTITLE_IN_LISTS_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="disp_title_lists">FLEXI_HIDE</option>
-				<option value="1" show_list="disp_title_lists" hide_list="">FLEXI_SHOW</option>
-			</field>
-			<field name="link_titles_lists" type="radio" default="1" label="FLEXI_LINKED_TITLES_IN_LISTS" description="FLEXI_LINKED_TITLES_IN_LISTS_DESC" class="disp_title_lists btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="force_full" type="radio" default="0" label="FLEXI_FORCE_FULLTXT" description="FLEXI_FORCE_FULLTXT_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="show_readmore" type="radio" default="-1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-				<option value="-1">FLEXI_SHOW_ALWAYS</option>
-			</field>
-
-			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="" level="level1" />
-			
-			<field name="non_orderable_types" type="textarea" default="account_via_submit,authoritems,toolbar,image,groupmarker,fcpagenav,minigallery,weblink,extendedweblink,email,fcloadmodule" cols="60" rows="2" label="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS" description="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS_DESC" class="input-xxlarge" />
-			
-			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
-			<field name="orderby" type="fcordering" default="rdate" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC"/>
-			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
-			<field name="orderbycustomfield" type="multilist" subtype="radio" default="1" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" toggle_related="0" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="customorder1_ops">FLEXI_NO</option>
-				<option value="1" show_list="customorder1_ops" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="orderbycustomfieldid" type="fields" default="0" orderable="1" isnotcore="1" display_useglobal="0"
-				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" class="customorder1_ops" />
-			<field name="orderbycustomfielddir" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" class="customorder1_ops btn-group group-fcinfo">
-				<option value="ASC">FLEXI_ASC</option>
-				<option value="DESC">FLEXI_DESC</option>
-			</field>
-			<field name="orderbycustomfieldint" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" class="customorder1_ops btn-group group-fcinfo">
-				<option value="0">FLEXI_TEXT</option>
-				<option value="1">FLEXI_INTEGER</option>
-				<option value="2">FLEXI_FLOAT</option>
-				<option value="3">FLEXI_DATE</option>
-				<option value="4">FLEXI_DOWNLOAD_HITS</option>
-			</field>
-			<field name="" type="separator" default="FLEXI_ABOUT_FILE_FIELD_ORDERING" description="" level="level4" class="alert alert-info fcppaded" />
-			
-			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_2ND_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
-			<field name="orderby_2nd" type="fcordering" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC"/>
-			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
-			<field name="orderbycustomfield_2nd" type="multilist" subtype="radio" default="1" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" toggle_related="0" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="customorder2_ops">FLEXI_NO</option>
-				<option value="1" show_list="customorder2_ops" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="orderbycustomfieldid_2nd" type="fields" default="0" orderable="1" isnotcore="1" display_useglobal="0"
-				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" class="customorder2_ops"/>
-			<field name="orderbycustomfielddir_2nd" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" class="customorder2_ops btn-group group-fcinfo">
-				<option value="ASC">FLEXI_ASC</option>
-				<option value="DESC">FLEXI_DESC</option>
-			</field>
-			<field name="orderbycustomfieldint_2nd" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" class="customorder2_ops btn-group group-fcinfo">
-				<option value="0">FLEXI_TEXT</option>
-				<option value="1">FLEXI_INTEGER</option>
-				<option value="2">FLEXI_FLOAT</option>
-				<option value="3">FLEXI_DATE</option>
-				<option value="4">FLEXI_DOWNLOAD_HITS</option>
-			</field>
-			<field name="" type="separator" default="FLEXI_ABOUT_FILE_FIELD_ORDERING" description="" level="level4" class="alert alert-info fcppaded" />
-			
-			<field name="" type="separator" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level1" />
-			<field name="show_noauth" type="multilist" subtype="radio" default="0" label="FLEXI_SHOW_UNAUTHORIZED_LINKS" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC" toggle_related="0" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="noauthor_display">FLEXI_NO</option>
-				<option value="1" show_list="noauthor_display" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC" class="noauthor_display btn-group btn-group-yesno"> 
-				<option value="0">FLEXI_NO</option> 
-				<option value="1">FLEXI_DISPLAY_SUBCATS_1ST_SUBLEVEL</option> 
-				<option value="2">FLEXI_DISPLAY_SUBCATS_ALL_SUBLEVELS</option> 
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_DISPLAY_FEATURED_ITEMS" description="FLEXI_DISPLAY_FEATURED_ITEMS_DESC" level="level3" />
-			<field name="display_flag_featured" type="radio" default="0" label="FLEXI_DISPLAY_FLAG_FEATURED" description="FLEXI_DISPLAY_FLAG_FEATURED_DESC" class="btn-group btn-group-yesno"> 
-				<option value="0">FLEXI_BOTH</option>
-				<option value="1">FLEXI_NORMAL_ONLY</option>
-				<option value="2">FLEXI_FEATURED_ONLY</option> 
-			</field>
-			<!--field name="display_cats_featured" type="list" default="0" label="FLEXI_DISPLAY_CATS_FEATURED" description="FLEXI_DISPLAY_CATS_FEATURED_DESC"> 
-				<option value="0">FLEXI_BOTH</option>
-				<option value="1">FLEXI_NORMAL_ONLY</option>
-				<option value="2">FLEXI_FEATURED_ONLY</option>
-				<option value="3">FLEXI_EXCLUDE_SPECIFIC</option>
-			</field-->
-			
-		<field name="" type="separator" default="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" level="level1" />
-			<field name="show_item_total" type="radio" default="1" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" />
-			<field name="show_pagination" type="radio" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-				<option value="2">Auto</option>
-			</field>
-			<field name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			
-		<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level1" />
-			<field name="limit_override" type="multilist" subtype="radio" default="1" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" toggle_related="0" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="limit_override_display">FLEXI_NO</option>
-				<option value="1" show_list="limit_override_display" hide_list="">FLEXI_YES</option>
-			</field>
-			<field name="limit_override_label" type="radio" default="2" label="FLEXI_NUM_PER_PAGE_LABEL" description="FLEXI_NUM_PER_PAGE_LABEL_DESC" class="limit_override_display btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_OUTSIDE</option>
-				<option value="2">FLEXI_INSIDE</option>
-			</field>
-			
-			<field name="orderby_override" type="multilist" subtype="radio" default="1" label="FLEXI_USE_ORDERBY_SELECTOR_1ST" description="FLEXI_USE_ORDERBY_SELECTOR_1ST_DESC" toggle_related="0" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="orderby_override_display">FLEXI_HIDE</option>
-				<option value="1" show_list="orderby_override_display" hide_list="">FLEXI_SHOW</option>
-			</field>
-			<field name="orderby_override_2nd" type="multilist" subtype="radio" default="0" label="FLEXI_USE_ORDERBY_SELECTOR_2ND" description="FLEXI_USE_ORDERBY_SELECTOR_2ND_DESC" toggle_related="0" class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="orderby_override2_display">FLEXI_HIDE</option>
-				<option value="1" show_list="orderby_override2_display" hide_list="">FLEXI_SHOW</option>
-			</field>
-			<field name="" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" />
-			<field name="limit_options" type="text" default="5,10,20,30,50,100,150,200" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" class="limit_override_display input-xxlarge" />
-			
-			<field name="orderby_options" type="fccheckbox" default="" display_useglobal="0" class="orderby_override_display"
-				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST,FLEXI_ORDER_OLDEST_PUBLISHED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_MOST_COMMENTED,FLEXI_ORDER_BEST_RATED,FLEXI_ORDER_CONFIGURED_ORDER,FLEXI_ORDER_RANDOM,FLEXI_ORDER_ALIAS,FLEXI_ORDER_ALIAS_REVERSE"
-				checkvals="_preconfigured_,date,rdate,modified,published,published_oldest,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order,random,alias,ralias"
-				defaultvals="_preconfigured_,date,rdate,modified,published,alpha,ralpha,hits,id,commented,rated"
-				label="FLEXI_ORDER_OPTIONS_1ST" description="FLEXI_ORDER_OPTIONS_DESC" />
-			<field name="orderby_custom" type="textarea" rows="3" default="" label="FLEXI_ORDER_OPTIONS_CUSTOM_1ST" description="FLEXI_ORDER_OPTIONS_CUSTOM_V2_DESC" class="orderby_override_display input-xxlarge" />
-			
-			<field name="orderby_options_2nd" type="fccheckbox" default="" display_useglobal="0" class="orderby_override2_display"
-				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST,FLEXI_ORDER_OLDEST_PUBLISHED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_MOST_COMMENTED,FLEXI_ORDER_BEST_RATED,FLEXI_ORDER_CONFIGURED_ORDER,FLEXI_ORDER_RANDOM,FLEXI_ORDER_ALIAS,FLEXI_ORDER_ALIAS_REVERSE"
-				checkvals="_preconfigured_,date,rdate,modified,published,published_oldest,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order,random,alias,ralias"
-				defaultvals="_preconfigured_,date,rdate,modified,published,alpha,ralpha,hits,id,commented,rated"
-				label="FLEXI_ORDER_OPTIONS_2ND" description="FLEXI_ORDER_OPTIONS_DESC" />
-			<field name="orderby_custom_2nd" type="textarea" rows="3" default="" label="FLEXI_ORDER_OPTIONS_CUSTOM_2ND" description="FLEXI_ORDER_OPTIONS_CUSTOM_V2_DESC" class="orderby_override2_display input-xxlarge" />
-			
-	</fieldset>
-	<fieldset name="lists_filtering_fset" label="FLEXI_LISTS_FILTERING_CONF" description="" >
-			
 		<field name="" type="separator" default="FLEXI_ITEM_FILTERING_CONF" description="" level="level0" />
 		<field name="" type="separator" default="FLEXI_SUPPORTED_LIST_VIEWS" label="" level="level4" class="alert alert-info fcpadded" />
 		
@@ -828,10 +624,10 @@
 			<field name="" type="separator" default="FLEXI_ENABLE_SEARCH_FILTERS_AI_INDIVIDUALLY_INFO" label="" level="level4" class="alert alert-warning" />
 			
 			<field name="ff_placement" type="multilist" subtype="radio" default="0" label="FLEXI_SEARCH_FILTER_FORM_PLACEMENT" description="FLEXI_SEARCH_FILTER_FORM_PLACEMENT_DESC" toggle_related="0" class="btn-group group-fcsuccess">
-				<option value="0" show_list="" hide_list="searchform_inslider">FLEXI_SEARCH_FILTER_FORM_INLINE</option>
-				<option value="1" show_list="searchform_inslider" hide_list="">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
+				<option value="0">FLEXI_SEARCH_FILTER_FORM_INLINE</option>
+				<option value="1">FLEXI_SEARCH_FILTER_FORM_SLIDER</option>
 			</field>
-			<field name="ff_toggle_search_title" type="text" size="20" default="FLEXI_TOGGLE_SEARCH_FORM" label="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE" description="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE_DESC" class="searchform_inslider input-xxlarge" />
+			<field name="ff_toggle_search_title" type="text" size="20" default="FLEXI_TOGGLE_SEARCH_FORM" label="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE" description="FLEXI_TOGGLE_SEARCH_FORM_CUSTOM_TITLE_DESC" class="input-xxlarge" />
 			<field name="filter_autosubmit" type="radio" default="0" label="FLEXI_FILTER_FORM_AUTO_SUBMIT" description="FLEXI_FILTER_FORM_AUTO_SUBMIT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -841,15 +637,6 @@
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
-			
-			<field name="" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT" description="" level="level3" />
-			<field name="" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT_DESC" label="" level="level4" class="alert alert-info fcpadded" />
-			<field name="use_limit_before_search_filt" type="multilist" subtype="radio" default="0" toggle_related="0" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
-				<option value="0" show_list="" hide_list="limit_before_search_filt">FLEXI_NO</option>
-				<option value="1" show_list="limit_before_search_filt" hide_list="">FLEXI_YES</option>
-				<option value="2" show_list="limit_before_search_filt" hide_list="">FLEXI_FEATURED_ONLY</option>
-			</field>
-			<field name="limit_before_search_filt" type="text" size="4" default="0" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" class="limit_before_search_filt" />
 			
 			<field name="" type="separator" default="FLEXI_BUTTONS" label="" level="level3" />
 			<field name="" type="separator" default="FLEXI_SEARCH_GO_BUTTON" label="" level="level4" class="alert alert-info fcpadded" />
@@ -952,7 +739,7 @@
 			<field name="initial_filters" default="" type="textarea" rows="5" cols="60" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" class="filter_display input-xxlarge" />
 
 			<field name="" type="separator" default="FLEXI_LOCKED_FILTERS" description="" level="level3" />
-			<field name="use_persistent_filters" inline_tip="FLEXI_FIELDS_MUST_BE_SET_AS_FILTERABLE" tip_class="" tip_img="note.gif"  default="0" label="FLEXI_USE_LOCKED_FILTERS" description="FLEXI_USE_LOCKED_FILTERS_DESC" class="btn-group btn-group-yesno">
+			<field name="use_persistent_filters" type="multilist" subtype="radio" inline_tip="FLEXI_FIELDS_MUST_BE_SET_AS_FILTERABLE" tip_class="" tip_img="note.gif"  default="0" label="FLEXI_USE_LOCKED_FILTERS" description="FLEXI_USE_LOCKED_FILTERS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -971,7 +758,226 @@
 			</field>
 			
 	</fieldset>
-	<fieldset name="lists_markups_fset" label="FLEXI_LISTS_MARKUPS_CONF" description="" >
+	<fieldset name="lists_template_fset" label="FLEXI_LISTS_LAYOUTS_CONF" description="" >
+		
+		<field name="" type="separator" default="FLEXI_LAYOUTS" label="" level="level0" />
+		<field name="" type="separator" default="FLEXI_SUPPORTED_LIST_VIEWS" label="" level="level4" class="alert alert-info fcpadded" />
+			
+			<field name="clayout" type="categorylayout" default="blog" label="FLEXI_DEFAULT_CATEGORY_LAYOUT" description="FLEXI_DEFAULT_CATEGORY_LAYOUT_DESC"
+				inline_tip="FLEXI_HOW_TO_CUSTOMIZE_LAYOUT_CONF" tip_class="" tip_img="comment.png" class="use_select2_lib" />
+			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
+			
+			<field name="less_folders" type="textarea" default="JPATH_COMPONENT_SITE/assets/less/ ::&#10;JTEMPLATE_SITE/less/com_flexicontent/ ::&#10;" cols="60" rows="3" label="FLEXI_LESS_GLOBAL_INC_FOLDERS" description="FLEXI_LESS_GLOBAL_INC_FOLDERS_DESC" class="input-xxlarge" />
+			
+			<field name="" type="separator" default="FLEXI_CATEGORY_LAYOUT_SWITCHER" description="" level="level1" />
+			<field name="clayout_switcher" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_DISPLAY" description="FLEXI_CATEGORY_LAYOUT_SWITCHER_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="clayout_selector_on">FLEXI_NO</option>
+				<option value="1" show_list="clayout_selector_on" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="clayout_switcher_display_mode" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_CATEGORY_LAYOUT_SWITCHER_DISPLAY_MODE" description="FLEXI_CATEGORY_LAYOUT_SWITCHER_DISPLAY_MODE_DESC" class="btn-group group-fcinfo">
+				<option value="0">Drop-down select</option>
+				<option value="1">Radio-image</option>
+			</field>
+			<field name="clayout_switcher_label" type="radio" default="0" label="FLEXI_LABEL" description="..." class="limit_override_display btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_OUTSIDE</option>
+				<option value="2">FLEXI_INSIDE</option>
+			</field>
+			<field name="displayed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_DISPLAYED_CATEGORY_LAYOUTS" description="FLEXI_DISPLAYED_CATEGORY_LAYOUTS_DESC" labelclass="label-success" class="clayout_selector_on"/>
+			<field name="" type="separator" default="URL / Links" description="" level="level3" />
+			<field name="allowed_clayouts" type="clayoutlist" default="" multiple="true" size="12" label="FLEXI_ALLOWED_CATEGORY_LAYOUTS" description="FLEXI_ALLOWED_CATEGORY_LAYOUTS_DESC" labelclass="label-success" class="" />
+						
+	</fieldset>
+	<fieldset name="lists_itemdata_fset" label="FLEXI_LISTS_BASIC_N_ORDERING_CONF" description="" >
+		
+		<field name="" type="separator" default="FLEXI_ITEMS_LIST_CREATION_CONF" label="" level="level0" />
+		<field name="" type="separator" default="FLEXI_SUPPORTED_LIST_VIEWS" label="" level="level4" class="alert alert-info fcpadded" />
+			
+			<field name="" type="separator" default="FLEXI_BASIC_DISPLAY" description="" level="level1" />
+			
+			<field name="show_addbutton" type="multilist" subtype="radio" default="1" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_LIST_BUTTON_DESC" toggle_related="0" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp_addbtn">FLEXI_HIDE</option>
+				<option value="1" show_list="disp_addbtn" hide_list="">FLEXI_SHOW</option>
+			</field>
+			<field name="addbutton_menu_itemid" type="fcmenuitem" component="com_flexicontent" link_filters="view=item%%layout=form" default="" label="FLEXI_ADD_TO_LIST_BTN_MENU_ITEM" description="FLEXI_ADD_TO_LIST_BTN_MENU_ITEM_DESC" class="disp_addbtn">
+				<option value="">FLEXI_NONE</option>
+			</field>
+			<field name="show_editbutton_lists" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS" description="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_LINK_TO_FE</option>
+				<option value="2">FLEXI_LINK_TO_BE</option>
+			</field>
+			<field name="show_comments_count" type="radio" default="1" label="FLEXI_SHOW_COMMENTS_COUNTER" description="FLEXI_SHOW_COMMENTS_COUNTER_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_title_lists" type="multilist" subtype="radio" default="1" label="FLEXI_SHOWTITLE_IN_LISTS" toggle_related="0" description="FLEXI_SHOWTITLE_IN_LISTS_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp_title_lists">FLEXI_HIDE</option>
+				<option value="1" show_list="disp_title_lists" hide_list="">FLEXI_SHOW</option>
+			</field>
+			<field name="link_titles_lists" type="radio" default="1" label="FLEXI_LINKED_TITLES_IN_LISTS" description="FLEXI_LINKED_TITLES_IN_LISTS_DESC" class="disp_title_lists btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="force_full" type="radio" default="0" label="FLEXI_FORCE_FULLTXT" description="FLEXI_FORCE_FULLTXT_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_readmore" type="radio" default="-1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+				<option value="-1">FLEXI_SHOW_ALWAYS</option>
+			</field>
+
+
+			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="" level="level1" />
+			
+			<field name="non_orderable_types" type="textarea" default="account_via_submit,authoritems,toolbar,image,groupmarker,fcpagenav,minigallery,weblink,extendedweblink,email,fcloadmodule" cols="60" rows="2" label="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS" description="FLEXI_NON_ORDERABLE_CUSTOM_FIELDS_DESC" class="input-xxlarge" />
+			
+			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
+			<field name="orderby" type="fcordering" default="rdate" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC"/>
+			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
+			<field name="orderbycustomfield" type="multilist" subtype="radio" default="1" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" toggle_related="0" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="customorder1_ops">FLEXI_NO</option>
+				<option value="1" show_list="customorder1_ops" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="orderbycustomfieldid" type="fields" default="0" orderable="1" isnotcore="1" display_useglobal="0"
+				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" class="customorder1_ops" />
+			<field name="orderbycustomfielddir" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" class="customorder1_ops btn-group group-fcinfo">
+				<option value="ASC">FLEXI_ASC</option>
+				<option value="DESC">FLEXI_DESC</option>
+			</field>
+			<field name="orderbycustomfieldint" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" class="customorder1_ops btn-group group-fcinfo">
+				<option value="0">FLEXI_TEXT</option>
+				<option value="1">FLEXI_INTEGER</option>
+				<option value="2">FLEXI_FLOAT</option>
+				<option value="3">FLEXI_DATE</option>
+				<option value="4">FLEXI_DOWNLOAD_HITS</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_ABOUT_FILE_FIELD_ORDERING" description="" level="level4" class="alert alert-info fcppaded" />
+			
+			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_2ND_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
+			<field name="orderby_2nd" type="fcordering" default="alpha" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC"/>
+			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
+			<field name="orderbycustomfield_2nd" type="multilist" subtype="radio" default="1" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" toggle_related="0" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="customorder2_ops">FLEXI_NO</option>
+				<option value="1" show_list="customorder2_ops" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="orderbycustomfieldid_2nd" type="fields" default="0" orderable="1" isnotcore="1" display_useglobal="0"
+				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" class="customorder2_ops"/>
+			<field name="orderbycustomfielddir_2nd" type="radio" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" class="customorder2_ops btn-group group-fcinfo">
+				<option value="ASC">FLEXI_ASC</option>
+				<option value="DESC">FLEXI_DESC</option>
+			</field>
+			<field name="orderbycustomfieldint_2nd" type="radio" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" class="customorder2_ops btn-group group-fcinfo">
+				<option value="0">FLEXI_TEXT</option>
+				<option value="1">FLEXI_INTEGER</option>
+				<option value="2">FLEXI_FLOAT</option>
+				<option value="3">FLEXI_DATE</option>
+				<option value="4">FLEXI_DOWNLOAD_HITS</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_ABOUT_FILE_FIELD_ORDERING" description="" level="level4" class="alert alert-info fcppaded" />
+			
+			<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level2" />
+			
+			<field name="orderby_override" type="multilist" subtype="radio" default="1" label="FLEXI_USE_ORDERBY_SELECTOR_1ST" description="FLEXI_USE_ORDERBY_SELECTOR_1ST_DESC" toggle_related="0" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="orderby_override_display">FLEXI_HIDE</option>
+				<option value="1" show_list="orderby_override_display" hide_list="">FLEXI_SHOW</option>
+			</field>
+			<field name="orderby_override_2nd" type="multilist" subtype="radio" default="0" label="FLEXI_USE_ORDERBY_SELECTOR_2ND" description="FLEXI_USE_ORDERBY_SELECTOR_2ND_DESC" toggle_related="0" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="orderby_override2_display">FLEXI_HIDE</option>
+				<option value="1" show_list="orderby_override2_display" hide_list="">FLEXI_SHOW</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" />
+			<field name="limit_options" type="text" default="5,10,20,30,50,100,150,200" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" class="limit_override_display input-xxlarge" />
+			
+			<field name="orderby_options" type="fccheckbox" default="" display_useglobal="0" class="orderby_override_display"
+				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST,FLEXI_ORDER_OLDEST_PUBLISHED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_MOST_COMMENTED,FLEXI_ORDER_BEST_RATED,FLEXI_ORDER_CONFIGURED_ORDER,FLEXI_ORDER_RANDOM,FLEXI_ORDER_ALIAS,FLEXI_ORDER_ALIAS_REVERSE"
+				checkvals="_preconfigured_,date,rdate,modified,published,published_oldest,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order,random,alias,ralias"
+				defaultvals="_preconfigured_,date,rdate,modified,published,alpha,ralpha,hits,id,commented,rated"
+				label="FLEXI_ORDER_OPTIONS_1ST" description="FLEXI_ORDER_OPTIONS_DESC" />
+			<field name="orderby_custom" type="textarea" rows="3" default="" label="FLEXI_ORDER_OPTIONS_CUSTOM_1ST" description="FLEXI_ORDER_OPTIONS_CUSTOM_V2_DESC" class="orderby_override_display input-xxlarge" />
+			
+			<field name="orderby_options_2nd" type="fccheckbox" default="" display_useglobal="0" class="orderby_override2_display"
+				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST,FLEXI_ORDER_OLDEST_PUBLISHED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_MOST_COMMENTED,FLEXI_ORDER_BEST_RATED,FLEXI_ORDER_CONFIGURED_ORDER,FLEXI_ORDER_RANDOM,FLEXI_ORDER_ALIAS,FLEXI_ORDER_ALIAS_REVERSE"
+				checkvals="_preconfigured_,date,rdate,modified,published,published_oldest,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order,random,alias,ralias"
+				defaultvals="_preconfigured_,date,rdate,modified,published,alpha,ralpha,hits,id,commented,rated"
+				label="FLEXI_ORDER_OPTIONS_2ND" description="FLEXI_ORDER_OPTIONS_DESC" />
+			<field name="orderby_custom_2nd" type="textarea" rows="3" default="" label="FLEXI_ORDER_OPTIONS_CUSTOM_2ND" description="FLEXI_ORDER_OPTIONS_CUSTOM_V2_DESC" class="orderby_override2_display input-xxlarge" />
+			
+
+	</fieldset>
+	<fieldset name="lists_limits_orderings" label="FLEXI_LISTS_ITEM_SELECTION_N_PAGINATION_CONF">
+			 
+			<field name="sep_items_default_limits" type="separator" default="FLEXI_ITEMS_ITEM_SELECTION_N_PAGINATION" description="" level="level1" />
+			<field name="show_noauth" type="multilist" subtype="radio" default="0" label="FLEXI_UNAUTHORIZED_ITEMS" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC" toggle_related="0" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC" class="btn-group btn-group-yesno"> 
+				<option value="0">FLEXI_NO</option> 
+				<option value="1">FLEXI_DISPLAY_SUBCATS_1ST_SUBLEVEL</option> 
+				<option value="2">FLEXI_DISPLAY_SUBCATS_ALL_SUBLEVELS</option> 
+			</field>
+			<field name="filtercat" type="radio" default="1" label="FLEXI_FILTER_ITEM_BY_LANG" description="FLEXI_FILTER_ITEM_BY_LANG_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="sep_limit_items_list_till_submit" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT" description="" level="level2" />
+			<field name="sep_limit_items_list_till_submit_before" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT_BEFORE" level="level4" class="alert alert-info fcpadded" />
+			<field name="use_limit_before_search_filt" type="multilist" subtype="radio" default="0" toggle_related="0" label="FLEXI_ENABLE" description="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="limit_before_search_filt">FLEXI_NO</option>
+				<option value="1" show_list="limit_before_search_filt" hide_list="">FLEXI_YES</option>
+				<option value="2" show_list="limit_before_search_filt" hide_list="">FLEXI_FEATURED_ONLY</option>
+			</field>
+			<field name="limit_before_search_filt" type="text" size="4" default="0" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" class="limit_before_search_filt" />
+			
+			<field name="sep_limit_items_list_till_submit_after" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT_AFTER" level="level4" class="alert alert-info fcpadded" />
+			<field name="display_flag_featured" type="radio" default="0" label="FLEXI_DISPLAY_FLAG_FEATURED" description="FLEXI_DISPLAY_FLAG_FEATURED_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_BOTH</option>
+				<option value="1">FLEXI_NORMAL_ONLY</option>
+				<option value="2">FLEXI_FEATURED_ONLY</option> 
+			</field>
+			<!--field name="display_cats_featured" type="radio" default="0" label="FLEXI_DISPLAY_CATS_FEATURED" description="FLEXI_DISPLAY_CATS_FEATURED_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_BOTH</option>
+				<option value="1">FLEXI_NORMAL_ONLY</option>
+				<option value="2">FLEXI_FEATURED_ONLY</option>
+				<option value="3">FLEXI_EXCLUDE_SPECIFIC</option>
+			</field-->
+			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" />
+			
+			<field name="sep_limit_items_list_till_submit_custom_fields" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_VIA_CUSTOM_FIELDS" level="level4" class="alert alert-info fcpadded"/>
+
+		<field name="" type="separator" default="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" level="level1" />
+			<field name="show_item_total" type="radio" default="1" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_pagination" type="radio" default="2" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+				<option value="2">Auto</option>
+			</field>
+			<field name="show_pagination_results" type="radio" default="1" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level2" />
+			
+			<field name="limit_override" type="multilist" subtype="radio" default="1" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" toggle_related="0" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="limit_override_display">FLEXI_NO</option>
+				<option value="1" show_list="limit_override_display" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="limit_override_label" type="radio" default="2" label="FLEXI_NUM_PER_PAGE_LABEL" description="FLEXI_NUM_PER_PAGE_LABEL_DESC" class="limit_override_display btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_OUTSIDE</option>
+				<option value="2">FLEXI_INSIDE</option>
+			</field>
+			
+	</fieldset>
+	<fieldset name="lists_markups_fset" label="FLEXI_LISTS_ITEM_MARKUPS_CONF" description="" >
 	
 		<field name="" type="separator" default="FLEXI_CONTENT_MARKUPS_CONF" level="level0" />
 		<field name="" type="separator" default="FLEXI_SUPPORTED_LIST_VIEWS" label="" level="level4" class="alert alert-info fcpadded" />
@@ -1023,9 +1029,10 @@
 			<field name="mu_ru_timeframe_names" type="textarea" rows="4" cols="60" default="FLEXI_24H_RU , FLEXI_2D_RU , FLEXI_7D_RU , FLEXI_1M_RU , FLEXI_3M_RU , FLEXI_1Y_RU , FLEXI_3Y_RU" label="FLEXI_MU_RUPDATED_TIMEFRAME_NAMES" description="FLEXI_MU_RUPDATED_TIMEFRAME_NAMES_DESC" class="mu_rupdated_display input-xxlarge" />
 		
 	</fieldset>
-	<fieldset name="lists_rss_fset" label="FLEXI_LISTS_RSS_CONF" description="" >
+
+	<fieldset name="lists_rss_fset" label="FLEXI_LISTS_RSS_FEEDS_CONF" description="" >
 			
-		<field name="" type="separator" default="FLEXI_FEED_LIST_CONF" label="" level="level0" />
+		<field name="" type="separator" default="FLEXI_PARAMS_CAT_RSS_FEEDS" label="" level="level0" />
 		<field name="" type="separator" default="FLEXI_SUPPORTED_LIST_VIEWS" label="" level="level4" class="alert alert-info fcpadded" />
 			
 			<field name="feed_limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" />

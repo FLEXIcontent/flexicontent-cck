@@ -482,7 +482,7 @@ class flexicontent_items extends _flexicontent_items {
 			
 			// Check for unique Alias
 			$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='.(int)$this->id;
-			$query = 'SELECT COUNT(*) FROM #__content AS i '
+			$query = 'SELECT COUNT(*) FROM #__flexicontent_items_tmp AS i '
 				.' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
 				.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
 				.' WHERE i.alias='.$this->_db->Quote($this->alias)

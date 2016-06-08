@@ -987,7 +987,8 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		if ( !$query_ids ) {
 			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id '
-				. ', t.name AS type_name, rel.ordering as catsordering '
+				//. ($filter_order=='type_name' ? ', t.name AS type_name ' : '')
+				//. ($filter_order=='catsordering' ? ', rel.ordering as catsordering ' : '')
 				. ( count($customFiltsActive) ? ', COUNT(DISTINCT fi.field_id) AS matched_custom ' : '' )
 				. ( in_array('RV', $filter_state) ? ', i.version' : '' )
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
@@ -1068,14 +1069,16 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		switch ($filter_order)
 		{
-			case 'ie.lang_parent_id':
-				$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir .", i.id ASC";
+			case 'type_name':
+				$_filter_order = 't.name';
+				$orderby 	= ' ORDER BY '.$_filter_order.' '.$filter_order_Dir .", i.id ASC";
 				break;
 			case 'i.ordering':
 				$orderby 	= ' ORDER BY i.catid, state_order, i.language, '. $filter_order .' '. $filter_order_Dir .", i.id DESC";
 				break;
 			case 'catsordering':
-				$orderby 	= ' ORDER BY rel.catid, state_order, i.language, '. $filter_order.' '.$filter_order_Dir .", i.id DESC";
+				$_filter_order = 'rel.ordering';
+				$orderby 	= ' ORDER BY rel.catid, state_order, i.language, '. $_filter_order.' '.$filter_order_Dir .", i.id DESC";
 				break;
 			default:
 				$orderby 	= empty($filter_order) ? '' : ' ORDER BY '.$filter_order.' '.$filter_order_Dir;

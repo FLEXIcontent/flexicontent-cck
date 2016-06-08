@@ -52,27 +52,20 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 	 */
 	protected function getInput()
 	{
-		if (FLEXI_J16GE)  $node = & $this->element;
-		
 		// Get attribute array
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-			$children = $node->children();
-		} else {
-			$attributes = & $node->_attributes;
-			$children   = & $node->_children;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
+		$children = $node->children();
 		
 		// Get values array
-		$values			= FLEXI_J16GE ? $this->value : $value;
+		$values = $this->value;
 		if ( empty($values) )							$values = array();
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		// Get field and element name
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
 		// Initialize variables.
 		$extra_options = array();
@@ -83,7 +76,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		foreach ($children as $option)
 		{
 			// Only add <option /> elements.
-			$is_option = (FLEXI_J16GE && $option->getName()=='option')   ||   (!FLEXI_J16GE && $option->_name=='option');
+			$is_option = $option->getName()=='option';
 			if ( !$is_option ) continue;
 			
 			// Get variable for creating an extra option object based on the <option /> element
@@ -134,7 +127,6 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .=' multiple="multiple"';
 			$attribs .= ' size="'.$initial_size.'" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 		}
 		
 		// Initialize some field attributes.
@@ -143,7 +135,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		// Initialize JavaScript field attributes.
 		$attribs .= @$this->element['onchange'] ? ' onchange="' . (string) $this->element['onchange'] . '"' : '';		
 		
-		$classes = '';
+		$classes = 'use_select2_lib';
 		$classes .= @$attributes['required'] && @$attributes['required']!='false' ? ' required' : '';
 		$classes .= @$attributes['class'] ? ' '.$attributes['class'] : '';
 		$attribs .= ' class="'.$classes.'"';

@@ -62,6 +62,7 @@
 		msg_box.nodeName == 'INPUT' ? msg_box.value = input.value : msg_box.innerHTML = input.value;
 	}
 	
+	
 	// Display content in modal popup
 	function fc_showAsDialog(obj, winwidth, winheight, closeFunc, params)
 	{
@@ -135,11 +136,14 @@
 		return theDialog;
 	}
 	
+	
 	// Load given URL in an open dialog
 	function fc_showDialog(url, tagid, no_iframe, winwidth, winheight, closeFunc, params)
 	{
 		params = typeof params !== 'undefined' ? params : {};
 		params = fc_getAutoSizePos(winwidth, winheight, params);
+		
+		var loadFunc = typeof params.loadFunc !== 'undefined' && params.loadFunc ? params.loadFunc : false;
 		
 		// Get close function
 		var closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;
@@ -216,6 +220,14 @@
 		
 		// Open the dialog manually
 		var theDialog = container.dialog('open');
+		
+		// Attach on-load function to the iframe
+		if (!no_iframe && loadFunc)
+		{
+			jQuery('#'+tagid).find('iframe').first().on('load', function(e, data) {
+				loadFunc( container );
+			});
+		}
 		
 		// Stop scrolling of parent document
 		jQuery(document.body).addClass('fc-no-scroll');

@@ -134,6 +134,10 @@ class FlexicontentHelperPerm
 		$permission->ViewTree			= 1;  // Old (non-used) ACL, we will always displaying of categories as tree
 		$permission->MultiCat			= $user->authorise('flexicontent.multicat',		'com_flexicontent'); // (item edit form) allow user to assign items to multiple categories
 		
+		// REVIEWs: management tab and usage
+		$permission->CanReviews       = $user->authorise('flexicontent.managereviews',	'com_flexicontent');
+		$permission->CanCreateReviews = 1; //$user->authorise('flexicontent.createreviews',	'com_flexicontent');
+		
 		// TAGS: management tab and usage
 		$permission->CanTags			= $user->authorise('flexicontent.managetags',	'com_flexicontent'); // (backend) Allow management of Item Types
 		$permission->CanUseTags		= $user->authorise('flexicontent.usetags', 		'com_flexicontent'); // edit tag assignments (item form)

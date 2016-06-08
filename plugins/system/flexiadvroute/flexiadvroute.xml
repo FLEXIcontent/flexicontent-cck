@@ -22,14 +22,14 @@
 	<fields name="params"  addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="basic">
 			<field name="" type="separator" default="Hide categories" hr="false" level="level2" menu="hide" />
-			<field name="" type="separator" default="Hide Categories from Pathway/URLs for Types &lt;small&gt; &lt;br&gt; &lt;br&gt; -- These are types that contain content not being a part of structure but rather general information content like site usage instructions or license agreement, etc &lt;/small&gt;" hr="false" level="level3" menu="hide" />
+			<field name="" type="separator" default="Hide Categories from Pathway/URLs for Types &lt;small&gt; &lt;br&gt; - These are types that contain content not being a part of structure but rather general information content like site usage instructions or license agreement, etc &lt;/small&gt;" level="level3" class="alert alert-info" />
 			<field name="route_to_type" type="radio" default="0" label="Enable" description="..." class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="type_to_route" type="types" multiple="true" default="" label="Content Types" description="..." class="use_select2_lib" size="12" />
 		
-			<field name="" type="separator" default="Hide categories in Content / Content Listings by NOT displaying: &lt;br&gt; &lt;small&gt; a. direct category links &lt;br&gt; b. category title as a content/content list markup &lt;br&gt; &lt;br&gt; -- These categories are for special purposes, e.g. contain items &lt;b&gt;displayed&lt;/b&gt; in frontpage or in a module Slideshow. &lt;/small&gt;" hr="false" level="level3" menu="hide" />
+			<field name="" type="separator" default="Hide categories in Content / Content Listings by NOT displaying: &lt;br&gt; &lt;small&gt; &amp;nbsp; a. direct category links &lt;br&gt; &amp;nbsp; b. category title as a content/content list markup &lt;br&gt; - These categories are for special purposes, e.g. contain items &lt;b&gt;displayed&lt;/b&gt; in frontpage or in a module Slideshow. &lt;/small&gt;" level="level3" class="alert alert-info" />
 			<field name="cats_to_exclude" type="flexicategories" multiple="true" size="24" default="" label="FLEXI_CATEGORIES" description="FLEXI_ADVROUTE_CATS_TO_EXCLUDE_DESC" />
 		
 		</fieldset>

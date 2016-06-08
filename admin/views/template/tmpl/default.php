@@ -636,7 +636,7 @@ if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please
 				$fieldSets = $this->layout->params->getFieldsets($groupname);
 				foreach ($fieldSets as $fsname => $fieldSet) :
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 					?>
 					<fieldset class="panelform">
