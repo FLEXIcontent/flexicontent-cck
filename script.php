@@ -511,9 +511,9 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$reviews_beta_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_ratings"';
-		$db->setQuery($query);
-		$reviews_ratings_tbl_exists = (boolean) count($db->loadObjectList());
+		//$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews"';
+		//$db->setQuery($query);
+		//$reviews_tbl_exists = (boolean) count($db->loadObjectList());
 		
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_templates"';
 		$db->setQuery($query);
@@ -924,22 +924,29 @@ class com_flexicontentInstallerScript
 						$queries[] = "DROP TABLE `#__flexicontent_reviews`";
 					}
 					// TODO add this in installation SQL file when feature is finished
-					/*if ( !$reviews_ratings_tbl_exists ) {
+					/*if ( !$reviews_tbl_exists ) {
 						$queries[] = "
-						CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_ratings` (
+						CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_dev` (
+							`id` int(11) NOT NULL auto_increment,
 						  `content_id` int(11) NOT NULL,
 						  `type` varchar(255) NOT NULL DEFAULT 'item',
-						  `average_rating` mediumtext NOT NULL,
-						  `custom_ratings` mediumtext NOT NULL DEFAULT '',
+						  `average_rating` float NOT NULL,
+						  `custom_ratings` text NOT NULL DEFAULT '',
 						  `user_id` int(11) NOT NULL DEFAULT '0',
 						  `email` varchar(255) NOT NULL DEFAULT '',
 						  `title` varchar(255) NOT NULL,
 						  `text` mediumtext NOT NULL,
-						  `state` int(11) NOT NULL,
-						  `confirmed` int(11) NOT NULL,
+						  `state` tinyint(3) NOT NULL DEFAULT '0',
+							`approved` tinyint(3) NOT NULL DEFAULT '0',
+							`useful_yes` int(11) NOT NULL DEFAULT '0',
+							`useful_no` int(11) NOT NULL DEFAULT '0',
 						  `submit_date` datetime NOT NULL,
 						  `update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-						  `custom_fields` mediumtext NULL,
+							`checked_out` int(11) unsigned NOT NULL default '0',
+							`checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+						  `attribs` mediumtext NULL,
+							PRIMARY KEY  (`id`),
+						  UNIQUE (`content_id`, `user_id`, `type`),
 						  KEY (`content_id`, `type`),
 						  KEY `user_id` (`user_id`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";

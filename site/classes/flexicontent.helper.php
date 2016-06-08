@@ -436,30 +436,9 @@ class flexicontent_html
 	 * @return 	string  : the HTML of the tooltip for usage in the title paramter of the HTML tag
 	 * @since 1.5
 	 */
-	static function getToolTip($title = '', $content = '', $translate = 1, $escape = 1) {
-		if (FLEXI_J30GE) {
-			return JHtml::tooltipText($title, $content, $translate, $escape);
-		}
-		
-		else {
-			// Return empty in no title or content is given.
-			if ($title == '' && $content == '') return '';
-			
-			// Pass texts through the JText.
-			if ($translate) {
-				$title = JText::_($title);
-				$content = JText::_($content);
-			}
-			
-			// Escape the texts.
-			if ($escape) {
-				$title = htmlspecialchars($title, ENT_COMPAT, 'UTF-8');
-				$content = htmlspecialchars($content, ENT_COMPAT, 'UTF-8');
-			}
-			
-			// Return only the title or content if no title or content is given respectively
-			return $title.'::'.$content;
-		}
+	static function getToolTip($title = '', $content = '', $translate = 1, $escape = 1)
+	{
+		return JHtml::tooltipText($title, $content, $translate, $escape);
 	}
 	
 	
@@ -671,7 +650,7 @@ class flexicontent_html
 		$app	= JFactory::getApplication();
 		
 		$default_orderby = $params->get( 'orderby'.$sfx );
-		$orderby = $app->input->get('orderby'.$sfx);
+		$orderby = $app->input->get('orderby'.$sfx, '', 'string');
 		$orderby = $orderby ? $orderby : $default_orderby;
 		
 		flexicontent_html::loadFramework('select2');
@@ -2882,6 +2861,8 @@ class flexicontent_html
 		$db   = JFactory::getDBO();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
+		flexicontent_html::__DEV_check_reviews_table();
+		
 		if (!is_object($xiddata)) {
 			// Only label given
 			$label = $xiddata;
@@ -3146,6 +3127,53 @@ class flexicontent_html
 	}
 	
 	
+	static function __DEV_check_reviews_table()
+	{
+		static $check_review_table_dev = null;
+		if ($check_review_table_dev !== null) return;
+		$check_review_table_dev = 1;
+		
+		$app = JFactory::getApplication();
+		$db  = JFactory::getDBO();
+		$dbprefix = $app->getCfg('dbprefix');
+		
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_dev"';
+		$db->setQuery($query);
+		$reviews_tbl_exists = count($db->loadObjectList());
+		
+		if ( !$reviews_tbl_exists )
+		{
+			$query = "
+			CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_dev` (
+				`id` int(11) NOT NULL auto_increment,
+			  `content_id` int(11) NOT NULL,
+			  `type` varchar(255) NOT NULL DEFAULT 'item',
+			  `average_rating` float NOT NULL,
+			  `custom_ratings` text NOT NULL DEFAULT '',
+			  `user_id` int(11) NOT NULL DEFAULT '0',
+			  `email` varchar(255) NOT NULL DEFAULT '',
+			  `title` varchar(255) NOT NULL,
+			  `text` mediumtext NOT NULL,
+			  `state` tinyint(3) NOT NULL DEFAULT '0',
+				`approved` tinyint(3) NOT NULL DEFAULT '0',
+				`useful_yes` int(11) NOT NULL DEFAULT '0',
+				`useful_no` int(11) NOT NULL DEFAULT '0',
+			  `submit_date` datetime NOT NULL,
+			  `update_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`checked_out` int(11) unsigned NOT NULL default '0',
+				`checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
+			  `attribs` mediumtext NULL,
+				PRIMARY KEY  (`id`),
+			  UNIQUE (`content_id`, `user_id`, `type`),
+			  KEY (`content_id`, `type`),
+			  KEY `user_id` (`user_id`)
+			) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+		}
+		$db->setQuery($query);
+		$db->execute();
+	}
+	
+		
 	/**
 	 * Creates the favourited by user list
 	 *
@@ -6551,14 +6579,20 @@ class flexicontent_db
 			// SPECIAL case custom field
 			case 'field':
 				$cf = $sfx == '_2nd' ? 'f2' : 'f';
-				switch( $params->get('orderbycustomfieldint'.$sfx, 0) ) {
+				$order_type = $params->get('orderbycustomfieldint'.$sfx, 0);
+				switch( $order_type )
+				{
 					case 1:  $order_col = 'CAST('.$cf.'.value AS SIGNED)';  break;  // Integer
 					case 2:  $order_col = 'CAST('.$cf.'.value AS DECIMAL(65,15))'; break; // Decimal
 					case 3:  $order_col = 'CAST('.$cf.'.value AS DATE)';  break;  // Date
 					case 4:  $order_col = ($sfx == '_2nd' ? 'file_hits2' : 'file_hits'); break;  // Download hits
 					default: $order_col = $cf.'.value'; break;  // Text
 				}
-				$order_dir	= $params->get('orderbycustomfielddir'.$sfx, 'ASC');
+				$order_dir = $params->get('orderbycustomfielddir'.$sfx, 'ASC');
+				if ($order_type != 4)
+				{
+					$order_col = 'ISNULL('.$cf.'.value), ' . $order_col;
+				}
 				break;
 
 			// NEW ADDED
@@ -6599,7 +6633,9 @@ class flexicontent_db
 				}
 				if (!empty($_field_id) && count($order_parts)==4) {
 					$cf = $sfx == '_2nd' ? 'f2' : 'f';
-					switch(strtolower($order_parts[2])) {
+					$order_type = strtolower($order_parts[2]);
+					switch( $order_type )
+					{
 						case 'int':       $order_col = 'CAST('.$cf.'.value AS SIGNED)';  break;
 						case 'decimal':   $order_col = 'CAST('.$cf.'.value AS DECIMAL(65,15))'; break;
 						case 'date':      $order_col = 'CAST('.$cf.'.value AS DATE)'; break;
@@ -6607,6 +6643,10 @@ class flexicontent_db
 						default:          $order_col = $cf.'.value'; break;
 					}
 					$order_dir = strtolower($order_parts[3])=='desc' ? 'DESC' : 'ASC';
+					if ($order_type != 'file_hits')
+					{
+						$order_col = 'ISNULL('.$cf.'.value), ' . $order_col;
+					}
 				} else {
 					$order_col	= $order_col ? $order_col : $i_as.'.title';
 					$order_dir	= $order_dir ? $order_dir : 'ASC';
@@ -7031,43 +7071,45 @@ function FLEXISubmenu($cando)
 	// Create Submenu, Dashboard (HOME is always added, other will appear only if post-installation tasks are done)
 	$addEntry = array(FLEXI_J30GE ? 'JHtmlSidebar' : 'JSubMenuHelper', 'addEntry');
 	
-	if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-content-editing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' ).'</h2>', '', '');
-	call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-flexicontent"></span>' : '').JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
+	call_user_func($addEntry, '<h2 class="fcsbnav-content-editing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' ).'</h2>', '', '');
+	call_user_func($addEntry, '<span class="fcsb-icon-flexicontent"></span>'.JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
 	if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>'))
 	{
-		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-items"></span>' : '').JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items');
-		if ($perms->CanCats) 			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-fc_categories"></span>' : '').JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
+		call_user_func($addEntry, '<span class="fcsb-icon-items"></span>'.JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items');
+		if ($perms->CanCats) 			call_user_func($addEntry, '<span class="fcsb-icon-fc_categories"></span>'.JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
 		if ($cparams->get('comments')==1 && $perms->CanComments) call_user_func($addEntry,
 			'<a href="index.php?option=com_jcomments&task=view&fog=com_flexicontent" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
-				(FLEXI_J30GE ? '<span class="fcsb-icon-comments"></span>' : '').JText::_( 'FLEXI_COMMENTS' ).
+				'<span class="fcsb-icon-comments"></span>'.JText::_( 'FLEXI_COMMENTS' ).
 			'</a>', '', false);
-		else if ($cparams->get('comments')==1 && !$perms->JComments_Installed) call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-comments disabled"></span>' : '').'<span class="fc_sidebar_entry disabled">'.JText::_( 'FLEXI_JCOMMENTS_MISSING' ).'</span>', '', false);
+		else if ($cparams->get('comments')==1 && !$perms->JComments_Installed) call_user_func($addEntry, '<span class="fcsb-icon-comments disabled"></span><span class="fc_sidebar_entry disabled">'.JText::_( 'FLEXI_JCOMMENTS_MISSING' ).'</span>', '', false);
 		
-		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-type-fields">'.JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' ).'</h2>', '', '');
-		if ($perms->CanTypes)			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-types"></span>' : '').JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
-		if ($perms->CanFields) 		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-fields"></span>' : '').JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
-		if ($perms->CanTags) 			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-tags"></span>' : '').JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
-		if ($perms->CanFiles) 		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-filemanager"></span>' : '').JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
+		if ($perms->CanReviews)		call_user_func($addEntry, '<span class="fcsb-icon-reviews"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
 		
-		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-content-viewing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' ).'</h2>', '', '');
-		if ($perms->CanTemplates)	call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-templates"></span>' : '').JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
-		if ($perms->CanIndex)			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-search"></span>' : '').JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
-		if ($perms->CanStats)			call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-stats"></span>' : '').JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
+		call_user_func($addEntry, '<h2 class="fcsbnav-type-fields">'.JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' ).'</h2>', '', '');
+		if ($perms->CanTypes)			call_user_func($addEntry, '<span class="fcsb-icon-types"></span>'.JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
+		if ($perms->CanFields) 		call_user_func($addEntry, '<span class="fcsb-icon-fields"></span>'.JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
+		if ($perms->CanTags) 			call_user_func($addEntry, '<span class="fcsb-icon-tags"></span>'.JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
+		if ($perms->CanFiles) 		call_user_func($addEntry, '<span class="fcsb-icon-filemanager"></span>'.JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
 		
-		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-users">'.JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' ).'</h2>', '', '');
-		if ($perms->CanAuthors)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-users"></span>' : '').JText::_( 'FLEXI_USERS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
-		if ($perms->CanGroups)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-groups"></span>' : '').JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups');
+		call_user_func($addEntry, '<h2 class="fcsbnav-content-viewing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' ).'</h2>', '', '');
+		if ($perms->CanTemplates)	call_user_func($addEntry, '<span class="fcsb-icon-templates"></span>'.JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
+		if ($perms->CanIndex)			call_user_func($addEntry, '<span class="fcsb-icon-search"></span>'.JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
+		if ($perms->CanStats)			call_user_func($addEntry, '<span class="fcsb-icon-stats"></span>'.JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
+		
+		call_user_func($addEntry, '<h2 class="fcsbnav-users">'.JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' ).'</h2>', '', '');
+		if ($perms->CanAuthors)		call_user_func($addEntry, '<span class="fcsb-icon-users"></span>'.JText::_( 'FLEXI_USERS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
+		if ($perms->CanGroups)		call_user_func($addEntry, '<span class="fcsb-icon-groups"></span>'.JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups');
 	//if ($perms->CanArchives)	call_user_func($addEntry, '<span class="fcsb-icon-archive"></span>'.JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
 	
-		if (FLEXI_J30GE) call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
+		call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
 		$appsman_path = JPATH_COMPONENT_ADMINISTRATOR.DS.'views'.DS.'appsman';
 		if (file_exists($appsman_path)) {
-			if ($perms->CanConfig)	call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-wrench"></span>' : '').JText::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' ), 'index.php?option=com_flexicontent&view=appsman', $view=='appsman');
+			if ($perms->CanConfig)	call_user_func($addEntry, '<span class="fcsb-icon-wrench"></span>'.JText::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' ), 'index.php?option=com_flexicontent&view=appsman', $view=='appsman');
 		}
-		if ($perms->CanImport)		call_user_func($addEntry, (FLEXI_J30GE ? '<span class="fcsb-icon-import"></span>' : '').JText::_( 'FLEXI_CONTENT_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
+		if ($perms->CanImport)		call_user_func($addEntry, '<span class="fcsb-icon-import"></span>'.JText::_( 'FLEXI_CONTENT_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
 		if ($perms->CanPlugins) call_user_func($addEntry,
 			'<a href="index.php?option=com_plugins" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
-				(FLEXI_J30GE ? '<span class="fcsb-icon-plugins"></span>' : '').JText::_( 'FLEXI_PLUGINS' ).
+				'<span class="fcsb-icon-plugins"></span>'.JText::_( 'FLEXI_PLUGINS' ).
 			'</a>', '', false);
 	}
 }
