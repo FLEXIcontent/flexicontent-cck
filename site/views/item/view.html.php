@@ -570,6 +570,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('prettyCheckable');
 		flexicontent_html::loadFramework('flexi-lib');
+		$document->addScriptVersion( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', FLEXI_VHASH );  // Frontend/backend script
 		
 		// Load custom behaviours: form validation, popup tooltips
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
