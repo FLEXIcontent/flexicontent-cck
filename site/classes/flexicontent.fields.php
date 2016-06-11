@@ -2601,6 +2601,14 @@ class FlexicontentFields
 		$slider_display_config = $filter->parameters->get( 'slider_display_config'.$_s, 1 );  // Slider found values: 1 or custom values/labels: 2
 		
 		$filter_vals_display = $filter->parameters->get( 'filter_vals_display'.$_s, 0 );
+		if ($filter_vals_display)
+		{
+			$icon_size  = $filter->parameters->get( 'icon_size_filter'.$_s );
+			$icon_color = $filter->parameters->get( 'icon_color_filter'.$_s );
+			
+			$icon_class = ($icon_size ? ' fc-icon-'.$icon_size : '');
+			$icon_style = ($icon_color ? ' color: '.$icon_color.';' : '');
+		}
 		
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
@@ -3094,7 +3102,9 @@ class FlexicontentFields
 				
 				// *** PLACE image before label (and e.g. (default) above the label)
 				if ($filter_vals_display == 2)
-					$filter->html .= '<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"/></span>';
+					$filter->html .= isset( $result->image_url ) ?
+						'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"/></span>' :
+						'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"></span></span>' ;
 				
 				if ($display_filter_as==4) {
 					$filter->html .= ' <input onchange="fc_toggleClassGrp(this, \'fc_highlight\');" ';
@@ -3115,9 +3125,9 @@ class FlexicontentFields
 				
 				// *** PLACE image after label (and e.g. (default) next to the label)
 				if ($filter_vals_display == 1)
-					$filter->html .= '<span class="fc_filter_val_img">'
-					.'<img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"/>'
-					.'</span>';
+					$filter->html .= isset( $result->image_url ) ?
+						'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"/></span>' :
+						'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"></span></span>' ;
 				
 				$filter->html .= '</li>';
 				$i++;

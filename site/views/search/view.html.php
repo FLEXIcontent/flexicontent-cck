@@ -725,7 +725,6 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Create links
 		$link = JRoute::_(FlexicontentHelperRoute::getSearchRoute(0, $menu_matches ? $menu->id : 0));
 		
-		//$print_link = JRoute::_('index.php?view=search&pop=1&tmpl=component&print=1');
     $curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
     $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 		

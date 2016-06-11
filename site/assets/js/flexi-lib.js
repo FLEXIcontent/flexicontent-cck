@@ -365,10 +365,13 @@
 		// Display fields / enable input on them ( removeAttr + css ),  force them to update display ( trigger:click ), and to validate new value ( trigger:blur )
 		if (fcconfigs) for (var fieldname in fcconfigs) {
 			if (fcconfigs.hasOwnProperty(fieldname)) {
-				var jf_field = jQuery('#'+'jform_attribs_'+fieldname); // first try 'attribs' 
+				var jf_field = jQuery('#'+'jform_attribs_'+fieldname); // first try 'jform_attribs'
 				if (!jf_field.length) {
-					jf_field = jQuery('#'+'jform_params_'+fieldname);  // then try params
-					if (!jf_field.length) continue;
+					jf_field = jQuery('#'+'jform_params_'+fieldname);  // then try 'jform_params'
+					if (!jf_field.length) {
+						jf_field = jQuery('#'+'jform_'+fieldname);  // then try just 'jform_'
+						if (!jf_field.length) continue;
+					}
 				}
 				jf_field = jf_field.first();
 				

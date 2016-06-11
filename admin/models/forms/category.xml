@@ -59,6 +59,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="show_csvbutton" type="radio" default="" label="FLEXI_CSV_EXPORT_BUTTON" description="FLEXI_CSV_EXPORT_BUTTON_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
 			
 			<field name="sep_cat_icons" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level1" />
 			<field name="show_icons" type="radio" default="" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" class="btn-group btn-group-yesno">
@@ -503,6 +508,11 @@
 				<option value="1">FLEXI_LINK_TO_FE</option>
 				<option value="2">FLEXI_LINK_TO_BE</option>
 			</field>
+			<field name="show_deletebutton_lists" type="radio" default="" label="FLEXI_SHOW_DELETE_BUTTON_IN_LISTS" description="FLEXI_SHOW_DELETE_BUTTON_IN_LISTS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
 			<field name="show_comments_count" type="radio" default="" label="FLEXI_SHOW_COMMENTS_COUNTER" description="FLEXI_SHOW_COMMENTS_COUNTER_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
@@ -635,7 +645,6 @@
 			</field>
 			
 			<field name="sep_limit_items_list_till_submit" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT" description="" level="level2" />
-			
 			<field name="sep_limit_items_list_till_submit_before" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_TILL_SUBMIT_BEFORE" level="level4" class="alert alert-info fcpadded" />
 			<field name="use_limit_before_search_filt" type="multilist" subtype="radio" default="" toggle_related="0" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>

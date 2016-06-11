@@ -108,11 +108,12 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 		$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug, 0, $item );
 		$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 		$editbutton = flexicontent_html::editbutton( $item, $this->params );
+		$deletebutton = flexicontent_html::deletebutton( $item, $this->params );
 		$statebutton = flexicontent_html::statebutton( $item, $this->params );
 		$approvalbutton = flexicontent_html::approvalbutton( $item, $this->params );
 		?>
 		
-		<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) : ?>
+		<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $deletebutton || $statebutton || $approvalbutton) : ?>
 		
 			<!-- BOF buttons -->
 			<?php if ($this->params->get('btn_grp_dropdown')) : ?>
@@ -126,6 +127,7 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 			    <?php echo $mailbutton   ? '<li>'.$mailbutton.'</li>' : ''; ?>
 			    <?php echo $printbutton  ? '<li>'.$printbutton.'</li>' : ''; ?>
 			    <?php echo $editbutton   ? '<li>'.$editbutton.'</li>' : ''; ?>
+			    <?php echo $deletebutton   ? '<li>'.$deletebutton.'</li>' : ''; ?>
 			    <?php echo $approvalbutton  ? '<li>'.$approvalbutton.'</li>' : ''; ?>
 			  </ul>
 		    <?php echo $statebutton; ?>
@@ -137,6 +139,7 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 				<?php echo $mailbutton; ?>
 				<?php echo $printbutton; ?>
 				<?php echo $editbutton; ?>
+				<?php echo $deletebutton; ?>
 				<?php echo $statebutton; ?>
 				<?php echo $approvalbutton; ?>
 			</div>
@@ -180,8 +183,9 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 	<!-- BOF item basic/core info -->
 	<div class="iteminfo group">
 		
-		<?php if (($this->params->get('show_author')) && ($item->creator != "")) : ?>
 		<div class="createdline">
+			
+			<?php if (($this->params->get('show_author')) && ($item->creator != "")) : ?>
 			<div class="createdby">
 				<?php FlexicontentFields::getFieldDisplay($item, 'created_by', $values=null, $method='display'); ?>
 				<?php echo JText::sprintf('FLEXI_WRITTEN_BY', $this->fields['created_by']->display); ?>
@@ -198,9 +202,11 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 				<?php echo '['.JHTML::_('date', $this->fields['created']->value[0], JText::_('DATE_FORMAT_LC2')).']'; ?>		
 			</div>
 			<?php endif; ?>
+			
 		</div>
 		
 		<div class="modifiedline">
+			
 			<?php if (($this->params->get('show_modifier')) && ($item->modifier != "")) : ?>
 			<div class="modifiedby">
 				<?php FlexicontentFields::getFieldDisplay($item, 'modified_by', $values=null, $method='display'); ?>
@@ -218,7 +224,9 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 				<?php echo '['.JHTML::_('date', $this->fields['modified']->value[0], JText::_('DATE_FORMAT_LC2')).']'; ?>
 				</div>
 			<?php endif; ?>
+			
 		</div>
+		
 	</div>
 	<!-- EOF item basic/core info -->
 	<?php endif; ?>

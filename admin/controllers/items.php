@@ -639,9 +639,14 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Get variables: model, user, item id
 		$model = $this->getModel('items');
 		$user  = JFactory::getUser();
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		
+		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$ord_catid = JRequest::getVar( 'ord_catid', array(0), 'post', 'array' );
 		$prev_order = JRequest::getVar( 'prev_order', array(0), 'post', 'array' );
+		
+		JArrayHelper::toInteger($cid);
+		JArrayHelper::toInteger($ord_catid);
+		JArrayHelper::toInteger($prev_order);
 		
 		// calculate access
 		$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
@@ -700,10 +705,16 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Get variables: model, user, item id, new ordering
 		$model = $this->getModel('items');
 		$user  = JFactory::getUser();
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		
+		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$order = JRequest::getVar( 'order', array(0), 'post', 'array' );
 		$ord_catid = JRequest::getVar( 'ord_catid', array(0), 'post', 'array' );
 		$prev_order = JRequest::getVar( 'prev_order', array(0), 'post', 'array' );
+		
+		JArrayHelper::toInteger($cid);
+		JArrayHelper::toInteger($order);
+		JArrayHelper::toInteger($ord_catid);
+		JArrayHelper::toInteger($prev_order);
 		
 		// calculate access
 		$canOrder = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
@@ -735,6 +746,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
 		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		JArrayHelper::toInteger($cid);
 		
 		$canCopy = $user->authorise('flexicontent.copyitems', 'com_flexicontent');
 		
@@ -809,7 +821,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		$task  = JRequest::getVar('task');
 		$model = $this->getModel('items');
 		$user  = JFactory::getUser();
+		
 		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		JArrayHelper::toInteger($cid);
+		
 		$method   = JRequest::getInt( 'method', 1);
 		$keeepcats= JRequest::getInt( 'keeepcats', 1 );
 		$keeptags = JRequest::getInt( 'keeptags', 1 );
@@ -1031,9 +1046,12 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
-		$cid   = JRequest::getVar( 'cid', array(), 'post', 'array' );
+		
 		$model = $this->getModel('item');
 		$msg = '';
+		
+		$cid   = JRequest::getVar( 'cid', array(), 'post', 'array' );
+		JArrayHelper::toInteger($cid);
 		
 		$newstate = JRequest::getVar("newstate", '');
 		$stateids = array ( 'PE' => -3, 'OQ' => -4, 'IP' => -5, 'P' => 1, 'U' => 0, 'A' => (FLEXI_J16GE ? 2:-1), 'T' => -2 );
@@ -1119,6 +1137,8 @@ class FlexicontentControllerItems extends FlexicontentController
 	function approval()
 	{
 		$cid	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		JArrayHelper::toInteger($cid);
+		
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_APPROVAL_SELECT_ITEM_SUBMIT' ) );
@@ -1145,11 +1165,14 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
-		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		
 		$model = $this->getModel('items');
 		$itemmodel = $this->getModel('item');
 		$msg = '';
 
+		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		JArrayHelper::toInteger($cid);
+		
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			JError::raiseNotice(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
 		} else {
@@ -1204,7 +1227,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
 	}
-
+	
+	
 	/**
 	 * Logic to set the access level of the Items
 	 *

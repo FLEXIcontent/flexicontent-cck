@@ -87,7 +87,12 @@
 			<option value="1">FLEXI_LINK_TO_FE</option>
 			<option value="2">FLEXI_LINK_TO_BE</option>
 		</field>
-		<field name="show_state_icon" type="radio" default="" label="FLEXI_STATE_ICON" description="FLEXI_STATE_ICON_DESC" class="btn-group btn-group-yesno">
+		<field name="show_deletebutton" type="radio" default="" label="FLEXI_SHOW_DELETE_BUTTON" description="FLEXI_SHOW_DELETE_BUTTON_DESC" class="btn-group btn-group-yesno">
+			<option value="">FLEXI_USE_GLOBAL</option>
+			<option value="0">FLEXI_HIDE</option>
+			<option value="1">FLEXI_SHOW</option>
+		</field>
+		<field name="show_state_icon" type="radio" default="" label="FLEXI_STATE_BUTTON" description="FLEXI_STATE_BUTTON_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>

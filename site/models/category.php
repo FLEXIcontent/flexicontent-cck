@@ -2029,6 +2029,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Parameters meant for lists
 		$params->set('show_editbutton', $params->get('show_editbutton_lists', 1));    // Parameter meant for lists
+		$params->set('show_deletebutton', $params->get('show_deletebutton_lists', 0));    // Parameter meant for lists
 		$params->set('show_title', $params->get('show_title_lists', 1));    // Parameter meant for lists
 		$params->set('link_titles', $params->get('link_titles_lists', 1));  // Parameter meant for lists
 		

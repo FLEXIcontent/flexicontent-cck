@@ -533,7 +533,7 @@ class flexicontent_html
 		$this->params_saved = @$this->params;
 		$this->params = $item->parameters;
 		$this->tmpl = '.item.'.$ilayout;
-		$this->print_link = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&id='.$item->slug.'&pop=1&tmpl=component');
+		$this->print_link = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&id='.$item->slug.'&pop=1&tmpl=component&print=1');
 		$this->pageclass_sfx = '';
 		if (!isset($this->item->event)) $this->item->event = new stdClass();
 		$this->item->event->beforeDisplayContent = '';
@@ -1890,7 +1890,7 @@ class flexicontent_html
 	 */
 	static function feedbutton($view, &$params, $slug = null, $itemslug = null, $reserved=null, $item = null)
 	{
-		if ( !$params->get('show_feed_icon', 1) || JRequest::getCmd('print') ) return;
+		if ( !$params->get('show_feed_icon', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 		
 		$uri    = JURI::getInstance();
 		$base  	= $uri->toString( array('scheme', 'host', 'port'));
@@ -1941,17 +1941,166 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
+			$tooltip_place = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		// $link as set above
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="bottom" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
+		return $output;
+	}
+	
+	
+	/**
+	 * Creates the delete button
+	 *
+	 * @param array $params
+	 * @since 1.0
+	 */
+	static function deletebutton( $item, &$params)
+	{
+		if ( !$params->get('show_deletebutton', 0) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
+		
+		$user	= JFactory::getUser();
+		
+		// Determine if current user can delete the given item
+		$has_delete = false;
+		$asset = 'com_content.article.' . $item->id;
+		$has_delete = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
+		// ALTERNATIVE 1
+		//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
+		//$has_delete = in_array('delete', $rights) || (in_array('delete.own', $rights) && $item->created_by == $user->get('id')) ;
+
+		// Create the delete button only if user can delete the give item
+		if ( !$has_delete ) return;
+		
+		$show_icons = $params->get('show_icons', 2);
+		$use_font   = $params->get('use_font_icons', 1);
+		if ( $show_icons && $use_font ) {
+			static $icon_class = null;
+			if ($icon_class == null) {
+				if (self::$icon_classes==null) self::load_class_config();
+				$icon_class = empty(self::$icon_classes['delete']) ? 'icon-delete' : self::$icon_classes['delete'];
+				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
+			}
+			$attribs = '';
+			$image = '<i class="'.$icon_class.'"></i>';
+		} else if ( $show_icons ) {
+			$attribs = '';
+			$image = JHTML::image('components/com_flexicontent/assets/images/'.'delete.png', JText::_( 'FLEXI_DELETE' ), $attribs);
+		} else {
+			$image = '';
+		}
+		
+		$overlib 	= JText::_( 'FLEXI_DELETE_TIP' );
+		$text 		= JText::_( 'FLEXI_DELETE' );
+		
+		$button_classes = 'fc_deletebutton';
+		if ( $show_icons==1 ) {
+			$caption = '';
+			$button_classes .= '';
+			$tooltip_place = 'bottom';
+		} else {
+			$caption = $text;
+			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+		}
+		$button_classes .= ' hasTooltip';
+		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
+		
+		//$Itemid = JRequest::getInt('Itemid', 0);  // Maintain menu item ? e.g. current category view, 
+		$Itemid = 0;
+		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
+		$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=remove';
+		$targetLink = "_self";
+		$confirm_text = JText::_('FLEXI_ARE_YOU_SURE_PERMANENT_DELETE', true);
+		
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		
+		return $output;
+	}
+	
+	
+	/**
+	 * Creates the CSV export button
+	 *
+	 * @param array $params
+	 * @since 1.0
+	 */
+	static function csvbutton($view, &$params, $slug = null, $itemslug = null, $reserved=null, $item = null)
+	{
+		if ( !$params->get('show_csvbutton', 0) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
+		
+		$uri    = JURI::getInstance();
+		$base  	= $uri->toString( array('scheme', 'host', 'port'));
+
+		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
+		if($view == 'category')
+		{
+			$non_sef_link = null;
+			flexicontent_html::createCatLink($slug, $non_sef_link);
+			$link = $base . JRoute::_($non_sef_link.'&format=csv');
+			//$link = $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=csv', false );
+		} elseif($view == FLEXI_ITEMVIEW) {
+			$link = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $slug, 0, $item).'&format=csv');
+			//$link = $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug.'&format=csv', false );
+		} elseif($view == 'tags') {
+			$link = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($itemslug).'&format=csv');
+			//$link = $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug.'&format=csv', false );
+		} else {
+			$link = $base . JRoute::_( 'index.php?view='.$view.'&format=csv', false );
+		}
+		
+		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+(screen.width-100)+\',top=20,height=\'+(screen.height-160)+\',directories=no,location=no';
+		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
+		
+		// This checks template image directory for image, if none found, default image is returned
+		$show_icons = $params->get('show_icons', 2);
+		$use_font   = $params->get('use_font_icons', 1);
+		if ( $show_icons && $use_font ) {
+			static $icon_class = null;
+			if ($icon_class == null) {
+				if (self::$icon_classes==null) self::load_class_config();
+				$icon_class = empty(self::$icon_classes['csv']) ? 'icon-download' : self::$icon_classes['csv'];
+				$icon_class .= ($show_icons==2 ? ' fcIconPadRight' : '');
+			}
+			$attribs = '';
+			$image = '<i class="'.$icon_class.'"></i>';
+		} else if ( $show_icons ) {
+			$attribs = '';
+			$image = JHTML::image('components/com_flexicontent/assets/images/'.'csv.png', JText::_( 'FLEXI_CSV_EXPORT' ), $attribs);
+		} else {
+			$image = '';
+		}
+		
+		$overlib = JText::_( 'FLEXI_CSV_TIP' );
+		$text = JText::_( 'FLEXI_CSV' );
+		
+		$button_classes = 'fc_csvbutton';
+		if ( $show_icons==1 ) {
+			$caption = '';
+			$button_classes .= '';
+			$tooltip_place = 'bottom';
+		} else {
+			$caption = $text;
+			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+		}
+		$button_classes .= ' hasTooltip';
+		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
+		
+		// $link as set above
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		
 		return $output;
 	}
 	
@@ -1965,18 +2114,11 @@ class flexicontent_html
 	 */
 	static function printbutton( $print_link, &$params )
 	{
-		if ( !$params->get('show_print_icon') || JRequest::getCmd('print') ) return;
+		if ( !$params->get('show_print_icon') || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 		
 		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+(screen.width-100)+\',top=20,height=\'+(screen.height-160)+\',directories=no,location=no';
-		
-		$print = JRequest::getInt('pop') || JRequest::getInt('print');
-		if ( $print ) {
-			$onclick = ' window.print(); return false; ';
-			$link = 'javascript:;';
-		} else {
-			$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
-			$link = JRoute::_($print_link);
-		}
+		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
+		$link = JRoute::_($print_link);
 		
 		// This checks template image directory for image, if none found, default image is returned
 		$show_icons = $params->get('show_icons', 2);
@@ -2004,15 +2146,17 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
+			$tooltip_place = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		// $link as set above
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="bottom" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -2031,7 +2175,7 @@ class flexicontent_html
 		static $initialize = null;
 		static $uri, $base;
 
-		if ( !$params->get('show_email_icon') || JRequest::getCmd('print') ) return;
+		if ( !$params->get('show_email_icon') || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 
 		if ($initialize === null) {
 			if (file_exists ( JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php' )) {
@@ -2091,15 +2235,17 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
+			$tooltip_place = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		// emailed link was set above
-		$output	= ' <a href="'.$mail_to_url.'" class="'.$button_classes.'" data-placement="bottom" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$mail_to_url.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 		
 		return $output;
@@ -2115,7 +2261,7 @@ class flexicontent_html
 	 */
 	static function pdfbutton( $item, &$params)
 	{
-		if ( FLEXI_J16GE || !$params->get('show_pdf_icon') || JRequest::getCmd('print') ) return;
+		if ( FLEXI_J16GE || !$params->get('show_pdf_icon') || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 		
 		$show_icons = $params->get('show_icons', 2);
 		$use_font   = $params->get('use_font_icons', 1);
@@ -2142,15 +2288,17 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
+			$tooltip_place = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		$link 	= JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf');
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="bottom" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
@@ -2167,7 +2315,7 @@ class flexicontent_html
 	static function statebutton( $item, &$params=null, $addToggler=true )
 	{
 		// Check for empty params too
-		if ( $params && !$params->get('show_state_icon', 1) || JRequest::getCmd('print') ) return;
+		if ( $params && !$params->get('show_state_icon', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 		
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
@@ -2287,6 +2435,11 @@ class flexicontent_html
 			$box_css = ''; //$app->isSite() ? 'width:182px; left:-100px;' : '';
 			$publish_info .= '<br/><br/>'.JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
 			
+			if ( !$params || !$params->get('show_icons', 2) )
+				$tooltip_place = 'bottom';
+			else
+				$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
+			
 			$allowed_states = array();
 			foreach ($state_ids as $i => $state_id) {
 				$allowed_states[] ='
@@ -2300,7 +2453,7 @@ class flexicontent_html
 			$output = '
 			<ul class="statetoggler">
 				<li class="topLevel">
-					<a href="javascript:void(0);" onclick="fc_toggleStateSelector(this)" id="row'.$item->id.'" class="stateopener '.$button_classes.'" data-placement="bottom" title="'.$tooltip_title.'">
+					<a href="javascript:void(0);" onclick="fc_toggleStateSelector(this)" id="row'.$item->id.'" class="stateopener '.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'">
 						'.$stateicon.'
 					</a>
 					<div class="options" style="'.$box_css.'" onclick="fc_toggleStateSelector(this)">
@@ -2345,7 +2498,7 @@ class flexicontent_html
 	 */
 	static function approvalbutton( $item, &$params)
 	{
-		if ( JRequest::getCmd('print') ) return;
+		if ( JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 		
 		static $user = null, $requestApproval = null;
 		if ($user === null) {
@@ -2394,15 +2547,17 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
+			$tooltip_place = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
 		$link = 'index.php?option=com_flexicontent&task=approval&cid='.$item->id;
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="bottom" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 		
 		return $output;
@@ -2418,7 +2573,7 @@ class flexicontent_html
 	 */
 	static function editbutton( $item, &$params)
 	{
-		if ( !$params->get('show_editbutton', 1) || JRequest::getCmd('print') ) return;
+		if ( !$params->get('show_editbutton', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 		
 		$user	= JFactory::getUser();
 		
@@ -2458,9 +2613,11 @@ class flexicontent_html
 		if ( $show_icons==1 ) {
 			$caption = '';
 			$button_classes .= '';
+			$tooltip_place = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .= self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
+			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -2472,11 +2629,10 @@ class flexicontent_html
 			$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=edit';
 			$targetLink = "_self";
 		} else if ( $params->get('show_editbutton', 1) == '2' ) {
-			//$link = JURI::base(true).'/administrator/index.php?option=com_flexicontent&view=items&filter_id='.$item->id;
 			$link = JURI::base(true).'/administrator/index.php?option=com_flexicontent&task=items.edit&cid[]='.$item->id;
 			$targetLink = "_blank";
 		}
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="bottom" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 		
 		return $output;
@@ -2491,7 +2647,7 @@ class flexicontent_html
 	 */
 	static function addbutton(&$params, &$submit_cat = null, $menu_itemid = 0, $submit_text = '', $auto_relations = false, $ignore_unauthorized = false)
 	{
-		if ( !$params->get('show_addbutton', 1) || JRequest::getCmd('print') ) return;
+		if ( !$params->get('show_addbutton', 1) || JFactory::getApplication()->input->get('print', 0, 'INT') ) return;
 		
 		// Currently add button will appear to logged users only
 		// ... unless unauthorized users are allowed
@@ -2599,16 +2755,18 @@ class flexicontent_html
 		if ( $show_icons==1 && !$auto_relations ) {
 			$caption = '';
 			$button_classes .= '';
+			$tooltip_place = 'bottom';
 		} else {
 			$caption = $text;
 			if ( !$params->get('btn_grp_dropdown', 0) ) $button_classes .=
 				(self::$use_bootstrap ? ' btn btn-small' : ' fc_button fcsimple fcsmall')
 				.($auto_relations ? ' btn-success' : '');
+			$tooltip_place = !$params->get('btn_grp_dropdown', 0) ? 'bottom' : 'left';
 		}
 		$button_classes .= ' hasTooltip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
 		
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="bottom" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="'.$tooltip_place.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		if (!$auto_relations) {
 			$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 		}

@@ -92,18 +92,17 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 		$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug, 0, $item );
 		$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 		$editbutton = flexicontent_html::editbutton( $item, $this->params );
+		$deletebutton = flexicontent_html::deletebutton( $item, $this->params );
 		$statebutton = flexicontent_html::statebutton( $item, $this->params );
 		$approvalbutton = flexicontent_html::approvalbutton( $item, $this->params );
 		?>
 		
-		<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) : ?>
+		<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $deletebutton || $statebutton || $approvalbutton) : ?>
 		
 			<!-- BOF buttons -->
 			<?php if ($this->params->get('btn_grp_dropdown')) : ?>
 			
 			<div class="buttons btn-group">
-		    <?php echo $statebutton; ?>
-		    
 			  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
 			    <span class="<?php echo $this->params->get('btn_grp_dropdown_class', 'icon-options'); ?>"></span>
 			  </button>
@@ -112,8 +111,10 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 			    <?php echo $mailbutton   ? '<li>'.$mailbutton.'</li>' : ''; ?>
 			    <?php echo $printbutton  ? '<li>'.$printbutton.'</li>' : ''; ?>
 			    <?php echo $editbutton   ? '<li>'.$editbutton.'</li>' : ''; ?>
+			    <?php echo $deletebutton   ? '<li>'.$deletebutton.'</li>' : ''; ?>
 			    <?php echo $approvalbutton  ? '<li>'.$approvalbutton.'</li>' : ''; ?>
 			  </ul>
+		    <?php echo $statebutton; ?>
 			</div>
 
 			<?php else : ?>
@@ -122,6 +123,7 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 				<?php echo $mailbutton; ?>
 				<?php echo $printbutton; ?>
 				<?php echo $editbutton; ?>
+				<?php echo $deletebutton; ?>
 				<?php echo $statebutton; ?>
 				<?php echo $approvalbutton; ?>
 			</div>
