@@ -209,6 +209,7 @@ class plgSystemFlexisystem extends JPlugin
 			";
 		}
 		
+		// Hide Joomla administration menus in FC modals
 		if (
 			$isAdmin && (
 				($option=='com_users' && ($view == 'user'))
