@@ -223,8 +223,11 @@
 				<option value="1">FLEXI_LINK_TO_FE</option>
 				<option value="2">FLEXI_LINK_TO_BE</option>
 			</field>
-
-			<field name="show_state_icon" type="radio" default="1" label="FLEXI_STATE_ICON" description="FLEXI_STATE_ICON_DESC" class="btn-group btn-group-yesno">
+			<field name="show_deletebutton" type="radio" default="0" label="FLEXI_SHOW_DELETE_BUTTON" description="FLEXI_SHOW_DELETE_BUTTON_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_state_icon" type="radio" default="1" label="FLEXI_STATE_BUTTON" description="FLEXI_STATE_BUTTON_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -245,7 +248,14 @@
 				<option value="0" show_list="" hide_list="disp_icon_classes">FLEXI_IMAGE</option>
 				<option value="1" show_list="disp_icon_classes" hide_list="disp_title">FLEXI_FONT_ICONS</option>
 			</field>
-			<field name="font_icon_classes" type="textarea" rows="2" default="pdf:icon-book, print:icon-print, mail:icon-envelope, feed:icon-feed, edit:icon-pencil, new:icon-new, approval:icon-key" label="FLEXI_FONT_ICONS" description="FLEXI_FONT_ICONS_DESC" class="disp_icon_classes input-xxlarge" />
+
+			<field name="font_icon_configs" type="multilist" subtype="radio" default="" label="FLEXI_PRESET_CONFIGURATIONS" description="FLEXI_PRESET_CONFIGURATIONS_DESC" toggle_related="1" fccustom_revert="1" class="btn-group group-fcmethod disp_icon_classes">
+				<option value="">FLEXI_CUSTOMIZE</option>
+				<option value="1" fcconfigs="{'font_icon_classes':'pdf:icon-book, print:icon-print, mail:icon-envelope, feed:icon-feed, edit:icon-pencil, new:icon-new, approval:icon-key, delete:icon-delete, csv:icon-download'}">FLEXI_LOAD_DEFAULTS_N_CUSTOMIZE</option>
+			</field>
+			<field name="font_icon_classes" type="textarea" rows="2" default="pdf:icon-book, print:icon-print, mail:icon-envelope, feed:icon-feed, edit:icon-pencil, new:icon-new, approval:icon-key, delete:icon-delete, csv:icon-download" label="FLEXI_FONT_ICONS" description="FLEXI_FONT_ICONS_DESC" class="disp_icon_classes input-xxlarge" />
+			
+			<field name="" type="separator" default="FLEXI_BUTTONS_PLACEMENT" label="" level="level3" />
 			<field name="btn_grp_dropdown" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_BTN_GROUP_AS_DROPDOWN" description="FLEXI_BTN_GROUP_AS_DROPDOWN_DESC" class="btn-group btn-group-yesno" >
 				<option value="0" show_list="" hide_list="disp_btn_grp_dropdown">FLEXI_NO</option>
 				<option value="1" show_list="disp_btn_grp_dropdown" hide_list="">FLEXI_YES</option>
@@ -398,14 +408,18 @@
 		
 		<field name="" type="separator" default="FLEXI_SUPPORTED_LIST_VIEWS" label="" level="level4" class="alert alert-info fcpadded" />
 		
-			<field name="" type="separator" default="FLEXI_PARAMETERS_CAT_INFO_OPTIONS" label="" level="level0" />
+			<field name="" type="separator" default="FLEXI_PARAMS_CAT_INFO_OPTIONS" label="" level="level0" />
 			
 			<field name="" type="separator" default="FLEXI_CATEGORY_EXTRA" level="level2" />
 			<field name="show_feed_link" type="radio" default="1" label="FLEXI_ADD_FEED_TO_HEAD" description="FLEXI_ADD_FEED_TO_HEAD_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_feed_icon" type="radio" default="1" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC" class="btn-group btn-group-yesno">
+			<field name="show_feed_icon" type="radio" default="0" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_csvbutton" type="radio" default="0" label="FLEXI_CSV_EXPORT_BUTTON" description="FLEXI_CSV_EXPORT_BUTTON_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -532,7 +546,7 @@
 			<field name="subcat_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="disp_subcats input-xxlarge" />
 			
 
-		<field name="" type="separator" default="FLEXI_PARAMETERS_PEERCATS_INFO_OPTIONS" level="level0" />
+		<field name="" type="separator" default="FLEXI_PARAMS_PEERCATS_INFO_OPTIONS" level="level0" />
 			
 			<field name="show_peercategories" type="multilist" subtype="radio" default="1" label="FLEXI_SHOW_PEERCATS" description="FLEXI_SHOW_PEERCATS_DESC" toggle_related="0" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="disp_peercats">FLEXI_HIDE</option>
@@ -806,6 +820,10 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_LINK_TO_FE</option>
 				<option value="2">FLEXI_LINK_TO_BE</option>
+			</field>
+			<field name="show_deletebutton_lists" type="radio" default="0" label="FLEXI_SHOW_DELETE_BUTTON_IN_LISTS" description="FLEXI_SHOW_DELETE_BUTTON_IN_LISTS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="show_comments_count" type="radio" default="1" label="FLEXI_SHOW_COMMENTS_COUNTER" description="FLEXI_SHOW_COMMENTS_COUNTER_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>

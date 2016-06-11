@@ -2359,8 +2359,11 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$user = JFactory::getUser();
 		
+		JArrayHelper::toInteger($cid);
+		$cids = implode( ',', $cid );
+		
 		$query = 'SELECT id, catid, created_by FROM #__content'
-			. ' WHERE id IN ( '. implode(',', $cid) . ' )'
+			. ' WHERE id IN ('. $cids . ')'
 			;
 		$this->_db->setQuery( $query );
 		$items = $this->_db->loadObjectList();
@@ -2393,6 +2396,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		if ( !count( $cid ) ) return false;
 		
+		JArrayHelper::toInteger($cid);
 		$cids = implode( ',', $cid );
 		
 		if ($itemmodel)
@@ -2585,6 +2589,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		return true;
 	}
+	
 	
 	/**
 	 * Method to save the access level of the items

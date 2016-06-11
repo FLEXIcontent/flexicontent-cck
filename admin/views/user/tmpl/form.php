@@ -101,7 +101,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				
 				$query = 'SELECT group_id FROM #__user_usergroup_map WHERE user_id = '.(int) $this->form->getValue('id');
 				$db->setQuery( $query );
-				$this->row->usergroups = $db->loadColumn();
+				$user_grpids = $db->loadColumn();
 				
 				// Get list of Groups for dropdown filter
 				$query = 'SELECT *, id AS value, title AS text FROM #__usergroups';
@@ -109,7 +109,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				$usergroups = $db->loadObjectList('id');
 				
 				$row_groupnames = array();
-				foreach($this->row->usergroups as $row_ugrp_id) {
+				foreach($user_grpids as $row_ugrp_id) {
 					$row_groupnames[] = $usergroups[$row_ugrp_id]->title;
 				}
 				$row_groupnames = implode(', ', $row_groupnames);

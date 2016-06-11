@@ -271,6 +271,93 @@ class FlexicontentController extends JControllerLegacy
 	}
 	
 	
+	
+	/**
+	 * Logic to delete items
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function remove()
+	{
+		$db    = JFactory::getDBO();
+		$user  = JFactory::getUser();
+		$cid   = JRequest::getVar( 'id', array(), '', 'array' );
+		JArrayHelper::toInteger($cid);
+		
+		require_once(JPATH_ROOT.DS."administrator".DS."components".DS."com_flexicontent".DS."models".DS."items.php");
+		$model = new FlexicontentModelItems;
+		$itemmodel = $this->getModel('item');
+		$msg = '';
+
+		if (!is_array( $cid ) || count( $cid ) < 1) {
+			JError::raiseNotice(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
+		} else {
+			// Remove unauthorized (undeletable) items
+			$auth_cid = array();
+			$non_auth_cid = array();
+			
+			// Get owner and other item data
+			$q = "SELECT id, created_by, catid FROM #__content WHERE id IN (". implode(',', $cid) .")";
+			$db->setQuery($q);
+			$itemdata = $db->loadObjectList('id');
+			
+			// Check authorization for delete operation
+			foreach ($cid as $id)
+			{
+				$has_delete = false;
+				$asset = 'com_content.article.' . $itemdata[$id]->id;
+				$canDelete 		= $user->authorise('core.delete', $asset);
+				$canDeleteOwn = $user->authorise('core.delete.own', $asset) && $itemdata[$id]->created_by == $user->get('id');
+				
+				if ( $canDelete || $canDeleteOwn ) {
+					$auth_cid[] = $id;
+				} else {
+					$non_auth_cid[] = $id;
+				}
+			}
+		}
+		//echo "<pre>"; echo "authorized:\n"; print_r($auth_cid); echo "\n\nNOT authorized:\n"; print_r($non_auth_cid); echo "</pre>"; exit;
+		
+		// Set warning for undeletable items
+		if (count($non_auth_cid)) {
+			if (count($non_auth_cid) < 2) {
+				$msg_noauth = JText::_( 'FLEXI_CANNOT_DELETE_ITEM' );
+			} else {
+				$msg_noauth = JText::_( 'FLEXI_CANNOT_DELETE_ITEMS' );
+			}
+			$msg_noauth .= ": " . implode(',', $non_auth_cid) ." - ". JText::_( 'FLEXI_REASON_NO_DELETE_PERMISSION' ) ." - ". JText::_( 'FLEXI_IDS_SKIPPED' );
+			JError::raiseNotice(500, $msg_noauth);
+		}
+		
+		// Try to delete 
+		if ( count($auth_cid) && !$model->delete($auth_cid, $itemmodel) )
+		{
+			// Item not deleted set error message, and return url to the item url
+			JError::raiseWarning(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($itemmodel->get('id').':'.$itemmodel->get('alias'), $globalcats[$itemmodel->get('catid')]->slug));
+		}
+		
+		else {
+			// Item deleted clean item-related caches
+			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+			$cache = FLEXIUtilities::getCache($group='', 1);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+			
+			// Item deleted set message, and return url to the home page // TODO return to category or other page
+			$msg = count($auth_cid).' '.JText::_( 'FLEXI_ITEMS_DELETED' );
+			$link = JRoute::_('index.php');
+		}
+		
+		$this->setRedirect( $link, $msg );
+	}
+	
+	
+	
 	/**
 	 * Logic to save an item
 	 *
