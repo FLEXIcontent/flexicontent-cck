@@ -31,7 +31,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
-			<field name="allow_multiple" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" inline_tip="FLEXI_PREFER_CHECKBOX_TO_MULVAL_RADIO" tip_class="multivalue-mode" tip_img="warning.png" toggle_related="1" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
+			<field name="allow_multiple" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC" inline_tip="FLEXI_PREFER_CHECKBOX_TO_MULVAL_RADIO" tip_class="multivalue-mode" tip_img="warning.png" depend_class="fieldgroupoff" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
 			</field>
@@ -56,13 +56,27 @@
 			</field>
 			<field name="sql_mode" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_SQL_MODE" description="FLEXI_FIELD_SQL_MODE_DESC"
 				inline_tip="SELECT ... AS value, ... AS text, ... AS image, ... AS valgrp ... FROM ... WHERE _valgrp_in_ AND (...)" tip_class="elements_sql" tip_img="comment.png"  preview_img="database_green.png" 
-				inline_tip2="value1::label1::image1::valgrp%%&lt;br/&gt; value2::label2::image2::valgrp%% ..." tip_class2="elements_list" tip_img2="comment.png" preview_img2="text_area.png" 
+				inline_tip2="value1::label1::image1.png::valgrp%%&lt;br/&gt; value2::label2::image2.png::valgrp%% ..." tip_class2="elements_list" tip_img2="comment.png" preview_img2="text_area.png" 
 				class="btn-group group-fcinfo">
 				<option value="0" show_list="elements_list" hide_list="elements_sql">FLEXI_NO</option>
 				<option value="1" show_list="elements_sql" hide_list="elements_list">FLEXI_YES</option>
 			</field>
 			<field name="field_elements" type="textarea" default="1::Information::information.png%% 0::Warning::warning.png%% " class="required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS_CASCADABLE" description="FLEXI_FIELD_ELEMENTS_CASCADABLE_DESC" />
-			<field name="imagedir" type="text" default="images/stories/" class="required" label="FLEXI_FIELD_IMAGEDIR" description="FLEXI_FIELD_IMAGEDIR_DESC" />
+			<field name="image_type" type="multilist" subtype="radio" toggle_related="1" default="0" label="Image / Icon" description="Select if 'image' will be an image filename (e.g. image1.png) or an font icon class (e.g. icon-mail, icon-lamp)" class="btn-group group-fcinfo" labelclass="label-success">
+				<option value="0" show_list="icontype_image" hide_list="icontype_font">Image name</option>
+				<option value="1" show_list="icontype_font" hide_list="icontype_image">Font class</option>
+			</field>
+			<field name="imagedir" type="text" default="images/stories/" class="required" label="FLEXI_FIELD_IMAGEDIR" description="FLEXI_FIELD_IMAGEDIR_DESC" depend_class="icontype_image" />
+			<field name="icon_size_form" type="list" default="" label="FLEXI_ICON_SIZE" description="" depend_class="icontype_font">
+				<option value="">FLEXI_SIZE_VIA_CSS</option>
+				<option value="16">16x16</option>
+				<option value="20">20x20</option>
+				<option value="24">24x24</option>
+				<option value="32">32x32</option>
+				<option value="48">48x48</option>
+				<option value="64">64x64</option>
+			</field>
+			<field name="icon_color_form" type="color" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font"/>
 			
 			<field name="cascade_after" type="fields" field_type="select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="Cascade after master" description="Load values when another field is changed" 
 				inline_tip="You need to have a property 'valgrp' in the elements &lt;br/&gt; The value(s) of -master- field will filter the values of -this- field, by requiring that:&lt;br/&gt;&lt;br/&gt; value master-field == valgrp this-field" tip_class="" tip_img="comment.png"  preview_img="relationships.png" 
@@ -71,7 +85,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level1" />
 
-			<field name="display_label_form" type="multilist" subtype="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+			<field name="display_label_form" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="custom_placeholder" hide_list="">FLEXI_NO</option>
 				<option value="1" show_list="custom_placeholder" hide_list="">FLEXI_FLOATED_LEFT</option>
 				<option value="2" show_list="custom_placeholder" hide_list="">FLEXI_CLEARED</option>
@@ -84,7 +98,7 @@
 				<option value="1">FLEXI_IMAGE</option>
 				<option value="2">FLEXI_BOTH</option>
 			</field>
-			<field name="usefirstoption" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_ADD_PROMPT" toggle_related="1" description="FLEXI_FIELD_ADD_PROMPT_DESC" class="btn-group btn-group-yesno">
+			<field name="usefirstoption" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_ADD_PROMPT" description="FLEXI_FIELD_ADD_PROMPT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="use_prompt">FLEXI_NO</option>
 				<option value="1" show_list="use_prompt" hide_list="">FLEXI_YES</option>
 			</field>
@@ -124,7 +138,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_acc_msg" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+			<field name="show_acc_msg" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="field-acc-msg">FLEXI_NO</option>
 				<option value="1" show_list="field-acc-msg" hide_list="">FLEXI_YES</option>
 			</field>
@@ -137,20 +151,30 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="text_or_value" type="radio" default="2" label="FLEXI_LABEL_OR_VALUE_ETC" description="FLEXI_LABEL_OR_VALUE_ETC_DESC" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_VALUE</option>
-				<option value="1">FLEXI_LABEL</option>
-				<option value="2">FLEXI_IMAGE</option>
-				<option value="3">FLEXI_IMAGE_N_LABEL</option>
-				<option value="4">FLEXI_IMAGE_N_VALUE</option>
+			<field name="text_or_value" type="multilist" subtype="radio" toggle_related="1" default="2" label="FLEXI_LABEL_OR_VALUE_ETC" description="FLEXI_LABEL_OR_VALUE_ETC_DESC" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="view_with_image">FLEXI_VALUE</option>
+				<option value="1" show_list="" hide_list="view_with_image">FLEXI_LABEL</option>
+				<option value="2" show_list="view_with_image" hide_list="">FLEXI_IMAGE</option>
+				<option value="3" show_list="view_with_image" hide_list="">FLEXI_IMAGE_N_LABEL</option>
+				<option value="4" show_list="view_with_image" hide_list="">FLEXI_IMAGE_N_VALUE</option>
 			</field>
+			<field name="icon_size" type="list" default="" label="FLEXI_ICON_SIZE" description="" depend_class="icontype_font view_with_image">
+				<option value="">FLEXI_SAME_AS_FORM</option>
+				<option value="16">16x16</option>
+				<option value="20">20x20</option>
+				<option value="24">24x24</option>
+				<option value="32">32x32</option>
+				<option value="48">48x48</option>
+				<option value="64">64x64</option>
+			</field>
+			<field name="icon_color" type="color" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font view_with_image"/>
 			<field name="display_all" type="radio" default="0" label="FLEXI_DISPLAY_NONSELECTED_VALUES" description="FLEXI_DISPLAY_NONSELECTED_VALUES_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
-			<field name="trigger_onprepare_content" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="plg-trigger-mode">FLEXI_NO</option>
 				<option value="1" show_list="plg-trigger-mode" hide_list="">FLEXI_YES</option>
 			</field>
@@ -242,11 +266,22 @@
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
-			<field name="filter_vals_display" type="radio" default="0" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_LABEL</option>
-				<option value="1">FLEXI_IMAGE</option>
-				<option value="2">FLEXI_BOTH</option>
+			<field name="filter_vals_display" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="filter_with_image">FLEXI_LABEL</option>
+				<option value="1" show_list="filter_with_image" hide_list="">FLEXI_IMAGE</option>
+				<option value="2" show_list="filter_with_image" hide_list="">FLEXI_BOTH</option>
 			</field>
+			<field name="icon_size_filter" type="list" default="" label="FLEXI_ICON_SIZE" description="" depend_class="icontype_font filter_with_image">
+				<option value="">FLEXI_SAME_AS_FORM</option>
+				<option value="16">16x16</option>
+				<option value="20">20x20</option>
+				<option value="24">24x24</option>
+				<option value="32">32x32</option>
+				<option value="48">48x48</option>
+				<option value="64">64x64</option>
+			</field>
+			<field name="icon_color_filter" type="color" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font filter_with_image"/>
+
 			<field name="display_filter_as" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC">
 				<option value="0" show_list="filt-drop-down" hide_list="filt-as-slider">FLEXI_DISPLAY_AS_DROP_DOWN</option>
 				<option value="1" show_list="" hide_list="filt-drop-down,filt-as-slider">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
@@ -276,7 +311,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_AS_DROP_DOWN" level="level3" depend_class="filt-drop-down" />
-			<field name="filter_usefirstoption" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down" class="btn-group btn-group-yesno">
+			<field name="filter_usefirstoption" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="displaydefauttext-mode">FLEXI_NO</option>
 				<option value="1" show_list="displaydefauttext-mode" hide_list="">FLEXI_YES</option>
 			</field>
@@ -301,11 +336,22 @@
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
-			<field name="filter_vals_display_s" type="radio" default="0" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC" class="btn-group group-fcinfo">
-				<option value="0">FLEXI_LABEL</option>
-				<option value="1">FLEXI_IMAGE</option>
-				<option value="2">FLEXI_BOTH</option>
+			<field name="filter_vals_display_s" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="filter_with_image_s">FLEXI_LABEL</option>
+				<option value="1" show_list="filter_with_image_s" hide_list="">FLEXI_IMAGE</option>
+				<option value="2" show_list="filter_with_image_s" hide_list="">FLEXI_BOTH</option>
 			</field>
+			<field name="icon_size_filter_s" type="list" default="" label="FLEXI_ICON_SIZE" description="" depend_class="icontype_font filter_with_image_s">
+				<option value="">FLEXI_SAME_AS_FORM</option>
+				<option value="16">16x16</option>
+				<option value="20">20x20</option>
+				<option value="24">24x24</option>
+				<option value="32">32x32</option>
+				<option value="48">48x48</option>
+				<option value="64">64x64</option>
+			</field>
+			<field name="icon_color_filter_s" type="color" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font filter_with_image_s"/>
+			
 			<field name="display_filter_as_s" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC">
 				<option value="0" show_list="filt-drop-down-s" hide_list="filt-as-slider-s">FLEXI_DISPLAY_AS_DROP_DOWN</option>
 				<option value="1" show_list="" hide_list="filt-drop-down-s,filt-as-slider-s">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
@@ -335,7 +381,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_AS_DROP_DOWN" level="level3" depend_class="filt-drop-down-s" />
-			<field name="filter_usefirstoption_s" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" toggle_related="1" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down-s" class="btn-group btn-group-yesno">
+			<field name="filter_usefirstoption_s" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION" description="FLEXI_FIELD_CUSTOMIZE_FILTER_FIRST_OPTION_DESC" depend_class="filt-drop-down-s" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="displaydefauttext-mode-s">FLEXI_NO</option>
 				<option value="1" show_list="displaydefauttext-mode-s" hide_list="">FLEXI_YES</option>
 			</field>

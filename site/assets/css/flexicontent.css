@@ -908,6 +908,51 @@ body .fc-nowrap-box,
 	border-bottom-right-radius: 0;
 	margin-right: 0px;
 }
+.fc-icon-16:before {
+	font-size: 16px !important;
+}
+.fc-icon-16 {
+	font-size: 16px !important;
+	line-height: 16px !important;
+	height: 16px !important;
+	width: 16px !important;
+}
+.fc-icon-20:before {
+	font-size: 20px !important;
+}
+.fc-icon-20 {
+	font-size: 20px !important;
+	line-height: 20px !important;
+	height: 20px !important;
+	width: 20px !important;
+}
+.fc-icon-32:before {
+	font-size: 32px !important;
+}
+.fc-icon-32 {
+	font-size: 32px !important;
+	line-height: 32px !important;
+	height: 32px !important;
+	width: 32px !important;
+}
+.fc-icon-48:before {
+	font-size: 48px !important;
+}
+.fc-icon-48 {
+	font-size: 48px !important;
+	line-height: 48px !important;
+	height: 48px !important;
+	width: 48px !important;
+}
+.fc-icon-64:before {
+	font-size: 64px !important;
+}
+.fc-icon-64 {
+	font-size: 64px !important;
+	line-height: 64px !important;
+	height: 64px !important;
+	width: 64px !important;
+}
 input.fc-inherited-value + label {
 	font-weight: bold !important;
 	text-decoration: underline !important;

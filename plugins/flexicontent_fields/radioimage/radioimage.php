@@ -616,15 +616,30 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		{
 			// image specific variables
 			$form_vals_display = $field->parameters->get( 'form_vals_display', 1 ) ;  // this field includes image but it can be more convenient/compact not to be display image in item form
-			$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
-			$imgpath  = JURI::root(true) .'/'. $imagedir;
-			$imgfolder = JPATH_SITE .DS. $imagedir;
+			$image_type = (int)$field->parameters->get( 'image_type', 0 );
 			
-			foreach ($elements as $element) {
+			if ($image_type==0)
+			{
+				$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
+				$imgpath  = JURI::root(true) .'/'. $imagedir;
+				$imgfolder = JPATH_SITE .DS. $imagedir;
+			}
+			else {
+				$icon_size = (int)$field->parameters->get( 'icon_size_form' ) ;
+				$icon_color = $field->parameters->get( 'icon_color_form' ) ;
+			}
+			
+			foreach ($elements as $element)
+			{
 				if ($form_vals_display >0 && !isset($element->image_html) && empty($element->isprompt))
-					$element->image_html = file_exists($imgfolder . $element->image) ?
-						'<img style="vertical-align:unset!important;" src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />' :
-						'[NOT found]: '. $imgpath . $element->image;
+				{
+					if (!$image_type)
+						$element->image_html = file_exists($imgfolder . $element->image) ?
+							'<img style="vertical-align:unset!important;" src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />' :
+							'[NOT found]: '. $imgpath . $element->image;
+					else
+						$element->image_html = '<span style="vertical-align:unset!important; '.($icon_color ? 'color: '.$icon_color.';' : '').'" class="fcfield_radiocheck_icon '. $element->image . ($icon_size ? ' fc-icon-'.$icon_size : '').'"></span>';
+				}
 				if (!isset($element->label_tip))
 					$element->label_tip = flexicontent_html::getToolTip(null, $element->text, 0, 1);
 			}
@@ -714,12 +729,16 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		// Value creation
 		$sql_mode = $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
-		$text_or_value  = $field->parameters->get( 'text_or_value', 2 ) ;
+		$text_or_value  = (int)$field->parameters->get( 'text_or_value', 2 ) ;
 		
 		// image specific or image related variables
 		$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
 		$imgpath  = JURI::root(true) .'/'. $imagedir;
 		$tooltip_class = 'hasTooltip';
+		
+		$image_type = (int)$field->parameters->get( 'image_type', 0 ) ;
+		$icon_size = (int)$field->parameters->get( 'icon_size', $field->parameters->get( 'icon_size_form') ) ;
+		$icon_color = $field->parameters->get( 'icon_color', $field->parameters->get( 'icon_color_form') ) ;
 		
 		switch($separatorf)
 		{
@@ -920,7 +939,9 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		$_s = $isSearchView ? '_s' : '';
 		$filter_vals_display = $filter->parameters->get( 'filter_vals_display'.$_s, 0 );
 		$filter_as_images = in_array($filter_vals_display, array(1,2)) ;
-		if ($filter_as_images && $elements)
+		$image_type = (int)$filter->parameters->get( 'image_type', 0 );
+		
+		if ($filter_as_images && $elements && !$image_type)
 		{
 			// image specific variables
 			$imagedir = preg_replace('#^(/)*#', '', $filter->parameters->get( 'imagedir' ) );
