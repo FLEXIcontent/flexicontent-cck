@@ -1088,8 +1088,17 @@ class flexicontent_html
 			case 'select2':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				// Replace chosen function (if loaded)
-				//JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
+				// Disable select2 JS in mobile devices and instead use chosen JS ...
+				$mobileDetector = flexicontent_html::getMobileDetector();
+				$isMobile = $mobileDetector->isMobile() || $mobileDetector->isTablet();
+				
+				// Load chosen function (if not loaded already) and target specific selector
+				if ($isMobile)
+				{
+					JHtml::_('formbehavior.chosen', '.use_chosen_lib');
+				}
+				
+				// Regardless if we loaded chosen JS or some other code loaded it, prevent it from ... attaching to elements meant for select2
 				$js .= "
 				if (typeof jQuery.fn.chosen == 'function') { 
 					jQuery.fn.chosen_fc = jQuery.fn.chosen;
@@ -1125,10 +1134,6 @@ class flexicontent_html
 					}
 				}
 				
-				// Disable select2 JS in mobile devices
-				$mobileDetector = flexicontent_html::getMobileDetector();
-				$isMobile = $mobileDetector->isMobile();
-				
 				$js .= "
 					jQuery(document).ready(function() {
 						
@@ -1136,7 +1141,8 @@ class flexicontent_html
 						".($isMobile ? "
 						jQuery('select.use_select2_lib')
 							//.filter(function(){return !jQuery(this).attr('multiple');})
-							.removeClass('use_select2_lib').addClass('fc_isselect').addClass('fc_ismobile');"
+							.removeClass('use_select2_lib').addClass('fc_isselect fc_ismobile fc_no_js_attach');  //use_chosen_lib
+						jQuery('.fc_mobile_label').show();"
 						: "")."
 						
 						"/* Attach select2 to specific to select elements having specific CSS class, show selected values as both: unselectable and disabled */."
