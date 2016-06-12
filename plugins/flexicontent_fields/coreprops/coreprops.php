@@ -209,30 +209,43 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 		}
 		
 		// a. If field filter has defined a custom SQL query to create filter (drop-down select) options, execute it and then create the options
-		if ( !empty($query) ) {
+		if ( !empty($query) )
+		{
 			$db->setQuery($query);
 			$lists = $db->loadObjectList();
+			
+			// Add the options
 			$options = array();
-			$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
+			$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
+			if ($display_filter_as == 6)
+			{
+				if ($label_filter==2)
+				{
+					$options[] = JHTML::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
+				}
+			}
+			else
+				$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
 			foreach ($lists as $list) $options[] = JHTML::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
 		}
 		
 		// b. If field filter has defined drop-down select options the create the drop-down select form field
-		if ( !empty($options) ) {
+		if ( !empty($options) )
+		{
 			// Make use of select2 lib
 			flexicontent_html::loadFramework('select2');
 			$classes  = " use_select2_lib". @ $extra_classes;
 			$extra_param = '';
 			
 			// MULTI-select: special label and prompts
-			if ($display_filter_as == 6) {
-				//$classes .= ' fc_label_internal fc_prompt_internal';
+			if ($display_filter_as == 6)
+			{
 				$classes .= ' fc_prompt_internal';
+				
 				// Add field's LABEL internally or click to select PROMPT (via js)
-				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
-				// Add type to filter PROMPT (via js)
-				//$extra_param  = ' data-fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
 				$extra_param  = ' data-placeholder="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
+				
+				// Add type to filter PROMPT (via js)
 				$extra_param .= ' data-fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
 			}
 			
@@ -245,11 +258,19 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 			$filter_ffname = 'filter_'.$filter->id;
 			$filter_ffid   = $formName.'_'.$filter->id.'_val';
 			
+			if ( !is_array($value) )  $value = array($value);
+			if ( count($value==1) && !strlen( reset($value) ) )  $value = array();
+			
 			// Create filter
-			$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
+			if ($display_filter_as != 6)
+				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
+			else
+				$filter->html	.=
+					($label_filter==2 && count($value) ? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> ' : '').
+					JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
 		}
 		
-		// Special CASE 'categories' filter, replace some tags in filter HTML ...
+		// Special CASE for some filters, do some replacements
 		//if ( $props_type == 'alias') $filter->html = str_replace('_', ' ', $filter->html);
 	}
 	

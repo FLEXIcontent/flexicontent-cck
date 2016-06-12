@@ -2610,6 +2610,13 @@ class FlexicontentFields
 			$icon_style = ($icon_color ? ' color: '.$icon_color.';' : '');
 		}
 		
+		// Make sure the current filtering values match the field filter configuration to single or multi-value
+		if ( in_array($display_filter_as, array(2,3,5,6,8)) ) {
+			if (!is_array($value)) $value = strlen($value) ? array($value) : array();
+		} else {
+			if (is_array($value)) $value = @ $value[0];
+		}
+		
 		$isRange = in_array( $display_filter_as, array(2,3,8) );
 		$require_all_param = $filter->parameters->get( 'filter_values_require_all', 0 );
 		$require_all = count($value)>1 && !$isRange ?   // prevent require_all for known ranges
@@ -2624,13 +2631,6 @@ class FlexicontentFields
 		
 		$filter_ffname = 'filter_'.$filter->id;
 		$filter_ffid   = $formName.'_'.$filter->id.'_val';
-		
-		// Make sure the current filtering values match the field filter configuration to single or multi-value
-		if ( in_array($display_filter_as, array(2,3,5,6,8)) ) {
-			if (!is_array($value)) $value = strlen($value) ? array($value) : array();
-		} else {
-			if (is_array($value)) $value = @ $value[0];
-		}
 		
 		// Escape values for output, moved to HTML code, because it causes problem with value matching (==)
 		//if (!is_array($value)) $value = htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
@@ -2768,9 +2768,33 @@ class FlexicontentFields
 		else switch ($display_filter_as)
 		{
 		case 0: case 2: case 6:  // 0: Select (single value selectable), 2: Dual select (value range), 6: Multi Select (multiple values selectable)
+			
+			// Make use of select2 lib
+			flexicontent_html::loadFramework('select2');
+			$classes  = " use_select2_lib";
+			$extra_param = '';
 			$options = array();
-			// MULTI-select does not has an internal label a drop-down list option
-			if ($display_filter_as != 6) {
+			
+			// MULTI-select: special label and prompts
+			if ($display_filter_as == 6)
+			{
+				$classes .= ' fc_prompt_internal';
+				
+				// Add field's LABEL internally or click to select PROMPT (via js)
+				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
+				if ($label_filter==2)
+				{
+					$options[] = JHTML::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
+				}
+				$extra_param  = ' data-placeholder="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
+				
+				// Add type to filter PROMPT (via js)
+				$extra_param .= ' data-fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
+			}
+			
+			// SINGLE-select does not has an internal label a drop-down list option
+			else
+			{
 				if ($label_filter==-1) {  // *** e.g. BACKEND ITEMS MANAGER custom filter
 					$filter->html = '<span class="'.$filter->parameters->get( 'label_filter_css'.$_s, 'label' ).'">'.$filter->label.'</span>';
 					$first_option_txt = '';
@@ -2782,26 +2806,11 @@ class FlexicontentFields
 				}
 				$options[] = JHTML::_('select.option', '', !$first_option_txt ? '-' : '- '.$first_option_txt.' -');
 			}
-			foreach ($results as $result) {
+			
+			foreach ($results as $result)
+			{
 				if ( !strlen($result->value) ) continue;
 				$options[] = JHTML::_('select.option', $result->value, $result->text, 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
-			}
-			
-			// Make use of select2 lib
-			flexicontent_html::loadFramework('select2');
-			$classes  = " use_select2_lib";
-			$extra_param = '';
-			
-			// MULTI-select: special label and prompts
-			if ($display_filter_as == 6) {
-				//$classes .= ' fc_label_internal fc_prompt_internal';
-				$classes .= ' fc_prompt_internal';
-				// Add field's LABEL internally or click to select PROMPT (via js)
-				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
-				// Add type to filter PROMPT (via js)
-				//$extra_param  = ' data-fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
-				$extra_param  = ' data-placeholder="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
-				$extra_param .= ' data-fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
 			}
 			
 			// Create HTML tag attributes
@@ -2819,7 +2828,10 @@ class FlexicontentFields
 			if ($display_filter_as==0) {
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname, $attribs_str, 'value', 'text', $value, $filter_ffid);
 			} else if ($display_filter_as==6) {
-				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
+				// Need selected values: array('') instead of array(), to force selecting the "field's prompt option" (e.g. field label) thus avoid "0 selected" display in mobiles
+				$filter->html	.=
+					($label_filter==2 && count($value) ? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> ' : '').
+					JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
 			} else {
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[1]', $attribs_str, 'value', 'text', @ $value[1], $filter_ffid.'1');
 				$filter->html	.= '<span class="fc_range"></span>';
@@ -2831,8 +2843,7 @@ class FlexicontentFields
 			if ( !$isSlider ) {
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isDate ? 'FLEXI_CLICK_CALENDAR' : ''/*'FLEXI_TYPE_TO_LIST'*/);
 				$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
-				//$attribs_str = ' class="fc_field_filter fc_label_internal '.($isDate ? 'fc_iscalendar' : '').'" data-fc_label_text="'.$_inner_lb.'"';
-				//$attribs_arr = array('class'=>'fc_field_filter fc_label_internal '.($isDate ? 'fc_iscalendar' : '').'', 'data-fc_label_text' => $_inner_lb );
+				
 				$attribs_str = ' class="fc_field_filter '.($isDate ? 'fc_iscalendar' : '').'" placeholder="'.$_inner_lb.'"';
 				$attribs_arr = array('class'=>'fc_field_filter '.($isDate ? 'fc_iscalendar' : '').'', 'placeholder' => $_inner_lb );
 			} else {
