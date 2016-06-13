@@ -3054,7 +3054,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Create attributes of the drop down field for selecting existing images
 		$onchange  = ' onchange="';
-		$onchange .= " if (!this.value) return true; qmAssignFile".$field->id."(this.id, this.value, fc_db_img_path+'/s_'+this.value); jQuery(this).val('').trigger('change');";
+		$onchange .= " qmAssignFile".$field->id."(this.id, this.value, fc_db_img_path+'/s_'+this.value);";
 		$onchange .= ' "';
 		$classes = ' existingname no_value_selected ';
 		$js = "";

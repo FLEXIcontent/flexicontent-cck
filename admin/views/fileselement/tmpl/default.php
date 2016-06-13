@@ -766,8 +766,8 @@ flexicontent_html::loadFramework('flexi-lib');
 			?>
 			
 			<?php if ($enable_multi_uploader) : ?>
-			<span class="alert alert-info" style="margin-left:64px;"><?php echo JText::_( 'Problem ? use single uploader' ); ?></span>
-			<button id="single_multi_uploader" class="<?php echo $btn_class; ?> btn-warning" onclick="jQuery('#filemanager-1').toggle(); jQuery('#filemanager-2').toggle(); jQuery('#multiple_uploader').height(330); setTimeout(function(){showUploader()}, 100);">
+			<span class="alert alert-info" style="margin: 2px 24px 0px 64px;"><?php echo JText::_( 'Problem ? use single uploader' ); ?></span>
+			<button id="single_multi_uploader" class="<?php echo $btn_class; ?>" onclick="jQuery('#filemanager-1').toggle(); jQuery('#filemanager-2').toggle(); jQuery('#multiple_uploader').height(330); setTimeout(function(){showUploader()}, 100);">
 				<?php echo JText::_( 'FLEXI_SINGLE_MULTIPLE_UPLOADER' ); ?>
 			</button>
 			<div class="fcclear"></div>
