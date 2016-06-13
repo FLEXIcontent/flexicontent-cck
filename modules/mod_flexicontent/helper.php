@@ -419,6 +419,7 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i] = new stdClass();
 					$lists[$ord]['featured'][$i]->_row = $row;
 					$lists[$ord]['featured'][$i]->id = $row->id;
+					$lists[$ord]['featured'][$i]->type_id = $row->type_id;
 					$lists[$ord]['featured'][$i]->is_active_item = ($isflexi_itemview && $row->id==$active_item_id);
 					
 					//date
@@ -558,6 +559,7 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i] = new stdClass();
 					$lists[$ord]['standard'][$i]->_row = $row;
 					$lists[$ord]['standard'][$i]->id = $row->id;
+					$lists[$ord]['standard'][$i]->type_id = $row->type_id;
 					$lists[$ord]['standard'][$i]->is_active_item = ($isflexi_itemview && $row->id==$active_item_id);
 					
 					//date
