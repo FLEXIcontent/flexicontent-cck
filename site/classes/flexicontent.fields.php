@@ -326,7 +326,11 @@ class FlexicontentFields
 			
 			
 			// ONCE per Content Item Type
-			if ( !isset($type_fields[$item->type_id]) )
+			if ( empty($item->type_id) ) {
+				echo "<b>Item with id: ". $item->id . " has empty type<br/>";
+				continue;
+			}
+			else if ( !isset($type_fields[$item->type_id]) )
 			{
 				// Field's has_access flag
 				$aid_arr = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
