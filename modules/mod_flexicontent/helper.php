@@ -120,10 +120,11 @@ class modFlexicontentHelper
 			$w		= '&amp;w=' . $mod_width;
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
+			$ar 	= '&amp;ar=x';
 			$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
 			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
 			$thumb_default = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
@@ -133,10 +134,11 @@ class modFlexicontentHelper
 			$w		= '&amp;w=' . $mod_width_feat;
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
+			$ar 	= '&amp;ar=x';
 			$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
 			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
 			$thumb_default_feat = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;

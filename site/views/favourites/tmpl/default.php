@@ -193,10 +193,11 @@ $items	= & $this->items;
 				$w		= '&amp;w=' . $image_width;
 				$aoe	= '&amp;aoe=1';
 				$q		= '&amp;q=95';
+				$ar 	= '&amp;ar=x';
 				$zc		= $image_method ? '&amp;zc=' . $image_method : '';
 				$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-				$conf	= $w . $h . $aoe . $q . $zc . $f;
+				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
 				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
 				$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;

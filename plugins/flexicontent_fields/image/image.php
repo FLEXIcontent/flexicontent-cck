@@ -817,7 +817,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$ext = strtolower(pathinfo($image_subpath, PATHINFO_EXTENSION));
 					$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$img_link = str_replace('\\', '/', $img_link);
-					$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h.'&amp;zc=1&amp;q=95';
+					$img_link = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$img_link.'&amp;w='.$preview_thumb_w.'&amp;h='.$preview_thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
 				}
 			} else {
 				$img_link = '';
@@ -2681,6 +2681,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		//	$phpThumb->setParameter('fltr', 'rcd|256|1');
 		$phpThumb->setParameter('w', $width);
 		$phpThumb->setParameter('h', $height);
+		$phpThumb->setParameter('ar', 'x');
 		if ($usewm == 1)
 		{
 			$phpThumb->setParameter('fltr', 'wmi|'.$wmfile.'|'.$wmpos.'|'.$wmop);
