@@ -147,10 +147,11 @@ switch ($cols)
 			$w		= '&amp;w=' . $cat_image_width;
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
+			$ar 	= '&amp;ar=x';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 	
 			$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 		} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
@@ -159,10 +160,11 @@ switch ($cols)
 			$w		= '&amp;w=' . $cat_image_width;
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
+			$ar 	= '&amp;ar=x';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
 			$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;

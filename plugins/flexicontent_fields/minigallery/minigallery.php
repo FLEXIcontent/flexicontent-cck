@@ -664,8 +664,8 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 				$img_path = (substr($file_data->filename, 0,7)!='http://' || substr($file_data->filename, 0,8)!='https://') ?
 					JURI::root(true) . '/' . $mediapath . '/' . $file_data->filename :
 					$file_data->filename ;
-				$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_s.'&amp;h='.$h_s.'&amp;zc=1&amp;q=95';
-				$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_l.'&amp;h='.$h_l.'&amp;zc=1&amp;q=95';
+				$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_s.'&amp;h='.$h_s.'&amp;zc=1&amp;q=95&amp;ar=x';
+				$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w='.$w_l.'&amp;h='.$h_l.'&amp;zc=1&amp;q=95&amp;ar=x';
 				$ext = pathinfo($img_path, PATHINFO_EXTENSION);
 				if ( in_array( $ext, array('png', 'ico', 'gif') ) ) {
 					$srcs .= '&amp;f='. $ext;

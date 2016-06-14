@@ -242,10 +242,11 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 				$h		= '&amp;h=' . $params->get($rprefix.'_height', 200);
 				$aoe	= '&amp;aoe=1';
 				$q		= '&amp;q=95';
+				$ar 	= '&amp;ar=x';
 				$zc		= $params->get($rprefix.'_method') ? '&amp;zc=' . $params->get($rprefix.'_method') : '';
 				$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-				$conf	= $w . $h . $aoe . $q . $zc . $f;
+				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
 				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
 				$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
@@ -284,10 +285,11 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$h		= '&amp;h=' . $params->get($rprefix.'_height', 200);
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
+			$ar 	= '&amp;ar=x';
 			$zc		= $params->get($rprefix.'_method') ? '&amp;zc=' . $params->get($rprefix.'_method') : '';
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
 			$image_src = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 		} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
@@ -296,10 +298,11 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$h		= '&amp;h=' . $params->get($rprefix.'_height', 200);
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
+			$ar 	= '&amp;ar=x';
 			$zc		= $params->get($rprefix.'_method') ? '&amp;zc=' . $params->get($rprefix.'_method') : '';
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
 			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
 			$image_src = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;

@@ -551,6 +551,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$w		= '&amp;w=' . $cat_image_width;
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
+			$ar 	= '&amp;ar=x';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 		}
 		
@@ -560,7 +561,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
 			$default_image = $phpThumbURL.$src.$conf;
 			$default_image = '<img class="fccat_image" style="float:'.$cat_image_float.'" src="'.$default_image.'" alt="%s" title="%s"/>';
@@ -583,14 +584,14 @@ class FlexicontentViewCategory extends JViewLegacy
 					
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 					
 					$image = $phpThumbURL.$src.$conf;
 				} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 					
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 					
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;
@@ -630,6 +631,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$w		= '&amp;w=' . $cat_image_width;
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
+			$ar 	= '&amp;ar=x';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 		}
 		
@@ -639,7 +641,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
 			$default_image = $phpThumbURL.$src.$conf;
 			$default_image = '<img class="fccat_image" style="float:'.$cat_image_float.'" src="'.$default_image.'" alt="%s" title="%s"/>';
@@ -665,14 +667,14 @@ class FlexicontentViewCategory extends JViewLegacy
 					
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 					
 					$image = $phpThumbURL.$src.$conf;
 				} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 					
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 					
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;
@@ -713,6 +715,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$w		= '&amp;w=' . $cat_image_width;
 			$aoe	= '&amp;aoe=1';
 			$q		= '&amp;q=95';
+			$ar 	= '&amp;ar=x';
 			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 		}
 		
@@ -722,7 +725,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
 			$default_image = $phpThumbURL.$src.$conf;
 			$default_image = '<img class="fccat_image" style="float:'.$cat_image_float.'" src="'.$default_image.'" alt="%s" title="%s"/>';
@@ -747,14 +750,14 @@ class FlexicontentViewCategory extends JViewLegacy
 					
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 					
 					$image = $phpThumbURL.$src.$conf;
 				} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 					
 					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 					
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;

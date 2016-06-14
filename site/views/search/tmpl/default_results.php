@@ -164,10 +164,11 @@ if ( $use_infoflds && count($infoflds) ) {
 				$h		= '&amp;h=' . $this->params->get('fcr_height', 200);
 				$aoe	= '&amp;aoe=1';
 				$q		= '&amp;q=95';
+				$ar 	= '&amp;ar=x';
 				$zc		= $this->params->get('fcr_method') ? '&amp;zc=' . $this->params->get('fcr_method') : '';
 				$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-				$conf	= $w . $h . $aoe . $q . $zc . $f;
+				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
 				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
 				$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;

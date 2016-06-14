@@ -234,7 +234,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 			
 			$ext = strtolower(pathinfo($newfilename, PATHINFO_EXTENSION));
 			$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$thumb = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$img_path.$_f. '&amp;w='.$thumb_w.'&amp;h='.$thumb_h.'&amp;zc=1';
+			$thumb = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$img_path.$_f. '&amp;w='.$thumb_w.'&amp;h='.$thumb_h.'&amp;zc=1&amp;ar=x';
 		}
 		$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$u_item_id;
 		$app->setUserState( $upload_path_var, $img_folder );
@@ -328,7 +328,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 				$imageexts = array('jpg','gif','png','bmp','jpeg');
 				$ext = strtolower($_newfile->ext);
 				$_f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-				$file_preview = !in_array($ext, $imageexts)  ?  ''  :  JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&w='.$thumb_w.'&h='.$thumb_h.'&zc=1';
+				$file_preview = !in_array($ext, $imageexts)  ?  ''  :  JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_path.$_f. '&w='.$thumb_w.'&h='.$thumb_h.'&zc=1&ar=x';
 			}
 			
 			
