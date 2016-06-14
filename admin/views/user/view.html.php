@@ -219,6 +219,8 @@ class FlexicontentViewUser extends JViewLegacy
 		
 		foreach ($tmpls as $tmpl)
 		{
+			if ($tmpl->name != $_clayout) continue;
+			
 			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
 			$jform->load($tmpl->params);
 			$tmpl->params = $jform;
@@ -229,10 +231,6 @@ class FlexicontentViewUser extends JViewLegacy
 				if (strlen($value)) $tmpl->params->setValue($fieldname, 'attribs', $value);
 			}
 		}
-		
-		//$lists = array();
-		//$javascript = "onchange=\"javascript:if (document.forms[0].image.options[selectedIndex].value!='') {document.imagelib.src='../images/stories/' + document.forms[0].image.options[selectedIndex].value} else {document.imagelib.src='../images/blank.png'}\"";
-		//$lists['imagelist'] 		= JHTML::_('list.images', 'image', $flexiauthor_extdata->image, $javascript, '/images/stories/' );
 		
 		if ( !$user->get('id') ) {
 			$new_usertype = JComponentHelper::getParams('com_users')->get('new_usertype');
@@ -251,25 +249,31 @@ class FlexicontentViewUser extends JViewLegacy
 		// build the html select list
 		$lists['sendEmail'] = JHTML::_('select.booleanlist',  'sendEmail', 'class="inputbox" size="1"', $user->get('sendEmail') );
 
-		$this->assignRef('me'				, $me);
-		$this->assignRef('document'	, $document);
-		$this->assignRef('lists'		, $lists);
+
+
+		// ************************
+		// Assign variables to view
+		// ************************
 		
-		$this->assignRef('user'				, $user);
-		$this->assignRef('usergroups'	, $usergroups);
-		$this->assignRef('contact'		, $contact);
+		$this->document = $document;
+		$this->lists = $lists;
 		
-		$this->assignRef('cparams',	$cparams);
+		$this->me   = $me;
+		$this->user = $user;
+		$this->usergroups = $usergroups;
+		$this->contact = $contact;
 		
-		$this->assignRef('params_authorbasic'	, $params_authorbasic);
-		$this->assignRef('params_authorcat'		, $params_authorcat);
+		$this->cparams = $cparams;
 		
-		$this->assignRef('jform_authorbasic'	, $jform_authorbasic);
-		$this->assignRef('jform_authorcat'		, $jform_authorcat);
+		$this->params_authorbasic = $params_authorbasic;
+		$this->params_authorcat   = $params_authorcat;
 		
-		$this->assignRef('tmpls'		, $tmpls);
-		$this->assignRef('form'		, $form);
-		$this->assignRef('params_author'		, $params_author);
+		$this->jform_authorbasic = $jform_authorbasic;
+		$this->jform_authorcat   = $jform_authorcat;
+		
+		$this->tmpls = $tmpls;
+		$this->form  = $form;
+		$this->params_author = $params_author;
 		
 		parent::display($tpl);
 	}

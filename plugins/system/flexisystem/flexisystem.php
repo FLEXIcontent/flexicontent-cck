@@ -22,6 +22,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
+
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 /**
@@ -29,8 +30,8 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
  */
 class plgSystemFlexisystem extends JPlugin
 {
-	var $extension_name;  // Component name
-	var $cparams;   // Component parameters
+	var $extension;  // Component name
+	var $cparams;    // Component parameters
 	
 	/**
 	 * Constructor
@@ -41,9 +42,9 @@ class plgSystemFlexisystem extends JPlugin
 		$this->extension = 'com_flexicontent';
 		$this->cparams  = JComponentHelper::getParams($this->extension);
 		
-		//JPlugin::loadLanguage($extension_name, JPATH_SITE);
-		JFactory::getLanguage()->load($this->extension, JPATH_SITE, 'en-GB'	, true);
-		JFactory::getLanguage()->load($this->extension, JPATH_SITE, null		, true);
+		//JPlugin::loadLanguage($this->extension, JPATH_SITE);
+		//JFactory::getLanguage()->load($this->extension, JPATH_SITE, 'en-GB'	, $_force_reload = false);
+		//JFactory::getLanguage()->load($this->extension, JPATH_SITE, null		, $_force_reload = false);
 	}
 	
 	

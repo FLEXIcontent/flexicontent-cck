@@ -602,7 +602,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		$extension	= $this->getState('com_flexicontent.category.extension');
 
 		// Get the form.
-		$form = $this->loadForm('com_flexicontent.category'.$extension, 'category', array('control' => 'jform', 'load_data' => $loadData));
+		$form = $this->loadForm('com_flexicontent.'.$this->getName(), $this->getName(), array('control' => 'jform', 'load_data' => $loadData));
 		if (empty($form)) {
 			return false;
 		}
@@ -636,13 +636,15 @@ class FlexicontentModelCategory extends JModelAdmin
 	protected function loadFormData()
 	{
 		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
+		$app = JFactory::getApplication();
+		$data = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
 
 		if (empty($data)) {
 			$data = $this->getItem();
 		}
 
-		//$this->preprocessData('com_categories.category', $data);
+		$this->preprocessData('com_flexicontent.'.$this->getName(), $data);
+		//$this->preprocessData('com_categories.'.$this->getName(), $data);
 		
 		return $data;
 	}
@@ -672,20 +674,6 @@ class FlexicontentModelCategory extends JModelAdmin
 
 		// Get the component form if it exists
 		$name = 'category' . ($section ? ('.' . $section) : '');
-
-		// Looking first in the component models/forms folder
-		$path = JPath::clean(JPATH_ADMINISTRATOR . "/components/$component/models/forms/$name.xml");
-		
-		if (file_exists($path))
-		{
-			$lang->load($component, JPATH_BASE, null, false, true);
-			$lang->load($component, JPATH_BASE . '/components/' . $component, null, false, true);
-
-			if (!$form->loadFile($path, false))
-			{
-				throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
-			}
-		}
 
 		// Try to find the component helper.
 		$eName = str_replace('com_', '', $component);
@@ -772,19 +760,23 @@ class FlexicontentModelCategory extends JModelAdmin
 	 */
 	public function getItem($pk = null)
 	{
-		$pk = $pk ? $pk : $this->_id;
+		$pk = $pk ? (int) $pk : $this->_id;
+		$pk = $pk ? $pk : (int) $this->getState($this->getName().'.id');
 		
-		if ( $result = parent::getItem($pk) )
+		static $items = array();
+		if ( $pk && isset($items[$pk]) ) return $items[$pk];
+		
+		if ( $item = parent::getItem($pk) )
 		{
 			// Prime required properties.
-			if (empty($result->id)) {
-				$result->parent_id	= $this->getState('com_flexicontent.category.parent_id');
-				$result->extension	= $this->getState('com_flexicontent.category.extension');
+			if (empty($item->id)) {
+				$item->parent_id	= $this->getState('com_flexicontent.category.parent_id');
+				$item->extension	= $this->getState('com_flexicontent.category.extension');
 			}
 
 			// Convert the metadata field to an array.
-			$registry = new JRegistry($result->metadata);
-			$result->metadata = $registry->toArray();
+			$registry = new JRegistry($item->metadata);
+			$item->metadata = $registry->toArray();
 
 			// Convert the created and modified dates to local user time for display in the form.
 			jimport('joomla.utilities.date');
@@ -794,40 +786,40 @@ class FlexicontentModelCategory extends JModelAdmin
 			$tz_string = $user_zone;
 			$tz = new DateTimeZone( $tz_string );
 			
-			if (intval($result->created_time)) {
-				$date = new JDate($result->created_time);
+			if (intval($item->created_time)) {
+				$date = new JDate($item->created_time);
 				$date->setTimezone($tz);
-				$result->created_time = $date->toSql(true);
+				$item->created_time = $date->toSql(true);
 			} else {
-				$result->created_time = null;
+				$item->created_time = null;
 			}
 
-			if (intval($result->modified_time)) {
-				$date = new JDate($result->modified_time);
+			if (intval($item->modified_time)) {
+				$date = new JDate($item->modified_time);
 				$date->setTimezone($tz);
-				$result->modified_time = $date->toSql(true);
+				$item->modified_time = $date->toSql(true);
 			} else {
-				$result->modified_time = null;
+				$item->modified_time = null;
 			}
-			$this->_category = $result;
-		}
-		
-		$useAssocs = $this->useAssociations();
+			$this->_category = $item;
 
-		if ($useAssocs)
-		{
-			if ($result->id != null)
+			$useAssocs = $this->useAssociations();
+			if ($useAssocs)
 			{
-				$result->associations = CategoriesHelper::getAssociations($result->id, $result->extension);
-				JArrayHelper::toInteger($result->associations);
-			}
-			else
-			{
-				$result->associations = array();
+				if ($item->id != null)
+				{
+					$item->associations = CategoriesHelper::getAssociations($item->id, $item->extension);
+					JArrayHelper::toInteger($item->associations);
+				}
+				else
+				{
+					$item->associations = array();
+				}
 			}
 		}
 		
-		return $result;
+		if ($pk) $items[$pk] = $item;
+		return $item;
 	}
 	
 	

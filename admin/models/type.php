@@ -494,33 +494,40 @@ class FlexicontentModelType extends JModelAdmin
 	 *
 	 * @since   1.6
 	 */
-	public function getItem($pk = null) {
-		static $item;
-		if(!$item) {
-			// Initialise variables.
-			$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
-			$table	= $this->getTable('flexicontent_types', '');
+	public function getItem($pk = null)
+	{
+		$pk = $pk ? (int) $pk : $this->_id;
+		$pk = $pk ? $pk : (int) $this->getState($this->getName().'.id');
+		
+		static $items = array();
+		if ( $pk && isset($items[$pk]) ) return $items[$pk];
+		
+		// Instatiate the JTable
+		$table	= $this->getTable('flexicontent_types', '');
 
-			if ($pk > 0) {
-				// Attempt to load the row.
-				$return = $table->load($pk);
+		if ($pk > 0)
+		{
+			// Attempt to load the row.
+			$return = $table->load($pk);
 
-				// Check for a table object error.
-				if ($return === false && $table->getError()) {
-					$this->setError($table->getError());
-					return false;
-				}
-			}
-
-			// Convert to the JObject before adding other data.
-			$_prop_arr = $table->getProperties(1);
-			$item = JArrayHelper::toObject($_prop_arr, 'JObject');
-
-			if (property_exists($item, 'attribs')) {
-				$registry = new JRegistry($item->attribs);
-				$item->attribs = $registry->toArray();
+			// Check for a table object error.
+			if ($return === false && $table->getError()) {
+				$this->setError($table->getError());
+				return false;
 			}
 		}
+
+		// Convert to the JObject before adding other data.
+		$_prop_arr = $table->getProperties(1);
+		$item = JArrayHelper::toObject($_prop_arr, 'JObject');
+
+		if (property_exists($item, 'attribs'))
+		{
+			$registry = new JRegistry($item->attribs);
+			$item->attribs = $registry->toArray();
+		}
+
+		if ($pk) $items[$pk] = $item;
 		return $item;
 	}
 	

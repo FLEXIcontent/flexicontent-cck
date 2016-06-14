@@ -86,6 +86,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				<?php endif; ?>
 				<?php echo $field->input; ?>
 			</div>
+			<div class="fcclear"></div>
 		<?php endforeach; ?>
 		
 			<span class="label-fcouter">
