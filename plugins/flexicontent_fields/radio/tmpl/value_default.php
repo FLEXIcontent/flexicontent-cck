@@ -11,6 +11,16 @@ if ( $display_all ) {
   $ns_posttext = $remove_space ? $ns_posttext : ' ' . $ns_posttext;
 }
 
+
+// Create CSS class for image / icon HTML tag  ** only for (*IMAGE) fields
+if ($text_or_value > 1)
+{
+	$_class = ' fc_ifield_val_icoclass'
+		.($icon_size ? ' fc-icon-'.$icon_size : '')
+		.($text_or_value == 2 || $text_or_value == 4  ?  ' '.$tooltip_class  :  '');
+}
+
+
 foreach ($values as $value)
 {
 	// Compatibility for serialized values
@@ -41,8 +51,22 @@ foreach ($values as $value)
 		{
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp =$element->text;
-			else /* only for (*IMAGE) fields */
-				$disp = '<img src="'.$imgpath . $element->image .'" class="'.$tooltip_class.'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'" alt="'.$element->text.'" />';
+			
+			/* only for (*IMAGE) fields */
+			else if ($text_or_value == 2)
+				$disp = !$image_type ?
+					'<img src="'. $imgpath . $element->image .'" class="fc_ifield_val_img '.$tooltip_class.'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'" alt="'.$element->text.'" />' :
+					'<span class="'. $_class .' '. $element->image .'" style="'.($icon_color ? 'color: '.$icon_color.';' : '').'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'"></span>' ;
+			else
+				$disp = '
+				<div class="fc_ifield_val_box">
+					'.(!$image_type ?
+						'<img src="'.$imgpath . $element->image .'" class="fc_ifield_val_img '.($text_or_value == 4 ? $tooltip_class : '').'" '.($text_or_value == 4 ? 'title="'.flexicontent_html::getToolTip(null, $element->text, 0).'"' : '').' alt="'.$element->text.'" />' :
+						'<span class="'. $_class .' '. $element->image .'" style="'.($icon_color ? 'color: '.$icon_color.';' : '').'" '.($text_or_value == 4 ? ' title="'.flexicontent_html::getToolTip(null, $element->text, 0).'"' : '').'"></span>'
+					).'
+					<span class="alert alert-info fc_ifield_val_txt">'.($text_or_value == 3 ? $element->text : $element->value).'</span>
+				</div>
+				';
 			
 			if ( isset($indexes[$val]) ) {
 				$html[]  = $pretext.$disp.$posttext;
@@ -65,8 +89,22 @@ foreach ($values as $value)
 			
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp = $element->text;
-			else  /* only for (*IMAGE) fields */
-				$disp = '<img src="'.$imgpath . $element->image .'" class="'.$tooltip_class.'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'" alt="'.$element->text.'" />';
+			
+			/* only for (*IMAGE) fields */
+			else if ($text_or_value == 2)
+				$disp = !$image_type ?
+					'<img src="'.$imgpath . $element->image .'" class="fc_ifield_val_img '.$tooltip_class.'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'" alt="'.$element->text.'" />' :
+					'<span class="'. $_class .' '. $element->image .'" style="'.($icon_color ? 'color: '.$icon_color.';' : '').'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'"></span>' ;
+			else
+				$disp = '
+				<div class="fc_ifield_val_box">
+					'.(!$image_type ?
+						'<img src="'. $imgpath . $element->image .'" class="fc_ifield_val_img '.($text_or_value == 4 ? $tooltip_class : '').'" '.($text_or_value == 4 ? 'title="'.flexicontent_html::getToolTip(null, $element->text, 0).'"' : '').' alt="'.$element->text.'" />' :
+						'<span class="'. $_class .' '. $element->image .'" style="'.($icon_color ? 'color: '.$icon_color.';' : '').'" '.($text_or_value == 4 ? ' title="'.flexicontent_html::getToolTip(null, $element->text, 0).'"' : '').'"></span>'
+					).'
+					<span class="alert alert-info fc_ifield_val_txt">'.($text_or_value == 3 ? $element->text : $element->value).'</span>
+				</div>
+				';
 			
 			$html[]  = $pretext . $disp . $posttext;
 			$index[] = $pretext . $element->value . $posttext;

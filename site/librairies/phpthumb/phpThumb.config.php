@@ -271,6 +271,7 @@ if (!function_exists('phpThumbURL'))
 		} else {
 			parse_str($ParameterString, $ParameterStringArray);
 		}
+		$ParamterStringEncodedArray = array();
 		foreach ($ParameterStringArray as $key => $value) {
 			if (is_array($value)) {
 				// e.g. fltr[] is passed as an array

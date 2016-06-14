@@ -189,6 +189,7 @@
 				<option value="3">FLEXI_FIELD_TOOLBAR_FBLIKE_FRIENDS</option>
 				<option value="4">FLEXI_FIELD_TOOLBAR_FBLIKE_RECOMMEND</option>
 				<option value="5">FLEXI_FIELD_TOOLBAR_FBLIKE_RECOMMEND_BOX</option>
+				<option value="6">FLEXI_FIELD_TOOLBAR_FBLIKE_SHARE</option>
 			</field>
 			<field name="addthis_fb_like_resize" type="multilist" subtype="radio" default="1" label="FLEXI_RESIZE" description="FLEXI_FIELD_TOOLBAR_FB_LIKE_RESIZE_DESC" tip_img="warning.png" inline_tip="FLEXI_FIELD_TOOLBAR_FB_LIKE_RESIZE_WARNING" class="btn-group btn-group-yesno" depend_class="enable_addthis addthis_inline">
 				<option value="0">FLEXI_NO</option>
