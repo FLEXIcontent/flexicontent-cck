@@ -317,7 +317,10 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 				4 => 'data-fb-like-layout="button_count" fb:like:action="recommend"',
 				5 => 'data-fb-like-layout="box_count" fb:like:action="recommend"',
 			);
-			$fb_like = !$addthis_fb_like ? '' : '<a class="addthis_button_facebook_like '.$fb_like_resize.'" '.$fb_like_layouts[$addthis_fb_like].' ></a>';
+			if ($addthis_fb_like == 6)
+				$fb_like = '<a class="addthis_button_facebook"></a>';
+			else
+				$fb_like = !$addthis_fb_like ? '' : '<a class="addthis_button_facebook_like '.$fb_like_resize.'" '.$fb_like_layouts[$addthis_fb_like].' ></a>';
 			
 			if (!$addthis_custom_code)
 			{

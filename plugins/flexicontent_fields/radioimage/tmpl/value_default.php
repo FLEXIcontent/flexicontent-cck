@@ -12,10 +12,10 @@ if ( $display_all ) {
 }
 
 
-// Create CSS class for image / icon HTML tag
+// Create CSS class for image / icon HTML tag  ** only for (*IMAGE) fields
 if ($text_or_value > 1)
 {
-	$_class = $element->image .' fc_ifield_val_icoclass'
+	$_class = ' fc_ifield_val_icoclass'
 		.($icon_size ? ' fc-icon-'.$icon_size : '')
 		.($text_or_value == 2 || $text_or_value == 4  ?  ' '.$tooltip_class  :  '');
 }
