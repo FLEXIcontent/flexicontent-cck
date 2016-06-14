@@ -38,7 +38,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
 		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
-		
+
+
 		// ***********************************************************
 		// Get category data, and check if item is already checked out
 		// ***********************************************************
@@ -60,13 +61,14 @@ class FlexicontentViewCategory extends JViewLegacy
 			JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 			$app->redirect( 'index.php?option=com_flexicontent&view=categories' );
 		}
-		
-		
+
+
 		// ***************************************************************************
 		// Currently access checking for category add/edit form , it is done here, for
 		// most other views we force going though the controller and checking it there
 		// ***************************************************************************
-		
+
+
 		// *********************************************************************************************
 		// Global Permssions checking (needed because this view can be called without a controller task)
 		// *********************************************************************************************
@@ -84,10 +86,10 @@ class FlexicontentViewCategory extends JViewLegacy
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
 			$app->redirect( 'index.php?option=com_flexicontent' );
 		}
-		
-		
+
+
 		// ************************************************************************************
-		// Record Permssions (needed because this view can be called without a controller task)
+		// Record Permissions (needed because this view can be called without a controller task)
 		// ************************************************************************************
 				
 		// Get edit privilege for current category
@@ -120,8 +122,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			JError::raiseWarning( 403, $acc_msg);
 			$app->redirect( 'index.php?option=com_flexicontent&view=categories' );
 		}
-		
-		
+
+
 		// **************************************************
 		// Include needed files and add needed js / css files
 		// **************************************************
@@ -138,8 +140,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js', FLEXI_VHASH);
 		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js', FLEXI_VHASH);
-		
-		
+
+
 		// ********************
 		// Initialise variables
 		// ********************
@@ -151,8 +153,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$bar     = JToolBar::getInstance('toolbar');
 		$tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-		
-		
+
+
 		// ******************
 		// Create the toolbar
 		// ******************
@@ -187,8 +189,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		} else {
 			JToolBarHelper::cancel('category.cancel', 'JTOOLBAR_CLOSE');
 		}
-		
-		
+
+
 		// ******************
 		// Add preview button
 		// ******************
@@ -201,7 +203,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			// Add a preview button
 			$bar->appendButton( 'Custom', '<a class="preview btn btn-small btn-info spaced-btn" href="'.$previewlink.'" target="_blank" ><span title="'.JText::_('Preview').'" class="icon-screen"></span>'.JText::_('Preview').'</a>', 'preview' );
 		}
-					
+
+
 		// ************************
 		// Add modal layout editing
 		// ************************
@@ -239,38 +242,8 @@ class FlexicontentViewCategory extends JViewLegacy
 				'" title="Edit the display layout of this category. <br/><br/>Note: this layout maybe assigned to other categories, thus changing it will effect them too"'
 			);
 		}
-		
-		
-		// *******************************************
-		// Prepare data to pass to the form's template
-		// *******************************************
-		
-		if ( !FLEXI_J16GE )
-		{
-			// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
-			JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = 'description' );
-			
-			// Create the form
-			$form = new JParameter($row->params, JPATH_COMPONENT.DS.'models'.DS.'category.xml');
-			//$form->loadINI($row->attribs);
-			
-			//echo "<pre>"; print_r($form->_xml['templates']->_children[0]);  echo "<pre>"; print_r($form->_xml['templates']->param[0]); exit;
-			foreach($form->_xml['templates']->_children as $i => $child) {
-				if ( isset($child->_attributes['enableparam']) && !$cparams->get($child->_attributes['enableparam']) ) {
-					unset($form->_xml['templates']->_children[$i]);
-					unset($form->_xml['templates']->param[$i]);
-				}
-			}
-			
-			foreach($form->_xml['special']->_children as $i => $child) {
-				if ( isset($child->_attributes['enableparam']) && !$cparams->get($child->_attributes['enableparam']) ) {
-					unset($form->_xml['special']->_children[$i]);
-					unset($form->_xml['special']->param[$i]);
-				}
-			}
-		}
-		
-		
+
+
 		// **********************************************************************************************************
 		// Get Layouts, load language of current selected template and apply Layout parameters values into the fields
 		// **********************************************************************************************************
@@ -286,6 +259,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Create JForm for the layout and apply Layout parameters values into the fields
 		foreach ($tmpls as $tmpl)
 		{
+			if ($tmpl->name != $_clayout) continue;
+			
 			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => true));
 			$jform->load($tmpl->params);
 			$tmpl->params = $jform;
@@ -299,12 +274,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		//build selectlists
 		$Lists = array();
-		
-		if ( !FLEXI_J16GE ) {
-			$javascript = "onchange=\"javascript:if (document.forms[0].image.options[selectedIndex].value!='') {document.imagelib.src='../images/stories/' + document.forms[0].image.options[selectedIndex].value} else {document.imagelib.src='../images/blank.png'}\"";
-			$Lists['imagelist']	= JHTML::_('list.images', 'image', $row->image, $javascript, '/images/stories/' );
-			$Lists['access']		= JHTML::_('list.accesslevel', $row );
-		}
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.create');
 		$fieldname = 'jform[parent_id]';
@@ -323,21 +292,21 @@ class FlexicontentViewCategory extends JViewLegacy
 		$fieldname = 'jform[special][inheritcid]';
 		$Lists['inheritcid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $catparams->get('inheritcid', ''),$top=false, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=false, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options);
-		
-		
+
+
 		// ************************
 		// Assign variables to view
 		// ************************
 		
-		$this->assignRef('document'	, $document);
-		$this->assignRef('Lists'		, $Lists);
-		$this->assignRef('row'			, $row);
-		$this->assignRef('form'			, $form);
-		$this->assignRef('perms'		, $perms);
-		$this->assignRef('editor'		, $editor);
-		$this->assignRef('tmpls'		, $tmpls);
-		$this->assignRef('cparams'	, $cparams);
-		$this->assignRef('iparams'	, $iparams);
+		$this->document = $document;
+		$this->Lists    = $Lists;
+		$this->row      = $row;
+		$this->form     = $form;
+		$this->perms    = $perms;
+		$this->editor   = $editor;
+		$this->tmpls    = $tmpls;
+		$this->cparams  = $cparams;
+		$this->iparams  = $iparams;
 
 		parent::display($tpl);
 	}

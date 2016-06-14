@@ -93,12 +93,21 @@ JPluginHelper::importPlugin('flexicontent');
 // Language handling
 // *****************
 
-// Load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
-JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
-JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = true, $load_default = true);
+if ( JFactory::getLanguage()->getDefault() != 'en-GB' )
+{
+	// If site default language is not english then load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
+	// We make sure that 'english' file has been loaded, because we need it as fallback for language strings that do not exist in current language
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = true, $load_default = true);
+}
+
+else
+	// No force loading needed, save some time, and do not force language file reload
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
-/*if (!FLEXI_J16GE) {
+/*if (!FLEXI_J16GE)
+{
 	$overrideDir = JPATH_SITE .DS. 'languages' .DS. 'overrides' .DS;
 	JFactory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
 	JFactory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);

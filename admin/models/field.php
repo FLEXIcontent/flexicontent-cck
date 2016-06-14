@@ -510,41 +510,52 @@ class FlexicontentModelField extends JModelAdmin
 	 * @return	mixed	Object on success, false on failure.
 	 * @since	1.6
 	 */
-	public function getItem($pk = null) {
-		static $item;
-		if(!$item) {
-			// Initialise variables.
-			$pk		= (!empty($pk)) ? $pk : (int) $this->getState($this->getName().'.id');
-			$table	= $this->getTable('flexicontent_fields', '');
+	public function getItem($pk = null)
+	{
+		$pk = $pk ? (int) $pk : $this->_id;
+		$pk = $pk ? $pk : (int) $this->getState($this->getName().'.id');
+		
+		static $items = array();
+		if ( $pk && isset($items[$pk]) ) return $items[$pk];
+		
+		// Instatiate the JTable
+		$table	= $this->getTable('flexicontent_fields', '');
 
-			if ($pk > 0) {
-				// Attempt to load the row.
-				$return = $table->load($pk);
+		if ($pk > 0)
+		{
+			// Attempt to load the row.
+			$return = $table->load($pk);
 
-				// Check for a table object error.
-				if ($return === false && $table->getError()) {
-					$this->setError($table->getError());
-					return false;
-				}
-			} else {
-				$table->name					= 'field' . ($this->_getLastId() + 1);
+			// Check for a table object error.
+			if ($return === false && $table->getError()) {
+				$this->setError($table->getError());
+				return false;
 			}
-
-			// Convert to the JObject before adding other data.
-			$_prop_arr = $table->getProperties(1);
-			$item = JArrayHelper::toObject($_prop_arr, 'JObject');
-			if ($pk > 0) {
-				$item->tid = $this->getTypesselected();
-			}
-
-			if (property_exists($item, 'attribs')) {
-				$registry = new JRegistry();
-				$registry->loadString($item->attribs, 'JSON');
-				$item->attribs = $registry->toArray();
-			}
-			$field_type = JRequest::getVar('field_type', ($pk ? $table->field_type : 'text'));
-			$this->setState('field.field_type', $field_type);
 		}
+		else
+		{
+			$table->name = 'field' . ($this->_getLastId() + 1);
+		}
+
+		// Convert to the JObject before adding other data.
+		$_prop_arr = $table->getProperties(1);
+		$item = JArrayHelper::toObject($_prop_arr, 'JObject');
+		if ($pk > 0)
+		{
+			$item->tid = $this->getTypesselected();
+		}
+
+		if (property_exists($item, 'attribs'))
+		{
+			$registry = new JRegistry();
+			$registry->loadString($item->attribs, 'JSON');
+			$item->attribs = $registry->toArray();
+		}
+
+		$field_type = JRequest::getVar('field_type', ($pk ? $table->field_type : 'text'));
+		$this->setState('field.field_type', $field_type);
+
+		if ($pk) $items[$pk] = $item;
 		return $item;
 	}
 	

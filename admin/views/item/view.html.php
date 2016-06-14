@@ -818,6 +818,8 @@ class FlexicontentViewItem extends JViewLegacy
 		// (f) Create JForm for the layout and apply Layout parameters values into the fields
 		foreach ($tmpls as $tmpl)
 		{
+			if ($tmpl->name != $_ilayout) continue;
+			
 			$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
 			$jform->load($tmpl->params);
 			$tmpl->params = $jform;
