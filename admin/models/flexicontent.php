@@ -1602,7 +1602,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	}
 
 	
-	function checkInitialPermission() {
+	function checkInitialPermission()
+	{
 		$debug_initial_perms = JComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
 		
 		static $init_required = null;
@@ -1634,7 +1635,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		// CHECK that we have the same Component Actions in assets DB table with the Actions as in component's access.xml file
 		$asset	= JTable::getInstance('asset');
-		if ($comp_section = $asset->loadByName($component_name)) {  // Try to load component asset, if missing it returns false
+		if ($comp_section = $asset->loadByName($component_name))    // Try to load component asset, if missing it returns false
+		{
+			$this->verifyExtraRules();  // Verify that com_content component asset has the extra FC specific rules
+			
 			// ok, component asset not missing, proceed to cross check for deleted / added actions
 			$rules = new JAccessRules($asset->rules);
 			$rules_data = $rules->getData();
@@ -1654,10 +1658,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($debug_initial_perms) { echo "Component File Rule Count " . count(JAccess::getActions('com_flexicontent', 'component')) . "<br />"; }
 		
 		// CHECK if some categories don't have permissions set, , !!! WARNING this query must be same like the one USED in function initialPermission()
+		$com_content_asset	= JTable::getInstance('asset');
+		$com_content_asset->loadByName('com_content');
 		$query = $db->getQuery(true)
 			->select('c.id')
 			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id AND se.name=concat("com_content.category.",c.id)')
-			->where( '(se.id is NULL OR (c.parent_id=1 AND se.parent_id!='.(int)$asset->id.') )' )
+			->where( '(se.id is NULL OR (c.parent_id=1 AND se.parent_id!='.(int)$com_content_asset->id.') )' )
 			->where( 'c.extension = ' . $db->quote('com_content') );
 		
 		$db->setQuery($query);
@@ -1667,16 +1673,6 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		if (!empty($result) && $debug_initial_perms) { echo "bad assets for categories: "; print_r($result); echo "<br>"; }
 		$category_section = count($result) == 0 ? 1 : 0;
-
-		// CHECK if some items don't have permissions set, , !!! WARNING this query must be same like the one USED in function initialPermission()
-		/*$query = $db->getQuery(true)
-			->select('c.id')
-			->from('#__assets AS se')->join('RIGHT', '#__content AS c ON se.id=c.asset_id AND se.name=concat("com_content.article.",c.id)')
-			->where('se.id is NULL');
-		$db->setQuery($query);
-		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
-		if (count($result) && $debug_initial_perms) { echo "bad assets for items: "; print_r($result); echo "<br>"; }*/
-		$article_section = 1; //count($result) == 0 ? 1 : 0;
 
 		// CHECK if some fields don't have permissions set, !!! WARNING this query must be same like the one USED in function initialPermission()
 		$query = $db->getQuery(true)
@@ -1704,22 +1700,29 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if (!empty($result) && $debug_initial_perms) { echo "bad assets for types: "; print_r($result); echo "<br>"; }
 		$type_section = count($result) == 0 ? 1 : 0;
 		
-		if ($debug_initial_perms) { echo "PASSED comp_section:$comp_section && category_section:$category_section && article_section:$article_section && field_section:$field_section && type_section:$type_section <br>"; }
+		if ($debug_initial_perms) { echo "PASSED comp_section:$comp_section && category_section:$category_section && field_section:$field_section && type_section:$type_section <br>"; }
 		
-		$init_required = $comp_section && $category_section && $article_section && $field_section && $type_section;
+		$init_required = $comp_section && $category_section && $field_section && $type_section;
 		return $init_required;
 	}
 	
 	
-	function initialPermission() {
+	function initialPermission()
+	{
 		$component_name	= JRequest::getCmd('option');
 		$db     = $this->_db;
 		$asset	= JTable::getInstance('asset');   // Create an asset object
 		
 		/*** Component assets ***/
+		$asset_exists = $asset->loadByName($component_name);
+		if ($asset_exists)
+		{
+			$rules_arr = strlen(trim($asset->rules))  ?  json_decode($asset->rules, true)  :  array();
+		}
 		
-		if (!$asset->loadByName($component_name)) {
-			// The assets entry does not exist: We will create initial rules for all component's actions
+		if ( !$asset_exists || !count($rules_arr) )
+		{
+			// Component asset entry does not exist or is empty: We will create initial rules for all component's actions
 			
 			// Get root asset
 			$root = JTable::getInstance('asset');
@@ -1731,9 +1734,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$asset->setLocation($root->id,'last-child');  // father of compontent asset it the root asset
 			
 			// Create initial component rules and set them into the asset
-			$initial_rules = $this->_createComponentRules($component_name);
-			$component_rules = new JAccessRules(json_encode($initial_rules));
-			$asset->rules = $component_rules->__toString();
+			$component_rules_arr = $this->_createComponentRules($component_name);
+			$component_rules = new JAccessRules($component_rules_arr);
+			$asset->rules = (string) $component_rules;
 			
 			// Save the asset into the DB
 			if (!$asset->check() || !$asset->store()) {
@@ -1741,8 +1744,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$this->setError($asset->getError());
 				return false;
 			}
-		} else {
-			// The assets entry already exists: We will check if it has exactly the actions specified in component's access.xml file
+		}
+		
+		else
+		{
+			// Component assets entry already exists and is non-empty: We will check if it has exactly the actions specified in component's access.xml file
 			
 			// Get existing DB rules and component's actions from the access.xml file
 			$existing_rules = new JAccessRules($asset->rules);
@@ -1756,16 +1762,18 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$deleted_actions =  array_diff($db_action_names,   $file_action_names);
 			$added_actions   =  array_diff($file_action_names, $db_action_names  );
 			
-			if ( count($deleted_actions) || count($added_actions) ) {
+			if ( count($deleted_actions) || count($added_actions) )
+			{
 				// We have changes in the component actions
 				
 				// First merge the existing component (db) rules into the initial rules
-				$initial_rules = $this->_createComponentRules($component_name);
-				$component_rules = new JAccessRules(json_encode($initial_rules));
+				$component_rules_arr = $this->_createComponentRules($component_name, $added_actions);
+				$component_rules = new JAccessRules($component_rules_arr);
 				$component_rules->merge($existing_rules);
 				
 				// Second, check if obsolete rules are contained in the existing component (db) rules, if so create a new rules object without the obsolete rules
-				if ($deleted_actions) {
+				if ($deleted_actions)
+				{
 					$rules_data = $component_rules->getData();
 					foreach($deleted_actions as $action_name) {
 						unset($rules_data[$action_name]);
@@ -1774,7 +1782,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				}
 				
 				// Set asset rules
-				$asset->rules = $component_rules->__toString();
+				$asset->rules = (string) $component_rules;
 				
 				// Save the asset
 				if (!$asset->check() || !$asset->store()) {
@@ -1789,13 +1797,18 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$component_asset = JTable::getInstance('asset');
 		$component_asset->loadByName($component_name);
 		
+		// Load com_content asset
+		$com_content_asset = JTable::getInstance('asset');
+		$com_content_asset->loadByName('com_content');
+		$com_content_name = 'com_content';
+		
 		/*** CATEGORY assets ***/
 		
 		// Get a list com_content categories that do not have assets (or have wrong asset names)
 		$query = $db->getQuery(true)
 			->select('c.id, c.parent_id, c.title, c.asset_id')
 			->from('#__assets AS se')->join('RIGHT', '#__categories AS c ON se.id=c.asset_id AND se.name=concat("com_content.category.",c.id)')
-			->where( '(se.id is NULL OR (c.parent_id=1 AND se.parent_id!='.(int)$asset->id.') )' )
+			->where( '(se.id is NULL OR (c.parent_id=1 AND se.parent_id!='.(int)$com_content_asset->id.') )' )
 			->where( 'c.extension = ' . $db->quote('com_content') )
 			->order('c.level ASC');   // IMPORTANT create categories asset using increasing depth level, so that get parent assetid will not fail
 		$db->setQuery($query);
@@ -2090,76 +2103,123 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @return  array
 	 * @since   11.1
 	 */
-	protected function _createComponentRules($component) {
-		
-		$groups 	= $this->_getUserGroups();
-		
-		// Get flexicontent ACTION names, and initialize flexicontent rules to empty *
+	protected function _createComponentRules($component, $added_actions=false)
+	{
+		// **************************
+		// Get com_flexicontent asset
+		// **************************
+
+		$comp_asset = JTable::getInstance('asset');
+		if ( $comp_asset->loadByName('com_flexicontent') )
+			$existing_rules = !empty($comp_asset->rules) ? json_decode($comp_asset->rules, true) : array();
+		else
+			$existing_rules = array();
+		$asset_is_empty = !count($existing_rules);
+
+
+		// **********************************************************************************************
+		// Get flexicontent ACTION names, and initialize all non-existing flexicontent ACL rules to empty
+		// **********************************************************************************************
+
 		$flexi_actions	= JAccess::getActions($component, 'component');
 		$flexi_rules		= array();
-		foreach($flexi_actions as $action) {
-			$flexi_rules[$action->name] = array();  // * WE NEED THIS (even if it remains empty), because we will compare COMPONENT actions in DB when checking initial permissions
-			$flexi_action_names[] = $action->name;  // Create an array of all COMPONENT actions names
+		foreach($flexi_actions as $action)
+		{
+			// * WE NEED THIS (even if it remains empty array), because we will compare COMPONENT actions in DB when checking initial permissions
+			$flexi_rules[$action->name] = !isset($flexi_rules[$action->name])  ?  array()  :  $flexi_rules[$action->name];
+			
+			// Create an array of all COMPONENT actions names
+			$flexi_action_names[$action->name] = 1;
 		}
 		
-		// Get Joomla ACTION names
-		$root = JTable::getInstance('asset');
-		$root->loadByName('root.1');
-		$joomla_rules = new JAccessRules( $root->rules );
-		foreach ($joomla_rules->getData() as $action_name => $data) {
-			$joomla_action_names[] = $action_name;
+		if ( is_array($added_actions) )
+		{
+			$new_actions = array_flip($added_actions);
+			$flexi_rules = array();
 		}
-		//echo "<pre>"; print_r($rules->getData()); echo "</pre>";
+		else
+		{
+			$new_actions = $flexi_action_names;
+		}
+
+
+		// ****************************************
+		// Get com_content asset and its rule names
+		// ****************************************
+
+		$com_content_asset = JTable::getInstance('asset');
+		$com_content_asset->loadByName('com_content');
+		$com_content_rules = json_decode($com_content_asset->rules, true);
 		
-		
-		// Decide the actions to grant (give) to each user group
-		foreach($groups as $group) {
-			
-			// STEP 1: we will -grant- all NON-STANDARD component ACTIONS to any user group, that has 'core.manage' ACTION in the Global Configuration
-			// NOTE (a): if some user group has the --Super Admin-- Global Configuration ACTION (aka 'core.admin' for asset root.1), then it also has 'core.manage'
-			// NOTE (b):  The STANDARD Joomla ACTIONs will not be set thus they will default to value -INHERIT- (=value "")
-			if(JAccess::checkGroup($group->id, 'core.manage')) {
-				//$flexi_rules['core.manage'][$group->id] = 1;
-				foreach($flexi_action_names as $action_name) {
-					//if ($action_name == 'core.admin') continue;  // component CONFIGURE action, skip it, this will can only be granted by STEP 2
-					if (in_array($action_name, $joomla_action_names)) continue;  // Skip Joomla STANDARD rules allowing them to inherit
-					$flexi_rules[$action_name][$group->id] = 1;
-				}
-			}
-			
-			// STEP 2: we will set ACTIONS already granted in GLOBAL CONFIGURATION (this include the COMPONENT CONFIGURE 'core.admin' action)
-			// NOTE: that actions that do not exist in global configuration, will not be set here, so they will default to the the setting received by STEP 1
-			// NOTE: this was commented out and thus heritage will be used instead for existing Global ACTIONS
-			/*foreach($flexi_action_names as $action_name) {
-				if (JAccess::checkGroup($group->id, $action_name)) {
-					$flexi_rules[$action_name][$group->id] = 1;
-				}
-			}*/
-			
-			// STEP 3: Handle some special case of custom-added ACTIONs
+		foreach ($com_content_rules as $action_name => $data)
+		{
+			$joomla_action_names[$action_name] = 1;
+		}
+		//echo "<pre>"; print_r($com_content_rules); echo "</pre>"; exit;
+
+
+		// *******************************************************************************************
+		// If com_flexicontent ASSET was empty then copy rules from com_content asset and set defaults
+		// *******************************************************************************************
+
+		if ( $asset_is_empty )
+		{
+			// Handle some special case of custom-added ACTIONs
 			// e.g. Grant --OWNED-- actions if they have the corresponding --GENERAL-- actions
-			if( !empty($flexi_rules['core.delete'][$group->id]) ) {
-				if (in_array('core.delete.own', $flexi_action_names)) $flexi_rules['core.delete.own'][$group->id] = 1;          // can DeleteOwn
-			}
-			if( !empty($flexi_rules['core.edit.state'][$group->id]) ) {
-				if (in_array('core.edit.state.own', $flexi_action_names)) $flexi_rules['core.edit.state.own'][$group->id] = 1;  // can PublishOwn
-			}
-			// Give these regardless of edit privelege, since if the do not have edit then they cannot access item form and save task anyway
-			//if( !empty($flexi_rules['core.edit'][$group->id]) || !empty($flexi_rules['core.edit.own'][$group->id])) {
-			if( 1 ) {
-				if (in_array('flexicontent.change.cat', $flexi_action_names)) $flexi_rules['flexicontent.change.cat'][$group->id] = 1;  // can ChangeCat
-				if (in_array('flexicontent.change.cat.sec', $flexi_action_names)) $flexi_rules['flexicontent.change.cat.sec'][$group->id] = 1;  // can ChangeSecCat
-				if (in_array('flexicontent.change.cat.feat', $flexi_action_names)) $flexi_rules['flexicontent.change.cat.feat'][$group->id] = 1;  // can ChangeFeatCat
-				if (in_array('flexicontent.uploadfiles', $flexi_action_names)) $flexi_rules['flexicontent.uploadfiles'][$group->id] = 1;  // can UploadFiles
+			if ( !isset($com_content_rules['core.delete.own']) )
+				$com_content_rules['core.delete.own'] = isset($com_content_rules['core.delete']) ? $com_content_rules['core.delete'] : array();
+			if ( !isset($com_content_rules['core.edit.state.own']) )
+				$com_content_rules['core.edit.state.own'] = isset($com_content_rules['core.edit.state']) ? $com_content_rules['core.edit.state'] : array();
+			
+			// Copy rules from com_content asset
+			foreach ($com_content_rules as $action_name => $data)
+			{
+				$flexi_rules[$action_name] = $data;
 			}
 			
-			// By default DO NOT SET the edit field values privelege, bacause we have another parameter "allow any editor"
-			//if (in_array('flexicontent.editfieldvalues', $flexi_action_names)) $flexi_rules['flexicontent.editfieldvalues'][$group->id] = 1;  // can EditFieldValues
+			// Save the asset into the DB
+			$com_content_asset->rules = json_encode($com_content_rules);
+			if (!$com_content_asset->check() || !$com_content_asset->store())
+			{
+				die($com_content_asset->getError());
+			}
+			
+			// By default DO NOT SET the edit field values privilege, because we have another parameter "allow any editor" and also to allow easier configuration via SOFT DENY
+			//$flexi_rules['flexicontent.editfieldvalues'] = $flexi_rules['core.edit'];  // can EditFieldValues
 		}
+
+
+		// Grant FLEXIcontent specific rules to user having GLOBAL "core.manage"
+		$groups = $this->_getUserGroups();
+		foreach($groups as $group)
+		{
+			// This unlike JUser::authorize will not return true for super-user, (we don't need to set anything for super-user group, because its users will be authorized by default)
+			if ( JAccess::checkGroup($group->id, 'core.manage') ) foreach($new_actions as $action_name => $_i)
+			{
+				// Skip Joomla STANDARD rules allowing them to inherit (these were copied on initial component installation from com_content asset)
+				if ( isset($joomla_action_names[$action_name]) ) continue;
+				
+				// Set flexicontent specific rule
+				$flexi_rules[$action_name][$group->id] = 1;
+			}
+		}
+
+
+		// ************************************************************************************************
+		// Rules that should be allowed by default, give these to the "Public" and "Registered" user groups
+		// ************************************************************************************************
 		
-		// return rules, a NOTE: MAYBE in future we create better initial permissions by checking allow/deny/inherit values instead of just HAS ACTION ...
+		$grant_to_all = array('flexicontent.change.cat', 'flexicontent.change.cat.sec', 'flexicontent.change.cat.feat', 'flexicontent.uploadfiles', 'flexicontent.editownfile', 'flexicontent.publishownfile', 'flexicontent.deleteownfile');
+		foreach($grant_to_all as $_name)
+		{
+			if ( !isset($new_actions[$_name] ) ) continue;
+			$flexi_rules[$_name][1] = $flexi_rules[$_name][2] = 1;
+		}
+		//echo "<pre>"; print_r($flexi_rules); echo "</pre>"; exit;
+		
 		return $flexi_rules;
 	}
+	
 	
 	/**
 	 * Get a list of the user groups.
@@ -2202,7 +2262,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$query	= $this->_db->getQuery(true)
 				->select('id')
 				->from('#__assets')
-				->where('name = '.$this->_db->quote(JRequest::getCmd('option')));
+				//->where('name = '.$this->_db->quote(JRequest::getCmd('option')));
+				->where('name = '.$this->_db->quote('com_content'));
 			$this->_db->setQuery($query);
 			$comp_assetid = (int) $this->_db->loadResult();
 		}
@@ -2235,5 +2296,48 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			return parent::_getAssetParentId($table, $id);
 		}*/
 	}
+
+
+	protected function verifyExtraRules()
+	{
+		$fc_asset = JTable::getInstance('asset');
+		$fc_asset->loadByName('com_flexicontent');
+		$fc_asset_rules = json_decode($fc_asset->rules, true);
+
+		$com_content_asset = JTable::getInstance('asset');
+		$com_content_asset->loadByName('com_content');
+		$com_content_rules = json_decode($com_content_asset->rules, true);
+		
+		$save_asset = false;
+		
+		if ($com_content_rules['core.delete.own'] != $fc_asset_rules['core.delete.own'])
+		{
+			$com_content_rules['core.delete.own'] = $fc_asset_rules['core.delete.own'];
+			$save_asset = true;
+		}
+		if ($com_content_rules['core.edit.state.own'] != $fc_asset_rules['core.edit.state.own'])
+		{
+			$com_content_rules['core.edit.state.own'] = $fc_asset_rules['core.edit.state.own'];
+			$save_asset = true;
+		}
+		//echo "<pre>"; print_r($com_content_rules); echo "</pre>";
+		
+		if ($save_asset)
+		{
+			$rules = new JAccessRules($com_content_rules);
+			$com_content_asset->rules = (string) $rules;
+			if (!$com_content_asset->check() || !$com_content_asset->store())
+			{
+				throw new RuntimeException($com_content_asset->getError());
+			}
+			JFactory::getApplication()->enqueueMessage( 'Updated com_content asset with extra rules', 'notice' );
+		}
+		else {
+			JFactory::getApplication()->enqueueMessage( 'No update needed for com_content asset with extra rules', 'notice' );
+		}
+	}
+
+
+	
 }
 ?>

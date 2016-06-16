@@ -60,6 +60,42 @@ class plgSystemFlexisystem extends JPlugin
 		if (JFactory::getApplication()->isAdmin()) $this->handleSerialized();
 		
 		$jinput = JFactory::getApplication()->input;
+
+		// Get Post DATA
+		if ( $jinput->get('task')=='config.store' )
+		{
+			$comp = $jinput->get('comp');
+			if ( $comp == 'com_content' || $comp == 'com_flexicontent' )
+			{
+				$skip_arr = array('core.admin'=>1, 'core.options'=>1, 'core.manage'=>1);
+				$action = $jinput->get('action');
+				if ( substr($action, 0, 5) == 'core.' && !isset($skip_arr[$action]) )
+				{
+					$comp_other = $comp == 'com_content'  ?  'com_flexicontent'  :  'com_content';
+					$permissions = array(
+						'component' => $comp_other,
+						'action'    => $jinput->get('action'),
+						'rule'      => $jinput->get('rule'),
+						'value'     => $jinput->get('value'),
+						'title'     => $jinput->get('title', '', 'RAW')
+					);
+					
+					JLoader::register('ConfigModelApplication', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_config'.DS.'model'.DS.'application.php');
+					JLoader::register('ConfigModelForm', JPATH_SITE.DS.'components'.DS.'com_config'.DS.'model'.DS.'form.php');
+					JLoader::register('ConfigModelCms', JPATH_SITE.DS.'components'.DS.'com_config'.DS.'model'.DS.'cms.php');
+					
+					//require_once( JPATH_ADMINISTRATOR.DS.'components'.DS.'com_config'.DS.'models'.DS.'application.php');					
+					if ( !(substr($permissions['component'], -6) == '.false') )
+					{
+						// Load Permissions from Session and send to Model
+						$model    = new ConfigModelApplication;
+						$response = $model->storePermissions($permissions);
+						//echo new JResponseJson(json_encode($response));
+					}
+				}
+			}
+		}
+		
 		
 		// Fix for return urls with unicode aliases
 		$return   = $jinput->get('return', null);
@@ -1001,7 +1037,8 @@ class plgSystemFlexisystem extends JPlugin
 	 * @return 	void
 	 * @since 1.5
 	 */
-	function checkinRecords() {
+	function checkinRecords()
+	{
 		
 		$db  = JFactory::getDBO();
 		$app = JFactory::getApplication();
@@ -1029,45 +1066,51 @@ class plgSystemFlexisystem extends JPlugin
 		// echo "Logged users:<br>"; print_r($logged); echo "<br><br>";
 		
 		$tablenames = array('content', 'categories', 'modules', 'menu');
-		foreach ( $tablenames as $tablename ) {
+		foreach ( $tablenames as $tablename )
+		{
 			//echo $tablename.":<br>";
 			
 			// Get checked out records
 			$query = 'SELECT id, checked_out, checked_out_time FROM #__'.$tablename.' WHERE checked_out > 0';
 			$db->setQuery($query);
 			$records = $db->loadObjectList();
-							
+
+			if ( !count($records) ) continue;
+			$tz	= new DateTimeZone($app->getCfg('offset'));
+
 			// Identify records that should be checked-in
 			$checkin_records = array();
-			foreach ($records as $record) {
+			foreach ($records as $record)
+			{
 				// Check user session ended
-				if ( $checkin_on_session_end && !isset($logged[$record->checked_out]) ) {
+				if ( $checkin_on_session_end && !isset($logged[$record->checked_out]) )
+				{
 					//echo "USER session ended for: ".$record->checked_out." check-in record: ".$tablename.": ".$record->id."<br>";
 					$checkin_records[] = $record->id;
 					continue;
 				}
 				
 				// Check maximum checkout time
-				if ( $limit_checkout_hours) {
+				if ( $limit_checkout_hours)
+				{
 					$date = JFactory::getDate($record->checked_out_time);
-					$tz	= new DateTimeZone($app->getCfg('offset'));
 					$date->setTimezone($tz);
 					$checkout_time_secs = $date->toUnix();
 					//echo $date->toFormat()." <br>";
 					
 					$checkout_secs = $current_time_secs - $checkout_time_secs;
-					if ( $checkout_secs >= $max_checkout_secs ) {
+					if ( $checkout_secs >= $max_checkout_secs )
+					{
 						//echo "Check-in table record: ".$tablename.": ".$record->id.". Check-out time of ".$checkout_secs." secs exceeds maximum of ".$max_checkout_secs." secs, by user: ".$record->checked_out."<br>";
 						$checkin_records[] = $record->id;
-					} else {
-						//echo "Table record: ".$tablename.": ".$record->id.". has a check-out time of ".$checkout_secs." secs which less than maximum ".$max_checkout_secs." secs, by user: ".$record->checked_out."<br>";
 					}
 				}
 			}
 			$checkin_records = array_unique($checkin_records);
 			
 			// Check-in the records
-			if ( count($checkin_records) ) {
+			if ( count($checkin_records) )
+			{
 				$query = 'UPDATE #__'.$tablename.' SET checked_out = 0 WHERE id IN ('.  implode(",", $checkin_records)  .')';
 				$db->setQuery($query);
 				$db->execute();
@@ -1476,6 +1519,77 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function onExtensionBeforeSave($context, $table, $isNew)
 	{
+		// Check for com_modules context
+		$jinput = JFactory::getApplication()->input;
+		$option = $jinput->get('component');
+		$user   = JFactory::getUser();
+		
+		if ( $context=='com_config.component' && ($option == 'com_content' || $option == 'com_flexicontent') )
+		{
+			$rules_arr = @ $_POST['jform']['rules'];
+			$option_other = $option == 'com_content'  ?  'com_flexicontent'  :  'com_content';
+			
+			// Only save permissions rules, if user is allowed to edit them
+			// and if rules exists (in J3.5+ they are saved via AJAX thus code would normally be triggered only in J3.2 - J3.4)
+			if ( $rules_arr!= null && $user->authorise('core.admin', $option) )
+			{
+				// Get asset of the other component
+				$asset = JTable::getInstance('asset');
+				if (!$asset->loadByName($option_other))
+				{
+					$root = JTable::getInstance('asset');
+					$root->loadByName('root.1');
+					$asset->name = $option_other;
+					$asset->title = $option_other;
+					$asset->setLocation($root->id, 'last-child');
+				}
+				
+				// Get existing asset rules as an array
+				$asset_rules = json_decode($asset->rules, true);
+				
+				// Copy rules, clearing empty ones
+				foreach($rules_arr as $rule_name => $rule_data)
+				{
+					if ( $option_other=='com_content' && substr($rule_name, 0, 5) != 'core.' )
+					{
+						continue;
+					}
+					foreach($rule_data as $grp_id => $v)
+					{
+						if ( !strlen($v) ) unset($rules_arr[$rule_name][$grp_id]);
+					}
+					$asset_rules[$rule_name] = $rules_arr[$rule_name];
+				}
+				
+				// If com_content configuration was saved then restore cleared *.own rules, and re-save com_content asset
+				if ($option == 'com_content')
+				{
+					$com_content_asset = JTable::getInstance('asset');
+					if ( $com_content_asset->loadByName('com_content') )
+					{
+						$com_content_rules = json_decode($com_content_asset->rules, true);
+						$com_content_rules['core.delete.own'] = isset($asset_rules['core.delete.own']) ? $asset_rules['core.delete.own'] : '';
+						$com_content_rules['core.edit.state.own'] = isset($asset_rules['core.edit.state.own']) ? $asset_rules['core.edit.state.own'] : '';
+						$rules = new JAccessRules($com_content_rules);
+						$com_content_asset->rules = (string) $rules;
+						if (!$com_content_asset->check() || !$com_content_asset->store())
+						{
+							throw new RuntimeException($com_content_asset->getError());
+						}
+					}
+				}
+				
+				// Save asset rules of the other component
+				$rules = new JAccessRules($asset_rules);
+				$asset->rules = (string) $rules;
+				
+				if (!$asset->check() || !$asset->store())
+				{
+					throw new RuntimeException($asset->getError());
+				}
+			}
+		}
+		
 		// *******************************
 		// TODO: add support for com_menus
 		// *******************************
