@@ -2310,12 +2310,21 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		$save_asset = false;
 		
-		if ($com_content_rules['core.delete.own'] != $fc_asset_rules['core.delete.own'])
+		foreach($com_content_rules as $rule_name => $rule_data)
+		{
+			if ( $com_content_rules[$rule_name] != $fc_asset_rules[$rule_name] )
+			{
+				$com_content_rules[$rule_name] = $fc_asset_rules[$rule_name];
+				$save_asset = true;
+			}
+		}
+		
+		if ( !isset($com_content_rules['core.delete.own'] ) || $com_content_rules['core.delete.own'] != $fc_asset_rules['core.delete.own'] )
 		{
 			$com_content_rules['core.delete.own'] = $fc_asset_rules['core.delete.own'];
 			$save_asset = true;
 		}
-		if ($com_content_rules['core.edit.state.own'] != $fc_asset_rules['core.edit.state.own'])
+		if (  !isset($com_content_rules['core.delete.own'] ) || $com_content_rules['core.edit.state.own'] != $fc_asset_rules['core.edit.state.own'] )
 		{
 			$com_content_rules['core.edit.state.own'] = $fc_asset_rules['core.edit.state.own'];
 			$save_asset = true;
