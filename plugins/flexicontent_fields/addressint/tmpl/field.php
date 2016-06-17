@@ -793,7 +793,10 @@ foreach ($values as $value)
 		jQuery("#'.$elementid_n.'_addr_display, #'.$elementid_n.'_addr_formatted").val(place.formatted_address);
 		
 		// name to google maps
-		jQuery("#'.$elementid_n.'_name").val(place.name);
+		if ( place.formatted_address.indexOf(place.name) == -1 )
+		{
+			jQuery("#'.$elementid_n.'_name").val(place.name);
+		}
 		
 		// url to google maps
 		jQuery("#'.$elementid_n.'_url").val(place.url);

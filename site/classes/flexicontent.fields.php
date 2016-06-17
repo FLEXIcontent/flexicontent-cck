@@ -186,14 +186,17 @@ class FlexicontentFields
 	 * @return object
 	 * @since 3
 	 */
-	static function & indexFieldsByIds($fields) 
+	static function & indexFieldsByIds($fields, $item=null, $force=false)
 	{
-		static $byIds = null;
-		if ($byIds===null) {
-			foreach($fields as $_field) {
-				$byIds[$_field->id] = $_field;
-			}
+		if ( $item && !$force && isset($item->fieldsByIds) )  return $item->fieldsByIds;
+		
+		$byIds = array();
+		foreach($fields as $_field)
+		{
+			$byIds[$_field->id] = $_field;
 		}
+		if ($item) $item->fieldsByIds = & $byIds;
+
 		return $byIds;
 	}
 	

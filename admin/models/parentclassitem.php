@@ -2387,6 +2387,8 @@ class ParentClassItem extends JModelAdmin
 		}
 		//JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): '.$original_content_id.' '.print_r($assoc_item_ids, true),'message');
 		$fields = $this->getExtrafields($force=true, $original_content_id, $old_item);
+		$item->fields = & $fields;
+		$item->calculated_fieldvalues = array();
 		
 		
 		// ******************************************************************************************************************
@@ -2396,6 +2398,7 @@ class ParentClassItem extends JModelAdmin
 		$searchindex = array();
 		//$qindex = array();
 		$core_data_via_events = array();  // Extra validation for some core fields via onBeforeSaveField
+		$postdata = array();
 		if ($fields)
 		{
 			$core_via_post = array('title'=>1, 'text'=>1);
@@ -2485,6 +2488,13 @@ class ParentClassItem extends JModelAdmin
 			}
 			//echo "<pre>"; print_r($postdata); echo "</pre>"; exit;
 			
+			// Set values of other fields (e.g. this is used for "Properties as Fields" feature)
+			foreach($item->calculated_fieldvalues as $fieldname => $fieldvalues)
+			{
+				if ( isset($fields[$fieldname]) ) $postdata[$fieldname] = $fieldvalues;
+			}
+			//echo "<pre>";  print_r($item->calculated_fieldvalues);  exit;
+			unset($item->calculated_fieldvalues);
 		}
 		if ( $print_logging_info ) @$fc_run_times['fields_value_preparation'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		

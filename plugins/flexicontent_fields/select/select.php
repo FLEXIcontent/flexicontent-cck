@@ -130,7 +130,7 @@ class plgFlexicontent_fieldsSelect extends FCField
 		
 		if ($cascade_after && !$ajax)
 		{
-			$byIds = FlexicontentFields::indexFieldsByIds($item->fields);
+			$byIds = FlexicontentFields::indexFieldsByIds($item->fields, $item);
 			
 			if ( isset($byIds[$cascade_after]) )
 			{
