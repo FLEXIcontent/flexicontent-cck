@@ -151,13 +151,27 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$newpost[$new]['country']    = /*!$use_country    ||*/ !isset($v['country'])    ? '' : flexicontent_html::dataFilter($v['country'],     2,  'STRING', 0);
 			$newpost[$new]['province']   = /*!$use_province   ||*/ !isset($v['province'])   ? '' : flexicontent_html::dataFilter($v['province'],  200,  'STRING', 0);
 			$newpost[$new]['zip_suffix'] = /*!$use_zip_suffix ||*/ !isset($v['zip_suffix']) ? '' : flexicontent_html::dataFilter($v['zip_suffix'], 10,  'STRING', 0);
-	
+			
 			$new++;
 		}
 		$post = $newpost;
-		
-		// Serialize multi-property data before storing them into the DB
-		foreach($post as $i => $v) {
+
+		// Serialize multi-property data before storing them into the DB, also map some properties as fields
+		$props_to_fields = array('addr1', 'addr2', 'addr3', 'city', 'zip', 'country', 'lon', 'lat');
+		$_fields = array();
+		$byIds = FlexicontentFields::indexFieldsByIds($item->fields, $item);
+		foreach($post as $i => $v)
+		{
+			foreach($props_to_fields as $propname)
+			{
+				$to_fieldid = $field->parameters->get('field_'.$propname);
+				if ( $to_fieldid && isset($byIds[$to_fieldid]) )
+				{
+					$to_fieldname = $byIds[$to_fieldid]->name;
+					$item->calculated_fieldvalues[$to_fieldname][$i] = $v[$propname];
+				}
+			}
+			
 			$post[$i] = serialize($v);
 		}
 	}

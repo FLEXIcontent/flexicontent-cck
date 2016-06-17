@@ -178,6 +178,7 @@ class JFormFieldFields extends JFormField
 		// Retrieve field data for DB
 		// **************************
 		
+		static $fields_q;
 		$query = 'SELECT f.'.$ovalue.' AS value, f.label, f.id, f.name'
 			.($groupables ? ', f.attribs' : '')
 			.' FROM #__flexicontent_fields AS f '
@@ -187,16 +188,25 @@ class JFormFieldFields extends JFormField
 			.' ORDER BY label ASC, id ASC'
 		;
 		
-		$db->setQuery($query);
-		$fields = $db->loadObjectList('id');
+		if ( !isset($fields_q[$query]) )
+		{
+			$db->setQuery($query);
+			$fields = $db->loadObjectList('id');
+			$fields_q[$query] = $fields;
+		}
+		else $fields = $fields_q[$query];
 		
 		
 		// Get only fields that are configured to be in a fieldgroup (we will need to render parameters for this)
 		if ($groupables)
 		{
 			$_fields = array();
-			foreach($fields as $field) {
-				$field->params = new JRegistry($field->attribs);
+			foreach($fields as $field)
+			{
+				if ( !isset($field->params) )
+				{
+					$field->params = new JRegistry($field->attribs);
+				}
 				if ($field->params->get('use_ingroup')) $_fields[$field->id] = $field;
 			}
 			$fields = $_fields;
@@ -282,8 +292,10 @@ class JFormFieldFields extends JFormField
 			else
 			{
 				$custom_prompt = (string) @ $attributes['custom_prompt'];
-				$custom_prompt = $custom_prompt ? $custom_prompt : 'FLEXI_PLEASE_SELECT';
-				array_unshift($options, JHTML::_('select.option', ($issortable ? '' : '0'), '- '.JText::_($custom_prompt).' -'));
+				$custom_prompt = JText::_($custom_prompt ? $custom_prompt : 'FLEXI_PLEASE_SELECT');
+				$custom_value = isset($attributes['custom_value']) ? (string) @ $attributes['custom_value'] : ($issortable ? '' : '0');
+				
+				array_unshift($options, JHTML::_('select.option', $custom_value, '- '.$custom_prompt.' -'));
 			}
 		}
 		

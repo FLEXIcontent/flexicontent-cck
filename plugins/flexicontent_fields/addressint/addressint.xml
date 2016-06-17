@@ -102,14 +102,7 @@
 			<field name="ac_country_allowed_list" type="fccountries" subtype="sortable" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALLOWED_COUNTRIES" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALLOWED_COUNTRIES_DESC" />
 			
 		</fieldset>
-		<fieldset name="group-addressint-config" repeat="1" icon_class="icon-wrench" label="FLEXI_CONFIG" addfieldpath="/administrator/components/com_flexicontent/elements">
-		    
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_CONFIG" level="level1" />
-			
-			<field name="google_maps_js_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_JS_API_KEY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_JS_API_KEY_DESC" />
-			<field name="google_maps_static_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_STATIC_API_KEY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_STATIC_API_KEY_DESC" />
-			
-		</fieldset>
+
 		<fieldset name="group-addressint-viewing" repeat="1" icon_class="icon-eye-open" label="FLEXI_FIELD_VIEWING" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level1" />
@@ -238,6 +231,31 @@
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="field_prefix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_PREFIX" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_PREFIX_DESC" />
 			<field name="field_suffix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_SUFFIX" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_SUFFIX_DESC" />
+		</fieldset>
+
+		<fieldset name="group-addressint-config" repeat="1" icon_class="icon-wrench" label="FLEXI_CONFIG" addfieldpath="/administrator/components/com_flexicontent/elements">
+		    
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_CONFIG" level="level1" />
+			
+			<field name="google_maps_js_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_JS_API_KEY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_JS_API_KEY_DESC" />
+			<field name="google_maps_static_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_STATIC_API_KEY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_STATIC_API_KEY_DESC" />
+			
+		</fieldset>
+		
+		<fieldset name="group-addressint-fields" repeat="1" icon_class="icon-link" label="FLEXI_PROPERTIES_AS_FIELDS" addfieldpath="/administrator/components/com_flexicontent/elements">
+		  
+			<field name="" type="separator" default="FLEXI_STORE_PROPERTIES_AS_FIELDS" level="level2" />
+			<field name="" type="separator" default="FLEXI_STORE_PROPERTIES_AS_FIELDS_DESC" class="alert alert-info" level="level4" />
+			
+			<field name="field_addr1" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Address 1" description="" class="use_select2_lib"/>
+			<field name="field_addr2" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Address 2" description="" class="use_select2_lib"/>
+			<field name="field_addr3" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Address 3" description="" class="use_select2_lib"/>
+			<field name="field_city" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="City" description="" class="use_select2_lib"/>
+			<field name="field_zip" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Zip" description="" class="use_select2_lib"/>
+			<field name="field_country" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Country" description="" class="use_select2_lib"/>
+			<field name="field_lon" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Longitude" description="" class="use_select2_lib"/>
+			<field name="field_lat" type="fields" default="" custom_prompt="FLEXI_SELECT" custom_value="" field_type="text" label="Latitude" description="" class="use_select2_lib"/>
+			
 		</fieldset>
 		
 	</fields>

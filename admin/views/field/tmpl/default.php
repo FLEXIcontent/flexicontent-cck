@@ -164,7 +164,11 @@ $this->document->addScriptDeclaration($js);
 							<?php echo $form->getInput('ordering'); ?>
 						</td>
 					</tr>
-					
+				</table>
+				
+				<div class="fcclear"></div>				
+
+				<table class="fc-form-tbl">
 					<tr>
 						<td colspan="2" style="padding-top:24px;">
 							<?php $box_class = $this->row->iscore ? 'fc-info' : ($this->typesselected ? 'fc-success' : 'fc-warning'); ?>
@@ -181,8 +185,8 @@ $this->document->addScriptDeclaration($js);
 							<?php echo /*FLEXI_J16GE ? $form->getInput('tid') :*/ $this->lists['tid']; ?>
 						</td>
 					</tr>
-					
 				</table>
+					
 			</div>
 			
 			
