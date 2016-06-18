@@ -303,10 +303,10 @@ class FlexicontentViewItems extends JViewLegacy
 						.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 240}, onClose: function() {}}');
 				";
 				//JToolBarHelper::addNew( $btn_task );
-				JToolBarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
+				JToolBarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW_ITEM', false );
 				JHtml::_('behavior.modal', '#toolbar-new a.toolbar, #toolbar-new button');
 			} else {
-				$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 800, 240);
+				$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW_ITEM'), str_replace('&', '&amp;', $popup_load_url), 800, 240);
 			}
 			$add_divider = true;
 		}
