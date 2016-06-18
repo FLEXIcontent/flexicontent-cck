@@ -1,4 +1,5 @@
-function FCFav(id, type) {
+function FCFav(id, type, add_counter)
+{
 	//var url = location.href;  // entire url including querystring - also: window.location.href;
 	//var live_site = url.substring(0, url.indexOf('/', 14)) + fcfav_rfolder + '/';
 	type = (typeof type === "undefined" || type === null ) ? 'item' : type;
@@ -39,7 +40,8 @@ function FCFav(id, type) {
 						var newtotal = Math.abs(response);
 						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
 						var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
-						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>' +' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') + ': ' + newfavs + '</div>';
+						div.innerHTML = _box_start + ' fcfavs-is-subscriber">' + Joomla.JText._('FLEXI_FAVS_YOU_HAVE_SUBSCRIBED') + '</div>'
+							+(add_counter ? ' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') + ': ' + newfavs + '</div>' : '');
 					}
 				}
 				else if(response<0){
@@ -47,9 +49,10 @@ function FCFav(id, type) {
 						var newtotal = Math.abs(response);
 						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_FAVOURE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
 						var newfavs=newtotal+' '+Joomla.JText._('FLEXI_USERS');
-						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>' +' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') +': ' + newfavs + '</div>';
+						div.innerHTML = _box_start + ' fcfavs-isnot-subscriber">' + Joomla.JText._('FLEXI_FAVS_CLICK_TO_SUBSCRIBE') + '</div>'
+							+(add_counter ? ' '+ _box_start + ' fcfavs-subscribers-count">' + Joomla.JText._('FLEXI_TOTAL') + ': ' + newfavs + '</div>' : '');
 					}
-				} 
+				}
 				else if(response=='added'){
 					if (div) {
 						link.innerHTML='<img alt="'+Joomla.JText._('FLEXI_REMOVE_FAVOURITE')+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
