@@ -2117,29 +2117,25 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$asset_is_empty = !count($existing_rules);
 
 
-		// **********************************************************************************************
-		// Get flexicontent ACTION names, and initialize all non-existing flexicontent ACL rules to empty
-		// **********************************************************************************************
+		// *****************************
+		// Get flexicontent ACTION names
+		// *****************************
 
 		$flexi_actions	= JAccess::getActions($component, 'component');
-		$flexi_rules		= array();
 		foreach($flexi_actions as $action)
 		{
-			// * WE NEED THIS (even if it remains empty array), because we will compare COMPONENT actions in DB when checking initial permissions
-			$flexi_rules[$action->name] = !isset($flexi_rules[$action->name])  ?  array()  :  $flexi_rules[$action->name];
-			
-			// Create an array of all COMPONENT actions names
 			$flexi_action_names[$action->name] = 1;
 		}
 		
-		if ( is_array($added_actions) )
+		// We will either populate all action names or just those that were given (new actions)
+		$new_actions = is_array($added_actions) ? array_flip($added_actions) : $flexi_action_names;
+		
+		// Initialize non-existing flexicontent ACL rules to empty
+		$flexi_rules = array();
+		foreach($new_actions as $action_name => $_i)
 		{
-			$new_actions = array_flip($added_actions);
-			$flexi_rules = array();
-		}
-		else
-		{
-			$new_actions = $flexi_action_names;
+			// * WE NEED THIS (even if it remains empty array), because we will compare COMPONENT actions in DB when checking initial permissions
+			$flexi_rules[$action_name] = !isset($flexi_rules[$action_name])  ?  array()  :  $flexi_rules[$action_name];
 		}
 
 
