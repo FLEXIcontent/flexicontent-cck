@@ -1096,12 +1096,16 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE" level="level1" />
 
-			<field name="display_favoured_userlist" type="list" default="0" label="FLEXI_FAVOURED_USERLIST" description="FLEXI_FAVOURED_USERLIST_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_FAVOURED_YES_USERNAMES</option>
-				<option value="2">FLEXI_FAVOURED_YES_FULLNAMES</option>
+			<field name="display_favoured_usercount" type="radio" default="0" label="FLEXI_FAVOURED_USERS_COUNTER" description="FLEXI_FAVOURED_USERS_COUNTER_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="display_favoured_max" type="text" default="12" label="FLEXI_FAVOURED_MAXUSERS" description="FLEXI_FAVOURED_MAXUSERS_DESC" />
+			<field name="display_favoured_userlist" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_FAVOURED_USERS_LIST" description="FLEXI_FAVOURED_USERS_LIST_DESC" class="btn-group group-fcmethod">
+				<option value="0" show_list="" hide_list="disp_userlist">FLEXI_HIDE</option>
+				<option value="1" show_list="disp_userlist" hide_list="">FLEXI_FAVOURED_YES_USERNAMES</option>
+				<option value="2" show_list="disp_userlist" hide_list="">FLEXI_FAVOURED_YES_FULLNAMES</option>
+			</field>
+			<field name="display_favoured_max" type="text" default="12" label="FLEXI_FAVOURED_MAXUSERS" description="FLEXI_FAVOURED_MAXUSERS_DESC" depend_class="disp_userlist" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" class="fc-mssg-inline fc-info fc-nobgimage" />
 			<field name="trigger_onprepare_content" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC" class="btn-group btn-group-yesno">

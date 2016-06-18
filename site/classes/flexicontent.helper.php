@@ -3346,33 +3346,46 @@ class flexicontent_html
 	 */
 	static function favoured_userlist(&$field, &$item,  $favourites)
 	{
-		$userlisttype = $field->parameters->get('display_favoured_userlist', 0);
-		$maxusercount = $field->parameters->get('display_favoured_max', 12);
-
-		$favuserlist = $favourites ? '<div class="fc-mssg fc-info fc-iblock fc-nobgimage fcfavs-subscribers-count">'.JText::_('FLEXI_TOTAL').': '.$favourites.' '.JText::_('FLEXI_USERS') : '';
-
-		if ( !$userlisttype ) return $favuserlist ? $favuserlist.'</div>' : '';
-		else if ($userlisttype==1) $uname="u.username";
-		else /*if ($userlisttype==2)*/ $uname="u.name";
-
-		$db	= JFactory::getDBO();
-		$query = "SELECT $uname FROM #__flexicontent_favourites AS ff"
-			." LEFT JOIN #__users AS u ON u.id=ff.userid "
-			." WHERE ff.itemid=" . $item->id;
-		$db->setQuery($query);
-		$favusers = $db->loadColumn();
-		if (!is_array($favusers) || !count($favusers)) return $favuserlist ? $favuserlist.'</div>' : '';
-
-		$seperator = ': ';
-		$count = 0;
-		foreach($favusers as $favuser) {
-			$favuserlist .= $seperator . $favuser;
-			$seperator = ',';
-			$count++;
-			if ($count >= $maxusercount) break;
+		$users_counter = (int) $field->parameters->get('display_favoured_usercount', 0);
+		$users_list_type = (int) $field->parameters->get('display_favoured_userlist', 0);
+		$users_list_limit = (int) $field->parameters->get('display_favoured_max', 12);
+		
+		// No user favouring the item yet
+		if (!$favourites) return;
+		
+		// Nothing to do if all options disabled
+		if (!$users_counter && !$users_list_type)  return;
+		
+		$favuserlist = '
+			<div class="fc-mssg-inline fc-info fc-iblock fc-nobgimage fcfavs-subscribers-count">
+				'.($users_counter ? JText::_('FLEXI_TOTAL').': '.$favourites.' '.JText::_('FLEXI_USERS') : '');
+		
+		if ( $users_list_type )
+		{
+			$uname = $users_list_type==1 ? "u.username" : "u.name";
+			
+			$db	= JFactory::getDBO();
+			$query = 'SELECT '.($users_list_type==1 ? "u.username" : "u.name")
+				.' FROM #__flexicontent_favourites AS ff'
+				.' LEFT JOIN #__users AS u ON u.id=ff.userid '
+				.' WHERE ff.itemid=' . $item->id;
+			$db->setQuery($query);
+			$favusers = $db->loadColumn();
+			
+			if (is_array($favusers) && count($favusers))
+			{
+				$count = 0;
+				foreach($favusers as $favuser)
+				{
+					$_list[] = $favuser;
+					if ($count++ >= $users_list_limit) break;
+				}
+				$favuserlist .= ($users_counter ? ': ' : '') . implode(', ', $_list) . (count($favusers) > $users_list_limit ? ' ...' : '');
+			}
 		}
-		if (count($favusers) > $maxusercount) $favuserlist .=" ...";
-		if (!empty($favuserlist)) $favuserlist .= '</div>';
+		
+		$favuserlist .= '
+			</div>';
 		return $favuserlist;
 	}
 
@@ -3384,6 +3397,8 @@ class flexicontent_html
 	 */
 	static function favicon($field, $favoured, $item, $type='item')
 	{
+		$users_counter = (int) $field->parameters->get('display_favoured_usercount', 0);
+		
 		$user = JFactory::getUser();
 		$item_id = $item->id;  // avoid using $field, we also support favoured categories
 		$item_title = $item->title;
@@ -3439,7 +3454,7 @@ class flexicontent_html
 			if (!$img_fav_delete) {
 				$img_fav_delete = JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', $alt_text, NULL);
 			}
-			$onclick 	= "javascript:FCFav(".$item_id.", '".$type."')";
+			$onclick 	= "javascript:FCFav(".$item_id.", '".$type."', ".$users_counter.")";
 			$link 		= "javascript:void(null)";
 
 			$output		.=
@@ -3456,7 +3471,7 @@ class flexicontent_html
 			if (!$img_fav_add) {
 				$img_fav_add = JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', $alt_text, NULL);
 			}
-			$onclick 	= "javascript:FCFav(".$item_id.", '".$type."')";
+			$onclick 	= "javascript:FCFav(".$item_id.", '".$type."', ".$users_counter.")";
 			$link 		= "javascript:void(null)";
 
 			$output		.=
