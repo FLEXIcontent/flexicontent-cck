@@ -39,7 +39,7 @@ defined('_JEXEC') or die('Restricted access');
 				</label>
 			</td>
 			<td>
-				<input id="title" name="title" class="input-xxlarge required" value="<?php echo $this->row->title; ?>" size="200" maxlength="100" />
+				<input type="text" id="title" name="title" class="input-xxlarge required" value="<?php echo $this->row->title; ?>" size="200" maxlength="100" />
 			</td>
 		</tr><tr>
 			<td class="key">

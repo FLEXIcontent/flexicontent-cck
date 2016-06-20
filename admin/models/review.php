@@ -147,12 +147,14 @@ class FlexicontentModelReview extends JModelLegacy
 		// Lets load the review if it doesn't already exist
 		if (empty($this->_review))
 		{
-			$review = new stdClass();
-			$review->id					= 0;
-			$review->name					= null;
-			$review->alias					= null;
-			$review->published				= 1;
-			$this->_review				= $review;
+			$review = $this->getTable('flexicontent_reviews', $_prefix='');
+
+			$review->id         = 0;
+			$review->title      = '';
+			$review->published  = 1;
+			$review->text       = '';
+
+			$this->_review      = $review;
 			return (boolean) $this->_review;
 		}
 		return true;
@@ -168,9 +170,11 @@ class FlexicontentModelReview extends JModelLegacy
 	function checkin($pk = NULL)
 	{
 		if (!$pk) $pk = $this->_id;
-		if ($pk) {
-			$item = JTable::getInstance('flexicontent_reviews', '');
-			return $item->checkin($pk);
+
+		if ($pk)
+		{
+			$tbl = $this->getTable('flexicontent_reviews', $_prefix='');
+			return $tbl->checkin($pk);
 		}
 		return false;
 	}
@@ -195,7 +199,7 @@ class FlexicontentModelReview extends JModelLegacy
 		$uid	= $user->get('id');
 		
 		// Lets get table record and checkout the it
-		$tbl = JTable::getInstance('flexicontent_reviews', '');
+		$tbl = $this->getTable('flexicontent_reviews', $_prefix='');
 		if ( $tbl->checkout($uid, $this->_id) ) return true;
 		
 		// Reaching this points means checkout failed
@@ -238,7 +242,7 @@ class FlexicontentModelReview extends JModelLegacy
 	 */
 	function store($data)
 	{
-		$review = $this->getTable('flexicontent_reviews', '');
+		$review = $this->getTable('flexicontent_reviews', $_prefix='');
 
 		// bind it to the table
 		if (!$review->bind($data)) {
@@ -263,10 +267,10 @@ class FlexicontentModelReview extends JModelLegacy
 		return true;
 	}
 	
-	function addreview($name)
+	function addreview($title)
 	{	
 		$obj = new stdClass();
-		$obj->name	 	= $name;
+		$obj->title = $title;
 		$obj->published	= 1;
 		
 		if ($this->store($obj))
