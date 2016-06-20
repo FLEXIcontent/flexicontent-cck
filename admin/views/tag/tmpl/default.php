@@ -19,13 +19,14 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 
+<div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate">
 
 	<table class="fc-form-tbl">
 		<tr>
 			<td class="key">
 				<label class="label">
-					<?php echo JText::_( 'FLEXI_ID' ).':'; ?>
+					<?php echo JText::_( 'FLEXI_ID' ); ?>
 				</label>
 			</td>
 			<td>
@@ -34,25 +35,25 @@ defined('_JEXEC') or die('Restricted access');
 		</tr><tr>
 			<td class="key">
 				<label class="label" for="name">
-					<?php echo JText::_( 'FLEXI_TAG_NAME' ).':'; ?>
+					<?php echo JText::_( 'FLEXI_TAG_NAME' ); ?>
 				</label>
 			</td>
 			<td>
-				<input id="name" name="name" class="required input-xxlarge" value="<?php echo $this->row->name; ?>" size="200" maxlength="100" />
+				<input type="text" id="name" name="name" class="required input-xxlarge" value="<?php echo $this->row->name; ?>" size="200" maxlength="100" />
 			</td>
 		</tr><tr>
 			<td class="key">
 				<label class="label" for="alias">
-					<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
+					<?php echo JText::_( 'FLEXI_ALIAS' ); ?>
 				</label>
 			</td>
 			<td>
-				<input id="alias" name="alias" class="input-xxlarge" value="<?php echo $this->row->alias; ?>" size="200" maxlength="100" />
+				<input type="text" id="alias" name="alias" class="input-xxlarge" value="<?php echo $this->row->alias; ?>" size="200" maxlength="100" />
 			</td>
 		</tr><tr>
 			<td class="key">
 				<label class="label">
-					<?php echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
+					<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>
 				</label>
 			</td>
 			<td>
@@ -82,6 +83,7 @@ defined('_JEXEC') or die('Restricted access');
 	<input type="hidden" name="view" value="tag" />
 	<input type="hidden" name="task" value="" />
 </form>
+</div>
 
 <?php
 //keep session alive while editing

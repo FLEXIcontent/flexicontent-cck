@@ -208,9 +208,11 @@ class FlexicontentModelType extends JModelAdmin
 	function checkin($pk = NULL)
 	{
 		if (!$pk) $pk = $this->_id;
-		if ($pk) {
-			$item = JTable::getInstance('flexicontent_types', '');
-			return $item->checkin($pk);
+
+		if ($pk)
+		{
+			$tbl = JTable::getInstance('flexicontent_types', '');
+			return $tbl->checkin($pk);
 		}
 		return false;
 	}

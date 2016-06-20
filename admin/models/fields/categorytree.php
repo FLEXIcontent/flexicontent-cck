@@ -125,7 +125,7 @@ class JFormFieldCategoryTree extends JFormFieldList
 			$obj = new stdClass;
 			$obj->value = '';
 			$obj->level = 0;
-			$obj->text = JText::_( 'FLEXI_SELECT_CAT' );
+			$obj->text = JText::_( 'FLEXI_SELECT_CATEGORY' );
 			$catlist[] 	= $obj;
 		}
 		

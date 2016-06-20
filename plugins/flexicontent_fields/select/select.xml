@@ -212,7 +212,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
 			
-			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level2" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" level="level2" />
 			<field name="display_label_filter" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>

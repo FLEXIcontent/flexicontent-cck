@@ -39,6 +39,9 @@ $fieldSets = $this->form->getFieldsets('attribs');
 // J2.5+ requires Edit State privilege while J1.5 requires Edit privilege
 $publication_priv = FLEXI_J16GE ? 'canpublish' : 'canedit';
 
+$task_items = 'task=';
+$tags_task  = 'task=';
+
 // For tabsets/tabs ids (focusing, etc)
 $tabSetCnt = -1;
 $tabSetMax = -1;
@@ -95,7 +98,8 @@ $this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent
 $this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
-if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
+if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
+{
 	//$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', FLEXI_VHASH);
 	//$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', FLEXI_VHASH);
 	//$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', FLEXI_VHASH);
@@ -103,6 +107,10 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 	$this->document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js', FLEXI_VHASH);  // e.g. autogrow version comment textarea
 
 	//$this->document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', FLEXI_VHASH);
+
+	JText::script("FLEXI_DELETE_TAG", true);
+	JText::script("FLEXI_ENTER_TAG", true);
+
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function(){
 			
@@ -148,7 +156,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 					var term = request.term;
 					//window.console.log( 'Getting tags for \"' + term + '\" ...');
 					jQuery.ajax({
-						url: '".JURI::base(true)."/index.php?option=com_flexicontent&task=viewtags&format=raw&".JSession::getFormToken()."=1',
+						url: '".JURI::base(true)."/index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&".JSession::getFormToken()."=1',
 						dataType: 'json',
 						data: {
 							q: request.term
@@ -199,31 +207,26 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 			}, tagInput.get(0) );
 			
 		});
-		
-		
+
+
 		function addToList(id, name)
 		{
 			var obj = jQuery('#ultagbox');
 			if (obj.find('input[value=\"'+id+'\"]').length > 0) return;
-			obj.append('<li class=\"tagitem\"><span>'+name+'</span><input type=\"hidden\" name=\"jform[tag][]\" value=\"'+id+'\" /><a href=\"javascript:;\" class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"".JText::_('FLEXI_DELETE_TAG',true)."\"></a></li>');
+			obj.append('<li class=\"tagitem\"><span>'+name+'</span><input type=\"hidden\" name=\"jform[tag][]\" value=\"'+id+'\" /><a href=\"javascript:;\" class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"' + Joomla.JText._('FLEXI_DELETE_TAG') + '\"></a></li>');
 		}
 		
 		function addtag(id, tagname)
 		{
 			if (id==null) id = 0;
-		
-			/*".( !$this->perms['cancreatetags'] ? '
-				alert("'.JText::_( 'FLEXI_NO_AUTH_CREATE_NEW_TAGS', true).'");
-				return;
-			' : ''
-			)."*/
+
 			if (tagname == '') {
-				alert('".JText::_( 'FLEXI_ENTER_TAG', true)."');
+				alert(\" + Joomla.JText._('FLEXI_ENTER_TAG') + \");
 				return;
 			}
 			
 			var tag = new itemscreen();
-			tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=addtag&format=raw&".JSession::getFormToken()."=1');
+			tag.addtag( id, tagname, 'index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&".JSession::getFormToken()."=1');
 		}
 		
 		function deleteTag(obj)
@@ -764,9 +767,6 @@ if ($tags_displayed) : ob_start();  // tags ?>
 			<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
 			<div class="fcclear"></div>
 			<div id="tags">
-				<?php /*<label for="input-tags">
-					<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
-				</label> */ ?>
 				<input type="text" id="input-tags" name="tagname" class="fcfield_textval <?php echo $tip_class; ?>"
 					placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>" 
 					title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Fieldgroup (A multi-value field that groups other fields)</name>
+	<name>FLEXIcontent - Fieldgroup (Repeatable and cascadable group of fields)</name>
 	<author>ggppdk</author>
 	<creationDate>3 December 2014</creationDate>
 	<copyright>Copyright (C) 2014 flexicontent.org</copyright>

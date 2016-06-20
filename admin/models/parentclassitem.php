@@ -1603,9 +1603,11 @@ class ParentClassItem extends JModelAdmin
 	function checkin($pk = NULL)
 	{
 		if (!$pk) $pk = $this->_id;
-		if ($pk) {
-			$item = JTable::getInstance('flexicontent_items', '');
-			return $item->checkin($pk);
+
+		if ($pk)
+		{
+			$tbl = JTable::getInstance('flexicontent_items', '');
+			return $tbl->checkin($pk);
 		}
 		return false;
 	}

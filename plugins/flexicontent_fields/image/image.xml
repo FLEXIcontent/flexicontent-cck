@@ -67,7 +67,7 @@
 		<fieldset name="group-image-source" repeat="1" icon_class="icon-wrench" label="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="image_source" type="multilist" subtype="list" default="1" toggle_related="1" label="FLEXI_FIELD_IMAGE_SRC_MODE" description="FLEXI_FIELD_IMAGE_SRC_MODE_DESC" class="btn-group group-fcinfo">
-				<option value="-2" show_list="" hide_list="img-db-mode,img-fld-mode">Joomla media manager (experimental)</option>
+				<option value="-2" show_list="" hide_list="img-db-mode,img-fld-mode">Joomla media manager</option>
 				<option value="-1" show_list="" hide_list="img-db-mode,img-fld-mode">Joomla article images: (intro + full)</option>
 				<option value="0"  show_list="img-db-mode"  hide_list="img-fld-mode">FLEXI_FIELD_REUSABLE_DB_MODE</option>
 				<option value="1"  show_list="img-fld-mode" hide_list="img-db-mode">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
