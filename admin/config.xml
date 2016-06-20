@@ -309,7 +309,7 @@
 	</fieldset>
 	<fieldset name="lists_fset" label="Listing views" description="" >
 		
-		<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" label="" level="level0" />
+		<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" label="" level="level0" />
 		<field name="" type="separator" default="FLEXI_SUPPORTED_LIST_VIEWS" label="" level="level4" class="alert alert-info fcpadded" />
 			
 			<field name="" type="separator" default="FLEXI_PARAMETERS_HANDLING" label="" level="level2" />
@@ -726,7 +726,7 @@
 				<option value="0" show_list="" hide_list="txtsearch_combine">FLEXI_HIDE</option>
 				<option value="1" show_list="txtsearch_combine" hide_list="">FLEXI_SHOW</option>
 			</field>
-			<field name="default_searchphrase" type="list" default="all" label="FLEXI_SEARCHWORD_DEFAULT_COMBINATION" description="FLEXI_SEARCHWORD_DEFAULT_COMBINATION_DESC" class="txtsearch_display txtsearch_combine">
+			<field name="default_searchphrase" type="radio" default="all" label="FLEXI_SEARCHWORD_DEFAULT_COMBINATION" description="FLEXI_SEARCHWORD_DEFAULT_COMBINATION_DESC" class="txtsearch_display txtsearch_combine btn-group btn-fcinfo">
 				<option value="all">FLEXI_ALL_WORDS</option>
 				<option value="any">FLEXI_ANY_WORDS</option>
 				<option value="exact">FLEXI_EXACT_PHRASE</option>

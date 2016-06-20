@@ -360,7 +360,7 @@ class flexicontent_cats
 		
 		// A tree to select a category
 		else if($top == 2 || $top == -1) {
-			$catlist[] 	= JHTML::_( 'select.option', '', JText::_( $top==-1 ? '' : 'FLEXI_SELECT_CAT' ));
+			$catlist[] 	= JHTML::_( 'select.option', '', JText::_( $top==-1 ? '' : 'FLEXI_SELECT_CATEGORY' ));
 		}
 		
 		// A sub-tree where root category of the sub-tree should be excluded, in place of it a disabled prompt is added ... NOTE that:
@@ -368,7 +368,7 @@ class flexicontent_cats
 		else if($top == 3) {
 			$first_item = reset($list); //$first_key = key($list);
 			$_first_item_treename = $first_item->treename; $_first_item_title = $first_item->title; $_first_item_id = $first_item->id;
-			$first_item->treename = $first_item->title = JText::_( 'FLEXI_SELECT_CAT' );
+			$first_item->treename = $first_item->title = JText::_( 'FLEXI_SELECT_CATEGORY' );
 			$first_item->id = "";
 		}
 		

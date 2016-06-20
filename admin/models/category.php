@@ -192,9 +192,11 @@ class FlexicontentModelCategory extends JModelAdmin
 	function checkin($pk = NULL)
 	{
 		if (!$pk) $pk = $this->_id;
-		if ($pk) {
-			$category = $this->getTable();
-			return $category->checkin($pk);
+
+		if ($pk)
+		{
+			$tbl = $this->getTable();
+			return $tbl->checkin($pk);
 		}
 		return false;
 	}
@@ -583,7 +585,8 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	JTable	A database object
 	 * @since	1.6
 	*/
-	public function getTable($type = 'flexicontent_categories', $prefix = '', $config = array()) {
+	public function getTable($type = 'flexicontent_categories', $prefix = '', $config = array())
+	{
 		return JTable::getInstance($type, $prefix, $config);
 	}
 	

@@ -185,7 +185,7 @@
 		<plugin name="extendedweblink"    folder="plugins/flexicontent_fields/extendedweblink"    instfolder="flexicontent_fields">FLEXIcontent - Extended Weblink</plugin>
 		<plugin name="fcloadmodule"       folder="plugins/flexicontent_fields/fcloadmodule"       instfolder="flexicontent_fields">FLEXIcontent - Load Module / Module position</plugin>
 		<plugin name="fcpagenav"          folder="plugins/flexicontent_fields/fcpagenav"          instfolder="flexicontent_fields">FLEXIcontent - Navigation (Next/Previous Item)</plugin>
-		<plugin name="fieldgroup"         folder="plugins/flexicontent_fields/fieldgroup"         instfolder="flexicontent_fields">FLEXIcontent - Fieldgroup (Multivalued field that groups other fields)</plugin>
+		<plugin name="fieldgroup"         folder="plugins/flexicontent_fields/fieldgroup"         instfolder="flexicontent_fields">FLEXIcontent - Fieldgroup (Repeatable and cascadable group of fields)</plugin>
 		<plugin name="file"               folder="plugins/flexicontent_fields/file"               instfolder="flexicontent_fields">FLEXIcontent - File (Download/View/Share/Download cart)</plugin>
 		<plugin name="groupmarker"        folder="plugins/flexicontent_fields/groupmarker"        instfolder="flexicontent_fields">FLEXIcontent - Item Form Tab / Fieldset / Custom HTML</plugin>
 		<plugin name="image"              folder="plugins/flexicontent_fields/image"              instfolder="flexicontent_fields">FLEXIcontent - Image or Gallery (image + details)</plugin>
