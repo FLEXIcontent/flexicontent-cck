@@ -209,6 +209,7 @@ defined('_JEXEC') or die('Restricted access');
 							<span class="alert alert-info fc-iblock" style="margin-bottom: 4px;"><?php echo JText::_( 'FLEXI_ASSIGNMENTS'); ?></span>
 						</td>
 					</tr>
+
 					<tr id="row_keeptags">
 						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_KEEP_TAGS' ); ?></label></td>
 						<td>
@@ -232,12 +233,12 @@ defined('_JEXEC') or die('Restricted access');
 					<tr id="row_keepseccats">
 						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_KEEP_SEC_CATS' ); ?></label></td>
 						<td>
-							<input id="keepseccats0" type="radio" name="keepseccats" value="0" onclick="seccats_on();" />
+							<input id="keepseccats0" type="radio" name="keepseccats" value="0" onclick="seccats_off();" />
 							<label for="keepseccats0">
 								<?php echo JText::_( 'FLEXI_NO' ); ?>
 							</label>
 							
-							<input id="keepseccats1" type="radio" name="keepseccats" value="1" onclick="seccats_off();" checked="checked" />
+							<input id="keepseccats1" type="radio" name="keepseccats" value="1" onclick="seccats_on();" checked="checked" />
 							<label for="keepseccats1">
 								<?php echo JText::_( 'FLEXI_YES' ); ?>
 							</label>
