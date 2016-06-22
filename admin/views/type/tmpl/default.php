@@ -44,6 +44,7 @@ $this->document->addScriptDeclaration($js);
 					</td>
 					<td>
 						<?php echo $this->form->getInput('name'); ?>
+						<input type="hidden" id="jform_title" name="jform[title]" value="<?php echo $this->form->getValue('name'); ?>" />
 					</td>
 				</tr>
 				

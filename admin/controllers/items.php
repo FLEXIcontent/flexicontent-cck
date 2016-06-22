@@ -601,7 +601,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		{
 			case 'apply':
 			case 'apply_type':
-				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&cid='.(int) $model->get('id');
+				$link = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&view=item&id='.(int) $model->get('id');
 				break;
 			case 'saveandnew':
 				$link = $type_id ?

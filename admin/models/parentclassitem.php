@@ -99,30 +99,34 @@ class ParentClassItem extends JModelAdmin
 		parent::__construct();
 		
 		$app = JFactory::getApplication();
+		$jinput = $app->input;
 		
 		// --. Get & Set ITEM's primary key (pk) and (for frontend) the current category
-		if (!$app->isAdmin()) {
+		if (!$app->isAdmin())
+		{
 			// FRONTEND, use "id" from request
-			$pk = JRequest::getVar('id', 0, 'default', 'int');
-			if ( !JRequest::getVar('task') )
-				$curcatid = JRequest::getVar('cid', 0, $hash='default', 'int');
-			else
-				$curcatid = 0;
+			$pk = $jinput->get('id', 0, 'int');
+			$curcatid = $jinput->get('task', '', 'cmd')  ?  0  :  $jinput->get('cid', 0, 'int');
 		}
 		else
 		{
-			// BACKEND, use "cid" array from request, but check first for a POST 'id' variable
-			// this is a correction for problematic name of categories AS cid in item edit form ...
-			$data = JRequest::get( 'post' );
+			$id = $jinput->get('id', array(0), 'array');
+			JArrayHelper::toInteger($id, array(0));
+			$pk = (int) $id[0];
 			
-			// Must check if id is SET and if it is non-ZERO !
-			if ( isset($data['jform']['id']) ) {
-				$pk = $data['jform']['id'];
-			} else {
-				$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
+			if (!$pk)
+			{
+				$cid = $jinput->get('cid', array(0), 'array');
 				JArrayHelper::toInteger($cid, array(0));
-				$pk = $cid[0];
+				$pk = (int) $cid[0];
 			}
+			
+			if (!$pk)
+			{
+				$data = $jinput->get('jform', array('id'=>0), 'array');
+				$pk = (int) $data['id'];
+			}
+			
 			$curcatid = 0;
 		}
 		
