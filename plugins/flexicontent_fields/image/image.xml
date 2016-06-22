@@ -111,7 +111,7 @@
 				<option value="0">FLEXI_FIELD_THIS_FIELD</option>
 				<option value="1">FLEXI_FIELD_ANY_FIELD_OR_FM</option>
 			</field>
-			<field name="" type="separator" default="FLEXI_FIELD_ANY_FIELD_OR_FM" description="FLEXI_FIELD_EXISTING_IMAGE_LIST_DESC" level="level4" depend_class="img-db-mode" />
+			<field name="" type="separator" default="FLEXI_FIELD_ANY_FIELD_OR_FM" description="FLEXI_FIELD_EXISTING_IMAGE_LIST_DESC" level="level4" class="alert alert-info" depend_class="img-db-mode" />
 			<field name="limit_by_uploader" type="radio" default="0" label="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED" description="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED_DESC" depend_class="img-db-mode" class="btn-group group-fcinfo">
 				<option value="1">FLEXI_FIELD_CURRENT_USER</option>
 				<option value="0">FLEXI_FIELD_ANY_USER</option>

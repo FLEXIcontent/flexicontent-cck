@@ -41,10 +41,6 @@ class plgSystemFlexisystem extends JPlugin
 		parent::__construct( $subject, $config );
 		$this->extension = 'com_flexicontent';
 		$this->cparams  = JComponentHelper::getParams($this->extension);
-		
-		//JPlugin::loadLanguage($this->extension, JPATH_SITE);
-		//JFactory::getLanguage()->load($this->extension, JPATH_SITE, 'en-GB'	, $_force_reload = false);
-		//JFactory::getLanguage()->load($this->extension, JPATH_SITE, null		, $_force_reload = false);
 	}
 	
 	
@@ -142,8 +138,9 @@ class plgSystemFlexisystem extends JPlugin
 		if ( $option==$this->extension && $this->cparams->get('print_logging_info')==1 )
 		{
 			// Try request variable first then session variable
-			$fcdebug = JRequest::getVar('fcdebug', '');
+			$fcdebug = $jinput->get('fcdebug', '', 'cmd');
 			$fcdebug = strlen($fcdebug) ? (int)$fcdebug : $session->get('fcdebug', 0, 'flexicontent');
+
 			// Enable/Disable debugging
 			$session->set('fcdebug', ($fcdebug ? 1 : 0), 'flexicontent');
 			$this->cparams->set('print_logging_info', ($fcdebug ? 2 : 0));
@@ -167,7 +164,8 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// (c) Route PDF format to HTML format for J1.6+
 		$redirect_pdf_format = $this->params->get('redirect_pdf_format', 1);
-		if ($redirect_pdf_format && JRequest::getVar('format') == 'pdf' ) {
+		if ($redirect_pdf_format && $jinput->get('format', 'html', 'cmd') == 'pdf' )
+		{
 			JRequest::setVar('format', 'html');
 			if ($redirect_pdf_format==2) {
 				JFactory::getApplication()->enqueueMessage('PDF generation is not supported, the HTML version is displayed instead', 'notice');
@@ -191,7 +189,8 @@ class plgSystemFlexisystem extends JPlugin
 		// We place this above format check, because maybe, saving will be AJAX based (? format=raw ?)
 		$this->trackSaveConf();
 		
-		$format = strtolower( JFactory::getApplication()->input->get('format', 'html', 'cmd') );
+		$jinput = JFactory::getApplication()->input;		
+		$format = $jinput->get('format', 'html', 'cmd');
 		if ($format != 'html') return;
 		
 		$jinput   = JFactory::getApplication()->input;
@@ -210,17 +209,24 @@ class plgSystemFlexisystem extends JPlugin
 		
 		$fcdebug = $this->cparams->get('print_logging_info')==2  ?  2  :  $session->get('fcdebug', 0, 'flexicontent');
 		$isAdmin = JFactory::getApplication()->isAdmin();
-		
+
+		$isFC_Config = $isAdmin ? ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent')  :  false;
+		$isBE_Module_Edit = $isAdmin ? (($option=='com_modules' || $option=='com_advancedmodules') && $view == 'module')  :  false;
+		$isBE_Menu_Edit   = $isAdmin ? ($option=='com_menus' && $view == 'item' && $layout=='edit')  :  false;
+
 		$js = '';
-			
+
+		if ( $isBE_Module_Edit || $isBE_Menu_Edit )
+		{
+			JFactory::getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, 'en-GB'	, $_force_reload = false);
+			JFactory::getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, null		, $_force_reload = false);
+		}
+
 		if (
-			$isAdmin && (
-				($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent')  ||  (($option=='com_modules' || $option=='com_advancedmodules') && $view == 'module')
-			) ||
-			($option=='com_flexicontent' && ($isAdmin || $task == 'edit'))
+			$isAdmin && ($isFC_Config || $isBE_Module_Edit) || ($option=='com_flexicontent' && ($isAdmin || $task == 'edit'))
 		) {
 			// WORKAROUNDs for slow chosen JS in component configuration form
-			if ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent')
+			if ($isFC_Config)
 			{
 				// Make sure chosen JS file is loaded before our code, but do not attach it to any elements (YET)
 				JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
@@ -1513,13 +1519,17 @@ class plgSystemFlexisystem extends JPlugin
 	}
 	
 	
-	/*
-	 * Add custom LAYOUT parameters to components that clear them during validation e.g. modules, menus
-	 * DONE modules, TODO: menus
+	/**
+	 * Event method onExtensionBeforeSave
+	 *
+	 * @param   string  $context  Current context
+	 * @param   JTable  $table    JTable instance
+	 * @param   bool    $isNew    Flag to determine whether this is a new extension
+	 *
+	 * @return void
 	 */
-	function onExtensionBeforeSave($context, $table, $isNew)
+	public function onExtensionBeforeSave($context, $table, $isNew)
 	{
-		// Check for com_modules context
 		$jinput = JFactory::getApplication()->input;
 		$option = $jinput->get('component');
 		$user   = JFactory::getUser();
@@ -1590,9 +1600,11 @@ class plgSystemFlexisystem extends JPlugin
 			}
 		}
 		
-		// *******************************
-		// TODO: add support for com_menus
-		// *******************************
+		// ****************************************************************************************
+		// Add custom LAYOUT parameters to non-FC components (cleared during their validation)
+		// DONE modules, TODO: add support to menus,
+		// NOTE: We do validate (filter) submitted values according to XML files of the layout file
+		// ****************************************************************************************
 		
 		// Check for com_modules context
 		if ($context=='com_modules.module' || $context=='com_advancedmodules.module' || substr($context, 0, 10) === "com_falang")
@@ -1614,46 +1626,51 @@ class plgSystemFlexisystem extends JPlugin
 			}
 			
 			// Load XML file
-			if (FLEXI_J30GE) {
-				$xml = simplexml_load_file($layoutpath);
-				$xmldoc = & $xml;
-			} else {
-				$xml = JFactory::getXMLParser('Simple');
-				$xml->loadFile($layoutpath);
-				$xmldoc = & $xml->document;
-			}
-			//echo "<pre>"; print_r($xmldoc); echo "</pre>";
+			$xml = simplexml_load_file($layoutpath);
 			
 			// Create form object loading the , (form name seems not to cause any problem)
 			$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
-			$tmpl_params = FLEXI_J30GE ? $xmldoc->asXML() : $xmldoc->toString();
+			$tmpl_params = $xml->asXML();
 			$jform->load($tmpl_params);
 			
 			// Set cleared layout parameters
-			$_post = & $_POST['jform']['params'];  //echo "<pre>"; print_r($_post); echo "</pre>";
+			$_post = & $_POST['jform']['params'];
 			$params = new JRegistry($table->params);
 			$grpname = 'params';
 			
-			$isValid = !$jform->validate($_post, $grpname);
-			if ($isValid) {
+			$isValid = $jform->validate($_post, $grpname);
+			if (!$isValid)
+			{
 				JFactory::getApplication()->enqueueMessage('Error validating layout posted parameters. Layout parameters were not saved', 'error');
 				return;
 			}
 			
-			foreach ($jform->getGroup($grpname) as $field) {
-				$fieldname =  $field->__get('fieldname');
-				if (substr($fieldname, 0, 2)=="__") continue;
+			foreach ($jform->getGroup($grpname) as $field)
+			{
+				$fieldname = $field->fieldname;
+				if (substr($fieldname, 0, 2)=="__") continue;   // Skip field that start with __
 				$value = $_post[$fieldname];
 				$params->set($fieldname, $value);
 			}
 			
 			// Set parameters back to module's DB table object
 			$table->params = $params->toString();
-			//echo "<pre>"; print_r($table->params); echo "</pre>";
-			//die('onExtensionBeforeSave: '. $layoutpath);
 		}
 	}
-	
+
+
+	/**
+	 * Event method onExtensionAfterSave
+	 *
+	 * @param   string  $context  Current context
+	 * @param   JTable  $table    JTable instance
+	 * @param   bool    $isNew    Flag to determine whether this is a new extension
+	 *
+	 * @return void
+	 */
+	public function onExtensionAfterSave($context, $table, $isNew)
+	{
+	}
 	
 	
 	function renderFields($context, &$row, &$params, $page=0, $eventName='')

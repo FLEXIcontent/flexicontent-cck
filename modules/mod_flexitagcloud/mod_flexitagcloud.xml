@@ -157,7 +157,7 @@
 				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
 				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
 				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
-				<option value="order">FLEXI_ORDER_ORDERING</option>
+				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			<field name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
 			<field name="orderbycustomfielddir" type="radio" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="..." class="btn-group group-fcinfo">

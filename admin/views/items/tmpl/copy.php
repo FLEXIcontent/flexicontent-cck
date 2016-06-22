@@ -22,9 +22,10 @@ defined('_JEXEC') or die('Restricted access');
 <div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post"  name="adminForm" id="adminForm" class="form-validate">
 
-	<table cellspacing="10" cellpadding="0" border="0" width="100%">
-		<tr>
-			<td valign="top" style="width:400px;">
+	<div class="container-fluid" style="padding: 0px; margin-bottom: 24px; max-width: 1200px;">
+
+		<div class="span6 full_width_980" style="margin-bottom: 16px !important;">
+
 			<fieldset>
 			<legend style="text-align: center;"><?php echo JText::_( 'FLEXI_CONTENTS_LIST' ); ?></legend>
 				<table class="fc-table-list" style="margin-top: 0px;">
@@ -55,8 +56,10 @@ defined('_JEXEC') or die('Restricted access');
 					</tbody>
 				</table>
 			</fieldset>
-			</td>
-			<td valign="top">
+
+	</div>
+	<div class="span6 full_width_980" style="margin-bottom: 16px !important;">
+
 			<fieldset>
 			
 			<?php if ($this->behaviour == 'translate') : ?>
@@ -139,123 +142,128 @@ defined('_JEXEC') or die('Restricted access');
 					<?php endif; ?>
 					
 					</tr>
-					
-					
-					<tr id="row_copy_options">
-						<td colspan="2">
-							<br/>
-							<span class="alert alert-info fc-iblock" style="margin-bottom: 4px;"><?php echo JText::_( 'FLEXI_COPY_OPTIONS'); ?></span>
-						</td>
-					</tr>
-					<tr id="row_prefix">
-						<td class="key"><label class="label" for="prefix"><?php echo JText::_( 'FLEXI_ADD_PREFIX' ); ?></label></td>
-						<td>
-							<?php
-							if ($this->behaviour == 'translate') $defprefix = JText::_( 'FLEXI_DEFAULT_TRANSLATE_PREFIX' );
-							else $defprefix = JText::_( 'FLEXI_DEFAULT_PREFIX');
-							?>
-							<input type="text" id="prefix" name="prefix" value="<?php echo $defprefix; ?>" size="15" />
-						</td>
-					</tr>
-					<tr id="row_suffix">
-						<td class="key"><label class="label" for="suffix"><?php echo JText::_( 'FLEXI_ADD_SUFFIX' ); ?></label></td>
-						<td>
-							<input type="text" id="suffix" name="suffix" value="" size="15" />
-						</td>
-					</tr>
-					<tr id="row_copynr">
-						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_COPIES_NR' ); ?></label></td>
-						<td>
-							<input type="text" id="copynr" name="copynr" value="1" size="3" />
-						</td>
-					</tr>
-					
-					<tr>
-						<td colspan="2">
-							<br/>
-							<span class="alert alert-info fc-iblock" style="margin-bottom: 4px;"><?php echo JText::_( 'FLEXI_COPY_UPDATE_OPTIONS'); ?></span>
-						</td>
-					</tr>
-					<tr id="row_language">
-						<td class="key"><label class="label" for="language"><?php echo ($this->behaviour == 'translate' ? JText::_( 'NEW' )." " : '').JText::_( 'FLEXI_LANGUAGE' ); ?></label></td>
-						<td>
-							<?php echo $this->lists['language']; ?>
-						</td>
-					</tr>
-					<tr id="row_language">
-						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_STATE' ); ?></label></td>
-						<td>
-							<?php echo $this->lists['state']; ?>
-						</td>
-					</tr>
-					<tr id="row_type_id">
-						<td class="key" style="vertical-align:top;"><label class="label"><?php echo JText::_( 'FLEXI_TYPE' ); ?></label></td>
-						<td style="vertical-align:top;">
-							<?php echo $this->lists['type_id']; ?>
-							<div id="fc-change-warning" class="fc-mssg fc-warning" style="display:none; width:50%;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
-						</td>
-					</tr>
-					<tr id="row_access">
-						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_ACCESS' ); ?></label></td>
-						<td>
-							<?php echo $this->lists['access']; ?>
-						</td>
-					</tr>
-					
-					
-					<tr>
-						<td colspan="2">
-							<br/>
-							<span class="alert alert-info fc-iblock" style="margin-bottom: 4px;"><?php echo JText::_( 'FLEXI_ASSIGNMENTS'); ?></span>
-						</td>
-					</tr>
-
-					<tr id="row_keeptags">
-						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_KEEP_TAGS' ); ?></label></td>
-						<td>
-							<input id="keeptags0" type="radio" name="keeptags" value="0"/>
-							<label for="keeptags0">
-								<?php echo JText::_( 'FLEXI_NO' ); ?>
-							</label>
-							
-							<input id="keeptags1" type="radio" name="keeptags" value="1" checked="checked" />
-							<label for="keeptags1">
-								<?php echo JText::_( 'FLEXI_YES' ); ?>
-							</label>
-						</td>
-					</tr>
-					<tr id="row_maincat">
-						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_MAIN_CATEGORY' ); ?></label></td>
-						<td>
-							<?php echo $this->lists['maincat']; ?>
-						</td>
-					</tr>
-					<tr id="row_keepseccats">
-						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_KEEP_SEC_CATS' ); ?></label></td>
-						<td>
-							<input id="keepseccats0" type="radio" name="keepseccats" value="0" onclick="seccats_off();" />
-							<label for="keepseccats0">
-								<?php echo JText::_( 'FLEXI_NO' ); ?>
-							</label>
-							
-							<input id="keepseccats1" type="radio" name="keepseccats" value="1" onclick="seccats_on();" checked="checked" />
-							<label for="keepseccats1">
-								<?php echo JText::_( 'FLEXI_YES' ); ?>
-							</label>
-						</td>
-					</tr>
-					<tr id="row_seccats">
-						<td class="key"><label class="label"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label></td>
-						<td><?php echo $this->lists['seccats']; ?></td>
-					</tr>
-					
 				</table>
+
+
+				<fieldset class="panelform" id="row_copy_options">
+					<br/>
+					<span class="alert alert-info fc-iblock" style="margin-bottom: 4px;"><?php echo JText::_( 'FLEXI_COPY_OPTIONS'); ?></span>
+				</fieldset>
+
+				<fieldset class="panelform" id="row_prefix">
+					<span class="label-fcouter"><label class="label" for="prefix"><?php echo JText::_( 'FLEXI_ADD_PREFIX' ); ?></label></span>
+					<div class="container_fcfield">
+						<?php
+						if ($this->behaviour == 'translate') $defprefix = JText::_( 'FLEXI_DEFAULT_TRANSLATE_PREFIX' );
+						else $defprefix = JText::_( 'FLEXI_DEFAULT_PREFIX');
+						?>
+						<input type="text" id="prefix" name="prefix" value="<?php echo $defprefix; ?>" size="15" />
+					</div>
+				</fieldset>
+
+				<fieldset class="panelform" id="row_suffix">
+					<span class="label-fcouter"><label class="label" for="suffix"><?php echo JText::_( 'FLEXI_ADD_SUFFIX' ); ?></label></span>
+					<div class="container_fcfield">
+						<input type="text" id="suffix" name="suffix" value="" size="15" />
+					</div>
+				</fieldset>
+
+				<fieldset class="panelform" id="row_copynr">
+					<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_COPIES_NR' ); ?></label></span>
+					<div class="container_fcfield">
+						<input type="text" id="copynr" name="copynr" value="1" size="3" />
+					</div>
+				</fieldset>
+
+				<fieldset class="panelform">
+					<br/>
+					<span class="alert alert-info fc-iblock" style="margin-bottom: 4px;"><?php echo JText::_( 'FLEXI_COPY_UPDATE_OPTIONS'); ?></span>
+				</fieldset>
+
+				<fieldset class="panelform" id="row_language">
+					<span class="label-fcouter"><label class="label" for="language"><?php echo ($this->behaviour == 'translate' ? JText::_( 'NEW' )." " : '').JText::_( 'FLEXI_LANGUAGE' ); ?></label></span>
+					<div class="container_fcfield">
+						<?php echo $this->lists['language']; ?>
+					</div>
+				</fieldset>
+
+				<fieldset class="panelform" id="row_state">
+					<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_STATE' ); ?></label></span>
+					<div class="container_fcfield">
+						<?php echo $this->lists['state']; ?>
+					</div>
+				</fieldset>
+
+				<fieldset class="panelform" id="row_type_id">
+					<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_TYPE' ); ?></label></span>
+					<div class="container_fcfield">
+						<?php echo $this->lists['type_id']; ?>
+						<div id="fc-change-warning" class="fc-mssg fc-warning" style="display:none; width:50%;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
+					</div>
+				</fieldset>
+
+				<fieldset class="panelform" id="row_access">
+					<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_ACCESS' ); ?></label></span>
+					<div class="container_fcfield">
+						<?php echo $this->lists['access']; ?>
+					</div>
+				</fieldset>
+
+				<fieldset class="panelform">
+					<br/>
+					<span class="alert alert-info fc-iblock" style="margin-bottom: 4px;"><?php echo JText::_( 'FLEXI_ASSIGNMENTS'); ?></span>
+				</fieldset>
+
+				<fieldset class="panelform" id="row_keeptags">
+					<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_KEEP_TAGS' ); ?></label></span>
+					<div class="container_fcfield">
+						<input id="keeptags0" type="radio" name="keeptags" value="0"/>
+						<label for="keeptags0">
+							<?php echo JText::_( 'FLEXI_NO' ); ?>
+						</label>
+
+						<input id="keeptags1" type="radio" name="keeptags" value="1" checked="checked" />
+						<label for="keeptags1">
+							<?php echo JText::_( 'FLEXI_YES' ); ?>
+						</label>
+					</div>
+				</fieldset>
+
+				<fieldset class="panelform" id="row_maincat">
+					<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_MAIN_CATEGORY' ); ?></label></span>
+					<div class="container_fcfield">
+						<?php echo $this->lists['maincat']; ?>
+					</div>
+				</fieldset>
+
+				<fieldset class="panelform" id="row_keepseccats">
+					<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_KEEP_SEC_CATS' ); ?></label></span>
+					<div class="container_fcfield">
+						<input id="keepseccats0" type="radio" name="keepseccats" value="0" onclick="seccats_off();" />
+						<label for="keepseccats0">
+							<?php echo JText::_( 'FLEXI_NO' ); ?>
+						</label>
+
+						<input id="keepseccats1" type="radio" name="keepseccats" value="1" onclick="seccats_on();" />
+						<label for="keepseccats1">
+							<?php echo JText::_( 'FLEXI_YES' ); ?>
+						</label>
+					</div>
+				</fieldset>
+
+				<fieldset class="panelform" id="row_seccats">
+					<span class="label-fcouter"><label class="label"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label></span>
+					<div class="container_fcfield">
+						<?php echo $this->lists['seccats']; ?>
+					</div>
+				</fieldset>
+
 			</fieldset>
-			</td>
-			
-		</tr>
-	</table>
-	
+
+		</div>
+
+	</div>
+
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="items" />
 	<input type="hidden" name="view" value="items" />

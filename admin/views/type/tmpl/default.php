@@ -88,9 +88,9 @@ $this->document->addScriptDeclaration($js);
 		</div>
 		<div class="span6 full_width_980">
 
-			<span class="fc-info fc-nobgimage fc-mssg" style="display:block; float:left; clear:both; margin: 32px 0px 32px 0px !important; font-size:12px;">
+			<div class="fc-info fc-nobgimage fc-mssg" style="display:block; float:left; clear:both; margin: 32px 0px 32px 0px !important; font-size:12px;">
 				<?php echo str_replace('<br/>', ' ', JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS')); ?>
-			</span>
+			</div>
 
 		</div>
 	</div>
