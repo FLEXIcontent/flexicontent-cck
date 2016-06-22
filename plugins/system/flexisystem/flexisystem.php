@@ -61,6 +61,10 @@ class plgSystemFlexisystem extends JPlugin
 		if ( $jinput->get('task')=='config.store' )
 		{
 			$comp = $jinput->get('comp');
+			$comp = str_replace('com_flexicontent.category.', 'com_content.category.', $comp);
+			$comp = str_replace('com_flexicontent.item.', 'com_content.article.', $comp);
+			$jinput->set('comp', $comp);
+
 			if ( $comp == 'com_content' || $comp == 'com_flexicontent' )
 			{
 				$skip_arr = array('core.admin'=>1, 'core.options'=>1, 'core.manage'=>1);

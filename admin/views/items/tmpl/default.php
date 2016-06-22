@@ -721,7 +721,7 @@ jQuery(document).ready(function(){
 			$publish_up->setTimezone($tz);
 			$publish_down->setTimezone($tz);
 			
-			$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid='. $row->id;
+			$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;view=item&amp;id='. $row->id;
 			
 			if (($canEdit || $canEditOwn) && $this->CanAccLvl) {
 				$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'items.access\')"');

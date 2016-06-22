@@ -261,14 +261,14 @@ class FlexicontentViewItem extends JViewLegacy
 				. ($item->language!='*' ? '&lang='.substr($item->language, 0,2) : '');
 			
 			// Check if we are in the backend, in the backend we need to set the application to the site app
-			if ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('site');
+			//if ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('site');
 			
 			// Create the SEF URL
 			$item_url = //!$isAdmin && $_sh404sef  ?  Sh404sefHelperGeneral::getSefFromNonSef($item_url, $fullyQualified = true, $xhtml = false, $ssl = null) :
 				JRoute::_($item_url);
 			
 			// Restore application to the admin app if we are in the backend
-			if  ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('administrator');
+			//if  ( $isAdmin && !$_sh404sef )  JFactory::$application = JApplication::getInstance('administrator');
 			
 			// Check if we are in the backend again
 			if ( $isAdmin )

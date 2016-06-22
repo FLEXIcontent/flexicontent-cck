@@ -52,15 +52,24 @@ class FlexicontentModelType extends JModelAdmin
 	function __construct()
 	{
 		parent::__construct();
-
-		$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
-		JArrayHelper::toInteger($cid, array(0));
-		$pk = (int) $cid[0];
 		
-		if (!$pk) {
-			$post = JRequest::get( 'post' );
-			$data = @$post['jform'];
-			$pk = (int) @$data['id'];
+		$jinput = JFactory::getApplication()->input;
+		
+		$id = $jinput->get('id', array(0), 'array');
+		JArrayHelper::toInteger($id, array(0));
+		$pk = (int) $id[0];
+		
+		if (!$pk)
+		{
+			$cid = $jinput->get('cid', array(0), 'array');
+			JArrayHelper::toInteger($cid, array(0));
+			$pk = (int) $cid[0];
+		}
+		
+		if (!$pk)
+		{
+			$data = $jinput->get('jform', array('id'=>0), 'array');
+			$pk = (int) $data['id'];
 		}
 		$this->setId((int)$pk);
 		

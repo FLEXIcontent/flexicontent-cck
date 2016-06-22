@@ -165,7 +165,7 @@ function delAllFilters() {
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
 			$row = & $this->rows[$i];
-			$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;cid='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;view=type&amp;id='. $row->id;
 			$published 	= JHTML::_('jgrid.published', $row->published, $i, 'types.' );
 			$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')"');
 			
