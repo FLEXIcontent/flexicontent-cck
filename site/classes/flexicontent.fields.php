@@ -1986,25 +1986,30 @@ class FlexicontentFields
 	
 	// Common method to create (insert) advanced search index DB records for various fields,
 	// this can be called by fields or copied inside the field to allow better customization
-	static function onIndexAdvSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null) {
+	static function onIndexAdvSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null)
+	{
 		FlexicontentFields::createIndexRecords($field, $values, $item, $required_props, $search_props, $props_spacer, $filter_func, $for_advsearch=1);
 	}
 	
 	
 	// Common method to create basic text search index for various fields (added as the property field->search),
 	// this can be called by fields or copied inside the field to allow better customization
-	static function onIndexSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null) {
+	static function onIndexSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null)
+	{
 		FlexicontentFields::createIndexRecords($field, $values, $item, $required_props, $search_props, $props_spacer, $filter_func, $for_advsearch=0);
 	}
 	
 	
 	// Get a language specific handler for parsing the text to be added to the search index
 	// e.g. doing word segmentation for a language that does not space-separate the words
-	static function getLangHandler($language) {
+	static function getLangHandler($language)
+	{
 		$cparams   = JComponentHelper::getParams('com_flexicontent');
 		$filter_word_like_any = $cparams->get('filter_word_like_any', 0);
 		
-		if ($language == 'th-TH' && $filter_word_like_any==0) {
+		if ($language == 'th-TH' && $filter_word_like_any==0)
+		{
+			jimport('joomla.filesystem.file');
 			$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
 			if ( JFile::exists($segmenter_path) )
 			{
@@ -2024,7 +2029,8 @@ class FlexicontentFields
 	
 	
 	// Common method to create basic/advanced search index for various fields
-	static function createIndexRecords(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null, $for_advsearch=0) {
+	static function createIndexRecords(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null, $for_advsearch=0)
+	{
 		$fi = FlexicontentFields::getPropertySupport($field->field_type, $field->iscore);
 		$db = JFactory::getDBO();
 		

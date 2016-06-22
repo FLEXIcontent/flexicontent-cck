@@ -851,7 +851,7 @@ class plgFlexicontent_fieldsCheckbox extends FCField
 		// Account for fact that ARRAY form elements are not submitted if they do not have a value
 		if ( $use_ingroup )
 		{
-			$custom = JFactory::getApplication()->input->get('custom', array(), 'post', 'array');
+			$custom = JFactory::getApplication()->input->get('custom', array(), 'array');
 			if ( isset($custom['_fcfield_valueholder_'][$field->name]) ) 
 			{
 				$holders = $custom['_fcfield_valueholder_'][$field->name];
