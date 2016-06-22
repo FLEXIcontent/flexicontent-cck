@@ -2299,6 +2299,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$fc_asset = JTable::getInstance('asset');
 		$fc_asset->loadByName('com_flexicontent');
 		$fc_asset_rules = json_decode($fc_asset->rules, true);
+		if ( !count($fc_asset_rules) )  return; // The asset is empty do not try anything
 
 		$com_content_asset = JTable::getInstance('asset');
 		$com_content_asset->loadByName('com_content');
@@ -2308,24 +2309,33 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		foreach($com_content_rules as $rule_name => $rule_data)
 		{
-			if ( $com_content_rules[$rule_name] != $fc_asset_rules[$rule_name] )
+			if ( isset($fc_asset_rules[$rule_name]) && $com_content_rules[$rule_name] != $fc_asset_rules[$rule_name] )
 			{
 				$com_content_rules[$rule_name] = $fc_asset_rules[$rule_name];
 				$save_asset = true;
 			}
 		}
 		
-		if ( !isset($com_content_rules['core.delete.own'] ) || $com_content_rules['core.delete.own'] != $fc_asset_rules['core.delete.own'] )
+		if ( isset($fc_asset_rules['core.delete.own']) )
 		{
-			$com_content_rules['core.delete.own'] = $fc_asset_rules['core.delete.own'];
-			$save_asset = true;
+			if ( !isset($com_content_rules['core.delete.own']) || $com_content_rules['core.delete.own'] != $fc_asset_rules['core.delete.own'] )
+			{
+				$com_content_rules['core.delete.own'] = $fc_asset_rules['core.delete.own'];
+				$save_asset = true;
+			}
 		}
-		if (  !isset($com_content_rules['core.delete.own'] ) || $com_content_rules['core.edit.state.own'] != $fc_asset_rules['core.edit.state.own'] )
+		
+		if ( isset($fc_asset_rules['core.edit.state.own']) )
 		{
-			$com_content_rules['core.edit.state.own'] = $fc_asset_rules['core.edit.state.own'];
-			$save_asset = true;
+			if ( !isset($com_content_rules['core.edit.state.own']) || $com_content_rules['core.edit.state.own'] != $fc_asset_rules['core.edit.state.own'] )
+			{
+				$com_content_rules['core.edit.state.own'] = $fc_asset_rules['core.edit.state.own'];
+				$save_asset = true;
+			}
 		}
-		//echo "<pre>"; print_r($com_content_rules); echo "</pre>";
+		
+		if ( !isset($com_content_rules['core.delete.own']) )       $com_content_rules['core.delete.own'] = array();
+		if ( !isset($com_content_rules['core.edit.state.own']) )   $com_content_rules['core.edit.state.own'] = array();
 		
 		if ($save_asset)
 		{
@@ -2341,8 +2351,5 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			JFactory::getApplication()->enqueueMessage( 'No update needed for com_content asset with extra rules', 'notice' );
 		}
 	}
-
-
-	
 }
 ?>

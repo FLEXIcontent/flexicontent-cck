@@ -816,15 +816,13 @@ body .nowrap_box .container_fcfield,
 		width: 75%;
 	}
 }
-@media (max-width: 1660px) {
-	body .span6 .label-fcouter,
-	#flexicontent .span6 .label-fcouter {
-		width: 28% !important;
-	}
-	body .span6 .container_fcfield,
-	#flexicontent .span6 .container_fcfield {
-		width: 71% !important;
-	}
+body .span6 .label-fcouter,
+#flexicontent .span6 .label-fcouter {
+	width: 28% !important;
+}
+body .span6 .container_fcfield,
+#flexicontent .span6 .container_fcfield {
+	width: 71% !important;
 }
 body .input-fcmax.container_fcfield input,
 #flexicontent .input-fcmax.container_fcfield input {

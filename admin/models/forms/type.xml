@@ -8,10 +8,12 @@
 		<option value="1">JPUBLISHED</option>
 		<option value="0">JUNPUBLISHED</option>
 	</field>
-	<field name="itemscreatable" type="radio" default="0" filter="int" label="FLEXI_PERMIT_SUBMISSION" description="FLEXI_PERMIT_SUBMISSION_DESC" labelclass="label" class="btn-group group-fcmethod">
-		<option value="0">FLEXI_ANY_AUTHOR</option>
-		<option value="1">FLEXI_USE_ACL_TO_HIDE</option>
-		<option value="2">FLEXI_USE_ACL_TO_DISABLE</option>
+	<field name="itemscreatable" type="multilist" subtype="radio" default="0" toggle_related="1" filter="int" label="FLEXI_PERMIT_SUBMISSION" description="FLEXI_PERMIT_SUBMISSION_DESC"
+		inline_tip="FLEXI_PLEASE_SET_CREATE_ITEM_ACL_IN_PERMS_TAB"  tip_class="create_items_using_acl"   tip_img="comment.png"  preview_img="lock.png" 
+		labelclass="label" class="btn-group group-fcmethod">
+		<option value="0" show_list="" hide_list="create_items_using_acl">FLEXI_ANY_AUTHOR</option>
+		<option value="1" show_list="create_items_using_acl" hide_list="">FLEXI_USE_ACL_TO_HIDE</option>
+		<option value="2" show_list="create_items_using_acl" hide_list="">FLEXI_USE_ACL_TO_DISABLE</option>
 	</field>
 	
 	<field name="checked_out" type="hidden" filter="unset" />
@@ -288,12 +290,10 @@
 		</fieldset>
 		<fieldset name="editing" label="FLEXI_AUTHORING" icon_class="icon-lock">
 			
-			<field name="" type="separator" default="FLEXI_AUTHORING" level="level1" />
-			
-			<field name="" type="separator" default="Main category" level="level2" />
+			<field name="" type="separator" default="Main category" level="level1" />
 			<field name="catid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
-				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be used for selecting main category" labelclass="label-success" />
+				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be used for selecting main category" labelclass="label-warning" />
 			<field name="catid_allowed_parent_disable" type="radio" default="1" label="Disable subtree parent" description="Usually you would want to disable selecting the root category of the category subtree" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -302,10 +302,10 @@
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
 				default="" label="Default category" description="Select the default main category to for this type (that will be pre-selected on item form load)" />
 			
-			<field name="" type="separator" default="Secondary categories" level="level2" />
+			<field name="" type="separator" default="Secondary categories" level="level1" />
 			<field name="cid_allowed_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="0" multiple="false"
-				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be allowed to be used for selecting secondary categories" labelclass="label-success" />
+				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be allowed to be used for selecting secondary categories" labelclass="label-warning" />
 			<field name="cid_allowed_parent_disable" type="radio" default="1" label="Disable subtree parent" description="Usually you would want to disable selecting the root category of the category subtree" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -314,8 +314,8 @@
 				published_only="1" parent_id=""	depth_limit="0" multiple="true"
 				default="" label="Default categories" description="Select the default secondary categories" />
 			
-			<field name="" type="separator" default="Item layout" level="level2" />
-			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" labelclass="label-success"/>
+			<field name="" type="separator" default="FLEXI_TEMPLATE_ITEM" level="level1" />
+			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" labelclass="label-warning"/>
 			
 		</fieldset>
 		

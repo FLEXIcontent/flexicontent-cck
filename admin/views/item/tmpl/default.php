@@ -407,10 +407,10 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			</span>
 			<div class="container_fcfield container_fcfield_name_catid">
 				<?php echo $this->lists['catid']; ?>
-				<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo '<b>'.JText::_('FLEXI_NOTES').'</b><br/>'.JText::_('<br/>Please select <br/> - secondary categories <br/> - and featured <br/> inside the \'Assignments\' TAB'); ?>">
+				<div class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo '<b>'.JText::_('FLEXI_NOTES').'</b><br/>'.JText::_('<br/>Please select <br/> - secondary categories <br/> - and featured <br/> inside the \'Assignments\' TAB'); ?>">
 					<?php echo $conf_image; ?>
 					<?php echo JText::_('FLEXI_NOTES'); ?>
-				</span>
+				</div>
 			</div>
 		
 

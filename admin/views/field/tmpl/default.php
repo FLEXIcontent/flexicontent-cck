@@ -249,7 +249,7 @@ $this->document->addScriptDeclaration($js);
 				
 				<?php if ($this->supportsearch || $this->supportfilter) : ?>
 					<span class="fcsep_level1" style="width:90%; margin-top:16px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX' ); ?></span>
-					<span class="fcsep_level4" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX_NOTES' ); ?></span>
+					<span class="fcsep_level4 alert alert-info" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX_NOTES' ); ?></span>
 					<div class="fcclear"></div>
 				
 					<table class="fc-form-tbl">
@@ -286,7 +286,7 @@ $this->document->addScriptDeclaration($js);
 				
 				<?php if ($this->supportadvsearch || $this->supportadvfilter) : ?>
 					<span class="fcsep_level1" style="width:90%; margin-top:16px; "><?php echo JText::_( 'FLEXI_ADV_INDEX' ); ?></span>
-					<span class="fcsep_level4" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_ADV_INDEX_NOTES' ); ?></span>
+					<span class="fcsep_level4 alert alert-info" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_ADV_INDEX_NOTES' ); ?></span>
 					<div class="fcclear"></div>
 					
 					<table class="fc-form-tbl">
