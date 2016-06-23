@@ -281,6 +281,7 @@ function delAllFilters() {
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 	
+	<!-- fc_perf -->
 	</div>
 </form>
 </div>

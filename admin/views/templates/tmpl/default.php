@@ -228,7 +228,8 @@ $list_total_cols = 8;
 	<input type="hidden" name="view" value="templates" />
 	<input type="hidden" name="task" value="" />
 	<?php echo JHTML::_( 'form.token' ); ?>
-	
+
+	<!-- fc_perf -->
 	</div>
 </form>
 </div>

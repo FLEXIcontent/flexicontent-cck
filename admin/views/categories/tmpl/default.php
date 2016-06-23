@@ -192,7 +192,7 @@ function delAllFilters() {
 			<th class="hideOnDemandClass"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th class="hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'c.lft', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				<?php echo $this->orderingx ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'categories.saveorder' ) : ''; ?>
+				<?php echo $this->orderingx ? str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', 'categories.saveorder' )) : ''; ?>
 			</th>
 			<th class="hideOnDemandClass">
 				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -448,7 +448,8 @@ function delAllFilters() {
 	<input type="hidden" name="original_order_values" value="<?php echo implode(',', $originalOrders); ?>" />
 	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
-	
-	</div>
+
+	<!-- fc_perf -->
+	</div>  <!-- sidebar -->
 </form>
-</div>
+</div><!-- #flexicontent end -->

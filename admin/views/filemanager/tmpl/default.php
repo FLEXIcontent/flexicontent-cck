@@ -1127,5 +1127,6 @@ flexicontent_html::loadFramework('flexi-lib');
 		</div>
 		<!-- .fctabber end --> 
 
+		<!-- fc_perf -->
 	</div>  <!-- sidebar -->
 </div><!-- #flexicontent end -->

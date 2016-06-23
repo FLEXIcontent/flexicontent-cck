@@ -36,7 +36,7 @@ $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username .
 $attribs_preview = ' class="fc-man-icon-s '.$tip_class.'" title="'.flexicontent_html::getToolTip( 'FLEXI_PREVIEW', 'FLEXI_DISPLAY_ENTRY_IN_FRONTEND_DESC', 1, 1).'" ';
 $image_preview = JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview);
 
-$list_total_cols = 8;
+$list_total_cols = 7;
 ?>
 <script type="text/javascript">
 
@@ -237,7 +237,8 @@ function delAllFilters() {
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
-	
-	</div>
+
+		<!-- fc_perf -->
+	</div>  <!-- sidebar -->
 </form>
-</div>
+</div><!-- #flexicontent end -->

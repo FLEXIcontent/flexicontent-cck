@@ -40,65 +40,69 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 
 <?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
-		<?php echo $this->sidebar; ?>
+		<?php echo str_replace('type="button"', '', $this->sidebar); ?>
 	</div>
 	<div id="j-main-container" class="span10">
 <?php else : ?>
 	<div id="j-main-container">
 <?php endif;?>
 
-
-<?php
-array_push($tabSetStack, $tabSetCnt);
-$tabSetCnt = ++$tabSetMax;
-$tabCnt[$tabSetCnt] = 0;
-?>
-
-
-<?php
-$xml = simplexml_load_string($this->conf['xml']);
-
-foreach ($xml->rows as $table) {
-	$table_name = (string)$table->attributes()->table;
-	$table_name = ucfirst(str_replace('flexicontent_', '', $table_name));
-	$rows = $table->row;
+	<?php
+	array_push($tabSetStack, $tabSetCnt);
+	$tabSetCnt = ++$tabSetMax;
+	$tabCnt[$tabSetCnt] = 0;
+	?>
 	
-	if (!count($rows)) {
-		echo "no rows <br/>";
-		continue;
-	}
+	<?php
+	$xml = simplexml_load_string($this->conf['xml']);
 	
-	$row = $rows[0];
-	echo '<h1>'.$table_name.'</h1>';
-	echo '<table class="adminlist fcmanlist">'."\n";
-	echo '<thead>'."\n";
-	echo "<tr>\n";
-	foreach($row as $prop => $value) {
-		if ($prop=='attribs') continue;
-		echo '<th>'.$prop.'</th>';
-	}
-	echo "</tr>\n";
-	echo '</thead>'."\n";
+	if (!$xml)
+		echo 'Could not parse XML file';
 	
-	echo '<tbody>'."\n";
-	foreach($rows as $row) {
+	else foreach ($xml->rows as $table)
+	{
+		$table_name = (string)$table->attributes()->table;
+		$table_name = ucfirst(str_replace('flexicontent_', '', $table_name));
+		$rows = $table->row;
+		
+		if (!count($rows)) {
+			echo "no rows <br/>";
+			continue;
+		}
+		
+		$row = $rows[0];
+		echo '<h1>'.$table_name.'</h1>';
+		echo '<table class="adminlist fcmanlist">'."\n";
+		echo '<thead>'."\n";
 		echo "<tr>\n";
 		foreach($row as $prop => $value) {
 			if ($prop=='attribs') continue;
-			echo '<td style="text-align:center;">'.trim($value,'"').'</td>';
+			echo '<th>'.$prop.'</th>';
 		}
 		echo "</tr>\n";
+		echo '</thead>'."\n";
+		
+		echo '<tbody>'."\n";
+		foreach($rows as $row) {
+			echo "<tr>\n";
+			foreach($row as $prop => $value) {
+				if ($prop=='attribs') continue;
+				echo '<td style="text-align:center;">'.trim($value,'"').'</td>';
+			}
+			echo "</tr>\n";
+		}
+		echo '</tbody>'."\n";
+		echo '</table>'."\n";
 	}
-	echo '</tbody>'."\n";
-	echo '</table>'."\n";
-}
-?>
-	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="controller" value="appsman" />
-	<input type="hidden" name="view" value="appsman" />
-	<input type="hidden" name="task" value="" />
-	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHTML::_( 'form.token' ); ?>
-	
+	?>
+		<input type="hidden" name="option" value="com_flexicontent" />
+		<input type="hidden" name="controller" value="appsman" />
+		<input type="hidden" name="view" value="appsman" />
+		<input type="hidden" name="task" value="" />
+		<input type="hidden" name="fcform" value="1" />
+		<?php echo JHTML::_( 'form.token' ); ?>
+		
+	<!-- fc_perf -->
+	</div>  <!-- sidebar -->
 </form>
-</div>
+</div><!-- #flexicontent end -->

@@ -678,87 +678,87 @@ else :
 	</table>
 	
 	<!-- Most and less Popular-->
-			<div class="row-fluid">
-				<div class="span5">
-					<div class="well">
-						<h3><?php echo JText::_( 'FLEXI_TOP_EDITORS' ) ?></h3>
-						<hr>
-							<table class="adminlist  table table-hover table-striped">
-								<thead>
-									<tr>
-										<th class="left"><?php echo JText::_( 'FLEXI_USER' ); ?></th>
-										<th class="center"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-									</tr>
-								</thead>
-								<tbody>
-									<?php
-									$k = 0;
-									for ($i=0, $n=count($this->creators); $i < $n; $i++) {
-									$row = $this->creators[$i];
-									$link = 'index.php?option=com_flexicontent&amp;view=user&amp;'.$ctrl_users.'edit&amp;cid='. $row->id;
-									?>
-									<tr>
-										<td>
-											<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
-												<a href="<?php echo $link; ?>">
-													<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
-												</a>
-											</span>
-										</td>
-										<td class="center">
-											<span class="badge badge-success"><?php echo $row->counter; ?></span>
-										</td>
-									</tr>
-									<?php $k = 1 - $k; } ?>
-								</tbody>
-							</table>
-					</div>
-				</div>
-				
-				
-				<div class="span7">
-					<div class="well">
-						<h3><?php echo JText::_( 'FLEXI_TOP_CONTRIBUTORS' ) ?></h3>
-						<hr>
-							<table class="adminlist table table-hover table-striped">
-								<thead>
-									<tr>
-										<th class="left"><?php echo JText::_( 'FLEXI_USER' ); ?></th>
-										<th class="center"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-									</tr>
-								</thead>
-								<tbody>
-									<?php
-									$k = 0;
-									for ($i=0, $n=count($this->editors); $i < $n; $i++) {
-									$row = $this->editors[$i];
-									$link = 'index.php?option=com_flexicontent&amp;view=user&amp;'.$ctrl_users.'edit&amp;cid='. $row->id;
-									?>
-									<tr>
-										<td>
-											<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
-												<a href="<?php echo $link; ?>">
-													<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
-												</a>
-											</span>
-										</td>
-										<td class="center">
-											<span class="badge badge-success"><?php echo $row->counter; ?></span>
-										</td>
-									</tr>
-									<?php $k = 1 - $k; } ?>
-								</tbody>
-							</table>
-					</div>
-				</div>
-				
+	<div class="row-fluid">
+		<div class="span5">
+			<div class="well">
+				<h3><?php echo JText::_( 'FLEXI_TOP_EDITORS' ) ?></h3>
+				<hr>
+					<table class="adminlist  table table-hover table-striped">
+						<thead>
+							<tr>
+								<th class="left"><?php echo JText::_( 'FLEXI_USER' ); ?></th>
+								<th class="center"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+							$k = 0;
+							for ($i=0, $n=count($this->creators); $i < $n; $i++) {
+							$row = $this->creators[$i];
+							$link = 'index.php?option=com_flexicontent&amp;view=user&amp;'.$ctrl_users.'edit&amp;cid='. $row->id;
+							?>
+							<tr>
+								<td>
+									<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
+										<a href="<?php echo $link; ?>">
+											<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
+										</a>
+									</span>
+								</td>
+								<td class="center">
+									<span class="badge badge-success"><?php echo $row->counter; ?></span>
+								</td>
+							</tr>
+							<?php $k = 1 - $k; } ?>
+						</tbody>
+					</table>
 			</div>
-		<!-- End of Most and less Popular-->
+		</div>
+		
+		
+		<div class="span7">
+			<div class="well">
+				<h3><?php echo JText::_( 'FLEXI_TOP_CONTRIBUTORS' ) ?></h3>
+				<hr>
+					<table class="adminlist table table-hover table-striped">
+						<thead>
+							<tr>
+								<th class="left"><?php echo JText::_( 'FLEXI_USER' ); ?></th>
+								<th class="center"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+							$k = 0;
+							for ($i=0, $n=count($this->editors); $i < $n; $i++) {
+							$row = $this->editors[$i];
+							$link = 'index.php?option=com_flexicontent&amp;view=user&amp;'.$ctrl_users.'edit&amp;cid='. $row->id;
+							?>
+							<tr>
+								<td>
+									<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
+										<a href="<?php echo $link; ?>">
+											<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
+										</a>
+									</span>
+								</td>
+								<td class="center">
+									<span class="badge badge-success"><?php echo $row->counter; ?></span>
+								</td>
+							</tr>
+							<?php $k = 1 - $k; } ?>
+						</tbody>
+					</table>
+			</div>
+		</div>
+		
+	</div>
+	<!-- End of Most and less Popular-->
 
 </div>
-
 <?php endif; /* EOF: Load echart  libraries */ ?>
 
-
-<div class="clear clearfix"></div>
-</div><!-- BOF j-main-container -->
+	<div class="clear clearfix"></div>
+	
+	<!-- fc_perf -->
+	</div><!-- BOF j-main-container -->

@@ -606,14 +606,14 @@ $tabCnt[$tabSetCnt] = 0;
 <?php $tabSetCnt = array_pop($tabSetStack); ?>
 
 
-	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="controller" value="import" />
-	<input type="hidden" name="view" value="import" />
-	<input type="hidden" name="task" value="" />
-	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHTML::_( 'form.token' ); ?>
-	
-</div>
+		<input type="hidden" name="option" value="com_flexicontent" />
+		<input type="hidden" name="controller" value="import" />
+		<input type="hidden" name="view" value="import" />
+		<input type="hidden" name="task" value="" />
+		<input type="hidden" name="fcform" value="1" />
+		<?php echo JHTML::_( 'form.token' ); ?>
 
+		<!-- fc_perf -->
+	</div>  <!-- sidebar -->
 </form>
-</div>
+</div><!-- #flexicontent end -->

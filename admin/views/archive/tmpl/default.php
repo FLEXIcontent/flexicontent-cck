@@ -40,34 +40,29 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 	<div id="j-main-container">
 <?php endif;?>
 
-	<table class="adminform">
-		<tr>
-			<td width="100%">
-				<?php echo JText::_( 'FLEXI_SEARCH' ); ?>
-				<input type="text" name="search" id="search" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="text_area" onChange="document.adminForm.submit();" />
-				<div id="fc-filter-buttons">
-					<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-					<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_CLEAR' ); ?></button>
-				</div>
-			</td>
-		</tr>
-	</table>
+	<div id="fc-filters-header">
+		<span class="btn-group input-append fc-filter filter-search filter-search">
+			<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="inputbox" />
+			<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
+			<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class.' '.$tip_class; ?>" onclick="document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-remove"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
+		</span>
+	</div>		
 
-	<table class="adminlist">
+	<table id="adminListTableFCarchive" class="adminlist fcmanlist">
 	<thead>
 		<tr>
-			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="5"><input type="checkbox" name="toggle" value="" onClick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+			<th><input type="checkbox" name="toggle" value="" onClick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'i.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="20%"><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'i.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></th>
+			<th><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 	</thead>
 
 	<tfoot>
 		<tr>
-			<td colspan="10">
+			<td colspan="6">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
@@ -150,6 +145,7 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 	
-	</div>
+	<!-- fc_perf -->
+	</div>  <!-- sidebar -->
 </form>
-</div>
+</div><!-- #flexicontent end -->
