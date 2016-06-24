@@ -46,22 +46,16 @@ class JFormFieldFctag extends JFormField
 	function getInput()
 	{
 		$doc = JFactory::getDocument();
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
-		$value = FLEXI_J16GE ? $this->value : $value;
-		if (FLEXI_J16GE) {
-			$paramset = isset($attributes['paramset']) ? $attributes['paramset'] : 'request';
-		}
+		$value = $this->value;
+		$paramset = isset($attributes['paramset']) ? $attributes['paramset'] : 'request';
 		$required = isset($attributes['required']) ? $attributes['required'] : false;
 		
-		$fieldname = FLEXI_J16GE ? "jform[".$paramset."][".$this->element["name"]."]" : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? "jform_".$paramset."_".$node["name"] : "a_id";
+		$fieldname = "jform[".$paramset."][".$this->element["name"]."]";
+		$element_id = "jform_".$paramset."_".$node["name"];
 		$prompt_str = JText::_( 'FLEXI_SELECT_TAG', true );
 
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');

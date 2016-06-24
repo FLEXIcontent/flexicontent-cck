@@ -237,7 +237,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 									if (@$missing['admin']) $missing_str .= '<label class="label">Missing files (Backend)</label> <br/>'. implode('<br/>', $missing['admin']);
 									echo $missing_str;
 									?>
-									<div class="clear"></div>
+									<div class="fcclear"></div>
 									<input id="missing" type="button" class="fc_button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ADD_MISSING' ); ?>" />
 								<?php endif; ?>
 							</div>

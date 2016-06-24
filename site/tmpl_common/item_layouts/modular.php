@@ -288,7 +288,7 @@ $microdata_itemtype_code = $microdata_itemtype ? 'itemscope itemtype="http://sch
 				<?php foreach ($item->positions['image'] as $field) : ?>
 				<div class="flexi image field_<?php echo $field->name; ?>">
 					<?php echo $field->display; ?>
-					<div class="clear"></div>
+					<div class="fcclear"></div>
 				</div>
 				<?php endforeach; ?>
 				<!-- EOF image block -->

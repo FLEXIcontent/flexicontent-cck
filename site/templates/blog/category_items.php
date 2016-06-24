@@ -94,7 +94,7 @@ if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this
 	}
 ?>
 
-<div class="clear"></div>
+<div class="fcclear"></div>
 
 <?php
 if (!$this->items) {
@@ -819,4 +819,4 @@ if ($count > $leadnum) :
 	</ul>
 	<?php endif; ?>
 </div>
-<div class="clear"></div>
+<div class="fcclear"></div>

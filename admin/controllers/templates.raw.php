@@ -214,7 +214,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		if ( !file_exists($layoutpath) ) {
 			if (file_exists($path.DS.'_fallback'.DS.'_fallback.xml')) {
 				$layoutpath = $path.DS.'_fallback'.DS.'_fallback.xml';
-				echo '<div class="alert alert-warning">Currently selected layout: <b>"'.$layout_name.'"</b> does not have a parameters XML file, using general defaults. if this is an old template then these parameters will allow to continue using it, but we recommend that you create parameter file: '.$layout_name.'.xml</div><div class="clear"></div>';
+				echo '<div class="alert alert-warning">Currently selected layout: <b>"'.$layout_name.'"</b> does not have a parameters XML file, using general defaults. if this is an old template then these parameters will allow to continue using it, but we recommend that you create parameter file: '.$layout_name.'.xml</div><div class="fcclear"></div>';
 			}
 			else {
 				echo '<div class="alert alert-info">Currently selected layout: <b>"'.$layout_name.'"</b> does not have layout specific parameters</div>';

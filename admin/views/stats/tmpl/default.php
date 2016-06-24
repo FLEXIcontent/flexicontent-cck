@@ -492,7 +492,7 @@ else :
 	
 	
 	
-	<div class="clear clearfix"></div>
+	<div class="fcclear"></div>
 	
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
 	<tr>
@@ -667,7 +667,7 @@ else :
 	<!-- End of Most and less Popular-->
 
 
-	<div class="clear clearfix"></div>
+	<div class="fcclear"></div>
 	<hr>
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:98%;">
 	<tr>
@@ -758,7 +758,7 @@ else :
 </div>
 <?php endif; /* EOF: Load echart  libraries */ ?>
 
-	<div class="clear clearfix"></div>
+	<div class="fcclear"></div>
 	
 	<!-- fc_perf -->
 	</div><!-- BOF j-main-container -->

@@ -1500,7 +1500,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			}
 			$rsp .= '</ul>';
 			$rsp .= '</div>';
-			$rsp .= '<div class="clear"></div>';
+			$rsp .= '<div class="fcclear"></div>';
 		}
 		if ($CanCreateTags)
 		{

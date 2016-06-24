@@ -40,7 +40,7 @@ $microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article
 	}
 ?>
 
-<div class="clear"></div>
+<div class="fcclear"></div>
 
 <?php
 $items = & $this->items;
@@ -269,7 +269,7 @@ foreach ($cat_items as $catid => $items) :
 									<!-- EOF item title -->
 								<?php endif; ?>
 								
-								<div class="clear"></div>
+								<div class="fcclear"></div>
 								<?php echo $markup_tags; ?>
 						
 								<?php if ($item->event->afterDisplayTitle) : ?>

@@ -54,7 +54,7 @@ foreach($field->value as $file_id)
 				' : '').'
 			</span>
 			
-			<br/>
+			<div class="fcclear"></div>
 			<div style="display:inline-block;">
 				<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$filename_original.'</div>
 				<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.' value="'.$filename_original.'" />

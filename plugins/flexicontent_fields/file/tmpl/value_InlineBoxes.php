@@ -25,11 +25,27 @@ foreach($values as $file_id)
 	// Check if it exists and get file size
 	$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
 	$abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file_data->filename));
-	if ($display_size) {
-		$path_exists = file_exists($abspath);
-		$file_data->size = $path_exists ? filesize($abspath) : 0;
+
+	if ($display_size)
+	{
+		if ($file_data->url)
+		{
+			$_size = (int)$file_data->size ? (int)$file_data->size : '-';
+		}
+		else if (file_exists($abspath))
+		{
+			$_size = filesize($abspath);
+		}
+		else
+			$_size = '-';
+		
+		// Override DB size with the calculated file size
+		$file_data->size = (int) $_size;
 	}
-	
+	else
+		$_size = '-';
+
+
 	// *****************************
 	// Check user access on the file
 	// *****************************
@@ -106,12 +122,14 @@ foreach($values as $file_id)
 	{
 		$sizeinfo = '<span class="fcfile_size">';
 		$sizeinfo .= '<span class="fcfile_size_label label">' .JTEXT::_('FLEXI_SIZE'). '</span> ';
-		if ($display_size==1)
-			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($file_data->size / 1024, 0).'&nbsp;'.JTEXT::_('FLEXI_KBS').'</span>';
+		if ( !is_numeric($_size) )
+			$sizeinfo .= '<span class="fcfile_size_value">'.$_size.'</span>';
+		else if ($display_size==1)
+			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($_size / 1024, 0).'&nbsp;'.JTEXT::_('FLEXI_KBS').'</span>';
 		else if ($display_size==2)
-			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($file_data->size / 1048576, 2).'&nbsp;'.JTEXT::_('FLEXI_MBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($_size / 1048576, 2).'&nbsp;'.JTEXT::_('FLEXI_MBS').'</span>';
 		else
-			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($file_data->size / 1073741824, 2).'&nbsp;'.JTEXT::_('FLEXI_GBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value">'.number_format($_size / 1073741824, 2).'&nbsp;'.JTEXT::_('FLEXI_GBS').'</span>';
 		$sizeinfo .= '</span>';
 	}
 	

@@ -32,6 +32,19 @@ body.fc-no-scroll {
 	clear: both !important;
 	float: left !important;
 }
+#fc_perf_box {
+	margin: 12px 1% 48px;
+	text-align: left;
+	float: left;
+	width: 98%;
+	display: inline-block;
+	clear: both;
+	box-sizing: border-box;
+}
+.flexicontent #fc_perf_box {
+	margin: 12px 0% 48px;
+	width: 100%;
+}
 table#version_tbl td.versions-first {
 	border-bottom: 1px dotted silver;
 	padding: 4px;
@@ -1058,9 +1071,9 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 .container_fcfield.fcdualline {
 	width: auto !important;
 }
-#flexicontent .fcclear,
+.fcclear,
 #flexicontent .clear {
-	border: 0px solid red !important;
+	border: 0 !important;
 	clear: both !important;
 	float: none !important;
 	font-size: 1px !important;
@@ -1069,7 +1082,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	margin: 0 !important;
 	padding: 0 !important;
 	visibility: hidden !important;
-	display: block;
+	display: block !important;
 }
 #flexicontent form .fcfield_textareaval,
 #flexicontent form .fcfield_selectval,

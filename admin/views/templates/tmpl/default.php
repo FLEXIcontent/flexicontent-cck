@@ -221,7 +221,7 @@ $list_total_cols = 8;
 
 	</table>
 	
-	<div class="clear"></div>
+	<div class="fcclear"></div>
 	
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="templates" />

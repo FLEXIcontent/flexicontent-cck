@@ -468,7 +468,7 @@ jQuery(document).ready(function(){
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 	<?php echo @$this->minihelp; ?>
 
-	<div class="clear"></div>
+	<div class="fcclear"></div>
 	<span style="display:none;" class="alert fc-small fc-iblock" id="fcorder_save_warn_box">
 		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder')) : '') ; ?>
 	</span>
@@ -1076,7 +1076,7 @@ jQuery(document).ready(function(){
 
 	</table>
 
-	<div class="clear"></div>
+	<div class="fcclear"></div>
 
 	<sup>[1]</sup> <?php echo JText::_('FLEXI_TMPL_NOT_SET_USING_TYPE_DEFAULT'); ?><br />
 	<sup>[2]</sup> <?php echo JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $this->inline_ss_max); ?><br />

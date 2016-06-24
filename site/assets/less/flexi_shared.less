@@ -52,6 +52,25 @@ body.fc-no-scroll {  /* prevents scrolling of the document */
 }
 
 
+/***********************
+ * Performance stats box
+ ***********************/
+ 
+#fc_perf_box {
+	margin: 12px 1% 48px;
+	text-align: left;
+	float: left;
+	width: 98%;
+	display: inline-block;
+	clear: both;
+	box-sizing: border-box;
+}
+.flexicontent #fc_perf_box {
+	margin: 12px 0% 48px;
+	width: 100%;
+}
+
+
 /****************************
  * Versioning TAB (item form)
  ****************************/
@@ -1253,9 +1272,9 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
  * clear classes, forcing to wrap
  ********************************/
 
-#flexicontent .fcclear,
+.fcclear,
 #flexicontent .clear {
-	border: 0px solid red !important;
+	border: 0 !important;
 	clear: both !important;
 	float: none !important;
 	font-size: 1px !important;
@@ -1264,7 +1283,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	margin: 0 !important;
 	padding: 0 !important;
 	visibility: hidden !important;
-	display: block;
+	display: block !important;
 }
 
 

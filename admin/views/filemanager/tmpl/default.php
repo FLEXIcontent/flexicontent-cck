@@ -975,7 +975,24 @@ flexicontent_html::loadFramework('flexi-lib');
 								<input type="text" id="file-url-ext" size="5" class="required input-xxlarge" name="file-url-ext" />
 							</td>
 						</tr>
-						
+
+						<tr>
+							<td class="key <?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', '', 1, 1); ?>">
+								<label class="label" for="file-url-size">
+								<?php echo JText::_( 'FLEXI_SIZE' ); ?>
+								</label>
+							</td>
+							<td>
+								<input type="text" id="file-url-size" size="44" class="required input-xxlarge" name="file-url-size" />
+								<select id="size_unit" name="size_unit" class="use_select2_lib" value="KBs">
+									<option value="KBs">KBs</option>
+									<option value="MBs">MBs</option>
+									<option value="GBs">GBs</option>
+								</select>
+								<span class="hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>"><i class="icon-info"></i></span>
+							</td>
+						</tr>
+
 					</table>
 					
 					<input type="submit" id="file-url-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>"/>

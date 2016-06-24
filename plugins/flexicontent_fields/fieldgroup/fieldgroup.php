@@ -492,7 +492,7 @@ class plgFlexicontent_fieldsFieldgroup extends JPlugin
 					</div>';
 				}
 				if (count($default_html)) {
-					$field->{$prop}[] = $pretext . implode('<div class="clear"></div>', $default_html).'<div class="clear"></div>' . $posttext;
+					$field->{$prop}[] = $pretext . implode('<div class="fcclear"></div>', $default_html).'<div class="fcclear"></div>' . $posttext;
 				}
 			}
 			
