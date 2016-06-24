@@ -22,4 +22,4 @@ if ($display_method == 0) return;  // No previous / next links if using scroll-t
 		<span class="tocNoPrevNext tocNext" >'. JText::_( 'FLEXIBREAK_NEXT_PAGE' ) .'</span>';
 	?>
 </div>
-<div class="clear"></div>
+<div class="fcclear"></div>

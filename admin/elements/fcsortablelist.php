@@ -226,7 +226,7 @@ class JFormFieldFcSortableList extends JFormField
 			if ($class = @$attributes['class']) {
 				$classes .= ' '.$class;
 			}
-			$sorter_html  = '<div class="clear"></div>';
+			$sorter_html  = '<div class="fcclear"></div>';
 			$sorter_html .= '<div class="'.$classes.'" style="margin:6px; min-height:64px; overflow-y:hidden!important">';
 			$sorter_html .= '<ul id="'.$sortable_id.'" class="positions"> ';
 			foreach($values as $val) {
@@ -239,7 +239,7 @@ class JFormFieldFcSortableList extends JFormField
 			$sorter_html .= '</ul>';
 			$sorter_html .= '<input type="hidden" value="'.implode(',', $values).'" id="'.$_element_id.'" name="'.$_fieldname.'" />';
 			$sorter_html .= '</div>';
-			$sorter_html .= '<div class="clear"></div>';
+			$sorter_html .= '<div class="fcclear"></div>';
 			
 			$js = "
 				if (sorttable_fcrecord_lists)

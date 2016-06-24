@@ -700,7 +700,7 @@ class plgFlexicontent_fieldsMinigallery extends FCField
 			</div>
 		</div>
 		<div class="clr"></div>
-		<div class="clear"></div>
+		<div class="fcclear"></div>
 		<div id="'.$htmltag_id.'_popup_images" style="display:none;">
 			'.implode("\n", $pimages).'
 		</div>';

@@ -47,13 +47,9 @@ class JFormFieldTags extends JFormField
 		$doc = JFactory::getDocument();
 		$db  = JFactory::getDBO();
 		
-		if (FLEXI_J16GE) {
-			$node = & $this->element;
-			$attributes = get_object_vars($node->attributes());
-			$attributes = $attributes['@attributes'];
-		} else {
-			$attributes = & $node->_attributes;
-		}		
+		$node = & $this->element;
+		$attributes = get_object_vars($node->attributes());
+		$attributes = $attributes['@attributes'];
 		
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_tags'
@@ -64,27 +60,29 @@ class JFormFieldTags extends JFormField
 		$db->setQuery($query);
 		$tags = $db->loadObjectList();
 		
-		$values			= FLEXI_J16GE ? $this->value : $value;
+		$values = $this->value;
 		if ( empty($values) )							$values = array();
-		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
+		else if ( ! is_array($values) )		$values = explode("|", $values);
 		
-		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
-		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		
 		$attribs = ' style="float:left;" ';
 		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
-			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 		} else {
 			array_unshift($tags, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 		}
+		$classes = 'use_select2_lib';
 		if ($class = @$attributes['class']) {
-			$attribs .= 'class="'.$class.'"';
+			$classes .= ' '.$class;
 		}
 		if ($onchange = @$attributes['onchange']) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
+
+		$attribs .= ' class="'.$classes.'" ';
 
 		return JHTML::_('select.genericlist', $tags, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}

@@ -2060,7 +2060,7 @@ class FlexicontentController extends JControllerLegacy
 			$rsp .=  '<span class="qf_tag"><span class="qf_tagidbox"><input type="checkbox" name="tag[]" value="'.$tag->id.'"' . (in_array($tag->id, $used) ? 'checked="checked"' : '') . ' /></span>'.$tag->name.'</span>';
 		}
 		$rsp .= '</div>';
-		$rsp .= '<div class="clear"></div>';
+		$rsp .= '<div class="fcclear"></div>';
 		$rsp .= '<div class="qf_addtag">';
 		$rsp .= '<label for="addtags">'.JText::_( 'FLEXI_ADD_TAG' ).'</label>';
 		$rsp .= '<input type="text" id="tagname" class="inputbox" size="30" />';

@@ -773,6 +773,7 @@ if (!$this->row->url)
 		</tr>
 
 		<?php if (!$this->row->url) : ?>
+
 		<tr>
 			<td colspan="2">
 				<br/><span class="badge badge-info" style="margin-top:6px;"><?php echo JText::_( 'FLEXI_SIZE' ); ?></span>
@@ -781,6 +782,26 @@ if (!$this->row->url)
 				<?php echo $file_path;?>
 			</td>
 		</tr>
+
+		<?php else: ?>
+
+		<tr>
+			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>">
+				<label class="label" for="size">
+					<?php echo JText::_( 'FLEXI_SIZE' ); ?>
+				</label>
+			</td>
+			<td>
+				<input type="text" id="size" name="size" value="<?php echo ceil(((int)$this->row->size)/1024.0); ?>" size="10" style="max-width:200px;" maxlength="100"/>
+				<select id="size_unit" name="size_unit" class="use_select2_lib" value="KBs">
+					<option value="KBs">KBs</option>
+					<option value="MBs">MBs</option>
+					<option value="GBs">GBs</option>
+				</select>
+				<span class="hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>"><i class="icon-info"></i></span>
+			</td>
+		</tr>
+		
 		<?php endif; ?>
 		
 	</table>

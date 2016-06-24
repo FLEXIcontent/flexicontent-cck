@@ -399,13 +399,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
 		$app = JFactory::getApplication();
+		$jinput = $app->input;
 		
-		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
-		$filename	= JRequest::getVar( 'file-url-data', null, 'post' );
-		$altname	= JRequest::getVar( 'file-url-title', null, 'post', 'string' );
-		$ext			= JRequest::getVar( 'file-url-ext', null, 'post', 'alnum' );
-		$filedesc	= JRequest::getVar( 'file-url-desc', '');
-		$filelang	= JRequest::getVar( 'file-url-lang', '');
+		$return		= $jinput->get( 'return-url', null, 'base64' );
+		$filename	= $jinput->get( 'file-url-data', null);  // Default filtering
+		$altname	= $jinput->get( 'file-url-title', null, 'string' );
+		$ext			= $jinput->get( 'file-url-ext', null, 'alnum' );
+		$filedesc	= $jinput->get( 'file-url-desc', '');  // Default filtering
+		$filelang	= $jinput->get( 'file-url-lang', '*', 'string');
+		$filesize	= $jinput->get( 'file-url-size', 0, 'int');
+		$size_unit= $jinput->get( 'size_unit', 'KBs', 'cmd');
 
 		jimport('joomla.utilities.date');
 
@@ -418,6 +421,13 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			}
 			return;
 		}
+
+		$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
+		$size_unit = (int) @ $arr_sizes[$size_unit];
+		if ( $size_unit )
+			$filesize = ((int)$filesize) * $size_unit;
+		else
+			$filesize = 0;
 		
 		// we verifiy the url prefix and add http if any
 		if (!preg_match("#^http|^https|^ftp#i", $filename)) { $filename	= 'http://'.$filename; }
@@ -434,7 +444,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$obj->description = $filedesc;
 		$obj->language    = $filelang ? $filelang : '*';
 		$obj->hits        = 0;
-		$obj->size        = 0;
+		$obj->size        = $filesize;
 		$obj->uploaded    = JFactory::getDate( 'now' )->toSql();
 		$obj->uploaded_by = $user->get('id');
 
@@ -442,7 +452,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$app->enqueueMessage(JText::_( 'FLEXI_FILE_ADD_SUCCESS' ));
 
-		$option = JRequest::getVar('option');
+		$option = $jinput->get('option', '', 'cmd');
 		$filter_item = $app->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', '', 'int' );
 		if($filter_item) {
 			$session = JFactory::getSession();
@@ -755,31 +765,49 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+		$jinput = JFactory::getApplication()->input;
 		
 		require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
 		$user		= JFactory::getUser();
 		$model	= $this->getModel('file');
 		$file		= $model->getFile();
-		
-		$task = JRequest::getVar('task');
-		$post = JRequest::get( 'post' );
-		
+
+		$task = $jinput->get('task', '', 'cmd');
+		$post = $jinput->post->getArray();  // Default filtering will remove HTML
+
 		// calculate access
 		$canedit = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
 		$caneditown = $user->authorise('flexicontent.publishownfile', 'com_flexicontent') && $file->uploaded_by == $user->get('id');
 		$is_authorised = $canedit || $caneditown;
-		
+
 		// check access
 		if ( !$is_authorised ) {
 			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
 			return;
 		}
-		
+
+		$post['secure'] = $post['secure'] ? 1 : 0;   // only allow 1 or 0
+		$post['url'] = $post['url'] ? 1 : 0;   // only allow 1 or 0
+
 		$path = $post['secure'] ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
-		$file_path = $path . $post['filename'];
-		$post['size'] = !$post['url'] && file_exists($file_path) ? filesize($file_path) : 0;
-		
+		$file_path = JPath::clean($path . $post['filename']);
+
+		// Get file size if local file
+		if (!$post['url'])
+		{
+			$post['size'] = file_exists($file_path) ? filesize($file_path) : 0;
+		}
+		else
+		{
+			$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
+			$size_unit = (int) @ $arr_sizes[$post['size_unit']];
+			if ( $size_unit )
+				$post['size'] = ((int)$post['size']) * $size_unit;
+			else
+				$post['size'] = 0;
+		}
+
 		if ($model->store($post))
 		{
 			switch ($task)

@@ -290,4 +290,4 @@ switch ($cols)
 		endif;
 endforeach; ?>
 </div>
-<div class="clear"></div>
+<div class="fcclear"></div>

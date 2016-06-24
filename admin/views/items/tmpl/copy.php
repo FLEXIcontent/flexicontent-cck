@@ -106,7 +106,7 @@ defined('_JEXEC') or die('Restricted access');
 							<?php endif; ?>
 							</fieldset>
 							
-							<div class="clear"></div>
+							<div class="fcclear"></div>
 							<div id="falang-import-info" class="fc-mssg fc-note" style="display:none; margin-top: 4px;">
 								<?php echo JText::_( 'FLEXI_USE_JF_FL_DATA_INFO' ); ?>
 							</div>

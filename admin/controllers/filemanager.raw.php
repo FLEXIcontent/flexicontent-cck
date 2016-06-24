@@ -69,7 +69,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		// Get ids of files to index
 		$fmanmodel = $this->getModel('filemanager');
-		$file_ids = $fmanmodel->getFileIds();
+		$file_ids = $fmanmodel->getFileIds($skip_urls=true);
 		
 		// Set file ids into session to avoid recalculation ...
 		$session->set($indexer.'_items_to_index', $file_ids, 'flexicontent');

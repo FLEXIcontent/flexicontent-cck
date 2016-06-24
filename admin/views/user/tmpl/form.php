@@ -454,7 +454,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 						else:
 							echo $field->label;
 							echo $field->input;
-							echo '<div class="clear"></div>';
+							echo '<div class="fcclear"></div>';
 						endif;
 					endforeach;
 					?>
@@ -552,7 +552,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 								else:
 									echo $field->label;
 									echo $field->input;
-									echo '<div class="clear"></div>';
+									echo '<div class="fcclear"></div>';
 								endif;
 							endforeach;
 							?>

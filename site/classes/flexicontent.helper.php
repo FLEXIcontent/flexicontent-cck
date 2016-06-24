@@ -3831,7 +3831,7 @@ class flexicontent_html
 				$list  = '<input id="lang9999" type="radio" name="'.$name.'" class="'.$required.'" value="" checked="checked" data-element-grpid="'.$tagid.'" />';
 				$list .= '<label class="lang_box" for="lang9999" title="'.JText::_( 'FLEXI_NOCHANGE_LANGUAGE_DESC' ).'" >';
 				$list .= JText::_( 'FLEXI_NOCHANGE_LANGUAGE' );
-				$list .= '</label><div class="clear"></div>';
+				$list .= '</label><div class="fcclear"></div>';
 
 				foreach ($user_langs as $lang) {
 					$list 	.= '<input id="'.$tagid.'_'.$lang->id.'" type="radio" name="'.$name.'" class="'.$required.'" value="'.$lang->code.'" data-element-grpid="'.$tagid.'" />';
@@ -5511,27 +5511,39 @@ class flexicontent_images
 	{
 		jimport('joomla.filesystem.path' );
 		jimport('joomla.filesystem.file');
+		$NA = '-';
 
-		for ($i=0, $n=count($rows); $i < $n; $i++) {
-
+		for ($i=0, $n=count($rows); $i < $n; $i++)
+		{
 			$basePath = $rows[$i]->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
 
-			if (is_file($basePath.DS.$rows[$i]->filename)) {
+			if ($rows[$i]->url)
+			{
+				$size = (int)$rows[$i]->size ? (int)$rows[$i]->size : $NA;
+			}
+			else if (is_file($basePath.DS.$rows[$i]->filename))
+			{
 				$path = str_replace(DS, '/', JPath::clean($basePath.DS.$rows[$i]->filename));
-
 				$size = filesize($path);
+			}
+			else
+			{
+				$size = $NA;
+			}
 
+			if (is_numeric($size))
+			{
 				if ($size < 1024) {
 					$rows[$i]->size = $size . ' bytes';
 				} else {
 					if ($size >= 1024 && $size < 1024 * 1024) {
-						$rows[$i]->size = sprintf('%01.2f', $size / 1024.0) . ' Kb';
+						$rows[$i]->size = sprintf('%01.2f', $size / 1024.0) . ' KBs';
 					} else {
-						$rows[$i]->size = sprintf('%01.2f', $size / (1024.0 * 1024)) . ' Mb';
+						$rows[$i]->size = sprintf('%01.2f', $size / (1024.0 * 1024)) . ' MBs';
 					}
 				}
 			} else {
-				$rows[$i]->size = 'N/A';
+				$rows[$i]->size = $size;
 			}
 
 			if ($rows[$i]->url == 1)

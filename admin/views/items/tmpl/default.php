@@ -368,7 +368,7 @@ jQuery(document).ready(function(){
 		<span class="btn-group input-append fc-filter">
 			<input type="button" id="fc_filters_box_btn" class="<?php echo $_class.($this->count_filters ? ' btn-primary' : ''); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 			<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-			<span href="javascript:;" id="fc-mini-help_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" value="help_button" ><span class="icon-help"></span></span>
+			<span id="fc-mini-help_btn" class="<?php echo $_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" ><span class="icon-help"></span></span>
 		</span>
 		
 		<span class="fc-filter nowrap_box">
@@ -468,7 +468,7 @@ jQuery(document).ready(function(){
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 	<?php echo @$this->minihelp; ?>
 
-	<div class="clear"></div>
+	<div class="fcclear"></div>
 	<span style="display:none;" class="alert fc-small fc-iblock" id="fcorder_save_warn_box">
 		<?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE') .' '. ($this->ordering ? str_replace('rel="tooltip"', '', JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder')) : '') ; ?>
 	</span>
@@ -1076,7 +1076,7 @@ jQuery(document).ready(function(){
 
 	</table>
 
-	<div class="clear"></div>
+	<div class="fcclear"></div>
 
 	<sup>[1]</sup> <?php echo JText::_('FLEXI_TMPL_NOT_SET_USING_TYPE_DEFAULT'); ?><br />
 	<sup>[2]</sup> <?php echo JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $this->inline_ss_max); ?><br />
@@ -1095,8 +1095,8 @@ jQuery(document).ready(function(){
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
-	
-	</form>
-	</div>
 
-</div>
+	</form>
+	<!-- fc_perf -->
+	</div>  <!-- sidebar -->
+</div><!-- #flexicontent end -->

@@ -221,14 +221,15 @@ $list_total_cols = 8;
 
 	</table>
 	
-	<div class="clear"></div>
+	<div class="fcclear"></div>
 	
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="templates" />
 	<input type="hidden" name="view" value="templates" />
 	<input type="hidden" name="task" value="" />
 	<?php echo JHTML::_( 'form.token' ); ?>
-	
+
+	<!-- fc_perf -->
 	</div>
 </form>
 </div>

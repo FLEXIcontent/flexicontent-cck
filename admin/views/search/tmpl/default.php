@@ -263,6 +263,7 @@ function delAllFilters() {
 	<input type="hidden" name="fcform" value="1" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 
+	<!-- fc_perf -->
 	</div>
 </form>
 </div>

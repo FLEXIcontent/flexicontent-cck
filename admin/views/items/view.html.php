@@ -395,7 +395,7 @@ class FlexicontentViewItems extends JViewLegacy
 			}
 			
 			if (!empty($show_turn_off_notice)) {
-				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="clear"></div>';
+				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="fcclear"></div>';
 				$app->enqueueMessage($disable_use_notices, 'notice');
 			}
 		}

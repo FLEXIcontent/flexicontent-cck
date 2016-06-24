@@ -855,15 +855,15 @@ class plgSystemFlexisystem extends JPlugin
 		global $fc_performance_msg;
 		if ($fc_performance_msg) {
 			$html = JResponse::getBody();
-			$inline_css = 'margin:12px 1% 48px; text-align:left; float:none; width:auto; display:block; clear:both;';
 			$inline_js_close_btn = !FLEXI_J30GE ? 'onclick="this.parentNode.parentNode.removeChild(this.parentNode);"' : '';
 			$inline_css_close_btn = !FLEXI_J30GE ? 'float:right; display:block; font-size:18px; cursor: pointer;' : '';
-			$html = str_replace('</body>',
-				'<div class="fc-mssg fc-info" style="'.$inline_css.'" >'.
+			$_replace_ = strpos($html, '<!-- fc_perf -->') ? '<!-- fc_perf -->' : '</body>';
+			$html = str_replace($_replace_,
+				'<div id="fc_perf_box" class="fc-mssg fc-info">'.
 					'<a class="close" data-dismiss="alert" '.$inline_js_close_btn.' style="'.$inline_css_close_btn.'" >&#215;</a>'.
 					(!empty($body_css_time) ? sprintf('** [Flexisystem PLG: Adding css classes to BODY: %.3f s]<br/>', $body_css_time/1000000) : '').
 					$fc_performance_msg.
-				'</div>'."\n</body>", $html
+				'</div>'."\n".$_replace_, $html
 			);
 			JResponse::setBody($html);
 		}

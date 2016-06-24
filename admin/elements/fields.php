@@ -318,7 +318,7 @@ class JFormFieldFields extends JFormField
 			
 			$onchange .= ' return fcfield_add_sortable_element(this);';
 			$classes .= ' positions_container fcfields_sorter';
-			$sorter_html  = '<div class="clear"></div>';
+			$sorter_html  = '<div class="fcclear"></div>';
 			$sorter_html .= '<div class="'.$classes.'">';
 			$sorter_html .= '<ul id="'.$sortable_id.'" class="positions"> ';
 			foreach($values as $val)
@@ -332,7 +332,7 @@ class JFormFieldFields extends JFormField
 			$sorter_html .= '</ul>';
 			$sorter_html .= '<input type="hidden" value="'.implode(',', $values).'" id="'.$element_id_sorter.'" name="'.$fieldname_sorter.'" />';
 			$sorter_html .= '</div>';
-			$sorter_html .= '<div class="clear"></div>';
+			$sorter_html .= '<div class="fcclear"></div>';
 			
 			$js = "
 				if (sorttable_fcfield_lists)

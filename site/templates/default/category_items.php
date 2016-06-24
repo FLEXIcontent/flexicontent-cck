@@ -50,7 +50,7 @@ if ($this->params->get('togglable_table_cols', 1))
 	}
 ?>
 
-<div class="clear"></div>
+<div class="fcclear"></div>
 
 <?php
 if (!$this->items) {

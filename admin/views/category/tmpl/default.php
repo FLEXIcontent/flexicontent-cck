@@ -348,7 +348,7 @@ $js = "
 					else:
 						echo $field->label;
 						echo $this->getInheritedFieldDisplay($field, $this->iparams);
-						echo '<div class="clear"></div>';
+						echo '<div class="fcclear"></div>';
 					endif;
 				endforeach;
 				?>
@@ -446,7 +446,7 @@ $js = "
 							else:
 								echo $field->label;
 								echo $this->getInheritedFieldDisplay($field, $this->iparams);
-								echo '<div class="clear"></div>';
+								echo '<div class="fcclear"></div>';
 							endif;
 						endforeach;
 						?>

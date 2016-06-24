@@ -969,9 +969,12 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @return	boolean	integer array on success
 	 * @since	1.0
 	 */
-	function getFileIds()
+	function getFileIds($skip_urls=true)
 	{
-		$query	= 'SELECT id FROM #__flexicontent_files';
+		$query = 'SELECT id '
+			.' FROM #__flexicontent_files'
+			.($skip_urls ? ' WHERE url=0 ' : '')
+			;
 		$this->_db->setQuery($query);
 		$file_ids = $this->_db->loadColumn();
 		return $file_ids;
