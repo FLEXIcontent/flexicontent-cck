@@ -128,6 +128,8 @@
 		<!--field name="language" type="languages" client="site" label="Content Language (for Browser)" description="Indication to the the browser for the language used to write this content" /-->
 		<!--field name="keyref" type="text" default="" label="Key Reference" description="A Unique Key which can be used to undentify the item in the URL, like &amp;key=keyref, note this is currently unusued" size="30" /-->
 		
+		<field name="view_extra_css_fe" type="textarea" default="" rows="5" cols="36" label="FLEXI_ITEM_VIEW_CSS" description="FLEXI_ITEM_VIEW_CSS_DESC" />
+		<field name="view_extra_js_fe" type="textarea" default="" rows="5" cols="36" label="FLEXI_ITEM_VIEW_JS" description="FLEXI_ITEM_VIEW_JS_DESC" />
 	</fieldset>
 	
 	<fieldset name="params-seoconf" label="FLEXI_PARAMETERS_ITEM_SEO" addfieldpath="/administrator/components/com_flexicontent/elements">
