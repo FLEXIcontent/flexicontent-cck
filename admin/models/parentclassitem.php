@@ -3130,11 +3130,12 @@ class ParentClassItem extends JModelAdmin
 	 * 
 	 * @param 	array
 	 * @return 	array
-	 * @since 	1.5.2
+	 * @since 	3.0.15
 	 */
-	function getUsedtagsData($tagIds)
+	function getTagsByIds($tagIds, $indexed = true)
 	{
-		if (empty($tagIds)) {
+		if (empty($tagIds))
+		{
 			return array();
 		}
 		
@@ -3143,15 +3144,33 @@ class ParentClassItem extends JModelAdmin
 				. ' ORDER BY name ASC'
 				;
 		$this->_db->setQuery($query);
-		$tagDatas = $this->_db->loadObjectList('tid');
-		
-		$used = array();
+		$tagsData = $this->_db->loadObjectList('tid');
+
+		if ($indexed) return $tagsData;
+
+		$tags = array();
 		foreach($tagIds as $tid)
 		{
-			if ( !empty($tagDatas[$tid]) )  $used[] = $tagDatas[$tid];
+			if ( !empty($tagsData[$tid]) )
+			{
+				$tags[] = $tagsData[$tid];
+			}
 		}
-		
-		return $used;
+
+		return $tags;
+	}
+
+
+	/**
+	 * Method to get the list of the used tags
+	 * 
+	 * @param 	array
+	 * @return 	array
+	 * @since 	1.5.2
+	 */
+	function getUsedtagsData($tagIds, $indexed = false)
+	{
+		return $this->getTagsByIds($tagIds, $indexed);
 	}
 	
 	
@@ -3162,7 +3181,8 @@ class ParentClassItem extends JModelAdmin
 	 * @return 	array
 	 * @since 	1.5.2
 	 */
-	function getAlltags() {
+	function getAlltags()
+	{
 		$query = 'SELECT * FROM #__flexicontent_tags ORDER BY name';
 		$this->_db->setQuery($query);
 		$tags = $this->_db->loadObjectlist();

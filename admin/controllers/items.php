@@ -1478,7 +1478,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$n = count($tags);
 		$rsp = '';
 		if ($n>0) {
-			$rsp .= '<div class="qf_tagbox" id="qf_tagbox">';
+			$rsp .= '<div class="fc_tagbox" id="fc_tagbox">';
 			$rsp .= '<ul id="ultagbox">';
 			for( $i = 0, $n; $i < $n; $i++ ){
 				$tag = $tags[$i];
@@ -1505,7 +1505,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		if ($CanCreateTags)
 		{
 			$rsp .= '
-			<div class="qf_addtag">
+			<div class="fc_addtag">
 				<label for="addtags">'.JText::_( 'FLEXI_ADD_TAG' ).'</label>
 				<input type="text" id="tagname" class="inputbox" size="30" />
 				<input type="button" class="fc_button" value="'.JText::_( 'FLEXI_ADD' ).'" onclick="addtag()" />

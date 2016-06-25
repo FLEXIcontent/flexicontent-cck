@@ -325,20 +325,22 @@ ul#ultagbox > li {
 	border-radius: 3px;
 }
 ul#ultagbox > li.tagitem.plain {
-	background: url(../images/tag_blue.png) #e4e4e4 no-repeat 100% 50%;
-	padding-right: 18px;
+	border: 1px solid silver;
+	padding: 6px 6px 5px 24px;
+	background: url(../images/tag_blue.png) transparent no-repeat 4px 4px;
 }
 ul#ultagbox > li.tagitem {
 	border: 1px solid silver;
-	padding: 4px 1px 3px 6px;
-	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat 100% 50%;
+	padding: 6px 6px 0px 6px;
+	background: url(../images/tag_blue_delete.png) #f9f9f9 no-repeat 4px 50%;
 }
 ul#ultagbox > li.tagitem .deletetag {
 	display: block;
 	width: 18px;
 	height: 18px;
-	float: right;
-	margin-left: 5px;
+	float: left;
+	margin: -6px 0 0 -4px;
+	padding: 4px;
 	outline: none;
 	background-color: transparent;
 }
@@ -360,30 +362,25 @@ div#tags #input_new_tag {
 	height: 16px;
 	background: url(../images/tag_blue_add.png) #f9f9f9 no-repeat 100% 50%;
 }
-#qf_tagbox {
+#fc_tagbox {
 	display: block;
 	overflow: auto;
 	border: 1px dashed silver;
+	border-radius: 4px;
 	background: #fff;
 	margin: 0px 4px 4px 0px;
 	float: left;
 	min-width: 16px;
 	min-height: 24px;
 }
-.qf_tagidbox {
+.fc_tagidbox {
 	width: 20px !important;
 	display: block !important;
 	float: left !important;
 	margin-top: -4px !important;
 }
-.qf_addtag {
+.fc_addtag {
 	margin-top: 10px !important;
-}
-.qf_centerimg {
-	text-align: center !important;
-	margin-top: 0px !important;
-	margin-bottom: 0px !important;
-	padding: 0px !important;
 }
 .flexicontent .clear,
 #flexicontent .clear,

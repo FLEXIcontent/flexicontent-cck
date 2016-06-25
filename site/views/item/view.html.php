@@ -911,9 +911,17 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		if ( $print_logging_info ) $fc_run_times['render_field_html'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
-		// Tags used by the item
+
+
+		// **************************************************
+		// Get tags used by the item and quick selection tags
+		// **************************************************
 		$usedtagsids  = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
 		$usedtagsdata = $model->getUsedtagsData($usedtagsids);
+		
+		$quicktagsIds = $params->get('quick_tags', array());
+		$quicktagsdata = !empty($quicktagsIds) ? $model->getTagsByIds($quicktagsIds, $_indexed = true) : array();
+
 		
 		// Get the edit lists
 		$lists = $this->_buildEditLists($perms, $params, $authorparams);
@@ -984,7 +992,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		$this->assignRef('subscribers', $subscribers);
 		$this->assignRef('editor',		$editor);
 		$this->assignRef('user',			$user);
-		$this->assignRef('usedtagsdata', $usedtagsdata);
+		$this->assignRef('usedtagsdata'  , $usedtagsdata);
+		$this->assignRef('quicktagsdata' , $quicktagsdata);
 		$this->assignRef('fields',     $fields);
 		$this->assignRef('tparams',    $tparams);
 		$this->assignRef('perms',      $perms);
