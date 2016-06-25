@@ -122,7 +122,12 @@ class FlexicontentViewItem  extends JViewLegacy
 			$document->addStyleSheetVersion($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', FLEXI_VHASH);
 		}
 		
-		
+		// Add extra css/js for the item view
+		if ($params->get('view_extra_css_fe')) $document->addStyleDeclaration($params->get('view_extra_css_fe'));
+		if ($params->get('view_extra_js_fe'))  $document->addScriptDeclaration($params->get('view_extra_js_fe'));
+
+
+
 		// ********************************************************************************************
 		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
 		// ********************************************************************************************
