@@ -296,7 +296,6 @@ function fc_getLayout(el)
 	
 	var layout_name = el.value;
 	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">';
-	panel_header.html(_loading_img);
 	panel_header.html('<a href=\"javascript:void(0);\"><span>Layout: '+_loading_img+'</span></a>');
 	panel.html('');
 	jQuery.ajax({

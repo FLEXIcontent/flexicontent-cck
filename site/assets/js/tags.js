@@ -13,7 +13,7 @@ var tagajax = new Class(
 	},  
 
 	fetchscreen: function( name, options ) {
-		$(this.name).setHTML('<p class="qf_centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+		$(this.name).setHTML('<p><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 		
   		var ajax = new Ajax("index.php?option=com_flexicontent&format=raw&task=getajaxtags&id=" + this.options.id, {
     		method: 'get',

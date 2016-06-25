@@ -31,7 +31,7 @@ $tabCnt = array();
 $tabSetStack = array();
 
 $useAssocs = flexicontent_db::useAssociations();
-$tags_displayed = $this->row->type_id && ( $this->perms['cantags'] || count(@$this->usedtags) ) ;
+$tags_displayed = $this->row->type_id && ( $this->perms['cantags'] || count(@$this->usedtagsdata) ) ;
 
 $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
@@ -42,6 +42,9 @@ $noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 4px 6px 4px;
 $hint_image = '<i class="icon-info"></i>';//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $warn_image = '<i class="icon-warning"></i>';//JHTML::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $conf_image = '<i class="icon-cog"></i>';
+
+$add_on_class    = $this->params->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
+$input_grp_class = $this->params->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 
 // add extra css/js for the edit form
 if ($this->params->get('form_extra_css'))    $this->document->addStyleDeclaration($this->params->get('form_extra_css'));
@@ -77,7 +80,8 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 			
 			var tagInput = jQuery('#input-tags');
 			
-			tagInput.keydown(function(event){
+			tagInput.keydown(function(event)
+			{
 				if( (event.keyCode==13) )
 				{
 					var el = jQuery(event.target);
@@ -167,16 +171,27 @@ if ($this->perms['cantags'] || $this->perms['canversion'])
 
 		function addToList(id, name)
 		{
-			var obj = jQuery('#ultagbox');
-			if (obj.find('input[value=\"'+id+'\"]').length > 0) return;
-			obj.append('<li class=\"tagitem\"><span>'+name+'</span><input type=\"hidden\" name=\"jform[tag][]\" value=\"'+id+'\" /><a href=\"javascript:;\" class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"' + Joomla.JText._('FLEXI_DELETE_TAG') + '\"></a></li>');
+			// Prefer quick tag selector if it exists
+			var cmtag = jQuery('#quick-tag-'+id);
+			if (cmtag.length)
+			{
+				cmtag.attr('checked', 'checked').trigger('change');
+			}
+			else
+			{
+				var obj = jQuery('#ultagbox');
+				if (obj.find('input[value=\"'+id+'\"]').length > 0) return;
+				obj.append('<li class=\"tagitem\"><span>'+name+'</span><input type=\"hidden\" name=\"jform[tag][]\" value=\"'+id+'\" /><a href=\"javascript:;\" class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"' + Joomla.JText._('FLEXI_DELETE_TAG') + '\"></a></li>');
+			}
 		}
-		
+
+
 		function addtag(id, tagname)
 		{
-			if (id==null) id = 0;
+			id = id==null ? 0 : id;
 
-			if (tagname == '') {
+			if (tagname == '')
+			{
 				alert(\" + Joomla.JText._('FLEXI_ENTER_TAG') + \");
 				return;
 			}
@@ -442,34 +457,57 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					<span id='input_new_tag' ></span>
 				</div>
 				<?php endif; ?>
-				
-				<div class="qf_tagbox" id="qf_tagbox">
+
+				<div class="fc_tagbox" id="fc_tagbox">
 					<ul id="ultagbox">
 					<?php
-						$nused = count($this->usedtags);
-						for( $i = 0, $nused; $i < $nused; $i++ ) {
-							$tag = $this->usedtags[$i];
-							if ( $this->perms['cantags'] ) {
+						$common_tags_selected = array();
+						foreach($this->usedtagsdata as $tag)
+						{
+							if ( $this->perms['cantags'] )
+							{
+								if ( isset($this->quicktagsdata[$tag->id]) )
+								{
+									$common_tags_selected[$tag->id] = 1;
+									continue;
+								}
 								echo '
 								<li class="tagitem">
 									<span>'.$tag->name.'</span>
-									<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
+									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
 									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
 								</li>';
 							} else {
 								echo '
 								<li class="tagitem plain">
 									<span>'.$tag->name.'</span>
-									<input type="hidden" name="jform[tag][]" value="'.$tag->tid.'" />
+									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
 								</li>';
 							}
 						}
 					?>
 					</ul>
+
+					<div class="fcclear"></div>
+
+					<?php
+					if ( $this->perms['cantags'] && count($this->quicktagsdata))
+					{
+						echo '<span class="tagicon '.$tip_class.'" title="'.JText::_('FLEXI_COMMON_TAGS').'"></span>';
+						foreach ($this->quicktagsdata as $tag)
+						{
+							$_checked = isset($common_tags_selected[$tag->id]) ? ' checked="checked" ' : '';
+							echo '
+							<input type="checkbox" name=jform[tag][]" value="'.$tag->id.'" data-tagname="'.$tag->name.'" id="quick-tag-'.$tag->id.'" '.$_checked.' />
+							<label for="quick-tag-'.$tag->id.'" name="quick-tags[]" class="tagitem">'.$tag->name.'</label>
+							';
+						}
+					}
+					?>
 				</div>
 
 			</div>
-			
+
 		</div>
 		
 		
@@ -1094,7 +1132,7 @@ if ($this->row->type_id) {
 					<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 							<h3 class="tabberheading"> <?php echo '-'.$itemlangname.'-'; // $itemlang; ?> </h3>
-							<?php echo $this->form->getInput('metadesc');?>
+							<?php echo $this->form->getInput('metadesc'); ?>
 						</div>
 						<?php foreach ($this->row->item_translations as $t): ?>
 							<?php if ($itemlang!=$t->shortcode && $t->shortcode!='*') : ?>
@@ -1104,14 +1142,14 @@ if ($this->row->type_id) {
 									$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
 									$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
 									?>
-									<textarea id="<?php echo $ff_id; ?>" class="inputbox" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
+									<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
 								</div>
 							<?php endif; ?>
 						<?php endforeach; ?>
 					</div>
 					<!-- tabber end -->
 					<?php $tabSetCnt = array_pop($tabSetStack); ?>
-				
+					
 				<?php else : ?>
 					<?php echo $this->form->getInput('metadesc'); ?>
 				<?php endif; ?>

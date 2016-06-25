@@ -417,15 +417,18 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 		}
 		if ( $print_logging_info ) $fc_run_times['render_field_html'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
-		
-		
-		// *************************
-		// Get tags used by the item
-		// *************************
+
+
+
+		// **************************************************
+		// Get tags used by the item and quick selection tags
+		// **************************************************
 		
 		$usedtagsIds = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
-		$usedtags = $model->getUsedtagsData($usedtagsIds);
+		$usedtagsdata = $model->getTagsByIds($usedtagsIds, $_indexed = false);
+		
+		$quicktagsIds = $tparams->get('quick_tags', array());
+		$quicktagsdata = !empty($quicktagsIds) ? $model->getTagsByIds($quicktagsIds, $_indexed = true) : array();
 		
 		
 		
@@ -845,7 +848,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$this->assignRef('formparams'	, $formparams);
 		}
 		if ($enable_translation_groups)  $this->assignRef('lang_assocs', $langAssocs);
-		if (FLEXI_FISH || FLEXI_J16GE)   $this->assignRef('langs', $langs);
+		$this->assignRef('langs'        , $langs);
 		$this->assignRef('typesselected', $typesselected);
 		$this->assignRef('published'		, $published);
 		$this->assignRef('nullDate'			, $nullDate);
@@ -857,7 +860,8 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->assignRef('params'				, $params);
 		$this->assignRef('tparams'			, $tparams);
 		$this->assignRef('tmpls'				, $tmpls);
-		$this->assignRef('usedtags'			, $usedtags);
+		$this->assignRef('usedtagsdata'  , $usedtagsdata);
+		$this->assignRef('quicktagsdata' , $quicktagsdata);
 		$this->assignRef('perms'				, $perms);
 		$this->assignRef('current_page'	, $current_page);
 		

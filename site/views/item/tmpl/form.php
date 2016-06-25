@@ -121,7 +121,8 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 			
 			var tagInput = jQuery('#input-tags');
 			
-			tagInput.keydown(function(event){
+			tagInput.keydown(function(event)
+			{
 				if( (event.keyCode==13) )
 				{
 					var el = jQuery(event.target);
@@ -211,16 +212,27 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
 
 		function addToList(id, name)
 		{
-			var obj = jQuery('#ultagbox');
-			if (obj.find('input[value=\"'+id+'\"]').length > 0) return;
-			obj.append('<li class=\"tagitem\"><span>'+name+'</span><input type=\"hidden\" name=\"jform[tag][]\" value=\"'+id+'\" /><a href=\"javascript:;\" class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"' + Joomla.JText._('FLEXI_DELETE_TAG') + '\"></a></li>');
+			// Prefer quick tag selector if it exists
+			var cmtag = jQuery('#quick-tag-'+id);
+			if (cmtag.length)
+			{
+				cmtag.attr('checked', 'checked').trigger('change');
+			}
+			else
+			{
+				var obj = jQuery('#ultagbox');
+				if (obj.find('input[value=\"'+id+'\"]').length > 0) return;
+				obj.append('<li class=\"tagitem\"><span>'+name+'</span><input type=\"hidden\" name=\"jform[tag][]\" value=\"'+id+'\" /><a href=\"javascript:;\" class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"' + Joomla.JText._('FLEXI_DELETE_TAG') + '\"></a></li>');
+			}
 		}
-		
+
+
 		function addtag(id, tagname)
 		{
-			if (id==null) id = 0;
+			id = id==null ? 0 : id;
 
-			if (tagname == '') {
+			if (tagname == '')
+			{
 				alert(\" + Joomla.JText._('FLEXI_ENTER_TAG') + \");
 				return;
 			}
@@ -763,41 +775,66 @@ if ($tags_displayed) : ob_start();  // tags ?>
 			</label>
 		</span>
 		<div class="container_fcfield container_fcfield_name_tags">
-			
+
 			<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
-			<div class="fcclear"></div>
-			<div id="tags">
-				<input type="text" id="input-tags" name="tagname" class="fcfield_textval <?php echo $tip_class; ?>"
-					placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>" 
-					title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"
-				/>
-				<span id='input_new_tag' ></span>
-			</div>
-			<?php endif; ?>
-			
-			<div class="qf_tagbox" id="qf_tagbox">
-				<ul id="ultagbox">
-				<?php
-					foreach($this->usedtagsdata as $tag) {
-						if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
+				<div class="fcclear"></div>
+				<div id="tags">
+					<input type="text" id="input-tags" name="tagname" class="fcfield_textval <?php echo $tip_class; ?>"
+						placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>" 
+						title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"
+					/>
+					<span id='input_new_tag' ></span>
+				</div>
+				<?php endif; ?>
+
+				<div class="fc_tagbox" id="fc_tagbox">
+					<ul id="ultagbox">
+					<?php
+						$common_tags_selected = array();
+						foreach($this->usedtagsdata as $tag)
+						{
+							if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 )
+							{
+								if ( isset($this->quicktagsdata[$tag->id]) )
+								{
+									$common_tags_selected[$tag->id] = 1;
+									continue;
+								}
+								echo '
+								<li class="tagitem">
+									<span>'.$tag->name.'</span>
+									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
+									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
+								</li>';
+							} else {
+								echo '
+								<li class="tagitem plain">
+									<span>'.$tag->name.'</span>
+									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
+								</li>';
+							}
+						}
+					?>
+					</ul>
+
+					<div class="fcclear"></div>
+
+					<?php
+					if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 && count($this->quicktagsdata) )
+					{
+						echo '<span class="tagicon '.$tip_class.'" title="'.JText::_('FLEXI_COMMON_TAGS').'"></span>';
+						foreach ($this->quicktagsdata as $tag)
+						{
+							$_checked = isset($common_tags_selected[$tag->id]) ? ' checked="checked" ' : '';
 							echo '
-							<li class="tagitem">
-								<span>'.$tag->name.'</span>
-								<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
-								<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
-							</li>';
-						} else {
-							echo '
-							<li class="tagitem plain">
-								<span>'.$tag->name.'</span>
-								<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
-							</li>';
+							<input type="checkbox" name=jform[tag][]" value="'.$tag->id.'" data-tagname="'.$tag->name.'" id="quick-tag-'.$tag->id.'" '.$_checked.' />
+							<label for="quick-tag-'.$tag->id.'" name="quick-tags[]" class="tagitem">'.$tag->name.'</label>
+							';
 						}
 					}
-				?>
-				</ul>
-			</div>
-			
+					?>
+				</div>
+
 		</div>
 	</fieldset>
 <?php $captured['tags'] = ob_get_clean(); endif;
@@ -943,7 +980,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 									$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
 									$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
 									?>
-									<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="80" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
+									<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
 								</div>
 							<?php endif; ?>
 						<?php endforeach; ?>
@@ -954,6 +991,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 				<?php else : ?>
 					<?php echo $this->form->getInput('metadesc'); ?>
 				<?php endif; ?>
+				
 			</div>
 				
 			<div class="fcclear"></div>

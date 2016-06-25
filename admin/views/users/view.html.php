@@ -298,7 +298,7 @@ class FlexicontentViewUsers extends JViewLegacy
 			}
 			function fc_edit_juser_modal_close() {
 				window.location.reload();
-				document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
+				document.body.innerHTML = Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif">\';
 			}
 		');
 		

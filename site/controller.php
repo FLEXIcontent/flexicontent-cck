@@ -2057,14 +2057,14 @@ class FlexicontentController extends JControllerLegacy
 				}
 				$rsp .=  '<div class="qf_tagline">';
 			}
-			$rsp .=  '<span class="qf_tag"><span class="qf_tagidbox"><input type="checkbox" name="tag[]" value="'.$tag->id.'"' . (in_array($tag->id, $used) ? 'checked="checked"' : '') . ' /></span>'.$tag->name.'</span>';
+			$rsp .=  '<span class="qf_tag"><span class="fc_tagidbox"><input type="checkbox" name="tag[]" value="'.$tag->id.'"' . (in_array($tag->id, $used) ? 'checked="checked"' : '') . ' /></span>'.$tag->name.'</span>';
 		}
 		$rsp .= '</div>';
 		$rsp .= '<div class="fcclear"></div>';
-		$rsp .= '<div class="qf_addtag">';
+		$rsp .= '<div class="fc_addtag">';
 		$rsp .= '<label for="addtags">'.JText::_( 'FLEXI_ADD_TAG' ).'</label>';
-		$rsp .= '<input type="text" id="tagname" class="inputbox" size="30" />';
-		$rsp .=	'<input type="button" class="button" value="'.JText::_( 'FLEXI_ADD' ).'" onclick="addtag()" />';
+		$rsp .= '  <input type="text" id="tagname" class="inputbox" size="30" />';
+		$rsp .=	'  <input type="button" class="button" value="'.JText::_( 'FLEXI_ADD' ).'" onclick="addtag()" />';
 		$rsp .= '</div>';
 
 		echo $rsp;

@@ -39,7 +39,7 @@ jQuery(document).ready(function() {
 			jQuery('div#insideprogress').css('width', '300px');
 			jQuery('div#updatepercent').text(' 100 %');
 			jQuery('div#statuscomment').html( jQuery('div#statuscomment').html() + '<br/><br/><strong>INDEXING FINISHED</strong>. You may close this window');
-			//jQuery('img#loading_img').hide();
+			//jQuery('img#page_loading_img').hide();
 			return;
 		}
 		
@@ -54,7 +54,7 @@ jQuery(document).ready(function() {
 				var arr = response.split('|');
 				if(arr[0]=='fail') {
 					jQuery('div#statuscomment').html(arr[1]);
-					//jQuery('img#loading_img').hide();
+					//jQuery('img#page_loading_img').hide();
 					looper = number;
 					return;
 				}
@@ -145,5 +145,5 @@ div#statuscomment{
 <div id="advancebar"><div id="insideprogress"></div></div>
 <div id="updatepercent">0 %</div>
 <div class="clr"></div>
-<div id="statuscomment">Initializing <img id="loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif"></div>
+<div id="statuscomment">Initializing <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif"></div>
 <div class="clr"></div>
