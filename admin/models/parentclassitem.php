@@ -801,8 +801,8 @@ class ParentClassItem extends JModelAdmin
 			$item->cats = & $item->categories;
 			
 			// Set original content item id, e.g. maybe used by some fields that are marked as untranslatable
-			$enable_translation_groups = flexicontent_db::useAssociations(); //$cparams->get('enable_translation_groups');
-			if ($enable_translation_groups)
+			$useAssocs = flexicontent_db::useAssociations();
+			if ($useAssocs)
 			{
 				$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
 				$is_content_default_lang = $site_default == substr($item->language, 0,2);
@@ -2358,18 +2358,15 @@ class ParentClassItem extends JModelAdmin
 		
 		// CASE 1. Check if saving an item that translates an original content in site's default language
 		// ... Decide whether to retrieve field values of untranslatable fields from the original content item
-		$enable_translation_groups = flexicontent_db::useAssociations(); //$cparams->get('enable_translation_groups');
+		$useAssocs = flexicontent_db::useAssociations();
 		
 		$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
 		$is_content_default_lang = $site_default == substr($item->language, 0,2);
 		
-		$get_untraslatable_values = $enable_translation_groups && !$is_content_default_lang;
-		if ($enable_translation_groups)
+		$get_untraslatable_values = $useAssocs && !$is_content_default_lang;
+		if ($useAssocs)
 		{
 			$langAssocs = $this->getLangAssocs();
-			//}
-			//if ($enable_translation_groups /*&& $is_content_default_lang*/)
-			//{
 			// ... Get item ids of the associated items, so that we save into the untranslatable fields
 			$_langAssocs = $langAssocs;
 			unset($_langAssocs[$this->_id]);

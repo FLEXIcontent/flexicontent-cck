@@ -1034,7 +1034,7 @@ if ($this->row->type_id) {
 			</legend>
 			
 			<!-- BOF of language / language associations section -->
-			<?php if ( $useAssocs/*$this->params->get('enable_translation_groups')*/ ) : ?>
+			<?php if ( $useAssocs ) : ?>
 
 				<div class="fcclear"></div>
 				<?php echo $this->loadTemplate('associations'); ?>	

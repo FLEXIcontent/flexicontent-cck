@@ -577,7 +577,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$return = false;
 		
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		$enable_translation_groups = flexicontent_db::useAssociations(); //$cparams->get("enable_translation_groups");
+		//$useAssocs = flexicontent_db::useAssociations();
 		
 		// Check for emtpy language in flexicontent EXT table
 		$query = "SELECT COUNT(*)"

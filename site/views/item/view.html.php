@@ -444,7 +444,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		// Some flags
-		$enable_translation_groups = flexicontent_db::useAssociations(); //$params->get("enable_translation_groups");
+		$useAssocs = flexicontent_db::useAssociations();
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
@@ -609,7 +609,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// *********************************************************************************************************
 		// Get language stuff, and also load Template-Specific language file to override or add new language strings
 		// *********************************************************************************************************
-		if ($enable_translation_groups)  $langAssocs = $params->get('uselang_fe')==1 ? $this->get( 'LangAssocs' ) : false;
+		if ($useAssocs)  $langAssocs = $params->get('uselang_fe')==1 ? $this->get( 'LangAssocs' ) : false;
 		$langs = FLEXIUtilities::getLanguages('code');
 		FLEXIUtilities::loadTemplateLanguageFile( $params->get('ilayout', 'default') );
 		
@@ -985,7 +985,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$this->assignRef('item',		$item);
 		$this->assignRef('form',		$form);  // most core field are created via calling methods of the form (J2.5)
 		
-		if ($enable_translation_groups)  $this->assignRef('lang_assocs', $langAssocs);
+		if ($useAssocs)  $this->assignRef('lang_assocs', $langAssocs);
 		$this->assignRef('langs', $langs);
 		$this->assignRef('params',		$params);
 		$this->assignRef('lists',			$lists);

@@ -70,7 +70,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$bind_limit = $jinput->get('bind_limit', 1000, 'int');
 		
 		// Some flags
-		$enable_translation_groups = flexicontent_db::useAssociations(); //$cparams->get("enable_translation_groups");
+		$useAssocs = flexicontent_db::useAssociations();
 		$print_logging_info = $cparams->get('print_logging_info');
 		
 		// Get model
@@ -321,7 +321,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($CanAddAny && $CanCopy) {
 			$btn_task = 'items.copy';
 			JToolBarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_BATCH' /*'FLEXI_COPY_MOVE'*/ );
-			if ($enable_translation_groups) {
+			if ($useAssocs) {
 				JToolBarHelper::custom( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
 			}
 			$add_divider = true;
@@ -361,7 +361,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$itemCats   = $this->get( 'ItemCats' );
 		$itemTags   = $this->get( 'ItemTags' );
 		
-		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
+		if ($useAssocs)  $langAssocs = $this->get( 'LangAssocs' );
 		$langs = FLEXIUtilities::getLanguages('code');
 		$categories = $globalcats ? $globalcats : array();
 		
@@ -645,7 +645,7 @@ class FlexicontentViewItems extends JViewLegacy
 		$this->assignRef('itemTags'	, $itemTags);
 		$this->assignRef('extra_fields'	, $extraCols);
 		$this->assignRef('custom_filts'	, $customFilts);
-		if ($enable_translation_groups)  $this->assignRef('lang_assocs', $langAssocs);
+		if ($useAssocs)  $this->assignRef('lang_assocs', $langAssocs);
 		$this->assignRef('langs', $langs);
 		$this->assignRef('cid'      	, $cid);
 		$this->assignRef('pagination'	, $pagination);

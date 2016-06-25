@@ -62,7 +62,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$params->merge($cparams);
 		
 		// Some flags
-		$enable_translation_groups = flexicontent_db::useAssociations(); //$params->get("enable_translation_groups");
+		$useAssocs = flexicontent_db::useAssociations();
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
@@ -99,7 +99,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// Get Associated Translations
 		// ***************************
 		
-		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
+		if ($useAssocs)  $langAssocs = $this->get( 'LangAssocs' );
 		$langs = FLEXIUtilities::getLanguages('code');
 
 		// Get item id and new flag
@@ -847,7 +847,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$this->assignRef('pane'				, $pane);
 			$this->assignRef('formparams'	, $formparams);
 		}
-		if ($enable_translation_groups)  $this->assignRef('lang_assocs', $langAssocs);
+		if ($useAssocs)  $this->assignRef('lang_assocs', $langAssocs);
 		$this->assignRef('langs'        , $langs);
 		$this->assignRef('typesselected', $typesselected);
 		$this->assignRef('published'		, $published);

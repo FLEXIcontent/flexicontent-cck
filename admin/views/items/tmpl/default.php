@@ -45,11 +45,11 @@ $user 		= JFactory::getUser();
 //$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef') && $config->get('sef');
 $_sh404sef = defined('SH404SEF_IS_RUNNING') && $config->get('sef');
 $isAdmin = JFactory::getApplication()->isAdmin();
-$enable_translation_groups = flexicontent_db::useAssociations(); //$cparams->get("enable_translation_groups");
+$useAssocs = flexicontent_db::useAssociations();
 $autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
 $list_total_cols = 18;
-if ( $enable_translation_groups ) $list_total_cols++;
+if ( $useAssocs ) $list_total_cols++;
 
 $list_total_cols += count($this->extra_fields);
 
@@ -536,7 +536,7 @@ jQuery(document).ready(function(){
 				<?php endif; ?>
 			</th>
 
-		<?php if ( $enable_translation_groups ) : ?>
+		<?php if ( $useAssocs ) : ?>
 			<th class="left hideOnDemandClass">
 				<?php echo JText::_('FLEXI_ASSOCIATIONS'); /*JHTML::_('grid.sort', 'Translation Group', 'i.lang_parent_id', $this->lists['order_Dir'], $this->lists['order'] );*/ ?>
 			</th>
@@ -797,7 +797,7 @@ jQuery(document).ready(function(){
 
 				// Display title with edit link ... (row editable and not checked out)
 				} else {
-					if ( $enable_translation_groups ) {
+					if ( $useAssocs ) {
 						if ($this->lists['order']=='i.lang_parent_id' && $row->lang_parent_id && $row->id!=$row->lang_parent_id) echo "<sup>|</sup>--";
 					}
 					echo '<a href="'.$link.'" title="'.$edit_item_title.'">'.htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8').'</a>';
@@ -818,7 +818,7 @@ jQuery(document).ready(function(){
 			</td>
 
 
-		<?php if ( $enable_translation_groups ) : ?>
+		<?php if ( $useAssocs ) : ?>
 			<td>
 				<?php
 					/*if ($this->lists['order']=='i.lang_parent_id') {
@@ -1080,7 +1080,7 @@ jQuery(document).ready(function(){
 
 	<sup>[1]</sup> <?php echo JText::_('FLEXI_TMPL_NOT_SET_USING_TYPE_DEFAULT'); ?><br />
 	<sup>[2]</sup> <?php echo JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $this->inline_ss_max); ?><br />
-	<?php if ( $enable_translation_groups )	:?>
+	<?php if ( $useAssocs )	:?>
 	<sup>[3]</sup> <?php echo JText::_('FLEXI_SORT_TO_GROUP_TRANSLATION'); ?><br />
 	<?php endif;?>
 	<sup>[4]</sup> <?php echo JText::_('FLEXI_MULTIPLE_ITEM_ORDERINGS'); ?><br />
