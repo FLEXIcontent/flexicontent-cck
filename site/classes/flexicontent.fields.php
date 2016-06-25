@@ -1961,7 +1961,7 @@ class FlexicontentFields
 		}
 		
 		// This property is usable only when Translation Groups are enabled
-		$supportuntranslatable = $supportuntranslatable && flexicontent_db::useAssociations(); //$cparams->get('enable_translation_groups');
+		$supportuntranslatable = $supportuntranslatable && flexicontent_db::useAssociations();
 		
 		$support_ft[$field_type] = new stdClass();
 		$support_ft[$field_type]->supportsearch = $supportsearch;
@@ -3114,7 +3114,8 @@ class FlexicontentFields
 				.' </li>';
 			$i++;
 			
-			foreach ($results as $result) {
+			foreach ($results as $result)
+			{
 				if ( !strlen($result->value) ) continue;
 				$checked = ($display_filter_as==5) ? in_array($result->value, $value) : $result->value==$value;
 				$checked_attr = $checked ? ' checked=checked ' : '';
@@ -3126,15 +3127,21 @@ class FlexicontentFields
 				
 				// *** PLACE image before label (and e.g. (default) above the label)
 				if ($filter_vals_display == 2)
+				{
+					$encoded_title = htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8');
 					$filter->html .= isset( $result->image_url ) ?
-						'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"/></span>' :
-						'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"></span></span>' ;
+						'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.$encoded_title.'" title="'.$encoded_title.'" /></span>' :
+						'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.$encoded_title.'"></span></span>' ;
+				}
 				
-				if ($display_filter_as==4) {
+				if ($display_filter_as==4)
+				{
 					$filter->html .= ' <input onchange="fc_toggleClassGrp(this, \'fc_highlight\');" ';
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
 					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
-				} else {
+				}
+				else
+				{
 					$filter->html .= ' <input onchange="fc_toggleClass(this, \'fc_highlight\');" ';
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'['.$i.']" ';
 					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
@@ -3149,9 +3156,12 @@ class FlexicontentFields
 				
 				// *** PLACE image after label (and e.g. (default) next to the label)
 				if ($filter_vals_display == 1)
+				{
+					$encoded_title = htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8');
 					$filter->html .= isset( $result->image_url ) ?
-						'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"/></span>' :
-						'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8').'"></span></span>' ;
+						'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.$encoded_title.'" title="'.$encoded_title.'" /></span>' :
+						'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.$encoded_title.'"></span></span>' ;
+				}
 				
 				$filter->html .= '</li>';
 				$i++;

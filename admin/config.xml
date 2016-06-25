@@ -28,12 +28,6 @@
 				<option value="1">FLEXI_NO_DISABLE_WARNING</option>
 				<option value="2">FLEXI_YES</option>
 			</field>
-			
-			<!--field name="" type="separator" default="FLEXI_NATIVE_TRANSLATIONS" label="" level="level4" class="alert alert-info fcpadded" /-->
-			<!--field name="enable_translation_groups" type="radio" default="1" label="FLEXI_ENABLE_TRANSLATION_GROUPS" description="FLEXI_ENABLE_TRANSLATION_GROUPS_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field-->
 
 		<!--field name="" type="separator" default="FLEXI_GENERAL_CONF" label="" level="level0" /-->
 			
