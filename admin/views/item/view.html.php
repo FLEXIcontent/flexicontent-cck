@@ -628,7 +628,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$featured_sel = array();
 			foreach($selectedcats as $item_cat) if (isset($featured_tree[$item_cat])) $featured_sel[] = $item_cat;
 			
-			$class  = "use_select2_lib select2_list_selected";
+			$class  = "use_select2_lib";
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
 			$attribs .= $enable_featured_cid_selector ? '' : ' disabled="disabled"';
 			$fieldname = 'jform[featured_cid][]';
@@ -668,7 +668,7 @@ class FlexicontentViewItem extends JViewLegacy
 				existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
 			');
 			
-			$class  = "mcat use_select2_lib select2_list_selected";
+			$class  = "mcat use_select2_lib";
 			$class .= $max_cat_assign ? " validate-fccats" : " validate";
 			
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="20"';
