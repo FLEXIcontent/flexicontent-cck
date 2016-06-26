@@ -578,7 +578,7 @@ class plgFlexicontent_fieldsCore extends FCField
 					$options[] = JHTML::_('select.option', $list->id, $list->treename . ($faceted_filter ? '&nbsp; (<'. $list->totalitems.')' : ''));
 				}
 				
-				$extra_classes = ' select2_list_selected';
+				$extra_classes = '';
 			break;
 			
 			case 'tags':

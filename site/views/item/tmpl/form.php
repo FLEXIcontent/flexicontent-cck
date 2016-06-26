@@ -850,8 +850,13 @@ if ( ( !isset($all_tab_fields['lang']) && $captured['lang'] )  ||  ( flexiconten
 		<?php if (!isset($all_tab_fields['lang'])) { echo $captured['lang']; unset($captured['lang']); } ?>
 		
 		<div class="fcclear"></div>
-		<?php echo $this->loadTemplate('associations'); ?>	
-		<?php /*include('development_tmp.php');*/ ?>
+
+		<?php if ($this->item->language!='*'): ?>
+			<?php echo $this->loadTemplate('associations'); ?>
+		<?php else: ?>
+			<?php echo JText::_( 'FLEXI_ASSOC_NOT_POSSIBLE' ); ?>
+		<?php endif; ?>
+
 	</fieldset>
 <?php $captured['language'] = ob_get_clean(); endif;
 

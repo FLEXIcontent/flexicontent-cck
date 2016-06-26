@@ -163,7 +163,7 @@ if ( $show_mod )
 	// CREATE CATEGORY SELECTOR or create a hidden single category for input
 	if ($display_cat_list)
 	{
-		$_fld_classes = 'fc_field_filter use_select2_lib select2_list_selected';
+		$_fld_classes = 'fc_field_filter use_select2_lib';
 		
 		$loader_html = '<span class=\"ajax-loader\"></span>';
 		$url_to_load = JURI::root().'index.php?option=com_flexicontent&amp;task=getsefurl&amp;view=category&amp;tmpl=component&amp;cid=';

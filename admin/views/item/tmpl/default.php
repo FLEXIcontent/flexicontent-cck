@@ -30,7 +30,6 @@ $tabSetMax = -1;
 $tabCnt = array();
 $tabSetStack = array();
 
-$useAssocs = flexicontent_db::useAssociations();
 $tags_displayed = $this->row->type_id && ( $this->perms['cantags'] || count(@$this->usedtagsdata) ) ;
 
 $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
@@ -1034,11 +1033,15 @@ if ($this->row->type_id) {
 			</legend>
 			
 			<!-- BOF of language / language associations section -->
-			<?php if ( $useAssocs ) : ?>
+			<?php if ( flexicontent_db::useAssociations() ) : ?>
 
 				<div class="fcclear"></div>
-				<?php echo $this->loadTemplate('associations'); ?>	
-				<?php /*include('development_tmp.php');*/ ?>
+
+				<?php if ($this->row->language!='*'): ?>
+					<?php echo $this->loadTemplate('associations'); ?>
+				<?php else: ?>
+					<?php echo JText::_( 'FLEXI_ASSOC_NOT_POSSIBLE' ); ?>
+				<?php endif; ?>
 
 			<?php endif; ?>
 			<!-- EOF of language / language associations section -->

@@ -730,7 +730,9 @@ html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
     display: none;
 }
 /* style disable choise, and force showing already selected value as disabled */
-.select2-results .select2-selected,
+.select2-results .select2-selected.select2-selected-visible {
+  display: list-item !important;
+}
 .select2-results .select2-disabled {
 	max-width: 97%;
   background: #f4f4f4 !important;

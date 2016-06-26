@@ -121,12 +121,13 @@ class ParentClassItem extends JModelAdmin
 				$pk = (int) $cid[0];
 			}
 			
+			// Finally try form
 			if (!$pk)
 			{
 				$data = $jinput->get('jform', array('id'=>0), 'array');
 				$pk = (int) $data['id'];
 			}
-			
+
 			$curcatid = 0;
 		}
 		
@@ -801,7 +802,7 @@ class ParentClassItem extends JModelAdmin
 			$item->cats = & $item->categories;
 			
 			// Set original content item id, e.g. maybe used by some fields that are marked as untranslatable
-			$useAssocs = flexicontent_db::useAssociations();
+			$useAssocs = $this->useAssociations();
 			if ($useAssocs)
 			{
 				$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
@@ -2358,7 +2359,7 @@ class ParentClassItem extends JModelAdmin
 		
 		// CASE 1. Check if saving an item that translates an original content in site's default language
 		// ... Decide whether to retrieve field values of untranslatable fields from the original content item
-		$useAssocs = flexicontent_db::useAssociations();
+		$useAssocs = $this->useAssociations();
 		
 		$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
 		$is_content_default_lang = $site_default == substr($item->language, 0,2);

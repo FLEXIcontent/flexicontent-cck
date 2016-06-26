@@ -73,6 +73,7 @@ label input[type="radio"].fc_checkradio,
 	display: inline !important;
 	vertical-align: bottom !important;
 }
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
 input[type="checkbox"].fc_checkradio + label:not(.plupload_button):not(.btn),
 input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="checkbox"] + label:not(.plupload_button):not(.btn),
@@ -89,6 +90,7 @@ input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 	cursor: pointer !important;
 	color: #333;
 }
+div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select2-result-label,
 input[type="checkbox"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
 input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="checkbox"]:not(.skip_fccr):disabled + label:not(.plupload_button):not(.btn),
@@ -100,6 +102,7 @@ input[type="radio"].fc_checkradio:disabled + label:not(.plupload_button):not(.bt
 	color: gray !important;
 	cursor: default !important;
 }
+div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
 input[type="checkbox"].fc_checkradio + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="checkbox"] + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="checkbox"] + label:not(.plupload_button):not(.btn) {
@@ -110,6 +113,7 @@ input[type="radio"].fc_checkradio + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="radio"] + label:not(.plupload_button):not(.btn) {
 	background: url(../images/checks.png) no-repeat 0 0 !important;
 }
+div.select2-drop.select2-drop-multi li.select2-result.select2-selected-visible > .select2-result-label,
 input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn),
 [name="adminForm"] input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn),
 .flexicontent input[type="checkbox"]:checked + label:not(.plupload_button):not(.btn) {
