@@ -64,6 +64,7 @@ $this->document->addScriptDeclaration($js);
 				</td>
 				<td>
 					<?php echo $form->getInput('name'); ?>
+					<input type="hidden" id="jform_title" name="jform[title]" value="<?php echo $this->form->getValue('name'); ?>" />
 					
 					<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo '<b>'.JText::_('FLEXI_NOTES').'</b><br/>'.JText::_('FLEXI_FIELDNAME_CHANGE_WARNING'); ?>">
 						<?php echo $warn_image; ?>
@@ -170,7 +171,7 @@ $this->document->addScriptDeclaration($js);
 
 				<table class="fc-form-tbl">
 					<tr>
-						<td colspan="2" style="padding-top:24px;">
+						<td style="padding-top:24px;">
 							<?php $box_class = $this->row->iscore ? 'fc-info' : ($this->typesselected ? 'fc-success' : 'fc-warning'); ?>
 							<span class="<?php echo $box_class; ?> fc-mssg" style="width:90%; margin:6px 0px 0px 0px !important;">
 								<?php echo JText::_( $this->row->iscore ? 'FLEXI_SELECT_TYPES_CORE_NOTES' : 'FLEXI_SELECT_TYPES_CUSTOM_NOTES' ); ?>
@@ -178,7 +179,7 @@ $this->document->addScriptDeclaration($js);
 						</td>
 					</tr>
 					<tr>
-						<td colspan="2">
+						<td>
 							<span class="label label-warning" style="vertical-align:middle;">
 								<?php echo JText::_( 'FLEXI_TYPES' ); ?>
 							</span>
@@ -392,9 +393,12 @@ $this->document->addScriptDeclaration($js);
 					<h3 class="tabberheading hasTooltip" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
 					<?php $i = 0; ?>
 					<?php foreach ($form->getFieldset($name) as $field) {
-						$_depends = FLEXI_J30GE ? $field->getAttribute('depend_class') :
-							$form->getFieldAttribute($field->__get('fieldname'), 'depend_class', '', 'attribs');
-						echo '
+						$_depends = $field->getAttribute('depend_class');
+
+						if ( $field->getAttribute('box_type') )
+							echo $field->input;
+						else
+							echo '
 						<fieldset class="panelform'.($i ? '' : ' fc-nomargin').' '.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
 							'.($field->label ? '
 								<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>

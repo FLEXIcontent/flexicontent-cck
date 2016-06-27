@@ -185,9 +185,9 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		}
 
 		if (substr($level, 0, 5)=='level')
-		{
 			$class = 'fcsep_'.$level;
-		}
+		else
+			$class = '';
 		
 		if ($_class) {
 			$class .= ' '.$_class;

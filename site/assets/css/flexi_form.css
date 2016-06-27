@@ -439,16 +439,17 @@ div.control-group:first-of-type > div > .fcsep_level2 {
 }
 .fcsep_level3 {
 	background-color: #9fe1ff;
+	border: 1px solid #96c7ef;
 	color: #3a579d;
-	padding: 0.4em 2em;
-	margin: 5px 5% 1px;
+	padding: 0.3em 2em;
+	margin: 4px 5% 1px;
 	display: block;
 	position: relative;
 	border-radius: 5px;
 	clear: both;
 	float: left;
 	width: auto;
-	font-size: 13px;
+	font-size: 12px;
 }
 .fcsep_level4 {
 	background: #f7f7f7;
@@ -466,7 +467,7 @@ div.control-group:first-of-type > div > .fcsep_level2 {
 	max-width: 60%;
 }
 body .alert.fcpadded {
-	margin: 0px 48px;
+	margin: 4px 48px 2px;
 	box-sizing: border-box;
 	max-width: 92%;
 }

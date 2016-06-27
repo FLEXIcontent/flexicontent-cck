@@ -73,7 +73,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			if ($task=='uploads') {
 				die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "'.JText::_( 'FLEXI_ALERTNOTAUTH' ).'"}, "id" : "id"}');
 			} else {
-				JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 				$this->setRedirect( $this->return_url, '');
 			}
 			return;
@@ -621,7 +621,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			$this->setRedirect( $_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER'] : 'index.php?option=com_flexicontent&view=filemanager', '');
 			return;
 		}
@@ -692,7 +692,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			$this->setRedirect( $this->return_url, '');
 			return;
 		}
@@ -773,7 +773,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$file		= $model->getFile();
 
 		$task = $jinput->get('task', '', 'cmd');
-		$post = $jinput->post->getArray();  // Default filtering will remove HTML
+		$data = $jinput->post->getArray();  // Default filtering will remove HTML
 
 		// calculate access
 		$canedit = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
@@ -782,33 +782,33 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
 			return;
 		}
 
-		$post['secure'] = $post['secure'] ? 1 : 0;   // only allow 1 or 0
-		$post['url'] = $post['url'] ? 1 : 0;   // only allow 1 or 0
+		$data['secure'] = $data['secure'] ? 1 : 0;   // only allow 1 or 0
+		$data['url'] = $data['url'] ? 1 : 0;   // only allow 1 or 0
 
-		$path = $post['secure'] ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
-		$file_path = JPath::clean($path . $post['filename']);
+		$path = $data['secure'] ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
+		$file_path = JPath::clean($path . $data['filename']);
 
 		// Get file size if local file
-		if (!$post['url'])
+		if (!$data['url'])
 		{
-			$post['size'] = file_exists($file_path) ? filesize($file_path) : 0;
+			$data['size'] = file_exists($file_path) ? filesize($file_path) : 0;
 		}
 		else
 		{
 			$arr_sizes = array('KBs'=>1024, 'MBs'=>(1024*1024), 'GBs'=>(1024*1024*1024));
-			$size_unit = (int) @ $arr_sizes[$post['size_unit']];
+			$size_unit = (int) @ $arr_sizes[$data['size_unit']];
 			if ( $size_unit )
-				$post['size'] = ((int)$post['size']) * $size_unit;
+				$data['size'] = ((int)$data['size']) * $size_unit;
 			else
-				$post['size'] = 0;
+				$data['size'] = 0;
 		}
 
-		if ($model->store($post))
+		if ($model->store($data))
 		{
 			switch ($task)
 			{
@@ -863,7 +863,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
 			return;
 		}
@@ -940,7 +940,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			$this->setRedirect( $this->return_url, '');
 			return;
 		}
@@ -1018,7 +1018,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			$this->setRedirect( $this->return_url, '');
 			return;
 		}
