@@ -42,9 +42,13 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	 * @var		string
 	 */
 	var	$_name = 'separator';
+	
+	static $css_js_added = null;
+	static $tab_css_js_added = null;
 		
 	function add_css_js()
 	{
+		self::$css_js_added = true;
 		$css = "
 		div.pane-sliders ul.adminformlist li select { margin-bottom: 0px;}
 		div.pane-sliders ul.adminformlist li fieldset  { margin: 0; padding: 0; }
@@ -120,13 +124,12 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		if ($option!='com_flexicontent') {
 			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', FLEXI_VHASH);  // NOTE: this is imported by main Frontend/Backend CSS file
 			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', FLEXI_VHASH);  // NOTE: this is imported by main Frontend/Backend CSS file
+			
 			// Add flexicontent specific TABBing to non-flexicontent views
-			$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
-			$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
-			$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
+			$this->add_tab_css_js();
 		}
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+		JHtml::_('behavior.framework', true);
 		flexicontent_html::loadJQuery();
 		
 		// Add js function to overload the joomla submitform validation
@@ -136,53 +139,116 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		
 		$document->addStyleSheetVersion(JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css', FLEXI_VHASH);
 	}
-	
-	
+
+
+	function add_tab_css_js()
+	{
+		self::$tab_css_js_added = true;
+		$document = JFactory::getDocument();
+		
+		// Load JS tabber lib
+		$document->addScriptVersion(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', FLEXI_VHASH);
+		$document->addStyleSheetVersion(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css', FLEXI_VHASH);
+		$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+	}
+
+
 	function getLabel() {
 		return "";
 	}
-	
+
+
 	function getInput()
 	{
-		static $js_css_added = null;
-		if ($js_css_added===null) {
+		static $tabset_id = 0;
+		static $tab_id;
+
+		if (self::$css_js_added===null)
+		{
 			$this->add_css_js();
-			$js_css_added = true;
 		}
 		
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
 		
-		$level = @$attributes['level'];
-		$description = @$attributes['description'];
-		$initial_tbl_hidden = @$attributes['initial_tbl_hidden'];
 		$value = $this->element['default'];
+		$description = @$attributes['description'];
+
+		$level = @$attributes['level'];
+		$_class = @$attributes['class'];
+		$_style = @$attributes['style'];
 		
-		if (in_array($level, array('tblbreak','tabs_start','tab_open','tab_close','tabs_end')) ) return 'do no use type "'.$level.'" in J1.6+';
+		if (self::$tab_css_js_added===null && $level=='tabset_start')
+		{
+			$this->add_tab_css_js();
+		}
+
+		if (substr($level, 0, 5)=='level')
+		{
+			$class = 'fcsep_'.$level;
+		}
 		
-		static $tab_js_css_added = false;
-		
-		$class = $level ? 'fcsep_'.$level : '';
-		$title = "";
-		if ($_class = @$attributes['class']) {
+		if ($_class) {
 			$class .= ' '.$_class;
 		}
+
 		$style = '';
-		if ($_style = @$attributes['style']) {
+		if ($_style) {
 			$style .= ' '.$_style;
 		}
-		if ($description) {
-			$class .= FLEXI_J30GE ? " hasTooltip" : " hasTip";
-			$title = flexicontent_html::getToolTip($value, $description, 1, 1);
+
+		$tip = '';
+		$title = JText::_($value);
+		$desc = JText::_($description);
+		if ($desc)
+		{
+			$class .= ' hasTooltip';
+			$tip = flexicontent_html::getToolTip($title, $desc, 0, 1);
 		}
+		$icon_class = @$attributes['icon_class'];
 		
+		$box_type = @$attributes['box_type'];
+		switch ($level)
+		{
+		case 'tabset_start':
+			$tab_id = 0;
+			if ($box_type==2)
+				return JHtml::_('tabs.start','core-tabs-cat-props-'.($tabset_id++), array('useCookie'=>1));
+			else
+				return "\n". '<div class="fctabber s-gray" id="tabset_attrs_'.($tabset_id++).'">';
+			break;
+
+		case 'tabset_close':
+			if ($box_type==2)
+				return JHtml::_('tabs.end');
+			else
+			return '
+				</div>
+			</div>';
+			break;
+
+		case 'tab_open':
+			if ($box_type==2)
+				return JHtml::_('tabs.panel', $title, 'tab_attrs_'.$tabset_id.'_'.($tab_id++));
+			return ($tab_id > 0 ? '
+				</div>' : '').'
+				<div class="tabbertab" id="tab_attrs_'.$tabset_id.'_'.($tab_id++).'" data-icon-class="'.$icon_class.'" >
+					<h3 class="tabberheading">'.$title.'</h3>
+				';
+			break;
+
+		default:
+			// Will be handled after switch
+			break;
+		}
+
 		$pad = '';
 		if ($class) $pad .= ' ';
 		else if ($level=='level0') $pad .= ' ';
 		else if ($level=='level1') $pad .= ' &nbsp; ';
 		else if ($level=='level2') $pad .= ' &nbsp; &nbsp; ';
 		else if ($level=='level3') $pad .= '';
-		return '<div style="'.$style.'" class="'.$class.'" title="'.$title.'" >'.$pad.JText::_($value).'</div><div class="fcclear"></div>';
+		return '<div style="'.$style.'" class="'.$class.'" title="'.$tip.'" >'.$pad.$title.'</div><div class="fcclear"></div>';
 	}
 }

@@ -105,7 +105,7 @@ if ( $show_mod )
 	
 	
 	// Load needed JS libs & CSS styles
-	//FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+	//JHtml::_('behavior.framework', true);
 	flexicontent_html::loadFramework('jQuery');
 	flexicontent_html::loadFramework('flexi_tmpl_common');
 	
