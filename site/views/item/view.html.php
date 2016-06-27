@@ -748,7 +748,7 @@ class FlexicontentViewItem  extends JViewLegacy
 					$app->redirect( $url );
 				} else if ($unauthorized_page) {
 					//  unauthorized page via global configuration
-					JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+					JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 					$app->redirect($unauthorized_page);
 				} else {
 					// user isn't authorize to edit this content

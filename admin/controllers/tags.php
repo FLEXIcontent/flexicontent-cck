@@ -276,7 +276,7 @@ class FlexicontentControllerTags extends FlexicontentController
 		
 		// check access
 		if ( !$is_authorised ) {
-			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', '');
 			return;
 		}

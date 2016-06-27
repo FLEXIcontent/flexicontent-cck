@@ -653,7 +653,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// check access
 		if ( !$canOrder ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 		} else if ( $model->move($dir, $ord_catid, $prev_order) ){
 			// success
 		} else {
@@ -721,7 +721,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// check access
 		if ( !$canOrder ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 		} else if (!$model->saveorder($cid, $order, $ord_catid, $prev_order)) {
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_ORDER' );
 			JError::raiseWarning( 500, $msg ." " . $model->getError() );
@@ -752,7 +752,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// check access of copy task
 		if ( !$canCopy ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			$this->setRedirect('index.php?option=com_flexicontent&view=items');
 			return false;
 		}
@@ -851,7 +851,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// check access of copy task
 		if ( !$canCopy ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
 			$this->setRedirect('index.php?option=com_flexicontent&view=items');
 			return false;
 		}

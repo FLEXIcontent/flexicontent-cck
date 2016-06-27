@@ -208,7 +208,7 @@
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
-			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC" class="use_select2_lib">
 				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
 			

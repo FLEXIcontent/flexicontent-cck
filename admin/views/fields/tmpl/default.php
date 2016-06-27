@@ -305,7 +305,7 @@ function delAllFilters() {
 			$canPublish		= in_array('publishfield', $rights);
 			$canDelete		= in_array('deletefield', $rights);
 			
-			$link 		= 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;id='. $row->id;
 			if ($row->id < 7) {  // First 6 core field are not unpublishable
 				$published 	= JHTML::image( 'administrator/components/com_flexicontent/assets/images/tick_f2.png', JText::_ ( 'FLEXI_NOT_AVAILABLE' ), ' class="fc-man-icon-s" ' );
 			} else if (!$canPublish && $row->published) {   // No privilige published
@@ -432,7 +432,7 @@ function delAllFilters() {
 				<?php
 				if (isset($row->grouping_field)) {
 					$_r = $row->grouping_field;
-					$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid='. $_r->id;
+					$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;id='. $_r->id;
 					echo '
 					<a style="padding:2px;" href="'.$_link.'" title="'.$edit_entry.'">
 						<img style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/insert_merge_field.png" title="Grouped inside: '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="fc-man-icon-s '.$tip_class.'" />
@@ -481,7 +481,7 @@ function delAllFilters() {
 					if (!empty($row->parameters) && $row->parameters->get('cascade_after'))
 					{
 						$_r = $allrows_byid[ $row->parameters->get('cascade_after') ];
-						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid='. $_r->id;
+						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;id='. $_r->id;
 						echo '
 						<a style="padding:2px;" href="'.$_link.'" title="'.$edit_entry.'">
 							<img style="max-height:24px; padding:0px; margin:0px;" alt="Note" src="components/com_flexicontent/assets/images/relationships.png" title="Cascade after (master field): '.htmlspecialchars($_r->label, ENT_QUOTES, 'UTF-8').'" class="fc-man-icon-s '.$tip_class.'" />
@@ -502,7 +502,7 @@ function delAllFilters() {
 					echo '<span class="alert alert-info" style="display: inline-block; margin: 0px 0px 1px; border-radius: 3px; width: 98%; padding: 4px 1%;">';
 					$_lbls = array();
 					foreach($grouped_fields[$row->id] as $_r) {
-						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;cid='. $_r->id;
+						$_link = 'index.php?option=com_flexicontent&amp;'.$fields_task.'edit&amp;id='. $_r->id;
 						$_lbls[] = '<a class="badge" style="border-radius:3px;" href="'.$_link.'" title="'.$edit_entry.'">'.htmlspecialchars(JText::_($_r->label), ENT_QUOTES, 'UTF-8').'</a>';
 					}
 					echo implode(' ', $_lbls);

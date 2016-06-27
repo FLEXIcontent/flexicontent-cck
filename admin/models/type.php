@@ -54,11 +54,11 @@ class FlexicontentModelType extends JModelAdmin
 		parent::__construct();
 		
 		$jinput = JFactory::getApplication()->input;
-		
+
 		$id = $jinput->get('id', array(0), 'array');
 		JArrayHelper::toInteger($id, array(0));
 		$pk = (int) $id[0];
-		
+
 		if (!$pk)
 		{
 			$cid = $jinput->get('cid', array(0), 'array');
@@ -72,7 +72,7 @@ class FlexicontentModelType extends JModelAdmin
 			$pk = (int) $data['id'];
 		}
 		$this->setId((int)$pk);
-		
+
 		$this->populateState();
 	}
 
@@ -80,18 +80,18 @@ class FlexicontentModelType extends JModelAdmin
 	 * Method to set the identifier
 	 *
 	 * @access	public
-	 * @param	int type identifier
+	 * @param	int record identifier
 	 */
 	function setId($id)
 	{
-		// Set type id and wipe data
+		// Set record id and wipe data
 		$this->_id     = $id;
 		$this->_type   = null;
 	}
 	
 
 	/**
-	 * Method to get the type identifier
+	 * Method to get the record identifier
 	 *
 	 * @access	public
 	 */
@@ -100,7 +100,7 @@ class FlexicontentModelType extends JModelAdmin
 	}
 	
 	/**
-	 * Overridden get method to get properties from the type
+	 * Overridden get method to get properties from the record
 	 *
 	 * @access	public
 	 * @param	string	$property	The name of the property
@@ -120,7 +120,7 @@ class FlexicontentModelType extends JModelAdmin
 	}
 
 	/**
-	 * Method to get type data
+	 * Method to get record data
 	 *
 	 * @access	public
 	 * @return	array
@@ -140,7 +140,7 @@ class FlexicontentModelType extends JModelAdmin
 
 
 	/**
-	 * Method to load type data
+	 * Method to load record data
 	 *
 	 * @access	private
 	 * @return	boolean	True on success
@@ -148,7 +148,7 @@ class FlexicontentModelType extends JModelAdmin
 	 */
 	function _loadType()
 	{
-		// Lets load the type if it doesn't already exist
+		// Lets load the record if it doesn't already exist
 		if ( $this->_type===null )
 		{
 			$query = 'SELECT *'
@@ -182,7 +182,7 @@ class FlexicontentModelType extends JModelAdmin
 	}
 
 	/**
-	 * Method to initialise the type data
+	 * Method to initialise the record data
 	 *
 	 * @access	private
 	 * @return	boolean	True on success
@@ -190,7 +190,7 @@ class FlexicontentModelType extends JModelAdmin
 	 */
 	function _initType()
 	{
-		// Lets load the type if it doesn't already exist
+		// Lets load the record if it doesn't already exist
 		if ( $this->_type===null )
 		{
 			$type = new stdClass();
@@ -208,7 +208,7 @@ class FlexicontentModelType extends JModelAdmin
 	}
 
 	/**
-	 * Method to checkin/unlock the type
+	 * Method to checkin/unlock the record
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -228,7 +228,7 @@ class FlexicontentModelType extends JModelAdmin
 	
 	
 	/**
-	 * Method to checkout/lock the type
+	 * Method to checkout/lock the record
 	 *
 	 * @access	public
 	 * @param	int	$uid	User ID of the user checking the item out
@@ -256,7 +256,7 @@ class FlexicontentModelType extends JModelAdmin
 	
 	
 	/**
-	 * Tests if the type is checked out
+	 * Tests if the record is checked out
 	 *
 	 * @access	public
 	 * @param	int	A user id
@@ -281,7 +281,7 @@ class FlexicontentModelType extends JModelAdmin
 	}
 
 	/**
-	 * Method to store the type
+	 * Method to store the record
 	 *
 	 * @access	public
 	 * @return	boolean	True on success
@@ -377,7 +377,8 @@ class FlexicontentModelType extends JModelAdmin
 		
 		return true;
 	}
-	
+
+
 	/**
 	 * Method to add core field relation to a type
 	 *
@@ -401,32 +402,28 @@ class FlexicontentModelType extends JModelAdmin
 		}
 	}
 
-	
-	function addtype($name) {
-		
-		$obj = new stdClass();
-		$obj->name	 	= $name;
-		$obj->published	= 1;
-		
-		$this->store($obj);
-		return true;
-	}
 
-	function _getCoreFields(){
-		
+	/**
+	 * Method to get core field ids
+	 * 
+	 * @return array
+	 * @since 1.5
+	 */
+	function _getCoreFields()
+	{
 		$query = 'SELECT id'
 				. ' FROM #__flexicontent_fields'
 				. ' WHERE iscore = 1'
 				;
 		$this->_db->setQuery($query);
 		$corefields = $this->_db->loadColumn();
-		
+
 		return $corefields;
 	}
-	
-	
+
+
 	/**
-	 * Method to get the record form.
+	 * Method to get the row form.
 	 *
 	 * @param   array    $data      An optional array of data for the form to interogate.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
@@ -447,11 +444,11 @@ class FlexicontentModelType extends JModelAdmin
 		}
 		$form->option = $this->option;
 		$form->context = $this->getName();
-		
+
 		return $form;
 	}
-	
-	
+
+
 	/**
 	 * Method to get the data that should be injected in the form.
 	 *
@@ -464,10 +461,10 @@ class FlexicontentModelType extends JModelAdmin
 		// Check the session for previously entered form data.
 		$app = JFactory::getApplication();
 		$data = $app->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
-		
+
 		// Clear form data from session ?
 		$app->setUserState('com_flexicontent.edit.'.$this->getName().'.data', false);
-		
+
 		if (empty($data)) {
 			$data = $this->getItem($this->_id);
 		}
@@ -476,6 +473,7 @@ class FlexicontentModelType extends JModelAdmin
 		
 		return $data;
 	}
+
 
 	/**
 	 * Override JModelAdmin::preprocessForm to ensure the correct plugin group is loaded.
@@ -585,13 +583,14 @@ class FlexicontentModelType extends JModelAdmin
 	}
 	
 	/**
-	 * Method to get type attributes
+	 * Method to get record attributes
 	 *
 	 * Note. Calling getState in this method will result in recursion.
 	 *
 	 * @since	1.6
 	 */
-	public function getAttribs() {
+	public function getAttribs()
+	{
 		if($this->_type) {
 			return $this->_type->attribs;
 		}

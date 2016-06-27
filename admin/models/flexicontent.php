@@ -1611,14 +1611,23 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		$db = $this->_db;
 		$component_name = 'com_flexicontent';
-		
+
+
 		// DELETE old namespace (flexicontent.*) permissions of v2.0beta, we do not try to rename them ... instead we will use com_content (for some of them),
 		$query = $db->getQuery(true)->delete('#__assets')->where('name LIKE ' . $db->quote('flexicontent.%'));
 		$db->setQuery($query);
 		
 		try { $db->execute(); } catch (Exception $e) { }
 		if ($db->getErrorNum()) echo $db->getErrorMsg();
+
+		// DELETE bad top-level assets, only root.1 should exist
+		$query = $db->getQuery(true)->delete('#__assets')->where('(parent_id=0 OR level=0) AND name<>' . $db->quote('root.1'));
+		$db->setQuery($query);
 		
+		try { $db->execute(); } catch (Exception $e) { }
+		if ($db->getErrorNum()) echo $db->getErrorMsg();
+
+
 		// SET Access View Level to public (=1) for fields that do not have their Level set
 		$query = $db->getQuery(true)->update('#__flexicontent_fields')->set('access = 1')->where('access = 0');
 		$db->setQuery($query);
