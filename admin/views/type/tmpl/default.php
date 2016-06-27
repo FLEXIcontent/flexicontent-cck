@@ -150,14 +150,18 @@ $this->document->addScriptDeclaration($js);
 			
 			foreach ($this->form->getFieldset($fsname) as $field) :
 				$_depends = $field->getAttribute('depend_class');
-				echo '
-				<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
-					'.($field->label ? '
-						<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
-						<div class="container_fcfield">'.$field->input.'</div>
-					' : $field->input).'
-				</fieldset>
-				';
+				if ( $field->getAttribute('box_type') )
+					echo $field->input;
+				else
+					echo '
+					<fieldset class="panelform'.($_depends ? ' '.$_depends : '').'" id="'.$field->id.'-container">
+						'.($field->label ? '
+							<span class="label-fcouter">'.str_replace('class="', 'class="label label-fcinner ', $field->label).'</span>
+							<div class="container_fcfield">'.$field->input.'</div>
+						' : $field->input).'
+					</fieldset>
+					';
+					
 			endforeach;
 		?>
 		</div>

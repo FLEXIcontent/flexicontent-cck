@@ -129,6 +129,7 @@
 		<!--field name="keyref" type="text" default="" label="Key Reference" description="A Unique Key which can be used to undentify the item in the URL, like &amp;key=keyref, note this is currently unusued" size="30" /-->
 		
 		<field name="" type="separator" default="FLEXI_STYLING_N_BEHAVIOUR" label="" level="level1" />
+		<field name="" type="separator" default="FLEXI_ITEM_VIEW_CSS_JS_WARNING" label="" level="level4" class="alert alert-warning" />
 		<field name="view_extra_css_fe" type="textarea" default="" rows="5" cols="36" label="FLEXI_ITEM_VIEW_CSS" description="FLEXI_ITEM_VIEW_CSS_DESC" />
 		<field name="view_extra_js_fe" type="textarea" default="" rows="5" cols="36" label="FLEXI_ITEM_VIEW_JS" description="FLEXI_ITEM_VIEW_JS_DESC" />
 	</fieldset>

@@ -473,7 +473,7 @@ if ( !$this->params->get('auto_title', 0) || $this->params->get('usetitle_fe', 1
 		$tabCnt[$tabSetCnt] = 0;
 		?>
 		<!-- tabber start -->
-		<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+		<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 			<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 				<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 				<?php echo $this->form->getInput('title');?>
@@ -523,7 +523,7 @@ if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 		$tabCnt[$tabSetCnt] = 0;
 		?>
 		<!-- tabber start -->
-		<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+		<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 			<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 				<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 				<?php echo $this->form->getInput('alias');?>
@@ -972,7 +972,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 					$tabCnt[$tabSetCnt] = 0;
 					?>
 					<!-- tabber start -->
-					<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+					<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 							<?php echo $this->form->getInput('metadesc'); ?>
@@ -1011,7 +1011,7 @@ if ( $typeid && $this->params->get('usemetadata_fe', 1) ) : ob_start(); // metad
 					$tabCnt[$tabSetCnt] = 0;
 					?>
 					<!-- tabber start -->
-					<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+					<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
 							<?php echo $this->form->getInput('metakey'); ?>
@@ -1345,7 +1345,7 @@ if ($this->fields && $typeid) :
 				$tabCnt[$tabSetCnt] = 0;
 				?>
 				<!-- tabber start -->
-				<div class="fctabber tabber-inline tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
+				<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 					<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" style="padding: 0px;">
 						<h3 class="tabberheading"> <?php echo '- '.$this->itemlang->name.' -'; // $t->name; ?> </h3>
 						<?php

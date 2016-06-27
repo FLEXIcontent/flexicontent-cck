@@ -1652,7 +1652,7 @@ class flexicontent_html
 			
 			case 'noobSlide':
 				// Make sure mootools are loaded
-				FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+				JHtml::_('behavior.framework', true);
 				
 				$framework_path = JURI::root(true).$lib_path.'/noobSlide';
 				//$document->addScript($framework_path.'/_class.noobSlide.js');
@@ -3541,7 +3541,7 @@ class flexicontent_html
 			$addremove_tip = flexicontent_html::getToolTip($text, $overlib, 1, 1);
 			
 			// Make sure mootools are loaded before our js
-			//FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+			//JHtml::_('behavior.framework', true);
 			
 			// Load tooltips JS
 			if ($cparams->get('add_tooltips', 1)) JHtml::_('bootstrap.tooltip');
