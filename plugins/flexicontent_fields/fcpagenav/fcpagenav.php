@@ -188,8 +188,6 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout ? 'value_'.$viewlayout : 'value_default';
 		
-		//$this->values = $values;
-		//$this->displayFieldValue( $prop, $viewlayout );
 		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
 		
 		

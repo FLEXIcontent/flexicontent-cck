@@ -185,12 +185,12 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		}
 
 		if (substr($level, 0, 5)=='level')
-			$class = 'fcsep_'.$level;
+			$classes = 'fcsep_'.$level;
 		else
-			$class = '';
+			$classes = '';
 		
 		if ($_class) {
-			$class .= ' '.$_class;
+			$classes .= ' '.$_class;
 		}
 
 		$style = '';
@@ -203,8 +203,8 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		$desc = JText::_($description);
 		if ($desc)
 		{
-			$class .= ' hasTooltip';
-			$tip = flexicontent_html::getToolTip($title, $desc, 0, 1);
+			$classes .= ' hasTooltip';
+			$tip = 'title="'.flexicontent_html::getToolTip($title, $desc, 0, 1).'"';
 		}
 		$icon_class = @$attributes['icon_class'];
 		
@@ -234,7 +234,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			return ($tab_id > 0 ? '
 				</div>' : '').'
 				<div class="tabbertab" id="tab_attrs_'.$tabset_id.'_'.($tab_id++).'" data-icon-class="'.$icon_class.'" >
-					<h3 class="tabberheading">'.$title.'</h3>
+					<h3 class="tabberheading '.$classes.'" '.$tip.'>'.$title.'</h3>
 				';
 			break;
 
@@ -243,12 +243,6 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			break;
 		}
 
-		$pad = '';
-		if ($class) $pad .= ' ';
-		else if ($level=='level0') $pad .= ' ';
-		else if ($level=='level1') $pad .= ' &nbsp; ';
-		else if ($level=='level2') $pad .= ' &nbsp; &nbsp; ';
-		else if ($level=='level3') $pad .= '';
-		return '<div style="'.$style.'" class="'.$class.'" title="'.$tip.'" >'.$pad.$title.'</div><div class="fcclear"></div>';
+		return '<div style="'.$style.'" class="'.$classes.'" '.$tip.' >'.$title.'</div><div class="fcclear"></div>';
 	}
 }
