@@ -452,8 +452,6 @@ class plgFlexicontent_fieldsEmail extends FCField
 		
 		// Create field's HTML, using layout file
 		$field->{$prop} = array();
-		//$this->values = $values;
-		//$this->displayFieldValue( $prop, $viewlayout );
 		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
 		
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opetag, closetag, value separator

@@ -800,8 +800,6 @@ class plgFlexicontent_fieldsRadioimage extends FCField
 		$field->{$prop} = array();
 		$display_index = array();
 		
-		//$this->values = $values;
-		//$this->displayFieldValue( $prop, $viewlayout );
 		include(self::getViewPath($this->fieldtypes[0], $viewlayout));
 		
 		

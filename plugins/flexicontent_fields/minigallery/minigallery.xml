@@ -102,7 +102,7 @@
 				<option value="0">FLEXI_NO</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_DEFAULT" description="" level="level3" depend_class="inline-edit-on" />
+			<field name="" type="separator" default="FLEXI_DEFAULTS" description="" level="level3" depend_class="inline-edit-on" />
 			<field name="iform_title_default" type="text" default="" label="FLEXI_TITLE" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
 			<field name="iform_desc_default" type="text" default="" label="FLEXI_DESCRIPTION" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
 			<field name="iform_lang_default" type="fclanguage" default="*" label="FLEXI_LANGUAGE" description="FLEXI_FIELD_DEFAULT_VALUE" depend_class="inline-edit-on" class="btn-group btn-group-yesno" />
